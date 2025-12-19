@@ -35,28 +35,26 @@ namespace
 char constexpr const* const RequestBodyKey{ "requestBody" };
 char constexpr const* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
-[[nodiscard]] int64_t nextTag()
+[[nodiscard]] int64_t nextId()
 {
-    static int64_t tag = {};
-    return tag++;
+    static int64_t id = {};
+    return id++;
 }
 
-[[nodiscard]] std::pair<tr_variant, int64_t> buildRequest(tr_quark const method, tr_variant* args)
+[[nodiscard]] std::pair<tr_variant, int64_t> buildRequest(tr_quark const method, tr_variant* params)
 {
-    auto const tag = nextTag();
+    auto const id = nextId();
 
-    // TODO(ckerr): JSON-RPCize
-    auto req = tr_variant::Map{ 3U };
+    auto req = tr_variant::Map{ 4U };
+    req.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
     req.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(method));
-    req.try_emplace(TR_KEY_tag, tag);
-    if (args != nullptr)
+    req.try_emplace(TR_KEY_id, id);
+    if (params != nullptr)
     {
-        auto tmp = tr_variant{};
-        std::swap(tmp, *args);
-        req.try_emplace(TR_KEY_arguments, std::move(tmp));
+        req.try_emplace(TR_KEY_params, params->clone());
     }
 
-    return { std::move(req), tag };
+    return { std::move(req), id };
 }
 } // namespace
 
@@ -94,7 +92,7 @@ void RpcClient::start(QUrl const& url)
 
 RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 {
-    auto [req, tag] = buildRequest(method, args);
+    auto [req, id] = buildRequest(method, args);
     req = api_compat::convert_outgoing_data(req);
 
     auto promise = QFutureInterface<RpcResponse>{};
@@ -105,7 +103,7 @@ RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 
     if (session_ != nullptr)
     {
-        sendLocalRequest(req, promise, tag);
+        sendLocalRequest(req, promise, id);
     }
     else if (!url_.isEmpty())
     {
@@ -156,14 +154,14 @@ void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcR
     }
 }
 
-void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResponse> const& promise, int64_t tag)
+void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResponse> const& promise, int64_t const id)
 {
     if (verbose_)
     {
         fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(req));
     }
 
-    local_requests_.try_emplace(tag, promise);
+    local_requests_.try_emplace(id, promise);
     tr_rpc_request_exec(
         session_,
         req,
