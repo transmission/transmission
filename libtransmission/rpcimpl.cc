@@ -2658,7 +2658,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_sequential_download:
         return session.sequential_download();
     case TR_KEY_session_id:
-    case TR_KEY_session_id_kebab:
         return session.sessionId();
     case TR_KEY_speed_limit_down:
     case TR_KEY_speed_limit_down_kebab:
