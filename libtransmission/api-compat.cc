@@ -41,7 +41,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_alt_speed_up, TR_KEY_alt_speed_up_kebab_APICOMPAT },
     { TR_KEY_announce_state, TR_KEY_announce_state_camel },
     { TR_KEY_anti_brute_force_enabled, TR_KEY_anti_brute_force_enabled_kebab_APICOMPAT },
-    { TR_KEY_anti_brute_force_threshold, TR_KEY_anti_brute_force_threshold_kebab },
+    { TR_KEY_anti_brute_force_threshold, TR_KEY_anti_brute_force_threshold_kebab_APICOMPAT },
     { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_blocklist_enabled, TR_KEY_blocklist_enabled_kebab },
     { TR_KEY_blocklist_size, TR_KEY_blocklist_size_kebab },
@@ -256,7 +256,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_announce_ip, TR_KEY_announce_ip_kebab },
     { TR_KEY_announce_ip_enabled, TR_KEY_announce_ip_enabled_kebab },
     { TR_KEY_anti_brute_force_enabled, TR_KEY_anti_brute_force_enabled_kebab_APICOMPAT },
-    { TR_KEY_anti_brute_force_threshold, TR_KEY_anti_brute_force_threshold_kebab },
+    { TR_KEY_anti_brute_force_threshold, TR_KEY_anti_brute_force_threshold_kebab_APICOMPAT },
     { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_kebab_APICOMPAT },
     { TR_KEY_bind_address_ipv4, TR_KEY_bind_address_ipv4_kebab },
     { TR_KEY_bind_address_ipv6, TR_KEY_bind_address_ipv6_kebab },

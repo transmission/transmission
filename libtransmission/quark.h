@@ -69,7 +69,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_announce_ip_enabled, /* settings */
     TR_KEY_announce_state, /* rpc */
     TR_KEY_anti_brute_force_enabled_kebab_APICOMPAT,
-    TR_KEY_anti_brute_force_threshold_kebab, /* rpc, settings (deprecated) */
+    TR_KEY_anti_brute_force_threshold_kebab_APICOMPAT,
     TR_KEY_anti_brute_force_enabled, /* rpc, settings */
     TR_KEY_anti_brute_force_threshold, /* rpc, settings */
     TR_KEY_arguments, /* rpc */
