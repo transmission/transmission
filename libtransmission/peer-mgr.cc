@@ -442,6 +442,8 @@ public:
               tor_in->started_.observe([this](tr_torrent*) { on_torrent_started(); }),
               tor_in->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }),
               tor_in->swarm_is_all_upload_only_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_upload_only(); }),
+              tor_in->files_wanted_changed_.observe([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool)
+                                                    { mark_desired_available_dirty(); }),
           } }
     {
         rebuild_webseeds();
@@ -560,7 +562,7 @@ public:
             ++stats.known_peer_from_count[from];
         }
 
-        mark_all_upload_only_flag_dirty();
+        mark_swarm_piece_completeness_dirty();
 
         return peer_info;
     }
@@ -600,21 +602,21 @@ public:
 
         case tr_peer_event::Type::ClientGotHave:
             s->got_have.emit(s->tor, event.pieceIndex);
-            s->mark_all_upload_only_flag_dirty();
+            s->mark_swarm_piece_completeness_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotHaveAll:
             s->got_have_all.emit(s->tor);
-            s->mark_all_upload_only_flag_dirty();
+            s->mark_swarm_piece_completeness_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotHaveNone:
-            s->mark_all_upload_only_flag_dirty();
+            s->mark_swarm_piece_completeness_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotBitfield:
             s->got_bitfield.emit(s->tor, msgs->has());
-            s->mark_all_upload_only_flag_dirty();
+            s->mark_swarm_piece_completeness_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotChoke:
@@ -662,6 +664,16 @@ public:
             peer_callback_common(msgs, event, s);
             break;
         }
+    }
+
+    [[nodiscard]] uint64_t desired_available() const
+    {
+        if (!desired_available_.has_value())
+        {
+            desired_available_ = compute_desired_available();
+        }
+
+        return *desired_available_;
     }
 
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const& /*bitfield*/, tr_bitfield const& /*active requests*/>
@@ -759,9 +771,16 @@ private:
         }
     }
 
-    void mark_all_upload_only_flag_dirty() noexcept
+    TR_CONSTEXPR20 void mark_swarm_piece_completeness_dirty() noexcept
     {
         pool_is_all_upload_only_.reset();
+
+        mark_desired_available_dirty();
+    }
+
+    TR_CONSTEXPR20 void mark_desired_available_dirty() noexcept
+    {
+        desired_available_.reset();
     }
 
     void on_torrent_doomed()
@@ -787,7 +806,7 @@ private:
             peer_info->set_upload_only();
         }
 
-        mark_all_upload_only_flag_dirty();
+        mark_swarm_piece_completeness_dirty();
     }
 
     void on_piece_completed(tr_piece_index_t piece)
@@ -962,7 +981,7 @@ private:
         connectable_pool.insert_or_assign(info_this->listen_socket_address(), std::move(info_this));
 
 EXIT:
-        mark_all_upload_only_flag_dirty();
+        mark_swarm_piece_completeness_dirty();
     }
 
     bool on_got_port_duplicate_connection(tr_peerMsgs* const msgs, std::shared_ptr<tr_peer_info> info_that)
@@ -990,14 +1009,56 @@ EXIT:
         return true;
     }
 
+    // count how many bytes we want that connected peers have
+    [[nodiscard]] uint64_t compute_desired_available() const
+    {
+        if (!tor->is_running() || tor->is_stopping() || tor->is_done() || !tor->has_metainfo())
+        {
+            return 0;
+        }
+
+        if (std::empty(peers))
+        {
+            return 0;
+        }
+
+        auto available = tr_bitfield{ tor->piece_count() };
+        for (auto const& peer : peers)
+        {
+            available |= peer->has();
+        }
+
+        if (available.has_all())
+        {
+            return tor->left_until_done();
+        }
+
+        auto desired_available = uint64_t{};
+
+        for (tr_piece_index_t i = 0, n = tor->piece_count(); i < n; ++i)
+        {
+            if (tor->piece_is_wanted(i) && available.test(i))
+            {
+                desired_available += tor->count_missing_bytes_in_piece(i);
+            }
+        }
+
+        TR_ASSERT(desired_available <= tor->total_size());
+        return desired_available;
+    }
+
     // ---
 
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = 5U;
 
-    std::array<libtransmission::ObserverTag, 8> const tags_;
+    std::array<libtransmission::ObserverTag, 9U> const tags_;
 
     mutable std::optional<bool> pool_is_all_upload_only_;
+
+    // Cached value of how many bytes we want that connected peers have.
+    // See: `desired_available()` and `mark_desired_available_dirty()`
+    mutable std::optional<uint64_t> desired_available_;
 };
 
 bool tr_swarm::WishlistMediator::client_has_block(tr_block_index_t block) const
@@ -1771,47 +1832,9 @@ tr_swarm_stats tr_swarmGetStats(tr_swarm const* const swarm)
     return stats;
 }
 
-/* count how many bytes we want that connected peers have */
 uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-
-    // common shortcuts...
-
-    if (!tor->is_running() || tor->is_stopping() || tor->is_done() || !tor->has_metainfo())
-    {
-        return 0;
-    }
-
-    tr_swarm const* const swarm = tor->swarm;
-    if (swarm == nullptr || std::empty(swarm->peers))
-    {
-        return 0;
-    }
-
-    auto available = tr_bitfield{ tor->piece_count() };
-    for (auto const& peer : swarm->peers)
-    {
-        available |= peer->has();
-    }
-
-    if (available.has_all())
-    {
-        return tor->left_until_done();
-    }
-
-    auto desired_available = uint64_t{};
-
-    for (tr_piece_index_t i = 0, n = tor->piece_count(); i < n; ++i)
-    {
-        if (tor->piece_is_wanted(i) && available.test(i))
-        {
-            desired_available += tor->count_missing_bytes_in_piece(i);
-        }
-    }
-
-    TR_ASSERT(desired_available <= tor->total_size());
-    return desired_available;
+    return tor->swarm->desired_available();
 }
 
 tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i)
