@@ -369,7 +369,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_paused_torrent_count,
     TR_KEY_peer_congestion_algorithm_kebab,
     TR_KEY_peer_limit_kebab,
-    TR_KEY_peer_limit_global_kebab,
+    TR_KEY_peer_limit_global_kebab_APICOMPAT,
     TR_KEY_peer_limit_per_torrent_kebab,
     TR_KEY_peer_port_kebab,
     TR_KEY_peer_port_random_high_kebab,

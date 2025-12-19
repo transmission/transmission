@@ -2289,7 +2289,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         session->useIncompleteDir(*val);
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_peer_limit_global, TR_KEY_peer_limit_global_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit_global); val)
     {
         tr_sessionSetPeerLimit(session, *val);
     }
@@ -2611,7 +2611,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_lpd_enabled:
         return session.allowsLPD();
     case TR_KEY_peer_limit_global:
-    case TR_KEY_peer_limit_global_kebab:
         return session.peerLimit();
     case TR_KEY_peer_limit_per_torrent:
     case TR_KEY_peer_limit_per_torrent_kebab:
