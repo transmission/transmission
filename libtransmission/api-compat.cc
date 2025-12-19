@@ -45,7 +45,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_blocklist_enabled, TR_KEY_blocklist_enabled_kebab_APICOMPAT },
     { TR_KEY_blocklist_size, TR_KEY_blocklist_size_kebab_APICOMPAT },
-    { TR_KEY_blocklist_url, TR_KEY_blocklist_url_kebab },
+    { TR_KEY_blocklist_url, TR_KEY_blocklist_url_kebab_APICOMPAT },
     { TR_KEY_bytes_completed, TR_KEY_bytes_completed_camel },
     { TR_KEY_cache_size_mb, TR_KEY_cache_size_mb_kebab },
     { TR_KEY_client_is_choked, TR_KEY_client_is_choked_camel },
@@ -263,7 +263,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_blocklist_date, TR_KEY_blocklist_date_kebab },
     { TR_KEY_blocklist_enabled, TR_KEY_blocklist_enabled_kebab_APICOMPAT },
     { TR_KEY_blocklist_updates_enabled, TR_KEY_blocklist_updates_enabled_kebab },
-    { TR_KEY_blocklist_url, TR_KEY_blocklist_url_kebab },
+    { TR_KEY_blocklist_url, TR_KEY_blocklist_url_kebab_APICOMPAT },
     { TR_KEY_cache_size_mb, TR_KEY_cache_size_mb_kebab },
     { TR_KEY_compact_view, TR_KEY_compact_view_kebab },
     { TR_KEY_default_trackers, TR_KEY_default_trackers_kebab },
