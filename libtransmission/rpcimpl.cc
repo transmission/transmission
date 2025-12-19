@@ -2664,7 +2664,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_start_added_torrents:
         return !session.shouldPauseAddedTorrents();
     case TR_KEY_tcp_enabled:
-    case TR_KEY_tcp_enabled_kebab:
         return session.allowsTCP();
     case TR_KEY_trash_original_torrent_files:
     case TR_KEY_trash_original_torrent_files_kebab:
