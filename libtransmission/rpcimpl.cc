@@ -2240,7 +2240,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionUseAltSpeedTime(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>({ TR_KEY_blocklist_enabled, TR_KEY_blocklist_enabled_kebab }); val)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_blocklist_enabled); val)
     {
         session->set_blocklist_enabled(*val);
     }
@@ -2579,7 +2579,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_anti_brute_force_threshold:
         return tr_sessionGetAntiBruteForceThreshold(&session);
     case TR_KEY_blocklist_enabled:
-    case TR_KEY_blocklist_enabled_kebab:
         return session.blocklist_enabled();
     case TR_KEY_blocklist_size:
     case TR_KEY_blocklist_size_kebab:
