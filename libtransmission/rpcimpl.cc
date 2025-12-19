@@ -2381,12 +2381,12 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 
     for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
     {
-        if (auto const val = args_in.value_if<bool>({ tr_quark_convert(enabled_key), enabled_key }); val)
+        if (auto const val = args_in.value_if<bool>(enabled_key); val)
         {
             session->useScript(script, *val);
         }
 
-        if (auto const val = args_in.value_if<std::string_view>({ tr_quark_convert(script_key), script_key }); val)
+        if (auto const val = args_in.value_if<std::string_view>(script_key); val)
         {
             session->setScript(script, *val);
         }
