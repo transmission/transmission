@@ -2330,7 +2330,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetPeerPortRandomOnStart(session, *val);
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_peer_port, TR_KEY_peer_port_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_port); val)
     {
         tr_sessionSetPeerPort(session, *val);
     }
@@ -2615,7 +2615,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_peer_limit_per_torrent:
         return session.peerLimitPerTorrent();
     case TR_KEY_peer_port:
-    case TR_KEY_peer_port_kebab:
         return session.advertisedPeerPort().host();
     case TR_KEY_peer_port_random_on_start:
     case TR_KEY_peer_port_random_on_start_kebab:
