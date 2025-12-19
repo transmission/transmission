@@ -449,6 +449,38 @@ TEST_F(VariantTest, variantConstructor)
     EXPECT_EQ(var_char_nullptr.index(), tr_variant::StringIndex);
 }
 
+TEST_F(VariantTest, variantAssingmentOperator)
+{
+    auto var = tr_variant{};
+
+    var = nullptr;
+    EXPECT_EQ(var.index(), tr_variant::NullIndex);
+
+    var = true;
+    EXPECT_EQ(var.index(), tr_variant::BoolIndex);
+
+    var = false;
+    EXPECT_EQ(var.index(), tr_variant::BoolIndex);
+
+    var = 123;
+    EXPECT_EQ(var.index(), tr_variant::IntIndex);
+
+    var = 4.5;
+    EXPECT_EQ(var.index(), tr_variant::DoubleIndex);
+
+    var = "foo"sv;
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+
+    var = "foo"s;
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+
+    var = "foo";
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+
+    var = static_cast<char const*>(nullptr);
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+}
+
 TEST_F(VariantTest, mergeOverwritesDifferingTypes)
 {
     auto const variants = std::array<std::pair<tr_variant, std::string_view>, 7U>{ {
