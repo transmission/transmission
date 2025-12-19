@@ -197,7 +197,7 @@ tr_variant& tr_variant::merge(tr_variant const& that)
             if constexpr (
                 std::is_same_v<ValueType, std::monostate> || std::is_same_v<ValueType, std::nullptr_t> ||
                 std::is_same_v<ValueType, bool> || std::is_same_v<ValueType, int64_t> || std::is_same_v<ValueType, double> ||
-                std::is_same_v<ValueType, std::string_view>)
+                std::is_same_v<ValueType, std::string_view> || std::is_same_v<ValueType, std::string>)
             {
                 *this = value;
             }

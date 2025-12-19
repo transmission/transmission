@@ -413,13 +413,13 @@ public:
     template<typename Visitor>
     [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor)
     {
-        return std::visit(make_visit_adapter(std::forward<Visitor>(visitor)), val_);
+        return std::visit(std::forward<Visitor>(visitor), val_);
     }
 
     template<typename Visitor>
     [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor) const
     {
-        return std::visit(make_visit_adapter(std::forward<Visitor>(visitor)), val_);
+        return std::visit(std::forward<Visitor>(visitor), val_);
     }
 
     // Usually updates `this` to hold a clone of `that`, with two exceptions:
@@ -433,60 +433,6 @@ public:
     [[nodiscard]] tr_variant clone() const;
 
 private:
-    template<typename Visitor>
-    class VisitAdapter
-    {
-    public:
-        explicit constexpr VisitAdapter(Visitor visitor)
-            : visitor_{ std::move(visitor) }
-        {
-        }
-
-        // These ref-qualified overloads preserve the visitor's cv/ref category
-        // (lvalue/rvalue, const/non-const) to match std::visit() semantics.
-        template<typename T>
-        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) &
-        {
-            return call(*this, std::forward<T>(value));
-        }
-        template<typename T>
-        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) const&
-        {
-            return call(*this, std::forward<T>(value));
-        }
-        template<typename T>
-        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) &&
-        {
-            return call(std::move(*this), std::forward<T>(value));
-        }
-
-    private:
-        template<typename Self, typename T>
-        [[nodiscard]] static constexpr decltype(auto) call(Self&& self, T&& value)
-        {
-            auto&& visitor = std::forward<Self>(self).visitor_;
-
-            // Convert std::string to std::string_view for visitors
-            if constexpr (std::is_same_v<std::decay_t<T>, std::string>)
-            {
-                return std::invoke(std::forward<decltype(visitor)>(visitor), std::string_view{ value });
-            }
-            else
-            {
-                return std::invoke(std::forward<decltype(visitor)>(visitor), std::forward<T>(value));
-            }
-        }
-
-        Visitor visitor_;
-    };
-
-    template<typename Visitor>
-    [[nodiscard]] static constexpr auto make_visit_adapter(Visitor&& visitor)
-    {
-        using AdaptedVisitor = VisitAdapter<Visitor>;
-        return AdaptedVisitor{ std::forward<Visitor>(visitor) };
-    }
-
     std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, std::string, std::string_view, Vector, Map> val_;
 };
 
