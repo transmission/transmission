@@ -32,7 +32,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_active_torrent_count, TR_KEY_active_torrent_count_camel },
     { TR_KEY_activity_date, TR_KEY_activity_date_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_added_date, TR_KEY_added_date_camel }, // TODO(ckerr) legacy duplicate
-    { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab },
+    { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab_APICOMPAT },
     { TR_KEY_alt_speed_enabled, TR_KEY_alt_speed_enabled_kebab },
     { TR_KEY_alt_speed_time_begin, TR_KEY_alt_speed_time_begin_kebab },
     { TR_KEY_alt_speed_time_day, TR_KEY_alt_speed_time_day_kebab },
@@ -246,7 +246,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
 auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_activity_date, TR_KEY_activity_date_kebab_APICOMPAT },
     { TR_KEY_added_date, TR_KEY_added_date_kebab_APICOMPAT },
-    { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab },
+    { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab_APICOMPAT },
     { TR_KEY_alt_speed_enabled, TR_KEY_alt_speed_enabled_kebab },
     { TR_KEY_alt_speed_time_begin, TR_KEY_alt_speed_time_begin_kebab },
     { TR_KEY_alt_speed_time_day, TR_KEY_alt_speed_time_day_kebab },

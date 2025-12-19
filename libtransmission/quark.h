@@ -46,7 +46,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_added_date_camel, /* rpc (deprecated) */
     TR_KEY_added_date, /* rpc, resume file */
     TR_KEY_address, /* rpc */
-    TR_KEY_alt_speed_down_kebab, /* rpc, settings (deprecated) */
+    TR_KEY_alt_speed_down_kebab_APICOMPAT,
     TR_KEY_alt_speed_enabled_kebab, /* rpc, settings (deprecated) */
     TR_KEY_alt_speed_time_begin_kebab, /* rpc, settings (deprecated) */
     TR_KEY_alt_speed_time_day_kebab, /* rpc, settings (deprecated) */

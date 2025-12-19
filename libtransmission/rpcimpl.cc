@@ -2210,7 +2210,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetAltSpeed_KBps(session, TR_UP, *val);
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_down); val)
     {
         tr_sessionSetAltSpeed_KBps(session, TR_DOWN, *val);
     }
@@ -2564,7 +2564,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     switch (key)
     {
     case TR_KEY_alt_speed_down:
-    case TR_KEY_alt_speed_down_kebab:
         return tr_sessionGetAltSpeed_KBps(&session, TR_DOWN);
     case TR_KEY_alt_speed_enabled:
     case TR_KEY_alt_speed_enabled_kebab:
