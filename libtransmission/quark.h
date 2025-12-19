@@ -735,7 +735,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_tracker_stats,
     TR_KEY_trackers,
     TR_KEY_trash_can_enabled_kebab,
-    TR_KEY_trash_original_torrent_files_kebab,
+    TR_KEY_trash_original_torrent_files_kebab_APICOMPAT,
     TR_KEY_trash_can_enabled,
     TR_KEY_trash_original_torrent_files,
     TR_KEY_umask,

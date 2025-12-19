@@ -2385,9 +2385,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         }
     }
 
-    if (auto const val = args_in.value_if<bool>(
-            { TR_KEY_trash_original_torrent_files, TR_KEY_trash_original_torrent_files_kebab });
-        val)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_trash_original_torrent_files); val)
     {
         tr_sessionSetDeleteSource(session, *val);
     }
@@ -2666,7 +2664,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_tcp_enabled:
         return session.allowsTCP();
     case TR_KEY_trash_original_torrent_files:
-    case TR_KEY_trash_original_torrent_files_kebab:
         return session.shouldDeleteSource();
     case TR_KEY_units:
         return values_get_units();
