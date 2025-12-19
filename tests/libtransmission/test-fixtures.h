@@ -334,7 +334,7 @@ private:
         settings_map->try_emplace(TR_KEY_dht_enabled, false);
         settings_map->try_emplace(TR_KEY_message_level, verbose_ ? TR_LOG_DEBUG : TR_LOG_ERROR);
 
-        return tr_sessionInit(sandboxDir().data(), !verbose_, settings);
+        return tr_sessionInit(sandboxDir(), !verbose_, settings);
     }
 
     static void sessionClose(tr_session* session)

@@ -314,7 +314,7 @@ TEST_F(SessionTest, honorsSettings)
     {
         settings_map->insert_or_assign(key, true);
     }
-    auto* session = tr_sessionInit(sandboxDir().data(), false, settings);
+    auto* session = tr_sessionInit(sandboxDir(), false, settings);
 
     // confirm that these settings were enabled
     EXPECT_TRUE(session->isPortRandom());

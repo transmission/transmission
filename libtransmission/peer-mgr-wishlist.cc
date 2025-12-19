@@ -334,7 +334,9 @@ private:
         for (tr_piece_index_t piece = 0U, idx_c = 0U; piece < n_pieces; ++piece)
         {
             auto const existing_candidate = idx_c < n_old_c && piece == candidates_[idx_c].piece;
-            if (mediator_.client_wants_piece(piece))
+            auto const client_wants_piece = mediator_.client_wants_piece(piece);
+            auto const client_has_piece = mediator_.client_has_piece(piece);
+            if (client_wants_piece && !client_has_piece)
             {
                 if (existing_candidate)
                 {

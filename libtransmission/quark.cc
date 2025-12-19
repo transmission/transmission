@@ -568,22 +568,38 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "session_id"sv, // rpc
     "session_set"sv, // rpc
     "session_stats"sv, // rpc
+    "show-active",
+    "show-all",
     "show-backup-trackers"sv, // gtk app, qt app
+    "show-downloading",
+    "show-error",
     "show-extra-peer-details"sv, // gtk app
     "show-filterbar"sv, // gtk app, qt app
+    "show-finished",
     "show-notification-area-icon"sv, // gtk app, qt app
     "show-options-window"sv, // gtk app, qt app
+    "show-paused",
+    "show-seeding",
     "show-statusbar"sv, // gtk app, qt app
     "show-toolbar"sv, // gtk app, qt app
     "show-tracker-scrapes"sv, // gtk app, qt app
+    "show-verifying",
+    "show_active",
+    "show_all",
     "show_backup_trackers"sv, // gtk app, qt app
+    "show_downloading",
+    "show_error",
     "show_extra_peer_details"sv, // gtk app
     "show_filterbar"sv, // gtk app, qt app
+    "show_finished",
     "show_notification_area_icon"sv, // gtk app, qt app
     "show_options_window"sv, // gtk app, qt app
+    "show_paused",
+    "show_seeding",
     "show_statusbar"sv, // gtk app, qt app
     "show_toolbar"sv, // gtk app, qt app
     "show_tracker_scrapes"sv, // gtk app, qt app
+    "show_verifying",
     "sitename"sv, // rpc
     "size-bytes"sv, // rpc
     "size-units"sv, // rpc
@@ -594,8 +610,28 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "sleep-per-seconds-during-verify"sv, // tr_session::Settings
     "sleep_per_seconds_during_verify"sv, // tr_session::Settings
     "socket_address"sv, // .resume
+    "sort-by-activity", // gtk app, qt app
+    "sort-by-age", // gtk app, qt app
+    "sort-by-eta", // gtk app, qt app
+    "sort-by-id", // gtk app, qt app
+    "sort-by-name", // gtk app, qt app
+    "sort-by-progress", // gtk app, qt app
+    "sort-by-queue", // gtk app, qt app
+    "sort-by-ratio", // gtk app, qt app
+    "sort-by-size", // gtk app, qt app
+    "sort-by-state", // gtk app, qt app
     "sort-mode"sv, // gtk app, qt app
     "sort-reversed"sv, // gtk app, qt app
+    "sort_by_activity", // gtk app, qt app
+    "sort_by_age", // gtk app, qt app
+    "sort_by_eta", // gtk app, qt app
+    "sort_by_id", // gtk app, qt app
+    "sort_by_name", // gtk app, qt app
+    "sort_by_progress", // gtk app, qt app
+    "sort_by_queue", // gtk app, qt app
+    "sort_by_ratio", // gtk app, qt app
+    "sort_by_size", // gtk app, qt app
+    "sort_by_state", // gtk app, qt app
     "sort_mode"sv, // gtk app, qt app
     "sort_reversed"sv, // gtk app, qt app
     "source"sv, // .torrent
