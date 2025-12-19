@@ -18,6 +18,8 @@
 #include "TrackerModel.h"
 #include "Utils.h"
 
+using namespace transmission::app;
+
 /***
 ****
 ***/
