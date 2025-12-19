@@ -30,6 +30,7 @@
 
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::getValue;
+namespace api_compat = libtransmission::api_compat;
 
 // ---
 
@@ -411,6 +412,7 @@ Prefs::~Prefs()
     }
 
     settings.merge(current_settings);
+    settings = api_compat::convert_outgoing_data(settings);
     serde.to_file(settings, filename);
 }
 
