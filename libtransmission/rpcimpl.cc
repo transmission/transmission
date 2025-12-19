@@ -2264,7 +2264,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetQueueStalledEnabled(session, *val);
     }
 
-    if (auto const val = args_in.value_if<std::string_view>({ TR_KEY_default_trackers, TR_KEY_default_trackers_kebab }); val)
+    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_default_trackers); val)
     {
         session->setDefaultTrackers(*val);
     }
@@ -2588,7 +2588,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_config_dir:
         return session.configDir();
     case TR_KEY_default_trackers:
-    case TR_KEY_default_trackers_kebab:
         return session.defaultTrackersStr();
     case TR_KEY_dht_enabled:
     case TR_KEY_dht_enabled_kebab:
