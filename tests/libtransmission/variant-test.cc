@@ -629,26 +629,6 @@ TEST_F(VariantTest, mapContains)
     EXPECT_FALSE(map->contains(key));
 }
 
-TEST_F(VariantTest, visitStringExposesStringView)
-{
-    static auto const Text = "visit-string"sv;
-    auto var = tr_variant{ std::string{ Text } };
-    auto called = false;
-
-    var.visit(
-        Overloaded{ [&](std::string_view sv)
-                    {
-                        called = true;
-                        EXPECT_EQ(Text, sv);
-                    },
-                    // clang-format off: TODO: remove when we bump to clang-format >= 21
-                    [](auto&&) { FAIL(); } }
-    );
-    // clang-format on
-
-    EXPECT_TRUE(called);
-}
-
 TEST_F(VariantTest, visitConstVariant)
 {
     auto var = tr_variant::make_vector(1U);
@@ -708,7 +688,8 @@ TEST_F(VariantTest, visitsNodesDepthFirst)
                     std::is_same_v<ValueType, int64_t> || //
                     std::is_same_v<ValueType, std::monostate> || //
                     std::is_same_v<ValueType, std::nullptr_t> || //
-                    std::is_same_v<ValueType, std::string_view>)
+                    std::is_same_v<ValueType, std::string_view> || //
+                    std::is_same_v<ValueType, std::string>)
                 {
                     flattened.emplace_back(val);
                 }
