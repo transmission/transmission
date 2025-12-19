@@ -62,7 +62,8 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab_APICOMPAT },
     { TR_KEY_done_date, TR_KEY_done_date_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_download_count, TR_KEY_download_count_camel },
-    { TR_KEY_download_dir, TR_KEY_download_dir_kebab }, // crazy case 1: camel in torrent-get/set, kebab everywhere else
+    { TR_KEY_download_dir,
+      TR_KEY_download_dir_kebab_APICOMPAT }, // crazy case 1: camel in torrent-get/set, kebab everywhere else
     { TR_KEY_download_dir_free_space, TR_KEY_download_dir_free_space_kebab },
     { TR_KEY_download_limit, TR_KEY_download_limit_camel },
     { TR_KEY_download_limited, TR_KEY_download_limited_camel },
@@ -271,7 +272,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_details_window_width, TR_KEY_details_window_width_kebab },
     { TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab_APICOMPAT },
     { TR_KEY_done_date, TR_KEY_done_date_kebab_APICOMPAT },
-    { TR_KEY_download_dir, TR_KEY_download_dir_kebab }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_download_dir, TR_KEY_download_dir_kebab_APICOMPAT },
     { TR_KEY_download_queue_enabled, TR_KEY_download_queue_enabled_kebab },
     { TR_KEY_download_queue_size, TR_KEY_download_queue_size_kebab },
     { TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_kebab_APICOMPAT },
@@ -509,7 +510,8 @@ struct State
     // download-dir in Tr4 session-get
     // downloadDir in Tr4 torrent-get
     // download_dir in Tr5
-    if (state.is_rpc && (src == TR_KEY_download_dir_camel || src == TR_KEY_download_dir_kebab || src == TR_KEY_download_dir))
+    if (state.is_rpc &&
+        (src == TR_KEY_download_dir_camel || src == TR_KEY_download_dir_kebab_APICOMPAT || src == TR_KEY_download_dir))
     {
         if (state.style == Style::Tr5)
         {
@@ -521,7 +523,7 @@ struct State
             return TR_KEY_download_dir_camel;
         }
 
-        return TR_KEY_download_dir_kebab;
+        return TR_KEY_download_dir_kebab_APICOMPAT;
     }
 
     // Crazy case:

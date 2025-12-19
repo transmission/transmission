@@ -1936,7 +1936,7 @@ void torrentAdd(tr_session* session, tr_variant::Map const& args_in, DoneCb&& do
         return;
     }
 
-    auto const download_dir = args_in.value_if<std::string_view>({ TR_KEY_download_dir, TR_KEY_download_dir_kebab });
+    auto const download_dir = args_in.value_if<std::string_view>(TR_KEY_download_dir);
     if (download_dir && tr_sys_path_is_relative(*download_dir))
     {
         done_cb(idle_data, Error::PATH_NOT_ABSOLUTE, "download directory path is not absolute"sv);
@@ -2179,7 +2179,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 {
     using namespace JsonRpc;
 
-    auto const download_dir = args_in.value_if<std::string_view>({ TR_KEY_download_dir, TR_KEY_download_dir_kebab });
+    auto const download_dir = args_in.value_if<std::string_view>(TR_KEY_download_dir);
     if (download_dir && tr_sys_path_is_relative(*download_dir))
     {
         return { Error::PATH_NOT_ABSOLUTE, "download directory path is not absolute"s };
@@ -2592,7 +2592,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_dht_enabled:
         return session.allowsDHT();
     case TR_KEY_download_dir:
-    case TR_KEY_download_dir_kebab:
         return session.downloadDir();
     case TR_KEY_download_dir_free_space:
     case TR_KEY_download_dir_free_space_kebab:
