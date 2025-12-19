@@ -553,7 +553,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_seed_idle_limit_camel,
     TR_KEY_seed_idle_mode_camel,
     TR_KEY_seed_ratio_limit_camel_APICOMPAT,
-    TR_KEY_seed_ratio_limited_camel,
+    TR_KEY_seed_ratio_limited_camel_APICOMPAT,
     TR_KEY_seed_ratio_mode_camel,
     TR_KEY_seed_idle_limit,
     TR_KEY_seed_idle_mode,
