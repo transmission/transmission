@@ -371,8 +371,9 @@ void Session::start()
     }
     else
     {
-        auto const settings = tr_sessionLoadSettings(config_dir_.toStdString());
-        session_ = tr_sessionInit(config_dir_.toUtf8().constData(), true, settings);
+        auto config_dir = config_dir_.toStdString();
+        auto const settings = tr_sessionLoadSettings(config_dir);
+        session_ = tr_sessionInit(config_dir, true, settings);
 
         rpc_.start(session_);
 

@@ -552,11 +552,10 @@ struct tr_session::init_data
     std::condition_variable_any done_cv;
 };
 
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings)
+tr_session* tr_sessionInit(std::string_view const config_dir, bool message_queueing_enabled, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(config_dir != nullptr);
     TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
 
     tr_timeUpdate(time(nullptr));
