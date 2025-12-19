@@ -2808,7 +2808,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             }
 
             args.insert_or_assign(TR_KEY_fields, std::move(fields));
-            fields.emplace_back(tr_variant::unmanaged_string(TR_KEY_torrent_get_kebab));
+            map.insert_or_assign(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_get_kebab));
             map.insert_or_assign(TR_KEY_arguments, std::move(args));
             auto top = tr_variant{ std::move(map) };
             status |= flush(rpcurl, &top, config);
