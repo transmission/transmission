@@ -2185,7 +2185,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         return { Error::PATH_NOT_ABSOLUTE, "download directory path is not absolute"s };
     }
 
-    auto const incomplete_dir = args_in.value_if<std::string_view>({ TR_KEY_incomplete_dir, TR_KEY_incomplete_dir_kebab });
+    auto const incomplete_dir = args_in.value_if<std::string_view>(TR_KEY_incomplete_dir);
     if (incomplete_dir && tr_sys_path_is_relative(*incomplete_dir))
     {
         return { Error::PATH_NOT_ABSOLUTE, "incomplete torrents directory path is not absolute"s };
@@ -2605,7 +2605,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_idle_seeding_limit_enabled:
         return session.isIdleLimited();
     case TR_KEY_incomplete_dir:
-    case TR_KEY_incomplete_dir_kebab:
         return session.incompleteDir();
     case TR_KEY_incomplete_dir_enabled:
     case TR_KEY_incomplete_dir_enabled_kebab:
