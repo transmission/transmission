@@ -530,7 +530,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_scrape_paused_torrents_enabled,
     TR_KEY_scrape_state,
     TR_KEY_script_torrent_added_enabled_kebab_APICOMPAT,
-    TR_KEY_script_torrent_added_filename_kebab,
+    TR_KEY_script_torrent_added_filename_kebab_APICOMPAT,
     TR_KEY_script_torrent_done_enabled_kebab,
     TR_KEY_script_torrent_done_filename_kebab,
     TR_KEY_script_torrent_done_seeding_enabled_kebab,
