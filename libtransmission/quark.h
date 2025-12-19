@@ -85,7 +85,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_bitfield,
     TR_KEY_blocklist_date_kebab,
     TR_KEY_blocklist_enabled_kebab_APICOMPAT,
-    TR_KEY_blocklist_size_kebab,
+    TR_KEY_blocklist_size_kebab_APICOMPAT,
     TR_KEY_blocklist_update_kebab,
     TR_KEY_blocklist_updates_enabled_kebab,
     TR_KEY_blocklist_url_kebab,

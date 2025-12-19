@@ -1796,7 +1796,6 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response, DoneCb const&
     // feed it to the session and give the client a response
     auto const blocklist_size = tr_blocklistSetContent(session, filename);
     data->args_out.try_emplace(TR_KEY_blocklist_size, blocklist_size);
-    data->args_out.try_emplace(TR_KEY_blocklist_size_kebab, blocklist_size);
     tr_sys_path_remove(filename);
     done_cb(data, Error::SUCCESS, {});
 }
@@ -2581,7 +2580,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_blocklist_enabled:
         return session.blocklist_enabled();
     case TR_KEY_blocklist_size:
-    case TR_KEY_blocklist_size_kebab:
         return tr_blocklistGetRuleCount(&session);
     case TR_KEY_blocklist_url:
     case TR_KEY_blocklist_url_kebab:
