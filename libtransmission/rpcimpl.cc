@@ -2307,7 +2307,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetDHTEnabled(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>({ TR_KEY_utp_enabled, TR_KEY_utp_enabled_kebab }); val)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_utp_enabled); val)
     {
         tr_sessionSetUTPEnabled(session, *val);
     }
@@ -2668,7 +2668,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_units:
         return values_get_units();
     case TR_KEY_utp_enabled:
-    case TR_KEY_utp_enabled_kebab:
         return session.allowsUTP();
     case TR_KEY_version:
         return LONG_VERSION_STRING;

@@ -216,7 +216,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_upload_speed, TR_KEY_upload_speed_camel },
     { TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_uploaded_ever, TR_KEY_uploaded_ever_camel },
-    { TR_KEY_utp_enabled, TR_KEY_utp_enabled_kebab },
+    { TR_KEY_utp_enabled, TR_KEY_utp_enabled_kebab_APICOMPAT },
     { TR_KEY_webseeds_sending_to_us, TR_KEY_webseeds_sending_to_us_camel },
     { TR_KEY_blocklist_update, TR_KEY_blocklist_update_kebab },
     { TR_KEY_free_space, TR_KEY_free_space_kebab },
@@ -398,7 +398,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_kebab_APICOMPAT },
     { TR_KEY_use_global_speed_limit, TR_KEY_use_global_speed_limit_kebab_APICOMPAT },
     { TR_KEY_use_speed_limit, TR_KEY_use_speed_limit_kebab_APICOMPAT },
-    { TR_KEY_utp_enabled, TR_KEY_utp_enabled_kebab },
+    { TR_KEY_utp_enabled, TR_KEY_utp_enabled_kebab_APICOMPAT },
     { TR_KEY_watch_dir, TR_KEY_watch_dir_kebab },
     { TR_KEY_watch_dir_enabled, TR_KEY_watch_dir_enabled_kebab },
     { TR_KEY_watch_dir_force_generic, TR_KEY_watch_dir_force_generic_kebab },
