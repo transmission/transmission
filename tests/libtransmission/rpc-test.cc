@@ -644,7 +644,6 @@ TEST_F(RpcTest, sessionGet)
 
     // what we expected
     static auto constexpr ExpectedKeysUnsorted = std::array{
-        TR_KEY_alt_speed_enabled_kebab,
         TR_KEY_alt_speed_time_begin_kebab,
         TR_KEY_alt_speed_time_day_kebab,
         TR_KEY_alt_speed_time_enabled_kebab,
