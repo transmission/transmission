@@ -71,7 +71,7 @@ public:
 
     tr_torrent* find_torrent(tr_torrent_id_t id) const;
 
-    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& favicon_cache() const;
+    transmission::app::FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& favicon_cache() const;
 
     /******
     *******
