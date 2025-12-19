@@ -651,7 +651,6 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_alt_speed_time_enabled,
         TR_KEY_alt_speed_time_end,
         TR_KEY_alt_speed_up,
-        TR_KEY_anti_brute_force_enabled_kebab,
         TR_KEY_anti_brute_force_threshold_kebab,
         TR_KEY_anti_brute_force_enabled,
         TR_KEY_anti_brute_force_threshold,
