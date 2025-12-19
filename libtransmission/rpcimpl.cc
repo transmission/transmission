@@ -2294,7 +2294,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetPeerLimit(session, *val);
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_peer_limit_per_torrent, TR_KEY_peer_limit_per_torrent_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit_per_torrent); val)
     {
         tr_sessionSetPeerLimitPerTorrent(session, *val);
     }
@@ -2613,7 +2613,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_peer_limit_global:
         return session.peerLimit();
     case TR_KEY_peer_limit_per_torrent:
-    case TR_KEY_peer_limit_per_torrent_kebab:
         return session.peerLimitPerTorrent();
     case TR_KEY_peer_port:
     case TR_KEY_peer_port_kebab:
