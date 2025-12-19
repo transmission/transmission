@@ -2205,7 +2205,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetCacheLimit_MB(session, *val);
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_alt_speed_up, TR_KEY_alt_speed_up_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_up); val)
     {
         tr_sessionSetAltSpeed_KBps(session, TR_UP, *val);
     }
@@ -2576,7 +2576,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_alt_speed_time_end:
         return tr_sessionGetAltSpeedEnd(&session);
     case TR_KEY_alt_speed_up:
-    case TR_KEY_alt_speed_up_kebab:
         return tr_sessionGetAltSpeed_KBps(&session, TR_UP);
     case TR_KEY_anti_brute_force_enabled:
     case TR_KEY_anti_brute_force_enabled_kebab:

@@ -52,7 +52,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_alt_speed_time_day_kebab_APICOMPAT,
     TR_KEY_alt_speed_time_enabled_kebab_APICOMPAT,
     TR_KEY_alt_speed_time_end_kebab_APICOMPAT,
-    TR_KEY_alt_speed_up_kebab, /* rpc, settings (deprecated) */
+    TR_KEY_alt_speed_up_kebab_APICOMPAT,
     TR_KEY_alt_speed_down, /* rpc, settings */
     TR_KEY_alt_speed_enabled, /* rpc, settings */
     TR_KEY_alt_speed_time_begin, /* rpc, settings */
