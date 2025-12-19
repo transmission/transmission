@@ -2644,7 +2644,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_script_torrent_done_enabled:
         return session.useScript(TR_SCRIPT_ON_TORRENT_DONE);
     case TR_KEY_script_torrent_done_filename:
-    case TR_KEY_script_torrent_done_filename_kebab:
         return session.script(TR_SCRIPT_ON_TORRENT_DONE);
     case TR_KEY_script_torrent_done_seeding_enabled:
     case TR_KEY_script_torrent_done_seeding_enabled_kebab:
