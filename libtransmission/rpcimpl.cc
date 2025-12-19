@@ -178,6 +178,7 @@ namespace
 namespace
 {
 auto constexpr RecentlyActiveSeconds = time_t{ 60 };
+auto constexpr RpcVersion = int64_t{ 18 };
 auto constexpr RpcVersionMin = int64_t{ 14 };
 
 enum class TrFormat : uint8_t
@@ -2679,7 +2680,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         return session.reqq();
     case TR_KEY_rpc_version:
     case TR_KEY_rpc_version_kebab:
-        return TrRpcVersion;
+        return RpcVersion;
     case TR_KEY_rpc_version_minimum:
     case TR_KEY_rpc_version_minimum_kebab:
         return RpcVersionMin;

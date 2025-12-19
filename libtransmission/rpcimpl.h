@@ -11,7 +11,6 @@
 struct tr_session;
 struct tr_variant;
 
-auto inline constexpr TrRpcVersion = int64_t{ 18 };
 auto inline constexpr TrRpcVersionSemver = std::string_view{ "6.0.0" };
 
 namespace JsonRpc

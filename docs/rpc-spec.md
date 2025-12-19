@@ -826,11 +826,11 @@ to use `rpc_version_minimum` would still work on a Transmission release running
 `rpc_version`.
 
 Starting from `rpc-version-semver` 6.0.0, Transmission returns the RPC
-version in the HTTP header `X-Transmission-Rpc-Version` in the format
-`{rpc_version_semver};{rpc_version}` in the CSRF HTTP 409 response. This is so
+version in an HTTP header `X-Transmission-Rpc-Version: {rpc_version_semver}`
+in the CSRF HTTP 409 response. This is so
 that clients supporting both JSON-RPC and the old bespoke API can determine
 which scheme to use without making any extra requests.
-Example: `X-Transmission-Rpc-Version: 6.0.0;18`
+Example: `X-Transmission-Rpc-Version: 6.0.0`
 
 Breaking changes are denoted with a :bomb: emoji.
 
