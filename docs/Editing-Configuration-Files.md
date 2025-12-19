@@ -7,12 +7,13 @@ Some of Transmission's behavior can also be customized via environment variables
 # GTK / Daemon / CLI
 
 > [!IMPORTANT]
-> Transmisson 4.1.0 converted all configuration strings to snake_case.
-> 
-> Your configuration file will be converted to snake_case automatically by running and stopping Transmission.
-> Please keep a backup before upgrading if needed.
+> Transmisson 4.1.0 started a transition to convert all configuration strings to snake_case.
 >
-> The old kebab-case strings are still accepted in Transmission 4 but are deprecated and will be removed in the future.
+> The old kebab-case strings are still the default in Transmission 4, but are deprecated and will be removed in the future.
+> The new snake_case strings will become the default in Transmission 5, but you can adopt them now by starting Transmission
+> with environment variable `TR_SAVE_VERSION_FORMAT=5` (this will be the default in Transmission 5).
+>
+> You can start Transmission with `TR_SAVE_VERSION_FORMAT=4` (the default in Transmission 4) to fall back to the old format if needed.
 >
 > For documentation of the old configurations, please consult documentation from previous versions.
 > https://github.com/transmission/transmission/blob/4.0.6/docs/Editing-Configuration-Files.md
