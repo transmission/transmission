@@ -59,7 +59,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_default_trackers, TR_KEY_default_trackers_kebab_APICOMPAT },
     { TR_KEY_delete_local_data, TR_KEY_delete_local_data_kebab },
     { TR_KEY_desired_available, TR_KEY_desired_available_camel },
-    { TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab },
+    { TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab_APICOMPAT },
     { TR_KEY_done_date, TR_KEY_done_date_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_download_count, TR_KEY_download_count_camel },
     { TR_KEY_download_dir, TR_KEY_download_dir_kebab }, // crazy case 1: camel in torrent-get/set, kebab everywhere else
@@ -269,7 +269,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_default_trackers, TR_KEY_default_trackers_kebab_APICOMPAT },
     { TR_KEY_details_window_height, TR_KEY_details_window_height_kebab },
     { TR_KEY_details_window_width, TR_KEY_details_window_width_kebab },
-    { TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab },
+    { TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab_APICOMPAT },
     { TR_KEY_done_date, TR_KEY_done_date_kebab_APICOMPAT },
     { TR_KEY_download_dir, TR_KEY_download_dir_kebab }, // TODO(ckerr) legacy duplicate
     { TR_KEY_download_queue_enabled, TR_KEY_download_queue_enabled_kebab },
