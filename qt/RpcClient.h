@@ -89,7 +89,7 @@ private:
 
     void sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise);
     void sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResponse> const& promise, int64_t tag);
-    [[nodiscard]] int64_t parseResponseTag(tr_variant& response) const;
+    [[nodiscard]] int64_t parseResponseId(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
 
     std::optional<QNetworkRequest> request_;

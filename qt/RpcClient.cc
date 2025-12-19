@@ -279,31 +279,34 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
     }
 }
 
-int64_t RpcClient::parseResponseTag(tr_variant& response) const
+int64_t RpcClient::parseResponseId(tr_variant& response) const
 {
-    return dictFind<int>(&response, TR_KEY_tag).value_or(-1);
+    return dictFind<int>(&response, TR_KEY_id).value_or(-1);
 }
 
 RpcResponse RpcClient::parseResponseData(tr_variant& response) const
 {
-    RpcResponse ret;
+    auto ret = RpcResponse{};
 
-    if (auto const result = dictFind<QString>(&response, TR_KEY_result); result)
+    ret.success = false;
+    ret.errmsg = QStringLiteral("unknown error");
+
+    if (auto* response_map = response.get_if<tr_variant::Map>())
     {
-        if (*result == QStringLiteral("success"))
+        if (auto* result = response_map->find_if<tr_variant::Map>(TR_KEY_result))
         {
             ret.success = true;
+            ret.errmsg.clear();
+            ret.args = std::make_shared<tr_variant>(std::move(*result));
         }
-        else
-        {
-            ret.success = false;
-            ret.errmsg = *result;
-        }
-    }
 
-    if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
-    {
-        ret.args = std::make_shared<tr_variant>(std::move(*args));
+        if (auto* error_map = response_map->find_if<tr_variant::Map>(TR_KEY_error))
+        {
+            if (auto const errmsg = error_map->value_if<std::string_view>(TR_KEY_message))
+            {
+                ret.errmsg = QString::fromUtf8(*errmsg);
+            }
+        }
     }
 
     return ret;
