@@ -310,7 +310,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_last_scrape_timed_out,
     TR_KEY_leecher_count_camel,
     TR_KEY_leecher_count,
-    TR_KEY_left_until_done_camel,
+    TR_KEY_left_until_done_camel_APICOMPAT,
     TR_KEY_left_until_done,
     TR_KEY_length,
     TR_KEY_location,

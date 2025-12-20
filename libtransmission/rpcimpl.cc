@@ -761,7 +761,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_is_stalled:
     case TR_KEY_labels:
     case TR_KEY_left_until_done:
-    case TR_KEY_left_until_done_camel:
     case TR_KEY_magnet_link:
     case TR_KEY_magnet_link_camel:
     case TR_KEY_manual_announce_time:
@@ -924,7 +923,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_labels:
         return make_labels_vec(tor);
     case TR_KEY_left_until_done:
-    case TR_KEY_left_until_done_camel:
         return st.leftUntilDone;
     case TR_KEY_magnet_link:
     case TR_KEY_magnet_link_camel:
