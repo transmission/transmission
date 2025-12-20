@@ -93,7 +93,7 @@ void RpcClient::start(QUrl const& url)
 RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 {
     auto [req, id] = buildRequest(method, args);
-    req = api_compat::convert_outgoing_data(req);
+    api_compat::convert_outgoing_data(req);
 
     auto promise = QFutureInterface<RpcResponse>{};
     promise.setExpectedResultCount(1);
@@ -167,18 +167,19 @@ void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResp
         req,
         [this](tr_session* /*sesson*/, tr_variant&& response)
         {
-            auto converted = std::make_shared<tr_variant>(api_compat::convert_incoming_data(response));
+            api_compat::convert_incoming_data(response);
+
             if (verbose_)
             {
                 auto serde = tr_variant_serde::json();
                 serde.compact();
-                fmt::print("{:s}:{:d} got raw response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(response));
-                fmt::print("{:s}:{:d} converted response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(*converted));
+                fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(response));
             }
 
             // this callback is invoked in the libtransmission thread, so we don't want
             // to process the response here... let's push it over to the Qt thread.
-            QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, converted));
+            auto shared = std::make_shared<tr_variant>(std::move(response));
+            QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, shared));
         });
 }
 
@@ -247,7 +248,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
         if (auto var = tr_variant_serde::json().parse(json))
         {
-            var = api_compat::convert_incoming_data(*var);
+            api_compat::convert_incoming_data(*var);
 
             if (verbose_)
             {

@@ -494,10 +494,10 @@ tr_variant tr_sessionLoadSettings(std::string_view const config_dir, tr_variant 
     // ...and settings.json (if available) override the defaults
     if (auto const filename = fmt::format("{:s}/settings.json", config_dir); tr_sys_path_exists(filename))
     {
-        if (auto const file_settings = tr_variant_serde::json().parse_file(filename))
+        if (auto file_settings = tr_variant_serde::json().parse_file(filename))
         {
-            auto const incoming_style = libtransmission::api_compat::convert_incoming_data(*file_settings);
-            settings.merge(incoming_style);
+            libtransmission::api_compat::convert_incoming_data(*file_settings);
+            settings.merge(*file_settings);
         }
     }
 
@@ -518,16 +518,16 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     // - previous session's settings stored in settings.json
     // - built-in defaults
     auto settings = tr_sessionGetDefaultSettings();
-    if (auto const file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+    if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        auto const incoming_style = libtransmission::api_compat::convert_incoming_data(*file_settings);
-        settings.merge(incoming_style);
+        libtransmission::api_compat::convert_incoming_data(*file_settings);
+        settings.merge(*file_settings);
     }
     settings.merge(client_settings);
     settings.merge(tr_sessionGetSettings(session));
 
     // save 'em
-    settings = libtransmission::api_compat::convert_outgoing_data(settings);
+    libtransmission::api_compat::convert_outgoing_data(settings);
     tr_variant_serde::json().to_file(settings, filename);
 
     // write bandwidth groups limits to file

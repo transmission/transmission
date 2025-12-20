@@ -37,7 +37,7 @@ namespace
 
     if (var)
     {
-        var = api_compat::convert_incoming_data(*var);
+        api_compat::convert_incoming_data(*var);
     }
 
     return var;
@@ -88,7 +88,7 @@ void tr_stats::save() const
     map.try_emplace(TR_KEY_uploaded_bytes, saveme.uploadedBytes);
 
     auto var = tr_variant{ std::move(map) };
-    var = api_compat::convert_outgoing_data(var);
+    api_compat::convert_outgoing_data(var);
     tr_variant_serde::json().to_file(var, tr_pathbuf{ config_dir_, "/stats.json"sv });
 }
 
