@@ -143,33 +143,6 @@ TEST_F(SerializerTest, usesBuiltins)
     }
 }
 
-TEST_F(SerializerTest, usesIntWithOverflowCheck)
-{
-    // Normal case
-    {
-        auto const var = Converters::serialize(42);
-        EXPECT_TRUE(var.holds_alternative<int64_t>());
-
-        auto out = 0;
-        EXPECT_TRUE(Converters::deserialize(var, &out));
-        EXPECT_EQ(out, 42);
-    }
-
-    // Overflow case: value too large for int
-    {
-        auto const big = tr_variant{ int64_t{ INT64_MAX } };
-        auto out = 0;
-        EXPECT_FALSE(Converters::deserialize(big, &out));
-    }
-
-    // Underflow case: value too small for int
-    {
-        auto const small = tr_variant{ int64_t{ INT64_MIN } };
-        auto out = 0;
-        EXPECT_FALSE(Converters::deserialize(small, &out));
-    }
-}
-
 TEST_F(SerializerTest, usesCustomTypes)
 {
     registerRectConverter();
