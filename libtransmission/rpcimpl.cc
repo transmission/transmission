@@ -747,7 +747,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_error_string:
     case TR_KEY_eta:
     case TR_KEY_eta_idle:
-    case TR_KEY_eta_idle_camel:
     case TR_KEY_file_stats:
     case TR_KEY_file_stats_camel:
     case TR_KEY_file_count:
@@ -906,7 +905,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_eta:
         return st.eta;
     case TR_KEY_eta_idle:
-    case TR_KEY_eta_idle_camel:
         return st.etaIdle;
     case TR_KEY_file_stats:
     case TR_KEY_file_stats_camel:

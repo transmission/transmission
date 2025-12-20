@@ -184,7 +184,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_error_string_camel_APICOMPAT,
     TR_KEY_error_string,
     TR_KEY_eta,
-    TR_KEY_eta_idle_camel,
+    TR_KEY_eta_idle_camel_APICOMPAT,
     TR_KEY_eta_idle,
     TR_KEY_fields,
     TR_KEY_file_count_kebab,
