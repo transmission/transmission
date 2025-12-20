@@ -84,7 +84,7 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     {
         return;
     }
-    groups_var = libtransmission::api_compat::convert_incoming_data(*groups_var);
+    libtransmission::api_compat::convert_incoming_data(*groups_var);
 
     auto const* const groups_map = groups_var->get_if<tr_variant::Map>();
     if (groups_map == nullptr)
@@ -151,7 +151,7 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
     }
 
     auto out = tr_variant{ std::move(groups_map) };
-    out = libtransmission::api_compat::convert_outgoing_data(out);
+    libtransmission::api_compat::convert_outgoing_data(out);
     tr_variant_serde::json().to_file(out, tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
 }
 } // namespace bandwidth_group_helpers
