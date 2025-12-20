@@ -754,7 +754,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_hash_string:
     case TR_KEY_have_unchecked:
     case TR_KEY_have_valid:
-    case TR_KEY_have_valid_camel:
     case TR_KEY_honors_session_limits:
     case TR_KEY_honors_session_limits_camel:
     case TR_KEY_id:
@@ -915,7 +914,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_have_unchecked:
         return st.haveUnchecked;
     case TR_KEY_have_valid:
-    case TR_KEY_have_valid_camel:
         return st.haveValid;
     case TR_KEY_honors_session_limits:
     case TR_KEY_honors_session_limits_camel:
