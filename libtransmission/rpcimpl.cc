@@ -755,7 +755,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_have_unchecked:
     case TR_KEY_have_valid:
     case TR_KEY_honors_session_limits:
-    case TR_KEY_honors_session_limits_camel:
     case TR_KEY_id:
     case TR_KEY_is_finished:
     case TR_KEY_is_finished_camel:
@@ -916,7 +915,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_have_valid:
         return st.haveValid;
     case TR_KEY_honors_session_limits:
-    case TR_KEY_honors_session_limits_camel:
         return tor.uses_session_limits();
     case TR_KEY_id:
         return st.id;
@@ -1451,7 +1449,7 @@ namespace make_torrent_field_helpers
             tor->use_speed_limit(TR_DOWN, *val);
         }
 
-        if (auto const val = args_in.value_if<bool>({ TR_KEY_honors_session_limits, TR_KEY_honors_session_limits_camel }); val)
+        if (auto const val = args_in.value_if<bool>(TR_KEY_honors_session_limits); val)
         {
             tr_torrentUseSessionLimits(tor, *val);
         }
@@ -2054,7 +2052,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
             auto const limits = group->get_limits();
             auto group_map = tr_variant::Map{ 11U };
             group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(TR_UP));
-            group_map.try_emplace(TR_KEY_honors_session_limits_camel, group->are_parent_limits_honored(TR_UP));
             group_map.try_emplace(TR_KEY_name, name.sv());
             group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
             group_map.try_emplace(TR_KEY_speed_limit_down_enabled, limits.down_limited);
@@ -2106,7 +2103,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 
     group.set_limits(limits);
 
-    if (auto const val = args_in.value_if<bool>({ TR_KEY_honors_session_limits, TR_KEY_honors_session_limits_camel }); val)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_honors_session_limits); val)
     {
         group.honor_parent_limits(TR_UP, *val);
         group.honor_parent_limits(TR_DOWN, *val);
