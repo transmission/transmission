@@ -14,10 +14,10 @@
 
 #include "gtest/gtest.h"
 
-#include "libtransmission/net.h"
-#include "libtransmission/quark.h"
-#include "libtransmission/serializer.h"
-#include "libtransmission/variant.h"
+#include <libtransmission/net.h>
+#include <libtransmission/quark.h>
+#include <libtransmission/serializer.h>
+#include <libtransmission/variant.h>
 
 using SerializerTest = ::testing::Test;
 
