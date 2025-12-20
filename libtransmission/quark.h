@@ -272,7 +272,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_is_finished_camel_APICOMPAT,
     TR_KEY_is_incoming_camel,
     TR_KEY_is_private_camel_APICOMPAT,
-    TR_KEY_is_stalled_camel,
+    TR_KEY_is_stalled_camel_APICOMPAT,
     TR_KEY_is_utp_camel,
     TR_KEY_is_uploading_to_camel,
     TR_KEY_is_backup,

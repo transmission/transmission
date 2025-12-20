@@ -104,7 +104,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_is_finished, TR_KEY_is_finished_camel_APICOMPAT },
     { TR_KEY_is_incoming, TR_KEY_is_incoming_camel },
     { TR_KEY_is_private, TR_KEY_is_private_camel_APICOMPAT },
-    { TR_KEY_is_stalled, TR_KEY_is_stalled_camel },
+    { TR_KEY_is_stalled, TR_KEY_is_stalled_camel_APICOMPAT },
     { TR_KEY_is_uploading_to, TR_KEY_is_uploading_to_camel },
     { TR_KEY_is_utp, TR_KEY_is_utp_camel },
     { TR_KEY_last_announce_peer_count, TR_KEY_last_announce_peer_count_camel },
