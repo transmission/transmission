@@ -144,7 +144,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_dht_enabled,
     TR_KEY_dnd,
     TR_KEY_done_date_kebab_APICOMPAT,
-    TR_KEY_done_date_camel,
+    TR_KEY_done_date_camel_APICOMPAT,
     TR_KEY_done_date,
     TR_KEY_download_dir_kebab_APICOMPAT,
     TR_KEY_download_dir_free_space_kebab_APICOMPAT,

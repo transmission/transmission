@@ -738,7 +738,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_date_created:
     case TR_KEY_desired_available:
     case TR_KEY_done_date:
-    case TR_KEY_done_date_camel:
     case TR_KEY_download_dir:
     case TR_KEY_download_dir_camel:
     case TR_KEY_download_limit:
@@ -895,7 +894,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_desired_available:
         return st.desiredAvailable;
     case TR_KEY_done_date:
-    case TR_KEY_done_date_camel:
         return st.doneDate;
     case TR_KEY_download_dir:
     case TR_KEY_download_dir_camel:
