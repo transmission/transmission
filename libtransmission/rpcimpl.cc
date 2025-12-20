@@ -758,7 +758,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_id:
     case TR_KEY_is_finished:
     case TR_KEY_is_private:
-    case TR_KEY_is_private_camel:
     case TR_KEY_is_stalled:
     case TR_KEY_is_stalled_camel:
     case TR_KEY_labels:
@@ -920,7 +919,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_is_finished:
         return st.finished;
     case TR_KEY_is_private:
-    case TR_KEY_is_private_camel:
         return tor.is_private();
     case TR_KEY_is_stalled:
     case TR_KEY_is_stalled_camel:
