@@ -764,7 +764,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_magnet_link:
     case TR_KEY_manual_announce_time:
     case TR_KEY_max_connected_peers:
-    case TR_KEY_max_connected_peers_camel:
     case TR_KEY_metadata_percent_complete:
     case TR_KEY_metadata_percent_complete_camel:
     case TR_KEY_name:
@@ -927,7 +926,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_manual_announce_time:
         return tr_announcerNextManualAnnounce(&tor);
     case TR_KEY_max_connected_peers:
-    case TR_KEY_max_connected_peers_camel:
         return tor.peer_limit();
     case TR_KEY_metadata_percent_complete:
     case TR_KEY_metadata_percent_complete_camel:
