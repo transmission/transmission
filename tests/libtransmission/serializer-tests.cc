@@ -124,7 +124,8 @@ TEST_F(SerializerTest, usesBuiltins)
     }
 
     {
-        auto const var = tr_variant{ nullptr };
+        auto const s = std::optional<std::string>{};
+        auto const var = Converters::serialize(s);
         EXPECT_TRUE(var.holds_alternative<std::nullptr_t>());
 
         auto out = std::optional<std::string>{ "will reset"s };
