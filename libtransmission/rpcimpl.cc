@@ -767,7 +767,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_metadata_percent_complete:
     case TR_KEY_name:
     case TR_KEY_peer_limit:
-    case TR_KEY_peer_limit_kebab:
     case TR_KEY_peers:
     case TR_KEY_peers_connected:
     case TR_KEY_peers_connected_camel:
@@ -931,7 +930,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_name:
         return tor.name();
     case TR_KEY_peer_limit:
-    case TR_KEY_peer_limit_kebab:
         return tor.peer_limit();
     case TR_KEY_peers:
         return make_peer_vec(tor);
@@ -1390,7 +1388,7 @@ namespace make_torrent_field_helpers
             std::tie(err, errmsg) = set_file_dls(tor, true, *val);
         }
 
-        if (auto const val = args_in.value_if<int64_t>({ TR_KEY_peer_limit, TR_KEY_peer_limit_kebab }); val)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit); val)
         {
             tr_torrentSetPeerLimit(tor, *val);
         }
@@ -1891,7 +1889,7 @@ void torrentAdd(tr_session* session, tr_variant::Map const& args_in, DoneCb&& do
         ctor.set_paused(TR_FORCE, *val);
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_peer_limit, TR_KEY_peer_limit_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit); val)
     {
         ctor.set_peer_limit(TR_FORCE, static_cast<uint16_t>(*val));
     }

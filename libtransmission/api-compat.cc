@@ -132,7 +132,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_paused_torrent_count, TR_KEY_paused_torrent_count_camel },
     { TR_KEY_peer_is_choked, TR_KEY_peer_is_choked_camel },
     { TR_KEY_peer_is_interested, TR_KEY_peer_is_interested_camel },
-    { TR_KEY_peer_limit, TR_KEY_peer_limit_kebab },
+    { TR_KEY_peer_limit, TR_KEY_peer_limit_kebab_APICOMPAT },
     { TR_KEY_peer_limit_global, TR_KEY_peer_limit_global_kebab_APICOMPAT },
     { TR_KEY_peer_limit_per_torrent, TR_KEY_peer_limit_per_torrent_kebab_APICOMPAT },
     { TR_KEY_peer_port, TR_KEY_peer_port_kebab_APICOMPAT },
