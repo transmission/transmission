@@ -166,7 +166,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_downloaded,
     TR_KEY_downloaded_bytes_kebab_APICOMPAT,
     TR_KEY_downloaded_bytes_camel,
-    TR_KEY_downloaded_ever_camel,
+    TR_KEY_downloaded_ever_camel_APICOMPAT,
     TR_KEY_downloaded_bytes,
     TR_KEY_downloaded_ever,
     TR_KEY_downloader_count,
