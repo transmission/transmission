@@ -46,7 +46,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_blocklist_enabled, TR_KEY_blocklist_enabled_kebab_APICOMPAT },
     { TR_KEY_blocklist_size, TR_KEY_blocklist_size_kebab_APICOMPAT },
     { TR_KEY_blocklist_url, TR_KEY_blocklist_url_kebab_APICOMPAT },
-    { TR_KEY_bytes_completed, TR_KEY_bytes_completed_camel },
+    { TR_KEY_bytes_completed, TR_KEY_bytes_completed_camel_APICOMPAT },
     { TR_KEY_cache_size_mb, TR_KEY_cache_size_mb_kebab_APICOMPAT },
     { TR_KEY_client_is_choked, TR_KEY_client_is_choked_camel },
     { TR_KEY_client_is_interested, TR_KEY_client_is_interested_camel },

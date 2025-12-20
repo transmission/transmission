@@ -96,7 +96,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_blocklist_updates_enabled,
     TR_KEY_blocklist_url,
     TR_KEY_blocks,
-    TR_KEY_bytes_completed_camel,
+    TR_KEY_bytes_completed_camel_APICOMPAT,
     TR_KEY_bytes_completed,
     TR_KEY_bytes_to_client,
     TR_KEY_bytes_to_peer,

@@ -498,7 +498,6 @@ namespace make_torrent_field_helpers
         auto const file = tr_torrentFile(&tor, idx);
         auto stats_map = tr_variant::Map{ 3U };
         stats_map.try_emplace(TR_KEY_bytes_completed, file.have);
-        stats_map.try_emplace(TR_KEY_bytes_completed_camel, file.have);
         stats_map.try_emplace(TR_KEY_priority, file.priority);
         stats_map.try_emplace(TR_KEY_wanted, file.wanted);
         vec.emplace_back(std::move(stats_map));
@@ -530,7 +529,6 @@ namespace make_torrent_field_helpers
         auto file_map = tr_variant::Map{ 5U };
         file_map.try_emplace(TR_KEY_begin_piece, file.beginPiece);
         file_map.try_emplace(TR_KEY_bytes_completed, file.have);
-        file_map.try_emplace(TR_KEY_bytes_completed_camel, file.have);
         file_map.try_emplace(TR_KEY_end_piece, file.endPiece);
         file_map.try_emplace(TR_KEY_length, file.length);
         file_map.try_emplace(TR_KEY_name, file.name);
@@ -734,7 +732,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_availability:
     case TR_KEY_bandwidth_priority:
     case TR_KEY_bytes_completed:
-    case TR_KEY_bytes_completed_camel:
     case TR_KEY_comment:
     case TR_KEY_corrupt_ever:
     case TR_KEY_corrupt_ever_camel:
@@ -889,8 +886,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_bandwidth_priority:
         return tor.get_priority();
     case TR_KEY_bytes_completed:
-        return make_bytes_completed_vec(tor);
-    case TR_KEY_bytes_completed_camel:
         return make_bytes_completed_vec(tor);
     case TR_KEY_comment:
         return tor.comment();
