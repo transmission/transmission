@@ -511,7 +511,8 @@ struct State
     // downloadDir in Tr4 torrent-get
     // download_dir in Tr5
     if (state.is_rpc &&
-        (src == TR_KEY_download_dir_camel || src == TR_KEY_download_dir_kebab_APICOMPAT || src == TR_KEY_download_dir))
+        (src == TR_KEY_download_dir_camel_APICOMPAT || src == TR_KEY_download_dir_kebab_APICOMPAT ||
+         src == TR_KEY_download_dir))
     {
         if (state.style == Style::Tr5)
         {
@@ -520,7 +521,7 @@ struct State
 
         if (state.is_torrent)
         {
-            return TR_KEY_download_dir_camel;
+            return TR_KEY_download_dir_camel_APICOMPAT;
         }
 
         return TR_KEY_download_dir_kebab_APICOMPAT;
