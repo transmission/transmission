@@ -65,7 +65,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_download_dir,
       TR_KEY_download_dir_kebab_APICOMPAT }, // crazy case 1: camel in torrent-get/set, kebab everywhere else
     { TR_KEY_download_dir_free_space, TR_KEY_download_dir_free_space_kebab_APICOMPAT },
-    { TR_KEY_download_limit, TR_KEY_download_limit_camel },
+    { TR_KEY_download_limit, TR_KEY_download_limit_camel_APICOMPAT },
     { TR_KEY_download_limited, TR_KEY_download_limited_camel },
     { TR_KEY_download_queue_enabled, TR_KEY_download_queue_enabled_kebab_APICOMPAT },
     { TR_KEY_download_queue_size, TR_KEY_download_queue_size_kebab_APICOMPAT },
