@@ -317,7 +317,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_lpd_enabled_kebab_APICOMPAT,
     TR_KEY_lpd_enabled,
     TR_KEY_m,
-    TR_KEY_magnet_link_camel,
+    TR_KEY_magnet_link_camel_APICOMPAT,
     TR_KEY_magnet_link,
     TR_KEY_main_window_height_kebab,
     TR_KEY_main_window_is_maximized_kebab,

@@ -762,7 +762,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_labels:
     case TR_KEY_left_until_done:
     case TR_KEY_magnet_link:
-    case TR_KEY_magnet_link_camel:
     case TR_KEY_manual_announce_time:
     case TR_KEY_manual_announce_time_camel:
     case TR_KEY_max_connected_peers:
@@ -925,7 +924,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_left_until_done:
         return st.leftUntilDone;
     case TR_KEY_magnet_link:
-    case TR_KEY_magnet_link_camel:
         return tor.magnet();
     case TR_KEY_manual_announce_time:
     case TR_KEY_manual_announce_time_camel:
