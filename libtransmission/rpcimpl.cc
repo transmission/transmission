@@ -730,7 +730,6 @@ namespace make_torrent_field_helpers
     switch (key)
     {
     case TR_KEY_activity_date:
-    case TR_KEY_activity_date_camel:
     case TR_KEY_added_date:
     case TR_KEY_added_date_camel:
     case TR_KEY_availability:
@@ -884,7 +883,6 @@ namespace make_torrent_field_helpers
     switch (key)
     {
     case TR_KEY_activity_date:
-    case TR_KEY_activity_date_camel:
         return st.activityDate;
     case TR_KEY_added_date:
     case TR_KEY_added_date_camel:
