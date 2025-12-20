@@ -57,7 +57,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_current_stats, TR_KEY_current_stats_kebab },
     { TR_KEY_date_created, TR_KEY_date_created_camel },
     { TR_KEY_default_trackers, TR_KEY_default_trackers_kebab_APICOMPAT },
-    { TR_KEY_delete_local_data, TR_KEY_delete_local_data_kebab },
+    { TR_KEY_delete_local_data, TR_KEY_delete_local_data_kebab_APICOMPAT },
     { TR_KEY_desired_available, TR_KEY_desired_available_camel },
     { TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab_APICOMPAT },
     { TR_KEY_done_date, TR_KEY_done_date_camel }, // TODO(ckerr) legacy duplicate
