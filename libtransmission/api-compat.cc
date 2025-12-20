@@ -73,7 +73,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_downloaded_ever, TR_KEY_downloaded_ever_camel_APICOMPAT },
     { TR_KEY_edit_date, TR_KEY_edit_date_camel_APICOMPAT },
-    { TR_KEY_error_string, TR_KEY_error_string_camel },
+    { TR_KEY_error_string, TR_KEY_error_string_camel_APICOMPAT },
     { TR_KEY_eta_idle, TR_KEY_eta_idle_camel },
     { TR_KEY_file_count, TR_KEY_file_count_kebab },
     { TR_KEY_file_stats, TR_KEY_file_stats_camel },
@@ -726,7 +726,7 @@ void convert_jsonrpc(tr_variant::Map& top, State const& state)
 
             if (auto* data = error.find_if<tr_variant::Map>(TR_KEY_data))
             {
-                if (auto const errmsg = data->value_if<std::string_view>(TR_KEY_error_string_camel))
+                if (auto const errmsg = data->value_if<std::string_view>(TR_KEY_error_string_camel_APICOMPAT))
                 {
                     top.try_emplace(TR_KEY_result, *errmsg);
                 }

@@ -745,7 +745,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_edit_date:
     case TR_KEY_error:
     case TR_KEY_error_string:
-    case TR_KEY_error_string_camel:
     case TR_KEY_eta:
     case TR_KEY_eta_idle:
     case TR_KEY_eta_idle_camel:
@@ -903,7 +902,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_error:
         return st.error;
     case TR_KEY_error_string:
-    case TR_KEY_error_string_camel:
         return st.errorString;
     case TR_KEY_eta:
         return st.eta;
