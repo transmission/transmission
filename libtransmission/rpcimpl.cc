@@ -752,7 +752,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_files:
     case TR_KEY_group:
     case TR_KEY_hash_string:
-    case TR_KEY_hash_string_camel:
     case TR_KEY_have_unchecked:
     case TR_KEY_have_unchecked_camel:
     case TR_KEY_have_valid:
@@ -913,7 +912,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_group:
         return tr_variant::unmanaged_string(tor.bandwidth_group().sv());
     case TR_KEY_hash_string:
-    case TR_KEY_hash_string_camel:
         return tr_variant::unmanaged_string(tor.info_hash_string().sv());
     case TR_KEY_have_unchecked:
     case TR_KEY_have_unchecked_camel:
@@ -1790,7 +1788,6 @@ void add_torrent_impl(struct tr_rpc_idle_data* data, DoneCb const& done_cb, tr_c
         TR_KEY_id,
         TR_KEY_name,
         TR_KEY_hash_string,
-        TR_KEY_hash_string_camel,
     };
     if (duplicate_of != nullptr)
     {

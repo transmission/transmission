@@ -235,7 +235,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_has_scraped_camel,
     TR_KEY_has_announced,
     TR_KEY_has_scraped,
-    TR_KEY_hash_string_camel,
+    TR_KEY_hash_string_camel_APICOMPAT,
     TR_KEY_hash_string,
     TR_KEY_have_unchecked_camel,
     TR_KEY_have_valid_camel,
