@@ -140,7 +140,7 @@ constexpr std::string_view CurrentSessionGetResponseJson = R"json({
         "blocklist_enabled": false,
         "blocklist_size": 0,
         "blocklist_url": "http://www.example.com/blocklist",
-        "cache_size_mb": 4,
+        "cache_size_mib": 4,
         "config_dir": "/home/user/.config/transmission",
         "default_trackers": "",
         "dht_enabled": true,

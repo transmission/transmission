@@ -495,7 +495,7 @@ public:
             Field<&Settings::bind_address_ipv6>{ TR_KEY_bind_address_ipv6 },
             Field<&Settings::blocklist_enabled>{ TR_KEY_blocklist_enabled },
             Field<&Settings::blocklist_url>{ TR_KEY_blocklist_url },
-            Field<&Settings::cache_size_mbytes>{ TR_KEY_cache_size_mb },
+            Field<&Settings::cache_size_mbytes>{ TR_KEY_cache_size_mib },
             Field<&Settings::default_trackers_str>{ TR_KEY_default_trackers },
             Field<&Settings::dht_enabled>{ TR_KEY_dht_enabled },
             Field<&Settings::download_dir>{ TR_KEY_download_dir },
