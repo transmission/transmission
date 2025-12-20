@@ -741,7 +741,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_download_dir:
     case TR_KEY_download_limit:
     case TR_KEY_download_limited:
-    case TR_KEY_download_limited_camel:
     case TR_KEY_downloaded_ever:
     case TR_KEY_downloaded_ever_camel:
     case TR_KEY_edit_date:
@@ -898,7 +897,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_download_limit:
         return tr_torrentGetSpeedLimit_KBps(&tor, TR_DOWN);
     case TR_KEY_download_limited:
-    case TR_KEY_download_limited_camel:
         return tor.uses_speed_limit(TR_DOWN);
     case TR_KEY_downloaded_ever:
     case TR_KEY_downloaded_ever_camel:
@@ -1466,7 +1464,7 @@ namespace make_torrent_field_helpers
             std::tie(err, errmsg) = set_sequential_download_from_piece(*tor, *val);
         }
 
-        if (auto const val = args_in.value_if<bool>({ TR_KEY_download_limited, TR_KEY_download_limited_camel }); val)
+        if (auto const val = args_in.value_if<bool>(TR_KEY_download_limited); val)
         {
             tor->use_speed_limit(TR_DOWN, *val);
         }
