@@ -501,7 +501,7 @@ TEST_F(SettingsTest, canSavePreferredTransport)
     {
         auto const& expected = ExpectedValue[i];
         auto const& actual = (*l)[i];
-        ASSERT_EQ(actual.index(), tr_variant::StringIndex);
+        ASSERT_TRUE(actual.index() == tr_variant::StringIndex || actual.index() == tr_variant::StringViewIndex);
         EXPECT_EQ(expected, actual.value_if<std::string_view>());
     }
 }

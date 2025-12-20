@@ -686,26 +686,6 @@ TEST_F(VariantTest, mapContains)
     EXPECT_FALSE(map->contains(key));
 }
 
-TEST_F(VariantTest, visitStringExposesStringView)
-{
-    static auto const Text = "visit-string"sv;
-    auto var = tr_variant{ std::string{ Text } };
-    auto called = false;
-
-    var.visit(
-        Overloaded{ [&](std::string_view sv)
-                    {
-                        called = true;
-                        EXPECT_EQ(Text, sv);
-                    },
-                    // clang-format off: TODO: remove when we bump to clang-format >= 21
-                    [](auto&&) { FAIL(); } }
-    );
-    // clang-format on
-
-    EXPECT_TRUE(called);
-}
-
 TEST_F(VariantTest, visitConstVariant)
 {
     auto var = tr_variant::make_vector(1U);
@@ -765,7 +745,8 @@ TEST_F(VariantTest, visitsNodesDepthFirst)
                     std::is_same_v<ValueType, int64_t> || //
                     std::is_same_v<ValueType, std::monostate> || //
                     std::is_same_v<ValueType, std::nullptr_t> || //
-                    std::is_same_v<ValueType, std::string_view>)
+                    std::is_same_v<ValueType, std::string_view> || //
+                    std::is_same_v<ValueType, std::string>)
                 {
                     flattened.emplace_back(val);
                 }
@@ -796,6 +777,10 @@ TEST_F(VariantTest, visitsNodesDepthFirst)
     EXPECT_EQ(Expected, actual);
 
     // test that we visited the expected number of nodes.
+    //
+    // FIXME(ckerr): `serde.inplace()` doesn't work on JSON right now.
+    // RapidJSON always copies strings unless given mutable JSON input.
+    // That's why StringViewIndex is missing two counts here.
     auto const expected_visited_count = std::map<size_t, size_t>{
         { tr_variant::BoolIndex, 1U }, //
         { tr_variant::IntIndex, 4U }, //

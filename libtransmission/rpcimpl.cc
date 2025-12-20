@@ -139,6 +139,7 @@ namespace
     // Number, or NULL value if included. .. The value SHOULD normally not
     // be Null and Numbers SHOULD NOT contain fractional parts
     case tr_variant::StringIndex:
+    case tr_variant::StringViewIndex:
     case tr_variant::IntIndex:
     case tr_variant::DoubleIndex:
     case tr_variant::NullIndex:
@@ -1665,7 +1666,7 @@ void onPortTested(tr_web::FetchResponse const& web_response, DoneCb const& done_
     auto* data = static_cast<tr_rpc_idle_data*>(user_data);
 
     if (auto const addr = tr_address::from_string(primary_ip);
-        data->args_out.find_if<std::string_view>(TR_KEY_ip_protocol) == nullptr && addr && addr->is_valid())
+        !data->args_out.value_if<std::string_view>(TR_KEY_ip_protocol).has_value() && addr && addr->is_valid())
     {
         data->args_out.try_emplace(TR_KEY_ip_protocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
     }
