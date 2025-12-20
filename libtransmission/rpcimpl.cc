@@ -734,7 +734,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_bytes_completed:
     case TR_KEY_comment:
     case TR_KEY_corrupt_ever:
-    case TR_KEY_corrupt_ever_camel:
     case TR_KEY_creator:
     case TR_KEY_date_created:
     case TR_KEY_date_created_camel:
@@ -890,7 +889,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_comment:
         return tor.comment();
     case TR_KEY_corrupt_ever:
-    case TR_KEY_corrupt_ever_camel:
         return st.corruptEver;
     case TR_KEY_creator:
         return tor.creator();
