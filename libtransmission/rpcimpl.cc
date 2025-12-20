@@ -757,7 +757,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_honors_session_limits:
     case TR_KEY_id:
     case TR_KEY_is_finished:
-    case TR_KEY_is_finished_camel:
     case TR_KEY_is_private:
     case TR_KEY_is_private_camel:
     case TR_KEY_is_stalled:
@@ -919,7 +918,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_id:
         return st.id;
     case TR_KEY_is_finished:
-    case TR_KEY_is_finished_camel:
         return st.finished;
     case TR_KEY_is_private:
     case TR_KEY_is_private_camel:
