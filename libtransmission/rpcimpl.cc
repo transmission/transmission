@@ -747,9 +747,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_error_string:
     case TR_KEY_eta:
     case TR_KEY_eta_idle:
-    case TR_KEY_file_stats:
     case TR_KEY_file_count:
-    case TR_KEY_file_count_kebab:
+    case TR_KEY_file_stats:
     case TR_KEY_files:
     case TR_KEY_group:
     case TR_KEY_hash_string:
@@ -905,11 +904,10 @@ namespace make_torrent_field_helpers
         return st.eta;
     case TR_KEY_eta_idle:
         return st.etaIdle;
+    case TR_KEY_file_count:
+        return tor.file_count();
     case TR_KEY_file_stats:
         return make_file_stats_vec(tor);
-    case TR_KEY_file_count:
-    case TR_KEY_file_count_kebab:
-        return tor.file_count();
     case TR_KEY_files:
         return make_file_vec(tor);
     case TR_KEY_group:
