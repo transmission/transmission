@@ -736,7 +736,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_corrupt_ever:
     case TR_KEY_creator:
     case TR_KEY_date_created:
-    case TR_KEY_date_created_camel:
     case TR_KEY_desired_available:
     case TR_KEY_desired_available_camel:
     case TR_KEY_done_date:
@@ -893,7 +892,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_creator:
         return tor.creator();
     case TR_KEY_date_created:
-    case TR_KEY_date_created_camel:
         return tor.date_created();
     case TR_KEY_desired_available:
     case TR_KEY_desired_available_camel:

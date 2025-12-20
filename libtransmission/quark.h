@@ -127,7 +127,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_current_stats_kebab,
     TR_KEY_current_stats,
     TR_KEY_data,
-    TR_KEY_date_created_camel,
+    TR_KEY_date_created_camel_APICOMPAT,
     TR_KEY_date_created,
     TR_KEY_default_trackers_kebab_APICOMPAT,
     TR_KEY_default_trackers,
