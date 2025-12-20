@@ -42,7 +42,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_announce_state, TR_KEY_announce_state_camel },
     { TR_KEY_anti_brute_force_enabled, TR_KEY_anti_brute_force_enabled_kebab_APICOMPAT },
     { TR_KEY_anti_brute_force_threshold, TR_KEY_anti_brute_force_threshold_kebab_APICOMPAT },
-    { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_camel }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_camel_APICOMPAT },
     { TR_KEY_blocklist_enabled, TR_KEY_blocklist_enabled_kebab_APICOMPAT },
     { TR_KEY_blocklist_size, TR_KEY_blocklist_size_kebab_APICOMPAT },
     { TR_KEY_blocklist_url, TR_KEY_blocklist_url_kebab_APICOMPAT },
