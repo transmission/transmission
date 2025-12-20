@@ -394,7 +394,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_peers2,
     TR_KEY_peers2_6_kebab_APICOMPAT,
     TR_KEY_peers2_6,
-    TR_KEY_peers_connected_camel,
+    TR_KEY_peers_connected_camel_APICOMPAT,
     TR_KEY_peers_from_camel,
     TR_KEY_peers_getting_from_us_camel,
     TR_KEY_peers_sending_to_us_camel,

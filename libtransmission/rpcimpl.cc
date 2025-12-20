@@ -769,7 +769,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_peer_limit:
     case TR_KEY_peers:
     case TR_KEY_peers_connected:
-    case TR_KEY_peers_connected_camel:
     case TR_KEY_peers_from:
     case TR_KEY_peers_from_camel:
     case TR_KEY_peers_getting_from_us:
@@ -934,7 +933,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_peers:
         return make_peer_vec(tor);
     case TR_KEY_peers_connected:
-    case TR_KEY_peers_connected_camel:
         return st.peersConnected;
     case TR_KEY_peers_from:
     case TR_KEY_peers_from_camel:
