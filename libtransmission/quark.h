@@ -188,7 +188,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_eta_idle,
     TR_KEY_fields,
     TR_KEY_file_count_kebab,
-    TR_KEY_file_stats_camel,
+    TR_KEY_file_stats_camel_APICOMPAT,
     TR_KEY_file_count,
     TR_KEY_file_stats,
     TR_KEY_filename,
