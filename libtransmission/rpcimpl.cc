@@ -753,7 +753,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_group:
     case TR_KEY_hash_string:
     case TR_KEY_have_unchecked:
-    case TR_KEY_have_unchecked_camel:
     case TR_KEY_have_valid:
     case TR_KEY_have_valid_camel:
     case TR_KEY_honors_session_limits:
@@ -914,7 +913,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_hash_string:
         return tr_variant::unmanaged_string(tor.info_hash_string().sv());
     case TR_KEY_have_unchecked:
-    case TR_KEY_have_unchecked_camel:
         return st.haveUnchecked;
     case TR_KEY_have_valid:
     case TR_KEY_have_valid_camel:

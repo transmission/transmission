@@ -91,7 +91,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_has_announced, TR_KEY_has_announced_camel },
     { TR_KEY_has_scraped, TR_KEY_has_scraped_camel },
     { TR_KEY_hash_string, TR_KEY_hash_string_camel_APICOMPAT },
-    { TR_KEY_have_unchecked, TR_KEY_have_unchecked_camel },
+    { TR_KEY_have_unchecked, TR_KEY_have_unchecked_camel_APICOMPAT },
     { TR_KEY_have_valid, TR_KEY_have_valid_camel },
     { TR_KEY_honors_session_limits, TR_KEY_honors_session_limits_camel },
     { TR_KEY_idle_seeding_limit, TR_KEY_idle_seeding_limit_kebab_APICOMPAT },
