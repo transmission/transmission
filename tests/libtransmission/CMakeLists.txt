@@ -79,7 +79,7 @@ target_link_libraries(libtransmission-test
         dht::dht
         fmt::fmt-header-only
         libevent::core
-        WideInteger::WideInteger)
+        transmission::WideInteger)
 
 if (WIN32)
     cmake_policy(PUSH)

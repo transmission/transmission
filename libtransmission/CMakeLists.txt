@@ -290,7 +290,7 @@ target_link_libraries(${TR_NAME}
         RapidJSON
         utf8::cpp
         wildmat
-        WideInteger::WideInteger
+        transmission::WideInteger
         Crc32c::crc32c
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>

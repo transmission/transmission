@@ -649,9 +649,10 @@ endif()
 tr_add_external_auto_library(WIDE_INTEGER WideInteger
     SUBPROJECT
     SOURCE_DIR wide-integer)
-if(NOT TARGET WideInteger::WideInteger)
-    add_library(WideInteger::WideInteger ALIAS WideInteger)
-endif()
+add_library(transmission::WideInteger INTERFACE IMPORTED)
+target_link_libraries(transmission::WideInteger
+    INTERFACE
+        WideInteger::WideInteger)
 include(CheckCXXSourceCompiles)
 check_cxx_source_compiles(
 "int main()
@@ -660,8 +661,9 @@ check_cxx_source_compiles(
     signed __int128 i;
     return 0;
 }" TR_HAVE_INT128)
-add_compile_definitions(
-    $<$<BOOL:${TR_HAVE_INT128}>:WIDE_INTEGER_HAS_LIMB_TYPE_UINT64>)
+target_compile_definitions(transmission::WideInteger
+    INTERFACE
+        $<$<BOOL:${TR_HAVE_INT128}>:WIDE_INTEGER_HAS_LIMB_TYPE_UINT64>)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)
