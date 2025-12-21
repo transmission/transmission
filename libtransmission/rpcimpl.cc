@@ -2632,7 +2632,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_download_queue_size_kebab:
         return session.queueSize(TR_DOWN);
     case TR_KEY_encryption:
-        return getEncryptionModeString(tr_sessionGetEncryption(&session));
+        return tr_variant::unmanaged_string(getEncryptionModeString(tr_sessionGetEncryption(&session)));
     case TR_KEY_idle_seeding_limit:
     case TR_KEY_idle_seeding_limit_kebab:
         return session.idleLimitMinutes();
