@@ -4,11 +4,15 @@ include(CheckSymbolExists)
 set(LIBNAME ${TR_NAME}-app)
 
 add_library(${LIBNAME} STATIC)
+add_library(transmission::app ALIAS ${LIBNAME})
 
 target_sources(${LIBNAME}
     PRIVATE
         app.cc
         app.h
+        converters.cc
+        converters.h
+        display-modes.h
         favicon-cache.h)
 
 target_include_directories(${LIBNAME}
@@ -16,16 +20,6 @@ target_include_directories(${LIBNAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CMAKE_CURRENT_BINARY_DIR}/..)
 
-target_link_libraries(${TR_NAME}
+target_link_libraries(${LIBNAME}
     PUBLIC
         fmt::fmt-header-only)
-
-if(INSTALL_LIB)
-    install(
-        TARGETS ${LIBNAME}
-        DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    install(
-        FILES
-            favicon-cache.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${LIBNAME})
-endif()

@@ -6,15 +6,14 @@
 #include <libtransmission/utils.h> // tr_lib_init()
 
 #include "libtransmission-app/app.h"
+#include "libtransmission-app/converters.h"
 
 namespace transmission::app
 {
-
 void init()
 {
     tr_lib_init();
-
     tr_locale_set_global("");
+    detail::register_app_converters();
 }
-
 } // namespace transmission::app
