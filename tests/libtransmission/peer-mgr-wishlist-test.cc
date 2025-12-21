@@ -219,6 +219,37 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
     EXPECT_EQ(mediator.block_span_[0].end, spans[0].end);
 }
 
+TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatClientHas)
+{
+    auto mediator = MockMediator{ *this };
+
+    // setup: three pieces
+    mediator.piece_count_ = 3;
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 250 };
+
+    // we have pieces 0, 1
+    mediator.client_has_piece_.insert(0);
+    mediator.client_has_piece_.insert(1);
+
+    // peer has all pieces
+    mediator.piece_replication_[0] = 1;
+    mediator.piece_replication_[1] = 1;
+    mediator.piece_replication_[2] = 1;
+
+    // we want all three pieces
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
+
+    // we should only get piece 2
+    auto const spans = Wishlist{ mediator }.next(1000, PeerHasAllPieces);
+    ASSERT_EQ(1U, std::size(spans));
+    EXPECT_EQ(mediator.block_span_[2].begin, spans[0].begin);
+    EXPECT_EQ(mediator.block_span_[2].end, spans[0].end);
+}
+
 TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
 {
     auto mediator = MockMediator{ *this };

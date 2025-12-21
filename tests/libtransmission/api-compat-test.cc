@@ -1004,8 +1004,8 @@ TEST(ApiCompatTest, canConvertRpc)
         auto serde = tr_variant_serde::json();
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value()) << name << ": " << serde.error_;
-        auto converted = libtransmission::api_compat::convert(*parsed, tgt_style);
-        EXPECT_EQ(expected, serde.to_string(converted)) << name;
+        libtransmission::api_compat::convert(*parsed, tgt_style);
+        EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
     }
 }
 
@@ -1033,8 +1033,8 @@ TEST(ApiCompatTest, canConvertJsonDataFiles)
 
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value());
-        auto converted = libtransmission::api_compat::convert(*parsed, tgt_style);
-        EXPECT_EQ(expected, serde.to_string(converted)) << name;
+        libtransmission::api_compat::convert(*parsed, tgt_style);
+        EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
     }
 }
 
@@ -1057,7 +1057,7 @@ TEST(ApiCompatTest, canConvertBencDataFiles)
 
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value()) << name;
-        auto converted = libtransmission::api_compat::convert(*parsed, tgt_style);
-        EXPECT_EQ(expected, serde.to_string(converted)) << name;
+        libtransmission::api_compat::convert(*parsed, tgt_style);
+        EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
     }
 }

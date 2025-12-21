@@ -11,7 +11,13 @@
 struct tr_session;
 struct tr_variant;
 
-auto inline constexpr TrRpcVersionSemver = std::string_view{ "6.0.0" };
+#define RPC_VERSION_VARS(major, minor, patch) \
+    auto inline constexpr TrRpcVersionSemver = std::string_view{ #major "." #minor "." #patch }; \
+    auto inline constexpr TrRpcVersionSemverMajor = major;
+
+RPC_VERSION_VARS(6, 0, 0)
+
+#undef RPC_VERSION_VARS
 
 namespace JsonRpc
 {

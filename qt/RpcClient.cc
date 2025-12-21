@@ -16,6 +16,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QVersionNumber>
 
 #include <libtransmission/api-compat.h>
 #include <libtransmission/rpcimpl.h>
@@ -70,6 +71,7 @@ void RpcClient::stop()
     session_id_.clear();
     url_.clear();
     request_.reset();
+    network_style_ = DefaultNetworkStyle;
 
     if (nam_ != nullptr)
     {
@@ -93,7 +95,6 @@ void RpcClient::start(QUrl const& url)
 RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 {
     auto [req, id] = buildRequest(method, args);
-    req = api_compat::convert_outgoing_data(req);
 
     auto promise = QFutureInterface<RpcResponse>{};
     promise.setExpectedResultCount(1);
@@ -107,6 +108,7 @@ RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
     }
     else if (!url_.isEmpty())
     {
+        api_compat::convert(req, network_style_);
         auto const json = tr_variant_serde::json().compact().to_string(req);
         auto const body = QByteArray::fromStdString(json);
         sendNetworkRequest(body, promise);
@@ -165,20 +167,21 @@ void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResp
     tr_rpc_request_exec(
         session_,
         req,
-        [this](tr_session* /*sesson*/, tr_variant&& response)
+        [this](tr_session* /*session*/, tr_variant&& response)
         {
-            auto converted = std::make_shared<tr_variant>(api_compat::convert_incoming_data(response));
+            api_compat::convert_incoming_data(response);
+
             if (verbose_)
             {
                 auto serde = tr_variant_serde::json();
                 serde.compact();
-                fmt::print("{:s}:{:d} got raw response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(response));
-                fmt::print("{:s}:{:d} converted response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(*converted));
+                fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(response));
             }
 
             // this callback is invoked in the libtransmission thread, so we don't want
             // to process the response here... let's push it over to the Qt thread.
-            QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, converted));
+            auto shared = std::make_shared<tr_variant>(std::move(response));
+            QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, shared));
         });
 }
 
@@ -217,6 +220,38 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     {
         // we got a 409 telling us our session id has expired.
         // update it and resubmit the request.
+
+        auto version_str = QString::fromUtf8("unknown");
+
+        if (reply->hasRawHeader(TR_RPC_RPC_VERSION_HEADER))
+        {
+            network_style_ = api_compat::Style::Tr5;
+
+            version_str = QString::fromUtf8(reply->rawHeader(TR_RPC_RPC_VERSION_HEADER));
+            if (QVersionNumber::fromString(version_str).majorVersion() > TrRpcVersionSemverMajor)
+            {
+                fmt::print(
+                    stderr,
+                    "Server '{:s}' RPC version is {:s}, which may be incompatible with our version {:s}.\n",
+                    url_.toDisplayString().toStdString(),
+                    version_str.toStdString(),
+                    TrRpcVersionSemver);
+            }
+        }
+        else
+        {
+            network_style_ = api_compat::Style::Tr4;
+        }
+
+        if (verbose_)
+        {
+            fmt::print(
+                "Server '{:s}' RPC version is {:s}. Using style {:d}\n",
+                url_.toDisplayString().toStdString(),
+                version_str.toStdString(),
+                static_cast<int>(network_style_));
+        }
+
         session_id_ = QString::fromUtf8(reply->rawHeader(TR_RPC_SESSION_ID_HEADER));
         request_.reset();
 
@@ -247,7 +282,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
         if (auto var = tr_variant_serde::json().parse(json))
         {
-            var = api_compat::convert_incoming_data(*var);
+            api_compat::convert_incoming_data(*var);
 
             if (verbose_)
             {
