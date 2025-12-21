@@ -412,7 +412,7 @@ Prefs::~Prefs()
     }
 
     settings.merge(current_settings);
-    settings = api_compat::convert_outgoing_data(settings);
+    api_compat::convert_outgoing_data(settings);
     serde.to_file(settings, filename);
 }
 

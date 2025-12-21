@@ -3,8 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <iostream>
-
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -407,49 +405,6 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
 
 auto constexpr MethodNotFoundLegacyErrmsg = std::string_view{ "no method name" };
 
-[[nodiscard]] constexpr tr_quark convert_key(tr_quark const src, Style const style, bool const is_rpc)
-{
-    if (style == Style::Tr5)
-    {
-        for (auto const [current, legacy] : RpcKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return current;
-            }
-        }
-        for (auto const [current, legacy] : SessionKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return current;
-            }
-        }
-    }
-    else if (is_rpc) // legacy RPC
-    {
-        for (auto const [current, legacy] : RpcKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return legacy;
-            }
-        }
-    }
-    else // legacy datafiles
-    {
-        for (auto const [current, legacy] : SessionKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return legacy;
-            }
-        }
-    }
-
-    return src;
-}
-
 /**
  * Guess the error code from a legacy RPC response message.
  *
@@ -498,304 +453,357 @@ auto constexpr MethodNotFoundLegacyErrmsg = std::string_view{ "no method name" }
     return {};
 }
 
-struct CloneState
+struct State
 {
     api_compat::Style style = {};
-    bool is_rpc = false;
     bool convert_strings = false;
-    bool is_torrent = false;
     bool is_free_space_response = false;
+    bool is_request = false;
+    bool is_response = false;
+    bool is_rpc = false;
+    bool is_success = false;
+    bool is_torrent = false;
+    bool was_jsonrpc = false;
+    bool was_legacy = false;
 };
 
-[[nodiscard]] tr_variant convert_impl(tr_variant const& self, CloneState& state)
+[[nodiscard]] State makeState(tr_variant::Map const& top)
 {
-    struct Visitor
-    {
-        tr_variant operator()(std::monostate const& /*unused*/) const
-        {
-            return tr_variant{};
-        }
+    auto state = State{};
 
-        tr_variant operator()(std::nullptr_t const& /*unused*/) const
-        {
-            return tr_variant{ nullptr };
-        }
+    state.is_request = top.contains(TR_KEY_method);
+    state.was_jsonrpc = top.contains(TR_KEY_jsonrpc);
+    state.was_legacy = !state.was_jsonrpc;
+    auto const was_jsonrpc_response = state.was_jsonrpc && (top.contains(TR_KEY_result) || top.contains(TR_KEY_error));
+    auto const was_legacy_response = state.was_legacy && top.contains(TR_KEY_result);
+    state.is_response = was_jsonrpc_response || was_legacy_response;
+    state.is_rpc = state.is_request || state.is_response;
 
-        tr_variant operator()(bool const& val) const
-        {
-            return tr_variant{ val };
-        }
+    state.is_success = state.is_response &&
+        (was_jsonrpc_response ? top.contains(TR_KEY_result) :
+                                top.value_if<std::string_view>(TR_KEY_result).value_or("") == "success");
 
-        tr_variant operator()(int64_t const& val) const
-        {
-            return tr_variant{ val };
-        }
-
-        tr_variant operator()(double const& val) const
-        {
-            return tr_variant{ val };
-        }
-
-        tr_variant operator()(std::string_view const& sv) const
-        {
-            if (!state_.convert_strings)
-            {
-                return sv;
-            }
-
-            auto const lookup = tr_quark_lookup(sv);
-            if (!lookup)
-            {
-                return sv;
-            }
-
-            auto key = *lookup;
-
-            // crazy case 1: downloadDir in torrent-get, download-dir in session-get
-            if (state_.is_rpc &&
-                (key == TR_KEY_download_dir_camel || key == TR_KEY_download_dir_kebab || key == TR_KEY_download_dir))
-            {
-                if (state_.style == Style::Tr5)
-                {
-                    key = TR_KEY_download_dir;
-                }
-                else
-                {
-                    key = state_.is_torrent ? TR_KEY_download_dir_camel : TR_KEY_download_dir_kebab;
-                }
-            }
-            else
-            {
-                key = convert_key(key, state_.style, state_.is_rpc);
-            }
-
-            return tr_variant::unmanaged_string(key);
-        }
-
-        tr_variant operator()(tr_variant::Vector const& src)
-        {
-            auto tgt = tr_variant::Vector();
-            tgt.reserve(std::size(src));
-            for (auto const& val : src)
-            {
-                tgt.emplace_back(convert_impl(val, state_));
-            }
-            return tgt;
-        }
-
-        tr_variant operator()(tr_variant::Map const& src)
-        {
-            auto tgt = tr_variant::Map{ std::size(src) };
-            for (auto const& [key, val] : src)
-            {
-                auto const pop = state_.convert_strings;
-                auto new_key = convert_key(key, state_.style, state_.is_rpc);
-
-                auto const special_rpc = state_.is_rpc &&
-                    (new_key == TR_KEY_method || new_key == TR_KEY_fields || new_key == TR_KEY_ids ||
-                     new_key == TR_KEY_torrents);
-                // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` on previous line with logic to turn on convert
-                // if it's an array inside an array val whose key was `torrents`.
-                // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
-                state_.convert_strings |= special_rpc;
-
-                auto const special_settings = !state_.is_rpc &&
-                    (new_key == TR_KEY_sort_mode || key == TR_KEY_sort_mode || new_key == TR_KEY_filter_mode ||
-                     key == TR_KEY_filter_mode);
-                state_.convert_strings |= special_settings;
-
-                // Crazy case: total_size in free-space, totalSize in torrent-get
-                if (state_.is_free_space_response && new_key == TR_KEY_total_size_camel)
-                {
-                    new_key = TR_KEY_total_size;
-                }
-
-                tgt.insert_or_assign(new_key, convert_impl(val, state_));
-                state_.convert_strings = pop;
-            }
-            return tgt;
-        }
-
-        CloneState& state_;
-    };
-
-    return self.visit(Visitor{ state });
-}
-} // namespace
-
-tr_variant convert(tr_variant const& src, Style const tgt_style)
-{
-    // TODO: yes I know this method is ugly rn.
-    // I've just been trying to get the tests passing.
-
-    auto const* const src_top = src.get_if<tr_variant::Map>();
-
-    // if it's not a Map, just clone it
-    if (src_top == nullptr)
-    {
-        return src.clone();
-    }
-
-    auto const is_request = src_top->contains(TR_KEY_method);
-
-    auto const was_jsonrpc = src_top->contains(TR_KEY_jsonrpc);
-    auto const was_legacy = !was_jsonrpc;
-    auto const was_jsonrpc_response = was_jsonrpc && (src_top->contains(TR_KEY_result) || src_top->contains(TR_KEY_error));
-    auto const was_legacy_response = was_legacy && src_top->contains(TR_KEY_result);
-    auto const is_response = was_jsonrpc_response || was_legacy_response;
-    auto const is_rpc = is_request || is_response;
-
-    auto state = CloneState{};
-    state.style = tgt_style;
-    state.is_rpc = is_rpc;
-
-    auto const is_success = is_response &&
-        (was_jsonrpc_response ? src_top->contains(TR_KEY_result) :
-                                src_top->value_if<std::string_view>(TR_KEY_result).value_or("") == "success");
-
-    if (auto const method = src_top->value_if<std::string_view>(TR_KEY_method))
+    if (auto const method = top.value_if<std::string_view>(TR_KEY_method))
     {
         auto const key = tr_quark_convert(tr_quark_new(*method));
         state.is_torrent = key == TR_KEY_torrent_get || key == TR_KEY_torrent_set;
     }
 
-    if (is_response)
+    if (state.is_response)
     {
-        if (auto const* const args = src_top->find_if<tr_variant::Map>(was_jsonrpc ? TR_KEY_result : TR_KEY_arguments))
+        if (auto const* const args = top.find_if<tr_variant::Map>(state.was_jsonrpc ? TR_KEY_result : TR_KEY_arguments))
         {
             state.is_free_space_response = args->contains(TR_KEY_path) &&
-                args->contains(was_jsonrpc ? TR_KEY_size_bytes : TR_KEY_size_bytes_kebab);
+                args->contains(state.was_jsonrpc ? TR_KEY_size_bytes : TR_KEY_size_bytes_kebab);
         }
     }
 
-    auto ret = convert_impl(src, state);
+    return state;
+}
 
-    auto* const tgt_top = ret.get_if<tr_variant::Map>();
+[[nodiscard]] tr_quark constexpr convert_key(State const& state, tr_quark const src)
+{
+    // special cases here
 
-    // jsonrpc <-> legacy rpc conversion
-    if (is_rpc)
+    // Crazy case:
+    // download-dir in Tr4 session-get
+    // downloadDir in Tr4 torrent-get
+    // download_dir in Tr5
+    if (state.is_rpc && (src == TR_KEY_download_dir_camel || src == TR_KEY_download_dir_kebab || src == TR_KEY_download_dir))
     {
-        auto const is_jsonrpc = tgt_style == Style::Tr5;
-        auto const is_legacy = tgt_style != Style::Tr5;
-
-        // - use `jsonrpc` in jsonrpc, but not in legacy
-        // - use `id` in jsonrpc; use `tag` in legacy
-        if (is_jsonrpc)
+        if (state.style == Style::Tr5)
         {
-            tgt_top->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
-            tgt_top->replace_key(TR_KEY_tag, TR_KEY_id);
-        }
-        else
-        {
-            tgt_top->erase(TR_KEY_jsonrpc);
-            tgt_top->replace_key(TR_KEY_id, TR_KEY_tag);
+            return TR_KEY_download_dir;
         }
 
-        if (is_response && is_legacy && is_success && was_jsonrpc)
+        if (state.is_torrent)
         {
-            // in legacy messages:
-            // - move `result` to `arguments`
-            // - add `result: "success"`
-            tgt_top->replace_key(TR_KEY_result, TR_KEY_arguments);
-            tgt_top->try_emplace(TR_KEY_result, tr_variant::unmanaged_string("success"));
+            return TR_KEY_download_dir_camel;
         }
 
-        if (is_response && is_legacy && !is_success)
+        return TR_KEY_download_dir_kebab;
+    }
+
+    // Crazy case:
+    // totalSize in Tr4 torrent-get
+    // total_size in Tr4 free-space
+    // total_size in Tr5
+    if (state.is_rpc && state.is_free_space_response && (src == TR_KEY_total_size || src == TR_KEY_total_size_camel))
+    {
+        return state.style == Style::Tr5 || state.is_free_space_response ? TR_KEY_total_size : TR_KEY_total_size_camel;
+    }
+
+    // Crazy cases done.
+    // Now for the lookup tables
+
+    if (state.style == Style::Tr5)
+    {
+        for (auto const [current, legacy] : RpcKeys)
         {
-            // in legacy error responses:
-            // - copy `error.data.error_string` to `result`
-            // - remove `error` object
-            // - add an empty `arguments` object
-            if (auto* error_ptr = tgt_top->find_if<tr_variant::Map>(TR_KEY_error))
+            if (src == current || src == legacy)
             {
-                // move the `error` object before memory reallocations invalidate the pointer
-                auto error = std::move(*error_ptr);
-                tgt_top->erase(TR_KEY_error);
-
-                // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
-                if (auto const code = error.value_if<int64_t>(TR_KEY_code); code && *code == JsonRpc::Error::METHOD_NOT_FOUND)
-                {
-                    tgt_top->try_emplace(TR_KEY_result, tr_variant::unmanaged_string(MethodNotFoundLegacyErrmsg));
-                }
-
-                if (auto* data = error.find_if<tr_variant::Map>(TR_KEY_data))
-                {
-                    if (auto const errmsg = data->value_if<std::string_view>(TR_KEY_error_string_camel))
-                    {
-                        tgt_top->try_emplace(TR_KEY_result, *errmsg);
-                    }
-
-                    if (auto const result = data->find(TR_KEY_result); result != std::end(*data))
-                    {
-                        tgt_top->try_emplace(TR_KEY_arguments, std::move(result->second));
-                    }
-                }
-
-                if (auto const errmsg = error.value_if<std::string_view>(TR_KEY_message))
-                {
-                    tgt_top->try_emplace(TR_KEY_result, *errmsg);
-                }
+                return current;
             }
-
-            tgt_top->try_emplace(TR_KEY_arguments, tr_variant::make_map());
         }
-
-        if (is_response && is_jsonrpc && is_success && was_legacy)
+        for (auto const [current, legacy] : SessionKeys)
         {
-            tgt_top->erase(TR_KEY_result);
-            tgt_top->replace_key(TR_KEY_arguments, TR_KEY_result);
-        }
-
-        if (is_response && is_jsonrpc && !is_success && was_legacy)
-        {
-            // in jsonrpc error message:
-            // - copy `result` to `error.data.error_string`
-            // - ensure `error` object exists and is well-formatted
-            // - remove `result`
-            auto const errstr = tgt_top->value_if<std::string_view>(TR_KEY_result).value_or("unknown error");
-            auto error = tr_variant::Map{ 3U };
-            auto data = tr_variant::Map{ 2U };
-            auto const code = guess_error_code(errstr);
-            auto const errmsg = JsonRpc::Error::to_string(code);
-            error.try_emplace(TR_KEY_code, code);
-            error.try_emplace(TR_KEY_message, errmsg);
-            // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
-            if (errstr != errmsg && errstr != MethodNotFoundLegacyErrmsg)
+            if (src == current || src == legacy)
             {
-                data.try_emplace(TR_KEY_error_string, errstr);
+                return current;
             }
-            tgt_top->erase(TR_KEY_result);
-
-            if (auto const args_it = tgt_top->find(TR_KEY_arguments); args_it != std::end(*tgt_top))
-            {
-                auto args = std::move(args_it->second);
-                tgt_top->erase(TR_KEY_arguments);
-
-                if (auto const* args_map = args.get_if<tr_variant::Map>(); args_map != nullptr && !std::empty(*args_map))
-                {
-                    data.try_emplace(TR_KEY_result, std::move(args));
-                }
-            }
-
-            if (!std::empty(data))
-            {
-                error.try_emplace(TR_KEY_data, std::move(data));
-            }
-            tgt_top->try_emplace(TR_KEY_error, std::move(error));
         }
-
-        if (is_request && is_jsonrpc)
+    }
+    else if (state.is_rpc) // legacy RPC
+    {
+        for (auto const [current, legacy] : RpcKeys)
         {
-            tgt_top->replace_key(TR_KEY_arguments, TR_KEY_params);
+            if (src == current || src == legacy)
+            {
+                return legacy;
+            }
         }
-
-        if (is_request && is_legacy)
+    }
+    else // legacy datafiles
+    {
+        for (auto const [current, legacy] : SessionKeys)
         {
-            tgt_top->replace_key(TR_KEY_params, TR_KEY_arguments);
+            if (src == current || src == legacy)
+            {
+                return legacy;
+            }
         }
     }
 
+    return src;
+}
+
+[[nodiscard]] std::optional<std::string_view> convert_string(State const& state, std::string_view const src)
+{
+    if (!state.convert_strings)
+    {
+        return {};
+    }
+
+    auto const old_key = tr_quark_lookup(src);
+    if (!old_key)
+    {
+        return {};
+    }
+
+    auto const new_key = convert_key(state, *old_key);
+    if (*old_key == new_key)
+    {
+        return {};
+    }
+
+    auto ret = tr_quark_get_string_view(new_key);
     return ret;
+}
+
+[[nodiscard]] bool should_convert_child_strings(State const& state, tr_quark const old_key, tr_quark const new_key)
+{
+    // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` here to turn on convert
+    // if it's an array inside an array val whose key was `torrents`.
+    // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
+    if (state.is_rpc &&
+        (new_key == TR_KEY_method || new_key == TR_KEY_fields || new_key == TR_KEY_ids || new_key == TR_KEY_torrents))
+    {
+        return true;
+    }
+
+    if (!state.is_rpc &&
+        (TR_KEY_filter_mode == new_key || TR_KEY_filter_mode == old_key || TR_KEY_filter_mode_kebab == new_key ||
+         TR_KEY_filter_mode_kebab == old_key || TR_KEY_sort_mode == new_key || TR_KEY_sort_mode == old_key ||
+         TR_KEY_sort_mode_kebab == new_key || TR_KEY_sort_mode_kebab == old_key))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void convert_keys(tr_variant& var, State& state)
+{
+    var.visit(
+        [&state](auto& val)
+        {
+            using ValueType = std::decay_t<decltype(val)>;
+
+            if constexpr (std::is_same_v<ValueType, std::string> || std::is_same_v<ValueType, std::string_view>)
+            {
+                if (auto const new_val = convert_string(state, val))
+                {
+                    val = *new_val;
+                }
+            }
+            else if constexpr (std::is_same_v<ValueType, tr_variant::Vector>)
+            {
+                for (auto& child : val)
+                {
+                    convert_keys(child, state);
+                }
+            }
+            else if constexpr (std::is_same_v<ValueType, tr_variant::Map>)
+            {
+                for (auto& [old_key, child] : val)
+                {
+                    auto const new_key = convert_key(state, old_key);
+
+                    // maybe change the key.
+                    // IMPORTANT: this is safe even inside a range loop of `val`:
+                    // tr_variant.replace_key() does not invalidate iterators
+                    if (old_key != new_key)
+                    {
+                        val.replace_key(old_key, new_key);
+                    }
+
+                    auto const pop = state.convert_strings;
+                    state.convert_strings |= should_convert_child_strings(state, old_key, new_key);
+                    convert_keys(child, state);
+                    state.convert_strings = pop;
+                }
+            }
+        });
+}
+
+// jsonrpc <-> legacy rpc conversion
+void convert_jsonrpc(tr_variant::Map& top, State const& state)
+{
+    if (!state.is_rpc)
+    {
+        return;
+    }
+
+    auto const is_jsonrpc = state.style == Style::Tr5;
+    auto const is_legacy = state.style != Style::Tr5;
+
+    // - use `jsonrpc` in jsonrpc, but not in legacy
+    // - use `id` in jsonrpc; use `tag` in legacy
+    if (is_jsonrpc)
+    {
+        top.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+        top.replace_key(TR_KEY_tag, TR_KEY_id);
+    }
+    else
+    {
+        top.erase(TR_KEY_jsonrpc);
+        top.replace_key(TR_KEY_id, TR_KEY_tag);
+    }
+
+    if (state.is_response && is_legacy && state.is_success && state.was_jsonrpc)
+    {
+        // in legacy messages:
+        // - move `result` to `arguments`
+        // - add `result: "success"`
+        top.replace_key(TR_KEY_result, TR_KEY_arguments);
+        top.try_emplace(TR_KEY_result, tr_variant::unmanaged_string("success"));
+    }
+
+    if (state.is_response && is_legacy && !state.is_success)
+    {
+        // in legacy error responses:
+        // - copy `error.data.error_string` to `result`
+        // - remove `error` object
+        // - add an empty `arguments` object
+        if (auto* error_ptr = top.find_if<tr_variant::Map>(TR_KEY_error))
+        {
+            // move the `error` object before memory reallocations invalidate the pointer
+            auto error = std::move(*error_ptr);
+            top.erase(TR_KEY_error);
+
+            // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
+            if (auto const code = error.value_if<int64_t>(TR_KEY_code); code && *code == JsonRpc::Error::METHOD_NOT_FOUND)
+            {
+                top.try_emplace(TR_KEY_result, tr_variant::unmanaged_string(MethodNotFoundLegacyErrmsg));
+            }
+
+            if (auto* data = error.find_if<tr_variant::Map>(TR_KEY_data))
+            {
+                if (auto const errmsg = data->value_if<std::string_view>(TR_KEY_error_string_camel))
+                {
+                    top.try_emplace(TR_KEY_result, *errmsg);
+                }
+
+                if (auto const result = data->find(TR_KEY_result); result != std::end(*data))
+                {
+                    top.try_emplace(TR_KEY_arguments, std::move(result->second));
+                }
+            }
+
+            if (auto const errmsg = error.value_if<std::string_view>(TR_KEY_message))
+            {
+                top.try_emplace(TR_KEY_result, *errmsg);
+            }
+        }
+
+        top.try_emplace(TR_KEY_arguments, tr_variant::make_map());
+    }
+
+    if (state.is_response && is_jsonrpc && state.is_success && state.was_legacy)
+    {
+        top.erase(TR_KEY_result);
+        top.replace_key(TR_KEY_arguments, TR_KEY_result);
+    }
+
+    if (state.is_response && is_jsonrpc && !state.is_success && state.was_legacy)
+    {
+        // in jsonrpc error message:
+        // - copy `result` to `error.data.error_string`
+        // - ensure `error` object exists and is well-formatted
+        // - remove `result`
+        auto const errstr = top.value_if<std::string_view>(TR_KEY_result).value_or("unknown error");
+        auto error = tr_variant::Map{ 3U };
+        auto data = tr_variant::Map{ 2U };
+        auto const code = guess_error_code(errstr);
+        auto const errmsg = JsonRpc::Error::to_string(code);
+        error.try_emplace(TR_KEY_code, code);
+        error.try_emplace(TR_KEY_message, errmsg);
+        // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
+        if (errstr != errmsg && errstr != MethodNotFoundLegacyErrmsg)
+        {
+            data.try_emplace(TR_KEY_error_string, errstr);
+        }
+        top.erase(TR_KEY_result);
+
+        if (auto const args_it = top.find(TR_KEY_arguments); args_it != std::end(top))
+        {
+            auto args = std::move(args_it->second);
+            top.erase(TR_KEY_arguments);
+
+            if (auto const* args_map = args.get_if<tr_variant::Map>(); args_map != nullptr && !std::empty(*args_map))
+            {
+                data.try_emplace(TR_KEY_result, std::move(args));
+            }
+        }
+
+        if (!std::empty(data))
+        {
+            error.try_emplace(TR_KEY_data, std::move(data));
+        }
+        top.try_emplace(TR_KEY_error, std::move(error));
+    }
+
+    if (state.is_request && is_jsonrpc)
+    {
+        top.replace_key(TR_KEY_arguments, TR_KEY_params);
+    }
+
+    if (state.is_request && is_legacy)
+    {
+        top.replace_key(TR_KEY_params, TR_KEY_arguments);
+    }
+}
+} // namespace
+
+void convert(tr_variant& var, Style const tgt_style)
+{
+    if (auto* const top = var.get_if<tr_variant::Map>())
+    {
+        auto state = makeState(*top);
+        state.style = tgt_style;
+        convert_keys(var, state);
+        convert_jsonrpc(*top, state);
+    }
 }
 
 [[nodiscard]] Style get_export_settings_style()
@@ -805,19 +813,22 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     return style;
 }
 
-[[nodiscard]] tr_variant convert_outgoing_data(tr_variant const& src)
+void convert_outgoing_data(tr_variant& var)
 {
-    return convert(src, get_export_settings_style());
+    convert(var, get_export_settings_style());
 }
 
-[[nodiscard]] tr_variant convert_incoming_data(tr_variant const& src)
+void convert_incoming_data(tr_variant& var)
 {
-    return convert(src, Style::Tr5);
+    convert(var, Style::Tr5);
 }
 } // namespace libtransmission::api_compat
 
 tr_quark tr_quark_convert(tr_quark const quark)
 {
     using namespace libtransmission::api_compat;
-    return convert_key(quark, Style::Tr5, false /*ignored for Style::Tr5*/);
+
+    auto state = State{};
+    state.style = Style::Tr5;
+    return convert_key(state, quark);
 }

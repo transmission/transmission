@@ -108,7 +108,7 @@ RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
     }
     else if (!url_.isEmpty())
     {
-        req = api_compat::convert(req, network_style_);
+        api_compat::convert(req, network_style_);
         auto const json = tr_variant_serde::json().compact().to_string(req);
         auto const body = QByteArray::fromStdString(json);
         sendNetworkRequest(body, promise);
@@ -167,20 +167,21 @@ void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResp
     tr_rpc_request_exec(
         session_,
         req,
-        [this](tr_session* /*sesson*/, tr_variant&& response_in)
+        [this](tr_session* /*session*/, tr_variant&& response)
         {
-            auto response = std::make_shared<tr_variant>(std::move(response_in));
+            api_compat::convert_incoming_data(response);
 
             if (verbose_)
             {
                 auto serde = tr_variant_serde::json();
                 serde.compact();
-                fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(*response));
+                fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(response));
             }
 
             // this callback is invoked in the libtransmission thread, so we don't want
             // to process the response here... let's push it over to the Qt thread.
-            QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, response));
+            auto shared = std::make_shared<tr_variant>(std::move(response));
+            QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, shared));
         });
 }
 
@@ -281,7 +282,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
         if (auto var = tr_variant_serde::json().parse(json))
         {
-            var = api_compat::convert(*var, api_compat::Style::Tr5);
+            api_compat::convert_incoming_data(*var);
 
             if (verbose_)
             {
