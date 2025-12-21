@@ -2546,7 +2546,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
             {
                 break;
             }
-            units_vec.emplace_back(display_name);
+            units_vec.emplace_back(tr_variant::unmanaged_string(display_name));
         }
         return units_vec;
     };
