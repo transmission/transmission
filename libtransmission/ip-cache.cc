@@ -63,6 +63,15 @@ namespace global_source_ip_helpers
 // and check its source address.
 //
 // Since it's a UDP socket, this doesn't actually send any packets
+//
+// N.B. Successfully obtaining a source address does not imply
+// connectivity to the given destination address, since all connect()
+// does is setting the default remote address for subsequent send() and
+// recv() calls.
+//
+// Having said that, the connect() step is still needed because on Windows,
+// calling getsockname() might not return what we want before calling
+// connect() if we are binding to 0.0.0.0 or ::.
 [[nodiscard]] std::optional<tr_address> get_source_address(
     tr_address const& dst_addr,
     tr_port dst_port,
@@ -116,7 +125,7 @@ namespace global_source_ip_helpers
 
     // In order for address selection to work right,
     // this should be a global unicast address, not Teredo or 6to4
-    TR_ASSERT(dst_addr && dst_addr->is_global_unicast_address());
+    TR_ASSERT(dst_addr && dst_addr->is_global_unicast() && !dst_addr->is_ipv6_teredo() && !dst_addr->is_ipv6_6to4());
 
     if (dst_addr)
     {
@@ -205,7 +214,7 @@ tr_address tr_ip_cache::bind_addr(tr_address_type type) const noexcept
 
 bool tr_ip_cache::set_global_addr(tr_address const& addr_new) noexcept
 {
-    if (addr_new.is_global_unicast_address())
+    if (addr_new.is_global_unicast())
     {
         auto const lock = std::scoped_lock{ global_addr_mutex_[addr_new.type] };
         if (auto& addr = global_addr_[addr_new.type]; addr != addr_new)
@@ -221,7 +230,7 @@ bool tr_ip_cache::set_global_addr(tr_address const& addr_new) noexcept
 void tr_ip_cache::update_addr(tr_address_type type) noexcept
 {
     update_source_addr(type);
-    if (global_source_addr(type))
+    if (source_addr(type))
     {
         update_global_addr(type);
     }
@@ -272,17 +281,16 @@ void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
 
     auto const protocol = tr_ip_protocol_to_sv(type);
-
     auto err = 0;
-    auto const& source_addr = get_global_source_address(bind_addr(type), err);
     source_addr_checked_[type] = true;
-    if (source_addr)
+    if (auto const& source_addr = get_global_source_address(bind_addr(type), err); source_addr)
     {
         set_source_addr(*source_addr);
-        tr_logAddDebug(fmt::format(
-            fmt::runtime(_("Successfully updated source {protocol} address to {ip}")),
-            fmt::arg("protocol", protocol),
-            fmt::arg("ip", source_addr->display_name())));
+        tr_logAddDebug(
+            fmt::format(
+                fmt::runtime(_("Successfully updated source {protocol} address to {ip}")),
+                fmt::arg("protocol", protocol),
+                fmt::arg("ip", source_addr->display_name())));
     }
     else
     {
@@ -327,11 +335,12 @@ void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchRespon
             success = true;
             upkeep_timers_[type]->set_interval(UpkeepInterval);
 
-            tr_logAddDebug(fmt::format(
-                fmt::runtime(_("Successfully updated global {type} address to {ip} using {url}")),
-                fmt::arg("type", protocol),
-                fmt::arg("ip", addr->display_name()),
-                fmt::arg("url", IPQueryServices[type][ix_service])));
+            tr_logAddDebug(
+                fmt::format(
+                    fmt::runtime(_("Successfully updated global {type} address to {ip} using {url}")),
+                    fmt::arg("type", protocol),
+                    fmt::arg("ip", addr->display_name()),
+                    fmt::arg("url", IPQueryServices[type][ix_service])));
         }
     }
 
@@ -344,12 +353,13 @@ void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchRespon
             return;
         }
 
-        tr_logAddDebug(fmt::format(
-            "Couldn't obtain global {} address, HTTP status = {}, did_connect = {}, did_timeout = {}",
-            protocol,
-            response.status,
-            response.did_connect,
-            response.did_timeout));
+        tr_logAddDebug(
+            fmt::format(
+                "Couldn't obtain global {} address, HTTP status = {}, did_connect = {}, did_timeout = {}",
+                protocol,
+                response.status,
+                response.did_connect,
+                response.did_timeout));
         unset_global_addr(type);
         upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
     }

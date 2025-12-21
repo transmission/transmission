@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 107 176" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-51.892661,-167.548423)">
+        <g transform="matrix(1.224393,0,0,1.224393,-114.493424,25.518782)">
+            <g id="ThumbButton" transform="matrix(0,-1.310776,0.893617,0,-17.907954,458.977137)">
+                <path d="M261.66,269L152.34,269C156.622,239.74 163.743,210.719 174.348,181.991C175.994,177.568 178.991,174.576 182.401,173.954C197.087,171.465 213.469,171.463 231.683,174.149C235.058,174.653 238.069,177.479 239.795,181.763C250.371,208.423 257.476,237.636 261.66,269Z" style="fill:url(#_Linear1);"/>
+            </g>
+        </g>
+    </g>
+    <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-73.240899,0,-0,-107.431255,241.694932,199.087472)"><stop offset="0" style="stop-color:rgb(154,154,154);stop-opacity:1"/><stop offset="0.23" style="stop-color:rgb(169,169,169);stop-opacity:1"/><stop offset="0.59" style="stop-color:white;stop-opacity:1"/><stop offset="0.62" style="stop-color:rgb(163,163,163);stop-opacity:1"/><stop offset="0.75" style="stop-color:rgb(66,66,66);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(39,39,39);stop-opacity:1"/></linearGradient>
+    </defs>
+</svg>

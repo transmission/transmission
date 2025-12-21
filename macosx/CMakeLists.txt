@@ -75,20 +75,20 @@ target_sources(${TR_NAME}-mac
         ExpandedPathToPathTransformer.mm
         FileListNode.h
         FileListNode.mm
-        FileNameCell.h
-        FileNameCell.mm
+        FileCheckCellView.h
+        FileCheckCellView.mm
+        FileNameCellView.h
+        FileNameCellView.mm
         FileOutlineController.h
         FileOutlineController.mm
         FileOutlineView.h
         FileOutlineView.mm
-        FilePriorityCell.h
-        FilePriorityCell.mm
+        FilePriorityCellView.h
+        FilePriorityCellView.mm
         FileRenameSheetController.h
         FileRenameSheetController.mm
         FilterBarController.h
         FilterBarController.mm
-        FilterBarView.h
-        FilterBarView.mm
         FilterButton.h
         FilterButton.mm
         GlobalOptionsPopoverViewController.h
@@ -143,6 +143,8 @@ target_sources(${TR_NAME}-mac
         PiecesView.mm
         PortChecker.h
         PortChecker.mm
+        PowerManager.h
+        PowerManager.mm
         PredicateEditorRowTemplateAny.h
         PredicateEditorRowTemplateAny.mm
         PrefsController.h
@@ -166,8 +168,6 @@ target_sources(${TR_NAME}-mac
         StatsWindowController.mm
         StatusBarController.h
         StatusBarController.mm
-        StatusBarView.h
-        StatusBarView.mm
         Toolbar.h
         Toolbar.mm
         Torrent.h
@@ -412,9 +412,9 @@ target_link_libraries(${TR_NAME}-mac
         "-framework AppKit"
         "-framework Carbon"
         "-framework Foundation"
-        "-framework IOKit"
         "-framework Quartz"
         "-framework Security"
+        "-weak_framework Sparkle"
         "-weak_framework UserNotifications")
 
 if(NOT CMAKE_GENERATOR STREQUAL Xcode)

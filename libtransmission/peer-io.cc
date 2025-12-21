@@ -151,7 +151,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         }
     };
 
-    for (auto const& transport : session->preferred_transport())
+    for (auto const& transport : session->preferred_transports())
     {
         if (auto sock = get_socket[transport](); sock.is_valid())
         {
@@ -578,7 +578,7 @@ void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_dat
     outbuf_.commit_space(n_bytes);
 
     session_->queue_session_thread(
-        [ptr = std::weak_ptr{ shared_from_this() }]()
+        [ptr = weak_from_this()]()
         {
             if (auto io = ptr.lock(); io)
             {

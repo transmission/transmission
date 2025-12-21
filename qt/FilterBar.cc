@@ -19,6 +19,7 @@
 #include "FilterBarComboBoxDelegate.h"
 #include "Filters.h"
 #include "IconCache.h"
+#include "NativeIcon.h"
 #include "Prefs.h"
 #include "Torrent.h"
 #include "TorrentFilter.h"
@@ -50,35 +51,19 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(new QStandardItem{}); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
-    auto const& icons = IconCache::get();
-
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("system-run")), tr("Active") };
-    row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("go-down")), tr("Downloading") };
-    row->setData(FilterMode::SHOW_DOWNLOADING, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("go-up")), tr("Seeding") };
-    row->setData(FilterMode::SHOW_SEEDING, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("media-playback-pause")), tr("Paused") };
-    row->setData(FilterMode::SHOW_PAUSED, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("dialog-ok")), tr("Finished") };
-    row->setData(FilterMode::SHOW_FINISHED, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("view-refresh")), tr("Verifying") };
-    row->setData(FilterMode::SHOW_VERIFYING, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("process-stop")), tr("Error") };
-    row->setData(FilterMode::SHOW_ERROR, ACTIVITY_ROLE);
-    model->appendRow(row);
+    auto add_row = [model](auto const filter_mode, QString label, std::optional<icons::Type> const type)
+    {
+        auto* row = type ? new QStandardItem{ icons::icon(*type), label } : new QStandardItem{ label };
+        row->setData(filter_mode, ACTIVITY_ROLE);
+        model->appendRow(row);
+    };
+    add_row(FilterMode::SHOW_ACTIVE, tr("Active"), icons::Type::TorrentStateActive);
+    add_row(FilterMode::SHOW_SEEDING, tr("Seeding"), icons::Type::TorrentStateSeeding);
+    add_row(FilterMode::SHOW_DOWNLOADING, tr("Downloading"), icons::Type::TorrentStateDownloading);
+    add_row(FilterMode::SHOW_PAUSED, tr("Paused"), icons::Type::TorrentStatePaused);
+    add_row(FilterMode::SHOW_FINISHED, tr("Finished"), {});
+    add_row(FilterMode::SHOW_VERIFYING, tr("Verifying"), icons::Type::TorrentStateVerifying);
+    add_row(FilterMode::SHOW_ERROR, tr("Error"), icons::Type::TorrentStateError);
 
     c->setModel(model);
     return c;

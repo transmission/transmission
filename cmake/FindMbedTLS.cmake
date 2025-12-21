@@ -43,6 +43,22 @@ find_package_handle_standard_args(MbedTLS
         MBEDTLS_INCLUDE_DIR
     VERSION_VAR MBEDTLS_VERSION)
 
+if(MBEDTLS_LIBRARY AND NOT TARGET MbedTLS::mbedtls)
+    add_library(MbedTLS::mbedtls UNKNOWN IMPORTED)
+    set_target_properties(MbedTLS::mbedtls PROPERTIES
+        IMPORTED_LOCATION ${MBEDTLS_LIBRARY}
+        INTERFACE_INCLUDE_DIRECTORIES ${MBEDTLS_INCLUDE_DIR}
+    )
+endif()
+
+if(MBEDCRYPTO_LIBRARY AND NOT TARGET MbedTLS::mbedcrypto)
+    add_library(MbedTLS::mbedcrypto UNKNOWN IMPORTED)
+    set_target_properties(MbedTLS::mbedcrypto PROPERTIES
+        IMPORTED_LOCATION ${MBEDCRYPTO_LIBRARY}
+        INTERFACE_INCLUDE_DIRECTORIES ${MBEDTLS_INCLUDE_DIR}
+    )
+endif()
+
 mark_as_advanced(MBEDTLS_INCLUDE_DIR MBEDTLS_LIBRARY MBEDCRYPTO_LIBRARY)
 
 if(MBEDTLS_PREFER_STATIC_LIB)

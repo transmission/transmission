@@ -4,7 +4,7 @@
 
 #import <AppKit/AppKit.h>
 
-@interface WebSeedTableView : NSTableView
+@interface WebSeedTableView : NSTableView<NSMenuItemValidation>
 
 @property(nonatomic, weak) NSArray<NSDictionary*>* webSeeds;
 

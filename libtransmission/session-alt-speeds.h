@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <array>
 #include <bitset>
 #include <cstddef> // size_t
 #include <ctime> // for time_t
@@ -17,7 +18,7 @@
 #include "libtransmission/transmission.h" // for TR_SCHED_ALL
 
 #include "libtransmission/quark.h"
-#include "libtransmission/settings.h"
+#include "libtransmission/serializable.h"
 #include "libtransmission/values.h"
 
 struct tr_variant;
@@ -28,7 +29,7 @@ class tr_session_alt_speeds
     using Speed = libtransmission::Values::Speed;
 
 public:
-    class Settings final : public libtransmission::Settings
+    class Settings final : public libtransmission::Serializable<Settings>
     {
     public:
         Settings() = default;
@@ -49,18 +50,17 @@ public:
         size_t use_on_these_weekdays = TR_SCHED_ALL;
 
     private:
-        [[nodiscard]] Fields fields() override
-        {
-            return {
-                { TR_KEY_alt_speed_enabled, &is_active },
-                { TR_KEY_alt_speed_up, &speed_up_kbyps },
-                { TR_KEY_alt_speed_down, &speed_down_kbyps },
-                { TR_KEY_alt_speed_time_enabled, &scheduler_enabled },
-                { TR_KEY_alt_speed_time_day, &use_on_these_weekdays },
-                { TR_KEY_alt_speed_time_begin, &minute_begin },
-                { TR_KEY_alt_speed_time_end, &minute_end },
-            };
-        }
+        friend libtransmission::Serializable<Settings>;
+
+        static inline auto const fields = std::array<Field, 7U>{ {
+            { TR_KEY_alt_speed_enabled, &Settings::is_active },
+            { TR_KEY_alt_speed_up, &Settings::speed_up_kbyps },
+            { TR_KEY_alt_speed_down, &Settings::speed_down_kbyps },
+            { TR_KEY_alt_speed_time_enabled, &Settings::scheduler_enabled },
+            { TR_KEY_alt_speed_time_day, &Settings::use_on_these_weekdays },
+            { TR_KEY_alt_speed_time_begin, &Settings::minute_begin },
+            { TR_KEY_alt_speed_time_end, &Settings::minute_end },
+        } };
     };
 
     enum class ChangeReason : uint8_t

@@ -30,6 +30,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
@@ -78,11 +79,12 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         return;
     }
 
-    auto const groups_var = tr_variant_serde::json().parse_file(filename);
+    auto groups_var = tr_variant_serde::json().parse_file(filename);
     if (!groups_var)
     {
         return;
     }
+    groups_var = libtransmission::api_compat::convert_incoming_data(*groups_var);
 
     auto const* const groups_map = groups_var->get_if<tr_variant::Map>();
     if (groups_map == nullptr)
@@ -101,29 +103,29 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         auto& group = session->getBandwidthGroup(tr_interned_string{ key });
         auto limits = tr_bandwidth_limits{};
 
-        if (auto const val = group_map->value_if<bool>(TR_KEY_uploadLimited))
+        if (auto const val = group_map->value_if<bool>(TR_KEY_upload_limited); val)
         {
             limits.up_limited = *val;
         }
 
-        if (auto const val = group_map->value_if<bool>(TR_KEY_downloadLimited))
+        if (auto const val = group_map->value_if<bool>(TR_KEY_download_limited); val)
         {
             limits.down_limited = *val;
         }
 
-        if (auto const val = group_map->value_if<int64_t>(TR_KEY_uploadLimit))
+        if (auto const val = group_map->value_if<int64_t>(TR_KEY_upload_limit); val)
         {
             limits.up_limit = Speed{ *val, Speed::Units::KByps };
         }
 
-        if (auto const val = group_map->value_if<int64_t>(TR_KEY_downloadLimit))
+        if (auto const val = group_map->value_if<int64_t>(TR_KEY_download_limit); val)
         {
             limits.down_limit = Speed{ *val, Speed::Units::KByps };
         }
 
         group.set_limits(limits);
 
-        if (auto const val = group_map->value_if<bool>(TR_KEY_honorsSessionLimits))
+        if (auto const val = group_map->value_if<bool>(TR_KEY_honors_session_limits); val)
         {
             group.honor_parent_limits(TR_UP, *val);
             group.honor_parent_limits(TR_DOWN, *val);
@@ -139,18 +141,18 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
     {
         auto const limits = group->get_limits();
         auto group_map = tr_variant::Map{ 6U };
-        group_map.try_emplace(TR_KEY_downloadLimit, limits.down_limit.count(Speed::Units::KByps));
-        group_map.try_emplace(TR_KEY_downloadLimited, limits.down_limited);
-        group_map.try_emplace(TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
+        group_map.try_emplace(TR_KEY_download_limit, limits.down_limit.count(Speed::Units::KByps));
+        group_map.try_emplace(TR_KEY_download_limited, limits.down_limited);
+        group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(TR_UP));
         group_map.try_emplace(TR_KEY_name, name.sv());
-        group_map.try_emplace(TR_KEY_uploadLimit, limits.up_limit.count(Speed::Units::KByps));
-        group_map.try_emplace(TR_KEY_uploadLimited, limits.up_limited);
+        group_map.try_emplace(TR_KEY_upload_limit, limits.up_limit.count(Speed::Units::KByps));
+        group_map.try_emplace(TR_KEY_upload_limited, limits.up_limited);
         groups_map.try_emplace(name.quark(), std::move(group_map));
     }
 
-    tr_variant_serde::json().to_file(
-        tr_variant{ std::move(groups_map) },
-        tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
+    auto out = tr_variant{ std::move(groups_map) };
+    out = libtransmission::api_compat::convert_outgoing_data(out);
+    tr_variant_serde::json().to_file(out, tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
 }
 } // namespace bandwidth_group_helpers
 } // namespace
@@ -416,9 +418,10 @@ tr_session::BoundSocket::BoundSocket(
         return;
     }
 
-    tr_logAddInfo(fmt::format(
-        fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
-        fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
+    tr_logAddInfo(
+        fmt::format(
+            fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
+            fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
     event_add(ev_.get(), nullptr);
 }
 
@@ -447,9 +450,8 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
         // if user provided an address, use it.
         // otherwise, if we can determine which one to use via global_source_address(ipv6) magic, use it.
         // otherwise, use any_ipv6 (::).
-        auto const source_addr = global_source_address(type);
-        auto const default_addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr :
-                                                                                            tr_address::any(TR_AF_INET6);
+        auto const source_addr = source_address(type);
+        auto const default_addr = source_addr && source_addr->is_global_unicast() ? *source_addr : tr_address::any(TR_AF_INET6);
         return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
     }
 
@@ -478,25 +480,24 @@ tr_variant tr_sessionGetSettings(tr_session const* session)
     return settings;
 }
 
-tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* config_dir, char const* app_name)
+tr_variant tr_sessionLoadSettings(std::string_view const config_dir, tr_variant const* const app_defaults)
 {
+    // start with session defaults...
     auto settings = tr_sessionGetDefaultSettings();
 
-    // if app defaults are provided, override libtransmission defaults
+    // ...app defaults (if provided) override session defaults...
     if (app_defaults != nullptr && app_defaults->holds_alternative<tr_variant::Map>())
     {
         settings.merge(*app_defaults);
     }
 
-    // if a settings file exists, use it to override the defaults
-    if (auto const filename = fmt::format(
-            "{:s}/settings.json",
-            config_dir != nullptr ? config_dir : tr_getDefaultConfigDir(app_name));
-        tr_sys_path_exists(filename))
+    // ...and settings.json (if available) override the defaults
+    if (auto const filename = fmt::format("{:s}/settings.json", config_dir); tr_sys_path_exists(filename))
     {
-        if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+        if (auto const file_settings = tr_variant_serde::json().parse_file(filename))
         {
-            settings.merge(*file_settings);
+            auto const incoming_style = libtransmission::api_compat::convert_incoming_data(*file_settings);
+            settings.merge(incoming_style);
         }
     }
 
@@ -519,12 +520,14 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     auto settings = tr_sessionGetDefaultSettings();
     if (auto const file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        settings.merge(*file_settings);
+        auto const incoming_style = libtransmission::api_compat::convert_incoming_data(*file_settings);
+        settings.merge(incoming_style);
     }
     settings.merge(client_settings);
     settings.merge(tr_sessionGetSettings(session));
 
     // save 'em
+    settings = libtransmission::api_compat::convert_outgoing_data(settings);
     tr_variant_serde::json().to_file(settings, filename);
 
     // write bandwidth groups limits to file
@@ -549,11 +552,10 @@ struct tr_session::init_data
     std::condition_variable_any done_cv;
 };
 
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings)
+tr_session* tr_sessionInit(std::string_view const config_dir, bool message_queueing_enabled, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(config_dir != nullptr);
     TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
 
     tr_timeUpdate(time(nullptr));
@@ -562,7 +564,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     // - client settings
     // - previous session's values in settings.json
     // - hardcoded defaults
-    auto settings = tr_sessionLoadSettings(nullptr, config_dir, nullptr);
+    auto settings = tr_sessionLoadSettings(config_dir);
     settings.merge(client_settings);
 
     // if logging is desired, start it now before doing more work
@@ -1505,9 +1507,10 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
 
     if (n_torrents != 0U)
     {
-        tr_logAddInfo(fmt::format(
-            fmt::runtime(tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents)),
-            fmt::arg("count", n_torrents)));
+        tr_logAddInfo(
+            fmt::format(
+                fmt::runtime(tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents)),
+                fmt::arg("count", n_torrents)));
     }
 
     loaded_promise->set_value(n_torrents);
@@ -1655,6 +1658,15 @@ size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->settings_.cache_size_mbytes;
+}
+
+// ---
+
+void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->settings_.torrent_complete_verify_enabled = enabled;
 }
 
 // ---

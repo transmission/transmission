@@ -19,6 +19,8 @@
 #endif
 
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/api-compat.h>
 #include <libtransmission/variant.h>
 
 #include "CustomVariantType.h"
@@ -28,6 +30,7 @@
 
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::getValue;
+namespace api_compat = libtransmission::api_compat;
 
 // ---
 
@@ -94,11 +97,11 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { SESSION_REMOTE_HTTPS, TR_KEY_remote_session_https, QMetaType::Bool },
     { SESSION_REMOTE_PASSWORD, TR_KEY_remote_session_password, QMetaType::QString },
     { SESSION_REMOTE_PORT, TR_KEY_remote_session_port, QMetaType::Int },
-    { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication, QMetaType::Bool },
+    { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requires_authentication, QMetaType::Bool },
     { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QMetaType::QString },
+    { SESSION_REMOTE_RPC_URL_PATH, TR_KEY_remote_session_rpc_url_path, QMetaType::QString },
     { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QMetaType::QStringList },
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QMetaType::Bool },
-    { USER_HAS_GIVEN_INFORMED_CONSENT, TR_KEY_user_has_given_informed_consent, QMetaType::Bool },
     { READ_CLIPBOARD, TR_KEY_read_clipboard, QMetaType::Bool },
 
     /* libtransmission settings */
@@ -236,12 +239,12 @@ Prefs::Prefs(QString config_dir)
 #endif
 
     auto const app_defaults = get_default_app_settings();
-    auto settings = tr_sessionLoadSettings(&app_defaults, config_dir_.toUtf8().constData(), nullptr);
+    auto settings = tr_sessionLoadSettings(config_dir_.toStdString(), &app_defaults);
     ensureSoundCommandIsAList(&settings);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        tr_variant const* b = tr_variantDictFind(&settings, Items[i].key);
+        tr_variant const* b = tr_variantDictFind(&settings, tr_quark_convert(getKey(i)));
 
         switch (Items[i].type)
         {
@@ -311,11 +314,7 @@ Prefs::Prefs(QString config_dir)
         case QMetaType::QDateTime:
             if (auto const value = getValue<time_t>(b); value)
             {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
                 values_[i].setValue(QDateTime::fromSecsSinceEpoch(*value));
-#else
-                values_[i].setValue(QDateTime::fromTime_t(*value));
-#endif
             }
             break;
 
@@ -339,7 +338,7 @@ Prefs::~Prefs()
             continue;
         }
 
-        tr_quark const key = Items[i].key;
+        tr_quark const key = tr_quark_convert(getKey(i));
         QVariant const& val = values_[i];
 
         switch (Items[i].type)
@@ -393,11 +392,7 @@ Prefs::~Prefs()
             break;
 
         case QMetaType::QDateTime:
-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
             dictAdd(&current_settings, key, int64_t{ val.toDateTime().toSecsSinceEpoch() });
-#else
-            dictAdd(&current_settings, key, val.toDateTime().toTime_t());
-#endif
             break;
 
         default:
@@ -410,16 +405,15 @@ Prefs::~Prefs()
     auto serde = tr_variant_serde::json();
     auto const file = QFile{ QDir{ config_dir_ }.absoluteFilePath(QStringLiteral("settings.json")) };
     auto const filename = file.fileName().toStdString();
-    auto settings = serde.parse_file(filename);
-    if (!settings)
+    auto settings = tr_variant::make_map(PREFS_COUNT);
+    if (auto const file_settings = serde.parse_file(filename); file_settings)
     {
-        auto empty_dict = tr_variant{};
-        tr_variantInitDict(&empty_dict, PREFS_COUNT);
-        settings = std::move(empty_dict);
+        settings.merge(*file_settings);
     }
 
-    tr_variantMergeDicts(&*settings, &current_settings);
-    serde.to_file(*settings, filename);
+    settings.merge(current_settings);
+    settings = api_compat::convert_outgoing_data(settings);
+    serde.to_file(settings, filename);
 }
 
 /**
@@ -444,7 +438,7 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_inhibit_desktop_hibernation, false);
     settings.try_emplace(TR_KEY_prompt_before_exit, true);
     settings.try_emplace(TR_KEY_remote_session_enabled, false);
-    settings.try_emplace(TR_KEY_remote_session_requres_authentication, false);
+    settings.try_emplace(TR_KEY_remote_session_requires_authentication, false);
     settings.try_emplace(TR_KEY_show_backup_trackers, false);
     settings.try_emplace(TR_KEY_show_filterbar, true);
     settings.try_emplace(TR_KEY_show_notification_area_icon, false);
@@ -457,7 +451,6 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_torrent_added_notification_enabled, true);
     settings.try_emplace(TR_KEY_torrent_complete_notification_enabled, true);
     settings.try_emplace(TR_KEY_torrent_complete_sound_enabled, true);
-    settings.try_emplace(TR_KEY_user_has_given_informed_consent, false);
     settings.try_emplace(TR_KEY_watch_dir_enabled, false);
     settings.try_emplace(TR_KEY_blocklist_date, 0);
     settings.try_emplace(TR_KEY_main_window_height, 500);
@@ -477,6 +470,7 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_statusbar_stats, StatsMode);
     settings.try_emplace(TR_KEY_watch_dir, download_dir);
     settings.try_emplace(TR_KEY_read_clipboard, false);
+    settings.try_emplace(TR_KEY_remote_session_rpc_url_path, TR_DEFAULT_RPC_URL_STR "rpc");
     return tr_variant{ std::move(settings) };
 }
 

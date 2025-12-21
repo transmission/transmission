@@ -16,6 +16,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/bitfield.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
@@ -74,7 +75,7 @@ auto load_peers(tr_variant::Map const& map, tr_torrent* tor)
         ret = tr_resume::Peers;
     }
 
-    if (auto const* l = map.find_if<tr_variant::Vector>(TR_KEY_peers2_6); l != nullptr)
+    if (auto const* l = map.find_if<tr_variant::Vector>(TR_KEY_peers2_6))
     {
         auto const num_added = add_peers(tor, *l);
         tr_logAddTraceTor(tor, fmt::format("Loaded {} IPv6 peers from resume file", num_added));
@@ -266,7 +267,7 @@ void save_idle_limits(tr_variant::Map& map, tr_torrent const* tor)
 
 void load_single_speed_limit(tr_variant::Map const& map, tr_direction dir, tr_torrent* tor)
 {
-    if (auto const i = map.value_if<int64_t>(TR_KEY_speed_Bps); i)
+    if (auto const i = map.value_if<int64_t>(TR_KEY_speed_Bps))
     {
         tor->set_speed_limit(dir, Speed{ *i, Speed::Units::Byps });
     }
@@ -275,12 +276,12 @@ void load_single_speed_limit(tr_variant::Map const& map, tr_direction dir, tr_to
         tor->set_speed_limit(dir, Speed{ *i2, Speed::Units::KByps });
     }
 
-    if (auto const b = map.value_if<bool>(TR_KEY_use_speed_limit); b)
+    if (auto const b = map.value_if<bool>(TR_KEY_use_speed_limit))
     {
         tor->use_speed_limit(dir, *b);
     }
 
-    if (auto const b = map.value_if<bool>(TR_KEY_use_global_speed_limit); b)
+    if (auto const b = map.value_if<bool>(TR_KEY_use_global_speed_limit))
     {
         tr_torrentUseSessionLimits(tor, *b);
     }
@@ -290,13 +291,13 @@ auto load_speed_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
-    if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_up); child != nullptr)
+    if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_up))
     {
         load_single_speed_limit(*child, TR_UP, tor);
         ret = tr_resume::Speedlimit;
     }
 
-    if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_down); child != nullptr)
+    if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_down))
     {
         load_single_speed_limit(*child, TR_DOWN, tor);
         ret = tr_resume::Speedlimit;
@@ -313,12 +314,12 @@ tr_resume::fields_t load_ratio_limits(tr_variant::Map const& map, tr_torrent* to
         return {};
     }
 
-    if (auto const dratio = d->value_if<double>(TR_KEY_ratio_limit); dratio)
+    if (auto const dratio = d->value_if<double>(TR_KEY_ratio_limit))
     {
         tor->set_seed_ratio(*dratio);
     }
 
-    if (auto const i = d->value_if<int64_t>(TR_KEY_ratio_mode); i)
+    if (auto const i = d->value_if<int64_t>(TR_KEY_ratio_mode))
     {
         tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(*i));
     }
@@ -334,12 +335,12 @@ tr_resume::fields_t load_idle_limits(tr_variant::Map const& map, tr_torrent* tor
         return {};
     }
 
-    if (auto const imin = d->value_if<int64_t>(TR_KEY_idle_limit); imin)
+    if (auto const imin = d->value_if<int64_t>(TR_KEY_idle_limit))
     {
         tor->set_idle_limit_minutes(*imin);
     }
 
-    if (auto const i = d->value_if<int64_t>(TR_KEY_idle_mode); i)
+    if (auto const i = d->value_if<int64_t>(TR_KEY_idle_mode))
     {
         tor->set_idle_limit_mode(static_cast<tr_idlelimit>(*i));
     }
@@ -634,6 +635,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         return {};
     }
 
+    otop = libtransmission::api_compat::convert_incoming_data(*otop);
     auto const* const p_map = otop->get_if<tr_variant::Map>();
     if (p_map == nullptr)
     {
@@ -692,7 +694,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::MaxPeers) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_max_peers); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_max_peers))
         {
             tor->set_peer_limit(static_cast<uint16_t>(*i));
             fields_loaded |= tr_resume::MaxPeers;
@@ -710,7 +712,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::AddedDate) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_added_date); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_added_date))
         {
             helper.load_date_added(static_cast<time_t>(*i));
             fields_loaded |= tr_resume::AddedDate;
@@ -719,7 +721,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::DoneDate) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_done_date); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_done_date))
         {
             helper.load_date_done(static_cast<time_t>(*i));
             fields_loaded |= tr_resume::DoneDate;
@@ -728,7 +730,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::ActivityDate) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_activity_date); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_activity_date))
         {
             tor->set_date_active(*i);
             fields_loaded |= tr_resume::ActivityDate;
@@ -737,7 +739,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::TimeSeeding) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_seeding_time_seconds); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_seeding_time_seconds))
         {
             helper.load_seconds_seeding_before_current_start(*i);
             fields_loaded |= tr_resume::TimeSeeding;
@@ -746,7 +748,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::TimeDownloading) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_downloading_time_seconds); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_downloading_time_seconds))
         {
             helper.load_seconds_downloading_before_current_start(*i);
             fields_loaded |= tr_resume::TimeDownloading;
@@ -755,7 +757,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::BandwidthPriority) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_bandwidth_priority); i && tr_isPriority(static_cast<tr_priority_t>(*i)))
+        if (auto const i = map.value_if<int64_t>(TR_KEY_bandwidth_priority); i && tr_isPriority(static_cast<tr_priority_t>(*i)))
         {
             tr_torrentSetPriority(tor, static_cast<tr_priority_t>(*i));
             fields_loaded |= tr_resume::BandwidthPriority;
@@ -768,6 +770,15 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         {
             tor->set_sequential_download(*b);
             fields_loaded |= tr_resume::SequentialDownload;
+        }
+    }
+
+    if ((fields_to_load & tr_resume::SequentialDownloadFromPiece) != 0)
+    {
+        if (auto i = map.value_if<int64_t>(TR_KEY_sequential_download_from_piece); i)
+        {
+            tor->set_sequential_download_from_piece(*i);
+            fields_loaded |= tr_resume::SequentialDownloadFromPiece;
         }
     }
 
@@ -880,6 +891,15 @@ auto set_from_ctor(
         }
     }
 
+    if ((fields & tr_resume::SequentialDownloadFromPiece) != 0)
+    {
+        if (auto const& val = ctor.sequential_download_from_piece(mode); val)
+        {
+            tor->set_sequential_download_from_piece(*val);
+            ret |= tr_resume::SequentialDownloadFromPiece;
+        }
+    }
+
     return ret;
 }
 
@@ -945,6 +965,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     map.try_emplace(TR_KEY_bandwidth_priority, tor->get_priority());
     map.try_emplace(TR_KEY_paused, !helper.start_when_stable());
     map.try_emplace(TR_KEY_sequential_download, tor->is_sequential_download());
+    map.try_emplace(TR_KEY_sequential_download_from_piece, tor->sequential_download_from_piece());
     save_peers(map, tor);
 
     if (tor->has_metainfo())
@@ -962,8 +983,9 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     save_labels(map, tor);
     save_group(map, tor);
 
+    auto const out = libtransmission::api_compat::convert_outgoing_data(std::move(map));
     auto serde = tr_variant_serde::benc();
-    if (!serde.to_file(std::move(map), tor->resume_file()))
+    if (!serde.to_file(out, tor->resume_file()))
     {
         tor->error().set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_.message()));
     }

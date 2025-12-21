@@ -25,6 +25,9 @@
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h>
 
+namespace transmission::app
+{
+
 template<typename Icon>
 class FaviconCache
 {
@@ -44,9 +47,7 @@ public:
         return iter != std::end(icons_) ? &iter->second : nullptr;
     }
 
-    void load( //
-        std::string_view url_in,
-        IconFunc callback = [](Icon const&) { /*default callback is a no-op */ })
+    void load(std::string_view url_in, IconFunc callback = [](Icon const&) { /*default callback is a no-op */ })
     {
         std::call_once(scan_once_flag_, &FaviconCache::scan_file_cache, this);
 
@@ -247,3 +248,5 @@ private:
 
     std::map<std::string /*sitename*/, Icon, std::less<>> icons_;
 };
+
+} // namespace transmission::app

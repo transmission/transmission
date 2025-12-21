@@ -6,8 +6,13 @@ target_include_directories(fmt::fmt-header-only
     INTERFACE
         ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE})
 
-file(READ "${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE}/fmt/base.h" _FMT_BASE_H)
-if(_FMT_BASE_H MATCHES "FMT_VERSION ([0-9]+)([0-9][0-9])([0-9][0-9])")
+set(_FMT_VERSION_H_PATH "${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE}/fmt/base.h")
+if(NOT EXISTS "${_FMT_VERSION_H_PATH}")
+    # fmt < 11
+    set(_FMT_VERSION_H_PATH "${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE}/fmt/core.h")
+endif()
+file(READ "${_FMT_VERSION_H_PATH}" _FMT_VERSION_H)
+if(_FMT_VERSION_H MATCHES "FMT_VERSION ([0-9]+)([0-9][0-9])([0-9][0-9])")
     # Use math to skip leading zeros if any.
     math(EXPR _FMT_VERSION_MAJOR ${CMAKE_MATCH_1})
     math(EXPR _FMT_VERSION_MINOR ${CMAKE_MATCH_2})

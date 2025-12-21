@@ -9,7 +9,7 @@
 
 typedef void (^CompletionBlock)(BOOL);
 
-@interface FileRenameSheetController ()
+@interface FileRenameSheetController ()<NSControlTextEditingDelegate>
 
 @property(nonatomic, weak) IBOutlet NSTextField* labelField;
 @property(nonatomic, weak) IBOutlet NSTextField* inputField;

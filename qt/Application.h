@@ -87,7 +87,6 @@ public slots:
     void addWatchdirTorrent(QString const& filename) const;
 
 private slots:
-    void consentGiven(int result) const;
     void onSessionSourceChanged() const;
     void onTorrentsAdded(torrent_ids_t const& torrent_ids) const;
     void onTorrentsCompleted(torrent_ids_t const& torrent_ids) const;
@@ -120,7 +119,7 @@ private:
     QTranslator qt_translator_;
     QTranslator app_translator_;
 
-    FaviconCache<QPixmap> favicon_cache_;
+    transmission::app::FaviconCache<QPixmap> favicon_cache_;
 };
 
 #define trApp dynamic_cast<Application*>(Application::instance())

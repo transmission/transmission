@@ -112,7 +112,7 @@ template<typename T>
  * @brief Rich Salz's classic implementation of shell-style pattern matching for `?`, `\`, `[]`, and `*` characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
  */
-[[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
+[[nodiscard]] bool tr_wildmat(char const* text, char const* pattern);
 
 template<typename T>
 [[nodiscard]] constexpr bool tr_strv_contains(std::string_view sv, T key) noexcept // c++23
@@ -247,7 +247,7 @@ template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 
 /** @param ratio    the ratio to convert to a string
     @param infinity the string representation of "infinity" */
-[[nodiscard]] std::string tr_strratio(double ratio, std::string_view infinity);
+[[nodiscard]] std::string tr_strratio(double ratio, std::string_view none, std::string_view infinity);
 
 // ---
 
@@ -286,7 +286,7 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 // ---
 
 /** @brief Check if environment variable exists. */
-[[nodiscard]] bool tr_env_key_exists(char const* key);
+[[nodiscard]] bool tr_env_key_exists(char const* key) noexcept;
 
 /** @brief Get environment variable value as string. */
 [[nodiscard]] std::string tr_env_get_string(std::string_view key, std::string_view default_value = {});

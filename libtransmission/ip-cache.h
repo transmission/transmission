@@ -28,10 +28,10 @@
  * This class caches 3 useful info:
  * 1. Whether your machine supports the IP protocol
  * 2. Source address used for global connections
- * 3. Global address
+ * 3. Global address (IPv4 public address/IPv6 global unicast address)
  *
  * The idea is, if this class successfully cached a source address, that means
- * you have connectivity to the public internet. And if the global address is
+ * your system is capable in that IP protocol. And if the global address is
  * the same as the source address, then you are not behind a NAT.
  */
 class tr_ip_cache
@@ -70,7 +70,7 @@ public:
         return global_addr_[type];
     }
 
-    [[nodiscard]] std::optional<tr_address> global_source_addr(tr_address_type type) const noexcept
+    [[nodiscard]] std::optional<tr_address> source_addr(tr_address_type type) const noexcept
     {
         auto const lock = std::shared_lock{ source_addr_mutex_[type] };
         return source_addr_[type];
