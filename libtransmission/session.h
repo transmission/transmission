@@ -392,9 +392,24 @@ public:
             load(src);
         }
 
+        void fixup_from_preferred_transports();
+        void fixup_to_preferred_transports();
+
         void load(tr_variant const& src)
         {
             libtransmission::serializer::load(*this, Fields, src);
+
+            if (auto const* map = src.get_if<tr_variant::Map>())
+            {
+                if (map->contains(TR_KEY_preferred_transports))
+                {
+                    fixup_from_preferred_transports();
+                }
+                else
+                {
+                    fixup_to_preferred_transports();
+                }
+            }
         }
 
         [[nodiscard]] tr_variant::Map save() const
@@ -1026,7 +1041,12 @@ public:
 
     bool load_preferred_transports(tr_variant const& var) noexcept
     {
-        return libtransmission::serializer::Converters::deserialize(var, &settings_.preferred_transports);
+        if (!libtransmission::serializer::Converters::deserialize(var, &settings_.preferred_transports))
+        {
+            return false;
+        }
+        settings_.fixup_from_preferred_transports();
+        return true;
     }
 
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
