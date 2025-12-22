@@ -25,9 +25,7 @@
 
 #include "VariantHelpers.h"
 
-using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
-using ::trqt::variant_helpers::variantInit;
 namespace api_compat = libtransmission::api_compat;
 
 namespace
