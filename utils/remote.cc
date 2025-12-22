@@ -198,18 +198,18 @@ struct RemoteConfig
 
 enum
 {
-    TAG_SESSION,
-    TAG_STATS,
-    TAG_DETAILS,
-    TAG_FILES,
-    TAG_FILTER,
-    TAG_GROUPS,
-    TAG_LIST,
-    TAG_PEERS,
-    TAG_PIECES,
-    TAG_PORTTEST,
-    TAG_TORRENT_ADD,
-    TAG_TRACKERS
+    ID_SESSION,
+    ID_STATS,
+    ID_DETAILS,
+    ID_FILES,
+    ID_FILTER,
+    ID_GROUPS,
+    ID_LIST,
+    ID_PEERS,
+    ID_PIECES,
+    ID_PORTTEST,
+    ID_TORRENT_ADD,
+    ID_TRACKERS
 };
 
 // --- Command-Line Arguments
@@ -594,7 +594,7 @@ enum
     return { std::move(num_vec) };
 }
 
-void add_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view fallback = "")
+void add_id_arg(tr_variant::Map& params, std::string_view id_str, std::string_view fallback = "")
 {
     if (std::empty(id_str))
     {
@@ -604,7 +604,7 @@ void add_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view
     if (std::empty(id_str))
     {
         fmt::print(stderr, "No torrent specified!  Please use the -t option first.\n");
-        id_str = "-1"sv; /* no torrent will have this ID, so will act as a no-op */
+        id_str = "-1"sv; // no torrent will have this ID, so will act as a no-op
     }
 
     static auto constexpr IdActive = "active"sv;
@@ -612,7 +612,7 @@ void add_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view
 
     if (IdActive == id_str)
     {
-        args.insert_or_assign(TR_KEY_ids, tr_variant::unmanaged_string(TR_KEY_recently_active_kebab));
+        params.insert_or_assign(TR_KEY_ids, tr_variant::unmanaged_string(TR_KEY_recently_active_kebab));
     }
     else if (IdAll != id_str)
     {
@@ -626,11 +626,11 @@ void add_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view
 
         if (is_num || is_list)
         {
-            args.insert_or_assign(TR_KEY_ids, rpc_parse_list_str(id_str));
+            params.insert_or_assign(TR_KEY_ids, rpc_parse_list_str(id_str));
         }
         else
         {
-            args.insert_or_assign(TR_KEY_ids, id_str); /* it's a torrent sha hash */
+            params.insert_or_assign(TR_KEY_ids, id_str); /* it's a torrent sha hash */
         }
     }
 }
@@ -1872,27 +1872,21 @@ void print_trackers(tr_variant::Map const& map)
     }
 }
 
-void print_session(tr_variant::Map const& map)
+void print_session(tr_variant::Map const& result)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
-    {
-        return;
-    }
-
     fmt::print("VERSION\n");
 
-    if (auto sv = args->value_if<std::string_view>(TR_KEY_version); sv)
+    if (auto sv = result.value_if<std::string_view>(TR_KEY_version))
     {
         fmt::print("  Daemon version: {:s}\n", *sv);
     }
 
-    if (auto i = args->value_if<int64_t>({ TR_KEY_rpc_version, TR_KEY_rpc_version_kebab }); i)
+    if (auto i = result.value_if<int64_t>(TR_KEY_rpc_version))
     {
         fmt::print("  RPC version: {:d}\n", *i);
     }
 
-    if (auto i = args->value_if<int64_t>({ TR_KEY_rpc_version_minimum, TR_KEY_rpc_version_minimum_kebab }); i)
+    if (auto i = result.value_if<int64_t>(TR_KEY_rpc_version_minimum))
     {
         fmt::print("  RPC minimum version: {:d}\n", *i);
     }
@@ -1901,78 +1895,77 @@ void print_session(tr_variant::Map const& map)
 
     fmt::print("CONFIG\n");
 
-    if (auto sv = args->value_if<std::string_view>({ TR_KEY_config_dir, TR_KEY_config_dir_kebab }); sv)
+    if (auto sv = result.value_if<std::string_view>(TR_KEY_config_dir))
     {
         fmt::print("  Configuration directory: {:s}\n", *sv);
     }
 
-    if (auto sv = args->value_if<std::string_view>({ TR_KEY_download_dir, TR_KEY_download_dir_kebab }); sv)
+    if (auto sv = result.value_if<std::string_view>(TR_KEY_download_dir))
     {
         fmt::print("  Download directory: {:s}\n", *sv);
     }
 
-    if (auto i = args->value_if<int64_t>({ TR_KEY_peer_port, TR_KEY_peer_port_kebab }); i)
+    if (auto i = result.value_if<int64_t>(TR_KEY_peer_port_kebab))
     {
         fmt::print("  Listen port: {:d}\n", *i);
     }
 
-    if (auto b = args->value_if<bool>({ TR_KEY_port_forwarding_enabled, TR_KEY_port_forwarding_enabled_kebab }); b)
+    if (auto b = result.value_if<bool>(TR_KEY_port_forwarding_enabled))
     {
         fmt::print("  Port forwarding enabled: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = args->value_if<bool>({ TR_KEY_utp_enabled, TR_KEY_utp_enabled_kebab }); b)
+    if (auto b = result.value_if<bool>(TR_KEY_utp_enabled))
     {
         fmt::print("  µTP enabled: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = args->value_if<bool>({ TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab }); b)
+    if (auto b = result.value_if<bool>(TR_KEY_dht_enabled))
     {
         fmt::print("  Distributed hash table enabled: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = args->value_if<bool>({ TR_KEY_lpd_enabled, TR_KEY_lpd_enabled_kebab }); b)
+    if (auto b = result.value_if<bool>(TR_KEY_lpd_enabled))
     {
         fmt::print("  Local peer discovery enabled: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = args->value_if<bool>({ TR_KEY_pex_enabled, TR_KEY_pex_enabled_kebab }); b)
+    if (auto b = result.value_if<bool>(TR_KEY_pex_enabled))
     {
         fmt::print("  Peer exchange allowed: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto sv = args->value_if<std::string_view>(TR_KEY_encryption); sv)
+    if (auto sv = result.value_if<std::string_view>(TR_KEY_encryption))
     {
         fmt::print("  Encryption: {:s}\n", *sv);
     }
 
-    if (auto i = args->value_if<int64_t>({ TR_KEY_cache_size_mb, TR_KEY_cache_size_mb_kebab }); i)
+    if (auto i = result.value_if<int64_t>(TR_KEY_cache_size_mb))
     {
         fmt::print("  Maximum memory cache size: {:s}\n", Memory{ *i, Memory::Units::MBytes }.to_string());
     }
 
-    if (auto b = args->value_if<bool>(TR_KEY_sequential_download); b)
+    if (auto b = result.value_if<bool>(TR_KEY_sequential_download))
     {
         fmt::print("  Sequential download: {:s}\n", *b ? "Yes" : "No");
     }
 
-    auto const alt_enabled = args->value_if<bool>({ TR_KEY_alt_speed_enabled, TR_KEY_alt_speed_enabled_kebab });
-    auto const alt_time_enabled = args->value_if<bool>({ TR_KEY_alt_speed_time_enabled, TR_KEY_alt_speed_time_enabled_kebab });
-    auto const up_enabled = args->value_if<bool>({ TR_KEY_speed_limit_up_enabled, TR_KEY_speed_limit_up_enabled_kebab });
-    auto const down_enabled = args->value_if<bool>({ TR_KEY_speed_limit_down_enabled, TR_KEY_speed_limit_down_enabled_kebab });
-    auto const speed_ratio_limited = args->value_if<bool>({ TR_KEY_seed_ratio_limited, TR_KEY_seed_ratio_limited_camel });
-    auto const idle_seeding_limited = args->value_if<bool>(
-        { TR_KEY_idle_seeding_limit_enabled, TR_KEY_idle_seeding_limit_enabled_kebab });
-    auto const alt_down = args->value_if<int64_t>({ TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab });
-    auto const alt_up = args->value_if<int64_t>({ TR_KEY_alt_speed_up, TR_KEY_alt_speed_up_kebab });
-    auto const alt_begin = args->value_if<int64_t>({ TR_KEY_alt_speed_time_begin, TR_KEY_alt_speed_time_begin_kebab });
-    auto const alt_end = args->value_if<int64_t>({ TR_KEY_alt_speed_time_end, TR_KEY_alt_speed_time_end_kebab });
-    auto const alt_day = args->value_if<int64_t>({ TR_KEY_alt_speed_time_day, TR_KEY_alt_speed_time_day_kebab });
-    auto const up_limit = args->value_if<int64_t>({ TR_KEY_speed_limit_up, TR_KEY_speed_limit_up_kebab });
-    auto const down_limit = args->value_if<int64_t>({ TR_KEY_speed_limit_down, TR_KEY_speed_limit_down_kebab });
-    auto const peer_limit = args->value_if<int64_t>({ TR_KEY_peer_limit_global, TR_KEY_peer_limit_global_kebab });
-    auto const idle_seeding_limit = args->value_if<int64_t>({ TR_KEY_idle_seeding_limit, TR_KEY_idle_seeding_limit_kebab });
-    auto const seed_ratio_limit = args->value_if<double>({ TR_KEY_seed_ratio_limit, TR_KEY_seed_ratio_limit_camel });
+    auto const alt_enabled = result.value_if<bool>(TR_KEY_alt_speed_enabled);
+    auto const alt_time_enabled = result.value_if<bool>(TR_KEY_alt_speed_time_enabled);
+    auto const up_enabled = result.value_if<bool>(TR_KEY_speed_limit_up_enabled);
+    auto const down_enabled = result.value_if<bool>(TR_KEY_speed_limit_down_enabled);
+    auto const speed_ratio_limited = result.value_if<bool>(TR_KEY_seed_ratio_limited);
+    auto const idle_seeding_limited = result.value_if<bool>(TR_KEY_idle_seeding_limit_enabled);
+    auto const alt_down = result.value_if<int64_t>(TR_KEY_alt_speed_down);
+    auto const alt_up = result.value_if<int64_t>(TR_KEY_alt_speed_up);
+    auto const alt_begin = result.value_if<int64_t>(TR_KEY_alt_speed_time_begin);
+    auto const alt_end = result.value_if<int64_t>(TR_KEY_alt_speed_time_end);
+    auto const alt_day = result.value_if<int64_t>(TR_KEY_alt_speed_time_day);
+    auto const up_limit = result.value_if<int64_t>(TR_KEY_speed_limit_up);
+    auto const down_limit = result.value_if<int64_t>(TR_KEY_speed_limit_down);
+    auto const peer_limit = result.value_if<int64_t>(TR_KEY_peer_limit_global);
+    auto const idle_seeding_limit = result.value_if<int64_t>(TR_KEY_idle_seeding_limit);
+    auto const seed_ratio_limit = result.value_if<double>(TR_KEY_seed_ratio_limit);
 
     if (alt_down && alt_enabled && alt_begin && alt_time_enabled && alt_end && alt_day && alt_up && peer_limit && down_limit &&
         down_enabled && up_limit && up_enabled && seed_ratio_limit && speed_ratio_limited && idle_seeding_limited &&
@@ -2086,30 +2079,24 @@ void print_session(tr_variant::Map const& map)
 
     fmt::print("MISC\n");
 
-    if (auto b = args->value_if<bool>({ TR_KEY_start_added_torrents, TR_KEY_start_added_torrents_kebab }); b)
+    if (auto b = result.value_if<bool>(TR_KEY_start_added_torrents))
     {
         fmt::print("  Autostart added torrents: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = args->value_if<bool>({ TR_KEY_trash_original_torrent_files, TR_KEY_trash_original_torrent_files_kebab }); b)
+    if (auto b = result.value_if<bool>(TR_KEY_trash_original_torrent_files))
     {
         fmt::print("  Delete automatically added torrents: {:s}\n", *b ? "Yes" : "No");
     }
 }
 
-void print_session_stats(tr_variant::Map const& map)
+void print_session_stats(tr_variant::Map const& result)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
+    if (auto const* const stats = result.find_if<tr_variant::Map>(TR_KEY_current_stats))
     {
-        return;
-    }
-
-    if (auto* d = args->find_if<tr_variant::Map>({ TR_KEY_current_stats, TR_KEY_current_stats_kebab }); d != nullptr)
-    {
-        auto const up = d->value_if<int64_t>({ TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_camel });
-        auto const down = d->value_if<int64_t>({ TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_camel });
-        auto const secs = d->value_if<int64_t>({ TR_KEY_seconds_active, TR_KEY_seconds_active_camel });
+        auto const up = stats->value_if<int64_t>(TR_KEY_uploaded_bytes);
+        auto const down = stats->value_if<int64_t>(TR_KEY_downloaded_bytes);
+        auto const secs = stats->value_if<int64_t>(TR_KEY_seconds_active);
 
         if (up && down && secs)
         {
@@ -2121,12 +2108,12 @@ void print_session_stats(tr_variant::Map const& map)
         }
     }
 
-    if (auto* d = args->find_if<tr_variant::Map>({ TR_KEY_cumulative_stats, TR_KEY_cumulative_stats_kebab }); d != nullptr)
+    if (auto const* const stats = result.find_if<tr_variant::Map>(TR_KEY_cumulative_stats))
     {
-        auto const up = d->value_if<int64_t>({ TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_camel });
-        auto const down = d->value_if<int64_t>({ TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_camel });
-        auto const secs = d->value_if<int64_t>({ TR_KEY_seconds_active, TR_KEY_seconds_active_camel });
-        auto const sessions = d->value_if<int64_t>({ TR_KEY_session_count, TR_KEY_session_count_camel });
+        auto const up = stats->value_if<int64_t>(TR_KEY_uploaded_bytes);
+        auto const down = stats->value_if<int64_t>(TR_KEY_downloaded_bytes);
+        auto const secs = stats->value_if<int64_t>(TR_KEY_seconds_active);
+        auto const sessions = stats->value_if<int64_t>(TR_KEY_session_count);
 
         if (up && down && secs && sessions)
         {
@@ -2318,115 +2305,118 @@ void filter_ids(tr_variant::Map const& map, RemoteConfig& config)
     }
 }
 
-int process_response(char const* rpcurl, std::string_view response, RemoteConfig& config)
+int process_response(char const* rpcurl, std::string_view const response, RemoteConfig& config)
 {
-    auto status = int{ EXIT_SUCCESS };
+    if (config.json)
+    {
+        fmt::print("{:s}\n", response);
+        return EXIT_SUCCESS;
+    }
 
     if (config.debug)
     {
         fmt::print(stderr, "got response (len {:d}):\n--------\n{:s}\n--------\n", std::size(response), response);
     }
 
-    if (config.json)
-    {
-        fmt::print("{:s}\n", response);
-        return status;
-    }
-
-    if (auto top = tr_variant_serde::json().inplace().parse(response); !top)
+    auto const parsed = tr_variant_serde::json().inplace().parse(response);
+    if (!parsed)
     {
         fmt::print(stderr, "Unable to parse response '{}'\n", response);
-        status |= EXIT_FAILURE;
+        return EXIT_FAILURE;
     }
-    else if (auto* map_ptr = top->get_if<tr_variant::Map>(); map_ptr == nullptr)
+
+    auto const* const top = parsed->get_if<tr_variant::Map>();
+    if (!top)
     {
         fmt::print(stderr, "Response was not a JSON object\n");
-        status |= EXIT_FAILURE;
+        return EXIT_FAILURE;
     }
-    else if (auto osv = map_ptr->value_if<std::string_view>(TR_KEY_result); osv)
+
+    if (!top->contains(TR_KEY_jsonrpc))
     {
-        auto const& map = *map_ptr;
-        auto const& sv = *osv;
-        if (sv != "success"sv)
+        fmt::print(stderr, "Response was not JSON-RPC\n");
+        return EXIT_FAILURE;
+    }
+
+    if (auto const* const errmap = top->find_if<tr_variant::Map>(TR_KEY_error))
+    {
+        auto const errmsg = errmap->value_if<std::string_view>(TR_KEY_message).value_or("unknown error");
+        fmt::print("Error: {:s}\n", errmsg);
+        return EXIT_FAILURE;
+    }
+
+    auto empty_result = tr_variant::Map{};
+    auto* result = top->find_if<tr_variant::Map>(TR_KEY_result);
+    result = result ? result : &empty_result;
+
+    switch (top->value_if<int64_t>(TR_KEY_id).value_or(-1))
+    {
+    case ID_SESSION:
+        print_session(*result);
+        break;
+
+    case ID_STATS:
+        print_session_stats(*result);
+        break;
+
+#if 0
+    case ID_DETAILS:
+        print_details(map);
+        break;
+
+    case ID_FILES:
+        print_file_list(map);
+        break;
+
+    case ID_LIST:
+        print_torrent_list(map);
+        break;
+
+    case ID_PEERS:
+        print_peers(map);
+        break;
+
+    case ID_PIECES:
+        print_pieces(map);
+        break;
+
+    case ID_PORTTEST:
+        print_port_test(map);
+        break;
+
+    case ID_TRACKERS:
+        print_trackers(map);
+        break;
+
+    case ID_GROUPS:
+        print_groups(map);
+        break;
+
+    case ID_FILTER:
+        filter_ids(map, config);
+        break;
+
+    case ID_TORRENT_ADD:
+        if (auto* b = map.find_if<tr_variant::Map>(TR_KEY_arguments); b != nullptr)
         {
-            fmt::print("Error: {:s}\n", sv);
-            status |= EXIT_FAILURE;
-        }
-        else
-        {
-            auto const tag = map.value_if<int64_t>(TR_KEY_tag).value_or(-1);
-            switch (tag)
+            b = b->find_if<tr_variant::Map>({ TR_KEY_torrent_added, TR_KEY_torrent_added_kebab });
+            if (b != nullptr)
             {
-            case TAG_SESSION:
-                print_session(map);
-                break;
-
-            case TAG_STATS:
-                print_session_stats(map);
-                break;
-
-            case TAG_DETAILS:
-                print_details(map);
-                break;
-
-            case TAG_FILES:
-                print_file_list(map);
-                break;
-
-            case TAG_LIST:
-                print_torrent_list(map);
-                break;
-
-            case TAG_PEERS:
-                print_peers(map);
-                break;
-
-            case TAG_PIECES:
-                print_pieces(map);
-                break;
-
-            case TAG_PORTTEST:
-                print_port_test(map);
-                break;
-
-            case TAG_TRACKERS:
-                print_trackers(map);
-                break;
-
-            case TAG_GROUPS:
-                print_groups(map);
-                break;
-
-            case TAG_FILTER:
-                filter_ids(map, config);
-                break;
-
-            case TAG_TORRENT_ADD:
-                if (auto* b = map.find_if<tr_variant::Map>(TR_KEY_arguments); b != nullptr)
+                if (auto i = b->value_if<int64_t>(TR_KEY_id); i)
                 {
-                    b = b->find_if<tr_variant::Map>({ TR_KEY_torrent_added, TR_KEY_torrent_added_kebab });
-                    if (b != nullptr)
-                    {
-                        if (auto i = b->value_if<int64_t>(TR_KEY_id); i)
-                        {
-                            config.torrent_ids = std::to_string(*i);
-                        }
-                    }
+                    config.torrent_ids = std::to_string(*i);
                 }
-                [[fallthrough]];
-
-            default:
-                fmt::print("{:s} responded: {:s}\n", rpcurl, sv);
-                break;
             }
         }
-    }
-    else
-    {
-        status |= EXIT_FAILURE;
+        [[fallthrough]];
+#endif
+
+    default:
+        fmt::print("{:s} responded: {:s}\n", rpcurl, response);
+        return EXIT_FAILURE;
     }
 
-    return status;
+    return EXIT_SUCCESS;
 }
 
 namespace flush_utils
@@ -2511,6 +2501,7 @@ void tr_curl_easy_cleanup(CURL* curl)
 {
     auto serde = tr_variant_serde::json();
     serde.compact();
+    fmt::print(stderr, "{:s}:{:d} serializing payload to {:d}\n", __FILE__, __LINE__, static_cast<int>(config.network_style));
 
     if (config.network_style == api_compat::Style::Tr5)
     {
@@ -2627,16 +2618,17 @@ tr_variant::Map& ensure_tadd(tr_variant& tadd)
     auto* map = tadd.get_if<tr_variant::Map>();
     if (map == nullptr)
     {
-        tadd = tr_variant::Map{ 3 };
+        tadd = tr_variant::Map{ 4U };
         map = tadd.get_if<tr_variant::Map>();
-        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_add_kebab));
-        map->try_emplace(TR_KEY_tag, TAG_TORRENT_ADD);
+        map->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_add));
+        map->try_emplace(TR_KEY_id, ID_TORRENT_ADD);
     }
 
-    auto* args = map->find_if<tr_variant::Map>(TR_KEY_arguments);
+    auto* args = map->find_if<tr_variant::Map>(TR_KEY_params);
     if (args == nullptr)
     {
-        args = map->insert_or_assign(TR_KEY_arguments, tr_variant::Map{}).first.get_if<tr_variant::Map>();
+        args = map->insert_or_assign(TR_KEY_params, tr_variant::Map{}).first.get_if<tr_variant::Map>();
     }
     return *args;
 }
@@ -2801,73 +2793,76 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 }
             }
 
-            auto map = tr_variant::Map{ 3 };
-            auto args = tr_variant::Map{ 1 };
+            auto map = tr_variant::Map{ 3U };
+            map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+            map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_get));
+
+            auto params = tr_variant::Map{ 1U };
             auto fields = tr_variant::Vector{};
 
             switch (c)
             {
             case 'F':
                 config.filter = optarg_sv;
-                map.insert_or_assign(TR_KEY_tag, TAG_FILTER);
+                map.insert_or_assign(TR_KEY_id, ID_FILTER);
 
                 for (auto const& key : DetailsKeys)
                 {
                     fields.emplace_back(tr_variant::unmanaged_string(key));
                 }
 
-                add_id_arg(args, config, "all");
+                add_id_arg(params, config, "all");
                 break;
             case 'i':
-                map.insert_or_assign(TR_KEY_tag, TAG_DETAILS);
+                map.insert_or_assign(TR_KEY_id, ID_DETAILS);
 
                 for (auto const& key : DetailsKeys)
                 {
                     fields.emplace_back(tr_variant::unmanaged_string(key));
                 }
 
-                add_id_arg(args, config);
+                add_id_arg(params, config);
                 break;
 
             case 'l':
-                map.insert_or_assign(TR_KEY_tag, TAG_LIST);
+                map.insert_or_assign(TR_KEY_id, ID_LIST);
 
                 for (auto const& key : ListKeys)
                 {
                     fields.emplace_back(tr_variant::unmanaged_string(key));
                 }
 
-                add_id_arg(args, config, "all");
+                add_id_arg(params, config, "all");
                 break;
 
             case 940:
-                map.insert_or_assign(TR_KEY_tag, TAG_FILES);
+                map.insert_or_assign(TR_KEY_id, ID_FILES);
 
                 for (auto const& key : FilesKeys)
                 {
                     fields.emplace_back(tr_variant::unmanaged_string(key));
                 }
 
-                add_id_arg(args, config);
+                add_id_arg(params, config);
                 break;
 
             case 941:
-                map.insert_or_assign(TR_KEY_tag, TAG_PEERS);
+                map.insert_or_assign(TR_KEY_id, ID_PEERS);
                 fields.emplace_back(tr_variant::unmanaged_string(TR_KEY_peers));
-                add_id_arg(args, config);
+                add_id_arg(params, config);
                 break;
 
             case 942:
-                map.insert_or_assign(TR_KEY_tag, TAG_PIECES);
+                map.insert_or_assign(TR_KEY_id, ID_PIECES);
                 fields.emplace_back(tr_variant::unmanaged_string(TR_KEY_pieces));
                 fields.emplace_back(tr_variant::unmanaged_string(TR_KEY_piece_count_camel));
-                add_id_arg(args, config);
+                add_id_arg(params, config);
                 break;
 
             case 943:
-                map.insert_or_assign(TR_KEY_tag, TAG_TRACKERS);
+                map.insert_or_assign(TR_KEY_id, ID_TRACKERS);
                 fields.emplace_back(tr_variant::unmanaged_string(TR_KEY_tracker_stats_camel));
-                add_id_arg(args, config);
+                add_id_arg(params, config);
                 break;
 
             default:
@@ -2875,9 +2870,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
             }
 
-            args.insert_or_assign(TR_KEY_fields, std::move(fields));
-            map.insert_or_assign(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_get_kebab));
-            map.insert_or_assign(TR_KEY_arguments, std::move(args));
+            params.insert_or_assign(TR_KEY_fields, std::move(fields));
+            map.insert_or_assign(TR_KEY_params, std::move(params));
             auto top = tr_variant{ std::move(map) };
             status |= flush(rpcurl, &top, config);
         }
@@ -3379,11 +3373,12 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
         {
             switch (c)
             {
-            case 920: /* session-info */
+            case 920: // session-info
                 {
-                    auto map = tr_variant::Map{ 2 };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_get_kebab));
-                    map.try_emplace(TR_KEY_tag, TAG_SESSION);
+                    auto map = tr_variant::Map{ 3U };
+                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_get));
+                    map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+                    map.try_emplace(TR_KEY_id, ID_SESSION);
 
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
@@ -3417,9 +3412,10 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 921:
                 {
-                    auto map = tr_variant::Map{ 2 };
+                    auto map = tr_variant::Map{ 3U };
+                    map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats_kebab));
-                    map.try_emplace(TR_KEY_tag, TAG_STATS);
+                    map.try_emplace(TR_KEY_id, ID_STATS);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
@@ -3429,7 +3425,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 {
                     auto map = tr_variant::Map{ 2 };
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_port_test_kebab));
-                    map.try_emplace(TR_KEY_tag, TAG_PORTTEST);
+                    map.try_emplace(TR_KEY_id, ID_PORTTEST);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
@@ -3499,7 +3495,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 {
                     auto map = tr_variant::Map{ 2 };
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_group_get_kebab));
-                    map.try_emplace(TR_KEY_tag, TAG_GROUPS);
+                    map.try_emplace(TR_KEY_id, ID_GROUPS);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
