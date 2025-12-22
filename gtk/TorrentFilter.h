@@ -18,7 +18,7 @@
 class TorrentFilter : public FilterBase<Torrent>
 {
 public:
-    using Activity = transmission::app::ShowMode;
+    using ShowMode = transmission::app::ShowMode;
 
     enum class Tracker : int8_t
     {
@@ -27,13 +27,13 @@ public:
     };
 
 public:
-    void set_activity(Activity type);
+    void set_mode(ShowMode mode);
     void set_tracker(Tracker type, Glib::ustring const& host);
     void set_text(Glib::ustring const& text);
 
-    bool match_activity(Torrent const& torrent) const;
-    bool match_tracker(Torrent const& torrent) const;
+    bool match_mode(Torrent const& torrent) const;
     bool match_text(Torrent const& torrent) const;
+    bool match_tracker(Torrent const& torrent) const;
 
     // FilterBase<Torrent>
     bool match(Torrent const& torrent) const override;
@@ -43,7 +43,7 @@ public:
 
     static Glib::RefPtr<TorrentFilter> create();
 
-    static bool match_activity(Torrent const& torrent, Activity type);
+    static bool match_mode(Torrent const& torrent, ShowMode mode);
     static bool match_tracker(Torrent const& torrent, Tracker type, Glib::ustring const& host);
     static bool match_text(Torrent const& torrent, Glib::ustring const& text);
 
@@ -51,7 +51,7 @@ private:
     TorrentFilter();
 
 private:
-    Activity activity_type_ = transmission::app::DefaultShowMode;
+    ShowMode show_mode_ = transmission::app::DefaultShowMode;
     Tracker tracker_type_ = Tracker::ALL;
     Glib::ustring tracker_host_;
     Glib::ustring text_;

@@ -17,7 +17,6 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
-#include <libtransmission/serializer.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h> // tr_time()
 #include <libtransmission/variant.h>
@@ -59,7 +58,6 @@
 
 using namespace std::literals;
 using namespace transmission::app;
-using namespace libtransmission::serializer;
 
 class Session::Impl
 {

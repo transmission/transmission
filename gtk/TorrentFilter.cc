@@ -19,25 +19,25 @@ TorrentFilter::TorrentFilter()
 {
 }
 
-void TorrentFilter::set_activity(Activity const type)
+void TorrentFilter::set_mode(ShowMode const mode)
 {
-    if (activity_type_ == type)
+    if (show_mode_ == mode)
     {
         return;
     }
 
     auto change = Change::DIFFERENT;
 
-    if (activity_type_ == Activity::ShowAll)
+    if (show_mode_ == ShowMode::ShowAll)
     {
         change = Change::MORE_STRICT;
     }
-    else if (type == Activity::ShowAll)
+    else if (mode == ShowMode::ShowAll)
     {
         change = Change::LESS_STRICT;
     }
 
-    activity_type_ = type;
+    show_mode_ = mode;
     changed(change);
 }
 
@@ -99,9 +99,9 @@ void TorrentFilter::set_text(Glib::ustring const& text)
     changed(change);
 }
 
-bool TorrentFilter::match_activity(Torrent const& torrent) const
+bool TorrentFilter::match_mode(Torrent const& torrent) const
 {
-    return match_activity(torrent, activity_type_);
+    return match_mode(torrent, show_mode_);
 }
 
 bool TorrentFilter::match_tracker(Torrent const& torrent) const
@@ -116,12 +116,12 @@ bool TorrentFilter::match_text(Torrent const& torrent) const
 
 bool TorrentFilter::match(Torrent const& torrent) const
 {
-    return match_activity(torrent) && match_tracker(torrent) && match_text(torrent);
+    return match_mode(torrent) && match_tracker(torrent) && match_text(torrent);
 }
 
 bool TorrentFilter::matches_all() const
 {
-    return activity_type_ == Activity::ShowAll && tracker_type_ == Tracker::ALL && text_.empty();
+    return show_mode_ == ShowMode::ShowAll && tracker_type_ == Tracker::ALL && text_.empty();
 }
 
 void TorrentFilter::update(Torrent::ChangeFlags changes)
@@ -130,23 +130,23 @@ void TorrentFilter::update(Torrent::ChangeFlags changes)
 
     bool refilter_needed = false;
 
-    if (activity_type_ != Activity::ShowAll)
+    if (show_mode_ != ShowMode::ShowAll)
     {
-        static auto TR_CONSTEXPR23 ActivityFlags = std::array<std::pair<Activity, Torrent::ChangeFlags>, 7U>{ {
-            { Activity::ShowActive, Flag::ACTIVE_PEER_COUNT | Flag::ACTIVITY },
-            { Activity::ShowDownloading, Flag::ACTIVITY },
-            { Activity::ShowError, Flag::ERROR_CODE },
-            { Activity::ShowFinished, Flag::FINISHED },
-            { Activity::ShowPaused, Flag::ACTIVITY },
-            { Activity::ShowSeeding, Flag::ACTIVITY },
-            { Activity::ShowVerifying, Flag::ACTIVITY },
+        static auto TR_CONSTEXPR23 ShowModeFlags = std::array<std::pair<ShowMode, Torrent::ChangeFlags>, 7U>{ {
+            { ShowMode::ShowActive, Flag::ACTIVE_PEER_COUNT | Flag::ACTIVITY },
+            { ShowMode::ShowDownloading, Flag::ACTIVITY },
+            { ShowMode::ShowError, Flag::ERROR_CODE },
+            { ShowMode::ShowFinished, Flag::FINISHED },
+            { ShowMode::ShowPaused, Flag::ACTIVITY },
+            { ShowMode::ShowSeeding, Flag::ACTIVITY },
+            { ShowMode::ShowVerifying, Flag::ACTIVITY },
         } };
 
         auto const iter = std::find_if(
-            std::begin(ActivityFlags),
-            std::end(ActivityFlags),
-            [key = activity_type_](auto const& row) { return row.first == key; });
-        refilter_needed = iter != std::end(ActivityFlags) && changes.test(iter->second);
+            std::begin(ShowModeFlags),
+            std::end(ShowModeFlags),
+            [key = show_mode_](auto const& row) { return row.first == key; });
+        refilter_needed = iter != std::end(ShowModeFlags) && changes.test(iter->second);
     }
 
     if (!refilter_needed)
@@ -171,43 +171,42 @@ Glib::RefPtr<TorrentFilter> TorrentFilter::create()
     return Glib::make_refptr_for_instance(new TorrentFilter());
 }
 
-bool TorrentFilter::match_activity(Torrent const& torrent, Activity type)
+bool TorrentFilter::match_mode(Torrent const& torrent, ShowMode const type)
 {
     auto activity = tr_torrent_activity();
 
     switch (type)
     {
-    case Activity::ShowAll:
+    case ShowMode::ShowAll:
         return true;
 
-    case Activity::ShowDownloading:
+    case ShowMode::ShowDownloading:
         activity = torrent.get_activity();
         return activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_DOWNLOAD_WAIT;
 
-    case Activity::ShowSeeding:
+    case ShowMode::ShowSeeding:
         activity = torrent.get_activity();
         return activity == TR_STATUS_SEED || activity == TR_STATUS_SEED_WAIT;
 
-    case Activity::ShowActive:
+    case ShowMode::ShowActive:
         return torrent.get_active_peer_count() > 0 || torrent.get_activity() == TR_STATUS_CHECK;
 
-    case Activity::ShowPaused:
+    case ShowMode::ShowPaused:
         return torrent.get_activity() == TR_STATUS_STOPPED;
 
-    case Activity::ShowFinished:
+    case ShowMode::ShowFinished:
         return torrent.get_finished();
 
-    case Activity::ShowVerifying:
+    case ShowMode::ShowVerifying:
         activity = torrent.get_activity();
         return activity == TR_STATUS_CHECK || activity == TR_STATUS_CHECK_WAIT;
 
-    case Activity::ShowError:
+    case ShowMode::ShowError:
         return torrent.get_error_code() != 0;
-
-    default:
-        g_assert_not_reached();
-        return true;
     }
+
+    g_assert_not_reached();
+    return true;
 }
 
 bool TorrentFilter::match_tracker(Torrent const& torrent, Tracker type, Glib::ustring const& host)
