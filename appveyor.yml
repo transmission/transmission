@@ -116,4 +116,4 @@ for:
     authorization:
        secure: PrvcykaHmPgJ0ENht1q58tCfjRcmybiOeHYrvtQtAGsfahWvniAfP66DqHxv872acpyf3FpJn2ETCeszoVuFGA==
     on:
-      APPVEYOR_REPO_TAG: true
+      APPVEYOR_REPO_TAG: true 
