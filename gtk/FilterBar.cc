@@ -470,15 +470,15 @@ Glib::RefPtr<Gtk::ListStore> FilterBar::Impl::activity_filter_model_new()
     };
 
     static auto constexpr types = std::array<FilterTypeInfo, 9>({ {
-        { ActivityType::ALL, nullptr, N_("All"), nullptr },
+        { ActivityType::ShowAll, nullptr, N_("All"), nullptr },
         { ActivityType{ -1 }, nullptr, nullptr, nullptr },
-        { ActivityType::ACTIVE, nullptr, N_("Active"), "system-run" },
-        { ActivityType::DOWNLOADING, "Verb", NC_("Verb", "Downloading"), "network-receive" },
-        { ActivityType::SEEDING, "Verb", NC_("Verb", "Seeding"), "network-transmit" },
-        { ActivityType::PAUSED, nullptr, N_("Paused"), "media-playback-pause" },
-        { ActivityType::FINISHED, nullptr, N_("Finished"), "media-playback-stop" },
-        { ActivityType::VERIFYING, "Verb", NC_("Verb", "Verifying"), "view-refresh" },
-        { ActivityType::ERROR, nullptr, N_("Error"), "dialog-error" },
+        { ActivityType::ShowActive, nullptr, N_("Active"), "system-run" },
+        { ActivityType::ShowDownloading, "Verb", NC_("Verb", "Downloading"), "network-receive" },
+        { ActivityType::ShowSeeding, "Verb", NC_("Verb", "Seeding"), "network-transmit" },
+        { ActivityType::ShowPaused, nullptr, N_("Paused"), "media-playback-pause" },
+        { ActivityType::ShowFinished, nullptr, N_("Finished"), "media-playback-stop" },
+        { ActivityType::ShowVerifying, "Verb", NC_("Verb", "Verifying"), "view-refresh" },
+        { ActivityType::ShowError, nullptr, N_("Error"), "dialog-error" },
     } });
 
     auto store = Gtk::ListStore::create(activity_filter_cols);
@@ -502,8 +502,8 @@ void FilterBar::Impl::render_activity_pixbuf_func(
     Gtk::TreeModel::const_iterator const& iter)
 {
     auto const type = ActivityType{ iter->get_value(activity_filter_cols.type) };
-    cell_renderer.property_width() = type == ActivityType::ALL ? 0 : 20;
-    cell_renderer.property_ypad() = type == ActivityType::ALL ? 0 : 2;
+    cell_renderer.property_width() = type == ActivityType::ShowAll ? 0 : 20;
+    cell_renderer.property_ypad() = type == ActivityType::ShowAll ? 0 : 2;
 }
 
 void FilterBar::Impl::activity_combo_box_init(Gtk::ComboBox& combo)
@@ -546,7 +546,7 @@ void FilterBar::Impl::update_filter_activity()
     }
     else
     {
-        filter_->set_activity(ActivityType::ALL);
+        filter_->set_activity(ActivityType::ShowAll);
     }
 }
 

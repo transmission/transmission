@@ -19,7 +19,7 @@ TorrentFilter::TorrentFilter()
 {
 }
 
-void TorrentFilter::set_activity(Activity type)
+void TorrentFilter::set_activity(Activity const type)
 {
     if (activity_type_ == type)
     {
@@ -27,11 +27,12 @@ void TorrentFilter::set_activity(Activity type)
     }
 
     auto change = Change::DIFFERENT;
-    if (activity_type_ == Activity::ALL)
+
+    if (activity_type_ == Activity::ShowAll)
     {
         change = Change::MORE_STRICT;
     }
-    else if (type == Activity::ALL)
+    else if (type == Activity::ShowAll)
     {
         change = Change::LESS_STRICT;
     }
@@ -120,7 +121,7 @@ bool TorrentFilter::match(Torrent const& torrent) const
 
 bool TorrentFilter::matches_all() const
 {
-    return activity_type_ == Activity::ALL && tracker_type_ == Tracker::ALL && text_.empty();
+    return activity_type_ == Activity::ShowAll && tracker_type_ == Tracker::ALL && text_.empty();
 }
 
 void TorrentFilter::update(Torrent::ChangeFlags changes)
@@ -129,16 +130,16 @@ void TorrentFilter::update(Torrent::ChangeFlags changes)
 
     bool refilter_needed = false;
 
-    if (activity_type_ != Activity::ALL)
+    if (activity_type_ != Activity::ShowAll)
     {
         static auto TR_CONSTEXPR23 ActivityFlags = std::array<std::pair<Activity, Torrent::ChangeFlags>, 7U>{ {
-            { Activity::DOWNLOADING, Flag::ACTIVITY },
-            { Activity::SEEDING, Flag::ACTIVITY },
-            { Activity::ACTIVE, Flag::ACTIVE_PEER_COUNT | Flag::ACTIVITY },
-            { Activity::PAUSED, Flag::ACTIVITY },
-            { Activity::FINISHED, Flag::FINISHED },
-            { Activity::VERIFYING, Flag::ACTIVITY },
-            { Activity::ERROR, Flag::ERROR_CODE },
+            { Activity::ShowActive, Flag::ACTIVE_PEER_COUNT | Flag::ACTIVITY },
+            { Activity::ShowDownloading, Flag::ACTIVITY },
+            { Activity::ShowError, Flag::ERROR_CODE },
+            { Activity::ShowFinished, Flag::FINISHED },
+            { Activity::ShowPaused, Flag::ACTIVITY },
+            { Activity::ShowSeeding, Flag::ACTIVITY },
+            { Activity::ShowVerifying, Flag::ACTIVITY },
         } };
 
         auto const iter = std::find_if(
@@ -176,31 +177,31 @@ bool TorrentFilter::match_activity(Torrent const& torrent, Activity type)
 
     switch (type)
     {
-    case Activity::ALL:
+    case Activity::ShowAll:
         return true;
 
-    case Activity::DOWNLOADING:
+    case Activity::ShowDownloading:
         activity = torrent.get_activity();
         return activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_DOWNLOAD_WAIT;
 
-    case Activity::SEEDING:
+    case Activity::ShowSeeding:
         activity = torrent.get_activity();
         return activity == TR_STATUS_SEED || activity == TR_STATUS_SEED_WAIT;
 
-    case Activity::ACTIVE:
+    case Activity::ShowActive:
         return torrent.get_active_peer_count() > 0 || torrent.get_activity() == TR_STATUS_CHECK;
 
-    case Activity::PAUSED:
+    case Activity::ShowPaused:
         return torrent.get_activity() == TR_STATUS_STOPPED;
 
-    case Activity::FINISHED:
+    case Activity::ShowFinished:
         return torrent.get_finished();
 
-    case Activity::VERIFYING:
+    case Activity::ShowVerifying:
         activity = torrent.get_activity();
         return activity == TR_STATUS_CHECK || activity == TR_STATUS_CHECK_WAIT;
 
-    case Activity::ERROR:
+    case Activity::ShowError:
         return torrent.get_error_code() != 0;
 
     default:

@@ -8,6 +8,8 @@
 #include "FilterBase.h"
 #include "Torrent.h"
 
+#include <libtransmission-app/display-modes.h>
+
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 
@@ -16,17 +18,7 @@
 class TorrentFilter : public FilterBase<Torrent>
 {
 public:
-    enum class Activity : int8_t
-    {
-        ALL,
-        DOWNLOADING,
-        SEEDING,
-        ACTIVE,
-        PAUSED,
-        FINISHED,
-        VERIFYING,
-        ERROR,
-    };
+    using Activity = transmission::app::ShowMode;
 
     enum class Tracker : int8_t
     {
@@ -59,7 +51,7 @@ private:
     TorrentFilter();
 
 private:
-    Activity activity_type_ = Activity::ALL;
+    Activity activity_type_ = transmission::app::DefaultShowMode;
     Tracker tracker_type_ = Tracker::ALL;
     Glib::ustring tracker_host_;
     Glib::ustring text_;
