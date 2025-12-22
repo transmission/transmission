@@ -678,6 +678,8 @@ using TorrentProperties = Session::TorrentProperties;
             };
     }
     // clang-format on
+
+    return {};
 }
 } // namespace
 
