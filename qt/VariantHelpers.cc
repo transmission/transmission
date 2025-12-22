@@ -233,7 +233,7 @@ void variantInit(tr_variant* init_me, std::string_view value)
 
 namespace
 {
-bool to_int(tr_variant const& src, int* tgt)
+bool toInt(tr_variant const& src, int* tgt)
 {
     if (auto const val = src.value_if<int64_t>())
     {
@@ -249,7 +249,7 @@ bool to_int(tr_variant const& src, int* tgt)
     return false;
 }
 
-tr_variant from_int(int const& val)
+tr_variant fromInt(int const& val)
 {
     return static_cast<int64_t>(val);
 }
@@ -263,7 +263,7 @@ void register_qt_converters()
         []
         {
             using namespace libtransmission::serializer;
-            Converters::add(to_int, from_int);
+            Converters::add(toInt, fromInt);
         });
 }
 

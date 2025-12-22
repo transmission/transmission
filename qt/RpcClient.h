@@ -96,11 +96,9 @@ private:
     // TODO: change this default in 5.0.0-beta.1
     static auto constexpr DefaultNetworkStyle = libtransmission::api_compat::Style::Tr4;
 
-    std::optional<QNetworkRequest> request_;
-
     libtransmission::api_compat::Style network_style_ = DefaultNetworkStyle;
     tr_session* session_ = {};
-    QString session_id_;
+    QByteArray session_id_;
     QUrl url_;
     QNetworkAccessManager* nam_ = {};
     std::unordered_map<int64_t, QFutureInterface<RpcResponse>> local_requests_;
