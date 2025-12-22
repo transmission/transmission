@@ -1616,6 +1616,7 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
         {
             auto settings = session->settings_;
             settings.utp_enabled = enabled;
+            settings.fixup_to_preferred_transports();
             session->setSettings(std::move(settings), false);
         });
 }
