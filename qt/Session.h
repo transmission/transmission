@@ -135,26 +135,6 @@ public:
         Rename
     };
 
-    void addKeyName(TorrentProperties props, tr_quark const key)
-    {
-        // populate names cache with default values
-        if (names_[props].empty())
-        {
-            getKeyNames(props);
-        }
-
-        names_[props].emplace(tr_quark_get_string_view(key));
-    }
-
-    void removeKeyName(TorrentProperties props, tr_quark const key)
-    {
-        // do not remove id because it must be in every torrent req
-        if (key != TR_KEY_id)
-        {
-            names_[props].erase(tr_quark_get_string_view(key));
-        }
-    }
-
 public slots:
     void addTorrent(AddData add_me);
     void launchWebInterface() const;
