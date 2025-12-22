@@ -16,6 +16,7 @@
 
 #ifdef __cplusplus
 #include <functional>
+#include <mutex>
 #include <string>
 #include <string_view>
 #else
@@ -143,6 +144,8 @@ inline auto constexpr TrDefaultPeerPort = 51413U;
 inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
 inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
+
+std::unique_lock<std::recursive_mutex> tr_sessionLock(tr_session const* session);
 
 /**
  * Add libtransmission's default settings to the benc dictionary.

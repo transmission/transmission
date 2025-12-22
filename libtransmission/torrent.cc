@@ -1270,6 +1270,8 @@ tr_stat tr_torrent::stats() const
         return tor->session->queueStalledEnabled() && idle_secs > tor->session->queueStalledMinutes() * 60U;
     };
 
+    auto const lock = unique_lock();
+
     auto const now_msec = tr_time_msec();
     auto const now_sec = tr_time();
 

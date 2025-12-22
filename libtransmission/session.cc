@@ -461,6 +461,13 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
 
 // ---
 
+std::unique_lock<std::recursive_mutex> tr_sessionLock(tr_session const* const session)
+{
+    return session->unique_lock();
+}
+
+// ---
+
 tr_variant tr_sessionGetDefaultSettings()
 {
     auto ret = tr_variant::make_map();
