@@ -916,16 +916,16 @@ void MainWindow::refreshIcons()
 
     // network icons
 
-    auto networkPixmap = [](icons::Type type)
+    auto network_pixmap = [](icons::Type type)
     {
         auto constexpr Size = QSize{ 16, 16 };
         return icons::icon(type).pixmap(Size);
     };
-    pixmap_network_idle_ = networkPixmap(icons::Type::NetworkIdle);
-    pixmap_network_receive_ = networkPixmap(icons::Type::NetworkReceive);
-    pixmap_network_transmit_ = networkPixmap(icons::Type::NetworkTransmit);
-    pixmap_network_transmit_receive_ = networkPixmap(icons::Type::NetworkTransmitReceive);
-    pixmap_network_error_ = networkPixmap(icons::Type::NetworkError);
+    pixmap_network_idle_ = network_pixmap(icons::Type::NetworkIdle);
+    pixmap_network_receive_ = network_pixmap(icons::Type::NetworkReceive);
+    pixmap_network_transmit_ = network_pixmap(icons::Type::NetworkTransmit);
+    pixmap_network_transmit_receive_ = network_pixmap(icons::Type::NetworkTransmitReceive);
+    pixmap_network_error_ = network_pixmap(icons::Type::NetworkError);
 }
 
 /**

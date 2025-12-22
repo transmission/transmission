@@ -478,9 +478,9 @@ QIcon icon(Type const type, QStyle const* const style)
 
 [[nodiscard]] bool shouldBeShownInMenu(Type type)
 {
-    static bool const force_icons = !qgetenv("TR_SHOW_MENU_ICONS").isEmpty();
-    static bool const is_gnome = qgetenv("XDG_CURRENT_DESKTOP").contains("GNOME");
-    return force_icons || !is_gnome || getInfo(type).ok_in_gnome_menus;
+    static bool const ForceIcons = !qgetenv("TR_SHOW_MENU_ICONS").isEmpty();
+    static bool const IsGnome = qgetenv("XDG_CURRENT_DESKTOP").contains("GNOME");
+    return ForceIcons || !IsGnome || getInfo(type).ok_in_gnome_menus;
 }
 
 } // namespace icons
