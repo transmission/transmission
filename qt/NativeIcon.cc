@@ -52,10 +52,14 @@ QString getWindowsFontFamily()
     return DEV_FORCE_FONT_FAMILY;
 #else
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion(QOperatingSystemVersion::Windows, 11))
+    {
         return Win11IconFamily;
+    }
 
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion(QOperatingSystemVersion::Windows, 10))
+    {
         return Win10IconFamily;
+    }
 
     return {};
 #endif
@@ -72,7 +76,9 @@ QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int c
 {
     auto font = QFont{ family };
     if (!QFontMetrics{ font }.inFont(codepoint))
+    {
         return {};
+    }
 
     font.setPixelSize(pixel_size);
 
@@ -439,10 +445,16 @@ QIcon icon(Type const type, QStyle const* const style)
         auto icon = QIcon{};
         auto const name = QString::fromUtf8(std::data(key), std::size(key));
         for (int const pixel_size : pixel_sizes)
+        {
             if (auto const pixmap = loadSFSymbol(name, pixel_size); !pixmap.isNull())
+            {
                 icon.addPixmap(pixmap);
+            }
+        }
         if (!icon.isNull())
+        {
             return icon;
+        }
     }
 #endif
 
@@ -453,10 +465,16 @@ QIcon icon(Type const type, QStyle const* const style)
             auto icon = QIcon{};
             auto const ch = QChar{ key };
             for (int const pixel_size : pixel_sizes)
+            {
                 if (auto pixmap = makeIconFromCodepoint(family, ch, pixel_size); !pixmap.isNull())
+                {
                     icon.addPixmap(pixmap);
+                }
+            }
             if (!icon.isNull())
+            {
                 return icon;
+            }
         }
     }
 
@@ -465,13 +483,19 @@ QIcon icon(Type const type, QStyle const* const style)
         auto const name = QString::fromUtf8(std::data(key), std::size(key));
 
         if (auto icon = QIcon::fromTheme(name); !icon.isNull())
+        {
             return icon;
+        }
         if (auto icon = QIcon::fromTheme(name + QStringLiteral("-symbolic")); !icon.isNull())
+        {
             return icon;
+        }
     }
 
     if (info.fallback)
+    {
         return style->standardIcon(*info.fallback);
+    }
 
     return {};
 }

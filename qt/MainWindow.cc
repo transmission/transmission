@@ -1602,7 +1602,9 @@ bool MainWindow::event(QEvent* e)
 
     case QEvent::Clipboard:
         if (auto_add_clipboard_links_)
+        {
             addTorrentFromClipboard();
+        }
         break;
 
     case QEvent::PaletteChange:
