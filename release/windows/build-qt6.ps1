@@ -12,13 +12,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     $Filename = "qt-everywhere-src-${Qt6Version}.zip" # tar.xz has some names truncated (e.g. .../double-conversion.h -> .../double-conv)
     $Url = "https://qt.mirror.constant.com/archive/qt/$($Qt6Version -replace '\.\d+$', '')/${Qt6Version}/single/${Filename}"
 
-    switch ($Arch) {
-        'x86'         { $QtPlatform = 'win32-msvc' }
-        'x64'         { $QtPlatform = 'win32-msvc' }
-        'arm64' { $QtPlatform = 'win32-arm64-msvc' }
-        default       { $QtPlatform = 'win32-msvc' }
-    }
-
     $ArchiveBase = "qt-everywhere-src-${Qt6Version}"
     $UnpackFlags = @(
         (Join-Path $ArchiveBase qtactiveqt '*')
@@ -38,7 +31,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     $BuildDir = Join-Path $SourceDir .build
 
     $ConfigOptions = @(
-        '-platform'; $QtPlatform
         '-opensource'
         '-confirm-license'
         '-prefix'; $PrefixDir
@@ -118,11 +110,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '--'
         "-DCMAKE_PREFIX_PATH=${DepsPrefixDir}"
     )
-
-    if ($env:LDFLAGS) {
-        # Patch to add our linker flags, mainly /PDBALTPATH
-        Edit-TextFile (Join-Path $SourceDir qtbase mkspecs $QtPlatform qmake.conf) '(^QMAKE_CXXFLAGS\b.*)' "`$1`nQMAKE_LFLAGS += ${env:LDFLAGS}"
-    }
 
     # No need in GUI and some other tools
     Edit-TextFile (Join-Path $SourceDir qttools src CMakeLists.txt) 'TARGET Qt::Widgets' 'QT_FEATURE_designer'
