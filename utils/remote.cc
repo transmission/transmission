@@ -903,16 +903,6 @@ void warn_if_unsupported_rpc_version(std::string_view const semver)
     return std::size(line);
 }
 
-[[nodiscard]] long get_timeout_secs(std::string_view req)
-{
-    if (req.find(R"("method":"blocklist-update")") != std::string_view::npos)
-    {
-        return 300L;
-    }
-
-    return 60L; /* default value */
-}
-
 [[nodiscard]] std::string get_status_string(tr_variant::Map const& t)
 {
     auto const status = t.value_if<int64_t>(TR_KEY_status);
@@ -2439,6 +2429,8 @@ int process_response(char const* rpcurl, std::string_view response, RemoteConfig
     return status;
 }
 
+namespace flush_utils
+{
 CURL* tr_curl_easy_init(std::string* writebuf, RemoteConfig& config)
 {
     CURL* curl = curl_easy_init();
@@ -2505,21 +2497,49 @@ void tr_curl_easy_cleanup(CURL* curl)
     }
 }
 
-int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
+[[nodiscard]] long get_timeout_secs(std::string_view req)
 {
-    auto const json = tr_variant_serde::json().compact().to_string(*benc);
+    if (req.find(R"("method":"blocklist-update")") != std::string_view::npos)
+    {
+        return 300L;
+    }
+
+    return 60L; /* default value */
+}
+
+[[nodiscard]] std::string serialize_payload(tr_variant const* const var, RemoteConfig const& config)
+{
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+
+    if (config.network_style == api_compat::Style::Tr5)
+    {
+        return serde.to_string(*var);
+    }
+
+    auto tmp = var->clone();
+    api_compat::convert(tmp, config.network_style);
+    return serde.to_string(*var);
+}
+} // namespace flush_utils
+
+int flush(char const* rpcurl, tr_variant* const var, RemoteConfig& config)
+{
+    using namespace flush_utils;
+
+    auto const payload = serialize_payload(var, config);
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
     auto const rpcurl_http = fmt::format("{:s}://{:s}", scheme, rpcurl);
 
     auto buf = std::string{};
     auto* curl = tr_curl_easy_init(&buf, config);
     (void)curl_easy_setopt(curl, CURLOPT_URL, rpcurl_http.c_str());
-    (void)curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json.c_str());
-    (void)curl_easy_setopt(curl, CURLOPT_TIMEOUT, get_timeout_secs(json));
+    (void)curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload.c_str());
+    (void)curl_easy_setopt(curl, CURLOPT_TIMEOUT, get_timeout_secs(payload));
 
     if (config.debug)
     {
-        fmt::print(stderr, "posting:\n--------\n{:s}\n--------\n", json);
+        fmt::print(stderr, "posting:\n--------\n{:s}\n--------\n", payload);
     }
 
     auto status = EXIT_SUCCESS;
@@ -2540,12 +2560,12 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
             break;
 
         case 409:
-            /* Session id failed. Our curl header func has already
-             * pulled the new session id from this response's headers,
-             * build a new CURL* and try again */
+            // Session id failed. Our curl header func has already
+            // pulled the new session id from this response's headers.
+            // Build a new CURL* and try again
             tr_curl_easy_cleanup(curl);
             curl = nullptr;
-            status |= flush(rpcurl, benc, config);
+            status |= flush(rpcurl, var, config);
             break;
 
         default:
@@ -2561,7 +2581,7 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
         tr_curl_easy_cleanup(curl);
     }
 
-    benc->clear();
+    var->clear();
 
     return status;
 }
