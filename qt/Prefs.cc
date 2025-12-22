@@ -28,9 +28,10 @@
 #include "Prefs.h"
 #include "VariantHelpers.h"
 
+namespace api_compat = libtransmission::api_compat;
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::getValue;
-namespace api_compat = libtransmission::api_compat;
+using namespace std::string_view_literals;
 
 // ---
 
@@ -422,55 +423,47 @@ Prefs::~Prefs()
  */
 tr_variant Prefs::get_default_app_settings()
 {
-    auto constexpr FilterMode = std::string_view{ "all" };
-    auto constexpr SessionHost = std::string_view{ "localhost" };
-    auto constexpr SessionPassword = std::string_view{};
-    auto constexpr SessionUsername = std::string_view{};
-    auto constexpr SortMode = std::string_view{ "sort-by-name" };
-    auto constexpr StatsMode = std::string_view{ "total-ratio" };
-    auto constexpr WindowLayout = std::string_view{ "menu,toolbar,filter,list,statusbar" };
-
     auto const download_dir = tr_getDefaultDownloadDir();
 
-    auto settings = tr_variant::Map{};
+    auto settings = tr_variant::Map{ 64U };
+    settings.try_emplace(TR_KEY_blocklist_date, 0);
     settings.try_emplace(TR_KEY_blocklist_updates_enabled, true);
     settings.try_emplace(TR_KEY_compact_view, false);
+    settings.try_emplace(TR_KEY_download_dir, download_dir);
+    settings.try_emplace(TR_KEY_filter_mode, tr_variant::unmanaged_string("all"sv));
     settings.try_emplace(TR_KEY_inhibit_desktop_hibernation, false);
+    settings.try_emplace(TR_KEY_main_window_height, 500);
+    settings.try_emplace(TR_KEY_main_window_layout_order, tr_variant::unmanaged_string("menu,toolbar,filter,list,statusbar"sv));
+    settings.try_emplace(TR_KEY_main_window_width, 300);
+    settings.try_emplace(TR_KEY_main_window_x, 50);
+    settings.try_emplace(TR_KEY_main_window_y, 50);
+    settings.try_emplace(TR_KEY_open_dialog_dir, QDir::home().absolutePath().toStdString());
     settings.try_emplace(TR_KEY_prompt_before_exit, true);
+    settings.try_emplace(TR_KEY_read_clipboard, false);
     settings.try_emplace(TR_KEY_remote_session_enabled, false);
+    settings.try_emplace(TR_KEY_remote_session_host, tr_variant::unmanaged_string("localhost"sv));
+    settings.try_emplace(TR_KEY_remote_session_https, false);
+    settings.try_emplace(TR_KEY_remote_session_password, tr_variant::unmanaged_string(""));
+    settings.try_emplace(TR_KEY_remote_session_port, TrDefaultRpcPort);
     settings.try_emplace(TR_KEY_remote_session_requires_authentication, false);
+    settings.try_emplace(TR_KEY_remote_session_rpc_url_path, TR_DEFAULT_RPC_URL_STR "rpc");
+    settings.try_emplace(TR_KEY_remote_session_username, tr_variant::unmanaged_string(""));
     settings.try_emplace(TR_KEY_show_backup_trackers, false);
     settings.try_emplace(TR_KEY_show_filterbar, true);
     settings.try_emplace(TR_KEY_show_notification_area_icon, false);
-    settings.try_emplace(TR_KEY_start_minimized, false);
     settings.try_emplace(TR_KEY_show_options_window, true);
     settings.try_emplace(TR_KEY_show_statusbar, true);
     settings.try_emplace(TR_KEY_show_toolbar, true);
     settings.try_emplace(TR_KEY_show_tracker_scrapes, false);
+    settings.try_emplace(TR_KEY_sort_mode, tr_variant::unmanaged_string("sort-by-name"sv));
     settings.try_emplace(TR_KEY_sort_reversed, false);
+    settings.try_emplace(TR_KEY_start_minimized, false);
+    settings.try_emplace(TR_KEY_statusbar_stats, tr_variant::unmanaged_string("total-ratio"));
     settings.try_emplace(TR_KEY_torrent_added_notification_enabled, true);
     settings.try_emplace(TR_KEY_torrent_complete_notification_enabled, true);
     settings.try_emplace(TR_KEY_torrent_complete_sound_enabled, true);
-    settings.try_emplace(TR_KEY_watch_dir_enabled, false);
-    settings.try_emplace(TR_KEY_blocklist_date, 0);
-    settings.try_emplace(TR_KEY_main_window_height, 500);
-    settings.try_emplace(TR_KEY_main_window_width, 300);
-    settings.try_emplace(TR_KEY_main_window_x, 50);
-    settings.try_emplace(TR_KEY_main_window_y, 50);
-    settings.try_emplace(TR_KEY_remote_session_port, TrDefaultRpcPort);
-    settings.try_emplace(TR_KEY_download_dir, download_dir);
-    settings.try_emplace(TR_KEY_filter_mode, FilterMode);
-    settings.try_emplace(TR_KEY_main_window_layout_order, WindowLayout);
-    settings.try_emplace(TR_KEY_open_dialog_dir, QDir::home().absolutePath().toStdString());
-    settings.try_emplace(TR_KEY_remote_session_https, false);
-    settings.try_emplace(TR_KEY_remote_session_host, SessionHost);
-    settings.try_emplace(TR_KEY_remote_session_password, SessionPassword);
-    settings.try_emplace(TR_KEY_remote_session_username, SessionUsername);
-    settings.try_emplace(TR_KEY_sort_mode, SortMode);
-    settings.try_emplace(TR_KEY_statusbar_stats, StatsMode);
     settings.try_emplace(TR_KEY_watch_dir, download_dir);
-    settings.try_emplace(TR_KEY_read_clipboard, false);
-    settings.try_emplace(TR_KEY_remote_session_rpc_url_path, TR_DEFAULT_RPC_URL_STR "rpc");
+    settings.try_emplace(TR_KEY_watch_dir_enabled, false);
     return tr_variant{ std::move(settings) };
 }
 
