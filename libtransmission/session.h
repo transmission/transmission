@@ -392,60 +392,8 @@ public:
             load(src);
         }
 
-        void fixup_from_preferred_transports()
-        {
-            utp_enabled = false;
-            tcp_enabled = false;
-            for (auto const& transport : preferred_transports)
-            {
-                switch (transport)
-                {
-                case TR_PREFER_UTP:
-                    utp_enabled = true;
-                    break;
-                case TR_PREFER_TCP:
-                    tcp_enabled = true;
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-
-        void fixup_to_preferred_transports()
-        {
-            if (!utp_enabled)
-            {
-                auto const remove_it = std::remove(
-                    std::begin(preferred_transports),
-                    std::end(preferred_transports),
-                    TR_PREFER_UTP);
-                preferred_transports.erase(remove_it, std::end(preferred_transports));
-            }
-            else if (
-                std::find(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_UTP) ==
-                std::end(preferred_transports))
-            {
-                TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
-                preferred_transports.emplace(std::begin(preferred_transports), TR_PREFER_UTP);
-            }
-
-            if (!tcp_enabled)
-            {
-                auto const remove_it = std::remove(
-                    std::begin(preferred_transports),
-                    std::end(preferred_transports),
-                    TR_PREFER_TCP);
-                preferred_transports.erase(remove_it, std::end(preferred_transports));
-            }
-            else if (
-                std::find(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_TCP) ==
-                std::end(preferred_transports))
-            {
-                TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
-                preferred_transports.emplace_back(TR_PREFER_TCP);
-            }
-        }
+        void fixup_from_preferred_transports();
+        void fixup_to_preferred_transports();
 
         void load(tr_variant const& src)
         {
