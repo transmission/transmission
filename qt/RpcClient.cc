@@ -68,7 +68,6 @@ void RpcClient::stop()
     session_ = nullptr;
     session_id_.clear();
     url_.clear();
-    request_.reset();
     network_style_ = DefaultNetworkStyle;
 
     if (nam_ != nullptr)
@@ -87,7 +86,6 @@ void RpcClient::start(QUrl const& url)
 {
     url_ = url;
     url_is_loopback_ = QHostAddress{ url_.host() }.isLoopback();
-    request_.reset();
 }
 
 RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
@@ -117,40 +115,35 @@ RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 
 void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise)
 {
-    if (!request_)
+    auto req = QNetworkRequest{};
+    QNetworkRequest request;
+    request.setUrl(url_);
+    request.setRawHeader("User-Agent", "Transmisson/" SHORT_VERSION_STRING);
+    if (!session_id_.isEmpty())
     {
-        QNetworkRequest request;
-        request.setUrl(url_);
-        request.setRawHeader(
-            "User-Agent",
-            (QApplication::applicationName() + QLatin1Char('/') + QString::fromUtf8(LONG_VERSION_STRING)).toUtf8());
-        request.setRawHeader("Content-Type", "application/json; charset=UTF-8");
-        if (!session_id_.isEmpty())
-        {
-            request.setRawHeader(TR_RPC_SESSION_ID_HEADER, session_id_.toUtf8());
-        }
-
-        request_ = request;
+        request.setRawHeader(TR_RPC_SESSION_ID_HEADER, session_id_);
     }
-
-    QNetworkReply* reply = networkAccessManager()->post(*request_, body);
-    reply->setProperty(RequestBodyKey, body);
-    reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
-
-    connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::dataReadProgress);
-    connect(reply, &QNetworkReply::uploadProgress, this, &RpcClient::dataSendProgress);
 
     if (verbose_)
     {
         qInfo() << "sending POST " << qPrintable(url_.path());
 
-        for (QByteArray const& b : request_->rawHeaderList())
+        for (QByteArray const& name : req.rawHeaderList())
         {
-            qInfo() << b.constData() << ": " << request_->rawHeader(b).constData();
+            qInfo() << name.constData() << ": " << req.rawHeader(name).constData();
         }
 
         qInfo() << "Body:";
         qInfo() << body.constData();
+    }
+
+    if (QNetworkReply* reply = networkAccessManager()->post(req, body))
+    {
+        reply->setProperty(RequestBodyKey, body);
+        reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
+
+        connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::dataReadProgress);
+        connect(reply, &QNetworkReply::uploadProgress, this, &RpcClient::dataSendProgress);
     }
 }
 
@@ -250,9 +243,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
                 static_cast<int>(network_style_));
         }
 
-        session_id_ = QString::fromUtf8(reply->rawHeader(TR_RPC_SESSION_ID_HEADER));
-        request_.reset();
-
+        session_id_ = reply->rawHeader(TR_RPC_SESSION_ID_HEADER);
         sendNetworkRequest(reply->property(RequestBodyKey).toByteArray(), promise);
         return;
     }
