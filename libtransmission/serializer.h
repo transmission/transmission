@@ -68,6 +68,12 @@ template<typename T, std::size_t N>
 inline constexpr bool is_std_array_v<std::array<T, N>> = true;
 
 template<typename C>
+inline constexpr bool is_optional_v = false;
+
+template<typename T>
+inline constexpr bool is_optional_v<std::optional<T>> = true;
+
+template<typename C>
 tr_variant from_push_back_range(C const& src);
 
 template<typename C>
@@ -84,6 +90,12 @@ tr_variant from_array(C const& src);
 
 template<typename C>
 bool to_array(tr_variant const& src, C* ptgt);
+
+template<typename T>
+tr_variant from_optional(std::optional<T> const& src);
+
+template<typename T>
+bool to_optional(tr_variant const& src, std::optional<T>* ptgt);
 
 // Call reserve() if available, otherwise no-op
 template<typename C>
@@ -137,6 +149,11 @@ public:
             return detail::from_array(src);
         }
 
+        if constexpr (detail::is_optional_v<T>)
+        {
+            return detail::from_optional(src);
+        }
+
         fmt::print(stderr, "ERROR: No serializer registered for type '{}'\n", typeid(T).name());
         return {};
     }
@@ -164,6 +181,11 @@ public:
         if constexpr (detail::is_std_array_v<T>)
         {
             return detail::to_array(src, ptgt);
+        }
+
+        if constexpr (detail::is_optional_v<T>)
+        {
+            return detail::to_optional(src, ptgt);
         }
 
         fmt::print(stderr, "ERROR: No deserializer registered for type '{}'\n", typeid(T).name());
@@ -394,6 +416,24 @@ bool to_array(tr_variant const& src, C* const ptgt)
 
     *ptgt = std::move(tmp);
     return true;
+}
+
+template<typename T>
+tr_variant from_optional(std::optional<T> const& src)
+{
+    return src ? Converters::serialize(*src) : nullptr;
+}
+
+template<typename T>
+bool to_optional(tr_variant const& src, std::optional<T>* ptgt)
+{
+    if (src.index() == tr_variant::NullIndex)
+    {
+        ptgt->reset();
+        return true;
+    }
+    *ptgt = T{};
+    return Converters::deserialize(src, &**ptgt);
 }
 
 } // namespace detail
