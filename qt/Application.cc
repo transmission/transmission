@@ -9,7 +9,6 @@
 #include <utility>
 
 #include <QIcon>
-#include <QLatin1String>
 #include <QLibraryInfo>
 #include <QMessageBox>
 #include <QProcess>
@@ -43,12 +42,12 @@
 namespace
 {
 
-auto constexpr ConfigName = QLatin1String("transmission");
+auto const ConfigName = QStringLiteral("transmission");
 
 #ifdef QT_DBUS_LIB
-auto constexpr FDONotificationsServiceName = QLatin1String("org.freedesktop.Notifications");
-auto constexpr FDONotificationsPath = QLatin1String("/org/freedesktop/Notifications");
-auto constexpr FDONotificationsInterfaceName = QLatin1String("org.freedesktop.Notifications");
+auto const FDONotificationsServiceName = QStringLiteral("org.freedesktop.Notifications");
+auto const FDONotificationsPath = QStringLiteral("/org/freedesktop/Notifications");
+auto const FDONotificationsInterfaceName = QStringLiteral("org.freedesktop.Notifications");
 #endif
 
 auto constexpr StatsRefreshIntervalMsec = 3000;

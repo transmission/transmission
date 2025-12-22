@@ -10,7 +10,6 @@
 
 #include <QChar>
 #include <QFontDatabase>
-#include <QLatin1String>
 #include <QOperatingSystemVersion>
 #include <QStyle>
 #include <QtGui/QFont>
@@ -32,10 +31,10 @@ namespace
 {
 
 // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-ui-symbol-font
-auto constexpr Win10IconFamily = QLatin1String{ "Segoe MDL2 Assets" };
+auto const Win10IconFamily = QStringLiteral("Segoe MDL2 Assets");
 
 // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-fluent-icons-font
-auto constexpr Win11IconFamily = QLatin1String{ "Segoe Fluent Icons" };
+auto const Win11IconFamily = QStringLiteral("Segoe Fluent Icons");
 
 // Define these two macros to force a specific icon icon during development.
 // Their EULA doesn't allow redistribution but does allow using them
