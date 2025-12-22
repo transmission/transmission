@@ -31,9 +31,11 @@ namespace
 {
 
 // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-ui-symbol-font
+// NOLINTNEXTLINE(cert-err58-cpp)
 auto const Win10IconFamily = QStringLiteral("Segoe MDL2 Assets");
 
 // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-fluent-icons-font
+// NOLINTNEXTLINE(cert-err58-cpp)
 auto const Win11IconFamily = QStringLiteral("Segoe Fluent Icons");
 
 // Define these two macros to force a specific icon icon during development.
