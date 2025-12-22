@@ -111,11 +111,6 @@ public:
         return session_.allowsDHT();
     }
 
-    [[nodiscard]] bool allows_tcp() const override
-    {
-        return session_.allowsTCP();
-    }
-
     void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_socket_address const& socket_address) override;
 
     [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
@@ -2772,7 +2767,7 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
 
     auto const now = tr_time();
     auto* const session = mgr->session;
-    auto const utp = session->allowsUTP() && peer_info.supports_utp().value_or(true);
+    auto const peer_supports_utp = peer_info.supports_utp().value_or(true);
 
     // Allow downloading torrents to "steal" connection slots
     if (tr_peer_socket::limit_reached(session) && s->tor->is_done())
@@ -2780,22 +2775,13 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
         return;
     }
 
-    if (!utp && !session->allowsTCP())
-    {
-        return;
-    }
-
-    tr_logAddTraceSwarm(
-        s,
-        fmt::format("Starting an OUTGOING {} connection with {}", utp ? " µTP" : "TCP", peer_info.display_name()));
-
     auto peer_io = tr_peerIo::new_outgoing(
         session,
         &session->top_bandwidth_,
         peer_info.listen_socket_address(),
         s->tor->info_hash(),
         s->tor->is_seed(),
-        utp);
+        peer_supports_utp);
 
     if (!peer_io)
     {
