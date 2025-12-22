@@ -14,6 +14,7 @@
 #include <cstring> /* strcmp */
 #include <ctime>
 #include <limits>
+#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -27,6 +28,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/api-compat.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/quark.h>
@@ -40,6 +42,7 @@
 
 using namespace std::literals;
 
+namespace api_compat = libtransmission::api_compat;
 using namespace libtransmission::Values;
 
 #define SPEED_K_STR "kB/s"
@@ -76,6 +79,8 @@ struct RemoteConfig
     bool debug = false;
     bool json = false;
     bool use_ssl = false;
+
+    api_compat::Style network_style = api_compat::Style::Tr4;
 };
 
 // --- Display Utilities
@@ -837,19 +842,62 @@ static_assert(ListKeys[std::size(ListKeys) - 1] != tr_quark{});
     return n_bytes;
 }
 
-/* look for a session id in the header in case the server gives back a 409 */
+namespace header_utils
+{
+// `${name}: {$value}` --> std::pair<name, value>
+[[nodiscard]] std::optional<std::pair<std::string_view, std::string_view>> parse_header(std::string_view const line)
+{
+    static auto constexpr Delimiter = ": "sv;
+    if (auto const pos = line.find(Delimiter); pos != std::string_view::npos)
+    {
+        auto const name = tr_strv_strip(line.substr(0, pos));
+        auto const value = tr_strv_strip(line.substr(pos + std::size(Delimiter)));
+        return std::make_pair(name, value);
+    }
+    return {};
+}
+
+void warn_if_unsupported_rpc_version(std::string_view const semver)
+{
+    static auto constexpr ExpectedMajor = TrRpcVersionSemverMajor;
+    auto const major_str = semver.substr(0, semver.find('.'));
+    if (auto const major = tr_num_parse<int>(major_str); major && *major > ExpectedMajor)
+    {
+        fmt::print(
+            stderr,
+            "Warning: Server RPC version is {:s}, which may be incompatible with our version {:s}.\n",
+            semver,
+            TrRpcVersionSemver);
+    }
+}
+} // namespace header_utils
+
+// look for a session id in the header
+// in case the server gives back a 409
 [[nodiscard]] size_t parse_response_header(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
-    auto& config = *static_cast<RemoteConfig*>(vconfig);
-    auto const line = std::string_view{ static_cast<char const*>(ptr), size * nmemb };
-    auto const key = tr_strlower(TR_RPC_SESSION_ID_HEADER ": ");
+    using namespace header_utils;
+    static auto const session_id_header = tr_strlower(TR_RPC_SESSION_ID_HEADER);
+    static auto const rpc_version_header = tr_strlower(TR_RPC_RPC_VERSION_HEADER);
 
-    if (tr_strv_starts_with(tr_strlower(line), key))
+    auto& config = *static_cast<RemoteConfig*>(vconfig);
+
+    auto const line = std::string_view{ static_cast<char const*>(ptr), size * nmemb };
+
+    if (auto const parsed = parse_header(line))
     {
-        std::string_view const val = line.substr(std::size(key));
-        auto const begin = std::begin(val);
-        auto const end = std::find_if(begin, std::end(val), [](char c) { return isspace(c); });
-        config.session_id.assign(begin, end);
+        auto const [key, val] = *parsed;
+        auto const key_lower = tr_strlower(key);
+
+        if (key_lower == session_id_header)
+        {
+            config.session_id = val;
+        }
+        else if (key_lower == rpc_version_header)
+        {
+            config.network_style = api_compat::Style::Tr5;
+            warn_if_unsupported_rpc_version(val);
+        }
     }
 
     return std::size(line);
