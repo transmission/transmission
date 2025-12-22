@@ -137,7 +137,7 @@ public:
             return detail::from_array(src);
         }
 
-        fmt::print(stderr, "ERROR: No serializer registered for type '{}'\\n", typeid(T).name());
+        fmt::print(stderr, "ERROR: No serializer registered for type '{}'\n", typeid(T).name());
         return {};
     }
 
@@ -166,6 +166,7 @@ public:
             return detail::to_array(src, ptgt);
         }
 
+        fmt::print(stderr, "ERROR: No deserializer registered for type '{}'\n", typeid(T).name());
         return false;
     }
 
