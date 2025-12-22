@@ -14,7 +14,6 @@
 
 #include <QString>
 
-#include <libtransmission/serializer.h>
 #include <libtransmission/variant.h>
 
 class QByteArray;
@@ -28,21 +27,6 @@ struct TrackerStat;
 namespace trqt::variant_helpers
 {
 void register_qt_converters();
-
-template<typename T>
-[[nodiscard]] tr_variant to_variant(T const& val)
-{
-    using namespace libtransmission::serializer;
-    return Converters::serialize(val);
-}
-
-template<typename T>
-[[nodiscard]] std::optional<T> to_value(tr_variant const& var)
-{
-    using namespace libtransmission::serializer;
-    auto ret = T{};
-    return Converters::deserialize(&var, &ret) ? T : std::nullopt;
-}
 
 template<typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
 auto getValue(tr_variant const* variant)
