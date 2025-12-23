@@ -27,6 +27,7 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/quark.h>
+#include <libtransmission/serializer.h>
 #include <libtransmission/session-id.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -35,6 +36,7 @@
 
 #include "AddData.h"
 #include "CustomVariantType.h"
+#include "Filters.h"
 #include "Prefs.h"
 #include "RpcQueue.h"
 #include "SessionDialog.h"
@@ -43,10 +45,11 @@
 
 using namespace std::literals;
 
+using ::libtransmission::serializer::to_value;
+using ::libtransmission::serializer::to_variant;
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
 using ::trqt::variant_helpers::getValue;
-using ::trqt::variant_helpers::to_variant;
 
 /***
 ****
@@ -675,6 +678,8 @@ using TorrentProperties = Session::TorrentProperties;
             };
     }
     // clang-format on
+
+    return {};
 }
 } // namespace
 
@@ -952,8 +957,22 @@ void Session::updateInfo(tr_variant* args_dict)
 
             break;
 
-        case CustomVariantType::FilterModeType:
+        case CustomVariantType::ShowModeType:
+            if (auto const val = to_value<ShowMode>(*b))
+            {
+                prefs_.set(i, *val);
+            }
+
+            break;
+
         case CustomVariantType::SortModeType:
+            if (auto const val = to_value<SortMode>(*b))
+            {
+                prefs_.set(i, *val);
+            }
+
+            break;
+
         case QMetaType::QString:
             if (auto const value = getValue<QString>(b); value)
             {

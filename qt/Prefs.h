@@ -13,6 +13,8 @@
 
 #include <libtransmission/quark.h>
 
+#include <libtransmission-app/display-modes.h>
+
 class QDateTime;
 
 extern "C"
@@ -168,7 +170,7 @@ public:
     QDateTime getDateTime(int key) const;
 
     template<typename T>
-    T get(int key) const
+    [[nodiscard]] T get(int const key) const
     {
         return values_[key].value<T>();
     }

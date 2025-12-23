@@ -8,6 +8,8 @@
 #include "Prefs.h"
 #include "Utils.h"
 
+#include <libtransmission-app/app.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
@@ -48,11 +50,9 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
 
 int main(int argc, char** argv)
 {
-    /* init libtransmission */
-    tr_lib_init();
+    transmission::app::init();
 
     /* init i18n */
-    tr_locale_set_global("");
     bindtextdomain(AppTranslationDomainName, TRANSMISSIONLOCALEDIR);
     bind_textdomain_codeset(AppTranslationDomainName, "UTF-8");
     textdomain(AppTranslationDomainName);

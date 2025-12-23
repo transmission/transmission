@@ -5,17 +5,9 @@
 
 #pragma once
 
-#include <QVariant>
-
-class CustomVariantType
+namespace transmission::app::detail
 {
-public:
-    enum
-    {
-        TrackerStatsList = QMetaType::User,
-        PeerList,
-        FileList,
-        ShowModeType,
-        SortModeType
-    };
-};
+
+void register_app_converters();
+
+} // namespace transmission::app::detail

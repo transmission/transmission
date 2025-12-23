@@ -8,6 +8,7 @@
 #include <array>
 #include <cstddef>
 #include <iterator>
+#include <optional>
 #include <tuple>
 #include <type_traits>
 #include <typeinfo>
@@ -212,6 +213,23 @@ private:
     template<typename T>
     static inline ConverterStorage<T> converter_storage;
 };
+
+template<typename T>
+[[nodiscard]] std::optional<T> to_value(tr_variant const& var)
+{
+    if (auto ret = T{}; Converters::deserialize<T>(var, &ret))
+    {
+        return ret;
+    }
+
+    return {};
+}
+
+template<typename T>
+[[nodiscard]] tr_variant to_variant(T const& val)
+{
+    return Converters::serialize<T>(val);
+}
 
 // ---
 

@@ -7,7 +7,10 @@
 #include "GtkCompat.h"
 #include "PrefsDialog.h"
 
+#include <libtransmission-app/display-modes.h>
+
 #include <libtransmission/transmission.h>
+#include <libtransmission/serializer.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
@@ -17,6 +20,8 @@
 #include <string_view>
 
 using namespace std::literals;
+using namespace transmission::app;
+using libtransmission::serializer::to_variant;
 
 std::string gl_confdir;
 
@@ -71,7 +76,7 @@ namespace
     map.try_emplace(TR_KEY_show_statusbar, true);
     map.try_emplace(TR_KEY_show_toolbar, true);
     map.try_emplace(TR_KEY_show_tracker_scrapes, false);
-    map.try_emplace(TR_KEY_sort_mode, "sort-by-name"sv);
+    map.try_emplace(TR_KEY_sort_mode, to_variant(DefaultSortMode));
     map.try_emplace(TR_KEY_sort_reversed, false);
     map.try_emplace(TR_KEY_statusbar_stats, "total-ratio"sv);
     map.try_emplace(TR_KEY_torrent_added_notification_enabled, true);
@@ -119,6 +124,11 @@ tr_variant& getPrefs()
 tr_variant& gtr_pref_get_all()
 {
     return getPrefs();
+}
+
+tr_variant::Map& gtr_pref_get_map()
+{
+    return *getPrefs().get_if<tr_variant::Map>();
 }
 
 int64_t gtr_pref_int_get(tr_quark const key)
