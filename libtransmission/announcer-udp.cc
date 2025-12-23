@@ -452,6 +452,12 @@ struct tau_tracker
 
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
+            auto const ipp_enum = static_cast<tr_address_type>(ipp);
+            if (!mediator_.has_source_address(ipp_enum))
+            {
+                continue;
+            }
+
             // update the addr if our lookup is past its shelf date
             if (auto& dns = addr_pending_dns_[ipp]; !dns && addr_expires_at_[ipp] <= now)
             {
@@ -462,7 +468,6 @@ struct tau_tracker
                     static_cast<tr_address_type>(ipp));
             }
 
-            auto const ipp_enum = static_cast<tr_address_type>(ipp);
             auto& conn_at = connecting_at[ipp];
             logtrace(
                 log_name(),
@@ -731,7 +736,10 @@ public:
         auto const data = std::make_shared<tau_announce_data>(std::move(on_response));
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
-            tracker->announces.emplace_back(static_cast<tr_address_type>(ipp), mediator_.announce_ip(), request, data);
+            if (auto const ipp_enum = static_cast<tr_address_type>(ipp); mediator_.has_source_address(ipp_enum))
+            {
+                tracker->announces.emplace_back(ipp_enum, mediator_.announce_ip(), request, data);
+            }
         }
         tracker->upkeep(false);
     }
