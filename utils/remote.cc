@@ -2430,7 +2430,6 @@ void tr_curl_easy_cleanup(CURL* curl)
 {
     auto serde = tr_variant_serde::json();
     serde.compact();
-    fmt::print(stderr, "{:s}:{:d} serializing payload to {:d}\n", __FILE__, __LINE__, static_cast<int>(config.network_style));
 
     if (config.network_style == api_compat::Style::Tr5)
     {
