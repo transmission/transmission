@@ -2342,7 +2342,7 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
 
     default:
         fmt::print("{:s} responded: {:s}\n", rpcurl, response);
-        return EXIT_FAILURE;
+        break;
     }
 
     return EXIT_SUCCESS;
