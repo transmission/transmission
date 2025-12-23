@@ -401,7 +401,7 @@ public:
 
             if (auto const* map = src.get_if<tr_variant::Map>())
             {
-                if (map->contains(TR_KEY_preferred_transports))
+                if (map->find_if<tr_variant::Vector>(TR_KEY_preferred_transports) != nullptr)
                 {
                     fixup_from_preferred_transports();
                 }
