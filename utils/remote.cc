@@ -3226,12 +3226,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
         }
         else if (step_mode == MODE_TORRENT_REMOVE)
         {
-            auto map = tr_variant::Map{ 2 };
-            auto params = tr_variant::Map{ 2 };
-
+            auto params = tr_variant::Map{ 2U };
             params.try_emplace(TR_KEY_delete_local_data, c == 840);
             add_id_arg(params, config);
 
+            auto map = tr_variant::Map{ 3U };
             map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
             map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_remove));
             map.try_emplace(TR_KEY_params, std::move(params));
@@ -3361,7 +3360,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 962:
                 {
-                    auto map = tr_variant::Map{ 2U };
+                    auto map = tr_variant::Map{ 3U };
                     map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_port_test));
                     map.try_emplace(TR_KEY_id, ID_PORTTEST);
@@ -3372,7 +3371,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 960:
                 {
-                    auto params = tr_variant::Map{ 2U };
+                    auto params = tr_variant::Map{ 3U };
                     params.try_emplace(TR_KEY_location, optarg_sv);
                     params.try_emplace(TR_KEY_move, true);
                     add_id_arg(params, config);
