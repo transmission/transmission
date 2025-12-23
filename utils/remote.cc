@@ -816,22 +816,22 @@ auto constexpr DetailsKeys = std::array<tr_quark, 57>{
 };
 static_assert(DetailsKeys[std::size(DetailsKeys) - 1] != tr_quark{});
 
-auto constexpr ListKeys = std::array<tr_quark, 15>{
-    TR_KEY_added_date_camel,
+auto constexpr ListKeys = std::array<tr_quark, 15U>{
+    TR_KEY_added_date,
     TR_KEY_error,
-    TR_KEY_error_string_camel,
+    TR_KEY_error_string,
     TR_KEY_eta,
     TR_KEY_id,
-    TR_KEY_is_finished_camel,
-    TR_KEY_left_until_done_camel,
+    TR_KEY_is_finished,
+    TR_KEY_left_until_done,
     TR_KEY_name,
-    TR_KEY_peers_getting_from_us_camel,
-    TR_KEY_peers_sending_to_us_camel,
-    TR_KEY_rate_download_camel,
-    TR_KEY_rate_upload_camel,
-    TR_KEY_size_when_done_camel,
+    TR_KEY_peers_getting_from_us,
+    TR_KEY_peers_sending_to_us,
+    TR_KEY_rate_download,
+    TR_KEY_rate_upload,
+    TR_KEY_size_when_done,
     TR_KEY_status,
-    TR_KEY_upload_ratio_camel,
+    TR_KEY_upload_ratio,
 };
 static_assert(ListKeys[std::size(ListKeys) - 1] != tr_quark{});
 
@@ -1423,7 +1423,6 @@ void print_file_list(tr_variant::Map const& result)
     }
 }
 
-#if 0
 void print_peers_impl(tr_variant::Vector const& peers)
 {
     fmt::print("{:<40s}  {:<12s}  {:<5s} {:<6s}  {:<6s}  {:s}\n", "Address", "Flags", "Done", "Down", "Up", "Client");
@@ -1457,15 +1456,9 @@ void print_peers_impl(tr_variant::Vector const& peers)
     }
 }
 
-void print_peers(tr_variant::Map const& map)
+void print_peers(tr_variant::Map const& result)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
-    {
-        return;
-    }
-
-    auto* const torrents = args->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    auto* const torrents = result.find_if<tr_variant::Vector>(TR_KEY_torrents);
     if (torrents == nullptr)
     {
         return;
@@ -1491,6 +1484,7 @@ void print_peers(tr_variant::Map const& map)
     }
 }
 
+#if 0
 void print_pieces_impl(std::string_view raw, size_t piece_count)
 {
     auto const str = tr_base64_decode(raw);
@@ -1569,16 +1563,11 @@ void print_port_test(tr_variant::Map const& map)
         fmt::print("Port is open: {:s}\n", *is_open ? "Yes" : "No");
     }
 }
+#endif
 
-void print_torrent_list(tr_variant::Map const& map)
+void print_torrent_list(tr_variant::Map const& result)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
-    {
-        return;
-    }
-
-    auto* const torrents = args->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    auto const* const torrents = result.find_if<tr_variant::Vector>(TR_KEY_torrents);
     if (torrents == nullptr)
     {
         return;
@@ -1612,8 +1601,8 @@ void print_torrent_list(tr_variant::Map const& map)
         [](tr_variant::Map const* f, tr_variant::Map const* s)
         {
             static auto constexpr Min = std::numeric_limits<int64_t>::min();
-            auto const f_time = f->value_if<int64_t>({ TR_KEY_added_date, TR_KEY_added_date_camel }).value_or(Min);
-            auto const s_time = s->value_if<int64_t>({ TR_KEY_added_date, TR_KEY_added_date_camel }).value_or(Min);
+            auto const f_time = f->value_if<int64_t>(TR_KEY_added_date).value_or(Min);
+            auto const s_time = s->value_if<int64_t>(TR_KEY_added_date).value_or(Min);
             return f_time < s_time;
         });
 
@@ -1625,11 +1614,11 @@ void print_torrent_list(tr_variant::Map const& map)
         auto o_tor_id = t->value_if<int64_t>(TR_KEY_id);
         auto o_eta = t->value_if<int64_t>(TR_KEY_eta);
         auto o_status = t->value_if<int64_t>(TR_KEY_status);
-        auto o_up = t->value_if<int64_t>({ TR_KEY_rate_upload, TR_KEY_rate_upload_camel });
-        auto o_down = t->value_if<int64_t>({ TR_KEY_rate_download, TR_KEY_rate_download_camel });
-        auto o_size_when_done = t->value_if<int64_t>({ TR_KEY_size_when_done, TR_KEY_size_when_done_camel });
-        auto o_left_until_done = t->value_if<int64_t>({ TR_KEY_left_until_done, TR_KEY_left_until_done_camel });
-        auto o_ratio = t->value_if<double>({ TR_KEY_upload_ratio, TR_KEY_upload_ratio_camel });
+        auto o_up = t->value_if<int64_t>(TR_KEY_rate_upload);
+        auto o_down = t->value_if<int64_t>(TR_KEY_rate_download);
+        auto o_size_when_done = t->value_if<int64_t>(TR_KEY_size_when_done);
+        auto o_left_until_done = t->value_if<int64_t>(TR_KEY_left_until_done);
+        auto o_ratio = t->value_if<double>(TR_KEY_upload_ratio);
         auto o_name = t->value_if<std::string_view>(TR_KEY_name);
 
         if (!o_eta || !o_tor_id || !o_left_until_done || !o_name || !o_down || !o_up || !o_size_when_done || !o_status ||
@@ -1675,6 +1664,7 @@ void print_torrent_list(tr_variant::Map const& map)
         Speed{ total_down, Speed::Units::Byps }.count(Speed::Units::KByps));
 }
 
+#if 0
 void print_trackers_impl(tr_variant::Vector const& tracker_stats)
 {
     for (auto const& t_var : tracker_stats)
@@ -2351,15 +2341,16 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         print_file_list(*result);
         break;
 
-#if 0
-    case ID_LIST:
-        print_torrent_list(map);
-        break;
-
     case ID_PEERS:
-        print_peers(map);
+        print_peers(*result);
         break;
 
+    case ID_LIST:
+        fmt::print(stderr, "calling print_torrent_list\n");
+        print_torrent_list(*result);
+        break;
+
+#if 0
     case ID_PIECES:
         print_pieces(map);
         break;
