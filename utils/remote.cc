@@ -1484,8 +1484,7 @@ void print_peers(tr_variant::Map const& result)
     }
 }
 
-#if 0
-void print_pieces_impl(std::string_view raw, size_t piece_count)
+void print_pieces_impl(std::string_view const raw, size_t const piece_count)
 {
     auto const str = tr_base64_decode(raw);
     fmt::print("  ");
@@ -1510,30 +1509,24 @@ void print_pieces_impl(std::string_view raw, size_t piece_count)
     fmt::print("\n");
 }
 
-void print_pieces(tr_variant::Map const& map)
+void print_pieces(tr_variant::Map const& result)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
-    {
-        return;
-    }
-
-    auto* const torrents = args->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    auto const* const torrents = result.find_if<tr_variant::Vector>(TR_KEY_torrents);
     if (torrents == nullptr)
     {
         return;
     }
 
-    for (auto it = std::begin(*torrents), end = std::end(*torrents); it != end; ++it)
+    for (auto it = std::cbegin(*torrents), end = std::cend(*torrents); it != end; ++it)
     {
-        auto* const t = it->get_if<tr_variant::Map>();
+        auto const* const t = it->get_if<tr_variant::Map>();
         if (t == nullptr)
         {
             continue;
         }
 
-        auto piece_count = t->value_if<int64_t>({ TR_KEY_piece_count, TR_KEY_piece_count_camel });
-        auto pieces = t->value_if<std::string_view>(TR_KEY_pieces);
+        auto const piece_count = t->value_if<int64_t>(TR_KEY_piece_count);
+        auto const pieces = t->value_if<std::string_view>(TR_KEY_pieces);
 
         if (!piece_count || !pieces)
         {
@@ -1549,7 +1542,6 @@ void print_pieces(tr_variant::Map const& map)
         }
     }
 }
-#endif
 
 void print_port_test(tr_variant::Map const& result)
 {
@@ -2332,11 +2324,11 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         print_port_test(*result);
         break;
 
-#if 0
     case ID_PIECES:
-        print_pieces(map);
+        print_pieces(*result);
         break;
 
+#if 0
     case ID_GROUPS:
         print_groups(map);
         break;
@@ -2804,7 +2796,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 942:
                 map.insert_or_assign(TR_KEY_id, ID_PIECES);
                 fields.emplace_back(tr_variant::unmanaged_string(TR_KEY_pieces));
-                fields.emplace_back(tr_variant::unmanaged_string(TR_KEY_piece_count_camel));
+                fields.emplace_back(tr_variant::unmanaged_string(TR_KEY_piece_count));
                 add_id_arg(params, config);
                 break;
 
