@@ -223,7 +223,7 @@ Prefs::Prefs(QString config_dir)
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        tr_variant const* b = tr_variantDictFind(&settings, tr_quark_convert(getKey(i)));
+        tr_variant const* b = tr_variantDictFind(&settings, getKey(i));
 
         switch (Items[i].type)
         {
@@ -303,8 +303,8 @@ Prefs::~Prefs()
             continue;
         }
 
-        tr_quark const key = tr_quark_convert(getKey(i));
-        QVariant const& val = values_[i];
+        auto const key = getKey(i);
+        auto const& val = values_[i];
 
         switch (Items[i].type)
         {
