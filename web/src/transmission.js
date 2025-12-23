@@ -285,8 +285,11 @@ export class Transmission extends EventTarget {
         this._deselectAll();
       }
     });
-    e.addEventListener('dblclick', () => {
-      if (!this.popup[0] || this.popup[0].name !== 'inspector') {
+    e.addEventListener('dblclick', (event_) => {
+      if (
+        !event_.target.classList.contains('select') &&
+        (!this.popup[0] || this.popup[0].name !== 'inspector')
+      ) {
         this.action_manager.click('show-inspector');
       }
     });
@@ -917,7 +920,10 @@ TODO: fix this when notifications get fixed
       globalThis.focus();
 
       // Apple-Click, not selected
-    } else if (!row.isSelected() && meta_key) {
+    } else if (
+      !row.isSelected() &&
+      (event_.target.classList.contains('select') || meta_key)
+    ) {
       this._selectRow(row);
 
       // Regular Click, not selected
@@ -925,7 +931,10 @@ TODO: fix this when notifications get fixed
       this._setSelectedRow(row);
 
       // Apple-Click, selected
-    } else if (row.isSelected() && meta_key) {
+    } else if (
+      row.isSelected() &&
+      (event_.target.classList.contains('select') || meta_key)
+    ) {
       this._deselectRow(row);
 
       // Regular Click, selected
