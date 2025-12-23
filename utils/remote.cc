@@ -612,7 +612,7 @@ void add_id_arg(tr_variant::Map& params, std::string_view id_str, std::string_vi
 
     if (IdActive == id_str)
     {
-        params.insert_or_assign(TR_KEY_ids, tr_variant::unmanaged_string(TR_KEY_recently_active_kebab));
+        params.insert_or_assign(TR_KEY_ids, tr_variant::unmanaged_string(TR_KEY_recently_active));
     }
     else if (IdAll != id_str)
     {
@@ -756,63 +756,63 @@ auto constexpr FilesKeys = std::array<tr_quark, 4>{
 static_assert(FilesKeys[std::size(FilesKeys) - 1] != tr_quark{});
 
 auto constexpr DetailsKeys = std::array<tr_quark, 57>{
-    TR_KEY_activity_date_camel,
-    TR_KEY_added_date_camel,
-    TR_KEY_bandwidth_priority_camel,
+    TR_KEY_activity_date,
+    TR_KEY_added_date,
+    TR_KEY_bandwidth_priority,
     TR_KEY_comment,
-    TR_KEY_corrupt_ever_camel,
+    TR_KEY_corrupt_ever,
     TR_KEY_creator,
-    TR_KEY_date_created_camel,
-    TR_KEY_desired_available_camel,
-    TR_KEY_done_date_camel,
-    TR_KEY_download_dir_camel,
-    TR_KEY_downloaded_ever_camel,
-    TR_KEY_download_limit_camel,
-    TR_KEY_download_limited_camel,
+    TR_KEY_date_created,
+    TR_KEY_desired_available,
+    TR_KEY_done_date,
+    TR_KEY_download_dir,
+    TR_KEY_downloaded_ever,
+    TR_KEY_download_limit,
+    TR_KEY_download_limited,
     TR_KEY_error,
-    TR_KEY_error_string_camel,
+    TR_KEY_error_string,
     TR_KEY_eta,
     TR_KEY_group,
-    TR_KEY_hash_string_camel,
-    TR_KEY_have_unchecked_camel,
-    TR_KEY_have_valid_camel,
-    TR_KEY_honors_session_limits_camel,
+    TR_KEY_hash_string,
+    TR_KEY_have_unchecked,
+    TR_KEY_have_valid,
+    TR_KEY_honors_session_limits,
     TR_KEY_id,
-    TR_KEY_is_finished_camel,
-    TR_KEY_is_private_camel,
+    TR_KEY_is_finished,
+    TR_KEY_is_private,
     TR_KEY_labels,
-    TR_KEY_left_until_done_camel,
-    TR_KEY_magnet_link_camel,
+    TR_KEY_left_until_done,
+    TR_KEY_magnet_link,
     TR_KEY_name,
-    TR_KEY_peers_connected_camel,
-    TR_KEY_peers_getting_from_us_camel,
-    TR_KEY_peers_sending_to_us_camel,
-    TR_KEY_peer_limit_kebab,
-    TR_KEY_percent_done_camel,
-    TR_KEY_piece_count_camel,
-    TR_KEY_piece_size_camel,
-    TR_KEY_rate_download_camel,
-    TR_KEY_rate_upload_camel,
-    TR_KEY_recheck_progress_camel,
-    TR_KEY_seconds_downloading_camel,
-    TR_KEY_seconds_seeding_camel,
-    TR_KEY_seed_idle_mode_camel,
-    TR_KEY_seed_idle_limit_camel,
-    TR_KEY_seed_ratio_mode_camel,
-    TR_KEY_seed_ratio_limit_camel,
+    TR_KEY_peers_connected,
+    TR_KEY_peers_getting_from_us,
+    TR_KEY_peers_sending_to_us,
+    TR_KEY_peer_limit,
+    TR_KEY_percent_done,
+    TR_KEY_piece_count,
+    TR_KEY_piece_size,
+    TR_KEY_rate_download,
+    TR_KEY_rate_upload,
+    TR_KEY_recheck_progress,
+    TR_KEY_seconds_downloading,
+    TR_KEY_seconds_seeding,
+    TR_KEY_seed_idle_mode,
+    TR_KEY_seed_idle_limit,
+    TR_KEY_seed_ratio_mode,
+    TR_KEY_seed_ratio_limit,
     TR_KEY_sequential_download,
     TR_KEY_sequential_download_from_piece,
-    TR_KEY_size_when_done_camel,
+    TR_KEY_size_when_done,
     TR_KEY_source,
-    TR_KEY_start_date_camel,
+    TR_KEY_start_date,
     TR_KEY_status,
-    TR_KEY_total_size_camel,
-    TR_KEY_uploaded_ever_camel,
-    TR_KEY_upload_limit_camel,
-    TR_KEY_upload_limited_camel,
-    TR_KEY_upload_ratio_camel,
+    TR_KEY_total_size,
+    TR_KEY_uploaded_ever,
+    TR_KEY_upload_limit,
+    TR_KEY_upload_limited,
+    TR_KEY_upload_ratio,
     TR_KEY_webseeds,
-    TR_KEY_webseeds_sending_to_us_camel,
+    TR_KEY_webseeds_sending_to_us,
 };
 static_assert(DetailsKeys[std::size(DetailsKeys) - 1] != tr_quark{});
 
@@ -918,21 +918,21 @@ void warn_if_unsupported_rpc_version(std::string_view const semver)
         return "Queued"s;
 
     case TR_STATUS_STOPPED:
-        if (t.value_if<bool>({ TR_KEY_is_finished, TR_KEY_is_finished_camel }).value_or(false))
+        if (t.value_if<bool>(TR_KEY_is_finished).value_or(false))
         {
             return "Finished"s;
         }
         return "Stopped"s;
 
     case TR_STATUS_CHECK_WAIT:
-        if (auto percent = t.value_if<double>({ TR_KEY_recheck_progress, TR_KEY_recheck_progress_camel }); percent)
+        if (auto const percent = t.value_if<double>(TR_KEY_recheck_progress))
         {
             return fmt::format("Will Verify ({:.0f}%)", floor(*percent * 100.0));
         }
         return "Will Verify"s;
 
     case TR_STATUS_CHECK:
-        if (auto percent = t.value_if<double>({ TR_KEY_recheck_progress, TR_KEY_recheck_progress_camel }); percent)
+        if (auto const percent = t.value_if<double>(TR_KEY_recheck_progress))
         {
             return fmt::format("Verifying ({:.0f}%)", floor(*percent * 100.0));
         }
@@ -940,9 +940,8 @@ void warn_if_unsupported_rpc_version(std::string_view const semver)
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
-        if (auto from_us = t.value_if<int64_t>({ TR_KEY_peers_getting_from_us, TR_KEY_peers_getting_from_us_camel })
-                               .value_or(0),
-            to_us = t.value_if<int64_t>({ TR_KEY_peers_sending_to_us, TR_KEY_peers_sending_to_us_camel }).value_or(0);
+        if (auto const from_us = t.value_if<int64_t>(TR_KEY_peers_getting_from_us).value_or(0),
+            to_us = t.value_if<int64_t>(TR_KEY_peers_sending_to_us).value_or(0);
             from_us != 0 && to_us != 0)
         {
             return "Up & Down"s;
@@ -955,8 +954,7 @@ void warn_if_unsupported_rpc_version(std::string_view const semver)
         {
             return "Idle"s;
         }
-        if (auto left_until_done = t.value_if<int64_t>({ TR_KEY_left_until_done, TR_KEY_left_until_done_camel }).value_or(0);
-            left_until_done > 0)
+        if (auto left_until_done = t.value_if<int64_t>(TR_KEY_left_until_done).value_or(0); left_until_done > 0)
         {
             return "Uploading"s;
         }
@@ -1330,7 +1328,7 @@ void print_details(tr_variant::Map const& result)
             }
         }
 
-        if (auto const b = t->value_if<bool>(TR_KEY_honors_session_limits_camel))
+        if (auto const b = t->value_if<bool>(TR_KEY_honors_session_limits))
         {
             fmt::print("  Honors Session Limits: {:s}\n", *b ? "Yes" : "No");
         }
@@ -1436,11 +1434,11 @@ void print_peers_impl(tr_variant::Vector const& peers)
         }
 
         auto const address = peer->value_if<std::string_view>(TR_KEY_address);
-        auto const client = peer->value_if<std::string_view>({ TR_KEY_client_name, TR_KEY_client_name_camel });
-        auto const flagstr = peer->value_if<std::string_view>({ TR_KEY_flag_str, TR_KEY_flag_str_camel });
+        auto const client = peer->value_if<std::string_view>(TR_KEY_client_name);
+        auto const flagstr = peer->value_if<std::string_view>(TR_KEY_flag_str);
         auto const progress = peer->value_if<double>(TR_KEY_progress);
-        auto const rate_to_client = peer->value_if<int64_t>({ TR_KEY_rate_to_client, TR_KEY_rate_to_client_camel });
-        auto const rate_to_peer = peer->value_if<int64_t>({ TR_KEY_rate_to_peer, TR_KEY_rate_to_peer_camel });
+        auto const rate_to_client = peer->value_if<int64_t>(TR_KEY_rate_to_client);
+        auto const rate_to_peer = peer->value_if<int64_t>(TR_KEY_rate_to_peer);
 
         if (address && client && progress && flagstr && rate_to_client && rate_to_peer)
         {
@@ -1845,7 +1843,7 @@ void print_session(tr_variant::Map const& result)
         fmt::print("  Download directory: {:s}\n", *sv);
     }
 
-    if (auto i = result.value_if<int64_t>(TR_KEY_peer_port_kebab))
+    if (auto i = result.value_if<int64_t>(TR_KEY_peer_port))
     {
         fmt::print("  Listen port: {:d}\n", *i);
     }
@@ -2067,15 +2065,9 @@ void print_session_stats(tr_variant::Map const& result)
     }
 }
 
-void print_groups(tr_variant::Map const& map)
+void print_groups(tr_variant::Map const& result)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
-    {
-        return;
-    }
-
-    auto* const groups = args->find_if<tr_variant::Vector>(TR_KEY_group);
+    auto const* const groups = result.find_if<tr_variant::Vector>(TR_KEY_group);
     if (groups == nullptr)
     {
         return;
@@ -2083,18 +2075,18 @@ void print_groups(tr_variant::Map const& map)
 
     for (auto const& group_var : *groups)
     {
-        auto* const group = group_var.get_if<tr_variant::Map>();
+        auto const* const group = group_var.get_if<tr_variant::Map>();
         if (group == nullptr)
         {
             continue;
         }
 
         auto const name = group->value_if<std::string_view>(TR_KEY_name);
-        auto const up_enabled = group->value_if<bool>({ TR_KEY_upload_limited, TR_KEY_upload_limited_camel });
-        auto const down_enabled = group->value_if<bool>({ TR_KEY_download_limited, TR_KEY_download_limited_camel });
-        auto const up_limit = group->value_if<int64_t>({ TR_KEY_upload_limit, TR_KEY_upload_limit_camel });
-        auto const down_limit = group->value_if<int64_t>({ TR_KEY_download_limit, TR_KEY_download_limit_camel });
-        auto const honors = group->value_if<bool>({ TR_KEY_honors_session_limits, TR_KEY_honors_session_limits_camel });
+        auto const up_enabled = group->value_if<bool>(TR_KEY_upload_limited);
+        auto const down_enabled = group->value_if<bool>(TR_KEY_download_limited);
+        auto const up_limit = group->value_if<int64_t>(TR_KEY_upload_limit);
+        auto const down_limit = group->value_if<int64_t>(TR_KEY_download_limit);
+        auto const honors = group->value_if<bool>(TR_KEY_honors_session_limits);
         if (name && down_limit && down_enabled && up_limit && up_enabled && honors)
         {
             fmt::print("{:s}: ", *name);
@@ -2107,15 +2099,9 @@ void print_groups(tr_variant::Map const& map)
     }
 }
 
-void filter_ids(tr_variant::Map const& map, RemoteConfig& config)
+void filter_ids(tr_variant::Map const& result, RemoteConfig& config)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
-    {
-        return;
-    }
-
-    auto* const torrents = args->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    auto const* const torrents = result.find_if<tr_variant::Vector>(TR_KEY_torrents);
     if (torrents == nullptr)
     {
         return;
@@ -2139,7 +2125,7 @@ void filter_ids(tr_variant::Map const& map, RemoteConfig& config)
 
     for (auto const& t_var : *torrents)
     {
-        auto* const t = t_var.get_if<tr_variant::Map>();
+        auto const* const t = t_var.get_if<tr_variant::Map>();
         if (t == nullptr)
         {
             continue;
@@ -2197,7 +2183,7 @@ void filter_ids(tr_variant::Map const& map, RemoteConfig& config)
             }
             break;
         case 'r': // Minimal ratio
-            if (auto ratio = t->value_if<double>({ TR_KEY_upload_ratio, TR_KEY_upload_ratio_camel }); !ratio)
+            if (auto ratio = t->value_if<double>(TR_KEY_upload_ratio); !ratio)
             {
                 continue;
             }
@@ -2207,14 +2193,11 @@ void filter_ids(tr_variant::Map const& map, RemoteConfig& config)
             }
             break;
         case 'w': // Not all torrent wanted
-            if (auto total_size = t->value_if<int64_t>({ TR_KEY_total_size, TR_KEY_total_size_camel }).value_or(-1);
-                total_size < 0)
+            if (auto total_size = t->value_if<int64_t>(TR_KEY_total_size).value_or(-1); total_size < 0)
             {
                 continue;
             }
-            else if (auto size_when_done = t->value_if<int64_t>({ TR_KEY_size_when_done, TR_KEY_size_when_done_camel })
-                                               .value_or(-1);
-                     size_when_done < 0)
+            else if (auto size_when_done = t->value_if<int64_t>(TR_KEY_size_when_done).value_or(-1); size_when_done < 0)
             {
                 continue;
             }
@@ -2258,12 +2241,13 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         fmt::print(stderr, "got response (len {:d}):\n--------\n{:s}\n--------\n", std::size(response), response);
     }
 
-    auto const parsed = tr_variant_serde::json().inplace().parse(response);
+    auto parsed = tr_variant_serde::json().inplace().parse(response);
     if (!parsed)
     {
         fmt::print(stderr, "Unable to parse response '{}'\n", response);
         return EXIT_FAILURE;
     }
+    api_compat::convert_incoming_data(*parsed);
 
     auto const* const top = parsed->get_if<tr_variant::Map>();
     if (!top)
@@ -2328,29 +2312,23 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         print_pieces(*result);
         break;
 
-#if 0
     case ID_GROUPS:
-        print_groups(map);
+        print_groups(*result);
         break;
 
     case ID_FILTER:
-        filter_ids(map, config);
+        filter_ids(*result, config);
         break;
 
     case ID_TORRENT_ADD:
-        if (auto* b = map.find_if<tr_variant::Map>(TR_KEY_arguments); b != nullptr)
+        if (auto* b = result->find_if<tr_variant::Map>(TR_KEY_torrent_added))
         {
-            b = b->find_if<tr_variant::Map>({ TR_KEY_torrent_added, TR_KEY_torrent_added_kebab });
-            if (b != nullptr)
+            if (auto const id = b->value_if<int64_t>(TR_KEY_id))
             {
-                if (auto i = b->value_if<int64_t>(TR_KEY_id); i)
-                {
-                    config.torrent_ids = std::to_string(*i);
-                }
+                config.torrent_ids = std::to_string(*id);
             }
         }
         [[fallthrough]];
-#endif
 
     default:
         fmt::print("{:s} responded: {:s}\n", rpcurl, response);
@@ -2523,17 +2501,18 @@ tr_variant::Map& ensure_sset(tr_variant& sset)
     auto* map = sset.get_if<tr_variant::Map>();
     if (map == nullptr)
     {
-        sset = tr_variant::Map{ 3 };
+        sset = tr_variant::Map{ 4U };
         map = sset.get_if<tr_variant::Map>();
-        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_set_kebab));
+        map->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_set));
     }
 
-    auto* args = map->find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
+    auto* params = map->find_if<tr_variant::Map>(TR_KEY_params);
+    if (params == nullptr)
     {
-        args = map->insert_or_assign(TR_KEY_arguments, tr_variant::Map{}).first.get_if<tr_variant::Map>();
+        params = map->insert_or_assign(TR_KEY_params, tr_variant::Map{}).first.get_if<tr_variant::Map>();
     }
-    return *args;
+    return *params;
 }
 
 tr_variant::Map& ensure_tset(tr_variant& tset)
@@ -2543,15 +2522,16 @@ tr_variant::Map& ensure_tset(tr_variant& tset)
     {
         tset = tr_variant::Map{ 3 };
         map = tset.get_if<tr_variant::Map>();
-        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_set_kebab));
+        map->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_set));
     }
 
-    auto* args = map->find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
+    auto* params = map->find_if<tr_variant::Map>(TR_KEY_params);
+    if (params == nullptr)
     {
-        args = map->insert_or_assign(TR_KEY_arguments, tr_variant::Map{ 1 }).first.get_if<tr_variant::Map>();
+        params = map->insert_or_assign(TR_KEY_params, tr_variant::Map{ 1 }).first.get_if<tr_variant::Map>();
     }
-    return *args;
+    return *params;
 }
 
 tr_variant::Map& ensure_tadd(tr_variant& tadd)
@@ -2609,11 +2589,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
                 if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
                 {
-                    auto* const args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments);
-                    TR_ASSERT(args_map != nullptr);
-                    if (args_map != nullptr)
+                    auto* const params = tset_map->find_if<tr_variant::Map>(TR_KEY_params);
+                    TR_ASSERT(params != nullptr);
+                    if (params != nullptr)
                     {
-                        add_id_arg(*args_map, config);
+                        add_id_arg(*params, config);
                         status |= flush(rpcurl, &tset, config);
                     }
                 }
@@ -2666,11 +2646,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
                 if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
                 {
-                    auto* const args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments);
-                    TR_ASSERT(args_map != nullptr);
-                    if (args_map != nullptr)
+                    auto* const params = tset_map->find_if<tr_variant::Map>(TR_KEY_params);
+                    TR_ASSERT(params != nullptr);
+                    if (params != nullptr)
                     {
-                        add_id_arg(*args_map, config);
+                        add_id_arg(*params, config);
                         status |= flush(rpcurl, &tset, config);
                     }
                 }
@@ -2695,17 +2675,17 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case TR_OPT_UNK:
                 if (auto* tadd_map = tadd.get_if<tr_variant::Map>(); tadd_map != nullptr)
                 {
-                    auto* const args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments);
-                    TR_ASSERT(args_map != nullptr);
-                    if (args_map != nullptr)
+                    auto* const params = tadd_map->find_if<tr_variant::Map>(TR_KEY_params);
+                    TR_ASSERT(params != nullptr);
+                    if (params != nullptr)
                     {
                         if (auto const metainfo = get_encoded_metainfo(optarg); !std::empty(metainfo))
                         {
-                            args_map->try_emplace(TR_KEY_metainfo, metainfo);
+                            params->try_emplace(TR_KEY_metainfo, metainfo);
                         }
                         else
                         {
-                            args_map->try_emplace(TR_KEY_filename, optarg_sv);
+                            params->try_emplace(TR_KEY_filename, optarg_sv);
                         }
                     }
                 }
@@ -2725,11 +2705,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
         {
             if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
             {
-                auto* const args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments);
-                TR_ASSERT(args_map != nullptr);
-                if (args_map != nullptr)
+                auto* const params = tset_map->find_if<tr_variant::Map>(TR_KEY_params);
+                TR_ASSERT(params != nullptr);
+                if (params != nullptr)
                 {
-                    add_id_arg(*args_map, config);
+                    add_id_arg(*params, config);
                     status |= flush(rpcurl, &tset, config);
                 }
             }
@@ -2823,70 +2803,70 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             switch (c)
             {
             case 800:
-                args.insert_or_assign(TR_KEY_script_torrent_done_filename_kebab, optarg_sv);
-                args.insert_or_assign(TR_KEY_script_torrent_done_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_script_torrent_done_filename, optarg_sv);
+                args.insert_or_assign(TR_KEY_script_torrent_done_enabled, true);
                 break;
 
             case 801:
-                args.insert_or_assign(TR_KEY_script_torrent_done_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_script_torrent_done_enabled, false);
                 break;
 
             case 802:
-                args.insert_or_assign(TR_KEY_script_torrent_done_seeding_filename_kebab, optarg_sv);
-                args.insert_or_assign(TR_KEY_script_torrent_done_seeding_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_script_torrent_done_seeding_filename, optarg_sv);
+                args.insert_or_assign(TR_KEY_script_torrent_done_seeding_enabled, true);
                 break;
 
             case 803:
-                args.insert_or_assign(TR_KEY_script_torrent_done_seeding_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_script_torrent_done_seeding_enabled, false);
                 break;
 
             case 970:
-                args.insert_or_assign(TR_KEY_alt_speed_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_alt_speed_enabled, true);
                 break;
 
             case 971:
-                args.insert_or_assign(TR_KEY_alt_speed_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_alt_speed_enabled, false);
                 break;
 
             case 972:
-                args.insert_or_assign(TR_KEY_alt_speed_down_kebab, numarg(optarg_sv));
+                args.insert_or_assign(TR_KEY_alt_speed_down, numarg(optarg_sv));
                 break;
 
             case 973:
-                args.insert_or_assign(TR_KEY_alt_speed_up_kebab, numarg(optarg_sv));
+                args.insert_or_assign(TR_KEY_alt_speed_up, numarg(optarg_sv));
                 break;
 
             case 974:
-                args.insert_or_assign(TR_KEY_alt_speed_time_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_alt_speed_time_enabled, true);
                 break;
 
             case 975:
-                args.insert_or_assign(TR_KEY_alt_speed_time_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_alt_speed_time_enabled, false);
                 break;
 
             case 976:
-                add_time(args, TR_KEY_alt_speed_time_begin_kebab, optarg_sv);
+                add_time(args, TR_KEY_alt_speed_time_begin, optarg_sv);
                 break;
 
             case 977:
-                add_time(args, TR_KEY_alt_speed_time_end_kebab, optarg_sv);
+                add_time(args, TR_KEY_alt_speed_time_end, optarg_sv);
                 break;
 
             case 978:
-                add_days(args, TR_KEY_alt_speed_time_day_kebab, optarg_sv);
+                add_days(args, TR_KEY_alt_speed_time_day, optarg_sv);
                 break;
 
             case 'c':
-                args.insert_or_assign(TR_KEY_incomplete_dir_kebab, optarg_sv);
-                args.insert_or_assign(TR_KEY_incomplete_dir_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_incomplete_dir, optarg_sv);
+                args.insert_or_assign(TR_KEY_incomplete_dir_enabled, true);
                 break;
 
             case 'C':
-                args.insert_or_assign(TR_KEY_incomplete_dir_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_incomplete_dir_enabled, false);
                 break;
 
             case 'e':
-                args.insert_or_assign(TR_KEY_cache_size_mb_kebab, tr_num_parse<int64_t>(optarg_sv).value());
+                args.insert_or_assign(TR_KEY_cache_size_mb, tr_num_parse<int64_t>(optarg_sv).value());
                 break;
 
             case 910:
@@ -2902,19 +2882,19 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 'm':
-                args.insert_or_assign(TR_KEY_port_forwarding_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_port_forwarding_enabled, true);
                 break;
 
             case 'M':
-                args.insert_or_assign(TR_KEY_port_forwarding_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_port_forwarding_enabled, false);
                 break;
 
             case 'o':
-                args.insert_or_assign(TR_KEY_dht_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_dht_enabled, true);
                 break;
 
             case 'O':
-                args.insert_or_assign(TR_KEY_dht_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_dht_enabled, false);
                 break;
 
             case 830:
@@ -2922,69 +2902,69 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 831:
-                args.insert_or_assign(TR_KEY_utp_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_utp_enabled, true);
                 break;
 
             case 832:
-                args.insert_or_assign(TR_KEY_utp_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_utp_enabled, false);
                 break;
 
             case 'p':
-                args.insert_or_assign(TR_KEY_peer_port_kebab, numarg(optarg_sv));
+                args.insert_or_assign(TR_KEY_peer_port, numarg(optarg_sv));
                 break;
 
             case 'P':
-                args.insert_or_assign(TR_KEY_peer_port_random_on_start_kebab, true);
+                args.insert_or_assign(TR_KEY_peer_port_random_on_start, true);
                 break;
 
             case 'x':
-                args.insert_or_assign(TR_KEY_pex_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_pex_enabled, true);
                 break;
 
             case 'X':
-                args.insert_or_assign(TR_KEY_pex_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_pex_enabled, false);
                 break;
 
             case 'y':
-                args.insert_or_assign(TR_KEY_lpd_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_lpd_enabled, true);
                 break;
 
             case 'Y':
-                args.insert_or_assign(TR_KEY_lpd_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_lpd_enabled, false);
                 break;
 
             case 953:
-                args.insert_or_assign(TR_KEY_seed_ratio_limit_camel, tr_num_parse<double>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seed_ratio_limited_camel, true);
+                args.insert_or_assign(TR_KEY_seed_ratio_limit, tr_num_parse<double>(optarg_sv).value());
+                args.insert_or_assign(TR_KEY_seed_ratio_limited, true);
                 break;
 
             case 954:
-                args.insert_or_assign(TR_KEY_seed_ratio_limited_camel, false);
+                args.insert_or_assign(TR_KEY_seed_ratio_limited, false);
                 break;
 
             case 958:
-                args.insert_or_assign(TR_KEY_idle_seeding_limit_kebab, tr_num_parse<int64_t>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled_kebab, true);
+                args.insert_or_assign(TR_KEY_idle_seeding_limit, tr_num_parse<int64_t>(optarg_sv).value());
+                args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, true);
                 break;
 
             case 959:
-                args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled_kebab, false);
+                args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, false);
                 break;
 
             case 990:
-                args.insert_or_assign(TR_KEY_start_added_torrents_kebab, false);
+                args.insert_or_assign(TR_KEY_start_added_torrents, false);
                 break;
 
             case 991:
-                args.insert_or_assign(TR_KEY_start_added_torrents_kebab, true);
+                args.insert_or_assign(TR_KEY_start_added_torrents, true);
                 break;
 
             case 992:
-                args.insert_or_assign(TR_KEY_trash_original_torrent_files_kebab, true);
+                args.insert_or_assign(TR_KEY_trash_original_torrent_files, true);
                 break;
 
             case 993:
-                args.insert_or_assign(TR_KEY_trash_original_torrent_files_kebab, false);
+                args.insert_or_assign(TR_KEY_trash_original_torrent_files, false);
                 break;
 
             default:
@@ -3011,13 +2991,13 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 'd':
                 if (targs != nullptr)
                 {
-                    targs->insert_or_assign(TR_KEY_download_limit_camel, numarg(optarg_sv));
-                    targs->insert_or_assign(TR_KEY_download_limited_camel, true);
+                    targs->insert_or_assign(TR_KEY_download_limit, numarg(optarg_sv));
+                    targs->insert_or_assign(TR_KEY_download_limited, true);
                 }
                 else
                 {
-                    sargs->insert_or_assign(TR_KEY_speed_limit_down_kebab, numarg(optarg_sv));
-                    sargs->insert_or_assign(TR_KEY_speed_limit_down_enabled_kebab, true);
+                    sargs->insert_or_assign(TR_KEY_speed_limit_down, numarg(optarg_sv));
+                    sargs->insert_or_assign(TR_KEY_speed_limit_down_enabled, true);
                 }
 
                 break;
@@ -3025,11 +3005,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 'D':
                 if (targs != nullptr)
                 {
-                    targs->insert_or_assign(TR_KEY_download_limited_camel, false);
+                    targs->insert_or_assign(TR_KEY_download_limited, false);
                 }
                 else
                 {
-                    sargs->insert_or_assign(TR_KEY_speed_limit_down_enabled_kebab, false);
+                    sargs->insert_or_assign(TR_KEY_speed_limit_down_enabled, false);
                 }
 
                 break;
@@ -3037,13 +3017,13 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 'u':
                 if (targs != nullptr)
                 {
-                    targs->insert_or_assign(TR_KEY_upload_limit_camel, numarg(optarg_sv));
-                    targs->insert_or_assign(TR_KEY_upload_limited_camel, true);
+                    targs->insert_or_assign(TR_KEY_upload_limit, numarg(optarg_sv));
+                    targs->insert_or_assign(TR_KEY_upload_limited, true);
                 }
                 else
                 {
-                    sargs->insert_or_assign(TR_KEY_speed_limit_up_kebab, numarg(optarg_sv));
-                    sargs->insert_or_assign(TR_KEY_speed_limit_up_enabled_kebab, true);
+                    sargs->insert_or_assign(TR_KEY_speed_limit_up, numarg(optarg_sv));
+                    sargs->insert_or_assign(TR_KEY_speed_limit_up_enabled, true);
                 }
 
                 break;
@@ -3051,11 +3031,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 'U':
                 if (targs != nullptr)
                 {
-                    targs->insert_or_assign(TR_KEY_upload_limited_camel, false);
+                    targs->insert_or_assign(TR_KEY_upload_limited, false);
                 }
                 else
                 {
-                    sargs->insert_or_assign(TR_KEY_speed_limit_up_enabled_kebab, false);
+                    sargs->insert_or_assign(TR_KEY_speed_limit_up_enabled, false);
                 }
 
                 break;
@@ -3063,11 +3043,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 930:
                 if (targs != nullptr)
                 {
-                    targs->insert_or_assign(TR_KEY_peer_limit_kebab, tr_num_parse<int64_t>(optarg_sv).value());
+                    targs->insert_or_assign(TR_KEY_peer_limit, tr_num_parse<int64_t>(optarg_sv).value());
                 }
                 else
                 {
-                    sargs->insert_or_assign(TR_KEY_peer_limit_global_kebab, tr_num_parse<int64_t>(optarg_sv).value());
+                    sargs->insert_or_assign(TR_KEY_peer_limit_global, tr_num_parse<int64_t>(optarg_sv).value());
                 }
 
                 break;
@@ -3085,10 +3065,10 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             {
             case 712:
                 {
-                    auto* list = args.find_if<tr_variant::Vector>(TR_KEY_tracker_remove_camel);
+                    auto* list = args.find_if<tr_variant::Vector>(TR_KEY_tracker_remove);
                     if (list == nullptr)
                     {
-                        list = args.insert_or_assign(TR_KEY_tracker_remove_camel, tr_variant::make_vector(1))
+                        list = args.insert_or_assign(TR_KEY_tracker_remove, tr_variant::make_vector(1))
                                    .first.get_if<tr_variant::Vector>();
                     }
                     list->emplace_back(tr_num_parse<int64_t>(optarg_sv).value());
@@ -3096,37 +3076,37 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 950:
-                args.insert_or_assign(TR_KEY_seed_ratio_limit_camel, tr_num_parse<double>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seed_ratio_mode_camel, TR_RATIOLIMIT_SINGLE);
+                args.insert_or_assign(TR_KEY_seed_ratio_limit, tr_num_parse<double>(optarg_sv).value());
+                args.insert_or_assign(TR_KEY_seed_ratio_mode, TR_RATIOLIMIT_SINGLE);
                 break;
 
             case 951:
-                args.insert_or_assign(TR_KEY_seed_ratio_mode_camel, TR_RATIOLIMIT_GLOBAL);
+                args.insert_or_assign(TR_KEY_seed_ratio_mode, TR_RATIOLIMIT_GLOBAL);
                 break;
 
             case 952:
-                args.insert_or_assign(TR_KEY_seed_ratio_mode_camel, TR_RATIOLIMIT_UNLIMITED);
+                args.insert_or_assign(TR_KEY_seed_ratio_mode, TR_RATIOLIMIT_UNLIMITED);
                 break;
 
             case 955:
-                args.insert_or_assign(TR_KEY_seed_idle_limit_camel, tr_num_parse<int64_t>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seed_idle_mode_camel, TR_IDLELIMIT_SINGLE);
+                args.insert_or_assign(TR_KEY_seed_idle_limit, tr_num_parse<int64_t>(optarg_sv).value());
+                args.insert_or_assign(TR_KEY_seed_idle_mode, TR_IDLELIMIT_SINGLE);
                 break;
 
             case 956:
-                args.insert_or_assign(TR_KEY_seed_idle_mode_camel, TR_IDLELIMIT_GLOBAL);
+                args.insert_or_assign(TR_KEY_seed_idle_mode, TR_IDLELIMIT_GLOBAL);
                 break;
 
             case 957:
-                args.insert_or_assign(TR_KEY_seed_idle_mode_camel, TR_IDLELIMIT_UNLIMITED);
+                args.insert_or_assign(TR_KEY_seed_idle_mode, TR_IDLELIMIT_UNLIMITED);
                 break;
 
             case 984:
-                args.insert_or_assign(TR_KEY_honors_session_limits_camel, true);
+                args.insert_or_assign(TR_KEY_honors_session_limits, true);
                 break;
 
             case 985:
-                args.insert_or_assign(TR_KEY_honors_session_limits_camel, false);
+                args.insert_or_assign(TR_KEY_honors_session_limits, false);
                 break;
 
             default:
@@ -3141,11 +3121,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             switch (c)
             {
             case 'g':
-                args.insert_or_assign(TR_KEY_files_wanted_kebab, make_files_list(optarg_sv));
+                args.insert_or_assign(TR_KEY_files_wanted, make_files_list(optarg_sv));
                 break;
 
             case 'G':
-                args.insert_or_assign(TR_KEY_files_unwanted_kebab, make_files_list(optarg_sv));
+                args.insert_or_assign(TR_KEY_files_unwanted, make_files_list(optarg_sv));
                 break;
 
             case 'L':
@@ -3161,35 +3141,35 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 900:
-                args.insert_or_assign(TR_KEY_priority_high_kebab, make_files_list(optarg_sv));
+                args.insert_or_assign(TR_KEY_priority_high, make_files_list(optarg_sv));
                 break;
 
             case 901:
-                args.insert_or_assign(TR_KEY_priority_normal_kebab, make_files_list(optarg_sv));
+                args.insert_or_assign(TR_KEY_priority_normal, make_files_list(optarg_sv));
                 break;
 
             case 902:
-                args.insert_or_assign(TR_KEY_priority_low_kebab, make_files_list(optarg_sv));
+                args.insert_or_assign(TR_KEY_priority_low, make_files_list(optarg_sv));
                 break;
 
             case 700:
-                args.insert_or_assign(TR_KEY_bandwidth_priority_camel, 1);
+                args.insert_or_assign(TR_KEY_bandwidth_priority, 1);
                 break;
 
             case 701:
-                args.insert_or_assign(TR_KEY_bandwidth_priority_camel, 0);
+                args.insert_or_assign(TR_KEY_bandwidth_priority, 0);
                 break;
 
             case 702:
-                args.insert_or_assign(TR_KEY_bandwidth_priority_camel, -1);
+                args.insert_or_assign(TR_KEY_bandwidth_priority, -1);
                 break;
 
             case 710:
                 {
-                    auto* list = args.find_if<tr_variant::Vector>(TR_KEY_tracker_add_camel);
+                    auto* list = args.find_if<tr_variant::Vector>(TR_KEY_tracker_add);
                     if (list == nullptr)
                     {
-                        list = args.insert_or_assign(TR_KEY_tracker_add_camel, tr_variant::make_vector(1))
+                        list = args.insert_or_assign(TR_KEY_tracker_add, tr_variant::make_vector(1))
                                    .first.get_if<tr_variant::Vector>();
                     }
                     list->emplace_back(optarg_sv);
@@ -3238,13 +3218,14 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
         else if (step_mode == MODE_TORRENT_REMOVE)
         {
             auto map = tr_variant::Map{ 2 };
-            auto args = tr_variant::Map{ 2 };
+            auto params = tr_variant::Map{ 2 };
 
-            args.try_emplace(TR_KEY_delete_local_data_kebab, c == 840);
-            add_id_arg(args, config);
+            params.try_emplace(TR_KEY_delete_local_data, c == 840);
+            add_id_arg(params, config);
 
-            map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_remove_kebab));
-            map.try_emplace(TR_KEY_arguments, std::move(args));
+            map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+            map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_remove));
+            map.try_emplace(TR_KEY_params, std::move(params));
 
             auto top = tr_variant{ std::move(map) };
             status |= flush(rpcurl, &top, config);
@@ -3254,21 +3235,23 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             auto const is_stop = c == 'S';
             if (auto* tadd_map = tadd.get_if<tr_variant::Map>(); tadd_map != nullptr)
             {
-                auto* const args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments);
-                TR_ASSERT(args_map != nullptr);
-                if (args_map != nullptr)
+                auto* const params = tadd_map->find_if<tr_variant::Map>(TR_KEY_params);
+                TR_ASSERT(params != nullptr);
+                if (params != nullptr)
                 {
-                    args_map->insert_or_assign(TR_KEY_paused, is_stop);
+                    params->insert_or_assign(TR_KEY_paused, is_stop);
                 }
             }
             else
             {
-                auto map = tr_variant::Map{ 2 };
-                auto args = tr_variant::Map{ 1 };
-                add_id_arg(args, config);
-                auto const key = is_stop ? TR_KEY_torrent_stop_kebab : TR_KEY_torrent_start_kebab;
+                auto params = tr_variant::Map{ 1U };
+                add_id_arg(params, config);
+
+                auto const key = is_stop ? TR_KEY_torrent_stop : TR_KEY_torrent_start;
+                auto map = tr_variant::Map{ 3U };
+                map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
                 map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(key));
-                map.try_emplace(TR_KEY_arguments, std::move(args));
+                map.try_emplace(TR_KEY_params, std::move(params));
 
                 auto top = tr_variant{ std::move(map) };
                 status |= flush(rpcurl, &top, config);
@@ -3281,9 +3264,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 switch (option)
                 {
                 case 'v':
-                    return TR_KEY_torrent_verify_kebab;
+                    return TR_KEY_torrent_verify;
                 case 600:
-                    return TR_KEY_torrent_reannounce_kebab;
+                    return TR_KEY_torrent_reannounce;
                 default:
                     TR_ASSERT_MSG(false, "unhandled value");
                     return TR_KEY_NONE;
@@ -3292,21 +3275,24 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
             {
-                auto* const args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments);
-                TR_ASSERT(args_map != nullptr);
-                if (args_map != nullptr)
+                auto* const params = tset_map->find_if<tr_variant::Map>(TR_KEY_params);
+                TR_ASSERT(params != nullptr);
+                if (params != nullptr)
                 {
-                    add_id_arg(*args_map, config);
+                    add_id_arg(*params, config);
                     status |= flush(rpcurl, &tset, config);
                 }
             }
 
-            auto map = tr_variant::Map{ 2 };
-            auto args = tr_variant::Map{ 1 };
-            add_id_arg(args, config);
+            auto params = tr_variant::Map{ 1U };
+            add_id_arg(params, config);
+
             auto const key = Method(c);
+            auto map = tr_variant::Map{ 3U };
+            map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
             map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(key));
-            map.try_emplace(TR_KEY_arguments, std::move(args));
+            map.try_emplace(TR_KEY_params, std::move(params));
+
             auto top = tr_variant{ std::move(map) };
             status |= flush(rpcurl, &top, config);
         }
@@ -3317,8 +3303,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 920: // session-info
                 {
                     auto map = tr_variant::Map{ 3U };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_get));
                     map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_get));
                     map.try_emplace(TR_KEY_id, ID_SESSION);
 
                     auto top = tr_variant{ std::move(map) };
@@ -3329,14 +3315,15 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 'w':
                 {
                     auto& args = tadd.has_value() ? ensure_tadd(tadd) : ensure_sset(sset);
-                    args.insert_or_assign(TR_KEY_download_dir_kebab, optarg_sv);
+                    args.insert_or_assign(TR_KEY_download_dir, optarg_sv);
                 }
                 break;
 
             case 850:
                 {
-                    auto map = tr_variant::Map{ 1 };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_close_kebab));
+                    auto map = tr_variant::Map{ 2U };
+                    map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_close));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
@@ -3344,8 +3331,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 963:
                 {
-                    auto map = tr_variant::Map{ 1 };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_blocklist_update_kebab));
+                    auto map = tr_variant::Map{ 2U };
+                    map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_blocklist_update));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
@@ -3355,7 +3343,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 {
                     auto map = tr_variant::Map{ 3U };
                     map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats_kebab));
+                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats));
                     map.try_emplace(TR_KEY_id, ID_STATS);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
@@ -3366,7 +3354,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 {
                     auto map = tr_variant::Map{ 2U };
                     map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_port_test_kebab));
+                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_port_test));
                     map.try_emplace(TR_KEY_id, ID_PORTTEST);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
@@ -3375,13 +3363,16 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 960:
                 {
-                    auto map = tr_variant::Map{ 2 };
-                    auto args = tr_variant::Map{ 3 };
-                    args.try_emplace(TR_KEY_location, optarg_sv);
-                    args.try_emplace(TR_KEY_move, true);
-                    add_id_arg(args, config);
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_set_location_kebab));
-                    map.try_emplace(TR_KEY_arguments, std::move(args));
+                    auto params = tr_variant::Map{ 2U };
+                    params.try_emplace(TR_KEY_location, optarg_sv);
+                    params.try_emplace(TR_KEY_move, true);
+                    add_id_arg(params, config);
+
+                    auto map = tr_variant::Map{ 3U };
+                    map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_set_location));
+                    map.try_emplace(TR_KEY_params, std::move(params));
+
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
@@ -3393,22 +3384,25 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 // 2. Group with --move under MODE_TORRENT_SET_LOCATION
                 if (auto* tadd_map = tadd.get_if<tr_variant::Map>(); tadd_map != nullptr)
                 {
-                    auto* const args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments);
-                    TR_ASSERT(args_map != nullptr);
-                    if (args_map != nullptr)
+                    auto* const params = tadd_map->find_if<tr_variant::Map>(TR_KEY_params);
+                    TR_ASSERT(params != nullptr);
+                    if (params != nullptr)
                     {
-                        args_map->try_emplace(TR_KEY_download_dir_kebab, optarg_sv);
+                        params->try_emplace(TR_KEY_download_dir, optarg_sv);
                     }
                 }
                 else
                 {
-                    auto map = tr_variant::Map{ 2 };
-                    auto args = tr_variant::Map{ 3 };
-                    args.try_emplace(TR_KEY_location, optarg_sv);
-                    args.try_emplace(TR_KEY_move, false);
-                    add_id_arg(args, config);
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_set_location_kebab));
-                    map.try_emplace(TR_KEY_arguments, std::move(args));
+                    auto params = tr_variant::Map{ 3U };
+                    params.try_emplace(TR_KEY_location, optarg_sv);
+                    params.try_emplace(TR_KEY_move, false);
+                    add_id_arg(params, config);
+
+                    auto map = tr_variant::Map{ 3U };
+                    map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_set_location));
+                    map.try_emplace(TR_KEY_params, std::move(params));
+
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
@@ -3416,13 +3410,16 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 964:
                 {
-                    auto map = tr_variant::Map{ 2 };
-                    auto args = tr_variant::Map{ 3 };
+                    auto args = tr_variant::Map{ 3U };
                     args.try_emplace(TR_KEY_path, rename_from);
                     args.try_emplace(TR_KEY_name, optarg_sv);
                     add_id_arg(args, config);
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_rename_path_kebab));
-                    map.try_emplace(TR_KEY_arguments, std::move(args));
+
+                    auto map = tr_variant::Map{ 3U };
+                    map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_rename_path));
+                    map.try_emplace(TR_KEY_params, std::move(args));
+
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                     rename_from.clear();
@@ -3435,9 +3432,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 732:
                 {
-                    auto map = tr_variant::Map{ 2 };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_group_get_kebab));
+                    auto map = tr_variant::Map{ 3U };
+                    map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_group_get));
                     map.try_emplace(TR_KEY_id, ID_GROUPS);
+
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
@@ -3458,11 +3457,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
     if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
     {
-        auto* const args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments);
-        TR_ASSERT(args_map != nullptr);
-        if (args_map != nullptr)
+        auto* const params = tset_map->find_if<tr_variant::Map>(TR_KEY_params);
+        TR_ASSERT(params != nullptr);
+        if (params != nullptr)
         {
-            add_id_arg(*args_map, config);
+            add_id_arg(*params, config);
             status |= flush(rpcurl, &tset, config);
         }
     }
