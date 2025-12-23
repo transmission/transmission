@@ -1664,7 +1664,6 @@ void print_torrent_list(tr_variant::Map const& result)
         Speed{ total_down, Speed::Units::Byps }.count(Speed::Units::KByps));
 }
 
-#if 0
 void print_trackers_impl(tr_variant::Vector const& tracker_stats)
 {
     for (auto const& t_var : tracker_stats)
@@ -1675,39 +1674,30 @@ void print_trackers_impl(tr_variant::Vector const& tracker_stats)
             continue;
         }
 
-        auto const announce_state = t->value_if<int64_t>({ TR_KEY_announce_state, TR_KEY_announce_state_camel });
-        auto const download_count = t->value_if<int64_t>({ TR_KEY_download_count, TR_KEY_download_count_camel });
-        auto const has_announced = t->value_if<bool>({ TR_KEY_has_announced, TR_KEY_has_announced_camel });
-        auto const has_scraped = t->value_if<bool>({ TR_KEY_has_scraped, TR_KEY_has_scraped_camel });
+        auto const announce_state = t->value_if<int64_t>(TR_KEY_announce_state);
+        auto const download_count = t->value_if<int64_t>(TR_KEY_download_count);
+        auto const has_announced = t->value_if<bool>(TR_KEY_has_announced);
+        auto const has_scraped = t->value_if<bool>(TR_KEY_has_scraped);
         auto const host = t->value_if<std::string_view>(TR_KEY_host);
-        auto const is_backup = t->value_if<bool>({ TR_KEY_is_backup, TR_KEY_is_backup_camel });
-        auto const last_announce_peer_count = t->value_if<int64_t>(
-            { TR_KEY_last_announce_peer_count, TR_KEY_last_announce_peer_count_camel });
-        auto const last_announce_result = t->value_if<std::string_view>(
-            { TR_KEY_last_announce_result, TR_KEY_last_announce_result_camel });
-        auto const last_announce_start_time = t->value_if<int64_t>(
-            { TR_KEY_last_announce_start_time, TR_KEY_last_announce_start_time_camel });
-        auto const last_announce_time = t->value_if<int64_t>({ TR_KEY_last_announce_time, TR_KEY_last_announce_time_camel });
-        auto const last_scrape_result = t->value_if<std::string_view>(
-            { TR_KEY_last_scrape_result, TR_KEY_last_scrape_result_camel });
-        auto const last_scrape_start_time = t->value_if<int64_t>(
-            { TR_KEY_last_scrape_start_time, TR_KEY_last_scrape_start_time_camel });
-        auto const last_scrape_succeeded = t->value_if<bool>(
-            { TR_KEY_last_scrape_succeeded, TR_KEY_last_scrape_succeeded_camel });
-        auto const last_scrape_time = t->value_if<int64_t>({ TR_KEY_last_scrape_time, TR_KEY_last_scrape_time_camel });
-        auto const last_scrape_timed_out = t->value_if<bool>(
-            { TR_KEY_last_scrape_timed_out, TR_KEY_last_scrape_timed_out_camel });
-        auto const leecher_count = t->value_if<int64_t>({ TR_KEY_leecher_count, TR_KEY_leecher_count_camel });
-        auto const next_announce_time = t->value_if<int64_t>({ TR_KEY_next_announce_time, TR_KEY_next_announce_time_camel });
-        auto const next_scrape_time = t->value_if<int64_t>({ TR_KEY_next_scrape_time, TR_KEY_next_scrape_time_camel });
-        auto const scrape_state = t->value_if<int64_t>({ TR_KEY_scrape_state, TR_KEY_scrape_state_camel });
-        auto const seeder_count = t->value_if<int64_t>({ TR_KEY_seeder_count, TR_KEY_seeder_count_camel });
+        auto const is_backup = t->value_if<bool>(TR_KEY_is_backup);
+        auto const last_announce_peer_count = t->value_if<int64_t>(TR_KEY_last_announce_peer_count);
+        auto const last_announce_result = t->value_if<std::string_view>(TR_KEY_last_announce_result);
+        auto const last_announce_start_time = t->value_if<int64_t>(TR_KEY_last_announce_start_time);
+        auto const last_announce_time = t->value_if<int64_t>(TR_KEY_last_announce_time);
+        auto const last_scrape_result = t->value_if<std::string_view>(TR_KEY_last_scrape_result);
+        auto const last_scrape_start_time = t->value_if<int64_t>(TR_KEY_last_scrape_start_time);
+        auto const last_scrape_succeeded = t->value_if<bool>(TR_KEY_last_scrape_succeeded);
+        auto const last_scrape_time = t->value_if<int64_t>(TR_KEY_last_scrape_time);
+        auto const last_scrape_timed_out = t->value_if<bool>(TR_KEY_last_scrape_timed_out);
+        auto const leecher_count = t->value_if<int64_t>(TR_KEY_leecher_count);
+        auto const next_announce_time = t->value_if<int64_t>(TR_KEY_next_announce_time);
+        auto const next_scrape_time = t->value_if<int64_t>(TR_KEY_next_scrape_time);
+        auto const scrape_state = t->value_if<int64_t>(TR_KEY_scrape_state);
+        auto const seeder_count = t->value_if<int64_t>(TR_KEY_seeder_count);
         auto const tier = t->value_if<int64_t>(TR_KEY_tier);
         auto const tracker_id = t->value_if<int64_t>(TR_KEY_id);
-        auto const last_announce_succeeded = t->value_if<bool>(
-            { TR_KEY_last_announce_succeeded, TR_KEY_last_announce_succeeded_camel });
-        auto const last_announce_timed_out = t->value_if<bool>(
-            { TR_KEY_last_announce_timed_out, TR_KEY_last_announce_timed_out_camel });
+        auto const last_announce_succeeded = t->value_if<bool>(TR_KEY_last_announce_succeeded);
+        auto const last_announce_timed_out = t->value_if<bool>(TR_KEY_last_announce_timed_out);
 
         if (!download_count || !has_announced || !has_scraped || !host || !tracker_id || !is_backup || !announce_state ||
             !scrape_state || !last_announce_peer_count || !last_announce_result || !last_announce_start_time ||
@@ -1808,43 +1798,33 @@ void print_trackers_impl(tr_variant::Vector const& tracker_stats)
     }
 }
 
-void print_trackers(tr_variant::Map const& map)
+void print_trackers(tr_variant::Map const& result)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
-    {
-        return;
-    }
-
-    auto* const torrents = args->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    auto const* const torrents = result.find_if<tr_variant::Vector>(TR_KEY_torrents);
     if (torrents == nullptr)
     {
         return;
     }
 
-    for (auto it = std::begin(*torrents), end = std::end(*torrents); it != end; ++it)
+    for (auto it = std::cbegin(*torrents), end = std::cend(*torrents); it != end; ++it)
     {
-        auto* const t = it->get_if<tr_variant::Map>();
+        auto const* const t = it->get_if<tr_variant::Map>();
         if (t == nullptr)
         {
             continue;
         }
 
-        auto* const tracker_stats = t->find_if<tr_variant::Vector>({ TR_KEY_tracker_stats, TR_KEY_tracker_stats_camel });
-        if (tracker_stats == nullptr)
+        if (auto const* const tracker_stats = t->find_if<tr_variant::Vector>(TR_KEY_tracker_stats))
         {
-            continue;
-        }
+            print_trackers_impl(*tracker_stats);
 
-        print_trackers_impl(*tracker_stats);
-
-        if (it < std::prev(end))
-        {
-            fmt::print("\n");
+            if (it < std::prev(end))
+            {
+                fmt::print("\n");
+            }
         }
     }
 }
-#endif
 
 void print_session(tr_variant::Map const& result)
 {
@@ -2350,6 +2330,10 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         print_torrent_list(*result);
         break;
 
+    case ID_TRACKERS:
+        print_trackers(*result);
+        break;
+
 #if 0
     case ID_PIECES:
         print_pieces(map);
@@ -2357,10 +2341,6 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
 
     case ID_PORTTEST:
         print_port_test(map);
-        break;
-
-    case ID_TRACKERS:
-        print_trackers(map);
         break;
 
     case ID_GROUPS:
@@ -2836,7 +2816,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 943:
                 map.insert_or_assign(TR_KEY_id, ID_TRACKERS);
-                fields.emplace_back(tr_variant::unmanaged_string(TR_KEY_tracker_stats_camel));
+                fields.emplace_back(tr_variant::unmanaged_string(TR_KEY_tracker_stats));
                 add_id_arg(params, config);
                 break;
 
