@@ -2425,20 +2425,14 @@ void tr_curl_easy_cleanup(CURL* curl)
 
     return 60L; /* default value */
 }
-
-[[nodiscard]] std::string serialize_payload(tr_variant const* const var, RemoteConfig const& config)
-{
-    auto tmp = var->clone();
-    api_compat::convert(tmp, config.network_style);
-    return tr_variant_serde::json().compact().to_string(tmp);
-}
 } // namespace flush_utils
 
 int flush(char const* rpcurl, tr_variant* const var, RemoteConfig& config)
 {
     using namespace flush_utils;
 
-    auto const payload = serialize_payload(var, config);
+    api_compat::convert(*var, config.network_style);
+    auto const payload = tr_variant_serde::json().compact().to_string(*var);
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
     auto const rpcurl_http = fmt::format("{:s}://{:s}", scheme, rpcurl);
 
