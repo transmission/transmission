@@ -1349,16 +1349,9 @@ void print_details(tr_variant::Map const& result)
     }
 }
 
-#if 0
-void print_file_list(tr_variant::Map const& map)
+void print_file_list(tr_variant::Map const& result)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
-    {
-        return;
-    }
-
-    auto* const torrents = args->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    auto* const torrents = result.find_if<tr_variant::Vector>(TR_KEY_torrents);
     if (torrents == nullptr)
     {
         return;
@@ -1394,7 +1387,7 @@ void print_file_list(tr_variant::Map const& map)
                 continue;
             }
 
-            auto const have = file->value_if<int64_t>({ TR_KEY_bytes_completed, TR_KEY_bytes_completed_camel });
+            auto const have = file->value_if<int64_t>(TR_KEY_bytes_completed);
             auto const length = file->value_if<int64_t>(TR_KEY_length);
             auto const priority = priorities->at(i).value_if<int64_t>();
             auto const wanted = wanteds->at(i).value_if<bool>();
@@ -1430,6 +1423,7 @@ void print_file_list(tr_variant::Map const& map)
     }
 }
 
+#if 0
 void print_peers_impl(tr_variant::Vector const& peers)
 {
     fmt::print("{:<40s}  {:<12s}  {:<5s} {:<6s}  {:<6s}  {:s}\n", "Address", "Flags", "Done", "Down", "Up", "Client");
@@ -2353,11 +2347,11 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         print_details(*result);
         break;
 
-#if 0
     case ID_FILES:
-        print_file_list(map);
+        print_file_list(*result);
         break;
 
+#if 0
     case ID_LIST:
         print_torrent_list(map);
         break;
