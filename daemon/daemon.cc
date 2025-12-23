@@ -476,6 +476,56 @@ void set_preferred_transports(tr_variant::Map& settings, std::string_view comma_
 
     settings.insert_or_assign(TR_KEY_preferred_transports, std::move(preferred_protocols));
 }
+
+// TODO(tearfur): remove everything in this helper namespace and the corresponding args in 5.0.0
+namespace utp_arg_helpers
+{
+auto constexpr UtpVal = "utp"sv;
+
+void utp(tr_variant::Map& settings)
+{
+    if (auto const pt = settings.value_if<std::string_view>(TR_KEY_preferred_transports); pt && pt != UtpVal)
+    {
+        settings.erase(TR_KEY_preferred_transports);
+    }
+
+    if (auto* const pt = settings.find_if<tr_variant::Vector>(TR_KEY_preferred_transports))
+    {
+        if (std::none_of(
+                std::begin(*pt),
+                std::end(*pt),
+                [](tr_variant const& e) { return e.value_if<std::string_view>() == UtpVal; }))
+        {
+            pt->emplace(std::begin(*pt), tr_variant::unmanaged_string(UtpVal));
+        }
+    }
+    else
+    {
+        settings.insert_or_assign(TR_KEY_utp_enabled, true);
+    }
+}
+
+void no_utp(tr_variant::Map& settings)
+{
+    if (auto const pt = settings.value_if<std::string_view>(TR_KEY_preferred_transports); pt == UtpVal)
+    {
+        settings.erase(TR_KEY_preferred_transports);
+    }
+
+    if (auto* const pt = settings.find_if<tr_variant::Vector>(TR_KEY_preferred_transports))
+    {
+        auto const remove_it = std::remove_if(
+            std::begin(*pt),
+            std::end(*pt),
+            [](tr_variant const& e) { return e.value_if<std::string_view>() == UtpVal; });
+        pt->erase(remove_it, std::end(*pt));
+    }
+    else
+    {
+        settings.insert_or_assign(TR_KEY_utp_enabled, false);
+    }
+}
+} // namespace utp_arg_helpers
 } // namespace
 
 bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code)
@@ -712,11 +762,11 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             set_preferred_transports(*map, optstr);
 
         case 831:
-            map->insert_or_assign(TR_KEY_utp_enabled, true);
+            utp_arg_helpers::utp(*map);
             break;
 
         case 832:
-            map->insert_or_assign(TR_KEY_utp_enabled, false);
+            utp_arg_helpers::no_utp(*map);
             break;
 
         case TR_OPT_UNK:
