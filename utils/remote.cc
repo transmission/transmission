@@ -2418,7 +2418,7 @@ void tr_curl_easy_cleanup(CURL* curl)
 
 [[nodiscard]] long get_timeout_secs(std::string_view req)
 {
-    if (req.find(R"("method":"blocklist-update")") != std::string_view::npos)
+    if (tr_strv_contains(req, R"("method":"blocklist-update")") || tr_strv_contains(req, R"("method":"blocklist_update")"))
     {
         return 300L;
     }
