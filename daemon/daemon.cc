@@ -80,7 +80,7 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                          "Usage: transmission-daemon [options]";
 
 using Arg = tr_option::Arg;
-auto constexpr Options = std::array<tr_option, 47>{ {
+auto constexpr Options = std::array<tr_option, 48>{ {
     { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", Arg::Required, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
@@ -114,8 +114,14 @@ auto constexpr Options = std::array<tr_option, 47>{ {
     { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", Arg::None, nullptr },
     { 'y', "lpd", "Enable local peer discovery (LPD)", "y", Arg::None, nullptr },
     { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", Arg::None, nullptr },
-    { 830, "utp", "Enable µTP for peer connections", nullptr, Arg::None, nullptr },
-    { 831, "no-utp", "Disable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 830,
+      "preferred-transports",
+      "Comma-separated list specifying preference of transport protocols",
+      nullptr,
+      Arg::Required,
+      "<protocol(s)>" },
+    { 831, "utp", "Enable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 832, "no-utp", "Disable µTP for peer connections", nullptr, Arg::None, nullptr },
     { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", Arg::Required, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
@@ -455,6 +461,23 @@ void tr_daemon::periodic_update()
     report_status();
 }
 
+namespace
+{
+void set_preferred_transports(tr_variant::Map& settings, std::string_view comma_delimited_protocols)
+{
+    auto preferred_protocols = tr_variant::Vector{};
+    preferred_protocols.reserve(2U);
+
+    auto protocol = std::string_view{};
+    while (tr_strv_sep(&comma_delimited_protocols, &protocol, ','))
+    {
+        preferred_protocols.emplace_back(protocol);
+    }
+
+    settings.insert_or_assign(TR_KEY_preferred_transports, std::move(preferred_protocols));
+}
+} // namespace
+
 bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code)
 {
     int c;
@@ -686,10 +709,13 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 830:
+            set_preferred_transports(*map, optstr);
+
+        case 831:
             map->insert_or_assign(TR_KEY_utp_enabled, true);
             break;
 
-        case 831:
+        case 832:
             map->insert_or_assign(TR_KEY_utp_enabled, false);
             break;
 
