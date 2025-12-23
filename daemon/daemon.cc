@@ -760,6 +760,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
 
         case 830:
             set_preferred_transports(*map, optstr);
+            break;
 
         case 831:
             utp_arg_helpers::utp(*map);
