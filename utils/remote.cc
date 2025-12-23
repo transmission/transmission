@@ -2264,8 +2264,19 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
 
     if (auto const* const errmap = top->find_if<tr_variant::Map>(TR_KEY_error))
     {
-        auto const errmsg = errmap->value_if<std::string_view>(TR_KEY_message).value_or("unknown error");
-        fmt::print("Error: {:s}\n", errmsg);
+        auto errmsg = std::optional<std::string_view>{};
+
+        if (auto const* const data = errmap->find_if<tr_variant::Map>(TR_KEY_data))
+        {
+            errmsg = data->value_if<std::string_view>(TR_KEY_error_string);
+        }
+
+        if (!errmsg)
+        {
+            errmsg = errmap->value_if<std::string_view>(TR_KEY_message);
+        }
+
+        fmt::print("Error: {:s}\n", errmsg.value_or("unknown error"sv));
         return EXIT_FAILURE;
     }
 
