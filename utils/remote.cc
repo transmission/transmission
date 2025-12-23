@@ -2307,7 +2307,6 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         break;
 
     case ID_LIST:
-        fmt::print(stderr, "calling print_torrent_list\n");
         print_torrent_list(*result);
         break;
 
