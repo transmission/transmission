@@ -22,12 +22,10 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
+using VariantTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
-
-using VariantTest = ::testing::Test;
 
 namespace
 {

@@ -18,11 +18,9 @@
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/web-utils.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using namespace std::literals;
-
-using WebUtilsTest = ::testing::Test;
+using WebUtilsTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(WebUtilsTest, urlParse)
@@ -150,7 +148,7 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ(80, parsed->port);
 }
 
-TEST(WebUtilsTest, urlParseFuzz)
+TEST_F(WebUtilsTest, urlParseFuzz)
 {
     auto buf = std::vector<char>{};
 

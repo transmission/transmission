@@ -10,11 +10,11 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/session-alt-speeds.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using namespace std::literals;
 
-class SessionAltSpeedsTest : public ::testing::Test
+class SessionAltSpeedsTest : public ::libtransmission::test::TransmissionTest
 {
 protected:
     using ChangeReason = tr_session_alt_speeds::ChangeReason;

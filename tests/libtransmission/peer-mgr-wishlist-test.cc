@@ -16,9 +16,9 @@
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/peer-mgr-wishlist.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-class PeerMgrWishlistTest : public ::testing::Test
+class PeerMgrWishlistTest : public ::libtransmission::test::TransmissionTest
 {
 protected:
     struct MockMediator final : public Wishlist::Mediator

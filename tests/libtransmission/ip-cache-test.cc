@@ -18,11 +18,11 @@
 #include <libtransmission/timer.h>
 #include <libtransmission/web.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using namespace std::literals;
 
-class IPCacheTest : public ::testing::Test
+class IPCacheTest : public ::libtransmission::test::TransmissionTest
 {
 protected:
     class MockTimerMaker final : public libtransmission::TimerMaker

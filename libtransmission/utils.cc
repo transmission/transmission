@@ -17,6 +17,7 @@
 #include <iterator> // for std::back_inserter
 #include <locale>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <stdexcept> // std::runtime_error
 #include <string>
@@ -783,7 +784,8 @@ std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::instance;
 
 void tr_lib_init()
 {
-    tr_net_init_impl::tr_net_init_mgr::create();
+    static auto once = std::once_flag{};
+    std::call_once(once, [] { tr_net_init_impl::tr_net_init_mgr::create(); });
 }
 
 // --- mime-type

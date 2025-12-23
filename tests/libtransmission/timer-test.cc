@@ -12,13 +12,11 @@
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/utils-ev.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 namespace libtransmission::test
 {
-
-class TimerTest : public ::testing::Test
+class TimerTest : public TransmissionTest
 {
 protected:
     // setup + teardown to manage an event_base

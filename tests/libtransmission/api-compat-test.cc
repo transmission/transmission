@@ -12,9 +12,10 @@
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
 
+using ApiCompatTest = ::libtransmission::test::TransmissionTest;
+
 namespace
 {
-
 constexpr std::string_view LegacySessionGetJson = R"json({
     "method": "session-get",
     "tag": 0
@@ -946,7 +947,7 @@ constexpr std::string_view ResumeBenc =
 
 } // namespace
 
-TEST(ApiCompatTest, canConvertRpc)
+TEST_F(ApiCompatTest, canConvertRpc)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
@@ -1008,7 +1009,7 @@ TEST(ApiCompatTest, canConvertRpc)
     }
 }
 
-TEST(ApiCompatTest, canConvertJsonDataFiles)
+TEST_F(ApiCompatTest, canConvertJsonDataFiles)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
@@ -1037,7 +1038,7 @@ TEST(ApiCompatTest, canConvertJsonDataFiles)
     }
 }
 
-TEST(ApiCompatTest, canConvertBencDataFiles)
+TEST_F(ApiCompatTest, canConvertBencDataFiles)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;

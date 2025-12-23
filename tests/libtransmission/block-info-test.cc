@@ -9,9 +9,9 @@
 
 #include <libtransmission/block-info.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using BlockInfoTest = ::testing::Test;
+using BlockInfoTest = ::libtransmission::test::TransmissionTest;
 
 TEST_F(BlockInfoTest, fieldsAreSet)
 {

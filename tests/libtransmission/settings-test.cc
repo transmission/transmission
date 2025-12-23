@@ -20,11 +20,10 @@
 #include <libtransmission/session.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
+using SettingsTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
-
-using SettingsTest = ::testing::Test;
 
 TEST_F(SettingsTest, canInstantiate)
 {
