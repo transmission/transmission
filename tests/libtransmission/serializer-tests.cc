@@ -12,17 +12,15 @@
 #include <string_view>
 #include <vector>
 
-#include "gtest/gtest.h"
-
 #include <libtransmission/net.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/serializer.h>
 #include <libtransmission/variant.h>
 
-using SerializerTest = ::testing::Test;
+#include "test-fixtures.h"
 
+using SerializerTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
-
 using libtransmission::serializer::Converters;
 
 namespace

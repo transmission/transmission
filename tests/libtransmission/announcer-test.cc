@@ -15,9 +15,9 @@
 #include <libtransmission/announcer-common.h>
 #include <libtransmission/net.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using AnnouncerTest = ::testing::Test;
+using AnnouncerTest = ::libtransmission::test::TransmissionTest;
 
 using namespace std::literals;
 

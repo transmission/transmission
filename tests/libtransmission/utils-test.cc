@@ -32,7 +32,7 @@
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-using UtilsTest = ::testing::Test;
+using UtilsTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(UtilsTest, trStrvContains)

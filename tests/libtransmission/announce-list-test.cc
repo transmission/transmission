@@ -21,10 +21,9 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-using AnnounceListTest = ::testing::Test;
+using AnnounceListTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(AnnounceListTest, canAdd)
