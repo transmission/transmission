@@ -2258,7 +2258,7 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
 
     if (auto const jsonrpc = top->value_if<std::string_view>(TR_KEY_jsonrpc); jsonrpc != JsonRpc::Version)
     {
-        fmt::print(stderr, "Response was not JSON-RPC {:d}\n", JsonRpc::Version);
+        fmt::print(stderr, "Response was not JSON-RPC {:s}\n", JsonRpc::Version);
         return EXIT_FAILURE;
     }
 
