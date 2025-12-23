@@ -983,15 +983,9 @@ std::string_view format_date(std::array<char, N>& buf, time_t now)
     return { begin, static_cast<size_t>(end - begin) };
 }
 
-void print_details(tr_variant::Map const& map)
+void print_details(tr_variant::Map const& result)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
-    {
-        return;
-    }
-
-    auto* const torrents = args->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    auto* const torrents = result.find_if<tr_variant::Vector>(TR_KEY_torrents);
     if (torrents == nullptr)
     {
         return;
@@ -1009,22 +1003,22 @@ void print_details(tr_variant::Map const& map)
 
         fmt::print("NAME\n");
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_id); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_id))
         {
             fmt::print("  Id: {:d}\n", *i);
         }
 
-        if (auto sv = t->value_if<std::string_view>(TR_KEY_name); sv)
+        if (auto const sv = t->value_if<std::string_view>(TR_KEY_name))
         {
             fmt::print("  Name: {:s}\n", *sv);
         }
 
-        if (auto sv = t->value_if<std::string_view>({ TR_KEY_hash_string, TR_KEY_hash_string_camel }); sv)
+        if (auto const sv = t->value_if<std::string_view>(TR_KEY_hash_string))
         {
             fmt::print("  Hash: {:s}\n", *sv);
         }
 
-        if (auto sv = t->value_if<std::string_view>({ TR_KEY_magnet_link, TR_KEY_magnet_link_camel }); sv)
+        if (auto const sv = t->value_if<std::string_view>(TR_KEY_magnet_link))
         {
             fmt::print("  Magnet: {:s}\n", *sv);
         }
@@ -1054,12 +1048,12 @@ void print_details(tr_variant::Map const& map)
         fmt::print("TRANSFER\n");
         fmt::print("  State: {:s}\n", get_status_string(*t));
 
-        if (auto sv = t->value_if<std::string_view>({ TR_KEY_download_dir, TR_KEY_download_dir_camel }); sv)
+        if (auto const sv = t->value_if<std::string_view>(TR_KEY_download_dir))
         {
             fmt::print("  Location: {:s}\n", *sv);
         }
 
-        if (auto b = t->value_if<bool>(TR_KEY_sequential_download); b)
+        if (auto const b = t->value_if<bool>(TR_KEY_sequential_download))
         {
             fmt::print("  Sequential Download: {:s}\n", *b ? "Yes" : "No");
             if (auto i = t->value_if<int64_t>(TR_KEY_sequential_download_from_piece); i)
@@ -1068,57 +1062,53 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto d = t->value_if<double>({ TR_KEY_percent_done, TR_KEY_percent_complete_camel }); d)
+        if (auto const d = t->value_if<double>(TR_KEY_percent_done))
         {
             fmt::print("  Percent Done: {:s}%\n", strlpercent(100.0 * *d));
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_eta); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_eta); i)
         {
             fmt::print("  ETA: {:s}\n", tr_strltime(*i));
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_rate_download, TR_KEY_rate_download_camel }); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_rate_download))
         {
             fmt::print("  Download Speed: {:s}\n", Speed{ *i, Speed::Units::Byps }.to_string());
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_rate_upload, TR_KEY_rate_upload_camel }); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_rate_upload))
         {
             fmt::print("  Upload Speed: {:s}\n", Speed{ *i, Speed::Units::Byps }.to_string());
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_have_unchecked, TR_KEY_have_unchecked_camel }),
-            j = t->value_if<int64_t>({ TR_KEY_have_valid, TR_KEY_have_valid_camel });
-            i && j)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_have_unchecked), j = t->value_if<int64_t>(TR_KEY_have_valid); i && j)
         {
             fmt::print("  Have: {:s} ({:s} verified)\n", strlsize(*i + *j), strlsize(*j));
         }
 
-        if (auto oi = t->value_if<int64_t>({ TR_KEY_size_when_done, TR_KEY_size_when_done_camel }); oi)
+        if (auto const oi = t->value_if<int64_t>(TR_KEY_size_when_done))
         {
             auto const i = *oi;
             if (i < 1)
             {
                 fmt::print("  Availability: None\n");
             }
-            else if (auto j = t->value_if<int64_t>({ TR_KEY_desired_available, TR_KEY_desired_available_camel }),
-                     k = t->value_if<int64_t>({ TR_KEY_left_until_done, TR_KEY_left_until_done_camel });
+            else if (auto j = t->value_if<int64_t>(TR_KEY_desired_available), k = t->value_if<int64_t>(TR_KEY_left_until_done);
                      j && k)
             {
                 fmt::print("  Availability: {:s}%\n", strlpercent(100.0 * (*j + i - *k) / i));
             }
 
-            if (auto j = t->value_if<int64_t>({ TR_KEY_total_size, TR_KEY_total_size_camel }); j)
+            if (auto j = t->value_if<int64_t>(TR_KEY_total_size))
             {
                 fmt::print("  Total size: {:s} ({:s} wanted)\n", strlsize(*j), strlsize(i));
             }
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_downloaded_ever, TR_KEY_downloaded_ever_camel }); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_downloaded_ever))
         {
-            if (auto corrupt = t->value_if<int64_t>({ TR_KEY_corrupt_ever, TR_KEY_corrupt_ever_camel }).value_or(0);
-                corrupt != 0)
+            if (auto corrupt = t->value_if<int64_t>(TR_KEY_corrupt_ever).value_or(0); corrupt != 0)
             {
                 fmt::print("  Downloaded: {:s} (+{:s} discarded after failed checksum)\n", strlsize(*i), strlsize(corrupt));
             }
@@ -1128,20 +1118,19 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_uploaded_ever, TR_KEY_uploaded_ever_camel }); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_uploaded_ever))
         {
             fmt::print("  Uploaded: {:s}\n", strlsize(*i));
 
-            if (auto j = t->value_if<int64_t>({ TR_KEY_size_when_done, TR_KEY_size_when_done_camel }); j)
+            if (auto const j = t->value_if<int64_t>(TR_KEY_size_when_done))
             {
                 fmt::print("  Ratio: {:s}\n", strlratio(*i, *j));
             }
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_error).value_or(0); i != 0)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_error).value_or(0); i != 0)
         {
-            if (auto sv = t->value_if<std::string_view>({ TR_KEY_error_string, TR_KEY_error_string_camel }).value_or(""sv);
-                !std::empty(sv))
+            if (auto const sv = t->value_if<std::string_view>(TR_KEY_error_string).value_or(""sv); !std::empty(sv))
             {
                 switch (i)
                 {
@@ -1163,19 +1152,19 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_peers_connected, TR_KEY_peers_connected_camel }),
-            j = t->value_if<int64_t>({ TR_KEY_peers_getting_from_us, TR_KEY_peers_getting_from_us_camel }),
-            k = t->value_if<int64_t>({ TR_KEY_peers_sending_to_us, TR_KEY_peers_sending_to_us_camel });
+        if (auto i = t->value_if<int64_t>(TR_KEY_peers_connected),
+            j = t->value_if<int64_t>(TR_KEY_peers_getting_from_us),
+            k = t->value_if<int64_t>(TR_KEY_peers_sending_to_us);
             i && j && k)
         {
             fmt::print("  Peers: connected to {:d}, uploading to {:d}, downloading from {:d}\n", *i, *j, *k);
         }
 
-        if (auto* l = t->find_if<tr_variant::Vector>(TR_KEY_webseeds); l != nullptr)
+        if (auto const* const l = t->find_if<tr_variant::Vector>(TR_KEY_webseeds); l != nullptr)
         {
             if (auto const n = std::size(*l); n > 0)
             {
-                if (auto i = t->value_if<int64_t>({ TR_KEY_webseeds_sending_to_us, TR_KEY_webseeds_sending_to_us_camel }); i)
+                if (auto const i = t->value_if<int64_t>(TR_KEY_webseeds_sending_to_us))
                 {
                     fmt::print("  Web Seeds: downloading from {:d} of {:d} web seeds\n", *i, n);
                 }
@@ -1186,32 +1175,32 @@ void print_details(tr_variant::Map const& map)
 
         fmt::print("HISTORY\n");
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_added_date, TR_KEY_added_date_camel }).value_or(0); i != 0)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_added_date).value_or(0); i != 0)
         {
             fmt::print("  Date added:       {:s}\n", format_date(buf, i));
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_done_date, TR_KEY_done_date_camel }).value_or(0); i != 0)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_done_date).value_or(0); i != 0)
         {
             fmt::print("  Date finished:    {:s}\n", format_date(buf, i));
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_start_date, TR_KEY_start_date_camel }).value_or(0); i != 0)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_start_date).value_or(0); i != 0)
         {
             fmt::print("  Date started:     {:s}\n", format_date(buf, i));
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_activity_date, TR_KEY_activity_date_camel }).value_or(0); i != 0)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_activity_date).value_or(0); i != 0)
         {
             fmt::print("  Latest activity:  {:s}\n", format_date(buf, i));
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_seconds_downloading, TR_KEY_seconds_downloading_camel }).value_or(0); i > 0)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_seconds_downloading).value_or(0); i > 0)
         {
             fmt::print("  Downloading Time: {:s}\n", tr_strltime(i));
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_seconds_seeding, TR_KEY_seconds_seeding_camel }).value_or(0); i > 0)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_seconds_seeding).value_or(0); i > 0)
         {
             fmt::print("  Seeding Time:     {:s}\n", tr_strltime(i));
         }
@@ -1220,37 +1209,37 @@ void print_details(tr_variant::Map const& map)
 
         fmt::print("ORIGINS\n");
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_date_created, TR_KEY_date_created_camel }).value_or(0); i != 0)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_date_created).value_or(0); i != 0)
         {
             fmt::print("  Date created: {:s}\n", format_date(buf, i));
         }
 
-        if (auto b = t->value_if<bool>({ TR_KEY_is_private, TR_KEY_is_private_camel }); b)
+        if (auto const b = t->value_if<bool>(TR_KEY_is_private))
         {
             fmt::print("  Public torrent: {:s}\n", *b ? "No" : "Yes");
         }
 
-        if (auto sv = t->value_if<std::string_view>(TR_KEY_comment).value_or(""sv); !std::empty(sv))
+        if (auto const sv = t->value_if<std::string_view>(TR_KEY_comment).value_or(""sv); !std::empty(sv))
         {
             fmt::print("  Comment: {:s}\n", sv);
         }
 
-        if (auto sv = t->value_if<std::string_view>(TR_KEY_creator).value_or(""sv); !std::empty(sv))
+        if (auto const sv = t->value_if<std::string_view>(TR_KEY_creator).value_or(""sv); !std::empty(sv))
         {
             fmt::print("  Creator: {:s}\n", sv);
         }
 
-        if (auto sv = t->value_if<std::string_view>(TR_KEY_source).value_or(""sv); !std::empty(sv))
+        if (auto const sv = t->value_if<std::string_view>(TR_KEY_source).value_or(""sv); !std::empty(sv))
         {
             fmt::print("  Source: {:s}\n", sv);
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_piece_count, TR_KEY_piece_count_camel }); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_piece_count))
         {
             fmt::print("  Piece Count: {:d}\n", *i);
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_piece_size, TR_KEY_piece_size_camel }); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_piece_size))
         {
             fmt::print("  Piece Size: {:s}\n", Memory{ *i, Memory::Units::Bytes }.to_string());
         }
@@ -1259,9 +1248,9 @@ void print_details(tr_variant::Map const& map)
 
         fmt::print("LIMITS & BANDWIDTH\n");
 
-        if (auto b = t->value_if<bool>({ TR_KEY_download_limited, TR_KEY_download_limited_camel }); b)
+        if (auto const b = t->value_if<bool>(TR_KEY_download_limited))
         {
-            if (auto i = t->value_if<int64_t>({ TR_KEY_download_limit, TR_KEY_download_limit_camel }); i)
+            if (auto const i = t->value_if<int64_t>(TR_KEY_download_limit))
             {
                 fmt::print("  Download Limit: ");
 
@@ -1276,9 +1265,9 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto b = t->value_if<bool>({ TR_KEY_upload_limited, TR_KEY_upload_limited_camel }); b)
+        if (auto b = t->value_if<bool>(TR_KEY_upload_limited))
         {
-            if (auto i = t->value_if<int64_t>({ TR_KEY_upload_limit, TR_KEY_upload_limit_camel }); i)
+            if (auto i = t->value_if<int64_t>(TR_KEY_upload_limit))
             {
                 fmt::print("  Upload Limit: ");
 
@@ -1293,7 +1282,7 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_seed_ratio_mode, TR_KEY_seed_ratio_mode_camel }); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_seed_ratio_mode))
         {
             switch (*i)
             {
@@ -1302,7 +1291,7 @@ void print_details(tr_variant::Map const& map)
                 break;
 
             case TR_RATIOLIMIT_SINGLE:
-                if (auto d = t->value_if<double>({ TR_KEY_seed_ratio_limit, TR_KEY_seed_ratio_limit_camel }); d)
+                if (auto const d = t->value_if<double>(TR_KEY_seed_ratio_limit))
                 {
                     fmt::print("  Ratio Limit: {:s}\n", strlratio2(*d));
                 }
@@ -1317,7 +1306,7 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_seed_idle_mode, TR_KEY_seed_idle_mode_camel }); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_seed_idle_mode))
         {
             switch (*i)
             {
@@ -1326,11 +1315,10 @@ void print_details(tr_variant::Map const& map)
                 break;
 
             case TR_IDLELIMIT_SINGLE:
-                if (auto j = t->value_if<int64_t>({ TR_KEY_seed_idle_limit, TR_KEY_seed_idle_limit_camel }); j)
+                if (auto const j = t->value_if<int64_t>(TR_KEY_seed_idle_limit))
                 {
                     fmt::print("  Idle Limit: {} minutes\n", *j);
                 }
-
                 break;
 
             case TR_IDLELIMIT_UNLIMITED:
@@ -1342,17 +1330,17 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto b = t->value_if<bool>({ TR_KEY_honors_session_limits, TR_KEY_honors_session_limits_camel }); b)
+        if (auto const b = t->value_if<bool>(TR_KEY_honors_session_limits_camel))
         {
             fmt::print("  Honors Session Limits: {:s}\n", *b ? "Yes" : "No");
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_peer_limit, TR_KEY_peer_limit_kebab }); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_peer_limit))
         {
             fmt::print("  Peer limit: {:d}\n", *i);
         }
 
-        if (auto i = t->value_if<int64_t>({ TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_camel }); i)
+        if (auto const i = t->value_if<int64_t>(TR_KEY_bandwidth_priority))
         {
             fmt::print("  Bandwidth Priority: {:s}\n", BandwidthPriorityNames[(*i + 1) & 0b11]);
         }
@@ -1361,6 +1349,7 @@ void print_details(tr_variant::Map const& map)
     }
 }
 
+#if 0
 void print_file_list(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
@@ -1871,6 +1860,7 @@ void print_trackers(tr_variant::Map const& map)
         }
     }
 }
+#endif
 
 void print_session(tr_variant::Map const& result)
 {
@@ -2359,11 +2349,11 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         print_session_stats(*result);
         break;
 
-#if 0
     case ID_DETAILS:
-        print_details(map);
+        print_details(*result);
         break;
 
+#if 0
     case ID_FILES:
         print_file_list(map);
         break;
