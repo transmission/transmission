@@ -1549,21 +1549,15 @@ void print_pieces(tr_variant::Map const& map)
         }
     }
 }
+#endif
 
-void print_port_test(tr_variant::Map const& map)
+void print_port_test(tr_variant::Map const& result)
 {
-    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
-    if (args == nullptr)
-    {
-        return;
-    }
-
-    if (auto is_open = args->value_if<bool>({ TR_KEY_port_is_open, TR_KEY_port_is_open_kebab }); is_open)
+    if (auto is_open = result.value_if<bool>(TR_KEY_port_is_open); is_open)
     {
         fmt::print("Port is open: {:s}\n", *is_open ? "Yes" : "No");
     }
 }
-#endif
 
 void print_torrent_list(tr_variant::Map const& result)
 {
@@ -2334,13 +2328,13 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         print_trackers(*result);
         break;
 
+    case ID_PORTTEST:
+        print_port_test(*result);
+        break;
+
 #if 0
     case ID_PIECES:
         print_pieces(map);
-        break;
-
-    case ID_PORTTEST:
-        print_port_test(map);
         break;
 
     case ID_GROUPS:
@@ -3378,7 +3372,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 962:
                 {
-                    auto map = tr_variant::Map{ 2 };
+                    auto map = tr_variant::Map{ 2U };
+                    map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_port_test_kebab));
                     map.try_emplace(TR_KEY_id, ID_PORTTEST);
                     auto top = tr_variant{ std::move(map) };
