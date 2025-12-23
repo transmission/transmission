@@ -2428,17 +2428,9 @@ void tr_curl_easy_cleanup(CURL* curl)
 
 [[nodiscard]] std::string serialize_payload(tr_variant const* const var, RemoteConfig const& config)
 {
-    auto serde = tr_variant_serde::json();
-    serde.compact();
-
-    if (config.network_style == api_compat::Style::Tr5)
-    {
-        return serde.to_string(*var);
-    }
-
     auto tmp = var->clone();
     api_compat::convert(tmp, config.network_style);
-    return serde.to_string(tmp);
+    return tr_variant_serde::json().compact().to_string(tmp);
 }
 } // namespace flush_utils
 
