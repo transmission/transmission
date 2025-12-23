@@ -2438,7 +2438,7 @@ void tr_curl_easy_cleanup(CURL* curl)
 
     auto tmp = var->clone();
     api_compat::convert(tmp, config.network_style);
-    return serde.to_string(*var);
+    return serde.to_string(tmp);
 }
 } // namespace flush_utils
 
