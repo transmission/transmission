@@ -214,7 +214,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_free_space,
     TR_KEY_from_cache_camel_APICOMPAT,
     TR_KEY_from_dht_camel_APICOMPAT,
-    TR_KEY_from_incoming_camel,
+    TR_KEY_from_incoming_camel_APICOMPAT,
     TR_KEY_from_lpd_camel,
     TR_KEY_from_ltep_camel,
     TR_KEY_from_pex_camel,
