@@ -338,7 +338,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_max_connected_peers,
     TR_KEY_max_peers,
     TR_KEY_memory_bytes_kebab_APICOMPAT,
-    TR_KEY_memory_units_kebab,
+    TR_KEY_memory_units_kebab_APICOMPAT,
     TR_KEY_memory_bytes,
     TR_KEY_memory_units,
     TR_KEY_message,
