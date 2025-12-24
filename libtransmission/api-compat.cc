@@ -53,7 +53,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_client_name, TR_KEY_client_name_camel_APICOMPAT },
     { TR_KEY_config_dir, TR_KEY_config_dir_kebab_APICOMPAT },
     { TR_KEY_corrupt_ever, TR_KEY_corrupt_ever_camel_APICOMPAT },
-    { TR_KEY_cumulative_stats, TR_KEY_cumulative_stats_kebab },
+    { TR_KEY_cumulative_stats, TR_KEY_cumulative_stats_kebab_APICOMPAT },
     { TR_KEY_current_stats, TR_KEY_current_stats_kebab },
     { TR_KEY_date_created, TR_KEY_date_created_camel_APICOMPAT },
     { TR_KEY_default_trackers, TR_KEY_default_trackers_kebab_APICOMPAT },
