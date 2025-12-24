@@ -784,7 +784,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_rate_upload:
     case TR_KEY_recheck_progress:
     case TR_KEY_seconds_downloading:
-    case TR_KEY_seconds_downloading_camel:
     case TR_KEY_seconds_seeding:
     case TR_KEY_seconds_seeding_camel:
     case TR_KEY_seed_idle_limit:
@@ -951,7 +950,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_recheck_progress:
         return st.recheckProgress;
     case TR_KEY_seconds_downloading:
-    case TR_KEY_seconds_downloading_camel:
         return st.secondsDownloading;
     case TR_KEY_seconds_seeding:
     case TR_KEY_seconds_seeding_camel:
