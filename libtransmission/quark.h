@@ -376,7 +376,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_peer_port_random_low_kebab,
     TR_KEY_peer_port_random_on_start_kebab_APICOMPAT,
     TR_KEY_peer_socket_tos_kebab,
-    TR_KEY_peer_is_choked_camel,
+    TR_KEY_peer_is_choked_camel_APICOMPAT,
     TR_KEY_peer_is_interested_camel,
     TR_KEY_peer_congestion_algorithm,
     TR_KEY_peer_id,
