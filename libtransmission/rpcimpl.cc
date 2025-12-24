@@ -630,7 +630,6 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_is_incoming, peer.isIncoming);
         peer_map.try_emplace(TR_KEY_is_utp, peer.isUTP);
         peer_map.try_emplace(TR_KEY_is_uploading_to, peer.isUploadingTo);
-        peer_map.try_emplace(TR_KEY_is_uploading_to_camel, peer.isUploadingTo);
         peer_map.try_emplace(TR_KEY_peer_is_choked, peer.peerIsChoked);
         peer_map.try_emplace(TR_KEY_peer_is_choked_camel, peer.peerIsChoked);
         peer_map.try_emplace(TR_KEY_peer_is_interested, peer.peerIsInterested);
