@@ -67,6 +67,8 @@ target_sources(${TR_NAME}
         history.h
         inout.cc
         inout.h
+        intern.cc
+        intern.h
         ip-cache.cc
         ip-cache.h
         log.cc
@@ -304,6 +306,8 @@ if(INSTALL_LIB)
         DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(
         FILES
+            intern.h
+            intern.cpp
             error-types.h
             error.h
             file.h
