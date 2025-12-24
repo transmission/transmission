@@ -287,7 +287,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_jsonrpc,
     TR_KEY_labels,
     TR_KEY_last_announce_peer_count_camel_APICOMPAT,
-    TR_KEY_last_announce_result_camel,
+    TR_KEY_last_announce_result_camel_APICOMPAT,
     TR_KEY_last_announce_start_time_camel,
     TR_KEY_last_announce_succeeded_camel,
     TR_KEY_last_announce_time_camel,
