@@ -365,7 +365,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_params,
     TR_KEY_path,
     TR_KEY_paused,
-    TR_KEY_paused_torrent_count_camel,
+    TR_KEY_paused_torrent_count_camel_APICOMPAT,
     TR_KEY_paused_torrent_count,
     TR_KEY_peer_congestion_algorithm_kebab,
     TR_KEY_peer_limit_kebab_APICOMPAT,
