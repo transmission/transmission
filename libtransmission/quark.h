@@ -206,7 +206,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_filter_mode,
     TR_KEY_filter_text,
     TR_KEY_filter_trackers,
-    TR_KEY_flag_str_camel,
+    TR_KEY_flag_str_camel_APICOMPAT,
     TR_KEY_flag_str,
     TR_KEY_flags,
     TR_KEY_format,
