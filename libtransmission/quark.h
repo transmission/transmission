@@ -232,7 +232,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_group_get,
     TR_KEY_group_set,
     TR_KEY_has_announced_camel_APICOMPAT,
-    TR_KEY_has_scraped_camel,
+    TR_KEY_has_scraped_camel_APICOMPAT,
     TR_KEY_has_announced,
     TR_KEY_has_scraped,
     TR_KEY_hash_string_camel_APICOMPAT,
