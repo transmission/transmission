@@ -64,7 +64,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_announce_ip_kebab, /* settings (legacy) */
     TR_KEY_announce_ip_enabled_kebab, /* settings (legacy) */
     TR_KEY_announce_list, /* metainfo */
-    TR_KEY_announce_state_camel, /* rpc (deprecated) */
+    TR_KEY_announce_state_camel_APICOMPAT,
     TR_KEY_announce_ip, /* settings */
     TR_KEY_announce_ip_enabled, /* settings */
     TR_KEY_announce_state, /* rpc */

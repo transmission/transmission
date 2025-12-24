@@ -39,7 +39,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_alt_speed_time_enabled, TR_KEY_alt_speed_time_enabled_kebab_APICOMPAT },
     { TR_KEY_alt_speed_time_end, TR_KEY_alt_speed_time_end_kebab_APICOMPAT },
     { TR_KEY_alt_speed_up, TR_KEY_alt_speed_up_kebab_APICOMPAT },
-    { TR_KEY_announce_state, TR_KEY_announce_state_camel },
+    { TR_KEY_announce_state, TR_KEY_announce_state_camel_APICOMPAT },
     { TR_KEY_anti_brute_force_enabled, TR_KEY_anti_brute_force_enabled_kebab_APICOMPAT },
     { TR_KEY_anti_brute_force_threshold, TR_KEY_anti_brute_force_threshold_kebab_APICOMPAT },
     { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_camel_APICOMPAT },
