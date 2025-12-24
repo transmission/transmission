@@ -205,7 +205,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_torrent_file, TR_KEY_torrent_file_camel_APICOMPAT },
     { TR_KEY_total_size, TR_KEY_total_size_camel_APICOMPAT },
     { TR_KEY_tracker_add, TR_KEY_tracker_add_camel },
-    { TR_KEY_tracker_list, TR_KEY_tracker_list_camel },
+    { TR_KEY_tracker_list, TR_KEY_tracker_list_camel_APICOMPAT },
     { TR_KEY_tracker_remove, TR_KEY_tracker_remove_camel },
     { TR_KEY_tracker_replace, TR_KEY_tracker_replace_camel },
     { TR_KEY_tracker_stats, TR_KEY_tracker_stats_camel },
