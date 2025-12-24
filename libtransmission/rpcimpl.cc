@@ -618,7 +618,7 @@ namespace make_torrent_field_helpers
     for (size_t idx = 0U; idx != n_peers; ++idx)
     {
         auto const& peer = peers[idx];
-        auto peer_map = tr_variant::Map{ 16U };
+        auto peer_map = tr_variant::Map{ 19U };
         peer_map.try_emplace(TR_KEY_address, peer.addr);
         peer_map.try_emplace(TR_KEY_client_is_choked, peer.clientIsChoked);
         peer_map.try_emplace(TR_KEY_client_is_interested, peer.clientIsInterested);
@@ -1908,7 +1908,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         if (names.empty() || names.count(name.sv()) > 0U)
         {
             auto const limits = group->get_limits();
-            auto group_map = tr_variant::Map{ 11U };
+            auto group_map = tr_variant::Map{ 6U };
             group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(TR_UP));
             group_map.try_emplace(TR_KEY_name, name.sv());
             group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
