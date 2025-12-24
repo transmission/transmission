@@ -174,7 +174,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_script_torrent_done_filename, TR_KEY_script_torrent_done_filename_kebab_APICOMPAT },
     { TR_KEY_script_torrent_done_seeding_enabled, TR_KEY_script_torrent_done_seeding_enabled_kebab_APICOMPAT },
     { TR_KEY_script_torrent_done_seeding_filename, TR_KEY_script_torrent_done_seeding_filename_kebab_APICOMPAT },
-    { TR_KEY_seconds_active, TR_KEY_seconds_active_camel }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_seconds_active, TR_KEY_seconds_active_camel_APICOMPAT },
     { TR_KEY_seconds_downloading, TR_KEY_seconds_downloading_camel_APICOMPAT },
     { TR_KEY_seconds_seeding, TR_KEY_seconds_seeding_camel_APICOMPAT },
     { TR_KEY_seed_idle_limit, TR_KEY_seed_idle_limit_camel_APICOMPAT },

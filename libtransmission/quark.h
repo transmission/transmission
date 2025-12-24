@@ -542,7 +542,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_script_torrent_done_seeding_enabled,
     TR_KEY_script_torrent_done_seeding_filename,
     TR_KEY_seconds_active_kebab_APICOMPAT,
-    TR_KEY_seconds_active_camel,
+    TR_KEY_seconds_active_camel_APICOMPAT,
     TR_KEY_seconds_downloading_camel_APICOMPAT,
     TR_KEY_seconds_seeding_camel_APICOMPAT,
     TR_KEY_seconds_active,
