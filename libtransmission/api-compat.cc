@@ -190,7 +190,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_size_bytes, TR_KEY_size_bytes_kebab_APICOMPAT },
     { TR_KEY_size_units, TR_KEY_size_units_kebab_APICOMPAT },
     { TR_KEY_size_when_done, TR_KEY_size_when_done_camel_APICOMPAT },
-    { TR_KEY_speed_bytes, TR_KEY_speed_bytes_kebab },
+    { TR_KEY_speed_bytes, TR_KEY_speed_bytes_kebab_APICOMPAT },
     { TR_KEY_speed_limit_down, TR_KEY_speed_limit_down_kebab_APICOMPAT },
     { TR_KEY_speed_limit_down_enabled, TR_KEY_speed_limit_down_enabled_kebab_APICOMPAT },
     { TR_KEY_speed_limit_up, TR_KEY_speed_limit_up_kebab_APICOMPAT },

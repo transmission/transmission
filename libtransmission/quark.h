@@ -650,7 +650,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_source,
     TR_KEY_speed,
     TR_KEY_speed_Bps_kebab_APICOMPAT,
-    TR_KEY_speed_bytes_kebab,
+    TR_KEY_speed_bytes_kebab_APICOMPAT,
     TR_KEY_speed_limit_down_kebab_APICOMPAT,
     TR_KEY_speed_limit_down_enabled_kebab_APICOMPAT,
     TR_KEY_speed_limit_up_kebab_APICOMPAT,
