@@ -686,7 +686,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_torrent_complete_notification_enabled_kebab,
     TR_KEY_torrent_complete_sound_command_kebab,
     TR_KEY_torrent_complete_sound_enabled_kebab,
-    TR_KEY_torrent_duplicate_kebab,
+    TR_KEY_torrent_duplicate_kebab_APICOMPAT,
     TR_KEY_torrent_get_kebab,
     TR_KEY_torrent_reannounce_kebab,
     TR_KEY_torrent_remove_kebab,
