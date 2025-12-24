@@ -781,7 +781,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_priorities:
     case TR_KEY_queue_position:
     case TR_KEY_rate_download:
-    case TR_KEY_rate_download_camel:
     case TR_KEY_rate_upload:
     case TR_KEY_rate_upload_camel:
     case TR_KEY_recheck_progress:
@@ -948,7 +947,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_queue_position:
         return st.queuePosition;
     case TR_KEY_rate_download:
-    case TR_KEY_rate_download_camel:
         return Speed{ st.pieceDownloadSpeed_KBps, Speed::Units::KByps }.base_quantity();
     case TR_KEY_rate_upload:
     case TR_KEY_rate_upload_camel:
