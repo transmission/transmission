@@ -458,7 +458,7 @@ namespace make_torrent_field_helpers
     vec.reserve(n_files);
     for (tr_file_index_t idx = 0U; idx != n_files; ++idx)
     {
-        vec.emplace_back(tr_torrentFile(&tor, idx).wanted ? 1 : 0);
+        vec.emplace_back(tr_torrentFile(&tor, idx).wanted);
     }
     return tr_variant{ std::move(vec) };
 }
