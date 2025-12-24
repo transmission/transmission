@@ -99,7 +99,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_incomplete_dir, TR_KEY_incomplete_dir_kebab_APICOMPAT },
     { TR_KEY_incomplete_dir_enabled, TR_KEY_incomplete_dir_enabled_kebab_APICOMPAT },
     { TR_KEY_is_backup, TR_KEY_is_backup_camel_APICOMPAT },
-    { TR_KEY_is_downloading_from, TR_KEY_is_downloading_from_camel },
+    { TR_KEY_is_downloading_from, TR_KEY_is_downloading_from_camel_APICOMPAT },
     { TR_KEY_is_encrypted, TR_KEY_is_encrypted_camel },
     { TR_KEY_is_finished, TR_KEY_is_finished_camel_APICOMPAT },
     { TR_KEY_is_incoming, TR_KEY_is_incoming_camel },
