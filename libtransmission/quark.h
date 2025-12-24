@@ -291,7 +291,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_last_announce_start_time_camel_APICOMPAT,
     TR_KEY_last_announce_succeeded_camel_APICOMPAT,
     TR_KEY_last_announce_time_camel_APICOMPAT,
-    TR_KEY_last_announce_timed_out_camel,
+    TR_KEY_last_announce_timed_out_camel_APICOMPAT,
     TR_KEY_last_scrape_result_camel,
     TR_KEY_last_scrape_start_time_camel,
     TR_KEY_last_scrape_succeeded_camel,
