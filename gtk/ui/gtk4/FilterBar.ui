@@ -7,11 +7,11 @@
       <object class="GtkLabel" id="show_label">
         <property name="label" translatable="1">_Show:</property>
         <property name="use-underline">1</property>
-        <property name="mnemonic-widget">activity_combo</property>
+        <property name="mnemonic-widget">show_mode_combo</property>
       </object>
     </child>
     <child>
-      <object class="GtkComboBox" id="activity_combo">
+      <object class="GtkComboBox" id="show_mode_combo">
         <property name="hexpand">1</property>
         <property name="margin-end">6</property>
       </object>

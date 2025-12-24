@@ -3,13 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/values.h>
 
-using namespace libtransmission::Values;
+#include "test-fixtures.h"
 
-using ValuesTest = ::testing::Test;
+using ValuesTest = ::libtransmission::test::TransmissionTest;
+using namespace libtransmission::Values;
 
 TEST_F(ValuesTest, baseQuantity)
 {

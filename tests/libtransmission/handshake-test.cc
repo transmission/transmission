@@ -94,11 +94,6 @@ public:
             return false;
         }
 
-        [[nodiscard]] bool allows_tcp() const override
-        {
-            return true;
-        }
-
         [[nodiscard]] size_t pad(void* setme, [[maybe_unused]] size_t maxlen) const override
         {
             TR_ASSERT(maxlen > 10);

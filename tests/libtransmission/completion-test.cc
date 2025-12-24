@@ -9,8 +9,6 @@
 #include <cstdint>
 #include <set>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/bitfield.h>
@@ -18,7 +16,9 @@
 #include <libtransmission/crypto-utils.h> // for tr_rand_obj()
 #include <libtransmission/completion.h>
 
-using CompletionTest = ::testing::Test;
+#include "test-fixtures.h"
+
+using CompletionTest = ::libtransmission::test::TransmissionTest;
 
 namespace
 {

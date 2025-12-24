@@ -8,12 +8,12 @@
 
 #include <fmt/format.h>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/benc.h>
 #include <libtransmission/error.h>
 
-using BencTest = ::testing::Test;
+#include "test-fixtures.h"
+
+using BencTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(BencTest, MalformedBenc)

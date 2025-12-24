@@ -10,16 +10,16 @@
 #include <tuple>
 #include <utility>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h>
 
+#include "test-fixtures.h"
+
 using namespace std::literals;
 
-using PeerInfoTest = ::testing::Test;
+using PeerInfoTest = ::libtransmission::test::TransmissionTest;
 
 TEST_F(PeerInfoTest, mergeConnectable)
 {

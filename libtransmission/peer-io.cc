@@ -121,7 +121,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(socket_address.is_valid());
-    TR_ASSERT(utp || session->allowsTCP());
+    TR_ASSERT(!std::empty(session->preferred_transports()));
 
     // N.B. This array needs to be kept in the same order as
     // the tr_preferred_transport enum.
@@ -220,7 +220,10 @@ void tr_peerIo::clear()
 bool tr_peerIo::reconnect()
 {
     TR_ASSERT(!is_incoming());
-    TR_ASSERT(session_->allowsTCP());
+    if (!session_->allowsTCP())
+    {
+        return false;
+    }
 
     auto const pending_events = pending_events_;
     event_disable(EV_READ | EV_WRITE);

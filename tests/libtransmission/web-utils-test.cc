@@ -15,14 +15,12 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/web-utils.h>
 
-using namespace std::literals;
+#include "test-fixtures.h"
 
-using WebUtilsTest = ::testing::Test;
+using WebUtilsTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(WebUtilsTest, urlParse)

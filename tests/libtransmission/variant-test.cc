@@ -26,9 +26,8 @@
 
 #include "test-fixtures.h"
 
+using VariantTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
-
-using VariantTest = ::testing::Test;
 
 namespace
 {

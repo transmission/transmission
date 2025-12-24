@@ -7,11 +7,11 @@
 #include <iterator>
 #include <string_view>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/tr-strbuf.h>
 
-using StrbufTest = ::testing::Test;
+#include "test-fixtures.h"
+
+using StrbufTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(StrbufTest, append)

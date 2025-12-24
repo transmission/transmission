@@ -631,7 +631,7 @@ TEST_F(RpcTest, sessionGet)
     ASSERT_NE(args_map, nullptr);
 
     // what we expected
-    static auto constexpr ExpectedKeys = std::array{
+    static auto constexpr ExpectedKeysUnsorted = std::array{
         TR_KEY_alt_speed_down_kebab,
         TR_KEY_alt_speed_enabled_kebab,
         TR_KEY_alt_speed_time_begin_kebab,
@@ -752,6 +752,8 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_version,
     };
 
+    auto const expected_keys = std::set<tr_quark>{ std::begin(ExpectedKeysUnsorted), std::end(ExpectedKeysUnsorted) };
+
     // what we got
     std::set<tr_quark> actual_keys;
     for (auto const& [key, val] : *args_map)
@@ -761,8 +763,8 @@ TEST_F(RpcTest, sessionGet)
 
     auto missing_keys = std::vector<tr_quark>{};
     std::set_difference(
-        std::begin(ExpectedKeys),
-        std::end(ExpectedKeys),
+        std::begin(expected_keys),
+        std::end(expected_keys),
         std::begin(actual_keys),
         std::end(actual_keys),
         std::inserter(missing_keys, std::begin(missing_keys)));
@@ -772,8 +774,8 @@ TEST_F(RpcTest, sessionGet)
     std::set_difference(
         std::begin(actual_keys),
         std::end(actual_keys),
-        std::begin(ExpectedKeys),
-        std::end(ExpectedKeys),
+        std::begin(expected_keys),
+        std::end(expected_keys),
         std::inserter(unexpected_keys, std::begin(unexpected_keys)));
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 

@@ -10,15 +10,15 @@
 #include <numeric>
 #include <vector>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/bitfield.h>
 #include <libtransmission/block-info.h>
 #include <libtransmission/file-piece-map.h>
 
-class FilePieceMapTest : public ::testing::Test
+#include "test-fixtures.h"
+
+class FilePieceMapTest : public ::libtransmission::test::TransmissionTest
 {
 protected:
     static constexpr size_t PieceSize{ tr_block_info::BlockSize };

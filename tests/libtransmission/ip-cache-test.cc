@@ -13,16 +13,16 @@
 #include <string_view>
 #include <utility>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/ip-cache.h>
 #include <libtransmission/net.h>
 #include <libtransmission/timer.h>
 #include <libtransmission/web.h>
 
+#include "test-fixtures.h"
+
 using namespace std::literals;
 
-class IPCacheTest : public ::testing::Test
+class IPCacheTest : public ::libtransmission::test::TransmissionTest
 {
 protected:
     class MockTimerMaker final : public libtransmission::TimerMaker

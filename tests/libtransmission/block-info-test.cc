@@ -5,13 +5,13 @@
 
 #include <cstdint>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/block-info.h>
 
-using BlockInfoTest = ::testing::Test;
+#include "test-fixtures.h"
+
+using BlockInfoTest = ::libtransmission::test::TransmissionTest;
 
 TEST_F(BlockInfoTest, fieldsAreSet)
 {

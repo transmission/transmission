@@ -43,7 +43,7 @@ std::string getTestProgramPath(std::string_view const filename)
 } // unnamed namespace
 
 class SubprocessTest
-    : public ::testing::Test
+    : public ::libtransmission::test::TransmissionTest
     , public testing::WithParamInterface<std::string>
 {
 protected:

@@ -8,12 +8,12 @@
 #include <memory>
 #include <string_view>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/tr-buffer.h>
 
-using BufferTest = ::testing::Test;
+#include "test-fixtures.h"
+
+using BufferTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 using Buffer = libtransmission::StackBuffer<1024, std::byte>;
 

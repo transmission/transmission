@@ -478,7 +478,10 @@ void Session::Impl::on_pref_changed(tr_quark const key)
     switch (key)
     {
     case TR_KEY_sort_mode:
-        sorter_->set_mode(gtr_pref_string_get(TR_KEY_sort_mode));
+        if (auto const sort_mode = gtr_pref_get<SortMode>(TR_KEY_sort_mode))
+        {
+            sorter_->set_mode(*sort_mode);
+        }
         break;
 
     case TR_KEY_sort_reversed:

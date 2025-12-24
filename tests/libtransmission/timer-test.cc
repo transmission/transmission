@@ -18,8 +18,7 @@
 
 namespace libtransmission::test
 {
-
-class TimerTest : public ::testing::Test
+class TimerTest : public TransmissionTest
 {
 protected:
     // setup + teardown to manage an event_base

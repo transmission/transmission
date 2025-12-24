@@ -2546,7 +2546,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
             {
                 break;
             }
-            units_vec.emplace_back(display_name);
+            units_vec.emplace_back(tr_variant::unmanaged_string(display_name));
         }
         return units_vec;
     };
@@ -2632,7 +2632,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_download_queue_size_kebab:
         return session.queueSize(TR_DOWN);
     case TR_KEY_encryption:
-        return getEncryptionModeString(tr_sessionGetEncryption(&session));
+        return tr_variant::unmanaged_string(getEncryptionModeString(tr_sessionGetEncryption(&session)));
     case TR_KEY_idle_seeding_limit:
     case TR_KEY_idle_seeding_limit_kebab:
         return session.idleLimitMinutes();
@@ -2687,7 +2687,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         return RpcVersionMin;
     case TR_KEY_rpc_version_semver:
     case TR_KEY_rpc_version_semver_kebab:
-        return TrRpcVersionSemver;
+        return tr_variant::unmanaged_string(TrRpcVersionSemver);
     case TR_KEY_script_torrent_added_enabled:
     case TR_KEY_script_torrent_added_enabled_kebab:
         return session.useScript(TR_SCRIPT_ON_TORRENT_ADDED);

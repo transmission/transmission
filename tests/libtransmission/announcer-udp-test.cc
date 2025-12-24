@@ -51,13 +51,12 @@ using tau_transaction_t = uint32_t;
 
 using MessageBuffer = libtransmission::StackBuffer<4096, std::byte>;
 
-class AnnouncerUdpTest : public ::testing::Test
+class AnnouncerUdpTest : public ::libtransmission::test::TransmissionTest
 {
 private:
     void SetUp() override
     {
         ::testing::Test::SetUp();
-        tr_lib_init();
         tr_timeUpdate(time(nullptr));
     }
 

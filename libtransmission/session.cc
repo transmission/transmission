@@ -461,6 +461,13 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
 
 // ---
 
+std::unique_lock<std::recursive_mutex> tr_sessionLock(tr_session const* const session)
+{
+    return session->unique_lock();
+}
+
+// ---
+
 tr_variant tr_sessionGetDefaultSettings()
 {
     auto ret = tr_variant::make_map();
@@ -900,6 +907,57 @@ void tr_sessionSet(tr_session* session, tr_variant const& settings)
             done_promise.set_value();
         });
     done_future.wait();
+}
+
+// ---
+
+void tr_session::Settings::fixup_from_preferred_transports()
+{
+    utp_enabled = false;
+    tcp_enabled = false;
+    for (auto const& transport : preferred_transports)
+    {
+        switch (transport)
+        {
+        case TR_PREFER_UTP:
+            utp_enabled = true;
+            break;
+        case TR_PREFER_TCP:
+            tcp_enabled = true;
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void tr_session::Settings::fixup_to_preferred_transports()
+{
+    if (!utp_enabled)
+    {
+        auto const remove_it = std::remove(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_UTP);
+        preferred_transports.erase(remove_it, std::end(preferred_transports));
+    }
+    else if (
+        std::find(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_UTP) ==
+        std::end(preferred_transports))
+    {
+        TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
+        preferred_transports.emplace(std::begin(preferred_transports), TR_PREFER_UTP);
+    }
+
+    if (!tcp_enabled)
+    {
+        auto const remove_it = std::remove(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_TCP);
+        preferred_transports.erase(remove_it, std::end(preferred_transports));
+    }
+    else if (
+        std::find(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_TCP) ==
+        std::end(preferred_transports))
+    {
+        TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
+        preferred_transports.emplace_back(TR_PREFER_TCP);
+    }
 }
 
 // ---
@@ -1616,6 +1674,7 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
         {
             auto settings = session->settings_;
             settings.utp_enabled = enabled;
+            settings.fixup_to_preferred_transports();
             session->setSettings(std::move(settings), false);
         });
 }

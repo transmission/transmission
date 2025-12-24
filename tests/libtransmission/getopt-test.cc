@@ -5,9 +5,9 @@
 
 #include <array>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/tr-getopt.h>
+
+#include "test-fixtures.h"
 
 namespace
 {
@@ -31,7 +31,7 @@ auto constexpr Options = std::array<tr_option, 9>{ {
 static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
-class GetoptTest : public ::testing::Test
+class GetoptTest : public ::libtransmission::test::TransmissionTest
 {
 protected:
     static void runTest( //

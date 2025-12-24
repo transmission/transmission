@@ -36,10 +36,6 @@
 
 using namespace std::literals;
 
-/***
-****
-***/
-
 static auto constexpr GenericRescanInterval = 100ms;
 static auto constexpr RetryDuration = 100ms;
 
@@ -69,7 +65,6 @@ protected:
     void SetUp() override
     {
         SandboxedTest::SetUp();
-        tr_lib_init();
         ev_base_.reset(event_base_new(), event_base_free);
         timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(ev_base_.get());
         Watchdir::set_generic_rescan_interval(GenericRescanInterval);

@@ -451,30 +451,6 @@ tr_variant from_string(std::string const& val)
 
 // ---
 
-bool to_optional_string(tr_variant const& src, std::optional<std::string>* tgt)
-{
-    if (src.holds_alternative<std::nullptr_t>())
-    {
-        tgt->reset();
-        return true;
-    }
-
-    if (auto const val = src.value_if<std::string_view>())
-    {
-        *tgt = std::string{ *val };
-        return true;
-    }
-
-    return false;
-}
-
-tr_variant from_optional_string(std::optional<std::string> const& val)
-{
-    return val ? tr_variant{ *val } : nullptr;
-}
-
-// ---
-
 bool to_tos_t(tr_variant const& src, tr_tos_t* tgt)
 {
     if (auto const val = src.value_if<std::string_view>())
@@ -570,7 +546,6 @@ void Converters::ensure_default_converters()
             Converters::add(to_log_level, from_log_level);
             Converters::add(to_mode_t, from_mode_t);
             Converters::add(to_msec, from_msec);
-            Converters::add(to_optional_string, from_optional_string);
             Converters::add(to_port, from_port);
             Converters::add(to_preallocation_mode, from_preallocation_mode);
             Converters::add(to_preferred_transport, from_preferred_transport);

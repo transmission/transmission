@@ -17,12 +17,12 @@
 #include <sys/socket.h>
 #endif
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h>
 
-using NetTest = ::testing::Test;
+#include "test-fixtures.h"
+
+using NetTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(NetTest, conversionsIPv4)

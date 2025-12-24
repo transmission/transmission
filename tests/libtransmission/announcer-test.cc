@@ -10,14 +10,14 @@
 #include <optional>
 #include <string_view>
 
-#include <gtest/gtest.h>
-
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include <libtransmission/announcer-common.h>
 #include <libtransmission/net.h>
 
-using AnnouncerTest = ::testing::Test;
+#include "test-fixtures.h"
+
+using AnnouncerTest = ::libtransmission::test::TransmissionTest;
 
 using namespace std::literals;
 
