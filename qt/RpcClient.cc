@@ -147,7 +147,7 @@ void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcR
     }
 }
 
-void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResponse> const& promise, int64_t const id)
+void RpcClient::sendLocalRequest(tr_variant& req, QFutureInterface<RpcResponse> const& promise, int64_t const id)
 {
     if (verbose_)
     {
