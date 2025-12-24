@@ -148,7 +148,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_piece_size, TR_KEY_piece_size_camel_APICOMPAT },
     { TR_KEY_port_forwarding_enabled, TR_KEY_port_forwarding_enabled_kebab_APICOMPAT },
     { TR_KEY_port_is_open, TR_KEY_port_is_open_kebab },
-    { TR_KEY_primary_mime_type, TR_KEY_primary_mime_type_kebab },
+    { TR_KEY_primary_mime_type, TR_KEY_primary_mime_type_kebab_APICOMPAT },
     { TR_KEY_priority_high, TR_KEY_priority_high_kebab },
     { TR_KEY_priority_low, TR_KEY_priority_low_kebab },
     { TR_KEY_priority_normal, TR_KEY_priority_normal_kebab },
