@@ -807,7 +807,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_wanted:
     case TR_KEY_webseeds:
     case TR_KEY_webseeds_sending_to_us:
-    case TR_KEY_webseeds_sending_to_us_camel:
         return true;
 
     default:
@@ -982,7 +981,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_webseeds:
         return make_webseed_vec(tor);
     case TR_KEY_webseeds_sending_to_us:
-    case TR_KEY_webseeds_sending_to_us_camel:
         return st.webseedsSendingToUs;
     default:
         return tr_variant{};

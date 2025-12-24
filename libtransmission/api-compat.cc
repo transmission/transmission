@@ -217,7 +217,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_uploaded_ever, TR_KEY_uploaded_ever_camel_APICOMPAT },
     { TR_KEY_utp_enabled, TR_KEY_utp_enabled_kebab_APICOMPAT },
-    { TR_KEY_webseeds_sending_to_us, TR_KEY_webseeds_sending_to_us_camel },
+    { TR_KEY_webseeds_sending_to_us, TR_KEY_webseeds_sending_to_us_camel_APICOMPAT },
     { TR_KEY_blocklist_update, TR_KEY_blocklist_update_kebab },
     { TR_KEY_free_space, TR_KEY_free_space_kebab },
     { TR_KEY_group_get, TR_KEY_group_get_kebab },
