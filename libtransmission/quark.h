@@ -266,7 +266,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_ip_protocol,
     TR_KEY_ipv4,
     TR_KEY_ipv6,
-    TR_KEY_is_backup_camel,
+    TR_KEY_is_backup_camel_APICOMPAT,
     TR_KEY_is_downloading_from_camel,
     TR_KEY_is_encrypted_camel,
     TR_KEY_is_finished_camel_APICOMPAT,
