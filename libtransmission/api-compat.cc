@@ -110,7 +110,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_last_announce_peer_count, TR_KEY_last_announce_peer_count_camel_APICOMPAT },
     { TR_KEY_last_announce_result, TR_KEY_last_announce_result_camel_APICOMPAT },
     { TR_KEY_last_announce_start_time, TR_KEY_last_announce_start_time_camel_APICOMPAT },
-    { TR_KEY_last_announce_succeeded, TR_KEY_last_announce_succeeded_camel },
+    { TR_KEY_last_announce_succeeded, TR_KEY_last_announce_succeeded_camel_APICOMPAT },
     { TR_KEY_last_announce_time, TR_KEY_last_announce_time_camel },
     { TR_KEY_last_announce_timed_out, TR_KEY_last_announce_timed_out_camel },
     { TR_KEY_last_scrape_result, TR_KEY_last_scrape_result_camel },
