@@ -2464,6 +2464,9 @@ int flush(char const* rpcurl, tr_variant* const var, RemoteConfig& config)
             status |= process_response(rpcurl, buf, config);
             break;
 
+        case 204:
+            break;
+
         case 409:
             // Session id failed. Our curl header func has already
             // pulled the new session id from this response's headers.
