@@ -195,7 +195,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_files,
     TR_KEY_files_added_kebab_APICOMPAT,
     TR_KEY_files_unwanted_kebab_APICOMPAT,
-    TR_KEY_files_wanted_kebab,
+    TR_KEY_files_wanted_kebab_APICOMPAT,
     TR_KEY_files_added_camel_APICOMPAT,
     TR_KEY_files_added,
     TR_KEY_files_unwanted,

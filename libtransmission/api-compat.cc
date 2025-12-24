@@ -79,7 +79,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_file_stats, TR_KEY_file_stats_camel_APICOMPAT },
     { TR_KEY_files_added, TR_KEY_files_added_camel_APICOMPAT },
     { TR_KEY_files_unwanted, TR_KEY_files_unwanted_kebab_APICOMPAT },
-    { TR_KEY_files_wanted, TR_KEY_files_wanted_kebab },
+    { TR_KEY_files_wanted, TR_KEY_files_wanted_kebab_APICOMPAT },
     { TR_KEY_flag_str, TR_KEY_flag_str_camel_APICOMPAT },
     { TR_KEY_from_cache, TR_KEY_from_cache_camel_APICOMPAT },
     { TR_KEY_from_dht, TR_KEY_from_dht_camel_APICOMPAT },
