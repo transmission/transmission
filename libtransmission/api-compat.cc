@@ -128,7 +128,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_memory_units, TR_KEY_memory_units_kebab },
     { TR_KEY_metadata_percent_complete, TR_KEY_metadata_percent_complete_camel_APICOMPAT },
     { TR_KEY_next_announce_time, TR_KEY_next_announce_time_camel_APICOMPAT },
-    { TR_KEY_next_scrape_time, TR_KEY_next_scrape_time_camel },
+    { TR_KEY_next_scrape_time, TR_KEY_next_scrape_time_camel_APICOMPAT },
     { TR_KEY_paused_torrent_count, TR_KEY_paused_torrent_count_camel },
     { TR_KEY_peer_is_choked, TR_KEY_peer_is_choked_camel },
     { TR_KEY_peer_is_interested, TR_KEY_peer_is_interested_camel },
