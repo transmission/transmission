@@ -187,7 +187,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_seeder_count, TR_KEY_seeder_count_camel_APICOMPAT },
     { TR_KEY_session_count, TR_KEY_session_count_camel_APICOMPAT },
     { TR_KEY_session_id, TR_KEY_session_id_kebab_APICOMPAT },
-    { TR_KEY_size_bytes, TR_KEY_size_bytes_kebab },
+    { TR_KEY_size_bytes, TR_KEY_size_bytes_kebab_APICOMPAT },
     { TR_KEY_size_units, TR_KEY_size_units_kebab },
     { TR_KEY_size_when_done, TR_KEY_size_when_done_camel_APICOMPAT },
     { TR_KEY_speed_bytes, TR_KEY_speed_bytes_kebab },
@@ -495,7 +495,7 @@ struct State
         if (auto const* const args = top.find_if<tr_variant::Map>(state.was_jsonrpc ? TR_KEY_result : TR_KEY_arguments))
         {
             state.is_free_space_response = args->contains(TR_KEY_path) &&
-                args->contains(state.was_jsonrpc ? TR_KEY_size_bytes : TR_KEY_size_bytes_kebab);
+                args->contains(state.was_jsonrpc ? TR_KEY_size_bytes : TR_KEY_size_bytes_kebab_APICOMPAT);
         }
     }
 

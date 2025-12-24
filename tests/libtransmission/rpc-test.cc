@@ -896,7 +896,6 @@ constexpr std::string_view WellFormedResponse = R"json({
     "jsonrpc": "2.0",
     "result": {
         "path": ")json" RPC_NON_EXISTENT_PATH R"json(",
-        "size-bytes": -1,
         "size_bytes": -1,
         "total_size": -1
     }
@@ -922,7 +921,6 @@ constexpr std::string_view WellFormedLegacyResponse = R"json({
     "arguments": {
         "path": ")json" RPC_NON_EXISTENT_PATH R"json(",
         "size-bytes": -1,
-        "size_bytes": -1,
         "total_size": -1
     },
     "result": "success",
