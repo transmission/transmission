@@ -787,7 +787,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_seconds_seeding:
     case TR_KEY_seed_idle_limit:
     case TR_KEY_seed_idle_mode:
-    case TR_KEY_seed_idle_mode_camel:
     case TR_KEY_seed_ratio_limit:
     case TR_KEY_seed_ratio_mode:
     case TR_KEY_seed_ratio_mode_camel:
@@ -954,7 +953,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_seed_idle_limit:
         return tor.idle_limit_minutes();
     case TR_KEY_seed_idle_mode:
-    case TR_KEY_seed_idle_mode_camel:
         return tor.idle_limit_mode();
     case TR_KEY_seed_ratio_limit:
         return tor.seed_ratio();
@@ -1419,7 +1417,7 @@ namespace make_torrent_field_helpers
             tor->set_idle_limit_minutes(static_cast<uint16_t>(*val));
         }
 
-        if (auto const val = args_in.value_if<int64_t>({ TR_KEY_seed_idle_mode, TR_KEY_seed_idle_mode_camel }); val)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_seed_idle_mode); val)
         {
             tor->set_idle_limit_mode(static_cast<tr_idlelimit>(*val));
         }
