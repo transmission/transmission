@@ -1472,9 +1472,8 @@ namespace
 
 [[nodiscard]] std::optional<tr_quark> get_rpc_method(std::string_view const str)
 {
-    if (auto quark = tr_quark_lookup(str)) // method-name, methodName, method_name
+    if (auto quark = tr_quark_lookup(str))
     {
-        quark = tr_quark_convert(*quark); // method_name
         switch (*quark)
         {
         // method_name
