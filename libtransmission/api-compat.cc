@@ -117,7 +117,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_last_scrape_start_time, TR_KEY_last_scrape_start_time_camel_APICOMPAT },
     { TR_KEY_last_scrape_succeeded, TR_KEY_last_scrape_succeeded_camel_APICOMPAT },
     { TR_KEY_last_scrape_time, TR_KEY_last_scrape_time_camel_APICOMPAT },
-    { TR_KEY_last_scrape_timed_out, TR_KEY_last_scrape_timed_out_camel },
+    { TR_KEY_last_scrape_timed_out, TR_KEY_last_scrape_timed_out_camel_APICOMPAT },
     { TR_KEY_leecher_count, TR_KEY_leecher_count_camel },
     { TR_KEY_left_until_done, TR_KEY_left_until_done_camel_APICOMPAT },
     { TR_KEY_lpd_enabled, TR_KEY_lpd_enabled_kebab_APICOMPAT },
