@@ -152,7 +152,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_priority_high, TR_KEY_priority_high_kebab },
     { TR_KEY_priority_low, TR_KEY_priority_low_kebab },
     { TR_KEY_priority_normal, TR_KEY_priority_normal_kebab },
-    { TR_KEY_queue_position, TR_KEY_queue_position_camel },
+    { TR_KEY_queue_position, TR_KEY_queue_position_camel_APICOMPAT },
     { TR_KEY_queue_stalled_enabled, TR_KEY_queue_stalled_enabled_kebab_APICOMPAT },
     { TR_KEY_queue_stalled_minutes, TR_KEY_queue_stalled_minutes_kebab_APICOMPAT },
     { TR_KEY_rate_download, TR_KEY_rate_download_camel },

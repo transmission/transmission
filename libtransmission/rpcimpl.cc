@@ -780,7 +780,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_primary_mime_type:
     case TR_KEY_priorities:
     case TR_KEY_queue_position:
-    case TR_KEY_queue_position_camel:
     case TR_KEY_rate_download:
     case TR_KEY_rate_download_camel:
     case TR_KEY_rate_upload:
@@ -947,7 +946,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_priorities:
         return make_file_priorities_vec(tor);
     case TR_KEY_queue_position:
-    case TR_KEY_queue_position_camel:
         return st.queuePosition;
     case TR_KEY_rate_download:
     case TR_KEY_rate_download_camel:
@@ -1448,7 +1446,7 @@ namespace make_torrent_field_helpers
             tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(*val));
         }
 
-        if (auto const val = args_in.value_if<int64_t>({ TR_KEY_queue_position, TR_KEY_queue_position_camel }); val)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_queue_position); val)
         {
             tr_torrentSetQueuePosition(tor, static_cast<size_t>(*val));
         }
