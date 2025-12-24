@@ -1,201 +1,64 @@
 {
-  "fill" : "system-dark",
+  "fill" : {
+    "automatic-gradient" : "srgb:0.25098,0.25000,0.25000,1.00000"
+  },
   "groups" : [
     {
-      "blur-material" : null,
       "hidden" : false,
       "layers" : [
         {
-          "image-name" : "Shaft.png",
-          "name" : "Shaft"
+          "hidden" : false,
+          "image-name" : "HandleShaft 2.svg",
+          "name" : "HandleShaft",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0.018329926457113288,
+              -183
+            ]
+          }
         },
         {
-          "fill-specializations" : [
-            {
-              "appearance" : "tinted",
-              "value" : {
-                "solid" : "extended-gray:0.00000,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Handle.png",
-          "name" : "Handle"
+          "image-name" : "Handle.svg",
+          "name" : "Handle",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0.03629980454161341,
+              -234
+            ]
+          }
         },
         {
-          "image-name" : "Thumb-Button.png",
-          "name" : "Thumb-Button"
-        },
-        {
-          "blend-mode-specializations" : [
-            {
-              "appearance" : "dark",
-              "value" : "normal"
-            }
-          ],
-          "glass-specializations" : [
-            {
-              "value" : false
-            },
-            {
-              "appearance" : "dark",
-              "value" : false
-            }
-          ],
-          "hidden-specializations" : [
-            {
-              "value" : false
-            },
-            {
-              "appearance" : "tinted",
-              "value" : true
-            }
-          ],
-          "image-name" : "Handle_Reflection.png",
-          "name" : "Handle_Reflection",
-          "opacity-specializations" : [
-            {
-              "appearance" : "dark",
-              "value" : 1
-            }
-          ]
+          "image-name" : "ThumbButton.svg",
+          "name" : "ThumbButton",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -413,
+              -234
+            ]
+          }
         }
       ],
-      "lighting" : "individual",
-      "position" : {
-        "scale" : 1,
-        "translation-in-points" : [
-          0,
-          0
-        ]
+      "name" : "Handle",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 0.5
       },
-      "shadow-specializations" : [
-        {
-          "value" : {
-            "kind" : "neutral",
-            "opacity" : 0.5
-          }
-        },
-        {
-          "appearance" : "dark",
-          "value" : {
-            "kind" : "neutral",
-            "opacity" : 0.5
-          }
-        }
-      ],
-      "specular-specializations" : [
-        {
-          "value" : true
-        },
-        {
-          "appearance" : "dark",
-          "value" : true
-        }
-      ],
       "translucency" : {
         "enabled" : false,
         "value" : 0.5
       }
     },
     {
-      "blend-mode-specializations" : [
-        {
-          "value" : "normal"
-        },
-        {
-          "appearance" : "dark",
-          "value" : "multiply"
-        },
-        {
-          "appearance" : "tinted",
-          "value" : "plus-darker"
-        }
-      ],
       "blur-material-specializations" : [
         {
-          "value" : null
-        },
-        {
-          "appearance" : "dark",
-          "value" : null
-        }
-      ],
-      "layers" : [
-        {
-          "blend-mode-specializations" : [
-            {
-              "appearance" : "dark",
-              "value" : "normal"
-            }
-          ],
-          "hidden" : false,
-          "image-name" : "Outer_Edge 3.png",
-          "name" : "Outer_Edge",
-          "opacity-specializations" : [
-            {
-              "appearance" : "dark",
-              "value" : 1
-            }
-          ]
-        }
-      ],
-      "opacity-specializations" : [
-        {
-          "value" : 1
-        },
-        {
-          "appearance" : "dark",
-          "value" : 1
-        }
-      ],
-      "shadow-specializations" : [
-        {
-          "value" : {
-            "kind" : "layer-color",
-            "opacity" : 0.5
-          }
-        },
-        {
-          "appearance" : "dark",
-          "value" : {
-            "kind" : "neutral",
-            "opacity" : 0.75
-          }
-        }
-      ],
-      "specular-specializations" : [
-        {
-          "value" : true
-        },
-        {
-          "appearance" : "dark",
-          "value" : true
-        }
-      ],
-      "translucency-specializations" : [
-        {
-          "value" : {
-            "enabled" : false,
-            "value" : 0.5
-          }
-        },
-        {
-          "appearance" : "dark",
-          "value" : {
-            "enabled" : false,
-            "value" : 0.5
-          }
-        }
-      ]
-    },
-    {
-      "blur-material-specializations" : [
-        {
-          "value" : null
-        },
-        {
-          "appearance" : "dark",
           "value" : 0.5
+        },
+        {
+          "appearance" : "dark",
+          "value" : null
         }
       ],
       "hidden" : false,
@@ -203,29 +66,24 @@
         {
           "blend-mode-specializations" : [
             {
-              "value" : "normal"
-            },
-            {
               "appearance" : "dark",
-              "value" : "normal"
+              "value" : "overlay"
             }
           ],
-          "fill-specializations" : [
-            {
-              "appearance" : "dark",
-              "value" : {
-                "solid" : "extended-gray:0.50000,1.00000"
-              }
-            },
-            {
-              "appearance" : "tinted",
-              "value" : "automatic"
-            }
-          ],
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "HandleReflection.svg",
+          "name" : "HandleReflection",
+          "position" : {
+            "scale" : 0.9,
+            "translation-in-points" : [
+              0,
+              -126
+            ]
+          }
+        },
+        {
           "glass-specializations" : [
-            {
-              "value" : true
-            },
             {
               "appearance" : "dark",
               "value" : true
@@ -237,24 +95,15 @@
             },
             {
               "appearance" : "light",
-              "value" : false
+              "value" : true
             },
             {
-              "appearance" : "dark",
-              "value" : false
+              "appearance" : "tinted",
+              "value" : true
             }
           ],
-          "image-name" : "Plate 2.svg",
-          "name" : "Plate",
-          "opacity-specializations" : [
-            {
-              "value" : 1
-            },
-            {
-              "appearance" : "dark",
-              "value" : 1
-            }
-          ]
+          "image-name" : "Plate-Dark-inner-Plaqued.svg",
+          "name" : "Plate-Dark-inner-Plaqued"
         },
         {
           "hidden-specializations" : [
@@ -262,41 +111,72 @@
               "value" : false
             },
             {
-              "appearance" : "tinted",
-              "value" : false
+              "appearance" : "dark",
+              "value" : true
             }
           ],
-          "image-name" : "Plate_Cutout_Back 2.png",
-          "name" : "Plate_Cutout_Back"
-        }
-      ],
-      "lighting" : "individual",
-      "shadow-specializations" : [
+          "image-name" : "Plate-Default.svg",
+          "name" : "Plate-Default"
+        },
         {
-          "value" : {
-            "kind" : "neutral",
-            "opacity" : 0.5
+          "blend-mode-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            }
+          ],
+          "fill-specializations" : [
+            {
+              "value" : {
+                "linear-gradient" : [
+                  "srgb:0.00000,0.00000,0.00000,1.00000",
+                  "gray:0.44371,1.00000"
+                ]
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "linear-gradient" : [
+                  "gray:0.12936,1.00000",
+                  "gray:0.35282,1.00000"
+                ]
+              }
+            }
+          ],
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "ArrowLines.svg",
+          "name" : "ArrowLines",
+          "opacity" : 0.5,
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              115
+            ]
           }
         },
         {
-          "appearance" : "dark",
-          "value" : {
-            "kind" : "layer-color",
-            "opacity" : 0.5
-          }
-        },
-        {
-          "appearance" : "tinted",
-          "value" : {
-            "kind" : "none",
-            "opacity" : 0.5
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "BehindArrowLinesDefault.svg",
+          "name" : "BehindArrowLinesDefault",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              100
+            ]
           }
         }
       ],
+      "name" : "Plate",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
       "specular-specializations" : [
-        {
-          "value" : true
-        },
         {
           "appearance" : "dark",
           "value" : true
@@ -306,24 +186,125 @@
         {
           "value" : {
             "enabled" : true,
-            "value" : 0.3
+            "value" : 0.5
           }
         },
         {
           "appearance" : "dark",
           "value" : {
-            "enabled" : true,
-            "value" : 0.3
-          }
-        },
-        {
-          "appearance" : "tinted",
-          "value" : {
             "enabled" : false,
-            "value" : 0.3
+            "value" : 0.5
           }
         }
       ]
+    },
+    {
+      "blend-mode-specializations" : [
+        {
+          "value" : "screen"
+        },
+        {
+          "appearance" : "dark",
+          "value" : "normal"
+        }
+      ],
+      "blur-material" : null,
+      "hidden" : false,
+      "layers" : [
+        {
+          "blend-mode-specializations" : [
+            {
+              "value" : "screen"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "screen"
+            }
+          ],
+          "hidden" : false,
+          "image-name" : "StripesOuterEdge-Inner.svg",
+          "name" : "StripesOuterEdge-Inner",
+          "opacity-specializations" : [
+            {
+              "value" : 0.5
+            },
+            {
+              "appearance" : "dark",
+              "value" : 0.5
+            }
+          ]
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "linear-gradient" : [
+                  "display-p3:0.41796,0.41024,0.40830,1.00000",
+                  "gray:0.39577,1.00000"
+                ],
+                "orientation" : {
+                  "start" : {
+                    "x" : 0.5,
+                    "y" : 0
+                  },
+                  "stop" : {
+                    "x" : 0.5,
+                    "y" : 0.7
+                  }
+                }
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "linear-gradient" : [
+                  "gray:0.24991,1.00000",
+                  "gray:0.07763,1.00000"
+                ],
+                "orientation" : {
+                  "start" : {
+                    "x" : 0.5,
+                    "y" : 0
+                  },
+                  "stop" : {
+                    "x" : 0.5,
+                    "y" : 0.7
+                  }
+                }
+              }
+            }
+          ],
+          "hidden-specializations" : [
+            {
+              "value" : false
+            },
+            {
+              "appearance" : "light",
+              "value" : true
+            }
+          ],
+          "image-name" : "OuterEdgeDefault-Inner.svg",
+          "name" : "OuterEdgeDefault-Inner"
+        }
+      ],
+      "name" : "Edge",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular-specializations" : [
+        {
+          "value" : false
+        },
+        {
+          "appearance" : "dark",
+          "value" : false
+        }
+      ],
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
     }
   ],
   "supported-platforms" : {

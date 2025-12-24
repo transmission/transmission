@@ -20,11 +20,10 @@
 #include <libtransmission/session.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
+using SettingsTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
-
-using SettingsTest = ::testing::Test;
 
 TEST_F(SettingsTest, canInstantiate)
 {
@@ -501,9 +500,76 @@ TEST_F(SettingsTest, canSavePreferredTransport)
     {
         auto const& expected = ExpectedValue[i];
         auto const& actual = (*l)[i];
-        ASSERT_EQ(actual.index(), tr_variant::StringIndex);
+        ASSERT_TRUE(actual.index() == tr_variant::StringIndex || actual.index() == tr_variant::StringViewIndex);
         EXPECT_EQ(expected, actual.value_if<std::string_view>());
     }
+}
+
+TEST_F(SettingsTest, fixupToPreferredTransports)
+{
+    auto settings = tr_session::Settings{};
+
+    // control case
+    auto expected_value = decltype(settings.preferred_transports){ TR_PREFER_UTP, TR_PREFER_TCP };
+    settings.utp_enabled = true;
+    settings.tcp_enabled = true;
+    settings.fixup_to_preferred_transports();
+    EXPECT_EQ(expected_value, settings.preferred_transports);
+
+    // preserves order if no insert is needed
+    settings.preferred_transports = { TR_PREFER_TCP, TR_PREFER_UTP };
+    expected_value = { TR_PREFER_TCP, TR_PREFER_UTP };
+    settings.utp_enabled = true;
+    settings.tcp_enabled = true;
+    settings.fixup_to_preferred_transports();
+    EXPECT_EQ(expected_value, settings.preferred_transports);
+
+    // removes utp if needed
+    expected_value = { TR_PREFER_TCP };
+    settings.utp_enabled = false;
+    settings.tcp_enabled = true;
+    settings.fixup_to_preferred_transports();
+    EXPECT_EQ(expected_value, settings.preferred_transports);
+
+    // inserts UTP in front of TCP
+    expected_value = { TR_PREFER_UTP, TR_PREFER_TCP };
+    settings.utp_enabled = true;
+    settings.tcp_enabled = true;
+    settings.fixup_to_preferred_transports();
+    EXPECT_EQ(expected_value, settings.preferred_transports);
+
+    // removes tcp if needed
+    expected_value = { TR_PREFER_UTP };
+    settings.utp_enabled = true;
+    settings.tcp_enabled = false;
+    settings.fixup_to_preferred_transports();
+    EXPECT_EQ(expected_value, settings.preferred_transports);
+
+    // inserts TCP behind UTP
+    expected_value = { TR_PREFER_UTP, TR_PREFER_TCP };
+    settings.utp_enabled = true;
+    settings.tcp_enabled = true;
+    settings.fixup_to_preferred_transports();
+    EXPECT_EQ(expected_value, settings.preferred_transports);
+}
+
+TEST_F(SettingsTest, fixupFromPreferredTransports)
+{
+    auto settings = tr_session::Settings{};
+
+    settings.fixup_from_preferred_transports();
+    EXPECT_TRUE(settings.utp_enabled);
+    EXPECT_TRUE(settings.tcp_enabled);
+
+    settings.preferred_transports = { TR_PREFER_UTP };
+    settings.fixup_from_preferred_transports();
+    EXPECT_TRUE(settings.utp_enabled);
+    EXPECT_FALSE(settings.tcp_enabled);
+
+    settings.preferred_transports = { TR_PREFER_TCP };
+    settings.fixup_from_preferred_transports();
+    EXPECT_FALSE(settings.utp_enabled);
+    EXPECT_TRUE(settings.tcp_enabled);
 }
 
 TEST_F(SettingsTest, canLoadSleepPerSecondsDuringVerify)

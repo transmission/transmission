@@ -14,7 +14,6 @@
 
 class QString;
 
-class FilterMode;
 class Prefs;
 class Torrent;
 
@@ -36,7 +35,7 @@ public:
     TorrentFilter& operator=(TorrentFilter&&) = delete;
     TorrentFilter& operator=(TorrentFilter const&) = delete;
 
-    [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
+    [[nodiscard]] std::array<int, ShowModeCount> countTorrentsPerMode() const;
 
 protected:
     // QSortFilterProxyModel

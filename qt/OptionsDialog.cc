@@ -248,9 +248,9 @@ void OptionsDialog::onAccepted()
     // priority
     int const index = ui_.priorityCombo->currentIndex();
     int const priority = ui_.priorityCombo->itemData(index).toInt();
-    dictAdd(&args, TR_KEY_bandwidthPriority, priority);
+    dictAdd(&args, TR_KEY_bandwidth_priority, priority);
 
-    // files-unwanted
+    // files_unwanted
     auto count = std::count(wanted_.begin(), wanted_.end(), false);
 
     if (count > 0)
@@ -266,7 +266,7 @@ void OptionsDialog::onAccepted()
         }
     }
 
-    // priority-low
+    // priority_low
     count = std::count(priorities_.begin(), priorities_.end(), TR_PRI_LOW);
 
     if (count > 0)
@@ -282,7 +282,7 @@ void OptionsDialog::onAccepted()
         }
     }
 
-    // priority-high
+    // priority_high
     count = std::count(priorities_.begin(), priorities_.end(), TR_PRI_HIGH);
 
     if (count > 0)

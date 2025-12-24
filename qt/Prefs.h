@@ -13,6 +13,8 @@
 
 #include <libtransmission/quark.h>
 
+#include <libtransmission-app/display-modes.h>
+
 class QDateTime;
 
 extern "C"
@@ -64,9 +66,9 @@ public:
         SESSION_REMOTE_PORT,
         SESSION_REMOTE_AUTH,
         SESSION_REMOTE_USERNAME,
+        SESSION_REMOTE_RPC_URL_PATH,
         COMPLETE_SOUND_COMMAND,
         COMPLETE_SOUND_ENABLED,
-        USER_HAS_GIVEN_INFORMED_CONSENT,
         READ_CLIPBOARD,
         /* core prefs */
         FIRST_CORE_PREF,
@@ -168,7 +170,7 @@ public:
     QDateTime getDateTime(int key) const;
 
     template<typename T>
-    T get(int key) const
+    [[nodiscard]] T get(int const key) const
     {
         return values_[key].value<T>();
     }

@@ -15,6 +15,8 @@
 #include <time.h> // time_t
 
 #ifdef __cplusplus
+#include <functional>
+#include <mutex>
 #include <string>
 #include <string_view>
 #else
@@ -54,6 +56,7 @@ struct tr_torrent_metainfo;
 struct tr_variant;
 
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
+#define TR_RPC_RPC_VERSION_HEADER "X-Transmission-Rpc-Version"
 
 enum tr_verify_added_mode : uint8_t
 {
@@ -142,6 +145,8 @@ inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
 inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
 
+std::unique_lock<std::recursive_mutex> tr_sessionLock(tr_session const* session);
+
 /**
  * Add libtransmission's default settings to the benc dictionary.
  *
@@ -178,15 +183,14 @@ tr_variant tr_sessionGetSettings(tr_session const* session);
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
- * @param app_defaults tr_variant containing the app defaults
  * @param config_dir the configuration directory to find settings.json
- * @param app_name if config_dir is empty, app_name is used to find the default dir.
+ * @param app_defaults optional tr_variant containing the app-specific defaults
  * @return the loaded settings
  * @see `tr_sessionGetDefaultSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_sessionSaveSettings()`
  */
-tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* config_dir, char const* app_name);
+[[nodiscard]] tr_variant tr_sessionLoadSettings(std::string_view config_dir, tr_variant const* app_defaults = nullptr);
 
 /**
  * Add the session's configuration settings to the benc dictionary
@@ -218,7 +222,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
  * @see `tr_sessionLoadSettings()`
  * @see `tr_getDefaultConfigDir()`
  */
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& settings);
+tr_session* tr_sessionInit(std::string_view config_dir, bool message_queueing_enabled, tr_variant const& settings);
 
 /** @brief Update a session's settings from a benc dictionary
            like to the one used in `tr_sessionInit()` */
@@ -375,7 +379,7 @@ enum tr_rpc_callback_type : uint8_t
     TR_RPC_TORRENT_STOPPED,
     TR_RPC_TORRENT_REMOVING,
     TR_RPC_TORRENT_TRASHING, /* _REMOVING + delete local data */
-    TR_RPC_TORRENT_CHANGED, /* catch-all for the "torrent-set" rpc method */
+    TR_RPC_TORRENT_CHANGED, /* catch-all for the "torrent_set" rpc method */
     TR_RPC_TORRENT_MOVED,
     TR_RPC_SESSION_CHANGED,
     TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED, /* catch potentially multiple torrents being moved in the queue */
@@ -724,11 +728,11 @@ void tr_blocklistSetEnabled(tr_session* session, bool is_enabled);
 char const* tr_blocklistGetURL(tr_session const* session);
 
 /** @brief The blocklist that gets updated when an RPC client
-           invokes the "blocklist-update" method */
+           invokes the "blocklist_update" method */
 void tr_blocklistSetURL(tr_session* session, char const* url);
 
 /** @brief the file in the $config/blocklists/ directory that's
-           used by `tr_blocklistSetContent()` and "blocklist-update" */
+           used by `tr_blocklistSetContent()` and "blocklist_update" */
 #define DEFAULT_BLOCKLIST_FILENAME "blocklist.bin"
 
 /** @} */
@@ -853,12 +857,8 @@ void tr_torrentStart(tr_torrent* torrent);
 /** @brief Stop (pause) a torrent */
 void tr_torrentStop(tr_torrent* torrent);
 
-using tr_torrent_rename_done_func = void (*)( //
-    tr_torrent* torrent,
-    char const* oldpath,
-    char const* newname,
-    int error,
-    void* user_data);
+using tr_torrent_rename_done_func = std::function<
+    void(tr_torrent* torrent, char const* oldpath, char const* newname, int error, void* user_data)>;
 
 /**
  * @brief Rename a file or directory in a torrent.

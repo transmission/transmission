@@ -379,12 +379,13 @@ void MainWindow::Impl::syncAltSpeedButton()
 {
     bool const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
     alt_speed_button_->set_active(b);
-    alt_speed_button_->set_tooltip_text(fmt::format(
-        fmt::runtime(
-            b ? _("Click to disable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)") :
-                _("Click to enable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)")),
-        fmt::arg("download_speed", Speed{ gtr_pref_int_get(TR_KEY_alt_speed_down), Speed::Units::KByps }.to_string()),
-        fmt::arg("upload_speed", Speed{ gtr_pref_int_get(TR_KEY_alt_speed_up), Speed::Units::KByps }.to_string())));
+    alt_speed_button_->set_tooltip_text(
+        fmt::format(
+            fmt::runtime(
+                b ? _("Click to disable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)") :
+                    _("Click to enable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)")),
+            fmt::arg("download_speed", Speed{ gtr_pref_int_get(TR_KEY_alt_speed_down), Speed::Units::KByps }.to_string()),
+            fmt::arg("upload_speed", Speed{ gtr_pref_int_get(TR_KEY_alt_speed_up), Speed::Units::KByps }.to_string())));
 }
 
 void MainWindow::Impl::alt_speed_toggled_cb()

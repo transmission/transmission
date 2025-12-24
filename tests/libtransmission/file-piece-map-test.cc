@@ -16,9 +16,9 @@
 #include <libtransmission/block-info.h>
 #include <libtransmission/file-piece-map.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-class FilePieceMapTest : public ::testing::Test
+class FilePieceMapTest : public ::libtransmission::test::TransmissionTest
 {
 protected:
     static constexpr size_t PieceSize{ tr_block_info::BlockSize };

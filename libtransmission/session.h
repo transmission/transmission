@@ -56,7 +56,7 @@
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/session-id.h"
 #include "libtransmission/session-thread.h"
-#include "libtransmission/settings.h"
+#include "libtransmission/serializer.h"
 #include "libtransmission/stats.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-queue.h"
@@ -382,7 +382,7 @@ private:
     };
 
 public:
-    struct Settings final : public libtransmission::Settings
+    struct Settings final
     {
     public:
         Settings() = default;
@@ -392,8 +392,33 @@ public:
             load(src);
         }
 
+        void fixup_from_preferred_transports();
+        void fixup_to_preferred_transports();
+
+        void load(tr_variant const& src)
+        {
+            libtransmission::serializer::load(*this, Fields, src);
+
+            if (auto const* map = src.get_if<tr_variant::Map>())
+            {
+                if (map->contains(TR_KEY_preferred_transports))
+                {
+                    fixup_from_preferred_transports();
+                }
+                else
+                {
+                    fixup_to_preferred_transports();
+                }
+            }
+        }
+
+        [[nodiscard]] tr_variant::Map save() const
+        {
+            return libtransmission::serializer::save(*this, Fields);
+        }
+
         // NB: When adding a field here, you must also add it to
-        // fields() if you want it to be in session-settings.json
+        // `Fields` if you want it to be in session-settings.json
         bool announce_ip_enabled = false;
         bool blocklist_enabled = false;
         bool dht_enabled = true;
@@ -460,72 +485,72 @@ public:
         tr_verify_added_mode torrent_added_verify_mode = TR_VERIFY_ADDED_FAST;
 
     private:
-        [[nodiscard]] Fields fields() override
-        {
-            return {
-                { TR_KEY_announce_ip, &announce_ip },
-                { TR_KEY_announce_ip_enabled, &announce_ip_enabled },
-                { TR_KEY_bind_address_ipv4, &bind_address_ipv4 },
-                { TR_KEY_bind_address_ipv6, &bind_address_ipv6 },
-                { TR_KEY_blocklist_enabled, &blocklist_enabled },
-                { TR_KEY_blocklist_url, &blocklist_url },
-                { TR_KEY_cache_size_mb, &cache_size_mbytes },
-                { TR_KEY_default_trackers, &default_trackers_str },
-                { TR_KEY_dht_enabled, &dht_enabled },
-                { TR_KEY_download_dir, &download_dir },
-                { TR_KEY_download_queue_enabled, &download_queue_enabled },
-                { TR_KEY_download_queue_size, &download_queue_size },
-                { TR_KEY_encryption, &encryption_mode },
-                { TR_KEY_idle_seeding_limit, &idle_seeding_limit_minutes },
-                { TR_KEY_idle_seeding_limit_enabled, &idle_seeding_limit_enabled },
-                { TR_KEY_incomplete_dir, &incomplete_dir },
-                { TR_KEY_incomplete_dir_enabled, &incomplete_dir_enabled },
-                { TR_KEY_lpd_enabled, &lpd_enabled },
-                { TR_KEY_message_level, &log_level },
-                { TR_KEY_peer_congestion_algorithm, &peer_congestion_algorithm },
-                { TR_KEY_peer_limit_global, &peer_limit_global },
-                { TR_KEY_peer_limit_per_torrent, &peer_limit_per_torrent },
-                { TR_KEY_peer_port, &peer_port },
-                { TR_KEY_peer_port_random_high, &peer_port_random_high },
-                { TR_KEY_peer_port_random_low, &peer_port_random_low },
-                { TR_KEY_peer_port_random_on_start, &peer_port_random_on_start },
-                { TR_KEY_peer_socket_tos, &peer_socket_tos },
-                { TR_KEY_pex_enabled, &pex_enabled },
-                { TR_KEY_port_forwarding_enabled, &port_forwarding_enabled },
-                { TR_KEY_preallocation, &preallocation_mode },
-                { TR_KEY_preferred_transports, &preferred_transports },
-                { TR_KEY_proxy_url, &proxy_url },
-                { TR_KEY_queue_stalled_enabled, &queue_stalled_enabled },
-                { TR_KEY_queue_stalled_minutes, &queue_stalled_minutes },
-                { TR_KEY_ratio_limit, &ratio_limit },
-                { TR_KEY_ratio_limit_enabled, &ratio_limit_enabled },
-                { TR_KEY_rename_partial_files, &is_incomplete_file_naming_enabled },
-                { TR_KEY_reqq, &reqq },
-                { TR_KEY_scrape_paused_torrents_enabled, &should_scrape_paused_torrents },
-                { TR_KEY_script_torrent_added_enabled, &script_torrent_added_enabled },
-                { TR_KEY_script_torrent_added_filename, &script_torrent_added_filename },
-                { TR_KEY_script_torrent_done_enabled, &script_torrent_done_enabled },
-                { TR_KEY_script_torrent_done_filename, &script_torrent_done_filename },
-                { TR_KEY_script_torrent_done_seeding_enabled, &script_torrent_done_seeding_enabled },
-                { TR_KEY_script_torrent_done_seeding_filename, &script_torrent_done_seeding_filename },
-                { TR_KEY_seed_queue_enabled, &seed_queue_enabled },
-                { TR_KEY_seed_queue_size, &seed_queue_size },
-                { TR_KEY_sequential_download, &sequential_download },
-                { TR_KEY_sleep_per_seconds_during_verify, &sleep_per_seconds_during_verify },
-                { TR_KEY_speed_limit_down, &speed_limit_down },
-                { TR_KEY_speed_limit_down_enabled, &speed_limit_down_enabled },
-                { TR_KEY_speed_limit_up, &speed_limit_up },
-                { TR_KEY_speed_limit_up_enabled, &speed_limit_up_enabled },
-                { TR_KEY_start_added_torrents, &should_start_added_torrents },
-                { TR_KEY_tcp_enabled, &tcp_enabled },
-                { TR_KEY_torrent_added_verify_mode, &torrent_added_verify_mode },
-                { TR_KEY_torrent_complete_verify_enabled, &torrent_complete_verify_enabled },
-                { TR_KEY_trash_original_torrent_files, &should_delete_source_torrents },
-                { TR_KEY_umask, &umask },
-                { TR_KEY_upload_slots_per_torrent, &upload_slots_per_torrent },
-                { TR_KEY_utp_enabled, &utp_enabled },
-            };
-        }
+        template<auto MemberPtr>
+        using Field = libtransmission::serializer::Field<MemberPtr>;
+
+        static constexpr auto Fields = std::tuple{
+            Field<&Settings::announce_ip>{ TR_KEY_announce_ip },
+            Field<&Settings::announce_ip_enabled>{ TR_KEY_announce_ip_enabled },
+            Field<&Settings::bind_address_ipv4>{ TR_KEY_bind_address_ipv4 },
+            Field<&Settings::bind_address_ipv6>{ TR_KEY_bind_address_ipv6 },
+            Field<&Settings::blocklist_enabled>{ TR_KEY_blocklist_enabled },
+            Field<&Settings::blocklist_url>{ TR_KEY_blocklist_url },
+            Field<&Settings::cache_size_mbytes>{ TR_KEY_cache_size_mb },
+            Field<&Settings::default_trackers_str>{ TR_KEY_default_trackers },
+            Field<&Settings::dht_enabled>{ TR_KEY_dht_enabled },
+            Field<&Settings::download_dir>{ TR_KEY_download_dir },
+            Field<&Settings::download_queue_enabled>{ TR_KEY_download_queue_enabled },
+            Field<&Settings::download_queue_size>{ TR_KEY_download_queue_size },
+            Field<&Settings::encryption_mode>{ TR_KEY_encryption },
+            Field<&Settings::idle_seeding_limit_minutes>{ TR_KEY_idle_seeding_limit },
+            Field<&Settings::idle_seeding_limit_enabled>{ TR_KEY_idle_seeding_limit_enabled },
+            Field<&Settings::incomplete_dir>{ TR_KEY_incomplete_dir },
+            Field<&Settings::incomplete_dir_enabled>{ TR_KEY_incomplete_dir_enabled },
+            Field<&Settings::lpd_enabled>{ TR_KEY_lpd_enabled },
+            Field<&Settings::log_level>{ TR_KEY_message_level },
+            Field<&Settings::peer_congestion_algorithm>{ TR_KEY_peer_congestion_algorithm },
+            Field<&Settings::peer_limit_global>{ TR_KEY_peer_limit_global },
+            Field<&Settings::peer_limit_per_torrent>{ TR_KEY_peer_limit_per_torrent },
+            Field<&Settings::peer_port>{ TR_KEY_peer_port },
+            Field<&Settings::peer_port_random_high>{ TR_KEY_peer_port_random_high },
+            Field<&Settings::peer_port_random_low>{ TR_KEY_peer_port_random_low },
+            Field<&Settings::peer_port_random_on_start>{ TR_KEY_peer_port_random_on_start },
+            Field<&Settings::peer_socket_tos>{ TR_KEY_peer_socket_tos },
+            Field<&Settings::pex_enabled>{ TR_KEY_pex_enabled },
+            Field<&Settings::port_forwarding_enabled>{ TR_KEY_port_forwarding_enabled },
+            Field<&Settings::preallocation_mode>{ TR_KEY_preallocation },
+            Field<&Settings::preferred_transports>{ TR_KEY_preferred_transports },
+            Field<&Settings::proxy_url>{ TR_KEY_proxy_url },
+            Field<&Settings::queue_stalled_enabled>{ TR_KEY_queue_stalled_enabled },
+            Field<&Settings::queue_stalled_minutes>{ TR_KEY_queue_stalled_minutes },
+            Field<&Settings::ratio_limit>{ TR_KEY_ratio_limit },
+            Field<&Settings::ratio_limit_enabled>{ TR_KEY_ratio_limit_enabled },
+            Field<&Settings::is_incomplete_file_naming_enabled>{ TR_KEY_rename_partial_files },
+            Field<&Settings::reqq>{ TR_KEY_reqq },
+            Field<&Settings::should_scrape_paused_torrents>{ TR_KEY_scrape_paused_torrents_enabled },
+            Field<&Settings::script_torrent_added_enabled>{ TR_KEY_script_torrent_added_enabled },
+            Field<&Settings::script_torrent_added_filename>{ TR_KEY_script_torrent_added_filename },
+            Field<&Settings::script_torrent_done_enabled>{ TR_KEY_script_torrent_done_enabled },
+            Field<&Settings::script_torrent_done_filename>{ TR_KEY_script_torrent_done_filename },
+            Field<&Settings::script_torrent_done_seeding_enabled>{ TR_KEY_script_torrent_done_seeding_enabled },
+            Field<&Settings::script_torrent_done_seeding_filename>{ TR_KEY_script_torrent_done_seeding_filename },
+            Field<&Settings::seed_queue_enabled>{ TR_KEY_seed_queue_enabled },
+            Field<&Settings::seed_queue_size>{ TR_KEY_seed_queue_size },
+            Field<&Settings::sequential_download>{ TR_KEY_sequential_download },
+            Field<&Settings::sleep_per_seconds_during_verify>{ TR_KEY_sleep_per_seconds_during_verify },
+            Field<&Settings::speed_limit_down>{ TR_KEY_speed_limit_down },
+            Field<&Settings::speed_limit_down_enabled>{ TR_KEY_speed_limit_down_enabled },
+            Field<&Settings::speed_limit_up>{ TR_KEY_speed_limit_up },
+            Field<&Settings::speed_limit_up_enabled>{ TR_KEY_speed_limit_up_enabled },
+            Field<&Settings::should_start_added_torrents>{ TR_KEY_start_added_torrents },
+            Field<&Settings::tcp_enabled>{ TR_KEY_tcp_enabled },
+            Field<&Settings::torrent_added_verify_mode>{ TR_KEY_torrent_added_verify_mode },
+            Field<&Settings::torrent_complete_verify_enabled>{ TR_KEY_torrent_complete_verify_enabled },
+            Field<&Settings::should_delete_source_torrents>{ TR_KEY_trash_original_torrent_files },
+            Field<&Settings::umask>{ TR_KEY_umask },
+            Field<&Settings::upload_slots_per_torrent>{ TR_KEY_upload_slots_per_torrent },
+            Field<&Settings::utp_enabled>{ TR_KEY_utp_enabled },
+        };
     };
 
     explicit tr_session(std::string_view config_dir, tr_variant const& settings_dict);
@@ -1009,14 +1034,19 @@ public:
 
     [[nodiscard]] auto save_preferred_transports() const
     {
-        auto var = settings().save_single(TR_KEY_preferred_transports);
+        auto var = libtransmission::serializer::Converters::serialize(settings_.preferred_transports);
         TR_ASSERT(var.has_value());
         return var;
     }
 
     bool load_preferred_transports(tr_variant const& var) noexcept
     {
-        return settings_.load_single(TR_KEY_preferred_transports, var);
+        if (!libtransmission::serializer::Converters::deserialize(var, &settings_.preferred_transports))
+        {
+            return false;
+        }
+        settings_.fixup_from_preferred_transports();
+        return true;
     }
 
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
@@ -1214,7 +1244,10 @@ private:
     friend size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
-    friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings);
+    friend tr_session* tr_sessionInit(
+        std::string_view config_dir,
+        bool message_queueing_enabled,
+        tr_variant const& client_settings);
     friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
@@ -1266,10 +1299,10 @@ public:
     /// constexpr fields
 
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
-        { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
-          { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
-          { TR_KEY_script_torrent_done_seeding_enabled,
-            TR_KEY_script_torrent_done_seeding_filename,
+        { { TR_KEY_script_torrent_added_enabled_kebab, TR_KEY_script_torrent_added_filename_kebab, TR_SCRIPT_ON_TORRENT_ADDED },
+          { TR_KEY_script_torrent_done_enabled_kebab, TR_KEY_script_torrent_done_filename_kebab, TR_SCRIPT_ON_TORRENT_DONE },
+          { TR_KEY_script_torrent_done_seeding_enabled_kebab,
+            TR_KEY_script_torrent_done_seeding_filename_kebab,
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 

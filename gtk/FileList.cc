@@ -821,13 +821,14 @@ struct rename_data
 
 void FileList::Impl::on_rename_done(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
 {
-    rename_done_tags_.push(Glib::signal_idle().connect(
-        [this, path_string, newname, error]()
-        {
-            rename_done_tags_.pop();
-            on_rename_done_idle(path_string, newname, error);
-            return false;
-        }));
+    rename_done_tags_.push(
+        Glib::signal_idle().connect(
+            [this, path_string, newname, error]()
+            {
+                rename_done_tags_.pop();
+                on_rename_done_idle(path_string, newname, error);
+                return false;
+            }));
 }
 
 void FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib::ustring const& newname, int error)

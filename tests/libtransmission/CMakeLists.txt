@@ -7,6 +7,7 @@ target_sources(libtransmission-test
         announce-list-test.cc
         announcer-test.cc
         announcer-udp-test.cc
+        api-compat-test.cc
         benc-test.cc
         bitfield-test.cc
         block-info-test.cc
@@ -16,8 +17,8 @@ target_sources(libtransmission-test
         completion-test.cc
         copy-test.cc
         crypto-test.cc
-        error-test.cc
         dht-test.cc
+        error-test.cc
         file-piece-map-test.cc
         file-test.cc
         getopt-test.cc
@@ -38,6 +39,7 @@ target_sources(libtransmission-test
         remove-test.cc
         rename-test.cc
         rpc-test.cc
+        serializer-tests.cc
         session-test.cc
         session-alt-speeds-test.cc
         settings-test.cc

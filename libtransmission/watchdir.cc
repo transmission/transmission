@@ -48,11 +48,12 @@ namespace
     auto const info = tr_sys_path_get_info(path, 0, &error);
     if (error && !tr_error_is_enoent(error.code()))
     {
-        tr_logAddWarn(fmt::format(
-            fmt::runtime(_("Skipping '{path}': {error} ({error_code})")),
-            fmt::arg("path", path),
-            fmt::arg("error", error.message()),
-            fmt::arg("error_code", error.code())));
+        tr_logAddWarn(
+            fmt::format(
+                fmt::runtime(_("Skipping '{path}': {error} ({error_code})")),
+                fmt::arg("path", path),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
     }
 
     return info && info->isFile();
@@ -114,11 +115,12 @@ void BaseWatchdir::scan()
 
     if (error)
     {
-        tr_logAddWarn(fmt::format(
-            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-            fmt::arg("path", dirname()),
-            fmt::arg("error", error.message()),
-            fmt::arg("error_code", error.code())));
+        tr_logAddWarn(
+            fmt::format(
+                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                fmt::arg("path", dirname()),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
     }
 }
 
