@@ -25,6 +25,7 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         (Join-Path $ArchiveBase qtsvg '*')
         (Join-Path $ArchiveBase qttools '*')
         (Join-Path $ArchiveBase qttranslations '*')
+        (Join-Path $ArchiveBase qtdeclarative '*')
         (Join-Path $ArchiveBase .gitmodules)
         (Join-Path $ArchiveBase cmake)
         (Join-Path $ArchiveBase CMakeLists.txt)
