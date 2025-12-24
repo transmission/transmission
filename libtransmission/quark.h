@@ -753,7 +753,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_upload_speed,
     TR_KEY_uploaded,
     TR_KEY_uploaded_bytes_kebab_APICOMPAT,
-    TR_KEY_uploaded_bytes_camel,
+    TR_KEY_uploaded_bytes_camel_APICOMPAT,
     TR_KEY_uploaded_ever_camel_APICOMPAT,
     TR_KEY_uploaded_bytes,
     TR_KEY_uploaded_ever,
