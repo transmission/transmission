@@ -17,9 +17,15 @@ export default [
     },
   },
   {
-    files: ['src/*.js'],
+    files: ['src/**/*.js'],
     languageOptions: {
       globals: { ...globals.browser, ...globals.es2015 },
+    },
+  },
+  {
+    files: ['tests/**/*.js'],
+    languageOptions: {
+      globals: { ...globals.node },
     },
   },
   {
