@@ -69,7 +69,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_download_limited, TR_KEY_download_limited_camel_APICOMPAT },
     { TR_KEY_download_queue_enabled, TR_KEY_download_queue_enabled_kebab_APICOMPAT },
     { TR_KEY_download_queue_size, TR_KEY_download_queue_size_kebab_APICOMPAT },
-    { TR_KEY_download_speed, TR_KEY_download_speed_camel },
+    { TR_KEY_download_speed, TR_KEY_download_speed_camel_APICOMPAT },
     { TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_camel_APICOMPAT },
     { TR_KEY_downloaded_ever, TR_KEY_downloaded_ever_camel_APICOMPAT },
     { TR_KEY_edit_date, TR_KEY_edit_date_camel_APICOMPAT },
