@@ -48,6 +48,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/error-types.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
@@ -799,6 +800,8 @@ void tr_lib_init()
 #undef KNOWN_KEY_NAME
             };
             Interner::instance().add_known(std::data(known), std::size(known));
+
+            libtransmission::api_compat::register_deprecated_keys();
         });
 }
 
