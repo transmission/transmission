@@ -697,7 +697,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_torrent_start_now_kebab,
     TR_KEY_torrent_stop_kebab,
     TR_KEY_torrent_verify_kebab,
-    TR_KEY_torrent_count_camel,
+    TR_KEY_torrent_count_camel_APICOMPAT,
     TR_KEY_torrent_file_camel_APICOMPAT,
     TR_KEY_torrent_add,
     TR_KEY_torrent_added,
