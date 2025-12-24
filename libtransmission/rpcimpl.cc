@@ -1372,8 +1372,7 @@ namespace make_torrent_field_helpers
             tr_torrentSetQueuePosition(tor, static_cast<size_t>(*val));
         }
 
-        if (auto const* val = args_in.find_if<tr_variant::Vector>({ TR_KEY_tracker_add, TR_KEY_tracker_add_camel });
-            val != nullptr)
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_tracker_add); val != nullptr)
         {
             std::tie(err, errmsg) = add_tracker_urls(tor, *val);
         }
