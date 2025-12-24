@@ -158,7 +158,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_rate_download, TR_KEY_rate_download_camel_APICOMPAT },
     { TR_KEY_rate_to_client, TR_KEY_rate_to_client_camel },
     { TR_KEY_rate_to_peer, TR_KEY_rate_to_peer_camel },
-    { TR_KEY_rate_upload, TR_KEY_rate_upload_camel },
+    { TR_KEY_rate_upload, TR_KEY_rate_upload_camel_APICOMPAT },
     { TR_KEY_recently_active, TR_KEY_recently_active_kebab_APICOMPAT },
     { TR_KEY_recheck_progress, TR_KEY_recheck_progress_camel },
     { TR_KEY_rename_partial_files, TR_KEY_rename_partial_files_kebab_APICOMPAT },
