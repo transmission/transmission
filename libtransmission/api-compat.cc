@@ -177,7 +177,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_seconds_active, TR_KEY_seconds_active_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_seconds_downloading, TR_KEY_seconds_downloading_camel_APICOMPAT },
     { TR_KEY_seconds_seeding, TR_KEY_seconds_seeding_camel_APICOMPAT },
-    { TR_KEY_seed_idle_limit, TR_KEY_seed_idle_limit_camel },
+    { TR_KEY_seed_idle_limit, TR_KEY_seed_idle_limit_camel_APICOMPAT },
     { TR_KEY_seed_idle_mode, TR_KEY_seed_idle_mode_camel },
     { TR_KEY_seed_queue_enabled, TR_KEY_seed_queue_enabled_kebab_APICOMPAT },
     { TR_KEY_seed_queue_size, TR_KEY_seed_queue_size_kebab_APICOMPAT },
