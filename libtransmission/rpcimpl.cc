@@ -797,7 +797,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_status:
     case TR_KEY_torrent_file:
     case TR_KEY_total_size:
-    case TR_KEY_total_size_camel:
     case TR_KEY_tracker_list:
     case TR_KEY_tracker_list_camel:
     case TR_KEY_tracker_stats:
@@ -969,7 +968,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_torrent_file:
         return tor.torrent_file();
     case TR_KEY_total_size:
-    case TR_KEY_total_size_camel:
         return tor.total_size();
     case TR_KEY_tracker_list:
     case TR_KEY_tracker_list_camel:

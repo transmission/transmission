@@ -721,7 +721,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_torrent_stop,
     TR_KEY_torrent_verify,
     TR_KEY_torrents,
-    TR_KEY_total_size_camel,
+    TR_KEY_total_size_camel_APICOMPAT,
     TR_KEY_total_size,
     TR_KEY_tracker_add_camel,
     TR_KEY_tracker_list_camel,

@@ -203,7 +203,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_torrent_count, TR_KEY_torrent_count_camel },
     { TR_KEY_torrent_duplicate, TR_KEY_torrent_duplicate_kebab },
     { TR_KEY_torrent_file, TR_KEY_torrent_file_camel_APICOMPAT },
-    { TR_KEY_total_size, TR_KEY_total_size_camel },
+    { TR_KEY_total_size, TR_KEY_total_size_camel_APICOMPAT },
     { TR_KEY_tracker_add, TR_KEY_tracker_add_camel },
     { TR_KEY_tracker_list, TR_KEY_tracker_list_camel },
     { TR_KEY_tracker_remove, TR_KEY_tracker_remove_camel },
@@ -531,9 +531,10 @@ struct State
     // totalSize in Tr4 torrent-get
     // total_size in Tr4 free-space
     // total_size in Tr5
-    if (state.is_rpc && state.is_free_space_response && (src == TR_KEY_total_size || src == TR_KEY_total_size_camel))
+    if (state.is_rpc && state.is_free_space_response && (src == TR_KEY_total_size || src == TR_KEY_total_size_camel_APICOMPAT))
     {
-        return state.style == Style::Tr5 || state.is_free_space_response ? TR_KEY_total_size : TR_KEY_total_size_camel;
+        return state.style == Style::Tr5 || state.is_free_space_response ? TR_KEY_total_size :
+                                                                           TR_KEY_total_size_camel_APICOMPAT;
     }
 
     // Crazy cases done.
