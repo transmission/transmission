@@ -412,7 +412,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_piece,
     TR_KEY_piece_length,
     TR_KEY_piece_count_camel_APICOMPAT,
-    TR_KEY_piece_size_camel,
+    TR_KEY_piece_size_camel_APICOMPAT,
     TR_KEY_piece_count,
     TR_KEY_piece_size,
     TR_KEY_pieces,

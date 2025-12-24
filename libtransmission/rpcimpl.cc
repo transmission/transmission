@@ -776,7 +776,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_percent_done:
     case TR_KEY_piece_count:
     case TR_KEY_piece_size:
-    case TR_KEY_piece_size_camel:
     case TR_KEY_pieces:
     case TR_KEY_primary_mime_type:
     case TR_KEY_primary_mime_type_kebab:
@@ -941,7 +940,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_piece_count:
         return tor.piece_count();
     case TR_KEY_piece_size:
-    case TR_KEY_piece_size_camel:
         return tor.piece_size();
     case TR_KEY_pieces:
         return make_piece_bitfield(tor);
