@@ -792,7 +792,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_sequential_download:
     case TR_KEY_sequential_download_from_piece:
     case TR_KEY_size_when_done:
-    case TR_KEY_size_when_done_camel:
     case TR_KEY_source:
     case TR_KEY_start_date:
     case TR_KEY_start_date_camel:
@@ -962,7 +961,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_sequential_download_from_piece:
         return tor.sequential_download_from_piece();
     case TR_KEY_size_when_done:
-    case TR_KEY_size_when_done_camel:
         return st.sizeWhenDone;
     case TR_KEY_source:
         return tor.source();
