@@ -353,7 +353,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_msg_type,
     TR_KEY_mtimes,
     TR_KEY_name,
-    TR_KEY_next_announce_time_camel,
+    TR_KEY_next_announce_time_camel_APICOMPAT,
     TR_KEY_next_scrape_time_camel,
     TR_KEY_next_announce_time,
     TR_KEY_next_scrape_time,
