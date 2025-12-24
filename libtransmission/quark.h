@@ -574,7 +574,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_session_id_kebab_APICOMPAT,
     TR_KEY_session_set_kebab,
     TR_KEY_session_stats_kebab,
-    TR_KEY_session_count_camel,
+    TR_KEY_session_count_camel_APICOMPAT,
     TR_KEY_session_close,
     TR_KEY_session_count,
     TR_KEY_session_get,

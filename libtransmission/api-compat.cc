@@ -185,7 +185,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_seed_ratio_limited, TR_KEY_seed_ratio_limited_camel_APICOMPAT },
     { TR_KEY_seed_ratio_mode, TR_KEY_seed_ratio_mode_camel_APICOMPAT },
     { TR_KEY_seeder_count, TR_KEY_seeder_count_camel_APICOMPAT },
-    { TR_KEY_session_count, TR_KEY_session_count_camel }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_session_count, TR_KEY_session_count_camel_APICOMPAT },
     { TR_KEY_session_id, TR_KEY_session_id_kebab_APICOMPAT },
     { TR_KEY_size_bytes, TR_KEY_size_bytes_kebab },
     { TR_KEY_size_units, TR_KEY_size_units_kebab },
