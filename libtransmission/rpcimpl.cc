@@ -654,7 +654,6 @@ namespace make_torrent_field_helpers
     peer_counts_map.try_emplace(TR_KEY_from_lpd, from[TR_PEER_FROM_LPD]);
     peer_counts_map.try_emplace(TR_KEY_from_ltep, from[TR_PEER_FROM_LTEP]);
     peer_counts_map.try_emplace(TR_KEY_from_pex, from[TR_PEER_FROM_PEX]);
-    peer_counts_map.try_emplace(TR_KEY_from_pex_camel, from[TR_PEER_FROM_PEX]);
     peer_counts_map.try_emplace(TR_KEY_from_tracker, from[TR_PEER_FROM_TRACKER]);
     peer_counts_map.try_emplace(TR_KEY_from_tracker_camel, from[TR_PEER_FROM_TRACKER]);
     return tr_variant{ std::move(peer_counts_map) };
