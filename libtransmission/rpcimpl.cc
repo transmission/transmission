@@ -801,7 +801,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_tracker_stats:
     case TR_KEY_trackers:
     case TR_KEY_upload_limit:
-    case TR_KEY_upload_limit_camel:
     case TR_KEY_upload_limited:
     case TR_KEY_upload_limited_camel:
     case TR_KEY_upload_ratio:
@@ -974,7 +973,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_trackers:
         return make_tracker_vec(tor);
     case TR_KEY_upload_limit:
-    case TR_KEY_upload_limit_camel:
         return tr_torrentGetSpeedLimit_KBps(&tor, TR_UP);
     case TR_KEY_upload_limited:
     case TR_KEY_upload_limited_camel:
@@ -1388,7 +1386,7 @@ namespace make_torrent_field_helpers
             tr_torrentUseSessionLimits(tor, *val);
         }
 
-        if (auto const val = args_in.value_if<int64_t>({ TR_KEY_upload_limit, TR_KEY_upload_limit_camel }); val)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_upload_limit); val)
         {
             tr_torrentSetSpeedLimit_KBps(tor, TR_UP, *val);
         }
