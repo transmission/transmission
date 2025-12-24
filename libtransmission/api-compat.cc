@@ -142,7 +142,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_peers_getting_from_us, TR_KEY_peers_getting_from_us_camel_APICOMPAT },
     { TR_KEY_peers_sending_to_us, TR_KEY_peers_sending_to_us_camel_APICOMPAT },
     { TR_KEY_percent_complete, TR_KEY_percent_complete_camel_APICOMPAT },
-    { TR_KEY_percent_done, TR_KEY_percent_done_camel },
+    { TR_KEY_percent_done, TR_KEY_percent_done_camel_APICOMPAT },
     { TR_KEY_pex_enabled, TR_KEY_pex_enabled_kebab_APICOMPAT },
     { TR_KEY_piece_count, TR_KEY_piece_count_camel },
     { TR_KEY_piece_size, TR_KEY_piece_size_camel },

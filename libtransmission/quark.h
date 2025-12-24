@@ -403,7 +403,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_peers_getting_from_us,
     TR_KEY_peers_sending_to_us,
     TR_KEY_percent_complete_camel_APICOMPAT,
-    TR_KEY_percent_done_camel,
+    TR_KEY_percent_done_camel_APICOMPAT,
     TR_KEY_percent_complete,
     TR_KEY_percent_done,
     TR_KEY_pex_enabled_kebab_APICOMPAT,
