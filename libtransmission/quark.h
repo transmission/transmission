@@ -430,7 +430,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_priorities,
     TR_KEY_priority,
     TR_KEY_priority_high_kebab_APICOMPAT,
-    TR_KEY_priority_low_kebab,
+    TR_KEY_priority_low_kebab_APICOMPAT,
     TR_KEY_priority_normal_kebab,
     TR_KEY_priority_high,
     TR_KEY_priority_low,
