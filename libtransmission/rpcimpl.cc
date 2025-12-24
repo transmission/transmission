@@ -1304,7 +1304,7 @@ namespace make_torrent_field_helpers
             std::tie(err, errmsg) = set_file_priorities(tor, TR_PRI_LOW, *val);
         }
 
-        if (auto const* val = args_in.find_if<tr_variant::Vector>({ TR_KEY_priority_normal, TR_KEY_priority_normal_kebab });
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_normal);
             val != nullptr && err == Error::SUCCESS)
         {
             std::tie(err, errmsg) = set_file_priorities(tor, TR_PRI_NORMAL, *val);
@@ -1813,8 +1813,7 @@ void torrentAdd(tr_session* session, tr_variant::Map const& args_in, DoneCb&& do
         ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_LOW);
     }
 
-    if (auto const* val = args_in.find_if<tr_variant::Vector>({ TR_KEY_priority_normal, TR_KEY_priority_normal_kebab });
-        val != nullptr)
+    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_normal); val != nullptr)
     {
         auto const files = file_list_from_list(*val);
         ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_NORMAL);
