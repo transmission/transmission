@@ -9,13 +9,15 @@
 #include <optional>
 #include <string_view>
 
+#include "libtransmission/intern.h"
+
 /**
  * Quarks — a 2-way association between a compile-time interned string
  * and a unique integer identifier. Used to make well-known strings
  * (e.g. strings in settings files, the JSON-RPC API, and BitTorrent protocol)
  * cheap to store, cheap to compare, and usable in switch-case statements.
  */
-using tr_quark = size_t;
+using tr_quark = transmission::intern::Interned;
 
 /**
  * Predefined Quarks.
@@ -786,20 +788,16 @@ using tr_quark = size_t;
     X(TR_KEY_webseeds_sending_to_us, "webseeds_sending_to_us") /* rpc */ \
     X(TR_KEY_yourip, "yourip") /* BEP0010; BT protocol */
 
-enum // NOLINT(performance-enum-size)
-{
-#define TR_KNOWN_KEY_ENUM(_key, _str) _key,
-    KNOWN_KEYS(TR_KNOWN_KEY_ENUM)
-#undef TR_KNOWN_KEY_ENUM
-        TR_N_KEYS
-};
+#define MAKE_KNOWN_KEY(_key, _str) inline constexpr auto _key = transmission::intern::known(_str);
+KNOWN_KEYS(MAKE_KNOWN_KEY)
+#undef MAKE_KNOWN_KEY
 
 /**
  * Find the quark that matches the specified string
  *
  * @return true if the specified string exists as a quark
  */
-[[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::string_view key);
+[[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::string_view str);
 
 /**
  * Get the string view that corresponds to the specified quark.
