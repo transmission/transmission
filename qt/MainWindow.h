@@ -75,7 +75,6 @@ public slots:
     void queueMoveDown();
     void queueMoveBottom();
     void reannounceSelected();
-    void onNetworkTimer();
 
     void setToolbarVisible(bool);
     void setFilterbarVisible(bool);
@@ -115,7 +114,6 @@ private slots:
     void openTorrent();
     void openURL();
     void refreshPref(int key);
-    void refreshSoon(int fields = ~0);
     void removeTorrents(bool const delete_files);
     void setLocation();
     void setSortAscendingPref(bool);
@@ -124,16 +122,16 @@ private slots:
     void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
-    [[nodiscard]] QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
-
     [[nodiscard]] torrent_ids_t getSelectedTorrents(bool with_metadata_only = false) const;
-    void updateNetworkIcon();
+    void updateNetworkLabel();
+    void refreshSoon(int fields);
 
     QMenu* createOptionsMenu();
     QMenu* createStatsModeMenu();
     void initStatusBar();
 
     void clearSelection();
+    void addTorrentFromClipboard();
     void addTorrent(AddData add_me, bool show_options);
 
     // QWidget
@@ -178,7 +176,7 @@ private:
     QWidget* filter_bar_ = {};
     QAction* alt_speed_action_ = {};
     QString error_message_;
-    bool auto_add_clipboard_links = {};
+    bool auto_add_clipboard_links_ = {};
     QStringList clipboard_processed_keys_ = {};
 
     QString const total_ratio_stats_mode_name_ = QStringLiteral("total-ratio");
@@ -202,12 +200,14 @@ private:
         REFRESH_STATUS_BAR = (1 << 1),
         REFRESH_TRAY_ICON = (1 << 2),
         REFRESH_TORRENT_VIEW_HEADER = (1 << 3),
-        REFRESH_ACTION_SENSITIVITY = (1 << 4)
+        REFRESH_ACTION_SENSITIVITY = (1 << 4),
+        REFRESH_ICONS = (1 << 5)
     };
     int refresh_fields_ = {};
     QTimer refresh_timer_;
 
     void refreshActionSensitivity();
+    void refreshIcons();
     void refreshStatusBar(TransferStats const&);
     void refreshTitle();
     void refreshTorrentViewHeader();

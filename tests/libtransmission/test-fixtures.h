@@ -118,6 +118,15 @@ inline bool waitFor(
     }
 }
 
+class TransmissionTest : public ::testing::Test
+{
+protected:
+    static void SetUpTestSuite()
+    {
+        tr_lib_init();
+    }
+};
+
 class Sandbox
 {
 public:
@@ -182,7 +191,7 @@ private:
     std::string const sandbox_dir_;
 };
 
-class SandboxedTest : public ::testing::Test
+class SandboxedTest : public TransmissionTest
 {
 protected:
     [[nodiscard]] std::string sandboxDir() const
@@ -334,7 +343,7 @@ private:
         settings_map->try_emplace(TR_KEY_dht_enabled, false);
         settings_map->try_emplace(TR_KEY_message_level, verbose_ ? TR_LOG_DEBUG : TR_LOG_ERROR);
 
-        return tr_sessionInit(sandboxDir().data(), !verbose_, settings);
+        return tr_sessionInit(sandboxDir(), !verbose_, settings);
     }
 
     static void sessionClose(tr_session* session)
@@ -490,8 +499,6 @@ protected:
     void SetUp() override
     {
         SandboxedTest::SetUp();
-
-        tr_lib_init();
 
         session_ = sessionInit(*settings());
     }

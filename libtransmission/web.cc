@@ -168,20 +168,23 @@ public:
         if (curl_version_num == 0x080901)
         {
             tr_logAddWarn(_("Consider upgrading your curl installation."));
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("curl {curl_version} is prone to SIGPIPE crashes. {details_url}")),
-                fmt::arg("curl_version", "8.9.1"),
-                fmt::arg("details_url", "https://github.com/transmission/transmission/issues/7035")));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("curl {curl_version} is prone to SIGPIPE crashes. {details_url}")),
+                    fmt::arg("curl_version", "8.9.1"),
+                    fmt::arg("details_url", "https://github.com/transmission/transmission/issues/7035")));
         }
 
         if (curl_version_num == 0x080B01)
         {
             tr_logAddWarn(_("Consider upgrading your curl installation."));
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT "
-                               "crashes for the transmission-daemon systemd service. {details_url}")),
-                fmt::arg("curl_version", "8.11.1"),
-                fmt::arg("details_url", "https://curl.se/docs/CVE-2025-0665.html")));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(
+                        _("curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT "
+                          "crashes for the transmission-daemon systemd service. {details_url}")),
+                    fmt::arg("curl_version", "8.11.1"),
+                    fmt::arg("details_url", "https://curl.se/docs/CVE-2025-0665.html")));
         }
 
         if (auto bundle = tr_env_get_string("CURL_CA_BUNDLE"); !std::empty(bundle))
@@ -194,9 +197,10 @@ public:
         if (curl_ssl_verify)
         {
             auto const* bundle = std::empty(curl_ca_bundle) ? "none" : curl_ca_bundle.c_str();
-            tr_logAddInfo(fmt::format(
-                fmt::runtime(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}")),
-                fmt::arg("bundle", bundle)));
+            tr_logAddInfo(
+                fmt::format(
+                    fmt::runtime(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}")),
+                    fmt::arg("bundle", bundle)));
             tr_logAddInfo(_("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"));
             tr_logAddInfo(_("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"));
         }
@@ -504,11 +508,13 @@ public:
             (void)curl_easy_getinfo(task->easy(), CURLINFO_RESPONSE_CODE, &code);
             if (code != NoResponseCode && code != PartialContentResponseCode)
             {
-                tr_logAddWarn(fmt::format(
-                    fmt::runtime(_("Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}")),
-                    fmt::arg("url", task->url()),
-                    fmt::arg("expected_code", PartialContentResponseCode),
-                    fmt::arg("actual_code", code)));
+                tr_logAddWarn(
+                    fmt::format(
+                        fmt::runtime(
+                            _("Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}")),
+                        fmt::arg("url", task->url()),
+                        fmt::arg("expected_code", PartialContentResponseCode),
+                        fmt::arg("actual_code", code)));
 
                 // Tell curl to error out. Returning anything that's not
                 // `bytes_used` signals an error and causes the transfer

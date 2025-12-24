@@ -17,6 +17,7 @@
 #include <iterator> // for std::back_inserter
 #include <locale>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <stdexcept> // std::runtime_error
 #include <string>
@@ -134,11 +135,12 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     auto const info = tr_sys_path_get_info(szfilename, 0, error);
     if (*error)
     {
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-            fmt::arg("path", filename),
-            fmt::arg("error", error->message()),
-            fmt::arg("error_code", error->code())));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
         return false;
     }
 
@@ -153,22 +155,24 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     auto const fd = tr_sys_file_open(szfilename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-            fmt::arg("path", filename),
-            fmt::arg("error", error->message()),
-            fmt::arg("error_code", error->code())));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
         return false;
     }
 
     contents.resize(info->size);
     if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, error))
     {
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-            fmt::arg("path", filename),
-            fmt::arg("error", error->message()),
-            fmt::arg("error_code", error->code())));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
         tr_sys_file_close(fd);
         return false;
     }
@@ -632,11 +636,12 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool
 
     if (auto log_error = tr_error{}; !tr_sys_path_remove(oldpath, &log_error))
     {
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
-            fmt::arg("path", oldpath),
-            fmt::arg("error", log_error.message()),
-            fmt::arg("error_code", log_error.code())));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
+                fmt::arg("path", oldpath),
+                fmt::arg("error", log_error.message()),
+                fmt::arg("error_code", log_error.code())));
     }
 
     return true;
@@ -687,7 +692,7 @@ uint64_t tr_ntohll(uint64_t netlonglong)
 
 // --- ENVIRONMENT
 
-bool tr_env_key_exists(char const* key)
+bool tr_env_key_exists(char const* key) noexcept
 {
     TR_ASSERT(key != nullptr);
 
@@ -779,7 +784,8 @@ std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::instance;
 
 void tr_lib_init()
 {
-    tr_net_init_impl::tr_net_init_mgr::create();
+    static auto once = std::once_flag{};
+    std::call_once(once, [] { tr_net_init_impl::tr_net_init_mgr::create(); });
 }
 
 // --- mime-type

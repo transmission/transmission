@@ -21,10 +21,9 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-using AnnounceListTest = ::testing::Test;
+using AnnounceListTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(AnnounceListTest, canAdd)
@@ -402,11 +401,12 @@ TEST_F(AnnounceListTest, save)
     EXPECT_EQ(original_tm.piece_count(), modified_tm.piece_count());
 
     // test that the saved version has the updated announce list
-    EXPECT_TRUE(std::equal(
-        std::begin(announce_list),
-        std::end(announce_list),
-        std::begin(modified_tm.announce_list()),
-        std::end(modified_tm.announce_list())));
+    EXPECT_TRUE(
+        std::equal(
+            std::begin(announce_list),
+            std::end(announce_list),
+            std::begin(modified_tm.announce_list()),
+            std::end(modified_tm.announce_list())));
 
     // cleanup
     (void)std::remove(test_file.c_str());

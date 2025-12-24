@@ -183,7 +183,7 @@ struct tr_torrent
     void rename_path(
         std::string_view oldpath,
         std::string_view newname,
-        tr_torrent_rename_done_func callback,
+        tr_torrent_rename_done_func&& callback,
         void* callback_user_data);
 
     // these functions should become private when possible,
@@ -266,6 +266,10 @@ struct tr_torrent
     [[nodiscard]] constexpr auto block_loc(tr_block_index_t block) const noexcept
     {
         return metainfo_.block_loc(block);
+    }
+    [[nodiscard]] constexpr auto block_last_loc(tr_block_index_t block) const noexcept
+    {
+        return metainfo_.block_last_loc(block);
     }
     [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
     {
@@ -1253,10 +1257,7 @@ private:
 
     constexpr void bump_date_changed(time_t when)
     {
-        if (date_changed_ < when)
-        {
-            date_changed_ = when;
-        }
+        date_changed_ = std::max(date_changed_, when);
     }
 
     void set_verify_state(VerifyState state);
@@ -1323,7 +1324,7 @@ private:
     void rename_path_in_session_thread(
         std::string_view oldpath,
         std::string_view newname,
-        tr_torrent_rename_done_func callback,
+        tr_torrent_rename_done_func const& callback,
         void* callback_user_data);
 
     void start_in_session_thread();

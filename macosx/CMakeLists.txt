@@ -89,8 +89,6 @@ target_sources(${TR_NAME}-mac
         FileRenameSheetController.mm
         FilterBarController.h
         FilterBarController.mm
-        FilterBarView.h
-        FilterBarView.mm
         FilterButton.h
         FilterButton.mm
         GlobalOptionsPopoverViewController.h
@@ -170,8 +168,6 @@ target_sources(${TR_NAME}-mac
         StatsWindowController.mm
         StatusBarController.h
         StatusBarController.mm
-        StatusBarView.h
-        StatusBarView.mm
         Toolbar.h
         Toolbar.mm
         Torrent.h

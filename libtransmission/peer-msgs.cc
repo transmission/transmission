@@ -292,7 +292,9 @@ using ReadResult = std::pair<ReadState, size_t /*n_piece_data_bytes_read*/>;
  * @see tr_peer
  * @see tr_peer_info
  */
-class tr_peerMsgsImpl final : public tr_peerMsgs
+class tr_peerMsgsImpl final
+    : public tr_peerMsgs
+    , public std::enable_shared_from_this<tr_peerMsgsImpl>
 {
 public:
     tr_peerMsgsImpl(
@@ -397,14 +399,19 @@ public:
         update_active();
     }
 
+    void cancel_block_request(tr_block_index_t block)
+    {
+        cancels_sent_to_peer.add(tr_time(), 1);
+        active_requests.unset(block);
+        publish(tr_peer_event::SentCancel(tor_.block_info(), block));
+        protocol_send_cancel(peer_request::from_block(tor_, block));
+    }
+
     void maybe_cancel_block_request(tr_block_index_t block) override
     {
         if (active_requests.test(block))
         {
-            cancels_sent_to_peer.add(tr_time(), 1);
-            active_requests.unset(block);
-            publish(tr_peer_event::SentCancel(tor_.block_info(), block));
-            protocol_send_cancel(peer_request::from_block(tor_, block));
+            cancel_block_request(block);
         }
     }
 
@@ -463,11 +470,7 @@ public:
         TR_ASSERT(client_is_interested());
         TR_ASSERT(!client_is_choked());
 
-        if (active_requests.has_none())
-        {
-            request_timeout_base_ = tr_time();
-        }
-
+        auto const timeout = tr_time() + RequestTimeoutSecs;
         for (auto const *span = block_spans, *span_end = span + n_spans; span != span_end; ++span)
         {
             auto const [block_begin, block_end] = *span;
@@ -488,6 +491,8 @@ public:
                     protocol_send_request({ loc.piece, loc.piece_offset, req_len });
                     offset += req_len;
                 }
+
+                request_timeouts_.emplace_back(block, timeout);
             }
 
             active_requests.set_span(block_begin, block_end);
@@ -728,7 +733,7 @@ private:
 
     time_t choke_changed_at_ = 0;
 
-    time_t request_timeout_base_ = {};
+    std::vector<std::pair<tr_block_index_t, time_t>> request_timeouts_;
 
     tr_incoming incoming_ = {};
 
@@ -747,7 +752,7 @@ private:
     static auto constexpr SendPexInterval = 90s;
 
     // how many seconds we expect the next piece block to arrive
-    static auto constexpr RequestTimeoutSecs = time_t{ 15 };
+    static auto constexpr RequestTimeoutSecs = time_t{ 25 };
 };
 
 // ---
@@ -1140,15 +1145,15 @@ void tr_peerMsgsImpl::send_ltep_handshake()
 
     // If connecting to global peer, then use global address
     // Otherwise we are connecting to local peer, use bind address directly
-    if (auto const addr = io_->address().is_global_unicast_address() ? session->global_address(TR_AF_INET) :
-                                                                       session->bind_address(TR_AF_INET);
+    if (auto const addr = io_->address().is_global_unicast() ? session->global_address(TR_AF_INET) :
+                                                               session->bind_address(TR_AF_INET);
         addr && !addr->is_any())
     {
         TR_ASSERT(addr->is_ipv4());
         tr_variantDictAddRaw(&val, TR_KEY_ipv4, &addr->addr.addr4, sizeof(addr->addr.addr4));
     }
-    if (auto const addr = io_->address().is_global_unicast_address() ? session->global_address(TR_AF_INET6) :
-                                                                       session->bind_address(TR_AF_INET6);
+    if (auto const addr = io_->address().is_global_unicast() ? session->global_address(TR_AF_INET6) :
+                                                               session->bind_address(TR_AF_INET6);
         addr && !addr->is_any())
     {
         TR_ASSERT(addr->is_ipv6());
@@ -1454,6 +1459,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         {
             publish(tr_peer_event::GotChoke());
             active_requests.set_has_none();
+            request_timeouts_.clear();
         }
 
         update_active(TR_PEER_TO_CLIENT);
@@ -1686,16 +1692,20 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
         return { ReadState::Err, len };
     }
 
-    if (!active_requests.test(block))
-    {
-        logwarn(this, fmt::format("got unrequested block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
-        return { ReadState::Err, len };
-    }
-
     if (tor_.has_block(block))
     {
         logtrace(this, fmt::format("got completed block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
         return { ReadState::Err, len };
+    }
+
+    if (auto const block_loc = tor_.block_loc(block); !tor_.piece_is_wanted(block_loc.piece))
+    {
+        if (auto const block_last_loc = tor_.block_last_loc(block);
+            block_loc.piece == block_last_loc.piece || !tor_.piece_is_wanted(block_last_loc.piece))
+        {
+            logwarn(this, fmt::format("got unwanted block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
+            return { ReadState::Err, len };
+        }
     }
 
     peer_info->set_latest_piece_data_time(tr_time());
@@ -1750,7 +1760,6 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_da
     }
 
     active_requests.unset(block);
-    request_timeout_base_ = tr_time();
     publish(tr_peer_event::GotBlock(tor_.block_info(), block));
 
     return 0;
@@ -1911,20 +1920,37 @@ void tr_peerMsgsImpl::maybe_send_block_requests()
     }
 }
 
-void tr_peerMsgsImpl::check_request_timeout(time_t now)
+void tr_peerMsgsImpl::check_request_timeout(time_t const now)
 {
-    if (active_requests.has_none() || now - request_timeout_base_ <= RequestTimeoutSecs)
-    {
-        return;
-    }
+    std::sort(std::begin(request_timeouts_), std::end(request_timeouts_));
 
-    // If we didn't receive any piece data from this peer for a while,
-    // cancel all active requests so that we will send a new batch.
-    // If the peer still doesn't send anything to us, then it will
-    // naturally get weeded out by the peer mgr.
-    for (size_t block = 0; block < std::size(active_requests); ++block)
+    for (auto it = std::begin(request_timeouts_); it != std::end(request_timeouts_);)
     {
-        maybe_cancel_block_request(block);
+        auto const [block, timeout] = *it;
+
+        if (auto const next = std::next(it); next != std::end(request_timeouts_) && block == next->first)
+        {
+            // A new request superseded this request, discard
+            it = request_timeouts_.erase(it);
+            continue;
+        }
+
+        if (!active_requests.test(block))
+        {
+            // request no longer active, discard
+            it = request_timeouts_.erase(it);
+            continue;
+        }
+
+        if (now >= timeout)
+        {
+            // request timed out, discard
+            cancel_block_request(block);
+            it = request_timeouts_.erase(it);
+            continue;
+        }
+
+        ++it;
     }
 }
 
@@ -2168,7 +2194,7 @@ tr_peerMsgs::~tr_peerMsgs()
     --n_peers;
 }
 
-tr_peerMsgs* tr_peerMsgs::create(
+std::shared_ptr<tr_peerMsgs> tr_peerMsgs::create(
     tr_torrent& torrent,
     std::shared_ptr<tr_peer_info> peer_info,
     std::shared_ptr<tr_peerIo> io,
@@ -2176,5 +2202,5 @@ tr_peerMsgs* tr_peerMsgs::create(
     tr_peer_callback_bt callback,
     void* callback_data)
 {
-    return new tr_peerMsgsImpl{ torrent, std::move(peer_info), std::move(io), peer_id, callback, callback_data };
+    return std::make_shared<tr_peerMsgsImpl>(torrent, std::move(peer_info), std::move(io), peer_id, callback, callback_data);
 }

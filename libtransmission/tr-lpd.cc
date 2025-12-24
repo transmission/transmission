@@ -266,11 +266,12 @@ private:
             auto const err = sockerrno;
             tr_net_close_socket(mcast_sockets_[TR_AF_INET]);
             mcast_sockets_[TR_AF_INET] = TR_BAD_SOCKET;
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})")),
-                fmt::arg("ip_protocol", tr_ip_protocol_to_sv(TR_AF_INET)),
-                fmt::arg("error", tr_strerror(err)),
-                fmt::arg("error_code", err)));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})")),
+                    fmt::arg("ip_protocol", tr_ip_protocol_to_sv(TR_AF_INET)),
+                    fmt::arg("error", tr_strerror(err)),
+                    fmt::arg("error_code", err)));
             --n_success;
         }
 
@@ -279,11 +280,12 @@ private:
             auto const err = sockerrno;
             tr_net_close_socket(mcast_sockets_[TR_AF_INET6]);
             mcast_sockets_[TR_AF_INET6] = TR_BAD_SOCKET;
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})")),
-                fmt::arg("ip_protocol", tr_ip_protocol_to_sv(TR_AF_INET6)),
-                fmt::arg("error", tr_strerror(err)),
-                fmt::arg("error_code", err)));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})")),
+                    fmt::arg("ip_protocol", tr_ip_protocol_to_sv(TR_AF_INET6)),
+                    fmt::arg("error", tr_strerror(err)),
+                    fmt::arg("error_code", err)));
             --n_success;
         }
 
@@ -604,10 +606,11 @@ private:
     {
         if (messages_received_since_upkeep_ > MaxIncomingPerUpkeep)
         {
-            tr_logAddTrace(fmt::format(
-                "Dropped {} announces in the last interval (max. {} allowed)",
-                messages_received_since_upkeep_ - MaxIncomingPerUpkeep,
-                MaxIncomingPerUpkeep));
+            tr_logAddTrace(
+                fmt::format(
+                    "Dropped {} announces in the last interval (max. {} allowed)",
+                    messages_received_since_upkeep_ - MaxIncomingPerUpkeep,
+                    MaxIncomingPerUpkeep));
         }
 
         messages_received_since_upkeep_ = 0;

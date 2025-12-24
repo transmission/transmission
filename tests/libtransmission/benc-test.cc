@@ -11,9 +11,9 @@
 #include <libtransmission/benc.h>
 #include <libtransmission/error.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using BencTest = ::testing::Test;
+using BencTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(BencTest, MalformedBenc)

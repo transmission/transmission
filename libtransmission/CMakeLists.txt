@@ -28,6 +28,8 @@ target_sources(${TR_NAME}
         announcer-udp.cc
         announcer.cc
         announcer.h
+        api-compat.cc
+        api-compat.h
         bandwidth.cc
         bandwidth.h
         benc.h
@@ -53,7 +55,6 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
-        favicon-cache.h
         file-capacity.cc
         file-piece-map.cc
         file-piece-map.h
@@ -110,6 +111,8 @@ target_sources(${TR_NAME}
         rpc-server.h
         rpcimpl.cc
         rpcimpl.h
+        serializer.cc
+        serializer.h
         session-alt-speeds.cc
         session-alt-speeds.h
         session-id.cc
@@ -118,8 +121,6 @@ target_sources(${TR_NAME}
         session-thread.h
         session.cc
         session.h
-        settings.cc
-        settings.h
         stats.cc
         stats.h
         subprocess-posix.cc
@@ -305,7 +306,6 @@ if(INSTALL_LIB)
         FILES
             error-types.h
             error.h
-            favicon-cache.h
             file.h
             log.h
             makemeta.h
