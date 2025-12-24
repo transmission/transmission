@@ -29,7 +29,7 @@ struct ApiKey
 };
 
 auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
-    { TR_KEY_active_torrent_count, TR_KEY_active_torrent_count_camel },
+    { TR_KEY_active_torrent_count, TR_KEY_active_torrent_count_camel_APICOMPAT },
     { TR_KEY_activity_date, TR_KEY_activity_date_camel_APICOMPAT },
     { TR_KEY_added_date, TR_KEY_added_date_camel_APICOMPAT },
     { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab_APICOMPAT },

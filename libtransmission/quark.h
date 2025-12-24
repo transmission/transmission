@@ -33,7 +33,7 @@ using tr_quark = size_t;
 enum // NOLINT(performance-enum-size)
 {
     TR_KEY_NONE, /* represented as an empty string */
-    TR_KEY_active_torrent_count_camel, /* rpc (deprecated) */
+    TR_KEY_active_torrent_count_camel_APICOMPAT,
     TR_KEY_active_torrent_count, /* rpc */
     TR_KEY_activity_date_kebab_APICOMPAT,
     TR_KEY_activity_date_camel_APICOMPAT,
