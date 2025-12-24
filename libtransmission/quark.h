@@ -456,7 +456,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_queue_stalled_minutes,
     TR_KEY_rate_download_camel_APICOMPAT,
     TR_KEY_rate_to_client_camel_APICOMPAT,
-    TR_KEY_rate_to_peer_camel,
+    TR_KEY_rate_to_peer_camel_APICOMPAT,
     TR_KEY_rate_upload_camel_APICOMPAT,
     TR_KEY_rate_download,
     TR_KEY_rate_to_client,
