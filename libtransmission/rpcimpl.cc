@@ -775,7 +775,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_percent_complete:
     case TR_KEY_percent_done:
     case TR_KEY_piece_count:
-    case TR_KEY_piece_count_camel:
     case TR_KEY_piece_size:
     case TR_KEY_piece_size_camel:
     case TR_KEY_pieces:
@@ -940,7 +939,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_percent_done:
         return st.percentDone;
     case TR_KEY_piece_count:
-    case TR_KEY_piece_count_camel:
         return tor.piece_count();
     case TR_KEY_piece_size:
     case TR_KEY_piece_size_camel:
