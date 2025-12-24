@@ -794,7 +794,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_size_when_done:
     case TR_KEY_source:
     case TR_KEY_start_date:
-    case TR_KEY_start_date_camel:
     case TR_KEY_status:
     case TR_KEY_torrent_file:
     case TR_KEY_torrent_file_camel:
@@ -965,7 +964,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_source:
         return tor.source();
     case TR_KEY_start_date:
-    case TR_KEY_start_date_camel:
         return st.startDate;
     case TR_KEY_status:
         return st.activity;

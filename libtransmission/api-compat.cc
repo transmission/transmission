@@ -197,7 +197,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_speed_limit_up_enabled, TR_KEY_speed_limit_up_enabled_kebab_APICOMPAT },
     { TR_KEY_speed_units, TR_KEY_speed_units_kebab },
     { TR_KEY_start_added_torrents, TR_KEY_start_added_torrents_kebab_APICOMPAT },
-    { TR_KEY_start_date, TR_KEY_start_date_camel },
+    { TR_KEY_start_date, TR_KEY_start_date_camel_APICOMPAT },
     { TR_KEY_tcp_enabled, TR_KEY_tcp_enabled_kebab_APICOMPAT },
     { TR_KEY_torrent_added, TR_KEY_torrent_added_kebab },
     { TR_KEY_torrent_count, TR_KEY_torrent_count_camel },
