@@ -213,7 +213,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_upload_limit, TR_KEY_upload_limit_camel_APICOMPAT },
     { TR_KEY_upload_limited, TR_KEY_upload_limited_camel_APICOMPAT },
     { TR_KEY_upload_ratio, TR_KEY_upload_ratio_camel_APICOMPAT },
-    { TR_KEY_upload_speed, TR_KEY_upload_speed_camel },
+    { TR_KEY_upload_speed, TR_KEY_upload_speed_camel_APICOMPAT },
     { TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_camel_APICOMPAT },
     { TR_KEY_uploaded_ever, TR_KEY_uploaded_ever_camel_APICOMPAT },
     { TR_KEY_utp_enabled, TR_KEY_utp_enabled_kebab_APICOMPAT },
