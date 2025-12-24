@@ -231,7 +231,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_group_set_kebab,
     TR_KEY_group_get,
     TR_KEY_group_set,
-    TR_KEY_has_announced_camel,
+    TR_KEY_has_announced_camel_APICOMPAT,
     TR_KEY_has_scraped_camel,
     TR_KEY_has_announced,
     TR_KEY_has_scraped,
