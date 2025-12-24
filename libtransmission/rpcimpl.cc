@@ -804,7 +804,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_upload_limited:
     case TR_KEY_upload_ratio:
     case TR_KEY_uploaded_ever:
-    case TR_KEY_uploaded_ever_camel:
     case TR_KEY_wanted:
     case TR_KEY_webseeds:
     case TR_KEY_webseeds_sending_to_us:
@@ -977,7 +976,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_upload_ratio:
         return st.ratio;
     case TR_KEY_uploaded_ever:
-    case TR_KEY_uploaded_ever_camel:
         return st.uploadedEver;
     case TR_KEY_wanted:
         return make_file_wanted_vec(tor);
