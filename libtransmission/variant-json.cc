@@ -92,7 +92,8 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool String(Ch const* const str, rapidjson::SizeType const len, bool const copy)
     {
-        *get_leaf() = copy ? tr_variant{ std::string_view{ str, len } } : tr_variant::unmanaged_string({ str, len });
+        auto const sv = std::string_view{ str, len };
+        *get_leaf() = copy ? tr_variant{ sv } : tr_variant::unmanaged_string(sv);
         return true;
     }
 

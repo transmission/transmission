@@ -2487,10 +2487,9 @@ namespace session_get_helpers
 
     if (std::empty(fields)) // no fields specified; get them all
     {
-        for (tr_quark field_id = TR_KEY_NONE + 1; field_id < TR_N_KEYS; ++field_id)
-        {
-            fields.insert(field_id);
-        }
+#define INSERT_KNOWN(_key, _str) fields.insert(_key);
+        KNOWN_KEYS(INSERT_KNOWN)
+#undef INSERT_KNOWN
     }
 
     return fields;

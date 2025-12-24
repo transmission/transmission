@@ -53,6 +53,7 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/mime-types.h"
+#include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
@@ -785,7 +786,20 @@ std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::instance;
 void tr_lib_init()
 {
     static auto once = std::once_flag{};
-    std::call_once(once, [] { tr_net_init_impl::tr_net_init_mgr::create(); });
+    std::call_once(
+        once,
+        []()
+        {
+            tr_net_init_impl::tr_net_init_mgr::create();
+
+            using namespace transmission::intern;
+            auto const known = std::vector<tr_quark>{
+#define KNOWN_KEY_NAME(_key, _str) _key,
+                KNOWN_KEYS(KNOWN_KEY_NAME)
+#undef KNOWN_KEY_NAME
+            };
+            Interner::instance().add_known(std::data(known), std::size(known));
+        });
 }
 
 // --- mime-type
