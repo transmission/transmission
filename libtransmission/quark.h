@@ -680,7 +680,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_time_checked_kebab,
     TR_KEY_time_checked,
     TR_KEY_torrent_add_kebab,
-    TR_KEY_torrent_added_kebab,
+    TR_KEY_torrent_added_kebab_APICOMPAT,
     TR_KEY_torrent_added_notification_enabled_kebab,
     TR_KEY_torrent_added_verify_mode_kebab,
     TR_KEY_torrent_complete_notification_enabled_kebab,
