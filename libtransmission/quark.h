@@ -615,7 +615,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_show_verifying,
     TR_KEY_sitename,
     TR_KEY_size_bytes_kebab_APICOMPAT,
-    TR_KEY_size_units_kebab,
+    TR_KEY_size_units_kebab_APICOMPAT,
     TR_KEY_size_when_done_camel_APICOMPAT,
     TR_KEY_size_bytes,
     TR_KEY_size_units,
