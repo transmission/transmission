@@ -481,7 +481,7 @@ public:
         tr_port peer_port_random_high = tr_port::from_host(65535);
         tr_port peer_port_random_low = tr_port::from_host(49152);
         tr_port peer_port = tr_port::from_host(TrDefaultPeerPort);
-        tr_tos_t peer_socket_tos{ 0x04 };
+        tr_diffserv_t peer_socket_diffserv{ 0x04 };
         tr_verify_added_mode torrent_added_verify_mode = TR_VERIFY_ADDED_FAST;
 
     private:
@@ -515,7 +515,7 @@ public:
             Field<&Settings::peer_port_random_high>{ TR_KEY_peer_port_random_high },
             Field<&Settings::peer_port_random_low>{ TR_KEY_peer_port_random_low },
             Field<&Settings::peer_port_random_on_start>{ TR_KEY_peer_port_random_on_start },
-            Field<&Settings::peer_socket_tos>{ TR_KEY_peer_socket_tos },
+            Field<&Settings::peer_socket_diffserv>{ TR_KEY_peer_socket_diffserv },
             Field<&Settings::pex_enabled>{ TR_KEY_pex_enabled },
             Field<&Settings::port_forwarding_enabled>{ TR_KEY_port_forwarding_enabled },
             Field<&Settings::preallocation_mode>{ TR_KEY_preallocation },
@@ -751,9 +751,9 @@ public:
         settings_.peer_congestion_algorithm = algorithm;
     }
 
-    void setSocketTOS(tr_socket_t sock, tr_address_type type) const
+    void setSocketDiffServ(tr_socket_t sock, tr_address_type type) const
     {
-        tr_netSetTOS(sock, settings_.peer_socket_tos, type);
+        tr_netSetDiffServ(sock, settings_.peer_socket_diffserv, type);
     }
 
     [[nodiscard]] constexpr auto peerLimit() const noexcept

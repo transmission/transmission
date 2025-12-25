@@ -451,11 +451,11 @@ tr_variant from_string(std::string const& val)
 
 // ---
 
-bool to_tos_t(tr_variant const& src, tr_tos_t* tgt)
+bool to_diffserv_t(tr_variant const& src, tr_diffserv_t* tgt)
 {
     if (auto const val = src.value_if<std::string_view>())
     {
-        if (auto const tos = tr_tos_t::from_string(*val); tos)
+        if (auto const tos = tr_diffserv_t::from_string(*val); tos)
         {
             *tgt = *tos;
             return true;
@@ -466,14 +466,14 @@ bool to_tos_t(tr_variant const& src, tr_tos_t* tgt)
 
     if (auto const val = src.value_if<int64_t>())
     {
-        *tgt = tr_tos_t{ static_cast<int>(*val) };
+        *tgt = tr_diffserv_t{ static_cast<int>(*val) };
         return true;
     }
 
     return false;
 }
 
-tr_variant from_tos_t(tr_tos_t const& val)
+tr_variant from_diffserv_t(tr_diffserv_t const& val)
 {
     return val.toString();
 }
@@ -540,6 +540,7 @@ void Converters::ensure_default_converters()
         []
         {
             Converters::add(to_bool, from_bool);
+            Converters::add(to_diffserv_t, from_diffserv_t);
             Converters::add(to_double, from_double);
             Converters::add(to_encryption_mode, from_encryption_mode);
             Converters::add(to_int64, from_int64);
@@ -551,7 +552,6 @@ void Converters::ensure_default_converters()
             Converters::add(to_preferred_transport, from_preferred_transport);
             Converters::add(to_size_t, from_size_t);
             Converters::add(to_string, from_string);
-            Converters::add(to_tos_t, from_tos_t);
             Converters::add(to_uint64, from_uint64);
             Converters::add(to_verify_added_mode, from_verify_added_mode);
         });
