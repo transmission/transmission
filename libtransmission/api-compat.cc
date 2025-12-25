@@ -924,12 +924,3 @@ void convert_incoming_data(tr_variant& var)
     convert(var, Style::Tr5);
 }
 } // namespace libtransmission::api_compat
-
-tr_quark tr_quark_convert(tr_quark const quark)
-{
-    using namespace libtransmission::api_compat;
-
-    auto state = State{};
-    state.style = Style::Tr5;
-    return convert_key(state, quark);
-}
