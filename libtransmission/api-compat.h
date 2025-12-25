@@ -26,10 +26,3 @@ void convert_incoming_data(tr_variant& var);
 void convert_outgoing_data(tr_variant& var);
 
 } // namespace libtransmission::api_compat
-
-/**
- * Get the replacement quark from old deprecated quarks.
- *
- * Note: Temporary shim just for the transition period to snake_case.
- */
-[[nodiscard]] tr_quark tr_quark_convert(tr_quark quark);
