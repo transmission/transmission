@@ -70,14 +70,6 @@ private:
         }
     };
 
-    struct SvEq
-    {
-        [[nodiscard]] bool operator()(std::string_view const a, std::string_view const b) const noexcept
-        {
-            return a == b;
-        }
-    };
-
     struct InternedLt
     {
         [[nodiscard]] bool operator()(Interned const& a, Interned const& b) const noexcept
@@ -132,7 +124,7 @@ private:
 
     // Runtime
     std::deque<std::string> strings_;
-    std::unordered_map<std::string_view, std::uint64_t, SvHash, SvEq> runtime_;
+    std::unordered_map<std::string_view, std::uint64_t, SvHash> runtime_;
     uint64_t next_runtime_ = 1;
 };
 
