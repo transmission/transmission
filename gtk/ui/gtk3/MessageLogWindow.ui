@@ -22,7 +22,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="is-important">True</property>
-                <property name="action-name">win.save-message-log</property>
+                <property name="action-name">win.save_message_log</property>
                 <property name="label" translatable="yes">Save _As</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">document-save-as</property>
@@ -37,7 +37,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="is-important">True</property>
-                <property name="action-name">win.clear-message-log</property>
+                <property name="action-name">win.clear_message_log</property>
                 <property name="label" translatable="yes">Clear</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">edit-clear</property>
@@ -62,7 +62,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="is-important">True</property>
-                <property name="action-name">win.pause-message-log</property>
+                <property name="action-name">win.pause_message_log</property>
                 <property name="label" translatable="yes">P_ause</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">media-playback-pause</property>
