@@ -38,7 +38,7 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     $BuildDir = Join-Path $SourceDir .build
 
     $ConfigOptions = @(
-        '-platform'; $QtPlatform
+        #'-platform'; $QtPlatform
         '-opensource'
         '-confirm-license'
         '-prefix'; $PrefixDir
