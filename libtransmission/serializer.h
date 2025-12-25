@@ -139,24 +139,23 @@ public:
         {
             return detail::from_push_back_range(src);
         }
-
-        if constexpr (detail::is_insert_range_v<T>)
+        else if constexpr (detail::is_insert_range_v<T>)
         {
             return detail::from_insert_range(src);
         }
-
-        if constexpr (detail::is_std_array_v<T>)
+        else if constexpr (detail::is_std_array_v<T>)
         {
             return detail::from_array(src);
         }
-
-        if constexpr (detail::is_optional_v<T>)
+        else if constexpr (detail::is_optional_v<T>)
         {
             return detail::from_optional(src);
         }
-
-        fmt::print(stderr, "ERROR: No serializer registered for type '{}'\n", typeid(T).name());
-        return {};
+        else
+        {
+            fmt::print(stderr, "ERROR: No serializer registered for type '{}'\n", typeid(T).name());
+            return {};
+        }
     }
 
     template<typename T>
@@ -173,24 +172,23 @@ public:
         {
             return detail::to_push_back_range(src, ptgt);
         }
-
-        if constexpr (detail::is_insert_range_v<T>)
+        else if constexpr (detail::is_insert_range_v<T>)
         {
             return detail::to_insert_range(src, ptgt);
         }
-
-        if constexpr (detail::is_std_array_v<T>)
+        else if constexpr (detail::is_std_array_v<T>)
         {
             return detail::to_array(src, ptgt);
         }
-
-        if constexpr (detail::is_optional_v<T>)
+        else if constexpr (detail::is_optional_v<T>)
         {
             return detail::to_optional(src, ptgt);
         }
-
-        fmt::print(stderr, "ERROR: No deserializer registered for type '{}'\n", typeid(T).name());
-        return false;
+        else
+        {
+            fmt::print(stderr, "ERROR: No deserializer registered for type '{}'\n", typeid(T).name());
+            return false;
+        }
     }
 
     // register a new tr_variant<->T converter.
