@@ -817,7 +817,7 @@ struct State
         auto const key = tr_quark_lookup(*method);
         state.is_torrent = key &&
             (*key == TR_KEY_torrent_get || *key == TR_KEY_torrent_get_kebab || *key == TR_KEY_torrent_set ||
-             *key == TR_KEY_torrent_set_kebab_APICOMPAT);
+             *key == TR_KEY_torrent_set_kebab);
     }
 
     if (state.is_response)
