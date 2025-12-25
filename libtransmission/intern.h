@@ -40,6 +40,7 @@ struct Interned
 
     // Implicit conversion to uint64_t.
     // This way, constexpr `Interned` instances can be used switch-case statements
+    // NOLINTNEXTLINE(google-explicit-constructor)
     constexpr operator uint64_t() const noexcept
     {
         return key;
@@ -59,7 +60,7 @@ struct Interned
         return key > that.key;
     }
 
-    std::string_view sv = {};
+    std::string_view sv;
 
     uint64_t key = {};
 };
@@ -70,23 +71,23 @@ namespace detail
 // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
 constexpr uint64_t fnv1a_64(std::string_view s) noexcept
 {
-    uint64_t h = 14695981039346656037ull;
-    for (char c : s)
+    uint64_t h = 14695981039346656037ULL;
+    for (char const c : s)
     {
         h ^= static_cast<unsigned char>(c);
-        h *= 1099511628211ull;
+        h *= 1099511628211ULL;
     }
     return h;
 }
 
 // Used to distinguish between compile-time and run-time items:
 // The top bit is true for strings interned during runtime.
-constexpr uint64_t kRuntimeTag = 1ull << 63;
-constexpr uint64_t kPayloadMask = ~kRuntimeTag;
+constexpr uint64_t RuntimeTag = 1ULL << 63;
+constexpr uint64_t PayloadMask = ~RuntimeTag;
 
 constexpr uint64_t known_key(std::string_view const s) noexcept
 {
-    return fnv1a_64(s) & kPayloadMask; // top bit 0
+    return fnv1a_64(s) & PayloadMask; // top bit 0
 }
 } // namespace detail
 
@@ -94,10 +95,11 @@ constexpr uint64_t known_key(std::string_view const s) noexcept
 // Usage: `inline constexpr auto TR_KEY_foo = known("foo");`
 // TODO(C++20): consteval
 template<std::size_t N>
+// NOLINTNEXTLINE(modernize-avoid-c-arrays)
 [[nodiscard]] constexpr Interned known(char const (&lit)[N]) noexcept
 {
-    constexpr std::size_t len = N > 0 ? N - 1 : 0;
-    auto sv = std::string_view{ lit, len };
+    constexpr std::size_t Len = N > 0 ? N - 1 : 0;
+    auto sv = std::string_view{ lit, Len };
     return Interned{ sv, detail::known_key(sv) };
 }
 
@@ -109,12 +111,17 @@ class Interner
 public:
     static Interner& instance();
 
+    Interner(Interner const&) = delete;
+    Interner(Interner&&) = delete;
+    Interner& operator=(Interner const&) = delete;
+    Interner& operator=(Interner&&) = delete;
+
     // Get the interned copy of `str`.
-    std::optional<Interned> lookup(std::string_view str) const noexcept;
+    [[nodiscard]] std::optional<Interned> lookup(std::string_view str) const noexcept;
 
     // Add a new Interned string.
     // If the string is already interned, return the existing copy.
-    Interned add(std::string_view str);
+    [[nodiscard]] Interned add(std::string_view str);
 
     // Add strings as a batch.
     // Only use this to register compile-time strings during startup.
@@ -129,8 +136,6 @@ public:
 private:
     Interner();
     ~Interner() noexcept = default;
-    Interner(Interner const&) = delete;
-    Interner& operator=(Interner const&) = delete;
 
     struct Impl;
     std::unique_ptr<Impl> const pimpl_;

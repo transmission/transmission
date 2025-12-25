@@ -98,13 +98,13 @@ private:
     {
         [[nodiscard]] bool operator()(Interned const& str) const noexcept
         {
-            return (str.id() & detail::kRuntimeTag) != 0;
+            return (str.id() & detail::RuntimeTag) != 0;
         }
     };
 
     [[nodiscard]] static constexpr uint64_t runtime_id(uint64_t const counter) noexcept
     {
-        return detail::kRuntimeTag | (counter & detail::kPayloadMask); // top bit 1
+        return detail::RuntimeTag | (counter & detail::PayloadMask); // top bit 1
     }
 
     [[nodiscard]] std::string_view store(std::string_view const str)
