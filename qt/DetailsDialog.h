@@ -120,7 +120,7 @@ private:
     }
 
     template<typename T>
-    void torrentSet(tr_quark key, T val)
+    void torrentSet(tr_quark const key, T val)
     {
         torrentSet(ids_, key, val);
     }
