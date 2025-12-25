@@ -486,8 +486,10 @@ struct State
 
     if (auto const method = top.value_if<std::string_view>(TR_KEY_method))
     {
-        auto const key = tr_quark_convert(tr_quark_new(*method));
-        state.is_torrent = key == TR_KEY_torrent_get || key == TR_KEY_torrent_set;
+        auto const key = tr_quark_lookup(*method);
+        state.is_torrent = key &&
+            (*key == TR_KEY_torrent_get || *key == TR_KEY_torrent_get_kebab || *key == TR_KEY_torrent_set ||
+             *key == TR_KEY_torrent_set_kebab_APICOMPAT);
     }
 
     if (state.is_response)
