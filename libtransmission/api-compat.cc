@@ -305,7 +305,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_peer_port_random_high, TR_KEY_peer_port_random_high_kebab_APICOMPAT },
     { TR_KEY_peer_port_random_low, TR_KEY_peer_port_random_low_kebab_APICOMPAT },
     { TR_KEY_peer_port_random_on_start, TR_KEY_peer_port_random_on_start_kebab_APICOMPAT },
-    { TR_KEY_peer_socket_tos, TR_KEY_peer_socket_tos_kebab_APICOMPAT },
+    { TR_KEY_peer_socket_diffserv, TR_KEY_peer_socket_tos_kebab_APICOMPAT },
     { TR_KEY_peers2_6, TR_KEY_peers2_6_kebab_APICOMPAT },
     { TR_KEY_pex_enabled, TR_KEY_pex_enabled_kebab_APICOMPAT },
     { TR_KEY_port_forwarding_enabled, TR_KEY_port_forwarding_enabled_kebab_APICOMPAT },

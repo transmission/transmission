@@ -360,36 +360,36 @@ TEST_F(SettingsTest, canSaveNullableString)
     EXPECT_TRUE(null_p);
 }
 
-TEST_F(SettingsTest, canLoadTos)
+TEST_F(SettingsTest, canLoadDiffServ)
 {
-    static auto constexpr Key = TR_KEY_peer_socket_tos;
-    static auto constexpr ChangedValue = tr_tos_t{ 0x20 };
+    static auto constexpr Key = TR_KEY_peer_socket_diffserv;
+    static auto constexpr ChangedValue = tr_diffserv_t{ 0x20 };
 
     auto settings = std::make_unique<tr_session::Settings>();
-    auto const default_value = settings->peer_socket_tos;
+    auto const default_value = settings->peer_socket_diffserv;
     ASSERT_NE(ChangedValue, default_value);
 
     auto map = tr_variant::Map{ 1U };
     map.try_emplace(Key, 0x20);
     settings->load(tr_variant{ std::move(map) });
-    EXPECT_EQ(ChangedValue, settings->peer_socket_tos);
+    EXPECT_EQ(ChangedValue, settings->peer_socket_diffserv);
 
     settings = std::make_unique<tr_session::Settings>();
     map = tr_variant::Map{ 1U };
     map.try_emplace(Key, "cs1"sv);
     settings->load(tr_variant{ std::move(map) });
-    EXPECT_EQ(ChangedValue, settings->peer_socket_tos);
+    EXPECT_EQ(ChangedValue, settings->peer_socket_diffserv);
 }
 
-TEST_F(SettingsTest, canSaveTos)
+TEST_F(SettingsTest, canSaveDiffServ)
 {
-    static auto constexpr Key = TR_KEY_peer_socket_tos;
-    static auto constexpr ChangedValue = tr_tos_t{ 0x20 };
+    static auto constexpr Key = TR_KEY_peer_socket_diffserv;
+    static auto constexpr ChangedValue = tr_diffserv_t{ 0x20 };
 
     auto settings = tr_session::Settings{};
-    ASSERT_NE(ChangedValue, settings.peer_socket_tos);
+    ASSERT_NE(ChangedValue, settings.peer_socket_diffserv);
 
-    settings.peer_socket_tos = tr_tos_t(0x20);
+    settings.peer_socket_diffserv = tr_diffserv_t(0x20);
     auto const map = settings.save();
     auto const val = map.value_if<std::string_view>(Key);
     ASSERT_TRUE(val);

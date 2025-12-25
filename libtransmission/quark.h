@@ -389,7 +389,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_peer_port_random_high,
     TR_KEY_peer_port_random_low,
     TR_KEY_peer_port_random_on_start,
-    TR_KEY_peer_socket_tos,
+    TR_KEY_peer_socket_diffserv,
     TR_KEY_peers,
     TR_KEY_peers2,
     TR_KEY_peers2_6_kebab_APICOMPAT,

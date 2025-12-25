@@ -481,7 +481,7 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "peer_port_random_high": 65535,
     "peer_port_random_low": 49152,
     "peer_port_random_on_start": false,
-    "peer_socket_tos": "le",
+    "peer_socket_diffserv": "le",
     "pex_enabled": true,
     "port_forwarding_enabled": true,
     "preallocation": 1,
