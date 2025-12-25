@@ -1999,7 +1999,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         }
     }
 
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_cache_size_mb); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_cache_size_mib); val)
     {
         tr_sessionSetCacheLimit_MB(session, *val);
     }
@@ -2360,7 +2360,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         return tr_blocklistGetRuleCount(&session);
     case TR_KEY_blocklist_url:
         return session.blocklistUrl();
-    case TR_KEY_cache_size_mb:
+    case TR_KEY_cache_size_mib:
         return tr_sessionGetCacheLimit_MB(&session);
     case TR_KEY_config_dir:
         return session.configDir();
