@@ -300,6 +300,128 @@ constexpr std::string_view CurrentTorrentGetJson = R"json({
     }
 })json";
 
+constexpr std::string_view CurrentFilesWantedResponseObjectJson = R"json({
+    "id": 6,
+    "jsonrpc": "2.0",
+    "result": {
+        "torrents": [
+            {
+                "wanted": [
+                    false,
+                    true,
+                    true,
+                    false
+                ]
+            },
+            {
+                "wanted": [
+                    true,
+                    false,
+                    true,
+                    false,
+                    true
+                ]
+            }
+        ]
+    }
+})json";
+
+constexpr std::string_view LegacyFilesWantedResponseObjectJson = R"json({
+    "arguments": {
+        "torrents": [
+            {
+                "wanted": [
+                    0,
+                    1,
+                    1,
+                    0
+                ]
+            },
+            {
+                "wanted": [
+                    1,
+                    0,
+                    1,
+                    0,
+                    1
+                ]
+            }
+        ]
+    },
+    "result": "success",
+    "tag": 6
+})json";
+
+constexpr std::string_view CurrentFilesWantedResponseArrayJson = R"json({
+    "id": 6,
+    "jsonrpc": "2.0",
+    "result": {
+        "torrents": [
+            [
+                "comment",
+                "wanted",
+                "id"
+            ],
+            [
+                "id 1",
+                [
+                    false,
+                    true,
+                    true,
+                    false
+                ],
+                1
+            ],
+            [
+                "id 2",
+                [
+                    true,
+                    false,
+                    true,
+                    false,
+                    true
+                ],
+                2
+            ]
+        ]
+    }
+})json";
+
+constexpr std::string_view LegacyFilesWantedResponseArrayJson = R"json({
+    "arguments": {
+        "torrents": [
+            [
+                "comment",
+                "wanted",
+                "id"
+            ],
+            [
+                "id 1",
+                [
+                    0,
+                    1,
+                    1,
+                    0
+                ],
+                1
+            ],
+            [
+                "id 2",
+                [
+                    1,
+                    0,
+                    1,
+                    0,
+                    1
+                ],
+                2
+            ]
+        ]
+    },
+    "result": "success",
+    "tag": 6
+})json";
+
 constexpr std::string_view CurrentPortTestErrorResponse = R"json({
     "error": {
         "code": 8,
@@ -963,7 +1085,7 @@ TEST_F(ApiCompatTest, canConvertRpc)
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
     // clang-format off
-    static auto constexpr TestCases = std::array<TestCase, 42U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 50U>{ {
         { "free_space tr5 -> tr5", BadFreeSpaceRequest, Style::Tr5, BadFreeSpaceRequest },
         { "free_space tr5 -> tr4", BadFreeSpaceRequest, Style::Tr4, BadFreeSpaceRequestLegacy },
         { "free_space tr4 -> tr5", BadFreeSpaceRequestLegacy, Style::Tr5, BadFreeSpaceRequest },
@@ -1006,6 +1128,14 @@ TEST_F(ApiCompatTest, canConvertRpc)
         { "unrecognised info tr4 -> tr4", UnrecognisedInfoLegacyResponse, Style::Tr4, UnrecognisedInfoLegacyResponse},
         { "non-int tag tr4 -> tr5", LegacyNonIntTagRequest, Style::Tr5, LegacyNonIntTagRequestResult },
         { "non-int tag tr4 -> tr4", LegacyNonIntTagRequest, Style::Tr4, LegacyNonIntTagRequest },
+        { "files wanted response object tr5 -> tr5", CurrentFilesWantedResponseObjectJson, Style::Tr5, CurrentFilesWantedResponseObjectJson },
+        { "files wanted response object tr5 -> tr4", CurrentFilesWantedResponseObjectJson, Style::Tr4, LegacyFilesWantedResponseObjectJson },
+        { "files wanted response object tr4 -> tr5", LegacyFilesWantedResponseObjectJson, Style::Tr5, CurrentFilesWantedResponseObjectJson },
+        { "files wanted response object tr5 -> tr4", LegacyFilesWantedResponseObjectJson, Style::Tr4, LegacyFilesWantedResponseObjectJson },
+        { "files wanted response array tr5 -> tr5", CurrentFilesWantedResponseArrayJson, Style::Tr5, CurrentFilesWantedResponseArrayJson },
+        { "files wanted response array tr5 -> tr4", CurrentFilesWantedResponseArrayJson, Style::Tr4, LegacyFilesWantedResponseArrayJson },
+        { "files wanted response array tr4 -> tr5", LegacyFilesWantedResponseArrayJson, Style::Tr5, CurrentFilesWantedResponseArrayJson },
+        { "files wanted response array tr5 -> tr4", LegacyFilesWantedResponseArrayJson, Style::Tr4, LegacyFilesWantedResponseArrayJson },
 
         // TODO(ckerr): torrent-get with 'table'
     } };

@@ -670,9 +670,96 @@ void convert_keys(tr_variant& var, State& state)
         });
 }
 
+namespace convert_jsonrpc_helpers
+{
+void convert_files_wanted(tr_variant::Vector& wanted, State const& state)
+{
+    auto ret = tr_variant::Vector{};
+    ret.reserve(std::size(wanted));
+    for (auto const& var : wanted)
+    {
+        if (state.style == Style::Tr5)
+        {
+            if (auto const val = var.value_if<bool>())
+            {
+                ret.emplace_back(*val);
+            }
+            else
+            {
+                return;
+            }
+        }
+        else
+        {
+            if (auto const val = var.value_if<int64_t>(); val == 0 || val == 1)
+            {
+                ret.emplace_back(*val);
+            }
+            else
+            {
+                return;
+            }
+        }
+    }
+
+    wanted = std::move(ret);
+}
+
+void convert_files_wanted_response(tr_variant::Map& top, State const& state)
+{
+    if (auto* const args = top.find_if<tr_variant::Map>(state.style == Style::Tr5 ? TR_KEY_result : TR_KEY_arguments))
+    {
+        if (auto* const torrents = args->find_if<tr_variant::Vector>(TR_KEY_torrents);
+            torrents != nullptr && !std::empty(*torrents))
+        {
+            // TrFormat::Table
+            if (auto* const first_vec = torrents->front().get_if<tr_variant::Vector>();
+                first_vec != nullptr && !std::empty(*first_vec))
+            {
+                if (auto const wanted_iter = std::find_if(
+                        std::begin(*first_vec),
+                        std::end(*first_vec),
+                        [](tr_variant const& v)
+                        { return v.value_if<std::string_view>() == tr_quark_get_string_view(TR_KEY_wanted); });
+                    wanted_iter != std::end(*first_vec))
+                {
+                    auto const wanted_idx = static_cast<size_t>(wanted_iter - std::begin(*first_vec));
+                    for (auto it = std::next(std::begin(*torrents)); it != std::end(*torrents); ++it)
+                    {
+                        if (auto* const row = it->get_if<tr_variant::Vector>(); row != nullptr && wanted_idx < std::size(*row))
+                        {
+                            if (auto* const wanted = (*row)[wanted_idx].get_if<tr_variant::Vector>())
+                            {
+                                convert_files_wanted(*wanted, state);
+                            }
+                        }
+                    }
+                }
+            }
+            // TrFormat::Object
+            else if (torrents->front().index() == tr_variant::MapIndex)
+            {
+                for (auto& var : *torrents)
+                {
+                    if (auto* const map = var.get_if<tr_variant::Map>())
+                    {
+                        if (auto* const wanted = map->find_if<tr_variant::Vector>(TR_KEY_wanted))
+                        {
+                            convert_files_wanted(*wanted, state);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+} // namespace convert_jsonrpc_helpers
+
 // jsonrpc <-> legacy rpc conversion
 void convert_jsonrpc(tr_variant::Map& top, State const& state)
 {
+    using namespace convert_jsonrpc_helpers;
+
     if (!state.is_rpc)
     {
         return;
@@ -705,6 +792,8 @@ void convert_jsonrpc(tr_variant::Map& top, State const& state)
         // - add `result: "success"`
         top.replace_key(TR_KEY_result, TR_KEY_arguments);
         top.try_emplace(TR_KEY_result, tr_variant::unmanaged_string("success"));
+
+        convert_files_wanted_response(top, state);
     }
 
     if (state.is_response && is_legacy && !state.is_success)
@@ -751,6 +840,8 @@ void convert_jsonrpc(tr_variant::Map& top, State const& state)
     {
         top.erase(TR_KEY_result);
         top.replace_key(TR_KEY_arguments, TR_KEY_result);
+
+        convert_files_wanted_response(top, state);
     }
 
     if (state.is_response && is_jsonrpc && !state.is_success && state.was_legacy)
