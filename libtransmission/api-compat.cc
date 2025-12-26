@@ -786,6 +786,10 @@ void convert_jsonrpc(tr_variant::Map& top, State const& state)
     {
         top.erase(TR_KEY_jsonrpc);
         top.replace_key(TR_KEY_id, TR_KEY_tag);
+        if (auto const tag = top.find_if<int64_t>(TR_KEY_tag); state.was_jsonrpc && tag == nullptr)
+        {
+            top.erase(TR_KEY_tag);
+        }
     }
 
     if (state.is_response && is_legacy && state.is_success && state.was_jsonrpc)
