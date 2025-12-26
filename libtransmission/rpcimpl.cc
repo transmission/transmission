@@ -1647,7 +1647,7 @@ void add_torrent_impl(struct tr_rpc_idle_data* data, tr_ctor& ctor)
         return;
     }
 
-    static auto constexpr Fields = std::array<tr_quark, 4>{
+    static auto constexpr Fields = std::array<tr_quark, 3U>{
         TR_KEY_id,
         TR_KEY_name,
         TR_KEY_hash_string,
