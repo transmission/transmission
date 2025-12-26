@@ -12,6 +12,8 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
@@ -19,7 +21,6 @@
 #include <libtransmission/open-files.h>
 #include <libtransmission/tr-strbuf.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

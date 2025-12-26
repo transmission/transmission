@@ -8,6 +8,8 @@
 
 #include <event2/event.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/timer.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/utils-ev.h>
