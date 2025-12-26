@@ -498,6 +498,7 @@ struct State
         {
             state.is_free_space_response = args->contains(TR_KEY_path) &&
                 args->contains(state.was_jsonrpc ? TR_KEY_size_bytes : TR_KEY_size_bytes_kebab_APICOMPAT);
+            state.is_torrent = args->contains(TR_KEY_torrents);
         }
     }
 
