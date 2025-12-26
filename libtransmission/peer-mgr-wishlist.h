@@ -79,7 +79,8 @@ public:
     // the next blocks that we should request from a peer
     [[nodiscard]] std::vector<tr_block_span_t> next(
         size_t n_wanted_blocks,
-        std::function<bool(tr_piece_index_t)> const& peer_has_piece);
+        std::function<bool(tr_piece_index_t)> const& peer_has_piece,
+        bool is_slow_peer = false);
 
 private:
     class Impl;
