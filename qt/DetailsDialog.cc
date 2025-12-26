@@ -35,6 +35,7 @@
 
 #include "BaseDialog.h"
 #include "ColumnResizer.h"
+#include "CustomVariantType.h"
 #include "DetailsDialog.h"
 #include "Formatter.h"
 #include "IconCache.h"
@@ -1354,7 +1355,7 @@ void DetailsDialog::onDownloadLimitedToggled(bool val)
 void DetailsDialog::onSpinBoxEditingFinished()
 {
     QObject const* spin = sender();
-    tr_quark const key = spin->property(PrefKey).toInt();
+    auto const key = spin->property(PrefKey).value<tr_quark>();
     auto const* d = qobject_cast<QDoubleSpinBox const*>(spin);
 
     if (d != nullptr)
@@ -1522,11 +1523,11 @@ void DetailsDialog::initOptionsTab()
     ui_.singleDownSpin->setSuffix(speed_unit_suffix);
     ui_.singleUpSpin->setSuffix(speed_unit_suffix);
 
-    ui_.singleDownSpin->setProperty(PrefKey, TR_KEY_download_limit);
-    ui_.singleUpSpin->setProperty(PrefKey, TR_KEY_upload_limit);
-    ui_.ratioSpin->setProperty(PrefKey, TR_KEY_seed_ratio_limit);
-    ui_.idleSpin->setProperty(PrefKey, TR_KEY_seed_idle_limit);
-    ui_.peerLimitSpin->setProperty(PrefKey, TR_KEY_peer_limit);
+    ui_.singleDownSpin->setProperty(PrefKey, QVariant::fromValue(TR_KEY_download_limit));
+    ui_.singleUpSpin->setProperty(PrefKey, QVariant::fromValue(TR_KEY_upload_limit));
+    ui_.ratioSpin->setProperty(PrefKey, QVariant::fromValue(TR_KEY_seed_ratio_limit));
+    ui_.idleSpin->setProperty(PrefKey, QVariant::fromValue(TR_KEY_seed_idle_limit));
+    ui_.peerLimitSpin->setProperty(PrefKey, QVariant::fromValue(TR_KEY_peer_limit));
 
     ui_.bandwidthPriorityCombo->addItem(tr("High"), TR_PRI_HIGH);
     ui_.bandwidthPriorityCombo->addItem(tr("Normal"), TR_PRI_NORMAL);
