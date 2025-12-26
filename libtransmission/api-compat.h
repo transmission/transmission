@@ -7,8 +7,6 @@
 
 #include <cstdint> // uint8_t
 
-#include "libtransmission/quark.h"
-
 struct tr_variant;
 
 namespace libtransmission::api_compat
@@ -18,8 +16,6 @@ enum class Style : uint8_t
     Tr4, // bespoke RPC, mixed-case keys,
     Tr5, // jsonrpc, all snake_case keys
 };
-
-[[nodiscard]] Style get_export_settings_style();
 
 void convert(tr_variant& var, Style tgt_style);
 void convert_incoming_data(tr_variant& var);
