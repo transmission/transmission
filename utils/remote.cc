@@ -209,7 +209,8 @@ enum
     ID_PIECES,
     ID_PORTTEST,
     ID_TORRENT_ADD,
-    ID_TRACKERS
+    ID_TRACKERS,
+    ID_BLOCKLIST,
 };
 
 // --- Command-Line Arguments
@@ -2228,6 +2229,14 @@ void filter_ids(tr_variant::Map const& result, RemoteConfig& config)
     }
 }
 
+void print_blocklist_size(tr_variant::Map const& result)
+{
+    if (auto const i = result.value_if<int64_t>(TR_KEY_blocklist_size))
+    {
+        fmt::print("Blocklist size: {:d}\n", *i);
+    }
+}
+
 int process_response(char const* rpcurl, std::string_view const response, RemoteConfig& config)
 {
     if (config.json)
@@ -2328,6 +2337,10 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
 
     case ID_FILTER:
         filter_ids(*result, config);
+        break;
+
+    case ID_BLOCKLIST:
+        print_blocklist_size(*result);
         break;
 
     case ID_TORRENT_ADD:
@@ -3328,9 +3341,10 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 963:
                 {
-                    auto map = tr_variant::Map{ 2U };
+                    auto map = tr_variant::Map{ 3U };
                     map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_blocklist_update));
+                    map.try_emplace(TR_KEY_id, ID_BLOCKLIST);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
