@@ -67,8 +67,8 @@ target_sources(${TR_NAME}
         history.h
         inout.cc
         inout.h
-        intern.cc
-        intern.h
+        symbol.cc
+        symbol.h
         ip-cache.cc
         ip-cache.h
         log.cc
@@ -306,8 +306,6 @@ if(INSTALL_LIB)
         DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(
         FILES
-            intern.h
-            intern.cpp
             error-types.h
             error.h
             file.h
@@ -316,6 +314,7 @@ if(INSTALL_LIB)
             quark.h
             rpcimpl.h
             session-id.h
+            symbol.h
             timer-ev.h
             timer.h
             tr-assert.h

@@ -8,7 +8,7 @@
 
 #include "libtransmission/quark.h"
 
-using namespace transmission::intern;
+using namespace transmission::symbol;
 
 std::optional<tr_quark> tr_quark_lookup(std::string_view const str)
 {

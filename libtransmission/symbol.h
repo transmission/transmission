@@ -13,7 +13,7 @@
 #include <string_view>
 
 // Namespace for interning strings
-namespace transmission::intern
+namespace transmission::symbol
 {
 
 /**
@@ -26,7 +26,7 @@ namespace transmission::intern
  * the BT protocol, RPC API, and settings files -- can be used
  * in switch-case statements.
  */
-struct Interned
+struct Symbol
 {
     [[nodiscard]] constexpr std::string_view sv() const noexcept
     {
@@ -39,14 +39,14 @@ struct Interned
     }
 
     // Implicit conversion to uint32_t.
-    // This way, constexpr `Interned` instances can be used switch-case statements
+    // This way, constexpr `Symbol` instances can be used switch-case statements
     // NOLINTNEXTLINE(google-explicit-constructor)
     constexpr operator uint32_t() const noexcept
     {
         return id_;
     }
 
-    [[nodiscard]] constexpr bool operator==(Interned const& that) const noexcept
+    [[nodiscard]] constexpr bool operator==(Symbol const& that) const noexcept
     {
         return id_ == that.id_;
     }
@@ -87,15 +87,15 @@ constexpr uint32_t known_key(std::string_view const s) noexcept
 // TODO(C++20): consteval
 template<std::size_t N>
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-[[nodiscard]] constexpr Interned known(char const (&lit)[N]) noexcept
+[[nodiscard]] constexpr Symbol known(char const (&lit)[N]) noexcept
 {
     constexpr std::size_t Len = N > 0 ? N - 1 : 0;
     auto sv = std::string_view{ lit, Len };
-    return Interned{ sv, detail::known_key(sv) };
+    return Symbol{ sv, detail::known_key(sv) };
 }
 
 /**
- * A registry of `Interned` strings.
+ * A registry of Symbols.
  */
 class StringInterner
 {
@@ -109,18 +109,18 @@ public:
 
     // Return the interned copy of `str`, if any.
     // Can be used to query if a string has already been interned without interning.
-    [[nodiscard]] std::optional<Interned> get(std::string_view str) const noexcept;
+    [[nodiscard]] std::optional<Symbol> get(std::string_view str) const noexcept;
 
-    // Add a new Interned string.
+    // Add a new Symbol.
     // If the string is already interned, return the existing copy.
-    [[nodiscard]] Interned get_or_intern(std::string_view str);
+    [[nodiscard]] Symbol get_or_intern(std::string_view str);
 
     // Add strings as a batch.
     // Only use this to register compile-time strings during startup.
-    void add_known(Interned const* entries, size_t n_entries);
+    void add_known(Symbol const* entries, size_t n_entries);
 
     template<size_t N>
-    void add_known(std::array<Interned, N> const& entries)
+    void add_known(std::array<Symbol, N> const& entries)
     {
         add_known(entries.data(), entries.size());
     }
@@ -133,4 +133,4 @@ private:
     std::unique_ptr<Impl> const pimpl_;
 };
 
-} // namespace transmission::intern
+} // namespace transmission::symbol

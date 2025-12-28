@@ -18,14 +18,14 @@
 
 #include <fmt/core.h>
 
-#include "libtransmission/intern.h"
+#include "libtransmission/symbol.h"
 
-namespace transmission::intern
+namespace transmission::symbol
 {
 struct StringInterner::Impl
 {
 public:
-    [[nodiscard]] std::optional<Interned> get(std::string_view const str) const noexcept
+    [[nodiscard]] std::optional<Symbol> get(std::string_view const str) const noexcept
     {
         if (auto const found = get_known(str))
         {
@@ -34,13 +34,13 @@ public:
 
         if (auto const iter = runtime_.find(str); iter != std::end(runtime_))
         {
-            return Interned{ iter->first, iter->second };
+            return Symbol{ iter->first, iter->second };
         }
 
         return {};
     }
 
-    [[nodiscard]] Interned get_or_internadd(std::string_view const str)
+    [[nodiscard]] Symbol get_or_internadd(std::string_view const str)
     {
         if (auto const found = get(str))
         {
@@ -55,17 +55,17 @@ public:
         auto const view = store(str);
         auto const id = runtime_id(next_runtime_++);
         runtime_.emplace(view, id);
-        return Interned{ view, id };
+        return Symbol{ view, id };
     }
 
-    void add_known(Interned const* const items, size_t const n_items)
+    void add_known(Symbol const* const items, size_t const n_items)
     {
         auto& v = known_;
         v.insert(std::end(v), items, items + n_items);
-        std::sort(std::begin(v), std::end(v), IternedIdLt{});
+        std::sort(std::begin(v), std::end(v), SymbolIdLt{});
 
         assert(std::none_of(std::begin(v), std::end(v), IsRuntime{}));
-        assert(std::adjacent_find(std::begin(v), std::end(v), InternedEqId{}) == std::end(v));
+        assert(std::adjacent_find(std::begin(v), std::end(v), SymbolEqId{}) == std::end(v));
     }
 
 private:
@@ -77,17 +77,17 @@ private:
         }
     };
 
-    struct IternedIdLt
+    struct SymbolIdLt
     {
-        [[nodiscard]] constexpr bool operator()(Interned const& a, Interned const& b) const noexcept
+        [[nodiscard]] constexpr bool operator()(Symbol const& a, Symbol const& b) const noexcept
         {
             return a.id() < b.id();
         }
     };
 
-    struct InternedEqId
+    struct SymbolEqId
     {
-        [[nodiscard]] constexpr bool operator()(Interned const& a, Interned const& b) const noexcept
+        [[nodiscard]] constexpr bool operator()(Symbol const& a, Symbol const& b) const noexcept
         {
             return a.id() == b.id();
         }
@@ -95,7 +95,7 @@ private:
 
     struct IsRuntime
     {
-        [[nodiscard]] bool operator()(Interned const& str) const noexcept
+        [[nodiscard]] bool operator()(Symbol const& str) const noexcept
         {
             return (str.id() & detail::RuntimeTag) != 0;
         }
@@ -112,11 +112,11 @@ private:
         return std::string_view{ strings_.back() };
     }
 
-    [[nodiscard]] std::optional<Interned> get_known(std::string_view const name) const noexcept
+    [[nodiscard]] std::optional<Symbol> get_known(std::string_view const name) const noexcept
     {
         auto const& v = known_;
-        auto const tmp = Interned{ name, detail::known_key(name) };
-        auto const iter = std::lower_bound(std::begin(v), std::end(v), tmp, IternedIdLt{});
+        auto const tmp = Symbol{ name, detail::known_key(name) };
+        auto const iter = std::lower_bound(std::begin(v), std::end(v), tmp, SymbolIdLt{});
         if (iter != std::end(v) && iter->id() == tmp.id() && iter->sv() == tmp.sv())
         {
             return *iter;
@@ -126,7 +126,7 @@ private:
     }
 
     // Set at startup with `StringInterner::addTable()`
-    using KnownVec = std::vector<Interned>;
+    using KnownVec = std::vector<Symbol>;
     KnownVec known_;
 
     // Runtime
@@ -146,18 +146,18 @@ StringInterner::StringInterner()
 {
 }
 
-void StringInterner::add_known(Interned const* const entries, std::size_t const n_entries)
+void StringInterner::add_known(Symbol const* const entries, std::size_t const n_entries)
 {
     pimpl_->add_known(entries, n_entries);
 }
 
-std::optional<Interned> StringInterner::get(std::string_view const str) const noexcept
+std::optional<Symbol> StringInterner::get(std::string_view const str) const noexcept
 {
     return pimpl_->get(str);
 }
 
-Interned StringInterner::get_or_intern(std::string_view const str)
+Symbol StringInterner::get_or_intern(std::string_view const str)
 {
     return pimpl_->get_or_internadd(str);
 }
-} // namespace transmission::intern
+} // namespace transmission::symbol

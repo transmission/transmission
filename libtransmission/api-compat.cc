@@ -344,7 +344,7 @@ namespace
     X(TR_KEY_watch_dir_force_generic_kebab, "watch-dir-force-generic") /* daemon */ \
     X(TR_KEY_webseeds_sending_to_us_camel, "webseedsSendingToUs") /* rpc */
 
-#define MAKE_KEY(_key, _str) inline constexpr auto _key = transmission::intern::known(_str);
+#define MAKE_KEY(_key, _str) inline constexpr auto _key = transmission::symbol::known(_str);
 APICOMPAT_KEYS(MAKE_KEY)
 #undef MAKE_KEY
 
@@ -1251,7 +1251,7 @@ void convert_incoming_data(tr_variant& var)
 
 void register_deprecated_keys()
 {
-    using namespace transmission::intern;
+    using namespace transmission::symbol;
     auto const keys = std::vector<tr_quark>{
 #define KEY_NAME(_key, _str) _key,
         APICOMPAT_KEYS(KEY_NAME)

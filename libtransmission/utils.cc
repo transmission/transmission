@@ -796,7 +796,7 @@ void tr_lib_init()
 
             libtransmission::serializer::Converters::ensure_default_converters();
 
-            using namespace transmission::intern;
+            using namespace transmission::symbol;
             auto const known = std::vector<tr_quark>{
 #define KNOWN_KEY_NAME(_key, _str) _key,
                 KNOWN_KEYS(KNOWN_KEY_NAME)

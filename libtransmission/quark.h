@@ -9,7 +9,7 @@
 #include <optional>
 #include <string_view>
 
-#include "libtransmission/intern.h"
+#include "libtransmission/symbol.h"
 
 /**
  * Quarks — a 2-way association between a compile-time interned string
@@ -17,7 +17,7 @@
  * (e.g. strings in settings files, the JSON-RPC API, and BitTorrent protocol)
  * cheap to store, cheap to compare, and usable in switch-case statements.
  */
-using tr_quark = transmission::intern::Interned;
+using tr_quark = transmission::symbol::Symbol;
 
 // Well-known names.
 #define KNOWN_KEYS(X) \
@@ -450,7 +450,7 @@ using tr_quark = transmission::intern::Interned;
     X(TR_KEY_webseeds_sending_to_us, "webseeds_sending_to_us") /* rpc */ \
     X(TR_KEY_yourip, "yourip") /* BEP0010; BT protocol */
 
-#define MAKE_KNOWN_KEY(_key, _str) inline constexpr auto _key = transmission::intern::known(_str);
+#define MAKE_KNOWN_KEY(_key, _str) inline constexpr auto _key = transmission::symbol::known(_str);
 KNOWN_KEYS(MAKE_KNOWN_KEY)
 #undef MAKE_KNOWN_KEY
 
