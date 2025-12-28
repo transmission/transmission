@@ -12,12 +12,12 @@ using namespace transmission::intern;
 
 std::optional<tr_quark> tr_quark_lookup(std::string_view const str)
 {
-    return Interner::instance().lookup(str);
+    return StringInterner::instance().get(str);
 }
 
 tr_quark tr_quark_new(std::string_view const str)
 {
-    return Interner::instance().add(str);
+    return StringInterner::instance().get_or_intern(str);
 }
 
 std::string_view tr_quark_get_string_view(tr_quark const quark)

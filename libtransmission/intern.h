@@ -106,22 +106,23 @@ template<std::size_t N>
 /**
  * A registry of `Interned` strings.
  */
-class Interner
+class StringInterner
 {
 public:
-    static Interner& instance();
+    static StringInterner& instance();
 
-    Interner(Interner const&) = delete;
-    Interner(Interner&&) = delete;
-    Interner& operator=(Interner const&) = delete;
-    Interner& operator=(Interner&&) = delete;
+    StringInterner(StringInterner const&) = delete;
+    StringInterner(StringInterner&&) = delete;
+    StringInterner& operator=(StringInterner const&) = delete;
+    StringInterner& operator=(StringInterner&&) = delete;
 
-    // Get the interned copy of `str`.
-    [[nodiscard]] std::optional<Interned> lookup(std::string_view str) const noexcept;
+    // Return the interned copy of `str`, if any.
+    // Can be used to query if a string has already been interned without interning.
+    [[nodiscard]] std::optional<Interned> get(std::string_view str) const noexcept;
 
     // Add a new Interned string.
     // If the string is already interned, return the existing copy.
-    [[nodiscard]] Interned add(std::string_view str);
+    [[nodiscard]] Interned get_or_intern(std::string_view str);
 
     // Add strings as a batch.
     // Only use this to register compile-time strings during startup.
@@ -134,8 +135,8 @@ public:
     }
 
 private:
-    Interner();
-    ~Interner() noexcept = default;
+    StringInterner();
+    ~StringInterner() noexcept = default;
 
     struct Impl;
     std::unique_ptr<Impl> const pimpl_;

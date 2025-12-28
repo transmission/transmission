@@ -20,12 +20,12 @@
 
 namespace transmission::intern
 {
-struct Interner::Impl
+struct StringInterner::Impl
 {
 public:
-    [[nodiscard]] std::optional<Interned> lookup(std::string_view const str) const noexcept
+    [[nodiscard]] std::optional<Interned> get(std::string_view const str) const noexcept
     {
-        if (auto const found = lookup_known(str))
+        if (auto const found = get_known(str))
         {
             return found;
         }
@@ -38,16 +38,16 @@ public:
         return {};
     }
 
-    [[nodiscard]] Interned add(std::string_view const str)
+    [[nodiscard]] Interned get_or_internadd(std::string_view const str)
     {
-        if (auto const found = lookup(str))
+        if (auto const found = get(str))
         {
             return *found;
         }
 
         if (next_runtime_ > detail::PayloadMask)
         {
-            throw std::overflow_error("intern::Interner exhausted runtime id space");
+            throw std::overflow_error("intern::StringInterner exhausted runtime id space");
         }
 
         auto const view = store(str);
@@ -110,7 +110,7 @@ private:
         return std::string_view{ strings_.back() };
     }
 
-    [[nodiscard]] std::optional<Interned> lookup_known(std::string_view const name) const noexcept
+    [[nodiscard]] std::optional<Interned> get_known(std::string_view const name) const noexcept
     {
         auto const& v = known_;
         auto const tmp = Interned{ name, detail::known_key(name) };
@@ -123,7 +123,7 @@ private:
         return {};
     }
 
-    // Set at startup with `Interner::addTable()`
+    // Set at startup with `StringInterner::addTable()`
     using KnownVec = std::vector<Interned>;
     KnownVec known_;
 
@@ -133,29 +133,29 @@ private:
     uint32_t next_runtime_ = 1;
 };
 
-Interner& Interner::instance()
+StringInterner& StringInterner::instance()
 {
-    static Interner singleton;
+    static StringInterner singleton;
     return singleton;
 }
 
-Interner::Interner()
+StringInterner::StringInterner()
     : pimpl_{ std::make_unique<Impl>() }
 {
 }
 
-void Interner::add_known(Interned const* const entries, std::size_t const n_entries)
+void StringInterner::add_known(Interned const* const entries, std::size_t const n_entries)
 {
     pimpl_->add_known(entries, n_entries);
 }
 
-std::optional<Interned> Interner::lookup(std::string_view const str) const noexcept
+std::optional<Interned> StringInterner::get(std::string_view const str) const noexcept
 {
-    return pimpl_->lookup(str);
+    return pimpl_->get(str);
 }
 
-Interned Interner::add(std::string_view const str)
+Interned StringInterner::get_or_intern(std::string_view const str)
 {
-    return pimpl_->add(str);
+    return pimpl_->get_or_internadd(str);
 }
 } // namespace transmission::intern

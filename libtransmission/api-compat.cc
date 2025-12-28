@@ -1257,7 +1257,7 @@ void register_deprecated_keys()
         APICOMPAT_KEYS(KEY_NAME)
 #undef KEY_NAME
     };
-    Interner::instance().add_known(std::data(keys), std::size(keys));
+    StringInterner::instance().add_known(std::data(keys), std::size(keys));
 }
 
 } // namespace libtransmission::api_compat

@@ -802,7 +802,7 @@ void tr_lib_init()
                 KNOWN_KEYS(KNOWN_KEY_NAME)
 #undef KNOWN_KEY_NAME
             };
-            Interner::instance().add_known(std::data(known), std::size(known));
+            StringInterner::instance().add_known(std::data(known), std::size(known));
 
             libtransmission::api_compat::register_deprecated_keys();
         });
