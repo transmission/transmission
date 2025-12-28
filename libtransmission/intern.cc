@@ -115,7 +115,7 @@ private:
         auto const& v = known_;
         auto const tmp = Interned{ name, detail::known_key(name) };
         auto const iter = std::lower_bound(std::begin(v), std::end(v), tmp, InternedLt{});
-        if (iter != std::end(v) && iter->id() == tmp.id() && iter->view() == tmp.view())
+        if (iter != std::end(v) && iter->id() == tmp.id() && iter->sv() == tmp.sv())
         {
             return *iter;
         }

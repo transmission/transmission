@@ -20,7 +20,7 @@ TEST_F(QuarkTest, allKnownKeysCanBeLookedUp){
         auto const str = tr_quark_get_string_view(_key); \
         auto const key = tr_quark_lookup(str); \
         ASSERT_TRUE(key.has_value()); \
-        EXPECT_EQ(_str, key->view()); \
+        EXPECT_EQ(_str, key->sv()); \
     }
     KNOWN_KEYS(TEST_KNOWN_KEY)
 #undef TEST_KNOWN_KEY

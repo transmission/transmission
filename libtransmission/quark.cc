@@ -22,5 +22,5 @@ tr_quark tr_quark_new(std::string_view const str)
 
 std::string_view tr_quark_get_string_view(tr_quark const quark)
 {
-    return quark.view();
+    return quark.sv();
 }

@@ -28,14 +28,14 @@ namespace transmission::intern
  */
 struct Interned
 {
-    [[nodiscard]] constexpr std::string_view view() const noexcept
+    [[nodiscard]] constexpr std::string_view sv() const noexcept
     {
-        return sv;
+        return sv_;
     }
 
     [[nodiscard]] constexpr uint32_t id() const noexcept
     {
-        return key;
+        return id_;
     }
 
     // Implicit conversion to uint32_t.
@@ -43,26 +43,17 @@ struct Interned
     // NOLINTNEXTLINE(google-explicit-constructor)
     constexpr operator uint32_t() const noexcept
     {
-        return key;
+        return id_;
     }
 
-    // TODO(C++20) spaceship operator
     [[nodiscard]] constexpr bool operator==(Interned const& that) const noexcept
     {
-        return key == that.key;
-    }
-    [[nodiscard]] constexpr bool operator<(Interned const& that) const noexcept
-    {
-        return key < that.key;
-    }
-    [[nodiscard]] constexpr bool operator>(Interned const& that) const noexcept
-    {
-        return key > that.key;
+        return id_ == that.id_;
     }
 
-    std::string_view sv;
+    std::string_view sv_;
 
-    uint32_t key = {};
+    uint32_t id_ = {};
 };
 
 namespace detail
