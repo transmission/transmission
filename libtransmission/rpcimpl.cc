@@ -2630,12 +2630,14 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
             }
         });
 
-    for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
+    for (auto const& row : tr_session::Scripts)
     {
+        auto const script = row.script;
+
         map.try_emplace(
-            enabled_key,
-            [script](tr_session const& src) -> tr_variant { return src.useScript(script); },
-            [script](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+            row.enabled_key,
+            [&](tr_session const& src) -> tr_variant { return src.useScript(script); },
+            [&](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
             {
                 if (auto const val = src.value_if<bool>())
                 {
@@ -2644,9 +2646,9 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
             });
 
         map.try_emplace(
-            script_key,
-            [script](tr_session const& src) -> tr_variant { return src.useScript(script); },
-            [script](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+            row.filename_key,
+            [&](tr_session const& src) -> tr_variant { return src.useScript(script); },
+            [&](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
             {
                 if (auto const val = src.value_if<std::string_view>())
                 {
