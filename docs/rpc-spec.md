@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> Transmisson 4.1.0 (`rpc_version` 18) added support for the JSON-RPC 2.0 protocol and converted all RPC strings to snake_case.
+> Transmisson 4.1.0 (`rpc_version_semver` 6.0.0) added support for the JSON-RPC 2.0 protocol and converted all RPC strings to snake_case.
 >
 > The old bespoke RPC protocol, and the old mix of kebab-case and camelCase strings, are still supported in Transmission 4 but are deprecated and will be removed in the future. People using the old protocol should update their code!
 >
@@ -596,9 +596,9 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `queue_stalled_minutes` | number | torrents that are idle for N minuets aren't counted toward `seed_queue_size` or `download_queue_size`
 | `rename_partial_files` | boolean | true means append `.part` to incomplete files
 | `reqq` | number | the number of outstanding block requests a peer is allowed to queue in the client
-| `rpc_version_minimum` | number | the minimum RPC API version supported
+| `rpc_version_minimum` | number | **DEPRECATED** the minimum RPC API version supported
 | `rpc_version_semver` | string | the current RPC API version in a [semver](https://semver.org)-compatible string
-| `rpc_version` | number | the current RPC API version
+| `rpc_version` | number | **DEPRECATED** the current RPC API version
 | `script_torrent_added_enabled` | boolean | whether or not to call the `added` script
 | `script_torrent_added_filename` | string | filename of the script to run
 | `script_torrent_done_enabled` | boolean | whether or not to call the `done` script
@@ -633,14 +633,6 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `size_bytes`   | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
 | `memory_units` | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
 | `memory_bytes` | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
-
-`rpc_version` indicates the RPC interface version supported by the RPC server.
-It is incremented when a new version of Transmission changes the RPC interface.
-
-`rpc_version_minimum` indicates the oldest API supported by the RPC server.
-It is changes when a new version of Transmission changes the RPC interface
-in a way that is not backwards compatible. There are no plans for this
-to be common behavior.
 
 #### 4.1.1 Mutators
 Method name: `session_set`
@@ -817,7 +809,7 @@ There are two ways to check for API compatibility. Since most developers know
 recommended way. That value is a semver-compatible string of the RPC protocol
 version number.
 
-Since Transmission predates the semver 1.0 spec, the previous scheme was for
+**DEPRECATED** Since Transmission predates the semver 1.0 spec, the previous scheme was for
 the RPC version to be a whole number and to increment it whenever a change was
 made. That is `session_get`'s `rpc_version`. `rpc_version_minimum` lists the
 oldest version that is compatible with the current version; i.e. an app coded
@@ -1095,3 +1087,5 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | `session_set` | new arg `preferred_transports`
 | `session_get` | :warning: **DEPRECATED** `utp_enabled`. Use `preferred_transports` instead.
 | `session_set` | :warning: **DEPRECATED** `utp_enabled`. Use `preferred_transports` instead.
+| `session_get` | :warning: **DEPRECATED** `rpc_version`. Use `rpc_version_semver` instead.
+| `session_get` | :warning: **DEPRECATED** `rpc_version_minimum`. Use `rpc_version_semver` instead.
