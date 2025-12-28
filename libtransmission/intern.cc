@@ -16,6 +16,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include "libtransmission/intern.h"
 
 namespace transmission::intern
@@ -47,7 +49,7 @@ public:
 
         if (next_runtime_ > detail::PayloadMask)
         {
-            throw std::overflow_error("intern::StringInterner exhausted runtime id space");
+            fmt::print(stderr, "intern::StringInterner exhausted runtime id space\n");
         }
 
         auto const view = store(str);
