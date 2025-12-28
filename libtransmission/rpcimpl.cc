@@ -2038,7 +2038,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 }
 
 using ErrorInfo = std::pair<JsonRpc::Error::Code, std::string>;
-auto const ErrorNone = ErrorInfo{ JsonRpc::Error::SUCCESS, {} };
+auto const error_none = ErrorInfo{ JsonRpc::Error::SUCCESS, {} };
 
 using SessionGetter = std::function<tr_variant(tr_session const& src)>;
 using SessionSetter = std::function<void(tr_session& tgt, tr_variant const&, ErrorInfo& err)>;
@@ -2699,7 +2699,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     auto const& accessors = session_helpers::session_accessors();
 
-    auto err = ErrorNone;
+    auto err = error_none;
 
     for (auto const& [key, val] : params)
     {
@@ -2711,7 +2711,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
             }
         }
 
-        if (err != ErrorNone)
+        if (err != error_none)
         {
             break;
         }
@@ -2741,7 +2741,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         }
     }
 
-    return ErrorNone;
+    return error_none;
 }
 
 [[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> freeSpace(
