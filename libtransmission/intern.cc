@@ -45,6 +45,11 @@ public:
             return *found;
         }
 
+        if (next_runtime_ > detail::PayloadMask)
+        {
+            throw std::overflow_error("intern::Interner exhausted runtime id space");
+        }
+
         auto const view = store(str);
         auto const id = runtime_id(next_runtime_++);
         runtime_.emplace(view, id);
@@ -66,7 +71,7 @@ private:
     {
         [[nodiscard]] std::size_t operator()(std::string_view const str) const noexcept
         {
-            return static_cast<std::size_t>(detail::fnv1a_64(str));
+            return static_cast<std::size_t>(detail::fnv1a_32(str));
         }
     };
 
@@ -94,7 +99,7 @@ private:
         }
     };
 
-    [[nodiscard]] static constexpr uint64_t runtime_id(uint64_t const counter) noexcept
+    [[nodiscard]] static constexpr uint32_t runtime_id(uint32_t const counter) noexcept
     {
         return detail::RuntimeTag | (counter & detail::PayloadMask); // top bit 1
     }
@@ -124,8 +129,8 @@ private:
 
     // Runtime
     std::deque<std::string> strings_;
-    std::unordered_map<std::string_view, std::uint64_t, SvHash> runtime_;
-    uint64_t next_runtime_ = 1;
+    std::unordered_map<std::string_view, std::uint32_t, SvHash> runtime_;
+    uint32_t next_runtime_ = 1;
 };
 
 Interner& Interner::instance()

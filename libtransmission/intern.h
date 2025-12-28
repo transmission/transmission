@@ -33,15 +33,15 @@ struct Interned
         return sv;
     }
 
-    [[nodiscard]] constexpr uint64_t id() const noexcept
+    [[nodiscard]] constexpr uint32_t id() const noexcept
     {
         return key;
     }
 
-    // Implicit conversion to uint64_t.
+    // Implicit conversion to uint32_t.
     // This way, constexpr `Interned` instances can be used switch-case statements
     // NOLINTNEXTLINE(google-explicit-constructor)
-    constexpr operator uint64_t() const noexcept
+    constexpr operator uint32_t() const noexcept
     {
         return key;
     }
@@ -62,32 +62,32 @@ struct Interned
 
     std::string_view sv;
 
-    uint64_t key = {};
+    uint32_t key = {};
 };
 
 namespace detail
 {
 // FNV hashes are designed to be fast while maintaining a low collision rate.
 // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
-constexpr uint64_t fnv1a_64(std::string_view s) noexcept
+constexpr uint32_t fnv1a_32(std::string_view s) noexcept
 {
-    uint64_t h = 14695981039346656037ULL;
+    uint32_t h = 2166136261U;
     for (char const c : s)
     {
         h ^= static_cast<unsigned char>(c);
-        h *= 1099511628211ULL;
+        h *= 16777619U;
     }
     return h;
 }
 
 // Used to distinguish between compile-time and run-time items:
 // The top bit is true for strings interned during runtime.
-constexpr uint64_t RuntimeTag = 1ULL << 63;
-constexpr uint64_t PayloadMask = ~RuntimeTag;
+constexpr uint32_t RuntimeTag = 1U << 31;
+constexpr uint32_t PayloadMask = ~RuntimeTag;
 
-constexpr uint64_t known_key(std::string_view const s) noexcept
+constexpr uint32_t known_key(std::string_view const s) noexcept
 {
-    return fnv1a_64(s) & PayloadMask; // top bit 0
+    return fnv1a_32(s) & PayloadMask; // top bit 0
 }
 } // namespace detail
 
