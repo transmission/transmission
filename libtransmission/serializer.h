@@ -128,8 +128,6 @@ public:
     template<typename T>
     static tr_variant serialize(T const& src)
     {
-        ensure_default_converters();
-
         if (converter_storage<T>.serialize != nullptr)
         {
             return converter_storage<T>.serialize(src);
@@ -161,8 +159,6 @@ public:
     template<typename T>
     static bool deserialize(tr_variant const& src, T* const ptgt)
     {
-        ensure_default_converters();
-
         if (converter_storage<T>.deserialize != nullptr)
         {
             return converter_storage<T>.deserialize(src, ptgt);
@@ -198,9 +194,9 @@ public:
         converter_storage<T> = { deserialize, serialize };
     }
 
-private:
     static void ensure_default_converters();
 
+private:
     template<typename T>
     struct ConverterStorage
     {
