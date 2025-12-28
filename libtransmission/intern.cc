@@ -60,7 +60,7 @@ public:
     {
         auto& v = known_;
         v.insert(std::end(v), items, items + n_items);
-        std::sort(std::begin(v), std::end(v), InternedLt{});
+        std::sort(std::begin(v), std::end(v), IternedIdLt{});
 
         assert(std::none_of(std::begin(v), std::end(v), IsRuntime{}));
         assert(std::adjacent_find(std::begin(v), std::end(v), InternedEqId{}) == std::end(v));
@@ -75,9 +75,9 @@ private:
         }
     };
 
-    struct InternedLt
+    struct IternedIdLt
     {
-        [[nodiscard]] bool operator()(Interned const& a, Interned const& b) const noexcept
+        [[nodiscard]] constexpr bool operator()(Interned const& a, Interned const& b) const noexcept
         {
             return a.id() < b.id();
         }
@@ -85,7 +85,7 @@ private:
 
     struct InternedEqId
     {
-        [[nodiscard]] bool operator()(Interned const& a, Interned const& b) const noexcept
+        [[nodiscard]] constexpr bool operator()(Interned const& a, Interned const& b) const noexcept
         {
             return a.id() == b.id();
         }
@@ -114,7 +114,7 @@ private:
     {
         auto const& v = known_;
         auto const tmp = Interned{ name, detail::known_key(name) };
-        auto const iter = std::lower_bound(std::begin(v), std::end(v), tmp, InternedLt{});
+        auto const iter = std::lower_bound(std::begin(v), std::end(v), tmp, IternedIdLt{});
         if (iter != std::end(v) && iter->id() == tmp.id() && iter->sv() == tmp.sv())
         {
             return *iter;
