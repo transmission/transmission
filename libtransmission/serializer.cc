@@ -137,6 +137,16 @@ bool to_encryption_mode(tr_variant const& src, tr_encryption_mode* tgt)
 
 tr_variant from_encryption_mode(tr_encryption_mode const& val)
 {
+    static constexpr auto& Keys = EncryptionKeys;
+
+    for (auto const& [key, encryption] : Keys)
+    {
+        if (encryption == val)
+        {
+            return tr_variant::unmanaged_string(key);
+        }
+    }
+
     return static_cast<int64_t>(val);
 }
 
