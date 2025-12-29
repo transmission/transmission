@@ -1089,3 +1089,6 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | `session_set` | :warning: **DEPRECATED** `utp_enabled`. Use `preferred_transports` instead.
 | `session_get` | :warning: **DEPRECATED** `rpc_version`. Use `rpc_version_semver` instead.
 | `session_get` | :warning: **DEPRECATED** `rpc_version_minimum`. Use `rpc_version_semver` instead.
+| `torrent_get` | :bomb: `wanted` is now a boolean array instead of 1/0
+| `session_get` | :bomb: renamed `cache_size_mb` to `cache_size_mib`
+| `session_set` | :bomb: renamed `cache_size_mb` to `cache_size_mib`
