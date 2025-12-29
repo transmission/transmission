@@ -198,6 +198,7 @@ struct RemoteConfig
 
 enum
 {
+    ID_NOOP,
     ID_SESSION,
     ID_STATS,
     ID_DETAILS,
@@ -2293,7 +2294,7 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
     auto* result = top->find_if<tr_variant::Map>(TR_KEY_result);
     result = result ? result : &empty_result;
 
-    switch (top->value_if<int64_t>(TR_KEY_id).value_or(-1))
+    switch (top->value_if<int64_t>(TR_KEY_id).value_or(ID_NOOP))
     {
     case ID_SESSION:
         print_session(*result);
@@ -2516,6 +2517,7 @@ tr_variant::Map& ensure_sset(tr_variant& sset)
         map = sset.get_if<tr_variant::Map>();
         map->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
         map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_set));
+        map->try_emplace(TR_KEY_id, ID_NOOP);
     }
 
     auto* params = map->find_if<tr_variant::Map>(TR_KEY_params);
