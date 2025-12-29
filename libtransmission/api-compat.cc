@@ -412,6 +412,7 @@ namespace EncryptionModeString
 auto constexpr PreferEncryption = std::string_view{ "preferred" };
 auto constexpr RequireEncryption = std::string_view{ "required" };
 auto constexpr PreferClear = std::string_view{ "allowed" };
+auto constexpr PreferClearLegacy = std::string_view{ "tolerated" };
 } // namespace EncryptionModeString
 
 /**
@@ -811,6 +812,31 @@ void convert_files_wanted_response(tr_variant::Map& top, State const& state)
         }
     }
 }
+
+// ---
+
+void convert_encryption(tr_variant& var, State const& state)
+{
+    using namespace EncryptionModeString;
+    if (auto const val = var.value_if<std::string_view>())
+    {
+        switch (state.style)
+        {
+        case Style::Tr5:
+            if (val == PreferClearLegacy)
+            {
+                var = tr_variant::unmanaged_string(PreferClear);
+            }
+            break;
+        case Style::Tr4:
+            if (val == PreferClear)
+            {
+                var = tr_variant::unmanaged_string(PreferClearLegacy);
+            }
+            break;
+        }
+    }
+}
 } // namespace convert_jsonrpc_helpers
 
 // jsonrpc <-> legacy rpc conversion
@@ -856,6 +882,14 @@ void convert_jsonrpc(tr_variant::Map& top, State const& state)
         top.try_emplace(TR_KEY_result, tr_variant::unmanaged_string("success"));
 
         convert_files_wanted_response(top, state);
+
+        if (auto* const args = top.find_if<tr_variant::Map>(TR_KEY_arguments))
+        {
+            if (auto const iter = args->find(TR_KEY_encryption); iter != std::end(*args))
+            {
+                convert_encryption(iter->second, state);
+            }
+        }
     }
 
     if (state.is_response && is_legacy && !state.is_success)
@@ -904,6 +938,14 @@ void convert_jsonrpc(tr_variant::Map& top, State const& state)
         top.replace_key(TR_KEY_arguments, TR_KEY_result);
 
         convert_files_wanted_response(top, state);
+
+        if (auto* const result = top.find_if<tr_variant::Map>(TR_KEY_result))
+        {
+            if (auto const iter = result->find(TR_KEY_encryption); iter != std::end(*result))
+            {
+                convert_encryption(iter->second, state);
+            }
+        }
     }
 
     if (state.is_response && is_jsonrpc && !state.is_success && state.was_legacy)
@@ -947,11 +989,27 @@ void convert_jsonrpc(tr_variant::Map& top, State const& state)
     if (state.is_request && is_jsonrpc)
     {
         top.replace_key(TR_KEY_arguments, TR_KEY_params);
+
+        if (auto* const params = top.find_if<tr_variant::Map>(TR_KEY_params))
+        {
+            if (auto const iter = params->find(TR_KEY_encryption); iter != std::end(*params))
+            {
+                convert_encryption(iter->second, state);
+            }
+        }
     }
 
     if (state.is_request && is_legacy)
     {
         top.replace_key(TR_KEY_params, TR_KEY_arguments);
+
+        if (auto* const args = top.find_if<tr_variant::Map>(TR_KEY_arguments))
+        {
+            if (auto const iter = args->find(TR_KEY_encryption); iter != std::end(*args))
+            {
+                convert_encryption(iter->second, state);
+            }
+        }
     }
 }
 } // namespace
