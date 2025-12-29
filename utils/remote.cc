@@ -3382,10 +3382,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     params.try_emplace(TR_KEY_move, true);
                     add_id_arg(params, config);
 
-                    auto map = tr_variant::Map{ 3U };
+                    auto map = tr_variant::Map{ 4U };
                     map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_set_location));
                     map.try_emplace(TR_KEY_params, std::move(params));
+                    map.try_emplace(TR_KEY_id, ID_NOOP);
 
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
@@ -3412,10 +3413,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     params.try_emplace(TR_KEY_move, false);
                     add_id_arg(params, config);
 
-                    auto map = tr_variant::Map{ 3U };
+                    auto map = tr_variant::Map{ 4U };
                     map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_set_location));
                     map.try_emplace(TR_KEY_params, std::move(params));
+                    map.try_emplace(TR_KEY_id, ID_NOOP);
 
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
