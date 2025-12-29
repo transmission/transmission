@@ -1865,7 +1865,8 @@ void tr_torrent::set_labels(labels_t const& new_labels)
         }
     }
     labels_.shrink_to_fit();
-    this->set_dirty();
+    set_dirty();
+    mark_edited();
 }
 
 // ---
