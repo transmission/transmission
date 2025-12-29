@@ -440,6 +440,7 @@ struct tr_torrent
             file_priorities_.set(file, priority);
             priority_changed_.emit(this, &file, 1U, priority);
             set_dirty();
+            mark_changed();
         }
     }
 

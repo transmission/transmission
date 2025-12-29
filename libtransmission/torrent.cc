@@ -1961,6 +1961,7 @@ void tr_torrent::set_file_priorities(tr_file_index_t const* files, tr_file_index
         file_priorities_.set(files, file_count, priority);
         priority_changed_.emit(this, files, file_count, priority);
         set_dirty();
+        mark_changed();
     }
 }
 
