@@ -579,7 +579,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `download_dir_free_space` | number |  **DEPRECATED** Use the `free_space` method instead.
 | `download_queue_enabled` | boolean | if true, limit how many torrents can be downloaded at once
 | `download_queue_size` | number | max number of torrents to download at once (see `download_queue_enabled`)
-| `encryption` | string | `required`, `preferred`, `tolerated`
+| `encryption` | string | `required`, `preferred`, `allowed`
 | `idle_seeding_limit` | number | torrents we're seeding will be stopped if they're idle for this long
 | `idle_seeding_limit_enabled` | boolean | true if the seeding inactivity limit is honored by default
 | `incomplete_dir` | string | path for incomplete torrents, when enabled
@@ -1092,3 +1092,5 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | `torrent_get` | :bomb: `wanted` is now a boolean array instead of 1/0
 | `session_get` | :bomb: renamed `cache_size_mb` to `cache_size_mib`
 | `session_set` | :bomb: renamed `cache_size_mb` to `cache_size_mib`
+| `session_get` | :bomb: renamed `tolerated` to `allowed` in `encryption`
+| `session_set` | :bomb: renamed `tolerated` to `allowed` in `encryption`

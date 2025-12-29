@@ -1999,6 +1999,14 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         }
     }
 
+    if (auto const iter = args_in.find(TR_KEY_encryption); iter != std::end(args_in))
+    {
+        if (!session->deserialize_encryption_mode(iter->second))
+        {
+            return { Error::INVALID_PARAMS, R"(must be one of "preferred", "required" or "allowed")"s };
+        }
+    }
+
     if (auto const val = args_in.value_if<int64_t>(TR_KEY_cache_size_mib); val)
     {
         tr_sessionSetCacheLimit_MB(session, *val);
@@ -2217,22 +2225,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionLimitSpeed(session, TR_UP, *val);
     }
 
-    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_encryption))
-    {
-        if (*val == "required"sv)
-        {
-            tr_sessionSetEncryption(session, TR_ENCRYPTION_REQUIRED);
-        }
-        else if (*val == "tolerated"sv)
-        {
-            tr_sessionSetEncryption(session, TR_CLEAR_PREFERRED);
-        }
-        else
-        {
-            tr_sessionSetEncryption(session, TR_ENCRYPTION_PREFERRED);
-        }
-    }
-
     if (auto const val = args_in.value_if<int64_t>(TR_KEY_anti_brute_force_threshold); val)
     {
         tr_sessionSetAntiBruteForceThreshold(session, static_cast<int>(*val));
@@ -2286,21 +2278,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     args_out.try_emplace(TR_KEY_upload_speed, session->piece_speed(TR_UP).base_quantity());
 
     return { JsonRpc::Error::SUCCESS, {} };
-}
-
-[[nodiscard]] constexpr std::string_view getEncryptionModeString(tr_encryption_mode mode)
-{
-    switch (mode)
-    {
-    case TR_CLEAR_PREFERRED:
-        return "tolerated"sv;
-
-    case TR_ENCRYPTION_REQUIRED:
-        return "required"sv;
-
-    default:
-        return "preferred"sv;
-    }
 }
 
 [[nodiscard]] auto values_get_units()
@@ -2377,7 +2354,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_download_queue_size:
         return session.queueSize(TR_DOWN);
     case TR_KEY_encryption:
-        return tr_variant::unmanaged_string(getEncryptionModeString(tr_sessionGetEncryption(&session)));
+        return session.serialize_encryption_mode();
     case TR_KEY_idle_seeding_limit:
         return session.idleLimitMinutes();
     case TR_KEY_idle_seeding_limit_enabled:
