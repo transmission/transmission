@@ -1255,11 +1255,6 @@ private:
         }
     }
 
-    constexpr void bump_date_changed(time_t when)
-    {
-        date_changed_ = std::max(date_changed_, when);
-    }
-
     void set_verify_state(VerifyState state);
 
     [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
@@ -1289,7 +1284,18 @@ private:
         completion_.set_has_piece(piece, has);
     }
 
+    constexpr void bump_date_changed(time_t when)
+    {
+        date_changed_ = std::max(date_changed_, when);
+    }
+
     void mark_changed();
+
+    constexpr void bump_date_edited(time_t when)
+    {
+        date_edited_ = std::max(date_edited_, when);
+    }
+
     void mark_edited();
 
     constexpr void set_dirty(bool dirty = true) noexcept

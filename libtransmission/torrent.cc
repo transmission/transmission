@@ -2535,7 +2535,7 @@ bool tr_torrentHasMetadata(tr_torrent const* tor)
 
 void tr_torrent::mark_edited()
 {
-    this->date_edited_ = tr_time();
+    bump_date_edited(tr_time());
 }
 
 void tr_torrent::mark_changed()
