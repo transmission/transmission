@@ -12,6 +12,7 @@
 #include "libtransmission/api-compat.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
+#include "libtransmission/transmission.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 
@@ -406,6 +407,13 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
 
 auto constexpr MethodNotFoundLegacyErrmsg = std::string_view{ "no method name" };
 
+namespace EncryptionModeString
+{
+auto constexpr PreferEncryption = std::string_view{ "preferred" };
+auto constexpr RequireEncryption = std::string_view{ "required" };
+auto constexpr PreferClear = std::string_view{ "allowed" };
+} // namespace EncryptionModeString
+
 /**
  * Guess the error code from a legacy RPC response message.
  *
@@ -673,6 +681,53 @@ void convert_keys(tr_variant& var, State& state)
         });
 }
 
+void convert_settings_encryption(tr_variant::Map& top, State const& state)
+{
+    if (state.is_rpc)
+    {
+        return;
+    }
+
+    if (state.style == Style::Tr4)
+    {
+        using namespace EncryptionModeString;
+        if (auto const encryption = top.value_if<std::string_view>(TR_KEY_encryption); encryption == PreferEncryption)
+        {
+            top.insert_or_assign(TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
+        }
+        else if (encryption == RequireEncryption)
+        {
+            top.insert_or_assign(TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
+        }
+        else if (encryption == PreferClear)
+        {
+            top.insert_or_assign(TR_KEY_encryption, TR_CLEAR_PREFERRED);
+        }
+    }
+
+    if (state.style == Style::Tr5)
+    {
+        if (auto const* const encryption = top.find_if<int64_t>(TR_KEY_encryption))
+        {
+            using namespace EncryptionModeString;
+            switch (*encryption)
+            {
+            case TR_CLEAR_PREFERRED:
+                top.insert_or_assign(TR_KEY_encryption, tr_variant::unmanaged_string(PreferClear));
+                break;
+            case TR_ENCRYPTION_PREFERRED:
+                top.insert_or_assign(TR_KEY_encryption, tr_variant::unmanaged_string(PreferEncryption));
+                break;
+            case TR_ENCRYPTION_REQUIRED:
+                top.insert_or_assign(TR_KEY_encryption, tr_variant::unmanaged_string(RequireEncryption));
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
+
 namespace convert_jsonrpc_helpers
 {
 void convert_files_wanted(tr_variant::Vector& wanted, State const& state)
@@ -908,6 +963,7 @@ void convert(tr_variant& var, Style const tgt_style)
         auto state = makeState(*top);
         state.style = tgt_style;
         convert_keys(var, state);
+        convert_settings_encryption(*top, state);
         convert_jsonrpc(*top, state);
     }
 }

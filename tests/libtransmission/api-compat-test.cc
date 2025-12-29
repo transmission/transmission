@@ -581,7 +581,7 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "download_dir": "/home/user/Downloads",
     "download_queue_enabled": true,
     "download_queue_size": 5,
-    "encryption": 1,
+    "encryption": "preferred",
     "filter_mode": "show_all",
     "filter_trackers": "",
     "idle_seeding_limit": 30,
@@ -663,6 +663,30 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "utp_enabled": true,
     "watch_dir": "/home/user/Downloads",
     "watch_dir_enabled": false
+})json";
+
+constexpr std::string_view LegacyPreferClearJson = R"json({
+    "encryption": 0
+})json";
+
+constexpr std::string_view CurrentPreferClearJson = R"json({
+    "encryption": "allowed"
+})json";
+
+constexpr std::string_view LegacyPreferEncryptionJson = R"json({
+    "encryption": 1
+})json";
+
+constexpr std::string_view CurrentPreferEncryptionJson = R"json({
+    "encryption": "preferred"
+})json";
+
+constexpr std::string_view LegacyRequireEncryptionJson = R"json({
+    "encryption": 2
+})json";
+
+constexpr std::string_view CurrentRequireEncryptionJson = R"json({
+    "encryption": "required"
 })json";
 
 constexpr std::string_view BadFreeSpaceRequest = R"json({
@@ -1156,11 +1180,23 @@ TEST_F(ApiCompatTest, canConvertJsonDataFiles)
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
-    static auto constexpr TestCases = std::array<TestCase, 8U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 20U>{ {
         { "settings tr5 -> tr5", CurrentSettingsJson, Style::Tr5, CurrentSettingsJson },
         { "settings tr5 -> tr4", CurrentSettingsJson, Style::Tr4, LegacySettingsJson },
         { "settings tr4 -> tr5", LegacySettingsJson, Style::Tr5, CurrentSettingsJson },
         { "settings tr4 -> tr4", LegacySettingsJson, Style::Tr4, LegacySettingsJson },
+        { "prefer clear tr5 -> tr5", CurrentPreferClearJson, Style::Tr5, CurrentPreferClearJson },
+        { "prefer clear tr5 -> tr4", CurrentPreferClearJson, Style::Tr4, LegacyPreferClearJson },
+        { "prefer clear tr4 -> tr5", LegacyPreferClearJson, Style::Tr5, CurrentPreferClearJson },
+        { "prefer clear tr4 -> tr4", LegacyPreferClearJson, Style::Tr4, LegacyPreferClearJson },
+        { "prefer encryption tr5 -> tr5", CurrentPreferEncryptionJson, Style::Tr5, CurrentPreferEncryptionJson },
+        { "prefer encryption tr5 -> tr4", CurrentPreferEncryptionJson, Style::Tr4, LegacyPreferEncryptionJson },
+        { "prefer encryption tr4 -> tr5", LegacyPreferEncryptionJson, Style::Tr5, CurrentPreferEncryptionJson },
+        { "prefer encryption tr4 -> tr4", LegacyPreferEncryptionJson, Style::Tr4, LegacyPreferEncryptionJson },
+        { "require encryption tr5 -> tr5", CurrentRequireEncryptionJson, Style::Tr5, CurrentRequireEncryptionJson },
+        { "require encryption tr5 -> tr4", CurrentRequireEncryptionJson, Style::Tr4, LegacyRequireEncryptionJson },
+        { "require encryption tr4 -> tr5", LegacyRequireEncryptionJson, Style::Tr5, CurrentRequireEncryptionJson },
+        { "require encryption tr4 -> tr4", LegacyRequireEncryptionJson, Style::Tr4, LegacyRequireEncryptionJson },
 
         { "stats tr5 -> tr5", CurrentStatsJson, Style::Tr5, CurrentStatsJson },
         { "stats tr5 -> tr4", CurrentStatsJson, Style::Tr4, LegacyStatsJson },
