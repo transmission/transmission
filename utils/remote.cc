@@ -2533,10 +2533,11 @@ tr_variant::Map& ensure_tset(tr_variant& tset)
     auto* map = tset.get_if<tr_variant::Map>();
     if (map == nullptr)
     {
-        tset = tr_variant::Map{ 3 };
+        tset = tr_variant::Map{ 4U };
         map = tset.get_if<tr_variant::Map>();
         map->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
         map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_set));
+        map->try_emplace(TR_KEY_id, ID_NOOP);
     }
 
     auto* params = map->find_if<tr_variant::Map>(TR_KEY_params);
