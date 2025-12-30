@@ -977,7 +977,7 @@ public:
 
     [[nodiscard]] auto serialize_encryption_mode() const noexcept
     {
-        auto var = libtransmission::serializer::Converters::serialize(settings().encryption_mode);
+        auto var = libtransmission::serializer::to_variant(settings().encryption_mode);
         TR_ASSERT(var.has_value());
         return var;
     }

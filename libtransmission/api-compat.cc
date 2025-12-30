@@ -12,6 +12,7 @@
 #include "libtransmission/api-compat.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
+#include "libtransmission/serializer.h"
 #include "libtransmission/transmission.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
@@ -710,21 +711,7 @@ void convert_settings_encryption(tr_variant::Map& top, State const& state)
     {
         if (auto const* const encryption = top.find_if<int64_t>(TR_KEY_encryption))
         {
-            using namespace EncryptionModeString;
-            switch (*encryption)
-            {
-            case TR_CLEAR_PREFERRED:
-                top.insert_or_assign(TR_KEY_encryption, tr_variant::unmanaged_string(PreferClear));
-                break;
-            case TR_ENCRYPTION_PREFERRED:
-                top.insert_or_assign(TR_KEY_encryption, tr_variant::unmanaged_string(PreferEncryption));
-                break;
-            case TR_ENCRYPTION_REQUIRED:
-                top.insert_or_assign(TR_KEY_encryption, tr_variant::unmanaged_string(RequireEncryption));
-                break;
-            default:
-                break;
-            }
+            top.insert_or_assign(TR_KEY_encryption, serializer::to_variant(static_cast<tr_encryption_mode>(*encryption)));
         }
     }
 }
