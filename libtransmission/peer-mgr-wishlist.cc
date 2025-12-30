@@ -633,9 +633,14 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
                 tr_logAddInfo(fmt::format("    block {}: requested but still in 'unrequested' set", block));
             }
 
-            if (!has && !requested && !contains)
+            if (!has && !requested && !contains && begin <= block && block < end)
             {
                 tr_logAddInfo(fmt::format("    block {}: missing from 'unrequested' set", block));
+            }
+
+            if ((begin > block || block >= end) && contains)
+            {
+                tr_logAddInfo(fmt::format("    block {}: out of range but still in 'unrequested' set", block));
             }
         }
     }
