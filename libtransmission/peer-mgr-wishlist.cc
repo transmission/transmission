@@ -242,6 +242,17 @@ private:
 
     // ---
 
+    TR_CONSTEXPR20 void client_got_block(tr_block_index_t block)
+    {
+        if (auto const iter = find_by_block(block); iter != std::end(candidates_))
+        {
+            iter->unrequested.erase(block);
+            resort_piece(iter);
+        }
+    }
+
+    // ---
+
     TR_CONSTEXPR20 void peer_disconnect(tr_bitfield const& have, tr_bitfield const& requests)
     {
         dec_replication_bitfield(have);
@@ -517,7 +528,7 @@ private:
 
     CandidateVec candidates_;
 
-    std::array<libtransmission::ObserverTag, 14U> const tags_;
+    std::array<libtransmission::ObserverTag, 15U> const tags_;
 
     Mediator& mediator_;
 };
@@ -534,6 +545,8 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
           mediator_in.observe_got_bad_piece([this](tr_torrent*, tr_piece_index_t p) { got_bad_piece(p); }),
           // replication
           mediator_in.observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_bitfield(b); }),
+          // unrequested
+          mediator_in.observe_got_block([this](tr_torrent*, tr_block_index_t b) { client_got_block(b); }),
           // unrequested
           mediator_in.observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { reset_blocks_bitfield(b); }),
           // replication

@@ -111,6 +111,12 @@ protected:
             return parent_.got_bitfield_.observe(std::move(observer));
         }
 
+        [[nodiscard]] libtransmission::ObserverTag observe_got_block(
+            libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) override
+        {
+            return parent_.got_block_.observe(std::move(observer));
+        }
+
         [[nodiscard]] libtransmission::ObserverTag observe_got_choke(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override
         {
@@ -177,6 +183,7 @@ protected:
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&> peer_disconnect_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t> got_block_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_choke_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have_;
     libtransmission::SimpleObservable<tr_torrent*> got_have_all_;
@@ -913,6 +920,75 @@ TEST_F(PeerMgrWishlistTest, sentRequestsResortsPiece)
         // we requested block 0 from someone, the wishlist should resort the
         // candidate list cache
         sent_request_.emit(nullptr, nullptr, { 0, 1 });
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // wishlist prefers to get pieces completed ASAP, so it
+    // should pick the ones with the fewest unrequested blocks first.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto const spans = get_spans(100);
+        auto requested = tr_bitfield{ 300 };
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(100U, requested.count());
+        EXPECT_EQ(99U, requested.count(0, 100));
+        EXPECT_EQ(1U, requested.count(100, 300));
+    }
+
+    // Same premise as previous test, but ask for more blocks.
+    // Since the first and second piece are the second nearest
+    // to completion, those blocks should be next in line.
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto const spans = get_spans(150);
+        auto requested = tr_bitfield{ 300 };
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(150U, requested.count());
+        EXPECT_EQ(99U, requested.count(0, 100));
+        EXPECT_EQ(51U, requested.count(100, 300));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, gotBlockResortsPiece)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: three pieces, all missing
+        mediator.piece_count_ = 3;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+
+        // and we want everything
+        for (tr_piece_index_t i = 0; i < 3; ++i)
+        {
+            mediator.client_wants_piece_.insert(i);
+        }
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // we received block 0 from someone, the wishlist should resort the
+        // candidate list cache
+        got_block_.emit(nullptr, 0);
 
         return wishlist.next(n_wanted, PeerHasAllPieces);
     };
