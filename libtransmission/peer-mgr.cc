@@ -892,7 +892,8 @@ private:
                     block_history.try_emplace(block).first->second.emplace_back(
                         now,
                         fmt::format(
-                            "got bad piece {} [{}]",
+                            "got bad piece {} {} [{}]",
+                            piece,
                             peer->display_name(),
                             msgs != nullptr ? msgs->user_agent() : "webseed"sv));
                     log_block_history(block);
@@ -915,7 +916,7 @@ private:
         auto const now = std::chrono::system_clock::now();
         for (auto [block, end] = tor->block_span_for_piece(piece); block < end; ++block)
         {
-            block_history.try_emplace(block).first->second.emplace_back(now, "got bad piece"s);
+            block_history.try_emplace(block).first->second.emplace_back(now, fmt::format("got bad piece {}", piece));
             log_block_history(block);
         }
 
