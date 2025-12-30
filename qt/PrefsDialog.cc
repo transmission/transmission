@@ -30,6 +30,8 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include <libtransmission/transmission.h>
+
 #include "ColumnResizer.h"
 #include "Formatter.h"
 #include "FreeSpaceLabel.h"
@@ -575,9 +577,9 @@ void PrefsDialog::encryptionEdited(int i)
 
 void PrefsDialog::initPrivacyTab()
 {
-    ui_.encryptionModeCombo->addItem(tr("Allow encryption"), 0);
-    ui_.encryptionModeCombo->addItem(tr("Prefer encryption"), 1);
-    ui_.encryptionModeCombo->addItem(tr("Require encryption"), 2);
+    ui_.encryptionModeCombo->addItem(tr("Allow encryption"), TR_CLEAR_PREFERRED);
+    ui_.encryptionModeCombo->addItem(tr("Prefer encryption"), TR_ENCRYPTION_PREFERRED);
+    ui_.encryptionModeCombo->addItem(tr("Require encryption"), TR_ENCRYPTION_REQUIRED);
 
     linkWidgetToPref(ui_.encryptionModeCombo, Prefs::ENCRYPTION);
     linkWidgetToPref(ui_.blocklistCheck, Prefs::BLOCKLIST_ENABLED);
