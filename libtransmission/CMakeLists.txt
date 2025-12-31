@@ -55,7 +55,6 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
-        favicon-cache.h
         file-capacity.cc
         file-piece-map.cc
         file-piece-map.h
@@ -112,8 +111,8 @@ target_sources(${TR_NAME}
         rpc-server.h
         rpcimpl.cc
         rpcimpl.h
-        serializable.cc
-        serializable.h
+        serializer.cc
+        serializer.h
         session-alt-speeds.cc
         session-alt-speeds.h
         session-id.cc
@@ -307,7 +306,6 @@ if(INSTALL_LIB)
         FILES
             error-types.h
             error.h
-            favicon-cache.h
             file.h
             log.h
             makemeta.h

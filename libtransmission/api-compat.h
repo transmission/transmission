@@ -7,8 +7,6 @@
 
 #include <cstdint> // uint8_t
 
-#include "libtransmission/quark.h"
-
 struct tr_variant;
 
 namespace libtransmission::api_compat
@@ -19,18 +17,8 @@ enum class Style : uint8_t
     Tr5, // jsonrpc, all snake_case keys
 };
 
-[[nodiscard]] tr_variant convert(tr_variant const& src, Style tgt_style);
-
-[[nodiscard]] Style get_export_settings_style();
-
-[[nodiscard]] tr_variant convert_incoming_data(tr_variant const& src);
-[[nodiscard]] tr_variant convert_outgoing_data(tr_variant const& src);
+void convert(tr_variant& var, Style tgt_style);
+void convert_incoming_data(tr_variant& var);
+void convert_outgoing_data(tr_variant& var);
 
 } // namespace libtransmission::api_compat
-
-/**
- * Get the replacement quark from old deprecated quarks.
- *
- * Note: Temporary shim just for the transition period to snake_case.
- */
-[[nodiscard]] tr_quark tr_quark_convert(tr_quark quark);

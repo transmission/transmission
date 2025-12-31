@@ -42,13 +42,14 @@
 namespace
 {
 
+// NOLINTBEGIN(cert-err58-cpp)
 auto const ConfigName = QStringLiteral("transmission");
-
 #ifdef QT_DBUS_LIB
 auto const FDONotificationsServiceName = QStringLiteral("org.freedesktop.Notifications");
 auto const FDONotificationsPath = QStringLiteral("/org/freedesktop/Notifications");
 auto const FDONotificationsInterfaceName = QStringLiteral("org.freedesktop.Notifications");
 #endif
+// NOLINTEND(cert-err58-cpp)
 
 auto constexpr StatsRefreshIntervalMsec = 3000;
 auto constexpr SessionRefreshIntervalMsec = 3000;

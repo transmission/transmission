@@ -231,7 +231,7 @@ int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 't':
-            tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, my_optarg);
+            tr_variantDictAddStr(d, TR_KEY_peer_socket_diffserv, my_optarg);
             break;
 
         case 'u':

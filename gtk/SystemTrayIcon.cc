@@ -114,7 +114,7 @@ SystemTrayIcon::Impl::~Impl() = default;
 
 void SystemTrayIcon::Impl::activated()
 {
-    gtr_action_activate("toggle-main-window");
+    gtr_action_activate(GTR_KEY_toggle_main_window);
 }
 
 void SystemTrayIcon::Impl::popup(guint /*button*/, guint /*when*/)

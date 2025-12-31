@@ -8,9 +8,12 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
+#include <mutex>
 #include <string_view>
 
 #include <QUrl>
+
+#include <libtransmission/serializer.h>
 
 #include "Application.h" // qApp
 #include "Speed.h"
@@ -226,6 +229,42 @@ void variantInit(tr_variant* init_me, QString const& value)
 void variantInit(tr_variant* init_me, std::string_view value)
 {
     *init_me = value;
+}
+
+namespace
+{
+bool toInt(tr_variant const& src, int* tgt)
+{
+    if (auto const val = src.value_if<int64_t>())
+    {
+        if (*val < std::numeric_limits<int>::min() || *val > std::numeric_limits<int>::max())
+        {
+            return false;
+        }
+
+        *tgt = static_cast<int>(*val);
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromInt(int const& val)
+{
+    return static_cast<int64_t>(val);
+}
+} // namespace
+
+void register_qt_converters()
+{
+    static auto once = std::once_flag{};
+    std::call_once(
+        once,
+        []
+        {
+            using namespace libtransmission::serializer;
+            Converters::add(toInt, fromInt);
+        });
 }
 
 } // namespace trqt::variant_helpers

@@ -211,6 +211,7 @@ target_include_directories(${TR_NAME}-qt
 
 target_link_libraries(${TR_NAME}-qt
     PRIVATE
+        ${TR_NAME}-app
         ${TR_NAME}
         transmission::qt_impl)
 

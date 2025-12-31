@@ -16,9 +16,9 @@
 #include <libtransmission/crypto-utils.h> // for tr_rand_obj()
 #include <libtransmission/completion.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using CompletionTest = ::testing::Test;
+using CompletionTest = ::libtransmission::test::TransmissionTest;
 
 namespace
 {

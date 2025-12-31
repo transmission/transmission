@@ -10,23 +10,15 @@
 
 #include <libtransmission/quark.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-class QuarkTest : public ::testing::Test
-{
-protected:
-    template<typename T>
-    std::string quarkGetString(T i)
-    {
-        return std::string{ tr_quark_get_string_view(tr_quark{ i }) };
-    }
-};
+using QuarkTest = ::libtransmission::test::TransmissionTest;
 
 TEST_F(QuarkTest, allPredefinedKeysCanBeLookedUp)
 {
     for (size_t i = 0; i < TR_N_KEYS; ++i)
     {
-        auto const str = quarkGetString(i);
+        auto const str = tr_quark_get_string_view(i);
         auto const q = tr_quark_lookup(str);
         ASSERT_TRUE(q.has_value());
         assert(q.has_value());

@@ -156,16 +156,16 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setModel(&filter_model_);
     connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
-    std::array<std::pair<QAction*, int>, 9> const sort_modes = { {
-        { ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY },
-        { ui_.action_SortByAge, SortMode::SORT_BY_AGE },
-        { ui_.action_SortByETA, SortMode::SORT_BY_ETA },
-        { ui_.action_SortByName, SortMode::SORT_BY_NAME },
-        { ui_.action_SortByProgress, SortMode::SORT_BY_PROGRESS },
-        { ui_.action_SortByQueue, SortMode::SORT_BY_QUEUE },
-        { ui_.action_SortByRatio, SortMode::SORT_BY_RATIO },
-        { ui_.action_SortBySize, SortMode::SORT_BY_SIZE },
-        { ui_.action_SortByState, SortMode::SORT_BY_STATE },
+    auto const sort_modes = std::array<std::pair<QAction*, SortMode>, 9U>{ {
+        { ui_.action_SortByActivity, SortMode::SortByActivity },
+        { ui_.action_SortByAge, SortMode::SortByAge },
+        { ui_.action_SortByETA, SortMode::SortByEta },
+        { ui_.action_SortByName, SortMode::SortByName },
+        { ui_.action_SortByProgress, SortMode::SortByProgress },
+        { ui_.action_SortByQueue, SortMode::SortByQueue },
+        { ui_.action_SortByRatio, SortMode::SortByRatio },
+        { ui_.action_SortBySize, SortMode::SortBySize },
+        { ui_.action_SortByState, SortMode::SortByState },
     } };
 
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
@@ -173,7 +173,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     for (auto const& [action, mode] : sort_modes)
     {
-        action->setProperty(SortModeKey, mode);
+        action->setProperty(SortModeKey, QVariant::fromValue(mode));
         action_group->addAction(action);
     }
 
@@ -437,7 +437,7 @@ QMenu* MainWindow::createStatsModeMenu()
 
 void MainWindow::onSortModeChanged(QAction const* action)
 {
-    prefs_.set(Prefs::SORT_MODE, SortMode(action->property(SortModeKey).toInt()));
+    prefs_.set(Prefs::SORT_MODE, action->property(SortModeKey));
 }
 
 void MainWindow::setSortAscendingPref(bool b)
@@ -916,16 +916,16 @@ void MainWindow::refreshIcons()
 
     // network icons
 
-    auto networkPixmap = [](icons::Type type)
+    auto network_pixmap = [](icons::Type type)
     {
         auto constexpr Size = QSize{ 16, 16 };
         return icons::icon(type).pixmap(Size);
     };
-    pixmap_network_idle_ = networkPixmap(icons::Type::NetworkIdle);
-    pixmap_network_receive_ = networkPixmap(icons::Type::NetworkReceive);
-    pixmap_network_transmit_ = networkPixmap(icons::Type::NetworkTransmit);
-    pixmap_network_transmit_receive_ = networkPixmap(icons::Type::NetworkTransmitReceive);
-    pixmap_network_error_ = networkPixmap(icons::Type::NetworkError);
+    pixmap_network_idle_ = network_pixmap(icons::Type::NetworkIdle);
+    pixmap_network_receive_ = network_pixmap(icons::Type::NetworkReceive);
+    pixmap_network_transmit_ = network_pixmap(icons::Type::NetworkTransmit);
+    pixmap_network_transmit_receive_ = network_pixmap(icons::Type::NetworkTransmitReceive);
+    pixmap_network_error_ = network_pixmap(icons::Type::NetworkError);
 }
 
 /**
@@ -1109,7 +1109,6 @@ void MainWindow::trayActivated(QSystemTrayIcon::ActivationReason reason)
 void MainWindow::refreshPref(int key)
 {
     auto b = bool{};
-    auto i = int{};
     auto str = QString{};
 
     switch (key)
@@ -1130,11 +1129,12 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::SORT_MODE:
-        i = prefs_.get<SortMode>(key).mode();
-
-        for (auto* action : ui_.action_SortByActivity->actionGroup()->actions())
         {
-            action->setChecked(i == action->property(SortModeKey).toInt());
+            auto const sort_mode = prefs_.get<SortMode>(key);
+            for (auto* action : ui_.action_SortByActivity->actionGroup()->actions())
+            {
+                action->setChecked(sort_mode == action->property(SortModeKey).value<SortMode>());
+            }
         }
 
         break;
@@ -1602,7 +1602,9 @@ bool MainWindow::event(QEvent* e)
 
     case QEvent::Clipboard:
         if (auto_add_clipboard_links_)
+        {
             addTorrentFromClipboard();
+        }
         break;
 
     case QEvent::PaletteChange:

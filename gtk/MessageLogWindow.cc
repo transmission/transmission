@@ -502,15 +502,15 @@ MessageLogWindow::Impl::Impl(
 
     auto const action_group = Gio::SimpleActionGroup::create();
 
-    auto const save_action = Gio::SimpleAction::create("save-message-log");
+    auto const save_action = Gio::SimpleAction::create("save_message_log");
     save_action->signal_activate().connect([this](auto const& /*value*/) { onSaveRequest(); });
     action_group->add_action(save_action);
 
-    auto const clear_action = Gio::SimpleAction::create("clear-message-log");
+    auto const clear_action = Gio::SimpleAction::create("clear_message_log");
     clear_action->signal_activate().connect([this](auto const& /*value*/) { onClearRequest(); });
     action_group->add_action(clear_action);
 
-    auto const pause_action = Gio::SimpleAction::create_bool("pause-message-log");
+    auto const pause_action = Gio::SimpleAction::create_bool("pause_message_log");
     pause_action->signal_activate().connect([this, &action = *pause_action](auto const& /*value*/) { onPauseToggled(action); });
     action_group->add_action(pause_action);
 

@@ -338,7 +338,11 @@ struct JsonWriter
 
     void operator()(std::string_view const val) const
     {
-        writer.String(std::data(val), std::size(val));
+        // workaround for this issue: in Writer::String() at
+        // rapidjson/writer.h:205: `RAPIDJSON_ASSERT(str != 0);`
+        // that fails when val.data() is nullptr when val.empty()
+        char const* data = std::data(val);
+        writer.String(data != nullptr ? data : "", std::size(val));
     }
 
     void operator()(tr_variant::Vector const& val) const

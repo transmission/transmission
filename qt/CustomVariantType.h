@@ -15,7 +15,7 @@ public:
         TrackerStatsList = QMetaType::User,
         PeerList,
         FileList,
-        FilterModeType,
+        ShowModeType,
         SortModeType
     };
 };

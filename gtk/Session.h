@@ -7,8 +7,9 @@
 #include "GtkCompat.h"
 #include "Torrent.h"
 
+#include <libtransmission-app/favicon-cache.h>
+
 #include <libtransmission/transmission.h>
-#include <libtransmission/favicon-cache.h>
 #include <libtransmission/variant.h>
 
 #include <gdkmm/pixbuf.h>

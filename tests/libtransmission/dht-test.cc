@@ -383,8 +383,6 @@ protected:
     {
         SandboxedTest::SetUp();
 
-        tr_lib_init();
-
         tr_session_thread::tr_evthread_init();
         event_base_ = event_base_new();
     }

@@ -637,14 +637,14 @@ void tr_net_close_socket(tr_socket_t fd);
 // --- TOS / DSCP
 
 /**
- * A `toString()` / `from_string()` convenience wrapper around the TOS int value
+ * A `toString()` / `from_string()` convenience wrapper around the DiffServ int value
  */
-class tr_tos_t
+class tr_diffserv_t
 {
 public:
-    constexpr tr_tos_t() = default;
+    constexpr tr_diffserv_t() = default;
 
-    constexpr explicit tr_tos_t(int value)
+    constexpr explicit tr_diffserv_t(int value)
         : value_{ value }
     {
     }
@@ -655,7 +655,7 @@ public:
         return value_;
     }
 
-    [[nodiscard]] static std::optional<tr_tos_t> from_string(std::string_view name);
+    [[nodiscard]] static std::optional<tr_diffserv_t> from_string(std::string_view name);
 
     [[nodiscard]] std::string toString() const;
 
@@ -701,7 +701,7 @@ private:
 };
 
 // set the IPTOS_ value for the specified socket
-void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
+void tr_netSetDiffServ(tr_socket_t sock, int tos, tr_address_type type);
 
 /**
  * @brief get a human-representable string representing the network error.

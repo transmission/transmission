@@ -9,9 +9,9 @@
 
 #include <libtransmission/tr-strbuf.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using StrbufTest = ::testing::Test;
+using StrbufTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(StrbufTest, append)
