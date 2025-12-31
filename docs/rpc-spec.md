@@ -616,7 +616,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `speed_limit_up` | number | max global upload speed (kB/s)
 | `speed_limit_up_enabled` | boolean | true means enabled
 | `start_added_torrents` | boolean | true means added torrents will be started right away
-| `tcp_enabled` | boolean | true means allow TCP
+| `tcp_enabled` | boolean | **DEPRECATED** Use `preferred_transports` instead
 | `trash_original_torrent_files` | boolean | true means the .torrent file of added torrents will be deleted
 | `units` | object | see below
 | `utp_enabled` | boolean | **DEPRECATED** Use `preferred_transports` instead
@@ -1081,10 +1081,11 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | `torrent_get` | new arg `files.begin_piece`
 | `torrent_get` | new arg `files.end_piece`
 | `port_test` | new arg `ip_protocol`
-| `torrent_get` | new arg `trackerStats.downloader_count`
+| `torrent_get` | new arg `tracker_stats.downloader_count`
 | `torrent_get` | :warning: **DEPRECATED** `manual_announce_time`, it never worked
 | `session_get` | new arg `preferred_transports`
 | `session_set` | new arg `preferred_transports`
+| `session_get` | :warning: **DEPRECATED** `tcp_enabled`. Use `preferred_transports` instead.
 | `session_get` | :warning: **DEPRECATED** `utp_enabled`. Use `preferred_transports` instead.
 | `session_set` | :warning: **DEPRECATED** `utp_enabled`. Use `preferred_transports` instead.
 | `session_get` | :warning: **DEPRECATED** `rpc_version`. Use `rpc_version_semver` instead.
