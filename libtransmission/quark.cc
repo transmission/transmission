@@ -88,7 +88,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "bytes_to_client"sv, // rpc
     "bytes_to_peer"sv, // rpc
     "cache-size-mb"sv, // rpc, tr_session::Settings
-    "cache_size_mb"sv, // rpc, tr_session::Settings
+    "cache_size_mib"sv, // rpc, tr_session::Settings
     "clientIsChoked"sv, // rpc
     "clientIsInterested"sv, // rpc
     "clientName"sv, // rpc
@@ -376,7 +376,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "peer_port_random_high"sv, // tr_session::Settings
     "peer_port_random_low"sv, // tr_session::Settings
     "peer_port_random_on_start"sv, // rpc, tr_session::Settings
-    "peer_socket_tos"sv, // tr_session::Settings
+    "peer_socket_diffserv"sv, // tr_session::Settings
     "peers"sv, // rpc
     "peers2"sv, // .resume
     "peers2-6"sv, // .resume

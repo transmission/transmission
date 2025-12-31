@@ -1865,7 +1865,8 @@ void tr_torrent::set_labels(labels_t const& new_labels)
         }
     }
     labels_.shrink_to_fit();
-    this->set_dirty();
+    set_dirty();
+    mark_edited();
 }
 
 // ---
@@ -1960,6 +1961,7 @@ void tr_torrent::set_file_priorities(tr_file_index_t const* files, tr_file_index
         file_priorities_.set(files, file_count, priority);
         priority_changed_.emit(this, files, file_count, priority);
         set_dirty();
+        mark_changed();
     }
 }
 
@@ -2254,7 +2256,6 @@ size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, 
 void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
 {
     download_dir_ = path;
-    mark_changed();
     mark_edited();
     set_dirty();
     refresh_current_dir();
@@ -2535,7 +2536,9 @@ bool tr_torrentHasMetadata(tr_torrent const* tor)
 
 void tr_torrent::mark_edited()
 {
-    this->date_edited_ = tr_time();
+    auto const now = tr_time();
+    bump_date_edited(now);
+    bump_date_changed(now);
 }
 
 void tr_torrent::mark_changed()

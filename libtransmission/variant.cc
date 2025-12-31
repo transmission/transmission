@@ -222,7 +222,7 @@ tr_variant& tr_variant::merge(tr_variant const& that)
                     dest->reserve(std::size(*dest) + std::size(value));
                     for (auto const& [key, child] : value)
                     {
-                        (*dest)[tr_quark_convert(key)].merge(child);
+                        (*dest)[key].merge(child);
                     }
                 }
             }

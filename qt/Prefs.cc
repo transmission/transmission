@@ -141,7 +141,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { SCRIPT_TORRENT_DONE_FILENAME, TR_KEY_script_torrent_done_filename, QMetaType::QString },
     { SCRIPT_TORRENT_DONE_SEEDING_ENABLED, TR_KEY_script_torrent_done_seeding_enabled, QMetaType::Bool },
     { SCRIPT_TORRENT_DONE_SEEDING_FILENAME, TR_KEY_script_torrent_done_seeding_filename, QMetaType::QString },
-    { SOCKET_TOS, TR_KEY_peer_socket_tos, QMetaType::QString },
+    { SOCKET_DIFFSERV, TR_KEY_peer_socket_diffserv, QMetaType::QString },
     { START, TR_KEY_start_added_torrents, QMetaType::Bool },
     { TRASH_ORIGINAL, TR_KEY_trash_original_torrent_files, QMetaType::Bool },
     { PEX_ENABLED, TR_KEY_pex_enabled, QMetaType::Bool },

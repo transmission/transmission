@@ -524,7 +524,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //hidden pref
         if ([_fDefaults objectForKey:@"PeerSocketTOS"])
         {
-            tr_variantDictAddStr(&settings, TR_KEY_peer_socket_tos, [_fDefaults stringForKey:@"PeerSocketTOS"].UTF8String);
+            tr_variantDictAddStr(&settings, TR_KEY_peer_socket_diffserv, [_fDefaults stringForKey:@"PeerSocketTOS"].UTF8String);
         }
 
         tr_variantDictAddBool(&settings, TR_KEY_pex_enabled, [_fDefaults boolForKey:@"PEXGlobal"]);
@@ -813,8 +813,17 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     [self updateMainWindow];
 
+    if (@available(macOS 26.0, *))
+        ;
+    else
+    {
+        // <#7908> Keep older macOS clean of visual noise
+        for (NSMenuItem* item in _fWindow.menu.itemArray)
+            for (NSMenuItem* subItem in item.submenu.itemArray)
+                subItem.image = nil;
+    }
+
     //timer to update the interface every second
-    [self updateUI];
     self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateUISeconds target:self selector:@selector(updateUI) userInfo:nil
                                                   repeats:YES];
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSModalPanelRunLoopMode];
@@ -2526,7 +2535,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         {
             //not found - must be filtering
             NSAssert([self.fDefaults boolForKey:@"FilterBar"], @"expected the filter to be enabled");
-            [self.fFilterBar reset:YES];
+            [self.fFilterBar reset];
 
             row = [self.fTableView rowForItem:torrent];
 
@@ -4043,7 +4052,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //disable filtering when hiding (have to do before updateMainWindow:)
     if (!show)
     {
-        [self.fFilterBar reset:NO];
+        [self.fFilterBar reset];
     }
 
     [self.fDefaults setBool:show forKey:@"FilterBar"];
