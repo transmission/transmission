@@ -7,12 +7,13 @@ Some of Transmission's behavior can also be customized via environment variables
 # GTK / Daemon / CLI
 
 > [!IMPORTANT]
-> Transmisson 4.1.0 converted all configuration strings to snake_case.
-> 
-> Your configuration file will be converted to snake_case automatically by running and stopping Transmission.
-> Please keep a backup before upgrading if needed.
+> Transmisson 4.1.0 started a transition to convert all configuration strings to snake_case.
 >
-> The old kebab-case strings are still accepted in Transmission 4 but are deprecated and will be removed in the future.
+> The old kebab-case strings are still the default in Transmission 4, but are deprecated and will be removed in the future.
+> The new snake_case strings will become the default in Transmission 5, but you can adopt them now by starting Transmission
+> with environment variable `TR_SAVE_VERSION_FORMAT=5` (this will be the default in Transmission 5).
+>
+> You can start Transmission with `TR_SAVE_VERSION_FORMAT=4` (the default in Transmission 4) to fall back to the old format if needed.
 >
 > For documentation of the old configurations, please consult documentation from previous versions.
 > https://github.com/transmission/transmission/blob/4.0.6/docs/Editing-Configuration-Files.md
@@ -85,7 +86,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
    _Note: transmission-daemon only._
 
 #### Misc
- * **cache_size_mb:** Number (default = 4), in MiB, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes. The value is the total available to the Transmission instance. Set it to the smallest value tolerable by the random access performance of your storage medium to minimize data loss in case Transmission quit unexpectedly. Setting this to 0 bypasses the cache, which may be useful if your filesystem already has a cache layer that aggregates transactions. Pieces are guaranteed to be written to filesystem if sequential download is enabled. Otherwise, data might still be in cache only.
+ * **cache_size_mib:** Number (default = 4), in MiB, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes. The value is the total available to the Transmission instance. Set it to the smallest value tolerable by the random access performance of your storage medium to minimize data loss in case Transmission quit unexpectedly. Setting this to 0 bypasses the cache, which may be useful if your filesystem already has a cache layer that aggregates transactions. Pieces are guaranteed to be written to filesystem if sequential download is enabled. Otherwise, data might still be in cache only.
  * **default_trackers:** String (default = "") A list of double-newline separated tracker announce URLs. These are used for all torrents in addition to the per torrent trackers specified in the torrent file. If a tracker is only meant to be a backup, it should be separated from its main tracker by a single newline character. If a tracker should be used additionally to another tracker it should be separated by two newlines. (e.g. "udp://tracker.example.invalid:1337/announce\n\nudp://tracker.another-example.invalid:6969/announce\nhttps://backup-tracker.another-example.invalid:443/announce\n\nudp://tracker.yet-another-example.invalid:1337/announce", in this case tracker.example.invalid, tracker.another-example.invalid and tracker.yet-another-example.invalid would be used as trackers and backup-tracker.another-example.invalid as backup in case tracker.another-example.invalid is unreachable.
  * **dht_enabled:** Boolean (default = true) Enable [Distributed Hash Table (DHT)](https://wiki.theory.org/BitTorrentSpecification#Distributed_Hash_Table).
  * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
@@ -116,7 +117,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **peer_congestion_algorithm:** String. This is documented on https://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
  * **peer_limit_global:** Number (default = 200)
  * **peer_limit_per_torrent:** Number (default = 50)
- * **peer_socket_tos:** String (default = "le") Set the [DiffServ](https://en.wikipedia.org/wiki/Differentiated_services) parameter for outgoing packets. Allowed values are lowercase DSCP names. See the `tr_tos_t` class from `libtransmission/net.h` for the exact list of possible values.
+ * **peer_socket_diffserv:** String (default = "le") Set the [DiffServ](https://en.wikipedia.org/wiki/Differentiated_services) parameter for outgoing packets. Allowed values are lowercase DSCP names. See the `tr_diffserv_t` class from `libtransmission/net.h` for the exact list of possible values.
  * **reqq:** Number (default = 2000) The number of outstanding block requests a peer is allowed to queue in the client. The higher this number, the higher the max possible upload speed towards each peer.
  * **sequential_download** Boolean (default = false) Enable sequential download by default when adding torrents.
 

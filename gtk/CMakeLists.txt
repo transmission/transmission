@@ -199,6 +199,7 @@ target_include_directories(${TR_NAME}-gtk SYSTEM
 
 target_link_libraries(${TR_NAME}-gtk
     PRIVATE
+        ${TR_NAME}-app
         ${TR_NAME}
         transmission::gtk_impl
         deflate::deflate

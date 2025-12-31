@@ -26,6 +26,7 @@ struct TrackerStat;
 
 namespace trqt::variant_helpers
 {
+void register_qt_converters();
 
 template<typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
 auto getValue(tr_variant const* variant)

@@ -42,13 +42,14 @@
 namespace
 {
 
+// NOLINTBEGIN(cert-err58-cpp)
 auto const ConfigName = QStringLiteral("transmission");
-
 #ifdef QT_DBUS_LIB
 auto const FDONotificationsServiceName = QStringLiteral("org.freedesktop.Notifications");
 auto const FDONotificationsPath = QStringLiteral("/org/freedesktop/Notifications");
 auto const FDONotificationsInterfaceName = QStringLiteral("org.freedesktop.Notifications");
 #endif
+// NOLINTEND(cert-err58-cpp)
 
 auto constexpr StatsRefreshIntervalMsec = 3000;
 auto constexpr SessionRefreshIntervalMsec = 3000;
@@ -212,26 +213,6 @@ Application::Application(
         window_->openSession();
     }
 
-    if (!prefs_->getBool(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
-    {
-        auto* dialog = new QMessageBox{ QMessageBox::Information,
-                                        QString{},
-                                        tr("<b>Transmission is a file sharing program.</b>"),
-                                        QMessageBox::Ok | QMessageBox::Cancel,
-                                        window_.get() };
-        dialog->setInformativeText(
-            tr("When you run a torrent, its data will be made available to others by means of upload. "
-               "Any content you share is your sole responsibility."));
-        dialog->button(QMessageBox::Ok)->setText(tr("I &Agree"));
-        dialog->setDefaultButton(QMessageBox::Ok);
-        dialog->setModal(true);
-
-        connect(dialog, &QDialog::finished, this, &Application::consentGiven);
-
-        dialog->setAttribute(Qt::WA_DeleteOnClose);
-        dialog->show();
-    }
-
     // torrent files passed in on the command line
     for (QString const& filename : filenames)
     {
@@ -361,21 +342,7 @@ void Application::notifyTorrentAdded(Torrent const* tor) const
     notifyApp(tr("Torrent Added"), tor->name(), actions);
 }
 
-/***
-****
-***/
-
-void Application::consentGiven(int result) const
-{
-    if (result == QMessageBox::Ok)
-    {
-        prefs_->set<bool>(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT, true);
-    }
-    else
-    {
-        quit();
-    }
-}
+// ---
 
 void Application::saveGeometry() const
 {
@@ -389,9 +356,7 @@ void Application::saveGeometry() const
     }
 }
 
-/***
-****
-***/
+// ---
 
 void Application::refreshPref(int key) const
 {

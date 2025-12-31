@@ -8,13 +8,12 @@
 
 #include <event2/event.h>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
 #include "dns-ev.h"
 #include "dns.h"
 #include "trevent.h" // for tr_evthread_init();
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -22,7 +21,7 @@ using namespace std::literals;
 namespace libtransmission::test
 {
 
-class EvDnsTest : public ::testing::Test
+class EvDnsTest : public ::libtransmission::test::TransmissionTest
 {
 protected:
     void SetUp() override

@@ -231,7 +231,7 @@ int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 't':
-            tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, my_optarg);
+            tr_variantDictAddStr(d, TR_KEY_peer_socket_diffserv, my_optarg);
             break;
 
         case 'u':
@@ -326,7 +326,7 @@ int tr_main(int argc, char* argv[])
 
     /* load the defaults from config file + libtransmission defaults */
     auto const config_dir = getConfigDir(argc, (char const**)argv);
-    auto settings = tr_sessionLoadSettings(nullptr, config_dir.c_str(), MyConfigName);
+    auto settings = tr_sessionLoadSettings(config_dir);
 
     /* the command line overrides defaults */
     if (parseCommandLine(&settings, argc, (char const**)argv) != 0)
@@ -346,7 +346,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    auto* const h = tr_sessionInit(config_dir.c_str(), false, settings);
+    auto* const h = tr_sessionInit(config_dir, false, settings);
     auto* const ctor = tr_ctorNew(h);
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);

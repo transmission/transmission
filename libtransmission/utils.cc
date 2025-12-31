@@ -17,6 +17,7 @@
 #include <iterator> // for std::back_inserter
 #include <locale>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <stdexcept> // std::runtime_error
 #include <string>
@@ -52,6 +53,7 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/mime-types.h"
+#include "libtransmission/serializer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
@@ -691,7 +693,7 @@ uint64_t tr_ntohll(uint64_t netlonglong)
 
 // --- ENVIRONMENT
 
-bool tr_env_key_exists(char const* key)
+bool tr_env_key_exists(char const* key) noexcept
 {
     TR_ASSERT(key != nullptr);
 
@@ -783,7 +785,15 @@ std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::instance;
 
 void tr_lib_init()
 {
-    tr_net_init_impl::tr_net_init_mgr::create();
+    static auto once = std::once_flag{};
+    std::call_once(
+        once,
+        []
+        {
+            tr_net_init_impl::tr_net_init_mgr::create();
+
+            libtransmission::serializer::Converters::ensure_default_converters();
+        });
 }
 
 // --- mime-type

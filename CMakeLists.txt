@@ -53,7 +53,7 @@ set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 2.7)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.1)
-set(QT_MINIMUM 5.6)
+set(QT_MINIMUM 5.15)
 
 option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
@@ -448,16 +448,14 @@ if(ENABLE_QT)
             endif()
         endforeach()
 
-        if(Qt${Qt_VERSION_MAJOR}AxContainer_FOUND AND Qt${Qt_VERSION_MAJOR}AxServer_FOUND)
+        if(WIN32 AND Qt${Qt_VERSION_MAJOR}AxContainer_FOUND AND Qt${Qt_VERSION_MAJOR}AxServer_FOUND)
             set(ENABLE_QT_COM_INTEROP ON)
 
             find_program(MIDL_EXECUTABLE midl)
             if(NOT MIDL_EXECUTABLE)
                 set(ENABLE_QT_COM_INTEROP OFF)
             endif()
-        endif()
-
-        if(Qt${Qt_VERSION_MAJOR}DBus_FOUND)
+        elseif(NOT WIN32 AND Qt${Qt_VERSION_MAJOR}DBus_FOUND)
             set(ENABLE_QT_DBUS_INTEROP ON)
         endif()
     endif()
@@ -833,6 +831,7 @@ function(tr_install_web DST_DIR)
 endfunction()
 
 add_subdirectory(libtransmission)
+add_subdirectory(libtransmission-app)
 
 set(MAC_PROJECT_DIR macosx)
 

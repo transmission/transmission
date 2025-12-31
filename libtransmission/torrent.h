@@ -267,6 +267,10 @@ struct tr_torrent
     {
         return metainfo_.block_loc(block);
     }
+    [[nodiscard]] constexpr auto block_last_loc(tr_block_index_t block) const noexcept
+    {
+        return metainfo_.block_last_loc(block);
+    }
     [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
     {
         return metainfo_.piece_loc(piece, offset, length);
@@ -436,6 +440,7 @@ struct tr_torrent
             file_priorities_.set(file, priority);
             priority_changed_.emit(this, &file, 1U, priority);
             set_dirty();
+            mark_changed();
         }
     }
 
@@ -1251,11 +1256,6 @@ private:
         }
     }
 
-    constexpr void bump_date_changed(time_t when)
-    {
-        date_changed_ = std::max(date_changed_, when);
-    }
-
     void set_verify_state(VerifyState state);
 
     [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
@@ -1285,7 +1285,18 @@ private:
         completion_.set_has_piece(piece, has);
     }
 
+    constexpr void bump_date_changed(time_t when)
+    {
+        date_changed_ = std::max(date_changed_, when);
+    }
+
     void mark_changed();
+
+    constexpr void bump_date_edited(time_t when)
+    {
+        date_edited_ = std::max(date_edited_, when);
+    }
+
     void mark_edited();
 
     constexpr void set_dirty(bool dirty = true) noexcept

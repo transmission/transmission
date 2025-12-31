@@ -31,9 +31,11 @@ namespace
 {
 
 // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-ui-symbol-font
+// NOLINTNEXTLINE(cert-err58-cpp)
 auto const Win10IconFamily = QStringLiteral("Segoe MDL2 Assets");
 
 // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-fluent-icons-font
+// NOLINTNEXTLINE(cert-err58-cpp)
 auto const Win11IconFamily = QStringLiteral("Segoe Fluent Icons");
 
 // Define these two macros to force a specific icon icon during development.
@@ -52,10 +54,14 @@ QString getWindowsFontFamily()
     return DEV_FORCE_FONT_FAMILY;
 #else
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion(QOperatingSystemVersion::Windows, 11))
+    {
         return Win11IconFamily;
+    }
 
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion(QOperatingSystemVersion::Windows, 10))
+    {
         return Win10IconFamily;
+    }
 
     return {};
 #endif
@@ -68,14 +74,18 @@ void ensureFontsLoaded()
 #endif
 }
 
-QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int const point_size)
+QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int const pixel_size)
 {
-    auto const font = QFont{ family, point_size - 8 };
+    auto font = QFont{ family };
     if (!QFontMetrics{ font }.inFont(codepoint))
+    {
         return {};
+    }
+
+    font.setPixelSize(pixel_size);
 
     // FIXME: HDPI, pixel size vs point size?
-    auto const rect = QRect{ 0, 0, point_size, point_size };
+    auto const rect = QRect{ 0, 0, pixel_size, pixel_size };
     auto pixmap = QPixmap{ rect.size() };
     pixmap.fill(Qt::transparent);
     auto painter = QPainter{ &pixmap };
@@ -422,7 +432,7 @@ QIcon icon(Type const type, QStyle const* const style)
 {
     ensureFontsLoaded();
 
-    auto const point_sizes = small::max_size_set<int, 7U>{
+    auto const pixel_sizes = small::max_size_set<int, 7U>{
         style->pixelMetric(QStyle::PM_ButtonIconSize),   style->pixelMetric(QStyle::PM_LargeIconSize),
         style->pixelMetric(QStyle::PM_ListViewIconSize), style->pixelMetric(QStyle::PM_MessageBoxIconSize),
         style->pixelMetric(QStyle::PM_SmallIconSize),    style->pixelMetric(QStyle::PM_TabBarIconSize),
@@ -436,11 +446,17 @@ QIcon icon(Type const type, QStyle const* const style)
     {
         auto icon = QIcon{};
         auto const name = QString::fromUtf8(std::data(key), std::size(key));
-        for (int const point_size : point_sizes)
-            if (auto const pixmap = loadSFSymbol(name, point_size); !pixmap.isNull())
+        for (int const pixel_size : pixel_sizes)
+        {
+            if (auto const pixmap = loadSFSymbol(name, pixel_size); !pixmap.isNull())
+            {
                 icon.addPixmap(pixmap);
+            }
+        }
         if (!icon.isNull())
+        {
             return icon;
+        }
     }
 #endif
 
@@ -450,11 +466,17 @@ QIcon icon(Type const type, QStyle const* const style)
         {
             auto icon = QIcon{};
             auto const ch = QChar{ key };
-            for (int const point_size : point_sizes)
-                if (auto pixmap = makeIconFromCodepoint(family, ch, point_size); !pixmap.isNull())
+            for (int const pixel_size : pixel_sizes)
+            {
+                if (auto pixmap = makeIconFromCodepoint(family, ch, pixel_size); !pixmap.isNull())
+                {
                     icon.addPixmap(pixmap);
+                }
+            }
             if (!icon.isNull())
+            {
                 return icon;
+            }
         }
     }
 
@@ -463,22 +485,28 @@ QIcon icon(Type const type, QStyle const* const style)
         auto const name = QString::fromUtf8(std::data(key), std::size(key));
 
         if (auto icon = QIcon::fromTheme(name); !icon.isNull())
+        {
             return icon;
+        }
         if (auto icon = QIcon::fromTheme(name + QStringLiteral("-symbolic")); !icon.isNull())
+        {
             return icon;
+        }
     }
 
     if (info.fallback)
+    {
         return style->standardIcon(*info.fallback);
+    }
 
     return {};
 }
 
 [[nodiscard]] bool shouldBeShownInMenu(Type type)
 {
-    static bool const force_icons = !qgetenv("TR_SHOW_MENU_ICONS").isEmpty();
-    static bool const is_gnome = qgetenv("XDG_CURRENT_DESKTOP").contains("GNOME");
-    return force_icons || !is_gnome || getInfo(type).ok_in_gnome_menus;
+    static bool const ForceIcons = !qgetenv("TR_SHOW_MENU_ICONS").isEmpty();
+    static bool const IsGnome = qgetenv("XDG_CURRENT_DESKTOP").contains("GNOME");
+    return ForceIcons || !IsGnome || getInfo(type).ok_in_gnome_menus;
 }
 
 } // namespace icons

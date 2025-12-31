@@ -23,6 +23,11 @@ using namespace std::literals;
 class JSONTest : public ::testing::TestWithParam<char const*>
 {
 protected:
+    static void SetUpTestSuite()
+    {
+        tr_lib_init();
+    }
+
     void SetUp() override
     {
         ::testing::TestWithParam<char const*>::SetUp();

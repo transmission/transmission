@@ -286,7 +286,7 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 // ---
 
 /** @brief Check if environment variable exists. */
-[[nodiscard]] bool tr_env_key_exists(char const* key);
+[[nodiscard]] bool tr_env_key_exists(char const* key) noexcept;
 
 /** @brief Get environment variable value as string. */
 [[nodiscard]] std::string tr_env_get_string(std::string_view key, std::string_view default_value = {});
