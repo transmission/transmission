@@ -31,7 +31,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     $BuildDir = Join-Path $SourceDir .build
 
     $ConfigOptions = @(
-        '-platform'; 'win32-msvc'
         '-opensource'
         '-confirm-license'
         '-prefix'; $PrefixDir
@@ -111,11 +110,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '--'
         "-DCMAKE_PREFIX_PATH=${DepsPrefixDir}"
     )
-
-    if ($env:LDFLAGS) {
-        # Patch to add our linker flags, mainly /PDBALTPATH
-        Edit-TextFile (Join-Path $SourceDir qtbase mkspecs win32-msvc qmake.conf) '(^QMAKE_CXXFLAGS\b.*)' "`$1`nQMAKE_LFLAGS += ${env:LDFLAGS}"
-    }
 
     # No need in GUI and some other tools
     Edit-TextFile (Join-Path $SourceDir qttools src CMakeLists.txt) 'TARGET Qt::Widgets' 'QT_FEATURE_designer'
