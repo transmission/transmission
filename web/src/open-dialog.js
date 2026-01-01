@@ -14,6 +14,7 @@ const is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 // https://github.com/transmission/transmission/pull/6320#issuecomment-1896968904
 // https://caniuse.com/input-file-accept
 const can_use_input_accept = !(is_ios && is_safari);
+const max_datalist_options = 100;
 
 export class OpenDialog extends EventTarget {
   constructor(controller, remote, url = '', files = null) {
@@ -187,9 +188,29 @@ export class OpenDialog extends EventTarget {
     input = document.createElement('input');
     input.type = 'text';
     input.id = 'add-dialog-folder-input';
+    input.setAttribute('list', 'add-dialog-folder-datalist');
     input.addEventListener('change', () => this._updateFreeSpaceInAddDialog());
     input.value = this.controller.session_properties.download_dir;
     workarea.append(input);
+    workarea.append((() => {
+      const datalist = document.createElement('datalist');
+      datalist.id = 'add-dialog-folder-datalist';
+      const dirs = new Set();
+      for (const row of this.controller._rows) {
+        const dir = row.getTorrent().getDownloadDir().trim();
+        if (!dir || dirs.has(dir)) {
+          continue;
+        }
+        dirs.add(dir);
+        const option = document.createElement('option');
+        option.value = dir;
+        datalist.append(option);
+        if (dirs.size >= max_datalist_options) { // do not explode the ui
+          break;
+        }
+      }
+      return datalist;
+    })());
     elements.folder_input = input;
 
     const checkarea = document.createElement('div');
