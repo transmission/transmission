@@ -2619,17 +2619,6 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         [](tr_session const& /*src*/) -> tr_variant { return tr_variant::unmanaged_string(LONG_VERSION_STRING); },
         nullptr);
 
-    map.try_emplace(
-        TR_KEY_script_torrent_added_enabled,
-        [](tr_session const& src) -> tr_variant { return src.useScript(TR_SCRIPT_ON_TORRENT_ADDED); },
-        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
-        {
-            if (auto const val = src.value_if<bool>())
-            {
-                tgt.useScript(TR_SCRIPT_ON_TORRENT_ADDED, *val);
-            }
-        });
-
     for (auto const& row : tr_session::Scripts)
     {
         auto const script = row.script;
