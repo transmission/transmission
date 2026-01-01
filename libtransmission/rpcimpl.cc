@@ -2647,7 +2647,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
         map.try_emplace(
             row.filename_key,
-            [&](tr_session const& src) -> tr_variant { return src.useScript(script); },
+            [&](tr_session const& src) -> tr_variant { return src.script(script); },
             [&](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
             {
                 if (auto const val = src.value_if<std::string_view>())
