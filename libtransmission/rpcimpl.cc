@@ -2461,15 +2461,9 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
             }
         });
 
-    map.try_emplace(
-        TR_KEY_rpc_version,
-        [](tr_session const& /*src*/) -> tr_variant { return tr_variant::unmanaged_string(RpcVersion); },
-        nullptr);
+    map.try_emplace(TR_KEY_rpc_version, [](tr_session const& /*src*/) -> tr_variant { return RpcVersion; }, nullptr);
 
-    map.try_emplace(
-        TR_KEY_rpc_version_minimum,
-        [](tr_session const& /*src*/) -> tr_variant { return tr_variant::unmanaged_string(RpcVersionMin); },
-        nullptr);
+    map.try_emplace(TR_KEY_rpc_version_minimum, [](tr_session const& /*src*/) -> tr_variant { return RpcVersionMin; }, nullptr);
 
     map.try_emplace(
         TR_KEY_rpc_version_semver,
