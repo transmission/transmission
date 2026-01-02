@@ -433,12 +433,14 @@ bool to_array(tr_variant const& src, C* const ptgt)
 template<typename T>
 tr_variant from_optional(std::optional<T> const& src)
 {
+    static_assert(!is_optional_v<T>);
     return src ? Converters::serialize(*src) : nullptr;
 }
 
 template<typename T>
 bool to_optional(tr_variant const& src, std::optional<T>* ptgt)
 {
+    static_assert(!is_optional_v<T>);
     if (src.index() == tr_variant::NullIndex)
     {
         ptgt->reset();
