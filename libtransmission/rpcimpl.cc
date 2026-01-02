@@ -2664,7 +2664,6 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     return fields;
 }
-} // namespace
 
 [[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> sessionSet(
     tr_session* session,
@@ -2945,6 +2944,7 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector& requests
             true);
     }
 }
+} // namespace
 
 // TODO(tearfur): take `tr_variant const& request` after removing api_compat
 void tr_rpc_request_exec(tr_session* session, tr_variant& request, tr_rpc_response_func&& callback)
