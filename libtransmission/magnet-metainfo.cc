@@ -235,7 +235,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* err
     }
 
     bool got_hash = false;
-    for (auto const& [key, value] : tr_url_query_view{ parsed->query })
+    for (auto const [key, value] : parsed->query_entries())
     {
         if (key == "dn"sv)
         {
