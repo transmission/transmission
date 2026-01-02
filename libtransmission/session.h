@@ -975,6 +975,18 @@ public:
         return settings().encryption_mode;
     }
 
+    [[nodiscard]] auto serialize_encryption_mode() const noexcept
+    {
+        auto var = libtransmission::serializer::to_variant(settings().encryption_mode);
+        TR_ASSERT(var.has_value());
+        return var;
+    }
+
+    bool deserialize_encryption_mode(tr_variant const& var) noexcept
+    {
+        return libtransmission::serializer::Converters::deserialize(var, &settings_.encryption_mode);
+    }
+
     [[nodiscard]] constexpr auto preallocationMode() const noexcept
     {
         return settings().preallocation_mode;
