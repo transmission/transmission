@@ -1435,9 +1435,11 @@ jobs:
         release:
           - '10.1'
         arch:
-          - x86_64
-          - aarch64
-    runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+          - vmactions: x86_64
+            binary-set: amd64
+          - vmactions: aarch64
+            binary-set: evbarm-aarch64
+    runs-on: ${{ matrix.arch.vmactions == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     steps:
       - name: Show Configuration
         run: |
@@ -1452,7 +1454,7 @@ jobs:
         with:
           usesh: true
           release: ${{ matrix.release }}
-          arch: ${{ matrix.arch }}
+          arch: ${{ matrix.arch.vmactions }}
           prepare: |
             set -ex
             uname -a
@@ -1475,13 +1477,8 @@ jobs:
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
               rapidjson \
               utf8-cpp
-            
-            case '${{ matrix.arch }}' in
-              x86_64) BINARY_SET_ARCH=amd64;;
-              aarch64) BINARY_SET_ARCH=evbarm-aarch64;;
-            esac
             for set in xbase xcomp; do
-              curl -sL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-`uname -r`/$BINARY_SET_ARCH/binary/sets/$set.tar.xz" | tar xJpf - -C /
+              curl -sL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-`uname -r`/${{ matrix.arch.binary-set }}/binary/sets/$set.tar.xz" | tar xJpf - -C /
             done
           run: |
             set -ex
@@ -1519,7 +1516,7 @@ jobs:
             cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
+          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch.vmactions }}
           path: pfx/**/*
 
   dragonflybsd-from-tarball:
