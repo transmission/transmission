@@ -444,8 +444,14 @@ bool to_optional(tr_variant const& src, std::optional<T>* ptgt)
         ptgt->reset();
         return true;
     }
-    *ptgt = T{};
-    return Converters::deserialize(src, &**ptgt);
+
+    if (auto const val = to_value<T>(src))
+    {
+        *ptgt = std::move(val);
+        return true;
+    }
+
+    return false;
 }
 
 } // namespace detail
