@@ -2262,19 +2262,12 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_encryption,
-        [](tr_session const& src){ return src.serialize_encryption_mode(); },
+        [](tr_session const& src) { return src.serialize_encryption_mode(); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& err)
         {
-            auto ok = false;
-
-            if (auto const val = src.value_if<std::string_view>())
+            if (!tgt.deserialize_encryption_mode(src))
             {
-                ok = session->deserialize_encryption_mode(iter->second))
-            }
-
-            if (!ok)
-            {
-                err = { Error::INVALID_PARAMS, R"(must be one of "preferred", "required" or "allowed")"s };
+                err = { JsonRpc::Error::INVALID_PARAMS, R"(must be one of "preferred", "required" or "allowed")"s };
             }
         });
 
@@ -2671,16 +2664,14 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     return fields;
 }
-} // namespace session_helpers
+} // namespace
 
 [[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> sessionSet(
     tr_session* session,
     tr_variant::Map const& params,
     tr_variant::Map& /*result*/)
 {
-    using namespace session_helpers;
-
-    auto const& accessors = session_helpers::session_accessors();
+    auto const& accessors = session_accessors();
 
     auto err = error_none;
 
@@ -2709,9 +2700,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
     tr_variant::Map const& params,
     tr_variant::Map& result)
 {
-    using namespace session_helpers;
-
-    auto const& accessors = session_helpers::session_accessors();
+    auto const& accessors = session_accessors();
 
     for (auto const key : get_session_fields(params.find_if<tr_variant::Vector>(TR_KEY_fields)))
     {
@@ -2956,8 +2945,6 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector& requests
             true);
     }
 }
-
-} // namespace
 
 // TODO(tearfur): take `tr_variant const& request` after removing api_compat
 void tr_rpc_request_exec(tr_session* session, tr_variant& request, tr_rpc_response_func&& callback)
