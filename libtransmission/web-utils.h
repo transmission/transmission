@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 
@@ -38,6 +39,10 @@ struct tr_url_parsed_t
     std::string_view fragment; // "nose"
     std::string_view full; // "http://example.com:80/over/there?name=ferret#nose"
     uint16_t port = 0;
+
+    // returns a vector of key,val pairs, e.g.
+    // `first=hello&second=world` -> [<"first","hello">,<"second","world">]
+    [[nodiscard]] std::vector<std::pair<std::string_view, std::string_view>> query_entries() const;
 };
 
 [[nodiscard]] std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);
@@ -49,52 +54,6 @@ struct tr_url_parsed_t
 // Convenience function to get a log-safe version of a tracker URL.
 // This is to avoid logging sensitive info, e.g. a personal announcer id in the URL.
 [[nodiscard]] std::string tr_urlTrackerLogName(std::string_view url);
-
-// example use: `for (auto const [key, val] : tr_url_query_view{ querystr })`
-struct tr_url_query_view
-{
-    std::string_view const query;
-
-    explicit tr_url_query_view(std::string_view query_in)
-        : query{ query_in }
-    {
-    }
-
-    struct iterator
-    {
-        std::pair<std::string_view, std::string_view> keyval;
-        std::string_view remain;
-
-        iterator& operator++();
-
-        [[nodiscard]] constexpr auto const& operator*() const
-        {
-            return keyval;
-        }
-
-        [[nodiscard]] constexpr auto const* operator->() const
-        {
-            return &keyval;
-        }
-
-        [[nodiscard]] constexpr bool operator==(iterator const& that) const
-        {
-            return this->remain == that.remain && this->keyval == that.keyval;
-        }
-
-        [[nodiscard]] constexpr bool operator!=(iterator const& that) const
-        {
-            return !(*this == that);
-        }
-    };
-
-    [[nodiscard]] iterator begin() const;
-
-    [[nodiscard]] static constexpr iterator end()
-    {
-        return iterator{};
-    }
-};
 
 template<typename BackInsertIter>
 constexpr void tr_urlPercentEncode(BackInsertIter out, std::string_view input, bool escape_reserved = true)

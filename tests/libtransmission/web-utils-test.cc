@@ -160,13 +160,15 @@ TEST_F(WebUtilsTest, urlParseFuzz)
     }
 }
 
-TEST_F(WebUtilsTest, urlNextQueryPair)
+TEST_F(WebUtilsTest, urlQueryEntries)
 {
-    auto constexpr Query = "a=1&b=two&c=si&d_has_no_val&e=&f&g=gee"sv;
-    auto const query_view = tr_url_query_view{ Query };
-    auto const end = std::end(query_view);
+    auto parsed = tr_url_parsed_t{};
+    parsed.query = "a=1&b=two&c=si&d_has_no_val&e=&f&g=gee"sv;
 
-    auto it = std::begin(query_view);
+    auto const keyvals = parsed.query_entries();
+    auto const end = std::cend(keyvals);
+
+    auto it = std::cbegin(keyvals);
     EXPECT_NE(end, it);
     EXPECT_EQ("a"sv, it->first);
     EXPECT_EQ("1"sv, it->second);

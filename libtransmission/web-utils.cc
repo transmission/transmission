@@ -434,19 +434,18 @@ std::string tr_urlTrackerLogName(std::string_view url)
     return std::string{ url };
 }
 
-tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()
+std::vector<std::pair<std::string_view, std::string_view>> tr_url_parsed_t::query_entries() const
 {
-    auto pair = tr_strv_sep(&remain, '&');
-    keyval.first = tr_strv_sep(&pair, '=');
-    keyval.second = pair;
-    return *this;
-}
-
-tr_url_query_view::iterator tr_url_query_view::begin() const
-{
-    auto it = iterator{};
-    it.remain = query;
-    return ++it;
+    auto tmp = query;
+    auto ret = std::vector<std::pair<std::string_view, std::string_view>>{};
+    ret.reserve(std::count(std::begin(tmp), std::end(tmp), '&') + 1U);
+    while (!std::empty(tmp))
+    {
+        auto val = tr_strv_sep(&tmp, '&');
+        auto key = tr_strv_sep(&val, '=');
+        ret.emplace_back(key, val);
+    }
+    return ret;
 }
 
 std::string tr_urlPercentDecode(std::string_view in)
