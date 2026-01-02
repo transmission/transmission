@@ -1257,7 +1257,13 @@ jobs:
         arch:
           - x86_64
           - aarch64
-        crypto: [ openssl, wolfssl, mbedtls ]
+        crypto:
+          - cmake: openssl
+            port: ''
+          - cmake: wolfssl
+            port: wolfssl
+          - cmake: mbedtls
+            port: mbedtls3
     runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     steps:
       - name: Show Configuration
@@ -1300,10 +1306,7 @@ jobs:
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
               rapidjson \
               utf8cpp \
-              $(case '${{ matrix.crypto }}' in
-                wolfssl) echo wolfssl;;
-                mbedtls) echo mbedtls3;;
-              esac)
+              `echo ${{ matrix.crypto.port }}`
           run: |
             set -ex
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
@@ -1327,7 +1330,7 @@ jobs:
               -DUSE_SYSTEM_SMALL=OFF `# Not packaged in FreeBSD` \
               -DUSE_SYSTEM_UTP=OFF `# Not packaged in FreeBSD` \
               -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in FreeBSD` \
-              -DWITH_CRYPTO=${{ matrix.crypto }}
+              -DWITH_CRYPTO=${{ matrix.crypto.cmake }}
             cmake --build obj --config RelWithDebInfo
             if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
               cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
