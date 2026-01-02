@@ -270,30 +270,29 @@ private:
         }
         TR_ASSERT(std::empty(iter->unrequested));
 
+        iter->block_span = iter->raw_block_span;
         if (piece > 0U)
         {
             if (auto const prev = find_by_piece(piece - 1U); prev != std::end(candidates_))
             {
-                iter->block_span.begin = std::max(iter->raw_block_span.begin, prev->block_span.end);
+                iter->block_span.begin = std::max(iter->block_span.begin, prev->block_span.end);
                 TR_ASSERT(iter->block_span.begin == prev->block_span.end);
                 for (tr_block_index_t i = iter->block_span.begin; i > iter->raw_block_span.begin; --i)
                 {
                     prev->unrequested.insert(i - 1U);
                 }
-                resort_piece(prev);
             }
         }
         if (piece < mediator_.piece_count() - 1U)
         {
             if (auto const next = find_by_piece(piece + 1U); next != std::end(candidates_))
             {
-                iter->block_span.end = std::min(iter->raw_block_span.end, next->block_span.begin);
+                iter->block_span.end = std::min(iter->block_span.end, next->block_span.begin);
                 TR_ASSERT(iter->block_span.end == next->block_span.begin);
                 for (tr_block_index_t i = iter->raw_block_span.end; i > iter->block_span.end; --i)
                 {
                     next->unrequested.insert(i - 1U);
                 }
-                resort_piece(next);
             }
         }
 
@@ -301,7 +300,8 @@ private:
         {
             iter->unrequested.insert(i - 1U);
         }
-        resort_piece(iter);
+
+        std::sort(std::begin(candidates_), std::end(candidates_));
     }
 
     // ---
