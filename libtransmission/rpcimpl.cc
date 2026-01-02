@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <cstdint>
 #include <ctime>
+#include <functional>
 #include <iterator>
 #include <memory>
 #include <numeric>
@@ -1972,279 +1973,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 
 // ---
 
-[[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> sessionSet(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/)
-{
-    using namespace JsonRpc;
-
-    auto const download_dir = args_in.value_if<std::string_view>(TR_KEY_download_dir);
-    if (download_dir && tr_sys_path_is_relative(*download_dir))
-    {
-        return { Error::PATH_NOT_ABSOLUTE, "download directory path is not absolute"s };
-    }
-
-    auto const incomplete_dir = args_in.value_if<std::string_view>(TR_KEY_incomplete_dir);
-    if (incomplete_dir && tr_sys_path_is_relative(*incomplete_dir))
-    {
-        return { Error::PATH_NOT_ABSOLUTE, "incomplete torrents directory path is not absolute"s };
-    }
-
-    if (auto const iter = args_in.find(TR_KEY_preferred_transports); iter != std::end(args_in))
-    {
-        if (!session->load_preferred_transports(iter->second))
-        {
-            return { Error::INVALID_PARAMS, R"(the list must be unique with the values "utp" or "tcp")" };
-        }
-    }
-
-    if (auto const iter = args_in.find(TR_KEY_encryption); iter != std::end(args_in))
-    {
-        if (!session->deserialize_encryption_mode(iter->second))
-        {
-            return { Error::INVALID_PARAMS, R"(must be one of "preferred", "required" or "allowed")"s };
-        }
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_cache_size_mib); val)
-    {
-        tr_sessionSetCacheLimit_MB(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_up); val)
-    {
-        tr_sessionSetAltSpeed_KBps(session, TR_UP, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_down); val)
-    {
-        tr_sessionSetAltSpeed_KBps(session, TR_DOWN, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_alt_speed_enabled); val)
-    {
-        tr_sessionUseAltSpeed(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_time_begin); val)
-    {
-        tr_sessionSetAltSpeedBegin(session, static_cast<size_t>(*val));
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_time_end); val)
-    {
-        tr_sessionSetAltSpeedEnd(session, static_cast<size_t>(*val));
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_time_day); val)
-    {
-        tr_sessionSetAltSpeedDay(session, static_cast<tr_sched_day>(*val));
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_alt_speed_time_enabled); val)
-    {
-        tr_sessionUseAltSpeedTime(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_blocklist_enabled); val)
-    {
-        session->set_blocklist_enabled(*val);
-    }
-
-    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_blocklist_url); val)
-    {
-        session->setBlocklistUrl(*val);
-    }
-
-    if (download_dir && !std::empty(*download_dir))
-    {
-        session->setDownloadDir(*download_dir);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_queue_stalled_minutes); val)
-    {
-        tr_sessionSetQueueStalledMinutes(session, static_cast<int>(*val));
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_queue_stalled_enabled); val)
-    {
-        tr_sessionSetQueueStalledEnabled(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_default_trackers); val)
-    {
-        session->setDefaultTrackers(*val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_download_queue_size); val)
-    {
-        tr_sessionSetQueueSize(session, TR_DOWN, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_download_queue_enabled); val)
-    {
-        tr_sessionSetQueueEnabled(session, TR_DOWN, *val);
-    }
-
-    if (incomplete_dir && !std::empty(*incomplete_dir))
-    {
-        session->setIncompleteDir(*incomplete_dir);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_incomplete_dir_enabled); val)
-    {
-        session->useIncompleteDir(*val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit_global); val)
-    {
-        tr_sessionSetPeerLimit(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit_per_torrent); val)
-    {
-        tr_sessionSetPeerLimitPerTorrent(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_reqq); val && val > 0)
-    {
-        session->set_reqq(*val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_pex_enabled); val)
-    {
-        tr_sessionSetPexEnabled(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_dht_enabled); val)
-    {
-        tr_sessionSetDHTEnabled(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_utp_enabled); val)
-    {
-        tr_sessionSetUTPEnabled(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_lpd_enabled); val)
-    {
-        tr_sessionSetLPDEnabled(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_peer_port_random_on_start); val)
-    {
-        tr_sessionSetPeerPortRandomOnStart(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_port); val)
-    {
-        tr_sessionSetPeerPort(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_port_forwarding_enabled); val)
-    {
-        tr_sessionSetPortForwardingEnabled(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_rename_partial_files); val)
-    {
-        tr_sessionSetIncompleteFileNamingEnabled(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<double>(TR_KEY_seed_ratio_limit); val)
-    {
-        tr_sessionSetRatioLimit(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_seed_ratio_limited); val)
-    {
-        tr_sessionSetRatioLimited(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_idle_seeding_limit); val)
-    {
-        tr_sessionSetIdleLimit(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_idle_seeding_limit_enabled); val)
-    {
-        tr_sessionSetIdleLimited(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_start_added_torrents); val)
-    {
-        tr_sessionSetPaused(session, !*val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_seed_queue_enabled); val)
-    {
-        tr_sessionSetQueueEnabled(session, TR_UP, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_seed_queue_size); val)
-    {
-        tr_sessionSetQueueSize(session, TR_UP, *val);
-    }
-
-    for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
-    {
-        if (auto const val = args_in.value_if<bool>(enabled_key); val)
-        {
-            session->useScript(script, *val);
-        }
-
-        if (auto const val = args_in.value_if<std::string_view>(script_key); val)
-        {
-            session->setScript(script, *val);
-        }
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_trash_original_torrent_files); val)
-    {
-        tr_sessionSetDeleteSource(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_speed_limit_down); val)
-    {
-        session->set_speed_limit(TR_DOWN, Speed{ *val, Speed::Units::KByps });
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_speed_limit_down_enabled); val)
-    {
-        tr_sessionLimitSpeed(session, TR_DOWN, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_speed_limit_up); val)
-    {
-        session->set_speed_limit(TR_UP, Speed{ *val, Speed::Units::KByps });
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_speed_limit_up_enabled); val)
-    {
-        tr_sessionLimitSpeed(session, TR_UP, *val);
-    }
-
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_anti_brute_force_threshold); val)
-    {
-        tr_sessionSetAntiBruteForceThreshold(session, static_cast<int>(*val));
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_anti_brute_force_enabled); val)
-    {
-        tr_sessionSetAntiBruteForceEnabled(session, *val);
-    }
-
-    if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
-    {
-        session->set_sequential_download(*val);
-    }
-
-    session->rpcNotify(TR_RPC_SESSION_CHANGED, nullptr);
-
-    return { Error::SUCCESS, {} };
-}
-
 [[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> sessionStats(
     tr_session* session,
     tr_variant::Map const& /*args_in*/,
@@ -2309,141 +2037,605 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     return tr_variant{ std::move(units_map) };
 }
 
-[[nodiscard]] tr_variant make_session_field(tr_session const& session, tr_quark const key)
+using ErrorInfo = std::pair<JsonRpc::Error::Code, std::string>;
+auto const error_none = ErrorInfo{ JsonRpc::Error::SUCCESS, {} };
+
+using SessionGetter = std::function<tr_variant(tr_session const& src)>;
+using SessionSetter = std::function<void(tr_session& tgt, tr_variant const&, ErrorInfo& err)>;
+using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
+
+[[nodiscard]] auto& session_accessors()
 {
-    switch (key)
+    static auto map = small::max_size_map<tr_quark, SessionAccessors, 64U>{};
+
+    if (!std::empty(map))
     {
-    case TR_KEY_alt_speed_down:
-        return tr_sessionGetAltSpeed_KBps(&session, TR_DOWN);
-    case TR_KEY_alt_speed_enabled:
-        return tr_sessionUsesAltSpeed(&session);
-    case TR_KEY_alt_speed_time_begin:
-        return tr_sessionGetAltSpeedBegin(&session);
-    case TR_KEY_alt_speed_time_day:
-        return tr_sessionGetAltSpeedDay(&session);
-    case TR_KEY_alt_speed_time_enabled:
-        return tr_sessionUsesAltSpeedTime(&session);
-    case TR_KEY_alt_speed_time_end:
-        return tr_sessionGetAltSpeedEnd(&session);
-    case TR_KEY_alt_speed_up:
-        return tr_sessionGetAltSpeed_KBps(&session, TR_UP);
-    case TR_KEY_anti_brute_force_enabled:
-        return tr_sessionGetAntiBruteForceEnabled(&session);
-    case TR_KEY_anti_brute_force_threshold:
-        return tr_sessionGetAntiBruteForceThreshold(&session);
-    case TR_KEY_blocklist_enabled:
-        return session.blocklist_enabled();
-    case TR_KEY_blocklist_size:
-        return tr_blocklistGetRuleCount(&session);
-    case TR_KEY_blocklist_url:
-        return session.blocklistUrl();
-    case TR_KEY_cache_size_mib:
-        return tr_sessionGetCacheLimit_MB(&session);
-    case TR_KEY_config_dir:
-        return session.configDir();
-    case TR_KEY_default_trackers:
-        return session.defaultTrackersStr();
-    case TR_KEY_dht_enabled:
-        return session.allowsDHT();
-    case TR_KEY_download_dir:
-        return session.downloadDir();
-    case TR_KEY_download_dir_free_space:
-        return tr_sys_path_get_capacity(session.downloadDir()).value_or(tr_sys_path_capacity{}).free;
-    case TR_KEY_download_queue_enabled:
-        return session.queueEnabled(TR_DOWN);
-    case TR_KEY_download_queue_size:
-        return session.queueSize(TR_DOWN);
-    case TR_KEY_encryption:
-        return session.serialize_encryption_mode();
-    case TR_KEY_idle_seeding_limit:
-        return session.idleLimitMinutes();
-    case TR_KEY_idle_seeding_limit_enabled:
-        return session.isIdleLimited();
-    case TR_KEY_incomplete_dir:
-        return session.incompleteDir();
-    case TR_KEY_incomplete_dir_enabled:
-        return session.useIncompleteDir();
-    case TR_KEY_lpd_enabled:
-        return session.allowsLPD();
-    case TR_KEY_peer_limit_global:
-        return session.peerLimit();
-    case TR_KEY_peer_limit_per_torrent:
-        return session.peerLimitPerTorrent();
-    case TR_KEY_peer_port:
-        return session.advertisedPeerPort().host();
-    case TR_KEY_peer_port_random_on_start:
-        return session.isPortRandom();
-    case TR_KEY_pex_enabled:
-        return session.allows_pex();
-    case TR_KEY_port_forwarding_enabled:
-        return tr_sessionIsPortForwardingEnabled(&session);
-    case TR_KEY_preferred_transports:
-        return session.save_preferred_transports();
-    case TR_KEY_queue_stalled_enabled:
-        return session.queueStalledEnabled();
-    case TR_KEY_queue_stalled_minutes:
-        return session.queueStalledMinutes();
-    case TR_KEY_rename_partial_files:
-        return session.isIncompleteFileNamingEnabled();
-    case TR_KEY_reqq:
-        return session.reqq();
-    case TR_KEY_rpc_version:
-        return RpcVersion;
-    case TR_KEY_rpc_version_minimum:
-        return RpcVersionMin;
-    case TR_KEY_rpc_version_semver:
-        return tr_variant::unmanaged_string(TrRpcVersionSemver);
-    case TR_KEY_script_torrent_added_enabled:
-        return session.useScript(TR_SCRIPT_ON_TORRENT_ADDED);
-    case TR_KEY_script_torrent_added_filename:
-        return session.script(TR_SCRIPT_ON_TORRENT_ADDED);
-    case TR_KEY_script_torrent_done_enabled:
-        return session.useScript(TR_SCRIPT_ON_TORRENT_DONE);
-    case TR_KEY_script_torrent_done_filename:
-        return session.script(TR_SCRIPT_ON_TORRENT_DONE);
-    case TR_KEY_script_torrent_done_seeding_enabled:
-        return session.useScript(TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
-    case TR_KEY_script_torrent_done_seeding_filename:
-        return session.script(TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
-    case TR_KEY_seed_ratio_limit:
-        return session.desiredRatio();
-    case TR_KEY_seed_ratio_limited:
-        return session.isRatioLimited();
-    case TR_KEY_seed_queue_enabled:
-        return session.queueEnabled(TR_UP);
-    case TR_KEY_seed_queue_size:
-        return session.queueSize(TR_UP);
-    case TR_KEY_sequential_download:
-        return session.sequential_download();
-    case TR_KEY_session_id:
-        return session.sessionId();
-    case TR_KEY_speed_limit_down:
-        return session.speed_limit(TR_DOWN).count(Speed::Units::KByps);
-    case TR_KEY_speed_limit_down_enabled:
-        return session.is_speed_limited(TR_DOWN);
-    case TR_KEY_speed_limit_up:
-        return session.speed_limit(TR_UP).count(Speed::Units::KByps);
-    case TR_KEY_speed_limit_up_enabled:
-        return session.is_speed_limited(TR_UP);
-    case TR_KEY_start_added_torrents:
-        return !session.shouldPauseAddedTorrents();
-    case TR_KEY_tcp_enabled:
-        return session.allowsTCP();
-    case TR_KEY_trash_original_torrent_files:
-        return session.shouldDeleteSource();
-    case TR_KEY_units:
-        return values_get_units();
-    case TR_KEY_utp_enabled:
-        return session.allowsUTP();
-    case TR_KEY_version:
-        return LONG_VERSION_STRING;
-    default:
-        return tr_variant{};
+        return map;
     }
+
+    map.try_emplace(
+        TR_KEY_alt_speed_down,
+        [](tr_session const& src) -> tr_variant { return tr_sessionGetAltSpeed_KBps(&src, TR_DOWN); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetAltSpeed_KBps(&tgt, TR_DOWN, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_alt_speed_enabled,
+        [](tr_session const& src) -> tr_variant { return tr_sessionUsesAltSpeed(&src); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionUseAltSpeed(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_alt_speed_time_begin,
+        [](tr_session const& src) -> tr_variant { return tr_sessionGetAltSpeedBegin(&src); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetAltSpeedBegin(&tgt, static_cast<size_t>(*val));
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_alt_speed_time_day,
+        [](tr_session const& src) -> tr_variant { return tr_sessionGetAltSpeedDay(&src); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetAltSpeedDay(&tgt, static_cast<tr_sched_day>(*val));
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_alt_speed_time_enabled,
+        [](tr_session const& src) -> tr_variant { return tr_sessionUsesAltSpeedTime(&src); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionUseAltSpeedTime(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_alt_speed_time_end,
+        [](tr_session const& src) -> tr_variant { return tr_sessionGetAltSpeedEnd(&src); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetAltSpeedEnd(&tgt, static_cast<size_t>(*val));
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_alt_speed_up,
+        [](tr_session const& src) -> tr_variant { return tr_sessionGetAltSpeed_KBps(&src, TR_UP); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetAltSpeed_KBps(&tgt, TR_UP, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_anti_brute_force_enabled,
+        [](tr_session const& src) -> tr_variant { return tr_sessionGetAntiBruteForceEnabled(&src); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetAntiBruteForceEnabled(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_anti_brute_force_threshold,
+        [](tr_session const& src) -> tr_variant { return tr_sessionGetAntiBruteForceThreshold(&src); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetAntiBruteForceThreshold(&tgt, static_cast<int>(*val));
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_blocklist_enabled,
+        [](tr_session const& src) -> tr_variant { return src.blocklist_enabled(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tgt.set_blocklist_enabled(*val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_blocklist_size,
+        [](tr_session const& src) -> tr_variant { return tr_blocklistGetRuleCount(&src); },
+        nullptr);
+
+    map.try_emplace(
+        TR_KEY_blocklist_url,
+        [](tr_session const& src) -> tr_variant { return src.blocklistUrl(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<std::string_view>())
+            {
+                tgt.setBlocklistUrl(*val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_cache_size_mib,
+        [](tr_session const& src) -> tr_variant { return tr_sessionGetCacheLimit_MB(&src); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetCacheLimit_MB(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(TR_KEY_config_dir, [](tr_session const& src) -> tr_variant { return src.configDir(); }, nullptr);
+
+    map.try_emplace(
+        TR_KEY_default_trackers,
+        [](tr_session const& src) -> tr_variant { return src.defaultTrackersStr(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<std::string_view>())
+            {
+                tgt.setDefaultTrackers(*val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_dht_enabled,
+        [](tr_session const& src) -> tr_variant { return src.allowsDHT(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetDHTEnabled(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_download_dir,
+        [](tr_session const& src) -> tr_variant { return src.downloadDir(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& err)
+        {
+            if (auto const download_dir = src.value_if<std::string_view>())
+            {
+                if (tr_sys_path_is_relative(*download_dir))
+                {
+                    err = { JsonRpc::Error::PATH_NOT_ABSOLUTE, "download directory path is not absolute"s };
+                }
+                else if (!std::empty(*download_dir))
+                {
+                    tgt.setDownloadDir(*download_dir);
+                }
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_download_dir_free_space,
+        [](tr_session const& src) -> tr_variant
+        { return tr_sys_path_get_capacity(src.downloadDir()).value_or(tr_sys_path_capacity{}).free; },
+        nullptr);
+
+    map.try_emplace(
+        TR_KEY_download_queue_enabled,
+        [](tr_session const& src) -> tr_variant { return src.queueEnabled(TR_DOWN); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetQueueEnabled(&tgt, TR_DOWN, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_download_queue_size,
+        [](tr_session const& src) -> tr_variant { return src.queueSize(TR_DOWN); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetQueueSize(&tgt, TR_DOWN, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_encryption,
+        [](tr_session const& src) { return src.serialize_encryption_mode(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& err)
+        {
+            if (!tgt.deserialize_encryption_mode(src))
+            {
+                err = { JsonRpc::Error::INVALID_PARAMS, R"(must be one of "preferred", "required" or "allowed")"s };
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_idle_seeding_limit,
+        [](tr_session const& src) -> tr_variant { return src.idleLimitMinutes(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetIdleLimit(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_idle_seeding_limit_enabled,
+        [](tr_session const& src) -> tr_variant { return src.isIdleLimited(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetIdleLimited(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_incomplete_dir,
+        [](tr_session const& src) -> tr_variant { return src.incompleteDir(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& err)
+        {
+            if (auto const dir = src.value_if<std::string_view>())
+            {
+                if (tr_sys_path_is_relative(*dir))
+                {
+                    err = { JsonRpc::Error::PATH_NOT_ABSOLUTE, "incomplete torrents directory path is not absolute"s };
+                }
+                else if (!std::empty(*dir))
+                {
+                    tgt.setIncompleteDir(*dir);
+                }
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_incomplete_dir_enabled,
+        [](tr_session const& src) -> tr_variant { return src.useIncompleteDir(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tgt.useIncompleteDir(*val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_lpd_enabled,
+        [](tr_session const& src) -> tr_variant { return src.allowsLPD(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetLPDEnabled(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_peer_limit_global,
+        [](tr_session const& src) -> tr_variant { return src.peerLimit(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetPeerLimit(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_peer_limit_per_torrent,
+        [](tr_session const& src) -> tr_variant { return src.peerLimitPerTorrent(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetPeerLimitPerTorrent(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_peer_port,
+        [](tr_session const& src) -> tr_variant { return src.advertisedPeerPort().host(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetPeerPort(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_peer_port_random_on_start,
+        [](tr_session const& src) -> tr_variant { return src.isPortRandom(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetPeerPortRandomOnStart(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_pex_enabled,
+        [](tr_session const& src) -> tr_variant { return src.allows_pex(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetPexEnabled(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_port_forwarding_enabled,
+        [](tr_session const& src) -> tr_variant { return tr_sessionIsPortForwardingEnabled(&src); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetPortForwardingEnabled(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_preferred_transports,
+        [](tr_session const& src) -> tr_variant { return src.save_preferred_transports(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& err)
+        {
+            if (!tgt.load_preferred_transports(src))
+            {
+                err = { JsonRpc::Error::INVALID_PARAMS, R"(the list must be unique with the values "utp" or "tcp")" };
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_queue_stalled_enabled,
+        [](tr_session const& src) -> tr_variant { return src.queueStalledEnabled(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetQueueStalledEnabled(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_queue_stalled_minutes,
+        [](tr_session const& src) -> tr_variant { return src.queueStalledMinutes(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetQueueStalledMinutes(&tgt, static_cast<int>(*val));
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_rename_partial_files,
+        [](tr_session const& src) -> tr_variant { return src.isIncompleteFileNamingEnabled(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetIncompleteFileNamingEnabled(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_reqq,
+        [](tr_session const& src) -> tr_variant { return src.reqq(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tgt.set_reqq(*val);
+            }
+        });
+
+    map.try_emplace(TR_KEY_rpc_version, [](tr_session const& /*src*/) -> tr_variant { return RpcVersion; }, nullptr);
+
+    map.try_emplace(TR_KEY_rpc_version_minimum, [](tr_session const& /*src*/) -> tr_variant { return RpcVersionMin; }, nullptr);
+
+    map.try_emplace(
+        TR_KEY_rpc_version_semver,
+        [](tr_session const& /*src*/) -> tr_variant { return tr_variant::unmanaged_string(TrRpcVersionSemver); },
+        nullptr);
+
+    map.try_emplace(
+        TR_KEY_seed_ratio_limit,
+        [](tr_session const& src) -> tr_variant { return src.desiredRatio(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<double>())
+            {
+                tr_sessionSetRatioLimit(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_seed_ratio_limited,
+        [](tr_session const& src) -> tr_variant { return src.isRatioLimited(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetRatioLimited(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_seed_queue_enabled,
+        [](tr_session const& src) -> tr_variant { return src.queueEnabled(TR_UP); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetQueueEnabled(&tgt, TR_UP, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_seed_queue_size,
+        [](tr_session const& src) -> tr_variant { return src.queueSize(TR_UP); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tr_sessionSetQueueSize(&tgt, TR_UP, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_sequential_download,
+        [](tr_session const& src) -> tr_variant { return src.sequential_download(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tgt.set_sequential_download(*val);
+            }
+        });
+
+    map.try_emplace(TR_KEY_session_id, [](tr_session const& src) -> tr_variant { return src.sessionId(); }, nullptr);
+
+    map.try_emplace(
+        TR_KEY_speed_limit_down,
+        [](tr_session const& src) -> tr_variant { return src.speed_limit(TR_DOWN).count(Speed::Units::KByps); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tgt.set_speed_limit(TR_DOWN, Speed{ *val, Speed::Units::KByps });
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_speed_limit_down_enabled,
+        [](tr_session const& src) -> tr_variant { return src.is_speed_limited(TR_DOWN); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionLimitSpeed(&tgt, TR_DOWN, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_speed_limit_up,
+        [](tr_session const& src) -> tr_variant { return src.speed_limit(TR_UP).count(Speed::Units::KByps); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tgt.set_speed_limit(TR_UP, Speed{ *val, Speed::Units::KByps });
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_speed_limit_up_enabled,
+        [](tr_session const& src) -> tr_variant { return src.is_speed_limited(TR_UP); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionLimitSpeed(&tgt, TR_UP, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_start_added_torrents,
+        [](tr_session const& src) -> tr_variant { return !src.shouldPauseAddedTorrents(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetPaused(&tgt, !*val);
+            }
+        });
+
+    map.try_emplace(TR_KEY_tcp_enabled, [](tr_session const& src) -> tr_variant { return src.allowsTCP(); }, nullptr);
+
+    map.try_emplace(
+        TR_KEY_trash_original_torrent_files,
+        [](tr_session const& src) -> tr_variant { return src.shouldDeleteSource(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetDeleteSource(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(TR_KEY_units, [](tr_session const& /*src*/) -> tr_variant { return values_get_units(); }, nullptr);
+
+    map.try_emplace(
+        TR_KEY_utp_enabled,
+        [](tr_session const& src) -> tr_variant { return src.allowsUTP(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetUTPEnabled(&tgt, *val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_version,
+        [](tr_session const& /*src*/) -> tr_variant { return tr_variant::unmanaged_string(LONG_VERSION_STRING); },
+        nullptr);
+
+    for (auto const& row : tr_session::Scripts)
+    {
+        auto const script = row.script;
+
+        map.try_emplace(
+            row.enabled_key,
+            [&](tr_session const& src) -> tr_variant { return src.useScript(script); },
+            [&](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+            {
+                if (auto const val = src.value_if<bool>())
+                {
+                    tgt.useScript(script, *val);
+                }
+            });
+
+        map.try_emplace(
+            row.filename_key,
+            [&](tr_session const& src) -> tr_variant { return src.script(script); },
+            [&](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+            {
+                if (auto const val = src.value_if<std::string_view>())
+                {
+                    tgt.setScript(script, *val);
+                }
+            });
+    }
+
+    return map;
 }
 
-namespace session_get_helpers
-{
 [[nodiscard]] auto get_session_fields(tr_variant::Vector const* fields_vec)
 {
     auto fields = std::set<tr_quark>{};
@@ -2464,32 +2656,63 @@ namespace session_get_helpers
 
     if (std::empty(fields)) // no fields specified; get them all
     {
-        for (tr_quark field_id = TR_KEY_NONE + 1; field_id < TR_N_KEYS; ++field_id)
+        for (auto const& [key, accessor] : session_accessors())
         {
-            fields.insert(field_id);
+            fields.insert(key);
         }
     }
 
     return fields;
 }
-} // namespace session_get_helpers
 
-[[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> sessionGet(
+[[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> sessionSet(
     tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& args_out)
+    tr_variant::Map const& params,
+    tr_variant::Map& /*result*/)
 {
-    using namespace session_get_helpers;
+    auto const& accessors = session_accessors();
 
-    for (auto const key : get_session_fields(args_in.find_if<tr_variant::Vector>(TR_KEY_fields)))
+    auto err = error_none;
+
+    for (auto const& [key, val] : params)
     {
-        if (auto var = make_session_field(*session, key); var.has_value())
+        if (auto const iter = accessors.find(key); iter != std::end(accessors))
         {
-            args_out.try_emplace(key, std::move(var));
+            if (auto const& [getter, setter] = iter->second; setter)
+            {
+                setter(*session, val, err);
+            }
+        }
+
+        if (err != error_none)
+        {
+            break;
         }
     }
 
-    return { JsonRpc::Error::SUCCESS, {} };
+    session->rpcNotify(TR_RPC_SESSION_CHANGED, nullptr);
+    return err;
+}
+
+[[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> sessionGet(
+    tr_session* session,
+    tr_variant::Map const& params,
+    tr_variant::Map& result)
+{
+    auto const& accessors = session_accessors();
+
+    for (auto const key : get_session_fields(params.find_if<tr_variant::Vector>(TR_KEY_fields)))
+    {
+        if (auto const iter = accessors.find(key); iter != std::end(accessors))
+        {
+            if (auto const& [getter, setter] = iter->second; getter)
+            {
+                result.try_emplace(key, getter(*session));
+            }
+        }
+    }
+
+    return error_none;
 }
 
 [[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> freeSpace(
@@ -2721,7 +2944,6 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector& requests
             true);
     }
 }
-
 } // namespace
 
 // TODO(tearfur): take `tr_variant const& request` after removing api_compat
