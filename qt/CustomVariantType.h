@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <libtransmission/quark.h>
+
 #include <QVariant>
 
 class CustomVariantType
@@ -15,7 +17,10 @@ public:
         TrackerStatsList = QMetaType::User,
         PeerList,
         FileList,
+        QuarkType,
         ShowModeType,
         SortModeType
     };
 };
+
+Q_DECLARE_METATYPE(tr_quark)

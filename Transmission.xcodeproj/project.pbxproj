@@ -168,6 +168,8 @@
 		A25BFD6B167BED3B0039D1AA /* variant-json.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25BFD65167BED3B0039D1AA /* variant-json.cc */; };
 		A25BFD6D167BED3B0039D1AA /* variant.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25BFD67167BED3B0039D1AA /* variant.cc */; };
 		A25BFD6E167BED3B0039D1AA /* variant.h in Headers */ = {isa = PBXBuildFile; fileRef = A25BFD68167BED3B0039D1AA /* variant.h */; };
+		A25BFD6F167BED3B0039D1AA /* symbol.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25BFD71167BED3B0039D1AA /* symbol.cc */; };
+		A25BFD70167BED3B0039D1AA /* symbol.h in Headers */ = {isa = PBXBuildFile; fileRef = A25BFD72167BED3B0039D1AA /* symbol.h */; };
 		A25D2CBD0CF4C73E0096A262 /* stats.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25D2CBB0CF4C7190096A262 /* stats.cc */; };
 		A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */ = {isa = PBXBuildFile; fileRef = A25D2CBA0CF4C7190096A262 /* stats.h */; };
 		A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -971,6 +973,8 @@
 		A25BFD65167BED3B0039D1AA /* variant-json.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "variant-json.cc"; sourceTree = "<group>"; };
 		A25BFD67167BED3B0039D1AA /* variant.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = variant.cc; sourceTree = "<group>"; };
 		A25BFD68167BED3B0039D1AA /* variant.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = variant.h; sourceTree = "<group>"; };
+		A25BFD71167BED3B0039D1AA /* symbol.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = symbol.cc; sourceTree = "<group>"; };
+		A25BFD72167BED3B0039D1AA /* symbol.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = symbol.h; sourceTree = "<group>"; };
 		A25D2CBA0CF4C7190096A262 /* stats.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = stats.h; sourceTree = "<group>"; };
 		A25D2CBB0CF4C7190096A262 /* stats.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = stats.cc; sourceTree = "<group>"; };
 		A25E03E00E4015380086C225 /* tr-getopt.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "tr-getopt.h"; sourceTree = "<group>"; };
@@ -2061,6 +2065,8 @@
 				A25BFD65167BED3B0039D1AA /* variant-json.cc */,
 				A25BFD67167BED3B0039D1AA /* variant.cc */,
 				A25BFD68167BED3B0039D1AA /* variant.h */,
+				A25BFD71167BED3B0039D1AA /* symbol.cc */,
+				A25BFD72167BED3B0039D1AA /* symbol.h */,
 				A2D22A100D65EED100007D5F /* verify.cc */,
 				A2D22A110D65EED100007D5F /* verify.h */,
 				BEFC1DF00C07861A00B0BB3C /* version.h */,
@@ -2635,6 +2641,7 @@
 				A2EE726F14DCCC950093C99A /* port-forwarding-natpmp.h in Headers */,
 				A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */,
 				A25BFD6E167BED3B0039D1AA /* variant.h in Headers */,
+				A25BFD70167BED3B0039D1AA /* symbol.h in Headers */,
 				A2EA52321686AC0D00180493 /* quark.h in Headers */,
 				A2AF23C916B44FA0003BC59E /* log.h in Headers */,
 				F11545ACA7C4D7A464F703AB /* block-info.h in Headers */,
@@ -3507,6 +3514,7 @@
 				A25BFD69167BED3B0039D1AA /* variant-benc.cc in Sources */,
 				A25BFD6B167BED3B0039D1AA /* variant-json.cc in Sources */,
 				A25BFD6D167BED3B0039D1AA /* variant.cc in Sources */,
+				A25BFD6F167BED3B0039D1AA /* symbol.cc in Sources */,
 				A2EA52311686AC0D00180493 /* quark.cc in Sources */,
 				A2AF23C816B44FA0003BC59E /* log.cc in Sources */,
 				A23FAE54178BC2950053DC5B /* file-capacity.cc in Sources */,
