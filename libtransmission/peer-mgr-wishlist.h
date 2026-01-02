@@ -48,6 +48,8 @@ public:
             libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_bitfield(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
+        [[nodiscard]] virtual libtransmission::ObserverTag observe_got_block(
+            libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_choke(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_have(
