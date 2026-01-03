@@ -91,16 +91,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    if (@available(macOS 26.0, *))
-        ;
-    else
-    {
-        // <#7908> Keep older macOS clean of visual noise
-        for (NSMenuItem* item in _fContextRow.itemArray)
-            item.image = nil;
-        for (NSMenuItem* item in _fContextNoRow.itemArray)
-            item.image = nil;
-    }
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshTorrentTable) name:@"RefreshTorrentTable"
                                              object:nil];
 }
