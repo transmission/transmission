@@ -248,7 +248,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_torrent_verify, TR_KEY_torrent_verify_kebab_APICOMPAT },
 } };
 
-auto constexpr SessionKeys = std::array<ApiKey, 147U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_activity_date, TR_KEY_activity_date_kebab_APICOMPAT },
     { TR_KEY_added_date, TR_KEY_added_date_kebab_APICOMPAT },
     { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab_APICOMPAT },
@@ -352,22 +352,14 @@ auto constexpr SessionKeys = std::array<ApiKey, 147U>{ {
     { TR_KEY_seed_queue_size, TR_KEY_seed_queue_size_kebab_APICOMPAT },
     { TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab_APICOMPAT },
     { TR_KEY_session_count, TR_KEY_session_count_kebab_APICOMPAT },
-    { TR_KEY_show_active, TR_KEY_show_active_kebab_APICOMPAT },
-    { TR_KEY_show_all, TR_KEY_show_all_kebab_APICOMPAT },
     { TR_KEY_show_backup_trackers, TR_KEY_show_backup_trackers_kebab_APICOMPAT },
-    { TR_KEY_show_downloading, TR_KEY_show_downloading_kebab_APICOMPAT },
-    { TR_KEY_show_error, TR_KEY_show_error_kebab_APICOMPAT },
     { TR_KEY_show_extra_peer_details, TR_KEY_show_extra_peer_details_kebab_APICOMPAT },
     { TR_KEY_show_filterbar, TR_KEY_show_filterbar_kebab_APICOMPAT },
-    { TR_KEY_show_finished, TR_KEY_show_finished_kebab_APICOMPAT },
     { TR_KEY_show_notification_area_icon, TR_KEY_show_notification_area_icon_kebab_APICOMPAT },
     { TR_KEY_show_options_window, TR_KEY_show_options_window_kebab_APICOMPAT },
-    { TR_KEY_show_paused, TR_KEY_show_paused_kebab_APICOMPAT },
-    { TR_KEY_show_seeding, TR_KEY_show_seeding_kebab_APICOMPAT },
     { TR_KEY_show_statusbar, TR_KEY_show_statusbar_kebab_APICOMPAT },
     { TR_KEY_show_toolbar, TR_KEY_show_toolbar_kebab_APICOMPAT },
     { TR_KEY_show_tracker_scrapes, TR_KEY_show_tracker_scrapes_kebab_APICOMPAT },
-    { TR_KEY_show_verifying, TR_KEY_show_verifying_kebab_APICOMPAT },
     { TR_KEY_sleep_per_seconds_during_verify, TR_KEY_sleep_per_seconds_during_verify_kebab_APICOMPAT },
     { TR_KEY_sort_mode, TR_KEY_sort_mode_kebab_APICOMPAT },
     { TR_KEY_sort_reversed, TR_KEY_sort_reversed_kebab_APICOMPAT },
@@ -618,11 +610,31 @@ struct State
         }
     }
 
+    if (state.is_settings && state.current_key_is_any_of({ TR_KEY_filter_mode, TR_KEY_filter_mode_kebab_APICOMPAT }))
+    {
+        static auto constexpr Strings = std::array<std::pair<std::string_view, std::string_view>, 8U>{ {
+            { "show_active", "show-active" },
+            { "show_all", "show-all" },
+            { "show_downloading", "show-downloading" },
+            { "show_error", "show-error" },
+            { "show_finished", "show-finished" },
+            { "show_paused", "show-paused" },
+            { "show_seeding", "show-seeding" },
+            { "show_verifying", "show-verifying" },
+        } };
+        for (auto const& [current, legacy] : Strings)
+        {
+            if (src == current || src == legacy)
+            {
+                return state.style == Style::Tr5 ? current : legacy;
+            }
+        }
+    }
+
     // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` here to turn on convert
     // if it's an array inside an array val whose key was `torrents`.
     // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
-    if ((state.is_rpc && state.current_key_is_any_of({ TR_KEY_method, TR_KEY_fields, TR_KEY_ids, TR_KEY_torrents })) ||
-        (state.is_settings && (state.current_key_is_any_of({ TR_KEY_filter_mode, TR_KEY_filter_mode_kebab_APICOMPAT }))))
+    if (state.is_rpc && state.current_key_is_any_of({ TR_KEY_method, TR_KEY_fields, TR_KEY_ids, TR_KEY_torrents }))
     {
         if (auto const old_key = tr_quark_lookup(src))
         {

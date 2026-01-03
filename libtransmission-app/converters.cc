@@ -23,15 +23,15 @@ using Lookup = std::array<std::pair<std::string_view, T>, N>;
 
 // ---
 
-auto constexpr ShowKeys = std::array<std::pair<tr_quark, ShowMode>, ShowModeCount>{ {
-    { TR_KEY_show_active, ShowMode::ShowActive },
-    { TR_KEY_show_all, ShowMode::ShowAll },
-    { TR_KEY_show_downloading, ShowMode::ShowDownloading },
-    { TR_KEY_show_error, ShowMode::ShowError },
-    { TR_KEY_show_finished, ShowMode::ShowFinished },
-    { TR_KEY_show_paused, ShowMode::ShowPaused },
-    { TR_KEY_show_seeding, ShowMode::ShowSeeding },
-    { TR_KEY_show_verifying, ShowMode::ShowVerifying },
+auto constexpr ShowKeys = std::array<std::pair<std::string_view, ShowMode>, ShowModeCount>{ {
+    { "show_active", ShowMode::ShowActive },
+    { "show_all", ShowMode::ShowAll },
+    { "show_downloading", ShowMode::ShowDownloading },
+    { "show_error", ShowMode::ShowError },
+    { "show_finished", ShowMode::ShowFinished },
+    { "show_paused", ShowMode::ShowPaused },
+    { "show_seeding", ShowMode::ShowSeeding },
+    { "show_verifying", ShowMode::ShowVerifying },
 } };
 
 bool to_show_mode(tr_variant const& src, ShowMode* tgt)
@@ -40,15 +40,12 @@ bool to_show_mode(tr_variant const& src, ShowMode* tgt)
 
     if (auto const str = src.value_if<std::string_view>())
     {
-        if (auto const needle = tr_quark_lookup(*str))
+        for (auto const& [key, val] : Keys)
         {
-            for (auto const& [key, val] : Keys)
+            if (str == key)
             {
-                if (needle == key)
-                {
-                    *tgt = val;
-                    return true;
-                }
+                *tgt = val;
+                return true;
             }
         }
     }
@@ -68,7 +65,7 @@ tr_variant from_show_mode(ShowMode const& src)
         }
     }
 
-    return tr_variant::unmanaged_string(TR_KEY_show_all);
+    return from_show_mode(DefaultShowMode);
 }
 
 // ---
