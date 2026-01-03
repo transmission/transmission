@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <deque>
+#include <initializer_list>
 #include <string_view>
 #include <vector>
 
@@ -467,15 +469,21 @@ auto constexpr PreferClearLegacy = std::string_view{ "tolerated" };
 struct State
 {
     api_compat::Style style = {};
-    bool convert_strings = false;
     bool is_free_space_response = false;
     bool is_request = false;
     bool is_response = false;
     bool is_rpc = false;
+    bool is_settings = false;
     bool is_success = false;
     bool is_torrent = false;
     bool was_jsonrpc = false;
     bool was_legacy = false;
+    std::deque<tr_quark> path;
+
+    [[nodiscard]] bool current_key_is_any_of(std::initializer_list<tr_quark> const pool) const noexcept
+    {
+        return !std::empty(path) && std::count(std::cbegin(pool), std::cend(pool), path.back()) != 0U;
+    }
 };
 
 [[nodiscard]] State makeState(tr_variant::Map const& top)
@@ -489,6 +497,7 @@ struct State
     auto const was_legacy_response = state.was_legacy && top.contains(TR_KEY_result);
     state.is_response = was_jsonrpc_response || was_legacy_response;
     state.is_rpc = state.is_request || state.is_response;
+    state.is_settings = !state.is_rpc;
 
     state.is_success = state.is_response &&
         (was_jsonrpc_response ? top.contains(TR_KEY_result) :
@@ -596,47 +605,24 @@ struct State
 
 [[nodiscard]] std::optional<std::string_view> convert_string(State const& state, std::string_view const src)
 {
-    if (!state.convert_strings)
-    {
-        return {};
-    }
-
-    auto const old_key = tr_quark_lookup(src);
-    if (!old_key)
-    {
-        return {};
-    }
-
-    auto const new_key = convert_key(state, *old_key);
-    if (*old_key == new_key)
-    {
-        return {};
-    }
-
-    auto ret = tr_quark_get_string_view(new_key);
-    return ret;
-}
-
-[[nodiscard]] bool should_convert_child_strings(State const& state, tr_quark const old_key, tr_quark const new_key)
-{
     // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` here to turn on convert
     // if it's an array inside an array val whose key was `torrents`.
     // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
-    if (state.is_rpc &&
-        (new_key == TR_KEY_method || new_key == TR_KEY_fields || new_key == TR_KEY_ids || new_key == TR_KEY_torrents))
+    if ((state.is_rpc && state.current_key_is_any_of({ TR_KEY_method, TR_KEY_fields, TR_KEY_ids, TR_KEY_torrents })) ||
+        (state.is_settings &&
+         (state.current_key_is_any_of(
+             { TR_KEY_filter_mode, TR_KEY_filter_mode_kebab_APICOMPAT, TR_KEY_sort_mode, TR_KEY_sort_mode_kebab_APICOMPAT }))))
     {
-        return true;
+        if (auto const old_key = tr_quark_lookup(src))
+        {
+            if (auto const new_key = convert_key(state, *old_key); *old_key != new_key)
+            {
+                return tr_quark_get_string_view(new_key);
+            }
+        }
     }
 
-    if (!state.is_rpc &&
-        (TR_KEY_filter_mode == new_key || TR_KEY_filter_mode == old_key || TR_KEY_filter_mode_kebab_APICOMPAT == new_key ||
-         TR_KEY_filter_mode_kebab_APICOMPAT == old_key || TR_KEY_sort_mode == new_key || TR_KEY_sort_mode == old_key ||
-         TR_KEY_sort_mode_kebab_APICOMPAT == new_key || TR_KEY_sort_mode_kebab_APICOMPAT == old_key))
-    {
-        return true;
-    }
-
-    return false;
+    return {};
 }
 
 void convert_keys(tr_variant& var, State& state)
@@ -674,10 +660,9 @@ void convert_keys(tr_variant& var, State& state)
                         val.replace_key(old_key, new_key);
                     }
 
-                    auto const pop = state.convert_strings;
-                    state.convert_strings |= should_convert_child_strings(state, old_key, new_key);
+                    state.path.push_back(new_key);
                     convert_keys(child, state);
-                    state.convert_strings = pop;
+                    state.path.pop_back();
                 }
             }
         });
