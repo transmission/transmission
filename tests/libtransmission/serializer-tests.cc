@@ -390,7 +390,10 @@ TEST_F(SerializerTest, fieldLoadIgnoresNonMap)
 
 TEST_F(SerializerTest, setMissingKey)
 {
-    auto thing = Thing{ .i = 1, .d = 2.0, .s = "x" };
+    auto thing = Thing{};
+    thing.i = 1;
+    thing.d = 2.0;
+    thing.s = "x";
     auto const original = thing;
 
     EXPECT_FALSE(set_if_changed(thing, Thing::Fields, TR_KEY_address, 123));
@@ -399,7 +402,9 @@ TEST_F(SerializerTest, setMissingKey)
 
 TEST_F(SerializerTest, setSameInt)
 {
-    auto thing = Thing{ .i = 5, .s = "" };
+    auto thing = Thing{};
+    thing.i = 5;
+    thing.s = "";
     auto const original = thing;
 
     EXPECT_FALSE(set_if_changed(thing, Thing::Fields, TR_KEY_port, 5));
@@ -408,7 +413,9 @@ TEST_F(SerializerTest, setSameInt)
 
 TEST_F(SerializerTest, setNewInt)
 {
-    auto thing = Thing{ .i = 5, .s = "" };
+    auto thing = Thing{};
+    thing.i = 5;
+    thing.s = "";
 
     EXPECT_TRUE(set_if_changed(thing, Thing::Fields, TR_KEY_port, 6));
     EXPECT_EQ(thing.i, 6);
@@ -416,7 +423,9 @@ TEST_F(SerializerTest, setNewInt)
 
 TEST_F(SerializerTest, setTypeMismatch)
 {
-    auto thing = Thing{ .d = 1.0, .s = "" };
+    auto thing = Thing{};
+    thing.d = 1.0;
+    thing.s = "";
     auto const original = thing;
 
     EXPECT_FALSE(set_if_changed(thing, Thing::Fields, TR_KEY_alt_speed_up, 1.0F));
@@ -425,7 +434,9 @@ TEST_F(SerializerTest, setTypeMismatch)
 
 TEST_F(SerializerTest, setFloatNear)
 {
-    auto thing = Thing{ .d = 1.0, .s = "" };
+    auto thing = Thing{};
+    thing.d = 1.0;
+    thing.s = "";
     auto const original = thing;
 
     auto const eps = std::numeric_limits<double>::epsilon();
@@ -435,7 +446,9 @@ TEST_F(SerializerTest, setFloatNear)
 
 TEST_F(SerializerTest, setFloatFar)
 {
-    auto thing = Thing{ .d = 1.0, .s = "" };
+    auto thing = Thing{};
+    thing.d = 1.0;
+    thing.s = "";
 
     auto const eps = std::numeric_limits<double>::epsilon();
     auto const val = 1.0 + (eps * 2.0);
@@ -445,7 +458,9 @@ TEST_F(SerializerTest, setFloatFar)
 
 TEST_F(SerializerTest, setFloatScaled)
 {
-    auto thing = Thing{ .d = 1e12, .s = "" };
+    auto thing = Thing{};
+    thing.d = 1e12;
+    thing.s = "";
     auto const original = thing;
 
     auto const eps = std::numeric_limits<double>::epsilon();
@@ -462,13 +477,17 @@ TEST_F(SerializerTest, setFloatScaled)
 
 TEST_F(SerializerTest, getMissingKey)
 {
-    auto const thing = Thing{ .i = 1, .d = 2.0, .s = "x" };
+    auto thing = Thing{};
+    thing.i = 1;
+    thing.d = 2.0;
+    thing.s = "x";
     EXPECT_FALSE(get_value<int>(thing, Thing::Fields, TR_KEY_address).has_value());
 }
 
 TEST_F(SerializerTest, getOk)
 {
-    auto const thing = Thing{ .s = "hello" };
+    auto thing = Thing{};
+    thing.s = "hello";
     auto const val = get_value<std::string>(thing, Thing::Fields, TR_KEY_name);
     ASSERT_TRUE(val.has_value());
     EXPECT_EQ(*val, "hello");
@@ -476,7 +495,8 @@ TEST_F(SerializerTest, getOk)
 
 TEST_F(SerializerTest, getTypeMismatch)
 {
-    auto const thing = Thing{ .s = "hello" };
+    auto thing = Thing{};
+    thing.s = "hello";
     EXPECT_FALSE(get_value<std::string_view>(thing, Thing::Fields, TR_KEY_name).has_value());
 }
 
