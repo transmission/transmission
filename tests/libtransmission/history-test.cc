@@ -5,9 +5,9 @@
 
 #include <cstddef> // size_t
 
-#include <libtransmission/history.h>
+#include <gtest/gtest.h>
 
-#include "gtest/gtest.h"
+#include <libtransmission/history.h>
 
 TEST(History, recentHistory)
 {
