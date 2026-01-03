@@ -1338,7 +1338,7 @@ jobs:
             cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.crypto }}
+          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.crypto.cmake }}
           path: pfx/**/*
 
   openbsd-from-tarball:
