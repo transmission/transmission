@@ -13,6 +13,8 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/announce-list.h>
