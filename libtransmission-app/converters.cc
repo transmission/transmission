@@ -23,15 +23,15 @@ using Lookup = std::array<std::pair<std::string_view, T>, N>;
 
 // ---
 
-auto constexpr ShowKeys = std::array<std::pair<tr_quark, ShowMode>, ShowModeCount>{ {
-    { TR_KEY_show_active, ShowMode::ShowActive },
-    { TR_KEY_show_all, ShowMode::ShowAll },
-    { TR_KEY_show_downloading, ShowMode::ShowDownloading },
-    { TR_KEY_show_error, ShowMode::ShowError },
-    { TR_KEY_show_finished, ShowMode::ShowFinished },
-    { TR_KEY_show_paused, ShowMode::ShowPaused },
-    { TR_KEY_show_seeding, ShowMode::ShowSeeding },
-    { TR_KEY_show_verifying, ShowMode::ShowVerifying },
+auto constexpr ShowKeys = std::array<std::pair<std::string_view, ShowMode>, ShowModeCount>{ {
+    { "show_active", ShowMode::ShowActive },
+    { "show_all", ShowMode::ShowAll },
+    { "show_downloading", ShowMode::ShowDownloading },
+    { "show_error", ShowMode::ShowError },
+    { "show_finished", ShowMode::ShowFinished },
+    { "show_paused", ShowMode::ShowPaused },
+    { "show_seeding", ShowMode::ShowSeeding },
+    { "show_verifying", ShowMode::ShowVerifying },
 } };
 
 bool to_show_mode(tr_variant const& src, ShowMode* tgt)
@@ -40,15 +40,12 @@ bool to_show_mode(tr_variant const& src, ShowMode* tgt)
 
     if (auto const str = src.value_if<std::string_view>())
     {
-        if (auto const needle = tr_quark_lookup(*str))
+        for (auto const& [key, val] : Keys)
         {
-            for (auto const& [key, val] : Keys)
+            if (str == key)
             {
-                if (needle == key)
-                {
-                    *tgt = val;
-                    return true;
-                }
+                *tgt = val;
+                return true;
             }
         }
     }
@@ -68,22 +65,22 @@ tr_variant from_show_mode(ShowMode const& src)
         }
     }
 
-    return tr_variant::unmanaged_string(TR_KEY_show_all);
+    return from_show_mode(DefaultShowMode);
 }
 
 // ---
 
-auto constexpr SortKeys = std::array<std::pair<tr_quark, SortMode>, SortModeCount>{ {
-    { TR_KEY_sort_by_activity, SortMode::SortByActivity },
-    { TR_KEY_sort_by_age, SortMode::SortByAge },
-    { TR_KEY_sort_by_eta, SortMode::SortByEta },
-    { TR_KEY_sort_by_id, SortMode::SortById },
-    { TR_KEY_sort_by_name, SortMode::SortByName },
-    { TR_KEY_sort_by_progress, SortMode::SortByProgress },
-    { TR_KEY_sort_by_queue, SortMode::SortByQueue },
-    { TR_KEY_sort_by_ratio, SortMode::SortByRatio },
-    { TR_KEY_sort_by_size, SortMode::SortBySize },
-    { TR_KEY_sort_by_state, SortMode::SortByState },
+auto constexpr SortKeys = std::array<std::pair<std::string_view, SortMode>, SortModeCount>{ {
+    { "sort_by_activity", SortMode::SortByActivity },
+    { "sort_by_age", SortMode::SortByAge },
+    { "sort_by_eta", SortMode::SortByEta },
+    { "sort_by_id", SortMode::SortById },
+    { "sort_by_name", SortMode::SortByName },
+    { "sort_by_progress", SortMode::SortByProgress },
+    { "sort_by_queue", SortMode::SortByQueue },
+    { "sort_by_ratio", SortMode::SortByRatio },
+    { "sort_by_size", SortMode::SortBySize },
+    { "sort_by_state", SortMode::SortByState },
 } };
 
 bool to_sort_mode(tr_variant const& src, SortMode* tgt)
@@ -92,15 +89,12 @@ bool to_sort_mode(tr_variant const& src, SortMode* tgt)
 
     if (auto const str = src.value_if<std::string_view>())
     {
-        if (auto const needle = tr_quark_lookup(*str))
+        for (auto const& [key, val] : Keys)
         {
-            for (auto const& [key, val] : Keys)
+            if (str == key)
             {
-                if (needle == key)
-                {
-                    *tgt = val;
-                    return true;
-                }
+                *tgt = val;
+                return true;
             }
         }
     }
@@ -120,7 +114,7 @@ tr_variant from_sort_mode(SortMode const& src)
         }
     }
 
-    return tr_variant::unmanaged_string(TR_KEY_sort_by_name);
+    return from_sort_mode(DefaultSortMode);
 }
 } // unnamed namespace
 

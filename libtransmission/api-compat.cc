@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <deque>
+#include <initializer_list>
 #include <string_view>
 #include <vector>
 
@@ -246,7 +248,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_torrent_verify, TR_KEY_torrent_verify_kebab_APICOMPAT },
 } };
 
-auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_activity_date, TR_KEY_activity_date_kebab_APICOMPAT },
     { TR_KEY_added_date, TR_KEY_added_date_kebab_APICOMPAT },
     { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab_APICOMPAT },
@@ -350,33 +352,15 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_seed_queue_size, TR_KEY_seed_queue_size_kebab_APICOMPAT },
     { TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab_APICOMPAT },
     { TR_KEY_session_count, TR_KEY_session_count_kebab_APICOMPAT },
-    { TR_KEY_show_active, TR_KEY_show_active_kebab_APICOMPAT },
-    { TR_KEY_show_all, TR_KEY_show_all_kebab_APICOMPAT },
     { TR_KEY_show_backup_trackers, TR_KEY_show_backup_trackers_kebab_APICOMPAT },
-    { TR_KEY_show_downloading, TR_KEY_show_downloading_kebab_APICOMPAT },
-    { TR_KEY_show_error, TR_KEY_show_error_kebab_APICOMPAT },
     { TR_KEY_show_extra_peer_details, TR_KEY_show_extra_peer_details_kebab_APICOMPAT },
     { TR_KEY_show_filterbar, TR_KEY_show_filterbar_kebab_APICOMPAT },
-    { TR_KEY_show_finished, TR_KEY_show_finished_kebab_APICOMPAT },
     { TR_KEY_show_notification_area_icon, TR_KEY_show_notification_area_icon_kebab_APICOMPAT },
     { TR_KEY_show_options_window, TR_KEY_show_options_window_kebab_APICOMPAT },
-    { TR_KEY_show_paused, TR_KEY_show_paused_kebab_APICOMPAT },
-    { TR_KEY_show_seeding, TR_KEY_show_seeding_kebab_APICOMPAT },
     { TR_KEY_show_statusbar, TR_KEY_show_statusbar_kebab_APICOMPAT },
     { TR_KEY_show_toolbar, TR_KEY_show_toolbar_kebab_APICOMPAT },
     { TR_KEY_show_tracker_scrapes, TR_KEY_show_tracker_scrapes_kebab_APICOMPAT },
-    { TR_KEY_show_verifying, TR_KEY_show_verifying_kebab_APICOMPAT },
     { TR_KEY_sleep_per_seconds_during_verify, TR_KEY_sleep_per_seconds_during_verify_kebab_APICOMPAT },
-    { TR_KEY_sort_by_activity, TR_KEY_sort_by_activity_kebab_APICOMPAT },
-    { TR_KEY_sort_by_age, TR_KEY_sort_by_age_kebab_APICOMPAT },
-    { TR_KEY_sort_by_eta, TR_KEY_sort_by_eta_kebab_APICOMPAT },
-    { TR_KEY_sort_by_id, TR_KEY_sort_by_id_kebab_APICOMPAT },
-    { TR_KEY_sort_by_name, TR_KEY_sort_by_name_kebab_APICOMPAT },
-    { TR_KEY_sort_by_progress, TR_KEY_sort_by_progress_kebab_APICOMPAT },
-    { TR_KEY_sort_by_queue, TR_KEY_sort_by_queue_kebab_APICOMPAT },
-    { TR_KEY_sort_by_ratio, TR_KEY_sort_by_ratio_kebab_APICOMPAT },
-    { TR_KEY_sort_by_size, TR_KEY_sort_by_size_kebab_APICOMPAT },
-    { TR_KEY_sort_by_state, TR_KEY_sort_by_state_kebab_APICOMPAT },
     { TR_KEY_sort_mode, TR_KEY_sort_mode_kebab_APICOMPAT },
     { TR_KEY_sort_reversed, TR_KEY_sort_reversed_kebab_APICOMPAT },
     { TR_KEY_speed_Bps, TR_KEY_speed_Bps_kebab_APICOMPAT },
@@ -467,15 +451,21 @@ auto constexpr PreferClearLegacy = std::string_view{ "tolerated" };
 struct State
 {
     api_compat::Style style = {};
-    bool convert_strings = false;
     bool is_free_space_response = false;
     bool is_request = false;
     bool is_response = false;
     bool is_rpc = false;
+    bool is_settings = false;
     bool is_success = false;
     bool is_torrent = false;
     bool was_jsonrpc = false;
     bool was_legacy = false;
+    std::deque<tr_quark> path;
+
+    [[nodiscard]] bool current_key_is_any_of(std::initializer_list<tr_quark> const pool) const noexcept
+    {
+        return !std::empty(path) && std::count(std::cbegin(pool), std::cend(pool), path.back()) != 0U;
+    }
 };
 
 [[nodiscard]] State makeState(tr_variant::Map const& top)
@@ -489,6 +479,7 @@ struct State
     auto const was_legacy_response = state.was_legacy && top.contains(TR_KEY_result);
     state.is_response = was_jsonrpc_response || was_legacy_response;
     state.is_rpc = state.is_request || state.is_response;
+    state.is_settings = !state.is_rpc;
 
     state.is_success = state.is_response &&
         (was_jsonrpc_response ? top.contains(TR_KEY_result) :
@@ -596,47 +587,65 @@ struct State
 
 [[nodiscard]] std::optional<std::string_view> convert_string(State const& state, std::string_view const src)
 {
-    if (!state.convert_strings)
+    if (state.is_settings && state.current_key_is_any_of({ TR_KEY_sort_mode, TR_KEY_sort_mode_kebab_APICOMPAT }))
     {
-        return {};
+        static auto constexpr Strings = std::array<std::pair<std::string_view /*Tr5*/, std::string_view /*Tr4*/>, 10U>{ {
+            { "sort_by_activity", "sort-by-activity" },
+            { "sort_by_age", "sort-by-age" },
+            { "sort_by_eta", "sort-by-eta" },
+            { "sort_by_id", "sort-by-id" },
+            { "sort_by_name", "sort-by-name" },
+            { "sort_by_progress", "sort-by-progress" },
+            { "sort_by_queue", "sort-by-queue" },
+            { "sort_by_ratio", "sort-by-ratio" },
+            { "sort_by_size", "sort-by-size" },
+            { "sort_by_state", "sort-by-state" },
+        } };
+        for (auto const& [current, legacy] : Strings)
+        {
+            if (src == current || src == legacy)
+            {
+                return state.style == Style::Tr5 ? current : legacy;
+            }
+        }
     }
 
-    auto const old_key = tr_quark_lookup(src);
-    if (!old_key)
+    if (state.is_settings && state.current_key_is_any_of({ TR_KEY_filter_mode, TR_KEY_filter_mode_kebab_APICOMPAT }))
     {
-        return {};
+        static auto constexpr Strings = std::array<std::pair<std::string_view, std::string_view>, 8U>{ {
+            { "show_active", "show-active" },
+            { "show_all", "show-all" },
+            { "show_downloading", "show-downloading" },
+            { "show_error", "show-error" },
+            { "show_finished", "show-finished" },
+            { "show_paused", "show-paused" },
+            { "show_seeding", "show-seeding" },
+            { "show_verifying", "show-verifying" },
+        } };
+        for (auto const& [current, legacy] : Strings)
+        {
+            if (src == current || src == legacy)
+            {
+                return state.style == Style::Tr5 ? current : legacy;
+            }
+        }
     }
 
-    auto const new_key = convert_key(state, *old_key);
-    if (*old_key == new_key)
-    {
-        return {};
-    }
-
-    auto ret = tr_quark_get_string_view(new_key);
-    return ret;
-}
-
-[[nodiscard]] bool should_convert_child_strings(State const& state, tr_quark const old_key, tr_quark const new_key)
-{
     // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` here to turn on convert
     // if it's an array inside an array val whose key was `torrents`.
     // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
-    if (state.is_rpc &&
-        (new_key == TR_KEY_method || new_key == TR_KEY_fields || new_key == TR_KEY_ids || new_key == TR_KEY_torrents))
+    if (state.is_rpc && state.current_key_is_any_of({ TR_KEY_method, TR_KEY_fields, TR_KEY_ids, TR_KEY_torrents }))
     {
-        return true;
+        if (auto const old_key = tr_quark_lookup(src))
+        {
+            if (auto const new_key = convert_key(state, *old_key); *old_key != new_key)
+            {
+                return tr_quark_get_string_view(new_key);
+            }
+        }
     }
 
-    if (!state.is_rpc &&
-        (TR_KEY_filter_mode == new_key || TR_KEY_filter_mode == old_key || TR_KEY_filter_mode_kebab_APICOMPAT == new_key ||
-         TR_KEY_filter_mode_kebab_APICOMPAT == old_key || TR_KEY_sort_mode == new_key || TR_KEY_sort_mode == old_key ||
-         TR_KEY_sort_mode_kebab_APICOMPAT == new_key || TR_KEY_sort_mode_kebab_APICOMPAT == old_key))
-    {
-        return true;
-    }
-
-    return false;
+    return {};
 }
 
 void convert_keys(tr_variant& var, State& state)
@@ -674,10 +683,9 @@ void convert_keys(tr_variant& var, State& state)
                         val.replace_key(old_key, new_key);
                     }
 
-                    auto const pop = state.convert_strings;
-                    state.convert_strings |= should_convert_child_strings(state, old_key, new_key);
+                    state.path.push_back(new_key);
                     convert_keys(child, state);
-                    state.convert_strings = pop;
+                    state.path.pop_back();
                 }
             }
         });
