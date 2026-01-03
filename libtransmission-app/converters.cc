@@ -73,17 +73,17 @@ tr_variant from_show_mode(ShowMode const& src)
 
 // ---
 
-auto constexpr SortKeys = std::array<std::pair<tr_quark, SortMode>, SortModeCount>{ {
-    { TR_KEY_sort_by_activity, SortMode::SortByActivity },
-    { TR_KEY_sort_by_age, SortMode::SortByAge },
-    { TR_KEY_sort_by_eta, SortMode::SortByEta },
-    { TR_KEY_sort_by_id, SortMode::SortById },
-    { TR_KEY_sort_by_name, SortMode::SortByName },
-    { TR_KEY_sort_by_progress, SortMode::SortByProgress },
-    { TR_KEY_sort_by_queue, SortMode::SortByQueue },
-    { TR_KEY_sort_by_ratio, SortMode::SortByRatio },
-    { TR_KEY_sort_by_size, SortMode::SortBySize },
-    { TR_KEY_sort_by_state, SortMode::SortByState },
+auto constexpr SortKeys = std::array<std::pair<std::string_view, SortMode>, SortModeCount>{ {
+    { "sort_by_activity", SortMode::SortByActivity },
+    { "sort_by_age", SortMode::SortByAge },
+    { "sort_by_eta", SortMode::SortByEta },
+    { "sort_by_id", SortMode::SortById },
+    { "sort_by_name", SortMode::SortByName },
+    { "sort_by_progress", SortMode::SortByProgress },
+    { "sort_by_queue", SortMode::SortByQueue },
+    { "sort_by_ratio", SortMode::SortByRatio },
+    { "sort_by_size", SortMode::SortBySize },
+    { "sort_by_state", SortMode::SortByState },
 } };
 
 bool to_sort_mode(tr_variant const& src, SortMode* tgt)
@@ -92,15 +92,12 @@ bool to_sort_mode(tr_variant const& src, SortMode* tgt)
 
     if (auto const str = src.value_if<std::string_view>())
     {
-        if (auto const needle = tr_quark_lookup(*str))
+        for (auto const& [key, val] : Keys)
         {
-            for (auto const& [key, val] : Keys)
+            if (str == key)
             {
-                if (needle == key)
-                {
-                    *tgt = val;
-                    return true;
-                }
+                *tgt = val;
+                return true;
             }
         }
     }
@@ -120,7 +117,7 @@ tr_variant from_sort_mode(SortMode const& src)
         }
     }
 
-    return tr_variant::unmanaged_string(TR_KEY_sort_by_name);
+    return from_sort_mode(DefaultSortMode);
 }
 } // unnamed namespace
 

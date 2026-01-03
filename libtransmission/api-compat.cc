@@ -248,7 +248,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_torrent_verify, TR_KEY_torrent_verify_kebab_APICOMPAT },
 } };
 
-auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 147U>{ {
     { TR_KEY_activity_date, TR_KEY_activity_date_kebab_APICOMPAT },
     { TR_KEY_added_date, TR_KEY_added_date_kebab_APICOMPAT },
     { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab_APICOMPAT },
@@ -369,16 +369,6 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_show_tracker_scrapes, TR_KEY_show_tracker_scrapes_kebab_APICOMPAT },
     { TR_KEY_show_verifying, TR_KEY_show_verifying_kebab_APICOMPAT },
     { TR_KEY_sleep_per_seconds_during_verify, TR_KEY_sleep_per_seconds_during_verify_kebab_APICOMPAT },
-    { TR_KEY_sort_by_activity, TR_KEY_sort_by_activity_kebab_APICOMPAT },
-    { TR_KEY_sort_by_age, TR_KEY_sort_by_age_kebab_APICOMPAT },
-    { TR_KEY_sort_by_eta, TR_KEY_sort_by_eta_kebab_APICOMPAT },
-    { TR_KEY_sort_by_id, TR_KEY_sort_by_id_kebab_APICOMPAT },
-    { TR_KEY_sort_by_name, TR_KEY_sort_by_name_kebab_APICOMPAT },
-    { TR_KEY_sort_by_progress, TR_KEY_sort_by_progress_kebab_APICOMPAT },
-    { TR_KEY_sort_by_queue, TR_KEY_sort_by_queue_kebab_APICOMPAT },
-    { TR_KEY_sort_by_ratio, TR_KEY_sort_by_ratio_kebab_APICOMPAT },
-    { TR_KEY_sort_by_size, TR_KEY_sort_by_size_kebab_APICOMPAT },
-    { TR_KEY_sort_by_state, TR_KEY_sort_by_state_kebab_APICOMPAT },
     { TR_KEY_sort_mode, TR_KEY_sort_mode_kebab_APICOMPAT },
     { TR_KEY_sort_reversed, TR_KEY_sort_reversed_kebab_APICOMPAT },
     { TR_KEY_speed_Bps, TR_KEY_speed_Bps_kebab_APICOMPAT },
@@ -605,13 +595,34 @@ struct State
 
 [[nodiscard]] std::optional<std::string_view> convert_string(State const& state, std::string_view const src)
 {
+    if (state.is_settings && state.current_key_is_any_of({ TR_KEY_sort_mode, TR_KEY_sort_mode_kebab_APICOMPAT }))
+    {
+        static auto constexpr Strings = std::array<std::pair<std::string_view /*Tr5*/, std::string_view /*Tr4*/>, 10U>{ {
+            { "sort_by_activity", "sort-by-activity" },
+            { "sort_by_age", "sort-by-age" },
+            { "sort_by_eta", "sort-by-eta" },
+            { "sort_by_id", "sort-by-id" },
+            { "sort_by_name", "sort-by-name" },
+            { "sort_by_progress", "sort-by-progress" },
+            { "sort_by_queue", "sort-by-queue" },
+            { "sort_by_ratio", "sort-by-ratio" },
+            { "sort_by_size", "sort-by-size" },
+            { "sort_by_state", "sort-by-state" },
+        } };
+        for (auto const& [current, legacy] : Strings)
+        {
+            if (src == current || src == legacy)
+            {
+                return state.style == Style::Tr5 ? current : legacy;
+            }
+        }
+    }
+
     // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` here to turn on convert
     // if it's an array inside an array val whose key was `torrents`.
     // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
     if ((state.is_rpc && state.current_key_is_any_of({ TR_KEY_method, TR_KEY_fields, TR_KEY_ids, TR_KEY_torrents })) ||
-        (state.is_settings &&
-         (state.current_key_is_any_of(
-             { TR_KEY_filter_mode, TR_KEY_filter_mode_kebab_APICOMPAT, TR_KEY_sort_mode, TR_KEY_sort_mode_kebab_APICOMPAT }))))
+        (state.is_settings && (state.current_key_is_any_of({ TR_KEY_filter_mode, TR_KEY_filter_mode_kebab_APICOMPAT }))))
     {
         if (auto const old_key = tr_quark_lookup(src))
         {
