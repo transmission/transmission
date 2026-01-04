@@ -13,22 +13,16 @@
 #include <QCoreApplication>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
-#include <QFileIconProvider>
-#include <QFileInfo>
 #include <QHBoxLayout>
-#include <QIcon>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QSpinBox>
-#include <QStyle>
-#include <QTabWidget>
 #include <QTime>
 #include <QTimeEdit>
-#include <QTimer>
-#include <QVBoxLayout>
 
 #include <libtransmission/transmission.h>
 
@@ -40,303 +34,234 @@
 #include "Session.h"
 #include "Utils.h"
 
+using namespace libtransmission;
+
 // ---
 
-namespace
+void PrefsDialog::linkAltSpeedDaysComboToPref(QComboBox* const w, int const key)
 {
-
-class PreferenceWidget
-{
-    static char const* const PrefKey;
-
-public:
-    explicit PreferenceWidget(QObject* object)
-        : object_{ object }
+    static auto items = []
     {
-    }
+        auto ret = std::array<std::pair<tr_sched_day, QString>, 10U>{};
+        auto idx = 0;
+        ret[idx++] = { TR_SCHED_ALL, tr("Every Day") };
+        ret[idx++] = { TR_SCHED_WEEKDAY, tr("Weekdays") };
+        ret[idx++] = { TR_SCHED_WEEKEND, tr("Weekends") };
 
-    template<typename T>
-    [[nodiscard]] bool is() const
-    {
-        return qobject_cast<T*>(object_) != nullptr;
-    }
-
-    template<typename T>
-    [[nodiscard]] T const* as() const
-    {
-        assert(is<T>());
-        return static_cast<T const*>(object_);
-    }
-
-    template<typename T>
-    [[nodiscard]] T* as()
-    {
-        assert(is<T>());
-        return static_cast<T*>(object_);
-    }
-
-    void setPrefKey(int key)
-    {
-        object_->setProperty(PrefKey, key);
-    }
-
-    [[nodiscard]] int getPrefKey() const
-    {
-        return object_->property(PrefKey).toInt();
-    }
-
-private:
-    QObject* object_;
-};
-
-char const* const PreferenceWidget::PrefKey = "pref-key";
-
-int qtDayToTrDay(int day)
-{
-    switch (day)
-    {
-    case Qt::Monday:
-        return TR_SCHED_MON;
-
-    case Qt::Tuesday:
-        return TR_SCHED_TUES;
-
-    case Qt::Wednesday:
-        return TR_SCHED_WED;
-
-    case Qt::Thursday:
-        return TR_SCHED_THURS;
-
-    case Qt::Friday:
-        return TR_SCHED_FRI;
-
-    case Qt::Saturday:
-        return TR_SCHED_SAT;
-
-    case Qt::Sunday:
-        return TR_SCHED_SUN;
-
-    default:
-        assert(false && "Invalid day of week");
-        return 0;
-    }
-}
-
-QString qtDayName(int day)
-{
-    switch (day)
-    {
-    case Qt::Monday:
-        return PrefsDialog::tr("Monday");
-
-    case Qt::Tuesday:
-        return PrefsDialog::tr("Tuesday");
-
-    case Qt::Wednesday:
-        return PrefsDialog::tr("Wednesday");
-
-    case Qt::Thursday:
-        return PrefsDialog::tr("Thursday");
-
-    case Qt::Friday:
-        return PrefsDialog::tr("Friday");
-
-    case Qt::Saturday:
-        return PrefsDialog::tr("Saturday");
-
-    case Qt::Sunday:
-        return PrefsDialog::tr("Sunday");
-
-    default:
-        assert(false && "Invalid day of week");
-        return {};
-    }
-}
-
-[[nodiscard]] bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
-{
-    if (ancestor == nullptr)
-    {
-        return false;
-    }
-
-    while (descendant != nullptr)
-    {
-        if (descendant == ancestor)
+        auto const locale = QLocale{};
+        auto const qt_day_to_tr_day = std::map<int, tr_sched_day>{ {
+            { Qt::Monday, TR_SCHED_MON },
+            { Qt::Tuesday, TR_SCHED_TUES },
+            { Qt::Wednesday, TR_SCHED_WED },
+            { Qt::Thursday, TR_SCHED_THURS },
+            { Qt::Friday, TR_SCHED_FRI },
+            { Qt::Saturday, TR_SCHED_SAT },
+            { Qt::Sunday, TR_SCHED_SUN },
+        } };
+        auto const first_day_of_week = locale.firstDayOfWeek();
+        for (int i = first_day_of_week; i <= Qt::Sunday; ++i)
         {
-            return true;
+            ret[idx++] = { qt_day_to_tr_day.at(i), locale.dayName(i) };
         }
+        for (int i = Qt::Monday; i < first_day_of_week; ++i)
+        {
+            ret[idx++] = { qt_day_to_tr_day.at(i), locale.dayName(i) };
+        }
+        return ret;
+    }();
 
-        descendant = descendant->parent();
-    }
-
-    return false;
-}
-} // namespace
-
-bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
-{
-    auto pref_widget = PreferenceWidget{ widget };
-
-    if (pref_widget.is<QCheckBox>())
+    for (auto const& [day, label] : items)
     {
-        pref_widget.as<QCheckBox>()->setChecked(prefs_.get<bool>(pref_key));
-    }
-    else if (pref_widget.is<QSpinBox>())
-    {
-        pref_widget.as<QSpinBox>()->setValue(prefs_.get<int>(pref_key));
-    }
-    else if (pref_widget.is<QDoubleSpinBox>())
-    {
-        pref_widget.as<QDoubleSpinBox>()->setValue(prefs_.get<double>(pref_key));
-    }
-    else if (pref_widget.is<QTimeEdit>())
-    {
-        pref_widget.as<QTimeEdit>()->setTime(QTime{ 0, 0 }.addSecs(prefs_.get<int>(pref_key) * 60));
-    }
-    else if (pref_widget.is<QLineEdit>())
-    {
-        pref_widget.as<QLineEdit>()->setText(prefs_.get<QString>(pref_key));
-    }
-    else if (pref_widget.is<PathButton>())
-    {
-        pref_widget.as<PathButton>()->setPath(prefs_.get<QString>(pref_key));
-    }
-    else if (pref_widget.is<FreeSpaceLabel>())
-    {
-        pref_widget.as<FreeSpaceLabel>()->setPath(prefs_.get<QString>(pref_key));
-    }
-    else if (pref_widget.is<QPlainTextEdit>())
-    {
-        pref_widget.as<QPlainTextEdit>()->setPlainText(prefs_.get<QString>(pref_key));
-    }
-    else
-    {
-        return false;
+        w->addItem(label);
     }
 
-    return true;
+    auto updater = [this, key, w]()
+    {
+        auto const blocker = QSignalBlocker{ w };
+        auto const val = prefs_.get<int>(key);
+        for (size_t i = 0; i < std::size(items); ++i)
+        {
+            if (items[i].first == val)
+            {
+                w->setCurrentIndex(i);
+            }
+        }
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
+    auto on_activated = [this, key](int const idx)
+    {
+        if (0 <= idx && idx < static_cast<int>(std::size(items)))
+        {
+            set(key, items[idx].first);
+        }
+    };
+    connect(w, &QComboBox::activated, std::move(on_activated));
 }
 
-void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
+void PrefsDialog::linkEncryptionComboToPref(QComboBox* const w, int const key)
 {
-    auto pref_widget = PreferenceWidget{ widget };
+    static auto const Items = std::array<std::pair<tr_encryption_mode, QString>, 3U>{ {
+        { TR_CLEAR_PREFERRED, tr("Allow encryption") },
+        { TR_ENCRYPTION_PREFERRED, tr("Prefer encryption") },
+        { TR_ENCRYPTION_REQUIRED, tr("Require encryption") },
+    } };
 
-    pref_widget.setPrefKey(pref_key);
-    updateWidgetValue(widget, pref_key);
-    widgets_.try_emplace(pref_key, widget);
-
-    if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
+    for (auto const& [mode, label] : Items)
     {
-        connect(check_box, &QAbstractButton::toggled, this, &PrefsDialog::checkBoxToggled);
-        return;
+        w->addItem(label);
     }
 
-    if (auto const* time_edit = qobject_cast<QTimeEdit*>(widget); time_edit != nullptr)
+    auto updater = [this, key, w]()
     {
-        connect(time_edit, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::timeEditingFinished);
-        return;
-    }
+        auto const blocker = QSignalBlocker{ w };
+        auto const val = prefs_.get<tr_encryption_mode>(key);
+        for (size_t i = 0; i < std::size(Items); ++i)
+        {
+            if (Items[i].first == val)
+            {
+                w->setCurrentIndex(i);
+            }
+        }
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
 
-    if (auto const* line_edit = qobject_cast<QLineEdit*>(widget); line_edit != nullptr)
+    auto const on_activated = [this, key](int const idx)
     {
-        connect(line_edit, &QLineEdit::editingFinished, this, &PrefsDialog::lineEditingFinished);
-        return;
-    }
+        if (0 <= idx && idx < static_cast<int>(std::size(Items)))
+        {
+            set(key, Items[idx].first);
+        }
+    };
 
-    if (auto const* path_button = qobject_cast<PathButton*>(widget); path_button != nullptr)
-    {
-        connect(path_button, &PathButton::pathChanged, this, &PrefsDialog::pathChanged);
-        return;
-    }
-
-    if (auto const* spin_box = qobject_cast<QAbstractSpinBox*>(widget); spin_box != nullptr)
-    {
-        connect(spin_box, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::spinBoxEditingFinished);
-        return;
-    }
+    connect(w, &QComboBox::activated, std::move(on_activated));
 }
 
-void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
+void PrefsDialog::linkWidgetToPref(QPlainTextEdit* const w, int const key)
 {
+    auto updater = [this, key, w]()
+    {
+        auto blocker = QSignalBlocker{ w };
+        w->setPlainText(prefs_.get<QString>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
     // We don't want to change the preference every time there's a keystroke
     // in a QPlainTextEdit, so instead of connecting to the textChanged signal,
     // only update the pref when the text changed AND focus was lost.
-    char constexpr const* const StartValue = "StartValue";
-
-    if (auto* const edit = qobject_cast<QPlainTextEdit*>(cur); isDescendantOf(edit, this))
+    auto on_focus_changed = [this, key, w](QWidget* old, QWidget* /*cur*/)
     {
-        edit->setProperty(StartValue, edit->toPlainText());
-    }
-
-    if (auto const* const edit = qobject_cast<QPlainTextEdit*>(old); isDescendantOf(edit, this))
-    {
-        if (auto const val = edit->toPlainText(); val != edit->property(StartValue).toString())
+        if (w == old && w->document()->isModified())
         {
-            setPref(PreferenceWidget{ old }.getPrefKey(), val);
+            set(key, w->toPlainText());
         }
-    }
-
-    // (TODO: we probably want to do this for single-line text entries too?)
+    };
+    connect(qApp, &QApplication::focusChanged, std::move(on_focus_changed));
 }
 
-void PrefsDialog::checkBoxToggled(bool checked)
+void PrefsDialog::linkWidgetToPref(FreeSpaceLabel* const w, int const key)
 {
-    auto const pref_widget = PreferenceWidget{ sender() };
-
-    if (pref_widget.is<QCheckBox>())
+    auto updater = [this, key, w]()
     {
-        setPref(pref_widget.getPrefKey(), checked);
-    }
+        auto blocker = QSignalBlocker{ w };
+        w->setPath(prefs_.get<QString>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
 }
 
-void PrefsDialog::spinBoxEditingFinished()
+void PrefsDialog::linkWidgetToPref(PathButton* const w, int const key)
 {
-    auto const pref_widget = PreferenceWidget{ sender() };
+    auto updater = [this, key, w]()
+    {
+        auto blocker = QSignalBlocker{ w };
+        w->setPath(prefs_.get<QString>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
 
-    if (pref_widget.is<QDoubleSpinBox>())
-    {
-        setPref(pref_widget.getPrefKey(), pref_widget.as<QDoubleSpinBox>()->value());
-    }
-    else if (pref_widget.is<QSpinBox>())
-    {
-        setPref(pref_widget.getPrefKey(), pref_widget.as<QSpinBox>()->value());
-    }
+    connect(w, &PathButton::pathChanged, [this, key](QString const& val) { set(key, val); });
 }
 
-void PrefsDialog::timeEditingFinished()
+void PrefsDialog::linkWidgetToPref(QCheckBox* const w, int const key)
 {
-    auto const pref_widget = PreferenceWidget{ sender() };
-
-    if (pref_widget.is<QTimeEdit>())
+    auto updater = [this, key, w]()
     {
-        setPref(pref_widget.getPrefKey(), QTime{ 0, 0 }.secsTo(pref_widget.as<QTimeEdit>()->time()) / 60);
-    }
+        auto blocker = QSignalBlocker{ w };
+        w->setChecked(prefs_.get<bool>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
+    connect(w, &QAbstractButton::toggled, [this, key](bool const val) { set(key, val); });
 }
 
-void PrefsDialog::lineEditingFinished()
+void PrefsDialog::linkWidgetToPref(QDoubleSpinBox* const w, int const key)
 {
-    auto const pref_widget = PreferenceWidget{ sender() };
-
-    if (pref_widget.is<QLineEdit>())
+    auto updater = [this, key, w]()
     {
-        auto const* const line_edit = pref_widget.as<QLineEdit>();
+        auto blocker = QSignalBlocker{ w };
+        w->setValue(prefs_.get<double>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
 
-        if (line_edit->isModified())
+    connect(w, &QDoubleSpinBox::valueChanged, [this, key](double const val) { set(key, val); });
+}
+
+void PrefsDialog::linkWidgetToPref(QLineEdit* const w, int const key)
+{
+    auto updater = [this, key, w]()
+    {
+        auto blocker = QSignalBlocker{ w };
+        w->setText(prefs_.get<QString>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
+    auto on_editing_finished = [this, key, w]()
+    {
+        if (w->isModified())
         {
-            setPref(pref_widget.getPrefKey(), line_edit->text());
+            set(key, w->text());
         }
-    }
+    };
+    connect(w, &QLineEdit::editingFinished, std::move(on_editing_finished));
 }
 
-void PrefsDialog::pathChanged(QString const& path)
+void PrefsDialog::linkWidgetToPref(QSpinBox* const w, int const key)
 {
-    auto const pref_widget = PreferenceWidget{ sender() };
-
-    if (pref_widget.is<PathButton>())
+    auto updater = [this, key, w]()
     {
-        setPref(pref_widget.getPrefKey(), path);
-    }
+        auto blocker = QSignalBlocker{ w };
+        w->setValue(prefs_.get<int>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
+    connect(w, &QSpinBox::valueChanged, [this, key](int const val) { set(key, val); });
+}
+
+void PrefsDialog::linkWidgetToPref(QTimeEdit* const w, int const key)
+{
+    auto updater = [this, key, w]()
+    {
+        auto blocker = QSignalBlocker{ w };
+        auto const minutes = prefs_.get<int>(key);
+        w->setTime(QTime{ 0, 0 }.addSecs(minutes * 60));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
+    auto on_editing_finished = [this, key, w]()
+    {
+        auto const minutes = w->time().msecsSinceStartOfDay() / (1000 * 60);
+        set(key, minutes);
+    };
+    connect(w, &QAbstractSpinBox::editingFinished, std::move(on_editing_finished));
 }
 
 // ---
@@ -361,40 +286,14 @@ void PrefsDialog::initRemoteTab()
 
 // ---
 
-void PrefsDialog::altSpeedDaysEdited(int i)
-{
-    int const value = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
-    setPref(Prefs::ALT_SPEED_LIMIT_TIME_DAY, value);
-}
-
 void PrefsDialog::initSpeedTab()
 {
     auto const suffix = QStringLiteral(" %1").arg(Speed::display_name(Speed::Units::KByps));
-
-    auto const locale = QLocale{};
 
     ui_.uploadSpeedLimitSpin->setSuffix(suffix);
     ui_.downloadSpeedLimitSpin->setSuffix(suffix);
     ui_.altUploadSpeedLimitSpin->setSuffix(suffix);
     ui_.altDownloadSpeedLimitSpin->setSuffix(suffix);
-
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant{ TR_SCHED_ALL });
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant{ TR_SCHED_WEEKDAY });
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekends"), QVariant{ TR_SCHED_WEEKEND });
-    ui_.altSpeedLimitDaysCombo->insertSeparator(ui_.altSpeedLimitDaysCombo->count());
-
-    for (int i = locale.firstDayOfWeek(); i <= Qt::Sunday; ++i)
-    {
-        ui_.altSpeedLimitDaysCombo->addItem(qtDayName(i), qtDayToTrDay(i));
-    }
-
-    for (int i = Qt::Monday; i < locale.firstDayOfWeek(); ++i)
-    {
-        ui_.altSpeedLimitDaysCombo->addItem(qtDayName(i), qtDayToTrDay(i));
-    }
-
-    ui_.altSpeedLimitDaysCombo->setCurrentIndex(
-        ui_.altSpeedLimitDaysCombo->findData(prefs_.get<int>(Prefs::ALT_SPEED_LIMIT_TIME_DAY)));
 
     linkWidgetToPref(ui_.uploadSpeedLimitCheck, Prefs::USPEED_ENABLED);
     linkWidgetToPref(ui_.uploadSpeedLimitSpin, Prefs::USPEED);
@@ -405,6 +304,7 @@ void PrefsDialog::initSpeedTab()
     linkWidgetToPref(ui_.altSpeedLimitScheduleCheck, Prefs::ALT_SPEED_LIMIT_TIME_ENABLED);
     linkWidgetToPref(ui_.altSpeedLimitStartTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_BEGIN);
     linkWidgetToPref(ui_.altSpeedLimitEndTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_END);
+    linkAltSpeedDaysComboToPref(ui_.altSpeedLimitDaysCombo, Prefs::ALT_SPEED_LIMIT_TIME_DAY);
 
     sched_widgets_ << ui_.altSpeedLimitStartTimeEdit << ui_.altSpeedLimitToLabel << ui_.altSpeedLimitEndTimeEdit
                    << ui_.altSpeedLimitDaysLabel << ui_.altSpeedLimitDaysCombo;
@@ -413,8 +313,6 @@ void PrefsDialog::initSpeedTab()
     cr->addLayout(ui_.speedLimitsSectionLayout);
     cr->addLayout(ui_.altSpeedLimitsSectionLayout);
     cr->update();
-
-    connect(ui_.altSpeedLimitDaysCombo, qOverload<int>(&QComboBox::activated), this, &PrefsDialog::altSpeedDaysEdited);
 }
 
 // ---
@@ -468,7 +366,7 @@ void PrefsDialog::portTestSetEnabled()
     auto const sensitive = !session_.portTestPending(Session::PORT_TEST_IPV4) &&
         !session_.portTestPending(Session::PORT_TEST_IPV6);
     ui_.testPeerPortButton->setEnabled(sensitive);
-    widgets_[Prefs::PEER_PORT]->setEnabled(sensitive);
+    ui_.peerPortSpin->setEnabled(sensitive);
 }
 
 void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol)
@@ -570,18 +468,9 @@ void PrefsDialog::onUpdateBlocklistClicked()
     session_.updateBlocklist();
 }
 
-void PrefsDialog::encryptionEdited(int i)
-{
-    setPref(Prefs::ENCRYPTION, qobject_cast<QComboBox*>(sender())->itemData(i));
-}
-
 void PrefsDialog::initPrivacyTab()
 {
-    ui_.encryptionModeCombo->addItem(tr("Allow encryption"), TR_CLEAR_PREFERRED);
-    ui_.encryptionModeCombo->addItem(tr("Prefer encryption"), TR_ENCRYPTION_PREFERRED);
-    ui_.encryptionModeCombo->addItem(tr("Require encryption"), TR_ENCRYPTION_REQUIRED);
-
-    linkWidgetToPref(ui_.encryptionModeCombo, Prefs::ENCRYPTION);
+    linkEncryptionComboToPref(ui_.encryptionModeCombo, Prefs::ENCRYPTION);
     linkWidgetToPref(ui_.blocklistCheck, Prefs::BLOCKLIST_ENABLED);
     linkWidgetToPref(ui_.blocklistEdit, Prefs::BLOCKLIST_URL);
     linkWidgetToPref(ui_.autoUpdateBlocklistCheck, Prefs::BLOCKLIST_UPDATES_ENABLED);
@@ -595,7 +484,6 @@ void PrefsDialog::initPrivacyTab()
     cr->update();
 
     connect(ui_.updateBlocklistButton, &QAbstractButton::clicked, this, &PrefsDialog::onUpdateBlocklistClicked);
-    connect(ui_.encryptionModeCombo, qOverload<int>(&QComboBox::activated), this, &PrefsDialog::encryptionEdited);
 
     updateBlocklistLabel();
 }
@@ -765,14 +653,6 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
     }
 
     adjustSize();
-
-    connect(qApp, &QApplication::focusChanged, this, &PrefsDialog::focusChanged);
-}
-
-void PrefsDialog::setPref(int key, QVariant const& v)
-{
-    prefs_.set(key, v);
-    refreshPref(key);
 }
 
 // ---
@@ -807,17 +687,17 @@ void PrefsDialog::refreshPref(int key)
             bool const whitelist(prefs_.get<bool>(Prefs::RPC_WHITELIST_ENABLED));
             bool const auth(prefs_.get<bool>(Prefs::RPC_AUTH_REQUIRED));
 
-            for (QWidget* const w : web_whitelist_widgets_)
+            for (auto* const w : web_whitelist_widgets_)
             {
                 w->setEnabled(enabled && whitelist);
             }
 
-            for (QWidget* const w : web_auth_widgets_)
+            for (auto* const w : web_auth_widgets_)
             {
                 w->setEnabled(enabled && auth);
             }
 
-            for (QWidget* const w : web_widgets_)
+            for (auto* const w : web_widgets_)
             {
                 w->setEnabled(enabled);
             }
@@ -829,7 +709,7 @@ void PrefsDialog::refreshPref(int key)
         {
             bool const enabled = prefs_.get<bool>(key);
 
-            for (QWidget* const w : sched_widgets_)
+            for (auto* const w : sched_widgets_)
             {
                 w->setEnabled(enabled);
             }
@@ -841,7 +721,7 @@ void PrefsDialog::refreshPref(int key)
         {
             bool const enabled = prefs_.get<bool>(key);
 
-            for (QWidget* const w : block_widgets_)
+            for (auto* const w : block_widgets_)
             {
                 w->setEnabled(enabled);
             }
@@ -860,19 +740,8 @@ void PrefsDialog::refreshPref(int key)
         break;
     }
 
-    if (auto iter = widgets_.find(key); iter != std::end(widgets_))
+    for (auto [iter, end] = updaters_.equal_range(key); iter != end; ++iter)
     {
-        QWidget* const w = iter->second;
-
-        w->blockSignals(true);
-
-        if (!updateWidgetValue(w, key) && (key == Prefs::ENCRYPTION))
-        {
-            auto* combo_box = qobject_cast<QComboBox*>(w);
-            int const index = combo_box->findData(prefs_.get<tr_encryption_mode>(key));
-            combo_box->setCurrentIndex(index);
-        }
-
-        w->blockSignals(false);
+        iter->second();
     }
 }
