@@ -206,6 +206,10 @@ public:
             return std::nullopt;
         }
 
+        // Merge the entries from `that` into `this`.
+        // Duplicate keys are merged recursively (matching tr_variant::merge()).
+        Map& merge(Map const& that);
+
     private:
         using Vector = std::vector<std::pair<tr_quark, tr_variant>>;
         Vector vec_;
@@ -388,6 +392,11 @@ public:
     //    duplicate keys from `this`.
     // 2. Any unmanaged string taken from `that` is copied so `this` owns its copy.
     tr_variant& merge(tr_variant const& that);
+
+    // Merge the entries from `that` into `this`.
+    // If `this` isn't currently a map, it is replaced with an empty map.
+    // Duplicate keys are merged recursively (matching merge(tr_variant const&)).
+    tr_variant& merge(Map const& that);
 
     // Returns a new copy of `this`.
     // Any unmanaged strings in `this` are copied so the new variant owns its copy.
