@@ -5,7 +5,7 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2023
-# Quentin PAGÈS, 2023
+# Quentin PAGÈS, 2025
 #
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-04 14:15+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Quentin PAGÈS, 2023\n"
+"Last-Translator: Quentin PAGÈS, 2025\n"
 "Language-Team: Occitan (post 1500) (https://app.transifex.com/transmissionbt/teams/33778/oc/)\n"
 "Language: oc\n"
 "MIME-Version: 1.0\n"
@@ -424,14 +424,14 @@ msgstr ""
 #: ../gtk/DetailsDialog.cc:1858
 msgid "seeder"
 msgid_plural "seeders"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "provesidor"
+msgstr[1] "provesidors"
 
 #: ../gtk/DetailsDialog.cc:1860
 msgid "leecher"
 msgid_plural "leechers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "telecargaire"
+msgstr[1] "telecargaires"
 
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1869
@@ -472,7 +472,7 @@ msgstr "Tracadors"
 
 #: ../gtk/DetailsDialog.cc:2593
 msgid "{torrent_name} Properties"
-msgstr ""
+msgstr "Proprietats de {torrent_name}"
 
 #: ../gtk/DetailsDialog.cc:2598
 msgid "Properties - {torrent_count:L} Torrent"
@@ -597,7 +597,7 @@ msgstr ""
 
 #: ../gtk/FreeSpaceLabel.cc:57
 msgid "{disk_space} free"
-msgstr ""
+msgstr "{disk_space} disponible"
 
 #: ../gtk/MainWindow.cc:385
 msgid ""
@@ -658,20 +658,20 @@ msgstr "Racio : {ratio}"
 #: ../gtk/MainWindow.cc:773
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Recepcion : {downloaded_size}, Mandadís : {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:781
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Recepcion ; {downloaded_size}, Mandadís : {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:815
 msgid "{download_speed} ▼"
-msgstr ""
+msgstr "{download_speed} ▼"
 
 #: ../gtk/MainWindow.cc:818 ../gtk/Torrent.cc:629
 msgid "{upload_speed} ▲"
-msgstr ""
+msgstr "{upload_speed} ▲"
 
 #: ../gtk/MakeDialog.cc:194
 msgid "Creating '{path}'"
@@ -780,7 +780,7 @@ msgstr ""
 
 #: ../gtk/PathButton.cc:152
 msgid "Select a File"
-msgstr ""
+msgstr "Seleccionatz un fichièr"
 
 #: ../gtk/PathButton.cc:210
 msgid "(None)"
@@ -831,35 +831,35 @@ msgstr "Obtencion de la lista dels blòts en cors…"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "desconegut"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "verificacion..."
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "dobrir"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "tampat"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "error"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "Estat : <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "Estat : <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -915,7 +915,7 @@ msgstr "Aquelas estatisticas vos son unicament destinadas. Las reïnicializar af
 
 #: ../gtk/SystemTrayIcon.cc:207
 msgid "{upload_speed} ▲ {download_speed} ▼"
-msgstr ""
+msgstr "{upload_speed} ▲ {download_speed} ▼"
 
 #: ../gtk/Torrent.cc:442
 #, no-c-format
@@ -948,7 +948,7 @@ msgstr "Temps restant desconegut"
 
 #: ../gtk/Torrent.cc:622
 msgid "{download_speed} ▼  {upload_speed} ▲"
-msgstr ""
+msgstr "{download_speed} ▼  {upload_speed} ▲"
 
 #: ../gtk/Torrent.cc:634
 msgid "Stalled"
@@ -970,26 +970,26 @@ msgstr ""
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Telecargament de las metadonadas de {active_count} par connectat ({percent_done} % terminat)"
+msgstr[1] "Telecargament de las metadonadas de {active_count} pars connectats ({percent_done} % terminat)"
 
 #: ../gtk/Torrent.cc:686
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Telecargament de {active_count} par e webseed connectats de {connected_count}"
+msgstr[1] "Telecargament de {active_count} pars e webseeds connectats de {connected_count}"
 
 #: ../gtk/Torrent.cc:697
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Telecargament de {active_count} webseed"
+msgstr[1] "Telecargament de {active_count} webseeds"
 
 #: ../gtk/Torrent.cc:705
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Telecargament de {active_count} de {connected_count} par connectat"
+msgstr[1] "Telecargament de {active_count} de {connected_count} pars connectats"
 
 #: ../gtk/Torrent.cc:714
 msgid "Seeding to {active_count} of {connected_count} connected peer"
@@ -1052,26 +1052,26 @@ msgstr[1] "fa {seconds_ago:L} segondas"
 #: ../gtk/Utils.cc:204
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days:L} jorn"
+msgstr[1] "{days:L} jorns"
 
 #: ../gtk/Utils.cc:209
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours:L} ora"
+msgstr[1] "{hours:L} oras"
 
 #: ../gtk/Utils.cc:215
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes:L} minuta"
+msgstr[1] "{minutes:L} minutas"
 
 #: ../gtk/Utils.cc:222
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds:L} segonda"
+msgstr[1] "{seconds:L} segondas"
 
 #: ../gtk/Utils.cc:234
 msgid "{days_left:L} day left"
@@ -1103,7 +1103,7 @@ msgstr ""
 
 #: ../gtk/Utils.cc:285
 msgid "Couldn't open torrent"
-msgstr ""
+msgstr "Impossible de dobrir lo torrent"
 
 #: ../gtk/Utils.cc:546
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
@@ -1111,7 +1111,7 @@ msgstr ""
 
 #: ../gtk/Utils.cc:654
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "Impossible de dobrir « {url} »"
 
 #: ../gtk/Utils.cc:865 ../libtransmission/announcer.cc:186 ../libtransmission/announcer.cc:205
 msgid "Unsupported URL: '{url}'"
@@ -1157,7 +1157,7 @@ msgstr ""
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "o/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1173,23 +1173,23 @@ msgstr "To/s"
 
 #: ../gtk/main.cc:120
 msgid "kB/s"
-msgstr "ko/s"
+msgstr "Ko/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "o"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
-msgstr "Go"
+msgstr "Gio"
 
 #: ../gtk/main.cc:121
 msgid "KiB"
-msgstr "ko"
+msgstr "Kio"
 
 #: ../gtk/main.cc:121
 msgid "MiB"
-msgstr "Mo"
+msgstr "Mio"
 
 #: ../gtk/main.cc:121
 msgid "TiB"
@@ -1209,7 +1209,7 @@ msgstr "To"
 
 #: ../gtk/main.cc:122
 msgid "kB"
-msgstr "Ko"
+msgstr "ko"
 
 #: ../gtk/transmission-gtk.desktop.in:3
 msgid "BitTorrent Client"
@@ -1562,7 +1562,7 @@ msgstr "Respectar los _limits globals"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:903 ../gtk/ui/gtk4/DetailsDialog.ui:676
 msgid "Limit _download speed ({speed_units}):"
-msgstr ""
+msgstr "Limit de velocitat _recepcion ({speed_units}) :"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:918 ../gtk/ui/gtk4/DetailsDialog.ui:688
 msgid "Limit _upload speed ({speed_units}):"
@@ -1656,7 +1656,7 @@ msgstr "Co_mentari :"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:339 ../gtk/ui/gtk4/MakeDialog.ui:229
 msgid "_Source:"
-msgstr ""
+msgstr "_Font:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:366 ../gtk/ui/gtk4/MakeDialog.ui:252
 msgid "_Private torrent"
@@ -1734,7 +1734,7 @@ msgstr ""
 #. Checkbox to limit download speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:105 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
-msgstr ""
+msgstr "_Recepcion ({speed_units}) :"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:159 ../gtk/ui/gtk4/PrefsDialog.ui:93
 msgid "Alternative Speed Limits"

@@ -61,7 +61,7 @@ msgstr "Report du rechargement après démarrage complet de la session."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "Échec de rechargement : échec d’obtention de l’heure monotone actuelle : {errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
@@ -764,7 +764,7 @@ msgstr "Impossible de créer un mandataire pour ’{bus}’ : {error} ({error_c
 
 #: ../gtk/Notify.cc:234
 msgid "Open File"
-msgstr "Ouvrir un fichier"
+msgstr "Ouvrir le fichier"
 
 #: ../gtk/Notify.cc:239
 msgid "Open Folder"

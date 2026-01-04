@@ -58,7 +58,7 @@ msgstr "Lykkää latausta, kunnes istunto on täysin aloitettu."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "Lataus uudelleen epäonnistui: Monotonisen ajan hakeminen epäonnistui: {errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"

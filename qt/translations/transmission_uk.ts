@@ -2010,17 +2010,17 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-210"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>невідомо</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>checking…</source>
-        <translation type="unfinished"></translation>
+        <translation>перевіряю...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>open</source>
-        <translation type="unfinished"></translation>
+        <translation>відкрити</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2030,7 +2030,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+2"/>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>помилка</translation>
     </message>
     <message>
         <location line="+13"/>

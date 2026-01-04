@@ -6,9 +6,9 @@
 # Translators:
 # jrthsr700tmax <jrthsr700tmax@gmail.com>, 2020
 # abc0922001 <abc0922001@hotmail.com>, 2024
-# taijuin lee, 2025
 # Mike Gelfand <mikedld@mikedld.com>, 2025
 # MP Wang, 2025
+# taijuin lee, 2025
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-04 14:15+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: MP Wang, 2025\n"
+"Last-Translator: taijuin lee, 2025\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/transmissionbt/teams/33778/zh_TW/)\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
@@ -59,7 +59,7 @@ msgstr "在工作階段啟動完成前，延遲重新載入。"
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "重新載入失敗：無法取得目前單調時間：{errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"

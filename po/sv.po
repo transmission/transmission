@@ -59,7 +59,7 @@ msgstr "Skjut upp omläsningen tills sessionen har startat helt."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "Misslyckades med att ladda om: Misslyckades med att hämta aktuell monoton tid: {errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"

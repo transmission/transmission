@@ -10,8 +10,8 @@
 # Темак, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # Victor, 2024
+# Alexey Ladygin, 2025
 # Andrei Stepanov, 2025
-# Алексей Ладыгин, 2025
 #
 #, fuzzy
 msgid ""
@@ -20,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-04 14:15+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Алексей Ладыгин, 2025\n"
+"Last-Translator: Andrei Stepanov, 2025\n"
 "Language-Team: Russian (https://app.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -62,7 +62,7 @@ msgstr "Откладывание перезагрузки до полного з
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "Перезагрузка не удалась: Не удалось получить текущее монотонное время: {errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
@@ -2237,7 +2237,7 @@ msgstr "Успешно изменён адрес источника {protocol} �
 
 #: ../libtransmission/ip-cache.cc:305
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
-msgstr ""
+msgstr "Не удалось получить адрес источника ни по одному IP-протоколу, сетевые подключения невозможны"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Your machine does not support {protocol}"
@@ -2621,11 +2621,11 @@ msgstr "Рассмотрите обновление вашей установк�
 
 #: ../libtransmission/web.cc:173
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "Curl {curl_version}  подвержен сбоям SIGPIPE. {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "Curl {curl_version} подвержен уязвимости двойного закрытия eventfd, которая может привести к сбоям SIGABRT для службы transmission-daemon systemd. {details_url}"
 
 #: ../libtransmission/web.cc:202
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"

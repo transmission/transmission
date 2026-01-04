@@ -12,7 +12,7 @@
 # Eduardo Lamblet <edlamblet@netscape.net>, 2023
 # LUIS PEDRO NUNES LESSA, 2023
 # Leonardo Colman Lopes <leonardo.dev@colman.com.br>, 2023
-# Alex, 2023
+# Alex W., 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # luquita39, 2023
 # Fúlvio Alves <fga.fulvio@gmail.com>, 2024

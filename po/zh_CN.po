@@ -65,7 +65,7 @@ msgstr "延迟重载直到会话完全启动。"
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "无法重新加载：无法获取当前单调时间：{errmsg}（{errno}）"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"

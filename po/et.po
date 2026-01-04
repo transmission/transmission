@@ -5,7 +5,7 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2023
-# Priit Uring, 2024
+# Priit Uring, 2025
 #
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-04 14:15+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Priit Uring, 2024\n"
+"Last-Translator: Priit Uring, 2025\n"
 "Language-Team: Estonian (https://app.transifex.com/transmissionbt/teams/33778/et/)\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
@@ -136,7 +136,7 @@ msgstr "Väle ja lihtne BitTorrenti klient"
 
 #: ../gtk/Application.cc:1397
 msgid "Copyright © The Transmission Project"
-msgstr "Autoriõigused © Transmissioni projekt"
+msgstr "Autoriõigus © The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"

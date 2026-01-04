@@ -57,7 +57,7 @@ msgstr "Odraczanie ponownego wczytania do czasu pełnego uruchomienia sesji."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "Nie udało się załadować ponownie: nie udało się pobrać bieżącego czasu monotonicznego: {errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
