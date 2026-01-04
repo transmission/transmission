@@ -384,6 +384,20 @@ bool set_if_changed(T& tgt, Fields const& fields, Key const key, Value val)
 }
 
 /**
+ * Check whether a key exists in a `fields` tuple.
+ */
+template<typename Fields, typename Key>
+[[nodiscard]] bool constexpr contains(Fields const& fields, Key const key)
+{
+    if constexpr (std::tuple_size_v<detail::remove_cvref_t<Fields>> == 0)
+    {
+        return false;
+    }
+
+    return std::apply([key](auto const&... field) { return ((field.key == key) || ...); }, fields);
+}
+
+/**
  * Get a field's value.
  *
  * @return the value if the field is found and its type exactly matches Value.

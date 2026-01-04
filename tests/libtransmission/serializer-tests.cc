@@ -297,6 +297,7 @@ TEST_F(SerializerTest, optionalRejectsWrongType)
 
 // ---
 
+using libtransmission::serializer::contains;
 using libtransmission::serializer::Field;
 using libtransmission::serializer::get_value;
 using libtransmission::serializer::load;
@@ -473,6 +474,24 @@ TEST_F(SerializerTest, setFloatScaled)
     auto const val = 1e12 + ((eps * 1e12) * 2.0);
     EXPECT_TRUE(set_if_changed(thing, Thing::Fields, TR_KEY_alt_speed_up, val));
     EXPECT_DOUBLE_EQ(thing.d, val);
+}
+
+TEST_F(SerializerTest, containsMissingKey)
+{
+    EXPECT_FALSE(contains(Thing::Fields, TR_KEY_address));
+}
+
+TEST_F(SerializerTest, containsOk)
+{
+    EXPECT_TRUE(contains(Thing::Fields, TR_KEY_port));
+    EXPECT_TRUE(contains(Thing::Fields, TR_KEY_alt_speed_up));
+    EXPECT_TRUE(contains(Thing::Fields, TR_KEY_name));
+}
+
+TEST_F(SerializerTest, containsEmptyFields)
+{
+    static constexpr auto Empty = std::tuple{};
+    EXPECT_FALSE(contains(Empty, TR_KEY_name));
 }
 
 TEST_F(SerializerTest, getMissingKey)
