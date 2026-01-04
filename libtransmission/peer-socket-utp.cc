@@ -24,6 +24,18 @@
 #define tr_logAddErrorSock(sock, msg) tr_logAddError(msg, (sock)->display_name())
 #define tr_logAddTraceSock(sock, msg) tr_logAddTrace(msg, (sock)->display_name())
 
+// The read buffer will grow indefinitely if libutp keeps buffering data faster
+// than the bandwidth limit allows. This is a possibility because libutp lacks
+// the ability to drop data that does not fit in the receive window[1], which
+// allows malicious peers to flood our read buffer.
+//
+// [1]: "Receive window" here refers to BEP-29 wnd_size.
+//      https://www.bittorrent.org/beps/bep_0029.html
+//
+// Define this macro to enable logic that protects the read buffer from growing
+// too large.
+#define RCVBUF_OVERFLOW_PROTECTION
+
 namespace
 {
 #ifdef WITH_UTP
@@ -121,7 +133,11 @@ public:
 
     void maybe_read_soon()
     {
-        if (is_read_enabled() && !std::empty(inbuf_))
+        if ((is_read_enabled() && !std::empty(inbuf_))
+#ifdef RCVBUF_OVERFLOW_PROTECTION
+            || read_buffer_size() > static_cast<size_t>(utp_getsockopt(sock_, UTP_RCVBUF))
+#endif
+        )
         {
             timer_->start_single_shot(std::chrono::milliseconds::zero());
         }
