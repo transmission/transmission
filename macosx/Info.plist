@@ -70,7 +70,7 @@
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © undefined-2026–2025 The Transmission Project</string>
+	<string>Copyright © 2025-2026 The Transmission Project</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
