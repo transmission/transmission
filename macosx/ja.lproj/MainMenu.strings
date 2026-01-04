@@ -167,9 +167,6 @@
 /* Class = "NSMenuItem"; title = "Hide Filter Bar"; ObjectID = "1620"; */
 "1620.title" = "絞り込みバーを非表示";
 
-/* Class = "NSMenuItem"; title = "Select None"; ObjectID = "1675"; */
-"1675.title" = "選択なし";
-
 /* Class = "NSMenuItem"; title = "Resume Selected Right Away"; ObjectID = "1678"; */
 "1678.title" = "選択項目をすぐに再開";
 
@@ -292,6 +289,9 @@
 
 /* Class = "NSMenu"; title = "Group"; ObjectID = "2850"; */
 "2850.title" = "グループ";
+
+/* Class = "NSTextFieldCell"; title = "Transfers"; ObjectID = "3049"; */
+/* "3049.title" = ""; */
 
 /* Class = "NSMenuItem"; title = "Use Groups"; ObjectID = "3078"; */
 "3078.title" = "グループ使用";
