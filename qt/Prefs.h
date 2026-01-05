@@ -182,8 +182,6 @@ public:
         }
     }
 
-    void toggleBool(int key);
-
 signals:
     void changed(int key);
 

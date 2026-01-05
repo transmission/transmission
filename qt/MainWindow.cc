@@ -1040,9 +1040,10 @@ void MainWindow::setCompactView(bool visible)
 
 void MainWindow::toggleSpeedMode()
 {
-    prefs_.toggleBool(Prefs::ALT_SPEED_LIMIT_ENABLED);
-    bool const mode = prefs_.get<bool>(Prefs::ALT_SPEED_LIMIT_ENABLED);
-    alt_speed_action_->setChecked(mode);
+    auto const key = Prefs::ALT_SPEED_LIMIT_ENABLED;
+    auto const checked = !prefs_.get<bool>(key);
+    prefs_.set<bool>(key, checked);
+    alt_speed_action_->setChecked(checked);
 }
 
 void MainWindow::setToolbarVisible(bool visible)

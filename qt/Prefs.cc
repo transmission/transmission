@@ -403,10 +403,3 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_watch_dir_enabled, false);
     return tr_variant{ std::move(settings) };
 }
-
-// ---
-
-void Prefs::toggleBool(int key)
-{
-    set(key, !get<bool>(key));
-}
