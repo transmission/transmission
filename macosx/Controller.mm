@@ -813,16 +813,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     [self updateMainWindow];
 
-    if (@available(macOS 26.0, *))
-        ;
-    else
-    {
-        // <#7908> Keep older macOS clean of visual noise
-        for (NSMenuItem* item in _fWindow.menu.itemArray)
-            for (NSMenuItem* subItem in item.submenu.itemArray)
-                subItem.image = nil;
-    }
-
     //timer to update the interface every second
     self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateUISeconds target:self selector:@selector(updateUI) userInfo:nil
                                                   repeats:YES];
