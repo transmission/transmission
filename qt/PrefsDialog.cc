@@ -196,19 +196,19 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     }
     else if (pref_widget.is<QLineEdit>())
     {
-        pref_widget.as<QLineEdit>()->setText(prefs_.getString(pref_key));
+        pref_widget.as<QLineEdit>()->setText(prefs_.get<QString>(pref_key));
     }
     else if (pref_widget.is<PathButton>())
     {
-        pref_widget.as<PathButton>()->setPath(prefs_.getString(pref_key));
+        pref_widget.as<PathButton>()->setPath(prefs_.get<QString>(pref_key));
     }
     else if (pref_widget.is<FreeSpaceLabel>())
     {
-        pref_widget.as<FreeSpaceLabel>()->setPath(prefs_.getString(pref_key));
+        pref_widget.as<FreeSpaceLabel>()->setPath(prefs_.get<QString>(pref_key));
     }
     else if (pref_widget.is<QPlainTextEdit>())
     {
-        pref_widget.as<QPlainTextEdit>()->setPlainText(prefs_.getString(pref_key));
+        pref_widget.as<QPlainTextEdit>()->setPlainText(prefs_.get<QString>(pref_key));
     }
     else
     {
@@ -652,7 +652,7 @@ void PrefsDialog::initDownloadingTab()
     ui_.watchDirStack->setMinimumWidth(200);
 
     ui_.downloadDirFreeSpaceLabel->setSession(session_);
-    ui_.downloadDirFreeSpaceLabel->setPath(prefs_.getString(Prefs::DOWNLOAD_DIR));
+    ui_.downloadDirFreeSpaceLabel->setPath(prefs_.get<QString>(Prefs::DOWNLOAD_DIR));
 
     linkWidgetToPref(ui_.watchDirCheck, Prefs::DIR_WATCH_ENABLED);
     linkWidgetToPref(ui_.watchDirButton, Prefs::DIR_WATCH);

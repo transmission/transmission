@@ -167,24 +167,6 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
 
 namespace
 {
-bool isValidUtf8(QByteArray const& byteArray)
-{
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-
-    auto decoder = QStringDecoder{ QStringConverter::Utf8, QStringConverter::Flag::Stateless };
-    auto const text = QString{ decoder.decode(byteArray) };
-    return !decoder.hasError() && !text.contains(QChar::ReplacementCharacter);
-
-#else
-
-    auto const* const codec = QTextCodec::codecForName("UTF-8");
-    auto state = QTextCodec::ConverterState{};
-    codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
-    return state.invalidChars == 0;
-
-#endif
-}
-
 [[nodiscard]] constexpr auto prefIsSavable(int pref)
 {
     switch (pref)
@@ -425,18 +407,6 @@ tr_variant Prefs::get_default_app_settings()
 /***
 ****
 ***/
-
-QString Prefs::getString(int key) const
-{
-    assert(Items[key].type == QMetaType::QString);
-
-    if (auto const b = values_[key].toByteArray(); isValidUtf8(b.constData()))
-    {
-        values_[key].setValue(QString::fromUtf8(b.constData()));
-    }
-
-    return values_[key].toString();
-}
 
 QDateTime Prefs::getDateTime(int key) const
 {

@@ -163,7 +163,6 @@ public:
         return values_[i];
     }
 
-    QString getString(int key) const;
     QDateTime getDateTime(int key) const;
 
     template<typename T>

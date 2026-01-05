@@ -368,7 +368,7 @@ void Application::refreshPref(int key) const
 
     case Prefs::DIR_WATCH:
     case Prefs::DIR_WATCH_ENABLED:
-        watch_dir_->setPath(prefs_->getString(Prefs::DIR_WATCH), prefs_->get<bool>(Prefs::DIR_WATCH_ENABLED));
+        watch_dir_->setPath(prefs_->get<QString>(Prefs::DIR_WATCH), prefs_->get<bool>(Prefs::DIR_WATCH_ENABLED));
         break;
 
     default:

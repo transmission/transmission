@@ -751,7 +751,7 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     ui_.downloadSpeedLabel->setText(stats.speed_down.to_download_qstring());
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
 
-    auto const mode = prefs_.getString(Prefs::STATUSBAR_STATS);
+    auto const mode = prefs_.get<QString>(Prefs::STATUSBAR_STATS);
     auto str = QString{};
 
     if (mode == session_ratio_stats_mode_name_)
@@ -1114,7 +1114,7 @@ void MainWindow::refreshPref(int key)
     switch (key)
     {
     case Prefs::STATUSBAR_STATS:
-        str = prefs_.getString(key);
+        str = prefs_.get<QString>(key);
 
         for (auto* action : ui_.action_TotalRatio->actionGroup()->actions())
         {
@@ -1247,7 +1247,7 @@ void MainWindow::openTorrent()
 {
     auto* const d = new QFileDialog{ this,
                                      tr("Open Torrent"),
-                                     prefs_.getString(Prefs::OPEN_DIALOG_FOLDER),
+                                     prefs_.get<QString>(Prefs::OPEN_DIALOG_FOLDER),
                                      tr("Torrent Files (*.torrent);;All Files (*.*)") };
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
