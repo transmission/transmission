@@ -94,8 +94,8 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
     ui_.priorityCombo->setCurrentIndex(1); // Normal
 
-    ui_.startCheck->setChecked(prefs.getBool(Prefs::START));
-    ui_.trashCheck->setChecked(prefs.getBool(Prefs::TRASH_ORIGINAL));
+    ui_.startCheck->setChecked(prefs.get<bool>(Prefs::START));
+    ui_.trashCheck->setChecked(prefs.get<bool>(Prefs::TRASH_ORIGINAL));
 
     connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &QObject::deleteLater);
     connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &OptionsDialog::onAccepted);

@@ -180,7 +180,7 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
 
     if (pref_widget.is<QCheckBox>())
     {
-        pref_widget.as<QCheckBox>()->setChecked(prefs_.getBool(pref_key));
+        pref_widget.as<QCheckBox>()->setChecked(prefs_.get<bool>(pref_key));
     }
     else if (pref_widget.is<QSpinBox>())
     {
@@ -803,9 +803,9 @@ void PrefsDialog::refreshPref(int key)
     case Prefs::RPC_WHITELIST_ENABLED:
     case Prefs::RPC_AUTH_REQUIRED:
         {
-            bool const enabled(prefs_.getBool(Prefs::RPC_ENABLED));
-            bool const whitelist(prefs_.getBool(Prefs::RPC_WHITELIST_ENABLED));
-            bool const auth(prefs_.getBool(Prefs::RPC_AUTH_REQUIRED));
+            bool const enabled(prefs_.get<bool>(Prefs::RPC_ENABLED));
+            bool const whitelist(prefs_.get<bool>(Prefs::RPC_WHITELIST_ENABLED));
+            bool const auth(prefs_.get<bool>(Prefs::RPC_AUTH_REQUIRED));
 
             for (QWidget* const w : web_whitelist_widgets_)
             {
@@ -827,7 +827,7 @@ void PrefsDialog::refreshPref(int key)
 
     case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
         {
-            bool const enabled = prefs_.getBool(key);
+            bool const enabled = prefs_.get<bool>(key);
 
             for (QWidget* const w : sched_widgets_)
             {
@@ -839,7 +839,7 @@ void PrefsDialog::refreshPref(int key)
 
     case Prefs::BLOCKLIST_ENABLED:
         {
-            bool const enabled = prefs_.getBool(key);
+            bool const enabled = prefs_.get<bool>(key);
 
             for (QWidget* const w : block_widgets_)
             {

@@ -68,7 +68,7 @@ void TorrentFilter::onPrefChanged(int key)
 void TorrentFilter::refilter()
 {
     invalidate();
-    sort(0, prefs_.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
+    sort(0, prefs_.get<bool>(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
 }
 
 /***

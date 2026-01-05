@@ -426,12 +426,6 @@ tr_variant Prefs::get_default_app_settings()
 ****
 ***/
 
-bool Prefs::getBool(int key) const
-{
-    assert(Items[key].type == QMetaType::Bool);
-    return values_[key].toBool();
-}
-
 QString Prefs::getString(int key) const
 {
     assert(Items[key].type == QMetaType::QString);
@@ -460,5 +454,5 @@ QDateTime Prefs::getDateTime(int key) const
 
 void Prefs::toggleBool(int key)
 {
-    set(key, !getBool(key));
+    set(key, !get<bool>(key));
 }

@@ -229,7 +229,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_AUTH_REQUIRED:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCPasswordEnabled(session_, prefs_.getBool(key));
+                tr_sessionSetRPCPasswordEnabled(session_, prefs_.get<bool>(key));
             }
 
             break;
@@ -237,7 +237,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_ENABLED:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCEnabled(session_, prefs_.getBool(key));
+                tr_sessionSetRPCEnabled(session_, prefs_.get<bool>(key));
             }
 
             break;
@@ -269,7 +269,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_WHITELIST_ENABLED:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCWhitelistEnabled(session_, prefs_.getBool(key));
+                tr_sessionSetRPCWhitelistEnabled(session_, prefs_.get<bool>(key));
             }
 
             break;
@@ -1002,7 +1002,7 @@ void Session::addTorrent(AddData add_me, tr_variant* args_dict)
 
     if (tr_variantDictFind(args_dict, TR_KEY_paused) == nullptr)
     {
-        dictAdd(args_dict, TR_KEY_paused, !prefs_.getBool(Prefs::START));
+        dictAdd(args_dict, TR_KEY_paused, !prefs_.get<bool>(Prefs::START));
     }
 
     switch (add_me.type)
@@ -1108,7 +1108,7 @@ void Session::addNewlyCreatedTorrent(QString const& filename, QString const& loc
     tr_variant args;
     tr_variantInitDict(&args, 3);
     dictAdd(&args, TR_KEY_download_dir, local_path);
-    dictAdd(&args, TR_KEY_paused, !prefs_.getBool(Prefs::START));
+    dictAdd(&args, TR_KEY_paused, !prefs_.get<bool>(Prefs::START));
     dictAdd(&args, TR_KEY_metainfo, b64);
 
     exec(TR_KEY_torrent_add, &args);
