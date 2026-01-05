@@ -124,7 +124,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { DOWNLOAD_DIR, TR_KEY_download_dir, QMetaType::QString },
     { DOWNLOAD_QUEUE_ENABLED, TR_KEY_download_queue_enabled, QMetaType::Bool },
     { DOWNLOAD_QUEUE_SIZE, TR_KEY_download_queue_size, QMetaType::Int },
-    { ENCRYPTION, TR_KEY_encryption, QMetaType::Int },
+    { ENCRYPTION, TR_KEY_encryption, CustomVariantType::EncryptionModeType },
     { IDLE_LIMIT, TR_KEY_idle_seeding_limit, QMetaType::Int },
     { IDLE_LIMIT_ENABLED, TR_KEY_idle_seeding_limit_enabled, QMetaType::Bool },
     { INCOMPLETE_DIR, TR_KEY_incomplete_dir, QMetaType::QString },
@@ -234,6 +234,13 @@ Prefs::Prefs(QString config_dir)
             }
             break;
 
+        case CustomVariantType::EncryptionModeType:
+            if (auto const val = to_value<tr_encryption_mode>(*b))
+            {
+                values_[i] = QVariant::fromValue(*val);
+            }
+            break;
+
         case CustomVariantType::SortModeType:
             if (auto const val = to_value<SortMode>(*b))
             {
@@ -310,6 +317,10 @@ Prefs::~Prefs()
         {
         case QMetaType::Int:
             dictAdd(&current_settings, key, val.toInt());
+            break;
+
+        case CustomVariantType::EncryptionModeType:
+            *tr_variantDictAdd(&current_settings, key) = to_variant(val.value<tr_encryption_mode>());
             break;
 
         case CustomVariantType::SortModeType:
