@@ -44,7 +44,7 @@ std::optional<double> Torrent::getSeedRatioLimit() const
 
     if (mode == TR_RATIOLIMIT_GLOBAL && prefs_.get<bool>(Prefs::RATIO_ENABLED))
     {
-        return prefs_.getDouble(Prefs::RATIO);
+        return prefs_.get<double>(Prefs::RATIO);
     }
 
     return {};

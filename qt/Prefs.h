@@ -164,7 +164,6 @@ public:
     }
 
     QString getString(int key) const;
-    double getDouble(int key) const;
     QDateTime getDateTime(int key) const;
 
     template<typename T>

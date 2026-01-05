@@ -188,7 +188,7 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     }
     else if (pref_widget.is<QDoubleSpinBox>())
     {
-        pref_widget.as<QDoubleSpinBox>()->setValue(prefs_.getDouble(pref_key));
+        pref_widget.as<QDoubleSpinBox>()->setValue(prefs_.get<double>(pref_key));
     }
     else if (pref_widget.is<QTimeEdit>())
     {

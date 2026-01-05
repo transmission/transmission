@@ -438,12 +438,6 @@ QString Prefs::getString(int key) const
     return values_[key].toString();
 }
 
-double Prefs::getDouble(int key) const
-{
-    assert(Items[key].type == QMetaType::Double);
-    return values_[key].toDouble();
-}
-
 QDateTime Prefs::getDateTime(int key) const
 {
     assert(Items[key].type == QMetaType::QDateTime);
