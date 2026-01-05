@@ -143,11 +143,6 @@ public:
         return FIRST_CORE_PREF <= key && key <= LAST_CORE_PREF;
     }
 
-    [[nodiscard]] constexpr auto isClient(int key) const noexcept
-    {
-        return !isCore(key);
-    }
-
     [[nodiscard]] constexpr auto getKey(int i) const noexcept
     {
         return Items[i].key;
