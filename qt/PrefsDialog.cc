@@ -33,6 +33,7 @@
 #include <libtransmission/transmission.h>
 
 #include "ColumnResizer.h"
+#include "CustomVariantType.h"
 #include "Formatter.h"
 #include "FreeSpaceLabel.h"
 #include "Prefs.h"
@@ -571,8 +572,7 @@ void PrefsDialog::onUpdateBlocklistClicked()
 
 void PrefsDialog::encryptionEdited(int i)
 {
-    int const value(qobject_cast<QComboBox*>(sender())->itemData(i).toInt());
-    setPref(Prefs::ENCRYPTION, value);
+    setPref(Prefs::ENCRYPTION, qobject_cast<QComboBox*>(sender())->itemData(i));
 }
 
 void PrefsDialog::initPrivacyTab()
@@ -869,7 +869,7 @@ void PrefsDialog::refreshPref(int key)
         if (!updateWidgetValue(w, key) && (key == Prefs::ENCRYPTION))
         {
             auto* combo_box = qobject_cast<QComboBox*>(w);
-            int const index = combo_box->findData(prefs_.getInt(key));
+            int const index = combo_box->findData(prefs_.get<tr_encryption_mode>(key));
             combo_box->setCurrentIndex(index);
         }
 

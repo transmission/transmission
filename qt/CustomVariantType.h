@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <libtransmission/transmission.h>
+
 #include <QVariant>
 
 class CustomVariantType
@@ -16,6 +18,9 @@ public:
         PeerList,
         FileList,
         ShowModeType,
-        SortModeType
+        SortModeType,
+        EncryptionModeType,
     };
 };
+
+Q_DECLARE_METATYPE(tr_encryption_mode)
