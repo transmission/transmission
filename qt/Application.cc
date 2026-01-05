@@ -383,7 +383,7 @@ void Application::maybeUpdateBlocklist() const
         return;
     }
 
-    QDateTime const last_updated_at = prefs_->getDateTime(Prefs::BLOCKLIST_DATE);
+    QDateTime const last_updated_at = prefs_->get<QDateTime>(Prefs::BLOCKLIST_DATE);
     QDateTime const next_update_at = last_updated_at.addDays(7);
     QDateTime const now = QDateTime::currentDateTime();
 

@@ -404,16 +404,6 @@ tr_variant Prefs::get_default_app_settings()
     return tr_variant{ std::move(settings) };
 }
 
-/***
-****
-***/
-
-QDateTime Prefs::getDateTime(int key) const
-{
-    assert(Items[key].type == QMetaType::QDateTime);
-    return values_[key].toDateTime();
-}
-
 // ---
 
 void Prefs::toggleBool(int key)

@@ -163,8 +163,6 @@ public:
         return values_[i];
     }
 
-    QDateTime getDateTime(int key) const;
-
     template<typename T>
     [[nodiscard]] T get(int const key) const
     {
