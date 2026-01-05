@@ -5,6 +5,8 @@
 
 #include "PrefsDialog.h"
 
+#include <iostream>
+
 #include <cassert>
 #include <optional>
 
@@ -42,14 +44,14 @@ void PrefsDialog::linkAltSpeedDaysComboToPref(QComboBox* const w, int const key)
 {
     static auto items = []
     {
-        auto ret = std::array<std::pair<tr_sched_day, QString>, 10U>{};
+        auto ret = std::array<std::pair<int, QString>, 10U>{};
         auto idx = 0;
         ret[idx++] = { TR_SCHED_ALL, tr("Every Day") };
         ret[idx++] = { TR_SCHED_WEEKDAY, tr("Weekdays") };
         ret[idx++] = { TR_SCHED_WEEKEND, tr("Weekends") };
 
         auto const locale = QLocale{};
-        auto const qt_day_to_tr_day = std::map<int, tr_sched_day>{ {
+        auto const qt_day_to_tr_day = std::map<int, int>{ {
             { Qt::Monday, TR_SCHED_MON },
             { Qt::Tuesday, TR_SCHED_TUES },
             { Qt::Wednesday, TR_SCHED_WED },
@@ -102,7 +104,7 @@ void PrefsDialog::linkAltSpeedDaysComboToPref(QComboBox* const w, int const key)
 
 void PrefsDialog::linkEncryptionComboToPref(QComboBox* const w, int const key)
 {
-    static auto const Items = std::array<std::pair<tr_encryption_mode, QString>, 3U>{ {
+    static auto const Items = std::array<std::pair<int, QString>, 3U>{ {
         { TR_CLEAR_PREFERRED, tr("Allow encryption") },
         { TR_ENCRYPTION_PREFERRED, tr("Prefer encryption") },
         { TR_ENCRYPTION_REQUIRED, tr("Require encryption") },
@@ -116,11 +118,13 @@ void PrefsDialog::linkEncryptionComboToPref(QComboBox* const w, int const key)
     auto updater = [this, key, w]()
     {
         auto const blocker = QSignalBlocker{ w };
-        auto const val = prefs_.get<tr_encryption_mode>(key);
+        auto const val = prefs_.get<int>(key);
+        std::cerr << __FILE__ << ':' << __LINE__ << " actual value is " << val << '\n';
         for (size_t i = 0; i < std::size(Items); ++i)
         {
             if (Items[i].first == val)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << " idx is " << i << '\n';
                 w->setCurrentIndex(i);
             }
         }
@@ -130,8 +134,10 @@ void PrefsDialog::linkEncryptionComboToPref(QComboBox* const w, int const key)
 
     auto const on_activated = [this, key](int const idx)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " activated -- idx is " << idx << '\n';
         if (0 <= idx && idx < static_cast<int>(std::size(Items)))
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << " setting value to " << Items[idx].first << '\n';
             set(key, Items[idx].first);
         }
     };
