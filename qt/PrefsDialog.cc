@@ -184,7 +184,7 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     }
     else if (pref_widget.is<QSpinBox>())
     {
-        pref_widget.as<QSpinBox>()->setValue(prefs_.getInt(pref_key));
+        pref_widget.as<QSpinBox>()->setValue(prefs_.get<int>(pref_key));
     }
     else if (pref_widget.is<QDoubleSpinBox>())
     {
@@ -192,7 +192,7 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     }
     else if (pref_widget.is<QTimeEdit>())
     {
-        pref_widget.as<QTimeEdit>()->setTime(QTime{ 0, 0 }.addSecs(prefs_.getInt(pref_key) * 60));
+        pref_widget.as<QTimeEdit>()->setTime(QTime{ 0, 0 }.addSecs(prefs_.get<int>(pref_key) * 60));
     }
     else if (pref_widget.is<QLineEdit>())
     {
@@ -394,7 +394,7 @@ void PrefsDialog::initSpeedTab()
     }
 
     ui_.altSpeedLimitDaysCombo->setCurrentIndex(
-        ui_.altSpeedLimitDaysCombo->findData(prefs_.getInt(Prefs::ALT_SPEED_LIMIT_TIME_DAY)));
+        ui_.altSpeedLimitDaysCombo->findData(prefs_.get<int>(Prefs::ALT_SPEED_LIMIT_TIME_DAY)));
 
     linkWidgetToPref(ui_.uploadSpeedLimitCheck, Prefs::USPEED_ENABLED);
     linkWidgetToPref(ui_.uploadSpeedLimitSpin, Prefs::USPEED);

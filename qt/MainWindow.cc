@@ -1202,10 +1202,10 @@ void MainWindow::refreshPref(int key)
     case Prefs::MAIN_WINDOW_WIDTH:
     case Prefs::MAIN_WINDOW_HEIGHT:
         setGeometry(
-            prefs_.getInt(Prefs::MAIN_WINDOW_X),
-            prefs_.getInt(Prefs::MAIN_WINDOW_Y),
-            prefs_.getInt(Prefs::MAIN_WINDOW_WIDTH),
-            prefs_.getInt(Prefs::MAIN_WINDOW_HEIGHT));
+            prefs_.get<int>(Prefs::MAIN_WINDOW_X),
+            prefs_.get<int>(Prefs::MAIN_WINDOW_Y),
+            prefs_.get<int>(Prefs::MAIN_WINDOW_WIDTH),
+            prefs_.get<int>(Prefs::MAIN_WINDOW_HEIGHT));
         break;
 
     case Prefs::ALT_SPEED_LIMIT_ENABLED:

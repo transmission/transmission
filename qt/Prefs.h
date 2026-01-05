@@ -163,7 +163,6 @@ public:
         return values_[i];
     }
 
-    int getInt(int key) const;
     bool getBool(int key) const;
     QString getString(int key) const;
     double getDouble(int key) const;

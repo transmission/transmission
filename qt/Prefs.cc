@@ -444,12 +444,6 @@ QString Prefs::getString(int key) const
     return values_[key].toString();
 }
 
-int Prefs::getInt(int key) const
-{
-    assert(Items[key].type == QMetaType::Int);
-    return values_[key].toInt();
-}
-
 double Prefs::getDouble(int key) const
 {
     assert(Items[key].type == QMetaType::Double);

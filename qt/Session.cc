@@ -253,7 +253,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_PORT:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCPort(session_, static_cast<uint16_t>(prefs_.getInt(key)));
+                tr_sessionSetRPCPort(session_, static_cast<uint16_t>(prefs_.get<int>(key)));
             }
 
             break;
@@ -1168,7 +1168,7 @@ void Session::launchWebInterface() const
     {
         url.setScheme(QStringLiteral("http"));
         url.setHost(QStringLiteral("localhost"));
-        url.setPort(prefs_.getInt(Prefs::RPC_PORT));
+        url.setPort(prefs_.get<int>(Prefs::RPC_PORT));
     }
 
     QDesktopServices::openUrl(url);
