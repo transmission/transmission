@@ -53,6 +53,7 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/mime-types.h"
+#include "libtransmission/quark.h"
 #include "libtransmission/serializer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
@@ -793,6 +794,14 @@ void tr_lib_init()
             tr_net_init_impl::tr_net_init_mgr::create();
 
             libtransmission::serializer::Converters::ensure_default_converters();
+
+            using namespace transmission::symbol;
+            auto const known = std::vector<tr_quark>{
+#define KNOWN_KEY_NAME(_key, _str) _key,
+                KNOWN_KEYS(KNOWN_KEY_NAME)
+#undef KNOWN_KEY_NAME
+            };
+            StringInterner::instance().add_known(std::data(known), std::size(known));
         });
 }
 
