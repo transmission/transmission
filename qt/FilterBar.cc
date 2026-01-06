@@ -273,7 +273,7 @@ void FilterBar::refreshPref(int key)
 
     case Prefs::FILTER_TRACKERS:
         {
-            auto const display_name = prefs_.getString(key);
+            auto const display_name = prefs_.get<QString>(key);
 
             if (auto rows = tracker_model_->findItems(display_name); !rows.isEmpty())
             {

@@ -322,7 +322,7 @@ void DetailsDialog::refreshPref(int key)
     if (key == Prefs::SHOW_TRACKER_SCRAPES)
     {
         auto* selection_model = ui_.trackersView->selectionModel();
-        tracker_delegate_->setShowMore(prefs_.getBool(key));
+        tracker_delegate_->setShowMore(prefs_.get<bool>(key));
         selection_model->clear();
         ui_.trackersView->reset();
         selection_model->select(selection_model->selection(), QItemSelectionModel::Select);
@@ -330,7 +330,7 @@ void DetailsDialog::refreshPref(int key)
     }
     else if (key == Prefs::SHOW_BACKUP_TRACKERS)
     {
-        tracker_filter_->setShowBackupTrackers(prefs_.getBool(key));
+        tracker_filter_->setShowBackupTrackers(prefs_.get<bool>(key));
     }
 }
 
@@ -1588,8 +1588,8 @@ void DetailsDialog::initTrackerTab()
     ui_.editTrackersButton->setIcon(icons::icon(icons::Type::EditTrackers));
     ui_.removeTrackerButton->setIcon(icons::icon(icons::Type::RemoveTracker));
 
-    ui_.showTrackerScrapesCheck->setChecked(prefs_.getBool(Prefs::SHOW_TRACKER_SCRAPES));
-    ui_.showBackupTrackersCheck->setChecked(prefs_.getBool(Prefs::SHOW_BACKUP_TRACKERS));
+    ui_.showTrackerScrapesCheck->setChecked(prefs_.get<bool>(Prefs::SHOW_TRACKER_SCRAPES));
+    ui_.showBackupTrackersCheck->setChecked(prefs_.get<bool>(Prefs::SHOW_BACKUP_TRACKERS));
 
     connect(ui_.addTrackerButton, &QAbstractButton::clicked, this, &DetailsDialog::onAddTrackerClicked);
     connect(ui_.editTrackersButton, &QAbstractButton::clicked, this, &DetailsDialog::onEditTrackersClicked);

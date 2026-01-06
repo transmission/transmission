@@ -180,35 +180,35 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
 
     if (pref_widget.is<QCheckBox>())
     {
-        pref_widget.as<QCheckBox>()->setChecked(prefs_.getBool(pref_key));
+        pref_widget.as<QCheckBox>()->setChecked(prefs_.get<bool>(pref_key));
     }
     else if (pref_widget.is<QSpinBox>())
     {
-        pref_widget.as<QSpinBox>()->setValue(prefs_.getInt(pref_key));
+        pref_widget.as<QSpinBox>()->setValue(prefs_.get<int>(pref_key));
     }
     else if (pref_widget.is<QDoubleSpinBox>())
     {
-        pref_widget.as<QDoubleSpinBox>()->setValue(prefs_.getDouble(pref_key));
+        pref_widget.as<QDoubleSpinBox>()->setValue(prefs_.get<double>(pref_key));
     }
     else if (pref_widget.is<QTimeEdit>())
     {
-        pref_widget.as<QTimeEdit>()->setTime(QTime{ 0, 0 }.addSecs(prefs_.getInt(pref_key) * 60));
+        pref_widget.as<QTimeEdit>()->setTime(QTime{ 0, 0 }.addSecs(prefs_.get<int>(pref_key) * 60));
     }
     else if (pref_widget.is<QLineEdit>())
     {
-        pref_widget.as<QLineEdit>()->setText(prefs_.getString(pref_key));
+        pref_widget.as<QLineEdit>()->setText(prefs_.get<QString>(pref_key));
     }
     else if (pref_widget.is<PathButton>())
     {
-        pref_widget.as<PathButton>()->setPath(prefs_.getString(pref_key));
+        pref_widget.as<PathButton>()->setPath(prefs_.get<QString>(pref_key));
     }
     else if (pref_widget.is<FreeSpaceLabel>())
     {
-        pref_widget.as<FreeSpaceLabel>()->setPath(prefs_.getString(pref_key));
+        pref_widget.as<FreeSpaceLabel>()->setPath(prefs_.get<QString>(pref_key));
     }
     else if (pref_widget.is<QPlainTextEdit>())
     {
-        pref_widget.as<QPlainTextEdit>()->setPlainText(prefs_.getString(pref_key));
+        pref_widget.as<QPlainTextEdit>()->setPlainText(prefs_.get<QString>(pref_key));
     }
     else
     {
@@ -394,7 +394,7 @@ void PrefsDialog::initSpeedTab()
     }
 
     ui_.altSpeedLimitDaysCombo->setCurrentIndex(
-        ui_.altSpeedLimitDaysCombo->findData(prefs_.getInt(Prefs::ALT_SPEED_LIMIT_TIME_DAY)));
+        ui_.altSpeedLimitDaysCombo->findData(prefs_.get<int>(Prefs::ALT_SPEED_LIMIT_TIME_DAY)));
 
     linkWidgetToPref(ui_.uploadSpeedLimitCheck, Prefs::USPEED_ENABLED);
     linkWidgetToPref(ui_.uploadSpeedLimitSpin, Prefs::USPEED);
@@ -652,7 +652,7 @@ void PrefsDialog::initDownloadingTab()
     ui_.watchDirStack->setMinimumWidth(200);
 
     ui_.downloadDirFreeSpaceLabel->setSession(session_);
-    ui_.downloadDirFreeSpaceLabel->setPath(prefs_.getString(Prefs::DOWNLOAD_DIR));
+    ui_.downloadDirFreeSpaceLabel->setPath(prefs_.get<QString>(Prefs::DOWNLOAD_DIR));
 
     linkWidgetToPref(ui_.watchDirCheck, Prefs::DIR_WATCH_ENABLED);
     linkWidgetToPref(ui_.watchDirButton, Prefs::DIR_WATCH);
@@ -803,9 +803,9 @@ void PrefsDialog::refreshPref(int key)
     case Prefs::RPC_WHITELIST_ENABLED:
     case Prefs::RPC_AUTH_REQUIRED:
         {
-            bool const enabled(prefs_.getBool(Prefs::RPC_ENABLED));
-            bool const whitelist(prefs_.getBool(Prefs::RPC_WHITELIST_ENABLED));
-            bool const auth(prefs_.getBool(Prefs::RPC_AUTH_REQUIRED));
+            bool const enabled(prefs_.get<bool>(Prefs::RPC_ENABLED));
+            bool const whitelist(prefs_.get<bool>(Prefs::RPC_WHITELIST_ENABLED));
+            bool const auth(prefs_.get<bool>(Prefs::RPC_AUTH_REQUIRED));
 
             for (QWidget* const w : web_whitelist_widgets_)
             {
@@ -827,7 +827,7 @@ void PrefsDialog::refreshPref(int key)
 
     case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
         {
-            bool const enabled = prefs_.getBool(key);
+            bool const enabled = prefs_.get<bool>(key);
 
             for (QWidget* const w : sched_widgets_)
             {
@@ -839,7 +839,7 @@ void PrefsDialog::refreshPref(int key)
 
     case Prefs::BLOCKLIST_ENABLED:
         {
-            bool const enabled = prefs_.getBool(key);
+            bool const enabled = prefs_.get<bool>(key);
 
             for (QWidget* const w : block_widgets_)
             {

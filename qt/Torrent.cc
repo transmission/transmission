@@ -42,9 +42,9 @@ std::optional<double> Torrent::getSeedRatioLimit() const
         return seedRatioLimit();
     }
 
-    if (mode == TR_RATIOLIMIT_GLOBAL && prefs_.getBool(Prefs::RATIO_ENABLED))
+    if (mode == TR_RATIOLIMIT_GLOBAL && prefs_.get<bool>(Prefs::RATIO_ENABLED))
     {
-        return prefs_.getDouble(Prefs::RATIO);
+        return prefs_.get<double>(Prefs::RATIO);
     }
 
     return {};

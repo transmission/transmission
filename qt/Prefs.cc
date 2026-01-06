@@ -167,24 +167,6 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
 
 namespace
 {
-bool isValidUtf8(QByteArray const& byteArray)
-{
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-
-    auto decoder = QStringDecoder{ QStringConverter::Utf8, QStringConverter::Flag::Stateless };
-    auto const text = QString{ decoder.decode(byteArray) };
-    return !decoder.hasError() && !text.contains(QChar::ReplacementCharacter);
-
-#else
-
-    auto const* const codec = QTextCodec::codecForName("UTF-8");
-    auto state = QTextCodec::ConverterState{};
-    codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
-    return state.invalidChars == 0;
-
-#endif
-}
-
 [[nodiscard]] constexpr auto prefIsSavable(int pref)
 {
     switch (pref)
@@ -420,51 +402,4 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_watch_dir, download_dir);
     settings.try_emplace(TR_KEY_watch_dir_enabled, false);
     return tr_variant{ std::move(settings) };
-}
-
-/***
-****
-***/
-
-bool Prefs::getBool(int key) const
-{
-    assert(Items[key].type == QMetaType::Bool);
-    return values_[key].toBool();
-}
-
-QString Prefs::getString(int key) const
-{
-    assert(Items[key].type == QMetaType::QString);
-
-    if (auto const b = values_[key].toByteArray(); isValidUtf8(b.constData()))
-    {
-        values_[key].setValue(QString::fromUtf8(b.constData()));
-    }
-
-    return values_[key].toString();
-}
-
-int Prefs::getInt(int key) const
-{
-    assert(Items[key].type == QMetaType::Int);
-    return values_[key].toInt();
-}
-
-double Prefs::getDouble(int key) const
-{
-    assert(Items[key].type == QMetaType::Double);
-    return values_[key].toDouble();
-}
-
-QDateTime Prefs::getDateTime(int key) const
-{
-    assert(Items[key].type == QMetaType::QDateTime);
-    return values_[key].toDateTime();
-}
-
-// ---
-
-void Prefs::toggleBool(int key)
-{
-    set(key, !getBool(key));
 }

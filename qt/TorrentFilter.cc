@@ -43,7 +43,7 @@ void TorrentFilter::onPrefChanged(int key)
     {
     case Prefs::FILTER_TEXT:
         // special case for isEmpty: user probably hit the 'clear' button
-        msec = prefs_.getString(key).isEmpty() ? FastMSec : SlowMSec;
+        msec = prefs_.get<QString>(key).isEmpty() ? FastMSec : SlowMSec;
         break;
 
     case Prefs::FILTER_MODE:
@@ -68,7 +68,7 @@ void TorrentFilter::onPrefChanged(int key)
 void TorrentFilter::refilter()
 {
     invalidate();
-    sort(0, prefs_.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
+    sort(0, prefs_.get<bool>(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
 }
 
 /***
@@ -227,13 +227,13 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
 
     if (accepts)
     {
-        auto const display_name = prefs_.getString(Prefs::FILTER_TRACKERS);
+        auto const display_name = prefs_.get<QString>(Prefs::FILTER_TRACKERS);
         accepts = display_name.isEmpty() || tor.includesTracker(display_name.toLower());
     }
 
     if (accepts)
     {
-        auto const text = prefs_.getString(Prefs::FILTER_TEXT);
+        auto const text = prefs_.get<QString>(Prefs::FILTER_TEXT);
         accepts = text.isEmpty() || tor.name().contains(text, Qt::CaseInsensitive) ||
             tor.hash().toString().contains(text, Qt::CaseInsensitive);
     }

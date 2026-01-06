@@ -295,7 +295,7 @@ QStringList Application::getNames(torrent_ids_t const& torrent_ids) const
 
 void Application::onTorrentsAdded(torrent_ids_t const& torrent_ids) const
 {
-    if (!prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
+    if (!prefs_->get<bool>(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
         return;
     }
@@ -308,14 +308,14 @@ void Application::onTorrentsAdded(torrent_ids_t const& torrent_ids) const
 
 void Application::onTorrentsCompleted(torrent_ids_t const& torrent_ids) const
 {
-    if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
+    if (prefs_->get<bool>(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
     {
         auto const title = tr("Torrent(s) Completed", nullptr, static_cast<int>(std::size(torrent_ids)));
         auto const body = getNames(torrent_ids).join(QStringLiteral("\n"));
         notifyApp(title, body);
     }
 
-    if (prefs_->getBool(Prefs::COMPLETE_SOUND_ENABLED))
+    if (prefs_->get<bool>(Prefs::COMPLETE_SOUND_ENABLED))
     {
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
         beep();
@@ -368,7 +368,7 @@ void Application::refreshPref(int key) const
 
     case Prefs::DIR_WATCH:
     case Prefs::DIR_WATCH_ENABLED:
-        watch_dir_->setPath(prefs_->getString(Prefs::DIR_WATCH), prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
+        watch_dir_->setPath(prefs_->get<QString>(Prefs::DIR_WATCH), prefs_->get<bool>(Prefs::DIR_WATCH_ENABLED));
         break;
 
     default:
@@ -378,12 +378,12 @@ void Application::refreshPref(int key) const
 
 void Application::maybeUpdateBlocklist() const
 {
-    if (!prefs_->getBool(Prefs::BLOCKLIST_UPDATES_ENABLED))
+    if (!prefs_->get<bool>(Prefs::BLOCKLIST_UPDATES_ENABLED))
     {
         return;
     }
 
-    QDateTime const last_updated_at = prefs_->getDateTime(Prefs::BLOCKLIST_DATE);
+    QDateTime const last_updated_at = prefs_->get<QDateTime>(Prefs::BLOCKLIST_DATE);
     QDateTime const next_update_at = last_updated_at.addDays(7);
     QDateTime const now = QDateTime::currentDateTime();
 
@@ -426,8 +426,8 @@ void Application::refreshTorrents()
 void Application::addWatchdirTorrent(QString const& filename) const
 {
     auto add_data = AddData{ filename };
-    auto const disposal = prefs_->getBool(Prefs::TRASH_ORIGINAL) ? AddData::FilenameDisposal::Delete :
-                                                                   AddData::FilenameDisposal::Rename;
+    auto const disposal = prefs_->get<bool>(Prefs::TRASH_ORIGINAL) ? AddData::FilenameDisposal::Delete :
+                                                                     AddData::FilenameDisposal::Rename;
     add_data.setFileDisposal(disposal);
     addTorrent(std::move(add_data));
 }
@@ -441,12 +441,12 @@ void Application::addTorrent(AddData addme) const
 
     // if there's not already a disposal action set,
     // then honor the `trash original` preference setting
-    if (!addme.fileDisposal() && prefs_->getBool(Prefs::TRASH_ORIGINAL))
+    if (!addme.fileDisposal() && prefs_->get<bool>(Prefs::TRASH_ORIGINAL))
     {
         addme.setFileDisposal(AddData::FilenameDisposal::Delete);
     }
 
-    if (!prefs_->getBool(Prefs::OPTIONS_PROMPT))
+    if (!prefs_->get<bool>(Prefs::OPTIONS_PROMPT))
     {
         session_->addTorrent(addme);
     }

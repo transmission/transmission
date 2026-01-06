@@ -230,13 +230,13 @@ int tr_main(int argc, char** argv)
         prefs->set(Prefs::SESSION_IS_REMOTE, true);
     }
 
-    if (prefs->getBool(Prefs::START_MINIMIZED))
+    if (prefs->get<bool>(Prefs::START_MINIMIZED))
     {
         minimized = true;
     }
 
     // start as minimized only if the system tray present
-    if (!prefs->getBool(Prefs::SHOW_TRAY_ICON))
+    if (!prefs->get<bool>(Prefs::SHOW_TRAY_ICON))
     {
         minimized = false;
     }

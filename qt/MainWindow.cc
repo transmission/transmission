@@ -205,7 +205,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&tray_icon_, &QSystemTrayIcon::activated, this, &MainWindow::trayActivated);
 
     toggleWindows(!minimized);
-    ui_.action_TrayIcon->setChecked(minimized || prefs.getBool(Prefs::SHOW_TRAY_ICON));
+    ui_.action_TrayIcon->setChecked(minimized || prefs.get<bool>(Prefs::SHOW_TRAY_ICON));
 
     initStatusBar();
     auto* filter_bar = new FilterBar{ prefs_, model_, filter_model_ };
@@ -751,7 +751,7 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     ui_.downloadSpeedLabel->setText(stats.speed_down.to_download_qstring());
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
 
-    auto const mode = prefs_.getString(Prefs::STATUSBAR_STATS);
+    auto const mode = prefs_.get<QString>(Prefs::STATUSBAR_STATS);
     auto str = QString{};
 
     if (mode == session_ratio_stats_mode_name_)
@@ -1040,9 +1040,10 @@ void MainWindow::setCompactView(bool visible)
 
 void MainWindow::toggleSpeedMode()
 {
-    prefs_.toggleBool(Prefs::ALT_SPEED_LIMIT_ENABLED);
-    bool const mode = prefs_.get<bool>(Prefs::ALT_SPEED_LIMIT_ENABLED);
-    alt_speed_action_->setChecked(mode);
+    auto const key = Prefs::ALT_SPEED_LIMIT_ENABLED;
+    auto const checked = !prefs_.get<bool>(key);
+    prefs_.set<bool>(key, checked);
+    alt_speed_action_->setChecked(checked);
 }
 
 void MainWindow::setToolbarVisible(bool visible)
@@ -1114,7 +1115,7 @@ void MainWindow::refreshPref(int key)
     switch (key)
     {
     case Prefs::STATUSBAR_STATS:
-        str = prefs_.getString(key);
+        str = prefs_.get<QString>(key);
 
         for (auto* action : ui_.action_TotalRatio->actionGroup()->actions())
         {
@@ -1125,7 +1126,7 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::SORT_REVERSED:
-        ui_.action_ReverseSortOrder->setChecked(prefs_.getBool(key));
+        ui_.action_ReverseSortOrder->setChecked(prefs_.get<bool>(key));
         break;
 
     case Prefs::SORT_MODE:
@@ -1166,25 +1167,25 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::FILTERBAR:
-        b = prefs_.getBool(key);
+        b = prefs_.get<bool>(key);
         filter_bar_->setVisible(b);
         ui_.action_Filterbar->setChecked(b);
         break;
 
     case Prefs::STATUSBAR:
-        b = prefs_.getBool(key);
+        b = prefs_.get<bool>(key);
         ui_.statusBar->setVisible(b);
         ui_.action_Statusbar->setChecked(b);
         break;
 
     case Prefs::TOOLBAR:
-        b = prefs_.getBool(key);
+        b = prefs_.get<bool>(key);
         ui_.toolBar->setVisible(b);
         ui_.action_Toolbar->setChecked(b);
         break;
 
     case Prefs::SHOW_TRAY_ICON:
-        b = prefs_.getBool(key);
+        b = prefs_.get<bool>(key);
         ui_.action_TrayIcon->setChecked(b);
         tray_icon_.setVisible(b);
         QApplication::setQuitOnLastWindowClosed(!b);
@@ -1192,7 +1193,7 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::COMPACT_VIEW:
-        b = prefs_.getBool(key);
+        b = prefs_.get<bool>(key);
         ui_.action_CompactView->setChecked(b);
         ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
         break;
@@ -1202,17 +1203,17 @@ void MainWindow::refreshPref(int key)
     case Prefs::MAIN_WINDOW_WIDTH:
     case Prefs::MAIN_WINDOW_HEIGHT:
         setGeometry(
-            prefs_.getInt(Prefs::MAIN_WINDOW_X),
-            prefs_.getInt(Prefs::MAIN_WINDOW_Y),
-            prefs_.getInt(Prefs::MAIN_WINDOW_WIDTH),
-            prefs_.getInt(Prefs::MAIN_WINDOW_HEIGHT));
+            prefs_.get<int>(Prefs::MAIN_WINDOW_X),
+            prefs_.get<int>(Prefs::MAIN_WINDOW_Y),
+            prefs_.get<int>(Prefs::MAIN_WINDOW_WIDTH),
+            prefs_.get<int>(Prefs::MAIN_WINDOW_HEIGHT));
         break;
 
     case Prefs::ALT_SPEED_LIMIT_ENABLED:
     case Prefs::ALT_SPEED_LIMIT_UP:
     case Prefs::ALT_SPEED_LIMIT_DOWN:
         {
-            b = prefs_.getBool(Prefs::ALT_SPEED_LIMIT_ENABLED);
+            b = prefs_.get<bool>(Prefs::ALT_SPEED_LIMIT_ENABLED);
             alt_speed_action_->setChecked(b);
             ui_.altSpeedButton->setChecked(b);
             auto const fmt = b ? tr("Click to disable Temporary Speed Limits\n (%1 down, %2 up)") :
@@ -1224,7 +1225,7 @@ void MainWindow::refreshPref(int key)
         }
 
     case Prefs::READ_CLIPBOARD:
-        auto_add_clipboard_links_ = prefs_.getBool(Prefs::READ_CLIPBOARD);
+        auto_add_clipboard_links_ = prefs_.get<bool>(Prefs::READ_CLIPBOARD);
         break;
 
     default:
@@ -1247,7 +1248,7 @@ void MainWindow::openTorrent()
 {
     auto* const d = new QFileDialog{ this,
                                      tr("Open Torrent"),
-                                     prefs_.getString(Prefs::OPEN_DIALOG_FOLDER),
+                                     prefs_.get<QString>(Prefs::OPEN_DIALOG_FOLDER),
                                      tr("Torrent Files (*.torrent);;All Files (*.*)") };
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
@@ -1255,7 +1256,7 @@ void MainWindow::openTorrent()
     if (auto* const l = qobject_cast<QGridLayout*>(d->layout()); l != nullptr)
     {
         auto* b = new QCheckBox{ tr("Show &options dialog") };
-        b->setChecked(prefs_.getBool(Prefs::OPTIONS_PROMPT));
+        b->setChecked(prefs_.get<bool>(Prefs::OPTIONS_PROMPT));
         b->setObjectName(show_options_checkbox_name_);
         l->addWidget(b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
     }
@@ -1311,7 +1312,7 @@ void MainWindow::addTorrentFromClipboard()
 
 void MainWindow::addTorrents(QStringList const& filenames)
 {
-    bool show_options = prefs_.getBool(Prefs::OPTIONS_PROMPT);
+    bool show_options = prefs_.get<bool>(Prefs::OPTIONS_PROMPT);
 
     if (auto const* const file_dialog = qobject_cast<QFileDialog const*>(sender()); file_dialog != nullptr)
     {

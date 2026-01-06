@@ -143,11 +143,6 @@ public:
         return FIRST_CORE_PREF <= key && key <= LAST_CORE_PREF;
     }
 
-    [[nodiscard]] constexpr auto isClient(int key) const noexcept
-    {
-        return !isCore(key);
-    }
-
     [[nodiscard]] constexpr auto getKey(int i) const noexcept
     {
         return Items[i].key;
@@ -162,12 +157,6 @@ public:
     {
         return values_[i];
     }
-
-    int getInt(int key) const;
-    bool getBool(int key) const;
-    QString getString(int key) const;
-    double getDouble(int key) const;
-    QDateTime getDateTime(int key) const;
 
     template<typename T>
     [[nodiscard]] T get(int const key) const
@@ -187,8 +176,6 @@ public:
             emit changed(key);
         }
     }
-
-    void toggleBool(int key);
 
 signals:
     void changed(int key);
