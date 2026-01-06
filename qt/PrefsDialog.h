@@ -60,23 +60,23 @@ private:
         refreshPref(key);
     }
 
-    void linkAltSpeedDaysComboToPref(QComboBox* w, int key);
-    void linkEncryptionComboToPref(QComboBox* w, int key);
-    void linkWidgetToPref(FreeSpaceLabel* w, int key);
-    void linkWidgetToPref(PathButton* w, int key);
-    void linkWidgetToPref(QCheckBox* w, int key);
-    void linkWidgetToPref(QDoubleSpinBox* w, int key);
-    void linkWidgetToPref(QLineEdit* w, int key);
-    void linkWidgetToPref(QPlainTextEdit*, int);
-    void linkWidgetToPref(QSpinBox* w, int key);
-    void linkWidgetToPref(QTimeEdit* w, int key);
-
     void portTestSetEnabled();
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();
     void updatePortStatusLabel();
     void updateSeedingWidgetsLocality();
     static QString getPortStatusText(PortTestStatus status) noexcept;
+
+    void initAltSpeedDaysCombo(QComboBox* w, int key);
+    void initEncryptionCombo(QComboBox* w, int key);
+    void initWidget(FreeSpaceLabel* w, int key);
+    void initWidget(PathButton* w, int key);
+    void initWidget(QCheckBox* w, int key);
+    void initWidget(QDoubleSpinBox* w, int key);
+    void initWidget(QLineEdit* w, int key);
+    void initWidget(QPlainTextEdit*, int);
+    void initWidget(QSpinBox* w, int key);
+    void initWidget(QTimeEdit* w, int key);
 
     void initDownloadingTab();
     void initSeedingTab();

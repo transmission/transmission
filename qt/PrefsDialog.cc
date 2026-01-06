@@ -38,7 +38,7 @@ using namespace libtransmission;
 
 // ---
 
-void PrefsDialog::linkAltSpeedDaysComboToPref(QComboBox* const w, int const key)
+void PrefsDialog::initAltSpeedDaysCombo(QComboBox* const w, int const key)
 {
     static auto items = []
     {
@@ -100,7 +100,7 @@ void PrefsDialog::linkAltSpeedDaysComboToPref(QComboBox* const w, int const key)
     connect(w, &QComboBox::activated, std::move(on_activated));
 }
 
-void PrefsDialog::linkEncryptionComboToPref(QComboBox* const w, int const key)
+void PrefsDialog::initEncryptionCombo(QComboBox* const w, int const key)
 {
     static auto const Items = std::array<std::pair<int, QString>, 3U>{ {
         { TR_CLEAR_PREFERRED, tr("Allow encryption") },
@@ -139,11 +139,11 @@ void PrefsDialog::linkEncryptionComboToPref(QComboBox* const w, int const key)
     connect(w, &QComboBox::activated, std::move(on_activated));
 }
 
-void PrefsDialog::linkWidgetToPref(QPlainTextEdit* const w, int const key)
+void PrefsDialog::initWidget(QPlainTextEdit* const w, int const key)
 {
     auto updater = [this, key, w]()
     {
-        auto blocker = QSignalBlocker{ w };
+        auto const blocker = QSignalBlocker{ w };
         w->setPlainText(prefs_.get<QString>(key));
     };
     updater();
@@ -162,22 +162,22 @@ void PrefsDialog::linkWidgetToPref(QPlainTextEdit* const w, int const key)
     connect(qApp, &QApplication::focusChanged, std::move(on_focus_changed));
 }
 
-void PrefsDialog::linkWidgetToPref(FreeSpaceLabel* const w, int const key)
+void PrefsDialog::initWidget(FreeSpaceLabel* const w, int const key)
 {
     auto updater = [this, key, w]()
     {
-        auto blocker = QSignalBlocker{ w };
+        auto const blocker = QSignalBlocker{ w };
         w->setPath(prefs_.get<QString>(key));
     };
     updater();
     updaters_.emplace(key, std::move(updater));
 }
 
-void PrefsDialog::linkWidgetToPref(PathButton* const w, int const key)
+void PrefsDialog::initWidget(PathButton* const w, int const key)
 {
     auto updater = [this, key, w]()
     {
-        auto blocker = QSignalBlocker{ w };
+        auto const blocker = QSignalBlocker{ w };
         w->setPath(prefs_.get<QString>(key));
     };
     updater();
@@ -186,11 +186,11 @@ void PrefsDialog::linkWidgetToPref(PathButton* const w, int const key)
     connect(w, &PathButton::pathChanged, [this, key](QString const& val) { set(key, val); });
 }
 
-void PrefsDialog::linkWidgetToPref(QCheckBox* const w, int const key)
+void PrefsDialog::initWidget(QCheckBox* const w, int const key)
 {
     auto updater = [this, key, w]()
     {
-        auto blocker = QSignalBlocker{ w };
+        auto const blocker = QSignalBlocker{ w };
         w->setChecked(prefs_.get<bool>(key));
     };
     updater();
@@ -199,11 +199,11 @@ void PrefsDialog::linkWidgetToPref(QCheckBox* const w, int const key)
     connect(w, &QAbstractButton::toggled, [this, key](bool const val) { set(key, val); });
 }
 
-void PrefsDialog::linkWidgetToPref(QDoubleSpinBox* const w, int const key)
+void PrefsDialog::initWidget(QDoubleSpinBox* const w, int const key)
 {
     auto updater = [this, key, w]()
     {
-        auto blocker = QSignalBlocker{ w };
+        auto const blocker = QSignalBlocker{ w };
         w->setValue(prefs_.get<double>(key));
     };
     updater();
@@ -212,11 +212,11 @@ void PrefsDialog::linkWidgetToPref(QDoubleSpinBox* const w, int const key)
     connect(w, &QDoubleSpinBox::valueChanged, [this, key](double const val) { set(key, val); });
 }
 
-void PrefsDialog::linkWidgetToPref(QLineEdit* const w, int const key)
+void PrefsDialog::initWidget(QLineEdit* const w, int const key)
 {
     auto updater = [this, key, w]()
     {
-        auto blocker = QSignalBlocker{ w };
+        auto const blocker = QSignalBlocker{ w };
         w->setText(prefs_.get<QString>(key));
     };
     updater();
@@ -232,11 +232,11 @@ void PrefsDialog::linkWidgetToPref(QLineEdit* const w, int const key)
     connect(w, &QLineEdit::editingFinished, std::move(on_editing_finished));
 }
 
-void PrefsDialog::linkWidgetToPref(QSpinBox* const w, int const key)
+void PrefsDialog::initWidget(QSpinBox* const w, int const key)
 {
     auto updater = [this, key, w]()
     {
-        auto blocker = QSignalBlocker{ w };
+        auto const blocker = QSignalBlocker{ w };
         w->setValue(prefs_.get<int>(key));
     };
     updater();
@@ -245,11 +245,11 @@ void PrefsDialog::linkWidgetToPref(QSpinBox* const w, int const key)
     connect(w, &QSpinBox::valueChanged, [this, key](int const val) { set(key, val); });
 }
 
-void PrefsDialog::linkWidgetToPref(QTimeEdit* const w, int const key)
+void PrefsDialog::initWidget(QTimeEdit* const w, int const key)
 {
     auto updater = [this, key, w]()
     {
-        auto blocker = QSignalBlocker{ w };
+        auto const blocker = QSignalBlocker{ w };
         auto const minutes = prefs_.get<int>(key);
         w->setTime(QTime{ 0, 0 }.addSecs(minutes * 60));
     };
@@ -268,13 +268,13 @@ void PrefsDialog::linkWidgetToPref(QTimeEdit* const w, int const key)
 
 void PrefsDialog::initRemoteTab()
 {
-    linkWidgetToPref(ui_.enableRpcCheck, Prefs::RPC_ENABLED);
-    linkWidgetToPref(ui_.rpcPortSpin, Prefs::RPC_PORT);
-    linkWidgetToPref(ui_.requireRpcAuthCheck, Prefs::RPC_AUTH_REQUIRED);
-    linkWidgetToPref(ui_.rpcUsernameEdit, Prefs::RPC_USERNAME);
-    linkWidgetToPref(ui_.rpcPasswordEdit, Prefs::RPC_PASSWORD);
-    linkWidgetToPref(ui_.enableRpcWhitelistCheck, Prefs::RPC_WHITELIST_ENABLED);
-    linkWidgetToPref(ui_.rpcWhitelistEdit, Prefs::RPC_WHITELIST);
+    initWidget(ui_.enableRpcCheck, Prefs::RPC_ENABLED);
+    initWidget(ui_.rpcPortSpin, Prefs::RPC_PORT);
+    initWidget(ui_.requireRpcAuthCheck, Prefs::RPC_AUTH_REQUIRED);
+    initWidget(ui_.rpcUsernameEdit, Prefs::RPC_USERNAME);
+    initWidget(ui_.rpcPasswordEdit, Prefs::RPC_PASSWORD);
+    initWidget(ui_.enableRpcWhitelistCheck, Prefs::RPC_WHITELIST_ENABLED);
+    initWidget(ui_.rpcWhitelistEdit, Prefs::RPC_WHITELIST);
 
     web_widgets_ << ui_.rpcPortLabel << ui_.rpcPortSpin << ui_.requireRpcAuthCheck << ui_.enableRpcWhitelistCheck;
     web_auth_widgets_ << ui_.rpcUsernameLabel << ui_.rpcUsernameEdit << ui_.rpcPasswordLabel << ui_.rpcPasswordEdit;
@@ -295,16 +295,16 @@ void PrefsDialog::initSpeedTab()
     ui_.altUploadSpeedLimitSpin->setSuffix(suffix);
     ui_.altDownloadSpeedLimitSpin->setSuffix(suffix);
 
-    linkWidgetToPref(ui_.uploadSpeedLimitCheck, Prefs::USPEED_ENABLED);
-    linkWidgetToPref(ui_.uploadSpeedLimitSpin, Prefs::USPEED);
-    linkWidgetToPref(ui_.downloadSpeedLimitCheck, Prefs::DSPEED_ENABLED);
-    linkWidgetToPref(ui_.downloadSpeedLimitSpin, Prefs::DSPEED);
-    linkWidgetToPref(ui_.altUploadSpeedLimitSpin, Prefs::ALT_SPEED_LIMIT_UP);
-    linkWidgetToPref(ui_.altDownloadSpeedLimitSpin, Prefs::ALT_SPEED_LIMIT_DOWN);
-    linkWidgetToPref(ui_.altSpeedLimitScheduleCheck, Prefs::ALT_SPEED_LIMIT_TIME_ENABLED);
-    linkWidgetToPref(ui_.altSpeedLimitStartTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_BEGIN);
-    linkWidgetToPref(ui_.altSpeedLimitEndTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_END);
-    linkAltSpeedDaysComboToPref(ui_.altSpeedLimitDaysCombo, Prefs::ALT_SPEED_LIMIT_TIME_DAY);
+    initWidget(ui_.uploadSpeedLimitCheck, Prefs::USPEED_ENABLED);
+    initWidget(ui_.uploadSpeedLimitSpin, Prefs::USPEED);
+    initWidget(ui_.downloadSpeedLimitCheck, Prefs::DSPEED_ENABLED);
+    initWidget(ui_.downloadSpeedLimitSpin, Prefs::DSPEED);
+    initWidget(ui_.altUploadSpeedLimitSpin, Prefs::ALT_SPEED_LIMIT_UP);
+    initWidget(ui_.altDownloadSpeedLimitSpin, Prefs::ALT_SPEED_LIMIT_DOWN);
+    initWidget(ui_.altSpeedLimitScheduleCheck, Prefs::ALT_SPEED_LIMIT_TIME_ENABLED);
+    initWidget(ui_.altSpeedLimitStartTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_BEGIN);
+    initWidget(ui_.altSpeedLimitEndTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_END);
+    initAltSpeedDaysCombo(ui_.altSpeedLimitDaysCombo, Prefs::ALT_SPEED_LIMIT_TIME_DAY);
 
     sched_widgets_ << ui_.altSpeedLimitStartTimeEdit << ui_.altSpeedLimitToLabel << ui_.altSpeedLimitEndTimeEdit
                    << ui_.altSpeedLimitDaysLabel << ui_.altSpeedLimitDaysCombo;
@@ -319,11 +319,11 @@ void PrefsDialog::initSpeedTab()
 
 void PrefsDialog::initDesktopTab()
 {
-    linkWidgetToPref(ui_.showTrayIconCheck, Prefs::SHOW_TRAY_ICON);
-    linkWidgetToPref(ui_.startMinimizedCheck, Prefs::START_MINIMIZED);
-    linkWidgetToPref(ui_.notifyOnTorrentAddedCheck, Prefs::SHOW_NOTIFICATION_ON_ADD);
-    linkWidgetToPref(ui_.notifyOnTorrentCompletedCheck, Prefs::SHOW_NOTIFICATION_ON_COMPLETE);
-    linkWidgetToPref(ui_.playSoundOnTorrentCompletedCheck, Prefs::COMPLETE_SOUND_ENABLED);
+    initWidget(ui_.showTrayIconCheck, Prefs::SHOW_TRAY_ICON);
+    initWidget(ui_.startMinimizedCheck, Prefs::START_MINIMIZED);
+    initWidget(ui_.notifyOnTorrentAddedCheck, Prefs::SHOW_NOTIFICATION_ON_ADD);
+    initWidget(ui_.notifyOnTorrentCompletedCheck, Prefs::SHOW_NOTIFICATION_ON_COMPLETE);
+    initWidget(ui_.playSoundOnTorrentCompletedCheck, Prefs::COMPLETE_SOUND_ENABLED);
 }
 
 // ---
@@ -412,16 +412,16 @@ void PrefsDialog::initNetworkTab()
     ui_.torrentPeerLimitSpin->setRange(1, INT_MAX);
     ui_.globalPeerLimitSpin->setRange(1, INT_MAX);
 
-    linkWidgetToPref(ui_.peerPortSpin, Prefs::PEER_PORT);
-    linkWidgetToPref(ui_.randomPeerPortCheck, Prefs::PEER_PORT_RANDOM_ON_START);
-    linkWidgetToPref(ui_.enablePortForwardingCheck, Prefs::PORT_FORWARDING);
-    linkWidgetToPref(ui_.torrentPeerLimitSpin, Prefs::PEER_LIMIT_TORRENT);
-    linkWidgetToPref(ui_.globalPeerLimitSpin, Prefs::PEER_LIMIT_GLOBAL);
-    linkWidgetToPref(ui_.enableUtpCheck, Prefs::UTP_ENABLED);
-    linkWidgetToPref(ui_.enablePexCheck, Prefs::PEX_ENABLED);
-    linkWidgetToPref(ui_.enableDhtCheck, Prefs::DHT_ENABLED);
-    linkWidgetToPref(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
-    linkWidgetToPref(ui_.defaultTrackersPlainTextEdit, Prefs::DEFAULT_TRACKERS);
+    initWidget(ui_.peerPortSpin, Prefs::PEER_PORT);
+    initWidget(ui_.randomPeerPortCheck, Prefs::PEER_PORT_RANDOM_ON_START);
+    initWidget(ui_.enablePortForwardingCheck, Prefs::PORT_FORWARDING);
+    initWidget(ui_.torrentPeerLimitSpin, Prefs::PEER_LIMIT_TORRENT);
+    initWidget(ui_.globalPeerLimitSpin, Prefs::PEER_LIMIT_GLOBAL);
+    initWidget(ui_.enableUtpCheck, Prefs::UTP_ENABLED);
+    initWidget(ui_.enablePexCheck, Prefs::PEX_ENABLED);
+    initWidget(ui_.enableDhtCheck, Prefs::DHT_ENABLED);
+    initWidget(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
+    initWidget(ui_.defaultTrackersPlainTextEdit, Prefs::DEFAULT_TRACKERS);
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.incomingPeersSectionLayout);
@@ -470,10 +470,10 @@ void PrefsDialog::onUpdateBlocklistClicked()
 
 void PrefsDialog::initPrivacyTab()
 {
-    linkEncryptionComboToPref(ui_.encryptionModeCombo, Prefs::ENCRYPTION);
-    linkWidgetToPref(ui_.blocklistCheck, Prefs::BLOCKLIST_ENABLED);
-    linkWidgetToPref(ui_.blocklistEdit, Prefs::BLOCKLIST_URL);
-    linkWidgetToPref(ui_.autoUpdateBlocklistCheck, Prefs::BLOCKLIST_UPDATES_ENABLED);
+    initEncryptionCombo(ui_.encryptionModeCombo, Prefs::ENCRYPTION);
+    initWidget(ui_.blocklistCheck, Prefs::BLOCKLIST_ENABLED);
+    initWidget(ui_.blocklistEdit, Prefs::BLOCKLIST_URL);
+    initWidget(ui_.autoUpdateBlocklistCheck, Prefs::BLOCKLIST_UPDATES_ENABLED);
 
     block_widgets_ << ui_.blocklistEdit << ui_.blocklistStatusLabel << ui_.updateBlocklistButton
                    << ui_.autoUpdateBlocklistCheck;
@@ -502,13 +502,13 @@ void PrefsDialog::initSeedingTab()
 {
     ui_.doneSeedingScriptButton->setTitle(tr("Select \"Torrent Done Seeding\" Script"));
 
-    linkWidgetToPref(ui_.ratioLimitCheck, Prefs::RATIO_ENABLED);
-    linkWidgetToPref(ui_.ratioLimitSpin, Prefs::RATIO);
-    linkWidgetToPref(ui_.idleLimitCheck, Prefs::IDLE_LIMIT_ENABLED);
-    linkWidgetToPref(ui_.idleLimitSpin, Prefs::IDLE_LIMIT);
-    linkWidgetToPref(ui_.doneSeedingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_SEEDING_ENABLED);
-    linkWidgetToPref(ui_.doneSeedingScriptButton, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
-    linkWidgetToPref(ui_.doneSeedingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
+    initWidget(ui_.ratioLimitCheck, Prefs::RATIO_ENABLED);
+    initWidget(ui_.ratioLimitSpin, Prefs::RATIO);
+    initWidget(ui_.idleLimitCheck, Prefs::IDLE_LIMIT_ENABLED);
+    initWidget(ui_.idleLimitSpin, Prefs::IDLE_LIMIT);
+    initWidget(ui_.doneSeedingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_SEEDING_ENABLED);
+    initWidget(ui_.doneSeedingScriptButton, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
+    initWidget(ui_.doneSeedingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
 
     connect(ui_.idleLimitSpin, qOverload<int>(&QSpinBox::valueChanged), this, &PrefsDialog::onIdleLimitChanged);
 
@@ -542,25 +542,25 @@ void PrefsDialog::initDownloadingTab()
     ui_.downloadDirFreeSpaceLabel->setSession(session_);
     ui_.downloadDirFreeSpaceLabel->setPath(prefs_.get<QString>(Prefs::DOWNLOAD_DIR));
 
-    linkWidgetToPref(ui_.watchDirCheck, Prefs::DIR_WATCH_ENABLED);
-    linkWidgetToPref(ui_.watchDirButton, Prefs::DIR_WATCH);
-    linkWidgetToPref(ui_.watchDirEdit, Prefs::DIR_WATCH);
-    linkWidgetToPref(ui_.showTorrentOptionsDialogCheck, Prefs::OPTIONS_PROMPT);
-    linkWidgetToPref(ui_.startAddedTorrentsCheck, Prefs::START);
-    linkWidgetToPref(ui_.detectTorrentFromClipboard, Prefs::READ_CLIPBOARD);
-    linkWidgetToPref(ui_.trashTorrentFileCheck, Prefs::TRASH_ORIGINAL);
-    linkWidgetToPref(ui_.downloadDirButton, Prefs::DOWNLOAD_DIR);
-    linkWidgetToPref(ui_.downloadDirEdit, Prefs::DOWNLOAD_DIR);
-    linkWidgetToPref(ui_.downloadDirFreeSpaceLabel, Prefs::DOWNLOAD_DIR);
-    linkWidgetToPref(ui_.downloadQueueSizeSpin, Prefs::DOWNLOAD_QUEUE_SIZE);
-    linkWidgetToPref(ui_.queueStalledMinutesSpin, Prefs::QUEUE_STALLED_MINUTES);
-    linkWidgetToPref(ui_.renamePartialFilesCheck, Prefs::RENAME_PARTIAL_FILES);
-    linkWidgetToPref(ui_.incompleteDirCheck, Prefs::INCOMPLETE_DIR_ENABLED);
-    linkWidgetToPref(ui_.incompleteDirButton, Prefs::INCOMPLETE_DIR);
-    linkWidgetToPref(ui_.incompleteDirEdit, Prefs::INCOMPLETE_DIR);
-    linkWidgetToPref(ui_.doneDownloadingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_ENABLED);
-    linkWidgetToPref(ui_.doneDownloadingScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
-    linkWidgetToPref(ui_.doneDownloadingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
+    initWidget(ui_.watchDirCheck, Prefs::DIR_WATCH_ENABLED);
+    initWidget(ui_.watchDirButton, Prefs::DIR_WATCH);
+    initWidget(ui_.watchDirEdit, Prefs::DIR_WATCH);
+    initWidget(ui_.showTorrentOptionsDialogCheck, Prefs::OPTIONS_PROMPT);
+    initWidget(ui_.startAddedTorrentsCheck, Prefs::START);
+    initWidget(ui_.detectTorrentFromClipboard, Prefs::READ_CLIPBOARD);
+    initWidget(ui_.trashTorrentFileCheck, Prefs::TRASH_ORIGINAL);
+    initWidget(ui_.downloadDirButton, Prefs::DOWNLOAD_DIR);
+    initWidget(ui_.downloadDirEdit, Prefs::DOWNLOAD_DIR);
+    initWidget(ui_.downloadDirFreeSpaceLabel, Prefs::DOWNLOAD_DIR);
+    initWidget(ui_.downloadQueueSizeSpin, Prefs::DOWNLOAD_QUEUE_SIZE);
+    initWidget(ui_.queueStalledMinutesSpin, Prefs::QUEUE_STALLED_MINUTES);
+    initWidget(ui_.renamePartialFilesCheck, Prefs::RENAME_PARTIAL_FILES);
+    initWidget(ui_.incompleteDirCheck, Prefs::INCOMPLETE_DIR_ENABLED);
+    initWidget(ui_.incompleteDirButton, Prefs::INCOMPLETE_DIR);
+    initWidget(ui_.incompleteDirEdit, Prefs::INCOMPLETE_DIR);
+    initWidget(ui_.doneDownloadingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_ENABLED);
+    initWidget(ui_.doneDownloadingScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
+    initWidget(ui_.doneDownloadingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.addingSectionLayout);
