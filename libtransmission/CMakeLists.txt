@@ -67,6 +67,8 @@ target_sources(${TR_NAME}
         history.h
         inout.cc
         inout.h
+        symbol.cc
+        symbol.h
         ip-cache.cc
         ip-cache.h
         log.cc
@@ -312,6 +314,7 @@ if(INSTALL_LIB)
             quark.h
             rpcimpl.h
             session-id.h
+            symbol.h
             timer-ev.h
             timer.h
             tr-assert.h
