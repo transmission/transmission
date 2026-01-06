@@ -38,6 +38,39 @@ using namespace libtransmission;
 
 // ---
 
+template<typename T, size_t N>
+void PrefsDialog::initComboFromItems(std::array<std::pair<T, QString>, N> const& items, QComboBox* const w, int const key)
+{
+    for (auto const& [value, label] : items)
+    {
+        w->addItem(label);
+    }
+
+    auto updater = [this, key, w, items]()
+    {
+        auto const blocker = QSignalBlocker{ w };
+        auto const val = prefs_.get<T>(key);
+        for (size_t i = 0; i < std::size(items); ++i)
+        {
+            if (items[i].first == val)
+            {
+                w->setCurrentIndex(static_cast<int>(i));
+            }
+        }
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
+    auto on_activated = [this, key, items](int const idx)
+    {
+        if (0 <= idx && idx < static_cast<int>(std::size(items)))
+        {
+            set(key, items[static_cast<size_t>(idx)].first);
+        }
+    };
+    connect(w, qOverload<int>(&QComboBox::activated), std::move(on_activated));
+}
+
 void PrefsDialog::initAltSpeedDaysCombo(QComboBox* const w, int const key)
 {
     static auto items = []
@@ -70,34 +103,7 @@ void PrefsDialog::initAltSpeedDaysCombo(QComboBox* const w, int const key)
         return ret;
     }();
 
-    for (auto const& [day, label] : items)
-    {
-        w->addItem(label);
-    }
-
-    auto updater = [this, key, w]()
-    {
-        auto const blocker = QSignalBlocker{ w };
-        auto const val = prefs_.get<int>(key);
-        for (size_t i = 0; i < std::size(items); ++i)
-        {
-            if (items[i].first == val)
-            {
-                w->setCurrentIndex(i);
-            }
-        }
-    };
-    updater();
-    updaters_.emplace(key, std::move(updater));
-
-    auto on_activated = [this, key](int const idx)
-    {
-        if (0 <= idx && idx < static_cast<int>(std::size(items)))
-        {
-            set(key, items[idx].first);
-        }
-    };
-    connect(w, &QComboBox::activated, std::move(on_activated));
+    initComboFromItems(items, w, key);
 }
 
 void PrefsDialog::initEncryptionCombo(QComboBox* const w, int const key)
@@ -108,35 +114,7 @@ void PrefsDialog::initEncryptionCombo(QComboBox* const w, int const key)
         { TR_ENCRYPTION_REQUIRED, tr("Require encryption") },
     } };
 
-    for (auto const& [mode, label] : Items)
-    {
-        w->addItem(label);
-    }
-
-    auto updater = [this, key, w]()
-    {
-        auto const blocker = QSignalBlocker{ w };
-        auto const val = prefs_.get<int>(key);
-        for (size_t i = 0; i < std::size(Items); ++i)
-        {
-            if (Items[i].first == val)
-            {
-                w->setCurrentIndex(i);
-            }
-        }
-    };
-    updater();
-    updaters_.emplace(key, std::move(updater));
-
-    auto const on_activated = [this, key](int const idx)
-    {
-        if (0 <= idx && idx < static_cast<int>(std::size(Items)))
-        {
-            set(key, Items[idx].first);
-        }
-    };
-
-    connect(w, &QComboBox::activated, std::move(on_activated));
+    initComboFromItems(Items, w, key);
 }
 
 void PrefsDialog::initWidget(QPlainTextEdit* const w, int const key)

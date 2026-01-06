@@ -9,6 +9,7 @@
 #include <functional>
 #include <map>
 #include <optional>
+#include <utility>
 
 #include "BaseDialog.h"
 #include "Prefs.h"
@@ -66,6 +67,9 @@ private:
     void updatePortStatusLabel();
     void updateSeedingWidgetsLocality();
     static QString getPortStatusText(PortTestStatus status) noexcept;
+
+    template<typename T, size_t N>
+    void initComboFromItems(std::array<std::pair<T, QString>, N> const& items, QComboBox* w, int key);
 
     void initAltSpeedDaysCombo(QComboBox* w, int key);
     void initEncryptionCombo(QComboBox* w, int key);
