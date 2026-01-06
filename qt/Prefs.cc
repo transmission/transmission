@@ -3,8 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <iostream>
-
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -204,7 +202,6 @@ Prefs::Prefs(QString config_dir)
     auto const app_defaults = get_default_app_settings();
     auto settings = tr_sessionLoadSettings(config_dir_.toStdString(), &app_defaults);
     ensureSoundCommandIsAList(&settings);
-    std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tr_variant_serde::json().to_string(settings) << '\n';
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
@@ -213,11 +210,9 @@ Prefs::Prefs(QString config_dir)
         switch (Items[i].type)
         {
         case QMetaType::Int:
-            std::cerr << __FILE__ << ':' << __LINE__ << " key " << tr_quark_get_string_view(getKey(i)) << '\n';
-            if (auto const val = getValue<int64_t>(b))
+            if (auto const value = getValue<int64_t>(b); value)
             {
-                std::cerr << __FILE__ << ':' << __LINE__ << " ... got value " << *val << '\n';
-                values_[i].setValue(*val);
+                values_[i].setValue(*value);
             }
             break;
 

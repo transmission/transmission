@@ -5,8 +5,6 @@
 
 #include "PrefsDialog.h"
 
-#include <iostream>
-
 #include <cassert>
 #include <optional>
 
@@ -119,12 +117,10 @@ void PrefsDialog::linkEncryptionComboToPref(QComboBox* const w, int const key)
     {
         auto const blocker = QSignalBlocker{ w };
         auto const val = prefs_.get<int>(key);
-        std::cerr << __FILE__ << ':' << __LINE__ << " actual value is " << val << '\n';
         for (size_t i = 0; i < std::size(Items); ++i)
         {
             if (Items[i].first == val)
             {
-                std::cerr << __FILE__ << ':' << __LINE__ << " idx is " << i << '\n';
                 w->setCurrentIndex(i);
             }
         }
@@ -134,10 +130,8 @@ void PrefsDialog::linkEncryptionComboToPref(QComboBox* const w, int const key)
 
     auto const on_activated = [this, key](int const idx)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " activated -- idx is " << idx << '\n';
         if (0 <= idx && idx < static_cast<int>(std::size(Items)))
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " setting value to " << Items[idx].first << '\n';
             set(key, Items[idx].first);
         }
     };
