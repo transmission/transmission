@@ -108,7 +108,7 @@ void PrefsDialog::initAltSpeedDaysCombo(QComboBox* const w, int const key)
 
 void PrefsDialog::initEncryptionCombo(QComboBox* const w, int const key)
 {
-    static auto const Items = std::array<std::pair<int, QString>, 3U>{ {
+    static auto const Items = std::array<std::pair<tr_encryption_mode, QString>, 3U>{ {
         { TR_CLEAR_PREFERRED, tr("Allow encryption") },
         { TR_ENCRYPTION_PREFERRED, tr("Prefer encryption") },
         { TR_ENCRYPTION_REQUIRED, tr("Require encryption") },
