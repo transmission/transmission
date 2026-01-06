@@ -23,6 +23,321 @@ namespace libtransmission::api_compat
 {
 namespace
 {
+#define API_COMPAT_KEYS(X) \
+    X(TR_KEY_active_torrent_count_camel_APICOMPAT, "activeTorrentCount") /* rpc */ \
+    X(TR_KEY_activity_date_kebab_APICOMPAT, "activity-date") /* .resume */ \
+    X(TR_KEY_activity_date_camel_APICOMPAT, "activityDate") /* rpc */ \
+    X(TR_KEY_added_date_kebab_APICOMPAT, "added-date") /* .resume */ \
+    X(TR_KEY_added_date_camel_APICOMPAT, "addedDate") /* rpc */ \
+    X(TR_KEY_alt_speed_down_kebab_APICOMPAT, "alt-speed-down") /* gtk app, rpc, speed settings */ \
+    X(TR_KEY_alt_speed_enabled_kebab_APICOMPAT, "alt-speed-enabled") /* gtk app, rpc, speed settings */ \
+    X(TR_KEY_alt_speed_time_begin_kebab_APICOMPAT, "alt-speed-time-begin") /* rpc, speed settings */ \
+    X(TR_KEY_alt_speed_time_day_kebab_APICOMPAT, "alt-speed-time-day") /* rpc, speed settings */ \
+    X(TR_KEY_alt_speed_time_enabled_kebab_APICOMPAT, "alt-speed-time-enabled") /* rpc, speed settings */ \
+    X(TR_KEY_alt_speed_time_end_kebab_APICOMPAT, "alt-speed-time-end") /* rpc, speed settings */ \
+    X(TR_KEY_alt_speed_up_kebab_APICOMPAT, "alt-speed-up") /* gtk app, rpc, speed settings */ \
+    X(TR_KEY_announce_ip_kebab_APICOMPAT, "announce-ip") /* tr_session::Settings */ \
+    X(TR_KEY_announce_ip_enabled_kebab_APICOMPAT, "announce-ip-enabled") /* tr_session::Settings */ \
+    X(TR_KEY_announce_state_camel_APICOMPAT, "announceState") /* rpc */ \
+    X(TR_KEY_anti_brute_force_enabled_kebab_APICOMPAT, "anti-brute-force-enabled") /* rpc, rpc server settings */ \
+    X(TR_KEY_anti_brute_force_threshold_kebab_APICOMPAT, "anti-brute-force-threshold") /* rpc server settings */ \
+    X(TR_KEY_bandwidth_priority_kebab_APICOMPAT, "bandwidth-priority") /* .resume */ \
+    X(TR_KEY_bandwidth_priority_camel_APICOMPAT, "bandwidthPriority") /* rpc */ \
+    X(TR_KEY_bind_address_ipv4_kebab_APICOMPAT, "bind-address-ipv4") /* daemon, tr_session::Settings */ \
+    X(TR_KEY_bind_address_ipv6_kebab_APICOMPAT, "bind-address-ipv6") /* daemon, tr_session::Settings */ \
+    X(TR_KEY_blocklist_date_kebab_APICOMPAT, "blocklist-date") /* gtk app, qt app */ \
+    X(TR_KEY_blocklist_enabled_kebab_APICOMPAT, "blocklist-enabled") /* daemon, gtk app, rpc, tr_session::Settings */ \
+    X(TR_KEY_blocklist_size_kebab_APICOMPAT, "blocklist-size") /* rpc */ \
+    X(TR_KEY_blocklist_update_kebab_APICOMPAT, "blocklist-update") /* rpc */ \
+    X(TR_KEY_blocklist_updates_enabled_kebab_APICOMPAT, "blocklist-updates-enabled") /* gtk app, qt app */ \
+    X(TR_KEY_blocklist_url_kebab_APICOMPAT, "blocklist-url") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_bytes_completed_camel_APICOMPAT, "bytesCompleted") /* rpc */ \
+    X(TR_KEY_cache_size_mb_kebab_APICOMPAT, "cache-size-mb") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_client_is_choked_camel_APICOMPAT, "clientIsChoked") /* rpc */ \
+    X(TR_KEY_client_is_interested_camel_APICOMPAT, "clientIsInterested") /* rpc */ \
+    X(TR_KEY_client_name_camel_APICOMPAT, "clientName") /* rpc */ \
+    X(TR_KEY_compact_view_kebab_APICOMPAT, "compact-view") /* gtk app, qt app */ \
+    X(TR_KEY_config_dir_kebab_APICOMPAT, "config-dir") /* rpc */ \
+    X(TR_KEY_corrupt_ever_camel_APICOMPAT, "corruptEver") /* rpc */ \
+    X(TR_KEY_cumulative_stats_kebab_APICOMPAT, "cumulative-stats") /* rpc */ \
+    X(TR_KEY_current_stats_kebab_APICOMPAT, "current-stats") /* rpc */ \
+    X(TR_KEY_date_created_camel_APICOMPAT, "dateCreated") /* rpc */ \
+    X(TR_KEY_default_trackers_kebab_APICOMPAT, "default-trackers") /* daemon, rpc, tr_session::Settings */ \
+    X(TR_KEY_delete_local_data_kebab_APICOMPAT, "delete-local-data") /* rpc */ \
+    X(TR_KEY_desired_available_camel_APICOMPAT, "desiredAvailable") /* rpc */ \
+    X(TR_KEY_details_window_height_kebab_APICOMPAT, "details-window-height") /* gtk app */ \
+    X(TR_KEY_details_window_width_kebab_APICOMPAT, "details-window-width") /* gtk app */ \
+    X(TR_KEY_dht_enabled_kebab_APICOMPAT, "dht-enabled") /* daemon, rpc, tr_session::Settings */ \
+    X(TR_KEY_done_date_kebab_APICOMPAT, "done-date") /* .resume */ \
+    X(TR_KEY_done_date_camel_APICOMPAT, "doneDate") /* rpc */ \
+    X(TR_KEY_download_dir_kebab_APICOMPAT, "download-dir") /* daemon, gtk app, tr_session::Settings */ \
+    X(TR_KEY_download_dir_free_space_kebab_APICOMPAT, "download-dir-free-space") /* rpc */ \
+    X(TR_KEY_download_queue_enabled_kebab_APICOMPAT, "download-queue-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_download_queue_size_kebab_APICOMPAT, "download-queue-size") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_download_count_camel_APICOMPAT, "downloadCount") /* rpc */ \
+    X(TR_KEY_download_dir_camel_APICOMPAT, "downloadDir") /* rpc */ \
+    X(TR_KEY_download_limit_camel_APICOMPAT, "downloadLimit") /* rpc */ \
+    X(TR_KEY_download_limited_camel_APICOMPAT, "downloadLimited") /* rpc */ \
+    X(TR_KEY_download_speed_camel_APICOMPAT, "downloadSpeed") /* rpc */ \
+    X(TR_KEY_downloaded_bytes_kebab_APICOMPAT, "downloaded-bytes") /* stats.json */ \
+    X(TR_KEY_downloaded_bytes_camel_APICOMPAT, "downloadedBytes") /* rpc */ \
+    X(TR_KEY_downloaded_ever_camel_APICOMPAT, "downloadedEver") /* rpc */ \
+    X(TR_KEY_downloading_time_seconds_kebab_APICOMPAT, "downloading-time-seconds") /* .resume */ \
+    X(TR_KEY_edit_date_camel_APICOMPAT, "editDate") /* rpc */ \
+    X(TR_KEY_error_string_camel_APICOMPAT, "errorString") /* rpc */ \
+    X(TR_KEY_eta_idle_camel_APICOMPAT, "etaIdle") /* rpc */ \
+    X(TR_KEY_file_count_kebab_APICOMPAT, "file-count") /* rpc */ \
+    X(TR_KEY_file_stats_camel_APICOMPAT, "fileStats") /* rpc */ \
+    X(TR_KEY_files_added_kebab_APICOMPAT, "files-added") /* stats.json */ \
+    X(TR_KEY_files_unwanted_kebab_APICOMPAT, "files-unwanted") /* rpc */ \
+    X(TR_KEY_files_wanted_kebab_APICOMPAT, "files-wanted") /* rpc */ \
+    X(TR_KEY_files_added_camel_APICOMPAT, "filesAdded") /* rpc */ \
+    X(TR_KEY_filter_mode_kebab_APICOMPAT, "filter-mode") /* qt app */ \
+    X(TR_KEY_filter_text_kebab_APICOMPAT, "filter-text") /* qt app */ \
+    X(TR_KEY_filter_trackers_kebab_APICOMPAT, "filter-trackers") /* qt app */ \
+    X(TR_KEY_flag_str_camel_APICOMPAT, "flagStr") /* rpc */ \
+    X(TR_KEY_free_space_kebab_APICOMPAT, "free-space") /* rpc */ \
+    X(TR_KEY_from_cache_camel_APICOMPAT, "fromCache") /* rpc */ \
+    X(TR_KEY_from_dht_camel_APICOMPAT, "fromDht") /* rpc */ \
+    X(TR_KEY_from_incoming_camel_APICOMPAT, "fromIncoming") /* rpc */ \
+    X(TR_KEY_from_lpd_camel_APICOMPAT, "fromLpd") /* rpc */ \
+    X(TR_KEY_from_ltep_camel_APICOMPAT, "fromLtep") /* rpc */ \
+    X(TR_KEY_from_pex_camel_APICOMPAT, "fromPex") /* rpc */ \
+    X(TR_KEY_from_tracker_camel_APICOMPAT, "fromTracker") /* rpc */ \
+    X(TR_KEY_group_get_kebab_APICOMPAT, "group-get") /* rpc */ \
+    X(TR_KEY_group_set_kebab_APICOMPAT, "group-set") /* rpc */ \
+    X(TR_KEY_has_announced_camel_APICOMPAT, "hasAnnounced") /* rpc */ \
+    X(TR_KEY_has_scraped_camel_APICOMPAT, "hasScraped") /* rpc */ \
+    X(TR_KEY_hash_string_camel_APICOMPAT, "hashString") /* rpc */ \
+    X(TR_KEY_have_unchecked_camel_APICOMPAT, "haveUnchecked") /* rpc */ \
+    X(TR_KEY_have_valid_camel_APICOMPAT, "haveValid") /* rpc */ \
+    X(TR_KEY_honors_session_limits_camel_APICOMPAT, "honorsSessionLimits") /* rpc */ \
+    X(TR_KEY_idle_limit_kebab_APICOMPAT, "idle-limit") /* .resume */ \
+    X(TR_KEY_idle_mode_kebab_APICOMPAT, "idle-mode") /* .resume */ \
+    X(TR_KEY_idle_seeding_limit_kebab_APICOMPAT, "idle-seeding-limit") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_idle_seeding_limit_enabled_kebab_APICOMPAT, "idle-seeding-limit-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_incomplete_dir_kebab_APICOMPAT, "incomplete-dir") /* .resume, daemon, gtk app, rpc, tr_session::Settings */ \
+    X(TR_KEY_incomplete_dir_enabled_kebab_APICOMPAT, "incomplete-dir-enabled") /* daemon, rpc, tr_session::Settings */ \
+    X(TR_KEY_inhibit_desktop_hibernation_kebab_APICOMPAT, "inhibit-desktop-hibernation") /* gtk app, qt app */ \
+    X(TR_KEY_is_backup_camel_APICOMPAT, "isBackup") /* rpc */ \
+    X(TR_KEY_is_downloading_from_camel_APICOMPAT, "isDownloadingFrom") /* rpc */ \
+    X(TR_KEY_is_encrypted_camel_APICOMPAT, "isEncrypted") /* rpc */ \
+    X(TR_KEY_is_finished_camel_APICOMPAT, "isFinished") /* rpc */ \
+    X(TR_KEY_is_incoming_camel_APICOMPAT, "isIncoming") /* rpc */ \
+    X(TR_KEY_is_private_camel_APICOMPAT, "isPrivate") /* rpc */ \
+    X(TR_KEY_is_stalled_camel_APICOMPAT, "isStalled") /* rpc */ \
+    X(TR_KEY_is_utp_camel_APICOMPAT, "isUTP") /* rpc */ \
+    X(TR_KEY_is_uploading_to_camel_APICOMPAT, "isUploadingTo") /* rpc */ \
+    X(TR_KEY_last_announce_peer_count_camel_APICOMPAT, "lastAnnouncePeerCount") /* rpc */ \
+    X(TR_KEY_last_announce_result_camel_APICOMPAT, "lastAnnounceResult") /* rpc */ \
+    X(TR_KEY_last_announce_start_time_camel_APICOMPAT, "lastAnnounceStartTime") /* rpc */ \
+    X(TR_KEY_last_announce_succeeded_camel_APICOMPAT, "lastAnnounceSucceeded") /* rpc */ \
+    X(TR_KEY_last_announce_time_camel_APICOMPAT, "lastAnnounceTime") /* rpc */ \
+    X(TR_KEY_last_announce_timed_out_camel_APICOMPAT, "lastAnnounceTimedOut") /* rpc */ \
+    X(TR_KEY_last_scrape_result_camel_APICOMPAT, "lastScrapeResult") /* rpc */ \
+    X(TR_KEY_last_scrape_start_time_camel_APICOMPAT, "lastScrapeStartTime") /* rpc */ \
+    X(TR_KEY_last_scrape_succeeded_camel_APICOMPAT, "lastScrapeSucceeded") /* rpc */ \
+    X(TR_KEY_last_scrape_time_camel_APICOMPAT, "lastScrapeTime") /* rpc */ \
+    X(TR_KEY_last_scrape_timed_out_camel_APICOMPAT, "lastScrapeTimedOut") /* rpc */ \
+    X(TR_KEY_leecher_count_camel_APICOMPAT, "leecherCount") /* rpc */ \
+    X(TR_KEY_left_until_done_camel_APICOMPAT, "leftUntilDone") /* rpc */ \
+    X(TR_KEY_lpd_enabled_kebab_APICOMPAT, "lpd-enabled") /* daemon, rpc, tr_session::Settings */ \
+    X(TR_KEY_magnet_link_camel_APICOMPAT, "magnetLink") /* rpc */ \
+    X(TR_KEY_main_window_height_kebab_APICOMPAT, "main-window-height") /* gtk app, qt app */ \
+    X(TR_KEY_main_window_is_maximized_kebab_APICOMPAT, "main-window-is-maximized") /* gtk app */ \
+    X(TR_KEY_main_window_layout_order_kebab_APICOMPAT, "main-window-layout-order") /* qt app */ \
+    X(TR_KEY_main_window_width_kebab_APICOMPAT, "main-window-width") /* gtk app, qt app */ \
+    X(TR_KEY_main_window_x_kebab_APICOMPAT, "main-window-x") /* gtk app, qt app */ \
+    X(TR_KEY_main_window_y_kebab_APICOMPAT, "main-window-y") /* gtk app, qt app */ \
+    X(TR_KEY_manual_announce_time_camel_APICOMPAT, "manualAnnounceTime") /* rpc */ \
+    X(TR_KEY_max_peers_kebab_APICOMPAT, "max-peers") /* .resume */ \
+    X(TR_KEY_max_connected_peers_camel_APICOMPAT, "maxConnectedPeers") /* rpc */ \
+    X(TR_KEY_memory_bytes_kebab_APICOMPAT, "memory-bytes") /* rpc */ \
+    X(TR_KEY_memory_units_kebab_APICOMPAT, "memory-units") /* rpc */ \
+    X(TR_KEY_message_level_kebab_APICOMPAT, "message-level") /* daemon, gtk app, tr_session::Settings */ \
+    X(TR_KEY_metadata_percent_complete_camel_APICOMPAT, "metadataPercentComplete") /* rpc */ \
+    X(TR_KEY_next_announce_time_camel_APICOMPAT, "nextAnnounceTime") /* rpc */ \
+    X(TR_KEY_next_scrape_time_camel_APICOMPAT, "nextScrapeTime") /* rpc */ \
+    X(TR_KEY_open_dialog_dir_kebab_APICOMPAT, "open-dialog-dir") /* gtk app, qt app */ \
+    X(TR_KEY_paused_torrent_count_camel_APICOMPAT, "pausedTorrentCount") /* rpc */ \
+    X(TR_KEY_peer_congestion_algorithm_kebab_APICOMPAT, "peer-congestion-algorithm") /* tr_session::Settings */ \
+    X(TR_KEY_peer_limit_kebab_APICOMPAT, "peer-limit") /* rpc */ \
+    X(TR_KEY_peer_limit_global_kebab_APICOMPAT, "peer-limit-global") /* daemon, rpc, tr_session::Settings */ \
+    X(TR_KEY_peer_limit_per_torrent_kebab_APICOMPAT, \
+      "peer-limit-per-torrent") /* daemon, gtk app, rpc, tr_session::Settings */ \
+    X(TR_KEY_peer_port_kebab_APICOMPAT, "peer-port") /* daemon, gtk app, rpc, tr_session::Settings */ \
+    X(TR_KEY_peer_port_random_high_kebab_APICOMPAT, "peer-port-random-high") /* tr_session::Settings */ \
+    X(TR_KEY_peer_port_random_low_kebab_APICOMPAT, "peer-port-random-low") /* tr_session::Settings */ \
+    X(TR_KEY_peer_port_random_on_start_kebab_APICOMPAT, "peer-port-random-on-start") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_peer_socket_tos_kebab_APICOMPAT, "peer-socket-tos") /* tr_session::Settings */ \
+    X(TR_KEY_peer_is_choked_camel_APICOMPAT, "peerIsChoked") /* rpc */ \
+    X(TR_KEY_peer_is_interested_camel_APICOMPAT, "peerIsInterested") /* rpc */ \
+    X(TR_KEY_peers2_6_kebab_APICOMPAT, "peers2-6") /* .resume */ \
+    X(TR_KEY_peers_connected_camel_APICOMPAT, "peersConnected") /* rpc */ \
+    X(TR_KEY_peers_from_camel_APICOMPAT, "peersFrom") /* rpc */ \
+    X(TR_KEY_peers_getting_from_us_camel_APICOMPAT, "peersGettingFromUs") /* rpc */ \
+    X(TR_KEY_peers_sending_to_us_camel_APICOMPAT, "peersSendingToUs") /* rpc */ \
+    X(TR_KEY_percent_complete_camel_APICOMPAT, "percentComplete") /* rpc */ \
+    X(TR_KEY_percent_done_camel_APICOMPAT, "percentDone") /* rpc */ \
+    X(TR_KEY_pex_enabled_kebab_APICOMPAT, "pex-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_piece_count_camel_APICOMPAT, "pieceCount") /* rpc */ \
+    X(TR_KEY_piece_size_camel_APICOMPAT, "pieceSize") /* rpc */ \
+    X(TR_KEY_port_forwarding_enabled_kebab_APICOMPAT, "port-forwarding-enabled") /* daemon, rpc, tr_session::Settings */ \
+    X(TR_KEY_port_is_open_kebab_APICOMPAT, "port-is-open") /* rpc */ \
+    X(TR_KEY_port_test_kebab_APICOMPAT, "port-test") /* rpc */ \
+    X(TR_KEY_primary_mime_type_kebab_APICOMPAT, "primary-mime-type") /* rpc */ \
+    X(TR_KEY_priority_high_kebab_APICOMPAT, "priority-high") /* rpc */ \
+    X(TR_KEY_priority_low_kebab_APICOMPAT, "priority-low") /* rpc */ \
+    X(TR_KEY_priority_normal_kebab_APICOMPAT, "priority-normal") /* rpc */ \
+    X(TR_KEY_prompt_before_exit_kebab_APICOMPAT, "prompt-before-exit") /* qt app */ \
+    X(TR_KEY_queue_move_bottom_kebab_APICOMPAT, "queue-move-bottom") /* rpc */ \
+    X(TR_KEY_queue_move_down_kebab_APICOMPAT, "queue-move-down") /* rpc */ \
+    X(TR_KEY_queue_move_top_kebab_APICOMPAT, "queue-move-top") /* rpc */ \
+    X(TR_KEY_queue_move_up_kebab_APICOMPAT, "queue-move-up") /* rpc */ \
+    X(TR_KEY_queue_stalled_enabled_kebab_APICOMPAT, "queue-stalled-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_queue_stalled_minutes_kebab_APICOMPAT, "queue-stalled-minutes") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_queue_position_camel_APICOMPAT, "queuePosition") /* rpc */ \
+    X(TR_KEY_rate_download_camel_APICOMPAT, "rateDownload") /* rpc */ \
+    X(TR_KEY_rate_to_client_camel_APICOMPAT, "rateToClient") /* rpc */ \
+    X(TR_KEY_rate_to_peer_camel_APICOMPAT, "rateToPeer") /* rpc */ \
+    X(TR_KEY_rate_upload_camel_APICOMPAT, "rateUpload") /* rpc */ \
+    X(TR_KEY_ratio_limit_kebab_APICOMPAT, "ratio-limit") /* .resume, daemon, gtk app, tr_session::Settings */ \
+    X(TR_KEY_ratio_limit_enabled_kebab_APICOMPAT, "ratio-limit-enabled") /* daemon, tr_session::Settings */ \
+    X(TR_KEY_ratio_mode_kebab_APICOMPAT, "ratio-mode") /* .resume */ \
+    X(TR_KEY_read_clipboard_kebab_APICOMPAT, "read-clipboard") /* qt app */ \
+    X(TR_KEY_recently_active_kebab_APICOMPAT, "recently-active") /* rpc */ \
+    X(TR_KEY_recheck_progress_camel_APICOMPAT, "recheckProgress") /* rpc */ \
+    X(TR_KEY_remote_session_enabled_kebab_APICOMPAT, "remote-session-enabled") /* qt app */ \
+    X(TR_KEY_remote_session_host_kebab_APICOMPAT, "remote-session-host") /* qt app */ \
+    X(TR_KEY_remote_session_https_kebab_APICOMPAT, "remote-session-https") /* qt app */ \
+    X(TR_KEY_remote_session_password_kebab_APICOMPAT, "remote-session-password") /* qt app */ \
+    X(TR_KEY_remote_session_port_kebab_APICOMPAT, "remote-session-port") /* qt app */ \
+    X(TR_KEY_remote_session_requres_authentication_kebab_APICOMPAT, \
+      "remote-session-requres-authentication") /* SIC: misspelled prior to 4.1.0-beta.4; qt app */ \
+    X(TR_KEY_remote_session_username_kebab_APICOMPAT, "remote-session-username") /* qt app */ \
+    X(TR_KEY_rename_partial_files_kebab_APICOMPAT, "rename-partial-files") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_rpc_authentication_required_kebab_APICOMPAT, "rpc-authentication-required") /* daemon, rpc server settings */ \
+    X(TR_KEY_rpc_bind_address_kebab_APICOMPAT, "rpc-bind-address") /* daemon, rpc server settings */ \
+    X(TR_KEY_rpc_enabled_kebab_APICOMPAT, "rpc-enabled") /* daemon, rpc server settings */ \
+    X(TR_KEY_rpc_host_whitelist_kebab_APICOMPAT, "rpc-host-whitelist") /* rpc, rpc server settings */ \
+    X(TR_KEY_rpc_host_whitelist_enabled_kebab_APICOMPAT, "rpc-host-whitelist-enabled") /* rpc, rpc server settings */ \
+    X(TR_KEY_rpc_password_kebab_APICOMPAT, "rpc-password") /* daemon, rpc server settings */ \
+    X(TR_KEY_rpc_port_kebab_APICOMPAT, "rpc-port") /* daemon, gtk app, rpc server settings */ \
+    X(TR_KEY_rpc_socket_mode_kebab_APICOMPAT, "rpc-socket-mode") /* rpc server settings */ \
+    X(TR_KEY_rpc_url_kebab_APICOMPAT, "rpc-url") /* rpc server settings */ \
+    X(TR_KEY_rpc_username_kebab_APICOMPAT, "rpc-username") /* daemon, rpc server settings */ \
+    X(TR_KEY_rpc_version_kebab_APICOMPAT, "rpc-version") /* rpc */ \
+    X(TR_KEY_rpc_version_minimum_kebab_APICOMPAT, "rpc-version-minimum") /* rpc */ \
+    X(TR_KEY_rpc_version_semver_kebab_APICOMPAT, "rpc-version-semver") /* rpc */ \
+    X(TR_KEY_rpc_whitelist_kebab_APICOMPAT, "rpc-whitelist") /* daemon, gtk app, rpc server settings */ \
+    X(TR_KEY_rpc_whitelist_enabled_kebab_APICOMPAT, "rpc-whitelist-enabled") /* daemon, rpc server settings */ \
+    X(TR_KEY_scrape_paused_torrents_enabled_kebab_APICOMPAT, "scrape-paused-torrents-enabled") /* tr_session::Settings */ \
+    X(TR_KEY_scrape_state_camel_APICOMPAT, "scrapeState") /* rpc */ \
+    X(TR_KEY_script_torrent_added_enabled_kebab_APICOMPAT, "script-torrent-added-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_script_torrent_added_filename_kebab_APICOMPAT, "script-torrent-added-filename") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_script_torrent_done_enabled_kebab_APICOMPAT, "script-torrent-done-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_script_torrent_done_filename_kebab_APICOMPAT, "script-torrent-done-filename") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_script_torrent_done_seeding_enabled_kebab_APICOMPAT, \
+      "script-torrent-done-seeding-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_script_torrent_done_seeding_filename_kebab_APICOMPAT, \
+      "script-torrent-done-seeding-filename") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_seconds_active_kebab_APICOMPAT, "seconds-active") /* stats.json */ \
+    X(TR_KEY_seconds_active_camel_APICOMPAT, "secondsActive") /* rpc */ \
+    X(TR_KEY_seconds_downloading_camel_APICOMPAT, "secondsDownloading") /* rpc */ \
+    X(TR_KEY_seconds_seeding_camel_APICOMPAT, "secondsSeeding") /* rpc */ \
+    X(TR_KEY_seed_queue_enabled_kebab_APICOMPAT, "seed-queue-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_seed_queue_size_kebab_APICOMPAT, "seed-queue-size") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_seed_idle_limit_camel_APICOMPAT, "seedIdleLimit") /* rpc */ \
+    X(TR_KEY_seed_idle_mode_camel_APICOMPAT, "seedIdleMode") /* rpc */ \
+    X(TR_KEY_seed_ratio_limit_camel_APICOMPAT, "seedRatioLimit") /* rpc */ \
+    X(TR_KEY_seed_ratio_limited_camel_APICOMPAT, "seedRatioLimited") /* rpc */ \
+    X(TR_KEY_seed_ratio_mode_camel_APICOMPAT, "seedRatioMode") /* rpc */ \
+    X(TR_KEY_seeder_count_camel_APICOMPAT, "seederCount") /* rpc */ \
+    X(TR_KEY_seeding_time_seconds_kebab_APICOMPAT, "seeding-time-seconds") /* .resume */ \
+    X(TR_KEY_session_close_kebab_APICOMPAT, "session-close") /* rpc */ \
+    X(TR_KEY_session_count_kebab_APICOMPAT, "session-count") /* stats.json */ \
+    X(TR_KEY_session_get_kebab_APICOMPAT, "session-get") /* rpc */ \
+    X(TR_KEY_session_id_kebab_APICOMPAT, "session-id") /* rpc */ \
+    X(TR_KEY_session_set_kebab_APICOMPAT, "session-set") /* rpc */ \
+    X(TR_KEY_session_stats_kebab_APICOMPAT, "session-stats") /* rpc */ \
+    X(TR_KEY_session_count_camel_APICOMPAT, "sessionCount") /* rpc */ \
+    X(TR_KEY_show_backup_trackers_kebab_APICOMPAT, "show-backup-trackers") /* gtk app, qt app */ \
+    X(TR_KEY_show_extra_peer_details_kebab_APICOMPAT, "show-extra-peer-details") /* gtk app */ \
+    X(TR_KEY_show_filterbar_kebab_APICOMPAT, "show-filterbar") /* gtk app, qt app */ \
+    X(TR_KEY_show_notification_area_icon_kebab_APICOMPAT, "show-notification-area-icon") /* gtk app, qt app */ \
+    X(TR_KEY_show_options_window_kebab_APICOMPAT, "show-options-window") /* gtk app, qt app */ \
+    X(TR_KEY_show_statusbar_kebab_APICOMPAT, "show-statusbar") /* gtk app, qt app */ \
+    X(TR_KEY_show_toolbar_kebab_APICOMPAT, "show-toolbar") /* gtk app, qt app */ \
+    X(TR_KEY_show_tracker_scrapes_kebab_APICOMPAT, "show-tracker-scrapes") /* gtk app, qt app */ \
+    X(TR_KEY_size_bytes_kebab_APICOMPAT, "size-bytes") /* rpc */ \
+    X(TR_KEY_size_units_kebab_APICOMPAT, "size-units") /* rpc */ \
+    X(TR_KEY_size_when_done_camel_APICOMPAT, "sizeWhenDone") /* rpc */ \
+    X(TR_KEY_sleep_per_seconds_during_verify_kebab_APICOMPAT, "sleep-per-seconds-during-verify") /* tr_session::Settings */ \
+    X(TR_KEY_sort_mode_kebab_APICOMPAT, "sort-mode") /* gtk app, qt app */ \
+    X(TR_KEY_sort_reversed_kebab_APICOMPAT, "sort-reversed") /* gtk app, qt app */ \
+    X(TR_KEY_speed_Bps_kebab_APICOMPAT, "speed-Bps") /* .resume */ \
+    X(TR_KEY_speed_bytes_kebab_APICOMPAT, "speed-bytes") /* rpc */ \
+    X(TR_KEY_speed_limit_down_kebab_APICOMPAT, "speed-limit-down") /* .resume, gtk app, rpc, tr_session::Settings */ \
+    X(TR_KEY_speed_limit_down_enabled_kebab_APICOMPAT, "speed-limit-down-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_speed_limit_up_kebab_APICOMPAT, "speed-limit-up") /* .resume, gtk app, rpc, tr_session::Settings */ \
+    X(TR_KEY_speed_limit_up_enabled_kebab_APICOMPAT, "speed-limit-up-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_speed_units_kebab_APICOMPAT, "speed-units") /* rpc */ \
+    X(TR_KEY_start_added_torrents_kebab_APICOMPAT, "start-added-torrents") /* gtk app, rpc, tr_session::Settings */ \
+    X(TR_KEY_start_minimized_kebab_APICOMPAT, "start-minimized") /* qt app */ \
+    X(TR_KEY_start_date_camel_APICOMPAT, "startDate") /* rpc */ \
+    X(TR_KEY_statusbar_stats_kebab_APICOMPAT, "statusbar-stats") /* gtk app, qt app */ \
+    X(TR_KEY_tcp_enabled_kebab_APICOMPAT, "tcp-enabled") /* rpc, tr_session::Settings */ \
+    X(TR_KEY_time_checked_kebab_APICOMPAT, "time-checked") /* .resume */ \
+    X(TR_KEY_torrent_add_kebab_APICOMPAT, "torrent-add") /* rpc */ \
+    X(TR_KEY_torrent_added_kebab_APICOMPAT, "torrent-added") /* rpc */ \
+    X(TR_KEY_torrent_added_notification_enabled_kebab_APICOMPAT, "torrent-added-notification-enabled") /* gtk app, qt app */ \
+    X(TR_KEY_torrent_added_verify_mode_kebab_APICOMPAT, "torrent-added-verify-mode") /* tr_session::Settings */ \
+    X(TR_KEY_torrent_complete_notification_enabled_kebab_APICOMPAT, \
+      "torrent-complete-notification-enabled") /* gtk app, qt app */ \
+    X(TR_KEY_torrent_complete_sound_command_kebab_APICOMPAT, "torrent-complete-sound-command") /* gtk app, qt app */ \
+    X(TR_KEY_torrent_complete_sound_enabled_kebab_APICOMPAT, "torrent-complete-sound-enabled") /* gtk app, qt app */ \
+    X(TR_KEY_torrent_duplicate_kebab_APICOMPAT, "torrent-duplicate") /* rpc */ \
+    X(TR_KEY_torrent_reannounce_kebab_APICOMPAT, "torrent-reannounce") /* rpc */ \
+    X(TR_KEY_torrent_remove_kebab_APICOMPAT, "torrent-remove") /* rpc */ \
+    X(TR_KEY_torrent_rename_path_kebab_APICOMPAT, "torrent-rename-path") /* rpc */ \
+    X(TR_KEY_torrent_set_kebab_APICOMPAT, "torrent-set") /* rpc */ \
+    X(TR_KEY_torrent_set_location_kebab_APICOMPAT, "torrent-set-location") /* rpc */ \
+    X(TR_KEY_torrent_start_kebab_APICOMPAT, "torrent-start") /* rpc */ \
+    X(TR_KEY_torrent_start_now_kebab_APICOMPAT, "torrent-start-now") /* rpc */ \
+    X(TR_KEY_torrent_stop_kebab_APICOMPAT, "torrent-stop") /* rpc */ \
+    X(TR_KEY_torrent_verify_kebab_APICOMPAT, "torrent-verify") /* rpc */ \
+    X(TR_KEY_torrent_count_camel_APICOMPAT, "torrentCount") /* rpc */ \
+    X(TR_KEY_torrent_file_camel_APICOMPAT, "torrentFile") /* rpc */ \
+    X(TR_KEY_total_size_camel_APICOMPAT, "totalSize") /* rpc */ \
+    X(TR_KEY_tracker_add_camel_APICOMPAT, "trackerAdd") /* rpc */ \
+    X(TR_KEY_tracker_list_camel_APICOMPAT, "trackerList") /* rpc */ \
+    X(TR_KEY_tracker_remove_camel_APICOMPAT, "trackerRemove") /* rpc */ \
+    X(TR_KEY_tracker_replace_camel_APICOMPAT, "trackerReplace") /* rpc */ \
+    X(TR_KEY_tracker_stats_camel_APICOMPAT, "trackerStats") /* rpc */ \
+    X(TR_KEY_trash_can_enabled_kebab_APICOMPAT, "trash-can-enabled") /* gtk app */ \
+    X(TR_KEY_trash_original_torrent_files_kebab_APICOMPAT, \
+      "trash-original-torrent-files") /* gtk app, rpc, tr_session::Settings */ \
+    X(TR_KEY_upload_slots_per_torrent_kebab_APICOMPAT, "upload-slots-per-torrent") /* tr_session::Settings */ \
+    X(TR_KEY_upload_limit_camel_APICOMPAT, "uploadLimit") /* rpc */ \
+    X(TR_KEY_upload_limited_camel_APICOMPAT, "uploadLimited") /* rpc */ \
+    X(TR_KEY_upload_ratio_camel_APICOMPAT, "uploadRatio") /* rpc */ \
+    X(TR_KEY_upload_speed_camel_APICOMPAT, "uploadSpeed") /* rpc */ \
+    X(TR_KEY_uploaded_bytes_kebab_APICOMPAT, "uploaded-bytes") /* stats.json */ \
+    X(TR_KEY_uploaded_bytes_camel_APICOMPAT, "uploadedBytes") /* rpc */ \
+    X(TR_KEY_uploaded_ever_camel_APICOMPAT, "uploadedEver") /* rpc */ \
+    X(TR_KEY_use_global_speed_limit_kebab_APICOMPAT, "use-global-speed-limit") /* .resume */ \
+    X(TR_KEY_use_speed_limit_kebab_APICOMPAT, "use-speed-limit") /* .resume */ \
+    X(TR_KEY_utp_enabled_kebab_APICOMPAT, "utp-enabled") /* daemon, rpc, tr_session::Settings */ \
+    X(TR_KEY_watch_dir_kebab_APICOMPAT, "watch-dir") /* daemon, gtk app, qt app */ \
+    X(TR_KEY_watch_dir_enabled_kebab_APICOMPAT, "watch-dir-enabled") /* daemon, gtk app, qt app */ \
+    X(TR_KEY_watch_dir_force_generic_kebab_APICOMPAT, "watch-dir-force-generic") /* daemon */ \
+    X(TR_KEY_webseeds_sending_to_us_camel_APICOMPAT, "webseedsSendingToUs") /* rpc */
+
+// NOLINTNEXTLINE(bugprone-macro-parentheses)
+#define MAKE_API_COMPAT_KEY(_key, _str) constexpr auto _key = transmission::symbol::known(_str);
+API_COMPAT_KEYS(MAKE_API_COMPAT_KEY)
+#undef MAKE_API_COMPAT_KEY
+
 struct ApiKey
 {
     // snake-case quark
@@ -1031,5 +1346,16 @@ void convert_outgoing_data(tr_variant& var)
 void convert_incoming_data(tr_variant& var)
 {
     convert(var, Style::Tr5);
+}
+
+void register_deprecated_keys()
+{
+    using namespace transmission::symbol;
+    auto const keys = std::vector<tr_quark>{
+#define KEY_NAME(_key, _str) _key,
+        API_COMPAT_KEYS(KEY_NAME)
+#undef KEY_NAME
+    };
+    StringInterner::instance().add_known(std::data(keys), std::size(keys));
 }
 } // namespace libtransmission::api_compat
