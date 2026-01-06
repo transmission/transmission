@@ -35,6 +35,8 @@ jobs:
             macosx/Info.plist
             macosx/Info.plist.in
             macosx/*/InfoPlist.strings
+            macosx/QuickLookExtension/Info.plist
+            macosx/QuickLookExtension/Info.plist.in
             macosx/QuickLookPlugin/Info.plist.in
             macosx/QuickLookPlugin/QuickLookPlugin-Info.plist
           transform: (?<=Copyright © )(?<from>\d{4})?[-–]?(\d{4})
