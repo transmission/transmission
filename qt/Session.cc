@@ -82,6 +82,10 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
         dictAdd(&args, key, value.toString());
         break;
 
+    case CustomVariantType::EncryptionModeType:
+        *tr_variantDictAdd(&args, key) = to_variant(value.value<tr_encryption_mode>());
+        break;
+
     default:
         assert(false);
     }
@@ -182,6 +186,7 @@ void Session::updatePref(int key)
         case Prefs::DOWNLOAD_QUEUE_SIZE:
         case Prefs::DSPEED:
         case Prefs::DSPEED_ENABLED:
+        case Prefs::ENCRYPTION:
         case Prefs::IDLE_LIMIT:
         case Prefs::IDLE_LIMIT_ENABLED:
         case Prefs::INCOMPLETE_DIR:
@@ -219,27 +224,6 @@ void Session::updatePref(int key)
 
         case Prefs::RATIO_ENABLED:
             sessionSet(TR_KEY_seed_ratio_limited, prefs_.variant(key));
-            break;
-
-        case Prefs::ENCRYPTION:
-            switch (int const i = prefs_.variant(key).toInt(); i)
-            {
-            case 0:
-                sessionSet(prefs_.getKey(key), QStringLiteral("tolerated"));
-                break;
-
-            case 1:
-                sessionSet(prefs_.getKey(key), QStringLiteral("preferred"));
-                break;
-
-            case 2:
-                sessionSet(prefs_.getKey(key), QStringLiteral("required"));
-                break;
-
-            default:
-                break;
-            }
-
             break;
 
         case Prefs::RPC_AUTH_REQUIRED:
@@ -910,27 +894,6 @@ void Session::updateInfo(tr_variant* args_dict)
             continue;
         }
 
-        if (i == Prefs::ENCRYPTION)
-        {
-            if (auto const str = getValue<QString>(b); str)
-            {
-                if (*str == QStringLiteral("required"))
-                {
-                    prefs_.set(i, 2);
-                }
-                else if (*str == QStringLiteral("preferred"))
-                {
-                    prefs_.set(i, 1);
-                }
-                else if (*str == QStringLiteral("tolerated"))
-                {
-                    prefs_.set(i, 0);
-                }
-            }
-
-            continue;
-        }
-
         switch (prefs_.type(i))
         {
         case QMetaType::Int:
@@ -957,16 +920,8 @@ void Session::updateInfo(tr_variant* args_dict)
 
             break;
 
-        case CustomVariantType::ShowModeType:
-            if (auto const val = to_value<ShowMode>(*b))
-            {
-                prefs_.set(i, *val);
-            }
-
-            break;
-
-        case CustomVariantType::SortModeType:
-            if (auto const val = to_value<SortMode>(*b))
+        case CustomVariantType::EncryptionModeType:
+            if (auto const val = to_value<tr_encryption_mode>(*b))
             {
                 prefs_.set(i, *val);
             }
