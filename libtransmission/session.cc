@@ -2099,13 +2099,6 @@ int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
     return session->rpc_server_->get_anti_brute_force_limit();
 }
 
-void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
-{
-    TR_ASSERT(session != nullptr);
-
-    session->rpc_server_->set_anti_brute_force_enabled(is_enabled);
-}
-
 bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);

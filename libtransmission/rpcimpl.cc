@@ -2137,7 +2137,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         {
             if (auto const val = src.value_if<bool>())
             {
-                tr_sessionSetAntiBruteForceEnabled(&tgt, *val);
+                tgt.set_anti_brute_force_enabled(*val);
             }
         });
 
