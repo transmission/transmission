@@ -2143,7 +2143,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_anti_brute_force_threshold,
-        [](tr_session const& src) -> tr_variant { return tr_sessionGetAntiBruteForceThreshold(&src); },
+        [](tr_session const& src) -> tr_variant { return src.get_anti_brute_force_limit(); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())

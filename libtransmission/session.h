@@ -1083,6 +1083,11 @@ public:
         return TR_RPC_OK;
     }
 
+    [[nodiscard]] TR_CONSTEXPR23 auto get_anti_brute_force_limit() const noexcept
+    {
+        return rpc_server_->get_anti_brute_force_limit();
+    }
+
     TR_CONSTEXPR23 void set_anti_brute_force_limit(size_t const limit) noexcept
     {
         rpc_server_->set_anti_brute_force_limit(limit);
@@ -1261,7 +1266,6 @@ private:
     friend char const* tr_sessionGetRPCPassword(tr_session const* session);
     friend char const* tr_sessionGetRPCUsername(tr_session const* session);
     friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
-    friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend size_t tr_sessionGetAltSpeedBegin(tr_session const* session);

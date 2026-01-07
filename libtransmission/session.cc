@@ -2084,15 +2084,6 @@ size_t tr_sessionGetQueueStalledMinutes(tr_session const* session)
 
 // ---
 
-int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    return session->rpc_server_->get_anti_brute_force_limit();
-}
-
-// ---
-
 void tr_session::verify_remove(tr_torrent const* const tor)
 {
     if (verifier_)
