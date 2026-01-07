@@ -487,7 +487,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_remote_session_password,
     TR_KEY_remote_session_port,
     TR_KEY_remote_session_requires_authentication,
-    TR_KEY_remote_session_rpc_url_path,
+    TR_KEY_remote_session_url_base_path,
     TR_KEY_remote_session_username,
     TR_KEY_removed,
     TR_KEY_rename_partial_files_kebab_APICOMPAT,
