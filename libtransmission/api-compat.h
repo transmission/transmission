@@ -21,4 +21,6 @@ void convert(tr_variant& var, Style tgt_style);
 void convert_incoming_data(tr_variant& var);
 void convert_outgoing_data(tr_variant& var);
 
+void register_deprecated_keys();
+
 } // namespace libtransmission::api_compat
