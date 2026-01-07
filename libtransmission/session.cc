@@ -2099,13 +2099,6 @@ int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
     return session->rpc_server_->get_anti_brute_force_limit();
 }
 
-bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    return session->rpc_server_->is_anti_brute_force_enabled();
-}
-
 // ---
 
 void tr_session::verify_remove(tr_torrent const* const tor)

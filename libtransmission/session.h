@@ -1083,6 +1083,11 @@ public:
         return TR_RPC_OK;
     }
 
+    [[nodiscard]] TR_CONSTEXPR23 auto is_anti_brute_force_enabled() const noexcept
+    {
+        return rpc_server_->is_anti_brute_force_enabled();
+    }
+
     void set_anti_brute_force_enabled(bool const enabled) noexcept
     {
         rpc_server_->set_anti_brute_force_enabled(enabled);
@@ -1243,7 +1248,6 @@ private:
     friend class libtransmission::test::SessionTest;
 
     friend bool tr_blocklistExists(tr_session const* session);
-    friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
     friend bool tr_sessionIsPortForwardingEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
