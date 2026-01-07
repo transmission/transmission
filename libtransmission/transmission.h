@@ -145,6 +145,10 @@ inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
 inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
 
+inline auto constexpr TrHttpServerDefaultBasePath = std::string_view{ TR_DEFAULT_RPC_URL_STR };
+inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc" };
+inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/" };
+
 std::unique_lock<std::recursive_mutex> tr_sessionLock(tr_session const* session);
 
 /**
