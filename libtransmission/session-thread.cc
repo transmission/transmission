@@ -224,8 +224,7 @@ public:
     }
 
 private:
-    using callback = std::function<void(void)>;
-    using work_queue_t = std::list<callback>;
+    using work_queue_t = std::list<std::function<void(void)>>;
 
     void session_thread_func(struct event_base* evbase)
     {

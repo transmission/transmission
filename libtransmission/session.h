@@ -268,7 +268,7 @@ private:
         [[nodiscard]] std::optional<std::string> proxyUrl() const override;
         [[nodiscard]] time_t now() const override;
         // runs the tr_web::fetch response callback in the libtransmission thread
-        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
+        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse const& response) const override;
 
     private:
         tr_session* const session_;

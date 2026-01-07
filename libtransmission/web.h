@@ -160,7 +160,7 @@ public:
         }
 
         // Invoke the user-provided fetch callback
-        virtual void run(FetchDoneFunc&& func, FetchResponse&& response) const
+        virtual void run(FetchDoneFunc&& func, FetchResponse const& response) const
         {
             func(response);
         }

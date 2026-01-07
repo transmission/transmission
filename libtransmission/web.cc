@@ -376,7 +376,7 @@ public:
                 return;
             }
 
-            impl.mediator.run(std::move(options_.done_func), std::move(this->response));
+            impl.mediator.run(std::move(options_.done_func), response);
             options_.done_func = {};
         }
 

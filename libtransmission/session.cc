@@ -356,9 +356,9 @@ std::optional<std::string> tr_session::WebMediator::proxyUrl() const
     return session_->settings().proxy_url;
 }
 
-void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
+void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse const& response) const
 {
-    session_->run_in_session_thread(std::move(func), std::move(response));
+    session_->run_in_session_thread(std::move(func), response);
 }
 
 time_t tr_session::WebMediator::now() const
