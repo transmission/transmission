@@ -110,7 +110,7 @@
       <item row="7" column="0">
        <widget class="QLabel" name="rpcLabel">
         <property name="text">
-         <string>RPC URL pa&amp;th:</string>
+         <string>Remote root pa&amp;th:</string>
         </property>
         <property name="buddy">
          <cstring>rpcEdit</cstring>
