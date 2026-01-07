@@ -174,7 +174,7 @@ public:
         return settings_.anti_brute_force_limit;
     }
 
-    constexpr void set_anti_brute_force_limit(int limit) noexcept
+    constexpr void set_anti_brute_force_limit(size_t limit) noexcept
     {
         settings_.anti_brute_force_limit = limit;
     }

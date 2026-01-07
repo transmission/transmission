@@ -1083,6 +1083,11 @@ public:
         return TR_RPC_OK;
     }
 
+    TR_CONSTEXPR23 void set_anti_brute_force_limit(size_t const limit) noexcept
+    {
+        rpc_server_->set_anti_brute_force_limit(limit);
+    }
+
     [[nodiscard]] TR_CONSTEXPR23 auto is_anti_brute_force_enabled() const noexcept
     {
         return rpc_server_->is_anti_brute_force_enabled();
@@ -1282,7 +1287,6 @@ private:
     friend void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight);
     friend void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data);
     friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, size_t limit_kbyps);
-    friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
     friend void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes);
     friend void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);

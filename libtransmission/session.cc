@@ -2084,14 +2084,6 @@ size_t tr_sessionGetQueueStalledMinutes(tr_session const* session)
 
 // ---
 
-void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests)
-{
-    TR_ASSERT(session != nullptr);
-    TR_ASSERT(max_bad_requests > 0);
-
-    session->rpc_server_->set_anti_brute_force_limit(max_bad_requests);
-}
-
 int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);

@@ -2148,7 +2148,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         {
             if (auto const val = src.value_if<int64_t>())
             {
-                tr_sessionSetAntiBruteForceThreshold(&tgt, static_cast<int>(*val));
+                tgt.set_anti_brute_force_limit(static_cast<size_t>(*val));
             }
         });
 
