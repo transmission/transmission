@@ -2132,23 +2132,23 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_anti_brute_force_enabled,
-        [](tr_session const& src) -> tr_variant { return tr_sessionGetAntiBruteForceEnabled(&src); },
+        [](tr_session const& src) -> tr_variant { return src.is_anti_brute_force_enabled(); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<bool>())
             {
-                tr_sessionSetAntiBruteForceEnabled(&tgt, *val);
+                tgt.set_anti_brute_force_enabled(*val);
             }
         });
 
     map.try_emplace(
         TR_KEY_anti_brute_force_threshold,
-        [](tr_session const& src) -> tr_variant { return tr_sessionGetAntiBruteForceThreshold(&src); },
+        [](tr_session const& src) -> tr_variant { return src.get_anti_brute_force_limit(); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())
             {
-                tr_sessionSetAntiBruteForceThreshold(&tgt, static_cast<int>(*val));
+                tgt.set_anti_brute_force_limit(static_cast<size_t>(*val));
             }
         });
 
