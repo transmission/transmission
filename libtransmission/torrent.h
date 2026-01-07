@@ -875,7 +875,7 @@ struct tr_torrent
         return idle_limit_minutes_;
     }
 
-    [[nodiscard]] constexpr std::optional<size_t> idle_seconds(time_t now) const noexcept
+    [[nodiscard]] constexpr std::optional<time_t> idle_seconds(time_t now) const noexcept
     {
         auto const activity = this->activity();
 
@@ -883,7 +883,7 @@ struct tr_torrent
         {
             if (auto const latest = std::max(date_started_, date_active_); latest != 0)
             {
-                return static_cast<size_t>(std::max(now - latest, time_t{ 0 }));
+                return std::max(now - latest, time_t{ 0 });
             }
         }
 
@@ -1214,8 +1214,8 @@ private:
             return {};
         }
 
-        auto const idle_limit_seconds = size_t{ *idle_limit_minutes } * 60U;
-        return idle_limit_seconds > *idle_seconds ? idle_limit_seconds - *idle_seconds : 0U;
+        auto const idle_limit_seconds = static_cast<time_t>(*idle_limit_minutes * 60U);
+        return idle_limit_seconds > *idle_seconds ? idle_limit_seconds - *idle_seconds : time_t{ 0U };
     }
 
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
