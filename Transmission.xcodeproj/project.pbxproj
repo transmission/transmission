@@ -473,6 +473,10 @@
 		EDBA62002D4180D5001470F8 /* torrent-queue.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDBA61FE2D4180D5001470F8 /* torrent-queue.cc */; };
 		EDBAAC8C29E486BC00D9495F /* ip-cache.h in Headers */ = {isa = PBXBuildFile; fileRef = EDBAAC8B29E486BC00D9495F /* ip-cache.h */; };
 		EDBAAC8E29E486C200D9495F /* ip-cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDBAAC8D29E486C200D9495F /* ip-cache.cc */; };
+		EDBBE7692F0FF05500E90EA1 /* peer-socket-tcp.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDBBE7662F0FF05500E90EA1 /* peer-socket-tcp.cc */; };
+		EDBBE76A2F0FF05500E90EA1 /* peer-socket-utp.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDBBE7682F0FF05500E90EA1 /* peer-socket-utp.cc */; };
+		EDBBE76B2F0FF05500E90EA1 /* peer-socket-tcp.h in Headers */ = {isa = PBXBuildFile; fileRef = EDBBE7652F0FF05500E90EA1 /* peer-socket-tcp.h */; };
+		EDBBE76C2F0FF05500E90EA1 /* peer-socket-utp.h in Headers */ = {isa = PBXBuildFile; fileRef = EDBBE7672F0FF05500E90EA1 /* peer-socket-utp.h */; };
 		EDBDFA9E25AFCCA60093D9C1 /* evutil_time.c in Sources */ = {isa = PBXBuildFile; fileRef = EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */; };
 		EDC37BCD2EE9C2AD001E2612 /* api-compat.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDC37BCC2EE9C2AD001E2612 /* api-compat.cc */; };
 		EDC37BCE2EE9C2AD001E2612 /* api-compat.h in Headers */ = {isa = PBXBuildFile; fileRef = EDC37BCB2EE9C2AD001E2612 /* api-compat.h */; };
@@ -1464,6 +1468,10 @@
 		EDBA61FE2D4180D5001470F8 /* torrent-queue.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-queue.cc"; sourceTree = "<group>"; };
 		EDBAAC8B29E486BC00D9495F /* ip-cache.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "ip-cache.h"; sourceTree = "<group>"; };
 		EDBAAC8D29E486C200D9495F /* ip-cache.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "ip-cache.cc"; sourceTree = "<group>"; };
+		EDBBE7652F0FF05500E90EA1 /* peer-socket-tcp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "peer-socket-tcp.h"; sourceTree = "<group>"; };
+		EDBBE7662F0FF05500E90EA1 /* peer-socket-tcp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-socket-tcp.cc"; sourceTree = "<group>"; };
+		EDBBE7672F0FF05500E90EA1 /* peer-socket-utp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "peer-socket-utp.h"; sourceTree = "<group>"; };
+		EDBBE7682F0FF05500E90EA1 /* peer-socket-utp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-socket-utp.cc"; sourceTree = "<group>"; };
 		EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = evutil_time.c; sourceTree = "<group>"; };
 		EDC37BCB2EE9C2AD001E2612 /* api-compat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "api-compat.h"; sourceTree = "<group>"; };
 		EDC37BCC2EE9C2AD001E2612 /* api-compat.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "api-compat.cc"; sourceTree = "<group>"; };
@@ -1987,6 +1995,10 @@
 				4D36BA610CA2F00800A63CA5 /* peer-mse.h */,
 				4D36BA6A0CA2F00800A63CA5 /* peer-msgs.cc */,
 				4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */,
+				EDBBE7652F0FF05500E90EA1 /* peer-socket-tcp.h */,
+				EDBBE7662F0FF05500E90EA1 /* peer-socket-tcp.cc */,
+				EDBBE7672F0FF05500E90EA1 /* peer-socket-utp.h */,
+				EDBBE7682F0FF05500E90EA1 /* peer-socket-utp.cc */,
 				C1425B381EE9C805001DB851 /* peer-socket.h */,
 				C1425B381EE9C805001DB853 /* peer-socket.cc */,
 				BEFC1E030C07861A00B0BB3C /* platform.cc */,
@@ -2553,6 +2565,8 @@
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
 				CCEBA596277340F6DF9F4482 /* session-alt-speeds.h in Headers */,
 				BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */,
+				EDBBE76B2F0FF05500E90EA1 /* peer-socket-tcp.h in Headers */,
+				EDBBE76C2F0FF05500E90EA1 /* peer-socket-utp.h in Headers */,
 				BEFC1E520C07861A00B0BB3C /* open-files.h in Headers */,
 				BEFC1E550C07861A00B0BB3C /* completion.h in Headers */,
 				BEFC1E570C07861A00B0BB3C /* clients.h in Headers */,
@@ -3378,6 +3392,8 @@
 				9F0B1F332E4D1A0100A1B2C3 /* env.cc in Sources */,
 				9F0B1F342E4D1A0100A1B2C3 /* file-utils.cc in Sources */,
 				9F0B1F352E4D1A0100A1B2C3 /* string-utils.cc in Sources */,
+				EDBBE7692F0FF05500E90EA1 /* peer-socket-tcp.cc in Sources */,
+				EDBBE76A2F0FF05500E90EA1 /* peer-socket-utp.cc in Sources */,
 				A2AAB65F0DE0CF6200E04DDA /* rpcimpl.cc in Sources */,
 				EDBAAC8E29E486C200D9495F /* ip-cache.cc in Sources */,
 				BEFC1E2D0C07861A00B0BB3C /* port-forwarding-upnp.cc in Sources */,
