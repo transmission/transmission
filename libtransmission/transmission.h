@@ -129,7 +129,6 @@ inline auto constexpr TrDefaultRpcPort = 9091U;
 inline auto constexpr TrDefaultPeerPort = 51413U;
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "le"
 inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
-#define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
 inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
 
 inline auto constexpr TrHttpServerDefaultBasePath = std::string_view{ "/transmission/" };
