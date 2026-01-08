@@ -50,6 +50,9 @@ sig_atomic_t manualUpdate = false;
 char const* torrentPath = nullptr;
 
 auto const peer_port_desc = fmt::format("Port for incoming peers (Default: {:d})", TrDefaultPeerPort);
+auto const tos_desc = fmt::format(
+    "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0'. default={:s})",
+    TrDefaultPeerSocketTos);
 
 using Arg = tr_option::Arg;
 auto const options = std::array<tr_option, 20>{ {
@@ -65,13 +68,7 @@ auto const options = std::array<tr_option, 20>{ {
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
     { 'p', "port", peer_port_desc.c_str(), "p", Arg::Required, "<port>" },
-    { 't',
-      "tos",
-      "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0', default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
-      ")",
-      "t",
-      Arg::Required,
-      "<dscp-or-tos>" },
+    { 't', "tos", tos_desc.c_str(), "t", Arg::Required, "<dscp-or-tos>" },
     { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", Arg::Required, "<speed>" },
     { 'U', "no-uplimit", "Don't limit the upload speed", "U", Arg::None, nullptr },
     { 'v', "verify", "Verify the specified torrent", "v", Arg::None, nullptr },
