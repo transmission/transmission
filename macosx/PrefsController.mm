@@ -138,9 +138,11 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
             NSURL* blocklistDir = [[NSFileManager.defaultManager URLsForDirectory:NSApplicationDirectory inDomains:NSUserDomainMask][0]
                 URLByAppendingPathComponent:@"Transmission/blocklists/"];
-            [NSFileManager.defaultManager moveItemAtURL:[blocklistDir URLByAppendingPathComponent:@"level1.bin"]
-                                                  toURL:[blocklistDir URLByAppendingPathComponent:@DEFAULT_BLOCKLIST_FILENAME]
-                                                  error:nil];
+            [NSFileManager.defaultManager
+                moveItemAtURL:[blocklistDir URLByAppendingPathComponent:@"level1.bin"]
+                        toURL:[blocklistDir
+                                  URLByAppendingPathComponent:[NSString stringWithUTF8String:TrDefaultBlocklistFilename.data()]]
+                        error:nil];
         }
 
         //save a new random port
