@@ -83,6 +83,7 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
 auto const rpc_port_desc = fmt::format("RPC port (Default: {:d})", TrDefaultRpcPort);
 auto const peer_port_desc = fmt::format("Port for incoming peers (Default: {:d})", TrDefaultPeerPort);
 auto const global_peer_desc = fmt::format("Maximum overall number of peers (Default: {:d})", TrDefaultPeerLimitGlobal);
+auto const peers_tor_desc = fmt::format("Maximum number of peers per torrent (Default: {:d})", TrDefaultPeerLimitTorrent);
 
 using Arg = tr_option::Arg;
 auto const options = std::array<tr_option, 48>{ {
@@ -131,12 +132,7 @@ auto const options = std::array<tr_option, 48>{ {
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
     { 'L', "peerlimit-global", global_peer_desc.c_str(), "L", Arg::Required, "<limit>" },
-    { 'l',
-      "peerlimit-torrent",
-      "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")",
-      "l",
-      Arg::Required,
-      "<limit>" },
+    { 'l', "peerlimit-torrent", peers_tor_desc.c_str(), "l", Arg::Required, "<limit>" },
     { 910, "encryption-required", "Encrypt all peer connections", "er", Arg::None, nullptr },
     { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", Arg::None, nullptr },
     { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", Arg::None, nullptr },
