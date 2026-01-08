@@ -80,7 +80,8 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                          "\n"
                          "Usage: transmission-daemon [options]";
 
-auto rpc_port_desc = fmt::format("RPC port (Default: {:d})", TrDefaultRpcPort);
+auto const rpc_port_desc = fmt::format("RPC port (Default: {:d})", TrDefaultRpcPort);
+auto const peer_port_desc = fmt::format("Port for incoming peers (Default: {:d})", TrDefaultPeerPort);
 
 using Arg = tr_option::Arg;
 auto const options = std::array<tr_option, 48>{ {
@@ -125,7 +126,7 @@ auto const options = std::array<tr_option, 48>{ {
       "<protocol(s)>" },
     { 831, "utp", "*DEPRECATED* Enable µTP for peer connections", nullptr, Arg::None, nullptr },
     { 832, "no-utp", "*DEPRECATED* Disable µTP for peer connections", nullptr, Arg::None, nullptr },
-    { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", Arg::Required, "<port>" },
+    { 'P', "peerport", peer_port_desc.c_str(), "P", Arg::Required, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
     { 'L',

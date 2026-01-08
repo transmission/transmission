@@ -126,7 +126,6 @@ size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
 inline auto constexpr TrDefaultRpcPort = 9091U;
-#define TR_DEFAULT_PEER_PORT_STR "51413"
 inline auto constexpr TrDefaultPeerPort = 51413U;
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "le"
 #define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "200"

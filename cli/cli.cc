@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cassert>
 #include <cstdio> /* fprintf () */
 #include <cstdlib> /* atoi () */
 #include <string>
@@ -48,8 +49,10 @@ sig_atomic_t manualUpdate = false;
 
 char const* torrentPath = nullptr;
 
+auto const peer_port_desc = fmt::format("Port for incoming peers (Default: {:d})", TrDefaultPeerPort);
+
 using Arg = tr_option::Arg;
-auto constexpr Options = std::array<tr_option, 20>{ {
+auto const options = std::array<tr_option, 20>{ {
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
     { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", Arg::Required, "<speed>" },
@@ -61,7 +64,7 @@ auto constexpr Options = std::array<tr_option, 20>{ {
     { 'g', "config-dir", "Where to find configuration files", "g", Arg::Required, "<path>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
-    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", Arg::Required, "<port>" },
+    { 'p', "port", peer_port_desc.c_str(), "p", Arg::Required, "<port>" },
     { 't',
       "tos",
       "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0', default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
@@ -78,7 +81,6 @@ auto constexpr Options = std::array<tr_option, 20>{ {
 
     { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
-static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
 namespace
@@ -168,7 +170,7 @@ void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
     char const* my_optarg;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &my_optarg)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
@@ -189,7 +191,7 @@ int parseCommandLine(tr_variant* d, int argc, char const** argv)
     int c;
     char const* my_optarg;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &my_optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -311,6 +313,8 @@ void sigHandler(int signal)
 
 int tr_main(int argc, char* argv[])
 {
+    assert(options[std::size(options) - 2].val != 0);
+
     tr_lib_init();
 
     tr_locale_set_global("");
@@ -320,7 +324,7 @@ int tr_main(int argc, char* argv[])
     /* user needs to pass in at least one argument */
     if (argc < 2)
     {
-        tr_getopt_usage(MyReadableName, Usage, std::data(Options));
+        tr_getopt_usage(MyReadableName, Usage, std::data(options));
         return EXIT_FAILURE;
     }
 
