@@ -137,7 +137,6 @@ size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 inline auto constexpr TrDefaultRpcPort = 9091U;
 inline auto constexpr TrDefaultPeerPort = 51413U;
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "le"
-#define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "200"
 inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
 inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
