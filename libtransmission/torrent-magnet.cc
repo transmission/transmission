@@ -37,9 +37,11 @@ namespace
 // don't ask for the same metadata piece more than this often
 auto constexpr MinRepeatIntervalSecs = time_t{ 3 };
 
-[[nodiscard]] int64_t div_ceil(int64_t numerator, int64_t denominator)
+template<typename T>
+[[nodiscard]] T div_ceil(T const& numerator, T const& denominator)
 {
-    auto const [quot, rem] = std::lldiv(numerator, denominator);
+    auto const quot = numerator / denominator;
+    auto const rem = numerator % denominator;
     return quot + (rem == 0 ? 0 : 1);
 }
 } // namespace
