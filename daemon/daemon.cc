@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cassert>
 #include <cerrno>
 #include <chrono>
 #include <cstdint>
@@ -79,8 +80,10 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                          "\n"
                          "Usage: transmission-daemon [options]";
 
+auto rpc_port_desc = fmt::format("RPC port (Default: {:d})", TrDefaultRpcPort);
+
 using Arg = tr_option::Arg;
-auto constexpr Options = std::array<tr_option, 48>{ {
+auto const options = std::array<tr_option, 48>{ {
     { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", Arg::Required, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
@@ -93,7 +96,7 @@ auto constexpr Options = std::array<tr_option, 48>{ {
     { 'e', "logfile", "Dump the log messages to this filename", "e", Arg::Required, "<filename>" },
     { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", Arg::None, nullptr },
     { 'g', "config-dir", "Where to look for configuration files", "g", Arg::Required, "<path>" },
-    { 'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", Arg::Required, "<port>" },
+    { 'p', "port", rpc_port_desc.c_str(), "p", Arg::Required, "<port>" },
     { 't', "auth", "Require authentication", "t", Arg::None, nullptr },
     { 'T', "no-auth", "Don't require authentication", "T", Arg::None, nullptr },
     { 'u', "username", "Set username for authentication", "u", Arg::Required, "<username>" },
@@ -160,7 +163,6 @@ auto constexpr Options = std::array<tr_option, 48>{ {
     { 'x', "pid-file", "Enable PID file", "x", Arg::Required, "<pid-file>" },
     { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
-static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
 namespace
@@ -171,7 +173,7 @@ namespace
     char const* optstr;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &optstr)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
@@ -544,7 +546,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
 
     tr_optind = 1;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &optstr)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -772,12 +774,12 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
 
         case TR_OPT_UNK:
             fprintf(stderr, "Unexpected argument: %s \n", optstr);
-            tr_getopt_usage(MyName, Usage, std::data(Options));
+            tr_getopt_usage(MyName, Usage, std::data(options));
             *exit_code = 1;
             return false;
 
         default:
-            tr_getopt_usage(MyName, Usage, std::data(Options));
+            tr_getopt_usage(MyName, Usage, std::data(options));
             *exit_code = 0;
             return false;
         }
@@ -1084,6 +1086,8 @@ void tr_daemon::handle_error(tr_error const& error) const
 
 int tr_main(int argc, char* argv[])
 {
+    assert(options[std::size(options) - 2].val != 0);
+
     tr_lib_init();
 
     tr_locale_set_global("");
