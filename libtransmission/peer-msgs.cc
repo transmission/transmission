@@ -1138,9 +1138,8 @@ void tr_peerMsgsImpl::send_ltep_handshake()
     /* decide if we want to advertise pex support */
     bool const allow_pex = tor_.allows_pex();
 
-    auto val = tr_variant{};
-    tr_variantInitDict(&val, 8);
-    tr_variantDictAddBool(&val, TR_KEY_e, session->encryptionMode() != TR_CLEAR_PREFERRED);
+    auto val = tr_variant::Map{ 8U };
+    val.try_emplace(TR_KEY_e, session->encryptionMode() != TR_CLEAR_PREFERRED);
 
     // If connecting to global peer, then use global address
     // Otherwise we are connecting to local peer, use bind address directly
@@ -1149,14 +1148,18 @@ void tr_peerMsgsImpl::send_ltep_handshake()
         addr && !addr->is_any())
     {
         TR_ASSERT(addr->is_ipv4());
-        tr_variantDictAddRaw(&val, TR_KEY_ipv4, &addr->addr.addr4, sizeof(addr->addr.addr4));
+        val.try_emplace(
+            TR_KEY_ipv4,
+            std::string_view{ reinterpret_cast<char const*>(&addr->addr.addr4), sizeof(addr->addr.addr4) });
     }
     if (auto const addr = io_->address().is_global_unicast() ? session->global_address(TR_AF_INET6) :
                                                                session->bind_address(TR_AF_INET6);
         addr && !addr->is_any())
     {
         TR_ASSERT(addr->is_ipv6());
-        tr_variantDictAddRaw(&val, TR_KEY_ipv6, &addr->addr.addr6, sizeof(addr->addr.addr6));
+        val.try_emplace(
+            TR_KEY_ipv6,
+            std::string_view{ reinterpret_cast<char const*>(&addr->addr.addr6), sizeof(addr->addr.addr6) });
     }
 
     // https://www.bittorrent.org/beps/bep_0009.html
@@ -1165,7 +1168,7 @@ void tr_peerMsgsImpl::send_ltep_handshake()
     // bytes of the metadata.
     if (auto const info_dict_size = tor_.info_dict_size(); allow_metadata_xfer && tor_.has_metainfo() && info_dict_size > 0)
     {
-        tr_variantDictAddInt(&val, TR_KEY_metadata_size, info_dict_size);
+        val.try_emplace(TR_KEY_metadata_size, info_dict_size);
     }
 
     // https://www.bittorrent.org/beps/bep_0010.html
@@ -1173,12 +1176,12 @@ void tr_peerMsgsImpl::send_ltep_handshake()
     // port number of the other side. Note that there is no need for the
     // receiving side of the connection to send this extension message,
     // since its port number is already known.
-    tr_variantDictAddInt(&val, TR_KEY_p, session->advertisedPeerPort().host());
+    val.try_emplace(TR_KEY_p, session->advertisedPeerPort().host());
 
     // https://www.bittorrent.org/beps/bep_0010.html
     // An integer, the number of outstanding request messages this
     // client supports without dropping any.
-    tr_variantDictAddInt(&val, TR_KEY_reqq, client_reqq());
+    val.try_emplace(TR_KEY_reqq, client_reqq());
 
     // https://www.bittorrent.org/beps/bep_0010.html
     // A string containing the compact representation of the ip address this peer sees
@@ -1188,40 +1191,42 @@ void tr_peerMsgsImpl::send_ltep_handshake()
         auto buf = std::array<std::byte, TrAddrStrlen>{};
         auto const begin = std::data(buf);
         auto const end = io_->address().to_compact(begin);
-        auto const len = end - begin;
+        auto const len = static_cast<size_t>(end - begin);
         TR_ASSERT(len == tr_address::CompactAddrBytes[0] || len == tr_address::CompactAddrBytes[1]);
-        tr_variantDictAddRaw(&val, TR_KEY_yourip, begin, len);
+        val.try_emplace(TR_KEY_yourip, std::string_view{ reinterpret_cast<char*>(begin), len });
     }
 
     // https://www.bittorrent.org/beps/bep_0010.html
     // Client name and version (as a utf-8 string). This is a much more
     // reliable way of identifying the client than relying on the
     // peer id encoding.
-    tr_variantDictAddStrView(&val, TR_KEY_v, TR_NAME " " USERAGENT_PREFIX);
+    val.try_emplace(TR_KEY_v, tr_variant::unmanaged_string(TR_NAME " " USERAGENT_PREFIX));
 
     // https://www.bittorrent.org/beps/bep_0021.html
     // A peer that is a partial seed SHOULD include an extra header in
     // the extension handshake 'upload_only'. Setting the value of this
     // key to 1 indicates that this peer is not interested in downloading
     // anything.
-    tr_variantDictAddBool(&val, TR_KEY_upload_only, tor_.is_done());
+    val.try_emplace(TR_KEY_upload_only, tor_.is_done());
 
     if (allow_metadata_xfer || allow_pex)
     {
-        tr_variant* m = tr_variantDictAddDict(&val, TR_KEY_m, 2);
+        auto m = tr_variant::Map{ 2U };
 
         if (allow_metadata_xfer)
         {
-            tr_variantDictAddInt(m, TR_KEY_ut_metadata, UT_METADATA_ID);
+            m.try_emplace(TR_KEY_ut_metadata, UT_METADATA_ID);
         }
 
         if (allow_pex)
         {
-            tr_variantDictAddInt(m, TR_KEY_ut_pex, UT_PEX_ID);
+            m.try_emplace(TR_KEY_ut_pex, UT_PEX_ID);
         }
+
+        val.try_emplace(TR_KEY_m, std::move(m));
     }
 
-    protocol_send_message(BtPeerMsgs::Ltep, LtepMessages::Handshake, tr_variant_serde::benc().to_string(val));
+    protocol_send_message(BtPeerMsgs::Ltep, LtepMessages::Handshake, tr_variant_serde::benc().to_string(std::move(val)));
 }
 
 void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
