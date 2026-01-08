@@ -86,6 +86,9 @@ private slots:
     void localRequestFinished(TrVariantPtr response);
 
 private:
+    QByteArray const SessionIdHeaderName = std::data(TrRpcSessionIdHeader);
+    QByteArray const VersionHeaderName = std::data(TrRpcVersionHeader);
+
     QNetworkAccessManager* networkAccessManager();
 
     void sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise);
