@@ -82,6 +82,7 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
 
 auto const rpc_port_desc = fmt::format("RPC port (Default: {:d})", TrDefaultRpcPort);
 auto const peer_port_desc = fmt::format("Port for incoming peers (Default: {:d})", TrDefaultPeerPort);
+auto const global_peer_desc = fmt::format("Maximum overall number of peers (Default: {:d})", TrDefaultPeerLimitGlobal);
 
 using Arg = tr_option::Arg;
 auto const options = std::array<tr_option, 48>{ {
@@ -129,12 +130,7 @@ auto const options = std::array<tr_option, 48>{ {
     { 'P', "peerport", peer_port_desc.c_str(), "P", Arg::Required, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
-    { 'L',
-      "peerlimit-global",
-      "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")",
-      "L",
-      Arg::Required,
-      "<limit>" },
+    { 'L', "peerlimit-global", global_peer_desc.c_str(), "L", Arg::Required, "<limit>" },
     { 'l',
       "peerlimit-torrent",
       "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")",
