@@ -136,7 +136,6 @@ size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
 #define TR_DEFAULT_RPC_PORT_STR "9091"
 inline auto constexpr TrDefaultRpcPort = 9091U;
-#define TR_DEFAULT_RPC_URL_STR "/transmission/"
 #define TR_DEFAULT_PEER_PORT_STR "51413"
 inline auto constexpr TrDefaultPeerPort = 51413U;
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "le"
@@ -145,7 +144,7 @@ inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
 inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
 
-inline auto constexpr TrHttpServerDefaultBasePath = std::string_view{ TR_DEFAULT_RPC_URL_STR };
+inline auto constexpr TrHttpServerDefaultBasePath = std::string_view{ "/transmission/" };
 inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc" };
 inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/" };
 

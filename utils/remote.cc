@@ -50,10 +50,6 @@ using namespace libtransmission::Values;
 
 namespace
 {
-auto constexpr DefaultPort = uint16_t{ TrDefaultRpcPort };
-char constexpr DefaultHost[] = "localhost";
-char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
-
 char constexpr MyName[] = "transmission-remote";
 char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
                          "\n"
@@ -3522,12 +3518,12 @@ void get_host_and_port_and_rpc_url(
     auto const sv = std::string_view{ argv[1] };
     if (tr_strv_starts_with(sv, "http://")) /* user passed in http rpc url */
     {
-        rpcurl = fmt::format("{:s}/rpc/", sv.substr(7));
+        rpcurl = fmt::format("{:s}/{:s}", sv.substr(7), TrHttpServerRpcRelativePath);
     }
     else if (tr_strv_starts_with(sv, "https://")) /* user passed in https rpc url */
     {
         config.use_ssl = true;
-        rpcurl = fmt::format("{:s}/rpc/", sv.substr(8));
+        rpcurl = fmt::format("{:s}/{:s}", sv.substr(8), TrHttpServerRpcRelativePath);
     }
     else if (parse_port_string(sv, port))
     {
@@ -3568,8 +3564,8 @@ int tr_main(int argc, char* argv[])
     tr_locale_set_global("");
 
     auto config = RemoteConfig{};
-    auto port = DefaultPort;
-    auto host = std::string{};
+    auto port = uint16_t{ TrDefaultRpcPort };
+    auto host = std::string{ "localhost" };
     auto rpcurl = std::string{};
 
     if (argc < 2)
@@ -3580,14 +3576,9 @@ int tr_main(int argc, char* argv[])
 
     get_host_and_port_and_rpc_url(argc, argv, host, port, rpcurl, config);
 
-    if (std::empty(host))
-    {
-        host = DefaultHost;
-    }
-
     if (std::empty(rpcurl))
     {
-        rpcurl = fmt::format("{:s}:{:d}{:s}", host, port, DefaultUrl);
+        rpcurl = fmt::format("{:s}:{:d}{:s}{:s}", host, port, TrHttpServerDefaultBasePath, TrHttpServerRpcRelativePath);
     }
 
     return process_args(rpcurl.c_str(), argc, (char const* const*)argv, config);
