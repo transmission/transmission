@@ -125,6 +125,7 @@ size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen
 size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
 inline auto constexpr TrDefaultBlocklistFilename = std::string_view{ "blocklist.bin" };
+inline auto constexpr TrDefaultHttpServerBasePath = std::string_view{ "/transmission/" };
 inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
 inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
 inline auto constexpr TrDefaultPeerPort = 51413U;
@@ -132,7 +133,6 @@ inline auto constexpr TrDefaultPeerSocketTos = std::string_view{ "le" };
 inline auto constexpr TrDefaultRpcPort = 9091U;
 inline auto constexpr TrDefaultRpcWhitelist = std::string_view{ "127.0.0.1,::1" };
 
-inline auto constexpr TrHttpServerDefaultBasePath = std::string_view{ "/transmission/" };
 inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc" };
 inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/" };
 

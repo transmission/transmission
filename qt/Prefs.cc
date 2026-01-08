@@ -383,7 +383,7 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_remote_session_password, tr_variant::unmanaged_string(""sv));
     settings.try_emplace(TR_KEY_remote_session_port, TrDefaultRpcPort);
     settings.try_emplace(TR_KEY_remote_session_requires_authentication, false);
-    settings.try_emplace(TR_KEY_remote_session_url_base_path, tr_variant::unmanaged_string(TrHttpServerDefaultBasePath));
+    settings.try_emplace(TR_KEY_remote_session_url_base_path, tr_variant::unmanaged_string(TrDefaultHttpServerBasePath));
     settings.try_emplace(TR_KEY_remote_session_username, tr_variant::unmanaged_string(""sv));
     settings.try_emplace(TR_KEY_show_backup_trackers, false);
     settings.try_emplace(TR_KEY_show_filterbar, true);

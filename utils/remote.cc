@@ -3582,7 +3582,7 @@ int tr_main(int argc, char* argv[])
 
     if (std::empty(rpcurl))
     {
-        rpcurl = fmt::format("{:s}:{:d}{:s}{:s}", host, port, TrHttpServerDefaultBasePath, TrHttpServerRpcRelativePath);
+        rpcurl = fmt::format("{:s}:{:d}{:s}{:s}", host, port, TrDefaultHttpServerBasePath, TrHttpServerRpcRelativePath);
     }
 
     return process_args(rpcurl.c_str(), argc, (char const* const*)argv, config);
