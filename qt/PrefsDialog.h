@@ -45,13 +45,13 @@ private slots:
     void onBlocklistUpdated(int n);
 
 private:
-    enum PortTestStatus : uint8_t
+    enum class PortTestStatus : uint8_t
     {
-        PORT_TEST_UNKNOWN = 0U,
-        PORT_TEST_CHECKING,
-        PORT_TEST_OPEN,
-        PORT_TEST_CLOSED,
-        PORT_TEST_ERROR
+        Unknown = 0U,
+        Checking,
+        Open,
+        Closed,
+        Error
     };
 
     template<typename T>

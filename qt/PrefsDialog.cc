@@ -310,15 +310,15 @@ QString PrefsDialog::getPortStatusText(PrefsDialog::PortTestStatus status) noexc
 {
     switch (status)
     {
-    case PORT_TEST_UNKNOWN:
+    case PortTestStatus::Unknown:
         return tr("unknown");
-    case PORT_TEST_CHECKING:
+    case PortTestStatus::Checking:
         return tr("checking…");
-    case PORT_TEST_OPEN:
+    case PortTestStatus::Open:
         return tr("open");
-    case PORT_TEST_CLOSED:
+    case PortTestStatus::Closed:
         return tr("closed");
-    case PORT_TEST_ERROR:
+    case PortTestStatus::Error:
         return tr("error");
     default:
         return {};
@@ -353,19 +353,19 @@ void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpPr
     {
         if (!res)
         {
-            return PORT_TEST_ERROR;
+            return PortTestStatus::Error;
         }
         if (!*res)
         {
-            return PORT_TEST_CLOSED;
+            return PortTestStatus::Closed;
         }
-        return PORT_TEST_OPEN;
+        return PortTestStatus::Open;
     };
 
     // Only update the UI if the current status is "checking", so that
     // we won't show the port test results for the old peer port if it
     // changed while we have port_test RPC call(s) in-flight.
-    if (port_test_status_[ip_protocol] == PORT_TEST_CHECKING)
+    if (port_test_status_[ip_protocol] == PortTestStatus::Checking)
     {
         port_test_status_[ip_protocol] = StatusFromResult(result);
         updatePortStatusLabel();
@@ -375,8 +375,8 @@ void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpPr
 
 void PrefsDialog::onPortTest()
 {
-    port_test_status_[Session::PORT_TEST_IPV4] = PORT_TEST_CHECKING;
-    port_test_status_[Session::PORT_TEST_IPV6] = PORT_TEST_CHECKING;
+    port_test_status_[Session::PORT_TEST_IPV4] = PortTestStatus::Checking;
+    port_test_status_[Session::PORT_TEST_IPV6] = PortTestStatus::Checking;
     updatePortStatusLabel();
 
     session_.portTest(Session::PORT_TEST_IPV4);
@@ -708,8 +708,8 @@ void PrefsDialog::refreshPref(int key)
         }
 
     case Prefs::PEER_PORT:
-        port_test_status_[Session::PORT_TEST_IPV4] = PORT_TEST_UNKNOWN;
-        port_test_status_[Session::PORT_TEST_IPV6] = PORT_TEST_UNKNOWN;
+        port_test_status_[Session::PORT_TEST_IPV4] = PortTestStatus::Unknown;
+        port_test_status_[Session::PORT_TEST_IPV6] = PortTestStatus::Unknown;
         updatePortStatusLabel();
         portTestSetEnabled();
         break;
