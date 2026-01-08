@@ -80,14 +80,15 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                          "\n"
                          "Usage: transmission-daemon [options]";
 
-auto const rpc_port_desc = fmt::format("RPC port (Default: {:d})", TrDefaultRpcPort);
-auto const peer_port_desc = fmt::format("Port for incoming peers (Default: {:d})", TrDefaultPeerPort);
 auto const global_peer_desc = fmt::format("Maximum overall number of peers (Default: {:d})", TrDefaultPeerLimitGlobal);
+auto const peer_port_desc = fmt::format("Port for incoming peers (Default: {:d})", TrDefaultPeerPort);
 auto const peers_tor_desc = fmt::format("Maximum number of peers per torrent (Default: {:d})", TrDefaultPeerLimitTorrent);
+auto const rpc_port_desc = fmt::format("RPC port (Default: {:d})", TrDefaultRpcPort);
+auto const whitelist_desc = fmt::format("Allowed IP addresses. (Default: {:s})", TrDefaultRpcWhitelist);
 
 using Arg = tr_option::Arg;
 auto const options = std::array<tr_option, 48>{ {
-    { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", Arg::Required, "<list>" },
+    { 'a', "allowed", whitelist_desc.c_str(), "a", Arg::Required, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
     { 'c', "watch-dir", "Where to watch for new torrent files", "c", Arg::Required, "<directory>" },
