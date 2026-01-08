@@ -474,7 +474,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "remote_session_password"sv, // qt app
     "remote_session_port"sv, // qt app
     "remote_session_requires_authentication"sv, // qt app
-    "remote_session_rpc_url_path"sv, // qt app
+    "remote_session_url_base_path"sv, // qt app
     "remote_session_username"sv, // qt app
     "removed"sv, // rpc
     "rename-partial-files"sv, // rpc, tr_session::Settings

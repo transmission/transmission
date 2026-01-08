@@ -347,7 +347,10 @@ void Session::start()
         }
         url.setHost(prefs_.get<QString>(Prefs::SESSION_REMOTE_HOST));
         url.setPort(prefs_.get<int>(Prefs::SESSION_REMOTE_PORT));
-        url.setPath(prefs_.get<QString>(Prefs::SESSION_REMOTE_RPC_URL_PATH));
+
+        auto const root_path = prefs_.get<QString>(Prefs::SESSION_REMOTE_URL_BASE_PATH);
+        auto const relative_path = TrHttpServerRpcRelativePath;
+        url.setPath(root_path + QString::fromUtf8(relative_path.data(), relative_path.size()));
 
         if (prefs_.get<bool>(Prefs::SESSION_REMOTE_AUTH))
         {
@@ -1162,7 +1165,10 @@ void Session::launchWebInterface() const
     if (session_ == nullptr) // remote session
     {
         url = rpc_.url();
-        url.setPath(QStringLiteral("/transmission/web/"));
+
+        auto const root_path = prefs_.get<QString>(Prefs::SESSION_REMOTE_URL_BASE_PATH);
+        auto const relative_path = TrHttpServerWebRelativePath;
+        url.setPath(root_path + QString::fromUtf8(relative_path.data(), relative_path.size()));
     }
     else // local session
     {

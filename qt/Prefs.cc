@@ -103,7 +103,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { SESSION_REMOTE_PORT, TR_KEY_remote_session_port, QMetaType::Int },
     { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requires_authentication, QMetaType::Bool },
     { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QMetaType::QString },
-    { SESSION_REMOTE_RPC_URL_PATH, TR_KEY_remote_session_rpc_url_path, QMetaType::QString },
+    { SESSION_REMOTE_URL_BASE_PATH, TR_KEY_remote_session_url_base_path, QMetaType::QString },
     { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QMetaType::QStringList },
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QMetaType::Bool },
     { READ_CLIPBOARD, TR_KEY_read_clipboard, QMetaType::Bool },
@@ -401,7 +401,7 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_remote_session_password, tr_variant::unmanaged_string(""sv));
     settings.try_emplace(TR_KEY_remote_session_port, TrDefaultRpcPort);
     settings.try_emplace(TR_KEY_remote_session_requires_authentication, false);
-    settings.try_emplace(TR_KEY_remote_session_rpc_url_path, tr_variant::unmanaged_string(TR_DEFAULT_RPC_URL_STR "rpc"));
+    settings.try_emplace(TR_KEY_remote_session_url_base_path, tr_variant::unmanaged_string(TrHttpServerDefaultBasePath));
     settings.try_emplace(TR_KEY_remote_session_username, tr_variant::unmanaged_string(""sv));
     settings.try_emplace(TR_KEY_show_backup_trackers, false);
     settings.try_emplace(TR_KEY_show_filterbar, true);
