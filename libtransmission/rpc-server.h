@@ -67,7 +67,7 @@ public:
         std::string bind_address_str = "0.0.0.0";
         std::string host_whitelist_str;
         std::string salted_password;
-        std::string url = std::string{ TrHttpServerDefaultBasePath };
+        std::string url = std::string{ TrDefaultHttpServerBasePath };
         std::string username;
         std::string whitelist_str = std::string{ TrDefaultRpcWhitelist };
         tr_mode_t socket_mode = 0750;
