@@ -984,41 +984,40 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
         return;
     }
 
-    if (auto var = tr_variant_serde::benc().inplace().parse(payload.to_string_view()); var)
+    auto const var = tr_variant_serde::benc().inplace().parse(payload.to_string_view());
+    if (!var)
     {
-        logtrace(this, "got ut pex");
+        return;
+    }
 
-        uint8_t const* added = nullptr;
-        auto added_len = size_t{};
-        if (tr_variantDictFindRaw(&*var, TR_KEY_added, &added, &added_len))
-        {
-            uint8_t const* added_f = nullptr;
-            auto added_f_len = size_t{};
-            if (!tr_variantDictFindRaw(&*var, TR_KEY_added_f, &added_f, &added_f_len))
-            {
-                added_f_len = 0;
-                added_f = nullptr;
-            }
+    auto const* const map = var->get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        return;
+    }
 
-            auto pex = tr_pex::from_compact_ipv4(added, added_len, added_f, added_f_len);
-            pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
-            tr_peerMgrAddPex(&tor_, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
-        }
+    logtrace(this, "got ut pex");
 
-        if (tr_variantDictFindRaw(&*var, TR_KEY_added6, &added, &added_len))
-        {
-            uint8_t const* added_f = nullptr;
-            auto added_f_len = size_t{};
-            if (!tr_variantDictFindRaw(&*var, TR_KEY_added6_f, &added_f, &added_f_len))
-            {
-                added_f_len = 0;
-                added_f = nullptr;
-            }
+    if (auto const added = map->value_if<std::string_view>(TR_KEY_added))
+    {
+        auto const added_f_sv = map->value_if<std::string_view>(TR_KEY_added_f);
+        auto const* const added_f = added_f_sv ? reinterpret_cast<uint8_t const*>(std::data(*added_f_sv)) : nullptr;
+        auto const added_f_len = added_f_sv ? std::size(*added_f_sv) : 0U;
 
-            auto pex = tr_pex::from_compact_ipv6(added, added_len, added_f, added_f_len);
-            pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
-            tr_peerMgrAddPex(&tor_, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
-        }
+        auto pex = tr_pex::from_compact_ipv4(std::data(*added), std::size(*added), added_f, added_f_len);
+        pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
+        tr_peerMgrAddPex(&tor_, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
+    }
+
+    if (auto const added = map->value_if<std::string_view>(TR_KEY_added6))
+    {
+        auto const added_f_sv = map->value_if<std::string_view>(TR_KEY_added6_f);
+        auto const* const added_f = added_f_sv ? reinterpret_cast<uint8_t const*>(std::data(*added_f_sv)) : nullptr;
+        auto const added_f_len = added_f_sv ? std::size(*added_f_sv) : 0U;
+
+        auto pex = tr_pex::from_compact_ipv6(std::data(*added), std::size(*added), added_f, added_f_len);
+        pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
+        tr_peerMgrAddPex(&tor_, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
     }
 }
 
