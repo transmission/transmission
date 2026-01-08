@@ -31,6 +31,20 @@ using tr_tracker_id_t = uint32_t;
 using tr_torrent_id_t = int;
 using tr_mode_t = uint16_t;
 
+inline auto constexpr TrDefaultBlocklistFilename = std::string_view{ "blocklist.bin" };
+inline auto constexpr TrDefaultHttpServerBasePath = std::string_view{ "/transmission/" };
+inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
+inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
+inline auto constexpr TrDefaultPeerPort = 51413U;
+inline auto constexpr TrDefaultPeerSocketTos = std::string_view{ "le" };
+inline auto constexpr TrDefaultRpcPort = 9091U;
+inline auto constexpr TrDefaultRpcWhitelist = std::string_view{ "127.0.0.1,::1" };
+
+inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc" };
+inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/" };
+inline auto constexpr TrRpcSessionIdHeader = std::string_view{ "X-Transmission-Session-Id" };
+inline auto constexpr TrRpcVersionHeader = std::string_view{ "X-Transmission-Rpc-Version" };
+
 struct tr_block_span_t
 {
     tr_block_index_t begin;
@@ -49,9 +63,6 @@ struct tr_session;
 struct tr_torrent;
 struct tr_torrent_metainfo;
 struct tr_variant;
-
-inline auto constexpr TrRpcSessionIdHeader = std::string_view{ "X-Transmission-Session-Id" };
-inline auto constexpr TrRpcVersionHeader = std::string_view{ "X-Transmission-Rpc-Version" };
 
 enum tr_verify_added_mode : uint8_t
 {
@@ -123,18 +134,6 @@ size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen
 
 /** @brief buffer variant of `tr_getDefaultDownloadDir()`. See `tr_strv_to_buf()`. */
 size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
-
-inline auto constexpr TrDefaultBlocklistFilename = std::string_view{ "blocklist.bin" };
-inline auto constexpr TrDefaultHttpServerBasePath = std::string_view{ "/transmission/" };
-inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
-inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
-inline auto constexpr TrDefaultPeerPort = 51413U;
-inline auto constexpr TrDefaultPeerSocketTos = std::string_view{ "le" };
-inline auto constexpr TrDefaultRpcPort = 9091U;
-inline auto constexpr TrDefaultRpcWhitelist = std::string_view{ "127.0.0.1,::1" };
-
-inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc" };
-inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/" };
 
 /**
  * Add libtransmission's default settings to the benc dictionary.
