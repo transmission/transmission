@@ -69,7 +69,7 @@ private:
     static QString getPortStatusText(PortTestStatus status) noexcept;
 
     template<typename T, size_t N>
-    void initComboFromItems(std::array<std::pair<T, QString>, N> const& items, QComboBox* w, int key);
+    void initComboFromItems(std::array<std::pair<QString, T>, N> const& items, QComboBox* w, int key);
 
     void initAltSpeedDaysCombo(QComboBox* w, int key);
     void initEncryptionCombo(QComboBox* w, int key);

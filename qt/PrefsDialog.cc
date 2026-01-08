@@ -39,9 +39,9 @@ using namespace libtransmission;
 // ---
 
 template<typename T, size_t N>
-void PrefsDialog::initComboFromItems(std::array<std::pair<T, QString>, N> const& items, QComboBox* const w, int const key)
+void PrefsDialog::initComboFromItems(std::array<std::pair<QString, T>, N> const& items, QComboBox* const w, int const key)
 {
-    for (auto const& [value, label] : items)
+    for (auto const& [label, value] : items)
     {
         w->addItem(label);
     }
@@ -52,7 +52,7 @@ void PrefsDialog::initComboFromItems(std::array<std::pair<T, QString>, N> const&
         auto const val = prefs_.get<T>(key);
         for (size_t i = 0; i < std::size(items); ++i)
         {
-            if (items[i].first == val)
+            if (items[i].second == val)
             {
                 w->setCurrentIndex(static_cast<int>(i));
             }
@@ -65,7 +65,7 @@ void PrefsDialog::initComboFromItems(std::array<std::pair<T, QString>, N> const&
     {
         if (0 <= idx && idx < static_cast<int>(std::size(items)))
         {
-            set(key, items[static_cast<size_t>(idx)].first);
+            set(key, items[static_cast<size_t>(idx)].second);
         }
     };
     connect(w, qOverload<int>(&QComboBox::activated), std::move(on_activated));
@@ -75,11 +75,11 @@ void PrefsDialog::initAltSpeedDaysCombo(QComboBox* const w, int const key)
 {
     static auto items = []
     {
-        auto ret = std::array<std::pair<int, QString>, 10U>{};
+        auto ret = std::array<std::pair<QString, int>, 10U>{};
         auto idx = 0;
-        ret[idx++] = { TR_SCHED_ALL, tr("Every Day") };
-        ret[idx++] = { TR_SCHED_WEEKDAY, tr("Weekdays") };
-        ret[idx++] = { TR_SCHED_WEEKEND, tr("Weekends") };
+        ret[idx++] = { tr("Every Day"), TR_SCHED_ALL };
+        ret[idx++] = { tr("Weekdays"), TR_SCHED_WEEKDAY };
+        ret[idx++] = { tr("Weekends"), TR_SCHED_WEEKEND };
 
         auto const locale = QLocale{};
         auto const qt_day_to_tr_day = std::map<int, int>{ {
@@ -94,11 +94,11 @@ void PrefsDialog::initAltSpeedDaysCombo(QComboBox* const w, int const key)
         auto const first_day_of_week = locale.firstDayOfWeek();
         for (int i = first_day_of_week; i <= Qt::Sunday; ++i)
         {
-            ret[idx++] = { qt_day_to_tr_day.at(i), locale.dayName(i) };
+            ret[idx++] = { locale.dayName(i), qt_day_to_tr_day.at(i) };
         }
         for (int i = Qt::Monday; i < first_day_of_week; ++i)
         {
-            ret[idx++] = { qt_day_to_tr_day.at(i), locale.dayName(i) };
+            ret[idx++] = { locale.dayName(i), qt_day_to_tr_day.at(i) };
         }
         return ret;
     }();
@@ -108,10 +108,10 @@ void PrefsDialog::initAltSpeedDaysCombo(QComboBox* const w, int const key)
 
 void PrefsDialog::initEncryptionCombo(QComboBox* const w, int const key)
 {
-    static auto const Items = std::array<std::pair<tr_encryption_mode, QString>, 3U>{ {
-        { TR_CLEAR_PREFERRED, tr("Allow encryption") },
-        { TR_ENCRYPTION_PREFERRED, tr("Prefer encryption") },
-        { TR_ENCRYPTION_REQUIRED, tr("Require encryption") },
+    static auto const Items = std::array<std::pair<QString, tr_encryption_mode>, 3U>{ {
+        { tr("Allow encryption"), TR_CLEAR_PREFERRED },
+        { tr("Prefer encryption"), TR_ENCRYPTION_PREFERRED },
+        { tr("Require encryption"), TR_ENCRYPTION_REQUIRED },
     } };
 
     initComboFromItems(Items, w, key);
