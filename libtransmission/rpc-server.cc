@@ -477,7 +477,7 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request* const req)
 bool test_session_id(tr_rpc_server const* server, evhttp_request* const req)
 {
     auto const* const input_headers = evhttp_request_get_input_headers(req);
-    char const* const session_id = evhttp_find_header(input_headers, TR_RPC_SESSION_ID_HEADER);
+    char const* const session_id = evhttp_find_header(input_headers, std::data(TrRpcSessionIdHeader));
     return session_id != nullptr && server->session->sessionId() == session_id;
 }
 
@@ -624,11 +624,17 @@ void handle_request(struct evhttp_request* req, void* arg)
     else if (!test_session_id(server, req))
     {
         auto const session_id = std::string{ server->session->sessionId() };
+        evhttp_add_header(output_headers, std::data(TrRpcSessionIdHeader), session_id.c_str());
+
+        evhttp_add_header(output_headers, std::data(TrRpcVersionHeader), std::data(TrRpcVersionSemver));
+
+        auto const expose_val = fmt::format("{:s}, {:s}", TrRpcSessionIdHeader, TrRpcVersionHeader);
+        evhttp_add_header(output_headers, "Access-Control-Expose-Headers", expose_val.c_str());
+
         auto const body = fmt::format(
             "<p>Your request had an invalid session_id header.</p>"
             "<p>To fix this, follow these steps:"
-            "<ol><li> When reading a response, get its " TR_RPC_SESSION_ID_HEADER
-            " header and remember it"
+            "<ol><li> When reading a response, get its {:s} header and remember it"
             "<li> Add the updated header to your outgoing requests"
             "<li> When you get this 409 error message, resend your request with the updated header"
             "</ol></p>"
@@ -636,14 +642,9 @@ void handle_request(struct evhttp_request* req, void* arg)
             "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
             "attacks.</p>"
             "<p><code>{:s}: {:s}</code></p>",
-            TR_RPC_SESSION_ID_HEADER,
+            TrRpcSessionIdHeader,
+            TrRpcSessionIdHeader,
             session_id);
-        evhttp_add_header(output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
-        evhttp_add_header(output_headers, TR_RPC_RPC_VERSION_HEADER, std::data(TrRpcVersionSemver));
-        evhttp_add_header(
-            output_headers,
-            "Access-Control-Expose-Headers",
-            TR_RPC_SESSION_ID_HEADER ", " TR_RPC_RPC_VERSION_HEADER);
         send_simple_response(req, 409, body.c_str());
     }
 #endif

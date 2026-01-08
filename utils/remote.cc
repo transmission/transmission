@@ -875,8 +875,8 @@ void warn_if_unsupported_rpc_version(std::string_view const semver)
 [[nodiscard]] size_t parse_response_header(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
     using namespace header_utils;
-    static auto const session_id_header = tr_strlower(TR_RPC_SESSION_ID_HEADER);
-    static auto const rpc_version_header = tr_strlower(TR_RPC_RPC_VERSION_HEADER);
+    static auto const session_id_header = tr_strlower(TrRpcSessionIdHeader);
+    static auto const rpc_version_header = tr_strlower(TrRpcVersionHeader);
 
     auto& config = *static_cast<RemoteConfig*>(vconfig);
 
@@ -2403,7 +2403,7 @@ CURL* tr_curl_easy_init(std::string* writebuf, RemoteConfig& config)
 
     if (auto const& str = config.session_id; !std::empty(str))
     {
-        auto const h = fmt::format("{:s}: {:s}", TR_RPC_SESSION_ID_HEADER, str);
+        auto const h = fmt::format("{:s}: {:s}", TrRpcSessionIdHeader, str);
         auto* const custom_headers = curl_slist_append(nullptr, h.c_str());
 
         (void)curl_easy_setopt(curl, CURLOPT_HTTPHEADER, custom_headers);
