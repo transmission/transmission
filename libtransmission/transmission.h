@@ -1591,6 +1591,11 @@ struct tr_stat
     second or so to get a new snapshot of the torrent's status. */
 tr_stat const* tr_torrentStat(tr_torrent* torrent);
 
+// Batch version of tr_torrentStat().
+// Prefer calling this over calling the single-torrent version in a loop.
+// TODO(c++20) take a std::span argument
+std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+
 /** @} */
 
 /** @brief Sanity checker to test that the direction is `TR_UP` or `TR_DOWN` */

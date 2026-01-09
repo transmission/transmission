@@ -1399,6 +1399,27 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
     return &tor->stats_;
 }
 
+std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* const torrents, size_t n_torrents)
+{
+    auto ret = std::vector<tr_stat const*>{};
+
+    if (n_torrents != 0U)
+    {
+        ret.reserve(n_torrents);
+
+        auto const lock = torrents[0]->unique_lock();
+
+        for (size_t idx = 0U; idx != n_torrents; ++idx)
+        {
+            tr_torrent* const tor = torrents[idx];
+            tor->stats_ = tor->stats();
+            ret.emplace_back(&tor->stats_);
+        }
+    }
+
+    return ret;
+}
+
 // ---
 
 tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
