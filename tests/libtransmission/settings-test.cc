@@ -390,11 +390,11 @@ TEST_F(SettingsTest, canSaveDiffServ)
     auto settings = tr_session::Settings{};
     ASSERT_NE(ChangedValue, settings.peer_socket_diffserv);
 
-    settings.peer_socket_diffserv = tr_diffserv_t(0x20);
+    settings.peer_socket_diffserv = ChangedValue;
     auto const map = settings.save();
     auto const val = map.value_if<std::string_view>(Key);
     ASSERT_TRUE(val);
-    EXPECT_EQ(ChangedValue.toString(), *val);
+    EXPECT_EQ("cs1"sv, *val);
 }
 
 TEST_F(SettingsTest, canLoadVerify)

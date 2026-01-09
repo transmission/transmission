@@ -636,9 +636,7 @@ void tr_net_close_socket(tr_socket_t fd);
 
 // --- TOS / DSCP
 
-/**
- * A `toString()` / `from_string()` convenience wrapper around the DiffServ int value
- */
+// A serializer-friendly wrapper around the DiffServ int value
 class tr_diffserv_t
 {
 public:
@@ -655,49 +653,8 @@ public:
         return value_;
     }
 
-    [[nodiscard]] static std::optional<tr_diffserv_t> from_string(std::string_view name);
-
-    [[nodiscard]] std::string toString() const;
-
 private:
     int value_ = 0x04;
-
-    // RFCs 2474, 3246, 4594 & 8622
-    // Service class names are defined in RFC 4594, RFC 5865, and RFC 8622.
-    // Not all platforms have these IPTOS_ definitions, so hardcode them here
-    static auto constexpr Names = std::array<std::pair<int, std::string_view>, 28>{ {
-        { 0x00, "cs0" }, // IPTOS_CLASS_CS0
-        { 0x04, "le" },
-        { 0x20, "cs1" }, // IPTOS_CLASS_CS1
-        { 0x28, "af11" }, // IPTOS_DSCP_AF11
-        { 0x30, "af12" }, // IPTOS_DSCP_AF12
-        { 0x38, "af13" }, // IPTOS_DSCP_AF13
-        { 0x40, "cs2" }, // IPTOS_CLASS_CS2
-        { 0x48, "af21" }, // IPTOS_DSCP_AF21
-        { 0x50, "af22" }, // IPTOS_DSCP_AF22
-        { 0x58, "af23" }, // IPTOS_DSCP_AF23
-        { 0x60, "cs3" }, // IPTOS_CLASS_CS3
-        { 0x68, "af31" }, // IPTOS_DSCP_AF31
-        { 0x70, "af32" }, // IPTOS_DSCP_AF32
-        { 0x78, "af33" }, // IPTOS_DSCP_AF33
-        { 0x80, "cs4" }, // IPTOS_CLASS_CS4
-        { 0x88, "af41" }, // IPTOS_DSCP_AF41
-        { 0x90, "af42" }, // IPTOS_DSCP_AF42
-        { 0x98, "af43" }, // IPTOS_DSCP_AF43
-        { 0xa0, "cs5" }, // IPTOS_CLASS_CS5
-        { 0xb8, "ef" }, // IPTOS_DSCP_EF
-        { 0xc0, "cs6" }, // IPTOS_CLASS_CS6
-        { 0xe0, "cs7" }, // IPTOS_CLASS_CS7
-
-        // <netinet/ip.h> lists these TOS names as deprecated,
-        // but keep them defined here for backward compatibility
-        { 0x00, "routine" }, // IPTOS_PREC_ROUTINE
-        { 0x02, "lowcost" }, // IPTOS_LOWCOST
-        { 0x02, "mincost" }, // IPTOS_MINCOST
-        { 0x04, "reliable" }, // IPTOS_RELIABILITY
-        { 0x08, "throughput" }, // IPTOS_THROUGHPUT
-        { 0x10, "lowdelay" }, // IPTOS_LOWDELAY
-    } };
 };
 
 // set the IPTOS_ value for the specified socket
