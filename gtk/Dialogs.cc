@@ -27,20 +27,23 @@ void gtr_confirm_remove(
     std::vector<tr_torrent_id_t> const& torrent_ids,
     bool delete_files)
 {
-    int connected = 0;
-    int incomplete = 0;
     int const count = torrent_ids.size();
-
     if (count == 0)
     {
         return;
     }
 
+    auto torrents = std::vector<tr_torrent*>{};
+    torrents.reserve(std::size(torrent_ids));
     for (auto const id : torrent_ids)
     {
-        tr_torrent* tor = core->find_torrent(id);
-        tr_stat const* stat = tr_torrentStat(tor);
+        torrents.emplace_back(core->find_torrent(id));
+    }
 
+    int connected = 0;
+    int incomplete = 0;
+    for (auto const* stat : tr_torrentStat(std::data(torrents), std::size(torrents)))
+    {
         if (stat->leftUntilDone != 0)
         {
             ++incomplete;
