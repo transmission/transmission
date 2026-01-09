@@ -1247,34 +1247,37 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
         logwarn(this, "got ltep handshake, but peer did not advertise support in reserved bytes");
     }
 
+    auto const* const map = var->get_if<tr_variant::Map>();
+    TR_ASSERT(map != nullptr);
+
     // does the peer prefer encrypted connections?
-    if (auto e = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_e, &e))
+    if (auto const e = map->value_if<int64_t>(TR_KEY_e))
     {
-        peer_info->set_encryption_preferred(e != 0);
+        peer_info->set_encryption_preferred(*e != 0);
     }
 
     // check supported messages for utorrent pex
     auto holepunch_supported = false;
-
-    if (tr_variant* sub = nullptr; tr_variantDictFindDict(&*var, TR_KEY_m, &sub))
+    if (auto const* const sub = map->find_if<tr_variant::Map>(TR_KEY_m))
     {
-        auto const tor_is_public = tor_.is_public();
-
-        if (auto ut_pex = int64_t{}; tor_is_public && tr_variantDictFindInt(sub, TR_KEY_ut_pex, &ut_pex))
+        if (tor_.is_public())
         {
-            ut_pex_id_ = static_cast<uint8_t>(ut_pex);
-            logtrace(this, fmt::format("msgs->ut_pex is {:d}", ut_pex_id_));
+            if (auto const ut_pex = sub->value_if<int64_t>(TR_KEY_ut_pex))
+            {
+                ut_pex_id_ = static_cast<uint8_t>(*ut_pex);
+                logtrace(this, fmt::format("msgs->ut_pex is {:d}", ut_pex_id_));
+            }
+
+            if (auto const ut_metadata = sub->value_if<int64_t>(TR_KEY_ut_metadata))
+            {
+                ut_metadata_id_ = static_cast<uint8_t>(*ut_metadata);
+                logtrace(this, fmt::format("msgs->ut_metadata_id_ is {:d}", ut_metadata_id_));
+            }
         }
 
-        if (auto ut_metadata = int64_t{}; tor_is_public && tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &ut_metadata))
+        if (auto const ut_holepunch = sub->value_if<int64_t>(TR_KEY_ut_holepunch))
         {
-            ut_metadata_id_ = static_cast<uint8_t>(ut_metadata);
-            logtrace(this, fmt::format("msgs->ut_metadata_id_ is {:d}", ut_metadata_id_));
-        }
-
-        if (auto ut_holepunch = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &ut_holepunch))
-        {
-            holepunch_supported = ut_holepunch != 0;
+            holepunch_supported = *ut_holepunch != 0;
         }
     }
 
@@ -1290,32 +1293,34 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     peer_info->set_holepunch_supported(holepunch_supported);
 
     // look for metainfo size (BEP 9)
-    if (auto metadata_size = int64_t{};
-        can_xfer_metadata() && tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &metadata_size))
+    if (can_xfer_metadata())
     {
-        if (!tr_metadata_download::is_valid_metadata_size(metadata_size))
+        if (auto const metadata_size = map->value_if<int64_t>(TR_KEY_metadata_size))
         {
-            ut_metadata_id_ = 0U;
-        }
-        else
-        {
-            tor_.maybe_start_metadata_transfer(metadata_size);
+            if (!tr_metadata_download::is_valid_metadata_size(*metadata_size))
+            {
+                ut_metadata_id_ = 0U;
+            }
+            else
+            {
+                tor_.maybe_start_metadata_transfer(*metadata_size);
+            }
         }
     }
 
     // look for upload_only (BEP 21)
-    if (auto upload_only = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_upload_only, &upload_only))
+    if (auto const upload_only = map->value_if<int64_t>(TR_KEY_upload_only))
     {
-        peer_info->set_upload_only(upload_only != 0);
+        peer_info->set_upload_only(*upload_only != 0);
     }
 
     // https://www.bittorrent.org/beps/bep_0010.html
     // Client name and version (as a utf-8 string). This is a much more
     // reliable way of identifying the client than relying on the
     // peer id encoding.
-    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&*var, TR_KEY_v, &sv))
+    if (auto const sv = map->value_if<std::string_view>(TR_KEY_v))
     {
-        set_user_agent(tr_interned_string{ tr_strv_convert_utf8(sv) });
+        set_user_agent(tr_interned_string{ tr_strv_convert_utf8(*sv) });
     }
 
     // https://www.bittorrent.org/beps/bep_0010.html
@@ -1323,10 +1328,10 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // this peer sees you as. i.e. this is the receiver's external ip
     // address (no port is included). This may be either an IPv4 (4 bytes)
     // or an IPv6 (16 bytes) address.
-    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&*var, TR_KEY_yourip, &sv))
+    if (auto const sv = map->value_if<std::string_view>(TR_KEY_yourip))
     {
-        auto const* const bytes = reinterpret_cast<std::byte const*>(std::data(sv));
-        switch (std::size(sv))
+        auto const* const bytes = reinterpret_cast<std::byte const*>(std::data(*sv));
+        switch (std::size(*sv))
         {
         case tr_address::CompactAddrBytes[TR_AF_INET]:
             peer_info->maybe_update_canonical_priority(tr_address::from_compact_ipv4(bytes).first);
@@ -1340,32 +1345,35 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     }
 
     /* get peer's listening port */
-    if (auto p = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_p, &p) && p > 0)
+    if (auto const p = map->value_if<int64_t>(TR_KEY_p).value_or(0); p > 0)
     {
         publish(tr_peer_event::GotPort(tr_port::from_host(p)));
         logtrace(this, fmt::format("peer's port is now {:d}", p));
     }
 
-    std::byte const* addr_compact = nullptr;
-    auto addr_len = size_t{};
-    if (io_->is_incoming() && tr_variantDictFindRaw(&*var, TR_KEY_ipv4, &addr_compact, &addr_len) &&
-        addr_len == tr_address::CompactAddrBytes[TR_AF_INET])
+    if (io_->is_incoming())
     {
-        auto pex = tr_pex{ peer_info->listen_socket_address(), peer_info->pex_flags() };
-        pex.socket_address.address_ = tr_address::from_compact_ipv4(addr_compact).first;
-        tr_peerMgrAddPex(&tor_, TR_PEER_FROM_LTEP, &pex, 1);
-    }
+        if (auto const addr_compact = map->value_if<std::string_view>(TR_KEY_ipv4);
+            addr_compact && std::size(*addr_compact) == tr_address::CompactAddrBytes[TR_AF_INET])
+        {
+            auto pex = tr_pex{ peer_info->listen_socket_address(), peer_info->pex_flags() };
+            auto const* const bytes = reinterpret_cast<std::byte const*>(std::data(*addr_compact));
+            pex.socket_address.address_ = tr_address::from_compact_ipv4(bytes).first;
+            tr_peerMgrAddPex(&tor_, TR_PEER_FROM_LTEP, &pex, 1);
+        }
 
-    if (io_->is_incoming() && tr_variantDictFindRaw(&*var, TR_KEY_ipv6, &addr_compact, &addr_len) &&
-        addr_len == tr_address::CompactAddrBytes[TR_AF_INET6])
-    {
-        auto pex = tr_pex{ peer_info->listen_socket_address(), peer_info->pex_flags() };
-        pex.socket_address.address_ = tr_address::from_compact_ipv6(addr_compact).first;
-        tr_peerMgrAddPex(&tor_, TR_PEER_FROM_LTEP, &pex, 1);
+        if (auto const addr_compact = map->value_if<std::string_view>(TR_KEY_ipv6);
+            addr_compact && std::size(*addr_compact) == tr_address::CompactAddrBytes[TR_AF_INET6])
+        {
+            auto pex = tr_pex{ peer_info->listen_socket_address(), peer_info->pex_flags() };
+            auto const* const bytes = reinterpret_cast<std::byte const*>(std::data(*addr_compact));
+            pex.socket_address.address_ = tr_address::from_compact_ipv6(bytes).first;
+            tr_peerMgrAddPex(&tor_, TR_PEER_FROM_LTEP, &pex, 1);
+        }
     }
 
     /* get peer's maximum request queue size */
-    if (auto reqq_in = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_reqq, &reqq_in) && reqq_in > 0)
+    if (auto const reqq_in = map->value_if<int64_t>(TR_KEY_reqq).value_or(0); reqq_in > 0)
     {
         peer_reqq_ = reqq_in;
     }
