@@ -2018,24 +2018,22 @@ void tr_peerMsgsImpl::check_request_timeout(time_t const now)
         return {};
     }
 
-    auto data = tor_.get_metadata_piece(*piece);
+    auto const data = tor_.get_metadata_piece(*piece);
     if (!data)
     {
         // send a reject
-        auto tmp = tr_variant{};
-        tr_variantInitDict(&tmp, 2);
-        tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Reject);
-        tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
-        return protocol_send_message(BtPeerMsgs::Ltep, ut_metadata_id_, tr_variant_serde::benc().to_string(tmp));
+        auto tmp = tr_variant::Map{ 2U };
+        tmp.try_emplace(TR_KEY_msg_type, MetadataMsgType::Reject);
+        tmp.try_emplace(TR_KEY_piece, *piece);
+        return protocol_send_message(BtPeerMsgs::Ltep, ut_metadata_id_, tr_variant_serde::benc().to_string(std::move(tmp)));
     }
 
     // send the metadata
-    auto tmp = tr_variant{};
-    tr_variantInitDict(&tmp, 3);
-    tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Data);
-    tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
-    tr_variantDictAddInt(&tmp, TR_KEY_total_size, tor_.info_dict_size());
-    return protocol_send_message(BtPeerMsgs::Ltep, ut_metadata_id_, tr_variant_serde::benc().to_string(tmp), *data);
+    auto tmp = tr_variant::Map{ 3U };
+    tmp.try_emplace(TR_KEY_msg_type, MetadataMsgType::Data);
+    tmp.try_emplace(TR_KEY_piece, *piece);
+    tmp.try_emplace(TR_KEY_total_size, tor_.info_dict_size());
+    return protocol_send_message(BtPeerMsgs::Ltep, ut_metadata_id_, tr_variant_serde::benc().to_string(std::move(tmp)), *data);
 }
 
 [[nodiscard]] size_t tr_peerMsgsImpl::add_next_block(time_t now_sec, uint64_t now_msec)
