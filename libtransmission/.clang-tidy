@@ -13,7 +13,6 @@ Checks: >
   -cert-err58-cpp,
   -cert-int09-c,
   clang-analyzer-*,
-  -clang-analyzer-optin.core.EnumCastOutOfRange,
   cppcoreguidelines-avoid-do-while,
   cppcoreguidelines-avoid-goto,
   cppcoreguidelines-avoid-reference-coroutine-parameters,

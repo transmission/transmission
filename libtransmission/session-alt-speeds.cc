@@ -32,7 +32,7 @@ void tr_session_alt_speeds::update_minutes()
 
     for (int day = 0; day < 7; ++day)
     {
-        if ((static_cast<tr_sched_day>(settings_.use_on_these_weekdays) & (1 << day)) != 0)
+        if ((settings_.use_on_these_weekdays & (1 << day)) != 0)
         {
             auto const begin = settings_.minute_begin;
             auto const end = settings_.minute_end > settings_.minute_begin ? settings_.minute_end :
