@@ -187,7 +187,7 @@ void PrefsDialog::initWidget(QDoubleSpinBox* const w, int const key)
     updater();
     updaters_.emplace(key, std::move(updater));
 
-    connect(w, &QDoubleSpinBox::valueChanged, [this, key](double const val) { set(key, val); });
+    connect(w, qOverload<double>(&QDoubleSpinBox::valueChanged), [this, key](double const val) { set(key, val); });
 }
 
 void PrefsDialog::initWidget(QLineEdit* const w, int const key)
@@ -220,7 +220,7 @@ void PrefsDialog::initWidget(QSpinBox* const w, int const key)
     updater();
     updaters_.emplace(key, std::move(updater));
 
-    connect(w, &QSpinBox::valueChanged, [this, key](int const val) { set(key, val); });
+    connect(w, qOverload<int>(&QSpinBox::valueChanged), [this, key](int const val) { set(key, val); });
 }
 
 void PrefsDialog::initWidget(QTimeEdit* const w, int const key)
