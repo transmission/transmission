@@ -5,8 +5,6 @@
 #import <Foundation/Foundation.h>
 #import <Quartz/Quartz.h>
 
-#include <stddef.h>
-
 #include <libtransmission/transmission.h>
 
 @class FileListNode;
