@@ -1399,7 +1399,7 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
     return &tor->stats_;
 }
 
-std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* const torrents, size_t n_torrents)
+std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents)
 {
     auto ret = std::vector<tr_stat const*>{};
 
