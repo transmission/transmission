@@ -464,7 +464,7 @@ tr_variant from_string(std::string const& val)
 // RFCs 2474, 3246, 4594 & 8622
 // Service class names are defined in RFC 4594, RFC 5865, and RFC 8622.
 // Not all platforms have these IPTOS_ definitions, so hardcode them here
-auto constexpr TosKeys = Lookup<int, 28U>{ {
+auto constexpr DiffServKeys = Lookup<int, 28U>{ {
     { "cs0", 0x00 }, // IPTOS_CLASS_CS0
     { "le", 0x04 },
     { "cs1", 0x20 }, // IPTOS_CLASS_CS1
@@ -500,7 +500,7 @@ auto constexpr TosKeys = Lookup<int, 28U>{ {
 
 bool to_diffserv_t(tr_variant const& src, tr_diffserv_t* tgt)
 {
-    static constexpr auto& Keys = TosKeys;
+    static constexpr auto& Keys = DiffServKeys;
 
     if (auto const val = src.value_if<std::string_view>())
     {
@@ -533,7 +533,7 @@ bool to_diffserv_t(tr_variant const& src, tr_diffserv_t* tgt)
 
 tr_variant from_diffserv_t(tr_diffserv_t const& val)
 {
-    static constexpr auto& Keys = TosKeys;
+    static constexpr auto& Keys = DiffServKeys;
 
     for (auto const& [key, value] : Keys)
     {
