@@ -39,18 +39,18 @@ Speed tr_bandwidth::get_speed(RateControl& r, unsigned int interval_msec, uint64
         uint64_t bytes = 0U;
         uint64_t const cutoff = now - interval_msec;
 
-        for (int i = r.newest_; r.date_[i] > cutoff;)
+        for (auto i = r.newest_; r.date_[i] > cutoff;)
         {
             bytes += r.size_[i];
 
-            if (--i == -1)
+            if (--i >= HistorySize) // overflowed below zero
             {
-                i = HistorySize - 1; /* circular history */
+                i = HistorySize - 1U; // circular history
             }
 
             if (i == r.newest_)
             {
-                break; /* we've come all the way around */
+                break; // we've come all the way around
             }
         }
 
@@ -71,7 +71,7 @@ void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateContr
     {
         if (++r.newest_ == HistorySize)
         {
-            r.newest_ = 0;
+            r.newest_ = 0U;
         }
 
         r.date_[r.newest_] = now;
