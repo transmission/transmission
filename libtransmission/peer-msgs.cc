@@ -1381,20 +1381,29 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
 void tr_peerMsgsImpl::parse_ut_metadata(MessageReader& payload_in)
 {
-    int64_t msg_type = -1;
-    int64_t piece = -1;
-    int64_t total_size = 0;
-
     auto const tmp = payload_in.to_string_view();
     auto const* const msg_end = std::data(tmp) + std::size(tmp);
 
     auto serde = tr_variant_serde::benc();
-    if (auto var = serde.inplace().parse(tmp); var)
+    auto const var = serde.inplace().parse(tmp);
+    if (!var)
     {
-        (void)tr_variantDictFindInt(&*var, TR_KEY_msg_type, &msg_type);
-        (void)tr_variantDictFindInt(&*var, TR_KEY_piece, &piece);
-        (void)tr_variantDictFindInt(&*var, TR_KEY_total_size, &total_size);
+        auto const base64 = tr_base64_encode(tmp);
+        logdbg(this, fmt::format("failed to parse ut_metadata msg: {}", base64));
+        return;
     }
+
+    auto const* const map = var->get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        auto const base64 = tr_base64_encode(tmp);
+        logdbg(this, fmt::format("got ut_metadata msg that is not a dict: {}", base64));
+        return;
+    }
+
+    auto const msg_type = map->value_if<int64_t>(TR_KEY_msg_type).value_or(-1);
+    auto const piece = map->value_if<int64_t>(TR_KEY_piece).value_or(-1);
+    auto const total_size = map->value_if<int64_t>(TR_KEY_total_size).value_or(0);
 
     logtrace(this, fmt::format("got ut_metadata msg: type {:d}, piece {:d}, total_size {:d}", msg_type, piece, total_size));
     if (tor_.is_private())
@@ -1402,33 +1411,34 @@ void tr_peerMsgsImpl::parse_ut_metadata(MessageReader& payload_in)
         logwarn(this, "got ut metadata in private torrent, rejecting");
     }
 
-    if (msg_type == MetadataMsgType::Reject)
+    switch (msg_type)
     {
-        // no-op
-    }
+    case MetadataMsgType::Data:
+        if (auto const piece_len = msg_end - serde.end(); piece * MetadataPieceSize + piece_len <= total_size)
+        {
+            tor_.set_metadata_piece(piece, serde.end(), piece_len);
+        }
+        break;
 
-    if (auto const piece_len = msg_end - serde.end();
-        msg_type == MetadataMsgType::Data && piece * MetadataPieceSize + piece_len <= total_size)
-    {
-        tor_.set_metadata_piece(piece, serde.end(), piece_len);
-    }
-
-    if (msg_type == MetadataMsgType::Request)
-    {
-        auto& reqs = peer_requested_metadata_pieces_;
-        if (piece >= 0 && tor_.has_metainfo() && can_xfer_metadata() && std::size(reqs) < MetadataReqQ)
+    case MetadataMsgType::Request:
+        if (auto& reqs = peer_requested_metadata_pieces_;
+            piece >= 0 && tor_.has_metainfo() && can_xfer_metadata() && std::size(reqs) < MetadataReqQ)
         {
             reqs.push(piece);
         }
         else
         {
-            /* send a rejection message */
-            auto v = tr_variant{};
-            tr_variantInitDict(&v, 2);
-            tr_variantDictAddInt(&v, TR_KEY_msg_type, MetadataMsgType::Reject);
-            tr_variantDictAddInt(&v, TR_KEY_piece, piece);
-            protocol_send_message(BtPeerMsgs::Ltep, ut_metadata_id_, serde.to_string(v));
+            // send a rejection message
+            auto v = tr_variant::Map{ 2U };
+            v.try_emplace(TR_KEY_msg_type, MetadataMsgType::Reject);
+            v.try_emplace(TR_KEY_piece, piece);
+            protocol_send_message(BtPeerMsgs::Ltep, ut_metadata_id_, serde.to_string(std::move(v)));
         }
+        break;
+
+    case MetadataMsgType::Reject:
+    default:
+        break;
     }
 }
 
