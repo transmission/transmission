@@ -16,6 +16,7 @@
 #include <functional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "libtransmission/tr-macros.h"
 
