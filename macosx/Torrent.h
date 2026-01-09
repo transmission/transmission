@@ -41,8 +41,6 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 // Updates one or more torrents by refreshing their libtransmission stats.
 // Prefer using this batch method when updating many torrents at once.
-+ (void)updateTorrents:(Torrent* const*)torrents count:(size_t)count;
-
 + (void)updateTorrents:(NSArray<Torrent*>*)torrents;
 
 - (void)update;

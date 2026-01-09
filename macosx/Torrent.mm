@@ -242,29 +242,27 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (void)update
 {
-    Torrent* const torrents[] = { self };
-    [Torrent updateTorrents:torrents count:1];
+    [Torrent updateTorrents:@[ self ]];
 }
 
-+ (void)updateTorrents:(Torrent* const*)torrents count:(size_t)count
++ (void)updateTorrents:(NSArray<Torrent*>*)torrents
 {
-    if (torrents == nullptr || count == 0)
+    if (torrents == nil || torrents.count == 0)
     {
         return;
     }
 
     std::vector<Torrent*> torrent_objects;
-    torrent_objects.reserve(count);
+    torrent_objects.reserve(torrents.count);
 
     std::vector<tr_torrent*> torrent_handles;
-    torrent_handles.reserve(count);
+    torrent_handles.reserve(torrents.count);
 
     std::vector<BOOL> was_transmitting;
-    was_transmitting.reserve(count);
+    was_transmitting.reserve(torrents.count);
 
-    for (size_t i = 0; i < count; ++i)
+    for (Torrent* torrent in torrents)
     {
-        Torrent* const torrent = torrents[i];
         if (torrent == nil || torrent.fHandle == nullptr)
         {
             continue;
@@ -298,24 +296,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
                                                          forModes:nil];
         }
     }
-}
-
-+ (void)updateTorrents:(NSArray<Torrent*>*)torrents
-{
-    if (torrents == nil || torrents.count == 0)
-    {
-        return;
-    }
-
-    // NSArray doesn't guarantee contiguous storage, so build a temporary C array.
-    std::vector<Torrent*> v;
-    v.reserve(torrents.count);
-    for (Torrent* torrent in torrents)
-    {
-        v.push_back(torrent);
-    }
-
-    [self updateTorrents:v.data() count:v.size()];
 }
 
 - (void)startTransferIgnoringQueue:(BOOL)ignoreQueue
