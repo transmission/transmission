@@ -1470,6 +1470,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     }
 }
 
+// TODO(C++20): convert to std::span
 size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, size_t n_pex)
 {
     size_t n_used = 0;
@@ -1490,6 +1491,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     return n_used;
 }
 
+// TODO(C++20): convert to std::span
 std::vector<tr_pex> tr_pex::from_compact_ipv4(
     void const* compact,
     size_t compact_len,
@@ -1513,6 +1515,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv4(
     return pex;
 }
 
+// TODO(C++20): convert to std::span
 std::vector<tr_pex> tr_pex::from_compact_ipv6(
     void const* compact,
     size_t compact_len,
