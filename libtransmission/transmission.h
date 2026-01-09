@@ -31,19 +31,19 @@ using tr_tracker_id_t = uint32_t;
 using tr_torrent_id_t = int;
 using tr_mode_t = uint16_t;
 
-inline auto constexpr TrDefaultBlocklistFilename = std::string_view{ "blocklist.bin" };
-inline auto constexpr TrDefaultHttpServerBasePath = std::string_view{ "/transmission/" };
+inline auto constexpr TrDefaultBlocklistFilename = std::string_view{ "blocklist.bin", 13 };
+inline auto constexpr TrDefaultHttpServerBasePath = std::string_view{ "/transmission/", 14 };
 inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
 inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
 inline auto constexpr TrDefaultPeerPort = 51413U;
-inline auto constexpr TrDefaultPeerSocketTos = std::string_view{ "le" };
+inline auto constexpr TrDefaultPeerSocketTos = std::string_view{ "le", 2 };
 inline auto constexpr TrDefaultRpcPort = 9091U;
-inline auto constexpr TrDefaultRpcWhitelist = std::string_view{ "127.0.0.1,::1" };
+inline auto constexpr TrDefaultRpcWhitelist = std::string_view{ "127.0.0.1,::1", 13 };
 
-inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc" };
-inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/" };
-inline auto constexpr TrRpcSessionIdHeader = std::string_view{ "X-Transmission-Session-Id" };
-inline auto constexpr TrRpcVersionHeader = std::string_view{ "X-Transmission-Rpc-Version" };
+inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc", 3 };
+inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/", 4 };
+inline auto constexpr TrRpcSessionIdHeader = std::string_view{ "X-Transmission-Session-Id", 25 };
+inline auto constexpr TrRpcVersionHeader = std::string_view{ "X-Transmission-Rpc-Version", 26 };
 
 struct tr_block_span_t
 {
