@@ -39,7 +39,7 @@ namespace
 auto constexpr MinRepeatIntervalSecs = time_t{ 3 };
 
 template<typename T>
-[[nodiscard]] T n_metadata_pieces(T const& numerator)
+[[nodiscard]] constexpr T n_metadata_pieces(T const& numerator) noexcept
 {
     auto const quot = numerator / MetadataPieceSize;
     auto const rem = numerator % MetadataPieceSize;
