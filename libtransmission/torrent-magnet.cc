@@ -39,10 +39,10 @@ namespace
 auto constexpr MinRepeatIntervalSecs = time_t{ 3 };
 
 template<typename T>
-[[nodiscard]] T div_ceil(T const& numerator, T const& denominator)
+[[nodiscard]] T n_metadata_pieces(T const& numerator)
 {
-    auto const quot = numerator / denominator;
-    auto const rem = numerator % denominator;
+    auto const quot = numerator / MetadataPieceSize;
+    auto const rem = numerator % MetadataPieceSize;
     return quot + (rem == 0 ? 0 : 1);
 }
 } // namespace
@@ -63,7 +63,7 @@ tr_metadata_download::tr_metadata_download(std::string_view log_name, int64_t co
 {
     TR_ASSERT(is_valid_metadata_size(size));
 
-    auto const n = div_ceil(size, int64_t{ MetadataPieceSize });
+    auto const n = n_metadata_pieces(size);
     tr_logAddDebugMagnet(this, fmt::format("metadata is {} bytes in {} pieces", size, n));
 
     piece_count_ = n;
@@ -99,7 +99,7 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
     auto const info_dict_size = this->info_dict_size();
     using size_type = std::remove_cv_t<decltype(info_dict_size)>;
     TR_ASSERT(info_dict_size > 0);
-    if (auto const n_pieces = std::max(size_type{ 1 }, div_ceil(info_dict_size, size_type{ MetadataPieceSize }));
+    if (auto const n_pieces = std::max(size_type{ 1 }, n_metadata_pieces(info_dict_size));
         piece < 0 || static_cast<size_type>(piece) >= n_pieces)
     {
         return {};
