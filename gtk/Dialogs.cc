@@ -33,15 +33,10 @@ void gtr_confirm_remove(
         return;
     }
 
-    auto torrents = std::vector<tr_torrent*>{};
-    torrents.reserve(std::size(torrent_ids));
-    for (auto const id : torrent_ids)
-    {
-        torrents.emplace_back(core->find_torrent(id));
-    }
-
     int connected = 0;
     int incomplete = 0;
+    // TODO(c++20) remove `torrents` local when tr_torrentStat() takes a span
+    auto const torrents = core->find_torrents(torrent_ids);
     for (auto const* stat : tr_torrentStat(std::data(torrents), std::size(torrents)))
     {
         if (stat->leftUntilDone != 0)

@@ -213,18 +213,7 @@ guint DetailsDialog::Impl::last_page_ = 0;
 
 std::vector<tr_torrent*> DetailsDialog::Impl::getTorrents() const
 {
-    std::vector<tr_torrent*> torrents;
-    torrents.reserve(ids_.size());
-
-    for (auto const id : ids_)
-    {
-        if (auto* torrent = core_->find_torrent(id); torrent != nullptr)
-        {
-            torrents.push_back(torrent);
-        }
-    }
-
-    return torrents;
+    return core_->find_torrents(ids_);
 }
 
 /****

@@ -1416,6 +1416,26 @@ size_t Session::Impl::get_active_torrent_count() const
     return activeCount;
 }
 
+std::vector<tr_torrent*> Session::find_torrents(std::vector<tr_torrent_id_t> const& ids) const
+{
+    auto ret = std::vector<tr_torrent*>{};
+
+    if (auto* const session = impl_->get_session())
+    {
+        ret.reserve(std::size(ids));
+
+        for (auto const& id : ids)
+        {
+            if (auto* const tor = tr_torrentFindFromId(session, id))
+            {
+                ret.emplace_back(tor);
+            }
+        }
+    }
+
+    return ret;
+}
+
 tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
 {
     tr_torrent* tor = nullptr;
