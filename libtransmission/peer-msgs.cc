@@ -1911,11 +1911,10 @@ void tr_peerMsgsImpl::maybe_send_metadata_requests(time_t now) const
 
     if (auto const piece = tor_.get_next_metadata_request(now); piece)
     {
-        auto tmp = tr_variant{};
-        tr_variantInitDict(&tmp, 3);
-        tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Request);
-        tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
-        protocol_send_message(BtPeerMsgs::Ltep, ut_metadata_id_, tr_variant_serde::benc().to_string(tmp));
+        auto tmp = tr_variant::Map{ 2U };
+        tmp.try_emplace(TR_KEY_msg_type, MetadataMsgType::Request);
+        tmp.try_emplace(TR_KEY_piece, *piece);
+        protocol_send_message(BtPeerMsgs::Ltep, ut_metadata_id_, tr_variant_serde::benc().to_string(std::move(tmp)));
     }
 }
 
