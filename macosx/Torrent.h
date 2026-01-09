@@ -5,6 +5,8 @@
 #import <Foundation/Foundation.h>
 #import <Quartz/Quartz.h>
 
+#include <stddef.h>
+
 #include <libtransmission/transmission.h>
 
 @class FileListNode;
@@ -34,6 +36,14 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 - (void)getAvailability:(int8_t*)tab size:(int)size;
 - (void)getAmountFinished:(float*)tab size:(int)size;
 @property(nonatomic) NSIndexSet* previousFinishedPieces;
+
+- (void)update;
+
+// Updates one or more torrents by refreshing their libtransmission stats.
+// Prefer using this batch method when updating many torrents at once.
++ (void)updateTorrents:(Torrent* const*)torrents count:(size_t)count;
+
++ (void)updateTorrents:(NSArray<Torrent*>*)torrents;
 
 - (void)update;
 

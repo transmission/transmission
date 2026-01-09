@@ -242,20 +242,58 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (void)update
 {
-    //get previous stalled value before update
-    BOOL const wasTransmitting = self.fStat != NULL && self.transmitting;
+    Torrent* const torrents[] = { self };
+    [Torrent updateTorrents:torrents count:1];
+}
 
-    self.fStat = tr_torrentStat(self.fHandle);
-
-    //make sure the "active" filter is updated when transmitting changes
-    if (wasTransmitting != self.transmitting)
++ (void)updateTorrents:(Torrent* const*)torrents count:(size_t)count
+{
+    if (torrents == nullptr || count == 0)
     {
-        //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
-        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
-                                                 postingStyle:NSPostASAP
-                                                 coalesceMask:NSNotificationCoalescingOnName
-                                                     forModes:nil];
+        return;
     }
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        Torrent* const torrent = torrents[i];
+        if (torrent == nil)
+        {
+            continue;
+        }
+
+        //get previous stalled value before update
+        BOOL const wasTransmitting = torrent.fStat != NULL && torrent.transmitting;
+
+        torrent.fStat = tr_torrentStat(torrent.fHandle);
+
+        //make sure the "active" filter is updated when transmitting changes
+        if (wasTransmitting != torrent.transmitting)
+        {
+            //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
+            [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
+                                                     postingStyle:NSPostASAP
+                                                     coalesceMask:NSNotificationCoalescingOnName
+                                                         forModes:nil];
+        }
+    }
+}
+
++ (void)updateTorrents:(NSArray<Torrent*>*)torrents
+{
+    if (torrents == nil || torrents.count == 0)
+    {
+        return;
+    }
+
+    // NSArray doesn't guarantee contiguous storage, so build a temporary C array.
+    std::vector<Torrent*> v;
+    v.reserve(torrents.count);
+    for (Torrent* torrent in torrents)
+    {
+        v.push_back(torrent);
+    }
+
+    [self updateTorrents:v.data() count:v.size()];
 }
 
 - (void)startTransferIgnoringQueue:(BOOL)ignoreQueue
