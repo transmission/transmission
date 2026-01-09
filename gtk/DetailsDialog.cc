@@ -581,14 +581,13 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     Glib::ustring const no_torrent = _("No Torrents Selected");
     Glib::ustring stateString;
     uint64_t sizeWhenDone = 0;
-    std::vector<tr_stat const*> stats;
-    std::vector<tr_torrent_view> infos;
 
-    stats.reserve(torrents.size());
+    auto const stats = tr_torrentStat(std::data(torrents), std::size(torrents));
+
+    std::vector<tr_torrent_view> infos;
     infos.reserve(torrents.size());
     for (auto* const torrent : torrents)
     {
-        stats.push_back(tr_torrentStat(torrent));
         infos.push_back(tr_torrentView(torrent));
     }
 
