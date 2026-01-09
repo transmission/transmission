@@ -253,21 +253,43 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
         return;
     }
 
+    std::vector<Torrent*> torrent_objects;
+    torrent_objects.reserve(count);
+
+    std::vector<tr_torrent*> torrent_handles;
+    torrent_handles.reserve(count);
+
+    std::vector<BOOL> was_transmitting;
+    was_transmitting.reserve(count);
+
     for (size_t i = 0; i < count; ++i)
     {
         Torrent* const torrent = torrents[i];
-        if (torrent == nil)
+        if (torrent == nil || torrent.fHandle == nullptr)
         {
             continue;
         }
 
-        //get previous stalled value before update
-        BOOL const wasTransmitting = torrent.fStat != NULL && torrent.transmitting;
+        torrent_objects.emplace_back(torrent);
+        torrent_handles.emplace_back(torrent.fHandle);
+        was_transmitting.emplace_back(torrent.fStat != NULL && torrent.transmitting);
+    }
 
-        torrent.fStat = tr_torrentStat(torrent.fHandle);
+    if (torrent_handles.empty())
+    {
+        return;
+    }
+
+    auto const stats = tr_torrentStat(torrent_handles.data(), torrent_handles.size());
+
+    // Assign stats and post notifications.
+    for (size_t i = 0, n = torrent_objects.size(); i < n; ++i)
+    {
+        Torrent* const torrent = torrent_objects[i];
+        torrent.fStat = stats[i];
 
         //make sure the "active" filter is updated when transmitting changes
-        if (wasTransmitting != torrent.transmitting)
+        if (was_transmitting[i] != torrent.transmitting)
         {
             //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
             [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
