@@ -277,7 +277,7 @@ bool create_dir(std::string_view path, int flags, int /*permissions*/, bool okay
 }
 
 template<typename CallbackT>
-void create_temp_path(char* path_template, CallbackT&& callback, tr_error* error)
+void create_temp_path(char* path_template, CallbackT const& callback, tr_error* error)
 {
     TR_ASSERT(path_template != nullptr);
 

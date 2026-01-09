@@ -2,6 +2,7 @@
 HeaderFilterRegex: .*/libtransmission/.*
 
 # TODO: Enable `portability-template-virtual-member-function` after https://github.com/llvm/llvm-project/issues/139031 is fixed
+# TODO: Enable `cppcoreguidelines-pro-bounds-pointer-arithmetic` after converting all pointers to std::span
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
 Checks: >
   bugprone-*,
@@ -13,18 +14,22 @@ Checks: >
   -cert-err58-cpp,
   -cert-int09-c,
   clang-analyzer-*,
-  cppcoreguidelines-avoid-do-while,
-  cppcoreguidelines-avoid-goto,
-  cppcoreguidelines-avoid-reference-coroutine-parameters,
-  cppcoreguidelines-init-variables,
-  cppcoreguidelines-interfaces-global-init,
-  cppcoreguidelines-no-malloc,
-  cppcoreguidelines-prefer-member-initializer,
-  cppcoreguidelines-pro-type-cstyle-cast,
-  cppcoreguidelines-pro-type-member-init,
-  cppcoreguidelines-slicing,
-  cppcoreguidelines-special-member-functions,
-  cppcoreguidelines-virtual-class-destructor,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-c-arrays,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-narrowing-conversions,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-const-cast,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-pro-type-vararg,
   google-explicit-constructor,
   misc-*,
   -misc-include-cleaner,
@@ -44,11 +49,12 @@ Checks: >
   -readability-qualified-auto,
 
 CheckOptions:
-  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros,                    value: true       }
-  - { key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor,  value: true       }
-  - { key: readability-identifier-naming.ConstexprVariableCase,              value: CamelCase  }
-  - { key: readability-identifier-naming.ParameterCase,                      value: lower_case }
-  - { key: readability-identifier-naming.PrivateMemberSuffix,                value: _          }
-  - { key: readability-identifier-naming.ProtectedMemberSuffix,              value: _          }
-  - { key: readability-identifier-naming.VariableCase,                       value: lower_case }
-  - { key: readability-implicit-bool-conversion.UseUpperCaseLiteralSuffix,   value: true       }
+  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros,                           value: true       }
+  - { key: cppcoreguidelines-rvalue-reference-param-not-moved.IgnoreUnnamedParams,  value: true       }
+  - { key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor,         value: true       }
+  - { key: readability-identifier-naming.ConstexprVariableCase,                     value: CamelCase  }
+  - { key: readability-identifier-naming.ParameterCase,                             value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberSuffix,                       value: _          }
+  - { key: readability-identifier-naming.ProtectedMemberSuffix,                     value: _          }
+  - { key: readability-identifier-naming.VariableCase,                              value: lower_case }
+  - { key: readability-implicit-bool-conversion.UseUpperCaseLiteralSuffix,          value: true       }
