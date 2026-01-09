@@ -767,6 +767,7 @@ void tr_session::setSettings(tr_variant const& settings, bool force)
     rpc_server_->load(tr_rpc_server::Settings{ settings });
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved): `std::swap()` also move from the parameter
 void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 {
     auto const lock = unique_lock();
