@@ -2367,21 +2367,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     BOOL anyCompleted = NO;
     BOOL anyActive = NO;
 
+    [Torrent updateTorrents:self.fTorrents];
+
+    for (Torrent* torrent in self.fTorrents)
     {
-        // avoid having to wait for the same lock multiple times in the same operation
-        auto const lock = tr_sessionLock(self.sessionHandle);
+        //pull the upload and download speeds - most consistent by using current stats
+        dlRate += torrent.downloadRate;
+        ulRate += torrent.uploadRate;
 
-        [Torrent updateTorrents:self.fTorrents];
-
-        for (Torrent* torrent in self.fTorrents)
-        {
-            //pull the upload and download speeds - most consistent by using current stats
-            dlRate += torrent.downloadRate;
-            ulRate += torrent.uploadRate;
-
-            anyCompleted |= torrent.finishedSeeding;
-            anyActive |= torrent.active && !torrent.stalled && !torrent.error;
-        }
+        anyCompleted |= torrent.finishedSeeding;
+        anyActive |= torrent.active && !torrent.stalled && !torrent.error;
     }
 
     PowerManager.shared.shouldPreventSleep = anyActive && [self.fDefaults boolForKey:@"SleepPrevent"];
