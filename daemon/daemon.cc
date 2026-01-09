@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cassert>
 #include <cerrno>
 #include <chrono>
 #include <cstdint>
@@ -80,15 +79,14 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                          "\n"
                          "Usage: transmission-daemon [options]";
 
-auto const global_peer_desc = fmt::format("Maximum overall number of peers (Default: {:d})", TrDefaultPeerLimitGlobal);
-auto const peer_port_desc = fmt::format("Port for incoming peers (Default: {:d})", TrDefaultPeerPort);
-auto const peers_tor_desc = fmt::format("Maximum number of peers per torrent (Default: {:d})", TrDefaultPeerLimitTorrent);
-auto const rpc_port_desc = fmt::format("RPC port (Default: {:d})", TrDefaultRpcPort);
-auto const whitelist_desc = fmt::format("Allowed IP addresses. (Default: {:s})", TrDefaultRpcWhitelist);
-
 using Arg = tr_option::Arg;
-auto const options = std::array<tr_option, 48>{ {
-    { 'a', "allowed", whitelist_desc.c_str(), "a", Arg::Required, "<list>" },
+static_assert(TrDefaultRpcWhitelist == "127.0.0.1,::1");
+static_assert(TrDefaultPeerPort == 51413);
+static_assert(TrDefaultPeerLimitTorrent == 50);
+static_assert(TrDefaultPeerLimitGlobal == 200);
+static_assert(TrDefaultRpcPort == 9091);
+auto constexpr Options = std::array<tr_option, 48>{ {
+    { 'a', "allowed", "Allowed IP addresses. (Default: '127.0.0.1,::1')", "a", Arg::Required, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
     { 'c', "watch-dir", "Where to watch for new torrent files", "c", Arg::Required, "<directory>" },
@@ -100,7 +98,7 @@ auto const options = std::array<tr_option, 48>{ {
     { 'e', "logfile", "Dump the log messages to this filename", "e", Arg::Required, "<filename>" },
     { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", Arg::None, nullptr },
     { 'g', "config-dir", "Where to look for configuration files", "g", Arg::Required, "<path>" },
-    { 'p', "port", rpc_port_desc.c_str(), "p", Arg::Required, "<port>" },
+    { 'p', "port", "RPC port (Default: 9091)", "p", Arg::Required, "<port>" },
     { 't', "auth", "Require authentication", "t", Arg::None, nullptr },
     { 'T', "no-auth", "Don't require authentication", "T", Arg::None, nullptr },
     { 'u', "username", "Set username for authentication", "u", Arg::Required, "<username>" },
@@ -129,11 +127,11 @@ auto const options = std::array<tr_option, 48>{ {
       "<protocol(s)>" },
     { 831, "utp", "*DEPRECATED* Enable µTP for peer connections", nullptr, Arg::None, nullptr },
     { 832, "no-utp", "*DEPRECATED* Disable µTP for peer connections", nullptr, Arg::None, nullptr },
-    { 'P', "peerport", peer_port_desc.c_str(), "P", Arg::Required, "<port>" },
+    { 'P', "peerport", "Port for incoming peers (Default: 51413)", "P", Arg::Required, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
-    { 'L', "peerlimit-global", global_peer_desc.c_str(), "L", Arg::Required, "<limit>" },
-    { 'l', "peerlimit-torrent", peers_tor_desc.c_str(), "l", Arg::Required, "<limit>" },
+    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: 200)", "L", Arg::Required, "<limit>" },
+    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: 50)", "l", Arg::Required, "<limit>" },
     { 910, "encryption-required", "Encrypt all peer connections", "er", Arg::None, nullptr },
     { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", Arg::None, nullptr },
     { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", Arg::None, nullptr },
@@ -157,6 +155,7 @@ auto const options = std::array<tr_option, 48>{ {
     { 'x', "pid-file", "Enable PID file", "x", Arg::Required, "<pid-file>" },
     { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
+static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
 namespace
@@ -167,7 +166,7 @@ namespace
     char const* optstr;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &optstr)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
@@ -540,7 +539,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
 
     tr_optind = 1;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &optstr)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -768,12 +767,12 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
 
         case TR_OPT_UNK:
             fprintf(stderr, "Unexpected argument: %s \n", optstr);
-            tr_getopt_usage(MyName, Usage, std::data(options));
+            tr_getopt_usage(MyName, Usage, std::data(Options));
             *exit_code = 1;
             return false;
 
         default:
-            tr_getopt_usage(MyName, Usage, std::data(options));
+            tr_getopt_usage(MyName, Usage, std::data(Options));
             *exit_code = 0;
             return false;
         }
@@ -1080,8 +1079,6 @@ void tr_daemon::handle_error(tr_error const& error) const
 
 int tr_main(int argc, char* argv[])
 {
-    assert(options[std::size(options) - 2].val != 0);
-
     tr_lib_init();
 
     tr_locale_set_global("");

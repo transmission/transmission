@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cassert>
 #include <cstdio> /* fprintf () */
 #include <cstdlib> /* atoi () */
 #include <string>
@@ -49,13 +48,10 @@ sig_atomic_t manualUpdate = false;
 
 char const* torrentPath = nullptr;
 
-auto const peer_port_desc = fmt::format("Port for incoming peers (Default: {:d})", TrDefaultPeerPort);
-auto const tos_desc = fmt::format(
-    "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0'. default={:s})",
-    TrDefaultPeerSocketTos);
-
 using Arg = tr_option::Arg;
-auto const options = std::array<tr_option, 20>{ {
+static_assert(TrDefaultPeerPort == 51413);
+static_assert(TrDefaultPeerSocketTos == "le");
+auto constexpr Options = std::array<tr_option, 20>{ {
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
     { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", Arg::Required, "<speed>" },
@@ -67,8 +63,13 @@ auto const options = std::array<tr_option, 20>{ {
     { 'g', "config-dir", "Where to find configuration files", "g", Arg::Required, "<path>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
-    { 'p', "port", peer_port_desc.c_str(), "p", Arg::Required, "<port>" },
-    { 't', "tos", tos_desc.c_str(), "t", Arg::Required, "<dscp-or-tos>" },
+    { 'p', "port", "Port for incoming peers (Default: 51413)", "p", Arg::Required, "<port>" },
+    { 't',
+      "tos",
+      "Peer socket DSCP / ToS. Number or DSCP string, e.g. 'af11' or 'cs0' (Default: 'le')",
+      "t",
+      Arg::Required,
+      "<dscp-or-tos>" },
     { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", Arg::Required, "<speed>" },
     { 'U', "no-uplimit", "Don't limit the upload speed", "U", Arg::None, nullptr },
     { 'v', "verify", "Verify the specified torrent", "v", Arg::None, nullptr },
@@ -78,6 +79,7 @@ auto const options = std::array<tr_option, 20>{ {
 
     { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
+static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
 namespace
@@ -167,7 +169,7 @@ void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
     char const* my_optarg;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &my_optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
@@ -188,7 +190,7 @@ int parseCommandLine(tr_variant* d, int argc, char const** argv)
     int c;
     char const* my_optarg;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &my_optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -310,8 +312,6 @@ void sigHandler(int signal)
 
 int tr_main(int argc, char* argv[])
 {
-    assert(options[std::size(options) - 2].val != 0);
-
     tr_lib_init();
 
     tr_locale_set_global("");
@@ -321,7 +321,7 @@ int tr_main(int argc, char* argv[])
     /* user needs to pass in at least one argument */
     if (argc < 2)
     {
-        tr_getopt_usage(MyReadableName, Usage, std::data(options));
+        tr_getopt_usage(MyReadableName, Usage, std::data(Options));
         return EXIT_FAILURE;
     }
 

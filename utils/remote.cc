@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cassert>
 #include <cctype> // isspace
 #include <cmath> // floor
 #include <chrono>
@@ -212,11 +211,10 @@ enum
 };
 
 // --- Command-Line Arguments
-//
-auto const peer_port_desc = fmt::format("Port for incoming peers (Default: {:d})", TrDefaultPeerPort);
 
 using Arg = tr_option::Arg;
-auto const options = std::array<tr_option, 106U>{ {
+static_assert(TrDefaultPeerPort == 51413);
+auto constexpr Options = std::array<tr_option, 106>{ {
     { 'a', "add", "Add torrent files by filename or URL", "a", Arg::None, nullptr },
     { 970, "alt-speed", "Use the alternate Limits", "as", Arg::None, nullptr },
     { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", Arg::None, nullptr },
@@ -274,7 +272,7 @@ auto const options = std::array<tr_option, 106U>{ {
     { 820, "ssl", "Use SSL when talking to daemon", nullptr, Arg::None, nullptr },
     { 'o', "dht", "Enable distributed hash tables (DHT)", "o", Arg::None, nullptr },
     { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", Arg::None, nullptr },
-    { 'p', "port", peer_port_desc.c_str(), "p", Arg::Required, "<port>" },
+    { 'p', "port", "Port for incoming peers (Default: 51413)", "p", Arg::Required, "<port>" },
     { 962, "port-test", "Port testing", "pt", Arg::None, nullptr },
     { 'P', "random-port", "Random port for incoming peers", "P", Arg::None, nullptr },
     { 900, "priority-high", "Try to download these file(s) first", "ph", Arg::Required, "<files>" },
@@ -385,13 +383,14 @@ auto const options = std::array<tr_option, 106U>{ {
     { 941, "peer-info", "List the current torrent(s)' peers", "pi", Arg::None, nullptr },
     { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
+static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
 namespace
 {
 void show_usage()
 {
-    tr_getopt_usage(MyName, Usage, std::data(options));
+    tr_getopt_usage(MyName, Usage, std::data(Options));
 }
 
 [[nodiscard]] auto numarg(std::string_view arg)
@@ -2578,7 +2577,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
     for (;;)
     {
-        int const c = tr_getopt(Usage, argc, argv, std::data(options), &optarg);
+        int const c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg);
         if (c == TR_OPT_DONE)
         {
             break;
@@ -3561,8 +3560,6 @@ void get_host_and_port_and_rpc_url(
 
 int tr_main(int argc, char* argv[])
 {
-    assert(options[std::size(options) - 2].val != 0);
-
     tr_lib_init();
 
     tr_locale_set_global("");
