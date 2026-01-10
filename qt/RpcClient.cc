@@ -116,12 +116,12 @@ RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise)
 {
     auto req = QNetworkRequest{};
-    QNetworkRequest request;
-    request.setUrl(url_);
-    request.setRawHeader("User-Agent", "Transmisson/" SHORT_VERSION_STRING);
+    req.setUrl(url_);
+    req.setRawHeader("Content-Type", "application/json; charset=UTF-8");
+    req.setRawHeader("User-Agent", "Transmisson/" SHORT_VERSION_STRING);
     if (!session_id_.isEmpty())
     {
-        request.setRawHeader(TR_RPC_SESSION_ID_HEADER, session_id_);
+        req.setRawHeader(TR_RPC_SESSION_ID_HEADER, session_id_);
     }
 
     if (verbose_)
