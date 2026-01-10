@@ -40,6 +40,11 @@ public:
         [[nodiscard]] virtual tr_piece_index_t piece_count() const = 0;
         [[nodiscard]] virtual tr_priority_t priority(tr_piece_index_t piece) const = 0;
 
+        [[nodiscard]] virtual std::vector<uint8_t> active_request_count(tr_piece_index_t /*piece*/) const
+        {
+            return {};
+        }
+
         [[nodiscard]] virtual libtransmission::ObserverTag observe_files_wanted_changed(
             libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_peer_disconnect(
