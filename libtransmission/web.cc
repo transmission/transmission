@@ -245,7 +245,11 @@ public:
         }
 
         auto const lock = std::unique_lock{ tasks_mutex_ };
-        queued_tasks_.emplace_back(*this, std::move(options));
+        if (auto& task = queued_tasks_.emplace_back(*this, std::move(options)); task.is_unreachable())
+        {
+            task.done();
+            queued_tasks_.pop_back();
+        }
         queued_tasks_cv_.notify_one();
     }
 
@@ -335,6 +339,16 @@ public:
             case FetchOptions::IPProtocol::V6:
                 return CURL_IPRESOLVE_V6;
             default:
+                if (!impl.mediator.has_source_address_V6())
+                {
+                    return CURL_IPRESOLVE_V4;
+                }
+
+                if (!impl.mediator.has_source_address_V4())
+                {
+                    return CURL_IPRESOLVE_V6;
+                }
+
                 return CURL_IPRESOLVE_WHATEVER;
             }
         }
@@ -348,14 +362,23 @@ public:
             case FetchOptions::IPProtocol::V6:
                 return impl.mediator.bind_address_V6();
             default:
-                auto ip = impl.mediator.bind_address_V4();
-                if (ip == std::nullopt)
+                if (!impl.mediator.has_source_address_V4())
                 {
-                    ip = impl.mediator.bind_address_V6();
+                    return impl.mediator.bind_address_V6();
                 }
 
-                return ip;
+                // Single stack destinations are more likely to have IPv4 over IPv6.
+                // FIXME(help needed): We will fail to connect to IPv6-only destinations,
+                // but ideally we should be able to connect to them too.
+                // Related: https://github.com/transmission/transmission/issues/7229
+                return impl.mediator.bind_address_V4();
             }
+        }
+
+        [[nodiscard]] bool is_unreachable() const
+        {
+            return (options_.ip_proto == FetchOptions::IPProtocol::V4 && !impl.mediator.has_source_address_V4()) ||
+                (options_.ip_proto == FetchOptions::IPProtocol::V6 && !impl.mediator.has_source_address_V6());
         }
 
         void add_data(void const* data, size_t const n_bytes)
