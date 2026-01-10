@@ -735,7 +735,7 @@ TEST_F(VariantTest, visitsNodesDepthFirst)
         node.visit(
             [&](auto const& val)
             {
-                using ValueType = std::decay_t<decltype(val)>;
+                using ValueType = std::remove_cvref_t<decltype(val)>;
 
                 if constexpr (
                     std::is_same_v<ValueType, bool> || //

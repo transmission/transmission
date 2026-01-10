@@ -111,7 +111,7 @@ public:
             return {};
         }
 
-        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), n_bytes, 0); n_sent >= 0U)
+        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), n_bytes, 0); n_sent >= 0)
         {
             drain(n_sent);
             return n_sent;

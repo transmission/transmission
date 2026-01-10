@@ -192,7 +192,7 @@ tr_variant& tr_variant::merge(tr_variant const& that)
     that.visit(
         [this](auto const& value)
         {
-            using ValueType = std::decay_t<decltype(value)>;
+            using ValueType = std::remove_cvref_t<decltype(value)>;
 
             if constexpr (
                 std::is_same_v<ValueType, std::monostate> || std::is_same_v<ValueType, std::nullptr_t> ||

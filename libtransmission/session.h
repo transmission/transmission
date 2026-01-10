@@ -555,7 +555,7 @@ public:
 
     explicit tr_session(std::string_view config_dir, tr_variant const& settings_dict);
 
-    [[nodiscard]] std::string_view sessionId() const noexcept
+    [[nodiscard]] std::string_view sessionId() const
     {
         return session_id_.sv();
     }

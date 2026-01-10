@@ -858,8 +858,9 @@ template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 
 #include <charconv> // std::from_chars()
 
-template<typename T, std::enable_if_t<std::is_integral_v<T>, bool>>
+template<typename T>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
+    requires std::is_integral_v<T>
 {
     auto val = T{};
     auto const* const begin_ch = std::data(str);
@@ -893,8 +894,9 @@ template std::optional<unsigned int> tr_num_parse(std::string_view str, std::str
 template std::optional<unsigned short> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 template std::optional<unsigned char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool>>
+template<typename T>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder)
+    requires std::is_floating_point_v<T>
 {
     auto const* const begin_ch = std::data(str);
     auto const* const end_ch = begin_ch + std::size(str);

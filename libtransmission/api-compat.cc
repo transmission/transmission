@@ -653,7 +653,7 @@ void convert_keys(tr_variant& var, State& state)
     var.visit(
         [&state](auto& val)
         {
-            using ValueType = std::decay_t<decltype(val)>;
+            using ValueType = std::remove_cvref_t<decltype(val)>;
 
             if constexpr (std::is_same_v<ValueType, std::string> || std::is_same_v<ValueType, std::string_view>)
             {

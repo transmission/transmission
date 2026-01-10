@@ -100,9 +100,9 @@ public:
             return Vector::const_iterator{ const_cast<Map*>(this)->find(key) };
         }
 
-        [[nodiscard]] auto contains(tr_quark const key) const noexcept
+        [[nodiscard]] TR_CONSTEXPR20 auto contains(tr_quark const key) const noexcept
         {
-            return find(key) != end(); // NOLINT(readability-container-contains)
+            return find(key) != end();
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
@@ -131,7 +131,7 @@ public:
             return 0U;
         }
 
-        bool replace_key(tr_quark const old_key, tr_quark const new_key)
+        TR_CONSTEXPR20 bool replace_key(tr_quark const old_key, tr_quark const new_key)
         {
             if (contains(new_key))
             {
@@ -310,7 +310,8 @@ public:
     [[nodiscard]] constexpr auto* get_if() noexcept
     {
         static_assert(
-            !std::is_same_v<std::decay_t<Val>, std::string> && !std::is_same_v<std::decay_t<Val>, std::string_view>,
+            !std::is_same_v<std::remove_cvref_t<Val>, std::string> &&
+                !std::is_same_v<std::remove_cvref_t<Val>, std::string_view>,
             "not supported -- use value_if<std::string_view>() instead.");
         return std::get_if<Val>(&val_);
     }
@@ -319,7 +320,8 @@ public:
     [[nodiscard]] constexpr auto const* get_if() const noexcept
     {
         static_assert(
-            !std::is_same_v<std::decay_t<Val>, std::string> && !std::is_same_v<std::decay_t<Val>, std::string_view>,
+            !std::is_same_v<std::remove_cvref_t<Val>, std::string> &&
+                !std::is_same_v<std::remove_cvref_t<Val>, std::string_view>,
             "not supported -- use value_if<std::string_view>() instead.");
         return const_cast<tr_variant*>(this)->get_if<Val>();
     }

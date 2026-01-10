@@ -99,9 +99,11 @@ target_link_libraries(${TR_NAME}-mac-qlappex
     PRIVATE
         ${TR_NAME}
         "-framework Foundation"
+        "-framework AppKit"
         "-framework CoreFoundation"
         "-framework CoreServices"
         "-framework Quartz"
+        "-framework UniformTypeIdentifiers"
         "-framework QuickLook")
 
 install(

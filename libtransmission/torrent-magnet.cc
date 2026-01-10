@@ -100,7 +100,7 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
     using size_type = std::remove_cv_t<decltype(info_dict_size)>;
     TR_ASSERT(info_dict_size > 0);
     if (auto const n_pieces = std::max(size_type{ 1 }, n_metadata_pieces(info_dict_size));
-        piece < 0 || static_cast<size_type>(piece) >= n_pieces)
+        piece < 0 || std::cmp_greater_equal(piece, n_pieces))
     {
         return {};
     }
