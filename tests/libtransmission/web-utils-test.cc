@@ -69,6 +69,26 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("fragment"sv, parsed->fragment);
     EXPECT_EQ(8080, parsed->port);
 
+    url = "http://www.some-tracker.org:invalid/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
+
+    url = "http://www.some-tracker.org:/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
+
+    url = "http://www.some-tracker.org:0/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
+
+    url = "http://www.some-tracker.org:-1/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
+
+    url = "http://www.some-tracker.org:65536/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
+
     url =
         "magnet:"
         "?xt=urn:btih:14ffe5dd23188fd5cb53a1d47f1289db70abf31e"
