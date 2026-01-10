@@ -270,7 +270,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
         torrent_objects.emplace_back(torrent);
         torrent_handles.emplace_back(torrent.fHandle);
-        was_transmitting.emplace_back(torrent.fStat != NULL && torrent.transmitting);
+        was_transmitting.emplace_back(torrent.fStat != nullptr && torrent.transmitting);
     }
 
     if (torrent_handles.empty())
