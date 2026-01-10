@@ -42,10 +42,7 @@ template<typename T, size_t N>
 using LookupTable = std::array<std::pair<std::string_view, T>, N>;
 
 template<typename T, size_t N>
-[[nodiscard]] tr_variant from_enum_or_integral_with_lookup(
-    LookupTable<T, N> const& rows,
-    T const src,
-    std::optional<T> const default_value = {})
+[[nodiscard]] tr_variant from_enum_or_integral_with_lookup(LookupTable<T, N> const& rows, T const src)
 {
     static_assert(std::is_enum_v<T> || std::is_integral_v<T>);
 
@@ -54,17 +51,6 @@ template<typename T, size_t N>
         if (value == src)
         {
             return tr_variant::unmanaged_string(key);
-        }
-    }
-
-    if (default_value)
-    {
-        for (auto const& [key, value] : rows)
-        {
-            if (value == *default_value)
-            {
-                return tr_variant::unmanaged_string(key);
-            }
         }
     }
 
