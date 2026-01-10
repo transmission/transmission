@@ -13,12 +13,12 @@
 #include <string_view>
 #include <unordered_set>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/peer-mse.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
-
-#include "gtest/gtest.h"
 
 using namespace std::literals;
 

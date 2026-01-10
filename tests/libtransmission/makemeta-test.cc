@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/announce-list.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
@@ -23,7 +25,6 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
