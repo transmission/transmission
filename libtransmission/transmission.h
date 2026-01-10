@@ -14,9 +14,9 @@
 #include <cstdint>
 #include <ctime>
 #include <functional>
-#include <mutex>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "libtransmission/tr-macros.h"
 
@@ -138,8 +138,6 @@ inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
 inline auto constexpr TrHttpServerDefaultBasePath = std::string_view{ "/transmission/" };
 inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc" };
 inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/" };
-
-std::unique_lock<std::recursive_mutex> tr_sessionLock(tr_session const* session);
 
 /**
  * Add libtransmission's default settings to the benc dictionary.
@@ -1590,6 +1588,11 @@ struct tr_stat
     on the torrent. This is typically called by the GUI clients every
     second or so to get a new snapshot of the torrent's status. */
 tr_stat const* tr_torrentStat(tr_torrent* torrent);
+
+// Batch version of tr_torrentStat().
+// Prefer calling this over calling the single-torrent version in a loop.
+// TODO(c++20) take a std::span argument
+std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
 
 /** @} */
 
