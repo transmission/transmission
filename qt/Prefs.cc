@@ -76,6 +76,43 @@ template<typename T>
     }
 }
 
+[[nodiscard]] tr_variant trvarFromQVar(QVariant const& var, int const qt_metatype)
+{
+    switch (qt_metatype)
+    {
+    case QMetaType::Int:
+        return to_variant(var.value<int>());
+
+    case CustomVariantType::EncryptionModeType:
+        return to_variant(var.value<tr_encryption_mode>());
+
+    case CustomVariantType::SortModeType:
+        return to_variant(var.value<SortMode>());
+
+    case CustomVariantType::ShowModeType:
+        return to_variant(var.value<ShowMode>());
+
+    case QMetaType::QString:
+        return to_variant(var.value<QString>());
+
+    case QMetaType::QStringList:
+        return to_variant(var.value<QStringList>());
+
+    case QMetaType::Bool:
+        return to_variant(var.value<bool>());
+
+    case QMetaType::Double:
+        return to_variant(var.value<double>());
+
+    case QMetaType::QDateTime:
+        return to_variant(var.value<QDateTime>());
+
+    default:
+        assert(false && "unhandled type");
+        return {};
+    }
+}
+
 void ensureSoundCommandIsAList(tr_variant::Map& map)
 {
     auto constexpr Key = TR_KEY_torrent_complete_sound_command;
@@ -208,23 +245,19 @@ namespace
 }
 } // namespace
 
-/***
-****
-***/
+// ---
 
 Prefs::Prefs()
 {
     static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
-
 #ifndef NDEBUG
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
         assert(Items[i].id == i);
     }
-
 #endif
 
-    load(get_defaults());
+    load(defaults());
 }
 
 void Prefs::loadFromConfigDir(QString const dir)
@@ -248,76 +281,32 @@ void Prefs::load(tr_variant::Map const& settings)
     }
 }
 
+tr_variant::Map Prefs::current_settings() const
+{
+    auto map = tr_variant::Map{ PREFS_COUNT };
+
+    for (int idx = 0; idx < PREFS_COUNT; ++idx)
+    {
+        if (prefIsSavable(idx))
+        {
+            map.try_emplace(Items[idx].key, trvarFromQVar(values_[idx], Items[idx].type));
+        }
+    }
+
+    return map;
+}
+
 void Prefs::save(QString const& filename) const
 {
-    // make a dict from settings.json
-    tr_variant current_settings;
-    tr_variantInitDict(&current_settings, PREFS_COUNT);
-
-    for (int i = 0; i < PREFS_COUNT; ++i)
-    {
-        if (!prefIsSavable(i))
-        {
-            continue;
-        }
-
-        auto const key = getKey(i);
-        auto const& val = values_[i];
-
-        switch (Items[i].type)
-        {
-        case QMetaType::Int:
-            dictAdd(&current_settings, key, val.toInt());
-            break;
-
-        case CustomVariantType::EncryptionModeType:
-            *tr_variantDictAdd(&current_settings, key) = to_variant(val.value<tr_encryption_mode>());
-            break;
-
-        case CustomVariantType::SortModeType:
-            *tr_variantDictAdd(&current_settings, key) = to_variant(val.value<SortMode>());
-            break;
-
-        case CustomVariantType::ShowModeType:
-            *tr_variantDictAdd(&current_settings, key) = to_variant(val.value<ShowMode>());
-            break;
-
-        case QMetaType::QString:
-            dictAdd(&current_settings, key, val.toString());
-            break;
-
-        case QMetaType::QStringList:
-            dictAdd(&current_settings, key, val.toStringList());
-            break;
-
-        case QMetaType::Bool:
-            dictAdd(&current_settings, key, val.toBool());
-            break;
-
-        case QMetaType::Double:
-            dictAdd(&current_settings, key, val.toDouble());
-            break;
-
-        case QMetaType::QDateTime:
-            dictAdd(&current_settings, key, int64_t{ val.toDateTime().toSecsSinceEpoch() });
-            break;
-
-        default:
-            assert(false && "unhandled type");
-            break;
-        }
-    }
-
-    // update settings.json with our settings
     auto const filename_str = filename.toStdString();
     auto serde = tr_variant_serde::json();
-    auto settings = tr_variant::make_map(PREFS_COUNT);
-    if (auto const file_settings = serde.parse_file(filename_str))
-    {
-        settings.merge(*file_settings);
-    }
 
-    settings.merge(current_settings);
+    auto settings = tr_variant::make_map(PREFS_COUNT);
+    if (auto const var = serde.parse_file(filename_str))
+    {
+        settings.merge(*var);
+    }
+    settings.merge(tr_variant{ current_settings() });
     api_compat::convert_outgoing_data(settings);
     serde.to_file(settings, filename_str);
 }
@@ -326,7 +315,8 @@ void Prefs::save(QString const& filename) const
  * This is where we initialize the preferences file with the default values.
  * If you add a new preferences key, you /must/ add a default value here.
  */
-tr_variant::Map Prefs::get_defaults()
+// static
+tr_variant::Map Prefs::defaults()
 {
     auto const download_dir = tr_getDefaultDownloadDir();
 

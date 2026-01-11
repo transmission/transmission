@@ -176,6 +176,8 @@ public:
         return values_[idx].value<T>();
     }
 
+    [[nodiscard]] tr_variant::Map current_settings() const;
+
     void save(QString const& filename) const;
 
 signals:
@@ -191,7 +193,7 @@ private:
 
     static std::array<PrefItem, PREFS_COUNT> const Items;
 
-    [[nodiscard]] static tr_variant::Map get_defaults();
+    [[nodiscard]] static tr_variant::Map defaults();
 
     void set(int key, char const* value) = delete;
 
