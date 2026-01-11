@@ -348,7 +348,8 @@ private:
 
     static void sessionClose(tr_session* session)
     {
-        tr_sessionClose(session, 0.5);
+        static auto constexpr DeadlineSecs = 0.1;
+        tr_sessionClose(session, DeadlineSecs);
         tr_logFreeQueue(tr_logGetQueue());
     }
 
