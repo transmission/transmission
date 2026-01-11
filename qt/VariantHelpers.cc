@@ -261,7 +261,7 @@ tr_variant fromInt(int const& val)
 
 bool toQDateTime(tr_variant const& src, QDateTime* tgt)
 {
-    if (auto const val = ser::to_value<time_t>(src))
+    if (auto const val = ser::to_value<int64_t>(src))
     {
         *tgt = QDateTime::fromSecsSinceEpoch(*val);
         return true;
@@ -272,7 +272,7 @@ bool toQDateTime(tr_variant const& src, QDateTime* tgt)
 
 tr_variant fromQDateTime(QDateTime const& src)
 {
-    return ser::to_variant(time_t{ src.toSecsSinceEpoch() });
+    return ser::to_variant(int64_t{ src.toSecsSinceEpoch() });
 }
 
 // ---
