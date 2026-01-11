@@ -11,6 +11,7 @@
 #include <mutex>
 #include <string_view>
 
+#include <QDateTime>
 #include <QUrl>
 
 #include <libtransmission/serializer.h>
