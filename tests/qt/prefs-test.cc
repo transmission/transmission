@@ -23,6 +23,11 @@
 #include "Prefs.h"
 #include "TrQtInit.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
+#define QCOMPARE_EQ(actual, expected) QCOMPARE(actual, expected)
+#define QCOMPARE_NE(actual, expected) QVERIFY((actual) != (expected))
+#endif
+
 using namespace std::literals;
 
 class PrefsTest : public QObject
