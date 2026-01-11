@@ -203,40 +203,40 @@ int tr_main(int argc, char** argv)
     }
 
     // initialize the prefs
-    auto prefs = std::make_unique<Prefs>(config_dir);
+    auto prefs = Prefs{ config_dir };
 
     if (!host.isNull())
     {
-        prefs->set(Prefs::SESSION_REMOTE_HOST, host);
+        prefs.set(Prefs::SESSION_REMOTE_HOST, host);
     }
 
     if (!port.isNull())
     {
-        prefs->set(Prefs::SESSION_REMOTE_PORT, port.toUInt());
+        prefs.set(Prefs::SESSION_REMOTE_PORT, port.toUInt());
     }
 
     if (!username.isNull())
     {
-        prefs->set(Prefs::SESSION_REMOTE_USERNAME, username);
+        prefs.set(Prefs::SESSION_REMOTE_USERNAME, username);
     }
 
     if (!password.isNull())
     {
-        prefs->set(Prefs::SESSION_REMOTE_PASSWORD, password);
+        prefs.set(Prefs::SESSION_REMOTE_PASSWORD, password);
     }
 
     if (!host.isNull() || !port.isNull() || !username.isNull() || !password.isNull())
     {
-        prefs->set(Prefs::SESSION_IS_REMOTE, true);
+        prefs.set(Prefs::SESSION_IS_REMOTE, true);
     }
 
-    if (prefs->get<bool>(Prefs::START_MINIMIZED))
+    if (prefs.get<bool>(Prefs::START_MINIMIZED))
     {
         minimized = true;
     }
 
     // start as minimized only if the system tray present
-    if (!prefs->get<bool>(Prefs::SHOW_TRAY_ICON))
+    if (!prefs.get<bool>(Prefs::SHOW_TRAY_ICON))
     {
         minimized = false;
     }
@@ -249,6 +249,6 @@ int tr_main(int argc, char** argv)
 
     auto qt_argc = static_cast<int>(std::size(qt_argv));
 
-    Application const app(std::move(prefs), minimized, config_dir, filenames, qt_argc, std::data(qt_argv));
+    Application const app(prefs, minimized, config_dir, filenames, qt_argc, std::data(qt_argv));
     return QApplication::exec();
 }
