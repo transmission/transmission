@@ -21,7 +21,6 @@
 #include "CustomVariantType.h"
 #include "Filters.h"
 #include "Prefs.h"
-#include "VariantHelpers.h"
 
 namespace api_compat = libtransmission::api_compat;
 namespace ser = libtransmission::serializer;
