@@ -48,12 +48,12 @@ using namespace std::literals;
 namespace libtransmission::test
 {
 
-class FileTest : public SessionTest
+class FileTest : public SandboxedTest
 {
 protected:
     auto createTestDir(std::string const& child_name)
     {
-        auto test_dir = tr_pathbuf{ session_->configDir(), '/', child_name };
+        auto test_dir = tr_pathbuf{ sandboxDir(), '/', child_name };
         tr_sys_dir_create(test_dir, 0, 0777);
         return test_dir;
     }
