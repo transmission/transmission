@@ -248,7 +248,7 @@ void Prefs::load(tr_variant::Map const& settings)
     }
 }
 
-void Prefs::save(QString const& filename)
+void Prefs::save(QString const& filename) const
 {
     // make a dict from settings.json
     tr_variant current_settings;

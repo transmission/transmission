@@ -176,7 +176,7 @@ public:
         return values_[idx].value<T>();
     }
 
-    void save(QString const& filename);
+    void save(QString const& filename) const;
 
 signals:
     void changed(int idx);
