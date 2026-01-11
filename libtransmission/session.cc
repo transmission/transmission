@@ -1443,7 +1443,9 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // ...and now that those are done, tell web_ that we're shutting
     // down soon. This leaves the `event=stopped` going but refuses any
     // new tasks.
-    this->web_->startShutdown(10s);
+    auto const now = std::chrono::steady_clock::now();
+    auto const remaining_ms = now < deadline ? std::chrono::duration_cast<std::chrono::milliseconds>(deadline - now) : 0ms;
+    this->web_->startShutdown(remaining_ms);
     this->cache.reset();
 
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
@@ -1480,7 +1482,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     closed_promise->set_value();
 }
 
-void tr_sessionClose(tr_session* session, size_t timeout_secs)
+void tr_sessionClose(tr_session* session, double const timeout_secs)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(!session->am_in_session_thread());
@@ -1490,7 +1492,8 @@ void tr_sessionClose(tr_session* session, size_t timeout_secs)
 
     auto closed_promise = std::promise<void>{};
     auto closed_future = closed_promise.get_future();
-    auto const deadline = std::chrono::steady_clock::now() + std::chrono::seconds{ timeout_secs };
+    auto const deadline = std::chrono::steady_clock::now() +
+        std::chrono::milliseconds{ static_cast<int64_t>(timeout_secs * 1000.0) };
     session->run_in_session_thread([&closed_promise, deadline, session]()
                                    { session->closeImplPart1(&closed_promise, deadline); });
     closed_future.wait();
