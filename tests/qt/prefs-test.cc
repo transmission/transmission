@@ -30,7 +30,7 @@ class PrefsTest : public QObject
         return fmt::format(R"("{:s}":{:s})", json_key, valstr);
     }
 
-    void verify_json_contains(tr_variant const& var, std::string_view const substr)
+    static void verify_json_contains(tr_variant const& var, std::string_view const substr)
     {
         auto serde = tr_variant_serde::json();
         serde.compact();
@@ -38,7 +38,7 @@ class PrefsTest : public QObject
         QVERIFY2(tr_strv_contains(str, substr), str.c_str());
     }
 
-    void verify_json_contains(tr_variant const& var, int const idx, std::string_view const val)
+    static void verify_json_contains(tr_variant const& var, int const idx, std::string_view const val)
     {
         auto serde = tr_variant_serde::json();
         serde.compact();
@@ -74,8 +74,10 @@ class PrefsTest : public QObject
     {
         auto const json_object_str = fmt::format(R"({{{:s}}})", get_json_member_str(idx, valstr));
         auto serde = tr_variant_serde::json();
-        auto var = serde.parse(json_object_str);
+        auto const var = serde.parse(json_object_str);
         QVERIFY(var.has_value());
+        // IDK why clang-tidy doesn't see the QVERIFY check above?
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         auto const* const map = var->get_if<tr_variant::Map>();
         QVERIFY(map != nullptr);
         prefs.load(*map);
@@ -116,13 +118,13 @@ private slots:
         auto constexpr Idx = Prefs::RATIO;
         auto constexpr ValA = 1.234;
         auto constexpr ValB = 5.678;
-        auto const ValAStr = fmt::format("{}", ValA);
-        auto const ValBStr = fmt::format("{}", ValB);
+        auto const val_a_str = fmt::format("{}", ValA);
+        auto const val_b_str = fmt::format("{}", ValB);
 
         auto prefs = Prefs{};
         verify_get_set_by_property(prefs, Idx, ValA, ValB);
-        verify_set_by_json(prefs, Idx, ValA, ValAStr);
-        verify_get_by_json(prefs, Idx, ValB, ValBStr);
+        verify_set_by_json(prefs, Idx, ValA, val_a_str);
+        verify_get_by_json(prefs, Idx, ValB, val_b_str);
     }
 
     void handles_qstring()
@@ -130,13 +132,13 @@ private slots:
         auto constexpr Idx = Prefs::DOWNLOAD_DIR;
         auto constexpr ValAStr = R"("/tmp/transmission-test-download-dir")"sv;
         auto constexpr ValBStr = R"("/tmp/transmission-test-download-dir-b")"sv;
-        auto const ValA = QStringLiteral("/tmp/transmission-test-download-dir");
-        auto const ValB = QStringLiteral("/tmp/transmission-test-download-dir-b");
+        auto const val_a = QStringLiteral("/tmp/transmission-test-download-dir");
+        auto const val_b = QStringLiteral("/tmp/transmission-test-download-dir-b");
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, ValA, ValB);
-        verify_set_by_json(prefs, Idx, ValA, ValAStr);
-        verify_get_by_json(prefs, Idx, ValB, ValBStr);
+        verify_get_set_by_property(prefs, Idx, val_a, val_b);
+        verify_set_by_json(prefs, Idx, val_a, ValAStr);
+        verify_get_by_json(prefs, Idx, val_b, ValBStr);
     }
 
     void handles_qstringlist()
@@ -144,27 +146,27 @@ private slots:
         auto constexpr Idx = Prefs::COMPLETE_SOUND_COMMAND;
         auto constexpr ValAStr = R"(["one","two","three"])"sv;
         auto constexpr ValBStr = R"(["alpha","beta"])"sv;
-        auto const ValA = QStringList{ QStringLiteral("one"), QStringLiteral("two"), QStringLiteral("three") };
-        auto const ValB = QStringList{ QStringLiteral("alpha"), QStringLiteral("beta") };
+        auto const val_a = QStringList{ QStringLiteral("one"), QStringLiteral("two"), QStringLiteral("three") };
+        auto const val_b = QStringList{ QStringLiteral("alpha"), QStringLiteral("beta") };
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, ValA, ValB);
-        verify_set_by_json(prefs, Idx, ValA, ValAStr);
-        verify_get_by_json(prefs, Idx, ValB, ValBStr);
+        verify_get_set_by_property(prefs, Idx, val_a, val_b);
+        verify_set_by_json(prefs, Idx, val_a, ValAStr);
+        verify_get_by_json(prefs, Idx, val_b, ValBStr);
     }
 
     void handles_qdatetime()
     {
         auto constexpr Idx = Prefs::BLOCKLIST_DATE;
-        auto const ValA = QDateTime::fromMSecsSinceEpoch(1700000000000LL).toUTC();
-        auto const ValAStr = fmt::format("{}", ValA.toSecsSinceEpoch());
-        auto const ValB = QDateTime::fromMSecsSinceEpoch(1700000000000LL + 123000LL).toUTC();
-        auto const ValBStr = fmt::format("{}", ValB.toSecsSinceEpoch());
+        auto const val_a = QDateTime::fromMSecsSinceEpoch(1700000000000LL).toUTC();
+        auto const val_a_str = fmt::format("{}", val_a.toSecsSinceEpoch());
+        auto const val_b = QDateTime::fromMSecsSinceEpoch(1700000000000LL + 123000LL).toUTC();
+        auto const val_b_str = fmt::format("{}", val_b.toSecsSinceEpoch());
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, ValA, ValB);
-        verify_set_by_json(prefs, Idx, ValA, ValAStr);
-        verify_get_by_json(prefs, Idx, ValB, ValBStr);
+        verify_get_set_by_property(prefs, Idx, val_a, val_b);
+        verify_set_by_json(prefs, Idx, val_a, val_a_str);
+        verify_get_by_json(prefs, Idx, val_b, val_b_str);
     }
 
     void handles_sortmode()
@@ -211,7 +213,7 @@ private slots:
 
     // ---
 
-    void load_sets_download_dir()
+    static void load_sets_download_dir()
     {
         auto const expected_str = "/tmp/foo/bar"sv;
 
@@ -225,10 +227,10 @@ private slots:
         QCOMPARE_EQ(prefs.get<QString>(Prefs::DOWNLOAD_DIR), expected_str);
     }
 
-    void emit_changed_signal_for_sort_reversed()
+    static void emit_changed_signal_for_sort_reversed()
     {
         auto prefs = Prefs{};
-        QSignalSpy spy(&prefs, &Prefs::changed);
+        auto spy = QSignalSpy{ &prefs, &Prefs::changed };
 
         auto const old_value = prefs.get<bool>(Prefs::SORT_REVERSED);
         prefs.set(Prefs::SORT_REVERSED, !old_value);
@@ -238,10 +240,10 @@ private slots:
         QCOMPARE(signal_args.at(0).toInt(), Prefs::SORT_REVERSED);
     }
 
-    void ignore_changed_signal_if_value_unchanged()
+    static void ignore_changed_signal_if_value_unchanged()
     {
         auto prefs = Prefs{};
-        QSignalSpy spy(&prefs, &Prefs::changed);
+        auto const spy = QSignalSpy{ &prefs, &Prefs::changed };
 
         auto const current_value = prefs.get<bool>(Prefs::SORT_REVERSED);
         prefs.set(Prefs::SORT_REVERSED, current_value);
@@ -253,8 +255,8 @@ private slots:
 int main(int argc, char** argv)
 {
     trqt::trqt_init();
-    QApplication app{ argc, argv };
-    PrefsTest test;
+    auto const app = QApplication{ argc, argv };
+    auto test = PrefsTest{};
     return QTest::qExec(&test, argc, argv);
 }
 
