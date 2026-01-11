@@ -716,6 +716,7 @@ public:
     void curlThreadFunc()
     {
         auto const multi = curl_helpers::multi_unique_ptr{ curl_multi_init() };
+        auto const start_time = mediator.now();
 
         auto repeats = unsigned{};
         for (;;)
@@ -762,13 +763,20 @@ public:
 
             resumePausedTasks();
 
+            // During steady state, wake up once per second.
+            // But during startup, wake up 10x more often. This is so tests
+            // that should take a few msec don't block for a full second
+            // while tr_session waits for this thread to finish.
+            static auto constexpr StartupSecs = 15;
+            auto const timeout_ms = mediator.now() - start_time < StartupSecs ? 50 : 1000;
+
             // Adapted from https://curl.se/libcurl/c/curl_multi_wait.html docs.
             // 'numfds' being zero means either a timeout or no file descriptors to
             // wait for. Try timeout on first occurrence, then assume no file
             // descriptors and no file descriptors to wait for means wait for 100
             // milliseconds.
             auto numfds = int{};
-            curl_multi_wait(multi.get(), nullptr, 0, 1000, &numfds);
+            curl_multi_wait(multi.get(), nullptr, 0, timeout_ms, &numfds);
             if (numfds == 0)
             {
                 ++repeats;
