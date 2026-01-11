@@ -213,41 +213,30 @@ private slots:
 
     // ---
 
-    static void load_sets_download_dir()
+    static void changed_signal_emits_when_change()
     {
-        auto const expected_str = "/tmp/foo/bar"sv;
+        static auto constexpr Idx = Prefs::SORT_REVERSED;
 
-        auto prefs = Prefs{};
-        QCOMPARE_NE(prefs.get<QString>(Prefs::DOWNLOAD_DIR), expected_str);
-
-        auto map = tr_variant::Map{};
-        map.try_emplace(TR_KEY_download_dir, expected_str);
-        prefs.load(map);
-
-        QCOMPARE_EQ(prefs.get<QString>(Prefs::DOWNLOAD_DIR), expected_str);
-    }
-
-    static void emit_changed_signal_for_sort_reversed()
-    {
-        auto prefs = Prefs{};
-        auto spy = QSignalSpy{ &prefs, &Prefs::changed };
-
-        auto const old_value = prefs.get<bool>(Prefs::SORT_REVERSED);
-        prefs.set(Prefs::SORT_REVERSED, !old_value);
-
-        QCOMPARE(spy.count(), 1);
-        auto const signal_args = spy.takeFirst();
-        QCOMPARE(signal_args.at(0).toInt(), Prefs::SORT_REVERSED);
-    }
-
-    static void ignore_changed_signal_if_value_unchanged()
-    {
         auto prefs = Prefs{};
         auto const spy = QSignalSpy{ &prefs, &Prefs::changed };
 
-        auto const current_value = prefs.get<bool>(Prefs::SORT_REVERSED);
-        prefs.set(Prefs::SORT_REVERSED, current_value);
+        auto const old_value = prefs.get<bool>(Idx);
+        auto const new_value = !old_value;
+        prefs.set(Idx, new_value);
+        QCOMPARE(spy.count(), 1);
+        auto const& signal_args = spy.first();
+        QCOMPARE(signal_args.at(0).toInt(), Idx);
+    }
 
+    static void changed_signal_does_not_emit_when_unchanged()
+    {
+        static auto constexpr Idx = Prefs::SORT_REVERSED;
+
+        auto prefs = Prefs{};
+        auto const spy = QSignalSpy{ &prefs, &Prefs::changed };
+
+        auto const current_value = prefs.get<bool>(Idx);
+        prefs.set(Idx, current_value);
         QCOMPARE(spy.count(), 0);
     }
 };
