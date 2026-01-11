@@ -35,12 +35,12 @@
 #include "Session.h"
 
 #include "AddData.h"
-#include "CustomVariantType.h"
 #include "Filters.h"
 #include "Prefs.h"
 #include "RpcQueue.h"
 #include "SessionDialog.h"
 #include "Torrent.h"
+#include "UserMetaType.h"
 #include "VariantHelpers.h"
 
 using namespace std::literals;
@@ -82,7 +82,7 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
         dictAdd(&args, key, value.toString());
         break;
 
-    case CustomVariantType::EncryptionModeType:
+    case UserMetaType::EncryptionModeType:
         *tr_variantDictAdd(&args, key) = to_variant(value.value<tr_encryption_mode>());
         break;
 
@@ -923,7 +923,7 @@ void Session::updateInfo(tr_variant* args_dict)
 
             break;
 
-        case CustomVariantType::EncryptionModeType:
+        case UserMetaType::EncryptionModeType:
             if (auto const val = to_value<tr_encryption_mode>(*b))
             {
                 prefs_.set(i, *val);
