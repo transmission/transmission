@@ -136,7 +136,7 @@ public:
     Prefs(Prefs const&) = delete;
     Prefs& operator=(Prefs&&) = delete;
     Prefs& operator=(Prefs const&) = delete;
-    ~Prefs() override;
+    ~Prefs() override = default;
 
     [[nodiscard]] static auto constexpr isCore(int key)
     {
@@ -176,6 +176,8 @@ public:
             emit changed(key);
         }
     }
+
+    void save(QString const& filename);
 
 signals:
     void changed(int key);

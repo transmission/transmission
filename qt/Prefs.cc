@@ -279,7 +279,7 @@ Prefs::Prefs(QString config_dir)
     }
 }
 
-Prefs::~Prefs()
+void Prefs::save(QString const& filename)
 {
     // make a dict from settings.json
     tr_variant current_settings;
@@ -340,18 +340,17 @@ Prefs::~Prefs()
     }
 
     // update settings.json with our settings
+    auto const filename_str = filename.toStdString();
     auto serde = tr_variant_serde::json();
-    auto const file = QFile{ QDir{ config_dir_ }.absoluteFilePath(QStringLiteral("settings.json")) };
-    auto const filename = file.fileName().toStdString();
     auto settings = tr_variant::make_map(PREFS_COUNT);
-    if (auto const file_settings = serde.parse_file(filename); file_settings)
+    if (auto const file_settings = serde.parse_file(filename_str))
     {
         settings.merge(*file_settings);
     }
 
     settings.merge(current_settings);
     api_compat::convert_outgoing_data(settings);
-    serde.to_file(settings, filename);
+    serde.to_file(settings, filename_str);
 }
 
 /**

@@ -7,6 +7,8 @@
 #include <memory>
 #include <string_view>
 
+#include <QDir>
+
 #include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
@@ -247,8 +249,14 @@ int tr_main(int argc, char** argv)
         qt_argv.insert(qt_argv.end(), &argv[qt_args_start_idx], &argv[argc]);
     }
 
+    // run the app
     auto qt_argc = static_cast<int>(std::size(qt_argv));
+    auto const app = Application{ prefs, minimized, config_dir, filenames, qt_argc, std::data(qt_argv) };
+    auto const ret = QApplication::exec();
 
-    Application const app(prefs, minimized, config_dir, filenames, qt_argc, std::data(qt_argv));
-    return QApplication::exec();
+    // save prefs before exiting
+    auto const filename = QDir{ config_dir }.absoluteFilePath(QStringLiteral("settings.json"));
+    prefs.save(filename);
+
+    return ret;
 }
