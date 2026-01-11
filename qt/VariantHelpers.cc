@@ -19,6 +19,8 @@
 #include "Speed.h"
 #include "Torrent.h"
 
+namespace ser = libtransmission::serializer;
+
 namespace trqt::variant_helpers
 {
 
@@ -253,6 +255,42 @@ tr_variant fromInt(int const& val)
 {
     return static_cast<int64_t>(val);
 }
+
+// ---
+
+bool toQDateTime(tr_variant const& src, QDateTime* tgt)
+{
+    if (auto const val = ser::to_value<time_t>(src))
+    {
+        *tgt = QDateTime::fromSecsSinceEpoch(*val);
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromQDateTime(QDateTime const& src)
+{
+    return ser::to_variant(time_t{ src.toSecsSinceEpoch() });
+}
+
+// ---
+
+bool toQString(tr_variant const& src, QString* tgt)
+{
+    if (auto const val = src.value_if<std::string_view>())
+    {
+        *tgt = QString::fromUtf8(std::data(*val), std::size(*val));
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromQString(QString const& val)
+{
+    return val.toStdString();
+}
 } // namespace
 
 void register_qt_converters()
@@ -264,6 +302,8 @@ void register_qt_converters()
         {
             using namespace libtransmission::serializer;
             Converters::add(toInt, fromInt);
+            Converters::add(toQDateTime, fromQDateTime);
+            Converters::add(toQString, fromQString);
         });
 }
 
