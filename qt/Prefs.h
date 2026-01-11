@@ -12,6 +12,7 @@
 #include <QVariant>
 
 #include <libtransmission/quark.h>
+#include <libtransmission/variant.h>
 
 #include <libtransmission-app/display-modes.h>
 
@@ -131,7 +132,7 @@ public:
         PREFS_COUNT
     };
 
-    explicit Prefs(QString config_dir);
+    Prefs();
     Prefs(Prefs&&) = delete;
     Prefs(Prefs const&) = delete;
     Prefs& operator=(Prefs&&) = delete;
@@ -152,6 +153,10 @@ public:
     {
         return Items[i].type;
     }
+
+    void loadFromConfigDir(QString dir);
+
+    void load(tr_variant::Map const& settings);
 
     [[nodiscard]] constexpr auto const& variant(int i) const noexcept
     {
@@ -190,11 +195,9 @@ private:
         int type;
     };
 
-    [[nodiscard]] static tr_variant get_default_app_settings();
+    [[nodiscard]] static tr_variant::Map get_default_app_settings();
 
     void set(int key, char const* value) = delete;
-
-    QString const config_dir_;
 
     std::array<QVariant, PREFS_COUNT> mutable values_;
 

@@ -205,7 +205,8 @@ int tr_main(int argc, char** argv)
     }
 
     // initialize the prefs
-    auto prefs = Prefs{ config_dir };
+    auto prefs = Prefs{};
+    prefs.loadFromConfigDir(config_dir);
 
     if (!host.isNull())
     {
