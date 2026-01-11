@@ -166,7 +166,7 @@ void Session::copyMagnetLinkToClipboard(int torrent_id)
 
 void Session::updatePref(int key)
 {
-    if (prefs_.isCore(key))
+    if (Prefs::isCore(key))
     {
         switch (key)
         {
@@ -209,11 +209,11 @@ void Session::updatePref(int key)
         case Prefs::USPEED:
         case Prefs::USPEED_ENABLED:
         case Prefs::UTP_ENABLED:
-            sessionSet(prefs_.getKey(key), prefs_.variant(key));
+            sessionSet(Prefs::getKey(key), prefs_.variant(key));
             break;
 
         case Prefs::DOWNLOAD_DIR:
-            sessionSet(prefs_.getKey(key), prefs_.variant(key));
+            sessionSet(Prefs::getKey(key), prefs_.variant(key));
             /* this will change the 'freespace' argument, so refresh */
             refreshSessionInfo();
             break;
@@ -890,14 +890,14 @@ void Session::updateInfo(tr_variant* args_dict)
 
     for (int i = Prefs::FIRST_CORE_PREF; i <= Prefs::LAST_CORE_PREF; ++i)
     {
-        tr_variant const* b(tr_variantDictFind(args_dict, prefs_.getKey(i)));
+        tr_variant const* b(tr_variantDictFind(args_dict, Prefs::getKey(i)));
 
         if (b == nullptr)
         {
             continue;
         }
 
-        switch (prefs_.type(i))
+        switch (Prefs::type(i))
         {
         case QMetaType::Int:
             if (auto const value = getValue<int>(b); value)

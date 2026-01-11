@@ -138,17 +138,17 @@ public:
     Prefs& operator=(Prefs const&) = delete;
     ~Prefs() override;
 
-    [[nodiscard]] constexpr auto isCore(int key) const noexcept
+    [[nodiscard]] static auto constexpr isCore(int key)
     {
         return FIRST_CORE_PREF <= key && key <= LAST_CORE_PREF;
     }
 
-    [[nodiscard]] constexpr auto getKey(int i) const noexcept
+    [[nodiscard]] static auto constexpr getKey(int i)
     {
         return Items[i].key;
     }
 
-    [[nodiscard]] constexpr auto type(int i) const noexcept
+    [[nodiscard]] static auto constexpr type(int i)
     {
         return Items[i].type;
     }
