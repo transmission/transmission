@@ -224,7 +224,7 @@ Prefs::Prefs()
 
 #endif
 
-    load(get_default_app_settings());
+    load(get_defaults());
 }
 
 void Prefs::loadFromConfigDir(QString const dir)
@@ -326,7 +326,7 @@ void Prefs::save(QString const& filename)
  * This is where we initialize the preferences file with the default values.
  * If you add a new preferences key, you /must/ add a default value here.
  */
-tr_variant::Map Prefs::get_default_app_settings()
+tr_variant::Map Prefs::get_defaults()
 {
     auto const download_dir = tr_getDefaultDownloadDir();
 

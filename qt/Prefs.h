@@ -16,13 +16,6 @@
 
 #include <libtransmission-app/display-modes.h>
 
-class QDateTime;
-
-extern "C"
-{
-    struct tr_variant;
-}
-
 class Prefs : public QObject
 {
     Q_OBJECT
@@ -139,34 +132,29 @@ public:
     Prefs& operator=(Prefs const&) = delete;
     ~Prefs() override = default;
 
-    [[nodiscard]] static auto constexpr isCore(int key)
+    [[nodiscard]] static auto constexpr isCore(int const idx)
     {
-        return FIRST_CORE_PREF <= key && key <= LAST_CORE_PREF;
+        return FIRST_CORE_PREF <= idx && idx <= LAST_CORE_PREF;
     }
 
-    [[nodiscard]] static auto constexpr getKey(int i)
+    [[nodiscard]] static auto constexpr getKey(int const idx)
     {
-        return Items[i].key;
+        return Items[idx].key;
     }
 
-    [[nodiscard]] static auto constexpr type(int i)
+    [[nodiscard]] static auto constexpr type(int const idx)
     {
-        return Items[i].type;
+        return Items[idx].type;
     }
 
     void loadFromConfigDir(QString dir);
 
     void load(tr_variant::Map const& settings);
 
-    [[nodiscard]] constexpr auto const& variant(int i) const noexcept
+    // DEPRECATED
+    [[nodiscard]] constexpr auto const& variant(int const idx) const noexcept
     {
-        return values_[i];
-    }
-
-    template<typename T>
-    [[nodiscard]] T get(int const key) const
-    {
-        return values_[key].value<T>();
+        return values_[idx];
     }
 
     template<typename T>
@@ -182,10 +170,16 @@ public:
         }
     }
 
+    template<typename T>
+    [[nodiscard]] T get(int const idx) const
+    {
+        return values_[idx].value<T>();
+    }
+
     void save(QString const& filename);
 
 signals:
-    void changed(int key);
+    void changed(int idx);
 
 private:
     struct PrefItem
@@ -195,11 +189,11 @@ private:
         int type;
     };
 
-    [[nodiscard]] static tr_variant::Map get_default_app_settings();
+    static std::array<PrefItem, PREFS_COUNT> const Items;
+
+    [[nodiscard]] static tr_variant::Map get_defaults();
 
     void set(int key, char const* value) = delete;
 
     std::array<QVariant, PREFS_COUNT> mutable values_;
-
-    static std::array<PrefItem, PREFS_COUNT> const Items;
 };
