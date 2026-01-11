@@ -811,11 +811,6 @@ if(RUN_CLANG_TIDY)
     endif()
 endif()
 
-if(ENABLE_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
-
 function(tr_install_web DST_DIR)
     if(INSTALL_WEB)
         install(
@@ -843,6 +838,11 @@ foreach(P cli daemon gtk mac qt utils)
         add_subdirectory(${P})
     endif()
 endforeach()
+
+if(ENABLE_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
     tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})
