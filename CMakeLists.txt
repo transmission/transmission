@@ -409,6 +409,9 @@ if(ENABLE_QT)
         Network
         Svg
         LinguistTools)
+    if(ENABLE_TESTS)
+        list(APPEND QT_REQUIRED_MODULES Test)
+    endif()
     set(QT_OPTIONAL_MODULES
         DBus
         AxContainer
@@ -429,7 +432,7 @@ if(ENABLE_QT)
         foreach(M ${QT_REQUIRED_MODULES})
             find_package(Qt${Qt_VERSION_MAJOR}${M} ${QT_MINIMUM} QUIET)
             if(Qt${Qt_VERSION_MAJOR}${M}_FOUND)
-                if(NOT M STREQUAL "LinguistTools")
+                if(NOT M STREQUAL "LinguistTools" AND NOT M STREQUAL "Test")
                     list(APPEND QT_TARGETS Qt${Qt_VERSION_MAJOR}::${M})
                 endif()
             else()
