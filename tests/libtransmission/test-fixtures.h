@@ -348,7 +348,7 @@ private:
 
     static void sessionClose(tr_session* session)
     {
-        tr_sessionClose(session);
+        tr_sessionClose(session, 0.5);
         tr_logFreeQueue(tr_logGetQueue());
     }
 

@@ -320,7 +320,7 @@ TEST_F(SessionTest, honorsSettings)
     EXPECT_TRUE(tr_sessionUsesAltSpeedTime(session));
     EXPECT_TRUE(tr_sessionIsRPCEnabled(session));
 
-    tr_sessionClose(session);
+    tr_sessionClose(session, 0.5);
 }
 
 TEST_F(SessionTest, savesSettings)
