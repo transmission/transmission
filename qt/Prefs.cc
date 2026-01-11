@@ -24,9 +24,7 @@
 #include "VariantHelpers.h"
 
 namespace api_compat = libtransmission::api_compat;
-using libtransmission::serializer::to_value;
-using libtransmission::serializer::to_variant;
-using ::trqt::variant_helpers::dictAdd;
+namespace ser = libtransmission::serializer;
 using namespace std::string_view_literals;
 
 // ---
@@ -44,31 +42,31 @@ template<typename T>
     switch (qt_metatype)
     {
     case QMetaType::Int:
-        return qvarFromOptional(to_value<int64_t>(var));
+        return qvarFromOptional(ser::to_value<int64_t>(var));
 
     case CustomVariantType::EncryptionModeType:
-        return qvarFromOptional(to_value<tr_encryption_mode>(var));
+        return qvarFromOptional(ser::to_value<tr_encryption_mode>(var));
 
     case CustomVariantType::SortModeType:
-        return qvarFromOptional(to_value<SortMode>(var));
+        return qvarFromOptional(ser::to_value<SortMode>(var));
 
     case CustomVariantType::ShowModeType:
-        return qvarFromOptional(to_value<ShowMode>(var));
+        return qvarFromOptional(ser::to_value<ShowMode>(var));
 
     case QMetaType::QString:
-        return qvarFromOptional(to_value<QString>(var));
+        return qvarFromOptional(ser::to_value<QString>(var));
 
     case QMetaType::QStringList:
-        return qvarFromOptional(to_value<QStringList>(var));
+        return qvarFromOptional(ser::to_value<QStringList>(var));
 
     case QMetaType::Bool:
-        return qvarFromOptional(to_value<bool>(var));
+        return qvarFromOptional(ser::to_value<bool>(var));
 
     case QMetaType::Double:
-        return qvarFromOptional(to_value<double>(var));
+        return qvarFromOptional(ser::to_value<double>(var));
 
     case QMetaType::QDateTime:
-        return qvarFromOptional(to_value<QDateTime>(var));
+        return qvarFromOptional(ser::to_value<QDateTime>(var));
 
     default:
         assert(false && "unhandled type");
@@ -81,31 +79,31 @@ template<typename T>
     switch (qt_metatype)
     {
     case QMetaType::Int:
-        return to_variant(var.value<int>());
+        return ser::to_variant(var.value<int>());
 
     case CustomVariantType::EncryptionModeType:
-        return to_variant(var.value<tr_encryption_mode>());
+        return ser::to_variant(var.value<tr_encryption_mode>());
 
     case CustomVariantType::SortModeType:
-        return to_variant(var.value<SortMode>());
+        return ser::to_variant(var.value<SortMode>());
 
     case CustomVariantType::ShowModeType:
-        return to_variant(var.value<ShowMode>());
+        return ser::to_variant(var.value<ShowMode>());
 
     case QMetaType::QString:
-        return to_variant(var.value<QString>());
+        return ser::to_variant(var.value<QString>());
 
     case QMetaType::QStringList:
-        return to_variant(var.value<QStringList>());
+        return ser::to_variant(var.value<QStringList>());
 
     case QMetaType::Bool:
-        return to_variant(var.value<bool>());
+        return ser::to_variant(var.value<bool>());
 
     case QMetaType::Double:
-        return to_variant(var.value<double>());
+        return ser::to_variant(var.value<double>());
 
     case QMetaType::QDateTime:
-        return to_variant(var.value<QDateTime>());
+        return ser::to_variant(var.value<QDateTime>());
 
     default:
         assert(false && "unhandled type");
@@ -123,7 +121,7 @@ void ensureSoundCommandIsAList(tr_variant::Map& map)
                                                                   "transmission torrent downloaded" };
     if (map.find_if<tr_variant::Vector>(Key) == nullptr)
     {
-        map.insert_or_assign(Key, to_variant(DefaultVal));
+        map.insert_or_assign(Key, ser::to_variant(DefaultVal));
     }
 }
 } // namespace
@@ -325,7 +323,7 @@ tr_variant::Map Prefs::defaults()
     map.try_emplace(TR_KEY_blocklist_updates_enabled, true);
     map.try_emplace(TR_KEY_compact_view, false);
     map.try_emplace(TR_KEY_download_dir, download_dir);
-    map.try_emplace(TR_KEY_filter_mode, to_variant(DefaultShowMode));
+    map.try_emplace(TR_KEY_filter_mode, ser::to_variant(DefaultShowMode));
     map.try_emplace(TR_KEY_inhibit_desktop_hibernation, false);
     map.try_emplace(TR_KEY_main_window_height, 500);
     map.try_emplace(TR_KEY_main_window_layout_order, tr_variant::unmanaged_string("menu,toolbar,filter,list,statusbar"sv));
@@ -350,7 +348,7 @@ tr_variant::Map Prefs::defaults()
     map.try_emplace(TR_KEY_show_statusbar, true);
     map.try_emplace(TR_KEY_show_toolbar, true);
     map.try_emplace(TR_KEY_show_tracker_scrapes, false);
-    map.try_emplace(TR_KEY_sort_mode, to_variant(DefaultSortMode));
+    map.try_emplace(TR_KEY_sort_mode, ser::to_variant(DefaultSortMode));
     map.try_emplace(TR_KEY_sort_reversed, false);
     map.try_emplace(TR_KEY_start_minimized, false);
     map.try_emplace(TR_KEY_statusbar_stats, tr_variant::unmanaged_string("total-ratio"));
