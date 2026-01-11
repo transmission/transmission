@@ -461,7 +461,7 @@ jobs:
         run: apk add --upgrade glibmm-dev gtkmm3-dev
       - name: Get Dependencies (Qt6)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: apk add --upgrade qt6-qtbase-dev qt6-qttools-dev qt6-qtsvg-dev libxcb-cursor
+        run: apk add --upgrade qt6-qtbase-dev qt6-qttools-dev qt6-qtsvg-dev xcb-util-cursor
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -817,7 +817,7 @@ jobs:
         run: dnf install -y glibmm2.68-devel gtkmm4.0-devel
       - name: Get Dependencies (Qt6)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel libxcb-cursor
+        run: dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel xcb-util-cursor
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
