@@ -63,7 +63,7 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
     switch (value.typeId())
 #else
-    switch (static_cast<QMetaType::Type>(value.type()))
+    switch (value.userType())
 #endif
     {
     case QMetaType::Bool:
