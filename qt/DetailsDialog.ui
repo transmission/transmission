@@ -47,7 +47,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="SqueezeLabel" name="haveValueLabel">
+           <widget class="QLabel" name="haveValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -79,7 +79,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="SqueezeLabel" name="availabilityValueLabel">
+           <widget class="QLabel" name="availabilityValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -111,7 +111,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="SqueezeLabel" name="uploadedValueLabel">
+           <widget class="QLabel" name="uploadedValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -143,7 +143,7 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="SqueezeLabel" name="downloadedValueLabel">
+           <widget class="QLabel" name="downloadedValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -175,7 +175,7 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="SqueezeLabel" name="stateValueLabel">
+           <widget class="QLabel" name="stateValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -207,7 +207,7 @@
            </widget>
           </item>
           <item row="5" column="1">
-           <widget class="SqueezeLabel" name="runningTimeValueLabel">
+           <widget class="QLabel" name="runningTimeValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -239,7 +239,7 @@
            </widget>
           </item>
           <item row="6" column="1">
-           <widget class="SqueezeLabel" name="remainingTimeValueLabel">
+           <widget class="QLabel" name="remainingTimeValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -271,7 +271,7 @@
            </widget>
           </item>
           <item row="7" column="1">
-           <widget class="SqueezeLabel" name="lastActivityValueLabel">
+           <widget class="QLabel" name="lastActivityValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -303,7 +303,7 @@
            </widget>
           </item>
           <item row="8" column="1">
-           <widget class="SqueezeLabel" name="errorValueLabel">
+           <widget class="QLabel" name="errorValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -344,7 +344,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="SqueezeLabel" name="sizeValueLabel">
+           <widget class="QLabel" name="sizeValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -376,7 +376,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="SqueezeLabel" name="locationValueLabel">
+           <widget class="QLabel" name="locationValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -408,7 +408,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="SqueezeLabel" name="hashValueLabel">
+           <widget class="QLabel" name="hashValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -440,7 +440,7 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="SqueezeLabel" name="privacyValueLabel">
+           <widget class="QLabel" name="privacyValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -472,7 +472,7 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="SqueezeLabel" name="originValueLabel">
+           <widget class="QLabel" name="originValueLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -504,7 +504,7 @@
            </widget>
           </item>
           <item row="5" column="1">
-           <widget class="SqueezeLabel" name="addedValueLabel">
+           <widget class="QLabel" name="addedValueLabel">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
             </property>
@@ -904,11 +904,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>SqueezeLabel</class>
-   <extends>QLabel</extends>
-   <header>SqueezeLabel.h</header>
-  </customwidget>
   <customwidget>
    <class>FileTreeView</class>
    <extends>QTreeView</extends>

@@ -9,8 +9,6 @@ target_sources(${TR_NAME}-qt-lib
     PRIVATE
         AboutDialog.cc
         AboutDialog.h
-        AccessibleSqueezeLabel.cc
-        AccessibleSqueezeLabel.h
         AddData.cc
         AddData.h
         Application.cc
@@ -82,8 +80,6 @@ target_sources(${TR_NAME}-qt-lib
         SessionDialog.cc
         SessionDialog.h
         Speed.h
-        SqueezeLabel.cc
-        SqueezeLabel.h
         StatsDialog.cc
         StatsDialog.h
         StyleHelper.cc

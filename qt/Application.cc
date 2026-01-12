@@ -21,15 +21,10 @@
 #include <QDBusReply>
 #endif
 
-#if QT_CONFIG(accessibility)
-#include <QAccessible>
-#endif
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/values.h>
 
-#include "AccessibleSqueezeLabel.h"
 #include "AddData.h"
 #include "InteropHelper.h"
 #include "MainWindow.h"
@@ -106,25 +101,6 @@ void initUnits()
     return QIcon{ QStringLiteral(":/icons/transmission.svg") };
 }
 
-#if QT_CONFIG(accessibility)
-
-QAccessibleInterface* accessibleFactory(QString const& className, QObject* object)
-{
-    auto* widget = qobject_cast<QWidget*>(object);
-
-    if (widget != nullptr)
-    {
-        if (className == QStringLiteral("SqueezeLabel"))
-        {
-            return new AccessibleSqueezeLabel(widget);
-        }
-    }
-
-    return nullptr;
-}
-
-#endif // QT_CONFIG(accessibility)
-
 } // namespace
 
 Application::Application(
@@ -157,10 +133,6 @@ Application::Application(
 
     // is this the first time we've run transmission?
     bool const first_time = !dir.exists(QStringLiteral("settings.json"));
-
-#if QT_CONFIG(accessibility)
-    QAccessible::installFactory(&accessibleFactory);
-#endif
 
     session_ = std::make_unique<Session>(config_dir, prefs_);
     model_ = std::make_unique<TorrentModel>(prefs_);

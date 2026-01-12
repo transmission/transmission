@@ -41,7 +41,6 @@
 #include "NativeIcon.h"
 #include "Prefs.h"
 #include "Session.h"
-#include "SqueezeLabel.h"
 #include "Torrent.h"
 #include "TorrentModel.h"
 #include "TrackerDelegate.h"
