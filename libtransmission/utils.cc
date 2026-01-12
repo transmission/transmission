@@ -7,6 +7,7 @@
 #include <array> // std::array
 #include <cctype>
 #include <cfloat> // DBL_DIG
+#include <charconv> // std::from_chars()
 #include <chrono>
 #include <cstdint> // SIZE_MAX
 #include <cstdlib> // getenv()
@@ -822,41 +823,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     return Fallback;
 }
 
-// --- parseNum()
-
-#if defined(__GNUC__) && !__has_include(<charconv>)
-
-#include <iomanip> // std::setbase
-#include <sstream>
-
-template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
-{
-    auto val = T{};
-    auto const tmpstr = std::string(std::data(str), std::min(std::size(str), size_t{ 64 }));
-    auto sstream = std::stringstream{ tmpstr };
-    auto const oldpos = sstream.tellg();
-    /* The base parameter only works for bases 8, 10 and 16.
-       All other bases will be converted to 0 which activates the
-       prefix based parsing and therefore decimal in our usual cases.
-       This differs from the from_chars solution below. */
-    sstream >> std::setbase(base) >> val;
-    auto const newpos = sstream.tellg();
-    if ((newpos == oldpos) || (sstream.fail() && !sstream.eof()))
-    {
-        return std::nullopt;
-    }
-    if (remainder != nullptr)
-    {
-        *remainder = str;
-        remainder->remove_prefix(sstream.eof() ? std::size(str) : newpos - oldpos);
-    }
-    return val;
-}
-
-#else // #if defined(__GNUC__) && !__has_include(<charconv>)
-
-#include <charconv> // std::from_chars()
+// --- tr_num_parse()
 
 template<typename T, std::enable_if_t<std::is_integral_v<T>, bool>>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
@@ -879,8 +846,6 @@ template<typename T, std::enable_if_t<std::is_integral_v<T>, bool>>
     }
     return val;
 }
-
-#endif // #if defined(__GNUC__) && !__has_include(<charconv>)
 
 template std::optional<long long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 template std::optional<long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
