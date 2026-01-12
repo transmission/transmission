@@ -242,19 +242,59 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (void)update
 {
-    //get previous stalled value before update
-    BOOL const wasTransmitting = self.fStat != NULL && self.transmitting;
+    [Torrent updateTorrents:@[ self ]];
+}
 
-    self.fStat = tr_torrentStat(self.fHandle);
-
-    //make sure the "active" filter is updated when transmitting changes
-    if (wasTransmitting != self.transmitting)
++ (void)updateTorrents:(NSArray<Torrent*>*)torrents
+{
+    if (torrents == nil || torrents.count == 0)
     {
-        //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
-        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
-                                                 postingStyle:NSPostASAP
-                                                 coalesceMask:NSNotificationCoalescingOnName
-                                                     forModes:nil];
+        return;
+    }
+
+    std::vector<Torrent*> torrent_objects;
+    torrent_objects.reserve(torrents.count);
+
+    std::vector<tr_torrent*> torrent_handles;
+    torrent_handles.reserve(torrents.count);
+
+    std::vector<BOOL> was_transmitting;
+    was_transmitting.reserve(torrents.count);
+
+    for (Torrent* torrent in torrents)
+    {
+        if (torrent == nil || torrent.fHandle == nullptr)
+        {
+            continue;
+        }
+
+        torrent_objects.emplace_back(torrent);
+        torrent_handles.emplace_back(torrent.fHandle);
+        was_transmitting.emplace_back(torrent.fStat != nullptr && torrent.transmitting);
+    }
+
+    if (torrent_handles.empty())
+    {
+        return;
+    }
+
+    auto const stats = tr_torrentStat(torrent_handles.data(), torrent_handles.size());
+
+    // Assign stats and post notifications.
+    for (size_t i = 0, n = torrent_objects.size(); i < n; ++i)
+    {
+        Torrent* const torrent = torrent_objects[i];
+        torrent.fStat = stats[i];
+
+        //make sure the "active" filter is updated when transmitting changes
+        if (was_transmitting[i] != torrent.transmitting)
+        {
+            //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
+            [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
+                                                     postingStyle:NSPostASAP
+                                                     coalesceMask:NSNotificationCoalescingOnName
+                                                         forModes:nil];
+        }
     }
 }
 

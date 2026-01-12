@@ -2367,20 +2367,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     BOOL anyCompleted = NO;
     BOOL anyActive = NO;
 
+    [Torrent updateTorrents:self.fTorrents];
+
+    for (Torrent* torrent in self.fTorrents)
     {
-        // avoid having to wait for the same lock multiple times in the same operation
-        auto const lock = tr_sessionLock(self.sessionHandle);
-        for (Torrent* torrent in self.fTorrents)
-        {
-            [torrent update];
+        //pull the upload and download speeds - most consistent by using current stats
+        dlRate += torrent.downloadRate;
+        ulRate += torrent.uploadRate;
 
-            //pull the upload and download speeds - most consistent by using current stats
-            dlRate += torrent.downloadRate;
-            ulRate += torrent.uploadRate;
-
-            anyCompleted |= torrent.finishedSeeding;
-            anyActive |= torrent.active && !torrent.stalled && !torrent.error;
-        }
+        anyCompleted |= torrent.finishedSeeding;
+        anyActive |= torrent.active && !torrent.stalled && !torrent.error;
     }
 
     PowerManager.shared.shouldPreventSleep = anyActive && [self.fDefaults boolForKey:@"SleepPrevent"];
@@ -3817,8 +3813,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             for (Torrent* torrent in self.fTorrents)
             {
                 torrent.queuePosition = i++;
-                [torrent update];
             }
+
+            [Torrent updateTorrents:self.fTorrents];
 
             //do the drag animation here so that the dragged torrents are the ones that are animated as moving, and not the torrents around them
             [self.fTableView beginUpdates];
@@ -5527,10 +5524,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)rpcUpdateQueue
 {
-    for (Torrent* torrent in self.fTorrents)
-    {
-        [torrent update];
-    }
+    [Torrent updateTorrents:self.fTorrents];
 
     NSSortDescriptor* descriptor = [NSSortDescriptor sortDescriptorWithKey:@"queuePosition" ascending:YES];
     NSArray* descriptors = @[ descriptor ];
