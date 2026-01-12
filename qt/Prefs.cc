@@ -3,20 +3,14 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
 #include <cassert>
+#include <optional>
 #include <string_view>
 #include <utility>
 
 #include <QDateTime>
 #include <QDir>
-#include <QFile>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-#include <QStringDecoder>
-#else
-#include <QTextCodec>
-#endif
 
 #include <libtransmission/transmission.h>
 
@@ -27,42 +21,108 @@
 #include "CustomVariantType.h"
 #include "Filters.h"
 #include "Prefs.h"
-#include "VariantHelpers.h"
 
 namespace api_compat = libtransmission::api_compat;
-using libtransmission::serializer::to_value;
-using libtransmission::serializer::to_variant;
-using ::trqt::variant_helpers::dictAdd;
-using ::trqt::variant_helpers::getValue;
+namespace ser = libtransmission::serializer;
 using namespace std::string_view_literals;
 
 // ---
 
 namespace
 {
-
-void ensureSoundCommandIsAList(tr_variant* dict)
+template<typename T>
+[[nodiscard]] QVariant qvarFromOptional(std::optional<T> const& val)
 {
-    tr_quark const key = TR_KEY_torrent_complete_sound_command;
-
-    if (tr_variant* list = nullptr; tr_variantDictFindList(dict, key, &list))
-    {
-        return;
-    }
-
-    tr_variantDictRemove(dict, key);
-    dictAdd(
-        dict,
-        key,
-        std::array<std::string_view, 5>{
-            "canberra-gtk-play",
-            "-i",
-            "complete-download",
-            "-d",
-            "transmission torrent downloaded",
-        });
+    return val ? QVariant::fromValue(*val) : QVariant{};
 }
 
+[[nodiscard]] QVariant qvarFromTVar(tr_variant const& var, int const qt_metatype)
+{
+    switch (qt_metatype)
+    {
+    case QMetaType::Int:
+        return qvarFromOptional(ser::to_value<int64_t>(var));
+
+    case CustomVariantType::EncryptionModeType:
+        return qvarFromOptional(ser::to_value<tr_encryption_mode>(var));
+
+    case CustomVariantType::SortModeType:
+        return qvarFromOptional(ser::to_value<SortMode>(var));
+
+    case CustomVariantType::ShowModeType:
+        return qvarFromOptional(ser::to_value<ShowMode>(var));
+
+    case QMetaType::QString:
+        return qvarFromOptional(ser::to_value<QString>(var));
+
+    case QMetaType::QStringList:
+        return qvarFromOptional(ser::to_value<QStringList>(var));
+
+    case QMetaType::Bool:
+        return qvarFromOptional(ser::to_value<bool>(var));
+
+    case QMetaType::Double:
+        return qvarFromOptional(ser::to_value<double>(var));
+
+    case QMetaType::QDateTime:
+        return qvarFromOptional(ser::to_value<QDateTime>(var));
+
+    default:
+        assert(false && "unhandled type");
+        return {};
+    }
+}
+
+[[nodiscard]] tr_variant trvarFromQVar(QVariant const& var, int const qt_metatype)
+{
+    switch (qt_metatype)
+    {
+    case QMetaType::Int:
+        return ser::to_variant(var.value<int>());
+
+    case CustomVariantType::EncryptionModeType:
+        return ser::to_variant(var.value<tr_encryption_mode>());
+
+    case CustomVariantType::SortModeType:
+        return ser::to_variant(var.value<SortMode>());
+
+    case CustomVariantType::ShowModeType:
+        return ser::to_variant(var.value<ShowMode>());
+
+    case QMetaType::QString:
+        return ser::to_variant(var.value<QString>());
+
+    case QMetaType::QStringList:
+        return ser::to_variant(var.value<QStringList>());
+
+    case QMetaType::Bool:
+        return ser::to_variant(var.value<bool>());
+
+    case QMetaType::Double:
+        return ser::to_variant(var.value<double>());
+
+    case QMetaType::QDateTime:
+        return ser::to_variant(var.value<QDateTime>());
+
+    default:
+        assert(false && "unhandled type");
+        return {};
+    }
+}
+
+void ensureSoundCommandIsAList(tr_variant::Map& map)
+{
+    auto constexpr Key = TR_KEY_torrent_complete_sound_command;
+    auto constexpr DefaultVal = std::array<std::string_view, 5U>{ "canberra-gtk-play",
+                                                                  "-i",
+                                                                  "complete-download",
+                                                                  "-d",
+                                                                  "transmission torrent downloaded" };
+    if (map.find_if<tr_variant::Vector>(Key) == nullptr)
+    {
+        map.insert_or_assign(Key, ser::to_variant(DefaultVal));
+    }
+}
 } // namespace
 
 std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
@@ -182,224 +242,119 @@ namespace
 }
 } // namespace
 
-/***
-****
-***/
+// ---
 
-Prefs::Prefs(QString config_dir)
-    : config_dir_{ std::move(config_dir) }
+Prefs::Prefs()
 {
     static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
-
 #ifndef NDEBUG
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
         assert(Items[i].id == i);
     }
-
 #endif
 
-    auto const app_defaults = get_default_app_settings();
-    auto settings = tr_sessionLoadSettings(config_dir_.toStdString(), &app_defaults);
-    ensureSoundCommandIsAList(&settings);
+    load(defaults());
+}
 
-    for (int i = 0; i < PREFS_COUNT; ++i)
+void Prefs::loadFromConfigDir(QString const dir)
+{
+    auto settings = tr_sessionLoadSettings(dir.toStdString());
+    if (auto* const map = settings.get_if<tr_variant::Map>())
     {
-        tr_variant const* b = tr_variantDictFind(&settings, getKey(i));
+        ensureSoundCommandIsAList(*map);
+        load(*map);
+    }
+}
 
-        switch (Items[i].type)
+void Prefs::load(tr_variant::Map const& settings)
+{
+    for (int idx = 0; idx < PREFS_COUNT; ++idx)
+    {
+        if (auto const iter = settings.find(getKey(idx)); iter != settings.end())
         {
-        case QMetaType::Int:
-            if (auto const value = getValue<int64_t>(b); value)
-            {
-                values_[i].setValue(*value);
-            }
-            break;
-
-        case CustomVariantType::EncryptionModeType:
-            if (auto const val = to_value<tr_encryption_mode>(*b))
-            {
-                values_[i] = QVariant::fromValue(*val);
-            }
-            break;
-
-        case CustomVariantType::SortModeType:
-            if (auto const val = to_value<SortMode>(*b))
-            {
-                values_[i] = QVariant::fromValue(*val);
-            }
-            break;
-
-        case CustomVariantType::ShowModeType:
-            if (auto const val = to_value<ShowMode>(*b))
-            {
-                values_[i] = QVariant::fromValue(*val);
-            }
-            break;
-
-        case QMetaType::QString:
-            if (auto const value = getValue<QString>(b); value)
-            {
-                values_[i].setValue(*value);
-            }
-            break;
-
-        case QMetaType::QStringList:
-            if (auto const value = getValue<QStringList>(b); value)
-            {
-                values_[i].setValue(*value);
-            }
-            break;
-
-        case QMetaType::Bool:
-            if (auto const value = getValue<bool>(b); value)
-            {
-                values_[i].setValue(*value);
-            }
-            break;
-
-        case QMetaType::Double:
-            if (auto const value = getValue<double>(b); value)
-            {
-                values_[i].setValue(*value);
-            }
-            break;
-
-        case QMetaType::QDateTime:
-            if (auto const value = getValue<time_t>(b); value)
-            {
-                values_[i].setValue(QDateTime::fromSecsSinceEpoch(*value));
-            }
-            break;
-
-        default:
-            assert(false && "unhandled type");
-            break;
+            values_[idx] = qvarFromTVar(iter->second, Items[idx].type);
         }
     }
 }
 
-Prefs::~Prefs()
+tr_variant::Map Prefs::current_settings() const
 {
-    // make a dict from settings.json
-    tr_variant current_settings;
-    tr_variantInitDict(&current_settings, PREFS_COUNT);
+    auto map = tr_variant::Map{ PREFS_COUNT };
 
-    for (int i = 0; i < PREFS_COUNT; ++i)
+    for (int idx = 0; idx < PREFS_COUNT; ++idx)
     {
-        if (!prefIsSavable(i))
+        if (prefIsSavable(idx))
         {
-            continue;
-        }
-
-        auto const key = getKey(i);
-        auto const& val = values_[i];
-
-        switch (Items[i].type)
-        {
-        case QMetaType::Int:
-            dictAdd(&current_settings, key, val.toInt());
-            break;
-
-        case CustomVariantType::EncryptionModeType:
-            *tr_variantDictAdd(&current_settings, key) = to_variant(val.value<tr_encryption_mode>());
-            break;
-
-        case CustomVariantType::SortModeType:
-            *tr_variantDictAdd(&current_settings, key) = to_variant(val.value<SortMode>());
-            break;
-
-        case CustomVariantType::ShowModeType:
-            *tr_variantDictAdd(&current_settings, key) = to_variant(val.value<ShowMode>());
-            break;
-
-        case QMetaType::QString:
-            dictAdd(&current_settings, key, val.toString());
-            break;
-
-        case QMetaType::QStringList:
-            dictAdd(&current_settings, key, val.toStringList());
-            break;
-
-        case QMetaType::Bool:
-            dictAdd(&current_settings, key, val.toBool());
-            break;
-
-        case QMetaType::Double:
-            dictAdd(&current_settings, key, val.toDouble());
-            break;
-
-        case QMetaType::QDateTime:
-            dictAdd(&current_settings, key, int64_t{ val.toDateTime().toSecsSinceEpoch() });
-            break;
-
-        default:
-            assert(false && "unhandled type");
-            break;
+            map.try_emplace(Items[idx].key, trvarFromQVar(values_[idx], Items[idx].type));
         }
     }
 
-    // update settings.json with our settings
+    return map;
+}
+
+void Prefs::save(QString const& filename) const
+{
+    auto const filename_str = filename.toStdString();
     auto serde = tr_variant_serde::json();
-    auto const file = QFile{ QDir{ config_dir_ }.absoluteFilePath(QStringLiteral("settings.json")) };
-    auto const filename = file.fileName().toStdString();
-    auto settings = tr_variant::make_map(PREFS_COUNT);
-    if (auto const file_settings = serde.parse_file(filename); file_settings)
-    {
-        settings.merge(*file_settings);
-    }
 
-    settings.merge(current_settings);
+    auto settings = tr_variant::make_map(PREFS_COUNT);
+    if (auto const var = serde.parse_file(filename_str))
+    {
+        settings.merge(*var);
+    }
+    settings.merge(tr_variant{ current_settings() });
     api_compat::convert_outgoing_data(settings);
-    serde.to_file(settings, filename);
+    serde.to_file(settings, filename_str);
 }
 
 /**
  * This is where we initialize the preferences file with the default values.
  * If you add a new preferences key, you /must/ add a default value here.
  */
-tr_variant Prefs::get_default_app_settings()
+// static
+tr_variant::Map Prefs::defaults()
 {
     auto const download_dir = tr_getDefaultDownloadDir();
 
-    auto settings = tr_variant::Map{ 64U };
-    settings.try_emplace(TR_KEY_blocklist_date, 0);
-    settings.try_emplace(TR_KEY_blocklist_updates_enabled, true);
-    settings.try_emplace(TR_KEY_compact_view, false);
-    settings.try_emplace(TR_KEY_download_dir, download_dir);
-    settings.try_emplace(TR_KEY_filter_mode, to_variant(DefaultShowMode));
-    settings.try_emplace(TR_KEY_inhibit_desktop_hibernation, false);
-    settings.try_emplace(TR_KEY_main_window_height, 500);
-    settings.try_emplace(TR_KEY_main_window_layout_order, tr_variant::unmanaged_string("menu,toolbar,filter,list,statusbar"sv));
-    settings.try_emplace(TR_KEY_main_window_width, 600);
-    settings.try_emplace(TR_KEY_main_window_x, 50);
-    settings.try_emplace(TR_KEY_main_window_y, 50);
-    settings.try_emplace(TR_KEY_open_dialog_dir, QDir::home().absolutePath().toStdString());
-    settings.try_emplace(TR_KEY_prompt_before_exit, true);
-    settings.try_emplace(TR_KEY_read_clipboard, false);
-    settings.try_emplace(TR_KEY_remote_session_enabled, false);
-    settings.try_emplace(TR_KEY_remote_session_host, tr_variant::unmanaged_string("localhost"sv));
-    settings.try_emplace(TR_KEY_remote_session_https, false);
-    settings.try_emplace(TR_KEY_remote_session_password, tr_variant::unmanaged_string(""sv));
-    settings.try_emplace(TR_KEY_remote_session_port, TrDefaultRpcPort);
-    settings.try_emplace(TR_KEY_remote_session_requires_authentication, false);
-    settings.try_emplace(TR_KEY_remote_session_url_base_path, tr_variant::unmanaged_string(TrHttpServerDefaultBasePath));
-    settings.try_emplace(TR_KEY_remote_session_username, tr_variant::unmanaged_string(""sv));
-    settings.try_emplace(TR_KEY_show_backup_trackers, false);
-    settings.try_emplace(TR_KEY_show_filterbar, true);
-    settings.try_emplace(TR_KEY_show_notification_area_icon, false);
-    settings.try_emplace(TR_KEY_show_options_window, true);
-    settings.try_emplace(TR_KEY_show_statusbar, true);
-    settings.try_emplace(TR_KEY_show_toolbar, true);
-    settings.try_emplace(TR_KEY_show_tracker_scrapes, false);
-    settings.try_emplace(TR_KEY_sort_mode, to_variant(DefaultSortMode));
-    settings.try_emplace(TR_KEY_sort_reversed, false);
-    settings.try_emplace(TR_KEY_start_minimized, false);
-    settings.try_emplace(TR_KEY_statusbar_stats, tr_variant::unmanaged_string("total-ratio"));
-    settings.try_emplace(TR_KEY_torrent_added_notification_enabled, true);
-    settings.try_emplace(TR_KEY_torrent_complete_notification_enabled, true);
-    settings.try_emplace(TR_KEY_torrent_complete_sound_enabled, true);
-    settings.try_emplace(TR_KEY_watch_dir, download_dir);
-    settings.try_emplace(TR_KEY_watch_dir_enabled, false);
-    return tr_variant{ std::move(settings) };
+    auto map = tr_variant::Map{ 64U };
+    map.try_emplace(TR_KEY_blocklist_date, 0);
+    map.try_emplace(TR_KEY_blocklist_updates_enabled, true);
+    map.try_emplace(TR_KEY_compact_view, false);
+    map.try_emplace(TR_KEY_download_dir, download_dir);
+    map.try_emplace(TR_KEY_filter_mode, ser::to_variant(DefaultShowMode));
+    map.try_emplace(TR_KEY_inhibit_desktop_hibernation, false);
+    map.try_emplace(TR_KEY_main_window_height, 500);
+    map.try_emplace(TR_KEY_main_window_layout_order, tr_variant::unmanaged_string("menu,toolbar,filter,list,statusbar"sv));
+    map.try_emplace(TR_KEY_main_window_width, 600);
+    map.try_emplace(TR_KEY_main_window_x, 50);
+    map.try_emplace(TR_KEY_main_window_y, 50);
+    map.try_emplace(TR_KEY_open_dialog_dir, QDir::home().absolutePath().toStdString());
+    map.try_emplace(TR_KEY_prompt_before_exit, true);
+    map.try_emplace(TR_KEY_read_clipboard, false);
+    map.try_emplace(TR_KEY_remote_session_enabled, false);
+    map.try_emplace(TR_KEY_remote_session_host, tr_variant::unmanaged_string("localhost"sv));
+    map.try_emplace(TR_KEY_remote_session_https, false);
+    map.try_emplace(TR_KEY_remote_session_password, tr_variant::unmanaged_string(""sv));
+    map.try_emplace(TR_KEY_remote_session_port, TrDefaultRpcPort);
+    map.try_emplace(TR_KEY_remote_session_requires_authentication, false);
+    map.try_emplace(TR_KEY_remote_session_url_base_path, tr_variant::unmanaged_string(TrHttpServerDefaultBasePath));
+    map.try_emplace(TR_KEY_remote_session_username, tr_variant::unmanaged_string(""sv));
+    map.try_emplace(TR_KEY_show_backup_trackers, false);
+    map.try_emplace(TR_KEY_show_filterbar, true);
+    map.try_emplace(TR_KEY_show_notification_area_icon, false);
+    map.try_emplace(TR_KEY_show_options_window, true);
+    map.try_emplace(TR_KEY_show_statusbar, true);
+    map.try_emplace(TR_KEY_show_toolbar, true);
+    map.try_emplace(TR_KEY_show_tracker_scrapes, false);
+    map.try_emplace(TR_KEY_sort_mode, ser::to_variant(DefaultSortMode));
+    map.try_emplace(TR_KEY_sort_reversed, false);
+    map.try_emplace(TR_KEY_start_minimized, false);
+    map.try_emplace(TR_KEY_statusbar_stats, tr_variant::unmanaged_string("total-ratio"));
+    map.try_emplace(TR_KEY_torrent_added_notification_enabled, true);
+    map.try_emplace(TR_KEY_torrent_complete_notification_enabled, true);
+    map.try_emplace(TR_KEY_torrent_complete_sound_enabled, true);
+    map.try_emplace(TR_KEY_watch_dir, download_dir);
+    map.try_emplace(TR_KEY_watch_dir_enabled, false);
+    return map;
 }

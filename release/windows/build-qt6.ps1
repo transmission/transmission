@@ -89,7 +89,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-no-feature-syntaxhighlighter'
         '-no-feature-systemsemaphore'
         '-no-feature-tablewidget'
-        '-no-feature-testlib'
         '-no-feature-textmarkdownreader'
         '-no-feature-textmarkdownwriter'
         '-no-feature-textodfwriter'

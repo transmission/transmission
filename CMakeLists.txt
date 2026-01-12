@@ -409,6 +409,9 @@ if(ENABLE_QT)
         Network
         Svg
         LinguistTools)
+    if(ENABLE_TESTS)
+        list(APPEND QT_REQUIRED_MODULES Test)
+    endif()
     set(QT_OPTIONAL_MODULES
         DBus
         AxContainer
@@ -429,7 +432,7 @@ if(ENABLE_QT)
         foreach(M ${QT_REQUIRED_MODULES})
             find_package(Qt${Qt_VERSION_MAJOR}${M} ${QT_MINIMUM} QUIET)
             if(Qt${Qt_VERSION_MAJOR}${M}_FOUND)
-                if(NOT M STREQUAL "LinguistTools")
+                if(NOT M STREQUAL "LinguistTools" AND NOT M STREQUAL "Test")
                     list(APPEND QT_TARGETS Qt${Qt_VERSION_MAJOR}::${M})
                 endif()
             else()
@@ -811,11 +814,6 @@ if(RUN_CLANG_TIDY)
     endif()
 endif()
 
-if(ENABLE_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
-
 function(tr_install_web DST_DIR)
     if(INSTALL_WEB)
         install(
@@ -843,6 +841,11 @@ foreach(P cli daemon gtk mac qt utils)
         add_subdirectory(${P})
     endif()
 endforeach()
+
+if(ENABLE_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
     tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})

@@ -12,15 +12,9 @@
 #include <QVariant>
 
 #include <libtransmission/quark.h>
+#include <libtransmission/variant.h>
 
 #include <libtransmission-app/display-modes.h>
-
-class QDateTime;
-
-extern "C"
-{
-    struct tr_variant;
-}
 
 class Prefs : public QObject
 {
@@ -131,37 +125,36 @@ public:
         PREFS_COUNT
     };
 
-    explicit Prefs(QString config_dir);
+    Prefs();
     Prefs(Prefs&&) = delete;
     Prefs(Prefs const&) = delete;
     Prefs& operator=(Prefs&&) = delete;
     Prefs& operator=(Prefs const&) = delete;
-    ~Prefs() override;
+    ~Prefs() override = default;
 
-    [[nodiscard]] constexpr auto isCore(int key) const noexcept
+    [[nodiscard]] static auto constexpr isCore(int const idx)
     {
-        return FIRST_CORE_PREF <= key && key <= LAST_CORE_PREF;
+        return FIRST_CORE_PREF <= idx && idx <= LAST_CORE_PREF;
     }
 
-    [[nodiscard]] constexpr auto getKey(int i) const noexcept
+    [[nodiscard]] static auto constexpr getKey(int const idx)
     {
-        return Items[i].key;
+        return Items[idx].key;
     }
 
-    [[nodiscard]] constexpr auto type(int i) const noexcept
+    [[nodiscard]] static auto constexpr type(int const idx)
     {
-        return Items[i].type;
+        return Items[idx].type;
     }
 
-    [[nodiscard]] constexpr auto const& variant(int i) const noexcept
-    {
-        return values_[i];
-    }
+    void loadFromConfigDir(QString dir);
 
-    template<typename T>
-    [[nodiscard]] T get(int const key) const
+    void load(tr_variant::Map const& settings);
+
+    // DEPRECATED
+    [[nodiscard]] constexpr auto const& variant(int const idx) const noexcept
     {
-        return values_[key].value<T>();
+        return values_[idx];
     }
 
     template<typename T>
@@ -177,8 +170,18 @@ public:
         }
     }
 
+    template<typename T>
+    [[nodiscard]] T get(int const idx) const
+    {
+        return values_[idx].value<T>();
+    }
+
+    [[nodiscard]] tr_variant::Map current_settings() const;
+
+    void save(QString const& filename) const;
+
 signals:
-    void changed(int key);
+    void changed(int idx);
 
 private:
     struct PrefItem
@@ -188,13 +191,11 @@ private:
         int type;
     };
 
-    [[nodiscard]] static tr_variant get_default_app_settings();
+    static std::array<PrefItem, PREFS_COUNT> const Items;
+
+    [[nodiscard]] static tr_variant::Map defaults();
 
     void set(int key, char const* value) = delete;
 
-    QString const config_dir_;
-
     std::array<QVariant, PREFS_COUNT> mutable values_;
-
-    static std::array<PrefItem, PREFS_COUNT> const Items;
 };
