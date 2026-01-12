@@ -634,15 +634,14 @@ void handle_request(struct evhttp_request* req, void* arg)
         auto const body = fmt::format(
             "<p>Your request had an invalid session_id header.</p>"
             "<p>To fix this, follow these steps:"
-            "<ol><li> When reading a response, get its {:s} header and remember it"
+            "<ol><li> When reading a response, get its {0:s} header and remember it"
             "<li> Add the updated header to your outgoing requests"
             "<li> When you get this 409 error message, resend your request with the updated header"
             "</ol></p>"
             "<p>This requirement has been added to help prevent "
             "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
             "attacks.</p>"
-            "<p><code>{:s}: {:s}</code></p>",
-            TrRpcSessionIdHeader,
+            "<p><code>{0:s}: {1:s}</code></p>",
             TrRpcSessionIdHeader,
             session_id);
         send_simple_response(req, 409, body.c_str());
