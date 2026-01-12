@@ -49,8 +49,8 @@ sig_atomic_t manualUpdate = false;
 char const* torrentPath = nullptr;
 
 using Arg = tr_option::Arg;
-static_assert(TrDefaultPeerPort == 51413);
-static_assert(TrDefaultPeerSocketTos == "le");
+static_assert(TrDefaultPeerPort == 51413, "update 'port' desc");
+static_assert(TrDefaultPeerSocketTos == "le", "update 'tos' desc");
 auto constexpr Options = std::array<tr_option, 20>{ {
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },

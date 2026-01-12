@@ -213,7 +213,7 @@ enum
 // --- Command-Line Arguments
 
 using Arg = tr_option::Arg;
-static_assert(TrDefaultPeerPort == 51413);
+static_assert(TrDefaultPeerPort == 51413, "update 'port' desc");
 auto constexpr Options = std::array<tr_option, 106>{ {
     { 'a', "add", "Add torrent files by filename or URL", "a", Arg::None, nullptr },
     { 970, "alt-speed", "Use the alternate Limits", "as", Arg::None, nullptr },

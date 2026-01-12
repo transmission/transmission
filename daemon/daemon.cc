@@ -80,11 +80,11 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                          "Usage: transmission-daemon [options]";
 
 using Arg = tr_option::Arg;
-static_assert(TrDefaultRpcWhitelist == "127.0.0.1,::1");
-static_assert(TrDefaultPeerPort == 51413);
-static_assert(TrDefaultPeerLimitTorrent == 50);
-static_assert(TrDefaultPeerLimitGlobal == 200);
-static_assert(TrDefaultRpcPort == 9091);
+static_assert(TrDefaultRpcWhitelist == "127.0.0.1,::1", "update 'allowed' desc");
+static_assert(TrDefaultPeerPort == 51413, "update 'peerport' desc");
+static_assert(TrDefaultPeerLimitTorrent == 50, "update 'peerlimit-torrent' desc");
+static_assert(TrDefaultPeerLimitGlobal == 200, "update 'peerlimit-global' desc");
+static_assert(TrDefaultRpcPort == 9091 && R"(update "port" desc)");
 auto constexpr Options = std::array<tr_option, 48>{ {
     { 'a', "allowed", "Allowed IP addresses. (Default: '127.0.0.1,::1')", "a", Arg::Required, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
