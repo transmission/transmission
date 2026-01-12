@@ -6,13 +6,14 @@
 #include <cstddef>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/net.h>
 #include <libtransmission/session.h> // tr_session.addressIsBlocked()
 #include <libtransmission/tr-strbuf.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 namespace libtransmission::test
