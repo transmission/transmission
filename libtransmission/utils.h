@@ -161,33 +161,25 @@ template<typename T>
     return 0;
 }
 
-constexpr std::string_view tr_strv_sep(std::string_view* sv, std::string_view delim)
+template<typename... Args>
+constexpr std::string_view tr_strv_sep(std::string_view* sv, Args&&... args)
 {
-    auto pos = sv->find_first_of(delim);
+    auto pos = sv->find_first_of(std::forward<Args>(args)...);
     auto const ret = sv->substr(0, pos);
     sv->remove_prefix(pos != std::string_view::npos ? pos + 1 : std::size(*sv));
     return ret;
 }
 
-constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, std::string_view delim)
+template<typename... Args>
+constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, Args&&... args)
 {
     if (std::empty(*sv))
     {
         return false;
     }
 
-    *token = tr_strv_sep(sv, delim);
+    *token = tr_strv_sep(sv, std::forward<Args>(args)...);
     return true;
-}
-
-constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
-{
-    return tr_strv_sep(sv, { &delim, 1U });
-}
-
-constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char delim)
-{
-    return tr_strv_sep(sv, token, { &delim, 1U });
 }
 
 [[nodiscard]] std::string_view tr_strv_strip(std::string_view str);
