@@ -53,7 +53,7 @@ class RpcClient : public QObject
     Q_OBJECT
 
 public:
-    explicit RpcClient(QObject* parent = nullptr);
+    explicit RpcClient(QNetworkAccessManager& nam, QObject* parent = nullptr);
     RpcClient(RpcClient&&) = delete;
     RpcClient(RpcClient const&) = delete;
     RpcClient& operator=(RpcClient&&) = delete;
@@ -89,7 +89,7 @@ private:
     QByteArray const SessionIdHeaderName = std::data(TrRpcSessionIdHeader);
     QByteArray const VersionHeaderName = std::data(TrRpcVersionHeader);
 
-    QNetworkAccessManager* networkAccessManager();
+    void connectNetworkAccessManager();
 
     void sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise);
     void sendLocalRequest(tr_variant& req, QFutureInterface<RpcResponse> const& promise, int64_t id);
@@ -103,7 +103,7 @@ private:
     tr_session* session_ = {};
     QByteArray session_id_;
     QUrl url_;
-    QNetworkAccessManager* nam_ = {};
+    QNetworkAccessManager* const nam_;
     std::unordered_map<int64_t, QFutureInterface<RpcResponse>> local_requests_;
     bool const verbose_ = qEnvironmentVariableIsSet("TR_RPC_VERBOSE");
     bool url_is_loopback_ = false;

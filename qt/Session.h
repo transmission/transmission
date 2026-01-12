@@ -16,6 +16,7 @@
 #include <QString>
 #include <QStringList>
 #include <QTimer>
+#include <QNetworkAccessManager>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
@@ -192,6 +193,7 @@ private:
     QString session_version_;
     QString session_id_;
     bool is_definitely_local_session_ = true;
+    QNetworkAccessManager nam_;
     RpcClient rpc_;
     torrent_ids_t const RecentlyActiveIDs = { -1 };
 
