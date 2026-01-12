@@ -1024,7 +1024,7 @@ void convert(tr_variant& var, Style const tgt_style)
 void convert_outgoing_data(tr_variant& var)
 {
     // TODO: change default to Tr5 in transmission 5.0.0-beta.1
-    static auto const style = tr_env_get_string("TR_SAVE_VERSION_FORMAT", "4") == "5" ? Style::Tr5 : Style::Tr4;
+    auto const style = tr_env_get_string("TR_SAVE_VERSION_FORMAT", "4") == "5" ? Style::Tr5 : Style::Tr4;
     convert(var, style);
 }
 
