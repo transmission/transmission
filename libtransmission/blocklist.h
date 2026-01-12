@@ -53,7 +53,7 @@ public:
 
     void load(std::string_view folder, bool is_enabled);
     void set_enabled(bool is_enabled);
-    size_t update_primary_blocklist(std::string_view external_file, bool is_enabled);
+    std::optional<size_t> update_primary_blocklist(std::string_view external_file, bool is_enabled);
 
     template<typename Observer>
     [[nodiscard]] sigslot::scoped_connection observe_changes(Observer observer) const
