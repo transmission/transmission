@@ -94,7 +94,7 @@ jobs:
           sudo apt update
           sudo apt install -y clang-format-20
       - name: Get NPM
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
       - name: Check for style diffs
@@ -741,7 +741,7 @@ jobs:
           echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
           echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
       - name: Get NPM
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
       - name: Get Dependencies (GTK)
@@ -823,7 +823,7 @@ jobs:
             pkgconf-pkg-config \
             xz
       - name: Get NPM
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
       - name: Get Dependencies (GTK)
@@ -910,7 +910,7 @@ jobs:
           echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
           echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
       - name: Get NPM
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
       - name: Get Dependencies (GTK)
@@ -981,7 +981,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    
+
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v3
       with:

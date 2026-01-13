@@ -60,7 +60,7 @@ jobs:
       - name: Get source
         uses: actions/checkout@v6
       - name: Get NPM
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
       - name: Check for style diffs
@@ -127,7 +127,7 @@ jobs:
         run: |
           env | sort
       - name: Get NPM
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
       - name: Get source
