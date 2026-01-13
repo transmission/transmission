@@ -20,7 +20,6 @@ target_sources(${TR_NAME}-qt-lib
         ColumnResizer.h
         ComInteropHelper.cc
         ComInteropHelper.h
-        CustomVariantType.h
         DBusInteropHelper.cc
         DBusInteropHelper.h
         DetailsDialog.cc
@@ -109,6 +108,7 @@ target_sources(${TR_NAME}-qt-lib
         TrQtInit.cc
         TrQtInit.h
         Typedefs.h
+        UserMetaType.h
         Utils.cc
         Utils.h
         VariantHelpers.cc
