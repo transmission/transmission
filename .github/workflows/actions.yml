@@ -725,9 +725,15 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
+            locales \
             ninja-build \
             pkg-config \
             xz-utils
+          # Set UTF-8 locale for Qt
+          echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+          locale-gen
+          echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
+          echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
       - name: Get NPM
         uses: actions/setup-node@v4
         with:
@@ -886,7 +892,13 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
+            locales \
             ninja-build
+          # Set UTF-8 locale for Qt
+          echo "en_US.UTF-8 UTF-8" | sudo tee /etc/locale.gen
+          sudo locale-gen
+          echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
+          echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
       - name: Get NPM
         uses: actions/setup-node@v4
         with:
@@ -1013,7 +1025,13 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
+            locales \
             ninja-build
+          # Set UTF-8 locale for Qt
+          echo "en_US.UTF-8 UTF-8" | sudo tee /etc/locale.gen
+          sudo locale-gen
+          echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
+          echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
