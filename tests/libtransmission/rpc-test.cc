@@ -13,13 +13,12 @@
 #include <string_view>
 #include <vector>
 
-#include <gtest/gtest.h>
-
-#include <libtransmission/quark.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
+#include "libtransmission/quark.h"
 #include "test-fixtures.h"
 
 struct tr_session;

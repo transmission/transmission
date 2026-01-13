@@ -30,7 +30,7 @@
 #include "libtransmission/utils.h" // for _(), tr_strerror()
 
 #ifndef MINIUPNPC_API_VERSION
-#error "MINIUPNPC_API_VERSION macro not defined"
+#error miniupnpc >= 1.7 is required
 #endif
 
 namespace

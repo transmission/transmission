@@ -14,8 +14,6 @@
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
-
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include <libtransmission/benc.h>

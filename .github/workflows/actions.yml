@@ -122,7 +122,7 @@ jobs:
           exit 1
 
   sanitizer-tests-ubuntu:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
@@ -140,19 +140,15 @@ jobs:
             clang \
             cmake \
             gettext \
-            libb64-dev \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
-            libfast-float-dev \
             libfmt-dev \
             libminiupnpc-dev \
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
-            libutfcpp-dev \
-            ninja-build \
-            rapidjson-dev
+            ninja-build
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -178,13 +174,7 @@ jobs:
             -DENABLE_TESTS=ON \
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
-            -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
+            -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
@@ -201,24 +191,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew install --formulae \
-            cmake \
-            crc32c \
-            fast_float \
-            fmt \
-            gettext \
-            libb64 \
-            libdeflate \
-            libevent \
-            libnatpmp \
-            libpsl \
-            miniupnpc \
-            ninja \
-            node \
-            pkgconf \
-            rapidjson \
-            utf8cpp
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -242,12 +215,7 @@ jobs:
             -DENABLE_TESTS=ON \
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
-            -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Homebrew` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Homebrew` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Homebrew`
+            -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
@@ -275,19 +243,15 @@ jobs:
             clang-tidy-20 \
             cmake \
             gettext \
-            libb64-dev \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
-            libfast-float-dev \
             libfmt-dev \
             libminiupnpc-dev \
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
-            libutfcpp-dev \
-            ninja-build \
-            rapidjson-dev
+            ninja-build
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -304,13 +268,7 @@ jobs:
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-            -DRUN_CLANG_TIDY=ON \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
+            -DRUN_CLANG_TIDY=ON
       - name: Make (Core)
         run: cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
       - name: Make (Tests)
@@ -419,24 +377,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew install --formulae \
-            cmake \
-            crc32c \
-            fast_float \
-            fmt \
-            gettext \
-            libb64 \
-            libdeflate \
-            libevent \
-            libnatpmp \
-            libpsl \
-            miniupnpc \
-            ninja \
-            node \
-            pkgconf \
-            rapidjson \
-            utf8cpp
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf crc32c
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install --formula gtkmm3
@@ -457,8 +398,6 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
-            -DCMAKE_CXX_FLAGS='--system-header-prefix=fmt/' `# Needed to supress system header warnings in macos-15-intel` \
-            -DCMAKE_C_FLAGS='--system-header-prefix=fmt/' `# Needed to supress system header warnings in macos-15-intel` \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
@@ -469,11 +408,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Homebrew` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Homebrew` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Homebrew`
+            -DUSE_SYSTEM_Crc32c=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -482,7 +417,7 @@ jobs:
           TMPDIR: /private/tmp
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ matrix.os }}-cmake-universal
@@ -490,7 +425,7 @@ jobs:
 
   alpine-musl:
     needs: [ what-to-make ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
       image: alpine:latest
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
@@ -510,22 +445,16 @@ jobs:
             cmake \
             crc32c-dev \
             curl-dev \
-            fast_float \
             fmt-dev \
             gettext-dev \
             git \
-            libdeflate-dev \
-            libdeflate-static \
             libevent-dev \
-            libnatpmp-dev \
-            libpsl-dev \
+            libpsl \
             linux-headers \
             miniupnpc-dev \
             ninja \
             npm \
             pkgconfig \
-            rapidjson-dev \
-            utfcpp \
             xz
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
@@ -558,12 +487,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_B64=OFF `# Not packaged in Alpine` \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Alpine` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Alpine` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Alpine` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Alpine`
+            -DUSE_SYSTEM_CRC32C=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -573,7 +497,7 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}
@@ -636,7 +560,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure --timeout 600
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo
+        run: cmake --build obj --config RelWithDebInfo --target install
       - name: Package
         if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
         run: |
@@ -750,7 +674,14 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_DEFAULT=OFF
+            -DUSE_SYSTEM_EVENT2=OFF \
+            -DUSE_SYSTEM_DEFLATE=OFF \
+            -DUSE_SYSTEM_DHT=OFF \
+            -DUSE_SYSTEM_MINIUPNPC=OFF \
+            -DUSE_SYSTEM_NATPMP=OFF \
+            -DUSE_SYSTEM_UTP=OFF \
+            -DUSE_SYSTEM_B64=OFF \
+            -DUSE_SYSTEM_PSL=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -759,7 +690,7 @@ jobs:
           TMPDIR: /private/tmp
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ matrix.os }}-from-tarball
@@ -768,7 +699,7 @@ jobs:
   debian-11-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
       image: debian:11-slim
     steps:
@@ -786,18 +717,16 @@ jobs:
             cmake \
             g++ \
             gettext \
-            libb64-dev \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
-            libgtest-dev \
+            libfmt-dev \
             libminiupnpc-dev \
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
             ninja-build \
             pkg-config \
-            rapidjson-dev \
             xz-utils
       - name: Get NPM
         uses: actions/setup-node@v4
@@ -832,17 +761,7 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_GTEST=ON \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian 11` \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian 11` \
-            -DUSE_SYSTEM_FAST_FLOAT=OFF `# Not packaged in Debian 11` \
-            -DUSE_SYSTEM_FMT=OFF `# Debian 11 package too old` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian 11` \
-            -DUSE_SYSTEM_UTF8CPP=OFF `# Debian 11 package too old` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian 11` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Debian 11`
+            -DRUN_CLANG_TIDY=OFF
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -851,116 +770,18 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  debian-from-tarball:
+  fedora-39-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        version: [stable, testing]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
-      image: debian:${{ matrix.version }}-slim
-    steps:
-      - name: Show Configuration
-        run: |
-          echo '${{ toJSON(needs) }}'
-          echo '${{ toJSON(runner) }}'
-          cat /etc/os-release
-      - name: Get Dependencies
-        run: |
-          set -ex
-          apt update
-          apt install -y --no-install-recommends \
-            ca-certificates \
-            cmake \
-            g++ \
-            gettext \
-            libb64-dev \
-            libcurl4-openssl-dev \
-            libdeflate-dev \
-            libevent-dev \
-            libfast-float-dev \
-            libfmt-dev \
-            libgtest-dev \
-            libminiupnpc-dev \
-            libnatpmp-dev \
-            libpsl-dev \
-            libssl-dev \
-            libutfcpp-dev \
-            ninja-build \
-            pkg-config \
-            rapidjson-dev \
-            xz-utils
-      - name: Get NPM
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - name: Get Dependencies (GTK3)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: apt install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
-      - name: Get Dependencies (Qt6)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: apt install -y --no-install-recommends qt6-svg-dev qt6-tools-dev
-      - name: Get Source
-        uses: actions/download-artifact@v4
-        with:
-          name: source-tarball
-      - name: Extract Source
-        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
-      - name: Configure
-        run: |
-          cmake \
-            -S src \
-            -B obj \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_GTEST=ON \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian` \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Debian`
-      - name: Build
-        run: cmake --build obj --config RelWithDebInfo
-      - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
-      - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
-      - uses: actions/upload-artifact@v4
-        with:
-          name: binaries-${{ github.job }}-${{ matrix.version }}
-          path: pfx/**/*
-
-  fedora-from-tarball:
-    needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        version: [41, 42, 43]
-    runs-on: ubuntu-latest
-    container:
-      image: fedora:${{ matrix.version }}
+      image: fedora:39
     steps:
       - name: Show Configuration
         run: |
@@ -973,12 +794,10 @@ jobs:
           dnf install -y \
             ca-certificates \
             cmake \
-            fast_float-devel \
             fmt-devel \
             gcc-c++ \
             gettext \
             google-crc32c-devel \
-            libb64-devel \
             libcurl-devel \
             libdeflate-devel \
             libevent-devel \
@@ -988,14 +807,12 @@ jobs:
             ninja-build \
             openssl-devel \
             pkgconf-pkg-config \
-            rapidjson-devel \
-            utf8cpp-devel \
             xz
       - name: Get NPM
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      - name: Get Dependencies (GTK4)
+      - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: dnf install -y glibmm2.68-devel gtkmm4.0-devel
       - name: Get Dependencies (Qt6)
@@ -1026,11 +843,7 @@ jobs:
             -DENABLE_DEPRECATED=ON \
             -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Fedora` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Fedora` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Fedora` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Fedora`
+            -DUSE_SYSTEM_Crc32c=ON
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -1039,16 +852,16 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ github.job }}-${{ matrix.version }}
+          name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  ubuntu-24-04-from-tarball:
+  ubuntu-22-04-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Show Configuration
         run: |
@@ -1065,19 +878,15 @@ jobs:
             clang \
             cmake \
             gettext \
-            libb64-dev \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
-            libfast-float-dev \
             libfmt-dev \
             libminiupnpc-dev \
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
-            libutfcpp-dev \
-            ninja-build \
-            rapidjson-dev
+            ninja-build
       - name: Get NPM
         uses: actions/setup-node@v4
         with:
@@ -1111,13 +920,7 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
+            -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -1126,7 +929,7 @@ jobs:
           TMPDIR: /private/tmp
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}
@@ -1156,7 +959,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-
+    
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v3
       with:
@@ -1202,19 +1005,15 @@ jobs:
             clang \
             cmake \
             gettext \
-            libb64-dev \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
-            libfast-float-dev \
             libfmt-dev \
             libminiupnpc-dev \
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
-            libutfcpp-dev \
-            ninja-build \
-            rapidjson-dev
+            ninja-build
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
@@ -1246,12 +1045,6 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
+            -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo -- "-k 0"

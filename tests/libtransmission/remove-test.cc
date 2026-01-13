@@ -10,14 +10,13 @@
 #include <string_view>
 #include <utility>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/file.h>
 #include <libtransmission/torrent-files.h>
 #include <libtransmission/tr-strbuf.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

@@ -32,8 +32,6 @@
 
 #include <fmt/format.h>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_rand_obj
@@ -50,6 +48,7 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 #ifdef _WIN32

@@ -11,12 +11,12 @@
 #include <string>
 #include <string_view>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
+
+#include "gtest/gtest.h"
 
 using namespace std::literals;
 

@@ -9,8 +9,6 @@
 #include <string_view>
 #include <utility>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/block-info.h>
@@ -22,6 +20,7 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

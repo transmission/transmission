@@ -21,8 +21,6 @@
 
 #include <fmt/format.h>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_rand_int()
@@ -31,6 +29,7 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using UtilsTest = ::libtransmission::test::TransmissionTest;
