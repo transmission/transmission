@@ -29,6 +29,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/blocklist.h"
+#include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
@@ -260,8 +261,12 @@ auto parseFile(std::string_view filename)
         }
         else
         {
-            // don't try to display the actual lines - it causes issues
-            tr_logAddWarn(fmt::format(fmt::runtime(_("Couldn't parse line: '{line}'")), fmt::arg("line", line_number)));
+            auto const base64 = tr_base64_encode(line);
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't parse line {line}: {base64}")),
+                    fmt::arg("line", line_number),
+                    fmt::arg("base64", base64)));
         }
     }
     in.close();
