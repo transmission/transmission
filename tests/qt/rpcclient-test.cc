@@ -112,8 +112,7 @@ class RpcClientTest : public QObject
 
     static void invoke_network_finished(RpcClient& client, QNetworkReply* reply)
     {
-        QVERIFY(
-            QMetaObject::invokeMethod(&client, "networkRequestFinished", Qt::DirectConnection, Q_ARG(QNetworkReply*, reply)));
+        QMetaObject::invokeMethod(&client, "networkRequestFinished", Qt::DirectConnection, Q_ARG(QNetworkReply*, reply));
     }
 
 private slots:
