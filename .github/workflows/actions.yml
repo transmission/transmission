@@ -38,7 +38,7 @@ jobs:
           fi
       - name: Get Source
         id: get-source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           path: src
@@ -83,7 +83,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Get Dependencies
@@ -150,7 +150,7 @@ jobs:
             libssl-dev \
             ninja-build
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
           path: src
@@ -193,7 +193,7 @@ jobs:
       - name: Get Dependencies
         run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
           path: src
@@ -253,7 +253,7 @@ jobs:
             libssl-dev \
             ninja-build
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
           path: src
@@ -288,7 +288,7 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
           path: src
@@ -337,7 +337,7 @@ jobs:
       - name: Get Dependencies
         run: brew install --formulae xcbeautify
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: src
           submodules: recursive
@@ -385,7 +385,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: brew install --formula qt
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: src
           submodules: recursive
@@ -466,7 +466,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: apk add --upgrade qt6-qtbase-dev qt6-qttools-dev qt6-qtsvg-dev xcb-util-cursor
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: src
           submodules: recursive
@@ -526,7 +526,7 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: src
           submodules: recursive
@@ -599,7 +599,7 @@ jobs:
             libssl-dev \
             ninja-build
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: src
           submodules: recursive
@@ -972,7 +972,7 @@ jobs:
           ninja-build
 
     - name: Get Source
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -1051,7 +1051,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: sudo apt-get install -y --no-install-recommends libxcb-cursor0 qt6-base-dev qt6-svg-dev qt6-tools-dev
       - name: Get Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
           path: src
