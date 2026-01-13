@@ -5,12 +5,11 @@
 
 #include <string_view>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/api-compat.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using ApiCompatTest = ::libtransmission::test::TransmissionTest;

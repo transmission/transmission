@@ -9,14 +9,13 @@
 #include <string_view>
 #include <vector>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 namespace libtransmission::test

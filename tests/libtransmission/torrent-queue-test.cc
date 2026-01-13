@@ -9,11 +9,10 @@
 #include <string_view>
 #include <vector>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/torrent-queue.h>
 #include <libtransmission/torrent.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

@@ -23,8 +23,6 @@
 
 #include <event2/util.h>
 
-#include <gtest/gtest.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_sha1_to_string, tr_base...
@@ -39,6 +37,7 @@
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
