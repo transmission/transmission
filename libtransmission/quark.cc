@@ -88,7 +88,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "bytes_to_client"sv, // rpc
     "bytes_to_peer"sv, // rpc
     "cache-size-mb"sv, // rpc, tr_session::Settings
-    "cache_size_mb"sv, // rpc, tr_session::Settings
+    "cache_size_mib"sv, // rpc, tr_session::Settings
     "clientIsChoked"sv, // rpc
     "clientIsInterested"sv, // rpc
     "clientName"sv, // rpc
@@ -376,7 +376,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "peer_port_random_high"sv, // tr_session::Settings
     "peer_port_random_low"sv, // tr_session::Settings
     "peer_port_random_on_start"sv, // rpc, tr_session::Settings
-    "peer_socket_tos"sv, // tr_session::Settings
+    "peer_socket_diffserv"sv, // tr_session::Settings
     "peers"sv, // rpc
     "peers2"sv, // .resume
     "peers2-6"sv, // .resume
@@ -474,7 +474,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "remote_session_password"sv, // qt app
     "remote_session_port"sv, // qt app
     "remote_session_requires_authentication"sv, // qt app
-    "remote_session_rpc_url_path"sv, // qt app
+    "remote_session_url_base_path"sv, // qt app
     "remote_session_username"sv, // qt app
     "removed"sv, // rpc
     "rename-partial-files"sv, // rpc, tr_session::Settings

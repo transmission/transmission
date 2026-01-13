@@ -7,8 +7,9 @@
 #include "GtkCompat.h"
 #include "Torrent.h"
 
+#include <libtransmission-app/favicon-cache.h>
+
 #include <libtransmission/transmission.h>
-#include <libtransmission/favicon-cache.h>
 #include <libtransmission/variant.h>
 
 #include <gdkmm/pixbuf.h>
@@ -71,7 +72,10 @@ public:
 
     tr_torrent* find_torrent(tr_torrent_id_t id) const;
 
-    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& favicon_cache() const;
+    // TODO(c++20) std::span
+    [[nodiscard]] std::vector<tr_torrent*> find_torrents(std::vector<tr_torrent_id_t> const& ids) const;
+
+    transmission::app::FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& favicon_cache() const;
 
     /******
     *******

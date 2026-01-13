@@ -197,7 +197,7 @@ vcpkg install curl zlib openssl
 
 Additional dependencies for the Qt client:
 ```bat
-vcpkg install qtsvg qttools
+vcpkg install qtactiveqt qtsvg qttools
 ```
 
 ### Get Transmission source

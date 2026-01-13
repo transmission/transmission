@@ -80,7 +80,7 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                          "Usage: transmission-daemon [options]";
 
 using Arg = tr_option::Arg;
-auto constexpr Options = std::array<tr_option, 47>{ {
+auto constexpr Options = std::array<tr_option, 48>{ {
     { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", Arg::Required, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
@@ -114,8 +114,14 @@ auto constexpr Options = std::array<tr_option, 47>{ {
     { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", Arg::None, nullptr },
     { 'y', "lpd", "Enable local peer discovery (LPD)", "y", Arg::None, nullptr },
     { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", Arg::None, nullptr },
-    { 830, "utp", "Enable µTP for peer connections", nullptr, Arg::None, nullptr },
-    { 831, "no-utp", "Disable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 830,
+      "preferred-transports",
+      "Comma-separated list specifying preference of transport protocols",
+      nullptr,
+      Arg::Required,
+      "<protocol(s)>" },
+    { 831, "utp", "*DEPRECATED* Enable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 832, "no-utp", "*DEPRECATED* Disable µTP for peer connections", nullptr, Arg::None, nullptr },
     { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", Arg::Required, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
@@ -455,6 +461,73 @@ void tr_daemon::periodic_update()
     report_status();
 }
 
+namespace
+{
+void set_preferred_transports(tr_variant::Map& settings, std::string_view comma_delimited_protocols)
+{
+    auto preferred_protocols = tr_variant::Vector{};
+    preferred_protocols.reserve(2U);
+
+    auto protocol = std::string_view{};
+    while (tr_strv_sep(&comma_delimited_protocols, &protocol, ','))
+    {
+        preferred_protocols.emplace_back(protocol);
+    }
+
+    settings.insert_or_assign(TR_KEY_preferred_transports, std::move(preferred_protocols));
+}
+
+// TODO(tearfur): remove everything in this helper namespace and the corresponding args in 5.0.0
+namespace utp_arg_helpers
+{
+auto constexpr UtpVal = "utp"sv;
+
+void utp(tr_variant::Map& settings)
+{
+    if (auto const pt = settings.value_if<std::string_view>(TR_KEY_preferred_transports); pt && pt != UtpVal)
+    {
+        settings.erase(TR_KEY_preferred_transports);
+    }
+
+    if (auto* const pt = settings.find_if<tr_variant::Vector>(TR_KEY_preferred_transports))
+    {
+        if (std::none_of(
+                std::begin(*pt),
+                std::end(*pt),
+                [](tr_variant const& e) { return e.value_if<std::string_view>() == UtpVal; }))
+        {
+            pt->emplace(std::begin(*pt), tr_variant::unmanaged_string(UtpVal));
+        }
+    }
+    else
+    {
+        settings.insert_or_assign(TR_KEY_utp_enabled, true);
+    }
+}
+
+void no_utp(tr_variant::Map& settings)
+{
+    if (auto const pt = settings.value_if<std::string_view>(TR_KEY_preferred_transports); pt == UtpVal)
+    {
+        settings.erase(TR_KEY_preferred_transports);
+    }
+
+    if (auto* const pt = settings.find_if<tr_variant::Vector>(TR_KEY_preferred_transports))
+    {
+        auto const remove_it = std::remove_if(
+            std::begin(*pt),
+            std::end(*pt),
+            [](tr_variant const& e) { return e.value_if<std::string_view>() == UtpVal; });
+        pt->erase(remove_it, std::end(*pt));
+    }
+    else
+    {
+        settings.insert_or_assign(TR_KEY_utp_enabled, false);
+    }
+}
+} // namespace utp_arg_helpers
+} // namespace
+
 bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code)
 {
     int c;
@@ -686,11 +759,15 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 830:
-            map->insert_or_assign(TR_KEY_utp_enabled, true);
+            set_preferred_transports(*map, optstr);
             break;
 
         case 831:
-            map->insert_or_assign(TR_KEY_utp_enabled, false);
+            utp_arg_helpers::utp(*map);
+            break;
+
+        case 832:
+            utp_arg_helpers::no_utp(*map);
             break;
 
         case TR_OPT_UNK:
@@ -783,9 +860,9 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
 
     /* start the session */
     auto const* const cdir = this->config_dir_.c_str();
-    auto* session = tr_sessionInit(cdir, true, settings_);
+    auto* session = tr_sessionInit(config_dir_, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
-    tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", cdir)));
+    tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", config_dir_)));
     tr_sessionSaveSettings(session, cdir, settings_);
 
     auto const* const settings_map = settings_.get_if<tr_variant::Map>();

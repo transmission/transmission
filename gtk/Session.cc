@@ -57,6 +57,7 @@
 #include <utility>
 
 using namespace std::literals;
+using namespace transmission::app;
 
 class Session::Impl
 {
@@ -477,7 +478,10 @@ void Session::Impl::on_pref_changed(tr_quark const key)
     switch (key)
     {
     case TR_KEY_sort_mode:
-        sorter_->set_mode(gtr_pref_string_get(TR_KEY_sort_mode));
+        if (auto const sort_mode = gtr_pref_get<SortMode>(TR_KEY_sort_mode))
+        {
+            sorter_->set_mode(*sort_mode);
+        }
         break;
 
     case TR_KEY_sort_reversed:
@@ -1410,6 +1414,26 @@ size_t Session::Impl::get_active_torrent_count() const
     }
 
     return activeCount;
+}
+
+std::vector<tr_torrent*> Session::find_torrents(std::vector<tr_torrent_id_t> const& ids) const
+{
+    auto ret = std::vector<tr_torrent*>{};
+
+    if (auto* const session = impl_->get_session())
+    {
+        ret.reserve(std::size(ids));
+
+        for (auto const& id : ids)
+        {
+            if (auto* const tor = tr_torrentFindFromId(session, id))
+            {
+                ret.emplace_back(tor);
+            }
+        }
+    }
+
+    return ret;
 }
 
 tr_torrent* Session::find_torrent(tr_torrent_id_t id) const

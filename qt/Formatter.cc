@@ -50,9 +50,9 @@ QString Formatter::storage_to_string(int64_t const bytes)
 QString Formatter::ratio_to_string(double ratio)
 {
     static auto constexpr Infinity = "\xE2\x88\x9E"sv;
-    static auto const none = tr("None").toStdString();
+    static auto const None = tr("None").toStdString();
 
-    return QString::fromStdString(tr_strratio(ratio, none, Infinity));
+    return QString::fromStdString(tr_strratio(ratio, None, Infinity));
 }
 
 QString Formatter::time_to_string(int seconds)

@@ -18,12 +18,10 @@
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-strbuf.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
+using TorrentsTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
-
-using TorrentsTest = ::testing::Test;
 
 TEST_F(TorrentsTest, simpleTests)
 {

@@ -39,6 +39,7 @@ target_sources(libtransmission-test
         remove-test.cc
         rename-test.cc
         rpc-test.cc
+        serializer-tests.cc
         session-test.cc
         session-alt-speeds-test.cc
         settings-test.cc

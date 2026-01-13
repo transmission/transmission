@@ -111,11 +111,6 @@ public:
         return session_.allowsDHT();
     }
 
-    [[nodiscard]] bool allows_tcp() const override
-    {
-        return session_.allowsTCP();
-    }
-
     void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_socket_address const& socket_address) override;
 
     [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
@@ -403,6 +398,8 @@ public:
             libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_bitfield(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_got_block(
+            libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_choke(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_have(
@@ -672,6 +669,7 @@ public:
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const& /*bitfield*/, tr_bitfield const& /*active requests*/>
         peer_disconnect;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield;
+    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t> got_block;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_choke;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have;
     libtransmission::SimpleObservable<tr_torrent*> got_have_all;
@@ -910,9 +908,9 @@ private:
                 s->cancel_all_requests_for_block(loc.block, peer);
                 peer->blocks_sent_to_client.add(tr_time(), 1);
                 peer->blame.set(loc.piece);
+                s->got_block.emit(tor, loc.block); // put this line before calling tr_torrent callback
                 tor->on_block_received(loc.block);
             }
-
             break;
 
         default:
@@ -1042,20 +1040,7 @@ size_t tr_swarm::WishlistMediator::count_piece_replication(tr_piece_index_t piec
 
 tr_block_span_t tr_swarm::WishlistMediator::block_span(tr_piece_index_t piece) const
 {
-    auto span = tor_.block_span_for_piece(piece);
-
-    // Overlapping block spans caused by blocks unaligned to piece boundaries
-    // might cause redundant block requests to be sent out, so detect it and
-    // ensure that block spans within the wishlist do not overlap.
-    auto const block_begin_piece = tor_.block_loc(span.begin).piece;
-    if (auto const is_unaligned_piece = block_begin_piece != piece;
-        is_unaligned_piece && tor_.piece_is_wanted(block_begin_piece))
-    {
-        TR_ASSERT(block_begin_piece < piece);
-        ++span.begin;
-    }
-
-    return span;
+    return tor_.block_span_for_piece(piece);
 }
 
 tr_piece_index_t tr_swarm::WishlistMediator::piece_count() const
@@ -1090,6 +1075,12 @@ libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_bitfield(
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer)
 {
     return swarm_.got_bitfield.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_block(
+    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer)
+{
+    return swarm_.got_block.observe(std::move(observer));
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_choke(
@@ -1479,6 +1470,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     }
 }
 
+// TODO(C++20): convert to std::span
 size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, size_t n_pex)
 {
     size_t n_used = 0;
@@ -1499,6 +1491,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     return n_used;
 }
 
+// TODO(C++20): convert to std::span
 std::vector<tr_pex> tr_pex::from_compact_ipv4(
     void const* compact,
     size_t compact_len,
@@ -1522,6 +1515,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv4(
     return pex;
 }
 
+// TODO(C++20): convert to std::span
 std::vector<tr_pex> tr_pex::from_compact_ipv6(
     void const* compact,
     size_t compact_len,
@@ -2772,7 +2766,7 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
 
     auto const now = tr_time();
     auto* const session = mgr->session;
-    auto const utp = session->allowsUTP() && peer_info.supports_utp().value_or(true);
+    auto const peer_supports_utp = peer_info.supports_utp().value_or(true);
 
     // Allow downloading torrents to "steal" connection slots
     if (tr_peer_socket::limit_reached(session) && s->tor->is_done())
@@ -2780,22 +2774,13 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
         return;
     }
 
-    if (!utp && !session->allowsTCP())
-    {
-        return;
-    }
-
-    tr_logAddTraceSwarm(
-        s,
-        fmt::format("Starting an OUTGOING {} connection with {}", utp ? " µTP" : "TCP", peer_info.display_name()));
-
     auto peer_io = tr_peerIo::new_outgoing(
         session,
         &session->top_bandwidth_,
         peer_info.listen_socket_address(),
         s->tor->info_hash(),
         s->tor->is_seed(),
-        utp);
+        peer_supports_utp);
 
     if (!peer_io)
     {

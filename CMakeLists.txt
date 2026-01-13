@@ -53,7 +53,7 @@ set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 2.7)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.1)
-set(QT_MINIMUM 5.6)
+set(QT_MINIMUM 5.15)
 
 option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
@@ -97,7 +97,7 @@ set(TR_NAME ${PROJECT_NAME})
 set(TR_VERSION_MAJOR "4")
 set(TR_VERSION_MINOR "1")
 set(TR_VERSION_PATCH "0")
-set(TR_VERSION_BETA_NUMBER "4") # empty string for not beta
+set(TR_VERSION_BETA_NUMBER "5") # empty string for not beta
 set(TR_VERSION_DEV FALSE)
 
 # derived from above: release type
@@ -409,6 +409,9 @@ if(ENABLE_QT)
         Network
         Svg
         LinguistTools)
+    if(ENABLE_TESTS)
+        list(APPEND QT_REQUIRED_MODULES Test)
+    endif()
     set(QT_OPTIONAL_MODULES
         DBus
         AxContainer
@@ -429,7 +432,7 @@ if(ENABLE_QT)
         foreach(M ${QT_REQUIRED_MODULES})
             find_package(Qt${Qt_VERSION_MAJOR}${M} ${QT_MINIMUM} QUIET)
             if(Qt${Qt_VERSION_MAJOR}${M}_FOUND)
-                if(NOT M STREQUAL "LinguistTools")
+                if(NOT M STREQUAL "LinguistTools" AND NOT M STREQUAL "Test")
                     list(APPEND QT_TARGETS Qt${Qt_VERSION_MAJOR}::${M})
                 endif()
             else()
@@ -448,16 +451,14 @@ if(ENABLE_QT)
             endif()
         endforeach()
 
-        if(Qt${Qt_VERSION_MAJOR}AxContainer_FOUND AND Qt${Qt_VERSION_MAJOR}AxServer_FOUND)
+        if(WIN32 AND Qt${Qt_VERSION_MAJOR}AxContainer_FOUND AND Qt${Qt_VERSION_MAJOR}AxServer_FOUND)
             set(ENABLE_QT_COM_INTEROP ON)
 
             find_program(MIDL_EXECUTABLE midl)
             if(NOT MIDL_EXECUTABLE)
                 set(ENABLE_QT_COM_INTEROP OFF)
             endif()
-        endif()
-
-        if(Qt${Qt_VERSION_MAJOR}DBus_FOUND)
+        elseif(NOT WIN32 AND Qt${Qt_VERSION_MAJOR}DBus_FOUND)
             set(ENABLE_QT_DBUS_INTEROP ON)
         endif()
     endif()
@@ -813,11 +814,6 @@ if(RUN_CLANG_TIDY)
     endif()
 endif()
 
-if(ENABLE_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
-
 function(tr_install_web DST_DIR)
     if(INSTALL_WEB)
         install(
@@ -827,6 +823,7 @@ function(tr_install_web DST_DIR)
 endfunction()
 
 add_subdirectory(libtransmission)
+add_subdirectory(libtransmission-app)
 
 set(MAC_PROJECT_DIR macosx)
 
@@ -844,6 +841,11 @@ foreach(P cli daemon gtk mac qt utils)
         add_subdirectory(${P})
     endif()
 endforeach()
+
+if(ENABLE_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
     tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})

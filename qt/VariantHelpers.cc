@@ -8,13 +8,19 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
+#include <mutex>
 #include <string_view>
 
+#include <QDateTime>
 #include <QUrl>
+
+#include <libtransmission/serializer.h>
 
 #include "Application.h" // qApp
 #include "Speed.h"
 #include "Torrent.h"
+
+namespace ser = libtransmission::serializer;
 
 namespace trqt::variant_helpers
 {
@@ -60,20 +66,20 @@ bool change(Peer& setme, tr_variant const* value)
         break;
 
             HANDLE_KEY(address, address)
-            HANDLE_KEY(client_is_choked_camel, client_is_choked)
-            HANDLE_KEY(client_is_interested_camel, client_is_interested)
-            HANDLE_KEY(client_name_camel, client_name)
-            HANDLE_KEY(flag_str_camel, flags)
-            HANDLE_KEY(is_downloading_from_camel, is_downloading_from)
-            HANDLE_KEY(is_encrypted_camel, is_encrypted)
-            HANDLE_KEY(is_incoming_camel, is_incoming)
-            HANDLE_KEY(is_uploading_to_camel, is_uploading_to)
-            HANDLE_KEY(peer_is_choked_camel, peer_is_choked)
-            HANDLE_KEY(peer_is_interested_camel, peer_is_interested)
+            HANDLE_KEY(client_is_choked, client_is_choked)
+            HANDLE_KEY(client_is_interested, client_is_interested)
+            HANDLE_KEY(client_name, client_name)
+            HANDLE_KEY(flag_str, flags)
+            HANDLE_KEY(is_downloading_from, is_downloading_from)
+            HANDLE_KEY(is_encrypted, is_encrypted)
+            HANDLE_KEY(is_incoming, is_incoming)
+            HANDLE_KEY(is_uploading_to, is_uploading_to)
+            HANDLE_KEY(peer_is_choked, peer_is_choked)
+            HANDLE_KEY(peer_is_interested, peer_is_interested)
             HANDLE_KEY(port, port)
             HANDLE_KEY(progress, progress)
-            HANDLE_KEY(rate_to_client_camel, rate_to_client)
-            HANDLE_KEY(rate_to_peer_camel, rate_to_peer)
+            HANDLE_KEY(rate_to_client, rate_to_client)
+            HANDLE_KEY(rate_to_peer, rate_to_peer)
 #undef HANDLE_KEY
         default:
             break;
@@ -107,7 +113,7 @@ bool change(TorrentFile& setme, tr_variant const* value)
         changed = change(setme.field, child) || changed; \
         break;
 
-            HANDLE_KEY(bytes_completed_camel, have)
+            HANDLE_KEY(bytes_completed, have)
             HANDLE_KEY(length, size)
             HANDLE_KEY(name, filename)
 #undef HANDLE_KEY
@@ -133,35 +139,35 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
         switch (key)
         {
-#define HANDLE_KEY(key, field) \
+#define HANDLE_KEY(key) \
     case TR_KEY_##key: \
-        field_changed = change(setme.field, child); \
+        field_changed = change(setme.key, child); \
         break;
-            HANDLE_KEY(announce, announce)
-            HANDLE_KEY(announce_state_camel, announce_state)
-            HANDLE_KEY(download_count_camel, download_count)
-            HANDLE_KEY(has_announced_camel, has_announced)
-            HANDLE_KEY(has_scraped_camel, has_scraped)
-            HANDLE_KEY(id, id)
-            HANDLE_KEY(is_backup_camel, is_backup)
-            HANDLE_KEY(last_announce_peer_count_camel, last_announce_peer_count)
-            HANDLE_KEY(last_announce_result_camel, last_announce_result)
-            HANDLE_KEY(last_announce_start_time_camel, last_announce_start_time)
-            HANDLE_KEY(last_announce_succeeded_camel, last_announce_succeeded)
-            HANDLE_KEY(last_announce_time_camel, last_announce_time)
-            HANDLE_KEY(last_announce_timed_out_camel, last_announce_timed_out)
-            HANDLE_KEY(last_scrape_result_camel, last_scrape_result)
-            HANDLE_KEY(last_scrape_start_time_camel, last_scrape_start_time)
-            HANDLE_KEY(last_scrape_succeeded_camel, last_scrape_succeeded)
-            HANDLE_KEY(last_scrape_time_camel, last_scrape_time)
-            HANDLE_KEY(last_scrape_timed_out_camel, last_scrape_timed_out)
-            HANDLE_KEY(leecher_count_camel, leecher_count)
-            HANDLE_KEY(next_announce_time_camel, next_announce_time)
-            HANDLE_KEY(next_scrape_time_camel, next_scrape_time)
-            HANDLE_KEY(scrape_state_camel, scrape_state)
-            HANDLE_KEY(seeder_count_camel, seeder_count)
-            HANDLE_KEY(sitename, sitename)
-            HANDLE_KEY(tier, tier)
+            HANDLE_KEY(announce)
+            HANDLE_KEY(announce_state)
+            HANDLE_KEY(download_count)
+            HANDLE_KEY(has_announced)
+            HANDLE_KEY(has_scraped)
+            HANDLE_KEY(id)
+            HANDLE_KEY(is_backup)
+            HANDLE_KEY(last_announce_peer_count)
+            HANDLE_KEY(last_announce_result)
+            HANDLE_KEY(last_announce_start_time)
+            HANDLE_KEY(last_announce_succeeded)
+            HANDLE_KEY(last_announce_time)
+            HANDLE_KEY(last_announce_timed_out)
+            HANDLE_KEY(last_scrape_result)
+            HANDLE_KEY(last_scrape_start_time)
+            HANDLE_KEY(last_scrape_succeeded)
+            HANDLE_KEY(last_scrape_time)
+            HANDLE_KEY(last_scrape_timed_out)
+            HANDLE_KEY(leecher_count)
+            HANDLE_KEY(next_announce_time)
+            HANDLE_KEY(next_scrape_time)
+            HANDLE_KEY(scrape_state)
+            HANDLE_KEY(seeder_count)
+            HANDLE_KEY(sitename)
+            HANDLE_KEY(tier)
 
 #undef HANDLE_KEY
         default:
@@ -226,6 +232,80 @@ void variantInit(tr_variant* init_me, QString const& value)
 void variantInit(tr_variant* init_me, std::string_view value)
 {
     *init_me = value;
+}
+
+namespace
+{
+bool toInt(tr_variant const& src, int* tgt)
+{
+    if (auto const val = src.value_if<int64_t>())
+    {
+        if (*val < std::numeric_limits<int>::min() || *val > std::numeric_limits<int>::max())
+        {
+            return false;
+        }
+
+        *tgt = static_cast<int>(*val);
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromInt(int const& val)
+{
+    return static_cast<int64_t>(val);
+}
+
+// ---
+
+bool toQDateTime(tr_variant const& src, QDateTime* tgt)
+{
+    if (auto const val = ser::to_value<int64_t>(src))
+    {
+        *tgt = QDateTime::fromSecsSinceEpoch(*val);
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromQDateTime(QDateTime const& src)
+{
+    return ser::to_variant(int64_t{ src.toSecsSinceEpoch() });
+}
+
+// ---
+
+bool toQString(tr_variant const& src, QString* tgt)
+{
+    if (auto const val = src.value_if<std::string_view>())
+    {
+        *tgt = QString::fromUtf8(std::data(*val), std::size(*val));
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromQString(QString const& val)
+{
+    return val.toStdString();
+}
+} // namespace
+
+void register_qt_converters()
+{
+    static auto once = std::once_flag{};
+    std::call_once(
+        once,
+        []
+        {
+            using namespace libtransmission::serializer;
+            Converters::add(toInt, fromInt);
+            Converters::add(toQDateTime, fromQDateTime);
+            Converters::add(toQString, fromQString);
+        });
 }
 
 } // namespace trqt::variant_helpers

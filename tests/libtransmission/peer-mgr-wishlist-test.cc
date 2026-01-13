@@ -16,9 +16,9 @@
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/peer-mgr-wishlist.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-class PeerMgrWishlistTest : public ::testing::Test
+class PeerMgrWishlistTest : public ::libtransmission::test::TransmissionTest
 {
 protected:
     struct MockMediator final : public Wishlist::Mediator
@@ -30,7 +30,6 @@ protected:
         mutable std::set<tr_block_index_t> client_has_block_;
         mutable std::set<tr_piece_index_t> client_has_piece_;
         mutable std::set<tr_piece_index_t> client_wants_piece_;
-        tr_piece_index_t piece_count_ = 0;
         bool is_sequential_download_ = false;
         tr_piece_index_t sequential_download_from_piece_ = 0;
 
@@ -78,7 +77,7 @@ protected:
 
         [[nodiscard]] tr_piece_index_t piece_count() const override
         {
-            return piece_count_;
+            return std::size(block_span_);
         }
 
         [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override
@@ -109,6 +108,12 @@ protected:
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override
         {
             return parent_.got_bitfield_.observe(std::move(observer));
+        }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_got_block(
+            libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) override
+        {
+            return parent_.got_block_.observe(std::move(observer));
         }
 
         [[nodiscard]] libtransmission::ObserverTag observe_got_choke(
@@ -177,6 +182,7 @@ protected:
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&> peer_disconnect_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t> got_block_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_choke_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have_;
     libtransmission::SimpleObservable<tr_torrent*> got_have_all_;
@@ -199,7 +205,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
     auto mediator = MockMediator{ *this };
 
     // setup: three pieces, all missing
-    mediator.piece_count_ = 3;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
@@ -219,12 +224,41 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
     EXPECT_EQ(mediator.block_span_[0].end, spans[0].end);
 }
 
+TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatClientHas)
+{
+    auto mediator = MockMediator{ *this };
+
+    // setup: three pieces
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 250 };
+
+    // we have pieces 0, 1
+    mediator.client_has_piece_.insert(0);
+    mediator.client_has_piece_.insert(1);
+
+    // peer has all pieces
+    mediator.piece_replication_[0] = 1;
+    mediator.piece_replication_[1] = 1;
+    mediator.piece_replication_[2] = 1;
+
+    // we want all three pieces
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
+
+    // we should only get piece 2
+    auto const spans = Wishlist{ mediator }.next(1000, PeerHasAllPieces);
+    ASSERT_EQ(1U, std::size(spans));
+    EXPECT_EQ(mediator.block_span_[2].begin, spans[0].begin);
+    EXPECT_EQ(mediator.block_span_[2].end, spans[0].end);
+}
+
 TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
 {
     auto mediator = MockMediator{ *this };
 
     // setup: three pieces, all missing
-    mediator.piece_count_ = 3;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
@@ -265,7 +299,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwice)
     auto mediator = MockMediator{ *this };
 
     // setup: three pieces, all missing
-    mediator.piece_count_ = 3;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
@@ -307,7 +340,6 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 250 };
@@ -372,7 +404,6 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
         auto mediator = MockMediator{ *this };
 
         // setup: four pieces, all missing
-        mediator.piece_count_ = 4;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -385,7 +416,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
         mediator.piece_replication_[3] = 1;
 
         // and we want all pieces
-        for (tr_piece_index_t i = 0; i < 4; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -426,7 +457,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
     auto mediator = MockMediator{ *this };
 
     // setup: three pieces, all missing
-    mediator.piece_count_ = 3;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
@@ -437,7 +467,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
     mediator.piece_replication_[2] = 1;
 
     // and we want everything
-    for (tr_piece_index_t i = 0; i < 3; ++i)
+    for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
     {
         mediator.client_wants_piece_.insert(i);
     }
@@ -461,7 +491,6 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -472,7 +501,7 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
         mediator.piece_replication_[2] = 1;
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -511,7 +540,6 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, same size
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -522,7 +550,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         mediator.piece_replication_[2] = 1;
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -588,13 +616,12 @@ TEST_F(PeerMgrWishlistTest, prefersRarerPieces)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -651,13 +678,12 @@ TEST_F(PeerMgrWishlistTest, peerDisconnectDecrementsReplication)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -725,13 +751,12 @@ TEST_F(PeerMgrWishlistTest, gotBadPieceResetsPiece)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -785,13 +810,12 @@ TEST_F(PeerMgrWishlistTest, gotBitfieldIncrementsReplication)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -860,7 +884,6 @@ TEST_F(PeerMgrWishlistTest, sentRequestsResortsPiece)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -871,7 +894,7 @@ TEST_F(PeerMgrWishlistTest, sentRequestsResortsPiece)
         mediator.piece_replication_[2] = 1;
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -922,6 +945,74 @@ TEST_F(PeerMgrWishlistTest, sentRequestsResortsPiece)
     }
 }
 
+TEST_F(PeerMgrWishlistTest, gotBlockResortsPiece)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: three pieces, all missing
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+
+        // and we want everything
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
+        {
+            mediator.client_wants_piece_.insert(i);
+        }
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // we received block 0 from someone, the wishlist should resort the
+        // candidate list cache
+        got_block_.emit(nullptr, 0);
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // wishlist prefers to get pieces completed ASAP, so it
+    // should pick the ones with the fewest unrequested blocks first.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto const spans = get_spans(100);
+        auto requested = tr_bitfield{ 300 };
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(100U, requested.count());
+        EXPECT_EQ(99U, requested.count(0, 100));
+        EXPECT_EQ(1U, requested.count(100, 300));
+    }
+
+    // Same premise as previous test, but ask for more blocks.
+    // Since the first and second piece are the second nearest
+    // to completion, those blocks should be next in line.
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto const spans = get_spans(150);
+        auto requested = tr_bitfield{ 300 };
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(150U, requested.count());
+        EXPECT_EQ(99U, requested.count(0, 100));
+        EXPECT_EQ(51U, requested.count(100, 300));
+    }
+}
+
 TEST_F(PeerMgrWishlistTest, gotHaveIncrementsReplication)
 {
     auto const get_spans = [this](size_t n_wanted)
@@ -929,13 +1020,12 @@ TEST_F(PeerMgrWishlistTest, gotHaveIncrementsReplication)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -1001,7 +1091,6 @@ TEST_F(PeerMgrWishlistTest, gotChokeResetsRequestedBlocks)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1012,7 +1101,7 @@ TEST_F(PeerMgrWishlistTest, gotChokeResetsRequestedBlocks)
         mediator.piece_replication_[2] = 2;
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -1059,13 +1148,12 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -1131,7 +1219,6 @@ TEST_F(PeerMgrWishlistTest, gotRejectResetsBlock)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1142,7 +1229,7 @@ TEST_F(PeerMgrWishlistTest, gotRejectResetsBlock)
         mediator.piece_replication_[2] = 2;
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -1195,7 +1282,6 @@ TEST_F(PeerMgrWishlistTest, gotRejectResortsPiece)
         auto mediator = MockMediator{ *this };
 
         // setup: two pieces, all missing
-        mediator.piece_count_ = 2;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
 
@@ -1246,7 +1332,6 @@ TEST_F(PeerMgrWishlistTest, sentCancelResetsBlocks)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1257,7 +1342,7 @@ TEST_F(PeerMgrWishlistTest, sentCancelResetsBlocks)
         mediator.piece_replication_[2] = 2;
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -1310,7 +1395,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlockAfterBlockCompleted)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1321,7 +1405,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlockAfterBlockCompleted)
         mediator.piece_replication_[2] = 2;
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -1360,7 +1444,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
     auto mediator = MockMediator{ *this };
 
     // setup: three pieces, piece 0 is nearly complete
-    mediator.piece_count_ = 3;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 300 };
@@ -1371,7 +1454,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
     mediator.piece_replication_[2] = 1;
 
     // and we want everything
-    for (tr_piece_index_t i = 0; i < 3; ++i)
+    for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
     {
         mediator.client_wants_piece_.insert(i);
     }
@@ -1381,6 +1464,12 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
     auto wishlist = Wishlist{ mediator };
 
     // we just completed piece 0
+    sent_request_.emit(nullptr, nullptr, mediator.block_span_[0]);
+    for (auto [block, end] = mediator.block_span_[0]; block < end; ++block)
+    {
+        mediator.client_has_block_.insert(block);
+        got_block_.emit(nullptr, block);
+    }
     mediator.client_has_piece_.insert(0);
     piece_completed_.emit(nullptr, 0);
 
@@ -1404,7 +1493,6 @@ TEST_F(PeerMgrWishlistTest, settingPriorityResortsCandidates)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1415,7 +1503,7 @@ TEST_F(PeerMgrWishlistTest, settingPriorityResortsCandidates)
         mediator.piece_replication_[2] = 1;
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -1459,7 +1547,6 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadResortsCandidates)
         auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1470,7 +1557,7 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadResortsCandidates)
         mediator.piece_replication_[2] = 1;
 
         // and we want everything
-        for (tr_piece_index_t i = 0; i < 3; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -1529,7 +1616,6 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPieceResortsCandidates)
         auto mediator = MockMediator{ *this };
 
         // setup: four pieces, all missing
-        mediator.piece_count_ = 4;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1542,7 +1628,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPieceResortsCandidates)
         mediator.piece_replication_[3] = 1;
 
         // and we want all pieces
-        for (tr_piece_index_t i = 0; i < 4; ++i)
+        for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
         {
             mediator.client_wants_piece_.insert(i);
         }
@@ -1592,7 +1678,6 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListAdd)
         auto mediator = MockMediator{ *this };
 
         // setup: four pieces, all missing
-        mediator.piece_count_ = 4;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1629,16 +1714,75 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListAdd)
     for (int run = 0; run < NumRuns; ++run)
     {
         auto requested = tr_bitfield{ 400 };
+        auto const spans = get_spans(400);
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(400U, requested.count());
+        EXPECT_NE(0U, requested.count(0, 100));
+        EXPECT_NE(0U, requested.count(100, 200));
+        EXPECT_NE(0U, requested.count(200, 300));
+        EXPECT_NE(0U, requested.count(300, 400));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListAddHad)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: four pieces
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+        mediator.block_span_[3] = { 300, 400 };
+
+        // we have pieces 2, 3
+        mediator.client_has_piece_.insert(2);
+        mediator.client_has_piece_.insert(3);
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we initially wanted the first 2 pieces only
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // now we want piece 2 and piece 3
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+        files_wanted_changed_.emit(nullptr, nullptr, 0, true);
+
+        // the candidate list should remain unchanged
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // We should only request pieces 0, 1 here.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 400 };
         auto const spans = get_spans(350);
         for (auto const& [begin, end] : spans)
         {
             requested.set_span(begin, end);
         }
-        EXPECT_EQ(350U, requested.count());
+        EXPECT_EQ(200U, requested.count());
         EXPECT_NE(0U, requested.count(0, 100));
         EXPECT_NE(0U, requested.count(100, 200));
-        EXPECT_NE(0U, requested.count(200, 300));
-        EXPECT_NE(0U, requested.count(300, 400));
+        EXPECT_EQ(0U, requested.count(200, 300));
+        EXPECT_EQ(0U, requested.count(300, 400));
     }
 }
 
@@ -1649,7 +1793,6 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListRemove)
         auto mediator = MockMediator{ *this };
 
         // setup: four pieces, all missing
-        mediator.piece_count_ = 4;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1661,7 +1804,7 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListRemove)
         mediator.piece_replication_[2] = 1;
         mediator.piece_replication_[3] = 1;
 
-        // we initially only want the all 4 pieces
+        // we initially want all 4 pieces
         mediator.client_wants_piece_.insert(0);
         mediator.client_wants_piece_.insert(1);
         mediator.client_wants_piece_.insert(2);
@@ -1687,7 +1830,7 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListRemove)
     for (int run = 0; run < NumRuns; ++run)
     {
         auto requested = tr_bitfield{ 400 };
-        auto const spans = get_spans(350);
+        auto const spans = get_spans(400);
         for (auto const& [begin, end] : spans)
         {
             requested.set_span(begin, end);
@@ -1697,5 +1840,697 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListRemove)
         EXPECT_NE(0U, requested.count(100, 200));
         EXPECT_EQ(0U, requested.count(200, 300));
         EXPECT_EQ(0U, requested.count(300, 400));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrent)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each, all missing
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we want all 4 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(134);
+
+        // We should get 1 span, instead of
+        // [0, 34), [33, 67), [66, 134)
+        EXPECT_EQ(std::size(spans), 1);
+
+        // Since the spans might overlap if we didn't handle unaligned
+        // torrents correctly, we might not get all 134 blocks if there
+        // is a bug
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_TRUE(requested.has_all());
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentPartiallyCompletedPiece)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // We have the first and last 10 blocks of piece 1
+        for (tr_block_index_t block = 33; block < 43; ++block)
+        {
+            mediator.client_has_block_.insert(block);
+        }
+        for (tr_block_index_t block = 57; block < 67; ++block)
+        {
+            mediator.client_has_block_.insert(block);
+        }
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we want all 4 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(134);
+
+        // We should get 3 spans
+        // [0, 33), [43, 57), [67, 134)
+        EXPECT_EQ(std::size(spans), 3);
+
+        // If we didn't handle the overlapping spans correctly, we might mistakenly
+        // erase blocks from the unrequested set despite not needing to.
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(114U, requested.count());
+        EXPECT_EQ(33U, requested.count(0, 34));
+        EXPECT_FALSE(requested.test(33));
+        EXPECT_EQ(14U, requested.count(34, 67));
+        EXPECT_EQ(14U, requested.count(43, 57));
+        EXPECT_EQ(33U, requested.count(67, 100));
+        EXPECT_FALSE(requested.test(66));
+        EXPECT_EQ(34U, requested.count(100, 134));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentPartiallyCompleted)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // We have pieces 0, 2, 3
+        mediator.client_has_piece_.insert(0);
+        mediator.client_has_piece_.insert(2);
+        mediator.client_has_piece_.insert(3);
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we want all 4 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(134);
+
+        // We should get [33, 67), not any shrunken spans like [34, 67)
+        EXPECT_EQ(std::size(spans), 1);
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(34U, requested.count());
+        EXPECT_EQ(34U, requested.count(33, 67));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentGotBadPiece)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we want all 4 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // requested all blocks and "download" piece 1,
+        // as well as parts of piece 0 and piece 2 that
+        // is next to piece 1
+        sent_request_.emit(nullptr, nullptr, { 0, 134 });
+        for (auto block = mediator.block_span_[0].end - 10; block < mediator.block_span_[1].end + 10; ++block)
+        {
+            mediator.client_has_block_.insert(block);
+            got_block_.emit(nullptr, block);
+        }
+
+        // piece 1 turned out to be corrupt, needs to be re-downloaded
+        for (auto [block, end] = mediator.block_span_[1]; block < end; ++block)
+        {
+            mediator.client_has_block_.erase(block);
+        }
+        got_bad_piece_.emit(nullptr, 1);
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(134);
+
+        // We should get [33, 67), not any shrunken spans like [34, 67)
+        EXPECT_EQ(std::size(spans), 1);
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(34U, requested.count());
+        EXPECT_EQ(34U, requested.count(33, 67));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentGotBadPieceSurroundingCompleted)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we want all 4 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // pieces 0, 2 completed normally, piece 3 has pending requests
+        sent_request_.emit(nullptr, nullptr, { 0, 134 });
+        for (tr_block_index_t block = 0; block < 120; ++block)
+        {
+            mediator.client_has_block_.insert(block);
+            got_block_.emit(nullptr, block);
+        }
+        mediator.client_has_piece_.insert(0);
+        piece_completed_.emit(nullptr, 0);
+        mediator.client_has_piece_.insert(2);
+        piece_completed_.emit(nullptr, 2);
+
+        // piece 1 turned out to be corrupt, needs to be re-downloaded
+        for (auto [block, end] = mediator.block_span_[1]; block < end; ++block)
+        {
+            mediator.client_has_block_.erase(block);
+        }
+        got_bad_piece_.emit(nullptr, 1);
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(134);
+
+        // We should get [33, 67), not any shrunken spans like [34, 67)
+        EXPECT_EQ(std::size(spans), 1);
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(34U, requested.count());
+        EXPECT_EQ(34U, requested.count(33, 67));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentGot2ConsectutiveBadPieces)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we want all 4 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // pieces 0, 3 completed normally
+        sent_request_.emit(nullptr, nullptr, { 0, 134 });
+        for (tr_block_index_t block = 0; block < 134; ++block)
+        {
+            mediator.client_has_block_.insert(block);
+            got_block_.emit(nullptr, block);
+        }
+        mediator.client_has_piece_.insert(0);
+        piece_completed_.emit(nullptr, 0);
+        mediator.client_has_piece_.insert(3);
+        piece_completed_.emit(nullptr, 3);
+
+        // pieces 1, 2 turned out to be corrupt, need to be re-downloaded
+        for (auto [block, end] = mediator.block_span_[1]; block < end; ++block)
+        {
+            mediator.client_has_block_.erase(block);
+        }
+        got_bad_piece_.emit(nullptr, 1);
+        for (auto [block, end] = mediator.block_span_[2]; block < end; ++block)
+        {
+            mediator.client_has_block_.erase(block);
+        }
+        got_bad_piece_.emit(nullptr, 2);
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(67);
+
+        // We should get 1 pan [33, 100),
+        // not [33, 67), [66, 100)
+        EXPECT_EQ(std::size(spans), 1);
+
+        // Since the spans might overlap if we didn't handle unaligned
+        // torrents correctly, we might not get all 67 blocks if there
+        // is a bug
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(67U, requested.count());
+        EXPECT_EQ(67U, requested.count(33, 100));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentPartiallyWanted)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each, all missing
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we want pieces 0, 2
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(2);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(134);
+
+        // We should get [0, 34), [66, 100)
+        EXPECT_EQ(std::size(spans), 2);
+
+        // If we don't handle overlapping spans correctly, we might get
+        // incorrectly shrunken spans and the download will never complete
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(68, requested.count());
+        EXPECT_EQ(34, requested.count(0, 34));
+        EXPECT_EQ(34, requested.count(66, 100));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentDeselectedPiece)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each, all missing
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we initially wanted all 4 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // we don't want piece 1 anymore
+        tr_file_index_t constexpr Deselected = 1;
+        mediator.client_wants_piece_.erase(Deselected);
+        files_wanted_changed_.emit(nullptr, &Deselected, 1, false);
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(134);
+
+        // We should get [0, 34), [66, 134)
+        EXPECT_EQ(std::size(spans), 2);
+
+        // If we don't handle overlapping spans correctly, we might get
+        // incorrectly shrunken spans and the download will never complete
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(102, requested.count());
+        EXPECT_EQ(34, requested.count(0, 34));
+        EXPECT_EQ(68, requested.count(66, 134));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentDeselected2ConsecutivePieces)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each, all missing
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we initially wanted all 4 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // we don't want pieces 1, 2 anymore
+        auto constexpr Deselected = std::array<tr_file_index_t, 2>{ 1, 2 };
+        for (auto const idx : Deselected)
+        {
+            mediator.client_wants_piece_.erase(idx);
+        }
+        files_wanted_changed_.emit(nullptr, std::data(Deselected), std::size(Deselected), false);
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(134);
+
+        // We should get [0, 34), [100, 134)
+        EXPECT_EQ(std::size(spans), 2);
+
+        // If we don't handle overlapping spans correctly, we might get
+        // incorrectly shrunken spans and the download will never complete
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(68, requested.count());
+        EXPECT_EQ(34, requested.count(0, 34));
+        EXPECT_EQ(34, requested.count(100, 134));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentSelectedPiece)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each, all missing
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we initially wanted all pieces except piece 1
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // we want piece 1 now
+        tr_file_index_t constexpr Selected = 1;
+        mediator.client_wants_piece_.insert(Selected);
+        files_wanted_changed_.emit(nullptr, &Selected, 1, true);
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(134);
+
+        // We should get 1 span
+        EXPECT_EQ(std::size(spans), 1);
+
+        // If we don't handle overlapping spans correctly, we might get
+        // incorrectly shrunken spans and the download will never complete
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_TRUE(requested.has_all());
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentSelected2ConsecutivePieces)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each, all missing
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we initially wanted pieces 0, 3
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // we don't want pieces 1, 2 anymore
+        auto constexpr Selected = std::array<tr_file_index_t, 2>{ 1, 2 };
+        for (auto const idx : Selected)
+        {
+            mediator.client_wants_piece_.insert(idx);
+        }
+        files_wanted_changed_.emit(nullptr, std::data(Selected), std::size(Selected), true);
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(134);
+
+        // We should get 1 span
+        EXPECT_EQ(std::size(spans), 1);
+
+        // If we don't handle overlapping spans correctly, we might get
+        // incorrectly shrunken spans and the download will never complete
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_TRUE(requested.has_all());
     }
 }

@@ -20,7 +20,7 @@
 
 #include "libtransmission/net.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/serializable.h"
+#include "libtransmission/serializer.h"
 #include "libtransmission/utils-ev.h"
 
 class tr_rpc_address;
@@ -36,7 +36,7 @@ class Timer;
 class tr_rpc_server
 {
 public:
-    class Settings final : public libtransmission::Serializable<Settings>
+    class Settings final
     {
     public:
         Settings() = default;
@@ -46,8 +46,18 @@ public:
             load(src);
         }
 
+        void load(tr_variant const& src)
+        {
+            libtransmission::serializer::load(*this, Fields, src);
+        }
+
+        [[nodiscard]] tr_variant::Map save() const
+        {
+            return libtransmission::serializer::save(*this, Fields);
+        }
+
         // NB: When adding a field here, you must also add it to
-        // fields() if you want it to be in session-settings.json
+        // `fields` if you want it to be in session-settings.json
         bool authentication_required = false;
         bool is_anti_brute_force_enabled = false;
         bool is_enabled = false;
@@ -57,31 +67,32 @@ public:
         std::string bind_address_str = "0.0.0.0";
         std::string host_whitelist_str;
         std::string salted_password;
-        std::string url = TR_DEFAULT_RPC_URL_STR;
+        std::string url = std::string{ TrHttpServerDefaultBasePath };
         std::string username;
         std::string whitelist_str = TR_DEFAULT_RPC_WHITELIST;
         tr_mode_t socket_mode = 0750;
         tr_port port = tr_port::from_host(TrDefaultRpcPort);
 
     private:
-        friend libtransmission::Serializable<Settings>;
+        template<auto MemberPtr>
+        using Field = libtransmission::serializer::Field<MemberPtr>;
 
-        static inline auto const fields = std::array<Field, 14U>{ {
-            { TR_KEY_anti_brute_force_enabled, &Settings::is_anti_brute_force_enabled },
-            { TR_KEY_anti_brute_force_threshold, &Settings::anti_brute_force_limit },
-            { TR_KEY_rpc_authentication_required, &Settings::authentication_required },
-            { TR_KEY_rpc_bind_address, &Settings::bind_address_str },
-            { TR_KEY_rpc_enabled, &Settings::is_enabled },
-            { TR_KEY_rpc_host_whitelist, &Settings::host_whitelist_str },
-            { TR_KEY_rpc_host_whitelist_enabled, &Settings::is_host_whitelist_enabled },
-            { TR_KEY_rpc_port, &Settings::port },
-            { TR_KEY_rpc_password, &Settings::salted_password },
-            { TR_KEY_rpc_socket_mode, &Settings::socket_mode },
-            { TR_KEY_rpc_url, &Settings::url },
-            { TR_KEY_rpc_username, &Settings::username },
-            { TR_KEY_rpc_whitelist, &Settings::whitelist_str },
-            { TR_KEY_rpc_whitelist_enabled, &Settings::is_whitelist_enabled },
-        } };
+        static constexpr auto Fields = std::tuple{
+            Field<&Settings::is_anti_brute_force_enabled>{ TR_KEY_anti_brute_force_enabled },
+            Field<&Settings::anti_brute_force_limit>{ TR_KEY_anti_brute_force_threshold },
+            Field<&Settings::authentication_required>{ TR_KEY_rpc_authentication_required },
+            Field<&Settings::bind_address_str>{ TR_KEY_rpc_bind_address },
+            Field<&Settings::is_enabled>{ TR_KEY_rpc_enabled },
+            Field<&Settings::host_whitelist_str>{ TR_KEY_rpc_host_whitelist },
+            Field<&Settings::is_host_whitelist_enabled>{ TR_KEY_rpc_host_whitelist_enabled },
+            Field<&Settings::port>{ TR_KEY_rpc_port },
+            Field<&Settings::salted_password>{ TR_KEY_rpc_password },
+            Field<&Settings::socket_mode>{ TR_KEY_rpc_socket_mode },
+            Field<&Settings::url>{ TR_KEY_rpc_url },
+            Field<&Settings::username>{ TR_KEY_rpc_username },
+            Field<&Settings::whitelist_str>{ TR_KEY_rpc_whitelist },
+            Field<&Settings::is_whitelist_enabled>{ TR_KEY_rpc_whitelist_enabled },
+        };
     };
 
     tr_rpc_server(tr_session* session, Settings&& settings);
@@ -163,7 +174,7 @@ public:
         return settings_.anti_brute_force_limit;
     }
 
-    constexpr void set_anti_brute_force_limit(int limit) noexcept
+    constexpr void set_anti_brute_force_limit(size_t limit) noexcept
     {
         settings_.anti_brute_force_limit = limit;
     }

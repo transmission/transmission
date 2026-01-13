@@ -5,17 +5,10 @@
 
 #pragma once
 
-#include <QVariant>
-
-class CustomVariantType
+namespace transmission::app
 {
-public:
-    enum
-    {
-        TrackerStatsList = QMetaType::User,
-        PeerList,
-        FileList,
-        FilterModeType,
-        SortModeType
-    };
-};
+
+// should be called once when starting the app
+void init();
+
+} // namespace transmission::app

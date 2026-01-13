@@ -9,7 +9,6 @@
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <functional> // std::invoke
-#include <initializer_list>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -40,6 +39,7 @@ public:
         IntIndex,
         DoubleIndex,
         StringIndex,
+        StringViewIndex,
         VectorIndex,
         MapIndex
     };
@@ -103,20 +103,6 @@ public:
         [[nodiscard]] auto contains(tr_quark const key) const noexcept
         {
             return find(key) != end(); // NOLINT(readability-container-contains)
-        }
-
-        [[nodiscard]] TR_CONSTEXPR20 auto find(std::initializer_list<tr_quark> keys) noexcept
-        {
-            auto constexpr Predicate = [](auto const& item, tr_quark key)
-            {
-                return item.first == key;
-            };
-            return std::find_first_of(std::begin(vec_), std::end(vec_), std::begin(keys), std::end(keys), Predicate);
-        }
-
-        [[nodiscard]] TR_CONSTEXPR20 auto find(std::initializer_list<tr_quark> keys) const noexcept
-        {
-            return Vector::const_iterator{ const_cast<Map*>(this)->find(keys) };
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
@@ -210,33 +196,9 @@ public:
         }
 
         template<typename Type>
-        [[nodiscard]] TR_CONSTEXPR20 auto* find_if(std::initializer_list<tr_quark> keys) noexcept
-        {
-            auto const iter = find(keys);
-            return iter != end() ? iter->second.get_if<Type>() : nullptr;
-        }
-
-        template<typename Type>
-        [[nodiscard]] TR_CONSTEXPR20 auto* find_if(std::initializer_list<tr_quark> keys) const noexcept
-        {
-            return const_cast<Map*>(this)->find_if<Type>(keys);
-        }
-
-        template<typename Type>
         [[nodiscard]] std::optional<Type> value_if(tr_quark const key) const noexcept
         {
             if (auto it = find(key); it != end())
-            {
-                return it->second.value_if<Type>();
-            }
-
-            return std::nullopt;
-        }
-
-        template<typename Type>
-        [[nodiscard]] std::optional<Type> value_if(std::initializer_list<tr_quark> keys) const noexcept
-        {
-            if (auto it = find(keys); it != end())
             {
                 return it->second.value_if<Type>();
             }
@@ -295,7 +257,7 @@ public:
     [[nodiscard]] static tr_variant unmanaged_string(std::string_view val)
     {
         auto ret = tr_variant{};
-        ret.val_.emplace<StringHolder>().set_unmanaged(val);
+        ret.val_.emplace<std::string_view>(val);
         return ret;
     }
 
@@ -307,13 +269,15 @@ public:
     template<typename Val>
     tr_variant& operator=(Val value)
     {
-        if constexpr (std::is_same_v<Val, std::nullptr_t>)
+        if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            val_.emplace<std::nullptr_t>(value);
+            // Note: std::string_view assignment takes ownership by copying.
+            // Use unmanaged_string() if you want the variant to hold a shallow copy.
+            val_.emplace<std::string>(value);
         }
-        else if constexpr (std::is_same_v<Val, std::string_view>)
+        else if constexpr (std::is_same_v<Val, char const*> || std::is_same_v<Val, char*>)
         {
-            val_.emplace<StringHolder>(std::string{ value });
+            val_.emplace<std::string>(value != nullptr ? value : "");
         }
         // note: std::is_integral_v<bool> is true, so this check
         // must come first to prevent bools from being stored as ints
@@ -332,24 +296,6 @@ public:
         return *this;
     }
 
-    tr_variant& operator=(std::string&& value)
-    {
-        val_.emplace<StringHolder>(std::move(value));
-        return *this;
-    }
-
-    tr_variant& operator=(std::string const& value)
-    {
-        *this = std::string{ value };
-        return *this;
-    }
-
-    tr_variant& operator=(char const* const value)
-    {
-        *this = std::string{ value != nullptr ? value : "" };
-        return *this;
-    }
-
     [[nodiscard]] constexpr auto index() const noexcept
     {
         return val_.index();
@@ -363,35 +309,25 @@ public:
     template<typename Val>
     [[nodiscard]] constexpr auto* get_if() noexcept
     {
-        if constexpr (std::is_same_v<Val, std::string_view>)
-        {
-            auto const* const val = std::get_if<StringHolder>(&val_);
-            return val != nullptr ? &val->sv_ : nullptr;
-        }
-        else
-        {
-            return std::get_if<Val>(&val_);
-        }
+        static_assert(
+            !std::is_same_v<std::decay_t<Val>, std::string> && !std::is_same_v<std::decay_t<Val>, std::string_view>,
+            "not supported -- use value_if<std::string_view>() instead.");
+        return std::get_if<Val>(&val_);
     }
 
     template<typename Val>
     [[nodiscard]] constexpr auto const* get_if() const noexcept
     {
+        static_assert(
+            !std::is_same_v<std::decay_t<Val>, std::string> && !std::is_same_v<std::decay_t<Val>, std::string_view>,
+            "not supported -- use value_if<std::string_view>() instead.");
         return const_cast<tr_variant*>(this)->get_if<Val>();
     }
 
     template<size_t Index>
     [[nodiscard]] constexpr auto* get_if() noexcept
     {
-        if constexpr (Index == StringIndex)
-        {
-            auto const* const val = std::get_if<StringIndex>(&val_);
-            return val != nullptr ? &val->sv_ : nullptr;
-        }
-        else
-        {
-            return std::get_if<Index>(&val_);
-        }
+        return std::get_if<Index>(&val_);
     }
 
     template<size_t Index>
@@ -422,7 +358,7 @@ public:
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            return std::holds_alternative<StringHolder>(val_);
+            return std::holds_alternative<std::string>(val_) || std::holds_alternative<std::string_view>(val_);
         }
         else
         {
@@ -438,13 +374,13 @@ public:
     template<typename Visitor>
     [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor)
     {
-        return std::visit(make_visit_adapter(std::forward<Visitor>(visitor)), val_);
+        return std::visit(std::forward<Visitor>(visitor), val_);
     }
 
     template<typename Visitor>
     [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor) const
     {
-        return std::visit(make_visit_adapter(std::forward<Visitor>(visitor)), val_);
+        return std::visit(std::forward<Visitor>(visitor), val_);
     }
 
     // Usually updates `this` to hold a clone of `that`, with two exceptions:
@@ -458,81 +394,7 @@ public:
     [[nodiscard]] tr_variant clone() const;
 
 private:
-    // Holds a string_view to either an unmanaged/external string or to
-    // one owned by the class. If the string is unmanaged, only sv_ is used.
-    // If we own the string, then sv_ points to the managed str_.
-    class StringHolder
-    {
-    public:
-        StringHolder() = default;
-        ~StringHolder() = default;
-        explicit StringHolder(std::string&& str) noexcept;
-        StringHolder(StringHolder&& that) noexcept;
-        StringHolder(StringHolder const&) = delete;
-        void set_unmanaged(std::string_view sv);
-        StringHolder& operator=(StringHolder&& that) noexcept;
-        StringHolder& operator=(StringHolder const&) = delete;
-
-        std::string_view sv_;
-
-    private:
-        std::string str_;
-    };
-
-    template<typename Visitor>
-    class VisitAdapter
-    {
-    public:
-        explicit constexpr VisitAdapter(Visitor visitor)
-            : visitor_{ std::move(visitor) }
-        {
-        }
-
-        // These ref-qualified overloads preserve the visitor's cv/ref category
-        // (lvalue/rvalue, const/non-const) to match std::visit() semantics.
-        template<typename T>
-        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) &
-        {
-            return call(*this, std::forward<T>(value));
-        }
-        template<typename T>
-        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) const&
-        {
-            return call(*this, std::forward<T>(value));
-        }
-        template<typename T>
-        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) &&
-        {
-            return call(std::move(*this), std::forward<T>(value));
-        }
-
-    private:
-        template<typename Self, typename T>
-        [[nodiscard]] static constexpr decltype(auto) call(Self&& self, T&& value)
-        {
-            auto&& visitor = std::forward<Self>(self).visitor_;
-
-            if constexpr (std::is_same_v<std::decay_t<T>, StringHolder>)
-            {
-                return std::invoke(std::forward<decltype(visitor)>(visitor), value.sv_);
-            }
-            else
-            {
-                return std::invoke(std::forward<decltype(visitor)>(visitor), std::forward<T>(value));
-            }
-        }
-
-        Visitor visitor_;
-    };
-
-    template<typename Visitor>
-    [[nodiscard]] static constexpr auto make_visit_adapter(Visitor&& visitor)
-    {
-        using AdaptedVisitor = VisitAdapter<Visitor>;
-        return AdaptedVisitor{ std::forward<Visitor>(visitor) };
-    }
-
-    std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, StringHolder, Vector, Map> val_;
+    std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, std::string, std::string_view, Vector, Map> val_;
 };
 
 template<>
@@ -541,6 +403,8 @@ template<>
 [[nodiscard]] std::optional<bool> tr_variant::value_if() noexcept;
 template<>
 [[nodiscard]] std::optional<double> tr_variant::value_if() noexcept;
+template<>
+[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() noexcept;
 
 // --- Strings
 

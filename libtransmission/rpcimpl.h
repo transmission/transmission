@@ -11,9 +11,17 @@
 struct tr_session;
 struct tr_variant;
 
+#define RPC_VERSION_VARS(major, minor, patch) \
+    auto inline constexpr TrRpcVersionSemver = std::string_view{ #major "." #minor "." #patch }; \
+    auto inline constexpr TrRpcVersionSemverMajor = major;
+
+RPC_VERSION_VARS(6, 0, 0)
+
+#undef RPC_VERSION_VARS
+
 namespace JsonRpc
 {
-auto constexpr Version = std::string_view{ "2.0" };
+auto inline constexpr Version = std::string_view{ "2.0" };
 
 namespace Error
 {
@@ -42,6 +50,6 @@ enum Code : int16_t
 
 using tr_rpc_response_func = std::function<void(tr_session* session, tr_variant&& response)>;
 
-void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_response_func&& callback = {});
+void tr_rpc_request_exec(tr_session* session, tr_variant& request, tr_rpc_response_func&& callback = {});
 
 void tr_rpc_request_exec(tr_session* session, std::string_view request, tr_rpc_response_func&& callback = {});

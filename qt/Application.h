@@ -17,7 +17,7 @@
 #include <QTranslator>
 #include <QWeakPointer>
 
-#include <libtransmission/favicon-cache.h>
+#include <libtransmission-app/favicon-cache.h>
 
 #include "AddData.h"
 #include "Typedefs.h"
@@ -36,13 +36,7 @@ class Application : public QApplication
     Q_OBJECT
 
 public:
-    Application(
-        std::unique_ptr<Prefs> prefs,
-        bool minimized,
-        QString const& config_dir,
-        QStringList const& filenames,
-        int& argc,
-        char** argv);
+    Application(Prefs& prefs, bool minimized, QString const& config_dir, QStringList const& filenames, int& argc, char** argv);
     Application(Application&&) = delete;
     Application(Application const&) = delete;
     Application& operator=(Application&&) = delete;
@@ -107,7 +101,7 @@ private:
 
     std::unordered_set<QString> interned_strings_;
 
-    std::unique_ptr<Prefs> prefs_;
+    Prefs& prefs_;
     std::unique_ptr<Session> session_;
     std::unique_ptr<TorrentModel> model_;
     std::unique_ptr<MainWindow> window_;
@@ -119,7 +113,7 @@ private:
     QTranslator qt_translator_;
     QTranslator app_translator_;
 
-    FaviconCache<QPixmap> favicon_cache_;
+    transmission::app::FaviconCache<QPixmap> favicon_cache_;
 };
 
 #define trApp dynamic_cast<Application*>(Application::instance())

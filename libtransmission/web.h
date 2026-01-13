@@ -160,6 +160,7 @@ public:
         }
 
         // Invoke the user-provided fetch callback
+        // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
         virtual void run(FetchDoneFunc&& func, FetchResponse&& response) const
         {
             func(response);

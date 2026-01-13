@@ -524,7 +524,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //hidden pref
         if ([_fDefaults objectForKey:@"PeerSocketTOS"])
         {
-            tr_variantDictAddStr(&settings, TR_KEY_peer_socket_tos, [_fDefaults stringForKey:@"PeerSocketTOS"].UTF8String);
+            tr_variantDictAddStr(&settings, TR_KEY_peer_socket_diffserv, [_fDefaults stringForKey:@"PeerSocketTOS"].UTF8String);
         }
 
         tr_variantDictAddBool(&settings, TR_KEY_pex_enabled, [_fDefaults boolForKey:@"PEXGlobal"]);
@@ -561,7 +561,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         initUnits();
 
         auto const default_config_dir = tr_getDefaultConfigDir("Transmission");
-        _fLib = tr_sessionInit(default_config_dir.c_str(), YES, settings);
+        _fLib = tr_sessionInit(default_config_dir, YES, settings);
         _fConfigDirectory = @(default_config_dir.c_str());
 
         tr_sessionSetIdleLimitHitCallback(_fLib, onIdleLimitHit, (__bridge void*)(self));
@@ -814,7 +814,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self updateMainWindow];
 
     //timer to update the interface every second
-    [self updateUI];
     self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateUISeconds target:self selector:@selector(updateUI) userInfo:nil
                                                   repeats:YES];
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSModalPanelRunLoopMode];
@@ -2368,10 +2367,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     BOOL anyCompleted = NO;
     BOOL anyActive = NO;
 
+    [Torrent updateTorrents:self.fTorrents];
+
     for (Torrent* torrent in self.fTorrents)
     {
-        [torrent update];
-
         //pull the upload and download speeds - most consistent by using current stats
         dlRate += torrent.downloadRate;
         ulRate += torrent.uploadRate;
@@ -2522,7 +2521,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         {
             //not found - must be filtering
             NSAssert([self.fDefaults boolForKey:@"FilterBar"], @"expected the filter to be enabled");
-            [self.fFilterBar reset:YES];
+            [self.fFilterBar reset];
 
             row = [self.fTableView rowForItem:torrent];
 
@@ -3814,8 +3813,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             for (Torrent* torrent in self.fTorrents)
             {
                 torrent.queuePosition = i++;
-                [torrent update];
             }
+
+            [Torrent updateTorrents:self.fTorrents];
 
             //do the drag animation here so that the dragged torrents are the ones that are animated as moving, and not the torrents around them
             [self.fTableView beginUpdates];
@@ -4039,7 +4039,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //disable filtering when hiding (have to do before updateMainWindow:)
     if (!show)
     {
-        [self.fFilterBar reset:NO];
+        [self.fFilterBar reset];
     }
 
     [self.fDefaults setBool:show forKey:@"FilterBar"];
@@ -5524,10 +5524,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)rpcUpdateQueue
 {
-    for (Torrent* torrent in self.fTorrents)
-    {
-        [torrent update];
-    }
+    [Torrent updateTorrents:self.fTorrents];
 
     NSSortDescriptor* descriptor = [NSSortDescriptor sortDescriptorWithKey:@"queuePosition" ascending:YES];
     NSArray* descriptors = @[ descriptor ];

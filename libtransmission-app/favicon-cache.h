@@ -25,6 +25,9 @@
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h>
 
+namespace transmission::app
+{
+
 template<typename Icon>
 class FaviconCache
 {
@@ -245,3 +248,5 @@ private:
 
     std::map<std::string /*sitename*/, Icon, std::less<>> icons_;
 };
+
+} // namespace transmission::app

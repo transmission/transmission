@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     AuthManager.loadCredentials(),
   );
   if (alreadyLoggedIn) {
-    globalThis.location.href = getAppRoot();
+    globalThis.location.href = `${getAppRoot()}/`;
   }
 
   const loginForm = document.querySelector('#login-form');
@@ -39,6 +39,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     AuthManager.storeCredentials(username, password);
-    globalThis.location.href = getAppRoot();
+    globalThis.location.href = `${getAppRoot()}/`;
   });
 });

@@ -18,7 +18,6 @@
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 #ifdef _WIN32
@@ -42,7 +41,7 @@ std::string getTestProgramPath(std::string_view const filename)
 } // unnamed namespace
 
 class SubprocessTest
-    : public ::testing::Test
+    : public ::libtransmission::test::TransmissionTest
     , public testing::WithParamInterface<std::string>
 {
 protected:

@@ -43,7 +43,7 @@ QIcon Utils::getIconFromIndex(QModelIndex const& index)
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
     switch (variant.typeId())
 #else
-    switch (static_cast<QMetaType::Type>(variant.type()))
+    switch (variant.userType())
 #endif
     {
     case QMetaType::QIcon:

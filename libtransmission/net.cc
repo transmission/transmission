@@ -111,40 +111,7 @@ int tr_make_listen_socket_ipv6only(tr_socket_t const sock)
 
 // - TCP Sockets
 
-[[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
-{
-    auto const needle = tr_strlower(tr_strv_strip(name));
-
-    for (auto const& [value, key] : Names)
-    {
-        if (needle == key)
-        {
-            return tr_tos_t(value);
-        }
-    }
-
-    if (auto value = tr_num_parse<int>(needle); value)
-    {
-        return tr_tos_t(*value);
-    }
-
-    return {};
-}
-
-std::string tr_tos_t::toString() const
-{
-    for (auto const& [value, key] : Names)
-    {
-        if (value_ == value)
-        {
-            return std::string{ key };
-        }
-    }
-
-    return std::to_string(value_);
-}
-
-void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_address_type type)
+void tr_netSetDiffServ([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_address_type type)
 {
     if (s == TR_BAD_SOCKET)
     {

@@ -13,340 +13,246 @@
 #include <QCoreApplication>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
-#include <QFileIconProvider>
-#include <QFileInfo>
 #include <QHBoxLayout>
-#include <QIcon>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QSpinBox>
-#include <QStyle>
-#include <QTabWidget>
 #include <QTime>
 #include <QTimeEdit>
-#include <QTimer>
-#include <QVBoxLayout>
+
+#include <libtransmission/transmission.h>
 
 #include "ColumnResizer.h"
 #include "Formatter.h"
 #include "FreeSpaceLabel.h"
 #include "Prefs.h"
 #include "Session.h"
+#include "UserMetaType.h"
 #include "Utils.h"
+
+using namespace libtransmission;
 
 // ---
 
-namespace
+template<typename T, size_t N>
+void PrefsDialog::initComboFromItems(std::array<std::pair<QString, T>, N> const& items, QComboBox* const w, int const key)
 {
-
-class PreferenceWidget
-{
-    static char const* const PrefKey;
-
-public:
-    explicit PreferenceWidget(QObject* object)
-        : object_{ object }
+    for (auto const& [label, value] : items)
     {
+        w->addItem(label);
     }
 
-    template<typename T>
-    [[nodiscard]] bool is() const
+    auto updater = [this, key, w, items]()
     {
-        return qobject_cast<T*>(object_) != nullptr;
-    }
-
-    template<typename T>
-    [[nodiscard]] T const* as() const
-    {
-        assert(is<T>());
-        return static_cast<T const*>(object_);
-    }
-
-    template<typename T>
-    [[nodiscard]] T* as()
-    {
-        assert(is<T>());
-        return static_cast<T*>(object_);
-    }
-
-    void setPrefKey(int key)
-    {
-        object_->setProperty(PrefKey, key);
-    }
-
-    [[nodiscard]] int getPrefKey() const
-    {
-        return object_->property(PrefKey).toInt();
-    }
-
-private:
-    QObject* object_;
-};
-
-char const* const PreferenceWidget::PrefKey = "pref-key";
-
-int qtDayToTrDay(int day)
-{
-    switch (day)
-    {
-    case Qt::Monday:
-        return TR_SCHED_MON;
-
-    case Qt::Tuesday:
-        return TR_SCHED_TUES;
-
-    case Qt::Wednesday:
-        return TR_SCHED_WED;
-
-    case Qt::Thursday:
-        return TR_SCHED_THURS;
-
-    case Qt::Friday:
-        return TR_SCHED_FRI;
-
-    case Qt::Saturday:
-        return TR_SCHED_SAT;
-
-    case Qt::Sunday:
-        return TR_SCHED_SUN;
-
-    default:
-        assert(false && "Invalid day of week");
-        return 0;
-    }
-}
-
-QString qtDayName(int day)
-{
-    switch (day)
-    {
-    case Qt::Monday:
-        return PrefsDialog::tr("Monday");
-
-    case Qt::Tuesday:
-        return PrefsDialog::tr("Tuesday");
-
-    case Qt::Wednesday:
-        return PrefsDialog::tr("Wednesday");
-
-    case Qt::Thursday:
-        return PrefsDialog::tr("Thursday");
-
-    case Qt::Friday:
-        return PrefsDialog::tr("Friday");
-
-    case Qt::Saturday:
-        return PrefsDialog::tr("Saturday");
-
-    case Qt::Sunday:
-        return PrefsDialog::tr("Sunday");
-
-    default:
-        assert(false && "Invalid day of week");
-        return {};
-    }
-}
-
-[[nodiscard]] bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
-{
-    if (ancestor == nullptr)
-    {
-        return false;
-    }
-
-    while (descendant != nullptr)
-    {
-        if (descendant == ancestor)
+        auto const blocker = QSignalBlocker{ w };
+        auto const val = prefs_.get<T>(key);
+        for (size_t i = 0; i < std::size(items); ++i)
         {
-            return true;
+            if (items[i].second == val)
+            {
+                w->setCurrentIndex(static_cast<int>(i));
+            }
         }
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
 
-        descendant = descendant->parent();
-    }
-
-    return false;
-}
-} // namespace
-
-bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
-{
-    auto pref_widget = PreferenceWidget{ widget };
-
-    if (pref_widget.is<QCheckBox>())
+    auto on_activated = [this, key, items](int const idx)
     {
-        pref_widget.as<QCheckBox>()->setChecked(prefs_.getBool(pref_key));
-    }
-    else if (pref_widget.is<QSpinBox>())
-    {
-        pref_widget.as<QSpinBox>()->setValue(prefs_.getInt(pref_key));
-    }
-    else if (pref_widget.is<QDoubleSpinBox>())
-    {
-        pref_widget.as<QDoubleSpinBox>()->setValue(prefs_.getDouble(pref_key));
-    }
-    else if (pref_widget.is<QTimeEdit>())
-    {
-        pref_widget.as<QTimeEdit>()->setTime(QTime{ 0, 0 }.addSecs(prefs_.getInt(pref_key) * 60));
-    }
-    else if (pref_widget.is<QLineEdit>())
-    {
-        pref_widget.as<QLineEdit>()->setText(prefs_.getString(pref_key));
-    }
-    else if (pref_widget.is<PathButton>())
-    {
-        pref_widget.as<PathButton>()->setPath(prefs_.getString(pref_key));
-    }
-    else if (pref_widget.is<FreeSpaceLabel>())
-    {
-        pref_widget.as<FreeSpaceLabel>()->setPath(prefs_.getString(pref_key));
-    }
-    else if (pref_widget.is<QPlainTextEdit>())
-    {
-        pref_widget.as<QPlainTextEdit>()->setPlainText(prefs_.getString(pref_key));
-    }
-    else
-    {
-        return false;
-    }
-
-    return true;
+        if (0 <= idx && idx < static_cast<int>(std::size(items)))
+        {
+            set(key, items[static_cast<size_t>(idx)].second);
+        }
+    };
+    connect(w, qOverload<int>(&QComboBox::activated), std::move(on_activated));
 }
 
-void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
+void PrefsDialog::initAltSpeedDaysCombo(QComboBox* const w, int const key)
 {
-    auto pref_widget = PreferenceWidget{ widget };
-
-    pref_widget.setPrefKey(pref_key);
-    updateWidgetValue(widget, pref_key);
-    widgets_.try_emplace(pref_key, widget);
-
-    if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
+    static auto items = []
     {
-        connect(check_box, &QAbstractButton::toggled, this, &PrefsDialog::checkBoxToggled);
-        return;
-    }
+        auto ret = std::array<std::pair<QString, int>, 10U>{};
+        auto idx = 0;
+        ret[idx++] = { tr("Every Day"), TR_SCHED_ALL };
+        ret[idx++] = { tr("Weekdays"), TR_SCHED_WEEKDAY };
+        ret[idx++] = { tr("Weekends"), TR_SCHED_WEEKEND };
 
-    if (auto const* time_edit = qobject_cast<QTimeEdit*>(widget); time_edit != nullptr)
-    {
-        connect(time_edit, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::timeEditingFinished);
-        return;
-    }
+        auto const locale = QLocale{};
+        auto const qt_day_to_tr_day = std::map<int, int>{ {
+            { Qt::Monday, TR_SCHED_MON },
+            { Qt::Tuesday, TR_SCHED_TUES },
+            { Qt::Wednesday, TR_SCHED_WED },
+            { Qt::Thursday, TR_SCHED_THURS },
+            { Qt::Friday, TR_SCHED_FRI },
+            { Qt::Saturday, TR_SCHED_SAT },
+            { Qt::Sunday, TR_SCHED_SUN },
+        } };
+        auto const first_day_of_week = locale.firstDayOfWeek();
+        for (int i = first_day_of_week; i <= Qt::Sunday; ++i)
+        {
+            ret[idx++] = { locale.dayName(i), qt_day_to_tr_day.at(i) };
+        }
+        for (int i = Qt::Monday; i < first_day_of_week; ++i)
+        {
+            ret[idx++] = { locale.dayName(i), qt_day_to_tr_day.at(i) };
+        }
+        return ret;
+    }();
 
-    if (auto const* line_edit = qobject_cast<QLineEdit*>(widget); line_edit != nullptr)
-    {
-        connect(line_edit, &QLineEdit::editingFinished, this, &PrefsDialog::lineEditingFinished);
-        return;
-    }
-
-    if (auto const* path_button = qobject_cast<PathButton*>(widget); path_button != nullptr)
-    {
-        connect(path_button, &PathButton::pathChanged, this, &PrefsDialog::pathChanged);
-        return;
-    }
-
-    if (auto const* spin_box = qobject_cast<QAbstractSpinBox*>(widget); spin_box != nullptr)
-    {
-        connect(spin_box, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::spinBoxEditingFinished);
-        return;
-    }
+    initComboFromItems(items, w, key);
 }
 
-void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
+void PrefsDialog::initEncryptionCombo(QComboBox* const w, int const key)
 {
+    static auto const Items = std::array<std::pair<QString, tr_encryption_mode>, 3U>{ {
+        { tr("Allow encryption"), TR_CLEAR_PREFERRED },
+        { tr("Prefer encryption"), TR_ENCRYPTION_PREFERRED },
+        { tr("Require encryption"), TR_ENCRYPTION_REQUIRED },
+    } };
+
+    initComboFromItems(Items, w, key);
+}
+
+void PrefsDialog::initWidget(QPlainTextEdit* const w, int const key)
+{
+    auto updater = [this, key, w]()
+    {
+        auto const blocker = QSignalBlocker{ w };
+        w->setPlainText(prefs_.get<QString>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
     // We don't want to change the preference every time there's a keystroke
     // in a QPlainTextEdit, so instead of connecting to the textChanged signal,
     // only update the pref when the text changed AND focus was lost.
-    char constexpr const* const StartValue = "StartValue";
-
-    if (auto* const edit = qobject_cast<QPlainTextEdit*>(cur); isDescendantOf(edit, this))
+    auto on_focus_changed = [this, key, w](QWidget* old, QWidget* /*cur*/)
     {
-        edit->setProperty(StartValue, edit->toPlainText());
-    }
-
-    if (auto const* const edit = qobject_cast<QPlainTextEdit*>(old); isDescendantOf(edit, this))
-    {
-        if (auto const val = edit->toPlainText(); val != edit->property(StartValue).toString())
+        if (w == old && w->document()->isModified())
         {
-            setPref(PreferenceWidget{ old }.getPrefKey(), val);
+            set(key, w->toPlainText());
         }
-    }
-
-    // (TODO: we probably want to do this for single-line text entries too?)
+    };
+    connect(qApp, &QApplication::focusChanged, std::move(on_focus_changed));
 }
 
-void PrefsDialog::checkBoxToggled(bool checked)
+void PrefsDialog::initWidget(FreeSpaceLabel* const w, int const key)
 {
-    auto const pref_widget = PreferenceWidget{ sender() };
-
-    if (pref_widget.is<QCheckBox>())
+    auto updater = [this, key, w]()
     {
-        setPref(pref_widget.getPrefKey(), checked);
-    }
+        auto const blocker = QSignalBlocker{ w };
+        w->setPath(prefs_.get<QString>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
 }
 
-void PrefsDialog::spinBoxEditingFinished()
+void PrefsDialog::initWidget(PathButton* const w, int const key)
 {
-    auto const pref_widget = PreferenceWidget{ sender() };
+    auto updater = [this, key, w]()
+    {
+        auto const blocker = QSignalBlocker{ w };
+        w->setPath(prefs_.get<QString>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
 
-    if (pref_widget.is<QDoubleSpinBox>())
-    {
-        setPref(pref_widget.getPrefKey(), pref_widget.as<QDoubleSpinBox>()->value());
-    }
-    else if (pref_widget.is<QSpinBox>())
-    {
-        setPref(pref_widget.getPrefKey(), pref_widget.as<QSpinBox>()->value());
-    }
+    connect(w, &PathButton::pathChanged, [this, key](QString const& val) { set(key, val); });
 }
 
-void PrefsDialog::timeEditingFinished()
+void PrefsDialog::initWidget(QCheckBox* const w, int const key)
 {
-    auto const pref_widget = PreferenceWidget{ sender() };
-
-    if (pref_widget.is<QTimeEdit>())
+    auto updater = [this, key, w]()
     {
-        setPref(pref_widget.getPrefKey(), QTime{ 0, 0 }.secsTo(pref_widget.as<QTimeEdit>()->time()) / 60);
-    }
+        auto const blocker = QSignalBlocker{ w };
+        w->setChecked(prefs_.get<bool>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
+    connect(w, &QAbstractButton::toggled, [this, key](bool const val) { set(key, val); });
 }
 
-void PrefsDialog::lineEditingFinished()
+void PrefsDialog::initWidget(QDoubleSpinBox* const w, int const key)
 {
-    auto const pref_widget = PreferenceWidget{ sender() };
-
-    if (pref_widget.is<QLineEdit>())
+    auto updater = [this, key, w]()
     {
-        auto const* const line_edit = pref_widget.as<QLineEdit>();
+        auto const blocker = QSignalBlocker{ w };
+        w->setValue(prefs_.get<double>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
 
-        if (line_edit->isModified())
+    connect(w, qOverload<double>(&QDoubleSpinBox::valueChanged), [this, key](double const val) { set(key, val); });
+}
+
+void PrefsDialog::initWidget(QLineEdit* const w, int const key)
+{
+    auto updater = [this, key, w]()
+    {
+        auto const blocker = QSignalBlocker{ w };
+        w->setText(prefs_.get<QString>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
+    auto on_editing_finished = [this, key, w]()
+    {
+        if (w->isModified())
         {
-            setPref(pref_widget.getPrefKey(), line_edit->text());
+            set(key, w->text());
         }
-    }
+    };
+    connect(w, &QLineEdit::editingFinished, std::move(on_editing_finished));
 }
 
-void PrefsDialog::pathChanged(QString const& path)
+void PrefsDialog::initWidget(QSpinBox* const w, int const key)
 {
-    auto const pref_widget = PreferenceWidget{ sender() };
-
-    if (pref_widget.is<PathButton>())
+    auto updater = [this, key, w]()
     {
-        setPref(pref_widget.getPrefKey(), path);
-    }
+        auto const blocker = QSignalBlocker{ w };
+        w->setValue(prefs_.get<int>(key));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
+    connect(w, qOverload<int>(&QSpinBox::valueChanged), [this, key](int const val) { set(key, val); });
+}
+
+void PrefsDialog::initWidget(QTimeEdit* const w, int const key)
+{
+    auto updater = [this, key, w]()
+    {
+        auto const blocker = QSignalBlocker{ w };
+        auto const minutes = prefs_.get<int>(key);
+        w->setTime(QTime{ 0, 0 }.addSecs(minutes * 60));
+    };
+    updater();
+    updaters_.emplace(key, std::move(updater));
+
+    auto on_editing_finished = [this, key, w]()
+    {
+        auto const minutes = w->time().msecsSinceStartOfDay() / (1000 * 60);
+        set(key, minutes);
+    };
+    connect(w, &QAbstractSpinBox::editingFinished, std::move(on_editing_finished));
 }
 
 // ---
 
 void PrefsDialog::initRemoteTab()
 {
-    linkWidgetToPref(ui_.enableRpcCheck, Prefs::RPC_ENABLED);
-    linkWidgetToPref(ui_.rpcPortSpin, Prefs::RPC_PORT);
-    linkWidgetToPref(ui_.requireRpcAuthCheck, Prefs::RPC_AUTH_REQUIRED);
-    linkWidgetToPref(ui_.rpcUsernameEdit, Prefs::RPC_USERNAME);
-    linkWidgetToPref(ui_.rpcPasswordEdit, Prefs::RPC_PASSWORD);
-    linkWidgetToPref(ui_.enableRpcWhitelistCheck, Prefs::RPC_WHITELIST_ENABLED);
-    linkWidgetToPref(ui_.rpcWhitelistEdit, Prefs::RPC_WHITELIST);
+    initWidget(ui_.enableRpcCheck, Prefs::RPC_ENABLED);
+    initWidget(ui_.rpcPortSpin, Prefs::RPC_PORT);
+    initWidget(ui_.requireRpcAuthCheck, Prefs::RPC_AUTH_REQUIRED);
+    initWidget(ui_.rpcUsernameEdit, Prefs::RPC_USERNAME);
+    initWidget(ui_.rpcPasswordEdit, Prefs::RPC_PASSWORD);
+    initWidget(ui_.enableRpcWhitelistCheck, Prefs::RPC_WHITELIST_ENABLED);
+    initWidget(ui_.rpcWhitelistEdit, Prefs::RPC_WHITELIST);
 
     web_widgets_ << ui_.rpcPortLabel << ui_.rpcPortSpin << ui_.requireRpcAuthCheck << ui_.enableRpcWhitelistCheck;
     web_auth_widgets_ << ui_.rpcUsernameLabel << ui_.rpcUsernameEdit << ui_.rpcPasswordLabel << ui_.rpcPasswordEdit;
@@ -358,50 +264,25 @@ void PrefsDialog::initRemoteTab()
 
 // ---
 
-void PrefsDialog::altSpeedDaysEdited(int i)
-{
-    int const value = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
-    setPref(Prefs::ALT_SPEED_LIMIT_TIME_DAY, value);
-}
-
 void PrefsDialog::initSpeedTab()
 {
     auto const suffix = QStringLiteral(" %1").arg(Speed::display_name(Speed::Units::KByps));
-
-    auto const locale = QLocale{};
 
     ui_.uploadSpeedLimitSpin->setSuffix(suffix);
     ui_.downloadSpeedLimitSpin->setSuffix(suffix);
     ui_.altUploadSpeedLimitSpin->setSuffix(suffix);
     ui_.altDownloadSpeedLimitSpin->setSuffix(suffix);
 
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant{ TR_SCHED_ALL });
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant{ TR_SCHED_WEEKDAY });
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekends"), QVariant{ TR_SCHED_WEEKEND });
-    ui_.altSpeedLimitDaysCombo->insertSeparator(ui_.altSpeedLimitDaysCombo->count());
-
-    for (int i = locale.firstDayOfWeek(); i <= Qt::Sunday; ++i)
-    {
-        ui_.altSpeedLimitDaysCombo->addItem(qtDayName(i), qtDayToTrDay(i));
-    }
-
-    for (int i = Qt::Monday; i < locale.firstDayOfWeek(); ++i)
-    {
-        ui_.altSpeedLimitDaysCombo->addItem(qtDayName(i), qtDayToTrDay(i));
-    }
-
-    ui_.altSpeedLimitDaysCombo->setCurrentIndex(
-        ui_.altSpeedLimitDaysCombo->findData(prefs_.getInt(Prefs::ALT_SPEED_LIMIT_TIME_DAY)));
-
-    linkWidgetToPref(ui_.uploadSpeedLimitCheck, Prefs::USPEED_ENABLED);
-    linkWidgetToPref(ui_.uploadSpeedLimitSpin, Prefs::USPEED);
-    linkWidgetToPref(ui_.downloadSpeedLimitCheck, Prefs::DSPEED_ENABLED);
-    linkWidgetToPref(ui_.downloadSpeedLimitSpin, Prefs::DSPEED);
-    linkWidgetToPref(ui_.altUploadSpeedLimitSpin, Prefs::ALT_SPEED_LIMIT_UP);
-    linkWidgetToPref(ui_.altDownloadSpeedLimitSpin, Prefs::ALT_SPEED_LIMIT_DOWN);
-    linkWidgetToPref(ui_.altSpeedLimitScheduleCheck, Prefs::ALT_SPEED_LIMIT_TIME_ENABLED);
-    linkWidgetToPref(ui_.altSpeedLimitStartTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_BEGIN);
-    linkWidgetToPref(ui_.altSpeedLimitEndTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_END);
+    initWidget(ui_.uploadSpeedLimitCheck, Prefs::USPEED_ENABLED);
+    initWidget(ui_.uploadSpeedLimitSpin, Prefs::USPEED);
+    initWidget(ui_.downloadSpeedLimitCheck, Prefs::DSPEED_ENABLED);
+    initWidget(ui_.downloadSpeedLimitSpin, Prefs::DSPEED);
+    initWidget(ui_.altUploadSpeedLimitSpin, Prefs::ALT_SPEED_LIMIT_UP);
+    initWidget(ui_.altDownloadSpeedLimitSpin, Prefs::ALT_SPEED_LIMIT_DOWN);
+    initWidget(ui_.altSpeedLimitScheduleCheck, Prefs::ALT_SPEED_LIMIT_TIME_ENABLED);
+    initWidget(ui_.altSpeedLimitStartTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_BEGIN);
+    initWidget(ui_.altSpeedLimitEndTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_END);
+    initAltSpeedDaysCombo(ui_.altSpeedLimitDaysCombo, Prefs::ALT_SPEED_LIMIT_TIME_DAY);
 
     sched_widgets_ << ui_.altSpeedLimitStartTimeEdit << ui_.altSpeedLimitToLabel << ui_.altSpeedLimitEndTimeEdit
                    << ui_.altSpeedLimitDaysLabel << ui_.altSpeedLimitDaysCombo;
@@ -410,19 +291,17 @@ void PrefsDialog::initSpeedTab()
     cr->addLayout(ui_.speedLimitsSectionLayout);
     cr->addLayout(ui_.altSpeedLimitsSectionLayout);
     cr->update();
-
-    connect(ui_.altSpeedLimitDaysCombo, qOverload<int>(&QComboBox::activated), this, &PrefsDialog::altSpeedDaysEdited);
 }
 
 // ---
 
 void PrefsDialog::initDesktopTab()
 {
-    linkWidgetToPref(ui_.showTrayIconCheck, Prefs::SHOW_TRAY_ICON);
-    linkWidgetToPref(ui_.startMinimizedCheck, Prefs::START_MINIMIZED);
-    linkWidgetToPref(ui_.notifyOnTorrentAddedCheck, Prefs::SHOW_NOTIFICATION_ON_ADD);
-    linkWidgetToPref(ui_.notifyOnTorrentCompletedCheck, Prefs::SHOW_NOTIFICATION_ON_COMPLETE);
-    linkWidgetToPref(ui_.playSoundOnTorrentCompletedCheck, Prefs::COMPLETE_SOUND_ENABLED);
+    initWidget(ui_.showTrayIconCheck, Prefs::SHOW_TRAY_ICON);
+    initWidget(ui_.startMinimizedCheck, Prefs::START_MINIMIZED);
+    initWidget(ui_.notifyOnTorrentAddedCheck, Prefs::SHOW_NOTIFICATION_ON_ADD);
+    initWidget(ui_.notifyOnTorrentCompletedCheck, Prefs::SHOW_NOTIFICATION_ON_COMPLETE);
+    initWidget(ui_.playSoundOnTorrentCompletedCheck, Prefs::COMPLETE_SOUND_ENABLED);
 }
 
 // ---
@@ -431,15 +310,15 @@ QString PrefsDialog::getPortStatusText(PrefsDialog::PortTestStatus status) noexc
 {
     switch (status)
     {
-    case PORT_TEST_UNKNOWN:
+    case PortTestStatus::Unknown:
         return tr("unknown");
-    case PORT_TEST_CHECKING:
+    case PortTestStatus::Checking:
         return tr("checking…");
-    case PORT_TEST_OPEN:
+    case PortTestStatus::Open:
         return tr("open");
-    case PORT_TEST_CLOSED:
+    case PortTestStatus::Closed:
         return tr("closed");
-    case PORT_TEST_ERROR:
+    case PortTestStatus::Error:
         return tr("error");
     default:
         return {};
@@ -465,7 +344,7 @@ void PrefsDialog::portTestSetEnabled()
     auto const sensitive = !session_.portTestPending(Session::PORT_TEST_IPV4) &&
         !session_.portTestPending(Session::PORT_TEST_IPV6);
     ui_.testPeerPortButton->setEnabled(sensitive);
-    widgets_[Prefs::PEER_PORT]->setEnabled(sensitive);
+    ui_.peerPortSpin->setEnabled(sensitive);
 }
 
 void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol)
@@ -474,19 +353,19 @@ void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpPr
     {
         if (!res)
         {
-            return PORT_TEST_ERROR;
+            return PortTestStatus::Error;
         }
         if (!*res)
         {
-            return PORT_TEST_CLOSED;
+            return PortTestStatus::Closed;
         }
-        return PORT_TEST_OPEN;
+        return PortTestStatus::Open;
     };
 
     // Only update the UI if the current status is "checking", so that
     // we won't show the port test results for the old peer port if it
     // changed while we have port_test RPC call(s) in-flight.
-    if (port_test_status_[ip_protocol] == PORT_TEST_CHECKING)
+    if (port_test_status_[ip_protocol] == PortTestStatus::Checking)
     {
         port_test_status_[ip_protocol] = StatusFromResult(result);
         updatePortStatusLabel();
@@ -496,8 +375,8 @@ void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpPr
 
 void PrefsDialog::onPortTest()
 {
-    port_test_status_[Session::PORT_TEST_IPV4] = PORT_TEST_CHECKING;
-    port_test_status_[Session::PORT_TEST_IPV6] = PORT_TEST_CHECKING;
+    port_test_status_[Session::PORT_TEST_IPV4] = PortTestStatus::Checking;
+    port_test_status_[Session::PORT_TEST_IPV6] = PortTestStatus::Checking;
     updatePortStatusLabel();
 
     session_.portTest(Session::PORT_TEST_IPV4);
@@ -511,16 +390,16 @@ void PrefsDialog::initNetworkTab()
     ui_.torrentPeerLimitSpin->setRange(1, INT_MAX);
     ui_.globalPeerLimitSpin->setRange(1, INT_MAX);
 
-    linkWidgetToPref(ui_.peerPortSpin, Prefs::PEER_PORT);
-    linkWidgetToPref(ui_.randomPeerPortCheck, Prefs::PEER_PORT_RANDOM_ON_START);
-    linkWidgetToPref(ui_.enablePortForwardingCheck, Prefs::PORT_FORWARDING);
-    linkWidgetToPref(ui_.torrentPeerLimitSpin, Prefs::PEER_LIMIT_TORRENT);
-    linkWidgetToPref(ui_.globalPeerLimitSpin, Prefs::PEER_LIMIT_GLOBAL);
-    linkWidgetToPref(ui_.enableUtpCheck, Prefs::UTP_ENABLED);
-    linkWidgetToPref(ui_.enablePexCheck, Prefs::PEX_ENABLED);
-    linkWidgetToPref(ui_.enableDhtCheck, Prefs::DHT_ENABLED);
-    linkWidgetToPref(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
-    linkWidgetToPref(ui_.defaultTrackersPlainTextEdit, Prefs::DEFAULT_TRACKERS);
+    initWidget(ui_.peerPortSpin, Prefs::PEER_PORT);
+    initWidget(ui_.randomPeerPortCheck, Prefs::PEER_PORT_RANDOM_ON_START);
+    initWidget(ui_.enablePortForwardingCheck, Prefs::PORT_FORWARDING);
+    initWidget(ui_.torrentPeerLimitSpin, Prefs::PEER_LIMIT_TORRENT);
+    initWidget(ui_.globalPeerLimitSpin, Prefs::PEER_LIMIT_GLOBAL);
+    initWidget(ui_.enableUtpCheck, Prefs::UTP_ENABLED);
+    initWidget(ui_.enablePexCheck, Prefs::PEX_ENABLED);
+    initWidget(ui_.enableDhtCheck, Prefs::DHT_ENABLED);
+    initWidget(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
+    initWidget(ui_.defaultTrackersPlainTextEdit, Prefs::DEFAULT_TRACKERS);
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.incomingPeersSectionLayout);
@@ -567,22 +446,12 @@ void PrefsDialog::onUpdateBlocklistClicked()
     session_.updateBlocklist();
 }
 
-void PrefsDialog::encryptionEdited(int i)
-{
-    int const value(qobject_cast<QComboBox*>(sender())->itemData(i).toInt());
-    setPref(Prefs::ENCRYPTION, value);
-}
-
 void PrefsDialog::initPrivacyTab()
 {
-    ui_.encryptionModeCombo->addItem(tr("Allow encryption"), 0);
-    ui_.encryptionModeCombo->addItem(tr("Prefer encryption"), 1);
-    ui_.encryptionModeCombo->addItem(tr("Require encryption"), 2);
-
-    linkWidgetToPref(ui_.encryptionModeCombo, Prefs::ENCRYPTION);
-    linkWidgetToPref(ui_.blocklistCheck, Prefs::BLOCKLIST_ENABLED);
-    linkWidgetToPref(ui_.blocklistEdit, Prefs::BLOCKLIST_URL);
-    linkWidgetToPref(ui_.autoUpdateBlocklistCheck, Prefs::BLOCKLIST_UPDATES_ENABLED);
+    initEncryptionCombo(ui_.encryptionModeCombo, Prefs::ENCRYPTION);
+    initWidget(ui_.blocklistCheck, Prefs::BLOCKLIST_ENABLED);
+    initWidget(ui_.blocklistEdit, Prefs::BLOCKLIST_URL);
+    initWidget(ui_.autoUpdateBlocklistCheck, Prefs::BLOCKLIST_UPDATES_ENABLED);
 
     block_widgets_ << ui_.blocklistEdit << ui_.blocklistStatusLabel << ui_.updateBlocklistButton
                    << ui_.autoUpdateBlocklistCheck;
@@ -593,7 +462,6 @@ void PrefsDialog::initPrivacyTab()
     cr->update();
 
     connect(ui_.updateBlocklistButton, &QAbstractButton::clicked, this, &PrefsDialog::onUpdateBlocklistClicked);
-    connect(ui_.encryptionModeCombo, qOverload<int>(&QComboBox::activated), this, &PrefsDialog::encryptionEdited);
 
     updateBlocklistLabel();
 }
@@ -612,13 +480,13 @@ void PrefsDialog::initSeedingTab()
 {
     ui_.doneSeedingScriptButton->setTitle(tr("Select \"Torrent Done Seeding\" Script"));
 
-    linkWidgetToPref(ui_.ratioLimitCheck, Prefs::RATIO_ENABLED);
-    linkWidgetToPref(ui_.ratioLimitSpin, Prefs::RATIO);
-    linkWidgetToPref(ui_.idleLimitCheck, Prefs::IDLE_LIMIT_ENABLED);
-    linkWidgetToPref(ui_.idleLimitSpin, Prefs::IDLE_LIMIT);
-    linkWidgetToPref(ui_.doneSeedingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_SEEDING_ENABLED);
-    linkWidgetToPref(ui_.doneSeedingScriptButton, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
-    linkWidgetToPref(ui_.doneSeedingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
+    initWidget(ui_.ratioLimitCheck, Prefs::RATIO_ENABLED);
+    initWidget(ui_.ratioLimitSpin, Prefs::RATIO);
+    initWidget(ui_.idleLimitCheck, Prefs::IDLE_LIMIT_ENABLED);
+    initWidget(ui_.idleLimitSpin, Prefs::IDLE_LIMIT);
+    initWidget(ui_.doneSeedingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_SEEDING_ENABLED);
+    initWidget(ui_.doneSeedingScriptButton, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
+    initWidget(ui_.doneSeedingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
 
     connect(ui_.idleLimitSpin, qOverload<int>(&QSpinBox::valueChanged), this, &PrefsDialog::onIdleLimitChanged);
 
@@ -650,27 +518,27 @@ void PrefsDialog::initDownloadingTab()
     ui_.watchDirStack->setMinimumWidth(200);
 
     ui_.downloadDirFreeSpaceLabel->setSession(session_);
-    ui_.downloadDirFreeSpaceLabel->setPath(prefs_.getString(Prefs::DOWNLOAD_DIR));
+    ui_.downloadDirFreeSpaceLabel->setPath(prefs_.get<QString>(Prefs::DOWNLOAD_DIR));
 
-    linkWidgetToPref(ui_.watchDirCheck, Prefs::DIR_WATCH_ENABLED);
-    linkWidgetToPref(ui_.watchDirButton, Prefs::DIR_WATCH);
-    linkWidgetToPref(ui_.watchDirEdit, Prefs::DIR_WATCH);
-    linkWidgetToPref(ui_.showTorrentOptionsDialogCheck, Prefs::OPTIONS_PROMPT);
-    linkWidgetToPref(ui_.startAddedTorrentsCheck, Prefs::START);
-    linkWidgetToPref(ui_.detectTorrentFromClipboard, Prefs::READ_CLIPBOARD);
-    linkWidgetToPref(ui_.trashTorrentFileCheck, Prefs::TRASH_ORIGINAL);
-    linkWidgetToPref(ui_.downloadDirButton, Prefs::DOWNLOAD_DIR);
-    linkWidgetToPref(ui_.downloadDirEdit, Prefs::DOWNLOAD_DIR);
-    linkWidgetToPref(ui_.downloadDirFreeSpaceLabel, Prefs::DOWNLOAD_DIR);
-    linkWidgetToPref(ui_.downloadQueueSizeSpin, Prefs::DOWNLOAD_QUEUE_SIZE);
-    linkWidgetToPref(ui_.queueStalledMinutesSpin, Prefs::QUEUE_STALLED_MINUTES);
-    linkWidgetToPref(ui_.renamePartialFilesCheck, Prefs::RENAME_PARTIAL_FILES);
-    linkWidgetToPref(ui_.incompleteDirCheck, Prefs::INCOMPLETE_DIR_ENABLED);
-    linkWidgetToPref(ui_.incompleteDirButton, Prefs::INCOMPLETE_DIR);
-    linkWidgetToPref(ui_.incompleteDirEdit, Prefs::INCOMPLETE_DIR);
-    linkWidgetToPref(ui_.doneDownloadingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_ENABLED);
-    linkWidgetToPref(ui_.doneDownloadingScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
-    linkWidgetToPref(ui_.doneDownloadingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
+    initWidget(ui_.watchDirCheck, Prefs::DIR_WATCH_ENABLED);
+    initWidget(ui_.watchDirButton, Prefs::DIR_WATCH);
+    initWidget(ui_.watchDirEdit, Prefs::DIR_WATCH);
+    initWidget(ui_.showTorrentOptionsDialogCheck, Prefs::OPTIONS_PROMPT);
+    initWidget(ui_.startAddedTorrentsCheck, Prefs::START);
+    initWidget(ui_.detectTorrentFromClipboard, Prefs::READ_CLIPBOARD);
+    initWidget(ui_.trashTorrentFileCheck, Prefs::TRASH_ORIGINAL);
+    initWidget(ui_.downloadDirButton, Prefs::DOWNLOAD_DIR);
+    initWidget(ui_.downloadDirEdit, Prefs::DOWNLOAD_DIR);
+    initWidget(ui_.downloadDirFreeSpaceLabel, Prefs::DOWNLOAD_DIR);
+    initWidget(ui_.downloadQueueSizeSpin, Prefs::DOWNLOAD_QUEUE_SIZE);
+    initWidget(ui_.queueStalledMinutesSpin, Prefs::QUEUE_STALLED_MINUTES);
+    initWidget(ui_.renamePartialFilesCheck, Prefs::RENAME_PARTIAL_FILES);
+    initWidget(ui_.incompleteDirCheck, Prefs::INCOMPLETE_DIR_ENABLED);
+    initWidget(ui_.incompleteDirButton, Prefs::INCOMPLETE_DIR);
+    initWidget(ui_.incompleteDirEdit, Prefs::INCOMPLETE_DIR);
+    initWidget(ui_.doneDownloadingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_ENABLED);
+    initWidget(ui_.doneDownloadingScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
+    initWidget(ui_.doneDownloadingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.addingSectionLayout);
@@ -763,14 +631,6 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
     }
 
     adjustSize();
-
-    connect(qApp, &QApplication::focusChanged, this, &PrefsDialog::focusChanged);
-}
-
-void PrefsDialog::setPref(int key, QVariant const& v)
-{
-    prefs_.set(key, v);
-    refreshPref(key);
 }
 
 // ---
@@ -801,21 +661,21 @@ void PrefsDialog::refreshPref(int key)
     case Prefs::RPC_WHITELIST_ENABLED:
     case Prefs::RPC_AUTH_REQUIRED:
         {
-            bool const enabled(prefs_.getBool(Prefs::RPC_ENABLED));
-            bool const whitelist(prefs_.getBool(Prefs::RPC_WHITELIST_ENABLED));
-            bool const auth(prefs_.getBool(Prefs::RPC_AUTH_REQUIRED));
+            bool const enabled(prefs_.get<bool>(Prefs::RPC_ENABLED));
+            bool const whitelist(prefs_.get<bool>(Prefs::RPC_WHITELIST_ENABLED));
+            bool const auth(prefs_.get<bool>(Prefs::RPC_AUTH_REQUIRED));
 
-            for (QWidget* const w : web_whitelist_widgets_)
+            for (auto* const w : web_whitelist_widgets_)
             {
                 w->setEnabled(enabled && whitelist);
             }
 
-            for (QWidget* const w : web_auth_widgets_)
+            for (auto* const w : web_auth_widgets_)
             {
                 w->setEnabled(enabled && auth);
             }
 
-            for (QWidget* const w : web_widgets_)
+            for (auto* const w : web_widgets_)
             {
                 w->setEnabled(enabled);
             }
@@ -825,9 +685,9 @@ void PrefsDialog::refreshPref(int key)
 
     case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
         {
-            bool const enabled = prefs_.getBool(key);
+            bool const enabled = prefs_.get<bool>(key);
 
-            for (QWidget* const w : sched_widgets_)
+            for (auto* const w : sched_widgets_)
             {
                 w->setEnabled(enabled);
             }
@@ -837,9 +697,9 @@ void PrefsDialog::refreshPref(int key)
 
     case Prefs::BLOCKLIST_ENABLED:
         {
-            bool const enabled = prefs_.getBool(key);
+            bool const enabled = prefs_.get<bool>(key);
 
-            for (QWidget* const w : block_widgets_)
+            for (auto* const w : block_widgets_)
             {
                 w->setEnabled(enabled);
             }
@@ -848,8 +708,8 @@ void PrefsDialog::refreshPref(int key)
         }
 
     case Prefs::PEER_PORT:
-        port_test_status_[Session::PORT_TEST_IPV4] = PORT_TEST_UNKNOWN;
-        port_test_status_[Session::PORT_TEST_IPV6] = PORT_TEST_UNKNOWN;
+        port_test_status_[Session::PORT_TEST_IPV4] = PortTestStatus::Unknown;
+        port_test_status_[Session::PORT_TEST_IPV6] = PortTestStatus::Unknown;
         updatePortStatusLabel();
         portTestSetEnabled();
         break;
@@ -858,19 +718,8 @@ void PrefsDialog::refreshPref(int key)
         break;
     }
 
-    if (auto iter = widgets_.find(key); iter != std::end(widgets_))
+    for (auto [iter, end] = updaters_.equal_range(key); iter != end; ++iter)
     {
-        QWidget* const w = iter->second;
-
-        w->blockSignals(true);
-
-        if (!updateWidgetValue(w, key) && (key == Prefs::ENCRYPTION))
-        {
-            auto* combo_box = qobject_cast<QComboBox*>(w);
-            int const index = combo_box->findData(prefs_.getInt(key));
-            combo_box->setCurrentIndex(index);
-        }
-
-        w->blockSignals(false);
+        iter->second();
     }
 }

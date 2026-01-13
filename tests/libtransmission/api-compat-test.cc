@@ -12,9 +12,10 @@
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
 
+using ApiCompatTest = ::libtransmission::test::TransmissionTest;
+
 namespace
 {
-
 constexpr std::string_view LegacySessionGetJson = R"json({
     "method": "session-get",
     "tag": 0
@@ -139,7 +140,7 @@ constexpr std::string_view CurrentSessionGetResponseJson = R"json({
         "blocklist_enabled": false,
         "blocklist_size": 0,
         "blocklist_url": "http://www.example.com/blocklist",
-        "cache_size_mb": 4,
+        "cache_size_mib": 4,
         "config_dir": "/home/user/.config/transmission",
         "default_trackers": "",
         "dht_enabled": true,
@@ -299,6 +300,128 @@ constexpr std::string_view CurrentTorrentGetJson = R"json({
     }
 })json";
 
+constexpr std::string_view CurrentFilesWantedResponseObjectJson = R"json({
+    "id": 6,
+    "jsonrpc": "2.0",
+    "result": {
+        "torrents": [
+            {
+                "wanted": [
+                    false,
+                    true,
+                    true,
+                    false
+                ]
+            },
+            {
+                "wanted": [
+                    true,
+                    false,
+                    true,
+                    false,
+                    true
+                ]
+            }
+        ]
+    }
+})json";
+
+constexpr std::string_view LegacyFilesWantedResponseObjectJson = R"json({
+    "arguments": {
+        "torrents": [
+            {
+                "wanted": [
+                    0,
+                    1,
+                    1,
+                    0
+                ]
+            },
+            {
+                "wanted": [
+                    1,
+                    0,
+                    1,
+                    0,
+                    1
+                ]
+            }
+        ]
+    },
+    "result": "success",
+    "tag": 6
+})json";
+
+constexpr std::string_view CurrentFilesWantedResponseArrayJson = R"json({
+    "id": 6,
+    "jsonrpc": "2.0",
+    "result": {
+        "torrents": [
+            [
+                "comment",
+                "wanted",
+                "id"
+            ],
+            [
+                "id 1",
+                [
+                    false,
+                    true,
+                    true,
+                    false
+                ],
+                1
+            ],
+            [
+                "id 2",
+                [
+                    true,
+                    false,
+                    true,
+                    false,
+                    true
+                ],
+                2
+            ]
+        ]
+    }
+})json";
+
+constexpr std::string_view LegacyFilesWantedResponseArrayJson = R"json({
+    "arguments": {
+        "torrents": [
+            [
+                "comment",
+                "wanted",
+                "id"
+            ],
+            [
+                "id 1",
+                [
+                    0,
+                    1,
+                    1,
+                    0
+                ],
+                1
+            ],
+            [
+                "id 2",
+                [
+                    1,
+                    0,
+                    1,
+                    0,
+                    1
+                ],
+                2
+            ]
+        ]
+    },
+    "result": "success",
+    "tag": 6
+})json";
+
 constexpr std::string_view CurrentPortTestErrorResponse = R"json({
     "error": {
         "code": 8,
@@ -320,6 +443,105 @@ constexpr std::string_view LegacyPortTestErrorResponse = R"json({
     },
     "result": "Couldn't test port: No Response (0)",
     "tag": 9
+})json";
+
+constexpr std::string_view CurrentPreferEncryptionResponse = R"json({
+    "id": 6,
+    "jsonrpc": "2.0",
+    "result": {
+        "encryption": "preferred"
+    }
+})json";
+
+constexpr std::string_view LegacyPreferEncryptionResponse = R"json({
+    "arguments": {
+        "encryption": "preferred"
+    },
+    "result": "success",
+    "tag": 6
+})json";
+
+constexpr std::string_view CurrentRequireEncryptionResponse = R"json({
+    "id": 6,
+    "jsonrpc": "2.0",
+    "result": {
+        "encryption": "required"
+    }
+})json";
+
+constexpr std::string_view LegacyRequireEncryptionResponse = R"json({
+    "arguments": {
+        "encryption": "required"
+    },
+    "result": "success",
+    "tag": 6
+})json";
+
+constexpr std::string_view CurrentPreferClearResponse = R"json({
+    "id": 6,
+    "jsonrpc": "2.0",
+    "result": {
+        "encryption": "allowed"
+    }
+})json";
+
+constexpr std::string_view LegacyPreferClearResponse = R"json({
+    "arguments": {
+        "encryption": "tolerated"
+    },
+    "result": "success",
+    "tag": 6
+})json";
+
+constexpr std::string_view CurrentPreferEncryptionRequest = R"json({
+    "id": 6,
+    "jsonrpc": "2.0",
+    "method": "session_set",
+    "params": {
+        "encryption": "preferred"
+    }
+})json";
+
+constexpr std::string_view LegacyPreferEncryptionRequest = R"json({
+    "arguments": {
+        "encryption": "preferred"
+    },
+    "method": "session-set",
+    "tag": 6
+})json";
+
+constexpr std::string_view CurrentRequireEncryptionRequest = R"json({
+    "id": 6,
+    "jsonrpc": "2.0",
+    "method": "session_set",
+    "params": {
+        "encryption": "required"
+    }
+})json";
+
+constexpr std::string_view LegacyRequireEncryptionRequest = R"json({
+    "arguments": {
+        "encryption": "required"
+    },
+    "method": "session-set",
+    "tag": 6
+})json";
+
+constexpr std::string_view CurrentPreferClearRequest = R"json({
+    "id": 6,
+    "jsonrpc": "2.0",
+    "method": "session_set",
+    "params": {
+        "encryption": "allowed"
+    }
+})json";
+
+constexpr std::string_view LegacyPreferClearRequest = R"json({
+    "arguments": {
+        "encryption": "tolerated"
+    },
+    "method": "session-set",
+    "tag": 6
 })json";
 
 constexpr std::string_view LegacyStatsJson = R"json({
@@ -458,8 +680,8 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "download_dir": "/home/user/Downloads",
     "download_queue_enabled": true,
     "download_queue_size": 5,
-    "encryption": 1,
-    "filter_mode": "show-all",
+    "encryption": "preferred",
+    "filter_mode": "show_all",
     "filter_trackers": "",
     "idle_seeding_limit": 30,
     "idle_seeding_limit_enabled": false,
@@ -480,7 +702,7 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "peer_port_random_high": 65535,
     "peer_port_random_low": 49152,
     "peer_port_random_on_start": false,
-    "peer_socket_tos": "le",
+    "peer_socket_diffserv": "le",
     "pex_enabled": true,
     "port_forwarding_enabled": true,
     "preallocation": 1,
@@ -516,7 +738,7 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "show_toolbar": true,
     "show_tracker_scrapes": false,
     "sleep_per_seconds_during_verify": 100,
-    "sort_mode": "sort-by-name",
+    "sort_mode": "sort_by_name",
     "sort_reversed": false,
     "speed_limit_down": 100,
     "speed_limit_down_enabled": false,
@@ -540,6 +762,30 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "utp_enabled": true,
     "watch_dir": "/home/user/Downloads",
     "watch_dir_enabled": false
+})json";
+
+constexpr std::string_view LegacyPreferClearJson = R"json({
+    "encryption": 0
+})json";
+
+constexpr std::string_view CurrentPreferClearJson = R"json({
+    "encryption": "allowed"
+})json";
+
+constexpr std::string_view LegacyPreferEncryptionJson = R"json({
+    "encryption": 1
+})json";
+
+constexpr std::string_view CurrentPreferEncryptionJson = R"json({
+    "encryption": "preferred"
+})json";
+
+constexpr std::string_view LegacyRequireEncryptionJson = R"json({
+    "encryption": 2
+})json";
+
+constexpr std::string_view CurrentRequireEncryptionJson = R"json({
+    "encryption": "required"
 })json";
 
 constexpr std::string_view BadFreeSpaceRequest = R"json({
@@ -642,6 +888,16 @@ constexpr std::string_view UnrecognisedInfoLegacyResponse = R"json({
     "arguments": {},
     "result": "unrecognized info",
     "tag": 10
+})json";
+
+constexpr std::string_view LegacyNonIntTagRequest = R"json({
+    "method": "session-get",
+    "tag": "0"
+})json";
+
+constexpr std::string_view LegacyNonIntTagRequestResult = R"json({
+    "jsonrpc": "2.0",
+    "method": "session_get"
 })json";
 
 // clang-format off
@@ -946,13 +1202,13 @@ constexpr std::string_view ResumeBenc =
 
 } // namespace
 
-TEST(ApiCompatTest, canConvertRpc)
+TEST_F(ApiCompatTest, canConvertRpc)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
     // clang-format off
-    static auto constexpr TestCases = std::array<TestCase, 40U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 74U>{ {
         { "free_space tr5 -> tr5", BadFreeSpaceRequest, Style::Tr5, BadFreeSpaceRequest },
         { "free_space tr5 -> tr4", BadFreeSpaceRequest, Style::Tr4, BadFreeSpaceRequestLegacy },
         { "free_space tr4 -> tr5", BadFreeSpaceRequestLegacy, Style::Tr5, BadFreeSpaceRequest },
@@ -993,6 +1249,40 @@ TEST(ApiCompatTest, canConvertRpc)
         { "unrecognised info tr5 -> tr4", UnrecognisedInfoResponse, Style::Tr4, UnrecognisedInfoLegacyResponse},
         { "unrecognised info tr4 -> tr5", UnrecognisedInfoLegacyResponse, Style::Tr5, UnrecognisedInfoResponse},
         { "unrecognised info tr4 -> tr4", UnrecognisedInfoLegacyResponse, Style::Tr4, UnrecognisedInfoLegacyResponse},
+        { "non-int tag tr4 -> tr5", LegacyNonIntTagRequest, Style::Tr5, LegacyNonIntTagRequestResult },
+        { "non-int tag tr4 -> tr4", LegacyNonIntTagRequest, Style::Tr4, LegacyNonIntTagRequest },
+        { "files wanted response object tr5 -> tr5", CurrentFilesWantedResponseObjectJson, Style::Tr5, CurrentFilesWantedResponseObjectJson },
+        { "files wanted response object tr5 -> tr4", CurrentFilesWantedResponseObjectJson, Style::Tr4, LegacyFilesWantedResponseObjectJson },
+        { "files wanted response object tr4 -> tr5", LegacyFilesWantedResponseObjectJson, Style::Tr5, CurrentFilesWantedResponseObjectJson },
+        { "files wanted response object tr5 -> tr4", LegacyFilesWantedResponseObjectJson, Style::Tr4, LegacyFilesWantedResponseObjectJson },
+        { "files wanted response array tr5 -> tr5", CurrentFilesWantedResponseArrayJson, Style::Tr5, CurrentFilesWantedResponseArrayJson },
+        { "files wanted response array tr5 -> tr4", CurrentFilesWantedResponseArrayJson, Style::Tr4, LegacyFilesWantedResponseArrayJson },
+        { "files wanted response array tr4 -> tr5", LegacyFilesWantedResponseArrayJson, Style::Tr5, CurrentFilesWantedResponseArrayJson },
+        { "files wanted response array tr5 -> tr4", LegacyFilesWantedResponseArrayJson, Style::Tr4, LegacyFilesWantedResponseArrayJson },
+        { "prefer encryption response tr5 -> tr5", CurrentPreferEncryptionResponse, Style::Tr5, CurrentPreferEncryptionResponse },
+        { "prefer encryption response tr5 -> tr4", CurrentPreferEncryptionResponse, Style::Tr4, LegacyPreferEncryptionResponse },
+        { "prefer encryption response tr4 -> tr5", LegacyPreferEncryptionResponse, Style::Tr5, CurrentPreferEncryptionResponse },
+        { "prefer encryption response tr5 -> tr4", LegacyPreferEncryptionResponse, Style::Tr4, LegacyPreferEncryptionResponse },
+        { "require encryption response tr5 -> tr5", CurrentRequireEncryptionResponse, Style::Tr5, CurrentRequireEncryptionResponse },
+        { "require encryption response tr5 -> tr4", CurrentRequireEncryptionResponse, Style::Tr4, LegacyRequireEncryptionResponse },
+        { "require encryption response tr4 -> tr5", LegacyRequireEncryptionResponse, Style::Tr5, CurrentRequireEncryptionResponse },
+        { "require encryption response tr5 -> tr4", LegacyRequireEncryptionResponse, Style::Tr4, LegacyRequireEncryptionResponse },
+        { "prefer clear response tr5 -> tr5", CurrentPreferClearResponse, Style::Tr5, CurrentPreferClearResponse },
+        { "prefer clear response tr5 -> tr4", CurrentPreferClearResponse, Style::Tr4, LegacyPreferClearResponse },
+        { "prefer clear response tr4 -> tr5", LegacyPreferClearResponse, Style::Tr5, CurrentPreferClearResponse },
+        { "prefer clear response tr5 -> tr4", LegacyPreferClearResponse, Style::Tr4, LegacyPreferClearResponse },
+        { "prefer encryption request tr5 -> tr5", CurrentPreferEncryptionRequest, Style::Tr5, CurrentPreferEncryptionRequest },
+        { "prefer encryption request tr5 -> tr4", CurrentPreferEncryptionRequest, Style::Tr4, LegacyPreferEncryptionRequest },
+        { "prefer encryption request tr4 -> tr5", LegacyPreferEncryptionRequest, Style::Tr5, CurrentPreferEncryptionRequest },
+        { "prefer encryption request tr5 -> tr4", LegacyPreferEncryptionRequest, Style::Tr4, LegacyPreferEncryptionRequest },
+        { "require encryption request tr5 -> tr5", CurrentRequireEncryptionRequest, Style::Tr5, CurrentRequireEncryptionRequest },
+        { "require encryption request tr5 -> tr4", CurrentRequireEncryptionRequest, Style::Tr4, LegacyRequireEncryptionRequest },
+        { "require encryption request tr4 -> tr5", LegacyRequireEncryptionRequest, Style::Tr5, CurrentRequireEncryptionRequest },
+        { "require encryption request tr5 -> tr4", LegacyRequireEncryptionRequest, Style::Tr4, LegacyRequireEncryptionRequest },
+        { "prefer clear request tr5 -> tr5", CurrentPreferClearRequest, Style::Tr5, CurrentPreferClearRequest },
+        { "prefer clear request tr5 -> tr4", CurrentPreferClearRequest, Style::Tr4, LegacyPreferClearRequest },
+        { "prefer clear request tr4 -> tr5", LegacyPreferClearRequest, Style::Tr5, CurrentPreferClearRequest },
+        { "prefer clear request tr5 -> tr4", LegacyPreferClearRequest, Style::Tr4, LegacyPreferClearRequest },
 
         // TODO(ckerr): torrent-get with 'table'
     } };
@@ -1003,21 +1293,33 @@ TEST(ApiCompatTest, canConvertRpc)
         auto serde = tr_variant_serde::json();
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value()) << name << ": " << serde.error_;
-        auto converted = libtransmission::api_compat::convert(*parsed, tgt_style);
-        EXPECT_EQ(expected, serde.to_string(converted)) << name;
+        libtransmission::api_compat::convert(*parsed, tgt_style);
+        EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
     }
 }
 
-TEST(ApiCompatTest, canConvertJsonDataFiles)
+TEST_F(ApiCompatTest, canConvertJsonDataFiles)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
-    static auto constexpr TestCases = std::array<TestCase, 8U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 20U>{ {
         { "settings tr5 -> tr5", CurrentSettingsJson, Style::Tr5, CurrentSettingsJson },
         { "settings tr5 -> tr4", CurrentSettingsJson, Style::Tr4, LegacySettingsJson },
         { "settings tr4 -> tr5", LegacySettingsJson, Style::Tr5, CurrentSettingsJson },
         { "settings tr4 -> tr4", LegacySettingsJson, Style::Tr4, LegacySettingsJson },
+        { "prefer clear tr5 -> tr5", CurrentPreferClearJson, Style::Tr5, CurrentPreferClearJson },
+        { "prefer clear tr5 -> tr4", CurrentPreferClearJson, Style::Tr4, LegacyPreferClearJson },
+        { "prefer clear tr4 -> tr5", LegacyPreferClearJson, Style::Tr5, CurrentPreferClearJson },
+        { "prefer clear tr4 -> tr4", LegacyPreferClearJson, Style::Tr4, LegacyPreferClearJson },
+        { "prefer encryption tr5 -> tr5", CurrentPreferEncryptionJson, Style::Tr5, CurrentPreferEncryptionJson },
+        { "prefer encryption tr5 -> tr4", CurrentPreferEncryptionJson, Style::Tr4, LegacyPreferEncryptionJson },
+        { "prefer encryption tr4 -> tr5", LegacyPreferEncryptionJson, Style::Tr5, CurrentPreferEncryptionJson },
+        { "prefer encryption tr4 -> tr4", LegacyPreferEncryptionJson, Style::Tr4, LegacyPreferEncryptionJson },
+        { "require encryption tr5 -> tr5", CurrentRequireEncryptionJson, Style::Tr5, CurrentRequireEncryptionJson },
+        { "require encryption tr5 -> tr4", CurrentRequireEncryptionJson, Style::Tr4, LegacyRequireEncryptionJson },
+        { "require encryption tr4 -> tr5", LegacyRequireEncryptionJson, Style::Tr5, CurrentRequireEncryptionJson },
+        { "require encryption tr4 -> tr4", LegacyRequireEncryptionJson, Style::Tr4, LegacyRequireEncryptionJson },
 
         { "stats tr5 -> tr5", CurrentStatsJson, Style::Tr5, CurrentStatsJson },
         { "stats tr5 -> tr4", CurrentStatsJson, Style::Tr4, LegacyStatsJson },
@@ -1032,12 +1334,12 @@ TEST(ApiCompatTest, canConvertJsonDataFiles)
 
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value());
-        auto converted = libtransmission::api_compat::convert(*parsed, tgt_style);
-        EXPECT_EQ(expected, serde.to_string(converted)) << name;
+        libtransmission::api_compat::convert(*parsed, tgt_style);
+        EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
     }
 }
 
-TEST(ApiCompatTest, canConvertBencDataFiles)
+TEST_F(ApiCompatTest, canConvertBencDataFiles)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
@@ -1056,7 +1358,7 @@ TEST(ApiCompatTest, canConvertBencDataFiles)
 
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value()) << name;
-        auto converted = libtransmission::api_compat::convert(*parsed, tgt_style);
-        EXPECT_EQ(expected, serde.to_string(converted)) << name;
+        libtransmission::api_compat::convert(*parsed, tgt_style);
+        EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
     }
 }

@@ -70,7 +70,7 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     int const width = font_metrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
     ui_.sourceStack->setMinimumWidth(width);
 
-    auto const download_dir = Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR));
+    auto const download_dir = Utils::removeTrailingDirSeparator(prefs.get<QString>(Prefs::DOWNLOAD_DIR));
     ui_.freeSpaceLabel->setSession(session_);
     ui_.freeSpaceLabel->setPath(download_dir);
 
@@ -94,8 +94,8 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
     ui_.priorityCombo->setCurrentIndex(1); // Normal
 
-    ui_.startCheck->setChecked(prefs.getBool(Prefs::START));
-    ui_.trashCheck->setChecked(prefs.getBool(Prefs::TRASH_ORIGINAL));
+    ui_.startCheck->setChecked(prefs.get<bool>(Prefs::START));
+    ui_.trashCheck->setChecked(prefs.get<bool>(Prefs::TRASH_ORIGINAL));
 
     connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &QObject::deleteLater);
     connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &OptionsDialog::onAccepted);
@@ -240,7 +240,7 @@ void OptionsDialog::onAccepted()
         download_dir = ui_.destinationEdit->text();
     }
 
-    dictAdd(&args, TR_KEY_download_dir_kebab, download_dir);
+    dictAdd(&args, TR_KEY_download_dir, download_dir);
 
     // paused
     dictAdd(&args, TR_KEY_paused, !ui_.startCheck->isChecked());
@@ -248,14 +248,14 @@ void OptionsDialog::onAccepted()
     // priority
     int const index = ui_.priorityCombo->currentIndex();
     int const priority = ui_.priorityCombo->itemData(index).toInt();
-    dictAdd(&args, TR_KEY_bandwidth_priority_camel, priority);
+    dictAdd(&args, TR_KEY_bandwidth_priority, priority);
 
     // files_unwanted
     auto count = std::count(wanted_.begin(), wanted_.end(), false);
 
     if (count > 0)
     {
-        tr_variant* l = tr_variantDictAddList(&args, TR_KEY_files_unwanted_kebab, count);
+        tr_variant* l = tr_variantDictAddList(&args, TR_KEY_files_unwanted, count);
 
         for (int i = 0, n = wanted_.size(); i < n; ++i)
         {
@@ -271,7 +271,7 @@ void OptionsDialog::onAccepted()
 
     if (count > 0)
     {
-        tr_variant* l = tr_variantDictAddList(&args, TR_KEY_priority_low_kebab, count);
+        tr_variant* l = tr_variantDictAddList(&args, TR_KEY_priority_low, count);
 
         for (int i = 0, n = priorities_.size(); i < n; ++i)
         {
@@ -287,7 +287,7 @@ void OptionsDialog::onAccepted()
 
     if (count > 0)
     {
-        tr_variant* l = tr_variantDictAddList(&args, TR_KEY_priority_high_kebab, count);
+        tr_variant* l = tr_variantDictAddList(&args, TR_KEY_priority_high, count);
 
         for (int i = 0, n = priorities_.size(); i < n; ++i)
         {

@@ -415,6 +415,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
+          QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
@@ -429,6 +430,8 @@ jobs:
     container:
       image: alpine:latest
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Show Configuration
         run: |
@@ -461,7 +464,7 @@ jobs:
         run: apk add --upgrade glibmm-dev gtkmm3-dev
       - name: Get Dependencies (Qt6)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: apk add --upgrade qt6-qttools-dev qt6-qtsvg-dev
+        run: apk add --upgrade qt6-qtbase-dev qt6-qttools-dev qt6-qtsvg-dev xcb-util-cursor
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -494,6 +497,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
+          QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
@@ -504,12 +508,18 @@ jobs:
 
   windows:
     needs: [ what-to-make ]
-    runs-on: windows-2022
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     strategy:
       fail-fast: false
       matrix:
-        arch: [x64, x86]
+        include:
+          - arch: x86
+            runner: windows-2022
+          - arch: x64
+            runner: windows-2022
+          - arch: arm64
+            runner: windows-11-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Show Configuration
         run: |
@@ -681,6 +691,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
+          QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
@@ -695,6 +706,8 @@ jobs:
     runs-on: ubuntu-22.04
     container:
       image: debian:11-slim
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Show Configuration
         run: |
@@ -718,9 +731,15 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
+            locales \
             ninja-build \
             pkg-config \
             xz-utils
+          # Set UTF-8 locale for Qt
+          echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+          locale-gen
+          echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
+          echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
       - name: Get NPM
         uses: actions/setup-node@v4
         with:
@@ -730,7 +749,7 @@ jobs:
         run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
       - name: Get Dependencies (Qt5)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
+        run: apt-get install -y --no-install-recommends libxcb-cursor0 qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -759,6 +778,8 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        env:
+          QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
@@ -773,6 +794,8 @@ jobs:
     runs-on: ubuntu-22.04
     container:
       image: fedora:39
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Show Configuration
         run: |
@@ -808,7 +831,7 @@ jobs:
         run: dnf install -y glibmm2.68-devel gtkmm4.0-devel
       - name: Get Dependencies (Qt6)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel
+        run: dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel xcb-util-cursor
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -839,6 +862,8 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        env:
+          QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
@@ -851,6 +876,8 @@ jobs:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Show Configuration
         run: |
@@ -875,7 +902,13 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
+            locales \
             ninja-build
+          # Set UTF-8 locale for Qt
+          echo "en_US.UTF-8 UTF-8" | sudo tee /etc/locale.gen
+          sudo locale-gen
+          echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
+          echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
       - name: Get NPM
         uses: actions/setup-node@v4
         with:
@@ -885,7 +918,7 @@ jobs:
         run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
       - name: Get Dependencies (Qt5)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: sudo apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
+        run: sudo apt-get install -y --no-install-recommends libxcb-cursor0 qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -978,6 +1011,8 @@ jobs:
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-24.04
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Show Configuration
         run: |
@@ -1002,13 +1037,19 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
+            locales \
             ninja-build
+          # Set UTF-8 locale for Qt
+          echo "en_US.UTF-8 UTF-8" | sudo tee /etc/locale.gen
+          sudo locale-gen
+          echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
+          echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
       - name: Get Dependencies (Qt6)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: sudo apt-get install -y --no-install-recommends qt6-svg-dev qt6-tools-dev
+        run: sudo apt-get install -y --no-install-recommends libxcb-cursor0 qt6-base-dev qt6-svg-dev qt6-tools-dev
       - name: Get Source
         uses: actions/checkout@v4
         with:

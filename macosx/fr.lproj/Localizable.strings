@@ -47,7 +47,7 @@
 "%lu files" = "%lu fichiers";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%lu fichiers";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu entrants";
@@ -83,7 +83,7 @@
 "%lu tracker" = "%lu traceur";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%lu traceurs";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,13 +94,13 @@
 "%lu web seeds" = "%lu semences Web";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%lu semences Web";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u morceaux, %2$@ chacun";
 
 /* Inspector -> Peers tab -> peers */
-"1 Connected" = "1 connecté";
+"1 Connected" = "1 connecté(s)";
 
 /* Add torrent -> info
    Create torrent -> info
@@ -121,7 +121,7 @@
 "1 time" = "1 fois";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "1 traceur";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "1 transfert";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "1 semence Web";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "« %@ » n’est pas un fichier torrent valide.";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "Créer un fichier torrent";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "Créé le %@";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "Créé le %1$@ avec %2$@";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "Créé avec %@";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "La création de « %@ » a échoué.";

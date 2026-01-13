@@ -47,7 +47,7 @@
 "%lu files" = "%lu קבצים";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%lu קבצים";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu נכנסים";
@@ -83,7 +83,7 @@
 "%lu tracker" = "עוקב אחד";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%lu עוקבים";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,7 +94,7 @@
 "%lu web seeds" = "%lu זורעי רשת";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%lu זורעי רשת";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u חלקים, כל אחד %2$@";
@@ -121,7 +121,7 @@
 "1 time" = "פעם אחת";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "עוקב אחד";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "העברה אחת";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "זורע רשת אחד";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "„%@” אינו קובץ טורנט תקני.";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "יצירת קובץ טורנט";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "נוצר ב־%@";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "נוצר ב־%1$@ עם %2$@";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "נוצר עם %@";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "היצירה של „%@” נכשלה.";

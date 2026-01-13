@@ -30,6 +30,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
@@ -78,11 +79,12 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         return;
     }
 
-    auto const groups_var = tr_variant_serde::json().parse_file(filename);
+    auto groups_var = tr_variant_serde::json().parse_file(filename);
     if (!groups_var)
     {
         return;
     }
+    libtransmission::api_compat::convert_incoming_data(*groups_var);
 
     auto const* const groups_map = groups_var->get_if<tr_variant::Map>();
     if (groups_map == nullptr)
@@ -101,30 +103,29 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         auto& group = session->getBandwidthGroup(tr_interned_string{ key });
         auto limits = tr_bandwidth_limits{};
 
-        if (auto const val = group_map->value_if<bool>({ TR_KEY_upload_limited, TR_KEY_upload_limited_camel }); val)
+        if (auto const val = group_map->value_if<bool>(TR_KEY_upload_limited); val)
         {
             limits.up_limited = *val;
         }
 
-        if (auto const val = group_map->value_if<bool>({ TR_KEY_download_limited, TR_KEY_download_limited_camel }); val)
+        if (auto const val = group_map->value_if<bool>(TR_KEY_download_limited); val)
         {
             limits.down_limited = *val;
         }
 
-        if (auto const val = group_map->value_if<int64_t>({ TR_KEY_upload_limit, TR_KEY_upload_limit_camel }); val)
+        if (auto const val = group_map->value_if<int64_t>(TR_KEY_upload_limit); val)
         {
             limits.up_limit = Speed{ *val, Speed::Units::KByps };
         }
 
-        if (auto const val = group_map->value_if<int64_t>({ TR_KEY_download_limit, TR_KEY_download_limit_camel }); val)
+        if (auto const val = group_map->value_if<int64_t>(TR_KEY_download_limit); val)
         {
             limits.down_limit = Speed{ *val, Speed::Units::KByps };
         }
 
         group.set_limits(limits);
 
-        if (auto const val = group_map->value_if<bool>({ TR_KEY_honors_session_limits, TR_KEY_honors_session_limits_camel });
-            val)
+        if (auto const val = group_map->value_if<bool>(TR_KEY_honors_session_limits); val)
         {
             group.honor_parent_limits(TR_UP, *val);
             group.honor_parent_limits(TR_DOWN, *val);
@@ -149,9 +150,9 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
         groups_map.try_emplace(name.quark(), std::move(group_map));
     }
 
-    tr_variant_serde::json().to_file(
-        tr_variant{ std::move(groups_map) },
-        tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
+    auto out = tr_variant{ std::move(groups_map) };
+    libtransmission::api_compat::convert_outgoing_data(out);
+    tr_variant_serde::json().to_file(out, tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
 }
 } // namespace bandwidth_group_helpers
 } // namespace
@@ -493,8 +494,9 @@ tr_variant tr_sessionLoadSettings(std::string_view const config_dir, tr_variant 
     // ...and settings.json (if available) override the defaults
     if (auto const filename = fmt::format("{:s}/settings.json", config_dir); tr_sys_path_exists(filename))
     {
-        if (auto const file_settings = tr_variant_serde::json().parse_file(filename))
+        if (auto file_settings = tr_variant_serde::json().parse_file(filename))
         {
+            libtransmission::api_compat::convert_incoming_data(*file_settings);
             settings.merge(*file_settings);
         }
     }
@@ -516,14 +518,16 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     // - previous session's settings stored in settings.json
     // - built-in defaults
     auto settings = tr_sessionGetDefaultSettings();
-    if (auto const file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+    if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
+        libtransmission::api_compat::convert_incoming_data(*file_settings);
         settings.merge(*file_settings);
     }
     settings.merge(client_settings);
     settings.merge(tr_sessionGetSettings(session));
 
     // save 'em
+    libtransmission::api_compat::convert_outgoing_data(settings);
     tr_variant_serde::json().to_file(settings, filename);
 
     // write bandwidth groups limits to file
@@ -548,11 +552,10 @@ struct tr_session::init_data
     std::condition_variable_any done_cv;
 };
 
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings)
+tr_session* tr_sessionInit(std::string_view const config_dir, bool message_queueing_enabled, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(config_dir != nullptr);
     TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
 
     tr_timeUpdate(time(nullptr));
@@ -645,7 +648,7 @@ size_t tr_session::count_queue_free_slots(tr_direction dir) const noexcept
     // count how many torrents are active
     auto active_count = size_t{};
     auto const stalled_enabled = queueStalledEnabled();
-    auto const stalled_if_idle_for_n_seconds = queueStalledMinutes() * 60;
+    auto const stalled_if_idle_for_n_seconds = static_cast<time_t>(queueStalledMinutes() * 60);
     auto const now = tr_time();
     for (auto const* const tor : torrents())
     {
@@ -757,6 +760,7 @@ void tr_session::setSettings(tr_variant const& settings, bool force)
     rpc_server_->load(tr_rpc_server::Settings{ settings });
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved): `std::swap()` also move from the parameter
 void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 {
     auto const lock = unique_lock();
@@ -845,7 +849,7 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         port_forwarding_->local_port_changed();
     }
 
-    if (!udp_core_ || force || port_changed || utp_changed)
+    if (!udp_core_ || force || addr_changed || port_changed || utp_changed)
     {
         udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
     }
@@ -897,6 +901,57 @@ void tr_sessionSet(tr_session* session, tr_variant const& settings)
             done_promise.set_value();
         });
     done_future.wait();
+}
+
+// ---
+
+void tr_session::Settings::fixup_from_preferred_transports()
+{
+    utp_enabled = false;
+    tcp_enabled = false;
+    for (auto const& transport : preferred_transports)
+    {
+        switch (transport)
+        {
+        case TR_PREFER_UTP:
+            utp_enabled = true;
+            break;
+        case TR_PREFER_TCP:
+            tcp_enabled = true;
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void tr_session::Settings::fixup_to_preferred_transports()
+{
+    if (!utp_enabled)
+    {
+        auto const remove_it = std::remove(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_UTP);
+        preferred_transports.erase(remove_it, std::end(preferred_transports));
+    }
+    else if (
+        std::find(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_UTP) ==
+        std::end(preferred_transports))
+    {
+        TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
+        preferred_transports.emplace(std::begin(preferred_transports), TR_PREFER_UTP);
+    }
+
+    if (!tcp_enabled)
+    {
+        auto const remove_it = std::remove(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_TCP);
+        preferred_transports.erase(remove_it, std::end(preferred_transports));
+    }
+    else if (
+        std::find(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_TCP) ==
+        std::end(preferred_transports))
+    {
+        TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
+        preferred_transports.emplace_back(TR_PREFER_TCP);
+    }
 }
 
 // ---
@@ -1613,6 +1668,7 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
         {
             auto settings = session->settings_;
             settings.utp_enabled = enabled;
+            settings.fixup_to_preferred_transports();
             session->setSettings(std::move(settings), false);
         });
 }
@@ -2018,37 +2074,6 @@ size_t tr_sessionGetQueueStalledMinutes(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->queueStalledMinutes();
-}
-
-// ---
-
-void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests)
-{
-    TR_ASSERT(session != nullptr);
-    TR_ASSERT(max_bad_requests > 0);
-
-    session->rpc_server_->set_anti_brute_force_limit(max_bad_requests);
-}
-
-int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    return session->rpc_server_->get_anti_brute_force_limit();
-}
-
-void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
-{
-    TR_ASSERT(session != nullptr);
-
-    session->rpc_server_->set_anti_brute_force_enabled(is_enabled);
-}
-
-bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    return session->rpc_server_->is_anti_brute_force_enabled();
 }
 
 // ---

@@ -237,7 +237,7 @@ private:
         std::array<size_t, HistorySize> size_;
         uint64_t cache_time_;
         Speed cache_val_;
-        int newest_;
+        size_t newest_;
     };
 
     struct Band
