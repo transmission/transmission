@@ -36,7 +36,6 @@
 #include <sys/stat.h> /* umask() */
 #endif
 
-#define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
 #include <curl/curl.h>
