@@ -78,7 +78,7 @@ jobs:
           echo ===
           set -e # undo set +e
       - name: Upload diffs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
         with:
           name: code-style.diff
