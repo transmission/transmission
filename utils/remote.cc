@@ -213,6 +213,7 @@ enum
 // --- Command-Line Arguments
 
 using Arg = tr_option::Arg;
+static_assert(TrDefaultPeerPort == 51413, "update 'port' desc");
 auto constexpr Options = std::array<tr_option, 106>{ {
     { 'a', "add", "Add torrent files by filename or URL", "a", Arg::None, nullptr },
     { 970, "alt-speed", "Use the alternate Limits", "as", Arg::None, nullptr },
@@ -271,7 +272,7 @@ auto constexpr Options = std::array<tr_option, 106>{ {
     { 820, "ssl", "Use SSL when talking to daemon", nullptr, Arg::None, nullptr },
     { 'o', "dht", "Enable distributed hash tables (DHT)", "o", Arg::None, nullptr },
     { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", Arg::None, nullptr },
-    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", Arg::Required, "<port>" },
+    { 'p', "port", "Port for incoming peers (Default: 51413)", "p", Arg::Required, "<port>" },
     { 962, "port-test", "Port testing", "pt", Arg::None, nullptr },
     { 'P', "random-port", "Random port for incoming peers", "P", Arg::None, nullptr },
     { 900, "priority-high", "Try to download these file(s) first", "ph", Arg::Required, "<files>" },
@@ -875,8 +876,8 @@ void warn_if_unsupported_rpc_version(std::string_view const semver)
 [[nodiscard]] size_t parse_response_header(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
     using namespace header_utils;
-    static auto const session_id_header = tr_strlower(TR_RPC_SESSION_ID_HEADER);
-    static auto const rpc_version_header = tr_strlower(TR_RPC_RPC_VERSION_HEADER);
+    static auto const session_id_header = tr_strlower(TrRpcSessionIdHeader);
+    static auto const rpc_version_header = tr_strlower(TrRpcVersionHeader);
 
     auto& config = *static_cast<RemoteConfig*>(vconfig);
 
@@ -2403,7 +2404,7 @@ CURL* tr_curl_easy_init(std::string* writebuf, RemoteConfig& config)
 
     if (auto const& str = config.session_id; !std::empty(str))
     {
-        auto const h = fmt::format("{:s}: {:s}", TR_RPC_SESSION_ID_HEADER, str);
+        auto const h = fmt::format("{:s}: {:s}", TrRpcSessionIdHeader, str);
         auto* const custom_headers = curl_slist_append(nullptr, h.c_str());
 
         (void)curl_easy_setopt(curl, CURLOPT_HTTPHEADER, custom_headers);
@@ -3578,7 +3579,7 @@ int tr_main(int argc, char* argv[])
 
     if (std::empty(rpcurl))
     {
-        rpcurl = fmt::format("{:s}:{:d}{:s}{:s}", host, port, TrHttpServerDefaultBasePath, TrHttpServerRpcRelativePath);
+        rpcurl = fmt::format("{:s}:{:d}{:s}{:s}", host, port, TrDefaultHttpServerBasePath, TrHttpServerRpcRelativePath);
     }
 
     return process_args(rpcurl.c_str(), argc, (char const* const*)argv, config);

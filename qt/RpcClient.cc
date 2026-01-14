@@ -121,7 +121,7 @@ void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcR
     req.setRawHeader("User-Agent", "Transmisson/" SHORT_VERSION_STRING);
     if (!session_id_.isEmpty())
     {
-        req.setRawHeader(TR_RPC_SESSION_ID_HEADER, session_id_);
+        req.setRawHeader(SessionIdHeaderName, session_id_);
     }
 
     if (verbose_)
@@ -206,19 +206,18 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
         }
     }
 
-    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 409 &&
-        reply->hasRawHeader(TR_RPC_SESSION_ID_HEADER))
+    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 409 && reply->hasRawHeader(SessionIdHeaderName))
     {
         // we got a 409 telling us our session id has expired.
         // update it and resubmit the request.
 
         auto version_str = QString::fromUtf8("unknown");
 
-        if (reply->hasRawHeader(TR_RPC_RPC_VERSION_HEADER))
+        if (reply->hasRawHeader(VersionHeaderName))
         {
             network_style_ = api_compat::Style::Tr5;
 
-            version_str = QString::fromUtf8(reply->rawHeader(TR_RPC_RPC_VERSION_HEADER));
+            version_str = QString::fromUtf8(reply->rawHeader(VersionHeaderName));
             if (QVersionNumber::fromString(version_str).majorVersion() > TrRpcVersionSemverMajor)
             {
                 fmt::print(
@@ -243,7 +242,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
                 static_cast<int>(network_style_));
         }
 
-        session_id_ = reply->rawHeader(TR_RPC_SESSION_ID_HEADER);
+        session_id_ = reply->rawHeader(SessionIdHeaderName);
         sendNetworkRequest(reply->property(RequestBodyKey).toByteArray(), promise);
         return;
     }

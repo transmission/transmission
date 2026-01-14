@@ -565,7 +565,7 @@ size_t Blocklists::update_primary_blocklist(std::string_view external_file, bool
 {
     // These rules will replace the default blocklist.
     // Build the path of the default blocklist .bin file where we'll save these rules.
-    auto const bin_file = tr_pathbuf{ folder_, '/', DEFAULT_BLOCKLIST_FILENAME };
+    auto const bin_file = tr_pathbuf{ folder_, '/', TrDefaultBlocklistFilename };
 
     // Try to save it
     auto added = Blocklist::saveNew(external_file, bin_file, is_enabled);

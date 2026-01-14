@@ -80,8 +80,13 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                          "Usage: transmission-daemon [options]";
 
 using Arg = tr_option::Arg;
+static_assert(TrDefaultRpcWhitelist == "127.0.0.1,::1", "update 'allowed' desc");
+static_assert(TrDefaultPeerPort == 51413, "update 'peerport' desc");
+static_assert(TrDefaultPeerLimitTorrent == 50, "update 'peerlimit-torrent' desc");
+static_assert(TrDefaultPeerLimitGlobal == 200, "update 'peerlimit-global' desc");
+static_assert(TrDefaultRpcPort == 9091 && R"(update "port" desc)");
 auto constexpr Options = std::array<tr_option, 48>{ {
-    { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", Arg::Required, "<list>" },
+    { 'a', "allowed", "Allowed IP addresses. (Default: '127.0.0.1,::1')", "a", Arg::Required, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
     { 'c', "watch-dir", "Where to watch for new torrent files", "c", Arg::Required, "<directory>" },
@@ -93,7 +98,7 @@ auto constexpr Options = std::array<tr_option, 48>{ {
     { 'e', "logfile", "Dump the log messages to this filename", "e", Arg::Required, "<filename>" },
     { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", Arg::None, nullptr },
     { 'g', "config-dir", "Where to look for configuration files", "g", Arg::Required, "<path>" },
-    { 'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", Arg::Required, "<port>" },
+    { 'p', "port", "RPC port (Default: 9091)", "p", Arg::Required, "<port>" },
     { 't', "auth", "Require authentication", "t", Arg::None, nullptr },
     { 'T', "no-auth", "Don't require authentication", "T", Arg::None, nullptr },
     { 'u', "username", "Set username for authentication", "u", Arg::Required, "<username>" },
@@ -122,21 +127,11 @@ auto constexpr Options = std::array<tr_option, 48>{ {
       "<protocol(s)>" },
     { 831, "utp", "*DEPRECATED* Enable µTP for peer connections", nullptr, Arg::None, nullptr },
     { 832, "no-utp", "*DEPRECATED* Disable µTP for peer connections", nullptr, Arg::None, nullptr },
-    { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", Arg::Required, "<port>" },
+    { 'P', "peerport", "Port for incoming peers (Default: 51413)", "P", Arg::Required, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
-    { 'L',
-      "peerlimit-global",
-      "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")",
-      "L",
-      Arg::Required,
-      "<limit>" },
-    { 'l',
-      "peerlimit-torrent",
-      "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")",
-      "l",
-      Arg::Required,
-      "<limit>" },
+    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: 200)", "L", Arg::Required, "<limit>" },
+    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: 50)", "l", Arg::Required, "<limit>" },
     { 910, "encryption-required", "Encrypt all peer connections", "er", Arg::None, nullptr },
     { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", Arg::None, nullptr },
     { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", Arg::None, nullptr },

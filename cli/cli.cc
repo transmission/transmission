@@ -49,6 +49,8 @@ sig_atomic_t manualUpdate = false;
 char const* torrentPath = nullptr;
 
 using Arg = tr_option::Arg;
+static_assert(TrDefaultPeerPort == 51413, "update 'port' desc");
+static_assert(TrDefaultPeerSocketTos == "le", "update 'tos' desc");
 auto constexpr Options = std::array<tr_option, 20>{ {
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
@@ -61,11 +63,10 @@ auto constexpr Options = std::array<tr_option, 20>{ {
     { 'g', "config-dir", "Where to find configuration files", "g", Arg::Required, "<path>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
-    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", Arg::Required, "<port>" },
+    { 'p', "port", "Port for incoming peers (Default: 51413)", "p", Arg::Required, "<port>" },
     { 't',
       "tos",
-      "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0', default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
-      ")",
+      "Peer socket DSCP / ToS. Number or DSCP string, e.g. 'af11' or 'cs0' (Default: 'le')",
       "t",
       Arg::Required,
       "<dscp-or-tos>" },

@@ -238,7 +238,7 @@ tr_variant::Map Prefs::defaults()
     map.try_emplace(TR_KEY_remote_session_password, tr_variant::unmanaged_string(""sv));
     map.try_emplace(TR_KEY_remote_session_port, TrDefaultRpcPort);
     map.try_emplace(TR_KEY_remote_session_requires_authentication, false);
-    map.try_emplace(TR_KEY_remote_session_url_base_path, tr_variant::unmanaged_string(TrHttpServerDefaultBasePath));
+    map.try_emplace(TR_KEY_remote_session_url_base_path, tr_variant::unmanaged_string(TrDefaultHttpServerBasePath));
     map.try_emplace(TR_KEY_remote_session_username, tr_variant::unmanaged_string(""sv));
     map.try_emplace(TR_KEY_show_backup_trackers, false);
     map.try_emplace(TR_KEY_show_filterbar, true);
