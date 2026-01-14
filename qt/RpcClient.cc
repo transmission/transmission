@@ -57,8 +57,9 @@ char constexpr const* const RequestFutureinterfacePropertyKey{ "requestReplyFutu
 }
 } // namespace
 
-RpcClient::RpcClient(QObject* parent)
+RpcClient::RpcClient(QNetworkAccessManager& nam, QObject* parent)
     : QObject{ parent }
+    , nam_{ &nam }
 {
     qRegisterMetaType<TrVariantPtr>("TrVariantPtr");
 }
@@ -68,13 +69,9 @@ void RpcClient::stop()
     session_ = nullptr;
     session_id_.clear();
     url_.clear();
-    network_style_ = DefaultNetworkStyle;
+    network_style_ = libtransmission::api_compat::default_style();
 
-    if (nam_ != nullptr)
-    {
-        nam_->deleteLater();
-        nam_ = nullptr;
-    }
+    QObject::disconnect(nam_, nullptr, this, nullptr);
 }
 
 void RpcClient::start(tr_session* session)
@@ -84,6 +81,7 @@ void RpcClient::start(tr_session* session)
 
 void RpcClient::start(QUrl const& url)
 {
+    connectNetworkAccessManager();
     url_ = url;
     url_is_loopback_ = QHostAddress{ url_.host() }.isLoopback();
 }
@@ -137,7 +135,7 @@ void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcR
         qInfo() << body.constData();
     }
 
-    if (QNetworkReply* reply = networkAccessManager()->post(req, body))
+    if (QNetworkReply* reply = nam_->post(req, body))
     {
         reply->setProperty(RequestBodyKey, body);
         reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
@@ -176,18 +174,11 @@ void RpcClient::sendLocalRequest(tr_variant& req, QFutureInterface<RpcResponse> 
         });
 }
 
-QNetworkAccessManager* RpcClient::networkAccessManager()
+void RpcClient::connectNetworkAccessManager()
 {
-    if (nam_ == nullptr)
-    {
-        nam_ = new QNetworkAccessManager{};
-
-        connect(nam_, &QNetworkAccessManager::finished, this, &RpcClient::networkRequestFinished);
-
-        connect(nam_, &QNetworkAccessManager::authenticationRequired, this, &RpcClient::httpAuthenticationRequired);
-    }
-
-    return nam_;
+    QObject::disconnect(nam_, nullptr, this, nullptr);
+    connect(nam_, &QNetworkAccessManager::finished, this, &RpcClient::networkRequestFinished);
+    connect(nam_, &QNetworkAccessManager::authenticationRequired, this, &RpcClient::httpAuthenticationRequired);
 }
 
 void RpcClient::networkRequestFinished(QNetworkReply* reply)

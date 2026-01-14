@@ -295,6 +295,7 @@ void Session::updatePref(int key)
 Session::Session(QString config_dir, Prefs& prefs)
     : config_dir_{ std::move(config_dir) }
     , prefs_{ prefs }
+    , rpc_{ nam_ }
 {
     connect(&prefs_, &Prefs::changed, this, &Session::updatePref);
     connect(&rpc_, &RpcClient::httpAuthenticationRequired, this, &Session::httpAuthenticationRequired);
