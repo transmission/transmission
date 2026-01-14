@@ -86,8 +86,10 @@ private slots:
     void localRequestFinished(TrVariantPtr response);
 
 private:
-    QByteArray const SessionIdHeaderName = std::data(TrRpcSessionIdHeader);
-    QByteArray const VersionHeaderName = std::data(TrRpcVersionHeader);
+    QByteArray const SessionIdHeaderName = QByteArray{ TrRpcSessionIdHeader.data(),
+                                                       static_cast<qsizetype>(TrRpcSessionIdHeader.size()) };
+    QByteArray const VersionHeaderName = QByteArray{ TrRpcVersionHeader.data(),
+                                                     static_cast<qsizetype>(TrRpcVersionHeader.size()) };
 
     void connectNetworkAccessManager();
 
