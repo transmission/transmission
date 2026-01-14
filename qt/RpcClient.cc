@@ -118,7 +118,7 @@ void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcR
     auto req = QNetworkRequest{};
     req.setUrl(url_);
     req.setRawHeader("Content-Type", "application/json; charset=UTF-8");
-    req.setRawHeader("User-Agent", "Transmisson/" SHORT_VERSION_STRING);
+    req.setRawHeader("User-Agent", "Transmission/" SHORT_VERSION_STRING);
     if (!session_id_.isEmpty())
     {
         req.setRawHeader(TR_RPC_SESSION_ID_HEADER, session_id_);
