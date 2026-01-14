@@ -19,11 +19,10 @@ std::string tr_strv_convert_utf8(std::string_view sv)
     @autoreleasepool
     {
         // UTF-8 encoding
-        char const* validUTF8 = [[NSString alloc] initWithBytes:std::data(sv) length:std::size(sv) encoding:NSUTF8StringEncoding]
-                                    .UTF8String;
-        if (validUTF8)
+        NSString* const utf8 = [[NSString alloc] initWithBytes:std::data(sv) length:std::size(sv) encoding:NSUTF8StringEncoding];
+        if (utf8 != nil)
         {
-            return std::string(validUTF8);
+            return std::string{ utf8.UTF8String };
         }
 
         // autodetection of the encoding (#3434)
@@ -39,12 +38,12 @@ std::string tr_strv_convert_utf8(std::string_view sv)
                   }
                   convertedString:&convertedString
               usedLossyConversion:nil];
+
         if (stringEncoding)
         {
-            validUTF8 = convertedString.UTF8String;
-            if (validUTF8)
+            if (convertedString.UTF8String != nullptr)
             {
-                return std::string(validUTF8);
+                return std::string{ convertedString.UTF8String };
             }
         }
 
