@@ -232,7 +232,7 @@ void tr_sessionReloadBlocklists(tr_session* session);
  *
  * @param timeout_secs specifies how long to wait on these announces.
  */
-void tr_sessionClose(tr_session* session, size_t timeout_secs = 15);
+void tr_sessionClose(tr_session* session, double timeout_secs = 15.0);
 
 /**
  * @brief Return the session's configuration directory.

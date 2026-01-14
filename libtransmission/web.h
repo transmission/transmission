@@ -102,9 +102,9 @@ public:
 
     [[nodiscard]] bool is_idle() const noexcept;
 
-    // If you want to give running tasks a chance to finish, call closeSoon()
-    // before destroying the tr_web object. Deleting the object will cancel
-    // all of its tasks.
+    // If you want to give running tasks a chance to finish,
+    // call startShutdown() before destroying the tr_web object.
+    // Deleting the object will cancel all of its tasks.
     ~tr_web();
 
     tr_web(tr_web const&) = delete;
