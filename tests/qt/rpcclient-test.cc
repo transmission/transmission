@@ -11,10 +11,16 @@
 #include <QTest>
 #include <QUrl>
 
+#include <libtransmission/api-compat.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/quark.h>
 
 #include "RpcClient.h"
+
+namespace api_compat = libtransmission::api_compat;
+using Style = api_compat::Style;
+
+Q_DECLARE_METATYPE(Style)
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 #define QCOMPARE_EQ(actual, expected) QCOMPARE(actual, expected)
@@ -23,11 +29,36 @@
 
 namespace
 {
+template<typename String>
+[[nodiscard]] QByteArray toQBA(String const& str)
+{
+    auto const sv = std::string_view{ str };
+    return { sv.data(), static_cast<qsizetype>(sv.size()) };
+}
+
 class FakeReply final : public QNetworkReply
 {
     Q_OBJECT
 
 public:
+    [[nodiscard]] static FakeReply* newPostReply(QUrl const& url, QObject* parent = nullptr)
+    {
+        return newPostReply(QNetworkRequest{ url }, parent);
+    }
+
+    [[nodiscard]] static FakeReply* newPostReply(QNetworkRequest const& req, QObject* parent = nullptr)
+    {
+        auto reply = new FakeReply{ QNetworkAccessManager::PostOperation, req, parent };
+
+        // networkRequestFinished expects these properties to exist.
+        auto promise = QFutureInterface<RpcResponse>{};
+        promise.reportStarted();
+        reply->setProperty("requestReplyFutureInterface", QVariant::fromValue(promise));
+        reply->setProperty("requestBody", QByteArray{ "{}" });
+
+        return reply;
+    }
+
     explicit FakeReply(QNetworkAccessManager::Operation op, QNetworkRequest const& req, QObject* parent = nullptr)
         : QNetworkReply{ parent }
     {
@@ -42,9 +73,10 @@ public:
         setAttribute(QNetworkRequest::HttpStatusCodeAttribute, code);
     }
 
-    void addRawHeader(QByteArray const& name, QByteArray const& value)
+    template<typename StringA, typename StringB>
+    void addRawHeader(StringA const& name, StringB const& value)
     {
-        setRawHeader(name, value);
+        setRawHeader(toQBA(name), toQBA(value));
     }
 
     void abort() override
@@ -78,7 +110,7 @@ protected:
         if (outgoing_data != nullptr)
         {
             last_body = outgoing_data->readAll();
-            (void)outgoing_data->seek(0);
+            outgoing_data->seek(0);
         }
 
         return new FakeReply{ op, req, this };
@@ -105,9 +137,10 @@ class RpcClientTest : public QObject
         QVERIFY_re_matches(tr4_session_get_payload_re, body);
     }
 
-    static void QVERIFY_is_tr5_session_get_payload(QByteArray const& body)
+    static void QVERIFY_is_session_get_request(Style style, QByteArray const& bytes)
     {
-        QVERIFY_re_matches(tr5_session_get_payload_re, body);
+        auto const payload_re = style == Style::Tr4 ? tr4_session_get_payload_re : tr5_session_get_payload_re;
+        QVERIFY_re_matches(payload_re, bytes);
     }
 
     static void invoke_network_finished(RpcClient& client, QNetworkReply* reply)
@@ -115,92 +148,127 @@ class RpcClientTest : public QObject
         QMetaObject::invokeMethod(&client, "networkRequestFinished", Qt::DirectConnection, Q_ARG(QNetworkReply*, reply));
     }
 
-private slots:
-    static void start_sets_url_and_exec_posts_tr4()
+    static void add_style_data()
     {
+        QTest::addColumn<Style>("initial_style");
+        QTest::newRow("Tr4") << Style::Tr4;
+        QTest::newRow("Tr5") << Style::Tr5;
+    }
+
+private slots:
+    void init()
+    {
+        api_compat::set_default_style(initial_style_);
+    }
+
+    static void first_post_is_in_default_style_data()
+    {
+        add_style_data();
+    }
+    static void first_post_is_in_default_style()
+    {
+        // setup: set style
+        QFETCH(Style const, initial_style);
+        api_compat::set_default_style(initial_style);
+
+        // setup: create & start `client`
         auto nam = FakeNetworkAccessManager{};
         auto client = RpcClient{ nam };
-
         auto const url = QUrl{ "http://example.invalid:9091/transmission/rpc" };
         client.start(url);
         QCOMPARE_EQ(client.url(), url);
 
-        (void)client.exec(TR_KEY_session_get, nullptr);
+        client.exec(TR_KEY_session_get, nullptr);
 
+        // verify that a request to `url` was posted
         QVERIFY(nam.create_count >= 1);
         QCOMPARE_EQ(nam.last_operation, QNetworkAccessManager::PostOperation);
         QCOMPARE_EQ(nam.last_request.url(), url);
 
+        // verify that the request's headers look right
         QCOMPARE_NE(nam.last_request.rawHeader("Content-Type"), QByteArray{});
         QVERIFY(nam.last_request.rawHeader("Content-Type").contains("application/json"));
-        QVERIFY(nam.last_request.rawHeader("User-Agent").startsWith("Transmisson/"));
+        QVERIFY(nam.last_request.rawHeader("User-Agent").startsWith("Transmission/"));
 
-        // TR4 is legacy style: method + tag, not jsonrpc + id.
-        QVERIFY_is_tr4_session_get_payload(nam.last_body);
+        // verify that the request's payload looks right
+        QVERIFY_is_session_get_request(initial_style, nam.last_body);
     }
 
+    static void exec_posts_tr5_after_409_sets_style_data()
+    {
+        add_style_data();
+    }
     static void exec_posts_tr5_after_409_sets_style()
     {
+        // setup: set style
+        QFETCH(Style const, initial_style);
+        api_compat::set_default_style(initial_style);
+
+        // setup: create & start `client`
+        auto const url = QUrl{ "http://example.invalid:9091/transmission/rpc" };
         auto nam = FakeNetworkAccessManager{};
         auto client = RpcClient{ nam };
-        client.start(QUrl{ "http://example.invalid:9091/transmission/rpc" });
+        client.start(url);
 
-        // request TR4 by default.
-        // TODO(TR5) expect Tr5 by default.
-        (void)client.exec(TR_KEY_session_get, nullptr);
-        QVERIFY_is_tr4_session_get_payload(nam.last_body);
+        // setup: post initial request
+        client.exec(TR_KEY_session_get, nullptr);
+        QVERIFY_is_session_get_request(initial_style, nam.last_body);
 
-        // Simulate a 409 response that includes both the Session-Id and the RPC version.
-        // This updates the client's network_style_ to Tr5.
-        auto* reply = new FakeReply{ QNetworkAccessManager::PostOperation, QNetworkRequest{ client.url() }, &nam };
+        // setup: make a 409 response that includes Session-Id *and* RPC version.
+        auto* reply = FakeReply::newPostReply(url, &nam);
         reply->setHttpStatus(409);
-        reply->addRawHeader(TR_RPC_SESSION_ID_HEADER, "fake-session-id");
-        reply->addRawHeader(
-            TR_RPC_RPC_VERSION_HEADER,
-            QByteArray{ std::data(TrRpcVersionSemver), static_cast<int>(std::size(TrRpcVersionSemver)) });
-
-        // networkRequestFinished expects these properties to exist.
-        auto promise = QFutureInterface<RpcResponse>{};
-        promise.reportStarted();
-        reply->setProperty("requestReplyFutureInterface", QVariant::fromValue(promise));
-        reply->setProperty("requestBody", QByteArray{ "{}" });
-
+        reply->addRawHeader(TrRpcSessionIdHeader, "fake-session-id");
+        reply->addRawHeader(TrRpcVersionHeader, TrRpcVersionSemver);
         invoke_network_finished(client, reply);
 
-        // Second request should now be TR5.
-        (void)client.exec(TR_KEY_session_get, nullptr);
-        QVERIFY_is_tr5_session_get_payload(nam.last_body);
+        // action: make another request after receiving the 409
+        auto const n_created = nam.create_count;
+        client.exec(TR_KEY_session_get, nullptr);
+
+        // verify subsequent request used Style::Tr5
+        QVERIFY(nam.create_count > n_created);
+        QVERIFY_is_session_get_request(Style::Tr5, nam.last_body);
     }
 
+    static void exec_post_tr4_after_409_without_rpc_version_header_data()
+    {
+        add_style_data();
+    }
     static void exec_post_tr4_after_409_without_rpc_version_header()
     {
+        // setup: set style
+        QFETCH(Style const, initial_style);
+        api_compat::set_default_style(initial_style);
+
+        // setup: create & start `client`
+        auto const url = QUrl{ "http://example.invalid:9091/transmission/rpc" };
         auto nam = FakeNetworkAccessManager{};
         auto client = RpcClient{ nam };
         client.start(QUrl{ "http://example.invalid:9091/transmission/rpc" });
 
-        // request TR4 by default.
-        // TODO(TR5) expect Tr5 by default.
-        (void)client.exec(TR_KEY_session_get, nullptr);
-        QVERIFY_is_tr4_session_get_payload(nam.last_body);
+        // setup: post initial request
+        client.exec(TR_KEY_session_get, nullptr);
+        QVERIFY_is_session_get_request(initial_style, nam.last_body);
 
-        // Simulate a 409 response that includes the Session-Id but *not* the RPC version.
-        // This should not change the client's network_style_.
-        auto* reply = new FakeReply{ QNetworkAccessManager::PostOperation, QNetworkRequest{ client.url() }, &nam };
+        // setup: make a 409 response with Session-Id but *not* RPC version.
+        auto* reply = FakeReply::newPostReply(url, &nam);
         reply->setHttpStatus(409);
-        reply->addRawHeader(TR_RPC_SESSION_ID_HEADER, "fake-session-id");
-
-        // networkRequestFinished expects these properties to exist.
-        auto promise = QFutureInterface<RpcResponse>{};
-        promise.reportStarted();
-        reply->setProperty("requestReplyFutureInterface", QVariant::fromValue(promise));
-        reply->setProperty("requestBody", QByteArray{ "{}" });
-
+        reply->addRawHeader(TrRpcSessionIdHeader, "fake-session-id");
         invoke_network_finished(client, reply);
 
-        // Second request should still be TR4.
-        (void)client.exec(TR_KEY_session_get, nullptr);
-        QVERIFY_is_tr4_session_get_payload(nam.last_body);
+        // action: make another request after receiving the 409
+        auto const n_created = nam.create_count;
+        client.exec(TR_KEY_session_get, nullptr);
+
+        // verify subsequent request used Style::Tr4
+        QVERIFY(nam.create_count > n_created);
+        QVERIFY_is_session_get_request(Style::Tr4, nam.last_body);
     }
+
+    // previous declaration was `private slots:`
+    // NOLINTNEXTLINE(readability-redundant-access-specifiers)
+private:
+    Style const initial_style_ = api_compat::default_style();
 };
 
 int main(int argc, char** argv)
