@@ -69,7 +69,7 @@ void RpcClient::stop()
     session_ = nullptr;
     session_id_.clear();
     url_.clear();
-    network_style_ = DefaultNetworkStyle;
+    network_style_ = libtransmission::api_compat::default_style();
 
     QObject::disconnect(nam_, nullptr, this, nullptr);
 }

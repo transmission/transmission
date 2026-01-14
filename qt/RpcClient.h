@@ -96,10 +96,7 @@ private:
     [[nodiscard]] int64_t parseResponseId(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
 
-    // TODO: change this default in 5.0.0-beta.1
-    static auto constexpr DefaultNetworkStyle = libtransmission::api_compat::Style::Tr4;
-
-    libtransmission::api_compat::Style network_style_ = DefaultNetworkStyle;
+    libtransmission::api_compat::Style network_style_ = libtransmission::api_compat::default_style();
     tr_session* session_ = {};
     QByteArray session_id_;
     QUrl url_;

@@ -21,4 +21,7 @@ void convert(tr_variant& var, Style tgt_style);
 void convert_incoming_data(tr_variant& var);
 void convert_outgoing_data(tr_variant& var);
 
+[[nodiscard]] Style default_style();
+void set_default_style(Style style);
+
 } // namespace libtransmission::api_compat
