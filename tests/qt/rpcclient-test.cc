@@ -132,11 +132,6 @@ class RpcClientTest : public QObject
         QVERIFY2(re.match(str).hasMatch(), bytes.constData());
     }
 
-    static void QVERIFY_is_tr4_session_get_payload(QByteArray const& body)
-    {
-        QVERIFY_re_matches(tr4_session_get_payload_re, body);
-    }
-
     static void QVERIFY_is_session_get_request(Style style, QByteArray const& bytes)
     {
         auto const payload_re = style == Style::Tr4 ? tr4_session_get_payload_re : tr5_session_get_payload_re;
