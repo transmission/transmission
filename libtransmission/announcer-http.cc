@@ -307,16 +307,24 @@ void tr_tracker_http_announce(
     }
     else
     {
-        d->requests_sent_count = 2;
+        d->requests_sent_count = 0;
 
         // First try to send the announce via IPv4
-        auto ipv4_options = options;
-        ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
-        do_make_request("IPv4"sv, std::move(ipv4_options));
+        if (session->global_address(TR_AF_INET))
+        {
+            auto ipv4_options = options;
+            ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+            do_make_request("IPv4"sv, std::move(ipv4_options));
+            d->requests_sent_count++;
+        }
 
         // Then try to send via IPv6
-        options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
-        do_make_request("IPv6"sv, std::move(options));
+        if (session->global_address(TR_AF_INET6))
+        {
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+            do_make_request("IPv6"sv, std::move(options));
+            d->requests_sent_count++;
+        }
     }
 }
 
