@@ -991,7 +991,7 @@ jobs:
       uses: android-actions/setup-android@v3
 
     - name: Install NDK
-      run: sdkmanager "ndk;26.1.10909125"
+      run: sdkmanager "ndk;27.3.13750724"
 
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v11
