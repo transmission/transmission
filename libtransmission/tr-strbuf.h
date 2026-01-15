@@ -251,26 +251,6 @@ public:
 
     ///
 
-    template<typename... Args>
-    void join(Char delim, Args const&... args)
-    {
-        ((append(args), append(delim)), ...);
-        resize(size() - 1);
-    }
-
-    template<typename ContiguousRange, typename... Args>
-    void join(ContiguousRange const& delim, Args const&... args)
-    {
-        ((append(args), append(delim)), ...);
-        resize(size() - std::size(delim));
-    }
-
-    template<typename... Args>
-    void join(Char const* sz_delim, Args const&... args)
-    {
-        join(std::basic_string_view<Char>{ sz_delim }, args...);
-    }
-
     // NOLINTNEXTLINE(google-explicit-constructor)
     [[nodiscard]] constexpr operator std::basic_string_view<Char>() const noexcept
     {
