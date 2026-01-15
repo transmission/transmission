@@ -14,14 +14,14 @@ on:
       - '.github/**'
 jobs:
   decide-what-jobs-to-run:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       test-style: ${{ steps.check-diffs.outputs.web-changed == '1' }}
       test-generated-files: ${{ steps.check-diffs.outputs.web-changed == '1' && steps.check-main-push.outputs.is-main-push == '0'}}
       update-generated-files: ${{ steps.check-diffs.outputs.web-changed == '1' && steps.check-main-push.outputs.is-main-push == '1'}}
     steps:
       - name: Get source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2 # >1 needed for merge base
       - name: Check push-to-main
@@ -58,9 +58,9 @@ jobs:
     if: ${{ needs.decide-what-jobs-to-run.outputs.test-style == 'true' }}
     steps:
       - name: Get source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Get NPM
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
       - name: Check for style diffs
@@ -78,7 +78,7 @@ jobs:
           echo ===
           set -e # undo set +e
       - name: Upload diffs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
         with:
           name: code-style.diff
@@ -97,7 +97,7 @@ jobs:
     if: ${{ needs.decide-what-jobs-to-run.outputs.test-generated-files == 'true' }}
     steps:
       - name: Get source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2 # >1 needed for merge base
       - name: Check for changes to generated files
@@ -127,11 +127,11 @@ jobs:
         run: |
           env | sort
       - name: Get NPM
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
       - name: Get source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2 # >1 needed for merge base
       - name: Generate webapp files
