@@ -983,9 +983,9 @@ jobs:
         distribution: 'temurin'
 
     - name: Setup Gradle
-      uses: gradle/gradle-build-action@v3
+      uses: gradle/actions/setup-gradle@v5
       with:
-        gradle-version: 7.6
+        gradle-version: 8.13
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
