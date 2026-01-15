@@ -23,6 +23,7 @@ def getExtOrIntegerDefault(name) {
 }
 
 android {
+  namespace "com.transmissionbt.transmission"
   ndkVersion getExtOrDefault("ndkVersion")
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 
