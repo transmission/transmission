@@ -14,7 +14,7 @@ on:
       - '.github/**'
 jobs:
   decide-what-jobs-to-run:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       test-style: ${{ steps.check-diffs.outputs.web-changed == '1' }}
       test-generated-files: ${{ steps.check-diffs.outputs.web-changed == '1' && steps.check-main-push.outputs.is-main-push == '0'}}

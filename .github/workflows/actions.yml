@@ -10,7 +10,7 @@ env:
   GTEST_OUTPUT: xml:./
 jobs:
   what-to-make:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       make-core: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.core-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-android: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.android-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
@@ -426,7 +426,7 @@ jobs:
 
   alpine-musl:
     needs: [ what-to-make ]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: alpine:latest
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
@@ -703,7 +703,7 @@ jobs:
   debian-11-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: debian:11-slim
     env:
@@ -791,7 +791,7 @@ jobs:
   fedora-39-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: fedora:39
     env:
@@ -960,7 +960,7 @@ jobs:
   android:
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-android == 'true' }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       VCPKG_DEFAULT_TRIPLET: arm64-android
     steps:
