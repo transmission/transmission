@@ -79,7 +79,7 @@ public:
 
     [[nodiscard]] constexpr auto end() noexcept
     {
-        return buffer_.end();
+        return begin() + size();
     }
 
     [[nodiscard]] constexpr auto begin() const noexcept
@@ -89,7 +89,7 @@ public:
 
     [[nodiscard]] constexpr auto end() const noexcept
     {
-        return buffer_.end();
+        return begin() + size();
     }
 
     [[nodiscard]] constexpr Char& at(size_t pos) noexcept
@@ -104,7 +104,11 @@ public:
 
     [[nodiscard]] constexpr auto size() const noexcept
     {
-        return buffer_.size();
+        // Store a trailing '\0' as an actual element to guarantee
+        // zero-termination even across fmt buffer growth/moves.
+        // `size()` reports the length excluding that terminator.
+        auto const raw = buffer_.size();
+        return raw == 0U ? 0U : raw - 1U;
     }
 
     [[nodiscard]] constexpr bool empty() const noexcept
@@ -188,6 +192,7 @@ public:
 
     void resize(size_t n)
     {
+        strip_sz();
         buffer_.resize(n);
         ensure_sz();
     }
@@ -196,6 +201,7 @@ public:
 
     void append(Char const& value)
     {
+        strip_sz();
         buffer_.push_back(value);
         ensure_sz();
     }
@@ -203,6 +209,7 @@ public:
     template<typename ContiguousRange>
     void append(ContiguousRange const& args)
     {
+        strip_sz();
         buffer_.append(std::data(args), std::data(args) + std::size(args));
         ensure_sz();
     }
@@ -286,18 +293,25 @@ public:
     }
 
 private:
+    void strip_sz() noexcept
+    {
+        auto const raw = buffer_.size();
+        if (raw != 0U && buffer_[raw - 1U] == '\0')
+        {
+            buffer_.resize(raw - 1U);
+        }
+    }
+
     /**
-     * Ensure that the buffer's string is zero-terminated, e.g. for
-     * external APIs that require `char*` strings.
-     *
-     * Note that the added trailing '\0' does not increment `size()`.
-     * This is to ensure that `strlen(buf.c_str()) == buf.size()`.
+     * Ensure the string is zero-terminated, e.g. for APIs needing char*.
+     * size() does *not* count the zero -- size() == strlen(buf.c_str()).
      */
     void ensure_sz()
     {
-        auto const n = size();
-        buffer_.reserve(n + 1);
-        buffer_[n] = '\0';
+        if (auto const raw = buffer_.size(); raw == 0U || buffer_[raw - 1U] != '\0')
+        {
+            buffer_.push_back('\0');
+        }
     }
 };
 
