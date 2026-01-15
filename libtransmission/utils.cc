@@ -830,9 +830,6 @@ template<typename T, std::enable_if_t<std::is_integral_v<T>, bool>>
     auto val = T{};
     auto const* const begin_ch = std::data(str);
     auto const* const end_ch = begin_ch + std::size(str);
-    /* The base parameter works for any base from 2 to 36 (inclusive).
-       This is different from the behaviour of the stringstream
-       based solution above. */
     auto const result = std::from_chars(begin_ch, end_ch, val, base);
     if (result.ec != std::errc{})
     {
