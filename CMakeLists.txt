@@ -677,6 +677,7 @@ else()
         -W
         -Wall
         -Wextra
+        -Warc-unsafe-retained-assign
         -Wcast-align
         -Wduplicated-cond
         -Wextra-semi
