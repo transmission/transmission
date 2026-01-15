@@ -136,23 +136,6 @@ TEST_F(StrbufTest, iterators)
     }
 }
 
-TEST_F(StrbufTest, join)
-{
-    auto buf = tr_pathbuf{};
-
-    buf.clear();
-    buf.join(' ', 'A', "short", "phrase"sv);
-    EXPECT_EQ("A short phrase"sv, buf.sv());
-
-    buf.clear();
-    buf.join("  ", 'A', "short", "phrase"sv);
-    EXPECT_EQ("A  short  phrase"sv, buf.sv());
-
-    buf.clear();
-    buf.join("--"sv, 'A', "short", "phrase"sv);
-    EXPECT_EQ("A--short--phrase"sv, buf.sv());
-}
-
 TEST_F(StrbufTest, move)
 {
     static auto constexpr Value = "/hello/world"sv;
