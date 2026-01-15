@@ -2878,7 +2878,10 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 'e':
-                args.insert_or_assign(TR_KEY_cache_size_mib, tr_num_parse<int64_t>(optarg_sv).value());
+                if (auto val = tr_num_parse<int64_t>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_cache_size_mib, *val);
+                }
                 break;
 
             case 910:
