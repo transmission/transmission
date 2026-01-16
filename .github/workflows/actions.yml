@@ -685,9 +685,8 @@ jobs:
           sparse-checkout: |
             .github/actions
           sparse-checkout-cone-mode: false
-          path: composite-actions
       - name: Get Dependencies
-        uses: ./composite-actions/.github/actions/install-deps
+        uses: ./.github/actions/install-deps
         with:
           compiler: gcc
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
@@ -757,9 +756,8 @@ jobs:
           sparse-checkout: |
             .github/actions
           sparse-checkout-cone-mode: false
-          path: composite-actions
       - name: Get Dependencies
-        uses: ./composite-actions/.github/actions/install-deps
+        uses: ./.github/actions/install-deps
         with:
           compiler: gcc
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
@@ -826,10 +824,9 @@ jobs:
           sparse-checkout: |
             .github/actions
           sparse-checkout-cone-mode: false
-          path: composite-actions
 
       - name: Get Dependencies
-        uses: ./composite-actions/.github/actions/install-deps
+        uses: ./.github/actions/install-deps
         with:
           compiler: clang
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
