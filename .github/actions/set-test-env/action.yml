@@ -1,0 +1,87 @@
+name: Set test environment
+description: Configure environment variables for richer crash diagnostics in CI
+inputs:
+  enable-sanitizers:
+    description: "Enable sanitizer runtime options"
+    required: false
+    default: "false"
+  enable-asan:
+    description: "Explicitly enable ASan options"
+    required: false
+    default: ""
+  enable-ubsan:
+    description: "Explicitly enable UBSan options"
+    required: false
+    default: ""
+  enable-lsan:
+    description: "Explicitly enable LSan options"
+    required: false
+    default: ""
+  extra-asan-options:
+    description: "Additional ASan options to append"
+    required: false
+    default: ""
+  extra-ubsan-options:
+    description: "Additional UBSan options to append"
+    required: false
+    default: ""
+  extra-lsan-options:
+    description: "Additional LSan options to append"
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: Configure test environment
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        echo "CTEST_OUTPUT_ON_FAILURE=1" >> "$GITHUB_ENV"
+        echo "QT_QPA_PLATFORM=offscreen" >> "$GITHUB_ENV"
+
+        enable_sanitizers="${{ inputs.enable-sanitizers }}"
+        enable_asan="${{ inputs.enable-asan }}"
+        enable_ubsan="${{ inputs.enable-ubsan }}"
+        enable_lsan="${{ inputs.enable-lsan }}"
+
+        if [[ -z "$enable_asan" && -z "$enable_ubsan" && -z "$enable_lsan" ]]; then
+          enable_asan="$enable_sanitizers"
+          enable_ubsan="$enable_sanitizers"
+          enable_lsan="$enable_sanitizers"
+        fi
+
+        if command -v llvm-symbolizer >/dev/null 2>&1; then
+          echo "ASAN_SYMBOLIZER_PATH=$(command -v llvm-symbolizer)" >> "$GITHUB_ENV"
+          echo "LLVM_SYMBOLIZER_PATH=$(command -v llvm-symbolizer)" >> "$GITHUB_ENV"
+        elif command -v llvm-symbolizer-20 >/dev/null 2>&1; then
+          echo "ASAN_SYMBOLIZER_PATH=$(command -v llvm-symbolizer-20)" >> "$GITHUB_ENV"
+          echo "LLVM_SYMBOLIZER_PATH=$(command -v llvm-symbolizer-20)" >> "$GITHUB_ENV"
+        elif command -v llvm-symbolizer-19 >/dev/null 2>&1; then
+          echo "ASAN_SYMBOLIZER_PATH=$(command -v llvm-symbolizer-19)" >> "$GITHUB_ENV"
+          echo "LLVM_SYMBOLIZER_PATH=$(command -v llvm-symbolizer-19)" >> "$GITHUB_ENV"
+        fi
+
+        if [[ "$enable_asan" == "true" ]]; then
+          asan_opts="abort_on_error=1:allocator_may_return_null=1:check_initialization_order=1:detect_leaks=1:halt_on_error=1:print_stacktrace=1:strict_string_checks=1:symbolize=1"
+          if [[ -n "${{ inputs.extra-asan-options }}" ]]; then
+            asan_opts+="${asan_opts:+:}${{ inputs.extra-asan-options }}"
+          fi
+          echo "ASAN_OPTIONS=$asan_opts" >> "$GITHUB_ENV"
+        fi
+
+        if [[ "$enable_ubsan" == "true" ]]; then
+          ubsan_opts="halt_on_error=1:print_stacktrace=1:report_error_type=1:symbolize=1"
+          if [[ -n "${{ inputs.extra-ubsan-options }}" ]]; then
+            ubsan_opts+="${ubsan_opts:+:}${{ inputs.extra-ubsan-options }}"
+          fi
+          echo "UBSAN_OPTIONS=$ubsan_opts" >> "$GITHUB_ENV"
+        fi
+
+        if [[ "$enable_lsan" == "true" ]]; then
+          lsan_opts="verbosity=1:log_threads=1:print_suppressions=1"
+          if [[ -n "${{ inputs.extra-lsan-options }}" ]]; then
+            lsan_opts+="${lsan_opts:+:}${{ inputs.extra-lsan-options }}"
+          fi
+          echo "LSAN_OPTIONS=$lsan_opts" >> "$GITHUB_ENV"
+        fi

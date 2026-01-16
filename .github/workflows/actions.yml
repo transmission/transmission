@@ -166,7 +166,11 @@ jobs:
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
+        uses: ./.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: Debug
+          enable-sanitizers: true
 
   sanitizer-tests-macos:
     runs-on: macos-26
@@ -208,7 +212,11 @@ jobs:
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
+        uses: ./.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: Debug
+          enable-sanitizers: true
 
   clang-tidy-libtransmission:
     runs-on: ubuntu-24.04
@@ -385,8 +393,10 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-          QT_QPA_PLATFORM: offscreen
-        run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
+        uses: ./.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: RelWithDebInfo
       - name: Install
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
@@ -465,8 +475,10 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-          QT_QPA_PLATFORM: offscreen
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+        uses: ./src/.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: RelWithDebInfo
       - name: Install
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
@@ -529,7 +541,11 @@ jobs:
           cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure --timeout 600
+        uses: ./src/.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: RelWithDebInfo
+          timeout: 600
       - name: Install
         run: cmake --install obj --config RelWithDebInfo
       - name: Package
@@ -620,6 +636,12 @@ jobs:
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: brew install --formula qt
+      - name: Get Composite Actions
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .github/actions
+          sparse-checkout-cone-mode: false
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
@@ -659,8 +681,10 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-          QT_QPA_PLATFORM: offscreen
-        run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
+        uses: ./.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: RelWithDebInfo
       - name: Install
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
@@ -726,9 +750,10 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        env:
-          QT_QPA_PLATFORM: offscreen
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+        uses: ./.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: RelWithDebInfo
       - name: Install
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
@@ -800,9 +825,10 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        env:
-          QT_QPA_PLATFORM: offscreen
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+        uses: ./.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: RelWithDebInfo
       - name: Install
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
@@ -870,7 +896,10 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+        uses: ./.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: RelWithDebInfo
       - name: Install
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
