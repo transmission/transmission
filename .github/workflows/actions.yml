@@ -430,8 +430,6 @@ jobs:
     container:
       image: alpine:latest
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    env:
-      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Show Configuration
         run: |
@@ -706,8 +704,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: debian:11-slim
-    env:
-      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Show Configuration
         run: |
@@ -794,8 +790,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: fedora:39
-    env:
-      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Show Configuration
         run: |
@@ -876,8 +870,6 @@ jobs:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
-    env:
-      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Show Configuration
         run: |
@@ -1011,8 +1003,6 @@ jobs:
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-24.04
-    env:
-      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Show Configuration
         run: |
