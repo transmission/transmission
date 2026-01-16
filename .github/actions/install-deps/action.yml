@@ -29,47 +29,15 @@ runs:
   using: composite
   steps:
     - name: Detect Platform
-      shell: bash
-      run: |
-        set -ex
-
-        if [[ "$(uname -s)" == "Darwin" ]]; then
-          DETECTED_PLATFORM="macos"
-          echo "Detected macOS"
-        elif [[ -f /etc/os-release ]]; then
-          source /etc/os-release
-          echo "Detected Linux: ID=$ID, VERSION_ID=$VERSION_ID"
-
-          case "$ID" in
-            ubuntu)
-              DETECTED_PLATFORM="ubuntu-$VERSION_ID"
-              ;;
-            debian)
-              DETECTED_PLATFORM="debian"
-              ;;
-            fedora)
-              DETECTED_PLATFORM="fedora"
-              ;;
-            *)
-              echo "Warning: Unsupported Linux distribution: $ID"
-              DETECTED_PLATFORM="unknown"
-              ;;
-          esac
-        else
-          echo "Error: Unable to detect platform"
-          DETECTED_PLATFORM="unknown"
-        fi
-
-        echo "DETECTED_PLATFORM=$DETECTED_PLATFORM" >> "$GITHUB_ENV"
-        echo "Final detected platform: $DETECTED_PLATFORM"
+      uses: ./.github/actions/detect-platform
 
     - name: Install Linux dependencies
-      if: env.DETECTED_PLATFORM == 'debian' || env.DETECTED_PLATFORM == 'ubuntu-22.04' || env.DETECTED_PLATFORM == 'ubuntu-24.04' || env.DETECTED_PLATFORM == 'fedora'
+      if: env.OS_FAMILY == 'linux'
       shell: bash
       run: |
         set -ex
 
-        if [[ "$DETECTED_PLATFORM" == "fedora" ]]; then
+        if [[ "$PKG_FAMILY" == "dnf" ]]; then
           # Fedora/DNF-based installation
           dnf install -y \
             ca-certificates \
@@ -103,7 +71,7 @@ runs:
             dnf install -y gdb valgrind
           fi
 
-        else
+        elif [[ "$PKG_FAMILY" == "apt" ]]; then
           # Debian/Ubuntu/APT-based installation
           SUDO_CMD=""
           if [[ "${{ inputs.use-sudo }}" == "true" ]]; then
@@ -113,7 +81,7 @@ runs:
           # Setup LLVM repo if clang-tidy is needed
           if [[ "${{ inputs.enable-clang-tidy }}" == "true" ]]; then
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | $SUDO_CMD apt-key add -
-            if [[ "$DETECTED_PLATFORM" == "ubuntu-24.04" ]]; then
+            if [[ "$DISTRO" == "ubuntu" && "$DISTRO_VERSION" == "24.04" ]]; then
               $SUDO_CMD add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main"
             else
               $SUDO_CMD add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-20 main"
@@ -173,33 +141,39 @@ runs:
             echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
             echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
           fi
+        else
+          echo "Unsupported package family: $PKG_FAMILY"
+          exit 1
         fi
 
     - name: Install Linux GTK dependencies
-      if: (env.DETECTED_PLATFORM == 'debian' || env.DETECTED_PLATFORM == 'ubuntu-22.04' || env.DETECTED_PLATFORM == 'ubuntu-24.04' || env.DETECTED_PLATFORM == 'fedora') && inputs.enable-gtk == 'true'
+      if: env.OS_FAMILY == 'linux' && env.PKG_FAMILY != 'unknown' && inputs.enable-gtk == 'true'
       shell: bash
       run: |
-        if [[ "$DETECTED_PLATFORM" == "fedora" ]]; then
+        if [[ "$PKG_FAMILY" == "dnf" ]]; then
           dnf install -y 'pkgconfig(glibmm-2.4)' 'pkgconfig(gtkmm-3.0)'
-        else
+        elif [[ "$PKG_FAMILY" == "apt" ]]; then
           SUDO_CMD=""
           if [[ "${{ inputs.use-sudo }}" == "true" ]]; then
             SUDO_CMD="sudo"
           fi
           $SUDO_CMD apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
+        else
+          echo "Unsupported package family: $PKG_FAMILY"
+          exit 1
         fi
 
     - name: Install Linux Qt dependencies
-      if: (env.DETECTED_PLATFORM == 'debian' || env.DETECTED_PLATFORM == 'ubuntu-22.04' || env.DETECTED_PLATFORM == 'ubuntu-24.04' || env.DETECTED_PLATFORM == 'fedora') && inputs.enable-qt != 'false'
+      if: env.OS_FAMILY == 'linux' && env.PKG_FAMILY != 'unknown' && inputs.enable-qt != 'false'
       shell: bash
       run: |
-        if [[ "$DETECTED_PLATFORM" == "fedora" ]]; then
+        if [[ "$PKG_FAMILY" == "dnf" ]]; then
           if [[ "${{ inputs.enable-qt }}" == "qt6" ]]; then
             dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel xcb-util-cursor
           elif [[ "${{ inputs.enable-qt }}" == "qt5" ]]; then
             dnf install -y qt5-qtbase-devel qt5-qtsvg-devel qt5-qttools-devel xcb-util-cursor
           fi
-        else
+        elif [[ "$PKG_FAMILY" == "apt" ]]; then
           SUDO_CMD=""
           if [[ "${{ inputs.use-sudo }}" == "true" ]]; then
             SUDO_CMD="sudo"
@@ -209,10 +183,13 @@ runs:
           elif [[ "${{ inputs.enable-qt }}" == "qt6" ]]; then
             $SUDO_CMD apt-get install -y --no-install-recommends qt6-base-dev qt6-tools-dev qt6-l10n-tools libqt6svg6-dev
           fi
+        else
+          echo "Unsupported package family: $PKG_FAMILY"
+          exit 1
         fi
 
     - name: Install macOS dependencies
-      if: env.DETECTED_PLATFORM == 'macos'
+      if: env.OS_FAMILY == 'macos'
       shell: bash
       run: |
         # Base packages for macOS
@@ -228,13 +205,13 @@ runs:
         brew install --formulae "${BASE_PACKAGES[@]}"
 
     - name: Install macOS GTK dependencies
-      if: env.DETECTED_PLATFORM == 'macos' && inputs.enable-gtk == 'true'
+      if: env.OS_FAMILY == 'macos' && inputs.enable-gtk == 'true'
       shell: bash
       run: |
         brew install --formula gtkmm3
 
     - name: Install macOS Qt dependencies
-      if: env.DETECTED_PLATFORM == 'macos' && inputs.enable-qt != 'false'
+      if: env.OS_FAMILY == 'macos' && inputs.enable-qt != 'false'
       shell: bash
       run: |
         brew install --formula qt
@@ -245,8 +222,8 @@ runs:
         echo "=== Installed Dependency Versions ==="
 
         # Platform info
-        echo "Platform: $DETECTED_PLATFORM"
-        if [[ "$DETECTED_PLATFORM" == "macos" ]]; then
+        echo "Platform: OS_FAMILY=$OS_FAMILY DISTRO=$DISTRO DISTRO_VERSION=$DISTRO_VERSION PKG_FAMILY=$PKG_FAMILY"
+        if [[ "$OS_FAMILY" == "macos" ]]; then
           sw_vers
         else
           cat /etc/os-release | head -3
@@ -311,7 +288,7 @@ runs:
         if [[ "${{ inputs.enable-debugging }}" == "true" ]]; then
           echo "Debugging Tools:"
           gdb --version 2>/dev/null | head -1 || echo "gdb: not found"
-          if [[ "$DETECTED_PLATFORM" == "macos" ]]; then
+          if [[ "$OS_FAMILY" == "macos" ]]; then
             lldb --version 2>/dev/null | head -1 || echo "lldb: not found"
           else
             valgrind --version 2>/dev/null || echo "valgrind: not found"
