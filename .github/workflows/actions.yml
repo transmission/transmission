@@ -784,12 +784,16 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  fedora-39-from-tarball:
+  fedora-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ 41, 42, 43 ]
     container:
-      image: fedora:39
+      image: fedora:${{ matrix.version }}
     steps:
       - name: Show Configuration
         run: |
@@ -820,7 +824,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-      - name: Get Dependencies (GTK)
+      - name: Get Dependencies (GTK4)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: dnf install -y glibmm2.68-devel gtkmm4.0-devel
       - name: Get Dependencies (Qt6)
@@ -863,7 +867,7 @@ jobs:
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}
+          name: binaries-${{ github.job }}-${{ matrix.version }}
           path: pfx/**/*
 
   ubuntu-22-04-from-tarball:
