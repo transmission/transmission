@@ -3107,6 +3107,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             switch (c)
             {
             case 712:
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
                 {
                     auto* list = args.find_if<tr_variant::Vector>(TR_KEY_tracker_remove);
                     if (list == nullptr)
@@ -3114,7 +3115,12 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                         list = args.insert_or_assign(TR_KEY_tracker_remove, tr_variant::make_vector(1))
                                    .first.get_if<tr_variant::Vector>();
                     }
-                    list->emplace_back(tr_num_parse<int64_t>(optarg_sv).value());
+                    list->emplace_back(*val);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-tr'/'--tracker-remove' should be an integer");
+                    status |= EXIT_FAILURE;
                 }
                 break;
 
