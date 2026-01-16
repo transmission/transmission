@@ -42,10 +42,6 @@ auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissi
 auto constexpr UpkeepInterval = 30min;
 auto constexpr RetryUpkeepInterval = 30s;
 
-// Normally there should only ever be 1 cache instance during the entire program execution
-// This is a counter only to cater for SessionTest.honorsSettings
-std::size_t cache_exists = 0;
-
 } // namespace
 
 namespace
@@ -156,8 +152,11 @@ tr_ip_cache::tr_ip_cache(Mediator& mediator_in)
         upkeep_timers_[i]->set_callback(cb);
         start_timer(type, UpkeepInterval);
     }
+}
 
-    ++cache_exists;
+std::shared_ptr<tr_ip_cache> tr_ip_cache::create(Mediator& mediator)
+{
+    return std::shared_ptr<tr_ip_cache>{ new tr_ip_cache{ mediator } };
 }
 
 tr_ip_cache::~tr_ip_cache()
@@ -175,8 +174,6 @@ tr_ip_cache::~tr_ip_cache()
     {
         tr_logAddDebug("Destructed while some global IP queries were pending.");
     }
-
-    --cache_exists;
 }
 
 bool tr_ip_cache::try_shutdown() noexcept
@@ -239,6 +236,7 @@ void tr_ip_cache::update_addr(tr_address_type type) noexcept
 void tr_ip_cache::update_global_addr(tr_address_type type) noexcept
 {
     auto const ix_service = ix_service_[type];
+    TR_ASSERT(type < NUM_TR_AF_INET_TYPES);
     TR_ASSERT(has_ip_protocol_[type]);
     TR_ASSERT(ix_service < std::size(IPQueryServices[type]));
 
@@ -249,18 +247,21 @@ void tr_ip_cache::update_global_addr(tr_address_type type) noexcept
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
 
     // Update global address
-    static auto constexpr IPProtocolMap = std::array{ tr_web::FetchOptions::IPProtocol::V4,
-                                                      tr_web::FetchOptions::IPProtocol::V6 };
-    auto options = tr_web::FetchOptions{ IPQueryServices[type][ix_service],
-                                         [this, type](tr_web::FetchResponse const& response)
-                                         {
-                                             // Check to avoid segfault
-                                             if (cache_exists != 0)
-                                             {
-                                                 this->on_response_ip_query(type, response);
-                                             }
-                                         },
-                                         nullptr };
+    static auto constexpr IPProtocolMap = std::array{
+        tr_web::FetchOptions::IPProtocol::V4,
+        tr_web::FetchOptions::IPProtocol::V6,
+    };
+    auto options = tr_web::FetchOptions{
+        IPQueryServices[type][ix_service],
+        [weak = weak_from_this(), type](tr_web::FetchResponse const& response)
+        {
+            if (auto const ptr = weak.lock())
+            {
+                ptr->on_response_ip_query(type, response);
+            }
+        },
+        nullptr,
+    };
     options.ip_proto = IPProtocolMap[type];
     options.sndbuf = 4096;
     options.rcvbuf = 4096;

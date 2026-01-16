@@ -89,7 +89,7 @@ protected:
     }
 
     // To be created within the test body
-    std::unique_ptr<tr_ip_cache> ip_cache_;
+    std::shared_ptr<tr_ip_cache> ip_cache_;
 };
 
 TEST_F(IPCacheTest, bindAddr)
@@ -123,7 +123,7 @@ TEST_F(IPCacheTest, bindAddr)
     };
 
     auto mediator = LocalMockMediator{};
-    ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
+    ip_cache_ = tr_ip_cache::create(mediator);
 
     for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
@@ -148,7 +148,7 @@ TEST_F(IPCacheTest, setGlobalAddr)
     static_assert(std::size(AddrStr) == std::size(AddrTests));
 
     auto mediator = MockMediator{};
-    ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
+    ip_cache_ = tr_ip_cache::create(mediator);
 
     for (std::size_t i = 0; i < std::size(AddrStr); ++i)
     {
@@ -172,7 +172,7 @@ TEST_F(IPCacheTest, globalSourceIPv4)
         }
     };
     auto mediator = LocalMockMediator{};
-    ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
+    ip_cache_ = tr_ip_cache::create(mediator);
 
     ip_cache_->update_source_addr(TR_AF_INET);
     auto const addr = ip_cache_->source_addr(TR_AF_INET);
@@ -196,7 +196,7 @@ TEST_F(IPCacheTest, globalSourceIPv6)
         }
     };
     auto mediator = LocalMockMediator{};
-    ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
+    ip_cache_ = tr_ip_cache::create(mediator);
 
     ip_cache_->update_source_addr(TR_AF_INET6);
     auto const addr = ip_cache_->source_addr(TR_AF_INET6);
@@ -242,7 +242,7 @@ TEST_F(IPCacheTest, onResponseIPQuery)
     };
 
     auto mediator = LocalMockMediator{};
-    ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
+    ip_cache_ = tr_ip_cache::create(mediator);
 
     mediator.address_type = 0;
     for (std::size_t& i = mediator.address_type; i < NUM_TR_AF_INET_TYPES; ++i)
