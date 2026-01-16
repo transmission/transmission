@@ -2952,8 +2952,16 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 953:
-                args.insert_or_assign(TR_KEY_seed_ratio_limit, tr_num_parse<double>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seed_ratio_limited, true);
+                if (auto const val = tr_num_parse<double>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_seed_ratio_limit, *val);
+                    args.insert_or_assign(TR_KEY_seed_ratio_limited, true);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-gsr'/'--global-seedratio' should be a number");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 954:
@@ -2961,8 +2969,16 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 958:
-                args.insert_or_assign(TR_KEY_idle_seeding_limit, tr_num_parse<int64_t>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, true);
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_idle_seeding_limit, *val);
+                    args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, true);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-gisl'/'--global-idle-seeding-limit' should be an integer");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 959:
@@ -3059,15 +3075,22 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 930:
-                if (targs != nullptr)
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
                 {
-                    targs->insert_or_assign(TR_KEY_peer_limit, tr_num_parse<int64_t>(optarg_sv).value());
+                    if (targs != nullptr)
+                    {
+                        targs->insert_or_assign(TR_KEY_peer_limit, *val);
+                    }
+                    else
+                    {
+                        sargs->insert_or_assign(TR_KEY_peer_limit_global, *val);
+                    }
                 }
                 else
                 {
-                    sargs->insert_or_assign(TR_KEY_peer_limit_global, tr_num_parse<int64_t>(optarg_sv).value());
+                    fmt::print(stderr, "Argument to '-pr'/'--peers' should be an integer");
+                    status |= EXIT_FAILURE;
                 }
-
                 break;
 
             default:
@@ -3082,6 +3105,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             switch (c)
             {
             case 712:
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
                 {
                     auto* list = args.find_if<tr_variant::Vector>(TR_KEY_tracker_remove);
                     if (list == nullptr)
@@ -3089,13 +3113,26 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                         list = args.insert_or_assign(TR_KEY_tracker_remove, tr_variant::make_vector(1))
                                    .first.get_if<tr_variant::Vector>();
                     }
-                    list->emplace_back(tr_num_parse<int64_t>(optarg_sv).value());
+                    list->emplace_back(*val);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-tr'/'--tracker-remove' should be an integer");
+                    status |= EXIT_FAILURE;
                 }
                 break;
 
             case 950:
-                args.insert_or_assign(TR_KEY_seed_ratio_limit, tr_num_parse<double>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seed_ratio_mode, TR_RATIOLIMIT_SINGLE);
+                if (auto const val = tr_num_parse<double>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_seed_ratio_limit, *val);
+                    args.insert_or_assign(TR_KEY_seed_ratio_mode, TR_RATIOLIMIT_SINGLE);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-sr'/'--seedratio' should be a number");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 951:
@@ -3107,8 +3144,16 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 955:
-                args.insert_or_assign(TR_KEY_seed_idle_limit, tr_num_parse<int64_t>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seed_idle_mode, TR_IDLELIMIT_SINGLE);
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_seed_idle_limit, *val);
+                    args.insert_or_assign(TR_KEY_seed_idle_mode, TR_IDLELIMIT_SINGLE);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-isl'/'--idle-seeding-limit' should be an integer");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 956:
