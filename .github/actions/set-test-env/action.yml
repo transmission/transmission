@@ -63,7 +63,7 @@ runs:
         fi
 
         if [[ "$enable_asan" == "true" ]]; then
-          asan_opts="abort_on_error=1:allocator_may_return_null=1:check_initialization_order=1:detect_leaks=1:halt_on_error=1:log_path=/dev/stderr:print_stacktrace=1:strict_string_checks=1:symbolize=1"
+          asan_opts="abort_on_error=1:allocator_may_return_null=1:check_initialization_order=1:detect_leaks=1:halt_on_error=1:print_stacktrace=1:strict_string_checks=1:symbolize=1:verbosity=0"
           if [[ -n "${{ inputs.extra-asan-options }}" ]]; then
             asan_opts+="${asan_opts:+:}${{ inputs.extra-asan-options }}"
           fi
@@ -71,7 +71,7 @@ runs:
         fi
 
         if [[ "$enable_ubsan" == "true" ]]; then
-          ubsan_opts="halt_on_error=1:log_path=/dev/stderr:print_stacktrace=1:report_error_type=1:symbolize=1"
+          ubsan_opts="halt_on_error=1:print_stacktrace=1:report_error_type=1:symbolize=1"
           if [[ -n "${{ inputs.extra-ubsan-options }}" ]]; then
             ubsan_opts+="${ubsan_opts:+:}${{ inputs.extra-ubsan-options }}"
           fi
@@ -79,7 +79,7 @@ runs:
         fi
 
         if [[ "$enable_lsan" == "true" ]]; then
-          lsan_opts="log_path=/dev/stderr:verbosity=0:log_threads=1:print_suppressions=1"
+          lsan_opts="verbosity=0:log_threads=0:print_suppressions=1"
           if [[ -n "${{ inputs.extra-lsan-options }}" ]]; then
             lsan_opts+="${lsan_opts:+:}${{ inputs.extra-lsan-options }}"
           fi
