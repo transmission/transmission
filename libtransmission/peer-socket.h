@@ -74,7 +74,7 @@ public:
         return socket_address().address();
     }
 
-    [[nodiscard]] constexpr auto const& port() const noexcept
+    [[nodiscard]] constexpr auto port() const noexcept
     {
         return socket_address().port();
     }
