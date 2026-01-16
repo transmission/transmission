@@ -3077,15 +3077,22 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 930:
-                if (targs != nullptr)
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
                 {
-                    targs->insert_or_assign(TR_KEY_peer_limit, tr_num_parse<int64_t>(optarg_sv).value());
+                    if (targs != nullptr)
+                    {
+                        targs->insert_or_assign(TR_KEY_peer_limit, *val);
+                    }
+                    else
+                    {
+                        sargs->insert_or_assign(TR_KEY_peer_limit_global, *val);
+                    }
                 }
                 else
                 {
-                    sargs->insert_or_assign(TR_KEY_peer_limit_global, tr_num_parse<int64_t>(optarg_sv).value());
+                    fmt::print(stderr, "Argument to '-pr'/'--peers' should be an integer");
+                    status |= EXIT_FAILURE;
                 }
-
                 break;
 
             default:
