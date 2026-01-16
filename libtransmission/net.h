@@ -435,7 +435,7 @@ struct tr_socket_address
         return address_;
     }
 
-    [[nodiscard]] constexpr auto const& port() const noexcept
+    [[nodiscard]] constexpr auto port() const noexcept
     {
         return port_;
     }
