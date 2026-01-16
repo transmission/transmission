@@ -2971,8 +2971,16 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 958:
-                args.insert_or_assign(TR_KEY_idle_seeding_limit, tr_num_parse<int64_t>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, true);
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_idle_seeding_limit, *val);
+                    args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, true);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-gisl'/'--global-idle-seeding-limit' should be an integer");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 959:
