@@ -131,33 +131,20 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
-      - name: Get Dependencies
-        run: |
-          set -ex
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            ca-certificates \
-            clang \
-            cmake \
-            gettext \
-            libcurl4-openssl-dev \
-            libdeflate-dev \
-            libevent-dev \
-            libfmt-dev \
-            libminiupnpc-dev \
-            libnatpmp-dev \
-            libpsl-dev \
-            libssl-dev \
-            ninja-build
       - name: Get Source
         uses: actions/checkout@v6
         with:
           submodules: recursive
-          path: src
+      - name: Get Dependencies
+        uses: ./.github/actions/install-deps
+        with:
+          compiler: clang
+          enable-debugging: true
+          use-sudo: true
       - name: Configure
         run: |
           cmake \
-            -S src \
+            -S . \
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Debug \
@@ -190,17 +177,18 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           sw_vers
-      - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v6
         with:
           submodules: recursive
-          path: src
+      - name: Get Dependencies
+        uses: ./.github/actions/install-deps
+        with:
+          compiler: clang
       - name: Configure
         run: |
           cmake \
-            -S src \
+            -S . \
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Debug \
@@ -231,36 +219,20 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
-      - name: Get Dependencies
-        run: |
-          set -ex
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main"
-          sudo apt update
-          sudo apt install -y --no-install-recommends \
-            ca-certificates \
-            clang \
-            clang-tidy-20 \
-            cmake \
-            gettext \
-            libcurl4-openssl-dev \
-            libdeflate-dev \
-            libevent-dev \
-            libfmt-dev \
-            libminiupnpc-dev \
-            libnatpmp-dev \
-            libpsl-dev \
-            libssl-dev \
-            ninja-build
       - name: Get Source
         uses: actions/checkout@v6
         with:
           submodules: recursive
-          path: src
+      - name: Get Dependencies
+        uses: ./.github/actions/install-deps
+        with:
+          compiler: clang
+          enable-clang-tidy: true
+          use-sudo: true
       - name: Configure
         run: |
           cmake \
-            -S src \
+            -S . \
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Debug \
@@ -376,23 +348,20 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           sw_vers
-      - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf crc32c
-      - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: brew install --formula gtkmm3
-      - name: Get Dependencies (Qt)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: brew install --formula qt
       - name: Get Source
         uses: actions/checkout@v6
         with:
-          path: src
           submodules: recursive
+      - name: Get Dependencies
+        uses: ./.github/actions/install-deps
+        with:
+          compiler: clang
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
       - name: Configure
         run: |
           cmake \
-            -S src \
+            -S . \
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -710,42 +679,24 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
+      - name: Get Composite Actions
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .github/actions
+          sparse-checkout-cone-mode: false
+          path: composite-actions
       - name: Get Dependencies
-        run: |
-          set -ex
-          apt-get update
-          apt-get install -y --no-install-recommends \
-            ca-certificates \
-            cmake \
-            g++ \
-            gettext \
-            libcurl4-openssl-dev \
-            libdeflate-dev \
-            libevent-dev \
-            libfmt-dev \
-            libminiupnpc-dev \
-            libnatpmp-dev \
-            libpsl-dev \
-            libssl-dev \
-            locales \
-            ninja-build \
-            pkg-config \
-            xz-utils
-          # Set UTF-8 locale for Qt
-          echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
-          locale-gen
-          echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
-          echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
+        uses: ./composite-actions/.github/actions/install-deps
+        with:
+          compiler: gcc
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
+          use-sudo: false
       - name: Get NPM
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-      - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
-      - name: Get Dependencies (Qt5)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: apt-get install -y --no-install-recommends libxcb-cursor0 qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
@@ -800,36 +751,24 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
+      - name: Get Composite Actions
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .github/actions
+          sparse-checkout-cone-mode: false
+          path: composite-actions
       - name: Get Dependencies
-        run: |
-          set -ex
-          dnf install -y \
-            ca-certificates \
-            cmake \
-            fmt-devel \
-            gcc-c++ \
-            gettext \
-            google-crc32c-devel \
-            libcurl-devel \
-            libdeflate-devel \
-            libevent-devel \
-            libnatpmp-devel \
-            libpsl-devel \
-            miniupnpc-devel \
-            ninja-build \
-            openssl-devel \
-            pkgconf-pkg-config \
-            xz
+        uses: ./composite-actions/.github/actions/install-deps
+        with:
+          compiler: gcc
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
+          use-sudo: false
       - name: Get NPM
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-      - name: Get Dependencies (GTK4)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: dnf install -y glibmm2.68-devel gtkmm4.0-devel
-      - name: Get Dependencies (Qt6)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel xcb-util-cursor
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
@@ -880,41 +819,26 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
+
+      - name: Get Composite Actions
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .github/actions
+          sparse-checkout-cone-mode: false
+          path: composite-actions
+
       - name: Get Dependencies
-        run: |
-          set -ex
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            appstream \
-            ca-certificates \
-            clang \
-            cmake \
-            gettext \
-            libcurl4-openssl-dev \
-            libdeflate-dev \
-            libevent-dev \
-            libfmt-dev \
-            libminiupnpc-dev \
-            libnatpmp-dev \
-            libpsl-dev \
-            libssl-dev \
-            locales \
-            ninja-build
-          # Set UTF-8 locale for Qt
-          echo "en_US.UTF-8 UTF-8" | sudo tee /etc/locale.gen
-          sudo locale-gen
-          echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
-          echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
+        uses: ./composite-actions/.github/actions/install-deps
+        with:
+          compiler: clang
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
+          use-sudo: true
       - name: Get NPM
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-      - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
-      - name: Get Dependencies (Qt5)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: sudo apt-get install -y --no-install-recommends libxcb-cursor0 qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
@@ -1013,46 +937,21 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
-      - name: Get Dependencies
-        run: |
-          set -ex
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            appstream \
-            ca-certificates \
-            clang \
-            cmake \
-            gettext \
-            libcurl4-openssl-dev \
-            libdeflate-dev \
-            libevent-dev \
-            libfmt-dev \
-            libminiupnpc-dev \
-            libnatpmp-dev \
-            libpsl-dev \
-            libssl-dev \
-            locales \
-            ninja-build
-          # Set UTF-8 locale for Qt
-          echo "en_US.UTF-8 UTF-8" | sudo tee /etc/locale.gen
-          sudo locale-gen
-          echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
-          echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
-      - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
-      - name: Get Dependencies (Qt6)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: sudo apt-get install -y --no-install-recommends libxcb-cursor0 qt6-base-dev qt6-svg-dev qt6-tools-dev
       - name: Get Source
         uses: actions/checkout@v6
         with:
           submodules: recursive
-          path: src
+      - name: Get Dependencies
+        uses: ./.github/actions/install-deps
+        with:
+          compiler: clang
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
+          use-sudo: true
       - name: Configure
         run: |
           cmake \
-            -S src \
+            -S . \
             -B obj \
             -G Ninja \
             -DCMAKE_CXX_STANDARD=23 \
