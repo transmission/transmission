@@ -152,7 +152,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
 
     for (auto const& transport : session->preferred_transports())
     {
-        if (auto sock = get_socket[transport](); sock)
+        if (auto sock = get_socket[transport]())
         {
             return tr_peerIo::create(session, std::move(sock), parent, &info_hash, false, client_is_seed);
         }
@@ -179,17 +179,17 @@ void tr_peerIo::set_socket(std::shared_ptr<tr_peer_socket> socket_in)
     socket_ = std::move(socket_in);
 
     socket_->set_read_cb(
-        [weak = weak_from_this()]()
+        [weak = weak_from_this()]
         {
-            if (auto const io = weak.lock(); io)
+            if (auto const io = weak.lock())
             {
                 io->read_cb();
             }
         });
     socket_->set_write_cb(
-        [weak = weak_from_this()]()
+        [weak = weak_from_this()]
         {
-            if (auto const io = weak.lock(); io)
+            if (auto const io = weak.lock())
             {
                 io->write_cb();
             }
@@ -197,7 +197,7 @@ void tr_peerIo::set_socket(std::shared_ptr<tr_peer_socket> socket_in)
     socket_->set_error_cb(
         [weak = weak_from_this()](tr_error const& error)
         {
-            if (auto const io = weak.lock(); io)
+            if (auto const io = weak.lock())
             {
                 io->call_error_callback(error);
             }
