@@ -2954,8 +2954,16 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 953:
-                args.insert_or_assign(TR_KEY_seed_ratio_limit, tr_num_parse<double>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seed_ratio_limited, true);
+                if (auto const val = tr_num_parse<double>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_seed_ratio_limit, *val);
+                    args.insert_or_assign(TR_KEY_seed_ratio_limited, true);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-gsr'/'--global-seedratio' should be a number");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 954:
