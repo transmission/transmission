@@ -418,7 +418,7 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --build obj --config RelWithDebInfo --target install/strip
+        run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ matrix.os }}-cmake-universal
@@ -498,7 +498,7 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --build obj --config RelWithDebInfo --target install/strip
+        run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}
@@ -561,7 +561,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure --timeout 600
       - name: Install
-        run: cmake --build obj --config RelWithDebInfo --target install
+        run: cmake --install obj --config RelWithDebInfo
       - name: Package
         if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
         run: |
@@ -692,7 +692,7 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --build obj --config RelWithDebInfo --target install/strip
+        run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ matrix.os }}-from-tarball
@@ -778,7 +778,7 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --build obj --config RelWithDebInfo --target install/strip
+        run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}
@@ -860,7 +860,7 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --build obj --config RelWithDebInfo --target install/strip
+        run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}
@@ -943,7 +943,7 @@ jobs:
           TMPDIR: /private/tmp
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
-        run: cmake --build obj --config RelWithDebInfo --target install/strip
+        run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}
