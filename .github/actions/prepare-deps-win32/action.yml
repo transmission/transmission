@@ -29,8 +29,9 @@ runs:
       id: cache-key
       shell: pwsh
       run: |
+        $RepoRoot = if (Test-Path (Join-Path . 'src/release/windows/main.ps1')) { Join-Path . 'src' } else { (Get-Item .).FullName }
         try {
-            $DepsHash = & (Join-Path . src release windows main.ps1) -Mode DepsHash -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
+            $DepsHash = & (Join-Path $RepoRoot release windows main.ps1) -Mode DepsHash -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
             "hash=${DepsHash}" | Out-File $Env:GITHUB_OUTPUT -Append
         } catch {
             Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
@@ -46,8 +47,9 @@ runs:
       if: steps.restore-cache.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
+        $RepoRoot = if (Test-Path (Join-Path . 'src/release/windows/main.ps1')) { Join-Path . 'src' } else { (Get-Item .).FullName }
         try {
-            & (Join-Path . src release windows main.ps1) -Mode Build -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
+            & (Join-Path $RepoRoot release windows main.ps1) -Mode Build -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
         } catch {
             Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
             exit 1

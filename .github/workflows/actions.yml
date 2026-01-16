@@ -446,12 +446,11 @@ jobs:
       - name: Get Source
         uses: actions/checkout@v6
         with:
-          path: src
           submodules: recursive
       - name: Configure
         run: |
           cmake \
-            -S src \
+            -S . \
             -B obj \
             -G Ninja \
             -DCMAKE_C_COMPILER='clang' \
@@ -475,7 +474,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        uses: ./src/.github/actions/run-tests
+        uses: ./.github/actions/run-tests
         with:
           build-dir: obj
           build-config: RelWithDebInfo
@@ -508,10 +507,9 @@ jobs:
       - name: Get Source
         uses: actions/checkout@v6
         with:
-          path: src
           submodules: recursive
       - name: Prepare Build Deps
-        uses: ./src/.github/actions/prepare-deps-win32
+        uses: ./.github/actions/prepare-deps-win32
         with:
           arch: ${{ matrix.arch }}
           type: Deps
@@ -519,7 +517,7 @@ jobs:
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
           cmake `
-            -S src `
+            -S . `
             -B obj `
             -G Ninja `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
@@ -541,7 +539,7 @@ jobs:
           cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        uses: ./src/.github/actions/run-tests
+        uses: ./.github/actions/run-tests
         with:
           build-dir: obj
           build-config: RelWithDebInfo
