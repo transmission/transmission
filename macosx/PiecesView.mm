@@ -184,6 +184,8 @@ typedef struct PieceInfo
     if (numCells > 0)
     {
         self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect /*dstRect*/) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wvla-cxx-extension"
             NSRect cFillRects[numCells];
             for (int i = 0; i < numCells; ++i)
             {
@@ -194,6 +196,7 @@ typedef struct PieceInfo
             {
                 cFillColors[i] = cellColors[i];
             }
+#pragma clang diagnostic pop
             NSRectFillListWithColors(cFillRects, cFillColors, numCells);
             return YES;
         }];
