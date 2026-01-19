@@ -1495,11 +1495,6 @@ std::string tr_torrentFilename(tr_torrent const* tor)
     return std::string{ tor->torrent_file() };
 }
 
-size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen)
-{
-    return tr_strv_to_buf(tr_torrentFilename(tor), buf, buflen);
-}
-
 // ---
 
 tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, size_t* peer_count)

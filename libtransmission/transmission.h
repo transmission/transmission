@@ -1331,9 +1331,6 @@ struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
  */
 [[nodiscard]] std::string tr_torrentFilename(tr_torrent const* tor);
 
-/** @brief buffer variant of `tr_torrentFilename()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen);
-
 /**
  * Use this to draw an advanced progress bar which is 'size' pixels
  * wide. Fills 'tab' which you must have allocated: each byte is set
