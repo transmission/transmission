@@ -1039,9 +1039,6 @@ char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
  */
 [[nodiscard]] std::string tr_torrentGetTrackerList(tr_torrent const* tor);
 
-/** @brief buffer variant of `tr_torrentGetTrackerList()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen);
-
 /**
  * Sets a torrent's tracker list from a list of announce URLs with one
  * URL per line and a blank line between tiers.

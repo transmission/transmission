@@ -2111,11 +2111,6 @@ std::string tr_torrentGetTrackerList(tr_torrent const* tor)
     return tor->announce_list().to_string();
 }
 
-size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen)
-{
-    return tr_strv_to_buf(tr_torrentGetTrackerList(tor), buf, buflen);
-}
-
 // ---
 
 uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
