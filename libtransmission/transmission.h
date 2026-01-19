@@ -229,10 +229,9 @@ void tr_sessionClose(tr_session* session, double timeout_secs = 15.0);
  * @brief Return the session's configuration directory.
  *
  * This is where transmission stores its torrent files, .resume files,
- * blocklists, etc. It's set in `tr_transmissionInit()` and is immutable
- * during the session.
+ * blocklists, etc. It's set in `tr_transmissionInit()`.
  */
-char const* tr_sessionGetConfigDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetConfigDir(tr_session const* session);
 
 /**
  * @brief Get the default download folder for new torrents.

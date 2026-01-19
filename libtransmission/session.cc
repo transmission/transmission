@@ -970,11 +970,11 @@ char const* tr_sessionGetDownloadDir(tr_session const* session)
     return session->downloadDir().c_str();
 }
 
-char const* tr_sessionGetConfigDir(tr_session const* session)
+std::string tr_sessionGetConfigDir(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->configDir().c_str();
+    return session->configDir();
 }
 
 // ---
