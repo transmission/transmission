@@ -119,9 +119,6 @@ enum : int8_t
  */
 [[nodiscard]] std::string tr_getDefaultConfigDir(std::string_view appname);
 
-/** @brief buffer variant of `tr_getDefaultConfigDir()`. See `tr_strv_to_buf()`. */
-size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
-
 /**
  * @brief returns Transmission's default download directory.
  *
@@ -131,9 +128,6 @@ size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen
  * -# Otherwise, `getpwuid(getuid())->pw_dir + "/Downloads"` is used.
  */
 [[nodiscard]] std::string tr_getDefaultDownloadDir();
-
-/** @brief buffer variant of `tr_getDefaultDownloadDir()`. See `tr_strv_to_buf()`. */
-size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
 /**
  * Add libtransmission's default settings to the benc dictionary.
@@ -940,9 +934,6 @@ char const* tr_torrentName(tr_torrent const* tor);
  */
 [[nodiscard]] std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num);
 
-/** @brief buffer variant of `tr_torrentFindFile()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
-
 // --- Torrent speed limits
 
 size_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir);
@@ -1034,9 +1025,6 @@ char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
  */
 [[nodiscard]] std::string tr_torrentGetMagnetLink(tr_torrent const* tor);
 
-/** @brief buffer variant of `tr_torrentGetMagnetLink()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
-
 // ---
 
 /**
@@ -1050,9 +1038,6 @@ size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buf
  * trackers, use `tr_torrentTracker()` and `tr_torrentTrackerCount()`
  */
 [[nodiscard]] std::string tr_torrentGetTrackerList(tr_torrent const* tor);
-
-/** @brief buffer variant of `tr_torrentGetTrackerList()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
  * Sets a torrent's tracker list from a list of announce URLs with one
@@ -1345,9 +1330,6 @@ struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
  * Get the filename of Transmission's internal copy of the torrent file.
  */
 [[nodiscard]] std::string tr_torrentFilename(tr_torrent const* tor);
-
-/** @brief buffer variant of `tr_torrentFilename()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
  * Use this to draw an advanced progress bar which is 'size' pixels

@@ -233,23 +233,6 @@ bool tr_file_save(std::string_view filename, std::string_view contents, tr_error
 
 // ---
 
-size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen)
-{
-    size_t const len = std::size(src);
-
-    if (buflen >= len)
-    {
-        auto const out = std::copy(std::begin(src), std::end(src), buf);
-
-        if (buflen > len)
-        {
-            *out = '\0';
-        }
-    }
-
-    return len;
-}
-
 /* User-level routine. returns whether or not 'text' and 'pattern' matched */
 bool tr_wildmat(char const* text, char const* pattern)
 {
