@@ -210,11 +210,6 @@ std::string tr_getDefaultDownloadDir()
     return fmt::format("{:s}/Downloads"sv, getHomeDir());
 }
 
-size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen)
-{
-    return tr_strv_to_buf(tr_getDefaultDownloadDir(), buf, buflen);
-}
-
 // ---
 
 std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)

@@ -129,9 +129,6 @@ enum : int8_t
  */
 [[nodiscard]] std::string tr_getDefaultDownloadDir();
 
-/** @brief buffer variant of `tr_getDefaultDownloadDir()`. See `tr_strv_to_buf()`. */
-size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
-
 /**
  * Add libtransmission's default settings to the benc dictionary.
  *
