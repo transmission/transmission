@@ -2885,6 +2885,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 {
                     args.insert_or_assign(TR_KEY_cache_size_mib, *val);
                 }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-e'/'--cache' should be an integer");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 910:
