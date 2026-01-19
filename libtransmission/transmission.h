@@ -119,9 +119,6 @@ enum : int8_t
  */
 [[nodiscard]] std::string tr_getDefaultConfigDir(std::string_view appname);
 
-/** @brief buffer variant of `tr_getDefaultConfigDir()`. See `tr_strv_to_buf()`. */
-size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
-
 /**
  * @brief returns Transmission's default download directory.
  *
