@@ -188,15 +188,6 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, Args&&
 
 [[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement = 0xFFFD /*�*/);
 
-/**
- * @brief copies `src` into `buf`.
- *
- * - Always returns std::size(src).
- * - `src` will be copied into `buf` iff `buflen >= std::size(src)`
- * - `buf` will also be zero terminated iff `buflen >= std::size(src) + 1`.
- */
-size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen);
-
 // ---
 
 template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
