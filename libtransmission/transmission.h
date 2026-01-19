@@ -1028,9 +1028,6 @@ char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
  */
 [[nodiscard]] std::string tr_torrentGetMagnetLink(tr_torrent const* tor);
 
-/** @brief buffer variant of `tr_torrentGetMagnetLink()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
-
 // ---
 
 /**
