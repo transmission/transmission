@@ -2270,11 +2270,6 @@ std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num)
     return std::string{ found ? found->filename().sv() : ""sv };
 }
 
-size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen)
-{
-    return tr_strv_to_buf(tr_torrentFindFile(tor, file_num), buf, buflen);
-}
-
 void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
 {
     download_dir_ = path;

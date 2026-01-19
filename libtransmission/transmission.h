@@ -937,9 +937,6 @@ char const* tr_torrentName(tr_torrent const* tor);
  */
 [[nodiscard]] std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num);
 
-/** @brief buffer variant of `tr_torrentFindFile()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
-
 // --- Torrent speed limits
 
 size_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir);
