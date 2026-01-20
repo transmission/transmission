@@ -210,8 +210,8 @@ TEST_F(UtilsTest, strvConvertUtf8Fuzz)
     {
         buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        auto const out = tr_strv_convert_utf8({ std::data(buf), std::size(buf) });
-        EXPECT_EQ(out, tr_strv_convert_utf8(out));
+        auto const out = tr_strv_to_utf8_string({ std::data(buf), std::size(buf) });
+        EXPECT_EQ(out, tr_strv_to_utf8_string(out));
     }
 }
 

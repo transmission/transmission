@@ -329,11 +329,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(CommentKey) || pathIs(CommentUtf8Key))
         {
-            tm_.comment_ = tr_strv_convert_utf8(value);
+            tm_.comment_ = tr_strv_to_utf8_string(value);
         }
         else if (pathIs(CreatedByKey) || pathIs(CreatedByUtf8Key))
         {
-            tm_.creator_ = tr_strv_convert_utf8(value);
+            tm_.creator_ = tr_strv_to_utf8_string(value);
         }
         else if (
             pathIs(SourceKey) || pathIs(InfoKey, SourceKey) || //
@@ -344,7 +344,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             // to have the same use as the 'source' key
             // http://wiki.bitcomet.com/inside_bitcomet
 
-            tm_.source_ = tr_strv_convert_utf8(value);
+            tm_.source_ = tr_strv_to_utf8_string(value);
         }
         else if (pathIs(AnnounceKey))
         {

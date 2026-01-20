@@ -192,7 +192,7 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, Args&&
 
 [[nodiscard]] std::string_view tr_strv_strip(std::string_view str);
 
-[[nodiscard]] std::string tr_strv_convert_utf8(std::string_view sv);
+[[nodiscard]] std::string tr_strv_to_utf8_string(std::string_view sv);
 
 [[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement = 0xFFFD /*�*/);
 

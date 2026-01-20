@@ -1320,7 +1320,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // peer id encoding.
     if (auto const sv = map->value_if<std::string_view>(TR_KEY_v))
     {
-        set_user_agent(tr_interned_string{ tr_strv_convert_utf8(*sv) });
+        set_user_agent(tr_interned_string{ tr_strv_to_utf8_string(*sv) });
     }
 
     // https://www.bittorrent.org/beps/bep_0010.html
