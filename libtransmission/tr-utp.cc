@@ -13,7 +13,7 @@
 #include "libtransmission/crypto-utils.h" // tr_rand_int()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
-#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-socket-utp.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
 #include "libtransmission/tr-assert.h"
@@ -91,7 +91,7 @@ void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
 
     if (auto addrport = tr_socket_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
     {
-        session->addIncoming({ *addrport, utp_sock });
+        session->addIncoming(tr_peer_socket_utp::create(*addrport, utp_sock, session->timerMaker()));
     }
     else
     {
@@ -194,7 +194,7 @@ void tr_utp_init(tr_session* session)
     utp_context_set_userdata(ctx, session);
     utp_set_callback(ctx, UTP_ON_ACCEPT, &utp_callback);
     utp_set_callback(ctx, UTP_SENDTO, &utp_callback);
-    tr_peerIo::utp_init(ctx);
+    tr_peer_socket_utp::init(ctx);
 
 #ifdef TR_UTP_TRACE
     utp_set_callback(ctx, UTP_LOG, &utp_callback);
