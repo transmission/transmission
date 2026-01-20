@@ -34,6 +34,7 @@
 #include <functional>
 #include <list>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -91,11 +92,11 @@ inline GParamSpec* gtr_get_param_spec(char const* name, char const* nick, char c
     return dummy_value.create_param_spec(name, nick, blurb, TR_GLIB_PARAM_FLAGS(READABLE));
 }
 
-void gtr_open_uri(Glib::ustring const& uri);
+void gtr_open_file(std::string_view base, std::string_view relative_path);
+void gtr_open_file(std::string_view filename);
+void gtr_open_uri(std::string_view uri);
 
-void gtr_open_file(std::string const& path);
-
-Glib::ustring gtr_get_help_uri();
+[[nodiscard]] std::string gtr_get_help_uri(std::string_view relative_path = "");
 
 /***
 ****
