@@ -704,13 +704,13 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = Glib::ustring(tr_torrentGetDownloadDir(torrents.front()));
+        std::string_view const baseline = tr_torrentGetDownloadDir(torrents.front());
         bool const is_uniform = std::all_of(
             torrents.begin(),
             torrents.end(),
             [&baseline](auto const* torrent) { return baseline == tr_torrentGetDownloadDir(torrent); });
 
-        str = is_uniform ? baseline : mixed;
+        str = is_uniform ? Glib::ustring{ baseline.data(), baseline.size() } : mixed;
     }
 
     destination_lb_->set_text(str);

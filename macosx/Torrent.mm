@@ -18,6 +18,7 @@
 #import "FileListNode.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
+#import "Utils.h"
 
 NSString* const kTorrentDidChangeGroupNotification = @"TorrentDidChangeGroup";
 
@@ -207,7 +208,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (NSString*)currentDirectory
 {
-    return @(tr_torrentGetCurrentDir(self.fHandle));
+    return tr_strv_to_utf8_nsstring(tr_torrentGetCurrentDir(self.fHandle));
 }
 
 - (void)getAvailability:(int8_t*)tab size:(int)size
@@ -2085,7 +2086,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     }
 
     //change the location if the group calls for it and it's either not already set or was set automatically before
-    if (((self.fDownloadFolderDetermination == TorrentDeterminationAutomatic) || !tr_torrentGetCurrentDir(self.fHandle)) &&
+    if (((self.fDownloadFolderDetermination == TorrentDeterminationAutomatic) || tr_torrentGetCurrentDir(self.fHandle).empty()) &&
         [GroupsController.groups usesCustomDownloadLocationForIndex:self.groupValue])
     {
         NSString* location = [GroupsController.groups customDownloadLocationForIndex:self.groupValue];
