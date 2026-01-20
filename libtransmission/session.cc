@@ -1002,11 +1002,11 @@ void tr_sessionSetIncompleteDir(tr_session* session, std::string_view const dir)
     session->setIncompleteDir(dir);
 }
 
-char const* tr_sessionGetIncompleteDir(tr_session const* session)
+std::string tr_sessionGetIncompleteDir(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->incompleteDir().c_str();
+    return session->incompleteDir();
 }
 
 void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool enabled)

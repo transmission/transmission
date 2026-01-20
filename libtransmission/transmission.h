@@ -250,7 +250,7 @@ void tr_sessionClose(tr_session* session, double timeout_secs = 15.0);
 void tr_sessionSetDownloadDir(tr_session* session, std::string_view download_dir);
 
 /** @brief get the per-session incomplete download folder */
-char const* tr_sessionGetIncompleteDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetIncompleteDir(tr_session const* session);
 
 /**
  * @brief set the per-session incomplete download folder.

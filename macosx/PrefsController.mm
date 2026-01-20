@@ -1324,7 +1324,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     NSString* downloadLocation = tr_strv_to_utf8_nsstring(tr_sessionGetDownloadDir(self.fHandle)).stringByStandardizingPath;
     [self.fDefaults setObject:downloadLocation forKey:@"DownloadFolder"];
 
-    NSString* incompleteLocation = @(tr_sessionGetIncompleteDir(self.fHandle)).stringByStandardizingPath;
+    NSString* incompleteLocation = tr_strv_to_utf8_nsstring(tr_sessionGetIncompleteDir(self.fHandle)).stringByStandardizingPath;
     [self.fDefaults setObject:incompleteLocation forKey:@"IncompleteDownloadFolder"];
 
     BOOL const useIncomplete = tr_sessionIsIncompleteDirEnabled(self.fHandle);
