@@ -922,7 +922,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* torrent, tr_torrent_metainfo cons
 /**
  * @return this torrent's name.
  */
-char const* tr_torrentName(tr_torrent const* tor);
+[[nodiscard]] std::string tr_torrentName(tr_torrent const* tor);
 
 /**
  * @brief find the location of a torrent's file by looking with and without

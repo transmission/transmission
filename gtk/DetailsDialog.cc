@@ -1138,8 +1138,8 @@ PeerModelColumns const peer_cols;
 
 void initPeerRow(
     Gtk::TreeModel::iterator const& iter,
-    std::string_view key,
-    std::string_view torrent_name,
+    std::string_view const key,
+    std::string_view const torrent_name,
     tr_peer_stat const* peer)
 {
     g_return_if_fail(peer != nullptr);
@@ -2053,7 +2053,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     }
 
     /* step 4: update the rows */
-    auto const summary_name = std::string(std::size(torrents) == 1 ? tr_torrentName(torrents.front()) : "");
+    auto const summary_name = std::size(torrents) == 1 ? tr_torrentName(torrents.front()) : ""s;
     for (auto const& [tor, tracker] : trackers)
     {
         auto const torrent_id = tr_torrentId(tor);

@@ -647,7 +647,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (NSString*)name
 {
-    return @(tr_torrentName(self.fHandle));
+    return tr_strv_to_utf8_nsstring(tr_torrentName(self.fHandle));
 }
 
 - (BOOL)isFolder
