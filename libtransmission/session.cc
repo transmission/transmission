@@ -963,11 +963,11 @@ void tr_sessionSetDownloadDir(tr_session* session, std::string_view const dir)
     session->setDownloadDir(dir);
 }
 
-char const* tr_sessionGetDownloadDir(tr_session const* session)
+std::string tr_sessionGetDownloadDir(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->downloadDir().c_str();
+    return session->downloadDir();
 }
 
 std::string tr_sessionGetConfigDir(tr_session const* session)

@@ -239,7 +239,7 @@ void tr_sessionClose(tr_session* session, double timeout_secs = 15.0);
  * This is set by `tr_sessionInit()` or `tr_sessionSetDownloadDir()`,
  * and can be overridden on a per-torrent basis by `tr_ctorSetDownloadDir()`.
  */
-char const* tr_sessionGetDownloadDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetDownloadDir(tr_session const* session);
 
 /**
  * @brief Set the per-session default download folder for new torrents.

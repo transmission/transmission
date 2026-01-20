@@ -16,6 +16,7 @@
 #import "BonjourController.h"
 #import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
+#import "Utils.h"
 
 typedef NS_ENUM(NSUInteger, DownloadPopupIndex) {
     DownloadPopupIndexFolder = 0,
@@ -1320,7 +1321,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.fDefaults setBool:encryptionMode == TR_ENCRYPTION_REQUIRED forKey:@"EncryptionRequire"];
 
     //download directory
-    NSString* downloadLocation = @(tr_sessionGetDownloadDir(self.fHandle)).stringByStandardizingPath;
+    NSString* downloadLocation = tr_strv_to_utf8_nsstring(tr_sessionGetDownloadDir(self.fHandle)).stringByStandardizingPath;
     [self.fDefaults setObject:downloadLocation forKey:@"DownloadFolder"];
 
     NSString* incompleteLocation = @(tr_sessionGetIncompleteDir(self.fHandle)).stringByStandardizingPath;

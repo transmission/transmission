@@ -54,7 +54,7 @@ protected:
 
 TEST_P(IncompleteDirTest, incompleteDir)
 {
-    auto const* download_dir = tr_sessionGetDownloadDir(session_);
+    std::string const download_dir = tr_sessionGetDownloadDir(session_);
     auto const* incomplete_dir = tr_sessionGetIncompleteDir(session_);
 
     // init an incomplete torrent.

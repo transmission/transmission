@@ -424,8 +424,8 @@ void DownloadingPage::on_core_prefs_changed(tr_quark const key)
 {
     if (key == TR_KEY_download_dir)
     {
-        char const* downloadDir = tr_sessionGetDownloadDir(core_->get_session());
-        freespace_label_->set_dir(downloadDir);
+        std::string const download_dir = tr_sessionGetDownloadDir(core_->get_session());
+        freespace_label_->set_dir(download_dir);
     }
 }
 
