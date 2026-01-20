@@ -194,6 +194,15 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, Args&&
 
 [[nodiscard]] std::string tr_strv_to_utf8_string(std::string_view sv);
 
+#ifdef __APPLE__
+#ifdef __OBJC__
+@class NSString;
+[[nodiscard]] std::string tr_strv_to_utf8_string(NSString* str);
+[[nodiscard]] NSString* tr_strv_to_utf8_nsstring(std::string_view sv);
+[[nodiscard]] NSString* tr_strv_to_utf8_nsstring(std::string_view sv, NSString* key, NSString* comment);
+#endif
+#endif
+
 [[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement = 0xFFFD /*�*/);
 
 // ---
