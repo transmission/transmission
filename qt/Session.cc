@@ -894,7 +894,7 @@ void Session::updateInfo(tr_variant* args_dict)
         prefs_.set(Prefs::RPC_PORT, tr_sessionGetRPCPort(session_));
         prefs_.set(Prefs::RPC_USERNAME, QString::fromUtf8(tr_sessionGetRPCUsername(session_)));
         prefs_.set(Prefs::RPC_WHITELIST_ENABLED, tr_sessionGetRPCWhitelistEnabled(session_));
-        prefs_.set(Prefs::RPC_WHITELIST, QString::fromUtf8(tr_sessionGetRPCWhitelist(session_)));
+        prefs_.set(Prefs::RPC_WHITELIST, QString::fromStdString(tr_sessionGetRPCWhitelist(session_)));
     }
 
     if (auto const size = dictFind<int>(args_dict, TR_KEY_blocklist_size); size && *size != blocklistSize())

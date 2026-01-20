@@ -1905,11 +1905,11 @@ void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view const white
     session->setRpcWhitelist(whitelist);
 }
 
-char const* tr_sessionGetRPCWhitelist(tr_session const* session)
+std::string tr_sessionGetRPCWhitelist(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->whitelist().c_str();
+    return session->rpc_server_->whitelist();
 }
 
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool enabled)

@@ -323,7 +323,7 @@ void tr_sessionSetRPCPort(tr_session* session, uint16_t port);
     @return a comma-separated string of whitelist domains.
     @see `tr_sessionInit`
     @see `tr_sessionSetRPCWhitelist` */
-char const* tr_sessionGetRPCWhitelist(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetRPCWhitelist(tr_session const* session);
 
 /**
  * @brief Specify a whitelist for remote RPC access
