@@ -1241,7 +1241,7 @@ bool core_read_rpc_response_idle(tr_variant& response)
     return false;
 }
 
-void core_read_rpc_response(tr_session* /*session*/, tr_variant&& response)
+void core_read_rpc_response(tr_variant&& response)
 {
     auto owned_response = std::make_shared<tr_variant>(std::move(response));
     Glib::signal_idle().connect([owned_response]() mutable { return core_read_rpc_response_idle(*owned_response); });
@@ -1272,7 +1272,7 @@ void Session::Impl::send_rpc_request(
     }
 
     // add id if we want a response
-    auto callback = std::function<void(tr_session*, tr_variant&&)>{};
+    auto callback = std::function<void(tr_variant&&)>{};
     if (on_response)
     {
         auto const id = nextId++;

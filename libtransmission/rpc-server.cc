@@ -367,7 +367,7 @@ void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std
         server->session,
         json,
         // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
-        [req, server](tr_session* /*session*/, tr_variant&& content)
+        [req, server](tr_variant&& content)
         {
             if (!content.has_value())
             {

@@ -43,10 +43,7 @@ namespace
     }
 
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session,
-        *request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session, *request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     return serde.to_string(response);
 }
@@ -57,10 +54,7 @@ TEST_F(RpcTest, EmptyRequest)
     static auto constexpr Request = ""sv;
 
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session_,
-        Request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session_, Request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     auto const* const response_map = response.get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
@@ -90,10 +84,7 @@ TEST_F(RpcTest, NotArrayOrObject)
     for (auto& req : requests)
     {
         auto response = tr_variant{};
-        tr_rpc_request_exec(
-            session_,
-            req,
-            [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+        tr_rpc_request_exec(session_, req, [&response](tr_variant&& resp) { response = std::move(resp); });
 
         auto const* const response_map = response.get_if<tr_variant::Map>();
         ASSERT_NE(response_map, nullptr);
@@ -126,10 +117,7 @@ TEST_F(RpcTest, JsonRpcWrongVersion)
     auto request = tr_variant{ std::move(request_map) };
 
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     auto const* const response_map = response.get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
@@ -169,10 +157,7 @@ TEST_F(RpcTest, idSync)
         auto request = tr_variant{ std::move(request_map) };
 
         auto response = tr_variant{};
-        tr_rpc_request_exec(
-            session_,
-            request,
-            [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+        tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
         auto const* const response_map = response.get_if<tr_variant::Map>();
         ASSERT_NE(response_map, nullptr);
@@ -217,10 +202,7 @@ TEST_F(RpcTest, idWrongType)
         auto request = tr_variant{ std::move(request_map) };
 
         auto response = tr_variant{};
-        tr_rpc_request_exec(
-            session_,
-            request,
-            [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+        tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
         auto const* const response_map = response.get_if<tr_variant::Map>();
         ASSERT_NE(response_map, nullptr);
@@ -252,10 +234,7 @@ TEST_F(RpcTest, tagSyncLegacy)
     auto request = tr_variant{ std::move(request_map) };
 
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     auto const* const response_map = response.get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
@@ -293,10 +272,7 @@ TEST_F(RpcTest, idAsync)
         auto request = tr_variant{ std::move(request_map) };
         auto promise = std::promise<tr_variant>{};
         auto future = promise.get_future();
-        tr_rpc_request_exec(
-            session_,
-            request,
-            [&promise](tr_session* /*session*/, tr_variant&& resp) { promise.set_value(std::move(resp)); });
+        tr_rpc_request_exec(session_, request, [&promise](tr_variant&& resp) { promise.set_value(std::move(resp)); });
         auto const response = future.get();
 
         auto const* const response_map = response.get_if<tr_variant::Map>();
@@ -346,10 +322,7 @@ TEST_F(RpcTest, tagAsyncLegacy)
     auto request = tr_variant{ std::move(request_map) };
     auto promise = std::promise<tr_variant>{};
     auto future = promise.get_future();
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&promise](tr_session* /*session*/, tr_variant&& resp) { promise.set_value(std::move(resp)); });
+    tr_rpc_request_exec(session_, request, [&promise](tr_variant&& resp) { promise.set_value(std::move(resp)); });
     auto const response = future.get();
 
     auto const* const response_map = response.get_if<tr_variant::Map>();
@@ -373,10 +346,7 @@ TEST_F(RpcTest, NotificationSync)
     auto request = tr_variant{ std::move(request_map) };
 
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     EXPECT_FALSE(response.has_value());
 }
@@ -398,10 +368,7 @@ TEST_F(RpcTest, NotificationAsync)
     auto request = tr_variant{ std::move(request_map) };
     auto promise = std::promise<tr_variant>{};
     auto future = promise.get_future();
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&promise](tr_session* /*session*/, tr_variant&& resp) { promise.set_value(std::move(resp)); });
+    tr_rpc_request_exec(session_, request, [&promise](tr_variant&& resp) { promise.set_value(std::move(resp)); });
     auto const response = future.get();
 
     EXPECT_FALSE(response.has_value());
@@ -419,10 +386,7 @@ TEST_F(RpcTest, tagNoHandler)
     auto request = tr_variant{ std::move(request_map) };
 
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     auto const* const response_map = response.get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
@@ -452,10 +416,7 @@ TEST_F(RpcTest, tagNoHandlerLegacy)
     auto request = tr_variant{ std::move(request_map) };
 
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     auto const* const response_map = response.get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
@@ -513,10 +474,7 @@ TEST_F(RpcTest, batch)
 
     auto request = tr_variant{ std::move(request_vec) };
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     auto* const response_vec_ptr = response.get_if<tr_variant::Vector>();
     ASSERT_NE(response_vec_ptr, nullptr);
@@ -632,10 +590,7 @@ TEST_F(RpcTest, sessionGet)
     auto request = tr_variant{ std::move(request_map) };
 
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     auto* response_map = response.get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
@@ -758,10 +713,7 @@ TEST_F(RpcTest, torrentGet)
 
     auto request = tr_variant{ std::move(request_map) };
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     auto* response_map = response.get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
@@ -799,10 +751,7 @@ TEST_F(RpcTest, torrentGetLegacy)
 
     auto request = tr_variant{ std::move(request_map) };
     auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session_,
-        request,
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
 
     auto* response_map = response.get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
