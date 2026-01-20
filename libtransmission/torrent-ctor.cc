@@ -100,9 +100,14 @@ bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* const ctor, std::string_view cons
     return ctor->set_metainfo_from_magnet_link(magnet, error);
 }
 
-char const* tr_ctorGetSourceFile(tr_ctor const* const ctor)
+std::optional<std::string> tr_ctorGetSourceFile(tr_ctor const* const ctor)
 {
-    return ctor->torrent_filename().c_str();
+    if (auto const& filename = ctor->torrent_filename(); !std::empty(filename))
+    {
+        return filename;
+    }
+
+    return {};
 }
 
 void tr_ctorSetFilePriorities(

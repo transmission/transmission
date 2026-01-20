@@ -788,8 +788,8 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);
 
 /** @brief Get the torrent file that this ctor's metainfo came from,
-           or nullptr if `tr_ctorSetMetainfoFromFile()` wasn't used */
-char const* tr_ctorGetSourceFile(tr_ctor const* ctor);
+           or empty if `tr_ctorSetMetainfoFromFile()` wasn't used */
+std::optional<std::string> tr_ctorGetSourceFile(tr_ctor const* ctor);
 
 /**
  * Instantiate a single torrent.
