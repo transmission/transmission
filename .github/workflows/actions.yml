@@ -94,6 +94,7 @@ jobs:
           sudo apt update
           sudo apt install -y clang-format-20
       - name: Get NPM
+        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
@@ -693,6 +694,7 @@ jobs:
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
           use-sudo: false
       - name: Get NPM
+        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
@@ -764,6 +766,7 @@ jobs:
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
           use-sudo: false
       - name: Get NPM
+        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
@@ -833,6 +836,7 @@ jobs:
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
           use-sudo: true
       - name: Get NPM
+        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
