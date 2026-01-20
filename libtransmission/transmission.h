@@ -346,7 +346,7 @@ void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);
 [[nodiscard]] std::string tr_sessionGetRPCPassword(tr_session const* session);
 void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
 
-char const* tr_sessionGetRPCUsername(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetRPCUsername(tr_session const* session);
 void tr_sessionSetRPCUsername(tr_session* session, std::string_view username);
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);

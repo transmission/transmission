@@ -1947,11 +1947,11 @@ void tr_sessionSetRPCUsername(tr_session* session, std::string_view const userna
     session->rpc_server_->set_username(username);
 }
 
-char const* tr_sessionGetRPCUsername(tr_session const* session)
+std::string tr_sessionGetRPCUsername(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->username().c_str();
+    return session->rpc_server_->username();
 }
 
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled)
