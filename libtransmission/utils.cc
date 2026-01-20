@@ -599,14 +599,21 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool
         return false;
     }
 
-    /* they might be on the same filesystem... */
-    if (tr_sys_path_rename(oldpath, newpath, error))
+    if (allow_copy)
     {
-        return true;
+        // they might be on the same filesystem...
+        if (tr_sys_path_rename(oldpath, newpath))
+        {
+            return true;
+        }
     }
-
-    if (!allow_copy)
+    else
     {
+        // do the actual moving
+        if (tr_sys_path_rename(oldpath, newpath, error))
+        {
+            return true;
+        }
         error->prefix_message("Unable to move file: ");
         return false;
     }
