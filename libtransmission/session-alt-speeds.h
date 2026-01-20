@@ -189,7 +189,7 @@ private:
     void set_active(bool active, ChangeReason reason, bool force);
 
     // whether `time` hits in one of the `minutes_` that is true
-    [[nodiscard]] bool is_active_minute(time_t time) const noexcept;
+    [[nodiscard]] bool is_active_minute(time_t time) const;
 
     static int constexpr MinutesPerHour = 60;
     static int constexpr MinutesPerDay = MinutesPerHour * 24;

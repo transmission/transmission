@@ -427,9 +427,9 @@ struct tr_address
         switch (type)
         {
         case TR_AF_INET:
-            return tr_address{ TR_AF_INET, { { { { INADDR_ANY } } } } };
+            return tr_address{ TR_AF_INET, { .addr4 = { INADDR_ANY } } };
         case TR_AF_INET6:
-            return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
+            return tr_address{ TR_AF_INET6, { .addr6 = IN6ADDR_ANY_INIT } };
         default:
             TR_ASSERT_MSG(false, "invalid type");
             return tr_address{};
@@ -472,8 +472,8 @@ struct tr_socket_address
         return port_;
     }
 
-    [[nodiscard]] static std::string display_name(tr_address const& address, tr_port port) noexcept;
-    [[nodiscard]] auto display_name() const noexcept
+    [[nodiscard]] static std::string display_name(tr_address const& address, tr_port port);
+    [[nodiscard]] auto display_name() const
     {
         return display_name(address_, port_);
     }

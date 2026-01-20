@@ -192,6 +192,7 @@ tr_variant& tr_variant::merge(tr_variant const& that)
     that.visit(
         [this](auto const& value)
         {
+            // TODO(c++20): use std::remove_cvref_t (P0550R2) when GCC >= 9.1
             using ValueType = std::decay_t<decltype(value)>;
 
             if constexpr (

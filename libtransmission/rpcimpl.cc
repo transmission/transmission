@@ -2606,6 +2606,9 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         [](tr_session const& /*src*/) -> tr_variant { return tr_variant::unmanaged_string(LONG_VERSION_STRING); },
         nullptr);
 
+    // `row` could have been replaced by structured bindings,
+    // but it's not available until clang 16
+    // https://github.com/llvm/llvm-project/commit/44f2baa3804a62ca793f0ff3e43aa71cea91a795
     for (auto const& row : tr_session::Scripts)
     {
         auto const script = row.script;

@@ -14,9 +14,9 @@
 struct tr_error
 {
 public:
-    tr_error() = default;
+    TR_CONSTEXPR_STR tr_error() = default;
 
-    tr_error(int code, std::string message)
+    TR_CONSTEXPR_STR tr_error(int code, std::string message)
         : message_{ std::move(message) }
         , code_{ code }
     {
@@ -27,7 +27,7 @@ public:
         return code_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto message() const noexcept
+    [[nodiscard]] TR_CONSTEXPR_STR auto message() const noexcept
     {
         return std::string_view{ message_ };
     }
@@ -42,24 +42,24 @@ public:
         return has_value();
     }
 
-    void set(int code, std::string&& message)
+    TR_CONSTEXPR_STR void set(int code, std::string&& message)
     {
         code_ = code;
         message_ = std::move(message);
     }
 
-    void set(int code, std::string_view message)
+    TR_CONSTEXPR_STR void set(int code, std::string_view message)
     {
         code_ = code;
         message_.assign(message);
     }
 
-    void set(int code, char const* const message)
+    TR_CONSTEXPR_STR void set(int code, char const* const message)
     {
         set(code, std::string_view{ message != nullptr ? message : "" });
     }
 
-    void prefix_message(std::string_view prefix)
+    TR_CONSTEXPR_STR void prefix_message(std::string_view prefix)
     {
         message_.insert(std::begin(message_), std::begin(prefix), std::end(prefix));
     }

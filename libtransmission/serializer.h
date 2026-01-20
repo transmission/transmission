@@ -31,6 +31,7 @@ namespace detail
 // NOLINTBEGIN(readability-identifier-naming)
 // use std-style naming for these traits
 
+// TODO(c++20): use std::remove_cvref_t (P0550R2) when GCC >= 9.1
 template<typename T>
 using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
 

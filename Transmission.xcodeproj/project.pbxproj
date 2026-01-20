@@ -483,6 +483,7 @@
 		EDC37BCD2EE9C2AD001E2612 /* api-compat.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDC37BCC2EE9C2AD001E2612 /* api-compat.cc */; };
 		EDC37BCE2EE9C2AD001E2612 /* api-compat.h in Headers */ = {isa = PBXBuildFile; fileRef = EDC37BCB2EE9C2AD001E2612 /* api-compat.h */; };
 		EDC749F92D98AE3000A12D0F /* PowerManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = EDC749F82D98AE2900A12D0F /* PowerManager.mm */; };
+		EDD735D62D83087400852628 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDD735D52D83087400852628 /* UniformTypeIdentifiers.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		F11545ACA7C4D7A464F703AB /* block-info.h in Headers */ = {isa = PBXBuildFile; fileRef = 6A044CBD8C049AFCBD4DB411 /* block-info.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		F63480631E1D7274005B9E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
 /* End PBXBuildFile section */
@@ -1478,6 +1479,7 @@
 		EDC37BCC2EE9C2AD001E2612 /* api-compat.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "api-compat.cc"; sourceTree = "<group>"; };
 		EDC749F72D98ADE200A12D0F /* PowerManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PowerManager.h; sourceTree = "<group>"; };
 		EDC749F82D98AE2900A12D0F /* PowerManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PowerManager.mm; sourceTree = "<group>"; };
+		EDD735D52D83087400852628 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 		F63480621E1D7274005B9E09 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Images/Images.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1505,6 +1507,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EDD735D62D83087400852628 /* UniformTypeIdentifiers.framework in Frameworks */,
 				C87369652809984200573C90 /* UserNotifications.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */,
@@ -2185,6 +2188,7 @@
 		A2F35BBA15C5A0A100EBF632 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EDD735D52D83087400852628 /* UniformTypeIdentifiers.framework */,
 				C87369642809984200573C90 /* UserNotifications.framework */,
 				55869925257074EC00F77A43 /* libcurl.tbd */,
 				C88771AB2803EE53005C7523 /* libiconv.tbd */,
@@ -4381,8 +4385,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(inherited)",
-					"-fmodules",
-					"-fcxx-modules",
+					"-fno-modules",
+					"-Xclang",
+					"-fno-cxx-modules",
 				);
 				PRODUCT_NAME = Transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4457,7 +4462,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -4644,8 +4649,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(inherited)",
-					"-fmodules",
-					"-fcxx-modules",
+					"-fno-modules",
+					"-Xclang",
+					"-fno-cxx-modules",
 				);
 				PRODUCT_NAME = Transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4662,7 +4668,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -4765,7 +4771,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -4849,8 +4855,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(inherited)",
-					"-fmodules",
-					"-fcxx-modules",
+					"-fno-modules",
+					"-Xclang",
+					"-fno-cxx-modules",
 				);
 				PRODUCT_NAME = Transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -5034,8 +5041,9 @@
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(inherited)",
-					"-fmodules",
-					"-fcxx-modules",
+					"-fno-modules",
+					"-Xclang",
+					"-fno-cxx-modules",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5061,8 +5069,9 @@
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(inherited)",
-					"-fmodules",
-					"-fcxx-modules",
+					"-fno-modules",
+					"-Xclang",
+					"-fno-cxx-modules",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5088,8 +5097,9 @@
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(inherited)",
-					"-fmodules",
-					"-fcxx-modules",
+					"-fno-modules",
+					"-Xclang",
+					"-fno-cxx-modules",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";

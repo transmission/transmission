@@ -3,7 +3,15 @@ HeaderFilterRegex: .*/libtransmission/.*
 
 # TODO: Enable `portability-template-virtual-member-function` after https://github.com/llvm/llvm-project/issues/139031 is fixed
 # TODO: Enable `cppcoreguidelines-pro-bounds-pointer-arithmetic` after converting all pointers to std::span
+# TODO: Enable `modernize-use-constraints` after GCC >= 10, clang 10
+# TODO: Enable `modernize-use-integer-sign-comparison` (P0586R2) after GCC >= 10.1, clang >= 13
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
+#
+# -modernize-use-ranges: GCC 10.1, clang 15
+# -modernize-loop-convert (P0896R4): GCC 10.1, clang 15
+# -readability-container-contains (P0458R2): GCC 9.1, clang 13
+# Ref: https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html
+# Ref: https://libcxx.llvm.org/Status/Cxx20.html
 Checks: >
   bugprone-*,
   -bugprone-branch-clone,
@@ -36,12 +44,18 @@ Checks: >
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
+  -modernize-loop-convert,
+  -modernize-use-constraints,
+  -modernize-use-designated-initializers,
+  -modernize-use-integer-sign-comparison,
+  -modernize-use-ranges,
   -modernize-use-trailing-return-type,
   performance-*,
   -performance-move-const-arg,
   portability-*,
   -portability-template-virtual-member-function,
   readability-*,
+  -readability-container-contains,
   -readability-enum-initial-value,
   -readability-function-cognitive-complexity,
   -readability-identifier-length,

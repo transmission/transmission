@@ -48,7 +48,7 @@ struct Config
     struct Units
     {
         template<typename... Names> // NOLINTNEXTLINE(google-explicit-constructor, cppcoreguidelines-pro-type-member-init)
-        Units(Base base, Names... names) noexcept
+        Units(Base base, Names... names)
         {
             set_base(base);
 
@@ -204,7 +204,7 @@ public:
         return compare(that) >= 0;
     }
 
-    std::string_view to_string(char* buf, size_t buflen) const noexcept
+    std::string_view to_string(char* buf, size_t buflen) const
     {
         auto idx = size_t{ 0 };
         auto val = 1.0 * base_quantity_;

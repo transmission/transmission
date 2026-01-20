@@ -40,7 +40,7 @@ public:
         return std::size(webseed_urls_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& webseed(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR_VEC auto const& webseed(size_t i) const
     {
         return webseed_urls_.at(i);
     }

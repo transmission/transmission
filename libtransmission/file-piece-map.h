@@ -45,7 +45,7 @@ public:
     explicit tr_file_piece_map(tr_torrent_metainfo const& tm);
     tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
 
-    [[nodiscard]] TR_CONSTEXPR20 piece_span_t piece_span_for_file(tr_file_index_t const file) const noexcept
+    [[nodiscard]] TR_CONSTEXPR_VEC piece_span_t piece_span_for_file(tr_file_index_t const file) const noexcept
     {
         return file_pieces_[file];
     }
@@ -59,7 +59,7 @@ public:
         return std::size(file_pieces_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto byte_span_for_file(tr_file_index_t const file) const
+    [[nodiscard]] TR_CONSTEXPR_VEC auto byte_span_for_file(tr_file_index_t const file) const
     {
         auto const& span = file_bytes_[file];
         return tr_byte_span_t{ span.begin, span.end };
@@ -84,7 +84,7 @@ private:
 class tr_file_priorities
 {
 public:
-    TR_CONSTEXPR20 explicit tr_file_priorities(tr_file_piece_map const* fpm) noexcept
+    TR_CONSTEXPR_VEC explicit tr_file_priorities(tr_file_piece_map const* fpm) noexcept
         : fpm_{ fpm }
     {
     }
