@@ -890,7 +890,7 @@ void Session::updateInfo(tr_variant* args_dict)
     {
         prefs_.set(Prefs::RPC_ENABLED, tr_sessionIsRPCEnabled(session_));
         prefs_.set(Prefs::RPC_AUTH_REQUIRED, tr_sessionIsRPCPasswordEnabled(session_));
-        prefs_.set(Prefs::RPC_PASSWORD, QString::fromUtf8(tr_sessionGetRPCPassword(session_)));
+        prefs_.set(Prefs::RPC_PASSWORD, QString::fromStdString(tr_sessionGetRPCPassword(session_)));
         prefs_.set(Prefs::RPC_PORT, tr_sessionGetRPCPort(session_));
         prefs_.set(Prefs::RPC_USERNAME, QString::fromUtf8(tr_sessionGetRPCUsername(session_)));
         prefs_.set(Prefs::RPC_WHITELIST_ENABLED, tr_sessionGetRPCWhitelistEnabled(session_));

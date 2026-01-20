@@ -1933,11 +1933,11 @@ void tr_sessionSetRPCPassword(tr_session* session, std::string_view const passwo
     session->rpc_server_->set_password(password);
 }
 
-char const* tr_sessionGetRPCPassword(tr_session const* session)
+std::string tr_sessionGetRPCPassword(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->get_salted_password().c_str();
+    return session->rpc_server_->get_salted_password();
 }
 
 void tr_sessionSetRPCUsername(tr_session* session, std::string_view const username)
