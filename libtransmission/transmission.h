@@ -701,7 +701,7 @@ bool tr_blocklistIsEnabled(tr_session const* session);
 
 void tr_blocklistSetEnabled(tr_session* session, bool is_enabled);
 
-char const* tr_blocklistGetURL(tr_session const* session);
+[[nodiscard]] std::string tr_blocklistGetURL(tr_session const* session);
 
 /** @brief The blocklist that gets updated when an RPC client
            invokes the "blocklist_update" method */

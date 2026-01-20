@@ -1837,9 +1837,9 @@ void tr_blocklistSetURL(tr_session* session, std::string_view const url)
     session->setBlocklistUrl(url);
 }
 
-char const* tr_blocklistGetURL(tr_session const* session)
+std::string tr_blocklistGetURL(tr_session const* session)
 {
-    return session->blocklistUrl().c_str();
+    return session->blocklistUrl();
 }
 
 // ---

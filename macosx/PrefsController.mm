@@ -1417,7 +1417,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const blocklist = tr_blocklistIsEnabled(self.fHandle);
     [self.fDefaults setBool:blocklist forKey:@"BlocklistNew"];
 
-    NSString* blocklistURL = @(tr_blocklistGetURL(self.fHandle));
+    NSString* blocklistURL = tr_strv_to_utf8_nsstring(tr_blocklistGetURL(self.fHandle));
     [self.fDefaults setObject:blocklistURL forKey:@"BlocklistURL"];
 
     //seed ratio
