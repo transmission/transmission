@@ -1994,12 +1994,12 @@ void tr_sessionSetScript(tr_session* session, TrScript type, std::string_view co
     session->setScript(type, script);
 }
 
-char const* tr_sessionGetScript(tr_session const* session, TrScript type)
+std::string tr_sessionGetScript(tr_session const* const session, TrScript const type)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->script(type).c_str();
+    return session->script(type);
 }
 
 // ---

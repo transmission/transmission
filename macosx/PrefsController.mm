@@ -1457,7 +1457,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const doneScriptEnabled = tr_sessionIsScriptEnabled(self.fHandle, TR_SCRIPT_ON_TORRENT_DONE);
     [self.fDefaults setBool:doneScriptEnabled forKey:@"DoneScriptEnabled"];
 
-    NSString* doneScriptPath = @(tr_sessionGetScript(self.fHandle, TR_SCRIPT_ON_TORRENT_DONE));
+    NSString* doneScriptPath = tr_strv_to_utf8_nsstring(tr_sessionGetScript(self.fHandle, TR_SCRIPT_ON_TORRENT_DONE));
     [self.fDefaults setObject:doneScriptPath forKey:@"DoneScriptPath"];
 
     //update gui if loaded

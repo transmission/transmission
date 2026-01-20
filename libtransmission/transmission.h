@@ -660,7 +660,7 @@ enum TrScript : uint8_t
     TR_SCRIPT_N_TYPES
 };
 
-char const* tr_sessionGetScript(tr_session const* session, TrScript type);
+[[nodiscard]] std::string tr_sessionGetScript(tr_session const* session, TrScript type);
 
 void tr_sessionSetScript(tr_session* session, TrScript type, std::string_view script_filename);
 
