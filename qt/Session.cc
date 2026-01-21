@@ -235,7 +235,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_USERNAME:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCUsername(session_, prefs_.get<QString>(key).toUtf8().constData());
+                tr_sessionSetRPCUsername(session_, prefs_.get<QString>(key).toStdString());
             }
 
             break;

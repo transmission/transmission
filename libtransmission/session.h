@@ -1316,7 +1316,7 @@ private:
     friend void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
     friend void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetRPCPort(tr_session* session, uint16_t hport);
-    friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
+    friend void tr_sessionSetRPCUsername(tr_session* session, std::string_view username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);

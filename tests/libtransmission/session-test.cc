@@ -131,12 +131,9 @@ TEST_F(SessionTest, propertiesApi)
 
     for (auto const& value : { "foo"sv, "bar"sv, ""sv })
     {
-        tr_sessionSetRPCUsername(session, std::string{ value }.c_str());
+        tr_sessionSetRPCUsername(session, value);
         EXPECT_EQ(value, tr_sessionGetRPCUsername(session));
     }
-
-    tr_sessionSetRPCUsername(session, nullptr);
-    EXPECT_EQ(""sv, tr_sessionGetRPCUsername(session));
 
     // rpc password (unsalted)
 

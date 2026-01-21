@@ -1940,11 +1940,11 @@ char const* tr_sessionGetRPCPassword(tr_session const* session)
     return session->rpc_server_->get_salted_password().c_str();
 }
 
-void tr_sessionSetRPCUsername(tr_session* session, char const* username)
+void tr_sessionSetRPCUsername(tr_session* session, std::string_view const username)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->set_username(username != nullptr ? username : "");
+    session->rpc_server_->set_username(username);
 }
 
 char const* tr_sessionGetRPCUsername(tr_session const* session)
