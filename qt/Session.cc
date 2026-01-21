@@ -55,41 +55,11 @@ using ::trqt::variant_helpers::getValue;
 ****
 ***/
 
-void Session::sessionSet(tr_quark const key, QVariant const& value)
+void Session::sessionSet(tr_quark const key, tr_variant val)
 {
-    tr_variant args;
+    auto args = tr_variant{};
     tr_variantInitDict(&args, 1);
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
-    switch (value.typeId())
-#else
-    switch (value.userType())
-#endif
-    {
-    case QMetaType::Bool:
-        dictAdd(&args, key, value.toBool());
-        break;
-
-    case QMetaType::Int:
-        dictAdd(&args, key, value.toInt());
-        break;
-
-    case QMetaType::Double:
-        dictAdd(&args, key, value.toDouble());
-        break;
-
-    case QMetaType::QString:
-        dictAdd(&args, key, value.toString());
-        break;
-
-    case UserMetaType::EncryptionModeType:
-        *tr_variantDictAdd(&args, key) = to_variant(value.value<tr_encryption_mode>());
-        break;
-
-    default:
-        assert(false);
-    }
-
+    *tr_variantDictAdd(&args, key) = std::move(val);
     exec(TR_KEY_session_set, &args);
 }
 
@@ -209,21 +179,27 @@ void Session::updatePref(int key)
         case Prefs::USPEED:
         case Prefs::USPEED_ENABLED:
         case Prefs::UTP_ENABLED:
-            sessionSet(Prefs::getKey(key), prefs_.variant(key));
+            {
+                auto [pref_key, pref_val] = prefs_.keyval(key);
+                sessionSet(pref_key, std::move(pref_val));
+            }
             break;
 
         case Prefs::DOWNLOAD_DIR:
-            sessionSet(Prefs::getKey(key), prefs_.variant(key));
+            {
+                auto [pref_key, pref_val] = prefs_.keyval(key);
+                sessionSet(pref_key, std::move(pref_val));
+            }
             /* this will change the 'freespace' argument, so refresh */
             refreshSessionInfo();
             break;
 
         case Prefs::RATIO:
-            sessionSet(TR_KEY_seed_ratio_limit, prefs_.variant(key));
+            sessionSet(TR_KEY_seed_ratio_limit, prefs_.keyval(key).second);
             break;
 
         case Prefs::RATIO_ENABLED:
-            sessionSet(TR_KEY_seed_ratio_limited, prefs_.variant(key));
+            sessionSet(TR_KEY_seed_ratio_limited, prefs_.keyval(key).second);
             break;
 
         case Prefs::RPC_AUTH_REQUIRED:
@@ -891,7 +867,8 @@ void Session::updateInfo(tr_variant* args_dict)
 
     for (int i = Prefs::FIRST_CORE_PREF; i <= Prefs::LAST_CORE_PREF; ++i)
     {
-        tr_variant const* b(tr_variantDictFind(args_dict, Prefs::getKey(i)));
+        auto const pref_key = prefs_.keyval(i).first;
+        tr_variant const* b(tr_variantDictFind(args_dict, pref_key));
 
         if (b == nullptr)
         {

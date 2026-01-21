@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include <utility>
 
 #include <QObject>
 #include <QString>
@@ -139,15 +140,12 @@ public:
         return FIRST_CORE_PREF <= idx && idx <= LAST_CORE_PREF;
     }
 
-    [[nodiscard]] static auto constexpr getKey(int const idx)
-    {
-        return Items[idx].key;
-    }
-
     [[nodiscard]] static auto constexpr type(int const idx)
     {
         return Items[idx].type;
     }
+
+    [[nodiscard]] std::pair<tr_quark, tr_variant> keyval(int idx) const;
 
     void loadFromConfigDir(QString dir);
 
