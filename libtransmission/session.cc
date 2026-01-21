@@ -1926,11 +1926,11 @@ bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session)
     return session->useRpcWhitelist();
 }
 
-void tr_sessionSetRPCPassword(tr_session* session, char const* password)
+void tr_sessionSetRPCPassword(tr_session* session, std::string_view const password)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->set_password(password != nullptr ? password : "");
+    session->rpc_server_->set_password(password);
 }
 
 char const* tr_sessionGetRPCPassword(tr_session const* session)

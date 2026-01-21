@@ -1256,7 +1256,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_rpc_password:
-        tr_sessionSetRPCPassword(tr, gtr_pref_string_get(key).c_str());
+        tr_sessionSetRPCPassword(tr, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_rpc_authentication_required:

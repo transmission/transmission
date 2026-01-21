@@ -142,7 +142,7 @@ TEST_F(SessionTest, propertiesApi)
 
     {
         auto const value = "foo"sv;
-        tr_sessionSetRPCPassword(session, std::string{ value }.c_str());
+        tr_sessionSetRPCPassword(session, value);
         EXPECT_NE(value, tr_sessionGetRPCPassword(session));
         EXPECT_EQ('{', tr_sessionGetRPCPassword(session)[0]);
     }
@@ -152,7 +152,7 @@ TEST_F(SessionTest, propertiesApi)
     {
         auto const plaintext = "foo"sv;
         auto const salted = tr_ssha1(plaintext);
-        tr_sessionSetRPCPassword(session, salted.c_str());
+        tr_sessionSetRPCPassword(session, salted);
         EXPECT_EQ(salted, tr_sessionGetRPCPassword(session));
     }
 

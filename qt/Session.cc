@@ -219,7 +219,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_PASSWORD:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCPassword(session_, prefs_.get<QString>(key).toUtf8().constData());
+                tr_sessionSetRPCPassword(session_, prefs_.get<QString>(key).toStdString());
             }
 
             break;
