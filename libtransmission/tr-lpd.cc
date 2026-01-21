@@ -139,7 +139,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
     {
         // parse `${major}.${minor}`
         auto walk = announce.substr(pos + std::size(key));
-        if (auto const major = tr_num_parse<int>(walk, &walk); major && tr_strv_starts_with(walk, '.'))
+        if (auto const major = tr_num_parse<int>(walk, &walk); major && walk.starts_with('.'))
         {
             ret.major = *major;
         }
@@ -149,7 +149,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
         }
 
         walk.remove_prefix(1); // the '.' between major and minor
-        if (auto const minor = tr_num_parse<int>(walk, &walk); minor && tr_strv_starts_with(walk, CrLf))
+        if (auto const minor = tr_num_parse<int>(walk, &walk); minor && walk.starts_with(CrLf))
         {
             ret.minor = *minor;
         }
@@ -163,7 +163,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
     if (auto const pos = announce.find(key); pos != std::string_view::npos)
     {
         auto walk = announce.substr(pos + std::size(key));
-        if (auto const port = tr_num_parse<uint16_t>(walk, &walk); port && tr_strv_starts_with(walk, CrLf))
+        if (auto const port = tr_num_parse<uint16_t>(walk, &walk); port && walk.starts_with(CrLf))
         {
             ret.port = tr_port::from_host(*port);
         }

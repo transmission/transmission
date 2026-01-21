@@ -37,7 +37,7 @@
 #include "libtransmission/net.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
-#include "libtransmission/utils.h" // for _(), tr_strerror(), tr_strv_ends_with()
+#include "libtransmission/utils.h" // for _(), tr_strerror()
 
 using namespace std::literals;
 
@@ -320,7 +320,7 @@ auto parseFile(std::string_view filename)
     return ranges;
 }
 
-auto getFilenamesInDir(std::string_view folder)
+[[nodiscard]] auto getFilenamesInDir(std::string_view folder)
 {
     auto const prefix = std::string{ folder } + '/';
     auto files = tr_sys_dir_get_files(folder);
@@ -532,7 +532,7 @@ std::vector<Blocklists::Blocklist> Blocklists::Blocklists::load_folder(std::stri
     // check for files that need to be updated
     for (auto const& src_file : getFilenamesInDir(folder))
     {
-        if (tr_strv_ends_with(src_file, BinFileSuffix))
+        if (src_file.ends_with(BinFileSuffix))
         {
             continue;
         }
@@ -554,7 +554,7 @@ std::vector<Blocklists::Blocklist> Blocklists::Blocklists::load_folder(std::stri
     auto ret = std::vector<Blocklist>{};
     for (auto const& bin_file : getFilenamesInDir(folder))
     {
-        if (tr_strv_ends_with(bin_file, BinFileSuffix))
+        if (bin_file.ends_with(BinFileSuffix))
         {
             ret.emplace_back(bin_file, is_enabled);
         }
