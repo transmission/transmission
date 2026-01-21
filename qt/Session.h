@@ -15,8 +15,8 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QNetworkReply>
 #include <QTimer>
-#include <QNetworkAccessManager>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
@@ -39,7 +39,7 @@ class Session : public QObject
     Q_OBJECT
 
 public:
-    Session(QString config_dir, Prefs& prefs);
+    Session(QString config_dir, Prefs& prefs, RpcClient& rpc);
     Session(Session&&) = delete;
     Session(Session const&) = delete;
     Session& operator=(Session&&) = delete;
@@ -193,8 +193,7 @@ private:
     QString session_version_;
     QString session_id_;
     bool is_definitely_local_session_ = true;
-    QNetworkAccessManager nam_;
-    RpcClient rpc_;
+    RpcClient& rpc_;
     torrent_ids_t const RecentlyActiveIDs = { -1 };
 
     std::map<QString, QString> duplicates_;
