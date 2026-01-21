@@ -260,16 +260,27 @@ void Application::loadTranslations()
 
     auto const qt_file_name = QStringLiteral("qtbase");
 
-    QLocale const locale;
-    QLocale const english_locale(QLocale::English, QLocale::UnitedStates);
+    // Determine the full UI locale if available, otherwise fall back to the system locale.
+    QStringList uiLangs = QLocale::uiLanguages();
+    QLocale uiLocale = uiLangs.isEmpty() ? QLocale::system() : QLocale(uiLangs.first());
 
-    if (loadTranslation(qt_translator_, qt_file_name, locale, qt_qm_dirs) ||
+    // Also prepare a language-only locale to use as a fallback for translation lookup
+    // (this prevents region-only differences from forcing a region-specific translation).
+    QLocale languageOnlyLocale(uiLocale.language(), QLocale::AnyCountry);
+
+    // Keep an English-language fallback (language-only).
+    QLocale const english_locale(QLocale::English, QLocale::AnyCountry);
+
+    // Try (in order): exact UI locale, language-only fallback, English.
+    if (loadTranslation(qt_translator_, qt_file_name, uiLocale, qt_qm_dirs) ||
+        loadTranslation(qt_translator_, qt_file_name, languageOnlyLocale, qt_qm_dirs) ||
         loadTranslation(qt_translator_, qt_file_name, english_locale, qt_qm_dirs))
     {
         installTranslator(&qt_translator_);
     }
 
-    if (loadTranslation(app_translator_, ConfigName, locale, app_qm_dirs) ||
+    if (loadTranslation(app_translator_, ConfigName, uiLocale, app_qm_dirs) ||
+        loadTranslation(app_translator_, ConfigName, languageOnlyLocale, app_qm_dirs) ||
         loadTranslation(app_translator_, ConfigName, english_locale, app_qm_dirs))
     {
         installTranslator(&app_translator_);
