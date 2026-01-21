@@ -271,7 +271,7 @@ char const* tr_sessionGetIncompleteDir(tr_session const* session);
  * @see `tr_sessionSetIncompleteDirEnabled()`
  * @see `tr_sessionGetIncompleteDirEnabled()`
  */
-void tr_sessionSetIncompleteDir(tr_session* session, char const* dir);
+void tr_sessionSetIncompleteDir(tr_session* session, std::string_view dir);
 
 /** @brief get whether or not the incomplete download folder is enabled */
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session);

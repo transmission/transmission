@@ -995,11 +995,11 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)
 
 // ---
 
-void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
+void tr_sessionSetIncompleteDir(tr_session* session, std::string_view const dir)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setIncompleteDir(dir != nullptr ? dir : "");
+    session->setIncompleteDir(dir);
 }
 
 char const* tr_sessionGetIncompleteDir(tr_session const* session)

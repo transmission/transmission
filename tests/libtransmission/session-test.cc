@@ -61,14 +61,10 @@ TEST_F(SessionTest, propertiesApi)
         EXPECT_EQ(value, session->incompleteDir());
         EXPECT_EQ(value, tr_sessionGetIncompleteDir(session));
 
-        tr_sessionSetIncompleteDir(session, std::string(value).c_str());
+        tr_sessionSetIncompleteDir(session, value);
         EXPECT_EQ(value, session->incompleteDir());
         EXPECT_EQ(value, tr_sessionGetIncompleteDir(session));
     }
-
-    tr_sessionSetIncompleteDir(session, nullptr);
-    EXPECT_EQ(""sv, session->incompleteDir());
-    EXPECT_EQ(""sv, tr_sessionGetIncompleteDir(session));
 
     // script
 
