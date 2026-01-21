@@ -333,7 +333,7 @@ char const* tr_sessionGetRPCWhitelist(tr_session const* session);
  * `'?'` is interpreted as a single-character wildcard and
  * `'*'` is interpreted as a multi-character wildcard.
  */
-void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist);
+void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view whitelist);
 
 bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session);
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);

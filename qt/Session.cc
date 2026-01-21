@@ -251,7 +251,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_WHITELIST:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCWhitelist(session_, prefs_.get<QString>(key).toUtf8().constData());
+                tr_sessionSetRPCWhitelist(session_, prefs_.get<QString>(key).toStdString());
             }
 
             break;

@@ -1898,11 +1898,11 @@ void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_
     session->rpc_func_user_data_ = user_data;
 }
 
-void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist)
+void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view const whitelist)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setRpcWhitelist(whitelist != nullptr ? whitelist : "");
+    session->setRpcWhitelist(whitelist);
 }
 
 char const* tr_sessionGetRPCWhitelist(tr_session const* session)
