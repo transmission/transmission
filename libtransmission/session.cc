@@ -1986,12 +1986,12 @@ bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type)
     return session->useScript(type);
 }
 
-void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
+void tr_sessionSetScript(tr_session* session, TrScript type, std::string_view const script)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->setScript(type, script != nullptr ? script : "");
+    session->setScript(type, script);
 }
 
 char const* tr_sessionGetScript(tr_session const* session, TrScript type)

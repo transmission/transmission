@@ -662,7 +662,7 @@ enum TrScript : uint8_t
 
 char const* tr_sessionGetScript(tr_session const* session, TrScript type);
 
-void tr_sessionSetScript(tr_session* session, TrScript type, char const* script_filename);
+void tr_sessionSetScript(tr_session* session, TrScript type, std::string_view script_filename);
 
 bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type);
 

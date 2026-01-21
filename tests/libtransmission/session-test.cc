@@ -76,14 +76,10 @@ TEST_F(SessionTest, propertiesApi)
             EXPECT_EQ(value, session->script(type));
             EXPECT_EQ(value, tr_sessionGetScript(session, type));
 
-            tr_sessionSetScript(session, type, std::string(value).c_str());
+            tr_sessionSetScript(session, type, value);
             EXPECT_EQ(value, session->script(type));
             EXPECT_EQ(value, tr_sessionGetScript(session, type));
         }
-
-        tr_sessionSetScript(session, type, nullptr);
-        EXPECT_EQ(""sv, session->script(type));
-        EXPECT_EQ(""sv, tr_sessionGetScript(session, type));
 
         for (auto const value : { true, false })
         {
