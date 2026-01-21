@@ -1157,7 +1157,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_blocklist_url:
-        tr_blocklistSetURL(tr, gtr_pref_string_get(key).c_str());
+        tr_blocklistSetURL(tr, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_show_notification_area_icon:

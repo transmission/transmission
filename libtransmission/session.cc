@@ -1832,9 +1832,9 @@ size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
     return session->blocklists_.update_primary_blocklist(content_filename, session->blocklist_enabled());
 }
 
-void tr_blocklistSetURL(tr_session* session, char const* url)
+void tr_blocklistSetURL(tr_session* session, std::string_view const url)
 {
-    session->setBlocklistUrl(url != nullptr ? url : "");
+    session->setBlocklistUrl(url);
 }
 
 char const* tr_blocklistGetURL(tr_session const* session)

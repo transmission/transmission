@@ -705,7 +705,7 @@ char const* tr_blocklistGetURL(tr_session const* session);
 
 /** @brief The blocklist that gets updated when an RPC client
            invokes the "blocklist_update" method */
-void tr_blocklistSetURL(tr_session* session, char const* url);
+void tr_blocklistSetURL(tr_session* session, std::string_view url);
 
 /** @} */
 
