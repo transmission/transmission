@@ -32,8 +32,13 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Detect platform
+      id: platform
+      uses: ./.github/actions/detect-platform
     - name: Configure test environment
       shell: bash
+      env:
+        OS_FAMILY: ${{ steps.platform.outputs.os-family }}
       run: |
         set -euo pipefail
 
@@ -63,7 +68,13 @@ runs:
         fi
 
         if [[ "$enable_asan" == "true" ]]; then
-          asan_opts="abort_on_error=1:allocator_may_return_null=1:check_initialization_order=1:detect_leaks=1:halt_on_error=1:print_stacktrace=1:strict_string_checks=1:symbolize=1:verbosity=0"
+          os_family="${OS_FAMILY:-unknown}"
+          detect_leaks_opt="detect_leaks=1"
+          if [[ "$os_family" == "macos" ]]; then
+            # don't run on unsupported platforms
+            detect_leaks_opt="detect_leaks=0"
+          fi
+          asan_opts="abort_on_error=1:allocator_may_return_null=1:check_initialization_order=1:${detect_leaks_opt}:halt_on_error=1:print_stacktrace=1:strict_string_checks=1:symbolize=1:verbosity=0"
           if [[ -n "${{ inputs.extra-asan-options }}" ]]; then
             asan_opts+="${asan_opts:+:}${{ inputs.extra-asan-options }}"
           fi
