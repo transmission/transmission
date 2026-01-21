@@ -195,7 +195,7 @@ std::string tr_magnet_metainfo::magnet() const
 
 void tr_magnet_metainfo::set_name(std::string_view name)
 {
-    name_ = tr_strv_convert_utf8(name);
+    name_ = tr_strv_to_utf8_string(name);
 }
 
 void tr_magnet_metainfo::add_webseed(std::string_view webseed)

@@ -119,9 +119,9 @@ private:
 
     enum class is_updating_t : uint8_t
     {
-        NO = 0,
-        YES,
-        ABORT
+        No = 0,
+        Yes,
+        Abort
     };
     array_ip_t<is_updating_t> is_updating_ = {};
 

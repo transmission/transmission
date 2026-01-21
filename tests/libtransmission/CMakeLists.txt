@@ -60,6 +60,12 @@ target_sources(libtransmission-test
         watchdir-test.cc
         web-utils-test.cc)
 
+if(APPLE)
+    target_sources(libtransmission-test
+        PRIVATE
+            utils-apple-test.mm)
+endif()
+
 set_property(
     TARGET libtransmission-test
     PROPERTY FOLDER "tests")
