@@ -178,6 +178,22 @@ void Prefs::load(tr_variant::Map const& settings)
     }
 }
 
+void Prefs::set(int const key, tr_variant const& value)
+{
+    auto const tmp = qvarFromTVar(value, Items[key].type);
+    if (tmp.isNull())
+    {
+        return;
+    }
+
+    auto& v = values_[key];
+    if (v.isNull() || v != tmp)
+    {
+        v = tmp;
+        emit changed(key);
+    }
+}
+
 tr_variant::Map Prefs::current_settings() const
 {
     auto map = tr_variant::Map{ PREFS_COUNT };

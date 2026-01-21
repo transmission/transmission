@@ -45,11 +45,9 @@
 
 using namespace std::literals;
 
-using ::libtransmission::serializer::to_value;
 using ::libtransmission::serializer::to_variant;
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
-using ::trqt::variant_helpers::getValue;
 
 /***
 ****
@@ -874,52 +872,7 @@ void Session::updateInfo(tr_variant* args_dict)
         {
             continue;
         }
-
-        switch (Prefs::type(i))
-        {
-        case QMetaType::Int:
-            if (auto const value = getValue<int>(b); value)
-            {
-                prefs_.set(i, *value);
-            }
-
-            break;
-
-        case QMetaType::Double:
-            if (auto const value = getValue<double>(b); value)
-            {
-                prefs_.set(i, *value);
-            }
-
-            break;
-
-        case QMetaType::Bool:
-            if (auto const value = getValue<bool>(b); value)
-            {
-                prefs_.set(i, *value);
-            }
-
-            break;
-
-        case UserMetaType::EncryptionModeType:
-            if (auto const val = to_value<tr_encryption_mode>(*b))
-            {
-                prefs_.set(i, *val);
-            }
-
-            break;
-
-        case QMetaType::QString:
-            if (auto const value = getValue<QString>(b); value)
-            {
-                prefs_.set(i, *value);
-            }
-
-            break;
-
-        default:
-            break;
-        }
+        prefs_.set(i, *b);
     }
 
     if (auto const b = dictFind<bool>(args_dict, TR_KEY_seed_ratio_limited))
