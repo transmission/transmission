@@ -1747,11 +1747,11 @@ void tr_session::setDefaultTrackers(std::string_view trackers)
     }
 }
 
-void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
+void tr_sessionSetDefaultTrackers(tr_session* session, std::string_view const trackers)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setDefaultTrackers(trackers != nullptr ? trackers : "");
+    session->setDefaultTrackers(trackers);
 }
 
 // ---

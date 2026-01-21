@@ -352,7 +352,7 @@ void tr_sessionSetRPCUsername(tr_session* session, std::string_view username);
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool is_enabled);
 
-void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers);
+void tr_sessionSetDefaultTrackers(tr_session* session, std::string_view trackers);
 
 enum tr_rpc_callback_type : uint8_t
 {

@@ -1137,7 +1137,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_default_trackers:
-        tr_sessionSetDefaultTrackers(tr, gtr_pref_string_get(key).c_str());
+        tr_sessionSetDefaultTrackers(tr, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_download_dir:
