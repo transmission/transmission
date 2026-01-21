@@ -162,7 +162,11 @@ jobs:
             -DENABLE_TESTS=ON \
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu`
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
@@ -208,7 +212,10 @@ jobs:
             -DENABLE_TESTS=ON \
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Homebrew` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew`
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
@@ -249,7 +256,11 @@ jobs:
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-            -DRUN_CLANG_TIDY=ON
+            -DRUN_CLANG_TIDY=ON \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu`
       - name: Make (Core)
         run: cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
       - name: Make (Tests)
@@ -288,7 +299,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Debug `
             -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} `
-            -DRUN_CLANG_TIDY=ON
+            -DRUN_CLANG_TIDY=ON `
+            -DUSE_SYSTEM_DEFAULT=OFF
       - name: Make (Core)
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
@@ -386,7 +398,9 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_Crc32c=ON
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Homebrew` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew`
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -430,8 +444,11 @@ jobs:
             fmt-dev \
             gettext-dev \
             git \
+            libdeflate-dev \
+            libdeflate-static \
             libevent-dev \
-            libpsl \
+            libnatpmp-dev \
+            libpsl-dev \
             linux-headers \
             miniupnpc-dev \
             ninja \
@@ -468,7 +485,10 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_CRC32C=ON
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_B64=OFF `# Not packaged in Alpine` \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Alpine` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Alpine`
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -533,7 +553,8 @@ jobs:
             -DENABLE_UTILS=ON `
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_WERROR=ON `
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF `
+            -DUSE_SYSTEM_DEFAULT=OFF
       - name: Make
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
@@ -666,14 +687,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_EVENT2=OFF \
-            -DUSE_SYSTEM_DEFLATE=OFF \
-            -DUSE_SYSTEM_DHT=OFF \
-            -DUSE_SYSTEM_MINIUPNPC=OFF \
-            -DUSE_SYSTEM_NATPMP=OFF \
-            -DUSE_SYSTEM_UTP=OFF \
-            -DUSE_SYSTEM_B64=OFF \
-            -DUSE_SYSTEM_PSL=OFF
+            -DUSE_SYSTEM_DEFAULT=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -744,7 +758,11 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian 11` \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian 11` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian 11`
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -819,7 +837,9 @@ jobs:
             -DENABLE_DEPRECATED=ON \
             -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_Crc32c=ON
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Fedora` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Fedora`
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -888,7 +908,11 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu`
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -997,6 +1021,10 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu`
       - name: Make
         run: cmake --build obj --config RelWithDebInfo -- "-k 0"
