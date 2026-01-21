@@ -126,9 +126,9 @@ void g_signal_callback(
         }
         else if (action == "file")
         {
-            char const* dir = tr_torrentGetDownloadDir(tor);
-            auto const path = Glib::build_filename(dir, tr_torrentFile(tor, 0).name);
-            gtr_open_file(path);
+            std::string_view const base_dir = tr_torrentGetDownloadDir(tor);
+            std::string_view const relative_path = tr_torrentFile(tor, 0).name;
+            gtr_open_file(base_dir, relative_path);
         }
         else if (action == "start-now")
         {
