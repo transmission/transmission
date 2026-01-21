@@ -133,7 +133,7 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     }
 }
 
-void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
+void bandwidthGroupWrite(tr_session const* session, std::string_view const config_dir)
 {
     auto const& groups = session->bandwidthGroups();
     auto groups_map = tr_variant::Map{ std::size(groups) };
@@ -504,7 +504,7 @@ tr_variant tr_sessionLoadSettings(std::string_view const config_dir, tr_variant 
     return settings;
 }
 
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings)
+void tr_sessionSaveSettings(tr_session* session, std::string_view const config_dir, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 

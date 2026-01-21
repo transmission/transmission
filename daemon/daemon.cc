@@ -854,11 +854,10 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     }
 
     /* start the session */
-    auto const* const cdir = this->config_dir_.c_str();
     auto* session = tr_sessionInit(config_dir_, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
     tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", config_dir_)));
-    tr_sessionSaveSettings(session, cdir, settings_);
+    tr_sessionSaveSettings(session, config_dir_, settings_);
 
     auto const* const settings_map = settings_.get_if<tr_variant::Map>();
     if (settings_map == nullptr)
@@ -1013,7 +1012,7 @@ CLEANUP:
 
     event_base_free(ev_base_);
 
-    tr_sessionSaveSettings(my_session_, cdir, settings_);
+    tr_sessionSaveSettings(my_session_, config_dir_, settings_);
     tr_sessionClose(my_session_);
     pumpLogMessages(log_stream_);
     printf(" done.\n");
