@@ -1851,7 +1851,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
         if (!loaded && magnetAddress)
         {
-            loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnetAddress.UTF8String, nullptr);
+            loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnetAddress.UTF8String);
         }
 
         if (loaded)

@@ -846,7 +846,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     if (!loaded)
     {
         // try to treat it as a magnet link...
-        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri().c_str(), nullptr);
+        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri());
     }
 
     // if we could make sense of it, add it

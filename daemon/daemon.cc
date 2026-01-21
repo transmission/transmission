@@ -218,9 +218,8 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
         }
         else
         {
-            content.push_back('\0'); // zero-terminated string
-            auto const* data = std::data(content);
-            if (!tr_ctorSetMetainfoFromMagnetLink(ctor, data, nullptr))
+            auto const content_sv = std::string_view{ content.data(), content.size() };
+            if (!tr_ctorSetMetainfoFromMagnetLink(ctor, content_sv))
             {
                 retry = true;
             }

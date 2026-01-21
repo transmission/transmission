@@ -95,10 +95,9 @@ bool tr_ctorSetMetainfo(tr_ctor* const ctor, char const* const metainfo, size_t 
     return ctor->set_metainfo(metainfo_sv, error);
 }
 
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* const ctor, char const* const magnet, tr_error* const error)
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* const ctor, std::string_view const magnet, tr_error* const error)
 {
-    auto const magnet_sv = std::string_view{ magnet != nullptr ? magnet : "" };
-    return ctor->set_metainfo_from_magnet_link(magnet_sv, error);
+    return ctor->set_metainfo_from_magnet_link(magnet, error);
 }
 
 char const* tr_ctorGetSourceFile(tr_ctor const* const ctor)
