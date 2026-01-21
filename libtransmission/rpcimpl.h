@@ -48,7 +48,7 @@ enum Code : int16_t
 } // namespace Error
 } // namespace JsonRpc
 
-using tr_rpc_response_func = std::function<void(tr_session* session, tr_variant&& response)>;
+using tr_rpc_response_func = std::function<void(tr_variant&& response)>;
 
 void tr_rpc_request_exec(tr_session* session, tr_variant& request, tr_rpc_response_func&& callback = {});
 

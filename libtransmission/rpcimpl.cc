@@ -221,11 +221,11 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
         {
             libtransmission::api_compat::convert(response, libtransmission::api_compat::Style::Tr4);
         }
-        data->callback(data->session, std::move(response));
+        data->callback(std::move(response));
     }
     else // notification
     {
-        data->callback(data->session, {});
+        data->callback({});
     }
 
     delete data;
@@ -2801,7 +2801,7 @@ auto const async_handlers = small::max_size_map<tr_quark, std::pair<AsyncHandler
     { TR_KEY_torrent_rename_path, { torrentRenamePath, true } },
 } };
 
-void noop_response_callback(tr_session* /*session*/, tr_variant&& /*response*/)
+void noop_response_callback(tr_variant&& /*response*/)
 {
 }
 
@@ -2817,12 +2817,10 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant& request, tr_rpc_r
     auto const* map = request.get_if<tr_variant::Map>();
     if (map == nullptr)
     {
-        callback(
-            session,
-            build_response(
-                Error::INVALID_REQUEST,
-                nullptr,
-                Error::build_data(is_batch ? "request must be an Object"sv : "request must be an Array or Object"sv, {})));
+        callback(build_response(
+            Error::INVALID_REQUEST,
+            nullptr,
+            Error::build_data(is_batch ? "request must be an Object"sv : "request must be an Array or Object"sv, {})));
         return;
     }
 
@@ -2833,9 +2831,7 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant& request, tr_rpc_r
     }
     else if (jsonrpc || is_batch)
     {
-        callback(
-            session,
-            build_response(Error::INVALID_REQUEST, nullptr, Error::build_data("JSON-RPC version is not 2.0"sv, {})));
+        callback(build_response(Error::INVALID_REQUEST, nullptr, Error::build_data("JSON-RPC version is not 2.0"sv, {})));
         return;
     }
     else
@@ -2851,7 +2847,7 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant& request, tr_rpc_r
                 TR_KEY_result,
                 tr_variant::unmanaged_string(
                     "bug in api-compat, please report a bug at https://github.com/transmission/transmission/issues"sv));
-            callback(session, std::move(response));
+            callback(std::move(response));
             return;
         }
     }
@@ -2928,7 +2924,7 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector& requests
         tr_rpc_request_exec_impl(
             session,
             requests[i],
-            [responses, n_requests, n_responses, i, cb](tr_session* s, tr_variant&& response)
+            [responses, n_requests, n_responses, i, cb](tr_variant&& response)
             {
                 (*responses)[i] = std::move(response);
 
@@ -2941,7 +2937,7 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector& requests
                         [](auto const& r) { return !r.has_value(); });
                     responses->erase(it_end, std::end(*responses));
 
-                    (*cb)(s, !std::empty(*responses) ? std::move(*responses) : tr_variant{});
+                    (*cb)(!std::empty(*responses) ? std::move(*responses) : tr_variant{});
                 }
             },
             true);
@@ -2974,5 +2970,5 @@ void tr_rpc_request_exec(tr_session* session, std::string_view request, tr_rpc_r
         return;
     }
 
-    callback(session, build_response(Error::PARSE_ERROR, nullptr, Error::build_data(serde.error_.message(), {})));
+    callback(build_response(Error::PARSE_ERROR, nullptr, Error::build_data(serde.error_.message(), {})));
 }

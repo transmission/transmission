@@ -156,7 +156,7 @@ void RpcClient::sendLocalRequest(tr_variant& req, QFutureInterface<RpcResponse> 
     tr_rpc_request_exec(
         session_,
         req,
-        [this](tr_session* /*session*/, tr_variant&& response)
+        [this](tr_variant&& response)
         {
             api_compat::convert_incoming_data(response);
 
