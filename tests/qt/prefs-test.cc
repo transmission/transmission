@@ -228,7 +228,7 @@ private slots:
         verify_get_by_json(prefs, Idx, ValB, ValBStr);
     }
 
-    void keyval_returns_key_and_value()
+    static void keyval_returns_key_and_value()
     {
         auto prefs = Prefs{};
 
