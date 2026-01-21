@@ -51,6 +51,7 @@ runs:
           dnf install -y \
             fmt-devel \
             google-crc32c-devel \
+            libb64-devel \
             libcurl-devel \
             libdeflate-devel \
             libevent-devel \
@@ -96,6 +97,7 @@ runs:
             ca-certificates
             cmake
             gettext
+            libb64-dev
             libcurl4-openssl-dev
             libdeflate-dev
             libevent-dev
@@ -195,12 +197,16 @@ runs:
         # Base packages for macOS
         BASE_PACKAGES=(cmake gettext ninja node pkgconf)
 
-        # Additional packages for some builds
-        if [[ "${{ inputs.enable-gtk }}" == "true" || "${{ inputs.enable-qt }}" != "false" ]]; then
-          BASE_PACKAGES+=(libdeflate libevent libpsl miniupnpc crc32c)
-        else
-          BASE_PACKAGES+=(libdeflate libevent libpsl miniupnpc)
-        fi
+        # Transmission-specific libraries
+        BASE_PACKAGES+=(
+          crc32c
+          libb64
+          libdeflate
+          libevent
+          libnatpmp
+          libpsl
+          miniupnpc
+        )
 
         brew install --formulae "${BASE_PACKAGES[@]}"
 
