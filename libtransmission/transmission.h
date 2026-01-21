@@ -761,9 +761,8 @@ void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t limit);
 bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setme_download_dir);
 
 /** @brief Set the download folder for the torrent being added with this ctor.
-    @see `tr_ctorSetDownloadDir()`
     @see `tr_sessionInit()` */
-void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory);
+void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, std::string_view dir);
 
 /**
  * @brief Set the incompleteDir for this torrent.

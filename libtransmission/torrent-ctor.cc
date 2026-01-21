@@ -149,9 +149,9 @@ void tr_ctorSetPeerLimit(tr_ctor* const ctor, tr_ctorMode const mode, uint16_t c
     ctor->set_peer_limit(mode, peer_limit);
 }
 
-void tr_ctorSetDownloadDir(tr_ctor* const ctor, tr_ctorMode const mode, char const* const dir)
+void tr_ctorSetDownloadDir(tr_ctor* const ctor, tr_ctorMode const mode, std::string_view const dir)
 {
-    ctor->set_download_dir(mode, std::string_view{ dir != nullptr ? dir : "" });
+    ctor->set_download_dir(mode, dir);
 }
 
 void tr_ctorSetIncompleteDir(tr_ctor* const ctor, char const* const dir)

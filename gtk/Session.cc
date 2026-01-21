@@ -767,7 +767,7 @@ void core_apply_defaults(tr_ctor* ctor)
 
     if (!tr_ctorGetDownloadDir(ctor, TR_FORCE, nullptr))
     {
-        tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir).c_str());
+        tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir));
     }
 }
 

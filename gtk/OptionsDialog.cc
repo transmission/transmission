@@ -189,7 +189,7 @@ void OptionsDialog::Impl::sourceChanged(PathButton* b)
             new_file = true;
         }
 
-        tr_ctorSetDownloadDir(ctor_.get(), TR_FORCE, downloadDir_.c_str());
+        tr_ctorSetDownloadDir(ctor_.get(), TR_FORCE, downloadDir_);
         tr_ctorSetPaused(ctor_.get(), TR_FORCE, true);
         tr_ctorSetDeleteSource(ctor_.get(), false);
 
