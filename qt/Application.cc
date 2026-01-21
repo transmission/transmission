@@ -261,7 +261,11 @@ void Application::loadTranslations()
     auto const qt_file_name = QStringLiteral("qtbase");
 
     // Determine the full UI locale if available, otherwise fall back to the system locale.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QStringList uiLangs = QLocale().uiLanguages();
+#else
     QStringList uiLangs = QLocale::uiLanguages();
+#endif
     QLocale uiLocale = uiLangs.isEmpty() ? QLocale::system() : QLocale(uiLangs.first());
 
     // Also prepare a language-only locale to use as a fallback for translation lookup
