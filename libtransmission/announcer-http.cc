@@ -12,6 +12,7 @@
 #include <iostream>
 #include <iterator>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -595,16 +596,15 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             {
                 row_.reset();
             }
-            else if (auto const it = std::find_if(
-                         std::begin(response_.rows),
-                         std::end(response_.rows),
+            else if (auto const it = std::ranges::find_if(
+                         response_.rows,
                          [value](auto const& row)
                          {
                              auto const row_hash = std::string_view{ reinterpret_cast<char const*>(std::data(row.info_hash)),
                                                                      std::size(row.info_hash) };
                              return row_hash == value;
                          });
-                     it == std::end(response_.rows))
+                     it == std::ranges::end(response_.rows))
             {
                 row_.reset();
             }

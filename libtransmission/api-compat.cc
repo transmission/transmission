@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <deque>
 #include <initializer_list>
+#include <ranges>
 #include <string_view>
 #include <vector>
 
@@ -778,12 +779,11 @@ void convert_files_wanted_response(tr_variant::Map& top, State const& state)
             if (auto* const first_vec = torrents->front().get_if<tr_variant::Vector>();
                 first_vec != nullptr && !std::empty(*first_vec))
             {
-                if (auto const wanted_iter = std::find_if(
-                        std::begin(*first_vec),
-                        std::end(*first_vec),
+                if (auto const wanted_iter = std::ranges::find_if(
+                        *first_vec,
                         [](tr_variant const& v)
                         { return v.value_if<std::string_view>() == tr_quark_get_string_view(TR_KEY_wanted); });
-                    wanted_iter != std::end(*first_vec))
+                    wanted_iter != std::ranges::end(*first_vec))
                 {
                     auto const wanted_idx = static_cast<size_t>(wanted_iter - std::begin(*first_vec));
                     for (auto it = std::next(std::begin(*torrents)); it != std::end(*torrents); ++it)

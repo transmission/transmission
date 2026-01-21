@@ -18,6 +18,7 @@
 #include <iterator> // for std::back_inserter
 #include <locale>
 #include <memory>
+#include <ranges>
 #include <mutex>
 #include <optional>
 #include <stdexcept> // std::runtime_error
@@ -260,11 +261,11 @@ std::string_view tr_strv_strip(std::string_view str)
         return isspace(static_cast<unsigned char>(ch));
     };
 
-    auto const it = std::find_if_not(std::begin(str), std::end(str), Test);
-    str.remove_prefix(std::distance(std::begin(str), it));
+    auto const it = std::ranges::find_if_not(str, Test);
+    str.remove_prefix(std::ranges::distance(std::ranges::begin(str), it));
 
-    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), Test);
-    str.remove_suffix(std::distance(std::rbegin(str), rit));
+    auto const rit = std::ranges::find_if_not(std::ranges::rbegin(str), std::ranges::rend(str), Test);
+    str.remove_suffix(std::ranges::distance(std::ranges::rbegin(str), rit));
 
     return str;
 }

@@ -36,10 +36,12 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <fstream>
 #include <memory>
+#include <ranges>
 #include <utility>
 
 class MessageLogColumnsModel : public Gtk::TreeModelColumnRecord
@@ -227,11 +229,10 @@ void MessageLogWindow::Impl::doSave(std::string const& filename)
             auto const* const node = row.get_value(message_log_cols.tr_msg);
             auto const date = gtr_asctime(node->when);
 
-            auto const iter = std::find_if(
-                std::begin(level_names_),
-                std::end(level_names_),
+            auto const iter = std::ranges::find_if(
+                level_names_,
                 [key = node->level](auto const& item) { return item.first == key; });
-            auto const* const level_str = iter != std::end(level_names_) ? iter->second : "???";
+            auto const* const level_str = iter != std::ranges::end(level_names_) ? iter->second : "???";
 
             fmt::print(stream, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
         }

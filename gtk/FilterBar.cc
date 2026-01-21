@@ -44,6 +44,7 @@
 #include <array>
 #include <map>
 #include <memory>
+#include <ranges>
 #include <string>
 #include <unordered_map>
 
@@ -243,7 +244,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
 
     auto const n_sites = std::size(site_infos);
     auto sites_v = std::vector<site_info>(n_sites);
-    std::transform(std::begin(site_infos), std::end(site_infos), std::begin(sites_v), [](auto const& it) { return it.second; });
+    std::ranges::transform(site_infos, std::begin(sites_v), [](auto const& it) { return it.second; });
     std::sort(std::begin(sites_v), std::end(sites_v));
 
     // update the "all" count

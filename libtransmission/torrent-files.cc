@@ -10,6 +10,7 @@
 #include <functional>
 #include <iterator>
 #include <optional>
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -106,7 +107,7 @@ bool is_junk_file(std::string_view filename)
         "desktop.ini"sv,
     };
 
-    return std::find(std::begin(Files), std::end(Files), base) != std::end(Files);
+    return std::ranges::find(Files, base) != std::ranges::end(Files);
 }
 
 } // unnamed namespace
@@ -324,7 +325,7 @@ namespace
         "."sv,
         ".."sv,
     };
-    return (std::find(std::begin(ReservedNames), std::end(ReservedNames), in) != std::end(ReservedNames));
+    return (std::ranges::find(ReservedNames, in) != std::ranges::end(ReservedNames));
 }
 
 // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
@@ -349,7 +350,7 @@ namespace
     }
 
     auto in_upper = tr_pathbuf{ in };
-    std::transform(std::begin(in_upper), std::end(in_upper), std::begin(in_upper), [](auto ch) { return toupper(ch); });
+    std::ranges::for_each(in_upper, [](auto& ch) { ch = toupper(ch); });
     auto const in_upper_sv = in_upper.sv();
 
     static auto constexpr ReservedNames = std::array<std::string_view, 22>{
@@ -357,7 +358,7 @@ namespace
         "COM1"sv, "COM2"sv, "COM3"sv, "COM4"sv, "COM5"sv, "COM6"sv, "COM7"sv, "COM8"sv, "COM9"sv, //
         "LPT1"sv, "LPT2"sv, "LPT3"sv, "LPT4"sv, "LPT5"sv, "LPT6"sv, "LPT7"sv, "LPT8"sv, "LPT9"sv, //
     };
-    if (std::find(std::begin(ReservedNames), std::end(ReservedNames), in_upper_sv) != std::end(ReservedNames))
+    if (std::ranges::find(ReservedNames, in_upper_sv) != std::ranges::end(ReservedNames))
     {
         return true;
     }
@@ -367,9 +368,8 @@ namespace
         "COM1."sv, "COM2."sv, "COM3."sv, "COM4."sv, "COM5."sv, "COM6."sv, "COM7."sv, "COM8."sv, "COM9."sv, //
         "LPT1."sv, "LPT2."sv, "LPT3."sv, "LPT4."sv, "LPT5."sv, "LPT6."sv, "LPT7."sv, "LPT8."sv, "LPT9."sv, //
     };
-    return std::any_of(
-        std::begin(ReservedPrefixes),
-        std::end(ReservedPrefixes),
+    return std::ranges::any_of(
+        ReservedPrefixes,
         [in_upper_sv](auto const& prefix) { return tr_strv_starts_with(in_upper_sv, prefix); });
 }
 
@@ -454,7 +454,7 @@ void append_sanitized_component(std::string_view in, tr_pathbuf& out, bool os_sp
     {
         return is_reserved_char(ch, os_specific) ? '_' : ch;
     };
-    std::transform(std::begin(in), std::end(in), std::back_inserter(out), add_char);
+    std::ranges::transform(in, std::back_inserter(out), add_char);
 }
 
 } // namespace

@@ -11,6 +11,7 @@
 #include <ios>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -289,11 +290,8 @@ bool tr_metadata_download::set_metadata_piece(int64_t const piece, void const* c
 
     // do we need this piece?
     auto& needed = pieces_needed_;
-    auto const iter = std::find_if(
-        std::begin(needed),
-        std::end(needed),
-        [piece](auto const& item) { return item.piece == piece; });
-    if (iter == std::end(needed))
+    auto const iter = std::ranges::find_if(needed, [piece](auto const& item) { return item.piece == piece; });
+    if (iter == std::ranges::end(needed))
     {
         return false;
     }

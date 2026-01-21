@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -49,16 +50,14 @@ size_t tr_torrent_queue::get_pos(tr_torrent_id_t const id)
     if (auto n_cache = std::size(pos_cache_);
         uid >= n_cache || pos_cache_[uid] >= std::size(queue_) || id != queue_[pos_cache_[uid]])
     {
-        auto const begin = std::begin(queue_);
-        auto const end = std::end(queue_);
-        auto it = std::find(begin, end, id);
-        if (it == end)
+        auto it = std::ranges::find(queue_, id);
+        if (it == std::ranges::cend(queue_))
         {
             return MaxQueuePosition;
         }
 
         pos_cache_.resize(std::max(uid + 1U, n_cache));
-        pos_cache_[uid] = it - begin;
+        pos_cache_[uid] = std::ranges::distance(std::ranges::cbegin(queue_), it);
     }
 
     return pos_cache_[uid];

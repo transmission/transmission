@@ -9,6 +9,7 @@
 #include <iterator>
 #include <memory>
 #include <numeric> // std::accumulate()
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -241,7 +242,7 @@ public:
         idle_timer_->stop();
 
         // flag all the pending tasks as dead
-        std::for_each(std::begin(tasks), std::end(tasks), [](auto* task) { task->dead = true; });
+        std::ranges::for_each(tasks, [](auto* task) { task->dead = true; });
         tasks.clear();
     }
 

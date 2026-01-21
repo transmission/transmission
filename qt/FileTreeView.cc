@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <queue>
+#include <ranges>
 #include <set>
 
 #include <QHeaderView>

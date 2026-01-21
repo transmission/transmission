@@ -3,9 +3,11 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <memory>
+#include <ranges>
 #include <utility>
 
 #include <QCheckBox>
@@ -549,7 +551,7 @@ void openSelect(QString const& path)
     }
 
     auto top = first_filename.left(slash_index);
-    if (!std::all_of(std::begin(files), std::end(files), [&top](auto const& file) { return file.filename.startsWith(top); }))
+    if (!std::ranges::all_of(files, [&top](auto const& file) { return file.filename.startsWith(top); }))
     {
         return {};
     }
@@ -845,8 +847,8 @@ void MainWindow::refreshActionSensitivity()
     {
         return tor->isPaused();
     };
-    auto const any_paused = std::any_of(std::begin(torrents), std::end(torrents), is_paused);
-    auto const any_not_paused = !std::all_of(std::begin(torrents), std::end(torrents), is_paused);
+    auto const any_paused = std::ranges::any_of(torrents, is_paused);
+    auto const any_not_paused = !std::ranges::all_of(torrents, is_paused);
 
     auto const have_selection = selected > 0;
     auto const have_selection_with_metadata = selected_with_metadata > 0;

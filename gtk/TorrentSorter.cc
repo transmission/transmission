@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <array>
+#include <ranges>
 #include <utility>
 
 using namespace std::string_view_literals;
@@ -248,11 +249,10 @@ void TorrentSorter::update(Torrent::ChangeFlags changes)
         { &compare_by_state, Flag::ACTIVITY | Flag::QUEUE_POSITION },
     } };
 
-    if (auto const iter = std::find_if(
-            std::begin(CompareFlags),
-            std::end(CompareFlags),
+    if (auto const iter = std::ranges::find_if(
+            CompareFlags,
             [key = compare_func_](auto const& row) { return row.first == key; });
-        iter != std::end(CompareFlags) && changes.test(iter->second))
+        iter != std::ranges::end(CompareFlags) && changes.test(iter->second))
     {
         changed(Change::DIFFERENT);
     }

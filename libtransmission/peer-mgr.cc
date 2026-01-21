@@ -14,6 +14,7 @@
 #include <iterator> // std::back_inserter
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <tuple> // std::tie
 #include <unordered_map>
 #include <utility>
@@ -270,8 +271,8 @@ void tr_peer_info::update_canonical_priority()
     {
         auto buf = std::array{ get_client_advertised_port_().host(), listen_port().host() };
         static_assert(std::is_same_v<std::remove_reference_t<decltype(buf[0])>, uint16_t>);
-        std::sort(std::begin(buf), std::end(buf));
-        std::transform(std::begin(buf), std::end(buf), std::begin(buf), [](uint16_t p) { return htons(p); });
+        std::ranges::sort(buf);
+        std::ranges::for_each(buf, [](auto& p) { p = htons(p); });
         canonical_priority_ = tr_crc32c(reinterpret_cast<uint8_t*>(std::data(buf)), std::size(buf) * sizeof(uint16_t));
         return;
     }
@@ -489,7 +490,7 @@ public:
         --stats.peer_count;
         --stats.peer_from_count[peer_info->from_first()];
 
-        if (auto iter = std::find(std::begin(peers), std::end(peers), peer); iter != std::end(peers))
+        if (auto iter = std::ranges::find(peers, peer); iter != std::ranges::end(peers))
         {
             peers.erase(iter);
             TR_ASSERT(stats.peer_count == peerCount());
@@ -512,9 +513,8 @@ public:
     {
         if (!pool_is_all_upload_only_)
         {
-            pool_is_all_upload_only_ = std::all_of(
-                std::begin(connectable_pool),
-                std::end(connectable_pool),
+            pool_is_all_upload_only_ = std::ranges::all_of(
+                connectable_pool,
                 [](auto const& key_val) { return key_val.second->is_upload_only(); });
         }
 
@@ -775,7 +775,7 @@ private:
 
     void on_torrent_done()
     {
-        std::for_each(std::begin(peers), std::end(peers), [](auto const& peer) { peer->set_interested(false); });
+        std::ranges::for_each(peers, [](auto const& peer) { peer->set_interested(false); });
         wishlist.reset();
     }
 
@@ -974,11 +974,10 @@ EXIT:
 
         if (CompareAtomsByUsefulness(*info_this, *info_that))
         {
-            auto const it = std::find_if(
-                std::begin(peers),
-                std::end(peers),
+            auto const it = std::ranges::find_if(
+                peers,
                 [&info_that](auto const& peer) { return peer->peer_info == info_that; });
-            TR_ASSERT(it != std::end(peers));
+            TR_ASSERT(it != std::ranges::end(peers));
             (*it)->disconnect_soon();
 
             return false;
@@ -1941,9 +1940,8 @@ tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
     auto const lock = tor->unique_lock();
     auto const now = tr_time();
     auto const now_msec = tr_time_msec();
-    std::transform(
-        std::begin(peers),
-        std::end(peers),
+    std::ranges::transform(
+        peers,
         ret,
         [&now, &now_msec](auto const& peer) { return peer_stat_helpers::get_peer_stats(peer.get(), now, now_msec); });
 
@@ -2357,13 +2355,8 @@ void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
 
     // close all but the `max` most active
     auto peers = std::vector<std::shared_ptr<tr_peerMsgs>>(n - max);
-    std::partial_sort_copy(
-        std::begin(swarm->peers),
-        std::end(swarm->peers),
-        std::begin(peers),
-        std::end(peers),
-        ComparePeerByLeastActive);
-    std::for_each(std::begin(peers), std::end(peers), close_peer);
+    std::ranges::partial_sort_copy(swarm->peers, peers, ComparePeerByLeastActive);
+    std::ranges::for_each(peers, close_peer);
 }
 
 void enforceSessionPeerLimit(size_t global_peer_limit, tr_torrents& torrents)
@@ -2485,11 +2478,7 @@ void tr_peerMgr::peer_info_pulse()
 
         auto infos = std::vector<std::shared_ptr<tr_peer_info>>{};
         infos.reserve(pool_size);
-        std::transform(
-            std::begin(pool),
-            std::end(pool),
-            std::back_inserter(infos),
-            [](auto const& keyval) { return keyval.second; });
+        std::ranges::transform(pool, std::back_inserter(infos), [](auto const& keyval) { return keyval.second; });
         pool.clear();
 
         // Keep all peer info objects before test_begin unconditionally

@@ -191,8 +191,8 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
 
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
     std::for_each(
-        std::rbegin(vals),
-        std::rend(vals),
+        vals.rbegin(),
+        vals.rend(),
         [&buf, &buflen](int num) { std::tie(buf, buflen) = buf_append(buf, buflen, num, '.'); });
     if (buf > buf_in)
     {

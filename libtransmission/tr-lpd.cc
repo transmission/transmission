@@ -545,9 +545,8 @@ private:
             return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
                 info.announce_after < now;
         };
-        torrents.erase(
-            std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(needs_announce)),
-            std::end(torrents));
+        auto const remove_it = std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(needs_announce));
+        torrents.erase(remove_it, std::end(torrents));
 
         if (std::empty(torrents))
         {

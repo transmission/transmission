@@ -52,6 +52,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -360,7 +361,7 @@ bool Session::Impl::watchdir_idle()
 
         adding_from_watch_dir_ = true;
         add_files(unchanging, do_start, do_prompt, true);
-        std::for_each(unchanging.begin(), unchanging.end(), rename_torrent);
+        std::ranges::for_each(unchanging, rename_torrent);
         adding_from_watch_dir_ = false;
     }
 
@@ -386,10 +387,7 @@ void Session::Impl::watchdir_monitor_file(Glib::RefPtr<Gio::File> const& file)
     if (is_torrent)
     {
         /* if we're not already watching this file, start watching it now */
-        bool const found = std::any_of(
-            monitor_files_.begin(),
-            monitor_files_.end(),
-            [file](auto const& f) { return file->equal(f); });
+        bool const found = std::ranges::any_of(monitor_files_, [file](auto const& f) { return file->equal(f); });
 
         if (!found)
         {
@@ -988,8 +986,8 @@ void Session::load(bool force_paused)
 
     auto torrents = std::vector<Glib::RefPtr<Torrent>>();
     torrents.reserve(raw_torrents.size());
-    std::transform(raw_torrents.begin(), raw_torrents.end(), std::back_inserter(torrents), &Torrent::create);
-    std::sort(torrents.begin(), torrents.end(), &Torrent::less_by_id);
+    std::ranges::transform(raw_torrents, std::back_inserter(torrents), &Torrent::create);
+    std::ranges::sort(torrents, &Torrent::less_by_id);
 
     auto const model = impl_->get_raw_model();
     model->splice(0, model->get_n_items(), torrents);

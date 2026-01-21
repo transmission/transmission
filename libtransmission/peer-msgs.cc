@@ -16,6 +16,7 @@
 #include <optional>
 #include <queue>
 #include <ratio>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -552,7 +553,7 @@ private:
 
         if (auto const must_send_rej = io_->supports_fext(); must_send_rej)
         {
-            std::for_each(std::begin(queue), std::end(queue), [this](peer_request const& req) { protocol_send_reject(req); });
+            std::ranges::for_each(queue, [this](peer_request const& req) { protocol_send_reject(req); });
         }
 
         queue.clear();
@@ -1554,7 +1555,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
             logtrace(this, fmt::format("got a Cancel {:d}:{:d}->{:d}", r.index, r.offset, r.length));
 
             auto& requests = peer_requested_;
-            if (auto iter = std::find(std::begin(requests), std::end(requests), r); iter != std::end(requests))
+            if (auto iter = std::ranges::find(requests, r); iter != std::ranges::end(requests))
             {
                 requests.erase(iter);
 
@@ -1942,7 +1943,7 @@ void tr_peerMsgsImpl::maybe_send_block_requests()
 
 void tr_peerMsgsImpl::check_request_timeout(time_t const now)
 {
-    std::sort(std::begin(request_timeouts_), std::end(request_timeouts_));
+    std::ranges::sort(request_timeouts_);
 
     for (auto it = std::begin(request_timeouts_); it != std::end(request_timeouts_);)
     {
