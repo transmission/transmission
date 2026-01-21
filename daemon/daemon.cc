@@ -197,7 +197,7 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
 
     if (is_torrent)
     {
-        if (!tr_ctorSetMetainfoFromFile(ctor, filename, nullptr))
+        if (!tr_ctorSetMetainfoFromFile(ctor, filename))
         {
             retry = true;
         }

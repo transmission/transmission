@@ -749,7 +749,7 @@ tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor);
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error* error);
 
 /** @brief Set the constructor's metainfo from a local torrent file */
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error* error);
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error* error = nullptr);
 
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme_count);

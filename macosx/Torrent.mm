@@ -1846,7 +1846,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
         if (path)
         {
-            loaded = tr_ctorSetMetainfoFromFile(ctor, path.UTF8String, nullptr);
+            loaded = tr_ctorSetMetainfoFromFile(ctor, path.UTF8String);
         }
 
         if (!loaded && magnetAddress)

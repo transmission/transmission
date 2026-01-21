@@ -84,9 +84,9 @@ void tr_ctorFree(tr_ctor* ctor)
     delete ctor;
 }
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* const ctor, char const* const filename, tr_error* const error)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* const ctor, std::string_view const filename, tr_error* const error)
 {
-    return ctor->set_metainfo_from_file(std::string_view{ filename != nullptr ? filename : "" }, error);
+    return ctor->set_metainfo_from_file(filename, error);
 }
 
 bool tr_ctorSetMetainfo(tr_ctor* const ctor, char const* const metainfo, size_t len, tr_error* const error)

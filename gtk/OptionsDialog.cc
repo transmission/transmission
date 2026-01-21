@@ -185,7 +185,7 @@ void OptionsDialog::Impl::sourceChanged(PathButton* b)
         if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename, filename_)))
         {
             filename_ = filename;
-            tr_ctorSetMetainfoFromFile(ctor_.get(), filename_.c_str(), nullptr);
+            tr_ctorSetMetainfoFromFile(ctor_.get(), filename_);
             new_file = true;
         }
 

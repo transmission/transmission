@@ -840,7 +840,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     if (auto const path = file->get_path(); !std::empty(path))
     {
         // try to treat it as a file...
-        loaded = tr_ctorSetMetainfoFromFile(ctor, path.c_str(), nullptr);
+        loaded = tr_ctorSetMetainfoFromFile(ctor, path);
     }
 
     if (!loaded)
