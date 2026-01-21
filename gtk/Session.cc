@@ -765,7 +765,7 @@ void core_apply_defaults(tr_ctor* ctor)
         tr_ctorSetPeerLimit(ctor, TR_FORCE, gtr_pref_int_get(TR_KEY_peer_limit_per_torrent));
     }
 
-    if (!tr_ctorGetDownloadDir(ctor, TR_FORCE, nullptr))
+    if (!tr_ctorGetDownloadDir(ctor, TR_FORCE).has_value())
     {
         tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir));
     }

@@ -189,19 +189,14 @@ bool tr_ctorGetPaused(tr_ctor const* const ctor, tr_ctorMode const mode, bool* c
     return false;
 }
 
-bool tr_ctorGetDownloadDir(tr_ctor const* const ctor, tr_ctorMode const mode, char const** setme)
+std::optional<std::string> tr_ctorGetDownloadDir(tr_ctor const* const ctor, tr_ctorMode const mode)
 {
-    if (auto const& val = ctor->download_dir(mode); !std::empty(val))
+    if (auto const& dir = ctor->download_dir(mode); !std::empty(dir))
     {
-        if (setme != nullptr)
-        {
-            *setme = val.c_str();
-        }
-
-        return true;
+        return dir;
     }
 
-    return false;
+    return {};
 }
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* const ctor)
