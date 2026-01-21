@@ -1141,7 +1141,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_download_dir:
-        tr_sessionSetDownloadDir(tr, gtr_pref_string_get(key).c_str());
+        tr_sessionSetDownloadDir(tr, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_message_level:

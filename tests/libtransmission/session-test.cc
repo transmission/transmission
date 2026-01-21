@@ -48,14 +48,10 @@ TEST_F(SessionTest, propertiesApi)
         EXPECT_EQ(value, session->downloadDir());
         EXPECT_EQ(value, tr_sessionGetDownloadDir(session));
 
-        tr_sessionSetDownloadDir(session, std::string(value).c_str());
+        tr_sessionSetDownloadDir(session, value);
         EXPECT_EQ(value, session->downloadDir());
         EXPECT_EQ(value, tr_sessionGetDownloadDir(session));
     }
-
-    tr_sessionSetDownloadDir(session, nullptr);
-    EXPECT_EQ(""sv, session->downloadDir());
-    EXPECT_EQ(""sv, tr_sessionGetDownloadDir(session));
 
     // incomplete dir
 

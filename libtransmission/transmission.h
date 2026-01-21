@@ -247,7 +247,7 @@ char const* tr_sessionGetDownloadDir(tr_session const* session);
  * @see `tr_sessionGetDownloadDir()`
  * @see `tr_ctorSetDownloadDir()`
  */
-void tr_sessionSetDownloadDir(tr_session* session, char const* download_dir);
+void tr_sessionSetDownloadDir(tr_session* session, std::string_view download_dir);
 
 /** @brief get the per-session incomplete download folder */
 char const* tr_sessionGetIncompleteDir(tr_session const* session);

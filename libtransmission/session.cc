@@ -956,11 +956,11 @@ void tr_session::Settings::fixup_to_preferred_transports()
 
 // ---
 
-void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
+void tr_sessionSetDownloadDir(tr_session* session, std::string_view const dir)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setDownloadDir(dir != nullptr ? dir : "");
+    session->setDownloadDir(dir);
 }
 
 char const* tr_sessionGetDownloadDir(tr_session const* session)
