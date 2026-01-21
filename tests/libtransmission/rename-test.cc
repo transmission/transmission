@@ -109,7 +109,7 @@ protected:
         EXPECT_EQ(0, tst->haveValid);
     }
 
-    static int torrentRenameAndWait(tr_torrent* tor, char const* oldpath, char const* newname)
+    static int torrentRenameAndWait(tr_torrent* tor, std::string_view const oldpath, std::string_view const newname)
     {
         auto const on_rename_done =
             [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, void* user_data) noexcept
@@ -170,7 +170,6 @@ TEST_F(RenameTest, singleFilenameTorrent)
 
     // confirm that bad inputs get caught
 
-    EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", nullptr));
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", ""));
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", "."));
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", ".."));

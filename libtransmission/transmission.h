@@ -875,8 +875,8 @@ using tr_torrent_rename_done_func = std::function<
  */
 void tr_torrentRenamePath(
     tr_torrent* tor,
-    char const* oldpath,
-    char const* newname,
+    std::string_view oldpath,
+    std::string_view newname,
     tr_torrent_rename_done_func callback,
     void* callback_user_data);
 

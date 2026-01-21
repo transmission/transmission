@@ -2530,14 +2530,11 @@ void tr_torrent::rename_path(
 
 void tr_torrentRenamePath(
     tr_torrent* tor,
-    char const* oldpath,
-    char const* newname,
+    std::string_view const oldpath,
+    std::string_view const newname,
     tr_torrent_rename_done_func callback,
     void* callback_user_data)
 {
-    oldpath = oldpath != nullptr ? oldpath : "";
-    newname = newname != nullptr ? newname : "";
-
     tor->rename_path(oldpath, newname, std::move(callback), callback_user_data);
 }
 
