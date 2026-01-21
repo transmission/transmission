@@ -2112,9 +2112,9 @@ void tr_torrent::on_tracker_response(tr_tracker_event const* event)
     }
 }
 
-bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text)
+bool tr_torrentSetTrackerList(tr_torrent* tor, std::string_view const txt)
 {
-    return text != nullptr && tor->set_announce_list(text);
+    return tor->set_announce_list(txt);
 }
 
 std::string tr_torrentGetTrackerList(tr_torrent const* tor)

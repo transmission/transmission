@@ -1048,7 +1048,7 @@ void tr_torrentSetDownloadDir(tr_torrent* torrent, std::string_view path);
  * This updates both the `torrent` object's tracker list
  * and the metainfo file in `tr_sessionGetConfigDir()`'s torrent subdirectory.
  */
-bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text);
+bool tr_torrentSetTrackerList(tr_torrent* tor, std::string_view txt);
 
 // ---
 
