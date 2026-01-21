@@ -1195,7 +1195,7 @@ bool tr_torrent::has_any_local_data() const
     return files().has_any_local_data(std::data(paths), n_paths);
 }
 
-void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
+void tr_torrentSetDownloadDir(tr_torrent* tor, std::string_view const path)
 {
     TR_ASSERT(tr_isTorrent(tor));
 

@@ -1012,7 +1012,7 @@ void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_
 /* Raw function to change the torrent's downloadDir field.
    This should only be used by libtransmission or to bootstrap
    a newly-instantiated tr_torrent object. */
-void tr_torrentSetDownloadDir(tr_torrent* torrent, char const* path);
+void tr_torrentSetDownloadDir(tr_torrent* torrent, std::string_view path);
 
 /**
  * Returns a permanently interned string of the torrent's root directory.

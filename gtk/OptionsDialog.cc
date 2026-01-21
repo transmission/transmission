@@ -159,7 +159,7 @@ void OptionsDialog::Impl::updateTorrent()
     }
     else
     {
-        tr_torrentSetDownloadDir(tor_, downloadDir_.c_str());
+        tr_torrentSetDownloadDir(tor_, downloadDir_);
         file_list_->set_sensitive(tr_torrentHasMetadata(tor_));
         file_list_->set_torrent(tr_torrentId(tor_));
         tr_torrentVerify(tor_);
