@@ -215,7 +215,7 @@ auto get_app_type(char const* app)
 {
     auto const lower = tr_strlower(app);
 
-    if (tr_strv_ends_with(lower, ".cmd") || tr_strv_ends_with(lower, ".bat"))
+    if (lower.ends_with(".cmd") || lower.ends_with(".bat"))
     {
         return tr_app_type::BATCH;
     }
