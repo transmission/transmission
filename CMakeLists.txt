@@ -552,7 +552,8 @@ unset(TR_MINIUPNPC_LIBNAME)
 
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
-tr_add_external_auto_library_legacy(DHT dht dht
+tr_add_external_auto_library(DHT dht
+    LIBNAME dht
     TARGET dht::dht)
 
 tr_add_external_auto_library_legacy(PSL libpsl psl
