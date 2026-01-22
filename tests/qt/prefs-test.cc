@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <string>
 #include <string_view>
 
 #include <QApplication>
@@ -32,9 +33,9 @@ class PrefsTest : public QObject
 {
     Q_OBJECT
 
-    [[nodiscard]] static std::string get_json_member_str(int const idx, std::string_view const valstr)
+    [[nodiscard]] static std::string get_json_member_str(tr_quark const key, std::string_view const valstr)
     {
-        auto const json_key = tr_quark_get_string_view(Prefs::getKey(idx));
+        auto const json_key = tr_quark_get_string_view(key);
         return fmt::format(R"("{:s}":{:s})", json_key, valstr);
     }
 
@@ -46,12 +47,12 @@ class PrefsTest : public QObject
         QVERIFY2(tr_strv_contains(str, substr), str.c_str());
     }
 
-    static void verify_json_contains(tr_variant const& var, int const idx, std::string_view const val)
+    static void verify_json_contains(tr_variant const& var, tr_quark const key, std::string_view const val)
     {
         auto serde = tr_variant_serde::json();
         serde.compact();
         auto const str = serde.to_string(var);
-        auto const substr = get_json_member_str(idx, val);
+        auto const substr = get_json_member_str(key, val);
         QVERIFY2(tr_strv_contains(str, substr), str.c_str());
     }
 
@@ -74,13 +75,13 @@ class PrefsTest : public QObject
     {
         prefs.set(idx, val);
         QCOMPARE_EQ(prefs.get<T>(idx), val);
-        verify_json_contains(prefs.current_settings(), idx, valstr);
+        verify_json_contains(prefs.current_settings(), prefs.keyval(idx).first, valstr);
     }
 
     template<typename T>
     void verify_set_by_json(Prefs& prefs, int const idx, T const& val, std::string_view const valstr)
     {
-        auto const json_object_str = fmt::format(R"({{{:s}}})", get_json_member_str(idx, valstr));
+        auto const json_object_str = fmt::format(R"({{{:s}}})", get_json_member_str(prefs.keyval(idx).first, valstr));
         auto serde = tr_variant_serde::json();
         auto const var = serde.parse(json_object_str);
         QVERIFY(var.has_value());
@@ -90,6 +91,14 @@ class PrefsTest : public QObject
         QVERIFY(map != nullptr);
         prefs.load(*map);
         QCOMPARE_EQ(prefs.get<T>(idx), val);
+    }
+
+    static void verify_variant_json(tr_variant const& var, std::string_view const expected)
+    {
+        auto serde = tr_variant_serde::json();
+        serde.compact();
+        auto const str = serde.to_string(var);
+        QCOMPARE_EQ(str, std::string{ expected });
     }
 
 private slots:
@@ -217,6 +226,31 @@ private slots:
         verify_get_set_by_property(prefs, Idx, ValA, ValB);
         verify_set_by_json(prefs, Idx, ValA, ValAStr);
         verify_get_by_json(prefs, Idx, ValB, ValBStr);
+    }
+
+    static void keyval_returns_key_and_value()
+    {
+        auto prefs = Prefs{};
+
+        {
+            auto constexpr Idx = Prefs::MAIN_WINDOW_HEIGHT;
+            auto constexpr Val = 4242;
+            prefs.set(Idx, Val);
+
+            auto const [key, var] = prefs.keyval(Idx);
+            QCOMPARE_EQ(key, TR_KEY_main_window_height);
+            verify_variant_json(var, fmt::format("{}", Val));
+        }
+
+        {
+            auto constexpr Idx = Prefs::DOWNLOAD_DIR;
+            auto const val = QStringLiteral("/tmp/transmission-test-download-dir");
+            prefs.set(Idx, val);
+
+            auto const [key, var] = prefs.keyval(Idx);
+            QCOMPARE_EQ(key, TR_KEY_download_dir);
+            verify_variant_json(var, fmt::format(R"("{}")", val.toStdString()));
+        }
     }
 
     // ---
