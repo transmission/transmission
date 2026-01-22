@@ -464,6 +464,7 @@ jobs:
             ninja \
             npm \
             pkgconfig \
+            utfcpp \
             xz
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
@@ -777,6 +778,7 @@ jobs:
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_FMT=OFF `# Debian 11 package too old` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian 11` \
+            -DUSE_SYSTEM_UTF8CPP=OFF `# Debian 11 package too old` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Debian 11`
       - name: Build
