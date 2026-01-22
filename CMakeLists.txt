@@ -566,9 +566,8 @@ if(ENABLE_UTP)
             -DLIBUTP_SHARED:BOOL=OFF)
 endif()
 
-tr_add_external_auto_library_legacy(B64 libb64 b64
+tr_add_external_auto_library(B64 libb64
     SUBPROJECT
-    TARGET libb64::libb64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
