@@ -48,14 +48,10 @@ TEST_F(SessionTest, propertiesApi)
         EXPECT_EQ(value, session->downloadDir());
         EXPECT_EQ(value, tr_sessionGetDownloadDir(session));
 
-        tr_sessionSetDownloadDir(session, std::string(value).c_str());
+        tr_sessionSetDownloadDir(session, value);
         EXPECT_EQ(value, session->downloadDir());
         EXPECT_EQ(value, tr_sessionGetDownloadDir(session));
     }
-
-    tr_sessionSetDownloadDir(session, nullptr);
-    EXPECT_EQ(""sv, session->downloadDir());
-    EXPECT_EQ(""sv, tr_sessionGetDownloadDir(session));
 
     // incomplete dir
 
@@ -65,14 +61,10 @@ TEST_F(SessionTest, propertiesApi)
         EXPECT_EQ(value, session->incompleteDir());
         EXPECT_EQ(value, tr_sessionGetIncompleteDir(session));
 
-        tr_sessionSetIncompleteDir(session, std::string(value).c_str());
+        tr_sessionSetIncompleteDir(session, value);
         EXPECT_EQ(value, session->incompleteDir());
         EXPECT_EQ(value, tr_sessionGetIncompleteDir(session));
     }
-
-    tr_sessionSetIncompleteDir(session, nullptr);
-    EXPECT_EQ(""sv, session->incompleteDir());
-    EXPECT_EQ(""sv, tr_sessionGetIncompleteDir(session));
 
     // script
 
@@ -84,14 +76,10 @@ TEST_F(SessionTest, propertiesApi)
             EXPECT_EQ(value, session->script(type));
             EXPECT_EQ(value, tr_sessionGetScript(session, type));
 
-            tr_sessionSetScript(session, type, std::string(value).c_str());
+            tr_sessionSetScript(session, type, value);
             EXPECT_EQ(value, session->script(type));
             EXPECT_EQ(value, tr_sessionGetScript(session, type));
         }
-
-        tr_sessionSetScript(session, type, nullptr);
-        EXPECT_EQ(""sv, session->script(type));
-        EXPECT_EQ(""sv, tr_sessionGetScript(session, type));
 
         for (auto const value : { true, false })
         {
@@ -139,18 +127,15 @@ TEST_F(SessionTest, propertiesApi)
 
     for (auto const& value : { "foo"sv, "bar"sv, ""sv })
     {
-        tr_sessionSetRPCUsername(session, std::string{ value }.c_str());
+        tr_sessionSetRPCUsername(session, value);
         EXPECT_EQ(value, tr_sessionGetRPCUsername(session));
     }
-
-    tr_sessionSetRPCUsername(session, nullptr);
-    EXPECT_EQ(""sv, tr_sessionGetRPCUsername(session));
 
     // rpc password (unsalted)
 
     {
         auto const value = "foo"sv;
-        tr_sessionSetRPCPassword(session, std::string{ value }.c_str());
+        tr_sessionSetRPCPassword(session, value);
         EXPECT_NE(value, tr_sessionGetRPCPassword(session));
         EXPECT_EQ('{', tr_sessionGetRPCPassword(session)[0]);
     }
@@ -160,7 +145,7 @@ TEST_F(SessionTest, propertiesApi)
     {
         auto const plaintext = "foo"sv;
         auto const salted = tr_ssha1(plaintext);
-        tr_sessionSetRPCPassword(session, salted.c_str());
+        tr_sessionSetRPCPassword(session, salted);
         EXPECT_EQ(salted, tr_sessionGetRPCPassword(session));
     }
 

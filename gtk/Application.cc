@@ -1137,11 +1137,11 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_default_trackers:
-        tr_sessionSetDefaultTrackers(tr, gtr_pref_string_get(key).c_str());
+        tr_sessionSetDefaultTrackers(tr, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_download_dir:
-        tr_sessionSetDownloadDir(tr, gtr_pref_string_get(key).c_str());
+        tr_sessionSetDownloadDir(tr, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_message_level:
@@ -1244,7 +1244,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_rpc_whitelist:
-        tr_sessionSetRPCWhitelist(tr, gtr_pref_string_get(key).c_str());
+        tr_sessionSetRPCWhitelist(tr, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_rpc_whitelist_enabled:
@@ -1252,11 +1252,11 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_rpc_username:
-        tr_sessionSetRPCUsername(tr, gtr_pref_string_get(key).c_str());
+        tr_sessionSetRPCUsername(tr, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_rpc_password:
-        tr_sessionSetRPCPassword(tr, gtr_pref_string_get(key).c_str());
+        tr_sessionSetRPCPassword(tr, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_rpc_authentication_required:
@@ -1300,7 +1300,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_incomplete_dir:
-        tr_sessionSetIncompleteDir(tr, gtr_pref_string_get(key).c_str());
+        tr_sessionSetIncompleteDir(tr, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_incomplete_dir_enabled:
@@ -1312,7 +1312,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_script_torrent_done_filename:
-        tr_sessionSetScript(tr, TR_SCRIPT_ON_TORRENT_DONE, gtr_pref_string_get(key).c_str());
+        tr_sessionSetScript(tr, TR_SCRIPT_ON_TORRENT_DONE, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_script_torrent_done_seeding_enabled:
@@ -1320,7 +1320,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_script_torrent_done_seeding_filename:
-        tr_sessionSetScript(tr, TR_SCRIPT_ON_TORRENT_DONE_SEEDING, gtr_pref_string_get(key).c_str());
+        tr_sessionSetScript(tr, TR_SCRIPT_ON_TORRENT_DONE_SEEDING, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_start_added_torrents:

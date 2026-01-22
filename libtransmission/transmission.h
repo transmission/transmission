@@ -185,7 +185,7 @@ tr_variant tr_sessionGetSettings(tr_session const* session);
  * @param client_settings the dictionary to save
  * @see `tr_sessionLoadSettings()`
  */
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings);
+void tr_sessionSaveSettings(tr_session* session, std::string_view config_dir, tr_variant const& client_settings);
 
 /**
  * @brief Initialize a libtransmission session.
@@ -247,7 +247,7 @@ char const* tr_sessionGetDownloadDir(tr_session const* session);
  * @see `tr_sessionGetDownloadDir()`
  * @see `tr_ctorSetDownloadDir()`
  */
-void tr_sessionSetDownloadDir(tr_session* session, char const* download_dir);
+void tr_sessionSetDownloadDir(tr_session* session, std::string_view download_dir);
 
 /** @brief get the per-session incomplete download folder */
 char const* tr_sessionGetIncompleteDir(tr_session const* session);
@@ -271,7 +271,7 @@ char const* tr_sessionGetIncompleteDir(tr_session const* session);
  * @see `tr_sessionSetIncompleteDirEnabled()`
  * @see `tr_sessionGetIncompleteDirEnabled()`
  */
-void tr_sessionSetIncompleteDir(tr_session* session, char const* dir);
+void tr_sessionSetIncompleteDir(tr_session* session, std::string_view dir);
 
 /** @brief get whether or not the incomplete download folder is enabled */
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session);
@@ -333,7 +333,7 @@ char const* tr_sessionGetRPCWhitelist(tr_session const* session);
  * `'?'` is interpreted as a single-character wildcard and
  * `'*'` is interpreted as a multi-character wildcard.
  */
-void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist);
+void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view whitelist);
 
 bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session);
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);
@@ -344,15 +344,15 @@ void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);
     @see `tr_sessionInit()`
     @see `tr_sessionSetRPCPassword()` */
 char const* tr_sessionGetRPCPassword(tr_session const* session);
-void tr_sessionSetRPCPassword(tr_session* session, char const* password);
+void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
 
 char const* tr_sessionGetRPCUsername(tr_session const* session);
-void tr_sessionSetRPCUsername(tr_session* session, char const* username);
+void tr_sessionSetRPCUsername(tr_session* session, std::string_view username);
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool is_enabled);
 
-void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers);
+void tr_sessionSetDefaultTrackers(tr_session* session, std::string_view trackers);
 
 enum tr_rpc_callback_type : uint8_t
 {
@@ -662,7 +662,7 @@ enum TrScript : uint8_t
 
 char const* tr_sessionGetScript(tr_session const* session, TrScript type);
 
-void tr_sessionSetScript(tr_session* session, TrScript type, char const* script_filename);
+void tr_sessionSetScript(tr_session* session, TrScript type, std::string_view script_filename);
 
 bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type);
 

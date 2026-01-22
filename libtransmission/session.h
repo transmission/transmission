@@ -1313,10 +1313,10 @@ private:
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
     friend void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
-    friend void tr_sessionSetRPCPassword(tr_session* session, char const* password);
+    friend void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
     friend void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetRPCPort(tr_session* session, uint16_t hport);
-    friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
+    friend void tr_sessionSetRPCUsername(tr_session* session, std::string_view username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);

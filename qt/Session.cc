@@ -219,7 +219,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_PASSWORD:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCPassword(session_, prefs_.get<QString>(key).toUtf8().constData());
+                tr_sessionSetRPCPassword(session_, prefs_.get<QString>(key).toStdString());
             }
 
             break;
@@ -235,7 +235,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_USERNAME:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCUsername(session_, prefs_.get<QString>(key).toUtf8().constData());
+                tr_sessionSetRPCUsername(session_, prefs_.get<QString>(key).toStdString());
             }
 
             break;
@@ -251,7 +251,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_WHITELIST:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCWhitelist(session_, prefs_.get<QString>(key).toUtf8().constData());
+                tr_sessionSetRPCWhitelist(session_, prefs_.get<QString>(key).toStdString());
             }
 
             break;
