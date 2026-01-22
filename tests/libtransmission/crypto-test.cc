@@ -234,6 +234,13 @@ TEST(Crypto, random)
         EXPECT_LE(0U, val);
         EXPECT_LT(val, 100U);
     }
+
+    for (int i = 0; i < 100000; ++i)
+    {
+        auto const val = tr_rand_int(100);
+        EXPECT_LE(0, val);
+        EXPECT_LT(val, 100);
+    }
 }
 
 using CryptoRandBufferTest = ::testing::TestWithParam<size_t>;

@@ -14,6 +14,7 @@
 #include <random> // for std::uniform_int_distribution<T>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha256_d...
 #include "libtransmission/tr-strbuf.h"
@@ -259,12 +260,12 @@ private:
 template<class T>
 [[nodiscard]] T tr_rand_int(T upper_bound)
 {
-    static_assert(!std::is_signed<T>());
     using dist_type = std::uniform_int_distribution<T>;
+    using unsigned_T = std::make_unsigned_t<T>;
 
-    thread_local auto rng = tr_urbg<T>{};
+    thread_local auto rng = tr_urbg<unsigned_T>{};
     thread_local auto dist = dist_type{};
-    return dist(rng, typename dist_type::param_type(0, upper_bound - 1));
+    return dist(rng, typename dist_type::param_type{ T{}, upper_bound - T{ 1 } });
 }
 
 /** @} */
