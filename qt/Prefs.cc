@@ -171,10 +171,26 @@ void Prefs::load(tr_variant::Map const& settings)
 {
     for (int idx = 0; idx < PREFS_COUNT; ++idx)
     {
-        if (auto const iter = settings.find(getKey(idx)); iter != settings.end())
+        if (auto const iter = settings.find(Items[idx].key); iter != settings.end())
         {
             values_[idx] = qvarFromTVar(iter->second, Items[idx].type);
         }
+    }
+}
+
+void Prefs::set(int const key, tr_variant const& value)
+{
+    auto const tmp = qvarFromTVar(value, Items[key].type);
+    if (tmp.isNull())
+    {
+        return;
+    }
+
+    auto& v = values_[key];
+    if (v.isNull() || v != tmp)
+    {
+        v = tmp;
+        emit changed(key);
     }
 }
 
@@ -186,11 +202,17 @@ tr_variant::Map Prefs::current_settings() const
     {
         if (prefIsSavable(idx))
         {
-            map.try_emplace(Items[idx].key, trvarFromQVar(values_[idx], Items[idx].type));
+            auto [key, val] = keyval(idx);
+            map.try_emplace(key, std::move(val));
         }
     }
 
     return map;
+}
+
+std::pair<tr_quark, tr_variant> Prefs::keyval(int const idx) const
+{
+    return { Items[idx].key, trvarFromQVar(values_[idx], Items[idx].type) };
 }
 
 void Prefs::save(QString const& filename) const

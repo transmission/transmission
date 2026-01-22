@@ -12,6 +12,7 @@
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h> /* tr_strratio() */
 #include <libtransmission/values.h>
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
@@ -21,6 +22,7 @@
 #include <giomm/appinfo.h>
 #include <giomm/asyncresult.h>
 #include <giomm/file.h>
+#include <glibmm/convert.h>
 #include <glibmm/error.h>
 #include <glibmm/i18n.h>
 #include <glibmm/quark.h>
@@ -609,51 +611,53 @@ void gtr_object_notify_emit(Glib::ObjectBase& object)
     g_signal_emit_by_name(object.gobj(), "notify", nullptr);
 }
 
-Glib::ustring gtr_get_help_uri()
+std::string gtr_get_help_uri(std::string_view const relative_path)
 {
-    static auto const uri = fmt::format("https://transmissionbt.com/help/gtk/{}.{}x", MAJOR_VERSION, MINOR_VERSION / 10);
-    return uri;
+    return fmt::format("https://transmissionbt.com/help/gtk/{}.{}x/{}", MAJOR_VERSION, MINOR_VERSION / 10, relative_path);
 }
 
-void gtr_open_file(std::string const& path)
+void gtr_open_file(std::string_view const base, std::string_view const relative_path)
 {
-    gtr_open_uri(Gio::File::create_for_path(path)->get_uri());
+    auto const filename = tr_pathbuf{ base, "/"sv, relative_path };
+    gtr_open_file(filename.sv());
 }
 
-void gtr_open_uri(Glib::ustring const& uri)
+void gtr_open_file(std::string_view const filename)
 {
-    if (!uri.empty())
+    auto const filename_ustr = Glib::ustring{ filename.data(), filename.size() };
+    gtr_open_uri(Glib::filename_to_uri(filename_ustr).raw());
+}
+
+void gtr_open_uri(std::string_view const uri)
+{
+    if (std::empty(uri))
     {
-        bool opened = false;
+        return;
+    }
 
-        if (!opened)
-        {
-            try
-            {
-                opened = Gio::AppInfo::launch_default_for_uri(uri);
-            }
-            catch (Glib::Error const&)
-            {
-            }
-        }
+    auto const uri_str = std::string{ uri };
 
-        if (!opened)
+    try
+    {
+        if (Gio::AppInfo::launch_default_for_uri(uri_str))
         {
-            try
-            {
-                Glib::spawn_async({}, std::vector<std::string>{ "xdg-open", uri }, TR_GLIB_SPAWN_FLAGS(SEARCH_PATH));
-                opened = true;
-            }
-            catch (Glib::SpawnError const&)
-            {
-            }
-        }
-
-        if (!opened)
-        {
-            gtr_message(fmt::format(fmt::runtime(_("Couldn't open '{url}'")), fmt::arg("url", uri)));
+            return;
         }
     }
+    catch (Glib::Error const&)
+    {
+    }
+
+    try
+    {
+        Glib::spawn_async({}, std::vector<std::string>{ "xdg-open", uri_str }, TR_GLIB_SPAWN_FLAGS(SEARCH_PATH));
+        return;
+    }
+    catch (Glib::SpawnError const&)
+    {
+    }
+
+    gtr_message(fmt::format(fmt::runtime(_("Couldn't open '{url}'")), fmt::arg("url", uri)));
 }
 
 // ---

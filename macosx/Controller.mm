@@ -62,6 +62,7 @@
 #import "ExpandedPathToIconTransformer.h"
 #import "VersionComparator.h"
 #import "PowerManager.h"
+#import "Utils.h"
 
 typedef NSString* ToolbarItemIdentifier NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -723,11 +724,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     tr_sessionGetAllTorrents(session, std::data(torrents), std::size(torrents));
     for (auto* tor : torrents)
     {
-        NSString* location;
-        if (tr_torrentGetDownloadDir(tor) != NULL)
-        {
-            location = @(tr_torrentGetDownloadDir(tor));
-        }
+        NSString* location = tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(tor));
         Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:tor location:location lib:self.fLib];
         [self.fTorrents addObject:torrent];
         self.fTorrentHashes[torrent.hashString] = torrent;
@@ -5466,11 +5463,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)rpcAddTorrentStruct:(struct tr_torrent*)torrentStruct
 {
-    NSString* location = nil;
-    if (tr_torrentGetDownloadDir(torrentStruct) != NULL)
-    {
-        location = @(tr_torrentGetDownloadDir(torrentStruct));
-    }
+    NSString* location = tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(torrentStruct));
 
     Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:torrentStruct location:location lib:self.fLib];
 

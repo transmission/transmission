@@ -1004,7 +1004,10 @@ void tr_torrentSetFilePriorities(
 /** @brief Set a batch of files to be downloaded or not. */
 void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);
 
-char const* tr_torrentGetDownloadDir(tr_torrent const* torrent);
+/**
+ * Returns a permanently interned string of the torrent's download directory.
+ */
+[[nodiscard]] std::string_view tr_torrentGetDownloadDir(tr_torrent const* torrent);
 
 /* Raw function to change the torrent's downloadDir field.
    This should only be used by libtransmission or to bootstrap
@@ -1012,13 +1015,13 @@ char const* tr_torrentGetDownloadDir(tr_torrent const* torrent);
 void tr_torrentSetDownloadDir(tr_torrent* torrent, char const* path);
 
 /**
- * Returns the root directory of where the torrent is.
+ * Returns a permanently interned string of the torrent's root directory.
  *
  * This will usually be the downloadDir. However if the torrent
  * has an incompleteDir enabled and hasn't finished downloading
  * yet, that will be returned instead.
  */
-char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
+[[nodiscard]] std::string_view tr_torrentGetCurrentDir(tr_torrent const* tor);
 
 /**
  * Returns a the magnet link to the torrent.

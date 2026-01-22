@@ -26,6 +26,7 @@
 class AddData;
 class MainWindow;
 class Prefs;
+class RpcClient;
 class Session;
 class Torrent;
 class TorrentModel;
@@ -36,7 +37,14 @@ class Application : public QApplication
     Q_OBJECT
 
 public:
-    Application(Prefs& prefs, bool minimized, QString const& config_dir, QStringList const& filenames, int& argc, char** argv);
+    Application(
+        Prefs& prefs,
+        RpcClient& rpc,
+        bool minimized,
+        QString const& config_dir,
+        QStringList const& filenames,
+        int& argc,
+        char** argv);
     Application(Application&&) = delete;
     Application(Application const&) = delete;
     Application& operator=(Application&&) = delete;

@@ -1205,18 +1205,18 @@ void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
     }
 }
 
-char const* tr_torrentGetDownloadDir(tr_torrent const* tor)
+std::string_view tr_torrentGetDownloadDir(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->download_dir().c_str();
+    return tor->download_dir().sv();
 }
 
-char const* tr_torrentGetCurrentDir(tr_torrent const* tor)
+std::string_view tr_torrentGetCurrentDir(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->current_dir().c_str();
+    return tor->current_dir().sv();
 }
 
 void tr_torrentChangeMyPort(tr_torrent* tor)

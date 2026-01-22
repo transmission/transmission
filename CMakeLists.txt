@@ -505,13 +505,13 @@ if(WIN32 AND NOT MINGW)
 else()
     set(DEFLATE_LIB_NAME deflate)
 endif()
-tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
+tr_add_external_auto_library_legacy(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
     TARGET deflate::deflate
     CMAKE_ARGS
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
 
-tr_add_external_auto_library(EVENT2 libevent event
+tr_add_external_auto_library_legacy(EVENT2 libevent event
     TARGET libevent::event
     CMAKE_ARGS
         -DEVENT__DISABLE_OPENSSL:BOOL=ON
@@ -521,7 +521,7 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
-tr_add_external_auto_library(NATPMP libnatpmp natpmp
+tr_add_external_auto_library_legacy(NATPMP libnatpmp natpmp
     TARGET natpmp::natpmp
     CMAKE_ARGS
         -DBUILD_SHARED_LIBS=OFF)
@@ -537,7 +537,7 @@ if(WIN32)
 else()
     set(TR_MINIUPNPC_LIBNAME miniupnpc)
 endif()
-tr_add_external_auto_library(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
+tr_add_external_auto_library_legacy(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
     TARGET miniupnpc::libminiupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
@@ -552,27 +552,27 @@ unset(TR_MINIUPNPC_LIBNAME)
 
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
-tr_add_external_auto_library(DHT dht dht
+tr_add_external_auto_library_legacy(DHT dht dht
     TARGET dht::dht)
 
-tr_add_external_auto_library(PSL libpsl psl
+tr_add_external_auto_library_legacy(PSL libpsl psl
     TARGET psl::psl)
 
 if(ENABLE_UTP)
-    tr_add_external_auto_library(UTP libutp utp
+    tr_add_external_auto_library_legacy(UTP libutp utp
         SUBPROJECT
         TARGET libutp::libutp
         CMAKE_ARGS
             -DLIBUTP_SHARED:BOOL=OFF)
 endif()
 
-tr_add_external_auto_library(B64 libb64 b64
+tr_add_external_auto_library_legacy(B64 libb64 b64
     SUBPROJECT
     TARGET libb64::libb64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
-tr_add_external_auto_library(CRC32C crc32c crc32c
+tr_add_external_auto_library_legacy(CRC32C crc32c crc32c
     TARGET Crc32c::crc32c
     CMAKE_ARGS
         -DCRC32C_BUILD_TESTS=OFF

@@ -144,7 +144,7 @@ jobs:
           git diff --name-only
           git add --update web
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: 'chore/update-webapp-files'
           commit-message: 'chore: update generated transmission-web files'

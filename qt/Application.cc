@@ -129,6 +129,7 @@ QAccessibleInterface* accessibleFactory(QString const& className, QObject* objec
 
 Application::Application(
     Prefs& prefs,
+    RpcClient& rpc,
     bool minimized,
     QString const& config_dir,
     QStringList const& filenames,
@@ -162,7 +163,7 @@ Application::Application(
     QAccessible::installFactory(&accessibleFactory);
 #endif
 
-    session_ = std::make_unique<Session>(config_dir, prefs_);
+    session_ = std::make_unique<Session>(config_dir, prefs_, rpc);
     model_ = std::make_unique<TorrentModel>(prefs_);
     window_ = std::make_unique<MainWindow>(*session_, prefs_, *model_, minimized);
     watch_dir_ = std::make_unique<WatchDir>(*model_);

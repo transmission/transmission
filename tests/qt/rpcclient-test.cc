@@ -4,9 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <QApplication>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 #include <QRegularExpression>
 #include <QTest>
 #include <QUrl>
@@ -16,6 +13,7 @@
 #include <libtransmission/quark.h>
 
 #include "RpcClient.h"
+#include "rpc-test-fixtures.h"
 
 namespace api_compat = libtransmission::api_compat;
 using Style = api_compat::Style;
@@ -29,97 +27,8 @@ Q_DECLARE_METATYPE(Style)
 
 namespace
 {
-template<typename String>
-[[nodiscard]] QByteArray toQBA(String const& str)
-{
-    auto const sv = std::string_view{ str };
-    return { sv.data(), static_cast<qsizetype>(sv.size()) };
-}
-
-class FakeReply final : public QNetworkReply
-{
-    Q_OBJECT
-
-public:
-    [[nodiscard]] static FakeReply* newPostReply(QUrl const& url, QObject* parent = nullptr)
-    {
-        return newPostReply(QNetworkRequest{ url }, parent);
-    }
-
-    [[nodiscard]] static FakeReply* newPostReply(QNetworkRequest const& req, QObject* parent = nullptr)
-    {
-        auto reply = new FakeReply{ QNetworkAccessManager::PostOperation, req, parent };
-
-        // networkRequestFinished expects these properties to exist.
-        auto promise = QFutureInterface<RpcResponse>{};
-        promise.reportStarted();
-        reply->setProperty("requestReplyFutureInterface", QVariant::fromValue(promise));
-        reply->setProperty("requestBody", QByteArray{ "{}" });
-
-        return reply;
-    }
-
-    explicit FakeReply(QNetworkAccessManager::Operation op, QNetworkRequest const& req, QObject* parent = nullptr)
-        : QNetworkReply{ parent }
-    {
-        setOperation(op);
-        setRequest(req);
-        setUrl(req.url());
-        open(QIODevice::ReadOnly);
-    }
-
-    void setHttpStatus(int const code)
-    {
-        setAttribute(QNetworkRequest::HttpStatusCodeAttribute, code);
-    }
-
-    template<typename StringA, typename StringB>
-    void addRawHeader(StringA const& name, StringB const& value)
-    {
-        setRawHeader(toQBA(name), toQBA(value));
-    }
-
-    void abort() override
-    {
-    }
-
-protected:
-    qint64 readData(char* /*data*/, qint64 /*maxSize*/) override
-    {
-        return 0;
-    }
-};
-
-class FakeNetworkAccessManager final : public QNetworkAccessManager
-{
-    Q_OBJECT
-
-public:
-    int create_count = 0;
-    QNetworkAccessManager::Operation last_operation = QNetworkAccessManager::UnknownOperation;
-    QNetworkRequest last_request;
-    QByteArray last_body;
-
-protected:
-    QNetworkReply* createRequest(Operation op, QNetworkRequest const& req, QIODevice* outgoing_data) override
-    {
-        ++create_count;
-        last_operation = op;
-        last_request = req;
-
-        if (outgoing_data != nullptr)
-        {
-            last_body = outgoing_data->readAll();
-            outgoing_data->seek(0);
-        }
-
-        return new FakeReply{ op, req, this };
-    }
-};
-
 auto const tr4_session_get_payload_re = QRegularExpression{ R"(^\{"method":"session-get","tag":[0-9]+\}$)" };
 auto const tr5_session_get_payload_re = QRegularExpression{ R"(^\{"id":[0-9]+,"jsonrpc":"2\.0","method":"session_get"\}$)" };
-
 } // namespace
 
 class RpcClientTest : public QObject
