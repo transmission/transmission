@@ -8,9 +8,10 @@
 #include <algorithm>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using UtilsTest = ::libtransmission::test::TransmissionTest;

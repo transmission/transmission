@@ -7,11 +7,12 @@
 #include <future>
 #include <string>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-magnet.h>
 #include <libtransmission/torrent-metainfo.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 namespace libtransmission::test

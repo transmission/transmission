@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/subprocess.h>
