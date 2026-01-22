@@ -43,6 +43,7 @@ include(TrMacros)
 
 set(CURL_MINIMUM 7.28.0)
 set(WOLFSSL_MINIMUM 3.4)
+set(CRC32C_MINIMUM 1.1.0)
 set(DEFLATE_MINIMUM 1.7)
 set(EVENT2_MINIMUM 2.1.0)
 set(GIOMM_MINIMUM 2.26.0)
@@ -572,8 +573,12 @@ tr_add_external_auto_library_legacy(B64 libb64 b64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
-tr_add_external_auto_library_legacy(CRC32C crc32c crc32c
+# Don't build crc32c as subdirectory as its CMakeLists.txt
+# messes with global CMAKE_* variables and global compiler options
+tr_add_external_auto_library(CRC32C Crc32c
     TARGET Crc32c::crc32c
+    LIBNAME crc32c
+    SOURCE_DIR crc32c
     CMAKE_ARGS
         -DCRC32C_BUILD_TESTS=OFF
         -DCRC32C_BUILD_BENCHMARKS=OFF
