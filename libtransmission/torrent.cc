@@ -118,9 +118,9 @@ tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo 
     return session->torrents().get(metainfo->info_hash());
 }
 
-tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
+tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, std::string_view const magnet_link)
 {
-    return magnet_link == nullptr ? nullptr : session->torrents().get(magnet_link);
+    return session->torrents().get(magnet_link);
 }
 
 bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename)

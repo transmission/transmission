@@ -910,7 +910,7 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, tr_torrent_id_t id);
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo);
 
-tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
+[[nodiscard]] tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, std::string_view magnet_link);
 
 /**
  * @brief Set metainfo if possible.
