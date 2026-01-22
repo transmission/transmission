@@ -39,7 +39,7 @@ protected:
 
     static auto makeRandomFiles(
         std::string_view top,
-        size_t n_files = std::max(size_t{ 1U }, static_cast<size_t>(tr_rand_int(DefaultMaxFileCount))),
+        size_t n_files = std::max(size_t{ 1U }, tr_rand_int(DefaultMaxFileCount)),
         size_t max_size = DefaultMaxFileSize)
     {
         auto files = std::vector<std::pair<std::string, std::vector<std::byte>>>{};
