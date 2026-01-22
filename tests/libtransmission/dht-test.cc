@@ -193,7 +193,7 @@ protected:
         {
             auto addrport = tr_socket_address::from_sockaddr(sa);
             assert(addrport);
-            pinged_.push_back(Pinged{ *addrport, tr_time() });
+            pinged_.push_back(Pinged{ .addrport = *addrport, .timestamp = tr_time() });
             return 0;
         }
 
@@ -201,7 +201,7 @@ protected:
         {
             auto info_hash = tr_sha1_digest_t{};
             std::copy_n(reinterpret_cast<std::byte const*>(id), std::size(info_hash), std::data(info_hash));
-            searched_.push_back(Searched{ info_hash, tr_port::from_host(port), af });
+            searched_.push_back(Searched{ .info_hash = info_hash, .port = tr_port::from_host(port), .af = af });
             return 0;
         }
 

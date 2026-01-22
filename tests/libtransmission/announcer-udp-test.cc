@@ -434,8 +434,20 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 2U;
-    expected_response.rows[0] = { tr_rand_obj<tr_sha1_digest_t>(), 1, 2, 3, std::nullopt };
-    expected_response.rows[1] = { tr_rand_obj<tr_sha1_digest_t>(), 4, 5, 6, std::nullopt };
+    expected_response.rows[0] = {
+        .info_hash = tr_rand_obj<tr_sha1_digest_t>(),
+        .seeders = 1,
+        .leechers = 2,
+        .downloads = 3,
+        .downloaders = std::nullopt,
+    };
+    expected_response.rows[1] = {
+        .info_hash = tr_rand_obj<tr_sha1_digest_t>(),
+        .seeders = 4,
+        .leechers = 5,
+        .downloads = 6,
+        .downloaders = std::nullopt,
+    };
     expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
 
