@@ -118,9 +118,9 @@ tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo 
     return session->torrents().get(metainfo->info_hash());
 }
 
-tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
+tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, std::string_view const magnet_link)
 {
-    return magnet_link == nullptr ? nullptr : session->torrents().get(magnet_link);
+    return session->torrents().get(magnet_link);
 }
 
 bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename)
@@ -1195,7 +1195,7 @@ bool tr_torrent::has_any_local_data() const
     return files().has_any_local_data(std::data(paths), n_paths);
 }
 
-void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
+void tr_torrentSetDownloadDir(tr_torrent* tor, std::string_view const path)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -2112,9 +2112,9 @@ void tr_torrent::on_tracker_response(tr_tracker_event const* event)
     }
 }
 
-bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text)
+bool tr_torrentSetTrackerList(tr_torrent* tor, std::string_view const txt)
 {
-    return text != nullptr && tor->set_announce_list(text);
+    return tor->set_announce_list(txt);
 }
 
 std::string tr_torrentGetTrackerList(tr_torrent const* tor)
@@ -2530,14 +2530,11 @@ void tr_torrent::rename_path(
 
 void tr_torrentRenamePath(
     tr_torrent* tor,
-    char const* oldpath,
-    char const* newname,
+    std::string_view const oldpath,
+    std::string_view const newname,
     tr_torrent_rename_done_func callback,
     void* callback_user_data)
 {
-    oldpath = oldpath != nullptr ? oldpath : "";
-    newname = newname != nullptr ? newname : "";
-
     tor->rename_path(oldpath, newname, std::move(callback), callback_user_data);
 }
 

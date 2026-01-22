@@ -2197,7 +2197,7 @@ void EditTrackersDialog::on_response(int response)
 
         if (auto* const tor = core_->find_torrent(torrent_id_); tor != nullptr)
         {
-            if (tr_torrentSetTrackerList(tor, text_buffer->get_text(false).c_str()))
+            if (tr_torrentSetTrackerList(tor, text_buffer->get_text(false).raw()))
             {
                 parent_.refresh();
             }

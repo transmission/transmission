@@ -252,8 +252,8 @@ MakeProgressDialog::~MakeProgressDialog()
 void MakeProgressDialog::addTorrent()
 {
     tr_ctor* ctor = tr_ctorNew(core_->get_session());
-    tr_ctorSetMetainfoFromFile(ctor, target_.c_str(), nullptr);
-    tr_ctorSetDownloadDir(ctor, TR_FORCE, Glib::path_get_dirname(builder_.top()).c_str());
+    tr_ctorSetMetainfoFromFile(ctor, target_);
+    tr_ctorSetDownloadDir(ctor, TR_FORCE, Glib::path_get_dirname(builder_.top()));
     core_->add_ctor(ctor);
 }
 

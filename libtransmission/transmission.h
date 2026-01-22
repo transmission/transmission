@@ -705,7 +705,7 @@ char const* tr_blocklistGetURL(tr_session const* session);
 
 /** @brief The blocklist that gets updated when an RPC client
            invokes the "blocklist_update" method */
-void tr_blocklistSetURL(tr_session* session, char const* url);
+void tr_blocklistSetURL(tr_session* session, std::string_view url);
 
 /** @} */
 
@@ -741,7 +741,7 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme_do_delete);
 void tr_ctorSetDeleteSource(tr_ctor* ctor, bool delete_source);
 
 /** @brief Set the constructor's metainfo from a magnet link */
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet, tr_error* error);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet, tr_error* error = nullptr);
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor);
 
@@ -749,7 +749,7 @@ tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor);
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error* error);
 
 /** @brief Set the constructor's metainfo from a local torrent file */
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error* error);
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error* error = nullptr);
 
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme_count);
@@ -761,9 +761,8 @@ void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t limit);
 bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setme_download_dir);
 
 /** @brief Set the download folder for the torrent being added with this ctor.
-    @see `tr_ctorSetDownloadDir()`
     @see `tr_sessionInit()` */
-void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory);
+void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, std::string_view dir);
 
 /**
  * @brief Set the incompleteDir for this torrent.
@@ -773,7 +772,7 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
  * its older incompleteDir settings, and that's
  * the only place where it should be used.
  */
-void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory);
+void tr_ctorSetIncompleteDir(tr_ctor* ctor, std::string_view dir);
 
 /** @brief Get the "isPaused" flag from this peer constructor */
 bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme_is_paused);
@@ -876,8 +875,8 @@ using tr_torrent_rename_done_func = std::function<
  */
 void tr_torrentRenamePath(
     tr_torrent* tor,
-    char const* oldpath,
-    char const* newname,
+    std::string_view oldpath,
+    std::string_view newname,
     tr_torrent_rename_done_func callback,
     void* callback_user_data);
 
@@ -911,7 +910,7 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, tr_torrent_id_t id);
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo);
 
-tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
+[[nodiscard]] tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, std::string_view magnet_link);
 
 /**
  * @brief Set metainfo if possible.
@@ -1012,7 +1011,7 @@ void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_
 /* Raw function to change the torrent's downloadDir field.
    This should only be used by libtransmission or to bootstrap
    a newly-instantiated tr_torrent object. */
-void tr_torrentSetDownloadDir(tr_torrent* torrent, char const* path);
+void tr_torrentSetDownloadDir(tr_torrent* torrent, std::string_view path);
 
 /**
  * Returns a permanently interned string of the torrent's root directory.
@@ -1049,7 +1048,7 @@ void tr_torrentSetDownloadDir(tr_torrent* torrent, char const* path);
  * This updates both the `torrent` object's tracker list
  * and the metainfo file in `tr_sessionGetConfigDir()`'s torrent subdirectory.
  */
-bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text);
+bool tr_torrentSetTrackerList(tr_torrent* tor, std::string_view txt);
 
 // ---
 

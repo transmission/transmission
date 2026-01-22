@@ -767,7 +767,7 @@ void core_apply_defaults(tr_ctor* ctor)
 
     if (!tr_ctorGetDownloadDir(ctor, TR_FORCE, nullptr))
     {
-        tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir).c_str());
+        tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir));
     }
 }
 
@@ -840,13 +840,13 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     if (auto const path = file->get_path(); !std::empty(path))
     {
         // try to treat it as a file...
-        loaded = tr_ctorSetMetainfoFromFile(ctor, path.c_str(), nullptr);
+        loaded = tr_ctorSetMetainfoFromFile(ctor, path);
     }
 
     if (!loaded)
     {
         // try to treat it as a magnet link...
-        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri().c_str(), nullptr);
+        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri());
     }
 
     // if we could make sense of it, add it

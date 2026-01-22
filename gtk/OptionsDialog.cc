@@ -159,7 +159,7 @@ void OptionsDialog::Impl::updateTorrent()
     }
     else
     {
-        tr_torrentSetDownloadDir(tor_, downloadDir_.c_str());
+        tr_torrentSetDownloadDir(tor_, downloadDir_);
         file_list_->set_sensitive(tr_torrentHasMetadata(tor_));
         file_list_->set_torrent(tr_torrentId(tor_));
         tr_torrentVerify(tor_);
@@ -185,11 +185,11 @@ void OptionsDialog::Impl::sourceChanged(PathButton* b)
         if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename, filename_)))
         {
             filename_ = filename;
-            tr_ctorSetMetainfoFromFile(ctor_.get(), filename_.c_str(), nullptr);
+            tr_ctorSetMetainfoFromFile(ctor_.get(), filename_);
             new_file = true;
         }
 
-        tr_ctorSetDownloadDir(ctor_.get(), TR_FORCE, downloadDir_.c_str());
+        tr_ctorSetDownloadDir(ctor_.get(), TR_FORCE, downloadDir_);
         tr_ctorSetPaused(ctor_.get(), TR_FORCE, true);
         tr_ctorSetDeleteSource(ctor_.get(), false);
 

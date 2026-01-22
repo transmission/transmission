@@ -84,9 +84,9 @@ void tr_ctorFree(tr_ctor* ctor)
     delete ctor;
 }
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* const ctor, char const* const filename, tr_error* const error)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* const ctor, std::string_view const filename, tr_error* const error)
 {
-    return ctor->set_metainfo_from_file(std::string_view{ filename != nullptr ? filename : "" }, error);
+    return ctor->set_metainfo_from_file(filename, error);
 }
 
 bool tr_ctorSetMetainfo(tr_ctor* const ctor, char const* const metainfo, size_t len, tr_error* const error)
@@ -95,10 +95,9 @@ bool tr_ctorSetMetainfo(tr_ctor* const ctor, char const* const metainfo, size_t 
     return ctor->set_metainfo(metainfo_sv, error);
 }
 
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* const ctor, char const* const magnet, tr_error* const error)
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* const ctor, std::string_view const magnet, tr_error* const error)
 {
-    auto const magnet_sv = std::string_view{ magnet != nullptr ? magnet : "" };
-    return ctor->set_metainfo_from_magnet_link(magnet_sv, error);
+    return ctor->set_metainfo_from_magnet_link(magnet, error);
 }
 
 char const* tr_ctorGetSourceFile(tr_ctor const* const ctor)
@@ -150,14 +149,14 @@ void tr_ctorSetPeerLimit(tr_ctor* const ctor, tr_ctorMode const mode, uint16_t c
     ctor->set_peer_limit(mode, peer_limit);
 }
 
-void tr_ctorSetDownloadDir(tr_ctor* const ctor, tr_ctorMode const mode, char const* const dir)
+void tr_ctorSetDownloadDir(tr_ctor* const ctor, tr_ctorMode const mode, std::string_view const dir)
 {
-    ctor->set_download_dir(mode, std::string_view{ dir != nullptr ? dir : "" });
+    ctor->set_download_dir(mode, dir);
 }
 
-void tr_ctorSetIncompleteDir(tr_ctor* const ctor, char const* const dir)
+void tr_ctorSetIncompleteDir(tr_ctor* const ctor, std::string_view const dir)
 {
-    ctor->set_incomplete_dir(std::string_view{ dir != nullptr ? dir : "" });
+    ctor->set_incomplete_dir(dir);
 }
 
 bool tr_ctorGetPeerLimit(tr_ctor const* const ctor, tr_ctorMode const mode, uint16_t* const setme)

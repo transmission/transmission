@@ -114,14 +114,10 @@ TEST_F(SessionTest, propertiesApi)
         EXPECT_EQ(value, session->blocklistUrl());
         EXPECT_EQ(value, tr_blocklistGetURL(session));
 
-        tr_blocklistSetURL(session, std::string(value).c_str());
+        tr_blocklistSetURL(session, value);
         EXPECT_EQ(value, session->blocklistUrl());
         EXPECT_EQ(value, tr_blocklistGetURL(session));
     }
-
-    tr_blocklistSetURL(session, nullptr);
-    EXPECT_EQ(""sv, session->blocklistUrl());
-    EXPECT_EQ(""sv, tr_blocklistGetURL(session));
 
     // rpc username
 
