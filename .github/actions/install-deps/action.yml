@@ -112,6 +112,12 @@ runs:
             xz-utils
           )
 
+          # Debian wants to build Transmission with system gtest
+          # https://github.com/transmission/transmission/pull/6900
+          if [ "$DISTRO" = 'debian' ]; then
+            BASE_PACKAGES+=(libgtest-dev)
+          fi
+
           # Compiler packages
           if [[ "${{ inputs.compiler }}" == "clang" ]]; then
             BASE_PACKAGES+=(clang)

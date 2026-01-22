@@ -759,6 +759,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_GTEST=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian 11` \
@@ -836,6 +837,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_GTEST=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian` \
