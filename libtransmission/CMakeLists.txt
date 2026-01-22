@@ -274,7 +274,7 @@ target_link_libraries(${TR_NAME}
         FastFloat::fast_float
         psl::psl
         natpmp::natpmp
-        miniupnpc::libminiupnpc
+        miniupnpc::miniupnpc
         dht::dht
         libutp::libutp
         libb64::libb64
