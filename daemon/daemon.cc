@@ -197,7 +197,7 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
 
     if (is_torrent)
     {
-        if (!tr_ctorSetMetainfoFromFile(ctor, filename, nullptr))
+        if (!tr_ctorSetMetainfoFromFile(ctor, filename))
         {
             retry = true;
         }
@@ -218,9 +218,8 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
         }
         else
         {
-            content.push_back('\0'); // zero-terminated string
-            auto const* data = std::data(content);
-            if (!tr_ctorSetMetainfoFromMagnetLink(ctor, data, nullptr))
+            auto const content_sv = std::string_view{ content.data(), content.size() };
+            if (!tr_ctorSetMetainfoFromMagnetLink(ctor, content_sv))
             {
                 retry = true;
             }
@@ -393,7 +392,7 @@ tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_
     return TR_RPC_OK;
 }
 
-tr_variant load_settings(char const* config_dir)
+tr_variant load_settings(std::string_view const config_dir)
 {
     auto app_defaults_map = tr_variant::Map{ 6U };
     app_defaults_map.try_emplace(TR_KEY_watch_dir, tr_variant::unmanaged_string(""sv));
@@ -810,18 +809,16 @@ void tr_daemon::reconfigure()
             static_cast<uint64_t>(ts.tv_sec) * 1000000U + static_cast<uint64_t>(ts.tv_nsec) / 1000U);
 #endif
 
-        char const* configDir;
-
         /* reopen the logfile to allow for log rotation */
         if (log_file_name_ != nullptr)
         {
             reopen_log_file(log_file_name_);
         }
 
-        configDir = tr_sessionGetConfigDir(my_session_);
-        tr_logAddInfo(fmt::format(fmt::runtime(_("Reloading settings from '{path}'")), fmt::arg("path", configDir)));
+        auto const config_dir = tr_sessionGetConfigDir(my_session_);
+        tr_logAddInfo(fmt::format(fmt::runtime(_("Reloading settings from '{path}'")), fmt::arg("path", config_dir)));
 
-        tr_sessionSet(my_session_, load_settings(configDir));
+        tr_sessionSet(my_session_, load_settings(config_dir));
         tr_sessionReloadBlocklists(my_session_);
 
         sd_notify(0, "STATUS=Reload complete.\nREADY=1\n");
@@ -854,11 +851,10 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     }
 
     /* start the session */
-    auto const* const cdir = this->config_dir_.c_str();
     auto* session = tr_sessionInit(config_dir_, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
     tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", config_dir_)));
-    tr_sessionSaveSettings(session, cdir, settings_);
+    tr_sessionSaveSettings(session, config_dir_, settings_);
 
     auto const* const settings_map = settings_.get_if<tr_variant::Map>();
     if (settings_map == nullptr)
@@ -1013,7 +1009,7 @@ CLEANUP:
 
     event_base_free(ev_base_);
 
-    tr_sessionSaveSettings(my_session_, cdir, settings_);
+    tr_sessionSaveSettings(my_session_, config_dir_, settings_);
     tr_sessionClose(my_session_);
     pumpLogMessages(log_stream_);
     printf(" done.\n");

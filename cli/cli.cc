@@ -352,8 +352,8 @@ int tr_main(int argc, char* argv[])
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);
 
-    if (tr_sys_path_exists(torrentPath) ? tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr) :
-                                          tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr))
+    if (tr_sys_path_exists(torrentPath) ? tr_ctorSetMetainfoFromFile(ctor, torrentPath) :
+                                          tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath))
     {
         // all good
     }
@@ -445,7 +445,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    tr_sessionSaveSettings(h, config_dir.c_str(), settings);
+    tr_sessionSaveSettings(h, config_dir, settings);
 
     printf("\n");
     tr_sessionClose(h);

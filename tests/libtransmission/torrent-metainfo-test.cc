@@ -122,7 +122,7 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
 
     auto* ctor = tr_ctorNew(session_);
     auto error = tr_error{};
-    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), &error));
+    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename, &error));
     EXPECT_FALSE(error) << error;
     auto const* const metainfo = tr_ctorGetMetainfo(ctor);
     EXPECT_NE(nullptr, metainfo);
@@ -147,7 +147,7 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     error = {};
 
     // now try saving _with_ metainfo
-    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str(), &error));
+    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename, &error));
     EXPECT_FALSE(error) << error;
     EXPECT_TRUE(ctor->save(tgt_filename, &error));
     EXPECT_FALSE(error) << error;

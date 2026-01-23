@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <ctime>
 #include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -185,7 +186,7 @@ tr_variant tr_sessionGetSettings(tr_session const* session);
  * @param client_settings the dictionary to save
  * @see `tr_sessionLoadSettings()`
  */
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings);
+void tr_sessionSaveSettings(tr_session* session, std::string_view config_dir, tr_variant const& client_settings);
 
 /**
  * @brief Initialize a libtransmission session.
@@ -228,10 +229,9 @@ void tr_sessionClose(tr_session* session, double timeout_secs = 15.0);
  * @brief Return the session's configuration directory.
  *
  * This is where transmission stores its torrent files, .resume files,
- * blocklists, etc. It's set in `tr_transmissionInit()` and is immutable
- * during the session.
+ * blocklists, etc. It's set in `tr_transmissionInit()`.
  */
-char const* tr_sessionGetConfigDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetConfigDir(tr_session const* session);
 
 /**
  * @brief Get the default download folder for new torrents.
@@ -239,7 +239,7 @@ char const* tr_sessionGetConfigDir(tr_session const* session);
  * This is set by `tr_sessionInit()` or `tr_sessionSetDownloadDir()`,
  * and can be overridden on a per-torrent basis by `tr_ctorSetDownloadDir()`.
  */
-char const* tr_sessionGetDownloadDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetDownloadDir(tr_session const* session);
 
 /**
  * @brief Set the per-session default download folder for new torrents.
@@ -247,10 +247,10 @@ char const* tr_sessionGetDownloadDir(tr_session const* session);
  * @see `tr_sessionGetDownloadDir()`
  * @see `tr_ctorSetDownloadDir()`
  */
-void tr_sessionSetDownloadDir(tr_session* session, char const* download_dir);
+void tr_sessionSetDownloadDir(tr_session* session, std::string_view download_dir);
 
 /** @brief get the per-session incomplete download folder */
-char const* tr_sessionGetIncompleteDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetIncompleteDir(tr_session const* session);
 
 /**
  * @brief set the per-session incomplete download folder.
@@ -271,7 +271,7 @@ char const* tr_sessionGetIncompleteDir(tr_session const* session);
  * @see `tr_sessionSetIncompleteDirEnabled()`
  * @see `tr_sessionGetIncompleteDirEnabled()`
  */
-void tr_sessionSetIncompleteDir(tr_session* session, char const* dir);
+void tr_sessionSetIncompleteDir(tr_session* session, std::string_view dir);
 
 /** @brief get whether or not the incomplete download folder is enabled */
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session);
@@ -323,7 +323,7 @@ void tr_sessionSetRPCPort(tr_session* session, uint16_t port);
     @return a comma-separated string of whitelist domains.
     @see `tr_sessionInit`
     @see `tr_sessionSetRPCWhitelist` */
-char const* tr_sessionGetRPCWhitelist(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetRPCWhitelist(tr_session const* session);
 
 /**
  * @brief Specify a whitelist for remote RPC access
@@ -333,7 +333,7 @@ char const* tr_sessionGetRPCWhitelist(tr_session const* session);
  * `'?'` is interpreted as a single-character wildcard and
  * `'*'` is interpreted as a multi-character wildcard.
  */
-void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist);
+void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view whitelist);
 
 bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session);
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);
@@ -343,16 +343,16 @@ void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);
     @return the password string.
     @see `tr_sessionInit()`
     @see `tr_sessionSetRPCPassword()` */
-char const* tr_sessionGetRPCPassword(tr_session const* session);
-void tr_sessionSetRPCPassword(tr_session* session, char const* password);
+[[nodiscard]] std::string tr_sessionGetRPCPassword(tr_session const* session);
+void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
 
-char const* tr_sessionGetRPCUsername(tr_session const* session);
-void tr_sessionSetRPCUsername(tr_session* session, char const* username);
+[[nodiscard]] std::string tr_sessionGetRPCUsername(tr_session const* session);
+void tr_sessionSetRPCUsername(tr_session* session, std::string_view username);
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool is_enabled);
 
-void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers);
+void tr_sessionSetDefaultTrackers(tr_session* session, std::string_view trackers);
 
 enum tr_rpc_callback_type : uint8_t
 {
@@ -660,9 +660,9 @@ enum TrScript : uint8_t
     TR_SCRIPT_N_TYPES
 };
 
-char const* tr_sessionGetScript(tr_session const* session, TrScript type);
+[[nodiscard]] std::string tr_sessionGetScript(tr_session const* session, TrScript type);
 
-void tr_sessionSetScript(tr_session* session, TrScript type, char const* script_filename);
+void tr_sessionSetScript(tr_session* session, TrScript type, std::string_view script_filename);
 
 bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type);
 
@@ -701,11 +701,11 @@ bool tr_blocklistIsEnabled(tr_session const* session);
 
 void tr_blocklistSetEnabled(tr_session* session, bool is_enabled);
 
-char const* tr_blocklistGetURL(tr_session const* session);
+[[nodiscard]] std::string tr_blocklistGetURL(tr_session const* session);
 
 /** @brief The blocklist that gets updated when an RPC client
            invokes the "blocklist_update" method */
-void tr_blocklistSetURL(tr_session* session, char const* url);
+void tr_blocklistSetURL(tr_session* session, std::string_view url);
 
 /** @} */
 
@@ -741,7 +741,7 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme_do_delete);
 void tr_ctorSetDeleteSource(tr_ctor* ctor, bool delete_source);
 
 /** @brief Set the constructor's metainfo from a magnet link */
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet, tr_error* error);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet, tr_error* error = nullptr);
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor);
 
@@ -749,7 +749,7 @@ tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor);
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error* error);
 
 /** @brief Set the constructor's metainfo from a local torrent file */
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error* error);
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error* error = nullptr);
 
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme_count);
@@ -758,12 +758,11 @@ bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme_
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t limit);
 
 /** @brief Get the download path from this peer constructor */
-bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setme_download_dir);
+std::optional<std::string> tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode);
 
 /** @brief Set the download folder for the torrent being added with this ctor.
-    @see `tr_ctorSetDownloadDir()`
     @see `tr_sessionInit()` */
-void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory);
+void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, std::string_view dir);
 
 /**
  * @brief Set the incompleteDir for this torrent.
@@ -773,7 +772,7 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
  * its older incompleteDir settings, and that's
  * the only place where it should be used.
  */
-void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory);
+void tr_ctorSetIncompleteDir(tr_ctor* ctor, std::string_view dir);
 
 /** @brief Get the "isPaused" flag from this peer constructor */
 bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme_is_paused);
@@ -789,8 +788,8 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);
 
 /** @brief Get the torrent file that this ctor's metainfo came from,
-           or nullptr if `tr_ctorSetMetainfoFromFile()` wasn't used */
-char const* tr_ctorGetSourceFile(tr_ctor const* ctor);
+           or empty if `tr_ctorSetMetainfoFromFile()` wasn't used */
+std::optional<std::string> tr_ctorGetSourceFile(tr_ctor const* ctor);
 
 /**
  * Instantiate a single torrent.
@@ -876,8 +875,8 @@ using tr_torrent_rename_done_func = std::function<
  */
 void tr_torrentRenamePath(
     tr_torrent* tor,
-    char const* oldpath,
-    char const* newname,
+    std::string_view oldpath,
+    std::string_view newname,
     tr_torrent_rename_done_func callback,
     void* callback_user_data);
 
@@ -911,7 +910,7 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, tr_torrent_id_t id);
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo);
 
-tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
+[[nodiscard]] tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, std::string_view magnet_link);
 
 /**
  * @brief Set metainfo if possible.
@@ -923,7 +922,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* torrent, tr_torrent_metainfo cons
 /**
  * @return this torrent's name.
  */
-char const* tr_torrentName(tr_torrent const* tor);
+[[nodiscard]] std::string tr_torrentName(tr_torrent const* tor);
 
 /**
  * @brief find the location of a torrent's file by looking with and without
@@ -1012,7 +1011,7 @@ void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_
 /* Raw function to change the torrent's downloadDir field.
    This should only be used by libtransmission or to bootstrap
    a newly-instantiated tr_torrent object. */
-void tr_torrentSetDownloadDir(tr_torrent* torrent, char const* path);
+void tr_torrentSetDownloadDir(tr_torrent* torrent, std::string_view path);
 
 /**
  * Returns a permanently interned string of the torrent's root directory.
@@ -1049,7 +1048,7 @@ void tr_torrentSetDownloadDir(tr_torrent* torrent, char const* path);
  * This updates both the `torrent` object's tracker list
  * and the metainfo file in `tr_sessionGetConfigDir()`'s torrent subdirectory.
  */
-bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text);
+bool tr_torrentSetTrackerList(tr_torrent* tor, std::string_view txt);
 
 // ---
 

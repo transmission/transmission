@@ -133,7 +133,7 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     }
 }
 
-void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
+void bandwidthGroupWrite(tr_session const* session, std::string_view const config_dir)
 {
     auto const& groups = session->bandwidthGroups();
     auto groups_map = tr_variant::Map{ std::size(groups) };
@@ -504,7 +504,7 @@ tr_variant tr_sessionLoadSettings(std::string_view const config_dir, tr_variant 
     return settings;
 }
 
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings)
+void tr_sessionSaveSettings(tr_session* session, std::string_view const config_dir, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 
@@ -956,25 +956,25 @@ void tr_session::Settings::fixup_to_preferred_transports()
 
 // ---
 
-void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
+void tr_sessionSetDownloadDir(tr_session* session, std::string_view const dir)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setDownloadDir(dir != nullptr ? dir : "");
+    session->setDownloadDir(dir);
 }
 
-char const* tr_sessionGetDownloadDir(tr_session const* session)
+std::string tr_sessionGetDownloadDir(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->downloadDir().c_str();
+    return session->downloadDir();
 }
 
-char const* tr_sessionGetConfigDir(tr_session const* session)
+std::string tr_sessionGetConfigDir(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->configDir().c_str();
+    return session->configDir();
 }
 
 // ---
@@ -995,18 +995,18 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)
 
 // ---
 
-void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
+void tr_sessionSetIncompleteDir(tr_session* session, std::string_view const dir)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setIncompleteDir(dir != nullptr ? dir : "");
+    session->setIncompleteDir(dir);
 }
 
-char const* tr_sessionGetIncompleteDir(tr_session const* session)
+std::string tr_sessionGetIncompleteDir(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->incompleteDir().c_str();
+    return session->incompleteDir();
 }
 
 void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool enabled)
@@ -1747,11 +1747,11 @@ void tr_session::setDefaultTrackers(std::string_view trackers)
     }
 }
 
-void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
+void tr_sessionSetDefaultTrackers(tr_session* session, std::string_view const trackers)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setDefaultTrackers(trackers != nullptr ? trackers : "");
+    session->setDefaultTrackers(trackers);
 }
 
 // ---
@@ -1832,14 +1832,14 @@ size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
     return session->blocklists_.update_primary_blocklist(content_filename, session->blocklist_enabled());
 }
 
-void tr_blocklistSetURL(tr_session* session, char const* url)
+void tr_blocklistSetURL(tr_session* session, std::string_view const url)
 {
-    session->setBlocklistUrl(url != nullptr ? url : "");
+    session->setBlocklistUrl(url);
 }
 
-char const* tr_blocklistGetURL(tr_session const* session)
+std::string tr_blocklistGetURL(tr_session const* session)
 {
-    return session->blocklistUrl().c_str();
+    return session->blocklistUrl();
 }
 
 // ---
@@ -1898,18 +1898,18 @@ void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_
     session->rpc_func_user_data_ = user_data;
 }
 
-void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist)
+void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view const whitelist)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setRpcWhitelist(whitelist != nullptr ? whitelist : "");
+    session->setRpcWhitelist(whitelist);
 }
 
-char const* tr_sessionGetRPCWhitelist(tr_session const* session)
+std::string tr_sessionGetRPCWhitelist(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->whitelist().c_str();
+    return session->rpc_server_->whitelist();
 }
 
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool enabled)
@@ -1926,32 +1926,32 @@ bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session)
     return session->useRpcWhitelist();
 }
 
-void tr_sessionSetRPCPassword(tr_session* session, char const* password)
+void tr_sessionSetRPCPassword(tr_session* session, std::string_view const password)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->set_password(password != nullptr ? password : "");
+    session->rpc_server_->set_password(password);
 }
 
-char const* tr_sessionGetRPCPassword(tr_session const* session)
+std::string tr_sessionGetRPCPassword(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->get_salted_password().c_str();
+    return session->rpc_server_->get_salted_password();
 }
 
-void tr_sessionSetRPCUsername(tr_session* session, char const* username)
+void tr_sessionSetRPCUsername(tr_session* session, std::string_view const username)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->set_username(username != nullptr ? username : "");
+    session->rpc_server_->set_username(username);
 }
 
-char const* tr_sessionGetRPCUsername(tr_session const* session)
+std::string tr_sessionGetRPCUsername(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->username().c_str();
+    return session->rpc_server_->username();
 }
 
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled)
@@ -1986,20 +1986,20 @@ bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type)
     return session->useScript(type);
 }
 
-void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
+void tr_sessionSetScript(tr_session* session, TrScript type, std::string_view const script)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->setScript(type, script != nullptr ? script : "");
+    session->setScript(type, script);
 }
 
-char const* tr_sessionGetScript(tr_session const* session, TrScript type)
+std::string tr_sessionGetScript(tr_session const* const session, TrScript const type)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->script(type).c_str();
+    return session->script(type);
 }
 
 // ---

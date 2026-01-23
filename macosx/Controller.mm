@@ -1384,7 +1384,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     tr_torrent* duplicateTorrent;
     if ((duplicateTorrent = tr_torrentFindFromMagnetLink(self.fLib, address.UTF8String)))
     {
-        NSString* name = @(tr_torrentName(duplicateTorrent));
+        NSString* name = tr_strv_to_utf8_nsstring(tr_torrentName(duplicateTorrent));
         [self duplicateOpenMagnetAlert:address transferName:name];
         return;
     }
