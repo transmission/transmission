@@ -200,6 +200,7 @@ runs:
         # Transmission-specific libraries
         BASE_PACKAGES+=(
           crc32c
+          fmt
           libb64
           libdeflate
           libevent
