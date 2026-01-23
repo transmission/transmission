@@ -2,7 +2,9 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#include <memory>
 #include <optional>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -50,32 +52,19 @@ static dispatch_queue_t timeMachineExcludeQueue;
 
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
-     completionHandler:(void (^)(BOOL))completionHandler
+     completionHandler:(std::function<void(bool)>)completionHandler
                oldPath:(NSString*)oldPath
                newName:(NSString*)newName;
+
+- (void)renamePath:(NSString*)oldPath
+             withName:(NSString*)newName
+                nodes:(NSArray<FileListNode*>*)nodes
+    completionHandler:(std::function<void(bool)>)completionHandler;
 
 @property(nonatomic, readonly) BOOL shouldShowEta;
 @property(nonatomic, readonly) NSString* etaString;
 
 @end
-
-void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char const* newNameCharString, int error, void* contextInfo)
-{
-    @autoreleasepool
-    {
-        NSString* oldPath = @(oldPathCharString);
-        NSString* newName = @(newNameCharString);
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSDictionary* contextDict = (__bridge_transfer NSDictionary*)contextInfo;
-            Torrent* torrentObject = contextDict[@"Torrent"];
-            [torrentObject renameFinished:error == 0 nodes:contextDict[@"Nodes"]
-                        completionHandler:contextDict[@"CompletionHandler"]
-                                  oldPath:oldPath
-                                  newName:newName];
-        });
-    }
-}
 
 bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 {
@@ -854,28 +843,64 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     }
 }
 
-- (void)renameTorrent:(NSString*)newName completionHandler:(void (^)(BOOL didRename))completionHandler
+- (void)renameTorrent:(NSString*)newName completionHandler:(std::function<void(bool)>)completionHandler
 {
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString:@""]);
 
-    NSDictionary* contextInfo = @{ @"Torrent" : self, @"CompletionHandler" : [completionHandler copy] };
-
-    tr_torrentRenamePath(self.fHandle, tr_torrentName(self.fHandle), newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
+    NSString* oldPath = tr_strv_to_utf8_nsstring(tr_torrentName(self.fHandle));
+    [self renamePath:oldPath withName:newName nodes:nil completionHandler:std::move(completionHandler)];
 }
 
 - (void)renameFileNode:(FileListNode*)node
               withName:(NSString*)newName
-     completionHandler:(void (^)(BOOL didRename))completionHandler
+     completionHandler:(std::function<void(bool)>)completionHandler
 {
     NSParameterAssert(node.torrent == self);
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString:@""]);
 
-    NSDictionary* contextInfo = @{ @"Torrent" : self, @"Nodes" : @[ node ], @"CompletionHandler" : [completionHandler copy] };
-
     NSString* oldPath = [node.path stringByAppendingPathComponent:node.name];
-    tr_torrentRenamePath(self.fHandle, oldPath.UTF8String, newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
+    [self renamePath:oldPath withName:newName nodes:@[ node ] completionHandler:std::move(completionHandler)];
+}
+
+- (void)renamePath:(NSString*)oldPath
+             withName:(NSString*)newName
+                nodes:(NSArray<FileListNode*>*)nodes
+    completionHandler:(std::function<void(bool)>)completionHandler
+{
+    struct RenameContext
+    {
+        __strong Torrent* torrent = nil;
+        __strong NSArray<FileListNode*>* nodes = nil;
+        __strong NSString* oldPath = nil;
+        __strong NSString* newName = nil;
+        std::function<void(bool)> completionHandler;
+    };
+
+    auto context = std::make_shared<RenameContext>();
+    context->torrent = self;
+    context->nodes = nodes;
+    context->oldPath = oldPath;
+    context->newName = newName;
+    context->completionHandler = std::move(completionHandler);
+
+    tr_torrentRenamePath(
+        self.fHandle,
+        oldPath.UTF8String,
+        newName.UTF8String,
+        [context](int error)
+        {
+            @autoreleasepool
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [context->torrent renameFinished:error == 0 nodes:context->nodes
+                                   completionHandler:context->completionHandler
+                                             oldPath:context->oldPath
+                                             newName:context->newName];
+                });
+            }
+        });
 }
 
 - (time_t)eta
@@ -2098,11 +2123,11 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
-     completionHandler:(void (^)(BOOL))completionHandler
+     completionHandler:(std::function<void(bool)>)completionHandler
                oldPath:(NSString*)oldPath
                newName:(NSString*)newName
 {
-    NSParameterAssert(completionHandler != nil);
+    NSParameterAssert(static_cast<bool>(completionHandler));
     NSParameterAssert(oldPath != nil);
     NSParameterAssert(newName != nil);
 

@@ -106,10 +106,18 @@ typedef void (^CompletionBlock)(BOOL);
 
 - (IBAction)rename:(id)sender
 {
-    void (^completionHandler)(BOOL) = ^(BOOL didRename) {
+    __weak FileRenameSheetController* weakSelf = self;
+    auto completionHandler = [weakSelf](bool didRename)
+    {
+        FileRenameSheetController* strongSelf = weakSelf;
+        if (strongSelf == nil)
+        {
+            return;
+        }
+
         if (didRename)
         {
-            [NSApp endSheet:self.window returnCode:NSModalResponseOK];
+            [NSApp endSheet:strongSelf.window returnCode:NSModalResponseOK];
         }
         else
         {
