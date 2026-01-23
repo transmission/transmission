@@ -911,13 +911,6 @@ private:
             maybe_add_strike(webseed.get());
         }
 
-        auto const now = std::chrono::system_clock::now();
-        for (auto [block, end] = tor->block_span_for_piece(piece); block < end; ++block)
-        {
-            block_history.try_emplace(block).first->second.emplace_back(now, fmt::format("got bad piece {}", piece));
-            log_block_history(block);
-        }
-
         tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
     }
 
@@ -1003,7 +996,6 @@ private:
                 peer->blocks_sent_to_client.add(tr_time(), 1);
                 peer->blame.set(loc.piece);
                 s->got_block.emit(tor, loc.block); // put this line before calling tr_torrent callback
-                tor->on_block_received(loc.block);
                 auto const* const msgs = dynamic_cast<tr_peerMsgs*>(peer);
                 s->block_history.try_emplace(loc.block).first->second.emplace_back(
                     now,
@@ -1011,6 +1003,7 @@ private:
                         "received from {} [{}]",
                         peer->display_name(),
                         msgs != nullptr ? msgs->user_agent() : "webseed"sv));
+                tor->on_block_received(loc.block);
             }
             break;
 
