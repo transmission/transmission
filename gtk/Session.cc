@@ -687,25 +687,22 @@ Glib::RefPtr<Torrent> Session::Impl::create_new_torrent(tr_ctor* ctor)
 {
     bool do_trash = false;
 
-    /* let the gtk client handle the removal, since libT
-     * doesn't have any concept of the glib trash API */
+    // let the gtk client handle the removal, since libT
+    // doesn't have any concept of the glib trash API
     tr_ctorGetDeleteSource(ctor, &do_trash);
     tr_ctorSetDeleteSource(ctor, false);
     tr_torrent* const tor = tr_torrentNew(ctor, nullptr);
 
     if (tor != nullptr && do_trash)
     {
-        char const* config = tr_sessionGetConfigDir(session_);
-        char const* source = tr_ctorGetSourceFile(ctor);
-
-        if (source != nullptr)
+        if (std::optional<std::string> const source = tr_ctorGetSourceFile(ctor))
         {
-            /* #1294: don't delete the .torrent file if it's our internal copy */
-            bool const is_internal = strstr(source, config) == source;
-
+            // #1294: don't delete the .torrent file if it's our internal copy
+            std::string const config_dir = tr_sessionGetConfigDir(session_);
+            bool const is_internal = source && source->starts_with(config_dir);
             if (!is_internal)
             {
-                gtr_file_trash_or_remove(source, nullptr);
+                gtr_file_trash_or_remove(*source);
             }
         }
     }
@@ -726,7 +723,7 @@ void Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
         /* don't complain about torrent files in the watch directory
          * that have already been added... that gets annoying and we
          * don't want to be nagging users to clean up their watch dirs */
-        if (tr_ctorGetSourceFile(ctor) == nullptr || !adding_from_watch_dir_)
+        if (!tr_ctorGetSourceFile(ctor).has_value() || !adding_from_watch_dir_)
         {
             signal_add_error_.emit(ERR_ADD_TORRENT_DUP, metainfo->name().c_str());
         }
@@ -765,7 +762,7 @@ void core_apply_defaults(tr_ctor* ctor)
         tr_ctorSetPeerLimit(ctor, TR_FORCE, gtr_pref_int_get(TR_KEY_peer_limit_per_torrent));
     }
 
-    if (!tr_ctorGetDownloadDir(ctor, TR_FORCE, nullptr))
+    if (!tr_ctorGetDownloadDir(ctor, TR_FORCE).has_value())
     {
         tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir));
     }

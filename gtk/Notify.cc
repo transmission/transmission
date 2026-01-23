@@ -252,7 +252,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_
             0U,
             Glib::ustring("transmission"),
             Glib::ustring(_("Torrent Complete")),
-            Glib::ustring(tr_torrentName(tor)),
+            Glib::ustring{ tr_torrentName(tor) },
             actions,
             hints,
             -1));
@@ -286,7 +286,7 @@ void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, tr_torrent_id_t
             0U,
             Glib::ustring("transmission"),
             Glib::ustring(_("Torrent Added")),
-            Glib::ustring(tr_torrentName(tor)),
+            Glib::ustring{ tr_torrentName(tor) },
             actions,
             std::map<Glib::ustring, Glib::VariantBase>(),
             -1));

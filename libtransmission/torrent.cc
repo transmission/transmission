@@ -93,9 +93,9 @@ void tr_torrent::Error::clear_if_tracker() noexcept
 
 // ---
 
-char const* tr_torrentName(tr_torrent const* tor)
+std::string tr_torrentName(tr_torrent const* tor)
 {
-    return tor != nullptr ? tor->name().c_str() : "";
+    return tor != nullptr ? tor->name() : ""s;
 }
 
 tr_torrent_id_t tr_torrentId(tr_torrent const* tor)

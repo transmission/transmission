@@ -26,7 +26,7 @@
 #include <memory>
 #include <utility>
 
-using namespace std::string_view_literals;
+using namespace std::literals;
 
 /****
 *****
@@ -36,28 +36,6 @@ namespace
 {
 
 auto const ShowOptionsDialogChoice = "show_options_dialog"sv; // TODO(C++20): Use ""s
-
-std::string get_source_file(tr_ctor& ctor)
-{
-    if (char const* source_file = tr_ctorGetSourceFile(&ctor); source_file != nullptr)
-    {
-        return source_file;
-    }
-
-    return "";
-}
-
-std::string get_download_dir(tr_ctor& ctor)
-{
-    char const* str = nullptr;
-    if (!tr_ctorGetDownloadDir(&ctor, TR_FORCE, &str))
-    {
-        g_assert_not_reached();
-    }
-
-    g_assert(str != nullptr);
-    return str;
-}
 
 } // namespace
 
@@ -149,7 +127,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
 
 void OptionsDialog::Impl::updateTorrent()
 {
-    bool const isLocalFile = tr_ctorGetSourceFile(ctor_.get()) != nullptr;
+    bool const isLocalFile = tr_ctorGetSourceFile(ctor_.get()).has_value();
     trash_check_->set_sensitive(isLocalFile);
 
     if (tor_ == nullptr)
@@ -276,8 +254,8 @@ OptionsDialog::Impl::Impl(
     : dialog_(dialog)
     , core_(core)
     , ctor_(std::move(ctor))
-    , filename_(get_source_file(*ctor_))
-    , downloadDir_(get_download_dir(*ctor_))
+    , filename_{ tr_ctorGetSourceFile(ctor_.get()).value_or(""s) }
+    , downloadDir_{ tr_ctorGetDownloadDir(ctor_.get(), TR_FORCE).value_or(""s) }
     , file_list_(gtr_get_widget_derived<FileList>(builder, "files_view_scroll", "files_view", core_, 0))
     , run_check_(gtr_get_widget<Gtk::CheckButton>(builder, "start_check"))
     , trash_check_(gtr_get_widget<Gtk::CheckButton>(builder, "trash_check"))

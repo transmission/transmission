@@ -166,7 +166,7 @@ void setup_item_view_button_event_handling(
 #endif
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error = nullptr);
+bool gtr_file_trash_or_remove(std::string_view filename, tr_error* error = nullptr);
 
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry);
 

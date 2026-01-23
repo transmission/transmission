@@ -521,7 +521,7 @@ void setup_item_view_button_event_handling(
 
 #endif
 
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error)
+bool gtr_file_trash_or_remove(std::string_view const filename, tr_error* error)
 {
     g_return_val_if_fail(!filename.empty(), false);
 
@@ -531,7 +531,7 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error)
         error = &local_error;
     }
 
-    auto const file = Gio::File::create_for_path(filename);
+    auto const file = Gio::File::create_for_path(std::string{ filename });
     bool trashed = false;
 
     if (gtr_pref_flag_get(TR_KEY_trash_can_enabled))

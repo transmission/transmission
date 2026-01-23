@@ -392,7 +392,7 @@ tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_
     return TR_RPC_OK;
 }
 
-tr_variant load_settings(char const* config_dir)
+tr_variant load_settings(std::string_view const config_dir)
 {
     auto app_defaults_map = tr_variant::Map{ 6U };
     app_defaults_map.try_emplace(TR_KEY_watch_dir, tr_variant::unmanaged_string(""sv));
@@ -809,18 +809,16 @@ void tr_daemon::reconfigure()
             static_cast<uint64_t>(ts.tv_sec) * 1000000U + static_cast<uint64_t>(ts.tv_nsec) / 1000U);
 #endif
 
-        char const* configDir;
-
         /* reopen the logfile to allow for log rotation */
         if (log_file_name_ != nullptr)
         {
             reopen_log_file(log_file_name_);
         }
 
-        configDir = tr_sessionGetConfigDir(my_session_);
-        tr_logAddInfo(fmt::format(fmt::runtime(_("Reloading settings from '{path}'")), fmt::arg("path", configDir)));
+        auto const config_dir = tr_sessionGetConfigDir(my_session_);
+        tr_logAddInfo(fmt::format(fmt::runtime(_("Reloading settings from '{path}'")), fmt::arg("path", config_dir)));
 
-        tr_sessionSet(my_session_, load_settings(configDir));
+        tr_sessionSet(my_session_, load_settings(config_dir));
         tr_sessionReloadBlocklists(my_session_);
 
         sd_notify(0, "STATUS=Reload complete.\nREADY=1\n");

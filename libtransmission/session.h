@@ -1263,9 +1263,9 @@ private:
     friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
     friend bool tr_sessionUsesAltSpeed(tr_session const* session);
     friend bool tr_sessionUsesAltSpeedTime(tr_session const* session);
-    friend char const* tr_sessionGetRPCPassword(tr_session const* session);
-    friend char const* tr_sessionGetRPCUsername(tr_session const* session);
-    friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
+    friend std::string tr_sessionGetRPCPassword(tr_session const* session);
+    friend std::string tr_sessionGetRPCUsername(tr_session const* session);
+    friend std::string tr_sessionGetRPCWhitelist(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend size_t tr_sessionGetAltSpeedBegin(tr_session const* session);

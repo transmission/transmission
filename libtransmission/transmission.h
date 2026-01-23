@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <ctime>
 #include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -228,10 +229,9 @@ void tr_sessionClose(tr_session* session, double timeout_secs = 15.0);
  * @brief Return the session's configuration directory.
  *
  * This is where transmission stores its torrent files, .resume files,
- * blocklists, etc. It's set in `tr_transmissionInit()` and is immutable
- * during the session.
+ * blocklists, etc. It's set in `tr_transmissionInit()`.
  */
-char const* tr_sessionGetConfigDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetConfigDir(tr_session const* session);
 
 /**
  * @brief Get the default download folder for new torrents.
@@ -239,7 +239,7 @@ char const* tr_sessionGetConfigDir(tr_session const* session);
  * This is set by `tr_sessionInit()` or `tr_sessionSetDownloadDir()`,
  * and can be overridden on a per-torrent basis by `tr_ctorSetDownloadDir()`.
  */
-char const* tr_sessionGetDownloadDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetDownloadDir(tr_session const* session);
 
 /**
  * @brief Set the per-session default download folder for new torrents.
@@ -250,7 +250,7 @@ char const* tr_sessionGetDownloadDir(tr_session const* session);
 void tr_sessionSetDownloadDir(tr_session* session, std::string_view download_dir);
 
 /** @brief get the per-session incomplete download folder */
-char const* tr_sessionGetIncompleteDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetIncompleteDir(tr_session const* session);
 
 /**
  * @brief set the per-session incomplete download folder.
@@ -323,7 +323,7 @@ void tr_sessionSetRPCPort(tr_session* session, uint16_t port);
     @return a comma-separated string of whitelist domains.
     @see `tr_sessionInit`
     @see `tr_sessionSetRPCWhitelist` */
-char const* tr_sessionGetRPCWhitelist(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetRPCWhitelist(tr_session const* session);
 
 /**
  * @brief Specify a whitelist for remote RPC access
@@ -343,10 +343,10 @@ void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);
     @return the password string.
     @see `tr_sessionInit()`
     @see `tr_sessionSetRPCPassword()` */
-char const* tr_sessionGetRPCPassword(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetRPCPassword(tr_session const* session);
 void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
 
-char const* tr_sessionGetRPCUsername(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetRPCUsername(tr_session const* session);
 void tr_sessionSetRPCUsername(tr_session* session, std::string_view username);
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
@@ -660,7 +660,7 @@ enum TrScript : uint8_t
     TR_SCRIPT_N_TYPES
 };
 
-char const* tr_sessionGetScript(tr_session const* session, TrScript type);
+[[nodiscard]] std::string tr_sessionGetScript(tr_session const* session, TrScript type);
 
 void tr_sessionSetScript(tr_session* session, TrScript type, std::string_view script_filename);
 
@@ -701,7 +701,7 @@ bool tr_blocklistIsEnabled(tr_session const* session);
 
 void tr_blocklistSetEnabled(tr_session* session, bool is_enabled);
 
-char const* tr_blocklistGetURL(tr_session const* session);
+[[nodiscard]] std::string tr_blocklistGetURL(tr_session const* session);
 
 /** @brief The blocklist that gets updated when an RPC client
            invokes the "blocklist_update" method */
@@ -758,7 +758,7 @@ bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme_
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t limit);
 
 /** @brief Get the download path from this peer constructor */
-bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setme_download_dir);
+std::optional<std::string> tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode);
 
 /** @brief Set the download folder for the torrent being added with this ctor.
     @see `tr_sessionInit()` */
@@ -788,8 +788,8 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);
 
 /** @brief Get the torrent file that this ctor's metainfo came from,
-           or nullptr if `tr_ctorSetMetainfoFromFile()` wasn't used */
-char const* tr_ctorGetSourceFile(tr_ctor const* ctor);
+           or empty if `tr_ctorSetMetainfoFromFile()` wasn't used */
+std::optional<std::string> tr_ctorGetSourceFile(tr_ctor const* ctor);
 
 /**
  * Instantiate a single torrent.
@@ -922,7 +922,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* torrent, tr_torrent_metainfo cons
 /**
  * @return this torrent's name.
  */
-char const* tr_torrentName(tr_torrent const* tor);
+[[nodiscard]] std::string tr_torrentName(tr_torrent const* tor);
 
 /**
  * @brief find the location of a torrent's file by looking with and without

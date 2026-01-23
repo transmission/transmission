@@ -16,6 +16,7 @@
 #import "BonjourController.h"
 #import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
+#import "Utils.h"
 
 typedef NS_ENUM(NSUInteger, DownloadPopupIndex) {
     DownloadPopupIndexFolder = 0,
@@ -1320,10 +1321,10 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.fDefaults setBool:encryptionMode == TR_ENCRYPTION_REQUIRED forKey:@"EncryptionRequire"];
 
     //download directory
-    NSString* downloadLocation = @(tr_sessionGetDownloadDir(self.fHandle)).stringByStandardizingPath;
+    NSString* downloadLocation = tr_strv_to_utf8_nsstring(tr_sessionGetDownloadDir(self.fHandle)).stringByStandardizingPath;
     [self.fDefaults setObject:downloadLocation forKey:@"DownloadFolder"];
 
-    NSString* incompleteLocation = @(tr_sessionGetIncompleteDir(self.fHandle)).stringByStandardizingPath;
+    NSString* incompleteLocation = tr_strv_to_utf8_nsstring(tr_sessionGetIncompleteDir(self.fHandle)).stringByStandardizingPath;
     [self.fDefaults setObject:incompleteLocation forKey:@"IncompleteDownloadFolder"];
 
     BOOL const useIncomplete = tr_sessionIsIncompleteDirEnabled(self.fHandle);
@@ -1416,7 +1417,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const blocklist = tr_blocklistIsEnabled(self.fHandle);
     [self.fDefaults setBool:blocklist forKey:@"BlocklistNew"];
 
-    NSString* blocklistURL = @(tr_blocklistGetURL(self.fHandle));
+    NSString* blocklistURL = tr_strv_to_utf8_nsstring(tr_blocklistGetURL(self.fHandle));
     [self.fDefaults setObject:blocklistURL forKey:@"BlocklistURL"];
 
     //seed ratio
@@ -1456,7 +1457,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const doneScriptEnabled = tr_sessionIsScriptEnabled(self.fHandle, TR_SCRIPT_ON_TORRENT_DONE);
     [self.fDefaults setBool:doneScriptEnabled forKey:@"DoneScriptEnabled"];
 
-    NSString* doneScriptPath = @(tr_sessionGetScript(self.fHandle, TR_SCRIPT_ON_TORRENT_DONE));
+    NSString* doneScriptPath = tr_strv_to_utf8_nsstring(tr_sessionGetScript(self.fHandle, TR_SCRIPT_ON_TORRENT_DONE));
     [self.fDefaults setObject:doneScriptPath forKey:@"DoneScriptPath"];
 
     //update gui if loaded

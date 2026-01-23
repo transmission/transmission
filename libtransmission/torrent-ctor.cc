@@ -100,9 +100,14 @@ bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* const ctor, std::string_view cons
     return ctor->set_metainfo_from_magnet_link(magnet, error);
 }
 
-char const* tr_ctorGetSourceFile(tr_ctor const* const ctor)
+std::optional<std::string> tr_ctorGetSourceFile(tr_ctor const* const ctor)
 {
-    return ctor->torrent_filename().c_str();
+    if (auto const& filename = ctor->torrent_filename(); !std::empty(filename))
+    {
+        return filename;
+    }
+
+    return {};
 }
 
 void tr_ctorSetFilePriorities(
@@ -189,19 +194,14 @@ bool tr_ctorGetPaused(tr_ctor const* const ctor, tr_ctorMode const mode, bool* c
     return false;
 }
 
-bool tr_ctorGetDownloadDir(tr_ctor const* const ctor, tr_ctorMode const mode, char const** setme)
+std::optional<std::string> tr_ctorGetDownloadDir(tr_ctor const* const ctor, tr_ctorMode const mode)
 {
-    if (auto const& val = ctor->download_dir(mode); !std::empty(val))
+    if (auto const& dir = ctor->download_dir(mode); !std::empty(dir))
     {
-        if (setme != nullptr)
-        {
-            *setme = val.c_str();
-        }
-
-        return true;
+        return dir;
     }
 
-    return false;
+    return {};
 }
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* const ctor)
