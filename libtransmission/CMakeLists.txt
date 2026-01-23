@@ -297,7 +297,7 @@ target_link_libraries(${TR_NAME}
     PUBLIC
         transmission::crypto_impl
         fmt::fmt-header-only
-        small::small
+        transmission::small
         libevent::event)
 
 if(INSTALL_LIB)

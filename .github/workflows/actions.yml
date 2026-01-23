@@ -166,6 +166,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu`
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
@@ -215,6 +216,7 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Homebrew` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew`
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
@@ -260,6 +262,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu`
       - name: Make (Core)
         run: cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
@@ -402,6 +405,7 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Homebrew` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew`
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
@@ -490,6 +494,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_B64=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Alpine` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Alpine`
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
@@ -765,6 +770,7 @@ jobs:
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_FMT=OFF `# Debian 11 package too old` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian 11`
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
@@ -842,6 +848,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian`
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
@@ -919,6 +926,7 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Fedora` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Fedora` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Fedora`
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
@@ -992,6 +1000,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu`
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
@@ -1105,6 +1114,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu`
       - name: Make
         run: cmake --build obj --config RelWithDebInfo -- "-k 0"
