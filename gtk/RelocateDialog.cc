@@ -77,7 +77,7 @@ void RelocateDialog::Impl::startMovingNextTorrent()
 
     if (tor != nullptr)
     {
-        tr_torrentSetLocation(tor, targetLocation.c_str(), do_move_, &done_);
+        tr_torrentSetLocation(tor, targetLocation, do_move_, &done_);
     }
 
     torrent_ids_.pop_back();

@@ -1157,22 +1157,24 @@ size_t buildSearchPathArray(tr_torrent const* tor, std::string_view* paths)
 } // namespace location_helpers
 } // namespace
 
-void tr_torrent::set_location(std::string_view location, bool move_from_old_path, int volatile* setme_state)
+void tr_torrent::set_location(std::string_view const location, bool const move_from_old_path, int volatile* setme_state)
 {
     if (setme_state != nullptr)
     {
         *setme_state = TR_LOC_MOVING;
     }
 
-    session->run_in_session_thread([this, loc = std::string(location), move_from_old_path, setme_state]()
+    session->run_in_session_thread([this, loc = std::string{ location }, move_from_old_path, setme_state]()
                                    { set_location_in_session_thread(loc, move_from_old_path, setme_state); });
 }
 
-void tr_torrentSetLocation(tr_torrent* tor, char const* location, bool move_from_old_path, int volatile* setme_state)
+void tr_torrentSetLocation(
+    tr_torrent* tor,
+    std::string_view const location,
+    bool const move_from_old_path,
+    int volatile* setme_state)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(location != nullptr);
-    TR_ASSERT(*location != '\0');
 
     tor->set_location(location, move_from_old_path, setme_state);
 }
