@@ -219,16 +219,12 @@ void tr_torrentSetSpeedLimit_KBps(tr_torrent* const tor, tr_direction const dir,
 size_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* const tor, tr_direction const dir)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_isDirection(dir));
-
     return tor->speed_limit(dir).count(Speed::Units::KByps);
 }
 
 void tr_torrentUseSpeedLimit(tr_torrent* const tor, tr_direction const dir, bool const enabled)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_isDirection(dir));
-
     tor->use_speed_limit(dir, enabled);
 }
 
@@ -243,7 +239,8 @@ void tr_torrentUseSessionLimits(tr_torrent* const tor, bool const enabled)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->bandwidth().honor_parent_limits(TR_UP, enabled) || tor->bandwidth().honor_parent_limits(TR_DOWN, enabled))
+    if (tor->bandwidth().honor_parent_limits(tr_direction::Up, enabled) ||
+        tor->bandwidth().honor_parent_limits(tr_direction::Down, enabled))
     {
         tor->set_dirty();
     }
@@ -954,10 +951,10 @@ void tr_torrent::init(tr_ctor const& ctor)
 
     if ((loaded & tr_resume::Speedlimit) == 0)
     {
-        use_speed_limit(TR_UP, false);
-        set_speed_limit(TR_UP, session->speed_limit(TR_UP));
-        use_speed_limit(TR_DOWN, false);
-        set_speed_limit(TR_DOWN, session->speed_limit(TR_DOWN));
+        use_speed_limit(tr_direction::Up, false);
+        set_speed_limit(tr_direction::Up, session->speed_limit(tr_direction::Up));
+        use_speed_limit(tr_direction::Down, false);
+        set_speed_limit(tr_direction::Down, session->speed_limit(tr_direction::Down));
         tr_torrentUseSessionLimits(this, true);
     }
 
@@ -1291,8 +1288,8 @@ tr_stat tr_torrent::stats() const
     stats.errorString = this->error().errmsg().c_str();
 
     stats.peersConnected = swarm_stats.peer_count;
-    stats.peersSendingToUs = swarm_stats.active_peer_count[TR_DOWN];
-    stats.peersGettingFromUs = swarm_stats.active_peer_count[TR_UP];
+    stats.peersSendingToUs = swarm_stats.active_peer_count[static_cast<uint8_t>(tr_direction::Down)];
+    stats.peersGettingFromUs = swarm_stats.active_peer_count[static_cast<uint8_t>(tr_direction::Up)];
     stats.webseedsSendingToUs = swarm_stats.active_webseed_count;
 
     for (int i = 0; i < TR_PEER_FROM_N_TYPES; i++)
@@ -1301,9 +1298,9 @@ tr_stat tr_torrent::stats() const
         stats.knownPeersFrom[i] = swarm_stats.known_peer_from_count[i];
     }
 
-    auto const piece_upload_speed = bandwidth().get_piece_speed(now_msec, TR_UP);
+    auto const piece_upload_speed = bandwidth().get_piece_speed(now_msec, tr_direction::Up);
     stats.pieceUploadSpeed_KBps = piece_upload_speed.count(Speed::Units::KByps);
-    auto const piece_download_speed = bandwidth().get_piece_speed(now_msec, TR_DOWN);
+    auto const piece_download_speed = bandwidth().get_piece_speed(now_msec, tr_direction::Down);
     stats.pieceDownloadSpeed_KBps = piece_download_speed.count(Speed::Units::KByps);
 
     stats.percentComplete = this->completion_.percent_complete();

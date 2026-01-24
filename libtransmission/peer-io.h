@@ -161,7 +161,10 @@ public:
 
     size_t flush_outgoing_protocol_msgs();
 
-    size_t flush(tr_direction dir, size_t byte_limit);
+    size_t flush(tr_direction dir, size_t byte_limit)
+    {
+        return dir == tr_direction::Down ? try_read(byte_limit) : try_write(byte_limit);
+    }
 
     ///
 

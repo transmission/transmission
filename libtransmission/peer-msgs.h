@@ -102,7 +102,7 @@ public:
 
     [[nodiscard]] constexpr auto is_active(tr_direction direction) const noexcept
     {
-        return is_active_[direction];
+        return is_active_[static_cast<uint8_t>(direction)];
     }
 
     [[nodiscard]] constexpr auto is_disconnecting() const noexcept
@@ -157,7 +157,7 @@ protected:
 
     constexpr void set_active(tr_direction direction, bool active) noexcept
     {
-        is_active_[direction] = active;
+        is_active_[static_cast<uint8_t>(direction)] = active;
     }
 
     constexpr void set_user_agent(tr_interned_string val) noexcept

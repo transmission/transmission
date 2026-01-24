@@ -465,12 +465,12 @@ enum tr_port_forwarding_state : uint8_t
 
 tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
 
-enum tr_direction : uint8_t
+enum class tr_direction : uint8_t
 {
-    TR_CLIENT_TO_PEER = 0,
-    TR_UP = 0,
-    TR_PEER_TO_CLIENT = 1,
-    TR_DOWN = 1
+    ClientToPeer = 0,
+    Up = 0,
+    PeerToClient = 1,
+    Down = 1,
 };
 
 // --- Session primary speed limits
@@ -554,7 +554,7 @@ void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
 /**
  * Torrent Queueing
  *
- * There are independent queues for seeding (`TR_UP`) and leeching (`TR_DOWN`).
+ * There are independent queues for seeding (`tr_direction::Up`) and leeching (`tr_direction::Down`).
  *
  * If the session already has enough non-stalled seeds/leeches when
  * `tr_torrentStart()` is called, the torrent will be moved into the
@@ -594,16 +594,16 @@ void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents, size_t torrent_coun
 
 // ---
 
-/** @brief Return the number of torrents allowed to download (if direction is `TR_DOWN`) or seed (if direction is `TR_UP`) at the same time */
+/** @brief Return the number of torrents allowed to download (if direction is `tr_direction::Down`) or seed (if direction is `tr_direction::Up`) at the same time */
 size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir);
 
-/** @brief Set the number of torrents allowed to download (if direction is `TR_DOWN`) or seed (if direction is `TR_UP`) at the same time */
+/** @brief Set the number of torrents allowed to download (if direction is `tr_direction::Down`) or seed (if direction is `tr_direction::Up`) at the same time */
 void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents);
 
-/** @brief Return true if we're limiting how many torrents can concurrently download (`TR_DOWN`) or seed (`TR_UP`) at the same time */
+/** @brief Return true if we're limiting how many torrents can concurrently download (`tr_direction::Down`) or seed (`tr_direction::Up`) at the same time */
 bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir);
 
-/** @brief Set whether or not to limit how many torrents can download (`TR_DOWN`) or seed (`TR_UP`) at the same time */
+/** @brief Set whether or not to limit how many torrents can download (`tr_direction::Down`) or seed (`tr_direction::Up`) at the same time */
 void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_torrents);
 
 // ---
@@ -1567,11 +1567,3 @@ tr_stat const* tr_torrentStat(tr_torrent* torrent);
 // Prefer calling this over calling the single-torrent version in a loop.
 // TODO(c++20) take a std::span argument
 std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
-
-/** @} */
-
-/** @brief Sanity checker to test that the direction is `TR_UP` or `TR_DOWN` */
-constexpr bool tr_isDirection(tr_direction d)
-{
-    return d == TR_UP || d == TR_DOWN;
-}

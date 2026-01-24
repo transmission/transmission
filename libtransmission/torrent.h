@@ -240,7 +240,7 @@ struct tr_torrent
 
     [[nodiscard]] constexpr auto uses_session_limits() const noexcept
     {
-        return bandwidth().are_parent_limits_honored(TR_UP);
+        return bandwidth().are_parent_limits_honored(tr_direction::Up);
     }
 
     [[nodiscard]] constexpr auto uses_speed_limit(tr_direction dir) const noexcept
@@ -651,7 +651,7 @@ struct tr_torrent
 
     [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
-        return is_done() ? TR_UP : TR_DOWN;
+        return is_done() ? tr_direction::Up : tr_direction::Down;
     }
 
     [[nodiscard]] constexpr auto is_queued(tr_direction const dir) const noexcept
@@ -686,12 +686,12 @@ struct tr_torrent
 
     [[nodiscard]] constexpr bool client_can_download() const
     {
-        return this->is_piece_transfer_allowed(TR_PEER_TO_CLIENT);
+        return this->is_piece_transfer_allowed(tr_direction::PeerToClient);
     }
 
     [[nodiscard]] constexpr bool client_can_upload() const
     {
-        return this->is_piece_transfer_allowed(TR_CLIENT_TO_PEER);
+        return this->is_piece_transfer_allowed(tr_direction::ClientToPeer);
     }
 
     void set_download_dir(std::string_view path, bool is_new_torrent = false);
@@ -735,12 +735,12 @@ struct tr_torrent
             return is_done() ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
         }
 
-        if (is_queued(TR_UP) && session->queueEnabled(TR_UP))
+        if (is_queued(tr_direction::Up) && session->queueEnabled(tr_direction::Up))
         {
             return TR_STATUS_SEED_WAIT;
         }
 
-        if (is_queued(TR_DOWN) && session->queueEnabled(TR_DOWN))
+        if (is_queued(tr_direction::Down) && session->queueEnabled(tr_direction::Down))
         {
             return TR_STATUS_DOWNLOAD_WAIT;
         }

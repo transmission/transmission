@@ -245,8 +245,8 @@ tr_variant::Map save_single_speed_limit(tr_torrent const* tor, tr_direction dir)
 
 void save_speed_limits(tr_variant::Map& map, tr_torrent const* tor)
 {
-    map.insert_or_assign(TR_KEY_speed_limit_down, save_single_speed_limit(tor, TR_DOWN));
-    map.insert_or_assign(TR_KEY_speed_limit_up, save_single_speed_limit(tor, TR_UP));
+    map.insert_or_assign(TR_KEY_speed_limit_down, save_single_speed_limit(tor, tr_direction::Down));
+    map.insert_or_assign(TR_KEY_speed_limit_up, save_single_speed_limit(tor, tr_direction::Up));
 }
 
 void save_ratio_limits(tr_variant::Map& map, tr_torrent const* tor)
@@ -293,13 +293,13 @@ auto load_speed_limits(tr_variant::Map const& map, tr_torrent* tor)
 
     if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_up))
     {
-        load_single_speed_limit(*child, TR_UP, tor);
+        load_single_speed_limit(*child, tr_direction::Up, tor);
         ret = tr_resume::Speedlimit;
     }
 
     if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_down))
     {
-        load_single_speed_limit(*child, TR_DOWN, tor);
+        load_single_speed_limit(*child, tr_direction::Down, tor);
         ret = tr_resume::Speedlimit;
     }
 

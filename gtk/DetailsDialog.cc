@@ -294,11 +294,11 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* down_limited_check */
     if (!torrents.empty())
     {
-        bool const baseline = tr_torrentUsesSpeedLimit(torrents.front(), TR_DOWN);
-        bool const is_uniform = std::all_of(
+        auto const baseline = tr_torrentUsesSpeedLimit(torrents.front(), tr_direction::Down);
+        auto const is_uniform = std::all_of(
             torrents.begin(),
             torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, TR_DOWN); });
+            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, tr_direction::Down); });
 
         if (is_uniform)
         {
@@ -309,11 +309,11 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* down_limit_spin */
     if (!torrents.empty())
     {
-        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), TR_DOWN);
-        bool const is_uniform = std::all_of(
+        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), tr_direction::Down);
+        auto const is_uniform = std::all_of(
             torrents.begin(),
             torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, TR_DOWN); });
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, tr_direction::Down); });
 
         if (is_uniform)
         {
@@ -324,11 +324,11 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* up_limited_check */
     if (!torrents.empty())
     {
-        bool const baseline = tr_torrentUsesSpeedLimit(torrents.front(), TR_UP);
-        bool const is_uniform = std::all_of(
+        auto const baseline = tr_torrentUsesSpeedLimit(torrents.front(), tr_direction::Up);
+        auto const is_uniform = std::all_of(
             torrents.begin(),
             torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, TR_UP); });
+            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, tr_direction::Up); });
 
         if (is_uniform)
         {
@@ -339,11 +339,11 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* up_limit_sping */
     if (!torrents.empty())
     {
-        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), TR_UP);
-        bool const is_uniform = std::all_of(
+        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), tr_direction::Up);
+        auto const is_uniform = std::all_of(
             torrents.begin(),
             torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, TR_UP); });
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, tr_direction::Up); });
 
         if (is_uniform)
         {

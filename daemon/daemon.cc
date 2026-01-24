@@ -436,8 +436,8 @@ bool tr_daemon::reopen_log_file(char const* filename)
 
 void tr_daemon::report_status()
 {
-    double const up = tr_sessionGetRawSpeed_KBps(my_session_, TR_UP);
-    double const dn = tr_sessionGetRawSpeed_KBps(my_session_, TR_DOWN);
+    auto const up = tr_sessionGetRawSpeed_KBps(my_session_, tr_direction::Up);
+    auto const dn = tr_sessionGetRawSpeed_KBps(my_session_, tr_direction::Down);
 
     if (up > 0 || dn > 0)
     {

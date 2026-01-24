@@ -65,7 +65,7 @@ size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
     // the .5 is to leave room for protocol messages
     static auto constexpr Floor = static_cast<uint64_t>(tr_block_info::BlockSize * 3.5);
 
-    auto const current_speed = io->get_piece_speed(now, TR_UP);
+    auto const current_speed = io->get_piece_speed(now, tr_direction::Up);
     return std::max(Floor, current_speed.base_quantity() * PeriodSecs);
 }
 } // namespace
@@ -212,8 +212,8 @@ void tr_peerIo::close()
 void tr_peerIo::clear()
 {
     clear_callbacks();
-    set_enabled(TR_UP, false);
-    set_enabled(TR_DOWN, false);
+    set_enabled(tr_direction::Up, false);
+    set_enabled(tr_direction::Down, false);
     close();
 }
 
@@ -251,7 +251,7 @@ void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 
     if (bytes_transferred > 0U)
     {
-        bandwidth().notify_bandwidth_consumed(TR_UP, bytes_transferred, false, now);
+        bandwidth().notify_bandwidth_consumed(tr_direction::Up, bytes_transferred, false, now);
     }
 
     while (bytes_transferred > 0U && !std::empty(outbuf_info_))
@@ -261,7 +261,7 @@ void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 
         if (is_piece_data)
         {
-            bandwidth().notify_bandwidth_consumed(TR_UP, payload, true, now);
+            bandwidth().notify_bandwidth_consumed(tr_direction::Up, payload, true, now);
         }
 
         if (did_write_ != nullptr)
@@ -280,7 +280,7 @@ void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 
 size_t tr_peerIo::try_write(size_t max)
 {
-    static auto constexpr Dir = TR_UP;
+    static auto constexpr Dir = tr_direction::Up;
 
     if (max == 0U)
     {
@@ -354,7 +354,7 @@ void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
 
     if (socket_.is_tcp() && bytes_transferred > 0U)
     {
-        bandwidth().notify_bandwidth_consumed(TR_DOWN, bytes_transferred, false, now);
+        bandwidth().notify_bandwidth_consumed(tr_direction::Down, bytes_transferred, false, now);
     }
 
     // In normal conditions, only continue processing if we still have bandwidth
@@ -364,7 +364,8 @@ void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
     // than the bandwidth limit allows. To safeguard against that, we keep
     // processing if the read buffer is more than twice as large as the target size.
     while (!done && !err &&
-           (socket_.is_tcp() || read_buffer_size() > RcvBuf * 2U || bandwidth().clamp(TR_DOWN, read_buffer_size()) != 0U))
+           (socket_.is_tcp() || read_buffer_size() > RcvBuf * 2U ||
+            bandwidth().clamp(tr_direction::Down, read_buffer_size()) != 0U))
     {
         auto piece = size_t{};
         auto const old_size = read_buffer_size();
@@ -373,12 +374,12 @@ void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
 
         if (piece > 0U)
         {
-            bandwidth().notify_bandwidth_consumed(TR_DOWN, piece, true, now);
+            bandwidth().notify_bandwidth_consumed(tr_direction::Down, piece, true, now);
         }
 
         if (socket_.is_utp() && used > 0U)
         {
-            bandwidth().notify_bandwidth_consumed(TR_DOWN, used, false, now);
+            bandwidth().notify_bandwidth_consumed(tr_direction::Down, used, false, now);
         }
 
         switch (read_state)
@@ -404,7 +405,7 @@ void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
 
 size_t tr_peerIo::try_read(size_t max)
 {
-    static auto constexpr Dir = TR_DOWN;
+    static auto constexpr Dir = tr_direction::Down;
 
     if (max == 0U)
     {
@@ -527,9 +528,7 @@ void tr_peerIo::event_disable(short event)
 
 void tr_peerIo::set_enabled(tr_direction dir, bool is_enabled)
 {
-    TR_ASSERT(tr_isDirection(dir));
-
-    short const event = dir == TR_UP ? EV_WRITE : EV_READ;
+    short const event = dir == tr_direction::Up ? EV_WRITE : EV_READ;
 
     if (is_enabled)
     {
@@ -539,13 +538,6 @@ void tr_peerIo::set_enabled(tr_direction dir, bool is_enabled)
     {
         event_disable(event);
     }
-}
-
-size_t tr_peerIo::flush(tr_direction dir, size_t limit)
-{
-    TR_ASSERT(tr_isDirection(dir));
-
-    return dir == TR_DOWN ? try_read(limit) : try_write(limit);
 }
 
 size_t tr_peerIo::flush_outgoing_protocol_msgs()
@@ -564,7 +556,7 @@ size_t tr_peerIo::flush_outgoing_protocol_msgs()
         byte_count += n_bytes;
     }
 
-    return flush(TR_UP, byte_count);
+    return flush(tr_direction::Up, byte_count);
 }
 
 void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
@@ -729,7 +721,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
                 auto const keep_alive = io->shared_from_this();
 
                 io->inbuf_.add(args->buf, args->len);
-                io->set_enabled(TR_DOWN, true);
+                io->set_enabled(tr_direction::Down, true);
                 io->can_read_wrapper(args->len);
 
                 // utp_read_drained() notifies libutp that we read a packet from them.
