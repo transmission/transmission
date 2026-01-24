@@ -109,6 +109,7 @@ public:
     explicit Impl(Mediator& mediator_in);
 
     [[nodiscard]] std::vector<tr_block_span_t> next(
+        tr_peer const* peer,
         size_t n_wanted_blocks,
         std::function<bool(tr_piece_index_t)> const& peer_has_piece);
 
@@ -576,6 +577,7 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
 }
 
 std::vector<tr_block_span_t> Wishlist::Impl::next(
+    tr_peer const* peer,
     size_t const n_wanted_blocks,
     std::function<bool(tr_piece_index_t)> const& peer_has_piece)
 {
@@ -601,6 +603,30 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         if (candidate.replication == 0 || !peer_has_piece(candidate.piece))
         {
             continue;
+        }
+
+        // In sequential download mode, try to hotswap blocks that are already requested by slower peers
+        if (mediator_.is_sequential_download())
+        {
+            for (auto block = candidate.block_span.begin; block < candidate.block_span.end; ++block)
+            {
+                if (std::size(blocks) >= n_wanted_blocks)
+                {
+                    break;
+                }
+
+                // Skip if block is unrequested (already handled below) or already downloaded
+                if (candidate.unrequested.count(block) > 0 || mediator_.client_has_block(block))
+                {
+                    continue;
+                }
+
+                // This block is currently being requested by someone - try to hotswap
+                if (mediator_.try_hotswap(block, peer))
+                {
+                    blocks.emplace_back(block);
+                }
+            }
         }
 
         // walk the blocks in this piece that we don't have or not requested
@@ -647,8 +673,9 @@ Wishlist::Wishlist(Mediator& mediator_in)
 Wishlist::~Wishlist() = default;
 
 std::vector<tr_block_span_t> Wishlist::next(
+    tr_peer const* peer,
     size_t const n_wanted_blocks,
     std::function<bool(tr_piece_index_t)> const& peer_has_piece)
 {
-    return impl_->next(n_wanted_blocks, peer_has_piece);
+    return impl_->next(peer, n_wanted_blocks, peer_has_piece);
 }
