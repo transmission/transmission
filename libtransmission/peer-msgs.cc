@@ -815,7 +815,7 @@ namespace protocol_send_message_helpers
 }
 
 template<typename T>
-[[nodiscard]] TR_CONSTEXPR20 auto get_param_length(T const& param) noexcept
+[[nodiscard]] constexpr auto get_param_length(T const& param) noexcept
 {
     return std::size(param);
 }

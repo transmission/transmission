@@ -197,7 +197,7 @@ constexpr std::optional<uint16_t> getPortForScheme(std::string_view scheme)
     return {};
 }
 
-TR_CONSTEXPR20 bool urlCharsAreValid(std::string_view url)
+constexpr bool urlCharsAreValid(std::string_view url)
 {
     // rfc2396
     auto constexpr ValidChars = std::string_view{

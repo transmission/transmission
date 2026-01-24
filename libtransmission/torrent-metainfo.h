@@ -23,7 +23,7 @@ struct tr_error;
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
 public:
-    [[nodiscard]] TR_CONSTEXPR20 auto empty() const noexcept
+    [[nodiscard]] constexpr auto empty() const noexcept
     {
         return std::empty(files_);
     }
@@ -42,7 +42,7 @@ public:
     {
         return files_;
     }
-    [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
+    [[nodiscard]] constexpr auto file_count() const noexcept
     {
         return files().file_count();
     }
@@ -137,7 +137,7 @@ public:
         return pieces_[piece];
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool has_v1_metadata() const noexcept
+    [[nodiscard]] constexpr bool has_v1_metadata() const noexcept
     {
         // need 'pieces' field and 'files' or 'length'
         // TODO check for 'files' or 'length'

@@ -30,12 +30,12 @@ struct tr_error;
 struct tr_torrent_files
 {
 public:
-    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
+    [[nodiscard]] constexpr bool empty() const noexcept
     {
         return std::empty(files_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t file_count() const noexcept
+    [[nodiscard]] constexpr size_t file_count() const noexcept
     {
         return std::size(files_);
     }

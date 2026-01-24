@@ -20,7 +20,7 @@
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/torrent-files.h"
-#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR_VEC
 
 class tr_metainfo_builder
 {
@@ -122,7 +122,7 @@ public:
         return comment_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
+    [[nodiscard]] constexpr auto file_count() const noexcept
     {
         return files_.file_count();
     }

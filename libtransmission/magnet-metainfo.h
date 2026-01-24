@@ -12,7 +12,7 @@
 
 #include "libtransmission/announce-list.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20, tr_sha1_digest_t
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR_VEC, tr_sha1_digest_t
 
 struct tr_error;
 
@@ -35,7 +35,7 @@ public:
         return name_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto webseed_count() const noexcept
+    [[nodiscard]] constexpr auto webseed_count() const noexcept
     {
         return std::size(webseed_urls_);
     }

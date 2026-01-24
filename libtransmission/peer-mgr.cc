@@ -472,7 +472,7 @@ public:
             [&now](auto const& webseed) { return webseed->get_piece_speed(now, TR_DOWN).base_quantity() != 0U; });
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto peerCount() const noexcept
+    [[nodiscard]] constexpr auto peerCount() const noexcept
     {
         return std::size(peers);
     }
@@ -508,7 +508,7 @@ public:
         TR_ASSERT(stats.peer_count == 0);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto is_all_upload_only() const noexcept
+    [[nodiscard]] constexpr auto is_all_upload_only() const noexcept
     {
         if (!pool_is_all_upload_only_)
         {
