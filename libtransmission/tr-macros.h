@@ -11,12 +11,6 @@
 
 // ---
 
-#if __cplusplus >= 202002L || _MSVC_LANG >= 202002L
-#define TR_CONSTEXPR20 constexpr
-#else
-#define TR_CONSTEXPR20
-#endif
-
 #if __cpp_lib_constexpr_vector >= 201907L
 #define TR_CONSTEXPR_VEC constexpr
 #else

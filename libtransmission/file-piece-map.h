@@ -17,7 +17,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/bitfield.h"
-#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR_VEC
 
 struct tr_block_info;
 struct tr_torrent_metainfo;
@@ -54,7 +54,7 @@ public:
 
     [[nodiscard]] file_offset_t file_offset(uint64_t offset) const;
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t file_count() const
+    [[nodiscard]] constexpr size_t file_count() const
     {
         return std::size(file_pieces_);
     }
@@ -65,7 +65,7 @@ public:
         return tr_byte_span_t{ .begin = span.begin, .end = span.end };
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool is_edge_piece(tr_piece_index_t const piece) const
+    [[nodiscard]] constexpr bool is_edge_piece(tr_piece_index_t const piece) const
     {
         return std::binary_search(std::begin(edge_pieces_), std::end(edge_pieces_), piece);
     }
@@ -108,7 +108,7 @@ public:
     void set(tr_file_index_t file, bool wanted);
     void set(tr_file_index_t const* files, size_t n, bool wanted);
 
-    [[nodiscard]] TR_CONSTEXPR20 bool file_wanted(tr_file_index_t file) const
+    [[nodiscard]] constexpr bool file_wanted(tr_file_index_t file) const
     {
         return wanted_.test(file);
     }

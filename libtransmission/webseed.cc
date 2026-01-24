@@ -210,7 +210,7 @@ public:
         };
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t active_req_count(tr_direction dir) const noexcept override
+    [[nodiscard]] constexpr size_t active_req_count(tr_direction dir) const noexcept override
     {
         if (dir == TR_CLIENT_TO_PEER) // blocks we've requested
         {
