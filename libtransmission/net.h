@@ -427,9 +427,9 @@ struct tr_address
         switch (type)
         {
         case TR_AF_INET:
-            return tr_address{ TR_AF_INET, { .addr4 = { INADDR_ANY } } };
+            return tr_address{ .type = TR_AF_INET, .addr = { .addr4 = { INADDR_ANY } } };
         case TR_AF_INET6:
-            return tr_address{ TR_AF_INET6, { .addr6 = IN6ADDR_ANY_INIT } };
+            return tr_address{ .type = TR_AF_INET6, .addr = { .addr6 = IN6ADDR_ANY_INIT } };
         default:
             TR_ASSERT_MSG(false, "invalid type");
             return tr_address{};

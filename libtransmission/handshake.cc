@@ -813,7 +813,12 @@ bool tr_handshake::fire_done(bool is_connected)
     auto cb = DoneFunc{};
     std::swap(cb, on_done_);
 
-    return (cb)(Result{ peer_io_, peer_id_, have_read_anything_from_peer_, is_connected });
+    return (cb)(Result{
+        .io = peer_io_,
+        .peer_id = peer_id_,
+        .read_anything_from_peer = have_read_anything_from_peer_,
+        .is_connected = is_connected,
+    });
 }
 
 void tr_handshake::fire_timer()

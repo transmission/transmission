@@ -59,7 +59,12 @@ void registerRectConverter()
             return false;
         }
 
-        *tgt = Rect{ static_cast<int>(*x), static_cast<int>(*y), static_cast<int>(*w), static_cast<int>(*h) };
+        *tgt = Rect{
+            .x = static_cast<int>(*x),
+            .y = static_cast<int>(*y),
+            .width = static_cast<int>(*w),
+            .height = static_cast<int>(*h),
+        };
         return true;
     };
 
@@ -146,7 +151,7 @@ TEST_F(SerializerTest, usesCustomTypes)
 {
     registerRectConverter();
 
-    static constexpr Rect Expected{ 10, 20, 640, 480 };
+    static constexpr Rect Expected{ .x = 10, .y = 20, .width = 640, .height = 480 };
     auto const var = Converters::serialize(Expected);
 
     auto actual = Rect{};
@@ -192,7 +197,10 @@ TEST_F(SerializerTest, usesVectorsOfCustom)
 {
     registerRectConverter();
 
-    auto const expected = std::vector<Rect>{ { 1, 2, 3, 4 }, { 10, 20, 640, 480 } };
+    auto const expected = std::vector<Rect>{
+        { .x = 1, .y = 2, .width = 3, .height = 4 },
+        { .x = 10, .y = 20, .width = 640, .height = 480 },
+    };
     auto const var = Converters::serialize(expected);
 
     auto actual = decltype(expected){};
@@ -277,7 +285,7 @@ TEST_F(SerializerTest, usesOptionalOfCustom)
 {
     registerRectConverter();
 
-    constexpr auto Expected = std::optional{ Rect{ 1, 2, 3, 4 } };
+    constexpr auto Expected = std::optional{ Rect{ .x = 1, .y = 2, .width = 3, .height = 4 } };
     auto const var = Converters::serialize(Expected);
 
     auto actual = decltype(Expected){};
@@ -323,7 +331,7 @@ struct Endpoint
 
 TEST_F(SerializerTest, fieldSaveLoad)
 {
-    auto const expected = Endpoint{ "localhost", tr_port::from_host(51413) };
+    auto const expected = Endpoint{ .address = "localhost", .port = tr_port::from_host(51413) };
 
     // Save to variant
     auto constexpr Expected = R"({"address":"localhost","port":51413})"sv;
@@ -339,7 +347,7 @@ TEST_F(SerializerTest, fieldSaveLoad)
 
 TEST_F(SerializerTest, fieldLoadIgnoresMissingKeys)
 {
-    auto endpoint = Endpoint{ "default", tr_port::from_host(9999) };
+    auto endpoint = Endpoint{ .address = "default", .port = tr_port::from_host(9999) };
     auto const original = endpoint;
 
     load(endpoint, Endpoint::Fields, tr_variant::make_map());
@@ -350,7 +358,7 @@ TEST_F(SerializerTest, fieldLoadIgnoresMissingKeys)
 
 TEST_F(SerializerTest, fieldLoadIgnoresNonMap)
 {
-    auto endpoint = Endpoint{ "default", tr_port::from_host(9999) };
+    auto endpoint = Endpoint{ .address = "default", .port = tr_port::from_host(9999) };
     auto const original = endpoint;
 
     load(endpoint, Endpoint::Fields, tr_variant{ 42 });

@@ -63,20 +63,20 @@ TEST_F(TorrentMetainfoTest, bucket)
     };
 
     auto const tests = std::array<LocalTest, 9>{ {
-        { BEFORE_PATH "5:a.txt" AFTER_PATH, true },
+        { .benc = BEFORE_PATH "5:a.txt" AFTER_PATH, .expected_parse_result = true },
         // allow empty components, but not =all= empty components, see bug #5517
-        { BEFORE_PATH "0:5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "0:0:" AFTER_PATH, false },
+        { .benc = BEFORE_PATH "0:5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "0:0:" AFTER_PATH, .expected_parse_result = false },
         // allow path separators in a filename (replaced with '_')
-        { BEFORE_PATH "7:a/a.txt" AFTER_PATH, true },
+        { .benc = BEFORE_PATH "7:a/a.txt" AFTER_PATH, .expected_parse_result = true },
         // allow "." components (skipped)
-        { BEFORE_PATH "1:.5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "5:a.txt1:." AFTER_PATH, true },
+        { .benc = BEFORE_PATH "1:.5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "5:a.txt1:." AFTER_PATH, .expected_parse_result = true },
         // allow ".." components (replaced with "__")
-        { BEFORE_PATH "2:..5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "5:a.txt2:.." AFTER_PATH, true },
+        { .benc = BEFORE_PATH "2:..5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "5:a.txt2:.." AFTER_PATH, .expected_parse_result = true },
         // fail on empty string
-        { "", false },
+        { .benc = "", .expected_parse_result = false },
     } };
 
     tr_logSetLevel(TR_LOG_OFF);

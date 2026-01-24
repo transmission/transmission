@@ -560,14 +560,38 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         int native_value;
     };
 
-    auto constexpr NativeMap = std::array<native_map_item, 7U>{
-        { { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, O_RDWR },
-          { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_READ, O_RDONLY },
-          { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_WRITE, O_WRONLY },
-          { TR_SYS_FILE_CREATE, TR_SYS_FILE_CREATE, O_CREAT },
-          { TR_SYS_FILE_TRUNCATE, TR_SYS_FILE_TRUNCATE, O_TRUNC },
-          { TR_SYS_FILE_SEQUENTIAL, TR_SYS_FILE_SEQUENTIAL, O_SEQUENTIAL } }
-    };
+    auto constexpr NativeMap = std::array<native_map_item, 7U>{ {
+        {
+            .symbolic_mask = TR_SYS_FILE_READ | TR_SYS_FILE_WRITE,
+            .symbolic_value = TR_SYS_FILE_READ | TR_SYS_FILE_WRITE,
+            .native_value = O_RDWR,
+        },
+        {
+            .symbolic_mask = TR_SYS_FILE_READ | TR_SYS_FILE_WRITE,
+            .symbolic_value = TR_SYS_FILE_READ,
+            .native_value = O_RDONLY,
+        },
+        {
+            .symbolic_mask = TR_SYS_FILE_READ | TR_SYS_FILE_WRITE,
+            .symbolic_value = TR_SYS_FILE_WRITE,
+            .native_value = O_WRONLY,
+        },
+        {
+            .symbolic_mask = TR_SYS_FILE_CREATE,
+            .symbolic_value = TR_SYS_FILE_CREATE,
+            .native_value = O_CREAT,
+        },
+        {
+            .symbolic_mask = TR_SYS_FILE_TRUNCATE,
+            .symbolic_value = TR_SYS_FILE_TRUNCATE,
+            .native_value = O_TRUNC,
+        },
+        {
+            .symbolic_mask = TR_SYS_FILE_SEQUENTIAL,
+            .symbolic_value = TR_SYS_FILE_SEQUENTIAL,
+            .native_value = O_SEQUENTIAL,
+        },
+    } };
 
     int native_flags = O_BINARY | O_LARGEFILE | O_CLOEXEC; // NOLINT(misc-redundant-expression)
 
