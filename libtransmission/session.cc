@@ -1826,7 +1826,7 @@ bool tr_blocklistExists(tr_session const* session)
     return session->blocklists_.num_lists() > 0U;
 }
 
-size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
+size_t tr_blocklistSetContent(tr_session* session, std::string_view const content_filename)
 {
     auto const lock = session->unique_lock();
     return session->blocklists_.update_primary_blocklist(content_filename, session->blocklist_enabled());

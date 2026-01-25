@@ -561,7 +561,7 @@ std::vector<Blocklists::Blocklist> Blocklists::Blocklists::load_folder(std::stri
     return ret;
 }
 
-size_t Blocklists::update_primary_blocklist(std::string_view external_file, bool is_enabled)
+size_t Blocklists::update_primary_blocklist(std::string_view const external_file, bool const is_enabled)
 {
     // These rules will replace the default blocklist.
     // Build the path of the default blocklist .bin file where we'll save these rules.
