@@ -318,12 +318,11 @@ std::string_view tr_sys_path_dirname(std::string_view path)
     return path.substr(0, end);
 }
 
-bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* error)
+bool tr_sys_path_rename(std::string_view const src_path, std::string_view const dst_path, tr_error* error)
 {
-    TR_ASSERT(src_path != nullptr);
-    TR_ASSERT(dst_path != nullptr);
-
-    bool const ret = rename(src_path, dst_path) != -1;
+    auto const sz_src_path = tr_pathbuf{ src_path };
+    auto const sz_dst_path = tr_pathbuf{ dst_path };
+    bool const ret = rename(sz_src_path.c_str(), sz_dst_path.c_str()) != -1;
 
     if (error != nullptr && !ret)
     {

@@ -136,7 +136,7 @@ bool is_valid_path(std::string_view path)
     return path.find_first_of(R"(<>:"|?*)"sv) == std::string_view::npos;
 }
 
-auto path_to_fixed_native_path(std::string_view path)
+[[nodiscard]] auto path_to_fixed_native_path(std::string_view const path)
 {
     auto wide_path = tr_win32_utf8_to_native(path);
 
@@ -161,7 +161,7 @@ auto path_to_fixed_native_path(std::string_view path)
 
 /* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
    https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx for more info */
-auto path_to_native_path(std::string_view path)
+[[nodiscard]] auto path_to_native_path(std::string_view path)
 {
     if (is_unc_path(path))
     {
@@ -689,11 +689,8 @@ std::string_view tr_sys_path_dirname(std::string_view path)
     return path.substr(0, end);
 }
 
-bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* error)
+bool tr_sys_path_rename(std::string_view const src_path, std::string_view const dst_path, tr_error* error)
 {
-    TR_ASSERT(src_path != nullptr);
-    TR_ASSERT(dst_path != nullptr);
-
     bool ret = false;
     auto const wide_src_path = path_to_native_path(src_path);
     auto const wide_dst_path = path_to_native_path(dst_path);

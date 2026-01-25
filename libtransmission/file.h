@@ -242,13 +242,7 @@ std::string_view tr_sys_path_dirname(std::string_view path);
  *         Rename will generally only succeed if both source and destination are
  *         on the same partition.
  */
-bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* error = nullptr);
-
-template<typename T, typename U, typename = decltype(&T::c_str), typename = decltype(&U::c_str)>
-bool tr_sys_path_rename(T const& src_path, U const& dst_path, tr_error* error = nullptr)
-{
-    return tr_sys_path_rename(src_path.c_str(), dst_path.c_str(), error);
-}
+bool tr_sys_path_rename(std::string_view src_path, std::string_view dst_path, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `remove()`.
