@@ -207,7 +207,12 @@ std::string native_path_to_path(std::wstring_view wide_path)
     return tr_win32_native_to_utf8(wide_path);
 }
 
-tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD disposition, DWORD flags, tr_error* error)
+[[nodiscard]] tr_sys_file_t open_file(
+    std::string_view const path,
+    DWORD const access,
+    DWORD const disposition,
+    DWORD const flags,
+    tr_error* error)
 {
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
 
@@ -789,9 +794,8 @@ char* tr_sys_path_native_separators(char* path)
     return path;
 }
 
-tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/, tr_error* error)
+tr_sys_file_t tr_sys_file_open(std::string_view const path, int const flags, int /*permissions*/, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
 
     DWORD native_access = 0;

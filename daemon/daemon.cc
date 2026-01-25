@@ -870,7 +870,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     {
         auto error = tr_error{};
         tr_sys_file_t fp = tr_sys_file_open(
-            sz_pid_filename.c_str(),
+            sz_pid_filename,
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0666,
             &error);

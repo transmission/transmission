@@ -548,9 +548,8 @@ char* tr_sys_path_native_separators(char* path)
     return path;
 }
 
-tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error* error)
+tr_sys_file_t tr_sys_file_open(std::string_view path, int const flags, int const permissions, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
 
     struct native_map_item
@@ -603,7 +602,8 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         }
     }
 
-    tr_sys_file_t const ret = open(path, native_flags, permissions);
+    auto const sz_path = tr_pathbuf{ path };
+    tr_sys_file_t const ret = open(sz_path.c_str(), native_flags, permissions);
 
     if (ret != TR_BAD_SYS_FILE)
     {

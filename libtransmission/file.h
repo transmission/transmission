@@ -305,7 +305,7 @@ char* tr_sys_path_native_separators(char* path);
  * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
  *         `error` set accordingly).
  */
-tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error* error = nullptr);
+tr_sys_file_t tr_sys_file_open(std::string_view path, int flags, int permissions, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `mkstemp()`.
