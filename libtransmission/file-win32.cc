@@ -375,10 +375,8 @@ std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(char const* path, tr_err
 
 } // namespace
 
-bool tr_sys_path_exists(char const* path, tr_error* error)
+bool tr_sys_path_exists(std::string_view const path, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
-
     bool ret = false;
     HANDLE handle = INVALID_HANDLE_VALUE;
 

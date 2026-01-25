@@ -129,11 +129,10 @@ void set_file_for_single_pass(tr_sys_file_t handle)
 }
 } // namespace
 
-bool tr_sys_path_exists(char const* path, tr_error* error)
+bool tr_sys_path_exists(std::string_view const path, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
-
-    bool const ret = access(path, F_OK) != -1;
+    auto const sz_path = tr_pathbuf{ path };
+    bool const ret = access(sz_path.c_str(), F_OK) != -1;
 
     if (error != nullptr && !ret && errno != ENOENT)
     {

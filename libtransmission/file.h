@@ -168,13 +168,7 @@ bool tr_sys_path_copy(std::string_view src_path, std::string_view dst_path, tr_e
  *         be returned in case of error; if you need to distinguish the two,
  *         check if `error` is `nullptr` afterwards.
  */
-bool tr_sys_path_exists(char const* path, tr_error* error = nullptr);
-
-template<typename T, typename = decltype(&T::c_str)>
-bool tr_sys_path_exists(T const& path, tr_error* error = nullptr)
-{
-    return tr_sys_path_exists(path.c_str(), error);
-}
+bool tr_sys_path_exists(std::string_view path, tr_error* error = nullptr);
 
 /**
  * @brief Check whether path is relative.

@@ -537,7 +537,7 @@ TEST_F(DhtTest, savesStateIfSwarmIsGood)
 {
     auto const state_file = MockStateFile{};
     auto const dat_file = MockStateFile::filename(sandboxDir());
-    EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+    EXPECT_FALSE(tr_sys_path_exists(dat_file));
 
     {
         auto mediator = MockMediator{ event_base_ };
@@ -548,17 +548,17 @@ TEST_F(DhtTest, savesStateIfSwarmIsGood)
 
         // as dht goes out of scope,
         // it should save its state if the swarm is healthy
-        EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+        EXPECT_FALSE(tr_sys_path_exists(dat_file));
     }
 
-    EXPECT_TRUE(tr_sys_path_exists(dat_file.c_str()));
+    EXPECT_TRUE(tr_sys_path_exists(dat_file));
 }
 
 TEST_F(DhtTest, doesNotSaveStateIfSwarmIsBad)
 {
     auto const state_file = MockStateFile{};
     auto const dat_file = MockStateFile::filename(sandboxDir());
-    EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+    EXPECT_FALSE(tr_sys_path_exists(dat_file));
 
     {
         auto mediator = MockMediator{ event_base_ };
@@ -569,10 +569,10 @@ TEST_F(DhtTest, doesNotSaveStateIfSwarmIsBad)
 
         // as dht goes out of scope,
         // it should save its state if the swarm is healthy
-        EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+        EXPECT_FALSE(tr_sys_path_exists(dat_file));
     }
 
-    EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+    EXPECT_FALSE(tr_sys_path_exists(dat_file));
 }
 
 TEST_F(DhtTest, usesBootstrapFile)
