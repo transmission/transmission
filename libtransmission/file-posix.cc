@@ -528,11 +528,11 @@ bool tr_sys_path_copy(std::string_view const src_path, std::string_view const ds
 #endif /* USE_COPYFILE */
 }
 
-bool tr_sys_path_remove(char const* path, tr_error* error)
+bool tr_sys_path_remove(std::string_view const path, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
+    auto const sz_path = tr_pathbuf{ path };
 
-    bool const ret = remove(path) != -1;
+    bool const ret = remove(sz_path.c_str()) != -1;
 
     if (error != nullptr && !ret)
     {

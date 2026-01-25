@@ -273,13 +273,7 @@ bool tr_sys_path_rename(T const& src_path, U const& dst_path, tr_error* error = 
  *         Directory removal will only succeed if it is empty (contains no other
  *         files and directories).
  */
-bool tr_sys_path_remove(char const* path, tr_error* error = nullptr);
-
-template<typename T, typename = decltype(&T::c_str)>
-bool tr_sys_path_remove(T const& path, tr_error* error = nullptr)
-{
-    return tr_sys_path_remove(path.c_str(), error);
-}
+bool tr_sys_path_remove(std::string_view path, tr_error* error = nullptr);
 
 /**
  * @brief Transform path separators to native ones, in-place.

@@ -480,7 +480,7 @@ std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
 
     // make a copy of `external_file` for our own safekeeping
     auto const src_file = std::string{ std::data(bin_file), std::size(bin_file) - std::size(BinFileSuffix) };
-    tr_sys_path_remove(src_file.c_str());
+    tr_sys_path_remove(src_file);
     auto error = tr_error{};
     auto const copied = tr_sys_path_copy(external_file, src_file, &error);
     if (error)

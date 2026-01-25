@@ -745,10 +745,8 @@ bool tr_sys_path_copy(std::string_view const src_path, std::string_view const ds
     return true;
 }
 
-bool tr_sys_path_remove(char const* path, tr_error* error)
+bool tr_sys_path_remove(std::string_view const path, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
-
     bool ret = false;
 
     if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
