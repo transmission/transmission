@@ -208,16 +208,13 @@ bool tr_sys_path_is_relative(std::string_view path)
     return std::empty(path) || path.front() != '/';
 }
 
-bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error* error)
+bool tr_sys_path_is_same(std::string_view const path1, std::string_view const path2, tr_error* error)
 {
-    TR_ASSERT(path1 != nullptr);
-    TR_ASSERT(path2 != nullptr);
-
     bool ret = false;
     struct stat sb1 = {};
     struct stat sb2 = {};
 
-    if (stat(path1, &sb1) != -1 && stat(path2, &sb2) != -1)
+    if (stat_sv(path1, &sb1) != -1 && stat_sv(path2, &sb2) != -1)
     {
         ret = sb1.st_dev == sb2.st_dev && sb1.st_ino == sb2.st_ino;
     }

@@ -349,7 +349,7 @@ std::optional<tr_sys_path_info> tr_sys_file_get_info_(tr_sys_file_t handle, tr_e
     return {};
 }
 
-std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(char const* path, tr_error* error)
+[[nodiscard]] std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(std::string_view const path, tr_error* error)
 {
     auto const wpath = path_to_native_path(path);
     if (std::empty(wpath))
@@ -470,11 +470,8 @@ bool tr_sys_path_is_relative(std::string_view path)
     return true;
 }
 
-bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error* error)
+bool tr_sys_path_is_same(std::string_view const path1, std::string_view const path2, tr_error* error)
 {
-    TR_ASSERT(path1 != nullptr);
-    TR_ASSERT(path2 != nullptr);
-
     auto const fi1 = get_file_info(path1, error);
     if (!fi1)
     {

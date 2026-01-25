@@ -194,13 +194,7 @@ bool tr_sys_path_is_relative(std::string_view path);
  *         if you need to distinguish the two, check if `error` is `nullptr`
  *         afterwards.
  */
-bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error* error = nullptr);
-
-template<typename T, typename U, typename = decltype(&T::c_str), typename = decltype(&U::c_str)>
-bool tr_sys_path_is_same(T const& path1, U const& path2, tr_error* error = nullptr)
-{
-    return tr_sys_path_is_same(path1.c_str(), path2.c_str(), error);
-}
+bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `realpath()`.
