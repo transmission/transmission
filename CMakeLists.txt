@@ -53,7 +53,7 @@ set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 2.7)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
-set(PSL_MINIMUM 0.21.1)
+set(PSL_MINIMUM 0.21.0)
 set(QT_MINIMUM 5.15)
 
 option(ENABLE_DAEMON "Build daemon" ON)
@@ -560,7 +560,8 @@ add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 tr_add_external_auto_library_legacy(DHT dht dht
     TARGET dht::dht)
 
-tr_add_external_auto_library_legacy(PSL libpsl psl
+tr_add_external_auto_library(PSL libpsl
+    LIBNAME psl
     TARGET psl::psl)
 
 if(ENABLE_UTP)
