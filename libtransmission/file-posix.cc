@@ -142,20 +142,34 @@ bool tr_sys_path_exists(std::string_view const path, tr_error* error)
     return ret;
 }
 
-std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error* error)
+namespace
+{
+[[nodiscard]] auto stat_sv(std::string_view const path, struct stat* sb)
+{
+    auto const sz_path = tr_pathbuf{ path };
+    return stat(sz_path.c_str(), sb);
+}
+
+[[nodiscard]] auto lstat_sv(std::string_view const path, struct stat* sb)
+{
+    auto const sz_path = tr_pathbuf{ path };
+    return lstat(sz_path.c_str(), sb);
+}
+} // namespace
+
+std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view const path, int const flags, tr_error* error)
 {
     struct stat sb = {};
 
     bool ok = false;
-    auto const szpath = tr_pathbuf{ path };
 
     if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
     {
-        ok = stat(szpath, &sb) != -1;
+        ok = stat_sv(path, &sb) != -1;
     }
     else
     {
-        ok = lstat(szpath, &sb) != -1;
+        ok = lstat_sv(path, &sb) != -1;
     }
 
     if (!ok)
