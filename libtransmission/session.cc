@@ -2164,33 +2164,34 @@ namespace
 auto constexpr QueueInterval = 1s;
 auto constexpr SaveInterval = 360s;
 
+[[nodiscard]] auto makeSubdir(std::string_view const parent, std::string_view const child)
+{
+    auto dir = fmt::format("{:s}/{:s}"sv, parent, child);
+    tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return dir;
+}
+
 auto makeResumeDir(std::string_view config_dir)
 {
 #if defined(__APPLE__) || defined(_WIN32)
-    auto dir = fmt::format("{:s}/Resume"sv, config_dir);
+    return makeSubdir(config_dir, "Resume"sv);
 #else
-    auto dir = fmt::format("{:s}/resume"sv, config_dir);
+    return makeSubdir(config_dir, "resume"sv);
 #endif
-    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-    return dir;
 }
 
 auto makeTorrentDir(std::string_view config_dir)
 {
 #if defined(__APPLE__) || defined(_WIN32)
-    auto dir = fmt::format("{:s}/Torrents"sv, config_dir);
+    return makeSubdir(config_dir, "Torrents"sv);
 #else
-    auto dir = fmt::format("{:s}/torrents"sv, config_dir);
+    return makeSubdir(config_dir, "torrents"sv);
 #endif
-    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-    return dir;
 }
 
 auto makeBlocklistDir(std::string_view config_dir)
 {
-    auto dir = fmt::format("{:s}/blocklists"sv, config_dir);
-    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-    return dir;
+    return makeSubdir(config_dir, "blocklists"sv);
 }
 } // namespace
 

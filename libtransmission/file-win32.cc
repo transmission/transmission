@@ -236,7 +236,12 @@ std::string native_path_to_path(std::wstring_view wide_path)
     return ret;
 }
 
-bool create_dir(std::string_view path, int flags, int /*permissions*/, bool okay_if_exists, tr_error* error)
+[[nodiscard]] bool create_dir(
+    std::string_view const path,
+    int const flags,
+    int /*permissions*/,
+    bool const okay_if_exists,
+    tr_error* error)
 {
     bool ret = false;
     DWORD error_code = ERROR_SUCCESS;
@@ -1091,7 +1096,7 @@ std::string tr_sys_dir_get_current(tr_error* error)
     return {};
 }
 
-bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error* error)
+bool tr_sys_dir_create(std::string_view const path, int const flags, int const permissions, tr_error* error)
 {
     return create_dir(path, flags, permissions, true, error);
 }

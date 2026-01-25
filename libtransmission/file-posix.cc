@@ -1085,24 +1085,24 @@ namespace
 #endif
 } // namespace
 
-bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error* error)
+bool tr_sys_dir_create(std::string_view const path, int const flags, int const permissions, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
-
     auto ret = false;
     auto local_error = tr_error{};
+
+    auto const sz_path = tr_pathbuf{ path };
 
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
 #ifdef HAVE_MKDIRP
-        ret = mkdirp(path, permissions) != -1;
+        ret = mkdirp(sz_path.c_str(), permissions) != -1;
 #else
         ret = tr_mkdirp_(path, permissions, &local_error);
 #endif
     }
     else
     {
-        ret = mkdir(path, permissions) != -1;
+        ret = mkdir(sz_path.c_str(), permissions) != -1;
     }
 
     if (!ret && errno == EEXIST)

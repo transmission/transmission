@@ -468,13 +468,7 @@ std::string tr_sys_dir_get_current(tr_error* error = nullptr);
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error* error = nullptr);
-
-template<typename T, typename = decltype(&T::c_str)>
-bool tr_sys_dir_create(T const& path, int flags, int permissions, tr_error* error = nullptr)
-{
-    return tr_sys_dir_create(path.c_str(), flags, permissions, error);
-}
+bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `mkdtemp()`.
