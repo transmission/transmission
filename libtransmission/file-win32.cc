@@ -724,11 +724,8 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* er
     return ret;
 }
 
-bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* error)
+bool tr_sys_path_copy(std::string_view const src_path, std::string_view const dst_path, tr_error* error)
 {
-    TR_ASSERT(src_path != nullptr);
-    TR_ASSERT(dst_path != nullptr);
-
     auto const wide_src_path = path_to_native_path(src_path);
     auto const wide_dst_path = path_to_native_path(dst_path);
     if (std::empty(wide_src_path) || std::empty(wide_dst_path))

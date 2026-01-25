@@ -467,8 +467,8 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
 }
 
 std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
-    std::string_view external_file,
-    std::string_view bin_file,
+    std::string_view const external_file,
+    std::string_view const bin_file,
     bool is_enabled)
 {
     // if we can't parse the file, do nothing
@@ -482,7 +482,7 @@ std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
     auto const src_file = std::string{ std::data(bin_file), std::size(bin_file) - std::size(BinFileSuffix) };
     tr_sys_path_remove(src_file.c_str());
     auto error = tr_error{};
-    auto const copied = tr_sys_path_copy(tr_pathbuf{ external_file }, src_file.c_str(), &error);
+    auto const copied = tr_sys_path_copy(external_file, src_file, &error);
     if (error)
     {
         tr_logAddWarn(

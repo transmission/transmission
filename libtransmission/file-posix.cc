@@ -326,11 +326,8 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* er
 /* We try to do a fast (in-kernel) copy using a variety of non-portable system
  * calls. If the current implementation does not support in-kernel copying, we
  * use a user-space fallback instead. */
-bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* error)
+bool tr_sys_path_copy(std::string_view const src_path, std::string_view const dst_path, tr_error* error)
 {
-    TR_ASSERT(src_path != nullptr);
-    TR_ASSERT(dst_path != nullptr);
-
     auto local_error = tr_error{};
     if (error == nullptr)
     {
@@ -338,7 +335,9 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* erro
     }
 
 #if defined(USE_COPYFILE)
-    if (copyfile(src_path, dst_path, nullptr, COPYFILE_CLONE | COPYFILE_ALL) < 0)
+    auto const sz_src_path = tr_pathbuf{ src_path };
+    auto const sz_dst_path = tr_pathbuf{ dst_path };
+    if (copyfile(sz_src_path.c_str(), sz_dst_path.c_str(), nullptr, COPYFILE_CLONE | COPYFILE_ALL) < 0)
     {
         error->set_from_errno(errno);
         return false;
