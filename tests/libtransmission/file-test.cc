@@ -845,10 +845,6 @@ TEST_F(FileTest, pathDirname)
     {
         EXPECT_EQ(expected, tr_sys_path_dirname(input))
             << "input[" << input << "] expected [" << expected << "] actual [" << tr_sys_path_dirname(input) << "]\n";
-
-        auto path = tr_pathbuf{ input };
-        path.popdir();
-        EXPECT_EQ(expected, path) << "input[" << input << "] expected [" << expected << "] actual [" << path << "]\n";
     }
 
     /* TODO: is_same(dirname(x) + '/' + basename(x), x) */

@@ -212,9 +212,7 @@ protected:
     {
         auto const tmperr = errno;
 
-        auto dir = tr_pathbuf{ path };
-        dir.popdir();
-        if (auto const info = tr_sys_path_get_info(path); !info)
+        if (auto const dir = tr_sys_path_dirname(path); !tr_sys_path_exists(dir))
         {
             auto error = tr_error{};
             tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
@@ -433,9 +431,7 @@ protected:
                 auto const suffix = std::string_view{ partial ? ".part" : "" };
                 auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
 
-                auto dirname = tr_pathbuf{ filename.sv() };
-                dirname.popdir();
-                tr_sys_dir_create(dirname, TR_SYS_DIR_CREATE_PARENTS, 0700);
+                tr_sys_dir_create(tr_sys_path_dirname(filename), TR_SYS_DIR_CREATE_PARENTS, 0700);
 
                 auto fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
                 auto const file_size = metainfo->file_size(i);
