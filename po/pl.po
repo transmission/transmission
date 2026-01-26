@@ -6,7 +6,7 @@
 # Translators:
 # Piotr Drąg <piotrdrag@gmail.com>, 2024
 # Mike Gelfand <mikedld@mikedld.com>, 2025
-# Marek Adamski, 2025
+# Marek Adamski, 2026
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Marek Adamski, 2025\n"
+"Last-Translator: Marek Adamski, 2026\n"
 "Language-Team: Polish (https://app.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -971,7 +971,7 @@ msgstr "Zezwolenie na hibernację"
 
 #: ../gtk/Session.cc:1236
 msgid "Couldn't find pending RPC request for id {id}"
-msgstr ""
+msgstr "Nie można znaleźć oczekującego żądania RPC dla identyfikatora {id}"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -2597,7 +2597,7 @@ msgstr "Nie można dowiązać gniazda IPv6 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:265
 msgid "Couldn't create any UDP sockets."
-msgstr ""
+msgstr "Nie można utworzyć gniazd UDP."
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
@@ -2726,12 +2726,3 @@ msgstr[0] "dzień"
 msgstr[1] "dni"
 msgstr[2] "dni"
 msgstr[3] "dni"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Nie można odnaleźć oczekującego żądania RPC dla znacznika {tag}"
-
-#~ msgid "I _Agree"
-#~ msgstr "_Zgadzam się"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission jest programem do udostępniania plików. Kiedy uruchamiany jest torrent, jego dane stają się dostępne dla innych. Wyłącznie użytkownik jest odpowiedzialny za każdą udostępnianą treść."

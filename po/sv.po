@@ -8,7 +8,7 @@
 # Josef Andersson <janderssonse@proton.me>, 2022
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2025
-# Daniel, 2025
+# Daniel, 2026
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Daniel, 2025\n"
+"Last-Translator: Daniel, 2026\n"
 "Language-Team: Swedish (https://app.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -817,7 +817,7 @@ msgstr "Helger"
 #: ../gtk/PrefsDialog.cc:567
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
-msgstr[0] "Blockeringslistan har 1 post"
+msgstr[0] "Blockeringslistan har {count:L} post"
 msgstr[1] "Blockeringslistan har {count:L} poster"
 
 #: ../gtk/PrefsDialog.cc:583
@@ -897,7 +897,7 @@ msgstr "Tillåter skrivbordsviloläge"
 
 #: ../gtk/Session.cc:1236
 msgid "Couldn't find pending RPC request for id {id}"
-msgstr ""
+msgstr "Det gick inte att hitta väntande RPC-begäran för {id}"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -2125,7 +2125,7 @@ msgstr "Lyckades"
 #: ../libtransmission/blocklist.cc:85 ../libtransmission/blocklist.cc:412
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
-msgstr[0] "Blocklistan '{path}' har {count} post"
+msgstr[0] "Blockeringslistan '{path}' har {count} post"
 msgstr[1] "Blockeringslistan '{path}' har {count} poster"
 
 #. don't try to display the actual lines - it causes issues
@@ -2471,7 +2471,7 @@ msgstr "Det gick inte att binda IPv6-socketen {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:265
 msgid "Couldn't create any UDP sockets."
-msgstr ""
+msgstr "Det gick inte att skapa några UDP-socketar."
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
@@ -2588,12 +2588,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dag"
 msgstr[1] "dagar"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Det gick inte att hitta väntande RPC-förfrågan för taggen {tag}"
-
-#~ msgid "I _Agree"
-#~ msgstr "Jag _godkänner"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission är ett fildelningsprogram. När du kör en torrent kommer dess data att göras tillgänglig för andra genom sändning. Allt innehåll du delar är ditt eget ansvar."

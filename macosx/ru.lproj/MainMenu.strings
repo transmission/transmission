@@ -165,7 +165,7 @@
 "1578.title" = "Компактный список";
 
 /* Class = "NSMenuItem"; title = "Hide Filter Bar"; ObjectID = "1620"; */
-"1620.title" = "Скрыть фильтр";
+"1620.title" = "Скрыть панель фильтра";
 
 /* Class = "NSMenuItem"; title = "Resume Selected Right Away"; ObjectID = "1678"; */
 "1678.title" = "Возобновить выбранные немедленно";
@@ -267,7 +267,7 @@
 "2122.title" = "Обновить трекер";
 
 /* Class = "NSMenuItem"; title = "Pieces Bar"; ObjectID = "2185"; */
-"2185.title" = "Части";
+"2185.title" = "Панель частей";
 
 /* Class = "NSMenuItem"; title = "Availability"; ObjectID = "2279"; */
 "2279.title" = "Доступность";
@@ -291,7 +291,7 @@
 "2850.title" = "Группа";
 
 /* Class = "NSTextFieldCell"; title = "Transfers"; ObjectID = "3049"; */
-/* "3049.title" = ""; */
+"3049.title" = "Раздачи";
 
 /* Class = "NSMenuItem"; title = "Use Groups"; ObjectID = "3078"; */
 "3078.title" = "Использовать группы";
@@ -303,7 +303,7 @@
 "3166.title" = "Быстрый ";
 
 /* Class = "NSMenuItem"; title = "Support & Development"; ObjectID = "3170"; */
-"3170.title" = "Transmission wiki и разработка";
+"3170.title" = "Поддержка и разработка";
 
 /* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "3207"; */
 "3207.title" = "Сохранить торрент-файл как…";

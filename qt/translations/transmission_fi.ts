@@ -6,7 +6,7 @@
     <message>
         <location filename="../AboutDialog.ui" line="+14"/>
         <source>About Transmission</source>
-        <translation>Tietoa Transmissionista</translation>
+        <translation>Tietoa Transmission</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -492,17 +492,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -2310,7 +2310,7 @@ seuraavalle riville. Lisää uusi URL-osoite lisäämällä se tyhjän rivin jä
     <message>
         <location line="+17"/>
         <source>Remote root pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <translation>Roo&amp;t-hallinnan polku:</translation>
     </message>
 </context>
 <context>

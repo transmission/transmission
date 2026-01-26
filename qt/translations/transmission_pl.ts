@@ -496,17 +496,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Edycja</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -2329,7 +2329,7 @@ Nowy podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message>
         <location line="+17"/>
         <source>Remote root pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zdalna ścieżka &amp;główna:</translation>
     </message>
 </context>
 <context>

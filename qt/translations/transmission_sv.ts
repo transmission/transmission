@@ -492,17 +492,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -2310,7 +2310,7 @@ Lägg till en ny primär URL genom att lägga till den efter en tom rad.</transl
     <message>
         <location line="+17"/>
         <source>Remote root pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjärrro&amp;tsökväg:</translation>
     </message>
 </context>
 <context>

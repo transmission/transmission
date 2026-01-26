@@ -2627,9 +2627,3 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#~ msgid "I _Agree"
-#~ msgstr "Eu _Concordo"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "O Transmission é um programa de partilha de ficheiros. Quando abre um torrent, os dados deste serão partilhados com outros utilizadores. Qualquer conteúdo que partilhe será de sua inteira responsabilidade."

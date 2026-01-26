@@ -2689,9 +2689,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "I _Agree"
-#~ msgstr "Strinj_am se"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Program Transmission je namenjen izmenjavi datotek. Podatki datotek torrent so na voljo za izmenjavo z drugimi uporabniki preko omrežja. Deljene datoteke so izključno vaša odgovornost."

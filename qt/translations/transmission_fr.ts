@@ -492,17 +492,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -2310,7 +2310,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
     <message>
         <location line="+17"/>
         <source>Remote root pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <translation>C&amp;hemin racine distant&#xa0;:</translation>
     </message>
 </context>
 <context>

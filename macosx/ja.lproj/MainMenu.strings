@@ -291,7 +291,7 @@
 "2850.title" = "グループ";
 
 /* Class = "NSTextFieldCell"; title = "Transfers"; ObjectID = "3049"; */
-/* "3049.title" = ""; */
+"3049.title" = "転送";
 
 /* Class = "NSMenuItem"; title = "Use Groups"; ObjectID = "3078"; */
 "3078.title" = "グループ使用";

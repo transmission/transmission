@@ -49,8 +49,8 @@
     <message numerus="yes">
         <location filename="../Application.cc" line="+313"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent Selesai</numerusform>
         </translation>
     </message>
     <message>
@@ -200,7 +200,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Peer tersambung lewat µTP</translation>
     </message>
     <message>
         <location line="+161"/>
@@ -250,14 +250,14 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 menit</numerusform>
         </translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tambah URL</translation>
     </message>
     <message>
         <location line="+116"/>
@@ -408,7 +408,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Label:</translation>
     </message>
     <message>
         <location line="-122"/>
@@ -488,17 +488,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Tambah</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunting</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Hapus</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -619,7 +619,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Ubah Nama...</translation>
     </message>
 </context>
 <context>
@@ -673,7 +673,7 @@
     <message>
         <location line="+13"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Cari...</translation>
     </message>
 </context>
 <context>
@@ -725,7 +725,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Menghitung Ruang Bebas...&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -811,7 +811,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Buka...</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -826,7 +826,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>B&amp;aru,,,</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1067,17 +1067,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ubah Sesi...</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>Tata &amp;Lokasi…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>Buka &amp;URL...</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1632,16 +1632,16 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
         <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 menit</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %1 menit yang lalu</numerusform>
         </translation>
     </message>
     <message>

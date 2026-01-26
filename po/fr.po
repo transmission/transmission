@@ -10,7 +10,7 @@
 # Charles Monzat <c.monzat@laposte.net>, 2022
 # Jean de la Mouche, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2025
-# AO <ao@localizationlab.org>, 2025
+# AO <aol10n@duck.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: AO <ao@localizationlab.org>, 2025\n"
+"Last-Translator: AO <aol10n@duck.com>, 2026\n"
 "Language-Team: French (https://app.transifex.com/transmissionbt/teams/33778/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -918,7 +918,7 @@ msgstr "Permettre la mise en veille du bureau"
 
 #: ../gtk/Session.cc:1236
 msgid "Couldn't find pending RPC request for id {id}"
-msgstr ""
+msgstr "Impossible de trouver la demande RPC en attente pour l’ID {id}"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -2518,7 +2518,7 @@ msgstr "Impossible de lier le connecteur IPv6 {address} : {error} ({error_code}
 
 #: ../libtransmission/tr-udp.cc:265
 msgid "Couldn't create any UDP sockets."
-msgstr ""
+msgstr "Impossible de créer un connecteur UDP."
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
@@ -2641,12 +2641,3 @@ msgid_plural "days"
 msgstr[0] "jour"
 msgstr[1] "de jours"
 msgstr[2] "jours"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Impossible de trouver la demande RPC en attente pour la valeur {tag}"
-
-#~ msgid "I _Agree"
-#~ msgstr "J’_accepte"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission est un programme de partage de fichiers. Quand vous hébergez un torrent, ses données sont mises à disposition d’autrui par voie de téléversement. Tout contenu que vous partagez relève de votre entière responsabilité."

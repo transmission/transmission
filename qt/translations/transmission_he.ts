@@ -492,17 +492,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>הוספה</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>עריכה</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>הסרה</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -2310,7 +2310,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+17"/>
         <source>Remote root pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <translation>נתיב &amp;על מרוחק:</translation>
     </message>
 </context>
 <context>

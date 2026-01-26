@@ -2565,12 +2565,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "無法找到標記為 {tag} 的待處理 RPC 請求"
-
-#~ msgid "I _Agree"
-#~ msgstr "我同意 (_A)"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission 是一個檔案分享程式。當您執行 torrent 時，其資料將以上傳的方式提供給其他人。您必須為自己分享的內容負起所有責任。"

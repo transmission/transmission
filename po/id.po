@@ -2544,9 +2544,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "I _Agree"
-#~ msgstr "S_aya Setuju"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission adalah sebuah program berbagi berkas. Ketika Anda menjalankan sebuah torrent, datanya akan menjadi tersedia bagi orang lain dengan cara diunggah. Sebarang isi yang Anda bagikan adalah sepenuhnya tanggung jawab Anda."

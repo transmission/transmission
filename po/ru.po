@@ -11,7 +11,7 @@
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # Victor, 2024
 # Alexey Ladygin, 2025
-# Andrei Stepanov, 2025
+# Andrei Stepanov, 2026
 #
 #, fuzzy
 msgid ""
@@ -20,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Andrei Stepanov, 2025\n"
+"Last-Translator: Andrei Stepanov, 2026\n"
 "Language-Team: Russian (https://app.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -70,7 +70,7 @@ msgstr "Перезагрузка настроек из «{path}»"
 
 #: ../daemon/daemon.cc:853
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr "Не удалось запустить службу: {error} ({error_code})"
+msgstr "Не удалось запустить демона: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:865
 msgid "Loading settings from '{path}'"
@@ -935,7 +935,7 @@ msgstr "Разрешение ухода в спящий режим"
 
 #: ../gtk/Session.cc:1236
 msgid "Couldn't find pending RPC request for id {id}"
-msgstr ""
+msgstr "Не удалось найти ожидающий RPC-запрос для ИД {id}"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -1556,7 +1556,7 @@ msgstr "В наличии:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:98 ../gtk/ui/gtk3/StatsDialog.ui:86 ../gtk/ui/gtk3/StatsDialog.ui:246 ../gtk/ui/gtk4/DetailsDialog.ui:58 ../gtk/ui/gtk4/StatsDialog.ui:32 ../gtk/ui/gtk4/StatsDialog.ui:164
 msgid "Uploaded:"
-msgstr "Роздано:"
+msgstr "Отдано:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:110 ../gtk/ui/gtk3/StatsDialog.ui:115 ../gtk/ui/gtk3/StatsDialog.ui:275 ../gtk/ui/gtk4/DetailsDialog.ui:68 ../gtk/ui/gtk4/StatsDialog.ui:57 ../gtk/ui/gtk4/StatsDialog.ui:189
 msgid "Downloaded:"
@@ -2561,7 +2561,7 @@ msgstr "Не удалось привязать сокет IPv6 {address}: {error
 
 #: ../libtransmission/tr-udp.cc:265
 msgid "Couldn't create any UDP sockets."
-msgstr ""
+msgstr "Не удалось создать ни одного сокета UDP."
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
@@ -2625,7 +2625,7 @@ msgstr "Curl {curl_version}  подвержен сбоям SIGPIPE. {details_url
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr "Curl {curl_version} подвержен уязвимости двойного закрытия eventfd, которая может привести к сбоям SIGABRT для службы transmission-daemon systemd. {details_url}"
+msgstr "Curl {curl_version} подвержен уязвимости двойного закрытия eventfd, которая может привести к сбоям SIGABRT для службы systemd transmission-daemon. {details_url}"
 
 #: ../libtransmission/web.cc:202
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
@@ -2690,12 +2690,3 @@ msgstr[0] "день"
 msgstr[1] "дня"
 msgstr[2] "дней"
 msgstr[3] "дней"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Не удалось найти ожидающий запрос RPC для тега {tag}"
-
-#~ msgid "I _Agree"
-#~ msgstr "_Принимаю"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission — программа для обмена файлами. Когда ваш торрент активен, его данные становятся доступными другим пользователям. Содержимое, которым вы делитесь, находится полностью под вашей ответственностью."

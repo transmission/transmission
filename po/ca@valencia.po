@@ -2578,6 +2578,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "I _Agree"
-#~ msgstr "Estic d'acord"

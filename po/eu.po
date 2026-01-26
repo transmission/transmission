@@ -2600,12 +2600,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "egun"
 msgstr[1] "egun"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Ezin izan da aurkitu {tag}(r)entzako zain dagoen RPC eskaera"
-
-#~ msgid "I _Agree"
-#~ msgstr "_Onartzen dut"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission fitxategiak partekatzeko aplikazioa da. Torrent bat abiarazten duzunean, torrenteko datuak beste erabaltzaileen eskura geratuko dira. Partekatzen dituzun edukien arduraduna zu zeu zara."

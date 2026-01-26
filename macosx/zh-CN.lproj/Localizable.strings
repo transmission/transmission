@@ -781,7 +781,7 @@
    Remove completed confirm panel -> button
    Remove toolbar item -> label
    Remove trackers alert -> button */
-"Remove" = "删除";
+"Remove" = "移除";
 
 /* Main window -> 3rd bottom left button (remove all) tooltip */
 "Remove all transfers that have completed seeding." = "移除全部已完成做种的传输。";

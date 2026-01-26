@@ -2715,12 +2715,3 @@ msgstr[0] "день"
 msgstr[1] "дні"
 msgstr[2] "днів"
 msgstr[3] "дня"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Не вдалось знайти запит RPC, що очікує на розгляд, для тега {tag}"
-
-#~ msgid "I _Agree"
-#~ msgstr "Я _погоджуюсь"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission є програмою для обміну даних. Коли ви запускаєте торентовий клієнт, умістові дані стануть доступними іншим для завантаження. Ви несете відповідальність за вміст, який поширюєте."

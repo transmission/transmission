@@ -2623,12 +2623,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "μέρα"
 msgstr[1] "μέρες"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Αδυναμία εύρεσης εκρεμμούς PRC αιτήματος για την ετικέτα {tag}"
-
-#~ msgid "I _Agree"
-#~ msgstr "_Συμφωνώ"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Το Transmission είναι ένα πρόγραμμα διαμοιρασμού αρχείων. Όταν εκκινείτε ένα torrent, τα δεδομένα του θα γίνουν διαθέσιμα σε άλλους μέσω ανεβάσματος. Για όποιο περιεχόμενο μοιράζεστε φέρετε αποκλειστική ευθύνη."

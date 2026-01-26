@@ -399,4 +399,4 @@
 "pgY-W3-HdI.title" = "הגדרה כיישום ברירת המחדל";
 
 /* Class = "NSButtonCell"; title = "Verify data when download completes"; ObjectID = "wM8-cD-WAB"; */
-/* "wM8-cD-WAB.title" = ""; */
+"wM8-cD-WAB.title" = "לאמת את הנתונים עם סיום ההורדה";

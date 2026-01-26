@@ -2623,12 +2623,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Nem található függőben lévő RPC kérés a {tag} címkéhez"
-
-#~ msgid "I _Agree"
-#~ msgstr "_Elfogadom"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "A Transmission egy fájlmegosztó program. Egy torrent futtatása során a hozzá tartozó adatok elérhetővé válnak más felhasználók számára is. Minden megosztott tartalomért kizárólag Ön tartozik felelősséggel."
