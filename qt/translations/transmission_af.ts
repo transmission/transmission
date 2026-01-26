@@ -1592,7 +1592,7 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
         <translation>&amp;Op dae:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Daagliks</translation>
     </message>
@@ -1642,7 +1642,7 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
         <translation>Saterdag</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1992,7 +1992,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>Kies Kyk-gids</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2040,7 +2040,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;b&gt;Werk Bloklys By&lt;/b&gt;&lt;p&gt;Kry tans nuwe bloklys…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Kies Bestemming</translation>
     </message>
@@ -2221,7 +2221,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Fout Met Hernoem Van Pad</translation>
     </message>
@@ -2231,7 +2231,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;Kan nie “%1” as “%2” hernoem nie: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Herstel die fout en probeer weer.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Fout Met Toevoeg Van Torrent</translation>
     </message>
@@ -2306,7 +2306,7 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

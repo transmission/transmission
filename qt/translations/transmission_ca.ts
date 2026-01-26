@@ -1592,7 +1592,7 @@ Per afegir un altre URL principal, afegiu-lo després d&apos;una línia en blanc
         <translation>&amp;Als dies:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Cada dia</translation>
     </message>
@@ -1642,7 +1642,7 @@ Per afegir un altre URL principal, afegiu-lo després d&apos;una línia en blanc
         <translation>Dissabte</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation type="unfinished">
@@ -1992,7 +1992,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>Selecciona el directori d&apos;observació</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2040,7 +2040,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Seleccioneu una destinació</translation>
     </message>
@@ -2221,7 +2221,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Error en reanomenar el camí</translation>
     </message>
@@ -2231,7 +2231,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;No es pot reanomenar &quot;%1&quot; com a &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Corregiu els errors i torneu-ho a intentar.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Error en afegir el torrent</translation>
     </message>
@@ -2306,7 +2306,7 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

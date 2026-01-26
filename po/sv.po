@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Daniel, 2025\n"
 "Language-Team: Swedish (https://app.transifex.com/transmissionbt/teams/33778/sv/)\n"
@@ -45,7 +45,7 @@ msgstr "Det gick inte att lägga till torrentfilen '{path}'"
 msgid "Removing torrent file '{path}'"
 msgstr "Tar bort torrentfilen '{path}'"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "Det gick inte att ta bort '{path}': {error} ({error_code})"
 
@@ -2145,19 +2145,19 @@ msgstr "{crypto_library} fel: {error} ({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "Det gick inte att få '{path}': {error} ({error_code})"
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "Uppdaterade källans {protocol}-adress till {ip}"
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr "Kunde inte hämta källadressen i något IP-protokoll, inga nätverksanslutningar möjliga"
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr "Din maskin stöder inte {protocol}"
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "Den globala {type}-adressen har uppdaterats till {ip} med {url}"
 
@@ -2385,7 +2385,7 @@ msgid_plural "Loaded {count} torrents"
 msgstr[0] "Läste in {count} torrent"
 msgstr[1] "Läste in {count} torrenter"
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Migrerade torrentfil från '{old_path}' till '{path}'"
 

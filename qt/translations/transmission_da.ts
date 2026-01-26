@@ -1592,7 +1592,7 @@ For at tilføje en anden primær-URL, skal du tilføje den efter en tom linje.</
         <translation>&amp;På følgende dage:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Hver dag</translation>
     </message>
@@ -1642,7 +1642,7 @@ For at tilføje en anden primær-URL, skal du tilføje den efter en tom linje.</
         <translation>Lørdag</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1995,7 +1995,7 @@ For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje.</tra
         <translation>Vælg mappe som der skal holdes øje med</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>ukendt</translation>
     </message>
@@ -2043,7 +2043,7 @@ For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje.</tra
         <translation>&lt;b&gt;Opdater blokeringsliste&lt;/b&gt;&lt;p&gt;Henter ny blokeringsliste …&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Vælg destination</translation>
     </message>
@@ -2224,7 +2224,7 @@ For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje.</tra
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Fejl ved omdøbning af sti</translation>
     </message>
@@ -2234,7 +2234,7 @@ For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje.</tra
         <translation>&lt;p&gt;&lt;b&gt;Kunne ikke omdøbe &quot;%1&quot; som &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Ret venligst fejlene og prøv igen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Fejl ved tilføjelse af torrent</translation>
     </message>
@@ -2309,7 +2309,7 @@ For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje.</tra
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Andrei Stepanov, 2025\n"
 "Language-Team: Russian (https://app.transifex.com/transmissionbt/teams/33778/ru/)\n"
@@ -48,7 +48,7 @@ msgstr "Не удалось добавить торрент-файл «{path}»"
 msgid "Removing torrent file '{path}'"
 msgstr "Удаляется торрент-файл «{path}»"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "Не удалось удалить «{path}»: {error} ({error_code})"
 
@@ -2231,19 +2231,19 @@ msgstr "Ошибка {crypto_library}: {error} ({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "Не удалось получить «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "Успешно изменён адрес источника {protocol} на {ip}"
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr "Не удалось получить адрес источника ни по одному IP-протоколу, сетевые подключения невозможны"
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr "Ваша машина не поддерживает {protocol}"
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "Успешно изменён общий адрес {type} на {ip} через {url}"
 
@@ -2475,7 +2475,7 @@ msgstr[1] "Загружено {count} торрента"
 msgstr[2] "Загружено {count} торрентов"
 msgstr[3] "Загружено {count} торрентов"
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Торрент-файл перенесён из «{old_path}» в «{path}»"
 

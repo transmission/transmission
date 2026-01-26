@@ -1592,7 +1592,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <translation>&amp;An Tagen:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Jeden Tag</translation>
     </message>
@@ -1642,7 +1642,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <translation>Samstag</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1992,7 +1992,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>Zu überwachendes Verzeichnis wählen</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2040,7 +2040,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;b&gt;Aktualisiere Sperrliste&lt;/b&gt;&lt;p&gt;Neue Sperrliste wird empfangen…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Ziel auswählen</translation>
     </message>
@@ -2221,7 +2221,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Fehler beim Umbenennen des Pfades</translation>
     </message>
@@ -2231,7 +2231,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;Konnte &quot;%1&quot; nicht zu &quot;%2&quot; umbenennen: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Bitte Fehler korrigieren und erneut versuchen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Fehler beim Hinzufügen des Torrents</translation>
     </message>
@@ -2306,7 +2306,7 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

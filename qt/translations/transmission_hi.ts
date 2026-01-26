@@ -1592,7 +1592,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>इन दिनों पर (&amp;O):</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>प्रति दिन</translation>
     </message>
@@ -1642,7 +1642,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>शनिवार</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation type="unfinished">
@@ -1992,7 +1992,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>कार्यरत डायरेक्टरी चुनें</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2040,7 +2040,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>लक्षित डायरेक्टरी चुनें</translation>
     </message>
@@ -2221,7 +2221,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>पथ नाम बदलने में त्रुटि</translation>
     </message>
@@ -2231,7 +2231,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot; का नाम &quot;%2&quot; करने में विफल : %3।&lt;/b&gt;&lt;/p&gt;&lt;p&gt;त्रुटि ठीक कर पुनः प्रयास करें।&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>टोरेंट जोड़ते समय त्रुटि</translation>
     </message>
@@ -2306,7 +2306,7 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1592,7 +1592,7 @@ För att lägga till ytterligare en primär URL, lägg till den efter en tom rad
         <translation>&amp;På dagar:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Varje dag</translation>
     </message>
@@ -1642,7 +1642,7 @@ För att lägga till ytterligare en primär URL, lägg till den efter en tom rad
         <translation>Lördag</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1995,7 +1995,7 @@ Lägg till en ny primär URL genom att lägga till den efter en tom rad.</transl
         <translation>Välj mapp för övervakning</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>okänd</translation>
     </message>
@@ -2043,7 +2043,7 @@ Lägg till en ny primär URL genom att lägga till den efter en tom rad.</transl
         <translation>&lt;b&gt;Uppdatera blockeringslista&lt;/b&gt;&lt;p&gt;Hämtar ny blockeringslista…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Välj destination</translation>
     </message>
@@ -2224,7 +2224,7 @@ Lägg till en ny primär URL genom att lägga till den efter en tom rad.</transl
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Fel vid namnbyte av sökväg</translation>
     </message>
@@ -2234,7 +2234,7 @@ Lägg till en ny primär URL genom att lägga till den efter en tom rad.</transl
         <translation>&lt;p&gt;&lt;b&gt;Det går inte att byta namn på &quot;%1&quot; till &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Rätta till felen och försök igen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Fel vi tillägg av torrent</translation>
     </message>
@@ -2309,7 +2309,7 @@ Lägg till en ny primär URL genom att lägga till den efter en tom rad.</transl
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
