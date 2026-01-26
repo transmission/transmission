@@ -56,6 +56,7 @@ set(MBEDTLS_MINIMUM 2.7)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.0)
 set(QT_MINIMUM 5.15)
+set(SMALL_MINIMUM 0.2.2)
 
 option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
@@ -80,6 +81,7 @@ tr_auto_option(USE_SYSTEM_DHT "Use system dht library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_FMT "Use system fmt library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_SMALL "Use system small library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" ${USE_SYSTEM_DEFAULT})
@@ -248,7 +250,6 @@ set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
 find_package(FastFloat)
 find_package(RapidJSON)
-find_package(Small)
 find_package(UtfCpp)
 find_package(WideInteger)
 
@@ -596,6 +597,18 @@ tr_add_external_auto_library(FMT fmt
     CMAKE_ARGS
         -DFMT_INSTALL=OFF
         -DFMT_SYSTEM_HEADERS=ON)
+
+tr_add_external_auto_library(SMALL small
+    SUBPROJECT
+    CMAKE_ARGS
+        -DSMALL_BUILD_WITH_EXCEPTIONS=OFF)
+add_library(transmission::small INTERFACE IMPORTED)
+target_link_libraries(transmission::small
+    INTERFACE
+        small::small)
+target_compile_definitions(transmission::small
+    INTERFACE
+        SMALL_DISABLE_EXCEPTIONS=1)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)
