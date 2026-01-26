@@ -1042,17 +1042,13 @@ private:
     friend void tr_torrentRemoveInSessionThread(
         tr_torrent* tor,
         bool delete_flag,
-        tr_fileFunc delete_func,
-        void* delete_user_data,
-        tr_torrent_remove_done_func callback,
-        void* callback_user_data);
+        tr_torrent_remove_func remove_func,
+        tr_torrent_remove_done_func on_remove_done);
     friend void tr_torrentRemove(
         tr_torrent* tor,
         bool delete_flag,
-        tr_fileFunc delete_func,
-        void* delete_user_data,
-        tr_torrent_remove_done_func callback,
-        void* callback_user_data);
+        tr_torrent_remove_func remove_func,
+        tr_torrent_remove_done_func on_remove_done);
     friend void tr_torrentSetDownloadDir(tr_torrent* tor, std::string_view path);
     friend void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
     friend void tr_torrentStart(tr_torrent* tor);

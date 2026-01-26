@@ -532,11 +532,6 @@ bool torrentShouldQueue(tr_torrent const* const tor)
     return tor->session->count_queue_free_slots(dir) == 0;
 }
 
-bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error* error)
-{
-    return tr_sys_path_remove(filename, error);
-}
-
 void freeTorrent(tr_torrent* tor)
 {
     auto const lock = tor->unique_lock();
@@ -683,13 +678,12 @@ void tr_torrent::stop_now()
     set_is_queued(false);
 }
 
+// By-value: arguments are moved into the session-thread work item.
 void tr_torrentRemoveInSessionThread(
     tr_torrent* tor,
     bool delete_flag,
-    tr_fileFunc delete_func,
-    void* delete_user_data,
-    tr_torrent_remove_done_func callback,
-    void* callback_user_data)
+    tr_torrent_remove_func remove_func,
+    tr_torrent_remove_done_func on_remove_done) // NOLINT(performance-unnecessary-value-param)
 {
     auto const lock = tor->unique_lock();
 
@@ -700,18 +694,13 @@ void tr_torrentRemoveInSessionThread(
         tor->session->close_torrent_files(tor->id());
         tor->session->verify_remove(tor);
 
-        if (delete_func == nullptr)
+        if (!remove_func)
         {
-            delete_func = start_stop_helpers::removeTorrentFile;
+            remove_func = tr_sys_path_remove;
         }
 
-        auto const delete_func_wrapper = [&delete_func, delete_user_data](char const* filename)
-        {
-            delete_func(filename, delete_user_data, nullptr);
-        };
-
         tr_error error;
-        tor->files().remove(tor->current_dir(), tor->name(), delete_func_wrapper, &error);
+        tor->files().remove(tor->current_dir(), tor->name(), remove_func, &error);
         if (error)
         {
             ok = false;
@@ -726,9 +715,9 @@ void tr_torrentRemoveInSessionThread(
         }
     }
 
-    if (callback != nullptr)
+    if (on_remove_done)
     {
-        callback(tor->id(), ok, callback_user_data);
+        on_remove_done(tor->id(), ok);
     }
 
     if (ok)
@@ -754,13 +743,9 @@ void tr_torrentStop(tr_torrent* tor)
 void tr_torrentRemove(
     tr_torrent* tor,
     bool delete_flag,
-    tr_fileFunc delete_func,
-    void* delete_user_data,
-    tr_torrent_remove_done_func callback,
-    void* callback_user_data)
+    tr_torrent_remove_func remove_func,
+    tr_torrent_remove_done_func on_remove_done)
 {
-    using namespace start_stop_helpers;
-
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->is_deleting_ = true;
@@ -769,10 +754,8 @@ void tr_torrentRemove(
         tr_torrentRemoveInSessionThread,
         tor,
         delete_flag,
-        delete_func,
-        delete_user_data,
-        callback,
-        callback_user_data);
+        std::move(remove_func),
+        std::move(on_remove_done));
 }
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor)
