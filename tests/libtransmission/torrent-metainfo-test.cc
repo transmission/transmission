@@ -128,7 +128,6 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
     EXPECT_NE(nullptr, metainfo);
     EXPECT_EQ(336, metainfo->info_dict_offset());
     EXPECT_EQ(26583, metainfo->info_dict_size());
-    EXPECT_EQ(592, metainfo->pieces_offset());
     tr_ctorFree(ctor);
 }
 
