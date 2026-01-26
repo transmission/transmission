@@ -588,9 +588,7 @@ bool tr_file_move(std::string_view oldpath, std::string_view newpath, bool allow
     }
 
     // ensure the target directory exists
-    auto newdir = tr_pathbuf{ newpath };
-    newdir.popdir();
-    if (!tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error))
+    if (!tr_sys_dir_create(tr_sys_path_dirname(newpath), TR_SYS_DIR_CREATE_PARENTS, 0777, error))
     {
         error->prefix_message("Unable to create directory for new file: ");
         return false;

@@ -1799,9 +1799,7 @@ void tr_torrent::create_empty_files() const
         filename.assign(base, '/', subpath);
 
         // create subfolders, if any
-        auto dir = tr_pathbuf{ filename.sv() };
-        dir.popdir();
-        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
+        tr_sys_dir_create(tr_sys_path_dirname(filename), TR_SYS_DIR_CREATE_PARENTS, 0777);
 
         // create the file
         if (auto const fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_SEQUENTIAL, 0666);
