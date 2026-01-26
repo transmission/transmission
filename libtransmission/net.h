@@ -101,11 +101,6 @@ public:
         hport_ = hport;
     }
 
-    void set_network(uint16_t nport) noexcept
-    {
-        hport_ = ntohs(nport);
-    }
-
     [[nodiscard]] static std::pair<tr_port, std::byte const*> from_compact(std::byte const* compact) noexcept;
 
     [[nodiscard]] constexpr auto operator<(tr_port const& that) const noexcept
