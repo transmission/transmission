@@ -158,13 +158,13 @@ public:
 
     [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
     {
-        auto const kbyps = dir == TR_DOWN ? settings().speed_down_kbyps : settings().speed_up_kbyps;
+        auto const kbyps = dir == tr_direction::Down ? settings().speed_down_kbyps : settings().speed_up_kbyps;
         return Speed{ kbyps, Speed::Units::KByps };
     }
 
     constexpr void set_speed_limit(tr_direction dir, Speed const limit) noexcept
     {
-        if (dir == TR_DOWN)
+        if (dir == tr_direction::Down)
         {
             settings_.speed_down_kbyps = limit.count(Speed::Units::KByps);
         }

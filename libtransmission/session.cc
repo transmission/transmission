@@ -127,8 +127,8 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 
         if (auto const val = group_map->value_if<bool>(TR_KEY_honors_session_limits); val)
         {
-            group.honor_parent_limits(TR_UP, *val);
-            group.honor_parent_limits(TR_DOWN, *val);
+            group.honor_parent_limits(tr_direction::Up, *val);
+            group.honor_parent_limits(tr_direction::Down, *val);
         }
     }
 }
@@ -143,7 +143,7 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view const confi
         auto group_map = tr_variant::Map{ 6U };
         group_map.try_emplace(TR_KEY_download_limit, limits.down_limit.count(Speed::Units::KByps));
         group_map.try_emplace(TR_KEY_download_limited, limits.down_limited);
-        group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(TR_UP));
+        group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(tr_direction::Up));
         group_map.try_emplace(TR_KEY_name, name.sv());
         group_map.try_emplace(TR_KEY_upload_limit, limits.up_limit.count(Speed::Units::KByps));
         group_map.try_emplace(TR_KEY_upload_limited, limits.up_limited);
@@ -348,7 +348,7 @@ size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
     auto const lock = session_->unique_lock();
 
     auto const* const tor = session_->torrents().get(torrent_id);
-    return tor == nullptr ? 0U : tor->bandwidth().clamp(TR_DOWN, byte_count);
+    return tor == nullptr ? 0U : tor->bandwidth().clamp(tr_direction::Down, byte_count);
 }
 
 std::optional<std::string> tr_session::WebMediator::proxyUrl() const
@@ -614,8 +614,6 @@ namespace queue_helpers
 {
 std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_direction dir, size_t num_wanted)
 {
-    TR_ASSERT(tr_isDirection(dir));
-
     auto candidates = torrents.get_matching([dir](auto const* const tor) { return tor->is_queued(dir); });
 
     // find the best n candidates
@@ -643,7 +641,7 @@ size_t tr_session::count_queue_free_slots(tr_direction dir) const noexcept
     }
 
     auto const max = queueSize(dir);
-    auto const activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+    auto const activity = dir == tr_direction::Up ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
 
     // count how many torrents are active
     auto active_count = size_t{};
@@ -684,7 +682,7 @@ void tr_session::on_queue_timer()
 {
     using namespace queue_helpers;
 
-    for (auto const dir : { TR_UP, TR_DOWN })
+    for (auto const dir : { tr_direction::Up, tr_direction::Down })
     {
         if (!queueEnabled(dir))
         {
@@ -885,8 +883,8 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 
     // We need to update bandwidth if speed settings changed.
     // It's a harmless call, so just call it instead of checking for settings changes
-    update_bandwidth(TR_UP);
-    update_bandwidth(TR_DOWN);
+    update_bandwidth(tr_direction::Up);
+    update_bandwidth(tr_direction::Down);
 }
 
 void tr_sessionSet(tr_session* session, tr_variant const& settings)
@@ -1168,8 +1166,8 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
 {
     auto const in_session_thread = [session = &session_, is_active, reason]()
     {
-        session->update_bandwidth(TR_UP);
-        session->update_bandwidth(TR_DOWN);
+        session->update_bandwidth(tr_direction::Up);
+        session->update_bandwidth(tr_direction::Down);
 
         if (session->alt_speed_active_changed_func_ != nullptr)
         {
@@ -1189,25 +1187,20 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
 void tr_sessionSetSpeedLimit_KBps(tr_session* const session, tr_direction const dir, size_t const limit_kbyps)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     session->set_speed_limit(dir, Speed{ limit_kbyps, Speed::Units::KByps });
 }
 
 size_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     return session->speed_limit(dir).count(Speed::Units::KByps);
 }
 
 void tr_sessionLimitSpeed(tr_session* session, tr_direction const dir, bool limited)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
+    if (dir == tr_direction::Down)
     {
         session->settings_.speed_limit_down_enabled = limited;
     }
@@ -1222,8 +1215,6 @@ void tr_sessionLimitSpeed(tr_session* session, tr_direction const dir, bool limi
 bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction const dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     return session->is_speed_limited(dir);
 }
 
@@ -1232,8 +1223,6 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction const dir)
 void tr_sessionSetAltSpeed_KBps(tr_session* const session, tr_direction const dir, size_t const limit_kbyps)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     session->alt_speeds_.set_speed_limit(dir, Speed{ limit_kbyps, Speed::Units::KByps });
     session->update_bandwidth(dir);
 }
@@ -1241,8 +1230,6 @@ void tr_sessionSetAltSpeed_KBps(tr_session* const session, tr_direction const di
 size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     return session->alt_speeds_.speed_limit(dir).count(Speed::Units::KByps);
 }
 
@@ -2007,9 +1994,8 @@ std::string tr_sessionGetScript(tr_session const* const session, TrScript const 
 void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
+    if (dir == tr_direction::Down)
     {
         session->settings_.download_queue_size = max_simultaneous_torrents;
     }
@@ -2022,7 +2008,6 @@ void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_si
 size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
     return session->queueSize(dir);
 }
@@ -2030,9 +2015,8 @@ size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
 void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_torrents)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
+    if (dir == tr_direction::Down)
     {
         session->settings_.download_queue_enabled = do_limit_simultaneous_torrents;
     }
@@ -2045,8 +2029,6 @@ void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_li
 bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     return session->queueEnabled(dir);
 }
 

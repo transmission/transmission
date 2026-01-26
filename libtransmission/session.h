@@ -932,12 +932,12 @@ public:
 
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
     {
-        return dir == TR_DOWN ? settings_.download_queue_enabled : settings_.seed_queue_enabled;
+        return dir == tr_direction::Down ? settings_.download_queue_enabled : settings_.seed_queue_enabled;
     }
 
     [[nodiscard]] constexpr auto queueSize(tr_direction dir) const noexcept
     {
-        return dir == TR_DOWN ? settings_.download_queue_size : settings_.seed_queue_size;
+        return dir == tr_direction::Down ? settings_.download_queue_size : settings_.seed_queue_size;
     }
 
     [[nodiscard]] constexpr auto queueStalledEnabled() const noexcept
@@ -1122,20 +1122,20 @@ public:
 
     [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
     {
-        auto const kbyps = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
+        auto const kbyps = dir == tr_direction::Down ? settings_.speed_limit_down : settings_.speed_limit_up;
         return Speed{ kbyps, Speed::Units::KByps };
     }
 
     void set_speed_limit(tr_direction dir, Speed limit) noexcept
     {
-        auto& tgt = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
+        auto& tgt = dir == tr_direction::Down ? settings_.speed_limit_down : settings_.speed_limit_up;
         tgt = limit.count(Speed::Units::KByps);
         update_bandwidth(dir);
     }
 
     [[nodiscard]] constexpr auto is_speed_limited(tr_direction dir) const noexcept
     {
-        return dir == TR_DOWN ? settings_.speed_limit_down_enabled : settings_.speed_limit_up_enabled;
+        return dir == tr_direction::Down ? settings_.speed_limit_down_enabled : settings_.speed_limit_up_enabled;
     }
 
     [[nodiscard]] auto piece_speed(tr_direction dir) const noexcept

@@ -448,22 +448,22 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (BOOL)usesSpeedLimit:(BOOL)upload
 {
-    return tr_torrentUsesSpeedLimit(self.fHandle, upload ? TR_UP : TR_DOWN);
+    return tr_torrentUsesSpeedLimit(self.fHandle, upload ? tr_direction::Up : tr_direction::Down);
 }
 
 - (void)setUseSpeedLimit:(BOOL)use upload:(BOOL)upload
 {
-    tr_torrentUseSpeedLimit(self.fHandle, upload ? TR_UP : TR_DOWN, use);
+    tr_torrentUseSpeedLimit(self.fHandle, upload ? tr_direction::Up : tr_direction::Down, use);
 }
 
 - (NSUInteger)speedLimit:(BOOL)upload
 {
-    return tr_torrentGetSpeedLimit_KBps(self.fHandle, upload ? TR_UP : TR_DOWN);
+    return tr_torrentGetSpeedLimit_KBps(self.fHandle, upload ? tr_direction::Up : tr_direction::Down);
 }
 
 - (void)setSpeedLimit:(NSUInteger)limit upload:(BOOL)upload
 {
-    tr_torrentSetSpeedLimit_KBps(self.fHandle, upload ? TR_UP : TR_DOWN, limit);
+    tr_torrentSetSpeedLimit_KBps(self.fHandle, upload ? tr_direction::Up : tr_direction::Down, limit);
 }
 
 - (BOOL)usesGlobalSpeedLimit

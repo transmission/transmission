@@ -151,9 +151,9 @@ void tr_bandwidth::allocate_bandwidth(
     auto const priority = std::min(parent_priority, priority_);
 
     // set the available bandwidth
-    for (auto const dir : { TR_UP, TR_DOWN })
+    for (auto const dir : { tr_direction::Up, tr_direction::Down })
     {
-        if (auto& bandwidth = band_[dir]; bandwidth.is_limited_)
+        if (auto& bandwidth = band_[static_cast<uint8_t>(dir)]; bandwidth.is_limited_)
         {
             auto const next_pulse_speed = bandwidth.desired_speed_;
             bandwidth.bytes_left_ = next_pulse_speed.base_quantity() * period_msec / 1000U;
@@ -179,7 +179,8 @@ void tr_bandwidth::phase_one(std::vector<tr_peerIo*>& peers, tr_direction dir)
 {
     // First phase of IO. Tries to distribute bandwidth fairly to keep faster
     // peers from starving the others.
-    tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peers.size(), dir == TR_UP ? "upload" : "download"));
+    tr_logAddTrace(
+        fmt::format("{} peers to go round-robin for {}", peers.size(), dir == tr_direction::Up ? "upload" : "download"));
 
     // Shuffle the peers so they all have equal chance to be first in line.
     static thread_local auto urbg = tr_urbg<size_t>{};
@@ -258,8 +259,8 @@ void tr_bandwidth::allocate(uint64_t period_msec)
     // and/or peers that can use it
     for (auto& peers : peer_arrays)
     {
-        phase_one(peers, TR_UP);
-        phase_one(peers, TR_DOWN);
+        phase_one(peers, tr_direction::Up);
+        phase_one(peers, tr_direction::Down);
     }
 
     // Second phase of IO. To help us scale in high bandwidth situations,
@@ -268,8 +269,8 @@ void tr_bandwidth::allocate(uint64_t period_msec)
     // or (2) the next tr_bandwidth::allocate () call, when we start over again.
     for (auto const& io : refs)
     {
-        io->set_enabled(TR_UP, io->has_bandwidth_left(TR_UP));
-        io->set_enabled(TR_DOWN, io->has_bandwidth_left(TR_DOWN));
+        io->set_enabled(tr_direction::Up, io->has_bandwidth_left(tr_direction::Up));
+        io->set_enabled(tr_direction::Down, io->has_bandwidth_left(tr_direction::Down));
     }
 }
 
@@ -277,14 +278,14 @@ void tr_bandwidth::allocate(uint64_t period_msec)
 
 size_t tr_bandwidth::clamp(tr_direction const dir, size_t byte_count) const noexcept
 {
-    TR_ASSERT(tr_isDirection(dir));
+    auto const idx = static_cast<uint8_t>(dir);
 
-    if (band_[dir].is_limited_)
+    if (band_[idx].is_limited_)
     {
-        byte_count = std::min(byte_count, band_[dir].bytes_left_);
+        byte_count = std::min(byte_count, band_[idx].bytes_left_);
     }
 
-    if (parent_ != nullptr && band_[dir].honor_parent_limits_ && byte_count > 0U)
+    if (parent_ != nullptr && band_[idx].honor_parent_limits_ && byte_count > 0U)
     {
         byte_count = parent_->clamp(dir, byte_count);
     }
@@ -294,9 +295,7 @@ size_t tr_bandwidth::clamp(tr_direction const dir, size_t byte_count) const noex
 
 void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count, bool is_piece_data, uint64_t now)
 {
-    TR_ASSERT(tr_isDirection(dir));
-
-    auto& band = band_[dir];
+    auto& band = band_[static_cast<uint8_t>(dir)];
 
     if (is_piece_data)
     {
@@ -323,17 +322,17 @@ void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count
 tr_bandwidth_limits tr_bandwidth::get_limits() const
 {
     auto limits = tr_bandwidth_limits{};
-    limits.up_limit = get_desired_speed(TR_UP);
-    limits.down_limit = get_desired_speed(TR_DOWN);
-    limits.up_limited = is_limited(TR_UP);
-    limits.down_limited = is_limited(TR_DOWN);
+    limits.up_limit = get_desired_speed(tr_direction::Up);
+    limits.down_limit = get_desired_speed(tr_direction::Down);
+    limits.up_limited = is_limited(tr_direction::Up);
+    limits.down_limited = is_limited(tr_direction::Down);
     return limits;
 }
 
 void tr_bandwidth::set_limits(tr_bandwidth_limits const& limits)
 {
-    set_desired_speed(TR_UP, limits.up_limit);
-    set_desired_speed(TR_DOWN, limits.down_limit);
-    set_limited(TR_UP, limits.up_limited);
-    set_limited(TR_DOWN, limits.down_limited);
+    set_desired_speed(tr_direction::Up, limits.up_limit);
+    set_desired_speed(tr_direction::Down, limits.down_limit);
+    set_limited(tr_direction::Up, limits.up_limited);
+    set_limited(tr_direction::Down, limits.down_limited);
 }

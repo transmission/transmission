@@ -807,9 +807,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_download_dir:
         return tr_variant::unmanaged_string(tor.download_dir().sv());
     case TR_KEY_download_limit:
-        return tr_torrentGetSpeedLimit_KBps(&tor, TR_DOWN);
+        return tr_torrentGetSpeedLimit_KBps(&tor, tr_direction::Down);
     case TR_KEY_download_limited:
-        return tor.uses_speed_limit(TR_DOWN);
+        return tor.uses_speed_limit(tr_direction::Down);
     case TR_KEY_downloaded_ever:
         return st.downloadedEver;
     case TR_KEY_edit_date:
@@ -929,9 +929,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_trackers:
         return make_tracker_vec(tor);
     case TR_KEY_upload_limit:
-        return tr_torrentGetSpeedLimit_KBps(&tor, TR_UP);
+        return tr_torrentGetSpeedLimit_KBps(&tor, tr_direction::Up);
     case TR_KEY_upload_limited:
-        return tor.uses_speed_limit(TR_UP);
+        return tor.uses_speed_limit(tr_direction::Up);
     case TR_KEY_upload_ratio:
         return st.ratio;
     case TR_KEY_uploaded_ever:
@@ -1313,7 +1313,7 @@ namespace make_torrent_field_helpers
 
         if (auto const val = args_in.value_if<int64_t>(TR_KEY_download_limit); val)
         {
-            tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, *val);
+            tr_torrentSetSpeedLimit_KBps(tor, tr_direction::Down, *val);
         }
 
         if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
@@ -1328,7 +1328,7 @@ namespace make_torrent_field_helpers
 
         if (auto const val = args_in.value_if<bool>(TR_KEY_download_limited); val)
         {
-            tor->use_speed_limit(TR_DOWN, *val);
+            tor->use_speed_limit(tr_direction::Down, *val);
         }
 
         if (auto const val = args_in.value_if<bool>(TR_KEY_honors_session_limits); val)
@@ -1338,12 +1338,12 @@ namespace make_torrent_field_helpers
 
         if (auto const val = args_in.value_if<int64_t>(TR_KEY_upload_limit); val)
         {
-            tr_torrentSetSpeedLimit_KBps(tor, TR_UP, *val);
+            tr_torrentSetSpeedLimit_KBps(tor, tr_direction::Up, *val);
         }
 
         if (auto const val = args_in.value_if<bool>(TR_KEY_upload_limited); val)
         {
-            tor->use_speed_limit(TR_UP, *val);
+            tor->use_speed_limit(tr_direction::Up, *val);
         }
 
         if (auto const val = args_in.value_if<int64_t>(TR_KEY_seed_idle_limit); val)
@@ -1910,7 +1910,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         {
             auto const limits = group->get_limits();
             auto group_map = tr_variant::Map{ 6U };
-            group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(TR_UP));
+            group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(tr_direction::Up));
             group_map.try_emplace(TR_KEY_name, name.sv());
             group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
             group_map.try_emplace(TR_KEY_speed_limit_down_enabled, limits.down_limited);
@@ -1964,8 +1964,8 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 
     if (auto const val = args_in.value_if<bool>(TR_KEY_honors_session_limits); val)
     {
-        group.honor_parent_limits(TR_UP, *val);
-        group.honor_parent_limits(TR_DOWN, *val);
+        group.honor_parent_limits(tr_direction::Up, *val);
+        group.honor_parent_limits(tr_direction::Down, *val);
     }
 
     return { Error::SUCCESS, {} };
@@ -2000,10 +2000,10 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     args_out.try_emplace(TR_KEY_active_torrent_count, n_running);
     args_out.try_emplace(TR_KEY_cumulative_stats, make_stats_map(session->stats().cumulative()));
     args_out.try_emplace(TR_KEY_current_stats, make_stats_map(session->stats().current()));
-    args_out.try_emplace(TR_KEY_download_speed, session->piece_speed(TR_DOWN).base_quantity());
+    args_out.try_emplace(TR_KEY_download_speed, session->piece_speed(tr_direction::Down).base_quantity());
     args_out.try_emplace(TR_KEY_paused_torrent_count, total - n_running);
     args_out.try_emplace(TR_KEY_torrent_count, total);
-    args_out.try_emplace(TR_KEY_upload_speed, session->piece_speed(TR_UP).base_quantity());
+    args_out.try_emplace(TR_KEY_upload_speed, session->piece_speed(tr_direction::Up).base_quantity());
 
     return { JsonRpc::Error::SUCCESS, {} };
 }
@@ -2055,12 +2055,12 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_alt_speed_down,
-        [](tr_session const& src) -> tr_variant { return tr_sessionGetAltSpeed_KBps(&src, TR_DOWN); },
+        [](tr_session const& src) -> tr_variant { return tr_sessionGetAltSpeed_KBps(&src, tr_direction::Down); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())
             {
-                tr_sessionSetAltSpeed_KBps(&tgt, TR_DOWN, *val);
+                tr_sessionSetAltSpeed_KBps(&tgt, tr_direction::Down, *val);
             }
         });
 
@@ -2121,12 +2121,12 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_alt_speed_up,
-        [](tr_session const& src) -> tr_variant { return tr_sessionGetAltSpeed_KBps(&src, TR_UP); },
+        [](tr_session const& src) -> tr_variant { return tr_sessionGetAltSpeed_KBps(&src, tr_direction::Up); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())
             {
-                tr_sessionSetAltSpeed_KBps(&tgt, TR_UP, *val);
+                tr_sessionSetAltSpeed_KBps(&tgt, tr_direction::Up, *val);
             }
         });
 
@@ -2240,23 +2240,23 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_download_queue_enabled,
-        [](tr_session const& src) -> tr_variant { return src.queueEnabled(TR_DOWN); },
+        [](tr_session const& src) -> tr_variant { return src.queueEnabled(tr_direction::Down); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<bool>())
             {
-                tr_sessionSetQueueEnabled(&tgt, TR_DOWN, *val);
+                tr_sessionSetQueueEnabled(&tgt, tr_direction::Down, *val);
             }
         });
 
     map.try_emplace(
         TR_KEY_download_queue_size,
-        [](tr_session const& src) -> tr_variant { return src.queueSize(TR_DOWN); },
+        [](tr_session const& src) -> tr_variant { return src.queueSize(tr_direction::Down); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())
             {
-                tr_sessionSetQueueSize(&tgt, TR_DOWN, *val);
+                tr_sessionSetQueueSize(&tgt, tr_direction::Down, *val);
             }
         });
 
@@ -2487,23 +2487,23 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_seed_queue_enabled,
-        [](tr_session const& src) -> tr_variant { return src.queueEnabled(TR_UP); },
+        [](tr_session const& src) -> tr_variant { return src.queueEnabled(tr_direction::Up); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<bool>())
             {
-                tr_sessionSetQueueEnabled(&tgt, TR_UP, *val);
+                tr_sessionSetQueueEnabled(&tgt, tr_direction::Up, *val);
             }
         });
 
     map.try_emplace(
         TR_KEY_seed_queue_size,
-        [](tr_session const& src) -> tr_variant { return src.queueSize(TR_UP); },
+        [](tr_session const& src) -> tr_variant { return src.queueSize(tr_direction::Up); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())
             {
-                tr_sessionSetQueueSize(&tgt, TR_UP, *val);
+                tr_sessionSetQueueSize(&tgt, tr_direction::Up, *val);
             }
         });
 
@@ -2522,45 +2522,45 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_speed_limit_down,
-        [](tr_session const& src) -> tr_variant { return src.speed_limit(TR_DOWN).count(Speed::Units::KByps); },
+        [](tr_session const& src) -> tr_variant { return src.speed_limit(tr_direction::Down).count(Speed::Units::KByps); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())
             {
-                tgt.set_speed_limit(TR_DOWN, Speed{ *val, Speed::Units::KByps });
+                tgt.set_speed_limit(tr_direction::Down, Speed{ *val, Speed::Units::KByps });
             }
         });
 
     map.try_emplace(
         TR_KEY_speed_limit_down_enabled,
-        [](tr_session const& src) -> tr_variant { return src.is_speed_limited(TR_DOWN); },
+        [](tr_session const& src) -> tr_variant { return src.is_speed_limited(tr_direction::Down); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<bool>())
             {
-                tr_sessionLimitSpeed(&tgt, TR_DOWN, *val);
+                tr_sessionLimitSpeed(&tgt, tr_direction::Down, *val);
             }
         });
 
     map.try_emplace(
         TR_KEY_speed_limit_up,
-        [](tr_session const& src) -> tr_variant { return src.speed_limit(TR_UP).count(Speed::Units::KByps); },
+        [](tr_session const& src) -> tr_variant { return src.speed_limit(tr_direction::Up).count(Speed::Units::KByps); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())
             {
-                tgt.set_speed_limit(TR_UP, Speed{ *val, Speed::Units::KByps });
+                tgt.set_speed_limit(tr_direction::Up, Speed{ *val, Speed::Units::KByps });
             }
         });
 
     map.try_emplace(
         TR_KEY_speed_limit_up_enabled,
-        [](tr_session const& src) -> tr_variant { return src.is_speed_limited(TR_UP); },
+        [](tr_session const& src) -> tr_variant { return src.is_speed_limited(tr_direction::Up); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<bool>())
             {
-                tr_sessionLimitSpeed(&tgt, TR_UP, *val);
+                tr_sessionLimitSpeed(&tgt, tr_direction::Up, *val);
             }
         });
 
