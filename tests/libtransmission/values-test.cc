@@ -40,10 +40,10 @@ TEST_F(ValuesTest, toString)
     EXPECT_EQ("999 kB/s", val.to_string());
 
     val = Speed{ 99.22222, Speed::Units::KByps };
-    EXPECT_EQ("99.22 kB/s", val.to_string());
+    EXPECT_EQ("99.2 kB/s", val.to_string());
 
     val = Speed{ 999.22222, Speed::Units::KByps };
-    EXPECT_EQ("999.2 kB/s", val.to_string());
+    EXPECT_EQ("999 kB/s", val.to_string());
 }
 
 TEST_F(ValuesTest, isZero)
