@@ -62,6 +62,6 @@ int main(int argc, char** argv)
     }
 
     out.close();
-    tr_sys_path_rename(tmp_result_path.c_str(), result_path.c_str());
+    tr_sys_path_rename(tmp_result_path, result_path);
     return 0;
 }

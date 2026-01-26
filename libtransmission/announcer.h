@@ -83,8 +83,6 @@ public:
     virtual void upkeep() = 0;
 };
 
-std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
-
 // --- For torrent customers
 
 void tr_announcerChangeMyPort(tr_torrent* tor);

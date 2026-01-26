@@ -206,7 +206,7 @@ struct peer_request
     [[nodiscard]] static auto from_block(tr_torrent const& tor, tr_block_index_t block) noexcept
     {
         auto const loc = tor.block_loc(block);
-        return peer_request{ loc.piece, loc.piece_offset, tor.block_size(block) };
+        return peer_request{ .index = loc.piece, .offset = loc.piece_offset, .length = tor.block_size(block) };
     }
 };
 
@@ -488,7 +488,7 @@ public:
                     auto const left_in_block = block_size - loc.block_offset;
                     auto const left_in_piece = tor_.piece_size(loc.piece) - loc.piece_offset;
                     auto const req_len = std::min(left_in_block, left_in_piece);
-                    protocol_send_request({ loc.piece, loc.piece_offset, req_len });
+                    protocol_send_request({ .index = loc.piece, .offset = loc.piece_offset, .length = req_len });
                     offset += req_len;
                 }
 

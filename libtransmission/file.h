@@ -131,7 +131,7 @@ struct tr_sys_path_capacity
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* error = nullptr);
+bool tr_sys_path_copy(std::string_view src_path, std::string_view dst_path, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `stat()`.
@@ -168,13 +168,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* erro
  *         be returned in case of error; if you need to distinguish the two,
  *         check if `error` is `nullptr` afterwards.
  */
-bool tr_sys_path_exists(char const* path, tr_error* error = nullptr);
-
-template<typename T, typename = decltype(&T::c_str)>
-bool tr_sys_path_exists(T const& path, tr_error* error = nullptr)
-{
-    return tr_sys_path_exists(path.c_str(), error);
-}
+bool tr_sys_path_exists(std::string_view path, tr_error* error = nullptr);
 
 /**
  * @brief Check whether path is relative.
@@ -200,13 +194,7 @@ bool tr_sys_path_is_relative(std::string_view path);
  *         if you need to distinguish the two, check if `error` is `nullptr`
  *         afterwards.
  */
-bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error* error = nullptr);
-
-template<typename T, typename U, typename = decltype(&T::c_str), typename = decltype(&U::c_str)>
-bool tr_sys_path_is_same(T const& path1, U const& path2, tr_error* error = nullptr)
-{
-    return tr_sys_path_is_same(path1.c_str(), path2.c_str(), error);
-}
+bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `realpath()`.
@@ -254,13 +242,7 @@ std::string_view tr_sys_path_dirname(std::string_view path);
  *         Rename will generally only succeed if both source and destination are
  *         on the same partition.
  */
-bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* error = nullptr);
-
-template<typename T, typename U, typename = decltype(&T::c_str), typename = decltype(&U::c_str)>
-bool tr_sys_path_rename(T const& src_path, U const& dst_path, tr_error* error = nullptr)
-{
-    return tr_sys_path_rename(src_path.c_str(), dst_path.c_str(), error);
-}
+bool tr_sys_path_rename(std::string_view src_path, std::string_view dst_path, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `remove()`.
@@ -273,13 +255,7 @@ bool tr_sys_path_rename(T const& src_path, U const& dst_path, tr_error* error = 
  *         Directory removal will only succeed if it is empty (contains no other
  *         files and directories).
  */
-bool tr_sys_path_remove(char const* path, tr_error* error = nullptr);
-
-template<typename T, typename = decltype(&T::c_str)>
-bool tr_sys_path_remove(T const& path, tr_error* error = nullptr)
-{
-    return tr_sys_path_remove(path.c_str(), error);
-}
+bool tr_sys_path_remove(std::string_view path, tr_error* error = nullptr);
 
 /**
  * @brief Transform path separators to native ones, in-place.
@@ -305,7 +281,7 @@ char* tr_sys_path_native_separators(char* path);
  * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
  *         `error` set accordingly).
  */
-tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error* error = nullptr);
+tr_sys_file_t tr_sys_file_open(std::string_view path, int flags, int permissions, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `mkstemp()`.
@@ -480,13 +456,7 @@ std::string tr_sys_dir_get_current(tr_error* error = nullptr);
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error* error = nullptr);
-
-template<typename T, typename = decltype(&T::c_str)>
-bool tr_sys_dir_create(T const& path, int flags, int permissions, tr_error* error = nullptr)
-{
-    return tr_sys_dir_create(path.c_str(), flags, permissions, error);
-}
+bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `mkdtemp()`.

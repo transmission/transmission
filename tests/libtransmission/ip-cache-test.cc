@@ -231,7 +231,12 @@ TEST_F(IPCacheTest, onResponseIPQuery)
         void fetch(tr_web::FetchOptions&& options) override // NOLINT(cppcoreguidelines-rvalue-reference-param-not-moved)
         {
             auto response = tr_web::FetchResponse{
-                http_code, std::string{ AddrStr[k_] }, std::string{}, true, false, options.done_func_user_data,
+                .status = http_code,
+                .body = std::string{ AddrStr[k_] },
+                .primary_ip = std::string{},
+                .did_connect = true,
+                .did_timeout = false,
+                .user_data = options.done_func_user_data,
             };
             options.done_func(response);
         }

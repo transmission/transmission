@@ -227,6 +227,8 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
+        FMT_USE_EXCEPTIONS=0 # {fmt} >= 11.2.0
+        FMT_EXCEPTIONS=0 # {fmt} < 11.2.0
         $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
@@ -269,7 +271,7 @@ endif()
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
-        deflate::deflate
+        libdeflate::libdeflate
         CURL::libcurl
         FastFloat::fast_float
         psl::psl

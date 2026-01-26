@@ -113,21 +113,21 @@ public:
     {
         if (!is_initialized())
         {
-            return { 0U, 0U };
+            return { .begin = 0U, .end = 0U };
         }
 
-        return { piece_loc(piece).block, piece_last_loc(piece).block + 1U };
+        return { .begin = piece_loc(piece).block, .end = piece_last_loc(piece).block + 1U };
     }
 
     [[nodiscard]] constexpr tr_byte_span_t byte_span_for_piece(tr_piece_index_t const piece) const noexcept
     {
         if (!is_initialized())
         {
-            return { 0U, 0U };
+            return { .begin = 0U, .end = 0U };
         }
 
         auto const offset = piece_loc(piece).byte;
-        return { offset, offset + piece_size(piece) };
+        return { .begin = offset, .end = offset + piece_size(piece) };
     }
 
 private:

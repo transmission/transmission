@@ -566,11 +566,8 @@ std::string tr_strratio(double ratio, std::string_view const none, std::string_v
 
 // ---
 
-bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool allow_copy, tr_error* error)
+bool tr_file_move(std::string_view oldpath, std::string_view newpath, bool allow_copy, tr_error* error)
 {
-    auto const oldpath = tr_pathbuf{ oldpath_in };
-    auto const newpath = tr_pathbuf{ newpath_in };
-
     auto local_error = tr_error{};
     if (error == nullptr)
     {
@@ -591,9 +588,7 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool
     }
 
     // ensure the target directory exists
-    auto newdir = tr_pathbuf{ newpath };
-    newdir.popdir();
-    if (!tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error))
+    if (!tr_sys_dir_create(tr_sys_path_dirname(newpath), TR_SYS_DIR_CREATE_PARENTS, 0777, error))
     {
         error->prefix_message("Unable to create directory for new file: ");
         return false;

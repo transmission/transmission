@@ -40,7 +40,7 @@ namespace
         };
 
         auto const span_end = std::min(std::adjacent_find(span_begin, end, NotAdjacent), std::prev(end));
-        spans.push_back({ *span_begin, *span_end + 1U });
+        spans.push_back({ .begin = *span_begin, .end = *span_end + 1U });
 
         span_begin = std::next(span_end);
     }

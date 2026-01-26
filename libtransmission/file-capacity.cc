@@ -302,7 +302,7 @@ extern "C"
 #else
     struct dqblk dq = {};
 #endif
-    auto disk_space = tr_sys_path_capacity{ -1, -1 };
+    auto disk_space = tr_sys_path_capacity{ .free = -1, .total = -1 };
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
     if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) != 0)
@@ -422,7 +422,7 @@ extern "C"
 
 [[nodiscard]] tr_sys_path_capacity get_quota_space([[maybe_unused]] tr_device_info const& info)
 {
-    struct tr_sys_path_capacity ret = { -1, -1 };
+    struct tr_sys_path_capacity ret = { .free = -1, .total = -1 };
 
 #ifndef _WIN32
 
@@ -446,7 +446,7 @@ extern "C"
 {
 #ifdef _WIN32
 
-    struct tr_sys_path_capacity ret = { -1, -1 };
+    struct tr_sys_path_capacity ret = { .free = -1, .total = -1 };
 
     if (auto const wide_path = tr_win32_utf8_to_native(path); !std::empty(wide_path))
     {
@@ -465,15 +465,15 @@ extern "C"
 #elif defined(HAVE_STATVFS)
 
     struct statvfs buf = {};
-    return statvfs(path, &buf) != 0 ? (struct tr_sys_path_capacity){ -1, -1 } :
-                                      (struct tr_sys_path_capacity){ (int64_t)buf.f_bavail * (int64_t)buf.f_frsize,
-                                                                     (int64_t)buf.f_blocks * (int64_t)buf.f_frsize };
+    return statvfs(path, &buf) != 0 ? (struct tr_sys_path_capacity){ .free = -1, .total = -1 } :
+                                      (struct tr_sys_path_capacity){ .free = (int64_t)buf.f_bavail * (int64_t)buf.f_frsize,
+                                                                     .total = (int64_t)buf.f_blocks * (int64_t)buf.f_frsize };
 
 #else
 
 #warning FIXME: not implemented
 
-    return { -1, -1 };
+    return { .free = -1, .total = -1 };
 
 #endif
 }
@@ -495,7 +495,7 @@ tr_sys_path_capacity tr_device_info_get_disk_space(struct tr_device_info const& 
     if (std::empty(info.path))
     {
         errno = EINVAL;
-        return { -1, -1 };
+        return { .free = -1, .total = -1 };
     }
 
     auto space = get_quota_space(info);

@@ -136,8 +136,9 @@ TEST(Crypto, ssha1)
     };
 
     static auto constexpr Tests = std::array<LocalTest, 2>{ {
-        { "test"sv, "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy"sv },
-        { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)"sv, "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL"sv },
+        { .plain_text = "test"sv, .ssha1 = "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy"sv },
+        { .plain_text = "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)"sv,
+          .ssha1 = "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL"sv },
     } };
 
     static auto constexpr HashCount = size_t{ 4U } * 1024U;

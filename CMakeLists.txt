@@ -43,8 +43,10 @@ include(TrMacros)
 
 set(CURL_MINIMUM 7.28.0)
 set(WOLFSSL_MINIMUM 3.4)
+set(CRC32C_MINIMUM 1.1.0)
 set(DEFLATE_MINIMUM 1.7)
 set(EVENT2_MINIMUM 2.1.0)
+set(FMT_MINIMUM 8.0.1)
 set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
 set(GTKMM3_MINIMUM 3.24.0)
@@ -52,7 +54,7 @@ set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 2.7)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
-set(PSL_MINIMUM 0.21.1)
+set(PSL_MINIMUM 0.21.0)
 set(QT_MINIMUM 5.15)
 
 option(ENABLE_DAEMON "Build daemon" ON)
@@ -75,6 +77,7 @@ tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" ${USE_SYSTEM_DEFAULT}
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_FMT "Use system fmt library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" ${USE_SYSTEM_DEFAULT})
@@ -244,7 +247,6 @@ set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
 find_package(FastFloat)
-find_package(Fmt)
 find_package(RapidJSON)
 find_package(Small)
 find_package(UtfCpp)
@@ -500,13 +502,16 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
+# Don't build libdeflate as subdirectory as its CMakeLists.txt
+# messes with global CMAKE_* variables and global compiler options
 if(WIN32 AND NOT MINGW)
     set(DEFLATE_LIB_NAME deflatestatic)
 else()
     set(DEFLATE_LIB_NAME deflate)
 endif()
-tr_add_external_auto_library_legacy(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
-    TARGET deflate::deflate
+tr_add_external_auto_library(DEFLATE libdeflate
+    LIBNAME ${DEFLATE_LIB_NAME}
+    TARGET libdeflate::libdeflate
     CMAKE_ARGS
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
@@ -521,7 +526,8 @@ tr_add_external_auto_library_legacy(EVENT2 libevent event
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
-tr_add_external_auto_library_legacy(NATPMP libnatpmp natpmp
+tr_add_external_auto_library(NATPMP libnatpmp
+    LIBNAME natpmp
     TARGET natpmp::natpmp
     CMAKE_ARGS
         -DBUILD_SHARED_LIBS=OFF)
@@ -552,10 +558,12 @@ unset(TR_MINIUPNPC_LIBNAME)
 
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
-tr_add_external_auto_library_legacy(DHT dht dht
+tr_add_external_auto_library(DHT dht
+    LIBNAME dht
     TARGET dht::dht)
 
-tr_add_external_auto_library_legacy(PSL libpsl psl
+tr_add_external_auto_library(PSL libpsl
+    LIBNAME psl
     TARGET psl::psl)
 
 if(ENABLE_UTP)
@@ -566,19 +574,28 @@ if(ENABLE_UTP)
             -DLIBUTP_SHARED:BOOL=OFF)
 endif()
 
-tr_add_external_auto_library_legacy(B64 libb64 b64
+tr_add_external_auto_library(B64 libb64
     SUBPROJECT
-    TARGET libb64::libb64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
-tr_add_external_auto_library_legacy(CRC32C crc32c crc32c
+# Don't build crc32c as subdirectory as its CMakeLists.txt
+# messes with global CMAKE_* variables and global compiler options
+tr_add_external_auto_library(CRC32C Crc32c
     TARGET Crc32c::crc32c
+    LIBNAME crc32c
+    SOURCE_DIR crc32c
     CMAKE_ARGS
         -DCRC32C_BUILD_TESTS=OFF
         -DCRC32C_BUILD_BENCHMARKS=OFF
         -DCRC32C_USE_GLOG=OFF
         -DCRC32C_INSTALL=ON)
+
+tr_add_external_auto_library(FMT fmt
+    SUBPROJECT
+    CMAKE_ARGS
+        -DFMT_INSTALL=OFF
+        -DFMT_SYSTEM_HEADERS=ON)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)

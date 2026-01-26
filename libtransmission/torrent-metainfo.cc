@@ -369,7 +369,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 auto const n = std::size(value) / sizeof(tr_sha1_digest_t);
                 tm_.pieces_.resize(n);
                 std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
-                tm_.pieces_offset_ = context.tokenSpan().first;
             }
             else
             {

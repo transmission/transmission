@@ -72,7 +72,14 @@ private:
     std::string const config_dir_;
     time_t start_time_;
 
-    static constexpr auto Zero = tr_session_stats{ TR_RATIO_NA, 0U, 0U, 0U, 0U, 0U };
+    static constexpr auto Zero = tr_session_stats{
+        .ratio = TR_RATIO_NA,
+        .uploadedBytes = 0U,
+        .downloadedBytes = 0U,
+        .filesAdded = 0U,
+        .sessionCount = 0U,
+        .secondsActive = 0U,
+    };
     tr_session_stats single_ = Zero;
     tr_session_stats old_ = Zero;
 };

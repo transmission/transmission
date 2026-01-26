@@ -46,7 +46,6 @@ Checks: >
   modernize-*,
   -modernize-loop-convert,
   -modernize-use-constraints,
-  -modernize-use-designated-initializers,
   -modernize-use-integer-sign-comparison,
   -modernize-use-ranges,
   -modernize-use-trailing-return-type,

@@ -140,7 +140,7 @@ void tr_completion::set_blocks(tr_bitfield blocks)
     TR_ASSERT(std::size(blocks_) == std::size(blocks));
 
     blocks_ = std::move(blocks);
-    size_now_ = count_has_bytes_in_span({ 0, block_info_->total_size() });
+    size_now_ = count_has_bytes_in_span({ .begin = 0, .end = block_info_->total_size() });
     size_when_done_.reset();
     has_valid_.reset();
 }

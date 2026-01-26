@@ -187,21 +187,25 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
     switch (state_)
     {
     case State::Idle:
-        return { is_mapped_ ? TR_PORT_MAPPED : TR_PORT_UNMAPPED, local_port_, advertised_port_ };
+        return {
+            .state = is_mapped_ ? TR_PORT_MAPPED : TR_PORT_UNMAPPED,
+            .local_port = local_port_,
+            .advertised_port = advertised_port_,
+        };
 
     case State::Discover:
-        return { TR_PORT_UNMAPPED, {}, {} };
+        return { .state = TR_PORT_UNMAPPED, .local_port = {}, .advertised_port = {} };
 
     case State::RecvPub:
     case State::SendMap:
     case State::RecvMap:
-        return { TR_PORT_MAPPING, {}, {} };
+        return { .state = TR_PORT_MAPPING, .local_port = {}, .advertised_port = {} };
 
     case State::SendUnmap:
     case State::RecvUnmap:
-        return { TR_PORT_UNMAPPING, {}, {} };
+        return { .state = TR_PORT_UNMAPPING, .local_port = {}, .advertised_port = {} };
 
     default:
-        return { TR_PORT_ERROR, {}, {} };
+        return { .state = TR_PORT_ERROR, .local_port = {}, .advertised_port = {} };
     }
 }

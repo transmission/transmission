@@ -62,7 +62,7 @@ public:
     [[nodiscard]] TR_CONSTEXPR_VEC auto byte_span_for_file(tr_file_index_t const file) const
     {
         auto const& span = file_bytes_[file];
-        return tr_byte_span_t{ span.begin, span.end };
+        return tr_byte_span_t{ .begin = span.begin, .end = span.end };
     }
 
     [[nodiscard]] TR_CONSTEXPR20 bool is_edge_piece(tr_piece_index_t const piece) const

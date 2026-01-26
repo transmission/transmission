@@ -178,13 +178,14 @@ protected:
 
         for (tr_file_index_t i = 0, n = files.file_count(); i < n; ++i)
         {
-            auto walk = tr_pathbuf{ parent, '/', files.path(i) };
-            createFileWithContents(walk, std::data(Content), std::size(Content));
-            paths.emplace(walk);
+            auto const filename = tr_pathbuf{ parent, '/', files.path(i) };
+            createFileWithContents(filename, std::data(Content), std::size(Content));
+            paths.emplace(filename);
 
+            auto walk = filename.sv();
             while (!tr_sys_path_is_same(parent, walk))
             {
-                walk.popdir();
+                walk = tr_sys_path_dirname(walk);
                 paths.emplace(walk);
             }
         }

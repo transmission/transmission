@@ -746,11 +746,6 @@ public:
         return settings().peer_congestion_algorithm;
     }
 
-    void setPeerCongestionAlgorithm(std::string_view algorithm)
-    {
-        settings_.peer_congestion_algorithm = algorithm;
-    }
-
     void setSocketDiffServ(tr_socket_t sock, tr_address_type type) const
     {
         tr_netSetDiffServ(sock, settings_.peer_socket_diffserv, type);
@@ -806,11 +801,6 @@ public:
     [[nodiscard]] constexpr std::string const& announceIP() const noexcept
     {
         return settings().announce_ip;
-    }
-
-    void setAnnounceIP(std::string_view ip)
-    {
-        settings_.announce_ip = ip;
     }
 
     [[nodiscard]] constexpr bool useAnnounceIP() const noexcept
@@ -1267,7 +1257,7 @@ private:
     friend std::string tr_sessionGetRPCUsername(tr_session const* session);
     friend std::string tr_sessionGetRPCWhitelist(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
-    friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
+    friend size_t tr_blocklistSetContent(tr_session* session, std::string_view content_filename);
     friend size_t tr_sessionGetAltSpeedBegin(tr_session const* session);
     friend size_t tr_sessionGetAltSpeedEnd(tr_session const* session);
     friend size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
@@ -1334,11 +1324,21 @@ public:
     };
 
     static constexpr std::array<ScriptInfo, 3U> Scripts{ {
-        { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
-        { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
-        { TR_KEY_script_torrent_done_seeding_enabled,
-          TR_KEY_script_torrent_done_seeding_filename,
-          TR_SCRIPT_ON_TORRENT_DONE_SEEDING },
+        {
+            .enabled_key = TR_KEY_script_torrent_added_enabled,
+            .filename_key = TR_KEY_script_torrent_added_filename,
+            .script = TR_SCRIPT_ON_TORRENT_ADDED,
+        },
+        {
+            .enabled_key = TR_KEY_script_torrent_done_enabled,
+            .filename_key = TR_KEY_script_torrent_done_filename,
+            .script = TR_SCRIPT_ON_TORRENT_DONE,
+        },
+        {
+            .enabled_key = TR_KEY_script_torrent_done_seeding_enabled,
+            .filename_key = TR_KEY_script_torrent_done_seeding_filename,
+            .script = TR_SCRIPT_ON_TORRENT_DONE_SEEDING,
+        },
     } };
 
 private:

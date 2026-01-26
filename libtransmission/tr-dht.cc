@@ -463,14 +463,14 @@ private:
         tr_variant_serde::benc().to_file(benc, state_filename_);
     }
 
-    void init_state(std::string_view filename)
+    void init_state(std::string_view const filename)
     {
         // Note that DHT ids need to be distributed uniformly,
         // so it should be something truly random
         id_ = tr_rand_obj<Id>();
         id_timestamp_ = tr_time();
 
-        if (!tr_sys_path_exists(std::data(filename)))
+        if (!tr_sys_path_exists(filename))
         {
             return;
         }

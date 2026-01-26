@@ -203,7 +203,11 @@ public:
     {
         auto const is_downloading = !std::empty(tasks);
         auto const speed = get_piece_speed(tr_time_msec(), TR_DOWN);
-        return { base_url.c_str(), is_downloading, speed.base_quantity() };
+        return {
+            .url = base_url.c_str(),
+            .is_downloading = is_downloading,
+            .download_bytes_per_second = speed.base_quantity(),
+        };
     }
 
     [[nodiscard]] TR_CONSTEXPR20 size_t active_req_count(tr_direction dir) const noexcept override
@@ -327,7 +331,7 @@ public:
         // The actual value of '64' is arbitrary here;
         // we could probably be smarter about this.
         static auto constexpr PreferredBlocksPerTask = size_t{ 64 };
-        return { n_slots, n_slots * PreferredBlocksPerTask };
+        return { .max_spans = n_slots, .max_blocks = n_slots * PreferredBlocksPerTask };
     }
 
     void publish(tr_peer_event const& peer_event)
@@ -434,7 +438,7 @@ void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_r
 
     if (!success)
     {
-        webseed->on_rejection({ task->loc_.block, task->blocks.end });
+        webseed->on_rejection({ .begin = task->loc_.block, .end = task->blocks.end });
         webseed->tasks.erase(task);
         delete task;
         return;

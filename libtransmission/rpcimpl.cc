@@ -1855,7 +1855,7 @@ void torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_rpc_idle
     {
         ok = ctor.set_metainfo(tr_base64_decode(metainfo_base64));
     }
-    else if (tr_sys_path_exists(tr_pathbuf{ filename }))
+    else if (tr_sys_path_exists(filename))
     {
         ok = ctor.set_metainfo_from_file(filename);
     }

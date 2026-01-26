@@ -110,15 +110,22 @@ unsigned long thread_current_id()
 void init_evthreads_once()
 {
     evthread_lock_callbacks constexpr LockCbs{
-        EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
+        .lock_api_version = EVTHREAD_LOCK_API_VERSION,
+        .supported_locktypes = EVTHREAD_LOCKTYPE_RECURSIVE,
+        .alloc = lock_alloc,
+        .free = lock_free,
+        .lock = lock_lock,
+        .unlock = lock_unlock,
     };
     evthread_set_lock_callbacks(&LockCbs);
 
-    evthread_condition_callbacks constexpr CondCbs{ EVTHREAD_CONDITION_API_VERSION,
-                                                    cond_alloc,
-                                                    cond_free,
-                                                    cond_signal,
-                                                    cond_wait };
+    evthread_condition_callbacks constexpr CondCbs{
+        .condition_api_version = EVTHREAD_CONDITION_API_VERSION,
+        .alloc_condition = cond_alloc,
+        .free_condition = cond_free,
+        .signal_condition = cond_signal,
+        .wait_condition = cond_wait,
+    };
     evthread_set_condition_callbacks(&CondCbs);
 
     evthread_set_id_callback(thread_current_id);
