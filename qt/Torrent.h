@@ -123,12 +123,12 @@ public:
     {
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto operator==(TorrentHash const& that) const
+    [[nodiscard]] constexpr auto operator==(TorrentHash const& that) const
     {
         return data_ == that.data_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto operator!=(TorrentHash const& that) const
+    [[nodiscard]] constexpr auto operator!=(TorrentHash const& that) const
     {
         return !(*this == that);
     }

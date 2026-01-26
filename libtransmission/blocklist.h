@@ -18,7 +18,6 @@
 #include <utility> // for std::pair
 #include <vector>
 
-#include "libtransmission/tr-macros.h" // for TR_CONSTEXPR20
 #include "libtransmission/net.h" // for tr_address
 #include "libtransmission/observable.h"
 
@@ -38,12 +37,12 @@ public:
             [&addr](auto const& blocklist) { return blocklist.enabled() && blocklist.contains(addr); });
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto num_lists() const noexcept
+    [[nodiscard]] constexpr auto num_lists() const noexcept
     {
         return std::size(blocklists_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto num_rules() const noexcept
+    [[nodiscard]] constexpr auto num_rules() const noexcept
     {
         return std::accumulate(
             std::begin(blocklists_),

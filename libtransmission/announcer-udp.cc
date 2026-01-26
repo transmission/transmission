@@ -517,7 +517,7 @@ private:
         return connection_id[ip_protocol] != tau_connection_t{} && now < connection_expiration_time[ip_protocol];
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool has_addr() const noexcept
+    [[nodiscard]] constexpr bool has_addr() const noexcept
     {
         return std::any_of(std::begin(addr_), std::end(addr_), [](auto const& o) { return !!o; });
     }
