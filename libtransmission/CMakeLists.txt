@@ -287,7 +287,8 @@ target_link_libraries(${TR_NAME}
         transmission::crypto_impl
         fmt::fmt-header-only
         transmission::small
-        libevent::event)
+        libevent::core
+        libevent::extra)
 
 if(INSTALL_LIB)
     install(
