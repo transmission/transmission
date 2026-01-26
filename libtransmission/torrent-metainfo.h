@@ -164,11 +164,6 @@ public:
         return info_dict_offset_;
     }
 
-    [[nodiscard]] constexpr auto pieces_offset() const noexcept
-    {
-        return pieces_offset_;
-    }
-
     // UTILS
 
     [[nodiscard]] auto torrent_file(std::string_view torrent_dir = {}) const
@@ -238,10 +233,6 @@ private:
     // See https://www.bittorrent.org/beps/bep_0009.html
     uint64_t info_dict_size_ = 0;
     uint64_t info_dict_offset_ = 0;
-
-    // Offset of the bencoded 'pieces' checksums subset of the bencoded data.
-    // Used when loading piece checksums on demand.
-    uint64_t pieces_offset_ = 0;
 
     bool has_magnet_info_hash_ = false;
     bool is_private_ = false;

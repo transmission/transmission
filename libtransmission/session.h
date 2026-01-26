@@ -746,11 +746,6 @@ public:
         return settings().peer_congestion_algorithm;
     }
 
-    void setPeerCongestionAlgorithm(std::string_view algorithm)
-    {
-        settings_.peer_congestion_algorithm = algorithm;
-    }
-
     void setSocketDiffServ(tr_socket_t sock, tr_address_type type) const
     {
         tr_netSetDiffServ(sock, settings_.peer_socket_diffserv, type);
@@ -806,11 +801,6 @@ public:
     [[nodiscard]] constexpr std::string const& announceIP() const noexcept
     {
         return settings().announce_ip;
-    }
-
-    void setAnnounceIP(std::string_view ip)
-    {
-        settings_.announce_ip = ip;
     }
 
     [[nodiscard]] constexpr bool useAnnounceIP() const noexcept
