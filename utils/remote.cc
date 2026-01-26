@@ -557,7 +557,7 @@ enum
     }
 }
 
-[[nodiscard]] std::string get_encoded_metainfo(char const* filename)
+[[nodiscard]] std::string get_encoded_metainfo(std::string_view const filename)
 {
     if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_file_read(filename, contents))
     {

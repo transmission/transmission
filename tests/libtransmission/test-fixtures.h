@@ -208,7 +208,7 @@ protected:
         return child;
     }
 
-    static void buildParentDir(std::string_view path)
+    static void buildParentDir(std::string_view const path)
     {
         auto const tmperr = errno;
 

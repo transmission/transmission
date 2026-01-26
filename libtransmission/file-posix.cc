@@ -129,11 +129,10 @@ void set_file_for_single_pass(tr_sys_file_t handle)
 }
 } // namespace
 
-bool tr_sys_path_exists(char const* path, tr_error* error)
+bool tr_sys_path_exists(std::string_view const path, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
-
-    bool const ret = access(path, F_OK) != -1;
+    auto const sz_path = tr_pathbuf{ path };
+    bool const ret = access(sz_path.c_str(), F_OK) != -1;
 
     if (error != nullptr && !ret && errno != ENOENT)
     {
@@ -143,20 +142,34 @@ bool tr_sys_path_exists(char const* path, tr_error* error)
     return ret;
 }
 
-std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error* error)
+namespace
+{
+[[nodiscard]] auto stat_sv(std::string_view const path, struct stat* sb)
+{
+    auto const sz_path = tr_pathbuf{ path };
+    return stat(sz_path.c_str(), sb);
+}
+
+[[nodiscard]] auto lstat_sv(std::string_view const path, struct stat* sb)
+{
+    auto const sz_path = tr_pathbuf{ path };
+    return lstat(sz_path.c_str(), sb);
+}
+} // namespace
+
+std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view const path, int const flags, tr_error* error)
 {
     struct stat sb = {};
 
     bool ok = false;
-    auto const szpath = tr_pathbuf{ path };
 
     if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
     {
-        ok = stat(szpath, &sb) != -1;
+        ok = stat_sv(path, &sb) != -1;
     }
     else
     {
-        ok = lstat(szpath, &sb) != -1;
+        ok = lstat_sv(path, &sb) != -1;
     }
 
     if (!ok)
@@ -195,16 +208,13 @@ bool tr_sys_path_is_relative(std::string_view path)
     return std::empty(path) || path.front() != '/';
 }
 
-bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error* error)
+bool tr_sys_path_is_same(std::string_view const path1, std::string_view const path2, tr_error* error)
 {
-    TR_ASSERT(path1 != nullptr);
-    TR_ASSERT(path2 != nullptr);
-
     bool ret = false;
     struct stat sb1 = {};
     struct stat sb2 = {};
 
-    if (stat(path1, &sb1) != -1 && stat(path2, &sb2) != -1)
+    if (stat_sv(path1, &sb1) != -1 && stat_sv(path2, &sb2) != -1)
     {
         ret = sb1.st_dev == sb2.st_dev && sb1.st_ino == sb2.st_ino;
     }
@@ -308,12 +318,11 @@ std::string_view tr_sys_path_dirname(std::string_view path)
     return path.substr(0, end);
 }
 
-bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* error)
+bool tr_sys_path_rename(std::string_view const src_path, std::string_view const dst_path, tr_error* error)
 {
-    TR_ASSERT(src_path != nullptr);
-    TR_ASSERT(dst_path != nullptr);
-
-    bool const ret = rename(src_path, dst_path) != -1;
+    auto const sz_src_path = tr_pathbuf{ src_path };
+    auto const sz_dst_path = tr_pathbuf{ dst_path };
+    bool const ret = rename(sz_src_path.c_str(), sz_dst_path.c_str()) != -1;
 
     if (error != nullptr && !ret)
     {
@@ -326,11 +335,8 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* er
 /* We try to do a fast (in-kernel) copy using a variety of non-portable system
  * calls. If the current implementation does not support in-kernel copying, we
  * use a user-space fallback instead. */
-bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* error)
+bool tr_sys_path_copy(std::string_view const src_path, std::string_view const dst_path, tr_error* error)
 {
-    TR_ASSERT(src_path != nullptr);
-    TR_ASSERT(dst_path != nullptr);
-
     auto local_error = tr_error{};
     if (error == nullptr)
     {
@@ -338,7 +344,9 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* erro
     }
 
 #if defined(USE_COPYFILE)
-    if (copyfile(src_path, dst_path, nullptr, COPYFILE_CLONE | COPYFILE_ALL) < 0)
+    auto const sz_src_path = tr_pathbuf{ src_path };
+    auto const sz_dst_path = tr_pathbuf{ dst_path };
+    if (copyfile(sz_src_path.c_str(), sz_dst_path.c_str(), nullptr, COPYFILE_CLONE | COPYFILE_ALL) < 0)
     {
         error->set_from_errno(errno);
         return false;
@@ -529,11 +537,11 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* erro
 #endif /* USE_COPYFILE */
 }
 
-bool tr_sys_path_remove(char const* path, tr_error* error)
+bool tr_sys_path_remove(std::string_view const path, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
+    auto const sz_path = tr_pathbuf{ path };
 
-    bool const ret = remove(path) != -1;
+    bool const ret = remove(sz_path.c_str()) != -1;
 
     if (error != nullptr && !ret)
     {
@@ -548,9 +556,8 @@ char* tr_sys_path_native_separators(char* path)
     return path;
 }
 
-tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error* error)
+tr_sys_file_t tr_sys_file_open(std::string_view path, int const flags, int const permissions, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
 
     struct native_map_item
@@ -603,7 +610,8 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         }
     }
 
-    tr_sys_file_t const ret = open(path, native_flags, permissions);
+    auto const sz_path = tr_pathbuf{ path };
+    tr_sys_file_t const ret = open(sz_path.c_str(), native_flags, permissions);
 
     if (ret != TR_BAD_SYS_FILE)
     {
@@ -1087,24 +1095,24 @@ namespace
 #endif
 } // namespace
 
-bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error* error)
+bool tr_sys_dir_create(std::string_view const path, int const flags, int const permissions, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
-
     auto ret = false;
     auto local_error = tr_error{};
+
+    auto const sz_path = tr_pathbuf{ path };
 
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
 #ifdef HAVE_MKDIRP
-        ret = mkdirp(path, permissions) != -1;
+        ret = mkdirp(sz_path.c_str(), permissions) != -1;
 #else
         ret = tr_mkdirp_(path, permissions, &local_error);
 #endif
     }
     else
     {
-        ret = mkdir(path, permissions) != -1;
+        ret = mkdir(sz_path.c_str(), permissions) != -1;
     }
 
     if (!ret && errno == EEXIST)

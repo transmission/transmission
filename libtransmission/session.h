@@ -1267,7 +1267,7 @@ private:
     friend std::string tr_sessionGetRPCUsername(tr_session const* session);
     friend std::string tr_sessionGetRPCWhitelist(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
-    friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
+    friend size_t tr_blocklistSetContent(tr_session* session, std::string_view content_filename);
     friend size_t tr_sessionGetAltSpeedBegin(tr_session const* session);
     friend size_t tr_sessionGetAltSpeedEnd(tr_session const* session);
     friend size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
