@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Giorgos Mousa, 2025\n"
 "Language-Team: Greek (https://app.transifex.com/transmissionbt/teams/33778/el/)\n"
@@ -47,7 +47,7 @@ msgstr "Αδυναμία προσθήκης αρχείου torrent '{path}'"
 msgid "Removing torrent file '{path}'"
 msgstr "Αφαιρείται το αρχείο torrent '{path}'"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "Αδυναμία αφαίρεσης '{path}': {error} ({error_code})"
 
@@ -2180,19 +2180,19 @@ msgstr "{crypto_library} σφάλμα: {error} ({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "Αδυναμία απόκτησης '{path}': {error} ({error_code})"
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "Επιτυχής ενημέρωση {protocol} διεύθυνσης πηγής σε {ip}"
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr "Το σύστημά σας δεν υποστηρίζει το {protocol}"
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "Επιτυχής ενημέρωση καθολικής διεύθυνσης {type} σε {ip} με χρήση του {url}"
 
@@ -2420,7 +2420,7 @@ msgid_plural "Loaded {count} torrents"
 msgstr[0] "Φορτώθηκε {count} torrent"
 msgstr[1] "Φορτώθηκαν {count} torrents"
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Μετακίνηση αρχείου torrent από '{old_path}' στο '{path}'"
 
@@ -2623,12 +2623,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "μέρα"
 msgstr[1] "μέρες"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Αδυναμία εύρεσης εκρεμμούς PRC αιτήματος για την ετικέτα {tag}"
-
-#~ msgid "I _Agree"
-#~ msgstr "_Συμφωνώ"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Το Transmission είναι ένα πρόγραμμα διαμοιρασμού αρχείων. Όταν εκκινείτε ένα torrent, τα δεδομένα του θα γίνουν διαθέσιμα σε άλλους μέσω ανεβάσματος. Για όποιο περιεχόμενο μοιράζεστε φέρετε αποκλειστική ευθύνη."

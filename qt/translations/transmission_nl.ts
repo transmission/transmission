@@ -1592,7 +1592,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>&amp;Op dagen:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Elke dag</translation>
     </message>
@@ -1642,7 +1642,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Zaterdag</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1995,7 +1995,7 @@ Om een nieuwe primaire URL toe te voegen, voeg je deze toe na een lege regel.</t
         <translation>Selecteer een map om in de gaten te houden</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>onbekend</translation>
     </message>
@@ -2043,7 +2043,7 @@ Om een nieuwe primaire URL toe te voegen, voeg je deze toe na een lege regel.</t
         <translation>&lt;b&gt;Zwarte lijst bijwerken&lt;/b&gt;&lt;p&gt;Verkrijgen van nieuwe zwarte lijst…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Selecteer bestemming</translation>
     </message>
@@ -2224,7 +2224,7 @@ Om een nieuwe primaire URL toe te voegen, voeg je deze toe na een lege regel.</t
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Fout hernoemen pad</translation>
     </message>
@@ -2234,7 +2234,7 @@ Om een nieuwe primaire URL toe te voegen, voeg je deze toe na een lege regel.</t
         <translation>&lt;p&gt;&lt;b&gt;Kan ‘%1’ niet naar ‘%2’ hernoemen: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Corrigeer de fouten en probeer het opnieuw.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Fout bij toevoegen van torrent</translation>
     </message>
@@ -2309,7 +2309,7 @@ Om een nieuwe primaire URL toe te voegen, voeg je deze toe na een lege regel.</t
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

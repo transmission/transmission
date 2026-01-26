@@ -496,17 +496,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -1605,7 +1605,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>В указанные &amp;дни:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Ежедневно</translation>
     </message>
@@ -1655,7 +1655,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Суббота</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -2011,7 +2011,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>Выбор папки</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>неизвестно</translation>
     </message>
@@ -2060,7 +2060,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;b&gt;Обновить чёрный список&lt;/b&gt;&lt;p&gt;Получение нового чёрного списка…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Выбор папки назначения</translation>
     </message>
@@ -2241,7 +2241,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Ошибка переименования пути</translation>
     </message>
@@ -2251,7 +2251,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;Невозможно переименовать «%1» в «%2»: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, исправьте ошибки и попробуйте снова.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Ошибка при добавлении торрента</translation>
     </message>
@@ -2328,8 +2328,8 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <source>Remote root pa&amp;th:</source>
+        <translation>Вн&amp;ешний корневой путь:</translation>
     </message>
 </context>
 <context>

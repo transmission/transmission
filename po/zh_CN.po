@@ -14,16 +14,16 @@
 # YFdyh000 <yfdyh000@gmail.com>, 2024
 # watchout, 2025
 # Mike Gelfand <mikedld@mikedld.com>, 2025
-# Phonebook3599, 2025
+# Phonebook3599, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Phonebook3599, 2025\n"
+"Last-Translator: Phonebook3599, 2026\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -51,7 +51,7 @@ msgstr "无法添加种子文件“{path}”"
 msgid "Removing torrent file '{path}'"
 msgstr "正在移除种子文件“{path}”"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "无法移除“{path}”：{error}（{error_code}）"
 
@@ -932,7 +932,7 @@ msgstr "允许桌面休眠"
 
 #: ../gtk/Session.cc:1236
 msgid "Couldn't find pending RPC request for id {id}"
-msgstr ""
+msgstr "找不到 ID 为 {id} 的待处理 RPC 请求"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -2156,19 +2156,19 @@ msgstr "{crypto_library} 错误：{error}（{error_code}）"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "无法获取“{path}”：{error}（{error_code}）"
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "成功更新源{protocol}地址到{ip}"
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr "无法在任何 IP 协议中获取源地址，无法建立网络连接"
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr "你的机器不支持{protocol}"
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "使用{url}成功更新全局{type}地址到{ip}"
 
@@ -2394,7 +2394,7 @@ msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "已载入 {count} 个种子"
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "已从“{old_path}”迁移种子文件至“{path}”"
 
@@ -2480,7 +2480,7 @@ msgstr "无法绑定 IPv6 socket {address}：{error}（{error_code}）"
 
 #: ../libtransmission/tr-udp.cc:265
 msgid "Couldn't create any UDP sockets."
-msgstr ""
+msgstr "无法创建任何 UDP 套接字。"
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
@@ -2591,12 +2591,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "无法找到标记 {tag} 的待处理 PRC 请求"
-
-#~ msgid "I _Agree"
-#~ msgstr "我同意(_A)"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission 是一个文件分享程序。当你运行种子任务时，其数据将通过上传的方式传给其他人。你分享的任何内容都由你自负责任。"

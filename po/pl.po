@@ -6,16 +6,16 @@
 # Translators:
 # Piotr Drąg <piotrdrag@gmail.com>, 2024
 # Mike Gelfand <mikedld@mikedld.com>, 2025
-# Marek Adamski, 2025
+# Marek Adamski, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Marek Adamski, 2025\n"
+"Last-Translator: Marek Adamski, 2026\n"
 "Language-Team: Polish (https://app.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +43,7 @@ msgstr "Nie można dodać pliku torrent „{path}”"
 msgid "Removing torrent file '{path}'"
 msgstr "Usuwanie pliku torrent „{path}”"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "Nie można usunąć „{path}”: {error} ({error_code})"
 
@@ -971,7 +971,7 @@ msgstr "Zezwolenie na hibernację"
 
 #: ../gtk/Session.cc:1236
 msgid "Couldn't find pending RPC request for id {id}"
-msgstr ""
+msgstr "Nie można znaleźć oczekującego żądania RPC dla identyfikatora {id}"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -2267,19 +2267,19 @@ msgstr "Błąd biblioteki {crypto_library}: {error} ({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "Nie można uzyskać „{path}”: {error} ({error_code})"
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "Pomyślnie zaktualizowano adres źródłowy {protocol} na {ip}"
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr "Nie udało się uzyskać adresu źródłowego w żadnym protokole IP, nie ma możliwości nawiązania połączenia sieciowego"
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr "Ten komputer nie obsługuje {protocol}"
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "Pomyślnie zaktualizowano globalny adres {type} na {ip} przy za pomocą {url}"
 
@@ -2511,7 +2511,7 @@ msgstr[1] "Wczytano {count} torrenty"
 msgstr[2] "Wczytano {count} torrentów"
 msgstr[3] "Wczytano {count} torrentów"
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Przeniesiono plik torrent z „{old_path}” do „{path}”"
 
@@ -2597,7 +2597,7 @@ msgstr "Nie można dowiązać gniazda IPv6 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:265
 msgid "Couldn't create any UDP sockets."
-msgstr ""
+msgstr "Nie można utworzyć gniazd UDP."
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
@@ -2726,12 +2726,3 @@ msgstr[0] "dzień"
 msgstr[1] "dni"
 msgstr[2] "dni"
 msgstr[3] "dni"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Nie można odnaleźć oczekującego żądania RPC dla znacznika {tag}"
-
-#~ msgid "I _Agree"
-#~ msgstr "_Zgadzam się"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission jest programem do udostępniania plików. Kiedy uruchamiany jest torrent, jego dane stają się dostępne dla innych. Wyłącznie użytkownik jest odpowiedzialny za każdą udostępnianą treść."

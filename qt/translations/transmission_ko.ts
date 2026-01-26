@@ -1579,7 +1579,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>날들 중에 (&amp;O): </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>모든 날</translation>
     </message>
@@ -1629,7 +1629,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>토요일</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation type="unfinished">
@@ -1976,7 +1976,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>주의 디렉터리 선택</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2023,7 +2023,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>목적 폴더 선택</translation>
     </message>
@@ -2204,7 +2204,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>이름변경 위치 오류</translation>
     </message>
@@ -2214,7 +2214,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot; 을 &quot;%2&quot;로 변경할수 없습니다: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;오류를 수정하고 다시 시도해주십시오.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Torrent 추가 오류</translation>
     </message>
@@ -2287,7 +2287,7 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

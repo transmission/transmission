@@ -6,7 +6,7 @@
     <message>
         <location filename="../AboutDialog.ui" line="+14"/>
         <source>About Transmission</source>
-        <translation>Tietoa Transmissionista</translation>
+        <translation>Tietoa Transmission</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -492,17 +492,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -1592,7 +1592,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <translation>&amp;Päivinä:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Joka päivä</translation>
     </message>
@@ -1642,7 +1642,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <translation>Lauantai</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1995,7 +1995,7 @@ seuraavalle riville. Lisää uusi URL-osoite lisäämällä se tyhjän rivin jä
         <translation>Valitse tarkkailtava kansio</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>tuntematon</translation>
     </message>
@@ -2043,7 +2043,7 @@ seuraavalle riville. Lisää uusi URL-osoite lisäämällä se tyhjän rivin jä
         <translation>&lt;b&gt;Päivitä estolista&lt;/b&gt;&lt;p&gt; Noudetaan uutta estolistaa…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Valitse kohde</translation>
     </message>
@@ -2224,7 +2224,7 @@ seuraavalle riville. Lisää uusi URL-osoite lisäämällä se tyhjän rivin jä
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Virhe uudelleennimettäessä polkua</translation>
     </message>
@@ -2234,7 +2234,7 @@ seuraavalle riville. Lisää uusi URL-osoite lisäämällä se tyhjän rivin jä
         <translation>&lt;p&gt;&lt;b&gt;Kohdetta &quot;%1&quot; ei voi nimetä nimellä &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Korjaa virheet ja yritä uudelleen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Virhe lisättäessä torrentia</translation>
     </message>
@@ -2309,8 +2309,8 @@ seuraavalle riville. Lisää uusi URL-osoite lisäämällä se tyhjän rivin jä
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <source>Remote root pa&amp;th:</source>
+        <translation>Roo&amp;t-hallinnan polku:</translation>
     </message>
 </context>
 <context>

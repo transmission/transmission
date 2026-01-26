@@ -492,17 +492,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -1592,7 +1592,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>J&amp;ours&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Tous les jours</translation>
     </message>
@@ -1642,7 +1642,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>Samedi</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1995,7 +1995,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
         <translation>Sélectionner le dossier surveillé</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>Inconnu</translation>
     </message>
@@ -2043,7 +2043,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
         <translation>&lt;b&gt;Mise à jour de la liste de blocage&lt;/b&gt;&lt;p&gt;Récupération de la nouvelle liste…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Sélectionner la destination</translation>
     </message>
@@ -2224,7 +2224,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Erreur de renommage du chemin</translation>
     </message>
@@ -2234,7 +2234,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
         <translation>&lt;p&gt;&lt;b&gt;Impossible de renommer «&#xa0;%1&#xa0;» en «&#xa0;%2&#xa0;»&#xa0;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Veuillez corriger les erreurs et ressayer.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Erreur d’ajout du torrent</translation>
     </message>
@@ -2309,8 +2309,8 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <source>Remote root pa&amp;th:</source>
+        <translation>C&amp;hemin racine distant&#xa0;:</translation>
     </message>
 </context>
 <context>

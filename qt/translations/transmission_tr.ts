@@ -1579,7 +1579,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>&amp;Şu günler:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Her Gün</translation>
     </message>
@@ -1629,7 +1629,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>Cumartesi</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1979,7 +1979,7 @@ Yeni bir birincil URL eklemek için, bunu boş bir satırdan sonra ekleyin.</tra
         <translation>İzlenen Klasörü Seç</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>bilinmeyen</translation>
     </message>
@@ -2026,7 +2026,7 @@ Yeni bir birincil URL eklemek için, bunu boş bir satırdan sonra ekleyin.</tra
         <translation>&lt;b&gt;Engel Listesini Güncelle&lt;/b&gt;&lt;p&gt;Yeni engel listesi alınıyor…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Hedef Seç</translation>
     </message>
@@ -2207,7 +2207,7 @@ Yeni bir birincil URL eklemek için, bunu boş bir satırdan sonra ekleyin.</tra
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Yolu Yeniden Adlandırırken Hata</translation>
     </message>
@@ -2217,7 +2217,7 @@ Yeni bir birincil URL eklemek için, bunu boş bir satırdan sonra ekleyin.</tra
         <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot;, &quot;%2&quot; olarak yeniden adlandırılamadı: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Lütfen hataları düzeltip yeniden deneyin.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Torrent Eklenirken Hata</translation>
     </message>
@@ -2290,7 +2290,7 @@ Yeni bir birincil URL eklemek için, bunu boş bir satırdan sonra ekleyin.</tra
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

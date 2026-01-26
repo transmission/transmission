@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Japanese (https://app.transifex.com/transmissionbt/teams/33778/ja/)\n"
@@ -43,7 +43,7 @@ msgstr "トレントファイルを追加できません「{path}」"
 msgid "Removing torrent file '{path}'"
 msgstr "トレントファイルを削除「{path}」"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "以下を除去できません「{path}」: {error} ({error_code})"
 
@@ -2107,19 +2107,19 @@ msgstr "{crypto_library} エラー: {error} ({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "取得できません「{path}」: {error} ({error_code})"
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "更新成功: 元の {protocol} アドレスを {ip} へ"
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr " この端末は{protocol}に未対応"
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "更新成功: グローバル {type} アドレスを {ip} の {url}を利用したものへ"
 
@@ -2345,7 +2345,7 @@ msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "{count} トレントを読み込みました"
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "トレントファイルを移行「{old_path}」から「{path}」へ"
 
@@ -2542,12 +2542,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "タグ {tag} 用の待機中のRPC要求はありません"
-
-#~ msgid "I _Agree"
-#~ msgstr "同意(_A)"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission はファイル共有プログラムです。トレントを利用すると、アップロードを通じてそのデータを他者が入手できるようになります。あなたが共有するコンテンツは、すべてあなた自身の責任です。"

@@ -4,7 +4,6 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Rodrigo Piñero <rodrigo.pinero@yahoo.com.br>, 2017
 # Gustavo Costa <xfgusta@gmail.com>, 2022
 # Gabriel P Machado <machado.gp@gmail.com>, 2022
 # Carlos Henrique De Freitas Ferreira <Neocazen@vivaldi.net>, 2022
@@ -23,7 +22,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Emilio Demeterco, 2025\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/transmissionbt/teams/33778/pt_BR/)\n"
@@ -53,7 +52,7 @@ msgstr "Não foi possível adicionar o arquivo de torrent '{path}'"
 msgid "Removing torrent file '{path}'"
 msgstr "Removendo o arquivo de torrent '{path}'"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "Não foi possível remover '{path}': {error} ({error_code})"
 
@@ -2252,19 +2251,19 @@ msgstr "{crypto_library}erro: {error}({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "Não foi possível recuperar '{path}': {error}({error_code})"
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr ""
 
@@ -2494,7 +2493,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
@@ -2703,12 +2702,3 @@ msgid_plural "days"
 msgstr[0] "dia"
 msgstr[1] "dias"
 msgstr[2] "dias"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Não foi possível encontrar requisição RPC pendente para etiqueta {tag}"
-
-#~ msgid "I _Agree"
-#~ msgstr "Concordo"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission é um programa de compartilhamento de arquivos. Quando você executa um torrent, seus dados serão disponibilizados para outros por meio de envio. Qualquer conteúdo que você compartilhe é de sua exclusiva responsabilidade."

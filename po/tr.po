@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Turkish (https://app.transifex.com/transmissionbt/teams/33778/tr/)\n"
@@ -50,7 +50,7 @@ msgstr "'{path}' torrent dosyası eklenemedi"
 msgid "Removing torrent file '{path}'"
 msgstr "'{path}' torrent dosyası kaldırılıyor"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "'{path}' kaldırılamadı: {error} ({error_code})"
 
@@ -2152,19 +2152,19 @@ msgstr "{crypto_library} hatası: {error} ({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "'{path}' alınamadı: {error} ({error_code})"
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "Kaynak {protocol} adresi başarıyla {ip} olarak güncellendi"
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr "Makineniz {protocol} iletişim kuralını desteklemiyor"
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "Küresel {type} adresi {url} kullanılarak {ip} olarak başarıyla güncellendi"
 
@@ -2392,7 +2392,7 @@ msgid_plural "Loaded {count} torrents"
 msgstr[0] "{count} torrent yüklendi"
 msgstr[1] "{count} torrent yüklendi"
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Torrent dosyası '{old_path}' konumundan '{path}' konumuna taşındı"
 
@@ -2595,12 +2595,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "gün"
 msgstr[1] "gün"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "{tag} etiketi için bekleyen RPC istemi bulunamadı"
-
-#~ msgid "I _Agree"
-#~ msgstr "_Onaylıyorum"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "Transmission, dosya paylaşım programıdır. Bir torrent çalıştırdığınızda, veriler karşıya yükleme yoluyla herkesin erişimine açılacaktır. Her türlü içerik paylaşımı sizin sorumluluğunuzdadır."

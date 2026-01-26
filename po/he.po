@@ -7,16 +7,16 @@
 # 63f334ffc0709ba0fc2361b80bf3c0f0_00ffd1e <ab96c93ca0ac55ba7fa06385427e60dd_878890>, 2022
 # Avi Markovitz <avi.markovitz@gmail.com>, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2025
-# Yaron Shahrabani <sh.yaron@gmail.com>, 2025
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2025\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2026\n"
 "Language-Team: Hebrew (https://app.transifex.com/transmissionbt/teams/33778/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -44,7 +44,7 @@ msgstr "לא ניתן להוסיף את קובץ הטורנט ‚{path}’"
 msgid "Removing torrent file '{path}'"
 msgstr "קובץ הטורנט ‚{path}’ הוסר"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "לא ניתן להסיר את ‚{path}’:‏ {error}‏ ({error_code})"
 
@@ -949,7 +949,7 @@ msgstr "תרדמת שולחן העבודה מותרת"
 
 #: ../gtk/Session.cc:1236
 msgid "Couldn't find pending RPC request for id {id}"
-msgstr ""
+msgstr "לא ניתן למצוא בקשת RPC ממתינה למזהה {id}"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -2245,19 +2245,19 @@ msgstr "שגיאת {crypto_library}‏: {error} ‏({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "לא ניתן למשוך את ‚{path}’: {error} ({error_code})"
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "כתובת המקור {protocol} עודכנה בהצלחה לכדי {ip}"
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr "לא ניתן לקבל את כתובת המקור באף פרוטוקול IP, אין חיבורי רשת אפשריים"
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr "המכונה שלך לא תומכת ב־{protocol}"
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "הכתובת הגלובלית {type} עודכנה בהצלחה ל־{ip} באמצעות {url}"
 
@@ -2489,7 +2489,7 @@ msgstr[1] "נטענו {count} טורנטים"
 msgstr[2] "נטענו {count} טורנטים"
 msgstr[3] "נטענו {count} טורנטים"
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "קובץ הטורנט הועבר מ־‚{old_path}’ ל־‚{path}’"
 
@@ -2575,7 +2575,7 @@ msgstr "לא ניתן לקשור שקע IPv6 {address}: {error}{error_code}"
 
 #: ../libtransmission/tr-udp.cc:265
 msgid "Couldn't create any UDP sockets."
-msgstr ""
+msgstr "לא ניתן ליצור שקעי UDP כלשהם."
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
@@ -2704,12 +2704,3 @@ msgstr[0] "יום"
 msgstr[1] "יומיים"
 msgstr[2] "ימים"
 msgstr[3] "ימים"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "לא ניתן למצוא את בקשת ה־RPC הממתינה לתגית {tag}"
-
-#~ msgid "I _Agree"
-#~ msgstr "מו_סכם"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "‏Transmission היא תוכנה לשיתוף קבצים. כאשר טורנט מופעל, הנתונים בו יהיו נגישים לאחרים דרך מנגנון ההעלאה. כל תוכן שישותף הוא על אחריותך הבלעדית."

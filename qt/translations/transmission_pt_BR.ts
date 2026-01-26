@@ -1592,7 +1592,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation>Nos dias</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Todos</translation>
     </message>
@@ -1642,7 +1642,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation>Sábado</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1995,7 +1995,7 @@ Para adicionar uma nova URL principal, adicione-o após uma linha em branco.</tr
         <translation>Monitorar Pasta</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>desconhecido</translation>
     </message>
@@ -2043,7 +2043,7 @@ Para adicionar uma nova URL principal, adicione-o após uma linha em branco.</tr
         <translation>&lt;b&gt;Atualizar lista de bloqueio&lt;/b&gt;&lt;p&gt;Obtendo nova lista de bloqueio…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Seleciona o Destino</translation>
     </message>
@@ -2224,7 +2224,7 @@ Para adicionar uma nova URL principal, adicione-o após uma linha em branco.</tr
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Erro ao renomear caminho</translation>
     </message>
@@ -2234,7 +2234,7 @@ Para adicionar uma nova URL principal, adicione-o após uma linha em branco.</tr
         <translation>&lt;p&gt;&lt;b&gt;Não foi possível renomear &quot;%1&quot; como &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Por favor corrija os erros e tente novamente.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Erro ao adicionar Torrent</translation>
     </message>
@@ -2309,7 +2309,7 @@ Para adicionar uma nova URL principal, adicione-o após uma linha em branco.</tr
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

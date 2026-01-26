@@ -12,7 +12,7 @@
 "219.title" = "Выбрать…";
 
 /* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
-"253.label" = "Основные";
+"253.label" = "Добавление";
 
 /* Class = "NSTabViewItem"; label = "Management"; ObjectID = "254"; */
 "254.label" = "Управление";
@@ -45,10 +45,10 @@
 "1208.title" = "Только во время скачивания";
 
 /* Class = "NSTextFieldCell"; title = "Auto resize:"; ObjectID = "1209"; */
-"1209.title" = "Размер окна:";
+"1209.title" = "Автоматический размер:";
 
 /* Class = "NSButtonCell"; title = "Automatically size window to fit all transfers"; ObjectID = "1210"; */
-"1210.title" = "Автоматически подстраивать размер окна";
+"1210.title" = "Подстраивать размер окна под все раздачи";
 
 /* Class = "NSButtonCell"; title = "Reset"; ObjectID = "1211"; */
 "1211.title" = "Сбросить";
@@ -66,7 +66,7 @@
 "1216.title" = "Скачивать в:";
 
 /* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
-"1217.title" = "Новые раздачи:";
+"1217.title" = "Настройки:";
 
 /* Class = "NSButtonCell"; title = "Trash original torrent files"; ObjectID = "1218"; */
 "1218.title" = "Удалять торрент-файлы";
@@ -117,7 +117,7 @@
 "1248.title" = "Используя NAT-T с NAT-PMP или UPnP";
 
 /* Class = "NSTextFieldCell"; title = "Port is open"; ObjectID = "1250"; */
-"1250.title" = "Проверяю статус порта…";
+"1250.title" = "Порт открыт";
 
 /* Class = "NSTextFieldCell"; title = "Peer communication:"; ObjectID = "1253"; */
 "1253.title" = "Связь:";
@@ -141,7 +141,7 @@
 "1269.title" = "КБ/с";
 
 /* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
-"1270.title" = "Ширина канала:";
+"1270.title" = "Глобальные ограничения ширины канала:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
 "1273.title" = "КБ/с";
@@ -153,10 +153,10 @@
 "1275.title" = "Режим ограничения:";
 
 /* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
-"1276.title" = "Раздачи:";
+"1276.title" = "Скорость отдачи:";
 
 /* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
-"1277.title" = "Максимальная скорость скачивания:";
+"1277.title" = "Скорость загрузки:";
 
 /* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
 "1278.title" = "В режиме ограничения скорости настройки общей ширины канала не учитывается";
@@ -168,7 +168,7 @@
 "1281.title" = "до";
 
 /* Class = "NSButtonCell"; title = "Display a window when opening a torrent file"; ObjectID = "1294"; */
-"1294.title" = "Показывать диалоговое окно при открытии торрент-файла";
+"1294.title" = "Показывать окно при открытии торрент-файла";
 
 /* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "1302"; */
 "1302.title" = "По завершении скачивания:";
@@ -183,7 +183,7 @@
 "1335.title" = "Начать скачивание после добавления";
 
 /* Class = "NSTextFieldCell"; title = "Add window:"; ObjectID = "1338"; */
-"1338.title" = "При добавлении:";
+"1338.title" = "Окно добавления:";
 
 /* Class = "NSButtonCell"; title = "Only when there are multiple files"; ObjectID = "1340"; */
 "1340.title" = "Только при наличии нескольких файлов";
@@ -234,7 +234,7 @@
 "1477.title" = "Только если добавлены вручную";
 
 /* Class = "NSTextFieldCell"; title = "Listening port:"; ObjectID = "1493"; */
-"1493.title" = "Порт:";
+"1493.title" = "Порт прослушивания:";
 
 /* Class = "NSButtonCell"; title = "Enable remote access"; ObjectID = "1502"; */
 "1502.title" = "Включить удалённый доступ";
@@ -309,13 +309,13 @@
 "1896.title" = "Обновляться до бета-версий";
 
 /* Class = "NSMenuItem"; title = "Every Day"; ObjectID = "1910"; */
-"1910.title" = "Каждый день";
+"1910.title" = "Ежедневно";
 
 /* Class = "NSMenuItem"; title = "Weekdays"; ObjectID = "1911"; */
-"1911.title" = "На неделе";
+"1911.title" = "Будни";
 
 /* Class = "NSMenuItem"; title = "Weekends"; ObjectID = "1912"; */
-"1912.title" = "По выходным";
+"1912.title" = "Выходные";
 
 /* Class = "NSMenuItem"; title = "Monday"; ObjectID = "1914"; */
 "1914.title" = "В понедельник";
@@ -348,7 +348,7 @@
 "1933.title" = "Сделать программой по умолчанию";
 
 /* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
-"1940.title" = "Добавлять .part к незавершенный файлам";
+"1940.title" = "Добавлять .part к незавершённым файлам";
 
 /* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
 "1948.title" = "Показывать окно при открытии магнит-ссылки";
@@ -363,7 +363,7 @@
 "1970.title" = "мин.";
 
 /* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
-"1988.title" = "URL:";
+"1988.title" = "URL-адрес:";
 
 /* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "2044"; */
 "2044.title" = "По завершении скачивания:";
@@ -399,4 +399,4 @@
 "pgY-W3-HdI.title" = "Сделать программой по умолчанию";
 
 /* Class = "NSButtonCell"; title = "Verify data when download completes"; ObjectID = "wM8-cD-WAB"; */
-/* "wM8-cD-WAB.title" = ""; */
+"wM8-cD-WAB.title" = "Проверить данные по окончании загрузки";

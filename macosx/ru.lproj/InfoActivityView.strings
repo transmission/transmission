@@ -6,7 +6,7 @@
 "31.placeholderString" = "Нет данных";
 
 /* Class = "NSTextFieldCell"; title = "Uploaded:"; ObjectID = "32"; */
-"32.title" = "Роздано:";
+"32.title" = "Отдано:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
 "33.placeholderString" = "Нет данных";
@@ -57,7 +57,7 @@
 "52.placeholderString" = "Нет данных";
 
 /* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Progress"; ObjectID = "54"; */
-"54.ibShadowedLabels[0]" = "Прогресс";
+"54.ibShadowedLabels[0]" = "Скачано";
 
 /* Class = "NSSegmentedCell"; 54.ibShadowedLabels[1] = "Available"; ObjectID = "54"; */
 "54.ibShadowedLabels[1]" = "Доступно";

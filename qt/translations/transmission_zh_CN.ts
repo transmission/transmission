@@ -488,17 +488,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>添加</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>移除</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -1579,7 +1579,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>日子(&amp;O)：</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>每天</translation>
     </message>
@@ -1629,7 +1629,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>星期六</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1979,7 +1979,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>选择监视目录</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>未知</translation>
     </message>
@@ -2026,7 +2026,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;b&gt;更新屏蔽列表&lt;/b&gt;&lt;p&gt;正在获取新的屏蔽列表…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>选择目标</translation>
     </message>
@@ -2207,7 +2207,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>重命名路径出错</translation>
     </message>
@@ -2217,7 +2217,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;无法重命名 &quot;%1&quot; 为 &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;请纠正问题后重试。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>添加 Torrent 出错</translation>
     </message>
@@ -2290,8 +2290,8 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <source>Remote root pa&amp;th:</source>
+        <translation>远程根路径(&amp;T):</translation>
     </message>
 </context>
 <context>

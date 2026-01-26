@@ -1594,7 +1594,7 @@ una riga vuota.</translation>
         <translation>&amp;Nei giorni:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Ogni giorno</translation>
     </message>
@@ -1644,7 +1644,7 @@ una riga vuota.</translation>
         <translation>Sabato</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation type="unfinished">
@@ -1994,7 +1994,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>Seleziona la cartella osservata</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2042,7 +2042,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Seleziona la destinazione</translation>
     </message>
@@ -2223,7 +2223,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Errore durante la rinomina del precorso</translation>
     </message>
@@ -2233,7 +2233,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;Impossibile rinominare &quot;%1&quot; in &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Si prega di correggere gli errori e riprovare.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Errore nell&apos;aggiunta del torrent</translation>
     </message>
@@ -2308,7 +2308,7 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

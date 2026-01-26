@@ -1579,7 +1579,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>曜日(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>毎日</translation>
     </message>
@@ -1629,7 +1629,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>土曜日</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1980,7 +1980,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>監視するフォルダを選択</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>不明</translation>
     </message>
@@ -2027,7 +2027,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;b&gt;ブロックリストの更新&lt;/b&gt;&lt;p&gt;新しいブロックリストを取得…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>保存先を選択</translation>
     </message>
@@ -2208,7 +2208,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>パスの改名時のエラー</translation>
     </message>
@@ -2218,7 +2218,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;「%1」を「%2」に改名できません: %3。&lt;/b&gt;&lt;/p&gt;&lt;p&gt;エラーを修正し再度お試しください。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>トレント追加時のエラー</translation>
     </message>
@@ -2291,7 +2291,7 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

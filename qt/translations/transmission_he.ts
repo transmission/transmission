@@ -492,17 +492,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>הוספה</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>עריכה</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>הסרה</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -1592,7 +1592,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&amp;בימים:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>כל יום</translation>
     </message>
@@ -1642,7 +1642,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>יום שבת</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -1995,7 +1995,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>בחירת מחיצת מעקב</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>לא ידוע</translation>
     </message>
@@ -2043,7 +2043,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;b&gt;עדכון רשימת החסימה&lt;/b&gt;&lt;p&gt;מתקבלת רשימת חסימה חדשה…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>בחירת יעד</translation>
     </message>
@@ -2224,7 +2224,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>שגיאה בשינוי שם הנתיב</translation>
     </message>
@@ -2234,7 +2234,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;לא ניתן לשנות את השם „%1” לשם „%2”: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;נא לתקן את השגיאות ולנסות שוב.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>שגיאה בהוספת טורנט</translation>
     </message>
@@ -2309,8 +2309,8 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <source>Remote root pa&amp;th:</source>
+        <translation>נתיב &amp;על מרוחק:</translation>
     </message>
 </context>
 <context>

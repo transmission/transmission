@@ -7,15 +7,16 @@
 # DemonCZ <scheuer.cz@gmail.com>, 2020
 # Pavel Rehak <pavel-rehak@email.cz>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Martin Brož, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Martin Brož, 2026\n"
 "Language-Team: Czech (https://app.transifex.com/transmissionbt/teams/33778/cs/)\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -33,83 +34,83 @@ msgstr ""
 
 #: ../daemon/daemon.cc:218 ../gtk/Session.cc:817 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Nemohu přečíst '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:243 ../gtk/Session.cc:869 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
-msgstr ""
+msgstr "Nemohu přidat soubor torrentu '{path}'"
 
 #: ../daemon/daemon.cc:252
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "Odstraňování souboru torrentu '{path}'"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Nelze odstranit '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:741
 msgid "Couldn't parse log level '{level}'"
-msgstr ""
+msgstr "Nepodařilo se analyzovat úroveň logu '{level}'"
 
 #: ../daemon/daemon.cc:793
 msgid "Deferring reload until session is fully started."
-msgstr ""
+msgstr "Znovunačtení odloženo dokud relace úplně nenastartuje."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "Znovunačtení selhalo: Nepodařilo se získat aktuální monotónní čas: {errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
-msgstr ""
+msgstr "Znovunačítání nastavení z '{path}'"
 
 #: ../daemon/daemon.cc:853
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr ""
+msgstr "Nepodařilo se inicializovat démona: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:865
 msgid "Loading settings from '{path}'"
-msgstr ""
+msgstr "Načítání nastavení z '{path}'"
 
 #: ../daemon/daemon.cc:892
 msgid "Saved pidfile '{path}'"
-msgstr ""
+msgstr "Uložený pid-soubor '{path}'"
 
 #: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1011 ../libtransmission/torrent.cc:2013 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Nelze uložit '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:908
 msgid "Requiring authentication"
-msgstr ""
+msgstr "Vyžaduje se ověření"
 
 #: ../daemon/daemon.cc:927
 msgid "Watching '{path}' for new torrent files"
-msgstr ""
+msgstr "Sledování '{path}' pro nové soubory torrentů"
 
 #: ../daemon/daemon.cc:973 ../libtransmission/watchdir-kqueue.cc:120 ../libtransmission/watchdir-win32.cc:197
 msgid "Couldn't create event: {error} ({error_code})"
-msgstr ""
+msgstr "Nelze vytvořit událost: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:984 ../libtransmission/watchdir-kqueue.cc:131
 msgid "Couldn't add event: {error} ({error_code})"
-msgstr ""
+msgstr "Nelze přidat událost {error} ({error_code})"
 
 #: ../daemon/daemon.cc:999
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
-msgstr ""
+msgstr "Nelze spustit smyčku událostí pro démona: {error} ({error_code})"
 
 #: ../gtk/Application.cc:402
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
-msgstr ""
+msgstr "Nelze registrovat Transmission pro {content_type} jako zpracovatele: {error} ({error_code})"
 
 #: ../gtk/Application.cc:560
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Obdržen požadavek ukončení. Pokus o čisté ukončení. Pokud se to zasekne, zkuste to znovu."
 
 #: ../gtk/Application.cc:992
 msgid "Closing Connections…"
-msgstr ""
+msgstr "Zavírání spojení..."
 
 #: ../gtk/Application.cc:997
 msgid "Sending upload/download totals to tracker…"
@@ -141,7 +142,7 @@ msgstr "Rychlý a jednoduchý BitTorrent klient"
 
 #: ../gtk/Application.cc:1397
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Copyright © The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -245,15 +246,15 @@ msgstr "Veřejný torrent"
 
 #: ../gtk/DetailsDialog.cc:674
 msgid "Created by {creator} on {date}"
-msgstr ""
+msgstr "Vytvořil {creator} dne {date}"
 
 #: ../gtk/DetailsDialog.cc:680
 msgid "Created by {creator}"
-msgstr ""
+msgstr "Vytvořil {creator}"
 
 #: ../gtk/DetailsDialog.cc:684
 msgid "Created on {date}"
-msgstr ""
+msgstr "Vytvořeno dne {date}"
 
 #: ../gtk/DetailsDialog.cc:798
 msgid "Unknown"
@@ -262,39 +263,39 @@ msgstr "Neznámý"
 #: ../gtk/DetailsDialog.cc:836 ../gtk/MakeDialog.cc:393
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{total_size} v {file_count:L} souboru"
+msgstr[1] "{total_size} ve {file_count:L} souborech"
+msgstr[2] "{total_size} v {file_count:L} souborech"
+msgstr[3] "{total_size} v {file_count:L} souborech"
 
 #: ../gtk/DetailsDialog.cc:851 ../gtk/MakeDialog.cc:401
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "({piece_count} část BitTorrentu @ {piece_size})"
+msgstr[1] "({piece_count} části BitTorrentu @ {piece_size})"
+msgstr[2] "({piece_count} částí BitTorrentu @ {piece_size})"
+msgstr[3] "({piece_count} částí BitTorrentu @ {piece_size})"
 
 #: ../gtk/DetailsDialog.cc:895
 msgid "{current_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} ({percent_done}%) "
 
 #: ../gtk/DetailsDialog.cc:903
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
-msgstr ""
+msgstr "{current_size} ({percent_done}% z {percent_available}% dostupných)"
 
 #: ../gtk/DetailsDialog.cc:913
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
-msgstr ""
+msgstr "{current_size} ({percent_done}% z {percent_available}% dostupných; {unverified_size}  neověřených)"
 
 #: ../gtk/DetailsDialog.cc:947
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
-msgstr ""
+msgstr "{downloaded_size} (+{discarded_size} zahozeno po neúspěšném kontrolním součtu)"
 
 #: ../gtk/DetailsDialog.cc:977
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{uploaded_size} (Poměr: {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1018
 msgid "No errors"
@@ -407,25 +408,25 @@ msgstr "Příznaky"
 
 #: ../gtk/DetailsDialog.cc:1706
 msgid "Web Seeds"
-msgstr ""
+msgstr "Web Seedů"
 
 #: ../gtk/DetailsDialog.cc:1774
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Získán seznam {markup_begin}{peer_count} peera{markup_end}{time_span_ago}"
+msgstr[1] "Získán seznam {markup_begin}{peer_count}peerů{markup_end}{time_span_ago}"
+msgstr[2] "Získán seznam {markup_begin}{peer_count}peerů{markup_end}{time_span_ago}"
+msgstr[3] "Získán seznam {markup_begin} {peer_count} peerů{markup_end}{time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1786
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr ""
+msgstr "Dotaz na peery {markup_begin} vypršel {time_span_ago}{markup_end}; opakuji"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1795
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Došlo k chybě '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1808
 msgid "No updates scheduled"
@@ -433,7 +434,7 @@ msgstr "Nenaplánovány žádné aktualizace"
 
 #: ../gtk/DetailsDialog.cc:1815
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "Dotazování na více peerů {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1822
 msgid "Queued to ask for more peers"
@@ -442,7 +443,7 @@ msgstr "Žádost o více protějšků zařazena do fronty"
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1830
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Dotazováno více peerů {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:1856
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
@@ -2232,19 +2233,19 @@ msgstr ""
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr ""
 
@@ -2476,7 +2477,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 

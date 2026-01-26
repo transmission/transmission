@@ -496,17 +496,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Edycja</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -1605,7 +1605,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>W&#xa0;d&amp;niach:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Codziennie</translation>
     </message>
@@ -1655,7 +1655,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Sobota</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
@@ -2011,7 +2011,7 @@ Nowy podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Wybór obserwowanego katalogu</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation>nieznany</translation>
     </message>
@@ -2060,7 +2060,7 @@ Nowy podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>&lt;b&gt;Aktualizacja listy blokowania&lt;/b&gt;&lt;p&gt;Pobieranie nowej listy blokowania…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Wybór miejsca docelowego</translation>
     </message>
@@ -2241,7 +2241,7 @@ Nowy podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Błąd podczas zmieniania nazwy ścieżki</translation>
     </message>
@@ -2251,7 +2251,7 @@ Nowy podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>&lt;p&gt;&lt;b&gt;Nie można zmienić nazwy pliku „%1” na „%2”: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Proszę poprawić błędy i spróbować ponownie.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Błąd podczas dodawania torrenta</translation>
     </message>
@@ -2328,8 +2328,8 @@ Nowy podstawowy adres URL należy dodać po pustym wierszu.</translation>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <source>Remote root pa&amp;th:</source>
+        <translation>Zdalna ścieżka &amp;główna:</translation>
     </message>
 </context>
 <context>

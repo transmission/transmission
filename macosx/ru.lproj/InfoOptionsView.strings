@@ -57,7 +57,7 @@
 "52.title" = "Высокий";
 
 /* Class = "NSMenuItem"; title = "Stop When Inactive"; ObjectID = "86"; */
-"86.title" = "Остановить после отсутствия активности в течение";
+"86.title" = "Остановить, если неактивен";
 
 /* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "87"; */
 "87.title" = "Общие настройки";

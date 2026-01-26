@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:15+0000\n"
+"POT-Creation-Date: 2026-01-26 16:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2025\n"
 "Language-Team: Hungarian (https://app.transifex.com/transmissionbt/teams/33778/hu/)\n"
@@ -47,7 +47,7 @@ msgstr "'{path}' torrent fájl nem adható hozzá"
 msgid "Removing torrent file '{path}'"
 msgstr "'{path}' torrent fájl eltávolítása"
 
-#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "'{path}' nem távolítható el: {error} ({error_code})"
 
@@ -2180,19 +2180,19 @@ msgstr "{crypto_library} hiba: {error} ({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "Nem sikerült '{path}' lekérése: {error} ({error_code})"
 
-#: ../libtransmission/ip-cache.cc:291
+#: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "Sikeresen frissítette a forrás {protocol} címet {ip}-re"
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr "Egyetlen IP protokollon sem sikerült lekérni a forráscímet, a hálózati kapcsolat nem lehetséges"
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
 msgstr "Az ön gépe nem támogatja a következőt: {protocol}"
 
-#: ../libtransmission/ip-cache.cc:340
+#: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "Sikeresen frissítette a globális {type} címet {ip}-re a {url} használatával"
 
@@ -2420,7 +2420,7 @@ msgid_plural "Loaded {count} torrents"
 msgstr[0] "{count} torrent betöltve"
 msgstr[1] "{count} torrent betöltve"
 
-#: ../libtransmission/torrent-metainfo.cc:705
+#: ../libtransmission/torrent-metainfo.cc:704
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Torrent fájl átköltöztetve innen: '{old_path}', ide: '{path}'"
 
@@ -2623,12 +2623,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
-
-#~ msgid "Couldn't find pending RPC request for tag {tag}"
-#~ msgstr "Nem található függőben lévő RPC kérés a {tag} címkéhez"
-
-#~ msgid "I _Agree"
-#~ msgstr "_Elfogadom"
-
-#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-#~ msgstr "A Transmission egy fájlmegosztó program. Egy torrent futtatása során a hozzá tartozó adatok elérhetővé válnak más felhasználók számára is. Minden megosztott tartalomért kizárólag Ön tartozik felelősséggel."

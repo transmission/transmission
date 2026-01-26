@@ -1605,7 +1605,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Šiomis &amp;dienomis:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>kasdien</translation>
     </message>
@@ -1655,7 +1655,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>šeštadieniais</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation type="unfinished">
@@ -2008,7 +2008,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>Parinkite stebimą aplanką</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2057,7 +2057,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Parinkite paskirties aplanką</translation>
     </message>
@@ -2238,7 +2238,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Klaida, pervadinant kelią</translation>
     </message>
@@ -2248,7 +2248,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;Nepavyko pervadinti &quot;%1&quot; kaip &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Prašome ištaisyti klaidas ir bandyti dar kartą.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Klaida pridedant torentą</translation>
     </message>
@@ -2325,7 +2325,7 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

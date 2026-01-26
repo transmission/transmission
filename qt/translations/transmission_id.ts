@@ -49,8 +49,8 @@
     <message numerus="yes">
         <location filename="../Application.cc" line="+313"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent Selesai</numerusform>
         </translation>
     </message>
     <message>
@@ -200,7 +200,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Peer tersambung lewat µTP</translation>
     </message>
     <message>
         <location line="+161"/>
@@ -250,14 +250,14 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 menit</numerusform>
         </translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tambah URL</translation>
     </message>
     <message>
         <location line="+116"/>
@@ -408,7 +408,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Label:</translation>
     </message>
     <message>
         <location line="-122"/>
@@ -488,17 +488,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Tambah</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunting</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Hapus</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -619,7 +619,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Ubah Nama...</translation>
     </message>
 </context>
 <context>
@@ -673,7 +673,7 @@
     <message>
         <location line="+13"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Cari...</translation>
     </message>
 </context>
 <context>
@@ -725,7 +725,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Menghitung Ruang Bebas...&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -811,7 +811,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Buka...</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -826,7 +826,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>B&amp;aru,,,</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1067,17 +1067,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ubah Sesi...</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>Tata &amp;Lokasi…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>Buka &amp;URL...</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1579,7 +1579,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
         <translation>&amp;Pada hari:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+380"/>
+        <location filename="../PrefsDialog.cc" line="+381"/>
         <source>Every Day</source>
         <translation>Setiap Hari</translation>
     </message>
@@ -1629,19 +1629,19 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
         <translation>Sabtu</translation>
     </message>
     <message numerus="yes">
-        <location line="+464"/>
+        <location line="+463"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 menit</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %1 menit yang lalu</numerusform>
         </translation>
     </message>
     <message>
@@ -1976,7 +1976,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>Pilih Direktori Pantau</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-209"/>
         <source>unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2023,7 +2023,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+84"/>
         <source>Select Destination</source>
         <translation>Pilih Tujuan</translation>
     </message>
@@ -2204,7 +2204,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+515"/>
+        <location filename="../Session.cc" line="+502"/>
         <source>Error Renaming Path</source>
         <translation>Galat Mengubah Nama Path</translation>
     </message>
@@ -2214,7 +2214,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;Tidak dapat mengubah nama &quot;%1&quot; sebagai &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Silakan perbaiki galat dan coba lagi.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+565"/>
+        <location line="+536"/>
         <source>Error Adding Torrent</source>
         <translation>Galat Saat Menambah Torrent</translation>
     </message>
@@ -2287,7 +2287,7 @@ To add a new primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+17"/>
-        <source>RPC URL pa&amp;th:</source>
+        <source>Remote root pa&amp;th:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
