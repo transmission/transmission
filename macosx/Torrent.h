@@ -39,6 +39,10 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 // Prefer using this batch method when updating many torrents at once.
 + (void)updateTorrents:(NSArray<Torrent*>*)torrents;
 
+// Async version of updateTorrents: that runs the stats fetch on a background queue
+// and calls the completion block on the main queue when done.
++ (void)updateTorrentsAsync:(NSArray<Torrent*>*)torrents completion:(void (^)(void))completion;
+
 - (void)update;
 
 - (void)startTransferIgnoringQueue:(BOOL)ignoreQueue;
@@ -87,6 +91,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 + (BOOL)trashFile:(NSString*)path error:(NSError**)error;
 - (void)moveTorrentDataFileTo:(NSString*)folder;
+- (void)moveTorrentDataFileTo:(NSString*)folder completionHandler:(void (^)(BOOL success))completion;
 - (void)copyTorrentFileTo:(NSString*)path;
 
 @property(nonatomic, readonly) BOOL alertForRemainingDiskSpace;
@@ -140,6 +145,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 @property(nonatomic, readonly) BOOL allDownloaded;
 @property(nonatomic, getter=isComplete, readonly) BOOL complete;
 @property(nonatomic, getter=isFinishedSeeding, readonly) BOOL finishedSeeding;
+@property(nonatomic, getter=isMovingData, readonly) BOOL movingData;
 @property(nonatomic, getter=isError, readonly) BOOL error;
 @property(nonatomic, getter=isAnyErrorOrWarning, readonly) BOOL anyErrorOrWarning;
 @property(nonatomic, readonly) NSString* errorMessage;

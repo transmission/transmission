@@ -174,6 +174,8 @@ target_sources(${TR_NAME}-mac
         Toolbar.mm
         Torrent.h
         Torrent.mm
+        TransmissionOperationQueue.h
+        TransmissionOperationQueue.mm
         TorrentCell.h
         TorrentCell.mm
         TorrentCellActionButton.h

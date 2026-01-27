@@ -18,6 +18,7 @@
 #import "FileListNode.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
+#import "TransmissionOperationQueue.h"
 #import "Utils.h"
 
 NSString* const kTorrentDidChangeGroupNotification = @"TorrentDidChangeGroup";
@@ -45,6 +46,9 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @property(nonatomic) TorrentDeterminationType fGroupValueDetermination;
 
 @property(nonatomic) TorrentDeterminationType fDownloadFolderDetermination;
+
+@property(nonatomic) BOOL fMovingData;
+@property(nonatomic) int volatile fMoveStatus; // Status for async move operation (TR_LOC_*)
 
 @property(nonatomic) BOOL fResumeOnWake;
 
@@ -302,6 +306,80 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     }
 }
 
++ (void)updateTorrentsAsync:(NSArray<Torrent*>*)torrents completion:(void (^)(void))completion
+{
+    if (torrents == nil || torrents.count == 0)
+    {
+        if (completion)
+        {
+            completion();
+        }
+        return;
+    }
+
+    // Capture copies of everything we need for the background work
+    NSArray<Torrent*>* torrentsCopy = [torrents copy];
+
+    [[TransmissionOperationQueue sharedQueue] async:^{
+        std::vector<Torrent*> torrent_objects;
+        torrent_objects.reserve(torrentsCopy.count);
+
+        std::vector<tr_torrent*> torrent_handles;
+        torrent_handles.reserve(torrentsCopy.count);
+
+        std::vector<BOOL> was_transmitting;
+        was_transmitting.reserve(torrentsCopy.count);
+
+        for (Torrent* torrent in torrentsCopy)
+        {
+            if (torrent == nil || torrent.fHandle == nullptr)
+            {
+                continue;
+            }
+
+            torrent_objects.emplace_back(torrent);
+            torrent_handles.emplace_back(torrent.fHandle);
+            was_transmitting.emplace_back(torrent.fStat != nullptr && torrent.transmitting);
+        }
+
+        if (torrent_handles.empty())
+        {
+            if (completion)
+            {
+                dispatch_async(dispatch_get_main_queue(), completion);
+            }
+            return;
+        }
+
+        auto const stats = tr_torrentStat(torrent_handles.data(), torrent_handles.size());
+
+        // Must update stats and check transmitting changes on main thread
+        // to ensure thread-safe access to Torrent properties
+        dispatch_async(dispatch_get_main_queue(), ^{
+            for (size_t i = 0, n = torrent_objects.size(); i < n; ++i)
+            {
+                Torrent* const torrent = torrent_objects[i];
+                BOOL wasTransmitting = was_transmitting[i];
+                torrent.fStat = stats[i];
+
+                if (wasTransmitting != torrent.transmitting)
+                {
+                    [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState"
+                                                                                                        object:nil]
+                                                             postingStyle:NSPostASAP
+                                                             coalesceMask:NSNotificationCoalescingOnName
+                                                                 forModes:nil];
+                }
+            }
+
+            if (completion)
+            {
+                completion();
+            }
+        });
+    } completion:nil]; // We handle main thread dispatch ourselves above
+}
+
 - (void)startTransferIgnoringQueue:(BOOL)ignoreQueue
 {
     if ([self alertForRemainingDiskSpace])
@@ -533,9 +611,28 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
 - (void)moveTorrentDataFileTo:(NSString*)folder
 {
+    [self moveTorrentDataFileTo:folder completionHandler:nil];
+}
+
+- (void)moveTorrentDataFileTo:(NSString*)folder completionHandler:(void (^)(BOOL success))completion
+{
+    // Prevent double-moves
+    if (self.fMovingData)
+    {
+        if (completion)
+        {
+            completion(NO);
+        }
+        return;
+    }
+
     NSString* oldFolder = self.currentDirectory;
     if ([oldFolder isEqualToString:folder])
     {
+        if (completion)
+        {
+            completion(YES);
+        }
         return;
     }
 
@@ -554,33 +651,66 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
         [alert runModal];
 
+        if (completion)
+        {
+            completion(NO);
+        }
         return;
     }
 
-    int volatile status;
-    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, &status);
+    // Set moving state and notify UI
+    self.fMovingData = YES;
+    [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentMovingStateChanged" object:self];
 
-    while (status == TR_LOC_MOVING) //block while moving (for now)
-    {
-        [NSThread sleepForTimeInterval:0.05];
-    }
+    // Capture handle for use in background block
+    tr_torrent* handle = self.fHandle;
 
-    if (status == TR_LOC_DONE)
-    {
-        [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateStats" object:nil];
-    }
-    else
-    {
-        NSAlert* alert = [[NSAlert alloc] init];
-        alert.messageText = NSLocalizedString(@"There was an error moving the data file.", "Move error alert -> title");
-        alert.informativeText = [NSString
-            stringWithFormat:NSLocalizedString(@"The move operation of \"%@\" cannot be done.", "Move error alert -> message"), self.name];
-        [alert addButtonWithTitle:NSLocalizedString(@"OK", "Move error alert -> button")];
+    // Use the operation queue only for the API call, then poll on a concurrent queue
+    // This prevents blocking the serial operation queue during slow file moves
+    //
+    // We use an instance variable (fMoveStatus) for the status because:
+    // 1. tr_torrentSetLocation captures the pointer and writes to it asynchronously
+    // 2. __block variables get moved to heap when captured by nested blocks, but AFTER
+    //    the pointer is taken - so the pointer would point to invalid stack memory
+    // 3. Using an ivar on self is ARC-safe since self is captured by the blocks
+    self.fMoveStatus = TR_LOC_MOVING;
 
-        [alert runModal];
-    }
+    [[TransmissionOperationQueue sharedQueue] async:^{
+        tr_torrentSetLocation(handle, folder.UTF8String, YES, &self->_fMoveStatus);
 
-    [self updateTimeMachineExclude];
+        // Dispatch the polling loop to a global concurrent queue so it doesn't block
+        // the operation queue (allowing resume/pause operations to proceed)
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            while (self.fMoveStatus == TR_LOC_MOVING)
+            {
+                [NSThread sleepForTimeInterval:0.05];
+            }
+
+            int const finalStatus = self.fMoveStatus;
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // Clear moving state
+                self.fMovingData = NO;
+
+                // Update stats to refresh the UI (error message shows on torrent if move failed)
+                [self update];
+
+                [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentMovingStateChanged" object:self];
+
+                [self updateTimeMachineExclude];
+
+                if (completion)
+                {
+                    completion(finalStatus == TR_LOC_DONE);
+                }
+            });
+        });
+    }];
+}
+
+- (BOOL)isMovingData
+{
+    return self.fMovingData;
 }
 
 - (void)copyTorrentFileTo:(NSString*)path
@@ -1142,6 +1272,11 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
 - (NSString*)statusString
 {
+    if (self.movingData)
+    {
+        return [NSLocalizedString(@"Moving data", "Torrent -> status string") stringByAppendingEllipsis];
+    }
+
     NSString* string;
 
     if (self.anyErrorOrWarning)
@@ -1279,6 +1414,11 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
 - (NSString*)shortStatusString
 {
+    if (self.movingData)
+    {
+        return [NSLocalizedString(@"Moving", "Torrent -> status string") stringByAppendingEllipsis];
+    }
+
     NSString* string;
 
     switch (self.fStat->activity)

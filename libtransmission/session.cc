@@ -1377,6 +1377,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // close the low-hanging fruit that can be closed immediately w/o consequences
     utp_timer.reset();
     verifier_.reset();
+    relocator_.reset();
     save_timer_.reset();
     queue_timer_.reset();
     now_timer_.reset();
@@ -2067,6 +2068,24 @@ void tr_session::verify_add(tr_torrent* const tor)
     if (verifier_)
     {
         verifier_->add(std::make_unique<tr_torrent::VerifyMediator>(tor), tor->get_priority());
+    }
+}
+
+// ---
+
+void tr_session::relocate_remove(tr_torrent_id_t const tor_id)
+{
+    if (relocator_)
+    {
+        relocator_->remove(tor_id);
+    }
+}
+
+void tr_session::relocate_add(std::unique_ptr<tr_relocate_worker::Mediator> mediator)
+{
+    if (relocator_)
+    {
+        relocator_->add(std::move(mediator));
     }
 }
 

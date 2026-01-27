@@ -62,6 +62,7 @@
 #import "ExpandedPathToIconTransformer.h"
 #import "VersionComparator.h"
 #import "PowerManager.h"
+#import "TransmissionOperationQueue.h"
 #import "Utils.h"
 
 typedef NSString* ToolbarItemIdentifier NS_TYPED_EXTENSIBLE_ENUM;
@@ -814,6 +815,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [nc addObserver:self selector:@selector(applyFilter) name:@"UpdateGroups" object:nil];
 
     [nc addObserver:self selector:@selector(updateWindowAfterToolbarChange) name:@"ToolbarDidChange" object:nil];
+
+    [nc addObserver:self selector:@selector(torrentMovingStateChanged:) name:@"TorrentMovingStateChanged" object:nil];
 
     [self updateMainWindow];
 
@@ -1771,12 +1774,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)resumeTorrents:(NSArray<Torrent*>*)torrents
 {
-    for (Torrent* torrent in torrents)
-    {
-        [torrent startTransfer];
-    }
+    NSArray<Torrent*>* torrentsCopy = [torrents copy];
 
-    [self fullUpdateUI];
+    [[TransmissionOperationQueue sharedQueue] async:^{
+        for (Torrent* torrent in torrentsCopy)
+        {
+            [torrent startTransfer];
+        }
+    } completion:^{
+        [self fullUpdateUI];
+    }];
 }
 
 - (void)resumeSelectedTorrentsNoWait:(id)sender
@@ -1801,13 +1808,17 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)resumeTorrentsNoWait:(NSArray<Torrent*>*)torrents
 {
-    //iterate through instead of all at once to ensure no conflicts
-    for (Torrent* torrent in torrents)
-    {
-        [torrent startTransferNoQueue];
-    }
+    NSArray<Torrent*>* torrentsCopy = [torrents copy];
 
-    [self fullUpdateUI];
+    [[TransmissionOperationQueue sharedQueue] async:^{
+        //iterate through instead of all at once to ensure no conflicts
+        for (Torrent* torrent in torrentsCopy)
+        {
+            [torrent startTransferNoQueue];
+        }
+    } completion:^{
+        [self fullUpdateUI];
+    }];
 }
 
 - (void)stopSelectedTorrents:(id)sender
@@ -1822,21 +1833,25 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)stopTorrents:(NSArray<Torrent*>*)torrents
 {
-    //don't want any of these starting then stopping
-    for (Torrent* torrent in torrents)
-    {
-        if (torrent.waitingToStart)
+    NSArray<Torrent*>* torrentsCopy = [torrents copy];
+
+    [[TransmissionOperationQueue sharedQueue] async:^{
+        //don't want any of these starting then stopping
+        for (Torrent* torrent in torrentsCopy)
+        {
+            if (torrent.waitingToStart)
+            {
+                [torrent stopTransfer];
+            }
+        }
+
+        for (Torrent* torrent in torrentsCopy)
         {
             [torrent stopTransfer];
         }
-    }
-
-    for (Torrent* torrent in torrents)
-    {
-        [torrent stopTransfer];
-    }
-
-    [self fullUpdateUI];
+    } completion:^{
+        [self fullUpdateUI];
+    }];
 }
 
 - (void)removeTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData
@@ -2149,9 +2164,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [panel beginSheetModalForWindow:self.fWindow completionHandler:^(NSInteger result) {
         if (result == NSModalResponseOK)
         {
+            NSString* folder = panel.URLs[0].path;
+            // Move torrents asynchronously - all moves are queued on the operation queue
+            // so they won't block the UI
             for (Torrent* torrent in torrents)
             {
-                [torrent moveTorrentDataFileTo:panel.URLs[0].path];
+                [torrent moveTorrentDataFileTo:folder completionHandler:nil];
             }
         }
     }];
@@ -2367,46 +2385,46 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)updateUI
 {
-    CGFloat dlRate = 0.0, ulRate = 0.0;
-    BOOL anyCompleted = NO;
-    BOOL anyActive = NO;
+    [Torrent updateTorrentsAsync:self.fTorrents completion:^{
+        CGFloat dlRate = 0.0, ulRate = 0.0;
+        BOOL anyCompleted = NO;
+        BOOL anyActive = NO;
 
-    [Torrent updateTorrents:self.fTorrents];
-
-    for (Torrent* torrent in self.fTorrents)
-    {
-        //pull the upload and download speeds - most consistent by using current stats
-        dlRate += torrent.downloadRate;
-        ulRate += torrent.uploadRate;
-
-        anyCompleted |= torrent.finishedSeeding;
-        anyActive |= torrent.active && !torrent.stalled && !torrent.error;
-    }
-
-    PowerManager.shared.shouldPreventSleep = anyActive && [self.fDefaults boolForKey:@"SleepPrevent"];
-
-    if (!NSApp.hidden)
-    {
-        if (self.fWindow.visible)
+        for (Torrent* torrent in self.fTorrents)
         {
-            [self sortTorrentsAndIncludeQueueOrder:NO];
+            //pull the upload and download speeds - most consistent by using current stats
+            dlRate += torrent.downloadRate;
+            ulRate += torrent.uploadRate;
 
-            [self.fStatusBar updateWithDownload:dlRate upload:ulRate];
-
-            self.fClearCompletedButton.hidden = !anyCompleted;
+            anyCompleted |= torrent.finishedSeeding;
+            anyActive |= torrent.active && !torrent.stalled && !torrent.error;
         }
 
-        //update non-constant parts of info window
-        if (self.fInfoController.window.visible)
+        PowerManager.shared.shouldPreventSleep = anyActive && [self.fDefaults boolForKey:@"SleepPrevent"];
+
+        if (!NSApp.hidden)
         {
-            [self.fInfoController updateInfoStats];
+            if (self.fWindow.visible)
+            {
+                [self sortTorrentsAndIncludeQueueOrder:NO];
+
+                [self.fStatusBar updateWithDownload:dlRate upload:ulRate];
+
+                self.fClearCompletedButton.hidden = !anyCompleted;
+            }
+
+            //update non-constant parts of info window
+            if (self.fInfoController.window.visible)
+            {
+                [self.fInfoController updateInfoStats];
+            }
+
+            [self.fTableView reloadVisibleRows];
         }
 
-        [self.fTableView reloadVisibleRows];
-    }
-
-    //badge dock
-    [self.fBadger updateBadgeWithDownload:dlRate upload:ulRate];
+        //badge dock
+        [self.fBadger updateBadgeWithDownload:dlRate upload:ulRate];
+    }];
 }
 
 #warning can this be removed or refined?
@@ -2625,6 +2643,11 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (void)torrentRestartedDownloading:(NSNotification*)notification
 {
     [self fullUpdateUI];
+}
+
+- (void)torrentMovingStateChanged:(NSNotification*)notification
+{
+    [self.fTableView reloadVisibleRows];
 }
 
 - (void)torrentFinishedSeeding:(NSNotification*)notification

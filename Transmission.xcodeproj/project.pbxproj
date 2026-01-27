@@ -56,6 +56,7 @@
 		4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCCA0981D9BE00BE280E /* Defaults.plist */; };
 		4DF0C5AB0899190500DD8943 /* Controller.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C5A90899190500DD8943 /* Controller.mm */; };
 		4DFBC2DF09C0970D00D5C571 /* Torrent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBC2DE09C0970D00D5C571 /* Torrent.mm */; };
+		A2C0D1F52C01A00000ASYNCQ /* TransmissionOperationQueue.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2C0D1F42C01A00000ASYNCQ /* TransmissionOperationQueue.mm */; };
 		55869926257074EC00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		55869932257074FE00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		558699542570759E00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
@@ -228,6 +229,8 @@
 		A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */; };
 		A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.mm */; };
 		A2CB38AF0E1E6896002B514C /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = A2CB38AE0E1E6896002B514C /* COPYING */; };
+		A2C0D1F62C01B00000RELOC0 /* relocate.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2C0D1F72C01B00000RELOC1 /* relocate.cc */; };
+		A2C0D1F82C01B00000RELOC2 /* relocate.h in Headers */ = {isa = PBXBuildFile; fileRef = A2C0D1F92C01B00000RELOC3 /* relocate.h */; };
 		A2D22A130D65EEE700007D5F /* verify.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2D22A100D65EED100007D5F /* verify.cc */; };
 		A2D307A40D9EC6870051FD27 /* BlocklistDownloader.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2D307A30D9EC6870051FD27 /* BlocklistDownloader.mm */; };
 		A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */; };
@@ -843,6 +846,8 @@
 		4DF0C5AA0899190500DD8943 /* Controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Torrent.mm; sourceTree = "<group>"; };
+		A2C0D1F32C01A00000ASYNCQ /* TransmissionOperationQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TransmissionOperationQueue.h; sourceTree = "<group>"; };
+		A2C0D1F42C01A00000ASYNCQ /* TransmissionOperationQueue.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TransmissionOperationQueue.mm; sourceTree = "<group>"; };
 		55869925257074EC00F77A43 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 		66F977825E65AD498C028BB1 /* announce-list.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "announce-list.cc"; sourceTree = "<group>"; };
 		66F977825E65AD498C028BB3 /* announce-list.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "announce-list.h"; sourceTree = "<group>"; };
@@ -1062,6 +1067,8 @@
 		A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ButtonToolbarItem.mm; sourceTree = "<group>"; };
 		A2CA772B187F063A00154956 /* tr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2CB38AE0E1E6896002B514C /* COPYING */ = {isa = PBXFileReference; lastKnownFileType = text; name = COPYING; path = ../COPYING; sourceTree = "<group>"; };
+		A2C0D1F72C01B00000RELOC1 /* relocate.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = relocate.cc; sourceTree = "<group>"; };
+		A2C0D1F92C01B00000RELOC3 /* relocate.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = relocate.h; sourceTree = "<group>"; };
 		A2D22A100D65EED100007D5F /* verify.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = verify.cc; sourceTree = "<group>"; };
 		A2D22A110D65EED100007D5F /* verify.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = verify.h; sourceTree = "<group>"; };
 		A2D3078E0D9EC45F0051FD27 /* blocklist.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = blocklist.cc; sourceTree = "<group>"; };
@@ -1699,6 +1706,8 @@
 				C843FC8629C8B40800491854 /* VersionComparator.mm */,
 				4DFBC2DD09C0970D00D5C571 /* Torrent.h */,
 				4DFBC2DE09C0970D00D5C571 /* Torrent.mm */,
+				A2C0D1F32C01A00000ASYNCQ /* TransmissionOperationQueue.h */,
+				A2C0D1F42C01A00000ASYNCQ /* TransmissionOperationQueue.mm */,
 				A27F0F310E19AD9800B2DB97 /* TorrentGroup.h */,
 				A27F0F320E19AD9800B2DB97 /* TorrentGroup.mm */,
 				4D364D9E091FBB2C00377D12 /* TorrentTableView.h */,
@@ -2064,6 +2073,8 @@
 				A25BFD65167BED3B0039D1AA /* variant-json.cc */,
 				A25BFD67167BED3B0039D1AA /* variant.cc */,
 				A25BFD68167BED3B0039D1AA /* variant.h */,
+				A2C0D1F72C01B00000RELOC1 /* relocate.cc */,
+				A2C0D1F92C01B00000RELOC3 /* relocate.h */,
 				A2D22A100D65EED100007D5F /* verify.cc */,
 				A2D22A110D65EED100007D5F /* verify.h */,
 				BEFC1DF00C07861A00B0BB3C /* version.h */,
@@ -2608,6 +2619,7 @@
 				A29DF8BB0DB2544C00D04E5A /* torrent.h in Headers */,
 				2B9BA6C508B488FE586A0AB2 /* torrents.h in Headers */,
 				A47A7C87B8B57BE50DF0D412 /* torrent-files.h in Headers */,
+				A2C0D1F82C01B00000RELOC2 /* relocate.h in Headers */,
 				A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */,
 				C1FEE57B1C3223CC00D62832 /* watchdir.h in Headers */,
 				A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */,
@@ -3478,6 +3490,7 @@
 				4D36BA790CA2F00800A63CA5 /* peer-msgs.cc in Sources */,
 				A25D2CBD0CF4C73E0096A262 /* stats.cc in Sources */,
 				A201527E0D1C270F0081714F /* torrent-ctor.cc in Sources */,
+				A2C0D1F62C01B00000RELOC0 /* relocate.cc in Sources */,
 				A2D22A130D65EEE700007D5F /* verify.cc in Sources */,
 				4D4ADFC70DA1631500A68297 /* blocklist.cc in Sources */,
 				A29DF8B90DB2544C00D04E5A /* resume.cc in Sources */,
@@ -3544,6 +3557,7 @@
 				4DE5CC9D0980656F00BE280E /* NSStringAdditions.mm in Sources */,
 				4DE5CCA70980735700BE280E /* Badger.mm in Sources */,
 				4DFBC2DF09C0970D00D5C571 /* Torrent.mm in Sources */,
+				A2C0D1F52C01A00000ASYNCQ /* TransmissionOperationQueue.mm in Sources */,
 				A200B9200A22798F007BBB1E /* InfoWindowController.mm in Sources */,
 				A2AF1C390A3D0F6200F1575D /* FileOutlineView.mm in Sources */,
 				A2710E770A86796000CE4F7D /* PrefsWindow.mm in Sources */,
