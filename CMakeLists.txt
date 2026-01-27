@@ -741,6 +741,7 @@ else()
         -Wextra
         -Warc-unsafe-retained-assign
         -Wcast-align
+        -Warray-bounds
         -Wduplicated-cond
         -Wextra-semi
         -Wextra-semi-stmt
@@ -750,6 +751,7 @@ else()
         -Winit-self
         -Wint-in-bool-context
         -Wlogical-op
+        -Wmaybe-uninitialized
         -Wmissing-format-attribute
         -Wnull-dereference
         -Wpointer-arith
