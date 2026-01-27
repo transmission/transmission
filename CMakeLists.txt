@@ -83,6 +83,7 @@ tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" ${USE_SYSTEM_
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_SMALL "Use system small library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_WIDE_INTEGER "Use system WideInteger library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_CRC32C "Use system crc32c library" ${USE_SYSTEM_DEFAULT})
@@ -251,7 +252,6 @@ set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 find_package(FastFloat)
 find_package(RapidJSON)
 find_package(UtfCpp)
-find_package(WideInteger)
 
 find_package(Threads)
 find_package(PkgConfig QUIET)
@@ -609,6 +609,25 @@ target_link_libraries(transmission::small
 target_compile_definitions(transmission::small
     INTERFACE
         SMALL_DISABLE_EXCEPTIONS=1)
+
+tr_add_external_auto_library(WIDE_INTEGER WideInteger
+    SUBPROJECT
+    SOURCE_DIR wide-integer)
+add_library(transmission::WideInteger INTERFACE IMPORTED)
+target_link_libraries(transmission::WideInteger
+    INTERFACE
+        WideInteger::WideInteger)
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles(
+"int main()
+{
+    unsigned __int128 u;
+    signed __int128 i;
+    return 0;
+}" TR_HAVE_INT128)
+target_compile_definitions(transmission::WideInteger
+    INTERFACE
+        $<$<BOOL:${TR_HAVE_INT128}>:WIDE_INTEGER_HAS_LIMB_TYPE_UINT64>)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)
