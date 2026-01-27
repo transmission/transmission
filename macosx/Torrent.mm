@@ -33,6 +33,19 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @property(nonatomic, readonly) tr_torrent* fHandle;
 @property(nonatomic) tr_stat fStat;
 
+// Properties cached from tr_torrentView().
+// These are only ever invalidated as a side-effect of metadata being retrieved.
+@property(nonatomic) BOOL fTorrentViewCacheValid;
+@property(nonatomic) BOOL fIsFolder;
+@property(nonatomic) BOOL fIsPrivate;
+@property(nonatomic) NSInteger fPieceCount;
+@property(nonatomic) NSInteger fPieceSize;
+@property(nonatomic) uint64_t fSize;
+@property(nonatomic, copy) NSString* fComment;
+@property(nonatomic, copy) NSString* fCreator;
+@property(nonatomic, copy) NSString* fHashString;
+@property(nonatomic, nullable) NSDate* fDateCreated;
+
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
 @property(nonatomic) NSImage* fIcon;
@@ -77,6 +90,28 @@ void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char
                                   newName:newName];
         });
     }
+}
+
+static void ensureTorrentViewCache(Torrent* torrent)
+{
+    if (torrent.fTorrentViewCacheValid)
+    {
+        return;
+    }
+
+    auto const view = tr_torrentView(torrent.fHandle);
+
+    torrent.fComment = view.comment != nullptr ? tr_strv_to_utf8_nsstring(view.comment) : @"";
+    torrent.fCreator = view.creator != nullptr ? tr_strv_to_utf8_nsstring(view.creator) : @"";
+    torrent.fDateCreated = view.date_created > 0 ? [NSDate dateWithTimeIntervalSince1970:view.date_created] : nil;
+    torrent.fHashString = tr_strv_to_utf8_nsstring(view.hash_string);
+    torrent.fIsFolder = view.is_folder;
+    torrent.fIsPrivate = view.is_private;
+    torrent.fPieceCount = view.n_pieces;
+    torrent.fPieceSize = view.piece_size;
+    torrent.fSize = view.total_size;
+
+    torrent.fTorrentViewCacheValid = YES;
 }
 
 bool trashDataFile(std::string_view const filename, tr_error* error)
@@ -657,12 +692,14 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
 - (BOOL)isFolder
 {
-    return tr_torrentView(self.fHandle).is_folder;
+    ensureTorrentViewCache(self);
+    return self.fIsFolder;
 }
 
 - (uint64_t)size
 {
-    return tr_torrentView(self.fHandle).total_size;
+    ensureTorrentViewCache(self);
+    return self.fSize;
 }
 
 - (uint64_t)sizeLeft
@@ -753,40 +790,44 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
 - (NSString*)comment
 {
-    auto const* comment = tr_torrentView(self.fHandle).comment;
-    return comment ? @(comment) : @"";
+    ensureTorrentViewCache(self);
+    return self.fComment;
 }
 
 - (NSString*)creator
 {
-    auto const* creator = tr_torrentView(self.fHandle).creator;
-    return creator ? @(creator) : @"";
+    ensureTorrentViewCache(self);
+    return self.fCreator;
 }
 
 - (NSDate*)dateCreated
 {
-    auto const date = tr_torrentView(self.fHandle).date_created;
-    return date > 0 ? [NSDate dateWithTimeIntervalSince1970:date] : nil;
+    ensureTorrentViewCache(self);
+    return self.fDateCreated;
 }
 
 - (NSInteger)pieceSize
 {
-    return tr_torrentView(self.fHandle).piece_size;
+    ensureTorrentViewCache(self);
+    return self.fPieceSize;
 }
 
 - (NSInteger)pieceCount
 {
-    return tr_torrentView(self.fHandle).n_pieces;
+    ensureTorrentViewCache(self);
+    return self.fPieceCount;
 }
 
 - (NSString*)hashString
 {
-    return @(tr_torrentView(self.fHandle).hash_string);
+    ensureTorrentViewCache(self);
+    return self.fHashString;
 }
 
 - (BOOL)privateTorrent
 {
-    return tr_torrentView(self.fHandle).is_private;
+    ensureTorrentViewCache(self);
+    return self.fIsPrivate;
 }
 
 - (NSString*)torrentLocation
@@ -1823,6 +1864,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
     _fDefaults = NSUserDefaults.standardUserDefaults;
     _fStat = tr_stat{};
+    _fTorrentViewCacheValid = NO;
 
     if (torrentStruct)
     {
@@ -2075,6 +2117,8 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 - (void)metadataRetrieved
 {
     self.fStat = tr_torrentStat(self.fHandle);
+
+    self.fTorrentViewCacheValid = NO;
 
     [self createFileList];
 
