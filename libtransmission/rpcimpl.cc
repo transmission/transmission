@@ -1431,26 +1431,6 @@ namespace make_torrent_field_helpers
 
 // ---
 
-void torrentRenamePathDone(tr_torrent* tor, char const* oldpath, char const* newname, int error, void* user_data)
-{
-    using namespace JsonRpc;
-
-    auto* const data = static_cast<struct tr_rpc_idle_data*>(user_data);
-
-    data->args_out.try_emplace(TR_KEY_id, tor->id());
-    data->args_out.try_emplace(TR_KEY_path, oldpath);
-    data->args_out.try_emplace(TR_KEY_name, newname);
-
-    if (error == 0)
-    {
-        tr_rpc_idle_done(data, Error::SUCCESS, {});
-    }
-    else
-    {
-        tr_rpc_idle_done(data, Error::SYSTEM_ERROR, tr_strerror(error));
-    }
-}
-
 void torrentRenamePath(tr_session* session, tr_variant::Map const& args_in, struct tr_rpc_idle_data* idle_data)
 {
     using namespace JsonRpc;
@@ -1462,14 +1442,28 @@ void torrentRenamePath(tr_session* session, tr_variant::Map const& args_in, stru
         return;
     }
 
+    auto* const tor = torrents[0];
+    idle_data->args_out.try_emplace(TR_KEY_id, tor->id());
+
     auto const oldpath = args_in.value_if<std::string_view>(TR_KEY_path).value_or(""sv);
     auto const newname = args_in.value_if<std::string_view>(TR_KEY_name).value_or(""sv);
-    torrents[0]->rename_path(
+    idle_data->args_out.try_emplace(TR_KEY_path, oldpath);
+    idle_data->args_out.try_emplace(TR_KEY_name, newname);
+
+    tor->rename_path(
         oldpath,
         newname,
-        [](tr_torrent* tor, char const* old_path, char const* new_name, int error, void* user_data)
-        { torrentRenamePathDone(tor, old_path, new_name, error, user_data); },
-        idle_data);
+        [idle_data](int const error)
+        {
+            if (error == 0)
+            {
+                tr_rpc_idle_done(idle_data, JsonRpc::Error::SUCCESS, {});
+            }
+            else
+            {
+                tr_rpc_idle_done(idle_data, JsonRpc::Error::SYSTEM_ERROR, tr_strerror(error));
+            }
+        });
 }
 
 // ---

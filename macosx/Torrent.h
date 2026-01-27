@@ -5,6 +5,8 @@
 #import <Foundation/Foundation.h>
 #import <Quartz/Quartz.h>
 
+#include <functional>
+
 #include <libtransmission/transmission.h>
 
 @class FileListNode;
@@ -117,10 +119,10 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 @property(nonatomic, readonly) NSString* lastKnownDataLocation;
 - (NSString*)fileLocation:(FileListNode*)node;
 
-- (void)renameTorrent:(NSString*)newName completionHandler:(void (^)(BOOL didRename))completionHandler;
+- (void)renameTorrent:(NSString*)newName completionHandler:(std::function<void(bool)>)completionHandler;
 - (void)renameFileNode:(FileListNode*)node
               withName:(NSString*)newName
-     completionHandler:(void (^)(BOOL didRename))completionHandler;
+     completionHandler:(std::function<void(bool)>)completionHandler;
 
 @property(nonatomic, readonly) time_t eta;
 @property(nonatomic, readonly) CGFloat progress;

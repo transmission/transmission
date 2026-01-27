@@ -1154,22 +1154,24 @@ size_t buildSearchPathArray(tr_torrent const* tor, std::string_view* paths)
 } // namespace location_helpers
 } // namespace
 
-void tr_torrent::set_location(std::string_view location, bool move_from_old_path, int volatile* setme_state)
+void tr_torrent::set_location(std::string_view const location, bool const move_from_old_path, int volatile* setme_state)
 {
     if (setme_state != nullptr)
     {
         *setme_state = TR_LOC_MOVING;
     }
 
-    session->run_in_session_thread([this, loc = std::string(location), move_from_old_path, setme_state]()
+    session->run_in_session_thread([this, loc = std::string{ location }, move_from_old_path, setme_state]()
                                    { set_location_in_session_thread(loc, move_from_old_path, setme_state); });
 }
 
-void tr_torrentSetLocation(tr_torrent* tor, char const* location, bool move_from_old_path, int volatile* setme_state)
+void tr_torrentSetLocation(
+    tr_torrent* tor,
+    std::string_view const location,
+    bool const move_from_old_path,
+    int volatile* setme_state)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(location != nullptr);
-    TR_ASSERT(*location != '\0');
 
     tor->set_location(location, move_from_old_path, setme_state);
 }
@@ -2464,8 +2466,7 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
 void tr_torrent::rename_path_in_session_thread(
     std::string_view const oldpath,
     std::string_view const newname,
-    tr_torrent_rename_done_func const& callback,
-    void* const callback_user_data)
+    std::function<void(int)> const& on_rename_done)
 {
     using namespace rename_helpers;
 
@@ -2504,33 +2505,26 @@ void tr_torrent::rename_path_in_session_thread(
 
     mark_changed();
 
-    if (callback != nullptr)
+    if (on_rename_done)
     {
-        auto const szold = tr_pathbuf{ oldpath };
-        auto const sznew = tr_pathbuf{ newname };
-        callback(this, szold.c_str(), sznew.c_str(), error, callback_user_data);
+        on_rename_done(error);
     }
 }
 
-void tr_torrent::rename_path(
-    std::string_view oldpath,
-    std::string_view newname,
-    tr_torrent_rename_done_func&& callback,
-    void* callback_user_data)
+void tr_torrent::rename_path(std::string_view oldpath, std::string_view newname, std::function<void(int)> on_rename_done)
 {
     this->session->run_in_session_thread(
-        [this, oldpath = std::string(oldpath), newname = std::string(newname), cb = std::move(callback), callback_user_data]()
-        { rename_path_in_session_thread(oldpath, newname, std::move(cb), callback_user_data); });
+        [this, oldpath = std::string(oldpath), newname = std::string(newname), cb = std::move(on_rename_done)]()
+        { rename_path_in_session_thread(oldpath, newname, std::move(cb)); });
 }
 
 void tr_torrentRenamePath(
     tr_torrent* tor,
     std::string_view const oldpath,
     std::string_view const newname,
-    tr_torrent_rename_done_func callback,
-    void* callback_user_data)
+    std::function<void(int)> on_rename_done)
 {
-    tor->rename_path(oldpath, newname, std::move(callback), callback_user_data);
+    tor->rename_path(oldpath, newname, std::move(on_rename_done));
 }
 
 // ---

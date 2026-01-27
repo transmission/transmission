@@ -826,9 +826,6 @@ void tr_torrentStart(tr_torrent* torrent);
 /** @brief Stop (pause) a torrent */
 void tr_torrentStop(tr_torrent* torrent);
 
-using tr_torrent_rename_done_func = std::function<
-    void(tr_torrent* torrent, char const* oldpath, char const* newname, int error, void* user_data)>;
-
 /**
  * @brief Rename a file or directory in a torrent.
  *
@@ -875,8 +872,7 @@ void tr_torrentRenamePath(
     tr_torrent* tor,
     std::string_view oldpath,
     std::string_view newname,
-    tr_torrent_rename_done_func callback,
-    void* callback_user_data);
+    std::function<void(int error)> on_rename_done = {});
 
 enum : uint8_t
 {
@@ -892,7 +888,7 @@ enum : uint8_t
  * will be clobbered s.t. additional files being added will be saved
  * to the torrent's downloadDir.
  */
-void tr_torrentSetLocation(tr_torrent* torrent, char const* location, bool move_from_old_path, int volatile* setme_state);
+void tr_torrentSetLocation(tr_torrent* torrent, std::string_view location, bool move_from_old_path, int volatile* setme_state);
 
 uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
 
