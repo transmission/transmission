@@ -12,6 +12,7 @@
 #include <iterator>
 #include <memory>
 #include <numeric>
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -254,7 +255,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
             {
                 auto const cutoff = tr_time() - RecentlyActiveSeconds;
                 auto const recent = torrents.get_matching([cutoff](auto* walk) { return walk->has_changed_since(cutoff); });
-                std::copy(std::begin(recent), std::end(recent), std::back_inserter(torrents_vec));
+                std::ranges::copy(recent, std::back_inserter(torrents_vec));
             }
             else
             {
@@ -274,7 +275,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
 
         if (auto const* ids_vec = ids_var.get_if<tr_variant::Vector>(); ids_vec != nullptr)
         {
-            std::for_each(std::begin(*ids_vec), std::end(*ids_vec), add_torrent_from_var);
+            std::ranges::for_each(*ids_vec, add_torrent_from_var);
         }
         else
         {
@@ -349,7 +350,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     tr_variant::Map& /*args_out*/)
 {
     auto torrents = getTorrents(session, args_in);
-    std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
+    std::ranges::sort(torrents, tr_torrent::CompareQueuePosition);
     for (auto* tor : torrents)
     {
         if (!tor->is_running())
@@ -368,7 +369,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     tr_variant::Map& /*args_out*/)
 {
     auto torrents = getTorrents(session, args_in);
-    std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
+    std::ranges::sort(torrents, tr_torrent::CompareQueuePosition);
     for (auto* tor : torrents)
     {
         if (!tor->is_running())
@@ -1034,11 +1035,7 @@ namespace make_torrent_field_helpers
         /* first entry is an array of property names */
         auto names = tr_variant::Vector{};
         names.reserve(std::size(keys));
-        std::transform(
-            std::begin(keys),
-            std::end(keys),
-            std::back_inserter(names),
-            [](tr_quark key) { return tr_quark_get_string_view(key); });
+        std::ranges::transform(keys, std::back_inserter(names), [](tr_quark key) { return tr_quark_get_string_view(key); });
         torrents_vec.emplace_back(std::move(names));
     }
 
@@ -1716,7 +1713,7 @@ bool isCurlURL(std::string_view url)
 {
     auto constexpr Schemes = std::array<std::string_view, 4>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv };
     auto const parsed = tr_urlParse(url);
-    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
+    return parsed && std::ranges::find(Schemes, parsed->scheme) != std::ranges::end(Schemes);
 }
 
 [[nodiscard]] auto file_list_from_list(tr_variant::Vector const& idx_vec)

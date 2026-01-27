@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <set>
+#include <ranges>
 
 #include <QApplication>
 #include <QString>
@@ -52,7 +53,7 @@ std::optional<double> Torrent::getSeedRatioLimit() const
 
 bool Torrent::includesTracker(QString const& sitename) const
 {
-    return std::binary_search(std::begin(sitenames_), std::end(sitenames_), sitename);
+    return std::ranges::binary_search(sitenames_, sitename);
 }
 
 int Torrent::compareSeedProgress(Torrent const& that) const

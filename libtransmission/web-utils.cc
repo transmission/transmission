@@ -10,6 +10,7 @@
 #include <cstdlib> // for strtoul()
 #include <limits>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -210,22 +211,18 @@ constexpr bool urlCharsAreValid(std::string_view url)
         "{}|\\^[]`" // unwise
     };
 
-    return !std::empty(url) &&
-        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return tr_strv_contains(ValidChars, ch); });
+    return !std::empty(url) && std::ranges::all_of(url, [&ValidChars](auto ch) { return tr_strv_contains(ValidChars, ch); });
 }
 
 bool tr_isValidTrackerScheme(std::string_view scheme)
 {
     auto constexpr Schemes = std::array<std::string_view, 3>{ "http"sv, "https"sv, "udp"sv };
-    return std::find(std::begin(Schemes), std::end(Schemes), scheme) != std::end(Schemes);
+    return std::ranges::find(Schemes, scheme) != std::ranges::end(Schemes);
 }
 
 bool isAsciiNonUpperCase(std::string_view host)
 {
-    return std::all_of(
-        std::begin(host),
-        std::end(host),
-        [](unsigned char ch) { return (ch < 128) && (std::isupper(ch) == 0); });
+    return std::ranges::all_of(host, [](unsigned char ch) { return (ch < 128) && (std::isupper(ch) == 0); });
 }
 
 // www.example.com -> example
@@ -434,7 +431,7 @@ bool tr_urlIsValid(std::string_view url)
 {
     auto constexpr Schemes = std::array<std::string_view, 5>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv, "udp"sv };
     auto const parsed = tr_urlParse(url);
-    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
+    return parsed && std::ranges::find(Schemes, parsed->scheme) != std::ranges::end(Schemes);
 }
 
 std::string tr_urlTrackerLogName(std::string_view url)

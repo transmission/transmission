@@ -10,6 +10,7 @@
 #include <initializer_list>
 #include <limits>
 #include <memory>
+#include <ranges>
 #include <utility> // for std::swap()
 #include <vector>
 
@@ -100,7 +101,7 @@ void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me) noexce
 {
     // the list isn't sorted -- so instead of erase()ing `it`,
     // do the cheaper option of overwriting it with the final item
-    if (auto it = std::find(std::begin(v), std::end(v), remove_me); it != std::end(v))
+    if (auto it = std::ranges::find(v, remove_me); it != std::ranges::end(v))
     {
         std::swap(*it, v.back());
         v.pop_back();
@@ -133,7 +134,7 @@ void tr_bandwidth::set_parent(tr_bandwidth* new_parent)
 #ifdef TR_ENABLE_ASSERTS
         TR_ASSERT(new_parent->parent_ != this);
         auto& children = new_parent->children_;
-        TR_ASSERT(std::find(std::begin(children), std::end(children), this) == std::end(children)); // not already there
+        TR_ASSERT(std::ranges::find(children, this) == std::ranges::end(children)); // not already there
 #endif
 
         new_parent->children_.push_back(this);

@@ -13,6 +13,7 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <ranges>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -385,7 +386,8 @@ private:
             return candidate.socket_address.port_ == tr_port::from_host(1);
         };
 
-        pex.erase(std::remove_if(std::begin(pex), std::end(pex), IsBadPex), std::end(pex));
+        auto const remove_it = std::remove_if(std::begin(pex), std::end(pex), IsBadPex);
+        pex.erase(remove_it, std::end(pex));
         return std::move(pex);
     }
 
@@ -493,7 +495,7 @@ private:
                 tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id_))
             {
                 id_timestamp_ = t;
-                std::copy(std::begin(sv), std::end(sv), std::begin(id_));
+                std::ranges::copy(sv, std::begin(id_));
             }
         }
 

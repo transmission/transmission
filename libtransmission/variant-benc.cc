@@ -10,6 +10,7 @@
 #include <cstdint> // int64_t
 #include <deque>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -101,7 +102,7 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
 
     // get the string length
     auto svtmp = benc->substr(0, colon_pos);
-    if (!std::all_of(std::begin(svtmp), std::end(svtmp), [](auto ch) { return isdigit(static_cast<unsigned char>(ch)) != 0; }))
+    if (!std::ranges::all_of(svtmp, [](auto ch) { return isdigit(static_cast<unsigned char>(ch)) != 0; }))
     {
         return {};
     }

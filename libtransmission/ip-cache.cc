@@ -10,6 +10,7 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <ranges>
 #include <string_view>
 #include <utility> // std::move
 
@@ -167,10 +168,7 @@ tr_ip_cache::~tr_ip_cache()
                                          source_addr_mutex_[TR_AF_INET],
                                          source_addr_mutex_[TR_AF_INET6] };
 
-    if (!std::all_of(
-            std::begin(is_updating_),
-            std::end(is_updating_),
-            [](is_updating_t const& v) { return v == is_updating_t::Abort; }))
+    if (!std::ranges::all_of(is_updating_, [](is_updating_t const& v) { return v == is_updating_t::Abort; }))
     {
         tr_logAddDebug("Destructed while some global IP queries were pending.");
     }
@@ -300,8 +298,8 @@ void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
         upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
 
         tr_logAddDebug(fmt::format("Couldn't obtain source {} address: {} ({})", protocol, tr_net_strerror(err), err));
-        if (std::all_of(std::begin(source_addr_checked_), std::end(source_addr_checked_), [](bool u) { return u; }) &&
-            std::all_of(std::begin(source_addr_), std::end(source_addr_), std::logical_not{}))
+        if (std::ranges::all_of(source_addr_checked_, [](bool u) { return u; }) &&
+            std::ranges::all_of(source_addr_, std::logical_not{}))
         {
             tr_logAddError(_("Couldn't obtain source address in any IP protocol, no network connections possible"));
         }

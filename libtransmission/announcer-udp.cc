@@ -14,6 +14,7 @@
 #include <list>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -519,7 +520,7 @@ private:
 
     [[nodiscard]] constexpr bool has_addr() const noexcept
     {
-        return std::any_of(std::begin(addr_), std::end(addr_), [](auto const& o) { return !!o; });
+        return std::ranges::any_of(addr_, [](auto const& o) { return !!o; });
     }
 
     [[nodiscard]] MaybeSockaddr lookup(tr_address_type ip_protocol)
@@ -794,11 +795,10 @@ public:
             // is it a response to one of this tracker's announces?
             if (auto& reqs = tracker.announces; !std::empty(reqs))
             {
-                if (auto it = std::find_if(
-                        std::begin(reqs),
-                        std::end(reqs),
+                if (auto it = std::ranges::find_if(
+                        reqs,
                         [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-                    it != std::end(reqs))
+                    it != std::ranges::end(reqs))
                 {
                     logtrace(tracker.log_name(), fmt::format("{} is an announce request!", transaction_id));
                     it->on_response(ip_protocol, action_id, buf);
@@ -810,11 +810,10 @@ public:
             // is it a response to one of this tracker's scrapes?
             if (auto& reqs = tracker.scrapes; !std::empty(reqs))
             {
-                if (auto it = std::find_if(
-                        std::begin(reqs),
-                        std::end(reqs),
+                if (auto it = std::ranges::find_if(
+                        reqs,
                         [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-                    it != std::end(reqs))
+                    it != std::ranges::end(reqs))
                 {
                     logtrace(tracker.log_name(), fmt::format("{} is a scrape request!", transaction_id));
                     it->on_response(action_id, buf);
@@ -830,7 +829,7 @@ public:
 
     [[nodiscard]] bool is_idle() const noexcept override
     {
-        return std::all_of(std::begin(trackers_), std::end(trackers_), [](auto const& tracker) { return tracker.is_idle(); });
+        return std::ranges::all_of(trackers_, [](auto const& tracker) { return tracker.is_idle(); });
     }
 
 private:
