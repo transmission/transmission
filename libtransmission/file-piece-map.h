@@ -43,7 +43,11 @@ public:
 
     using file_offset_t = offset_t<tr_file_index_t>;
     explicit tr_file_piece_map(tr_torrent_metainfo const& tm);
-    tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
+    tr_file_piece_map(
+        tr_block_info const& block_info,
+        uint64_t const* file_sizes,
+        size_t n_files,
+        std::vector<uint8_t> is_padding_files);
 
     [[nodiscard]] TR_CONSTEXPR_VEC piece_span_t piece_span_for_file(tr_file_index_t const file) const noexcept
     {
@@ -74,11 +78,16 @@ private:
     using byte_span_t = index_span_t<uint64_t>;
 
     void reset(tr_torrent_metainfo const& tm);
-    void reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
+    void reset(
+        tr_block_info const& block_info,
+        uint64_t const* file_sizes,
+        size_t n_files,
+        std::vector<uint8_t> is_padding_files);
 
     std::vector<byte_span_t> file_bytes_;
     std::vector<piece_span_t> file_pieces_;
     std::vector<tr_piece_index_t> edge_pieces_;
+    std::vector<uint8_t> is_padding_files_;
 };
 
 class tr_file_priorities
@@ -118,4 +127,24 @@ public:
 private:
     tr_file_piece_map const* fpm_;
     tr_bitfield wanted_;
+};
+
+class tr_files_padded
+{
+public:
+    explicit tr_files_padded(tr_file_piece_map const* fpm);
+
+    void set(tr_file_index_t file, bool padded);
+    void set(tr_file_index_t const* files, size_t n, bool padded);
+
+    [[nodiscard]] TR_CONSTEXPR20 bool file_padded(tr_file_index_t file) const
+    {
+        return padded_.test(file);
+    }
+
+    [[nodiscard]] bool piece_padded(tr_piece_index_t piece) const;
+
+private:
+    tr_file_piece_map const* fpm_;
+    tr_bitfield padded_;
 };

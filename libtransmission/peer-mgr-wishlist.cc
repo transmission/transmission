@@ -20,6 +20,7 @@
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/peer-mgr-wishlist.h"
+#include "torrent.h"
 
 namespace
 {
@@ -585,6 +586,7 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
     }
 
     auto blocks = small::vector<tr_block_index_t>{};
+    tr_torrent& tor = mediator_.torrent(); 
     blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates_)
     {

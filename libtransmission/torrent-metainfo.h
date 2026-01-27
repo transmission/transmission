@@ -46,6 +46,10 @@ public:
     {
         return files().file_count();
     }
+    [[nodiscard]] TR_CONSTEXPR_VEC auto const& file_is_padding(tr_file_index_t i) const
+    {
+        return files().is_padding(i);
+    }
     [[nodiscard]] TR_CONSTEXPR_VEC auto file_size(tr_file_index_t i) const
     {
         return files().file_size(i);

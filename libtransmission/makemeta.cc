@@ -124,7 +124,7 @@ tr_torrent_files findFiles(std::string_view const top, std::string_view const su
     auto files = tr_torrent_files{};
     for (auto const& file : tmp)
     {
-        files.add(file.subpath_, file.size_);
+        files.add(file.subpath_, file.size_, false);
     }
     return files;
 }
