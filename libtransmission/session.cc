@@ -343,6 +343,16 @@ std::optional<std::string> tr_session::WebMediator::bind_address_V6() const
     return std::nullopt;
 }
 
+bool tr_session::WebMediator::has_source_address_V4() const
+{
+    return session_->source_address(TR_AF_INET).has_value();
+}
+
+bool tr_session::WebMediator::has_source_address_V6() const
+{
+    return session_->source_address(TR_AF_INET6).has_value();
+}
+
 size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
 {
     auto const lock = session_->unique_lock();
@@ -358,7 +368,7 @@ std::optional<std::string> tr_session::WebMediator::proxyUrl() const
 
 void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
 {
-    session_->run_in_session_thread(std::move(func), std::move(response));
+    session_->queue_session_thread(std::move(func), std::move(response));
 }
 
 std::chrono::steady_clock::time_point tr_session::WebMediator::now() const

@@ -84,6 +84,11 @@ protected:
             return {};
         }
 
+        [[nodiscard]] bool has_source_address(tr_address_type /*type*/) const override
+        {
+            return true;
+        }
+
         struct Sent
         {
             Sent() = default;

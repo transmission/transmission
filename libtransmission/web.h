@@ -141,6 +141,18 @@ public:
             return std::nullopt;
         }
 
+        // Return true if Transmission has an IPv4 source address, false otherwise
+        [[nodiscard]] virtual bool has_source_address_V4() const
+        {
+            return false;
+        }
+
+        // Return true if Transmission has an IPv6 source address, false otherwise
+        [[nodiscard]] virtual bool has_source_address_V6() const
+        {
+            return false;
+        }
+
         // Return the preferred user aagent, or nullopt to not use one
         [[nodiscard]] virtual std::optional<std::string_view> userAgent() const
         {
