@@ -77,9 +77,9 @@ void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char
     }
 }
 
-bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
+bool trashDataFile(std::string_view const filename, tr_error* error)
 {
-    if (filename == NULL)
+    if (std::empty(filename))
     {
         return false;
     }
@@ -87,9 +87,12 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     @autoreleasepool
     {
         NSError* localError;
-        if (![Torrent trashFile:@(filename) error:&localError])
+        if (![Torrent trashFile:tr_strv_to_utf8_nsstring(filename) error:&localError])
         {
-            error->set(static_cast<int>(localError.code), localError.description.UTF8String);
+            if (error != nullptr)
+            {
+                error->set(static_cast<int>(localError.code), localError.description.UTF8String);
+            }
             return false;
         }
     }
@@ -193,7 +196,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     //allow the file to be indexed by Time Machine
     [self setTimeMachineExclude:NO];
 
-    tr_torrentRemove(self.fHandle, trashFiles, trashDataFile, nullptr, nullptr, nullptr);
+    tr_torrentRemove(self.fHandle, trashFiles, trashDataFile);
 }
 
 - (void)changeDownloadFolderBeforeUsing:(NSString*)folder determinationType:(TorrentDeterminationType)determinationType

@@ -20,6 +20,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/torrent-files.h"
@@ -31,15 +32,15 @@ using namespace std::literals;
 namespace
 {
 
-using file_func_t = std::function<void(char const* filename)>;
+using file_func_t = std::function<void(std::string_view filename)>;
 
-bool is_folder(std::string_view path)
+[[nodiscard]] bool is_folder(std::string_view const path)
 {
     auto const info = tr_sys_path_get_info(path);
     return info && info->isFolder();
 }
 
-bool is_empty_folder(char const* path)
+[[nodiscard]] bool is_empty_folder(std::string_view const path)
 {
     if (!is_folder(path))
     {
@@ -64,7 +65,7 @@ bool is_empty_folder(char const* path)
     return true;
 }
 
-void depth_first_walk(char const* path, file_func_t const& func, std::optional<int> max_depth = {})
+void depth_first_walk(std::string_view const path, file_func_t const& func, std::optional<int> max_depth = {})
 {
     if (is_folder(path) && (!max_depth || *max_depth > 0))
     {
@@ -79,7 +80,7 @@ void depth_first_walk(char const* path, file_func_t const& func, std::optional<i
                     continue;
                 }
 
-                depth_first_walk(tr_pathbuf{ path, '/', name }.c_str(), func, max_depth ? *max_depth - 1 : max_depth);
+                depth_first_walk(tr_pathbuf{ path, '/', name }, func, max_depth ? *max_depth - 1 : max_depth);
             }
 
             tr_sys_dir_close(odir);
@@ -209,12 +210,25 @@ bool tr_torrent_files::move(
     // after moving the files, remove any leftover empty directories
     if (!err)
     {
-        auto const remove_empty_directories = [](char const* filename)
+        auto const remove_empty_directories = [](std::string_view const path, tr_error* /*err*/)
         {
-            if (is_empty_folder(filename))
+            if (is_empty_folder(path))
             {
-                tr_sys_path_remove(filename, nullptr);
+                // Since the files have already been moved, errors in this step
+                // are considered secondary and aren't propagated back in `err`.
+                // Log them instead.
+                if (auto log_error = tr_error{}; !tr_sys_path_remove(path, &log_error))
+                {
+                    tr_logAddWarn(
+                        fmt::format(
+                            fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
+                            fmt::arg("path", path),
+                            fmt::arg("error", log_error.message()),
+                            fmt::arg("error_code", log_error.code())));
+                }
             }
+
+            return true;
         };
 
         remove(old_parent, parent_name, remove_empty_directories);
@@ -234,8 +248,11 @@ bool tr_torrent_files::move(
  * 2. If there are nontorrent files, don't delete them...
  * 3. ...unless the other files are "junk", such as .DS_Store
  */
-void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func, tr_error* error)
-    const
+void tr_torrent_files::remove(
+    std::string_view parent_in,
+    std::string_view tmpdir_prefix,
+    tr_torrent_remove_func const& func,
+    tr_error* error) const
 {
     auto const parent = tr_pathbuf{ parent_in };
 
@@ -272,7 +289,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     auto top_files = std::set<std::string>{ std::string{ path } };
     depth_first_walk(
         tmpdir,
-        [&parent, &tmpdir, &top_files](char const* filename)
+        [&parent, &tmpdir, &top_files](std::string_view const filename)
         {
             if (tmpdir != filename)
             {
@@ -281,11 +298,11 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
         },
         1);
 
-    auto const func_wrapper = [&tmpdir, &func](char const* filename)
+    auto const func_wrapper = [&error, &func, &tmpdir](std::string_view const filename)
     {
         if (tmpdir != filename)
         {
-            func(filename);
+            func(filename, error);
         }
     };
 
@@ -301,7 +318,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     // OK we've removed the local data.
     // What's left are empty folders, junk, and user-generated files.
     // Remove the first two categories and leave the third alone.
-    auto const remove_junk = [](char const* filename)
+    auto const remove_junk = [](std::string_view const filename)
     {
         if (is_empty_folder(filename) || is_junk_file(filename))
         {
@@ -310,7 +327,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     };
     for (auto const& filename : top_files)
     {
-        depth_first_walk(filename.c_str(), remove_junk);
+        depth_first_walk(filename, remove_junk);
     }
 }
 
