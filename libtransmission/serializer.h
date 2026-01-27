@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include <cmath>
 #include <array>
 #include <cstddef>
 #include <iterator>
+#include <limits>
 #include <optional>
 #include <tuple>
 #include <type_traits>
@@ -258,6 +260,20 @@ struct Field<MemberPtr, Key>
     }
 
     template<typename Derived>
+    constexpr T& ref(Derived& derived) const
+    {
+        static_assert(std::is_base_of_v<Owner, Derived>);
+        return static_cast<Owner&>(derived).*MemberPtr;
+    }
+
+    template<typename Derived>
+    constexpr T const& ref(Derived const& derived) const
+    {
+        static_assert(std::is_base_of_v<Owner, Derived>);
+        return static_cast<Owner const&>(derived).*MemberPtr;
+    }
+
+    template<typename Derived>
     void load(Derived* derived, tr_variant::Map const& map) const
     {
         static_assert(std::is_base_of_v<Owner, Derived>);
@@ -306,6 +322,114 @@ template<typename T, typename Fields>
     auto map = tr_variant::Map{ std::tuple_size_v<detail::remove_cvref_t<Fields>> };
     std::apply([&src, &map](auto const&... field) { (field.save(&src, map), ...); }, fields);
     return map;
+}
+
+/**
+ * Set a field's value iff the value changes.
+ *
+ * If a match of type `Value` is found for `key` *and* its value differs from `val`,
+ * Then the field is assigned and `true` is returned.
+ *
+ * @return true iff the key was found and the field changed.
+ */
+template<typename T, typename Fields, typename Key, typename Value>
+bool set_if_changed(T& tgt, Fields const& fields, Key const key, Value val)
+{
+    bool key_found = false;
+    bool changed = false;
+
+    std::apply(
+        [&tgt, key, &val, &key_found, &changed](auto const&... field)
+        {
+            auto const try_one = [&tgt, key, &val, &key_found, &changed](auto const& f)
+            {
+                if (changed || f.key != key)
+                {
+                    return;
+                }
+
+                key_found = true;
+
+                auto& current = f.ref(tgt);
+                using CurT = std::decay_t<decltype(current)>;
+                if constexpr (std::is_same_v<CurT, std::decay_t<Value>>)
+                {
+                    bool equal = false;
+                    if constexpr (std::is_floating_point_v<CurT>)
+                    {
+                        auto const diff = std::fabs(current - val);
+                        auto const abs_current = std::fabs(current);
+                        auto const abs_val = std::fabs(val);
+                        auto const max_abs = abs_current > abs_val ? abs_current : abs_val;
+                        auto const scale = max_abs > CurT{ 1 } ? max_abs : CurT{ 1 };
+                        equal = diff <= std::numeric_limits<CurT>::epsilon() * scale;
+                    }
+                    else
+                    {
+                        equal = (current == val);
+                    }
+
+                    if (!equal)
+                    {
+                        current = std::move(val);
+                        changed = true;
+                    }
+                }
+            };
+
+            (try_one(field), ...);
+        },
+        fields);
+
+    return key_found && changed;
+}
+
+/**
+ * Check whether a key exists in a `fields` tuple.
+ */
+template<typename Fields, typename Key>
+[[nodiscard]] bool constexpr contains(Fields const& fields, Key const key)
+{
+    if constexpr (std::tuple_size_v<detail::remove_cvref_t<Fields>> == 0)
+    {
+        return false;
+    }
+
+    return std::apply([key](auto const&... field) { return ((field.key == key) || ...); }, fields);
+}
+
+/**
+ * Get a field's value.
+ *
+ * @return the value if the field is found and its type exactly matches Value.
+ */
+template<typename Value, typename T, typename Fields, typename Key>
+[[nodiscard]] std::optional<Value> get_value(T const& src, Fields const& fields, Key const key)
+{
+    auto ret = std::optional<Value>{};
+
+    std::apply(
+        [&src, key, &ret](auto const&... field)
+        {
+            auto const try_one = [&src, key, &ret](auto const& f)
+            {
+                if (ret.has_value() || f.key != key)
+                {
+                    return;
+                }
+
+                auto const& current = f.ref(src);
+                if constexpr (std::is_same_v<std::decay_t<decltype(current)>, Value>)
+                {
+                    ret = current;
+                }
+            };
+
+            (try_one(field), ...);
+        },
+        fields);
+
+    return ret;
 }
 
 // ---
