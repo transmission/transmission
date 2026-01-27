@@ -2514,12 +2514,17 @@ namespace bandwidth_helpers
 {
 void pumpAllPeers(tr_peerMgr* mgr)
 {
+    auto peers = std::vector<tr_peerMsgs*>{};
     for (auto* const tor : mgr->torrents_)
     {
-        for (auto const& peer : tor->swarm->peers)
-        {
-            peer->pulse();
-        }
+        std::ranges::transform(tor->swarm->peers, std::back_inserter(peers), [](auto const& p) { return p.get(); });
+    }
+
+    thread_local auto urbg = tr_urbg<size_t>{};
+    std::ranges::shuffle(peers, urbg);
+    for (auto const& peer : peers)
+    {
+        peer->pulse();
     }
 }
 } // namespace bandwidth_helpers
