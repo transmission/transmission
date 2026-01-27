@@ -84,6 +84,56 @@ protected:
             return {};
         }
 
+        // Mock DNS lookup that only resolves localhost
+        [[nodiscard]] std::optional<tr_socket_address> dns_lookup(
+            tr_address_type const ip_protocol,
+            std::string_view const name,
+            uint16_t const service,
+            std::string_view /*log_name*/) const override
+        {
+            auto const is_localhost = name == "localhost"sv;
+            auto const port = tr_port::from_host(service);
+            switch (ip_protocol)
+            {
+            case TR_AF_INET:
+                if (is_localhost)
+                {
+                    auto const addr = tr_address::from_string("127.0.0.1"sv);
+                    EXPECT_TRUE(addr);
+                    EXPECT_TRUE(addr->is_ipv4_loopback());
+                    return tr_socket_address{ *addr, port };
+                }
+
+                if (auto const addr = tr_address::from_string(name); addr && addr->is_ipv4_loopback())
+                {
+                    return tr_socket_address{ *addr, port };
+                }
+
+                break;
+
+            case TR_AF_INET6:
+                if (is_localhost)
+                {
+                    auto const addr = tr_address::from_string("::1");
+                    EXPECT_TRUE(addr);
+                    EXPECT_TRUE(addr->is_ipv6_loopback());
+                    return tr_socket_address{ *addr, port };
+                }
+
+                if (auto const addr = tr_address::from_string(name); addr && addr->is_ipv6_loopback())
+                {
+                    return tr_socket_address{ *addr, port };
+                }
+
+                break;
+
+            default:
+                break;
+            }
+
+            return {};
+        }
+
         struct Sent
         {
             Sent() = default;
