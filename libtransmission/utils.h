@@ -207,11 +207,13 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, Args&&
 
 // ---
 
-template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10);
+template<typename T>
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10)
+    requires std::is_integral_v<T>;
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr);
+template<typename T>
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr)
+    requires std::is_floating_point_v<T>;
 
 /**
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
