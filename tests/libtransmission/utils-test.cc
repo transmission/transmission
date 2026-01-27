@@ -32,7 +32,7 @@
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-using UtilsTest = ::testing::Test;
+using UtilsTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(UtilsTest, trStrvContains)
@@ -85,24 +85,73 @@ TEST_F(UtilsTest, trStrvEndsWith)
 
 TEST_F(UtilsTest, trStrvSep)
 {
-    auto constexpr Delim = ',';
+    static auto constexpr CommaCh = ',';
+    static auto constexpr SemiColonCh = ';';
+    static auto constexpr CommaSemiColonSv = ",;"sv;
+    static auto constexpr CommaSemiColonArr = std::array{ ',', ';' };
 
     auto sv = "token1,token2,token3"sv;
-    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, Delim));
-    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, Delim));
-    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, Delim));
-    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaCh));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2,token3"sv, tr_strv_sep(&sv, SemiColonCh));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, SemiColonCh));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, CommaSemiColonSv));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, CommaSemiColonSv));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, CommaSemiColonSv));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaSemiColonSv));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2"sv, tr_strv_sep(&sv, CommaCh, 7));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaCh));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2,token3"sv, tr_strv_sep(&sv, SemiColonCh, 7));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, SemiColonCh));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2"sv, tr_strv_sep(&sv, CommaSemiColonSv, 7));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, CommaSemiColonSv));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaSemiColonSv));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2"sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 7, std::size(CommaSemiColonArr)));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2"sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv), 7));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
 
     sv = " token1,token2"sv;
-    EXPECT_EQ(" token1"sv, tr_strv_sep(&sv, Delim));
-    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ(" token1"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, CommaCh));
 
     sv = "token1;token2"sv;
-    EXPECT_EQ("token1;token2"sv, tr_strv_sep(&sv, Delim));
-    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ("token1;token2"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaCh));
 
     sv = ""sv;
-    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaCh));
 }
 
 TEST_F(UtilsTest, trStrvStrip)
@@ -161,8 +210,8 @@ TEST_F(UtilsTest, strvConvertUtf8Fuzz)
     {
         buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        auto const out = tr_strv_convert_utf8({ std::data(buf), std::size(buf) });
-        EXPECT_EQ(out, tr_strv_convert_utf8(out));
+        auto const out = tr_strv_to_utf8_string({ std::data(buf), std::size(buf) });
+        EXPECT_EQ(out, tr_strv_to_utf8_string(out));
     }
 }
 

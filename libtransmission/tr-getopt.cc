@@ -165,7 +165,14 @@ void tr_getopt_usage(char const* app_name, char const* description, struct tr_op
         maxWidth(o, long_width, short_width, arg_width);
     }
 
-    auto const help = tr_option{ -1, "help", "Display this help page and exit", "h", tr_option::Arg::None, nullptr };
+    auto const help = tr_option{
+        .val = -1,
+        .longName = "help",
+        .description = "Display this help page and exit",
+        .shortName = "h",
+        .arg = tr_option::Arg::None,
+        .argName = nullptr,
+    };
     maxWidth(&help, long_width, short_width, arg_width);
 
     if (description == nullptr)

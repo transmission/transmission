@@ -18,6 +18,7 @@
 #import "FileListNode.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
+#import "Utils.h"
 
 NSString* const kTorrentDidChangeGroupNotification = @"TorrentDidChangeGroup";
 
@@ -207,7 +208,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (NSString*)currentDirectory
 {
-    return @(tr_torrentGetCurrentDir(self.fHandle));
+    return tr_strv_to_utf8_nsstring(tr_torrentGetCurrentDir(self.fHandle));
 }
 
 - (void)getAvailability:(int8_t*)tab size:(int)size
@@ -242,19 +243,59 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (void)update
 {
-    //get previous stalled value before update
-    BOOL const wasTransmitting = self.fStat != NULL && self.transmitting;
+    [Torrent updateTorrents:@[ self ]];
+}
 
-    self.fStat = tr_torrentStat(self.fHandle);
-
-    //make sure the "active" filter is updated when transmitting changes
-    if (wasTransmitting != self.transmitting)
++ (void)updateTorrents:(NSArray<Torrent*>*)torrents
+{
+    if (torrents == nil || torrents.count == 0)
     {
-        //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
-        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
-                                                 postingStyle:NSPostASAP
-                                                 coalesceMask:NSNotificationCoalescingOnName
-                                                     forModes:nil];
+        return;
+    }
+
+    std::vector<Torrent*> torrent_objects;
+    torrent_objects.reserve(torrents.count);
+
+    std::vector<tr_torrent*> torrent_handles;
+    torrent_handles.reserve(torrents.count);
+
+    std::vector<BOOL> was_transmitting;
+    was_transmitting.reserve(torrents.count);
+
+    for (Torrent* torrent in torrents)
+    {
+        if (torrent == nil || torrent.fHandle == nullptr)
+        {
+            continue;
+        }
+
+        torrent_objects.emplace_back(torrent);
+        torrent_handles.emplace_back(torrent.fHandle);
+        was_transmitting.emplace_back(torrent.fStat != nullptr && torrent.transmitting);
+    }
+
+    if (torrent_handles.empty())
+    {
+        return;
+    }
+
+    auto const stats = tr_torrentStat(torrent_handles.data(), torrent_handles.size());
+
+    // Assign stats and post notifications.
+    for (size_t i = 0, n = torrent_objects.size(); i < n; ++i)
+    {
+        Torrent* const torrent = torrent_objects[i];
+        torrent.fStat = stats[i];
+
+        //make sure the "active" filter is updated when transmitting changes
+        if (was_transmitting[i] != torrent.transmitting)
+        {
+            //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
+            [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
+                                                     postingStyle:NSPostASAP
+                                                     coalesceMask:NSNotificationCoalescingOnName
+                                                         forModes:nil];
+        }
     }
 }
 
@@ -407,22 +448,22 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (BOOL)usesSpeedLimit:(BOOL)upload
 {
-    return tr_torrentUsesSpeedLimit(self.fHandle, upload ? TR_UP : TR_DOWN);
+    return tr_torrentUsesSpeedLimit(self.fHandle, upload ? tr_direction::Up : tr_direction::Down);
 }
 
 - (void)setUseSpeedLimit:(BOOL)use upload:(BOOL)upload
 {
-    tr_torrentUseSpeedLimit(self.fHandle, upload ? TR_UP : TR_DOWN, use);
+    tr_torrentUseSpeedLimit(self.fHandle, upload ? tr_direction::Up : tr_direction::Down, use);
 }
 
 - (NSUInteger)speedLimit:(BOOL)upload
 {
-    return tr_torrentGetSpeedLimit_KBps(self.fHandle, upload ? TR_UP : TR_DOWN);
+    return tr_torrentGetSpeedLimit_KBps(self.fHandle, upload ? tr_direction::Up : tr_direction::Down);
 }
 
 - (void)setSpeedLimit:(NSUInteger)limit upload:(BOOL)upload
 {
-    tr_torrentSetSpeedLimit_KBps(self.fHandle, upload ? TR_UP : TR_DOWN, limit);
+    tr_torrentSetSpeedLimit_KBps(self.fHandle, upload ? tr_direction::Up : tr_direction::Down, limit);
 }
 
 - (BOOL)usesGlobalSpeedLimit
@@ -606,7 +647,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (NSString*)name
 {
-    return @(tr_torrentName(self.fHandle));
+    return tr_strv_to_utf8_nsstring(tr_torrentName(self.fHandle));
 }
 
 - (BOOL)isFolder
@@ -671,7 +712,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
     auto const old_list = tr_torrentGetTrackerList(self.fHandle);
     auto const new_list = fmt::format(FMT_STRING("{:s}\n\n{:s}"), old_list, new_tracker.UTF8String);
-    BOOL const success = tr_torrentSetTrackerList(self.fHandle, new_list.c_str());
+    BOOL const success = tr_torrentSetTrackerList(self.fHandle, new_list);
 
     return success;
 }
@@ -701,7 +742,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
         current_tier = tracker.tier;
     }
 
-    BOOL const success = tr_torrentSetTrackerList(self.fHandle, new_list.c_str());
+    BOOL const success = tr_torrentSetTrackerList(self.fHandle, new_list);
     NSAssert(success, @"Removing tracker addresses failed");
 }
 
@@ -1805,12 +1846,12 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
         if (path)
         {
-            loaded = tr_ctorSetMetainfoFromFile(ctor, path.UTF8String, nullptr);
+            loaded = tr_ctorSetMetainfoFromFile(ctor, path.UTF8String);
         }
 
         if (!loaded && magnetAddress)
         {
-            loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnetAddress.UTF8String, nullptr);
+            loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnetAddress.UTF8String);
         }
 
         if (loaded)
@@ -2045,7 +2086,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     }
 
     //change the location if the group calls for it and it's either not already set or was set automatically before
-    if (((self.fDownloadFolderDetermination == TorrentDeterminationAutomatic) || !tr_torrentGetCurrentDir(self.fHandle)) &&
+    if (((self.fDownloadFolderDetermination == TorrentDeterminationAutomatic) || tr_torrentGetCurrentDir(self.fHandle).empty()) &&
         [GroupsController.groups usesCustomDownloadLocationForIndex:self.groupValue])
     {
         NSString* location = [GroupsController.groups customDownloadLocationForIndex:self.groupValue];

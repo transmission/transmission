@@ -52,7 +52,7 @@ void verboseLog(std::string_view description, tr_direction direction, std::strin
         return;
     }
 
-    auto const direction_sv = direction == TR_DOWN ? "<< "sv : ">> "sv;
+    auto const direction_sv = direction == tr_direction::Down ? "<< "sv : ">> "sv;
     auto& out = std::cerr;
     out << description << '\n' << "[raw]"sv << direction_sv;
     for (unsigned char const ch : message)
@@ -322,7 +322,7 @@ void tr_tracker_http_announce(
 
 void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc, std::string_view log_name)
 {
-    verboseLog("Announce response:", TR_DOWN, benc);
+    verboseLog("Announce response:", tr_direction::Down, benc);
 
     struct AnnounceHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
     {
@@ -563,7 +563,7 @@ void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& 
 
 void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc, std::string_view log_name)
 {
-    verboseLog("Scrape response:", TR_DOWN, benc);
+    verboseLog("Scrape response:", tr_direction::Down, benc);
 
     struct ScrapeHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
     {

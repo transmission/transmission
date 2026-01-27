@@ -80,8 +80,13 @@ char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                          "Usage: transmission-daemon [options]";
 
 using Arg = tr_option::Arg;
-auto constexpr Options = std::array<tr_option, 47>{ {
-    { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", Arg::Required, "<list>" },
+static_assert(TrDefaultRpcWhitelist == "127.0.0.1,::1", "update 'allowed' desc");
+static_assert(TrDefaultPeerPort == 51413, "update 'peerport' desc");
+static_assert(TrDefaultPeerLimitTorrent == 50, "update 'peerlimit-torrent' desc");
+static_assert(TrDefaultPeerLimitGlobal == 200, "update 'peerlimit-global' desc");
+static_assert(TrDefaultRpcPort == 9091 && R"(update "port" desc)");
+auto constexpr Options = std::array<tr_option, 48>{ {
+    { 'a', "allowed", "Allowed IP addresses. (Default: '127.0.0.1,::1')", "a", Arg::Required, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
     { 'c', "watch-dir", "Where to watch for new torrent files", "c", Arg::Required, "<directory>" },
@@ -93,7 +98,7 @@ auto constexpr Options = std::array<tr_option, 47>{ {
     { 'e', "logfile", "Dump the log messages to this filename", "e", Arg::Required, "<filename>" },
     { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", Arg::None, nullptr },
     { 'g', "config-dir", "Where to look for configuration files", "g", Arg::Required, "<path>" },
-    { 'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", Arg::Required, "<port>" },
+    { 'p', "port", "RPC port (Default: 9091)", "p", Arg::Required, "<port>" },
     { 't', "auth", "Require authentication", "t", Arg::None, nullptr },
     { 'T', "no-auth", "Don't require authentication", "T", Arg::None, nullptr },
     { 'u', "username", "Set username for authentication", "u", Arg::Required, "<username>" },
@@ -114,23 +119,19 @@ auto constexpr Options = std::array<tr_option, 47>{ {
     { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", Arg::None, nullptr },
     { 'y', "lpd", "Enable local peer discovery (LPD)", "y", Arg::None, nullptr },
     { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", Arg::None, nullptr },
-    { 830, "utp", "Enable µTP for peer connections", nullptr, Arg::None, nullptr },
-    { 831, "no-utp", "Disable µTP for peer connections", nullptr, Arg::None, nullptr },
-    { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", Arg::Required, "<port>" },
+    { 830,
+      "preferred-transports",
+      "Comma-separated list specifying preference of transport protocols",
+      nullptr,
+      Arg::Required,
+      "<protocol(s)>" },
+    { 831, "utp", "*DEPRECATED* Enable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 832, "no-utp", "*DEPRECATED* Disable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 'P', "peerport", "Port for incoming peers (Default: 51413)", "P", Arg::Required, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
-    { 'L',
-      "peerlimit-global",
-      "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")",
-      "L",
-      Arg::Required,
-      "<limit>" },
-    { 'l',
-      "peerlimit-torrent",
-      "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")",
-      "l",
-      Arg::Required,
-      "<limit>" },
+    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: 200)", "L", Arg::Required, "<limit>" },
+    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: 50)", "l", Arg::Required, "<limit>" },
     { 910, "encryption-required", "Encrypt all peer connections", "er", Arg::None, nullptr },
     { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", Arg::None, nullptr },
     { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", Arg::None, nullptr },
@@ -196,7 +197,7 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
 
     if (is_torrent)
     {
-        if (!tr_ctorSetMetainfoFromFile(ctor, filename, nullptr))
+        if (!tr_ctorSetMetainfoFromFile(ctor, filename))
         {
             retry = true;
         }
@@ -217,9 +218,8 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
         }
         else
         {
-            content.push_back('\0'); // zero-terminated string
-            auto const* data = std::data(content);
-            if (!tr_ctorSetMetainfoFromMagnetLink(ctor, data, nullptr))
+            auto const content_sv = std::string_view{ content.data(), content.size() };
+            if (!tr_ctorSetMetainfoFromMagnetLink(ctor, content_sv))
             {
                 retry = true;
             }
@@ -392,7 +392,7 @@ tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_
     return TR_RPC_OK;
 }
 
-tr_variant load_settings(char const* config_dir)
+tr_variant load_settings(std::string_view const config_dir)
 {
     auto app_defaults_map = tr_variant::Map{ 6U };
     app_defaults_map.try_emplace(TR_KEY_watch_dir, tr_variant::unmanaged_string(""sv));
@@ -402,7 +402,7 @@ tr_variant load_settings(char const* config_dir)
     app_defaults_map.try_emplace(TR_KEY_start_paused, false);
     app_defaults_map.try_emplace(TR_KEY_pidfile, tr_variant::unmanaged_string(""sv));
     auto const app_defaults = tr_variant{ std::move(app_defaults_map) };
-    return tr_sessionLoadSettings(&app_defaults, config_dir, MyName);
+    return tr_sessionLoadSettings(config_dir, &app_defaults);
 }
 
 } // namespace
@@ -436,8 +436,8 @@ bool tr_daemon::reopen_log_file(char const* filename)
 
 void tr_daemon::report_status()
 {
-    double const up = tr_sessionGetRawSpeed_KBps(my_session_, TR_UP);
-    double const dn = tr_sessionGetRawSpeed_KBps(my_session_, TR_DOWN);
+    auto const up = tr_sessionGetRawSpeed_KBps(my_session_, tr_direction::Up);
+    auto const dn = tr_sessionGetRawSpeed_KBps(my_session_, tr_direction::Down);
 
     if (up > 0 || dn > 0)
     {
@@ -454,6 +454,73 @@ void tr_daemon::periodic_update()
     pumpLogMessages(log_stream_);
     report_status();
 }
+
+namespace
+{
+void set_preferred_transports(tr_variant::Map& settings, std::string_view comma_delimited_protocols)
+{
+    auto preferred_protocols = tr_variant::Vector{};
+    preferred_protocols.reserve(2U);
+
+    auto protocol = std::string_view{};
+    while (tr_strv_sep(&comma_delimited_protocols, &protocol, ','))
+    {
+        preferred_protocols.emplace_back(protocol);
+    }
+
+    settings.insert_or_assign(TR_KEY_preferred_transports, std::move(preferred_protocols));
+}
+
+// TODO(tearfur): remove everything in this helper namespace and the corresponding args in 5.0.0
+namespace utp_arg_helpers
+{
+auto constexpr UtpVal = "utp"sv;
+
+void utp(tr_variant::Map& settings)
+{
+    if (auto const pt = settings.value_if<std::string_view>(TR_KEY_preferred_transports); pt && pt != UtpVal)
+    {
+        settings.erase(TR_KEY_preferred_transports);
+    }
+
+    if (auto* const pt = settings.find_if<tr_variant::Vector>(TR_KEY_preferred_transports))
+    {
+        if (std::none_of(
+                std::begin(*pt),
+                std::end(*pt),
+                [](tr_variant const& e) { return e.value_if<std::string_view>() == UtpVal; }))
+        {
+            pt->emplace(std::begin(*pt), tr_variant::unmanaged_string(UtpVal));
+        }
+    }
+    else
+    {
+        settings.insert_or_assign(TR_KEY_utp_enabled, true);
+    }
+}
+
+void no_utp(tr_variant::Map& settings)
+{
+    if (auto const pt = settings.value_if<std::string_view>(TR_KEY_preferred_transports); pt == UtpVal)
+    {
+        settings.erase(TR_KEY_preferred_transports);
+    }
+
+    if (auto* const pt = settings.find_if<tr_variant::Vector>(TR_KEY_preferred_transports))
+    {
+        auto const remove_it = std::remove_if(
+            std::begin(*pt),
+            std::end(*pt),
+            [](tr_variant const& e) { return e.value_if<std::string_view>() == UtpVal; });
+        pt->erase(remove_it, std::end(*pt));
+    }
+    else
+    {
+        settings.insert_or_assign(TR_KEY_utp_enabled, false);
+    }
+}
+} // namespace utp_arg_helpers
+} // namespace
 
 bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code)
 {
@@ -686,11 +753,15 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 830:
-            map->insert_or_assign(TR_KEY_utp_enabled, true);
+            set_preferred_transports(*map, optstr);
             break;
 
         case 831:
-            map->insert_or_assign(TR_KEY_utp_enabled, false);
+            utp_arg_helpers::utp(*map);
+            break;
+
+        case 832:
+            utp_arg_helpers::no_utp(*map);
             break;
 
         case TR_OPT_UNK:
@@ -738,18 +809,16 @@ void tr_daemon::reconfigure()
             static_cast<uint64_t>(ts.tv_sec) * 1000000U + static_cast<uint64_t>(ts.tv_nsec) / 1000U);
 #endif
 
-        char const* configDir;
-
         /* reopen the logfile to allow for log rotation */
         if (log_file_name_ != nullptr)
         {
             reopen_log_file(log_file_name_);
         }
 
-        configDir = tr_sessionGetConfigDir(my_session_);
-        tr_logAddInfo(fmt::format(fmt::runtime(_("Reloading settings from '{path}'")), fmt::arg("path", configDir)));
+        auto const config_dir = tr_sessionGetConfigDir(my_session_);
+        tr_logAddInfo(fmt::format(fmt::runtime(_("Reloading settings from '{path}'")), fmt::arg("path", config_dir)));
 
-        tr_sessionSet(my_session_, load_settings(configDir));
+        tr_sessionSet(my_session_, load_settings(config_dir));
         tr_sessionReloadBlocklists(my_session_);
 
         sd_notify(0, "STATUS=Reload complete.\nREADY=1\n");
@@ -782,11 +851,10 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     }
 
     /* start the session */
-    auto const* const cdir = this->config_dir_.c_str();
-    auto* session = tr_sessionInit(cdir, true, settings_);
+    auto* session = tr_sessionInit(config_dir_, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
-    tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", cdir)));
-    tr_sessionSaveSettings(session, cdir, settings_);
+    tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", config_dir_)));
+    tr_sessionSaveSettings(session, config_dir_, settings_);
 
     auto const* const settings_map = settings_.get_if<tr_variant::Map>();
     if (settings_map == nullptr)
@@ -796,13 +864,13 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
         return 1;
     }
 
-    auto const sz_pid_filename = std::string{ settings_map->value_if<std::string_view>(TR_KEY_pidfile).value_or(""sv) };
     auto pidfile_created = false;
-    if (!std::empty(sz_pid_filename))
+    auto const pid_filename = settings_map->value_if<std::string_view>(TR_KEY_pidfile).value_or(""sv);
+    if (!std::empty(pid_filename))
     {
         auto error = tr_error{};
         tr_sys_file_t fp = tr_sys_file_open(
-            sz_pid_filename.c_str(),
+            pid_filename,
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0666,
             &error);
@@ -812,7 +880,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             auto const out = std::to_string(getpid());
             tr_sys_file_write(fp, std::data(out), std::size(out), nullptr);
             tr_sys_file_close(fp);
-            tr_logAddInfo(fmt::format(fmt::runtime(_("Saved pidfile '{path}'")), fmt::arg("path", sz_pid_filename)));
+            tr_logAddInfo(fmt::format(fmt::runtime(_("Saved pidfile '{path}'")), fmt::arg("path", pid_filename)));
             pidfile_created = true;
         }
         else
@@ -820,7 +888,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             tr_logAddError(
                 fmt::format(
                     fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
-                    fmt::arg("path", sz_pid_filename),
+                    fmt::arg("path", pid_filename),
                     fmt::arg("error", error.message()),
                     fmt::arg("error_code", error.code())));
         }
@@ -941,7 +1009,7 @@ CLEANUP:
 
     event_base_free(ev_base_);
 
-    tr_sessionSaveSettings(my_session_, cdir, settings_);
+    tr_sessionSaveSettings(my_session_, config_dir_, settings_);
     tr_sessionClose(my_session_);
     pumpLogMessages(log_stream_);
     printf(" done.\n");
@@ -960,7 +1028,7 @@ CLEANUP:
     /* cleanup */
     if (pidfile_created)
     {
-        tr_sys_path_remove(sz_pid_filename);
+        tr_sys_path_remove(pid_filename);
     }
 
     sd_notify(0, "STATUS=\n");

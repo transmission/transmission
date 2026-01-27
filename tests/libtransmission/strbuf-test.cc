@@ -9,9 +9,9 @@
 
 #include <libtransmission/tr-strbuf.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using StrbufTest = ::testing::Test;
+using StrbufTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(StrbufTest, append)
@@ -134,23 +134,6 @@ TEST_F(StrbufTest, iterators)
         EXPECT_EQ(Value.front(), *begin);
         EXPECT_EQ(std::size(Value), static_cast<size_t>(std::distance(begin, end)));
     }
-}
-
-TEST_F(StrbufTest, join)
-{
-    auto buf = tr_pathbuf{};
-
-    buf.clear();
-    buf.join(' ', 'A', "short", "phrase"sv);
-    EXPECT_EQ("A short phrase"sv, buf.sv());
-
-    buf.clear();
-    buf.join("  ", 'A', "short", "phrase"sv);
-    EXPECT_EQ("A  short  phrase"sv, buf.sv());
-
-    buf.clear();
-    buf.join("--"sv, 'A', "short", "phrase"sv);
-    EXPECT_EQ("A--short--phrase"sv, buf.sv());
 }
 
 TEST_F(StrbufTest, move)

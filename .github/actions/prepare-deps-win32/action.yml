@@ -19,7 +19,7 @@ runs:
         choco install `
           jom `
           nasm `
-          nodejs
+          wixtoolset
         & "C:\Program Files\OpenSSL\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- | Out-Host
         (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
         (Join-Path (Get-Item -Path "${Env:ProgramFiles(x86)}\WiX Toolset v3.*")[0].FullName bin) | Out-File $Env:GITHUB_PATH -Append
@@ -29,15 +29,16 @@ runs:
       id: cache-key
       shell: pwsh
       run: |
+        $RepoRoot = if (Test-Path (Join-Path . 'src/release/windows/main.ps1')) { Join-Path . 'src' } else { (Get-Item .).FullName }
         try {
-            $DepsHash = & (Join-Path . src release windows main.ps1) -Mode DepsHash -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
+            $DepsHash = & (Join-Path $RepoRoot release windows main.ps1) -Mode DepsHash -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
             "hash=${DepsHash}" | Out-File $Env:GITHUB_OUTPUT -Append
         } catch {
             Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
             exit 1
         }
     - name: Restore Cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       id: restore-cache
       with:
         path: ${{ env.DEPS_PREFIX }}
@@ -46,15 +47,16 @@ runs:
       if: steps.restore-cache.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
+        $RepoRoot = if (Test-Path (Join-Path . 'src/release/windows/main.ps1')) { Join-Path . 'src' } else { (Get-Item .).FullName }
         try {
-            & (Join-Path . src release windows main.ps1) -Mode Build -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
+            & (Join-Path $RepoRoot release windows main.ps1) -Mode Build -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
         } catch {
             Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
             exit 1
         }
     - name: Save Cache
       if: steps.restore-cache.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       id: cache
       with:
         path: ${{ env.DEPS_PREFIX }}

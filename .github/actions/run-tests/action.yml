@@ -1,0 +1,157 @@
+name: Run tests
+description: Run ctest with crash-friendly settings and optional fallbacks
+inputs:
+  setup-env:
+    description: "Call set-test-env before running tests"
+    required: false
+    default: "true"
+  build-dir:
+    description: "CTest build directory"
+    required: false
+    default: "obj"
+  build-config:
+    description: "CTest build configuration"
+    required: false
+    default: ""
+  parallel:
+    description: "Number of parallel jobs (auto if empty)"
+    required: false
+    default: ""
+  timeout:
+    description: "CTest timeout in seconds"
+    required: false
+    default: ""
+  extra-ctest-args:
+    description: "Additional ctest arguments"
+    required: false
+    default: ""
+  enable-sanitizers:
+    description: "Whether sanitizer options are enabled (affects fallback choices)"
+    required: false
+    default: "false"
+  enable-asan:
+    description: "Explicitly enable ASan options"
+    required: false
+    default: ""
+  enable-ubsan:
+    description: "Explicitly enable UBSan options"
+    required: false
+    default: ""
+  enable-lsan:
+    description: "Explicitly enable LSan options"
+    required: false
+    default: ""
+  extra-asan-options:
+    description: "Additional ASan options to append"
+    required: false
+    default: ""
+  extra-ubsan-options:
+    description: "Additional UBSan options to append"
+    required: false
+    default: ""
+  extra-lsan-options:
+    description: "Additional LSan options to append"
+    required: false
+    default: ""
+  use-catchsegv:
+    description: "Use catchsegv on Linux if available"
+    required: false
+    default: "true"
+  enable-macos-crash-reports:
+    description: "Attempt to collect macOS crash reports on failure"
+    required: false
+    default: "true"
+runs:
+  using: composite
+  steps:
+    - name: Set test environment
+      if: ${{ inputs.setup-env == 'true' }}
+      uses: ./.github/actions/set-test-env
+      with:
+        enable-sanitizers: ${{ inputs.enable-sanitizers }}
+        enable-asan: ${{ inputs.enable-asan }}
+        enable-ubsan: ${{ inputs.enable-ubsan }}
+        enable-lsan: ${{ inputs.enable-lsan }}
+        extra-asan-options: ${{ inputs.extra-asan-options }}
+        extra-ubsan-options: ${{ inputs.extra-ubsan-options }}
+        extra-lsan-options: ${{ inputs.extra-lsan-options }}
+    - name: Detect platform
+      id: platform
+      uses: ./.github/actions/detect-platform
+    - name: Run ctest
+      shell: bash
+      env:
+        OS_FAMILY: ${{ steps.platform.outputs.os-family }}
+      run: |
+        set -euo pipefail
+
+        build_dir="${{ inputs.build-dir }}"
+        build_config="${{ inputs.build-config }}"
+        parallel="${{ inputs.parallel }}"
+        timeout="${{ inputs.timeout }}"
+        extra_args="${{ inputs.extra-ctest-args }}"
+        enable_sanitizers="${{ inputs.enable-sanitizers }}"
+        use_catchsegv="${{ inputs.use-catchsegv }}"
+        enable_macos_crash_reports="${{ inputs.enable-macos-crash-reports }}"
+
+        if [[ -z "$parallel" ]]; then
+          if command -v nproc >/dev/null 2>&1; then
+            parallel=$(nproc)
+          elif command -v sysctl >/dev/null 2>&1; then
+            parallel=$(sysctl -n hw.logicalcpu)
+          elif [[ -n "${NUMBER_OF_PROCESSORS:-}" ]]; then
+            parallel="$NUMBER_OF_PROCESSORS"
+          else
+            parallel=1
+          fi
+        fi
+
+        args=("--test-dir" "$build_dir" "-j" "$parallel" "--output-on-failure")
+        if [[ -n "$build_config" ]]; then
+          args+=("--build-config" "$build_config")
+        fi
+        if [[ -n "$timeout" ]]; then
+          args+=("--timeout" "$timeout")
+        fi
+        if [[ -n "$extra_args" ]]; then
+          args+=($extra_args)
+        fi
+
+        crash_marker=""
+        if [[ "${OS_FAMILY:-}" == "macos" && "$enable_macos_crash_reports" == "true" ]]; then
+          crash_marker="$RUNNER_TEMP/ctest-crash-marker"
+          touch "$crash_marker"
+        fi
+
+        run_ctest() {
+          if [[ "${OS_FAMILY:-}" == "linux" && "$enable_sanitizers" != "true" && "$use_catchsegv" == "true" ]] && command -v catchsegv >/dev/null 2>&1; then
+            catchsegv ctest "${args[@]}"
+          else
+            ctest "${args[@]}"
+          fi
+        }
+
+        set +e
+        run_ctest
+        status=$?
+        set -e
+
+        if [[ $status -ne 0 && "${OS_FAMILY:-}" == "macos" && "$enable_macos_crash_reports" == "true" ]]; then
+          echo "::group::macOS crash reports"
+          reports_found=0
+          for report_dir in "$HOME/Library/Logs/DiagnosticReports" "/Library/Logs/DiagnosticReports"; do
+            if [[ -d "$report_dir" ]]; then
+              while IFS= read -r report; do
+                reports_found=1
+                echo "--- $report ---"
+                tail -n 200 "$report" || true
+              done < <(find "$report_dir" -maxdepth 1 -type f \( -name "*.crash" -o -name "*.ips" \) -newer "$crash_marker" -print 2>/dev/null || true)
+            fi
+          done
+          if [[ $reports_found -eq 0 ]]; then
+            echo "No new crash reports found after test run."
+          fi
+          echo "::endgroup::"
+        fi
+
+        exit $status

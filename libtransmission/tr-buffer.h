@@ -48,7 +48,7 @@ public:
     }
 
     template<typename T>
-    [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
+    [[nodiscard]] constexpr bool starts_with(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
         auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
@@ -111,7 +111,7 @@ public:
             return {};
         }
 
-        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), n_bytes, 0); n_sent >= 0U)
+        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), n_bytes, 0); n_sent >= 0)
         {
             drain(n_sent);
             return n_sent;

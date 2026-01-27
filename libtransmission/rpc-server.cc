@@ -315,12 +315,17 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
         return;
     }
 
-    // convert the URL path component (ex: "/transmission/web/images/favicon.png")
-    // into a filesystem path (ex: "/usr/share/transmission/web/images/favicon.png")
+    // convert the URL path component into a filesystem path, e.g.
+    // "/transmission/web/images/favicon.png" ->
+    // "/usr/share/transmission/web/images/favicon.png")
+    auto subpath = std::string_view{ evhttp_request_get_uri(req) };
 
-    // remove the "/transmission/web/" prefix
-    static auto constexpr Web = "web/"sv;
-    auto subpath = std::string_view{ evhttp_request_get_uri(req) }.substr(std::size(server->url()) + std::size(Web));
+    // remove the web base path eg "/transmission/web/"
+    {
+        auto const& base_path = server->url();
+        static auto constexpr Web = TrHttpServerWebRelativePath;
+        subpath = subpath.substr(std::size(base_path) + std::size(Web));
+    }
 
     // remove any trailing query / fragment
     subpath = subpath.substr(0, subpath.find_first_of("?#"sv));
@@ -361,7 +366,8 @@ void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std
     tr_rpc_request_exec(
         server->session,
         json,
-        [req, server](tr_session* /*session*/, tr_variant&& content)
+        // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+        [req, server](tr_variant&& content)
         {
             if (!content.has_value())
             {
@@ -471,7 +477,7 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request* const req)
 bool test_session_id(tr_rpc_server const* server, evhttp_request* const req)
 {
     auto const* const input_headers = evhttp_request_get_input_headers(req);
-    char const* const session_id = evhttp_find_header(input_headers, TR_RPC_SESSION_ID_HEADER);
+    char const* const session_id = evhttp_find_header(input_headers, std::data(TrRpcSessionIdHeader));
     return session_id != nullptr && server->session->sessionId() == session_id;
 }
 
@@ -580,17 +586,20 @@ void handle_request(struct evhttp_request* req, void* arg)
 
     server->login_attempts_ = 0;
 
-    auto const* const uri = evhttp_request_get_uri(req);
-    auto const uri_sv = std::string_view{ uri };
-    auto const location = tr_strv_starts_with(uri_sv, server->url()) ? uri_sv.substr(std::size(server->url())) : ""sv;
+    // eg '/transmission/web/' and '/transmission/rpc'
+    auto const& base_path = server->url();
+    auto const web_base_path = tr_urlbuf{ base_path, TrHttpServerWebRelativePath };
+    auto const rpc_base_path = tr_urlbuf{ base_path, TrHttpServerRpcRelativePath };
+    auto const deprecated_web_path = tr_urlbuf{ base_path, "web" /*no trailing slash*/ };
 
-    if (std::empty(location) || location == "web"sv)
+    char const* const uri = evhttp_request_get_uri(req);
+
+    if (!tr_strv_starts_with(uri, base_path) || uri == deprecated_web_path)
     {
-        auto const new_location = fmt::format("{:s}web/", server->url());
-        evhttp_add_header(output_headers, "Location", new_location.c_str());
+        evhttp_add_header(output_headers, "Location", web_base_path.c_str());
         send_simple_response(req, HTTP_MOVEPERM, nullptr);
     }
-    else if (tr_strv_starts_with(location, "web/"sv))
+    else if (tr_strv_starts_with(uri, web_base_path))
     {
         handle_web_client(req, server);
     }
@@ -615,26 +624,30 @@ void handle_request(struct evhttp_request* req, void* arg)
     else if (!test_session_id(server, req))
     {
         auto const session_id = std::string{ server->session->sessionId() };
+        evhttp_add_header(output_headers, std::data(TrRpcSessionIdHeader), session_id.c_str());
+
+        evhttp_add_header(output_headers, std::data(TrRpcVersionHeader), std::data(TrRpcVersionSemver));
+
+        auto const expose_val = fmt::format("{:s}, {:s}", TrRpcSessionIdHeader, TrRpcVersionHeader);
+        evhttp_add_header(output_headers, "Access-Control-Expose-Headers", expose_val.c_str());
+
         auto const body = fmt::format(
             "<p>Your request had an invalid session_id header.</p>"
             "<p>To fix this, follow these steps:"
-            "<ol><li> When reading a response, get its " TR_RPC_SESSION_ID_HEADER
-            " header and remember it"
+            "<ol><li> When reading a response, get its {0:s} header and remember it"
             "<li> Add the updated header to your outgoing requests"
             "<li> When you get this 409 error message, resend your request with the updated header"
             "</ol></p>"
             "<p>This requirement has been added to help prevent "
             "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
             "attacks.</p>"
-            "<p><code>{:s}: {:s}</code></p>",
-            TR_RPC_SESSION_ID_HEADER,
+            "<p><code>{0:s}: {1:s}</code></p>",
+            TrRpcSessionIdHeader,
             session_id);
-        evhttp_add_header(output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
-        evhttp_add_header(output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
         send_simple_response(req, 409, body.c_str());
     }
 #endif
-    else if (tr_strv_starts_with(location, "rpc"sv))
+    else if (tr_strv_starts_with(uri, rpc_base_path))
     {
         handle_rpc(req, server);
     }
@@ -644,7 +657,7 @@ void handle_request(struct evhttp_request* req, void* arg)
             fmt::format(
                 fmt::runtime(_("Unknown URI from {host}: '{uri}'")),
                 fmt::arg("host", remote_host),
-                fmt::arg("uri", uri_sv)));
+                fmt::arg("uri", uri)));
         send_simple_response(req, HTTP_NOTFOUND, uri);
     }
 }
@@ -979,9 +992,9 @@ void tr_rpc_server::load(Settings&& settings)
 {
     settings_ = std::move(settings);
 
-    if (!tr_strv_ends_with(settings_.url, '/'))
+    if (std::string& path = settings_.url; !tr_strv_ends_with(path, '/'))
     {
-        settings_.url = fmt::format("{:s}/", settings_.url);
+        path = fmt::format("{:s}/", path);
     }
 
     host_whitelist_ = parse_whitelist(settings_.host_whitelist_str);
@@ -1008,7 +1021,8 @@ void tr_rpc_server::load(Settings&& settings)
     }
     if (this->is_enabled())
     {
-        auto const rpc_uri = bind_address_->to_string(port()) + settings_.url;
+        auto const& base_path = url();
+        auto const rpc_uri = bind_address_->to_string(port()) + base_path;
         tr_logAddInfo(fmt::format(fmt::runtime(_("Serving RPC and Web requests on {address}")), fmt::arg("address", rpc_uri)));
         session->run_in_session_thread(start_server, this);
 

@@ -1,5 +1,11 @@
+#if __has_feature(modules)
 @import CoreFoundation;
 @import QuickLook;
+#else
+#import <CoreFoundation/CoreFoundation.h>
+#import <CoreFoundation/CFPlugInCOM.h>
+#import <QuickLook/QuickLook.h>
+#endif
 
 QL_EXTERN_C_BEGIN
 OSStatus GenerateThumbnailForURL(void* thisInterface, QLThumbnailRequestRef thumbnail, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options, CGSize maxSize);

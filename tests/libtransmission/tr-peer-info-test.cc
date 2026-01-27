@@ -15,11 +15,11 @@
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using namespace std::literals;
 
-using PeerInfoTest = ::testing::Test;
+using PeerInfoTest = ::libtransmission::test::TransmissionTest;
 
 TEST_F(PeerInfoTest, mergeConnectable)
 {

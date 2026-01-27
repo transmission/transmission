@@ -9,7 +9,7 @@ jobs:
   update-copyright-years:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: FantasticFiasco/action-update-license-year@v3
@@ -35,9 +35,11 @@ jobs:
             macosx/Info.plist
             macosx/Info.plist.in
             macosx/*/InfoPlist.strings
+            macosx/QuickLookExtension/Info.plist
+            macosx/QuickLookExtension/Info.plist.in
             macosx/QuickLookPlugin/Info.plist.in
             macosx/QuickLookPlugin/QuickLookPlugin-Info.plist
-          transform: (?<=Copyright © )(?<from>\d{4})?-?(\d{4})
+          transform: (?<=Copyright © )(?<from>\d{4})?[-–]?(\d{4})
       - uses: FantasticFiasco/action-update-license-year@v3
         with:
           commitTitle: 'chore: update copyright year in cmake/transmission.rc.in'

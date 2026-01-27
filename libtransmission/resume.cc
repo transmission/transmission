@@ -16,6 +16,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/bitfield.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
@@ -74,7 +75,7 @@ auto load_peers(tr_variant::Map const& map, tr_torrent* tor)
         ret = tr_resume::Peers;
     }
 
-    if (auto const* l = map.find_if<tr_variant::Vector>({ TR_KEY_peers2_6, TR_KEY_peers2_6_kebab }); l != nullptr)
+    if (auto const* l = map.find_if<tr_variant::Vector>(TR_KEY_peers2_6))
     {
         auto const num_added = add_peers(tor, *l);
         tr_logAddTraceTor(tor, fmt::format("Loaded {} IPv6 peers from resume file", num_added));
@@ -244,8 +245,8 @@ tr_variant::Map save_single_speed_limit(tr_torrent const* tor, tr_direction dir)
 
 void save_speed_limits(tr_variant::Map& map, tr_torrent const* tor)
 {
-    map.insert_or_assign(TR_KEY_speed_limit_down, save_single_speed_limit(tor, TR_DOWN));
-    map.insert_or_assign(TR_KEY_speed_limit_up, save_single_speed_limit(tor, TR_UP));
+    map.insert_or_assign(TR_KEY_speed_limit_down, save_single_speed_limit(tor, tr_direction::Down));
+    map.insert_or_assign(TR_KEY_speed_limit_up, save_single_speed_limit(tor, tr_direction::Up));
 }
 
 void save_ratio_limits(tr_variant::Map& map, tr_torrent const* tor)
@@ -266,7 +267,7 @@ void save_idle_limits(tr_variant::Map& map, tr_torrent const* tor)
 
 void load_single_speed_limit(tr_variant::Map const& map, tr_direction dir, tr_torrent* tor)
 {
-    if (auto const i = map.value_if<int64_t>({ TR_KEY_speed_Bps, TR_KEY_speed_Bps_kebab }); i)
+    if (auto const i = map.value_if<int64_t>(TR_KEY_speed_Bps))
     {
         tor->set_speed_limit(dir, Speed{ *i, Speed::Units::Byps });
     }
@@ -275,12 +276,12 @@ void load_single_speed_limit(tr_variant::Map const& map, tr_direction dir, tr_to
         tor->set_speed_limit(dir, Speed{ *i2, Speed::Units::KByps });
     }
 
-    if (auto const b = map.value_if<bool>({ TR_KEY_use_speed_limit, TR_KEY_use_speed_limit_kebab }); b)
+    if (auto const b = map.value_if<bool>(TR_KEY_use_speed_limit))
     {
         tor->use_speed_limit(dir, *b);
     }
 
-    if (auto const b = map.value_if<bool>({ TR_KEY_use_global_speed_limit, TR_KEY_use_global_speed_limit_kebab }); b)
+    if (auto const b = map.value_if<bool>(TR_KEY_use_global_speed_limit))
     {
         tr_torrentUseSessionLimits(tor, *b);
     }
@@ -290,17 +291,15 @@ auto load_speed_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
-    if (auto const* child = map.find_if<tr_variant::Map>({ TR_KEY_speed_limit_up, TR_KEY_speed_limit_up_kebab });
-        child != nullptr)
+    if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_up))
     {
-        load_single_speed_limit(*child, TR_UP, tor);
+        load_single_speed_limit(*child, tr_direction::Up, tor);
         ret = tr_resume::Speedlimit;
     }
 
-    if (auto const* child = map.find_if<tr_variant::Map>({ TR_KEY_speed_limit_down, TR_KEY_speed_limit_down_kebab });
-        child != nullptr)
+    if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_down))
     {
-        load_single_speed_limit(*child, TR_DOWN, tor);
+        load_single_speed_limit(*child, tr_direction::Down, tor);
         ret = tr_resume::Speedlimit;
     }
 
@@ -309,18 +308,18 @@ auto load_speed_limits(tr_variant::Map const& map, tr_torrent* tor)
 
 tr_resume::fields_t load_ratio_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
-    auto const* const d = map.find_if<tr_variant::Map>({ TR_KEY_ratio_limit, TR_KEY_ratio_limit_kebab });
+    auto const* const d = map.find_if<tr_variant::Map>(TR_KEY_ratio_limit);
     if (d == nullptr)
     {
         return {};
     }
 
-    if (auto const dratio = d->value_if<double>({ TR_KEY_ratio_limit, TR_KEY_ratio_limit_kebab }); dratio)
+    if (auto const dratio = d->value_if<double>(TR_KEY_ratio_limit))
     {
         tor->set_seed_ratio(*dratio);
     }
 
-    if (auto const i = d->value_if<int64_t>({ TR_KEY_ratio_mode, TR_KEY_ratio_mode_kebab }); i)
+    if (auto const i = d->value_if<int64_t>(TR_KEY_ratio_mode))
     {
         tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(*i));
     }
@@ -330,18 +329,18 @@ tr_resume::fields_t load_ratio_limits(tr_variant::Map const& map, tr_torrent* to
 
 tr_resume::fields_t load_idle_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
-    auto const* const d = map.find_if<tr_variant::Map>({ TR_KEY_idle_limit, TR_KEY_idle_limit_kebab });
+    auto const* const d = map.find_if<tr_variant::Map>(TR_KEY_idle_limit);
     if (d == nullptr)
     {
         return {};
     }
 
-    if (auto const imin = d->value_if<int64_t>({ TR_KEY_idle_limit, TR_KEY_idle_limit_kebab }); imin)
+    if (auto const imin = d->value_if<int64_t>(TR_KEY_idle_limit))
     {
         tor->set_idle_limit_minutes(*imin);
     }
 
-    if (auto const i = d->value_if<int64_t>({ TR_KEY_idle_mode, TR_KEY_idle_mode_kebab }); i)
+    if (auto const i = d->value_if<int64_t>(TR_KEY_idle_mode))
     {
         tor->set_idle_limit_mode(static_cast<tr_idlelimit>(*i));
     }
@@ -636,6 +635,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         return {};
     }
 
+    libtransmission::api_compat::convert_incoming_data(*otop);
     auto const* const p_map = otop->get_if<tr_variant::Map>();
     if (p_map == nullptr)
     {
@@ -667,8 +667,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & (tr_resume::Progress | tr_resume::IncompleteDir)) != 0)
     {
-        if (auto sv = map.value_if<std::string_view>({ TR_KEY_incomplete_dir, TR_KEY_incomplete_dir_kebab });
-            sv && !std::empty(*sv))
+        if (auto sv = map.value_if<std::string_view>(TR_KEY_incomplete_dir); sv && !std::empty(*sv))
         {
             helper.load_incomplete_dir(*sv);
             fields_loaded |= tr_resume::IncompleteDir;
@@ -695,7 +694,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::MaxPeers) != 0)
     {
-        if (auto i = map.value_if<int64_t>({ TR_KEY_max_peers, TR_KEY_max_peers_kebab }); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_max_peers))
         {
             tor->set_peer_limit(static_cast<uint16_t>(*i));
             fields_loaded |= tr_resume::MaxPeers;
@@ -713,7 +712,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::AddedDate) != 0)
     {
-        if (auto i = map.value_if<int64_t>({ TR_KEY_added_date, TR_KEY_added_date_kebab }); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_added_date))
         {
             helper.load_date_added(static_cast<time_t>(*i));
             fields_loaded |= tr_resume::AddedDate;
@@ -722,7 +721,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::DoneDate) != 0)
     {
-        if (auto i = map.value_if<int64_t>({ TR_KEY_done_date, TR_KEY_done_date_kebab }); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_done_date))
         {
             helper.load_date_done(static_cast<time_t>(*i));
             fields_loaded |= tr_resume::DoneDate;
@@ -731,7 +730,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::ActivityDate) != 0)
     {
-        if (auto i = map.value_if<int64_t>({ TR_KEY_activity_date, TR_KEY_activity_date_kebab }); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_activity_date))
         {
             tor->set_date_active(*i);
             fields_loaded |= tr_resume::ActivityDate;
@@ -740,7 +739,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::TimeSeeding) != 0)
     {
-        if (auto i = map.value_if<int64_t>({ TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab }); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_seeding_time_seconds))
         {
             helper.load_seconds_seeding_before_current_start(*i);
             fields_loaded |= tr_resume::TimeSeeding;
@@ -749,7 +748,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::TimeDownloading) != 0)
     {
-        if (auto i = map.value_if<int64_t>({ TR_KEY_downloading_time_seconds, TR_KEY_downloading_time_seconds_kebab }); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_downloading_time_seconds))
         {
             helper.load_seconds_downloading_before_current_start(*i);
             fields_loaded |= tr_resume::TimeDownloading;
@@ -758,8 +757,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::BandwidthPriority) != 0)
     {
-        if (auto i = map.value_if<int64_t>({ TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_kebab });
-            i && tr_isPriority(static_cast<tr_priority_t>(*i)))
+        if (auto const i = map.value_if<int64_t>(TR_KEY_bandwidth_priority); i && tr_isPriority(static_cast<tr_priority_t>(*i)))
         {
             tr_torrentSetPriority(tor, static_cast<tr_priority_t>(*i));
             fields_loaded |= tr_resume::BandwidthPriority;
@@ -985,8 +983,10 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     save_labels(map, tor);
     save_group(map, tor);
 
+    auto out = tr_variant{ std::move(map) };
+    libtransmission::api_compat::convert_outgoing_data(out);
     auto serde = tr_variant_serde::benc();
-    if (!serde.to_file(std::move(map), tor->resume_file()))
+    if (!serde.to_file(out, tor->resume_file()))
     {
         tor->error().set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_.message()));
     }

@@ -26,7 +26,7 @@
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, TR_CONSTEXPR20
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 #include "libtransmission/utils-ev.h"
 
 struct struct_utp_context;
@@ -116,7 +116,7 @@ public:
 
     ///
 
-    [[nodiscard]] TR_CONSTEXPR20 auto read_buffer_size() const noexcept
+    [[nodiscard]] constexpr auto read_buffer_size() const noexcept
     {
         return std::size(inbuf_);
     }
@@ -161,7 +161,10 @@ public:
 
     size_t flush_outgoing_protocol_msgs();
 
-    size_t flush(tr_direction dir, size_t byte_limit);
+    size_t flush(tr_direction dir, size_t byte_limit)
+    {
+        return dir == tr_direction::Down ? try_read(byte_limit) : try_write(byte_limit);
+    }
 
     ///
 
@@ -287,7 +290,7 @@ public:
         filter_.decrypt_init(is_incoming, dh, info_hash);
     }
 
-    TR_CONSTEXPR20 void decrypt_disable(size_t decrypt_len = 0U) noexcept
+    constexpr void decrypt_disable(size_t decrypt_len = 0U) noexcept
     {
         // optionally decrypt decrypt_len more bytes before disabling decryption
         n_decrypt_remain_ = decrypt_len;

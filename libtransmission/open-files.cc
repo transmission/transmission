@@ -141,7 +141,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     tr_torrent_id_t tor_id,
     tr_file_index_t file_num,
     bool writable,
-    std::string_view filename_in,
+    std::string_view const filename,
     Preallocation allocation,
     uint64_t file_size)
 {
@@ -158,13 +158,10 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     }
 
     // create subfolders, if any
-    auto const filename = tr_pathbuf{ filename_in };
     auto error = tr_error{};
     if (writable)
     {
-        auto dir = tr_pathbuf{ filename.sv() };
-        dir.popdir();
-        if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
+        if (auto const dir = tr_sys_path_dirname(filename); !tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
             tr_logAddError(
                 fmt::format(

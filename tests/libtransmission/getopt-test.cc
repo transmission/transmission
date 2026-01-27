@@ -7,31 +7,61 @@
 
 #include <libtransmission/tr-getopt.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 namespace
 {
 using Arg = tr_option::Arg;
 auto constexpr Options = std::array<tr_option, 9>{ {
-    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", Arg::None, nullptr },
-    { 'o', "outfile", "Save the generated .torrent to this filename", "o", Arg::Required, "<file>" },
-    { 's',
-      "piecesize",
-      "Set how many KiB each piece should be, overriding the preferred default",
-      "s",
-      Arg::Required,
-      "<size in KiB>" },
-    { 'c', "comment", "Add a comment", "c", Arg::Required, "<comment>" },
-    { 't', "tracker", "Add a tracker's announce URL", "t", Arg::Required, "<url>" },
-    { 'q', "pooka", "Pooka", "pk", Arg::None, nullptr },
-    { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
-    { 994, "sequential-download", "Download the torrent sequentially", "seq", Arg::Optional, "<piece>" },
-    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
+    { .val = 'p',
+      .longName = "private",
+      .description = "Allow this torrent to only be used with the specified tracker(s)",
+      .shortName = "p",
+      .arg = Arg::None,
+      .argName = nullptr },
+    { .val = 'o',
+      .longName = "outfile",
+      .description = "Save the generated .torrent to this filename",
+      .shortName = "o",
+      .arg = Arg::Required,
+      .argName = "<file>" },
+    { .val = 's',
+      .longName = "piecesize",
+      .description = "Set how many KiB each piece should be, overriding the preferred default",
+      .shortName = "s",
+      .arg = Arg::Required,
+      .argName = "<size in KiB>" },
+    { .val = 'c',
+      .longName = "comment",
+      .description = "Add a comment",
+      .shortName = "c",
+      .arg = Arg::Required,
+      .argName = "<comment>" },
+    { .val = 't',
+      .longName = "tracker",
+      .description = "Add a tracker's announce URL",
+      .shortName = "t",
+      .arg = Arg::Required,
+      .argName = "<url>" },
+    { .val = 'q', .longName = "pooka", .description = "Pooka", .shortName = "pk", .arg = Arg::None, .argName = nullptr },
+    { .val = 'V',
+      .longName = "version",
+      .description = "Show version number and exit",
+      .shortName = "V",
+      .arg = Arg::None,
+      .argName = nullptr },
+    { .val = 994,
+      .longName = "sequential-download",
+      .description = "Download the torrent sequentially",
+      .shortName = "seq",
+      .arg = Arg::Optional,
+      .argName = "<piece>" },
+    { .val = 0, .longName = nullptr, .description = nullptr, .shortName = nullptr, .arg = Arg::None, .argName = nullptr },
 } };
 static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
-class GetoptTest : public ::testing::Test
+class GetoptTest : public ::libtransmission::test::TransmissionTest
 {
 protected:
     static void runTest( //

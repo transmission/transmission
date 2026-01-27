@@ -57,6 +57,7 @@
 #include <utility>
 
 using namespace std::literals;
+using namespace transmission::app;
 
 class Session::Impl
 {
@@ -91,7 +92,7 @@ public:
 
     void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
-    void send_rpc_request(tr_variant const& request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
+    void send_rpc_request(tr_quark method, tr_variant const& params, std::function<void(tr_variant&)> on_response);
 
     void commit_prefs_change(tr_quark key);
 
@@ -477,7 +478,10 @@ void Session::Impl::on_pref_changed(tr_quark const key)
     switch (key)
     {
     case TR_KEY_sort_mode:
-        sorter_->set_mode(gtr_pref_string_get(TR_KEY_sort_mode));
+        if (auto const sort_mode = gtr_pref_get<SortMode>(TR_KEY_sort_mode))
+        {
+            sorter_->set_mode(*sort_mode);
+        }
         break;
 
     case TR_KEY_sort_reversed:
@@ -683,25 +687,22 @@ Glib::RefPtr<Torrent> Session::Impl::create_new_torrent(tr_ctor* ctor)
 {
     bool do_trash = false;
 
-    /* let the gtk client handle the removal, since libT
-     * doesn't have any concept of the glib trash API */
+    // let the gtk client handle the removal, since libT
+    // doesn't have any concept of the glib trash API
     tr_ctorGetDeleteSource(ctor, &do_trash);
     tr_ctorSetDeleteSource(ctor, false);
     tr_torrent* const tor = tr_torrentNew(ctor, nullptr);
 
     if (tor != nullptr && do_trash)
     {
-        char const* config = tr_sessionGetConfigDir(session_);
-        char const* source = tr_ctorGetSourceFile(ctor);
-
-        if (source != nullptr)
+        if (std::optional<std::string> const source = tr_ctorGetSourceFile(ctor))
         {
-            /* #1294: don't delete the .torrent file if it's our internal copy */
-            bool const is_internal = strstr(source, config) == source;
-
+            // #1294: don't delete the .torrent file if it's our internal copy
+            std::string const config_dir = tr_sessionGetConfigDir(session_);
+            bool const is_internal = source && source->starts_with(config_dir);
             if (!is_internal)
             {
-                gtr_file_trash_or_remove(source, nullptr);
+                gtr_file_trash_or_remove(*source);
             }
         }
     }
@@ -722,7 +723,7 @@ void Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
         /* don't complain about torrent files in the watch directory
          * that have already been added... that gets annoying and we
          * don't want to be nagging users to clean up their watch dirs */
-        if (tr_ctorGetSourceFile(ctor) == nullptr || !adding_from_watch_dir_)
+        if (!tr_ctorGetSourceFile(ctor).has_value() || !adding_from_watch_dir_)
         {
             signal_add_error_.emit(ERR_ADD_TORRENT_DUP, metainfo->name().c_str());
         }
@@ -761,9 +762,9 @@ void core_apply_defaults(tr_ctor* ctor)
         tr_ctorSetPeerLimit(ctor, TR_FORCE, gtr_pref_int_get(TR_KEY_peer_limit_per_torrent));
     }
 
-    if (!tr_ctorGetDownloadDir(ctor, TR_FORCE, nullptr))
+    if (!tr_ctorGetDownloadDir(ctor, TR_FORCE).has_value())
     {
-        tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir).c_str());
+        tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir));
     }
 }
 
@@ -836,13 +837,13 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     if (auto const path = file->get_path(); !std::empty(path))
     {
         // try to treat it as a file...
-        loaded = tr_ctorSetMetainfoFromFile(ctor, path.c_str(), nullptr);
+        loaded = tr_ctorSetMetainfoFromFile(ctor, path);
     }
 
     if (!loaded)
     {
         // try to treat it as a magnet link...
-        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri().c_str(), nullptr);
+        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri());
     }
 
     // if we could make sense of it, add it
@@ -1008,16 +1009,11 @@ void Session::update()
     impl_->update();
 }
 
-void Session::start_now(tr_torrent_id_t id)
+void Session::start_now(tr_torrent_id_t const id)
 {
-    tr_variant top;
-    tr_variantInitDict(&top, 2);
-    tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-start-now");
-
-    auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
-    auto* ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
-    tr_variantListAddInt(ids, id);
-    exec(top);
+    auto params = tr_variant::Map{ 1U };
+    params.try_emplace(TR_KEY_ids, to_variant({ id }));
+    exec(TR_KEY_torrent_start_now, std::move(params));
 }
 
 void Session::Impl::update()
@@ -1208,38 +1204,41 @@ void Session::set_pref(tr_quark const key, double newval)
 ****
 ***/
 
-/* #define DEBUG_RPC */
-
 namespace
 {
 
-int64_t nextTag = 1;
+int64_t nextId = 1;
+
+bool const verbose_ = tr_env_key_exists("TR_RPC_VERBOSE");
 
 std::map<int64_t, std::function<void(tr_variant&)>> pendingRequests;
 
 bool core_read_rpc_response_idle(tr_variant& response)
 {
-    if (int64_t tag = 0; tr_variantDictFindInt(&response, TR_KEY_tag, &tag))
+    if (verbose_)
     {
-        if (auto const data_it = pendingRequests.find(tag); data_it != pendingRequests.end())
-        {
-            if (auto const& response_func = data_it->second; response_func)
-            {
-                response_func(response);
-            }
+        fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(response));
+    }
 
-            pendingRequests.erase(data_it);
-        }
-        else
+    if (auto const* resmap = response.get_if<tr_variant::Map>())
+    {
+        if (auto const id = resmap->value_if<int64_t>(TR_KEY_id))
         {
-            gtr_warning(fmt::format(fmt::runtime(_("Couldn't find pending RPC request for tag {tag}")), fmt::arg("tag", tag)));
+            if (auto const nh = pendingRequests.extract(*id))
+            {
+                nh.mapped()(response);
+            }
+            else
+            {
+                gtr_warning(fmt::format(fmt::runtime(_("Couldn't find pending RPC request for id {id}")), fmt::arg("id", *id)));
+            }
         }
     }
 
     return false;
 }
 
-void core_read_rpc_response(tr_session* /*session*/, tr_variant&& response)
+void core_read_rpc_response(tr_variant&& response)
 {
     auto owned_response = std::make_shared<tr_variant>(std::move(response));
     Glib::signal_idle().connect([owned_response]() mutable { return core_read_rpc_response_idle(*owned_response); });
@@ -1248,26 +1247,45 @@ void core_read_rpc_response(tr_session* /*session*/, tr_variant&& response)
 } // namespace
 
 void Session::Impl::send_rpc_request(
-    tr_variant const& request,
-    int64_t tag,
-    std::function<void(tr_variant&)> const& response_func)
+    tr_quark const method,
+    tr_variant const& params,
+    std::function<void(tr_variant&)> on_response)
 {
     if (session_ == nullptr)
     {
         gtr_error("GTK+ client doesn't support connections to remote servers yet.");
+        return;
     }
-    else
+
+    // build the jsonrpc request
+    auto reqmap = tr_variant::Map{ 4U };
+    reqmap.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+    reqmap.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(method));
+
+    // add params if there are any
+    if (params.has_value())
     {
-        /* remember this request */
-        pendingRequests.try_emplace(tag, response_func);
-
-        /* make the request */
-#ifdef DEBUG_RPC
-        gtr_message(fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)));
-#endif
-
-        tr_rpc_request_exec(session_, request, core_read_rpc_response);
+        reqmap.try_emplace(TR_KEY_params, params.clone());
     }
+
+    // add id if we want a response
+    auto callback = std::function<void(tr_variant&&)>{};
+    if (on_response)
+    {
+        auto const id = nextId++;
+        pendingRequests.try_emplace(id, std::move(on_response));
+        reqmap.try_emplace(TR_KEY_id, id);
+        callback = core_read_rpc_response;
+    }
+
+    auto req = tr_variant{ std::move(reqmap) };
+
+    if (verbose_)
+    {
+        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(req));
+    }
+
+    tr_rpc_request_exec(session_, req, std::move(callback));
 }
 
 /***
@@ -1284,36 +1302,30 @@ void Session::port_test(PortTestIpProtocol const ip_protocol)
     }
     impl_->set_port_test_pending(true, ip_protocol);
 
-    auto const tag = nextTag++;
-
-    auto arguments_map = tr_variant::Map{ 1U };
-    arguments_map.try_emplace(TR_KEY_ip_protocol, tr_variant::unmanaged_string(IpStr[ip_protocol]));
-
-    auto request_map = tr_variant::Map{ 3U };
-    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("port-test"sv));
-    request_map.try_emplace(TR_KEY_tag, tag);
-    request_map.try_emplace(TR_KEY_arguments, std::move(arguments_map));
+    auto params = tr_variant::Map{ 1U };
+    params.try_emplace(TR_KEY_ip_protocol, tr_variant::unmanaged_string(IpStr[ip_protocol]));
 
     impl_->send_rpc_request(
-        tr_variant{ std::move(request_map) },
-        tag,
+        TR_KEY_port_test,
+        std::move(params),
         [this, ip_protocol](tr_variant& response)
         {
             impl_->set_port_test_pending(false, ip_protocol);
 
-            auto status = std::optional<bool>{};
-            if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
+            auto is_open = std::optional<bool>();
+
+            if (auto const* resmap = response.get_if<tr_variant::Map>())
             {
-                if (auto result = bool{}; tr_variantDictFindBool(args, TR_KEY_port_is_open_kebab, &result))
+                if (auto const* result = resmap->find_if<tr_variant::Map>(TR_KEY_result))
                 {
-                    status = result;
+                    is_open = result->value_if<bool>(TR_KEY_port_is_open);
                 }
             }
 
             // If for whatever reason the status optional is empty here,
             // then something must have gone wrong with the port test,
             // so the UI should show the "error" state
-            impl_->signal_port_tested().emit(status, ip_protocol);
+            impl_->signal_port_tested().emit(is_open, ip_protocol);
         });
 }
 
@@ -1341,46 +1353,35 @@ void Session::Impl::set_port_test_pending(bool pending, Session::PortTestIpProto
 
 void Session::blocklist_update()
 {
-    auto const tag = nextTag;
-    ++nextTag;
-
-    tr_variant request;
-    tr_variantInitDict(&request, 2);
-    tr_variantDictAddStrView(&request, TR_KEY_method, "blocklist-update");
-    tr_variantDictAddInt(&request, TR_KEY_tag, tag);
     impl_->send_rpc_request(
-        request,
-        tag,
-        [this](auto& response)
+        TR_KEY_blocklist_update,
+        tr_variant{}, // no params
+        [this](tr_variant& response)
         {
-            tr_variant* args = nullptr;
-            int64_t ruleCount = 0;
+            std::optional<int64_t> n_rules;
 
-            if (!tr_variantDictFindDict(&response, TR_KEY_arguments, &args) ||
-                !tr_variantDictFindInt(args, TR_KEY_blocklist_size_kebab, &ruleCount))
+            if (auto const* resmap = response.get_if<tr_variant::Map>())
             {
-                ruleCount = -1;
+                if (auto const* result = resmap->find_if<tr_variant::Map>(TR_KEY_result))
+                {
+                    n_rules = result->value_if<int64_t>(TR_KEY_blocklist_size);
+                }
             }
 
-            if (ruleCount > 0)
+            if (n_rules.has_value())
             {
                 gtr_pref_int_set(TR_KEY_blocklist_date, tr_time());
             }
 
-            impl_->signal_blocklist_updated().emit(ruleCount >= 0);
+            impl_->signal_blocklist_updated().emit(*n_rules >= 0);
         });
 }
 
-/***
-****
-***/
+// ---
 
-void Session::exec(tr_variant const& request)
+void Session::exec(tr_quark method, tr_variant const& params)
 {
-    auto const tag = nextTag;
-    ++nextTag;
-
-    impl_->send_rpc_request(request, tag, {});
+    impl_->send_rpc_request(method, params, {});
 }
 
 /***
@@ -1412,6 +1413,26 @@ size_t Session::Impl::get_active_torrent_count() const
     return activeCount;
 }
 
+std::vector<tr_torrent*> Session::find_torrents(std::vector<tr_torrent_id_t> const& ids) const
+{
+    auto ret = std::vector<tr_torrent*>{};
+
+    if (auto* const session = impl_->get_session())
+    {
+        ret.reserve(std::size(ids));
+
+        for (auto const& id : ids)
+        {
+            if (auto* const tor = tr_torrentFindFromId(session, id))
+            {
+                ret.emplace_back(tor);
+            }
+        }
+    }
+
+    return ret;
+}
+
 tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
 {
     tr_torrent* tor = nullptr;
@@ -1431,20 +1452,17 @@ FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& Session::favicon_cache() const
 
 void Session::open_folder(tr_torrent_id_t torrent_id) const
 {
-    auto const* tor = find_torrent(torrent_id);
-
-    if (tor != nullptr)
+    if (auto const* tor = find_torrent(torrent_id); tor != nullptr)
     {
-        bool const single = tr_torrentFileCount(tor) == 1;
-        char const* currentDir = tr_torrentGetCurrentDir(tor);
+        std::string_view const current_dir = tr_torrentGetCurrentDir(tor);
 
-        if (single)
+        if (tr_torrentFileCount(tor) == 1)
         {
-            gtr_open_file(currentDir);
+            gtr_open_file(current_dir);
         }
         else
         {
-            gtr_open_file(Glib::build_filename(currentDir, tr_torrentName(tor)));
+            gtr_open_file(current_dir, tr_torrentName(tor));
         }
     }
 }

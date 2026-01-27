@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <array>
 #include <bitset>
 #include <cstddef> // size_t
 #include <ctime> // for time_t
@@ -17,7 +18,7 @@
 #include "libtransmission/transmission.h" // for TR_SCHED_ALL
 
 #include "libtransmission/quark.h"
-#include "libtransmission/settings.h"
+#include "libtransmission/serializer.h"
 #include "libtransmission/values.h"
 
 struct tr_variant;
@@ -28,7 +29,7 @@ class tr_session_alt_speeds
     using Speed = libtransmission::Values::Speed;
 
 public:
-    class Settings final : public libtransmission::Settings
+    class Settings final
     {
     public:
         Settings() = default;
@@ -38,8 +39,18 @@ public:
             load(src);
         }
 
+        void load(tr_variant const& src)
+        {
+            libtransmission::serializer::load(*this, Fields, src);
+        }
+
+        [[nodiscard]] tr_variant::Map save() const
+        {
+            return libtransmission::serializer::save(*this, Fields);
+        }
+
         // NB: When adding a field here, you must also add it to
-        // fields() if you want it to be in session-settings.json
+        // `Fields` if you want it to be in session-settings.json
         bool is_active = false;
         bool scheduler_enabled = false; // whether alt speeds toggle on and off on schedule
         size_t minute_begin = 540U; // minutes past midnight; 9AM
@@ -49,18 +60,18 @@ public:
         size_t use_on_these_weekdays = TR_SCHED_ALL;
 
     private:
-        [[nodiscard]] Fields fields() override
-        {
-            return {
-                { TR_KEY_alt_speed_enabled, &is_active },
-                { TR_KEY_alt_speed_up, &speed_up_kbyps },
-                { TR_KEY_alt_speed_down, &speed_down_kbyps },
-                { TR_KEY_alt_speed_time_enabled, &scheduler_enabled },
-                { TR_KEY_alt_speed_time_day, &use_on_these_weekdays },
-                { TR_KEY_alt_speed_time_begin, &minute_begin },
-                { TR_KEY_alt_speed_time_end, &minute_end },
-            };
-        }
+        template<auto MemberPtr>
+        using Field = libtransmission::serializer::Field<MemberPtr>;
+
+        static constexpr auto Fields = std::tuple{
+            Field<&Settings::is_active>{ TR_KEY_alt_speed_enabled },
+            Field<&Settings::speed_up_kbyps>{ TR_KEY_alt_speed_up },
+            Field<&Settings::speed_down_kbyps>{ TR_KEY_alt_speed_down },
+            Field<&Settings::scheduler_enabled>{ TR_KEY_alt_speed_time_enabled },
+            Field<&Settings::use_on_these_weekdays>{ TR_KEY_alt_speed_time_day },
+            Field<&Settings::minute_begin>{ TR_KEY_alt_speed_time_begin },
+            Field<&Settings::minute_end>{ TR_KEY_alt_speed_time_end },
+        };
     };
 
     enum class ChangeReason : uint8_t
@@ -147,13 +158,13 @@ public:
 
     [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
     {
-        auto const kbyps = dir == TR_DOWN ? settings().speed_down_kbyps : settings().speed_up_kbyps;
+        auto const kbyps = dir == tr_direction::Down ? settings().speed_down_kbyps : settings().speed_up_kbyps;
         return Speed{ kbyps, Speed::Units::KByps };
     }
 
     constexpr void set_speed_limit(tr_direction dir, Speed const limit) noexcept
     {
-        if (dir == TR_DOWN)
+        if (dir == tr_direction::Down)
         {
             settings_.speed_down_kbyps = limit.count(Speed::Units::KByps);
         }
@@ -178,7 +189,7 @@ private:
     void set_active(bool active, ChangeReason reason, bool force);
 
     // whether `time` hits in one of the `minutes_` that is true
-    [[nodiscard]] bool is_active_minute(time_t time) const noexcept;
+    [[nodiscard]] bool is_active_minute(time_t time) const;
 
     static int constexpr MinutesPerHour = 60;
     static int constexpr MinutesPerDay = MinutesPerHour * 24;

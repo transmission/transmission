@@ -54,8 +54,8 @@ protected:
 
 TEST_P(IncompleteDirTest, incompleteDir)
 {
-    auto const* download_dir = tr_sessionGetDownloadDir(session_);
-    auto const* incomplete_dir = tr_sessionGetIncompleteDir(session_);
+    std::string const download_dir = tr_sessionGetDownloadDir(session_);
+    std::string const incomplete_dir = tr_sessionGetIncompleteDir(session_);
 
     // init an incomplete torrent.
     // the test zero_torrent will be missing its first piece.
@@ -159,7 +159,7 @@ using MoveTest = SessionTest;
 TEST_F(MoveTest, setLocation)
 {
     auto const target_dir = tr_pathbuf{ session_->configDir(), "/target"sv };
-    tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+    tr_sys_dir_create(target_dir, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
     // init a torrent.
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);

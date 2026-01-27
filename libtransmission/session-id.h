@@ -36,11 +36,11 @@ public:
      * relative paths to absolute before passing through RPC, or presenting
      * different UI for local and remote sessions.
      */
-    [[nodiscard]] static bool is_local(std::string_view session_id) noexcept;
+    [[nodiscard]] static bool is_local(std::string_view session_id);
 
     // current session identifier
-    [[nodiscard]] std::string_view sv() const noexcept;
-    [[nodiscard]] char const* c_str() const noexcept;
+    [[nodiscard]] std::string_view sv() const;
+    [[nodiscard]] char const* c_str() const;
 
 private:
     static auto constexpr SessionIdSize = size_t{ 48 };

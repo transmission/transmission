@@ -42,10 +42,6 @@ auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissi
 auto constexpr UpkeepInterval = 30min;
 auto constexpr RetryUpkeepInterval = 30s;
 
-// Normally there should only ever be 1 cache instance during the entire program execution
-// This is a counter only to cater for SessionTest.honorsSettings
-std::size_t cache_exists = 0;
-
 } // namespace
 
 namespace
@@ -156,8 +152,11 @@ tr_ip_cache::tr_ip_cache(Mediator& mediator_in)
         upkeep_timers_[i]->set_callback(cb);
         start_timer(type, UpkeepInterval);
     }
+}
 
-    ++cache_exists;
+std::shared_ptr<tr_ip_cache> tr_ip_cache::create(Mediator& mediator)
+{
+    return std::shared_ptr<tr_ip_cache>{ new tr_ip_cache{ mediator } };
 }
 
 tr_ip_cache::~tr_ip_cache()
@@ -171,12 +170,10 @@ tr_ip_cache::~tr_ip_cache()
     if (!std::all_of(
             std::begin(is_updating_),
             std::end(is_updating_),
-            [](is_updating_t const& v) { return v == is_updating_t::ABORT; }))
+            [](is_updating_t const& v) { return v == is_updating_t::Abort; }))
     {
         tr_logAddDebug("Destructed while some global IP queries were pending.");
     }
-
-    --cache_exists;
 }
 
 bool tr_ip_cache::try_shutdown() noexcept
@@ -188,11 +185,11 @@ bool tr_ip_cache::try_shutdown() noexcept
 
     for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
-        if (is_updating_[i] == is_updating_t::YES)
+        if (is_updating_[i] == is_updating_t::Yes)
         {
             return false;
         }
-        is_updating_[i] = is_updating_t::ABORT; // Abort any future updates
+        is_updating_[i] = is_updating_t::Abort; // Abort any future updates
     }
     return true;
 }
@@ -239,6 +236,7 @@ void tr_ip_cache::update_addr(tr_address_type type) noexcept
 void tr_ip_cache::update_global_addr(tr_address_type type) noexcept
 {
     auto const ix_service = ix_service_[type];
+    TR_ASSERT(type < NUM_TR_AF_INET_TYPES);
     TR_ASSERT(has_ip_protocol_[type]);
     TR_ASSERT(ix_service < std::size(IPQueryServices[type]));
 
@@ -246,21 +244,24 @@ void tr_ip_cache::update_global_addr(tr_address_type type) noexcept
     {
         return;
     }
-    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
+    TR_ASSERT(is_updating_[type] == is_updating_t::Yes);
 
     // Update global address
-    static auto constexpr IPProtocolMap = std::array{ tr_web::FetchOptions::IPProtocol::V4,
-                                                      tr_web::FetchOptions::IPProtocol::V6 };
-    auto options = tr_web::FetchOptions{ IPQueryServices[type][ix_service],
-                                         [this, type](tr_web::FetchResponse const& response)
-                                         {
-                                             // Check to avoid segfault
-                                             if (cache_exists != 0)
-                                             {
-                                                 this->on_response_ip_query(type, response);
-                                             }
-                                         },
-                                         nullptr };
+    static auto constexpr IPProtocolMap = std::array{
+        tr_web::FetchOptions::IPProtocol::V4,
+        tr_web::FetchOptions::IPProtocol::V6,
+    };
+    auto options = tr_web::FetchOptions{
+        IPQueryServices[type][ix_service],
+        [weak = weak_from_this(), type](tr_web::FetchResponse const& response)
+        {
+            if (auto const ptr = weak.lock())
+            {
+                ptr->on_response_ip_query(type, response);
+            }
+        },
+        nullptr,
+    };
     options.ip_proto = IPProtocolMap[type];
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
@@ -278,7 +279,7 @@ void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
     {
         return;
     }
-    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
+    TR_ASSERT(is_updating_[type] == is_updating_t::Yes);
 
     auto const protocol = tr_ip_protocol_to_sv(type);
     auto err = 0;
@@ -320,7 +321,7 @@ void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
 void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept
 {
     auto& ix_service = ix_service_[type];
-    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
+    TR_ASSERT(is_updating_[type] == is_updating_t::Yes);
     TR_ASSERT(ix_service < std::size(IPQueryServices[type]));
 
     auto const protocol = tr_ip_protocol_to_sv(type);
@@ -397,16 +398,16 @@ void tr_ip_cache::unset_addr(tr_address_type type) noexcept
 
 bool tr_ip_cache::set_is_updating(tr_address_type type) noexcept
 {
-    if (is_updating_[type] != is_updating_t::NO)
+    if (is_updating_[type] != is_updating_t::No)
     {
         return false;
     }
-    is_updating_[type] = is_updating_t::YES;
+    is_updating_[type] = is_updating_t::Yes;
     return true;
 }
 
 void tr_ip_cache::unset_is_updating(tr_address_type type) noexcept
 {
-    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
-    is_updating_[type] = is_updating_t::NO;
+    TR_ASSERT(is_updating_[type] == is_updating_t::Yes);
+    is_updating_[type] = is_updating_t::No;
 }

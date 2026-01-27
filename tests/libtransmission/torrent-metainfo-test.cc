@@ -63,20 +63,20 @@ TEST_F(TorrentMetainfoTest, bucket)
     };
 
     auto const tests = std::array<LocalTest, 9>{ {
-        { BEFORE_PATH "5:a.txt" AFTER_PATH, true },
+        { .benc = BEFORE_PATH "5:a.txt" AFTER_PATH, .expected_parse_result = true },
         // allow empty components, but not =all= empty components, see bug #5517
-        { BEFORE_PATH "0:5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "0:0:" AFTER_PATH, false },
+        { .benc = BEFORE_PATH "0:5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "0:0:" AFTER_PATH, .expected_parse_result = false },
         // allow path separators in a filename (replaced with '_')
-        { BEFORE_PATH "7:a/a.txt" AFTER_PATH, true },
+        { .benc = BEFORE_PATH "7:a/a.txt" AFTER_PATH, .expected_parse_result = true },
         // allow "." components (skipped)
-        { BEFORE_PATH "1:.5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "5:a.txt1:." AFTER_PATH, true },
+        { .benc = BEFORE_PATH "1:.5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "5:a.txt1:." AFTER_PATH, .expected_parse_result = true },
         // allow ".." components (replaced with "__")
-        { BEFORE_PATH "2:..5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "5:a.txt2:.." AFTER_PATH, true },
+        { .benc = BEFORE_PATH "2:..5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "5:a.txt2:.." AFTER_PATH, .expected_parse_result = true },
         // fail on empty string
-        { "", false },
+        { .benc = "", .expected_parse_result = false },
     } };
 
     tr_logSetLevel(TR_LOG_OFF);
@@ -122,13 +122,12 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
 
     auto* ctor = tr_ctorNew(session_);
     auto error = tr_error{};
-    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), &error));
+    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename, &error));
     EXPECT_FALSE(error) << error;
     auto const* const metainfo = tr_ctorGetMetainfo(ctor);
     EXPECT_NE(nullptr, metainfo);
     EXPECT_EQ(336, metainfo->info_dict_offset());
     EXPECT_EQ(26583, metainfo->info_dict_size());
-    EXPECT_EQ(592, metainfo->pieces_offset());
     tr_ctorFree(ctor);
 }
 
@@ -147,7 +146,7 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     error = {};
 
     // now try saving _with_ metainfo
-    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str(), &error));
+    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename, &error));
     EXPECT_FALSE(error) << error;
     EXPECT_TRUE(ctor->save(tgt_filename, &error));
     EXPECT_FALSE(error) << error;

@@ -195,7 +195,7 @@ std::string tr_magnet_metainfo::magnet() const
 
 void tr_magnet_metainfo::set_name(std::string_view name)
 {
-    name_ = tr_strv_convert_utf8(name);
+    name_ = tr_strv_to_utf8_string(name);
 }
 
 void tr_magnet_metainfo::add_webseed(std::string_view webseed)
@@ -235,7 +235,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* err
     }
 
     bool got_hash = false;
-    for (auto const& [key, value] : tr_url_query_view{ parsed->query })
+    for (auto const& [key, value] : parsed->query_entries())
     {
         if (key == "dn"sv)
         {

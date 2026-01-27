@@ -180,7 +180,7 @@ void MainWindow::Impl::on_popup_menu([[maybe_unused]] double event_x, [[maybe_un
 {
     if (popup_menu_ == nullptr)
     {
-        auto const menu = gtr_action_get_object<Gio::Menu>("main-window-popup");
+        auto const menu = gtr_action_get_object<Gio::Menu>(GTR_KEY_main_window_popup);
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
         popup_menu_ = Gtk::make_managed<Gtk::PopoverMenu>(menu, Gtk::PopoverMenu::Flags::NESTED);
@@ -275,7 +275,7 @@ void MainWindow::Impl::init_view(TorrentView* view, Glib::RefPtr<FilterBar::Mode
     item_factory_compact_ = create_builder_list_item_factory("TorrentListItemCompact.ui"s);
     item_factory_full_ = create_builder_list_item_factory("TorrentListItemFull.ui"s);
 
-    view->signal_activate().connect([](guint /*position*/) { gtr_action_activate("show-torrent-properties"); });
+    view->signal_activate().connect([](guint /*position*/) { gtr_action_activate(GTR_KEY_show_torrent_properties); });
 
     selection_ = Gtk::MultiSelection::create(model);
     selection_->signal_selection_changed().connect([this](guint /*position*/, guint /*n_items*/)
@@ -297,7 +297,7 @@ void MainWindow::Impl::init_view(TorrentView* view, Glib::RefPtr<FilterBar::Mode
 
     view->signal_popup_menu().connect_notify([this]() { on_popup_menu(0, 0); });
     view->signal_row_activated().connect([](auto const& /*path*/, auto* /*column*/)
-                                         { gtr_action_activate("show-torrent-properties"); });
+                                         { gtr_action_activate(GTR_KEY_show_torrent_properties); });
 
     view->set_model(model);
 
@@ -409,24 +409,24 @@ void MainWindow::Impl::onAltSpeedToggledIdle()
 void MainWindow::Impl::onSpeedToggled(std::string const& action_name, tr_direction dir, bool enabled)
 {
     options_actions_->change_action_state(action_name, VariantInt::create(enabled ? 1 : 0));
-    core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, enabled);
+    core_->set_pref(dir == tr_direction::Up ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, enabled);
 }
 
 void MainWindow::Impl::onSpeedSet(tr_direction dir, int KBps)
 {
-    core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up : TR_KEY_speed_limit_down, KBps);
-    core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, true);
+    core_->set_pref(dir == tr_direction::Up ? TR_KEY_speed_limit_up : TR_KEY_speed_limit_down, KBps);
+    core_->set_pref(dir == tr_direction::Up ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, true);
 }
 
 Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(
     Glib::RefPtr<Gio::SimpleActionGroup> const& actions,
     tr_direction dir)
 {
-    auto& info = speed_menu_info_.at(dir);
+    auto& info = speed_menu_info_.at(static_cast<uint8_t>(dir));
 
     auto m = Gio::Menu::create();
 
-    auto const action_name = fmt::format("speed-limit-{}", dir == TR_UP ? "up" : "down");
+    auto const action_name = fmt::format("speed-limit-{}", dir == tr_direction::Up ? "up" : "down");
     auto const full_action_name = fmt::format("{}.{}", OptionsMenuActionGroupName, action_name);
     info.action = actions->add_action_radio_integer(
         action_name,
@@ -537,8 +537,8 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createOptionsMenu()
     auto actions = Gio::SimpleActionGroup::create();
 
     auto section = Gio::Menu::create();
-    section->append_submenu(_("Limit Download Speed"), createSpeedMenu(actions, TR_DOWN));
-    section->append_submenu(_("Limit Upload Speed"), createSpeedMenu(actions, TR_UP));
+    section->append_submenu(_("Limit Download Speed"), createSpeedMenu(actions, tr_direction::Down));
+    section->append_submenu(_("Limit Upload Speed"), createSpeedMenu(actions, tr_direction::Up));
     top->append_section(section);
 
     section = Gio::Menu::create();
@@ -570,12 +570,12 @@ void MainWindow::Impl::onOptionsClicked()
     };
 
     update_menu(
-        speed_menu_info_[TR_DOWN],
+        speed_menu_info_[static_cast<uint8_t>(tr_direction::Down)],
         Speed{ gtr_pref_int_get(TR_KEY_speed_limit_down), Speed::Units::KByps }.to_string(),
         TR_KEY_speed_limit_down_enabled);
 
     update_menu(
-        speed_menu_info_[TR_UP],
+        speed_menu_info_[static_cast<uint8_t>(tr_direction::Up)],
         Speed{ gtr_pref_int_get(TR_KEY_speed_limit_up), Speed::Units::KByps }.to_string(),
         TR_KEY_speed_limit_up_enabled);
 

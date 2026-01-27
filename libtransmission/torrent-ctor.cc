@@ -84,9 +84,9 @@ void tr_ctorFree(tr_ctor* ctor)
     delete ctor;
 }
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* const ctor, char const* const filename, tr_error* const error)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* const ctor, std::string_view const filename, tr_error* const error)
 {
-    return ctor->set_metainfo_from_file(std::string_view{ filename != nullptr ? filename : "" }, error);
+    return ctor->set_metainfo_from_file(filename, error);
 }
 
 bool tr_ctorSetMetainfo(tr_ctor* const ctor, char const* const metainfo, size_t len, tr_error* const error)
@@ -95,15 +95,19 @@ bool tr_ctorSetMetainfo(tr_ctor* const ctor, char const* const metainfo, size_t 
     return ctor->set_metainfo(metainfo_sv, error);
 }
 
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* const ctor, char const* const magnet, tr_error* const error)
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* const ctor, std::string_view const magnet, tr_error* const error)
 {
-    auto const magnet_sv = std::string_view{ magnet != nullptr ? magnet : "" };
-    return ctor->set_metainfo_from_magnet_link(magnet_sv, error);
+    return ctor->set_metainfo_from_magnet_link(magnet, error);
 }
 
-char const* tr_ctorGetSourceFile(tr_ctor const* const ctor)
+std::optional<std::string> tr_ctorGetSourceFile(tr_ctor const* const ctor)
 {
-    return ctor->torrent_filename().c_str();
+    if (auto const& filename = ctor->torrent_filename(); !std::empty(filename))
+    {
+        return filename;
+    }
+
+    return {};
 }
 
 void tr_ctorSetFilePriorities(
@@ -150,14 +154,14 @@ void tr_ctorSetPeerLimit(tr_ctor* const ctor, tr_ctorMode const mode, uint16_t c
     ctor->set_peer_limit(mode, peer_limit);
 }
 
-void tr_ctorSetDownloadDir(tr_ctor* const ctor, tr_ctorMode const mode, char const* const dir)
+void tr_ctorSetDownloadDir(tr_ctor* const ctor, tr_ctorMode const mode, std::string_view const dir)
 {
-    ctor->set_download_dir(mode, std::string_view{ dir != nullptr ? dir : "" });
+    ctor->set_download_dir(mode, dir);
 }
 
-void tr_ctorSetIncompleteDir(tr_ctor* const ctor, char const* const dir)
+void tr_ctorSetIncompleteDir(tr_ctor* const ctor, std::string_view const dir)
 {
-    ctor->set_incomplete_dir(std::string_view{ dir != nullptr ? dir : "" });
+    ctor->set_incomplete_dir(dir);
 }
 
 bool tr_ctorGetPeerLimit(tr_ctor const* const ctor, tr_ctorMode const mode, uint16_t* const setme)
@@ -190,19 +194,14 @@ bool tr_ctorGetPaused(tr_ctor const* const ctor, tr_ctorMode const mode, bool* c
     return false;
 }
 
-bool tr_ctorGetDownloadDir(tr_ctor const* const ctor, tr_ctorMode const mode, char const** setme)
+std::optional<std::string> tr_ctorGetDownloadDir(tr_ctor const* const ctor, tr_ctorMode const mode)
 {
-    if (auto const& val = ctor->download_dir(mode); !std::empty(val))
+    if (auto const& dir = ctor->download_dir(mode); !std::empty(dir))
     {
-        if (setme != nullptr)
-        {
-            *setme = val.c_str();
-        }
-
-        return true;
+        return dir;
     }
 
-    return false;
+    return {};
 }
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* const ctor)

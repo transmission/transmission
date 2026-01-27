@@ -671,7 +671,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
             handshake->mediator_->set_utp_failed(info_hash, io->socket_address());
         }
 
-        if (handshake->mediator_->allows_tcp() && io->reconnect())
+        if (io->reconnect())
         {
             tr_logAddTraceHand(handshake, "uTP connection failed, trying TCP...");
             if (handshake->encryption_mode_ != TR_CLEAR_PREFERRED)
@@ -692,8 +692,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
     /* if the error happened while we were sending a public key, we might
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
-    if (handshake->is_state(State::AwaitingYb) && handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED &&
-        handshake->mediator_->allows_tcp() && io->reconnect())
+    if (handshake->is_state(State::AwaitingYb) && handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && io->reconnect())
     {
         tr_logAddTraceHand(handshake, "MSE handshake failed, trying plaintext...");
         retry_plain();
@@ -814,7 +813,12 @@ bool tr_handshake::fire_done(bool is_connected)
     auto cb = DoneFunc{};
     std::swap(cb, on_done_);
 
-    return (cb)(Result{ peer_io_, peer_id_, have_read_anything_from_peer_, is_connected });
+    return (cb)(Result{
+        .io = peer_io_,
+        .peer_id = peer_id_,
+        .read_anything_from_peer = have_read_anything_from_peer_,
+        .is_connected = is_connected,
+    });
 }
 
 void tr_handshake::fire_timer()

@@ -10,17 +10,14 @@
 
 // --- Basic Types
 
-#include <stddef.h> // size_t
-#include <stdint.h> // uintN_t
-#include <time.h> // time_t
-
-#ifdef __cplusplus
+#include <cstddef>
+#include <cstdint>
+#include <ctime>
 #include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
-#else
-#include <stdbool.h> // bool
-#endif
+#include <vector>
 
 #include "libtransmission/tr-macros.h"
 
@@ -34,6 +31,20 @@ using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
 using tr_torrent_id_t = int;
 using tr_mode_t = uint16_t;
+
+inline auto constexpr TrDefaultBlocklistFilename = std::string_view{ "blocklist.bin" };
+inline auto constexpr TrDefaultHttpServerBasePath = std::string_view{ "/transmission/" };
+inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
+inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
+inline auto constexpr TrDefaultPeerPort = 51413U;
+inline auto constexpr TrDefaultPeerSocketTos = std::string_view{ "le" };
+inline auto constexpr TrDefaultRpcPort = 9091U;
+inline auto constexpr TrDefaultRpcWhitelist = std::string_view{ "127.0.0.1,::1" };
+
+inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc" };
+inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/" };
+inline auto constexpr TrRpcSessionIdHeader = std::string_view{ "X-Transmission-Session-Id" };
+inline auto constexpr TrRpcVersionHeader = std::string_view{ "X-Transmission-Rpc-Version" };
 
 struct tr_block_span_t
 {
@@ -53,8 +64,6 @@ struct tr_session;
 struct tr_torrent;
 struct tr_torrent_metainfo;
 struct tr_variant;
-
-#define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
 enum tr_verify_added_mode : uint8_t
 {
@@ -109,12 +118,7 @@ enum : int8_t
  * -# If `XDG_CONFIG_HOME` is set, `"${XDG_CONFIG_HOME}/${appname}"` is used.
  * -# `"${HOME}/.config/${appname}"` is used as a last resort.
  */
-#ifdef __cplusplus
 [[nodiscard]] std::string tr_getDefaultConfigDir(std::string_view appname);
-#endif
-
-/** @brief buffer variant of `tr_getDefaultConfigDir()`. See `tr_strv_to_buf()`. */
-size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
 
 /**
  * @brief returns Transmission's default download directory.
@@ -124,24 +128,7 @@ size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen
  * -# On Windows, `"${CSIDL_MYDOCUMENTS}/Downloads"` is used.
  * -# Otherwise, `getpwuid(getuid())->pw_dir + "/Downloads"` is used.
  */
-#ifdef __cplusplus
 [[nodiscard]] std::string tr_getDefaultDownloadDir();
-#endif
-
-/** @brief buffer variant of `tr_getDefaultDownloadDir()`. See `tr_strv_to_buf()`. */
-size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
-
-#define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
-#define TR_DEFAULT_RPC_PORT_STR "9091"
-inline auto constexpr TrDefaultRpcPort = 9091U;
-#define TR_DEFAULT_RPC_URL_STR "/transmission/"
-#define TR_DEFAULT_PEER_PORT_STR "51413"
-inline auto constexpr TrDefaultPeerPort = 51413U;
-#define TR_DEFAULT_PEER_SOCKET_TOS_STR "le"
-#define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "200"
-inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
-#define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
-inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
 
 /**
  * Add libtransmission's default settings to the benc dictionary.
@@ -179,15 +166,14 @@ tr_variant tr_sessionGetSettings(tr_session const* session);
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
- * @param app_defaults tr_variant containing the app defaults
  * @param config_dir the configuration directory to find settings.json
- * @param app_name if config_dir is empty, app_name is used to find the default dir.
+ * @param app_defaults optional tr_variant containing the app-specific defaults
  * @return the loaded settings
  * @see `tr_sessionGetDefaultSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_sessionSaveSettings()`
  */
-tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* config_dir, char const* app_name);
+[[nodiscard]] tr_variant tr_sessionLoadSettings(std::string_view config_dir, tr_variant const* app_defaults = nullptr);
 
 /**
  * Add the session's configuration settings to the benc dictionary
@@ -200,7 +186,7 @@ tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* co
  * @param client_settings the dictionary to save
  * @see `tr_sessionLoadSettings()`
  */
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings);
+void tr_sessionSaveSettings(tr_session* session, std::string_view config_dir, tr_variant const& client_settings);
 
 /**
  * @brief Initialize a libtransmission session.
@@ -219,7 +205,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
  * @see `tr_sessionLoadSettings()`
  * @see `tr_getDefaultConfigDir()`
  */
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& settings);
+tr_session* tr_sessionInit(std::string_view config_dir, bool message_queueing_enabled, tr_variant const& settings);
 
 /** @brief Update a session's settings from a benc dictionary
            like to the one used in `tr_sessionInit()` */
@@ -237,16 +223,15 @@ void tr_sessionReloadBlocklists(tr_session* session);
  *
  * @param timeout_secs specifies how long to wait on these announces.
  */
-void tr_sessionClose(tr_session* session, size_t timeout_secs = 15);
+void tr_sessionClose(tr_session* session, double timeout_secs = 15.0);
 
 /**
  * @brief Return the session's configuration directory.
  *
  * This is where transmission stores its torrent files, .resume files,
- * blocklists, etc. It's set in `tr_transmissionInit()` and is immutable
- * during the session.
+ * blocklists, etc. It's set in `tr_transmissionInit()`.
  */
-char const* tr_sessionGetConfigDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetConfigDir(tr_session const* session);
 
 /**
  * @brief Get the default download folder for new torrents.
@@ -254,7 +239,7 @@ char const* tr_sessionGetConfigDir(tr_session const* session);
  * This is set by `tr_sessionInit()` or `tr_sessionSetDownloadDir()`,
  * and can be overridden on a per-torrent basis by `tr_ctorSetDownloadDir()`.
  */
-char const* tr_sessionGetDownloadDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetDownloadDir(tr_session const* session);
 
 /**
  * @brief Set the per-session default download folder for new torrents.
@@ -262,10 +247,10 @@ char const* tr_sessionGetDownloadDir(tr_session const* session);
  * @see `tr_sessionGetDownloadDir()`
  * @see `tr_ctorSetDownloadDir()`
  */
-void tr_sessionSetDownloadDir(tr_session* session, char const* download_dir);
+void tr_sessionSetDownloadDir(tr_session* session, std::string_view download_dir);
 
 /** @brief get the per-session incomplete download folder */
-char const* tr_sessionGetIncompleteDir(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetIncompleteDir(tr_session const* session);
 
 /**
  * @brief set the per-session incomplete download folder.
@@ -286,7 +271,7 @@ char const* tr_sessionGetIncompleteDir(tr_session const* session);
  * @see `tr_sessionSetIncompleteDirEnabled()`
  * @see `tr_sessionGetIncompleteDirEnabled()`
  */
-void tr_sessionSetIncompleteDir(tr_session* session, char const* dir);
+void tr_sessionSetIncompleteDir(tr_session* session, std::string_view dir);
 
 /** @brief get whether or not the incomplete download folder is enabled */
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session);
@@ -338,7 +323,7 @@ void tr_sessionSetRPCPort(tr_session* session, uint16_t port);
     @return a comma-separated string of whitelist domains.
     @see `tr_sessionInit`
     @see `tr_sessionSetRPCWhitelist` */
-char const* tr_sessionGetRPCWhitelist(tr_session const* session);
+[[nodiscard]] std::string tr_sessionGetRPCWhitelist(tr_session const* session);
 
 /**
  * @brief Specify a whitelist for remote RPC access
@@ -348,7 +333,7 @@ char const* tr_sessionGetRPCWhitelist(tr_session const* session);
  * `'?'` is interpreted as a single-character wildcard and
  * `'*'` is interpreted as a multi-character wildcard.
  */
-void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist);
+void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view whitelist);
 
 bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session);
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);
@@ -358,16 +343,16 @@ void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);
     @return the password string.
     @see `tr_sessionInit()`
     @see `tr_sessionSetRPCPassword()` */
-char const* tr_sessionGetRPCPassword(tr_session const* session);
-void tr_sessionSetRPCPassword(tr_session* session, char const* password);
+[[nodiscard]] std::string tr_sessionGetRPCPassword(tr_session const* session);
+void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
 
-char const* tr_sessionGetRPCUsername(tr_session const* session);
-void tr_sessionSetRPCUsername(tr_session* session, char const* username);
+[[nodiscard]] std::string tr_sessionGetRPCUsername(tr_session const* session);
+void tr_sessionSetRPCUsername(tr_session* session, std::string_view username);
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool is_enabled);
 
-void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers);
+void tr_sessionSetDefaultTrackers(tr_session* session, std::string_view trackers);
 
 enum tr_rpc_callback_type : uint8_t
 {
@@ -480,12 +465,12 @@ enum tr_port_forwarding_state : uint8_t
 
 tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
 
-enum tr_direction : uint8_t
+enum class tr_direction : uint8_t
 {
-    TR_CLIENT_TO_PEER = 0,
-    TR_UP = 0,
-    TR_PEER_TO_CLIENT = 1,
-    TR_DOWN = 1
+    ClientToPeer = 0,
+    Up = 0,
+    PeerToClient = 1,
+    Down = 1,
 };
 
 // --- Session primary speed limits
@@ -564,18 +549,12 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
 tr_priority_t tr_torrentGetPriority(tr_torrent const* tor);
 void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
 
-int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
-void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
-
-bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
-void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool enabled);
-
 // ---
 
 /**
  * Torrent Queueing
  *
- * There are independent queues for seeding (`TR_UP`) and leeching (`TR_DOWN`).
+ * There are independent queues for seeding (`tr_direction::Up`) and leeching (`tr_direction::Down`).
  *
  * If the session already has enough non-stalled seeds/leeches when
  * `tr_torrentStart()` is called, the torrent will be moved into the
@@ -615,16 +594,16 @@ void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents, size_t torrent_coun
 
 // ---
 
-/** @brief Return the number of torrents allowed to download (if direction is `TR_DOWN`) or seed (if direction is `TR_UP`) at the same time */
+/** @brief Return the number of torrents allowed to download (if direction is `tr_direction::Down`) or seed (if direction is `tr_direction::Up`) at the same time */
 size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir);
 
-/** @brief Set the number of torrents allowed to download (if direction is `TR_DOWN`) or seed (if direction is `TR_UP`) at the same time */
+/** @brief Set the number of torrents allowed to download (if direction is `tr_direction::Down`) or seed (if direction is `tr_direction::Up`) at the same time */
 void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents);
 
-/** @brief Return true if we're limiting how many torrents can concurrently download (`TR_DOWN`) or seed (`TR_UP`) at the same time */
+/** @brief Return true if we're limiting how many torrents can concurrently download (`tr_direction::Down`) or seed (`tr_direction::Up`) at the same time */
 bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir);
 
-/** @brief Set whether or not to limit how many torrents can download (`TR_DOWN`) or seed (`TR_UP`) at the same time */
+/** @brief Set whether or not to limit how many torrents can download (`tr_direction::Down`) or seed (`tr_direction::Up`) at the same time */
 void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_torrents);
 
 // ---
@@ -681,9 +660,9 @@ enum TrScript : uint8_t
     TR_SCRIPT_N_TYPES
 };
 
-char const* tr_sessionGetScript(tr_session const* session, TrScript type);
+[[nodiscard]] std::string tr_sessionGetScript(tr_session const* session, TrScript type);
 
-void tr_sessionSetScript(tr_session* session, TrScript type, char const* script_filename);
+void tr_sessionSetScript(tr_session* session, TrScript type, std::string_view script_filename);
 
 bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type);
 
@@ -709,10 +688,8 @@ void tr_sessionSetScriptEnabled(tr_session* session, TrScript type, bool enabled
  *
  * The caller only needs to invoke this when the blocklist
  * has changed.
- *
- * Passing nullptr for a filename will clear the blocklist.
  */
-size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
+size_t tr_blocklistSetContent(tr_session* session, std::string_view content_filename);
 
 size_t tr_blocklistGetRuleCount(tr_session const* session);
 
@@ -722,15 +699,11 @@ bool tr_blocklistIsEnabled(tr_session const* session);
 
 void tr_blocklistSetEnabled(tr_session* session, bool is_enabled);
 
-char const* tr_blocklistGetURL(tr_session const* session);
+[[nodiscard]] std::string tr_blocklistGetURL(tr_session const* session);
 
 /** @brief The blocklist that gets updated when an RPC client
            invokes the "blocklist_update" method */
-void tr_blocklistSetURL(tr_session* session, char const* url);
-
-/** @brief the file in the $config/blocklists/ directory that's
-           used by `tr_blocklistSetContent()` and "blocklist_update" */
-#define DEFAULT_BLOCKLIST_FILENAME "blocklist.bin"
+void tr_blocklistSetURL(tr_session* session, std::string_view url);
 
 /** @} */
 
@@ -766,7 +739,7 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme_do_delete);
 void tr_ctorSetDeleteSource(tr_ctor* ctor, bool delete_source);
 
 /** @brief Set the constructor's metainfo from a magnet link */
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet, tr_error* error);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet, tr_error* error = nullptr);
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor);
 
@@ -774,7 +747,7 @@ tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor);
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error* error);
 
 /** @brief Set the constructor's metainfo from a local torrent file */
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error* error);
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error* error = nullptr);
 
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme_count);
@@ -783,12 +756,11 @@ bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme_
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t limit);
 
 /** @brief Get the download path from this peer constructor */
-bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setme_download_dir);
+std::optional<std::string> tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode);
 
 /** @brief Set the download folder for the torrent being added with this ctor.
-    @see `tr_ctorSetDownloadDir()`
     @see `tr_sessionInit()` */
-void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory);
+void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, std::string_view dir);
 
 /**
  * @brief Set the incompleteDir for this torrent.
@@ -798,7 +770,7 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
  * its older incompleteDir settings, and that's
  * the only place where it should be used.
  */
-void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory);
+void tr_ctorSetIncompleteDir(tr_ctor* ctor, std::string_view dir);
 
 /** @brief Get the "isPaused" flag from this peer constructor */
 bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme_is_paused);
@@ -814,8 +786,8 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);
 
 /** @brief Get the torrent file that this ctor's metainfo came from,
-           or nullptr if `tr_ctorSetMetainfoFromFile()` wasn't used */
-char const* tr_ctorGetSourceFile(tr_ctor const* ctor);
+           or empty if `tr_ctorSetMetainfoFromFile()` wasn't used */
+std::optional<std::string> tr_ctorGetSourceFile(tr_ctor const* ctor);
 
 /**
  * Instantiate a single torrent.
@@ -901,8 +873,8 @@ using tr_torrent_rename_done_func = std::function<
  */
 void tr_torrentRenamePath(
     tr_torrent* tor,
-    char const* oldpath,
-    char const* newname,
+    std::string_view oldpath,
+    std::string_view newname,
     tr_torrent_rename_done_func callback,
     void* callback_user_data);
 
@@ -936,7 +908,7 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, tr_torrent_id_t id);
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo);
 
-tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
+[[nodiscard]] tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, std::string_view magnet_link);
 
 /**
  * @brief Set metainfo if possible.
@@ -948,7 +920,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* torrent, tr_torrent_metainfo cons
 /**
  * @return this torrent's name.
  */
-char const* tr_torrentName(tr_torrent const* tor);
+[[nodiscard]] std::string tr_torrentName(tr_torrent const* tor);
 
 /**
  * @brief find the location of a torrent's file by looking with and without
@@ -957,12 +929,7 @@ char const* tr_torrentName(tr_torrent const* tor);
  * @param tor the torrent whose file we're looking for
  * @param file_num the fileIndex, in [0...tr_torrentFileCount())
  */
-#ifdef __cplusplus
 [[nodiscard]] std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num);
-#endif
-
-/** @brief buffer variant of `tr_torrentFindFile()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
 
 // --- Torrent speed limits
 
@@ -1034,31 +1001,29 @@ void tr_torrentSetFilePriorities(
 /** @brief Set a batch of files to be downloaded or not. */
 void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);
 
-char const* tr_torrentGetDownloadDir(tr_torrent const* torrent);
+/**
+ * Returns a permanently interned string of the torrent's download directory.
+ */
+[[nodiscard]] std::string_view tr_torrentGetDownloadDir(tr_torrent const* torrent);
 
 /* Raw function to change the torrent's downloadDir field.
    This should only be used by libtransmission or to bootstrap
    a newly-instantiated tr_torrent object. */
-void tr_torrentSetDownloadDir(tr_torrent* torrent, char const* path);
+void tr_torrentSetDownloadDir(tr_torrent* torrent, std::string_view path);
 
 /**
- * Returns the root directory of where the torrent is.
+ * Returns a permanently interned string of the torrent's root directory.
  *
  * This will usually be the downloadDir. However if the torrent
  * has an incompleteDir enabled and hasn't finished downloading
  * yet, that will be returned instead.
  */
-char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
+[[nodiscard]] std::string_view tr_torrentGetCurrentDir(tr_torrent const* tor);
 
 /**
  * Returns a the magnet link to the torrent.
  */
-#ifdef __cplusplus
 [[nodiscard]] std::string tr_torrentGetMagnetLink(tr_torrent const* tor);
-#endif
-
-/** @brief buffer variant of `tr_torrentGetMagnetLink()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 // ---
 
@@ -1072,12 +1037,7 @@ size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buf
  * are applied to all public torrents. If you want a full display of all
  * trackers, use `tr_torrentTracker()` and `tr_torrentTrackerCount()`
  */
-#ifdef __cplusplus
 [[nodiscard]] std::string tr_torrentGetTrackerList(tr_torrent const* tor);
-#endif
-
-/** @brief buffer variant of `tr_torrentGetTrackerList()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
  * Sets a torrent's tracker list from a list of announce URLs with one
@@ -1086,7 +1046,7 @@ size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t bu
  * This updates both the `torrent` object's tracker list
  * and the metainfo file in `tr_sessionGetConfigDir()`'s torrent subdirectory.
  */
-bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text);
+bool tr_torrentSetTrackerList(tr_torrent* tor, std::string_view txt);
 
 // ---
 
@@ -1369,12 +1329,7 @@ struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
 /*
  * Get the filename of Transmission's internal copy of the torrent file.
  */
-#ifdef __cplusplus
 [[nodiscard]] std::string tr_torrentFilename(tr_torrent const* tor);
-#endif
-
-/** @brief buffer variant of `tr_torrentFilename()`. See `tr_strv_to_buf()`. */
-size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
  * Use this to draw an advanced progress bar which is 'size' pixels
@@ -1608,10 +1563,7 @@ struct tr_stat
     second or so to get a new snapshot of the torrent's status. */
 tr_stat const* tr_torrentStat(tr_torrent* torrent);
 
-/** @} */
-
-/** @brief Sanity checker to test that the direction is `TR_UP` or `TR_DOWN` */
-constexpr bool tr_isDirection(tr_direction d)
-{
-    return d == TR_UP || d == TR_DOWN;
-}
+// Batch version of tr_torrentStat().
+// Prefer calling this over calling the single-torrent version in a loop.
+// TODO(c++20) take a std::span argument
+std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);

@@ -240,7 +240,7 @@ struct tr_torrent
 
     [[nodiscard]] constexpr auto uses_session_limits() const noexcept
     {
-        return bandwidth().are_parent_limits_honored(TR_UP);
+        return bandwidth().are_parent_limits_honored(tr_direction::Up);
     }
 
     [[nodiscard]] constexpr auto uses_speed_limit(tr_direction dir) const noexcept
@@ -340,7 +340,7 @@ struct tr_torrent
         return completion_.has_piece(piece);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto has_block(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto has_block(tr_block_index_t block) const
     {
         return completion_.has_block(block);
     }
@@ -409,7 +409,7 @@ struct tr_torrent
         return files_wanted_.piece_wanted(piece);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool file_is_wanted(tr_file_index_t file) const
+    [[nodiscard]] constexpr bool file_is_wanted(tr_file_index_t file) const
     {
         return files_wanted_.file_wanted(file);
     }
@@ -440,6 +440,7 @@ struct tr_torrent
             file_priorities_.set(file, priority);
             priority_changed_.emit(this, &file, 1U, priority);
             set_dirty();
+            mark_changed();
         }
     }
 
@@ -469,22 +470,22 @@ struct tr_torrent
 
     /// METAINFO - FILES
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& files() const noexcept
+    [[nodiscard]] constexpr auto const& files() const noexcept
     {
         return metainfo_.files();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
+    [[nodiscard]] constexpr auto file_count() const noexcept
     {
         return metainfo_.file_count();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& file_subpath(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR_VEC auto const& file_subpath(tr_file_index_t i) const
     {
         return metainfo_.file_subpath(i);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto file_size(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR_VEC auto file_size(tr_file_index_t i) const
     {
         return metainfo_.file_size(i);
     }
@@ -511,12 +512,12 @@ struct tr_torrent
 
     /// METAINFO - WEBSEEDS
 
-    [[nodiscard]] TR_CONSTEXPR20 auto webseed_count() const noexcept
+    [[nodiscard]] constexpr auto webseed_count() const noexcept
     {
         return metainfo_.webseed_count();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& webseed(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR_VEC auto const& webseed(size_t i) const
     {
         return metainfo_.webseed(i);
     }
@@ -650,7 +651,7 @@ struct tr_torrent
 
     [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
-        return is_done() ? TR_UP : TR_DOWN;
+        return is_done() ? tr_direction::Up : tr_direction::Down;
     }
 
     [[nodiscard]] constexpr auto is_queued(tr_direction const dir) const noexcept
@@ -685,12 +686,12 @@ struct tr_torrent
 
     [[nodiscard]] constexpr bool client_can_download() const
     {
-        return this->is_piece_transfer_allowed(TR_PEER_TO_CLIENT);
+        return this->is_piece_transfer_allowed(tr_direction::PeerToClient);
     }
 
     [[nodiscard]] constexpr bool client_can_upload() const
     {
-        return this->is_piece_transfer_allowed(TR_CLIENT_TO_PEER);
+        return this->is_piece_transfer_allowed(tr_direction::ClientToPeer);
     }
 
     void set_download_dir(std::string_view path, bool is_new_torrent = false);
@@ -734,12 +735,12 @@ struct tr_torrent
             return is_done() ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
         }
 
-        if (is_queued(TR_UP) && session->queueEnabled(TR_UP))
+        if (is_queued(tr_direction::Up) && session->queueEnabled(tr_direction::Up))
         {
             return TR_STATUS_SEED_WAIT;
         }
 
-        if (is_queued(TR_DOWN) && session->queueEnabled(TR_DOWN))
+        if (is_queued(tr_direction::Down) && session->queueEnabled(tr_direction::Down))
         {
             return TR_STATUS_DOWNLOAD_WAIT;
         }
@@ -874,7 +875,7 @@ struct tr_torrent
         return idle_limit_minutes_;
     }
 
-    [[nodiscard]] constexpr std::optional<size_t> idle_seconds(time_t now) const noexcept
+    [[nodiscard]] constexpr std::optional<time_t> idle_seconds(time_t now) const noexcept
     {
         auto const activity = this->activity();
 
@@ -882,7 +883,7 @@ struct tr_torrent
         {
             if (auto const latest = std::max(date_started_, date_active_); latest != 0)
             {
-                return static_cast<size_t>(std::max(now - latest, time_t{ 0 }));
+                return std::max(now - latest, time_t{ 0 });
             }
         }
 
@@ -978,7 +979,7 @@ struct tr_torrent
 
     void stop_if_seed_limit_reached();
 
-    [[nodiscard]] TR_CONSTEXPR20 auto obfuscated_hash_equals(tr_sha1_digest_t const& test) const noexcept
+    [[nodiscard]] constexpr auto obfuscated_hash_equals(tr_sha1_digest_t const& test) const noexcept
     {
         return obfuscated_hash_ == test;
     }
@@ -1034,6 +1035,7 @@ private:
     friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
+    friend std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
@@ -1051,7 +1053,7 @@ private:
         void* delete_user_data,
         tr_torrent_remove_done_func callback,
         void* callback_user_data);
-    friend void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path);
+    friend void tr_torrentSetDownloadDir(tr_torrent* tor, std::string_view path);
     friend void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
     friend void tr_torrentStart(tr_torrent* tor);
     friend void tr_torrentStartNow(tr_torrent* tor);
@@ -1175,7 +1177,7 @@ private:
         return n_secs;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr bool is_piece_checked(tr_piece_index_t piece) const
     {
         return checked_pieces_.test(piece);
     }
@@ -1213,8 +1215,8 @@ private:
             return {};
         }
 
-        auto const idle_limit_seconds = size_t{ *idle_limit_minutes } * 60U;
-        return idle_limit_seconds > *idle_seconds ? idle_limit_seconds - *idle_seconds : 0U;
+        auto const idle_limit_seconds = static_cast<time_t>(*idle_limit_minutes * 60U);
+        return idle_limit_seconds > *idle_seconds ? idle_limit_seconds - *idle_seconds : time_t{ 0U };
     }
 
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
@@ -1255,11 +1257,6 @@ private:
         }
     }
 
-    constexpr void bump_date_changed(time_t when)
-    {
-        date_changed_ = std::max(date_changed_, when);
-    }
-
     void set_verify_state(VerifyState state);
 
     [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
@@ -1275,7 +1272,7 @@ private:
     // must be called after the torrent's announce list changes.
     void on_announce_list_changed();
 
-    [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span_for_file(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR_VEC tr_byte_span_t byte_span_for_file(tr_file_index_t file) const
     {
         return fpm_.byte_span_for_file(file);
     }
@@ -1289,7 +1286,18 @@ private:
         completion_.set_has_piece(piece, has);
     }
 
+    constexpr void bump_date_changed(time_t when)
+    {
+        date_changed_ = std::max(date_changed_, when);
+    }
+
     void mark_changed();
+
+    constexpr void bump_date_edited(time_t when)
+    {
+        date_edited_ = std::max(date_edited_, when);
+    }
+
     void mark_edited();
 
     constexpr void set_dirty(bool dirty = true) noexcept
@@ -1402,7 +1410,7 @@ private:
     time_t seconds_seeding_before_current_start_ = 0;
 
     float verify_progress_ = -1.0F;
-    float seed_ratio_ = 0.0F;
+    double seed_ratio_ = 0.0;
 
     tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
 

@@ -43,8 +43,10 @@ include(TrMacros)
 
 set(CURL_MINIMUM 7.28.0)
 set(WOLFSSL_MINIMUM 3.4)
+set(CRC32C_MINIMUM 1.1.0)
 set(DEFLATE_MINIMUM 1.7)
 set(EVENT2_MINIMUM 2.1.0)
+set(FMT_MINIMUM 8.0.1)
 set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
 set(GTKMM3_MINIMUM 3.24.0)
@@ -52,8 +54,9 @@ set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 2.7)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
-set(PSL_MINIMUM 0.21.1)
-set(QT_MINIMUM 5.6)
+set(PSL_MINIMUM 0.21.0)
+set(QT_MINIMUM 5.15)
+set(SMALL_MINIMUM 0.2.2)
 
 option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
@@ -70,16 +73,19 @@ option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
 option(INSTALL_LIB "Install the library" OFF)
 tr_auto_option(ENABLE_DEPRECATED "Allow deprecated API use of upstream packages, e.g. GTK" AUTO)
-tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" AUTO)
-tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
-tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
-tr_auto_option(USE_SYSTEM_DHT "Use system dht library" AUTO)
-tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
-tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" AUTO)
-tr_auto_option(USE_SYSTEM_UTP "Use system utp library" AUTO)
-tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" AUTO)
-tr_auto_option(USE_SYSTEM_PSL "Use system psl library" AUTO)
-tr_auto_option(USE_SYSTEM_CRC32C "Use system crc32c library" AUTO)
+tr_auto_option(USE_SYSTEM_DEFAULT "Default value for USE_SYSTEM_* options" AUTO)
+tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_DHT "Use system dht library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_FMT "Use system fmt library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_SMALL "Use system small library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_UTP "Use system utp library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_PSL "Use system psl library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_CRC32C "Use system crc32c library" ${USE_SYSTEM_DEFAULT})
 tr_list_option(USE_GTK_VERSION "Use specific GTK version" AUTO 3 4)
 tr_list_option(USE_QT_VERSION "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO "Use specified crypto library" AUTO ccrypto mbedtls openssl wolfssl)
@@ -97,7 +103,7 @@ set(TR_NAME ${PROJECT_NAME})
 set(TR_VERSION_MAJOR "4")
 set(TR_VERSION_MINOR "1")
 set(TR_VERSION_PATCH "0")
-set(TR_VERSION_BETA_NUMBER "4") # empty string for not beta
+set(TR_VERSION_BETA_NUMBER "5") # empty string for not beta
 set(TR_VERSION_DEV FALSE)
 
 # derived from above: release type
@@ -174,7 +180,7 @@ if(NOT CMAKE_C_STANDARD)
     set(CMAKE_C_STANDARD_REQUIRED ON)
 endif()
 if(NOT CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD 20)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
@@ -223,6 +229,8 @@ if(WIN32)
             set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} /utf-8")
             # Reduce noise (at least for now)
             set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} /wd4244 /wd4267")
+            # Correctly set __cplusplus macro value
+            set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} /Zc:__cplusplus")
             # Make caching-friendly (store debug info inside object files)
             foreach(T IN ITEMS ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})
                 string(TOUPPER "${T}" T)
@@ -241,9 +249,7 @@ set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
 find_package(FastFloat)
-find_package(Fmt)
 find_package(RapidJSON)
-find_package(Small)
 find_package(UtfCpp)
 find_package(WideInteger)
 
@@ -409,6 +415,9 @@ if(ENABLE_QT)
         Network
         Svg
         LinguistTools)
+    if(ENABLE_TESTS)
+        list(APPEND QT_REQUIRED_MODULES Test)
+    endif()
     set(QT_OPTIONAL_MODULES
         DBus
         AxContainer
@@ -429,7 +438,7 @@ if(ENABLE_QT)
         foreach(M ${QT_REQUIRED_MODULES})
             find_package(Qt${Qt_VERSION_MAJOR}${M} ${QT_MINIMUM} QUIET)
             if(Qt${Qt_VERSION_MAJOR}${M}_FOUND)
-                if(NOT M STREQUAL "LinguistTools")
+                if(NOT M STREQUAL "LinguistTools" AND NOT M STREQUAL "Test")
                     list(APPEND QT_TARGETS Qt${Qt_VERSION_MAJOR}::${M})
                 endif()
             else()
@@ -448,16 +457,14 @@ if(ENABLE_QT)
             endif()
         endforeach()
 
-        if(Qt${Qt_VERSION_MAJOR}AxContainer_FOUND AND Qt${Qt_VERSION_MAJOR}AxServer_FOUND)
+        if(WIN32 AND Qt${Qt_VERSION_MAJOR}AxContainer_FOUND AND Qt${Qt_VERSION_MAJOR}AxServer_FOUND)
             set(ENABLE_QT_COM_INTEROP ON)
 
             find_program(MIDL_EXECUTABLE midl)
             if(NOT MIDL_EXECUTABLE)
                 set(ENABLE_QT_COM_INTEROP OFF)
             endif()
-        endif()
-
-        if(Qt${Qt_VERSION_MAJOR}DBus_FOUND)
+        elseif(NOT WIN32 AND Qt${Qt_VERSION_MAJOR}DBus_FOUND)
             set(ENABLE_QT_DBUS_INTEROP ON)
         endif()
     endif()
@@ -496,18 +503,21 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
+# Don't build libdeflate as subdirectory as its CMakeLists.txt
+# messes with global CMAKE_* variables and global compiler options
 if(WIN32 AND NOT MINGW)
     set(DEFLATE_LIB_NAME deflatestatic)
 else()
     set(DEFLATE_LIB_NAME deflate)
 endif()
-tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
-    TARGET deflate::deflate
+tr_add_external_auto_library(DEFLATE libdeflate
+    LIBNAME ${DEFLATE_LIB_NAME}
+    TARGET libdeflate::libdeflate
     CMAKE_ARGS
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
 
-tr_add_external_auto_library(EVENT2 libevent event
+tr_add_external_auto_library_legacy(EVENT2 libevent event
     TARGET libevent::event
     CMAKE_ARGS
         -DEVENT__DISABLE_OPENSSL:BOOL=ON
@@ -517,7 +527,8 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
-tr_add_external_auto_library(NATPMP libnatpmp natpmp
+tr_add_external_auto_library(NATPMP libnatpmp
+    LIBNAME natpmp
     TARGET natpmp::natpmp
     CMAKE_ARGS
         -DBUILD_SHARED_LIBS=OFF)
@@ -533,7 +544,7 @@ if(WIN32)
 else()
     set(TR_MINIUPNPC_LIBNAME miniupnpc)
 endif()
-tr_add_external_auto_library(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
+tr_add_external_auto_library_legacy(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
     TARGET miniupnpc::libminiupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
@@ -548,33 +559,56 @@ unset(TR_MINIUPNPC_LIBNAME)
 
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
-tr_add_external_auto_library(DHT dht dht
+tr_add_external_auto_library(DHT dht
+    LIBNAME dht
     TARGET dht::dht)
 
-tr_add_external_auto_library(PSL libpsl psl
+tr_add_external_auto_library(PSL libpsl
+    LIBNAME psl
     TARGET psl::psl)
 
 if(ENABLE_UTP)
-    tr_add_external_auto_library(UTP libutp utp
+    tr_add_external_auto_library_legacy(UTP libutp utp
         SUBPROJECT
         TARGET libutp::libutp
         CMAKE_ARGS
             -DLIBUTP_SHARED:BOOL=OFF)
 endif()
 
-tr_add_external_auto_library(B64 libb64 b64
+tr_add_external_auto_library(B64 libb64
     SUBPROJECT
-    TARGET libb64::libb64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
-tr_add_external_auto_library(CRC32C crc32c crc32c
+# Don't build crc32c as subdirectory as its CMakeLists.txt
+# messes with global CMAKE_* variables and global compiler options
+tr_add_external_auto_library(CRC32C Crc32c
     TARGET Crc32c::crc32c
+    LIBNAME crc32c
+    SOURCE_DIR crc32c
     CMAKE_ARGS
         -DCRC32C_BUILD_TESTS=OFF
         -DCRC32C_BUILD_BENCHMARKS=OFF
         -DCRC32C_USE_GLOG=OFF
         -DCRC32C_INSTALL=ON)
+
+tr_add_external_auto_library(FMT fmt
+    SUBPROJECT
+    CMAKE_ARGS
+        -DFMT_INSTALL=OFF
+        -DFMT_SYSTEM_HEADERS=ON)
+
+tr_add_external_auto_library(SMALL small
+    SUBPROJECT
+    CMAKE_ARGS
+        -DSMALL_BUILD_WITH_EXCEPTIONS=OFF)
+add_library(transmission::small INTERFACE IMPORTED)
+target_link_libraries(transmission::small
+    INTERFACE
+        small::small)
+target_compile_definitions(transmission::small
+    INTERFACE
+        SMALL_DISABLE_EXCEPTIONS=1)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)
@@ -674,6 +708,7 @@ else()
         -W
         -Wall
         -Wextra
+        -Warc-unsafe-retained-assign
         -Wcast-align
         -Wduplicated-cond
         -Wextra-semi
@@ -813,11 +848,6 @@ if(RUN_CLANG_TIDY)
     endif()
 endif()
 
-if(ENABLE_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
-
 function(tr_install_web DST_DIR)
     if(INSTALL_WEB)
         install(
@@ -827,6 +857,7 @@ function(tr_install_web DST_DIR)
 endfunction()
 
 add_subdirectory(libtransmission)
+add_subdirectory(libtransmission-app)
 
 set(MAC_PROJECT_DIR macosx)
 
@@ -844,6 +875,11 @@ foreach(P cli daemon gtk mac qt utils)
         add_subdirectory(${P})
     endif()
 endforeach()
+
+if(ENABLE_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
     tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})

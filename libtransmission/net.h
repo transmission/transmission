@@ -101,11 +101,6 @@ public:
         hport_ = hport;
     }
 
-    void set_network(uint16_t nport) noexcept
-    {
-        hport_ = ntohs(nport);
-    }
-
     [[nodiscard]] static std::pair<tr_port, std::byte const*> from_compact(std::byte const* compact) noexcept;
 
     [[nodiscard]] constexpr auto operator<(tr_port const& that) const noexcept
@@ -427,9 +422,9 @@ struct tr_address
         switch (type)
         {
         case TR_AF_INET:
-            return tr_address{ TR_AF_INET, { { { { INADDR_ANY } } } } };
+            return tr_address{ .type = TR_AF_INET, .addr = { .addr4 = { INADDR_ANY } } };
         case TR_AF_INET6:
-            return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
+            return tr_address{ .type = TR_AF_INET6, .addr = { .addr6 = IN6ADDR_ANY_INIT } };
         default:
             TR_ASSERT_MSG(false, "invalid type");
             return tr_address{};
@@ -472,8 +467,8 @@ struct tr_socket_address
         return port_;
     }
 
-    [[nodiscard]] static std::string display_name(tr_address const& address, tr_port port) noexcept;
-    [[nodiscard]] auto display_name() const noexcept
+    [[nodiscard]] static std::string display_name(tr_address const& address, tr_port port);
+    [[nodiscard]] auto display_name() const
     {
         return display_name(address_, port_);
     }
@@ -636,15 +631,13 @@ void tr_net_close_socket(tr_socket_t fd);
 
 // --- TOS / DSCP
 
-/**
- * A `toString()` / `from_string()` convenience wrapper around the TOS int value
- */
-class tr_tos_t
+// A serializer-friendly wrapper around the DiffServ int value
+class tr_diffserv_t
 {
 public:
-    constexpr tr_tos_t() = default;
+    constexpr tr_diffserv_t() = default;
 
-    constexpr explicit tr_tos_t(int value)
+    constexpr explicit tr_diffserv_t(int value)
         : value_{ value }
     {
     }
@@ -655,53 +648,12 @@ public:
         return value_;
     }
 
-    [[nodiscard]] static std::optional<tr_tos_t> from_string(std::string_view name);
-
-    [[nodiscard]] std::string toString() const;
-
 private:
     int value_ = 0x04;
-
-    // RFCs 2474, 3246, 4594 & 8622
-    // Service class names are defined in RFC 4594, RFC 5865, and RFC 8622.
-    // Not all platforms have these IPTOS_ definitions, so hardcode them here
-    static auto constexpr Names = std::array<std::pair<int, std::string_view>, 28>{ {
-        { 0x00, "cs0" }, // IPTOS_CLASS_CS0
-        { 0x04, "le" },
-        { 0x20, "cs1" }, // IPTOS_CLASS_CS1
-        { 0x28, "af11" }, // IPTOS_DSCP_AF11
-        { 0x30, "af12" }, // IPTOS_DSCP_AF12
-        { 0x38, "af13" }, // IPTOS_DSCP_AF13
-        { 0x40, "cs2" }, // IPTOS_CLASS_CS2
-        { 0x48, "af21" }, // IPTOS_DSCP_AF21
-        { 0x50, "af22" }, // IPTOS_DSCP_AF22
-        { 0x58, "af23" }, // IPTOS_DSCP_AF23
-        { 0x60, "cs3" }, // IPTOS_CLASS_CS3
-        { 0x68, "af31" }, // IPTOS_DSCP_AF31
-        { 0x70, "af32" }, // IPTOS_DSCP_AF32
-        { 0x78, "af33" }, // IPTOS_DSCP_AF33
-        { 0x80, "cs4" }, // IPTOS_CLASS_CS4
-        { 0x88, "af41" }, // IPTOS_DSCP_AF41
-        { 0x90, "af42" }, // IPTOS_DSCP_AF42
-        { 0x98, "af43" }, // IPTOS_DSCP_AF43
-        { 0xa0, "cs5" }, // IPTOS_CLASS_CS5
-        { 0xb8, "ef" }, // IPTOS_DSCP_EF
-        { 0xc0, "cs6" }, // IPTOS_CLASS_CS6
-        { 0xe0, "cs7" }, // IPTOS_CLASS_CS7
-
-        // <netinet/ip.h> lists these TOS names as deprecated,
-        // but keep them defined here for backward compatibility
-        { 0x00, "routine" }, // IPTOS_PREC_ROUTINE
-        { 0x02, "lowcost" }, // IPTOS_LOWCOST
-        { 0x02, "mincost" }, // IPTOS_MINCOST
-        { 0x04, "reliable" }, // IPTOS_RELIABILITY
-        { 0x08, "throughput" }, // IPTOS_THROUGHPUT
-        { 0x10, "lowdelay" }, // IPTOS_LOWDELAY
-    } };
 };
 
 // set the IPTOS_ value for the specified socket
-void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
+void tr_netSetDiffServ(tr_socket_t sock, int tos, tr_address_type type);
 
 /**
  * @brief get a human-representable string representing the network error.

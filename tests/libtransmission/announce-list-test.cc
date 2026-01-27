@@ -21,10 +21,9 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-using AnnounceListTest = ::testing::Test;
+using AnnounceListTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(AnnounceListTest, canAdd)
@@ -339,9 +338,9 @@ TEST_F(AnnounceListTest, announceToScrape)
     };
 
     auto constexpr Tests = std::array<ScrapeTest, 3>{ {
-        { "https://www.example.com/announce"sv, "https://www.example.com/scrape"sv },
-        { "https://www.example.com/foo"sv, ""sv },
-        { "udp://www.example.com:999/"sv, "udp://www.example.com:999/"sv },
+        { .announce = "https://www.example.com/announce"sv, .expected_scrape = "https://www.example.com/scrape"sv },
+        { .announce = "https://www.example.com/foo"sv, .expected_scrape = ""sv },
+        { .announce = "udp://www.example.com:999/"sv, .expected_scrape = "udp://www.example.com:999/"sv },
     } };
 
     for (auto const& test : Tests)

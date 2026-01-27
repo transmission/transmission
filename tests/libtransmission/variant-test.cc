@@ -7,8 +7,11 @@
 #include <cerrno>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <map>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
@@ -19,12 +22,24 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
+using VariantTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
-using VariantTest = ::testing::Test;
+namespace
+{
+
+template<class... Ts>
+struct Overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+
+template<class... Ts>
+Overloaded(Ts...) -> Overloaded<Ts...>;
+
+} // namespace
 
 #ifndef _WIN32
 #define STACK_SMASH_DEPTH (1 * 1000 * 1000)
@@ -80,6 +95,43 @@ TEST_F(VariantTest, getType)
     sv = v.value_if<std::string_view>();
     ASSERT_TRUE(sv);
     EXPECT_EQ(strkey, *sv);
+}
+
+TEST_F(VariantTest, mergeStringsTakesOwnership)
+{
+    auto const is_equal_string = [](std::string_view const a, std::string_view const b)
+    {
+        return a == b;
+    };
+
+    auto const is_same_address = [](std::string_view const a, std::string_view const b)
+    {
+        return std::data(a) == std::data(b);
+    };
+
+    // set up `src` to hold an unmanaged string
+    auto constexpr Original = "this is the string"sv;
+    auto const src = tr_variant::unmanaged_string(Original);
+    auto src_sv = src.value_if<std::string_view>().value_or(""sv);
+
+    // set up `tgt` to hold another unmanaged string
+    auto constexpr WillBeReplaced = "some other string"sv;
+    static_assert(Original != WillBeReplaced);
+    auto tgt = tr_variant::unmanaged_string(WillBeReplaced);
+    auto tgt_sv = tgt.value_if<std::string_view>().value_or(""sv);
+
+    // test that `src` and `tgt` hold unmanaged strings
+    EXPECT_TRUE(is_equal_string(Original, src_sv));
+    EXPECT_TRUE(is_equal_string(WillBeReplaced, tgt_sv));
+    EXPECT_TRUE(is_same_address(Original, src_sv));
+    EXPECT_TRUE(is_same_address(WillBeReplaced, tgt_sv));
+
+    tgt.merge(src);
+
+    // test that `tgt` now holds its own copy of `Original`.
+    auto const actual = tgt.value_if<std::string_view>().value_or(""sv);
+    EXPECT_TRUE(is_equal_string(Original, actual));
+    EXPECT_FALSE(is_same_address(Original, actual));
 }
 
 TEST_F(VariantTest, parseInt)
@@ -346,73 +398,129 @@ TEST_F(VariantTest, bencToJson)
     }
 }
 
-TEST_F(VariantTest, merge)
+TEST_F(VariantTest, mergeMapsCreatesCombinedMap)
 {
-    auto const i1 = tr_quark_new("i1"sv);
-    auto const i2 = tr_quark_new("i2"sv);
-    auto const i3 = tr_quark_new("i3"sv);
-    auto const i4 = tr_quark_new("i4"sv);
-    auto const s5 = tr_quark_new("s5"sv);
-    auto const s6 = tr_quark_new("s6"sv);
-    auto const s7 = tr_quark_new("s7"sv);
-    auto const s8 = tr_quark_new("s8"sv);
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
 
-    /* initial dictionary (default values) */
-    auto dest = tr_variant::make_map(6U);
-    auto* map = dest.get_if<tr_variant::Map>();
-    map->try_emplace(i1, 1);
-    map->try_emplace(i2, 2);
-    map->try_emplace(i4, -35); /* remains untouched */
-    map->try_emplace(s5, "abc");
-    map->try_emplace(s6, "def");
-    map->try_emplace(s7, "127.0.0.1"); /* remains untouched */
-
-    /* new dictionary, will overwrite items in dest */
-    auto src = tr_variant::make_map(6U);
-    map = src.get_if<tr_variant::Map>();
-    map->try_emplace(i1, 1); /* same value */
-    map->try_emplace(i2, 4); /* new value */
-    map->try_emplace(i3, 3); /* new key:value */
-    map->try_emplace(s5, "abc"); /* same value */
-    map->try_emplace(s6, "xyz"); /* new value */
-    map->try_emplace(s8, "ghi"); /* new key:value */
-
-    dest.merge(src);
-
-    map = dest.get_if<tr_variant::Map>();
-    auto i = map->value_if<int64_t>(i1);
-    ASSERT_TRUE(i);
-    EXPECT_EQ(1, *i);
-    i = map->value_if<int64_t>(i2);
-    ASSERT_TRUE(i);
-    EXPECT_EQ(4, *i);
-    i = map->value_if<int64_t>(i3);
-    ASSERT_TRUE(i);
-    EXPECT_EQ(3, *i);
-    i = map->value_if<int64_t>(i4);
-    ASSERT_TRUE(i);
-    EXPECT_EQ(-35, *i);
-    auto sv = map->value_if<std::string_view>(s5);
-    ASSERT_TRUE(sv);
-    EXPECT_EQ("abc"sv, *sv);
-    sv = map->value_if<std::string_view>(s6);
-    ASSERT_TRUE(sv);
-    EXPECT_EQ("xyz"sv, *sv);
-    sv = map->value_if<std::string_view>(s7);
-    ASSERT_TRUE(sv);
-    EXPECT_EQ("127.0.0.1"sv, *sv);
-    sv = map->value_if<std::string_view>(s8);
-    ASSERT_TRUE(sv);
-    EXPECT_EQ("ghi"sv, *sv);
+    auto src = serde.parse(R"({"src_key":123})"sv).value_or(tr_variant{});
+    auto tgt = serde.parse(R"({"tgt_key":456})"sv).value_or(tr_variant{});
+    tgt.merge(src);
+    EXPECT_EQ(R"({"src_key":123,"tgt_key":456})"sv, serde.to_string(tgt));
 }
 
-TEST_F(VariantTest, stackSmash)
+TEST_F(VariantTest, mergeMapsOverwritesSrcMapEntries)
 {
-    // make a nested list of list of lists.
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
+
+    auto src = serde.parse(R"({"src_key": 123, "dup_key":789})"sv).value_or(tr_variant{});
+    auto tgt = serde.parse(R"({"tgt_key": 456, "dup_key":456})"sv).value_or(tr_variant{});
+    tgt.merge(src);
+    EXPECT_EQ(R"({"dup_key":789,"src_key":123,"tgt_key":456})"sv, serde.to_string(tgt));
+}
+
+TEST_F(VariantTest, variantConstructor)
+{
+    auto const var_none = tr_variant{};
+    auto const var_null = tr_variant{ nullptr };
+    auto const var_true = tr_variant{ true };
+    auto const var_false = tr_variant{ false };
+    auto const var_int = tr_variant{ 123 };
+    auto const var_real = tr_variant{ 4.5 };
+    auto const var_sv = tr_variant{ "foo"sv };
+    auto const var_s = tr_variant{ "foo"s };
+    auto const var_char_ptr = tr_variant{ "foo" };
+    auto const var_char_nullptr = tr_variant{ static_cast<char const*>(nullptr) };
+
+    EXPECT_EQ(var_none.index(), tr_variant::NoneIndex);
+    EXPECT_EQ(var_null.index(), tr_variant::NullIndex);
+    EXPECT_EQ(var_true.index(), tr_variant::BoolIndex);
+    EXPECT_EQ(var_false.index(), tr_variant::BoolIndex);
+    EXPECT_EQ(var_int.index(), tr_variant::IntIndex);
+    EXPECT_EQ(var_real.index(), tr_variant::DoubleIndex);
+    EXPECT_EQ(var_sv.index(), tr_variant::StringIndex);
+    EXPECT_EQ(var_s.index(), tr_variant::StringIndex);
+    EXPECT_EQ(var_char_ptr.index(), tr_variant::StringIndex);
+    EXPECT_EQ(var_char_nullptr.index(), tr_variant::StringIndex);
+}
+
+TEST_F(VariantTest, variantAssingmentOperator)
+{
+    auto var = tr_variant{};
+
+    var = nullptr;
+    EXPECT_EQ(var.index(), tr_variant::NullIndex);
+
+    var = true;
+    EXPECT_EQ(var.index(), tr_variant::BoolIndex);
+
+    var = false;
+    EXPECT_EQ(var.index(), tr_variant::BoolIndex);
+
+    var = 123;
+    EXPECT_EQ(var.index(), tr_variant::IntIndex);
+
+    var = 4.5;
+    EXPECT_EQ(var.index(), tr_variant::DoubleIndex);
+
+    var = "foo"sv;
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+
+    var = "foo"s;
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+
+    var = "foo";
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+
+    var = static_cast<char const*>(nullptr);
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+}
+
+TEST_F(VariantTest, mergeOverwritesDifferingTypes)
+{
+    auto const variants = std::array<std::pair<tr_variant, std::string_view>, 7U>{ {
+        { tr_variant{ true }, "true" },
+        { tr_variant{ int64_t{ 123 } }, "123" },
+        { tr_variant{ 4.5 }, "4.5" },
+        { tr_variant{ "foo"sv }, R"("foo")"sv },
+        { tr_variant{ nullptr }, "null"sv },
+        { tr_variant::make_map(0U), "{}"sv },
+        { tr_variant::make_vector(), "[]"sv },
+    } };
+
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
+
+    for (auto const& [src, src_expected] : variants)
+    {
+        for (auto const& [tgt, tgt_expected] : variants)
+        {
+            if (&src != &tgt)
+            {
+                // set up `var` to be a copy of `src`
+                auto var = src.clone();
+                EXPECT_EQ(src_expected, serde.to_string(var));
+
+                var.merge(tgt);
+
+                // test that `var` is now a copy of `tgt`
+                EXPECT_EQ(tgt_expected, serde.to_string(var));
+            }
+        }
+    }
+}
+
+TEST_F(VariantTest, stackSmashBenc)
+{
+    // set up a nested list of list of lists.
     static int constexpr Depth = STACK_SMASH_DEPTH;
     std::string const in = std::string(Depth, 'l') + std::string(Depth, 'e');
 
-    // confirm that it fails instead of crashing
+    // test that parsing fails without crashing
     auto serde = tr_variant_serde::benc();
     auto var = serde.inplace().parse(in);
     EXPECT_FALSE(var.has_value());
@@ -420,7 +528,23 @@ TEST_F(VariantTest, stackSmash)
     EXPECT_EQ(E2BIG, serde.error_.code());
 }
 
-TEST_F(VariantTest, boolAndIntRecast)
+TEST_F(VariantTest, stackSmashJson)
+{
+    auto serde = tr_variant_serde::json();
+    serde.inplace();
+
+    // set up a nested array of arrays of arrays.
+    static auto constexpr Depth = STACK_SMASH_DEPTH;
+    auto const in = std::string(Depth, '[') + std::string(Depth, ']');
+
+    // test that parsing fails without crashing
+    auto var = serde.inplace().parse(in);
+    EXPECT_FALSE(var.has_value());
+    EXPECT_TRUE(serde.error_);
+    EXPECT_EQ(E2BIG, serde.error_.code());
+}
+
+TEST_F(VariantTest, valueIfCanReadBoolsAndIntsInterchangeably)
 {
     auto const key1 = tr_quark_new("key1"sv);
     auto const key2 = tr_quark_new("key2"sv);
@@ -521,6 +645,149 @@ TEST_F(VariantTest, dictFindType)
     i = map->value_if<int64_t>(key_int);
     ASSERT_TRUE(i);
     EXPECT_EQ(ExpectedInt, *i);
+}
+
+TEST_F(VariantTest, mapContains)
+{
+    auto serde = tr_variant_serde::json();
+    serde.inplace();
+    serde.compact();
+
+    // set up a map with some sample entries
+    static auto constexpr Input = R"({
+        "id": 42,
+        "is_finished": true,
+        "labels": ["a", "b"],
+        "units": { "speed_units": ["KB/s", "MB/s", "GB/s", "TB/s"] },
+        "upload_ratio": 4.2,
+        "version": "5.0"
+    })"sv;
+    auto top = serde.parse(Input).value_or(tr_variant{});
+    auto* const map = top.get_if<tr_variant::Map>();
+    ASSERT_NE(nullptr, map);
+
+    // test that contains() returns true for entries that exist
+    EXPECT_TRUE(map->contains(TR_KEY_id));
+    EXPECT_TRUE(map->contains(TR_KEY_is_finished));
+    EXPECT_TRUE(map->contains(TR_KEY_labels));
+    EXPECT_TRUE(map->contains(TR_KEY_units));
+    EXPECT_TRUE(map->contains(TR_KEY_upload_ratio));
+    EXPECT_TRUE(map->contains(TR_KEY_version));
+
+    // test that contains() returns false for entries that never existed
+    EXPECT_FALSE(map->contains(TR_KEY_umask));
+
+    // test that contains() returns false for entries that were removed
+    auto const key = TR_KEY_labels;
+    EXPECT_TRUE(map->contains(key));
+    EXPECT_EQ(1U, map->erase(key));
+    EXPECT_FALSE(map->contains(key));
+}
+
+TEST_F(VariantTest, visitConstVariant)
+{
+    auto var = tr_variant::make_vector(1U);
+    auto* vec = var.get_if<tr_variant::Vector>();
+    ASSERT_NE(vec, nullptr);
+    vec->emplace_back(int64_t{ 99 });
+
+    auto const result = std::as_const(var).visit(
+        Overloaded{ [](tr_variant::Vector const& values) -> int64_t
+                    {
+                        EXPECT_EQ(1U, std::size(values));
+                        return values[0].value_if<int64_t>().value_or(-1);
+                    },
+                    [](auto&&) -> int64_t
+                    {
+                        ADD_FAILURE() << "unexpected alternative";
+                        return -1;
+                    } });
+
+    EXPECT_EQ(99, result);
+}
+
+TEST_F(VariantTest, visitsNodesDepthFirst)
+{
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
+
+    // set up a test variant to be visited
+    static auto constexpr Input = R"({
+        "files": [
+            { "name": "file1", "size": 5, "pieces": [1, 2] },
+            { "name": "file2", "size": 7, "pieces": [] }
+        ],
+        "meta": { "active": true }
+    })"sv;
+    auto const var = serde.parse(Input).value_or(tr_variant{});
+
+    // set up some containers that we'll populate during `var.visit()`
+    auto visited_counts = std::map<size_t, size_t>{};
+    auto flattened = tr_variant::Vector{};
+    flattened.reserve(64U);
+
+    // set up the visitor
+    auto flatten = [&](tr_variant const& node, auto const& self) -> void
+    {
+        ++visited_counts[node.index()];
+
+        node.visit(
+            [&](auto const& val)
+            {
+                // TODO(c++20): use std::remove_cvref_t (P0550R2) when GCC >= 9.1
+                using ValueType = std::decay_t<decltype(val)>;
+
+                if constexpr (
+                    std::is_same_v<ValueType, bool> || //
+                    std::is_same_v<ValueType, double> || //
+                    std::is_same_v<ValueType, int64_t> || //
+                    std::is_same_v<ValueType, std::monostate> || //
+                    std::is_same_v<ValueType, std::nullptr_t> || //
+                    std::is_same_v<ValueType, std::string_view> || //
+                    std::is_same_v<ValueType, std::string>)
+                {
+                    flattened.emplace_back(val);
+                }
+                else if constexpr (std::is_same_v<ValueType, tr_variant::Vector>)
+                {
+                    for (auto const& child : val)
+                    {
+                        self(child, self);
+                    }
+                }
+                else if constexpr (std::is_same_v<ValueType, tr_variant::Map>)
+                {
+                    for (auto const& [key, child] : val)
+                    {
+                        flattened.emplace_back(tr_variant::unmanaged_string(key));
+                        self(child, self);
+                    }
+                }
+            });
+    };
+
+    flatten(var, flatten);
+
+    // test that the nodes were visited depth-first
+    auto const actual = serde.to_string({ std::move(flattened) });
+    auto constexpr Expected =
+        R"(["files","name","file1","size",5,"pieces",1,2,"name","file2","size",7,"pieces","meta","active",true])"sv;
+    EXPECT_EQ(Expected, actual);
+
+    // test that we visited the expected number of nodes.
+    //
+    // FIXME(ckerr): `serde.inplace()` doesn't work on JSON right now.
+    // RapidJSON always copies strings unless given mutable JSON input.
+    // That's why StringViewIndex is missing two counts here.
+    auto const expected_visited_count = std::map<size_t, size_t>{
+        { tr_variant::BoolIndex, 1U }, //
+        { tr_variant::IntIndex, 4U }, //
+        { tr_variant::MapIndex, 4U }, //
+        { tr_variant::StringIndex, 2U }, //
+        { tr_variant::VectorIndex, 3U }, //
+    };
+    EXPECT_EQ(expected_visited_count, visited_counts);
 }
 
 TEST_F(VariantTest, variantFromBufFuzz)

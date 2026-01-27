@@ -58,8 +58,6 @@ function global:Build-Qt5([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-no-sql-sqlite2'
         '-no-sql-tds'
         '-nomake'; 'examples'
-        '-nomake'; 'tests'
-        '-nomake'; 'tools'
         '-I'; (Join-Path $DepsPrefixDir include)
         '-L'; (Join-Path $DepsPrefixDir lib)
     )

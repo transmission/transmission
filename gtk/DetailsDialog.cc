@@ -109,9 +109,14 @@ private:
     void onScrapeToggled();
     void onBackupToggled();
 
-    void torrent_set_bool(tr_quark key, bool value);
-    void torrent_set_int(tr_quark key, int value);
-    void torrent_set_real(tr_quark key, double value);
+    template<typename T>
+    void torrent_set_field(tr_quark const key, T value)
+    {
+        auto params = tr_variant::Map{ 2U };
+        params.try_emplace(key, std::forward<T>(value));
+        params.try_emplace(TR_KEY_ids, Session::to_variant(ids_));
+        core_->exec(TR_KEY_torrent_set, std::move(params));
+    }
 
     void refreshInfo(std::vector<tr_torrent*> const& torrents);
     void refreshPeers(std::vector<tr_torrent*> const& torrents);
@@ -208,18 +213,7 @@ guint DetailsDialog::Impl::last_page_ = 0;
 
 std::vector<tr_torrent*> DetailsDialog::Impl::getTorrents() const
 {
-    std::vector<tr_torrent*> torrents;
-    torrents.reserve(ids_.size());
-
-    for (auto const id : ids_)
-    {
-        if (auto* torrent = core_->find_torrent(id); torrent != nullptr)
-        {
-            torrents.push_back(torrent);
-        }
-    }
-
-    return torrents;
+    return core_->find_torrents(ids_);
 }
 
 /****
@@ -300,11 +294,11 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* down_limited_check */
     if (!torrents.empty())
     {
-        bool const baseline = tr_torrentUsesSpeedLimit(torrents.front(), TR_DOWN);
-        bool const is_uniform = std::all_of(
+        auto const baseline = tr_torrentUsesSpeedLimit(torrents.front(), tr_direction::Down);
+        auto const is_uniform = std::all_of(
             torrents.begin(),
             torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, TR_DOWN); });
+            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, tr_direction::Down); });
 
         if (is_uniform)
         {
@@ -315,11 +309,11 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* down_limit_spin */
     if (!torrents.empty())
     {
-        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), TR_DOWN);
-        bool const is_uniform = std::all_of(
+        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), tr_direction::Down);
+        auto const is_uniform = std::all_of(
             torrents.begin(),
             torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, TR_DOWN); });
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, tr_direction::Down); });
 
         if (is_uniform)
         {
@@ -330,11 +324,11 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* up_limited_check */
     if (!torrents.empty())
     {
-        bool const baseline = tr_torrentUsesSpeedLimit(torrents.front(), TR_UP);
-        bool const is_uniform = std::all_of(
+        auto const baseline = tr_torrentUsesSpeedLimit(torrents.front(), tr_direction::Up);
+        auto const is_uniform = std::all_of(
             torrents.begin(),
             torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, TR_UP); });
+            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, tr_direction::Up); });
 
         if (is_uniform)
         {
@@ -345,11 +339,11 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* up_limit_sping */
     if (!torrents.empty())
     {
-        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), TR_UP);
-        bool const is_uniform = std::all_of(
+        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), tr_direction::Up);
+        auto const is_uniform = std::all_of(
             torrents.begin(),
             torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, TR_UP); });
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, tr_direction::Up); });
 
         if (is_uniform)
         {
@@ -436,88 +430,34 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     }
 }
 
-void DetailsDialog::Impl::torrent_set_bool(tr_quark key, bool value)
-{
-    tr_variant top;
-
-    tr_variantInitDict(&top, 2);
-    tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
-    tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
-    tr_variantDictAddBool(args, key, value);
-    tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, ids_.size());
-
-    for (auto const id : ids_)
-    {
-        tr_variantListAddInt(ids, id);
-    }
-
-    core_->exec(top);
-}
-
-void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
-{
-    tr_variant top;
-
-    tr_variantInitDict(&top, 2);
-    tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
-    tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
-    tr_variantDictAddInt(args, key, value);
-    tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, ids_.size());
-
-    for (auto const id : ids_)
-    {
-        tr_variantListAddInt(ids, id);
-    }
-
-    core_->exec(top);
-}
-
-void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
-{
-    tr_variant top;
-
-    tr_variantInitDict(&top, 2);
-    tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
-    tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
-    tr_variantDictAddReal(args, key, value);
-    tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, ids_.size());
-
-    for (auto const id : ids_)
-    {
-        tr_variantListAddInt(ids, id);
-    }
-
-    core_->exec(top);
-}
-
 void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*builder*/)
 {
     auto const speed_units_kbyps_str = Speed::units().display_name(Speed::Units::KByps);
 
     honor_limits_check_tag_ = honor_limits_check_->signal_toggled().connect(
-        [this]() { torrent_set_bool(TR_KEY_honors_session_limits_camel, honor_limits_check_->get_active()); });
+        [this]() { torrent_set_field(TR_KEY_honors_session_limits, honor_limits_check_->get_active()); });
 
     down_limited_check_->set_label(
         fmt::format(fmt::runtime(down_limited_check_->get_label().raw()), fmt::arg("speed_units", speed_units_kbyps_str)));
     down_limited_check_tag_ = down_limited_check_->signal_toggled().connect(
-        [this]() { torrent_set_bool(TR_KEY_download_limited_camel, down_limited_check_->get_active()); });
+        [this]() { torrent_set_field(TR_KEY_download_limited, down_limited_check_->get_active()); });
 
     down_limit_spin_->set_adjustment(Gtk::Adjustment::create(0, 0, std::numeric_limits<int>::max(), 5));
     down_limit_spin_tag_ = down_limit_spin_->signal_value_changed().connect(
-        [this]() { torrent_set_int(TR_KEY_download_limit_camel, down_limit_spin_->get_value_as_int()); });
+        [this]() { torrent_set_field(TR_KEY_download_limit, down_limit_spin_->get_value_as_int()); });
 
     up_limited_check_->set_label(
         fmt::format(fmt::runtime(up_limited_check_->get_label().raw()), fmt::arg("speed_units", speed_units_kbyps_str)));
     up_limited_check_tag_ = up_limited_check_->signal_toggled().connect(
-        [this]() { torrent_set_bool(TR_KEY_upload_limited_camel, up_limited_check_->get_active()); });
+        [this]() { torrent_set_field(TR_KEY_upload_limited, up_limited_check_->get_active()); });
 
     up_limit_sping_->set_adjustment(Gtk::Adjustment::create(0, 0, std::numeric_limits<int>::max(), 5));
     up_limit_spin_tag_ = up_limit_sping_->signal_value_changed().connect(
-        [this]() { torrent_set_int(TR_KEY_upload_limit_camel, up_limit_sping_->get_value_as_int()); });
+        [this]() { torrent_set_field(TR_KEY_upload_limit, up_limit_sping_->get_value_as_int()); });
 
     gtr_priority_combo_init(*bandwidth_combo_);
     bandwidth_combo_tag_ = bandwidth_combo_->signal_changed().connect(
-        [this]() { torrent_set_int(TR_KEY_bandwidth_priority_camel, gtr_combo_box_get_active_enum(*bandwidth_combo_)); });
+        [this]() { torrent_set_field(TR_KEY_bandwidth_priority, gtr_combo_box_get_active_enum(*bandwidth_combo_)); });
 
     gtr_combo_box_set_enum(
         *ratio_combo_,
@@ -529,13 +469,13 @@ void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*
     ratio_combo_tag_ = ratio_combo_->signal_changed().connect(
         [this]()
         {
-            torrent_set_int(TR_KEY_seed_ratio_mode_camel, gtr_combo_box_get_active_enum(*ratio_combo_));
+            torrent_set_field(TR_KEY_seed_ratio_mode, gtr_combo_box_get_active_enum(*ratio_combo_));
             refresh();
         });
     ratio_spin_->set_adjustment(Gtk::Adjustment::create(0, 0, 1000, .05));
     ratio_spin_->set_width_chars(7);
     ratio_spin_tag_ = ratio_spin_->signal_value_changed().connect(
-        [this]() { torrent_set_real(TR_KEY_seed_ratio_limit_camel, ratio_spin_->get_value()); });
+        [this]() { torrent_set_field(TR_KEY_seed_ratio_limit, ratio_spin_->get_value()); });
 
     gtr_combo_box_set_enum(
         *idle_combo_,
@@ -547,16 +487,16 @@ void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*
     idle_combo_tag_ = idle_combo_->signal_changed().connect(
         [this]()
         {
-            torrent_set_int(TR_KEY_seed_idle_mode_camel, gtr_combo_box_get_active_enum(*idle_combo_));
+            torrent_set_field(TR_KEY_seed_idle_mode, gtr_combo_box_get_active_enum(*idle_combo_));
             refresh();
         });
     idle_spin_->set_adjustment(Gtk::Adjustment::create(1, 1, 40320, 5));
     idle_spin_tag_ = idle_spin_->signal_value_changed().connect(
-        [this]() { torrent_set_int(TR_KEY_seed_idle_limit_camel, idle_spin_->get_value_as_int()); });
+        [this]() { torrent_set_field(TR_KEY_seed_idle_limit, idle_spin_->get_value_as_int()); });
 
     max_peers_spin_->set_adjustment(Gtk::Adjustment::create(1, 1, 3000, 5));
     max_peers_spin_tag_ = max_peers_spin_->signal_value_changed().connect(
-        [this]() { torrent_set_int(TR_KEY_peer_limit_kebab, max_peers_spin_->get_value_as_int()); });
+        [this]() { torrent_set_field(TR_KEY_peer_limit, max_peers_spin_->get_value_as_int()); });
 }
 
 /****
@@ -630,14 +570,13 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     Glib::ustring const no_torrent = _("No Torrents Selected");
     Glib::ustring stateString;
     uint64_t sizeWhenDone = 0;
-    std::vector<tr_stat const*> stats;
-    std::vector<tr_torrent_view> infos;
 
-    stats.reserve(torrents.size());
+    auto const stats = tr_torrentStat(std::data(torrents), std::size(torrents));
+
+    std::vector<tr_torrent_view> infos;
     infos.reserve(torrents.size());
     for (auto* const torrent : torrents)
     {
-        stats.push_back(tr_torrentStat(torrent));
         infos.push_back(tr_torrentView(torrent));
     }
 
@@ -765,13 +704,13 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = Glib::ustring(tr_torrentGetDownloadDir(torrents.front()));
+        std::string_view const baseline = tr_torrentGetDownloadDir(torrents.front());
         bool const is_uniform = std::all_of(
             torrents.begin(),
             torrents.end(),
             [&baseline](auto const* torrent) { return baseline == tr_torrentGetDownloadDir(torrent); });
 
-        str = is_uniform ? baseline : mixed;
+        str = is_uniform ? Glib::ustring{ baseline.data(), baseline.size() } : mixed;
     }
 
     destination_lb_->set_text(str);
@@ -1199,8 +1138,8 @@ PeerModelColumns const peer_cols;
 
 void initPeerRow(
     Gtk::TreeModel::iterator const& iter,
-    std::string_view key,
-    std::string_view torrent_name,
+    std::string_view const key,
+    std::string_view const torrent_name,
     tr_peer_stat const* peer)
 {
     g_return_if_fail(peer != nullptr);
@@ -2114,7 +2053,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     }
 
     /* step 4: update the rows */
-    auto const summary_name = std::string(std::size(torrents) == 1 ? tr_torrentName(torrents.front()) : "");
+    auto const summary_name = std::size(torrents) == 1 ? tr_torrentName(torrents.front()) : ""s;
     for (auto const& [tor, tracker] : trackers)
     {
         auto const torrent_id = tr_torrentId(tor);
@@ -2258,7 +2197,7 @@ void EditTrackersDialog::on_response(int response)
 
         if (auto* const tor = core_->find_torrent(torrent_id_); tor != nullptr)
         {
-            if (tr_torrentSetTrackerList(tor, text_buffer->get_text(false).c_str()))
+            if (tr_torrentSetTrackerList(tor, text_buffer->get_text(false).raw()))
             {
                 parent_.refresh();
             }
@@ -2388,16 +2327,11 @@ void AddTrackerDialog::on_response(int response)
         {
             if (tr_urlIsValidTracker(url.c_str()))
             {
-                tr_variant top;
-
-                tr_variantInitDict(&top, 2);
-                tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
-                auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
-                tr_variantDictAddInt(args, TR_KEY_id, torrent_id_);
-                auto* const trackers = tr_variantDictAddList(args, TR_KEY_tracker_add_camel, 1);
-                tr_variantListAddStr(trackers, url.raw());
-
-                core_->exec(top);
+                // TODO(ckerr) migrate to `TR_KEY_tracker_list`
+                auto params = tr_variant::Map{ 2U };
+                params.try_emplace(TR_KEY_ids, Session::to_variant({ torrent_id_ }));
+                params.try_emplace(TR_KEY_tracker_add, Session::to_variant({ url.raw() }));
+                core_->exec(TR_KEY_torrent_set, std::move(params));
                 parent_.refresh();
             }
             else
@@ -2435,16 +2369,12 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
     {
         auto const torrent_id = iter->get_value(tracker_cols.torrent_id);
         auto const tracker_id = iter->get_value(tracker_cols.tracker_id);
-        tr_variant top;
 
-        tr_variantInitDict(&top, 2);
-        tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
-        auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
-        tr_variantDictAddInt(args, TR_KEY_id, torrent_id);
-        auto* const trackers = tr_variantDictAddList(args, TR_KEY_tracker_remove_camel, 1);
-        tr_variantListAddInt(trackers, tracker_id);
-
-        core_->exec(top);
+        // TODO(ckerr): migrate to `TR_KEY_tracker_list`
+        auto params = tr_variant::Map{ 2U };
+        params.try_emplace(TR_KEY_ids, Session::to_variant({ torrent_id }));
+        params.try_emplace(TR_KEY_tracker_remove, Session::to_variant({ tracker_id }));
+        core_->exec(TR_KEY_torrent_set, std::move(params));
         refresh();
     }
 }

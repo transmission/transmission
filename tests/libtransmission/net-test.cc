@@ -20,9 +20,9 @@
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using NetTest = ::testing::Test;
+using NetTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(NetTest, conversionsIPv4)

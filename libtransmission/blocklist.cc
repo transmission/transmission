@@ -29,6 +29,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/blocklist.h"
+#include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
@@ -260,8 +261,12 @@ auto parseFile(std::string_view filename)
         }
         else
         {
-            // don't try to display the actual lines - it causes issues
-            tr_logAddWarn(fmt::format(fmt::runtime(_("Couldn't parse line: '{line}'")), fmt::arg("line", line_number)));
+            auto const base64 = tr_base64_encode(line);
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't parse line {line}: {base64}")),
+                    fmt::arg("line", line_number),
+                    fmt::arg("base64", base64)));
         }
     }
     in.close();
@@ -462,8 +467,8 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
 }
 
 std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
-    std::string_view external_file,
-    std::string_view bin_file,
+    std::string_view const external_file,
+    std::string_view const bin_file,
     bool is_enabled)
 {
     // if we can't parse the file, do nothing
@@ -475,9 +480,9 @@ std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
 
     // make a copy of `external_file` for our own safekeeping
     auto const src_file = std::string{ std::data(bin_file), std::size(bin_file) - std::size(BinFileSuffix) };
-    tr_sys_path_remove(src_file.c_str());
+    tr_sys_path_remove(src_file);
     auto error = tr_error{};
-    auto const copied = tr_sys_path_copy(tr_pathbuf{ external_file }, src_file.c_str(), &error);
+    auto const copied = tr_sys_path_copy(external_file, src_file, &error);
     if (error)
     {
         tr_logAddWarn(
@@ -556,11 +561,11 @@ std::vector<Blocklists::Blocklist> Blocklists::Blocklists::load_folder(std::stri
     return ret;
 }
 
-size_t Blocklists::update_primary_blocklist(std::string_view external_file, bool is_enabled)
+size_t Blocklists::update_primary_blocklist(std::string_view const external_file, bool const is_enabled)
 {
     // These rules will replace the default blocklist.
     // Build the path of the default blocklist .bin file where we'll save these rules.
-    auto const bin_file = tr_pathbuf{ folder_, '/', DEFAULT_BLOCKLIST_FILENAME };
+    auto const bin_file = tr_pathbuf{ folder_, '/', TrDefaultBlocklistFilename };
 
     // Try to save it
     auto added = Blocklist::saveNew(external_file, bin_file, is_enabled);

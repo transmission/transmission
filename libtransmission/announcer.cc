@@ -926,22 +926,22 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e, time
     auto const* const current_tracker = tier->currentTracker();
     TR_ASSERT(current_tracker != nullptr);
 
-    auto req = tr_announce_request{};
-    req.port = announcer->session->advertisedPeerPort();
-    req.announce_url = current_tracker->announce_url;
-    req.tracker_id = current_tracker->tracker_id;
-    req.info_hash = tor->info_hash();
-    req.peer_id = tor->peer_id();
-    req.up = tier->byteCounts[TR_ANN_UP];
-    req.down = tier->byteCounts[TR_ANN_DOWN];
-    req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
-    req.leftUntilComplete = tor->has_metainfo() ? tor->total_size() - tor->has_total() : INT64_MAX;
-    req.event = event;
-    req.numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
-    req.key = tor->announce_key();
-    req.partial_seed = tor->is_partial_seed();
-    req.log_name = tier->buildLogName();
-    return req;
+    return {
+        .event = event,
+        .partial_seed = tor->is_partial_seed(),
+        .port = announcer->session->advertisedPeerPort(),
+        .key = tor->announce_key(),
+        .numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant,
+        .up = tier->byteCounts[TR_ANN_UP],
+        .down = tier->byteCounts[TR_ANN_DOWN],
+        .corrupt = tier->byteCounts[TR_ANN_CORRUPT],
+        .leftUntilComplete = tor->has_metainfo() ? tor->total_size() - tor->has_total() : INT64_MAX,
+        .announce_url = current_tracker->announce_url,
+        .tracker_id = current_tracker->tracker_id,
+        .peer_id = tor->peer_id(),
+        .info_hash = tor->info_hash(),
+        .log_name = tier->buildLogName(),
+    };
 }
 
 [[nodiscard]] tr_tier* getTier(tr_announcer_impl* announcer, tr_sha1_digest_t const& info_hash, size_t tier_id)
@@ -1234,7 +1234,7 @@ namespace
 {
 namespace on_scrape_done_helpers
 {
-[[nodiscard]] TR_CONSTEXPR20 bool multiscrape_too_big(std::string_view errmsg)
+[[nodiscard]] constexpr bool multiscrape_too_big(std::string_view errmsg)
 {
     /* Found a tracker that returns some bespoke string for this case?
        Add your patch here and open a PR */
