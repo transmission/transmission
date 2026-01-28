@@ -99,15 +99,15 @@ protected:
         return false;
     }
 
-    static void expectHaveNone(tr_torrent* tor, uint64_t total_size)
+    static void expectHaveNone(tr_torrent* tor, uint64_t const total_size)
     {
-        auto const* tst = tr_torrentStat(tor);
-        EXPECT_EQ(TR_STATUS_STOPPED, tst->activity);
-        EXPECT_EQ(TR_STAT_OK, tst->error);
-        EXPECT_EQ(total_size, tst->sizeWhenDone);
-        EXPECT_EQ(total_size, tst->leftUntilDone);
+        auto const stats = tr_torrentStat(tor);
+        EXPECT_EQ(TR_STATUS_STOPPED, stats.activity);
+        EXPECT_EQ(TR_STAT_OK, stats.error);
+        EXPECT_EQ(total_size, stats.size_when_done);
+        EXPECT_EQ(total_size, stats.left_until_done);
         EXPECT_EQ(total_size, tor->total_size());
-        EXPECT_EQ(0, tst->haveValid);
+        EXPECT_EQ(0, stats.have_valid);
     }
 
     static int torrentRenameAndWait(tr_torrent* tor, std::string_view const oldpath, std::string_view const newname)
@@ -155,14 +155,14 @@ TEST_F(RenameTest, singleFilenameTorrent)
 
     // sanity check the stats again, now that we've added the file
     blockingTorrentVerify(tor);
-    auto const* st = tr_torrentStat(tor);
-    EXPECT_EQ(TR_STATUS_STOPPED, st->activity);
-    EXPECT_EQ(TR_STAT_OK, st->error);
-    EXPECT_EQ(0, st->leftUntilDone);
-    EXPECT_EQ(0, st->haveUnchecked);
-    EXPECT_EQ(0, st->desiredAvailable);
-    EXPECT_EQ(TotalSize, st->sizeWhenDone);
-    EXPECT_EQ(TotalSize, st->haveValid);
+    auto const stats = tr_torrentStat(tor);
+    EXPECT_EQ(TR_STATUS_STOPPED, stats.activity);
+    EXPECT_EQ(TR_STAT_OK, stats.error);
+    EXPECT_EQ(0, stats.left_until_done);
+    EXPECT_EQ(0, stats.have_unchecked);
+    EXPECT_EQ(0, stats.desired_available);
+    EXPECT_EQ(TotalSize, stats.size_when_done);
+    EXPECT_EQ(TotalSize, stats.have_valid);
 
     /**
     ***  okay! we've finally put together all the scaffolding to test
@@ -274,14 +274,14 @@ TEST_F(RenameTest, multifileTorrent)
 
     // sanity check the (full) stats
     blockingTorrentVerify(tor);
-    auto const* st = tr_torrentStat(tor);
-    EXPECT_EQ(TR_STATUS_STOPPED, st->activity);
-    EXPECT_EQ(TR_STAT_OK, st->error);
-    EXPECT_EQ(0, st->leftUntilDone);
-    EXPECT_EQ(0, st->haveUnchecked);
-    EXPECT_EQ(0, st->desiredAvailable);
-    EXPECT_EQ(TotalSize, st->sizeWhenDone);
-    EXPECT_EQ(TotalSize, st->haveValid);
+    auto const stats = tr_torrentStat(tor);
+    EXPECT_EQ(TR_STATUS_STOPPED, stats.activity);
+    EXPECT_EQ(TR_STAT_OK, stats.error);
+    EXPECT_EQ(0, stats.left_until_done);
+    EXPECT_EQ(0, stats.have_unchecked);
+    EXPECT_EQ(0, stats.desired_available);
+    EXPECT_EQ(TotalSize, stats.size_when_done);
+    EXPECT_EQ(TotalSize, stats.have_valid);
 
     /**
     ***  okay! let's test renaming.
@@ -462,9 +462,9 @@ TEST_F(RenameTest, partialFile)
     EXPECT_EQ(Length[0], tr_torrentFile(tor, 0).have + PieceSize);
     EXPECT_EQ(Length[1], tr_torrentFile(tor, 1).have);
     EXPECT_EQ(Length[2], tr_torrentFile(tor, 2).have);
-    auto const* st = tr_torrentStat(tor);
-    EXPECT_EQ(TotalSize, st->sizeWhenDone);
-    EXPECT_EQ(PieceSize, st->leftUntilDone);
+    auto const stats = tr_torrentStat(tor);
+    EXPECT_EQ(TotalSize, stats.size_when_done);
+    EXPECT_EQ(PieceSize, stats.left_until_done);
 
     /***
     ****

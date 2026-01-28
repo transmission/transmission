@@ -585,7 +585,7 @@ tr_session* Session::Impl::close()
    so delegate to the GTK+ thread before calling notify's dbus code... */
 void Session::Impl::on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running)
 {
-    if (was_running && completeness != TR_LEECH && tr_torrentStat(tor)->sizeWhenDone != 0)
+    if (was_running && completeness != TR_LEECH && tr_torrentStat(tor).size_when_done != 0U)
     {
         Glib::signal_idle().connect(
             [core = get_core_ptr(), torrent_id = tr_torrentId(tor)]()
