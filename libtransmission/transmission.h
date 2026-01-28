@@ -1142,21 +1142,21 @@ bool tr_torrentCanManualUpdate(tr_torrent const* torrent);
 
 struct tr_peer_stat
 {
-    bool is_utp;
+    bool is_utp = {};
 
-    bool is_encrypted;
-    bool is_downloading_from;
-    bool is_uploading_to;
-    bool is_seed;
+    bool is_encrypted = {};
+    bool is_downloading_from = {};
+    bool is_uploading_to = {};
+    bool is_seed = {};
 
-    bool peer_is_choked;
-    bool peer_is_interested;
-    bool client_is_choked;
-    bool client_is_interested;
-    bool is_incoming;
+    bool peer_is_choked = {};
+    bool peer_is_interested = {};
+    bool client_is_choked = {};
+    bool client_is_interested = {};
+    bool is_incoming = {};
 
-    uint8_t from;
-    uint16_t port;
+    uint8_t from = {};
+    uint16_t port = {};
 
     std::string addr;
     std::string flag_str;
@@ -1167,29 +1167,29 @@ struct tr_peer_stat
 
     tr_peer_id_t peer_id;
 
-    float progress;
+    float progress = {};
     libtransmission::Values::Speed rate_to_peer;
     libtransmission::Values::Speed rate_to_client;
 
     // THESE NEXT FOUR FIELDS ARE EXPERIMENTAL.
     // Don't rely on them; they'll probably go away
     /* how many blocks we've sent to this peer in the last 120 seconds */
-    uint32_t blocks_to_peer;
+    uint32_t blocks_to_peer = {};
     /* how many blocks this client's sent to us in the last 120 seconds */
-    uint32_t blocks_to_client;
+    uint32_t blocks_to_client = {};
     /* how many requests to this peer that we've cancelled in the last 120 seconds */
-    uint32_t cancels_to_peer;
+    uint32_t cancels_to_peer = {};
     /* how many requests this peer made of us, then cancelled, in the last 120 seconds */
-    uint32_t cancels_to_client;
+    uint32_t cancels_to_client = {};
 
     /* how many requests the peer has made that we haven't responded to yet */
-    size_t active_reqs_to_client;
+    size_t active_reqs_to_client = {};
 
     /* how many requests we've made and are currently awaiting a response for */
-    size_t active_reqs_to_peer;
+    size_t active_reqs_to_peer = {};
 
-    size_t bytes_to_peer;
-    size_t bytes_to_client;
+    size_t bytes_to_peer = {};
+    size_t bytes_to_client = {};
 };
 
 std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* torrent);
