@@ -57,6 +57,9 @@ set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.0)
 set(QT_MINIMUM 5.15)
 set(SMALL_MINIMUM 0.2.2)
+# utf8cpp v4's version file is configured with `COMPATIBILITY SameMajorVersion`
+# and does not support version range.
+# set(UTF8CPP_MINIMUM 3.1...4)
 
 option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
@@ -82,6 +85,7 @@ tr_auto_option(USE_SYSTEM_FMT "Use system fmt library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_SMALL "Use system small library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_UTF8CPP "Use system uft8cpp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_WIDE_INTEGER "Use system WideInteger library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" ${USE_SYSTEM_DEFAULT})
@@ -251,7 +255,6 @@ set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
 find_package(FastFloat)
 find_package(RapidJSON)
-find_package(UtfCpp)
 
 find_package(Threads)
 find_package(PkgConfig QUIET)
@@ -568,9 +571,8 @@ tr_add_external_auto_library(PSL libpsl
     TARGET psl::psl)
 
 if(ENABLE_UTP)
-    tr_add_external_auto_library_legacy(UTP libutp utp
+    tr_add_external_auto_library(UTP libutp
         SUBPROJECT
-        TARGET libutp::libutp
         CMAKE_ARGS
             -DLIBUTP_SHARED:BOOL=OFF)
 endif()
@@ -609,6 +611,13 @@ target_link_libraries(transmission::small
 target_compile_definitions(transmission::small
     INTERFACE
         SMALL_DISABLE_EXCEPTIONS=1)
+
+tr_add_external_auto_library(UTF8CPP utf8cpp
+    SUBPROJECT
+    SOURCE_DIR utfcpp)
+if (NOT TARGET utf8::cpp)
+    add_library(utf8::cpp ALIAS utf8cpp)
+endif()
 
 tr_add_external_auto_library(WIDE_INTEGER WideInteger
     SUBPROJECT
