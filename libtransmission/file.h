@@ -102,8 +102,8 @@ struct tr_sys_path_info
 
 struct tr_sys_path_capacity
 {
-    int64_t free = -1;
-    int64_t total = -1;
+    uint64_t free = {};
+    uint64_t total = {};
 };
 
 /**

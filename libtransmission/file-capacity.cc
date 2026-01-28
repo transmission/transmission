@@ -295,85 +295,79 @@ extern "C"
 
 #else
 
-[[nodiscard]] tr_sys_path_capacity getquota(char const* device)
+[[nodiscard]] std::optional<tr_sys_path_capacity> getquota(char const* device)
 {
 #if defined(__DragonFly__)
     struct ufs_dqblk dq = {};
 #else
     struct dqblk dq = {};
 #endif
-    auto disk_space = tr_sys_path_capacity{ .free = -1, .total = -1 };
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
-    if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) != 0)
+    if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), reinterpret_cast<caddr_t>(&dq)) != 0)
     {
-        return disk_space;
+        return {};
     }
 #elif defined(__sun)
-    struct quotctl op;
     int fd = open(device, O_RDONLY);
-
     if (fd < 0)
     {
-        return disk_space;
+        return {};
     }
 
+    struct quotctl op;
     op.op = Q_GETQUOTA;
     op.uid = getuid();
-    op.addr = (caddr_t)&dq;
+    op.addr = reinterpret_cast<caddr_t>(&dq);
 
     if (ioctl(fd, Q_QUOTACTL, &op) != 0)
     {
         close(fd);
-        return disk_space;
+        return {};
     }
 
     close(fd);
 #else
     if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), reinterpret_cast<caddr_t>(&dq)) != 0)
     {
-        return disk_space;
+        return {};
     }
 #endif
 
-    int64_t limit = 0;
-    if (dq.dqb_bsoftlimit > 0)
+    auto limit = uint64_t{};
+    if (dq.dqb_bsoftlimit > 0U)
     {
         /* Use soft limit first */
         limit = dq.dqb_bsoftlimit;
     }
-    else if (dq.dqb_bhardlimit > 0)
+    else if (dq.dqb_bhardlimit > 0U)
     {
         limit = dq.dqb_bhardlimit;
     }
     else
     {
-        /* No quota enabled for this user */
-        return disk_space;
+        // No quota enabled for this user
+        return {};
     }
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
-    int64_t const spaceused = (int64_t)dq.dqb_curblocks >> 1;
+    uint64_t const spaceused = dq.dqb_curblocks >> 1U;
 #elif defined(__APPLE__)
-    int64_t const spaceused = (int64_t)dq.dqb_curbytes;
+    uint64_t const spaceused = dq.dqb_curbytes;
 #elif defined(__UCLIBC__) && !TR_UCLIBC_CHECK_VERSION(1, 0, 18)
-    int64_t const spaceused = (int64_t)btodb(dq.dqb_curblocks);
+    uint64_t const spaceused = btodb(dq.dqb_curblocks);
 #elif defined(__sun) || (defined(_LINUX_QUOTA_VERSION) && _LINUX_QUOTA_VERSION < 2)
-    int64_t const spaceused = (int64_t)dq.dqb_curblocks >> 1;
+    uint64_t const spaceused = dq.dqb_curblocks >> 1U;
 #else
-    int64_t const spaceused = btodb(dq.dqb_curspace);
+    uint64_t const spaceused = btodb(dq.dqb_curspace);
 #endif
 
-    int64_t const freespace = limit - spaceused;
+    auto const freespace = limit > spaceused ? limit - spaceused : 0U;
 
 #ifdef __APPLE__
-    disk_space.free = std::max(int64_t{ 0 }, freespace);
-    disk_space.total = std::max(int64_t{ 0 }, limit);
-    return disk_space;
+    return tr_sys_path_capacity{ .free = freespace, .total = limit };
 #else
-    disk_space.free = std::max(int64_t{ 0 }, freespace * 1024);
-    disk_space.total = std::max(int64_t{ 0 }, limit * 1024);
-    return disk_space;
+    return tr_sys_path_capacity{ .free = freespace << 10U, .total = limit << 10U };
 #endif
 }
 
@@ -381,72 +375,62 @@ extern "C"
 
 #ifdef HAVE_XQM
 
-[[nodiscard]] tr_sys_path_capacity getxfsquota(char const* device)
+[[nodiscard]] std::optional<tr_sys_path_capacity> getxfsquota(char const* device)
 {
-    struct tr_sys_path_capacity disk_space = { -1, -1 };
-    struct fs_disk_quota dq;
-
-    if (quotactl(QCMD(Q_XGETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) == 0)
+    if (struct fs_disk_quota dq; quotactl(QCMD(Q_XGETQUOTA, USRQUOTA), device, getuid(), reinterpret_cast<caddr_t>(&dq)) != 0)
     {
-        int64_t limit = 0;
-        if (dq.d_blk_softlimit > 0)
-        {
-            /* Use soft limit first */
-            limit = dq.d_blk_softlimit >> 1;
-        }
-        else if (dq.d_blk_hardlimit > 0)
-        {
-            limit = dq.d_blk_hardlimit >> 1;
-        }
-        else
-        {
-            /* No quota enabled for this user */
-            return disk_space;
-        }
-
-        int64_t freespace = limit - (dq.d_bcount >> 1);
-        freespace = freespace < 0 ? 0 : (freespace * 1024);
-        limit = limit * 1024;
-        disk_space.free = freespace;
-        disk_space.total = limit;
-        return disk_space;
+        // something went wrong
+        return {};
     }
 
-    /* something went wrong */
-    return disk_space;
+    auto limit = uint64_t{};
+    if (dq.d_blk_softlimit > 0U)
+    {
+        /* Use soft limit first */
+        limit = dq.d_blk_softlimit >> 1U;
+    }
+    else if (dq.d_blk_hardlimit > 0U)
+    {
+        limit = dq.d_blk_hardlimit >> 1U;
+    }
+    else
+    {
+        // No quota enabled for this user
+        return {};
+    }
+
+    auto const spaceused = dq.d_bcount >> 1U;
+    auto const freespace = limit > spaceused ? limit - spaceused : 0U;
+    return tr_sys_path_capacity{ .free = freespace << 10U, .total = limit << 10U };
 }
 
 #endif /* HAVE_XQM */
 
 #endif /* _WIN32 */
 
-[[nodiscard]] tr_sys_path_capacity get_quota_space([[maybe_unused]] tr_device_info const& info)
+[[nodiscard]] std::optional<tr_sys_path_capacity> get_quota_space([[maybe_unused]] tr_device_info const& info)
 {
-    struct tr_sys_path_capacity ret = { .free = -1, .total = -1 };
-
 #ifndef _WIN32
 
     if (tr_strlower(info.fstype) == "xfs")
     {
 #ifdef HAVE_XQM
-        ret = getxfsquota(info.device.c_str());
+        return getxfsquota(info.device.c_str());
 #endif
     }
     else
     {
-        ret = getquota(info.device.c_str());
+        return getquota(info.device.c_str());
     }
 
 #endif /* _WIN32 */
 
-    return ret;
+    return {};
 }
 
-[[nodiscard]] tr_sys_path_capacity getDiskSpace(char const* path)
+[[nodiscard]] std::optional<tr_sys_path_capacity> getDiskSpace(char const* path)
 {
 #ifdef _WIN32
-
-    struct tr_sys_path_capacity ret = { .free = -1, .total = -1 };
 
     if (auto const wide_path = tr_win32_utf8_to_native(path); !std::empty(wide_path))
     {
@@ -457,25 +441,24 @@ extern "C"
         {
             ret.free = free_bytes_available.QuadPart;
             ret.total = total_bytes_available.QuadPart;
+            return tr_sys_path_capacity{ .free = free_bytes_available.QuadPart, .total = total_bytes_available.QuadPart };
         }
     }
 
-    return ret;
-
 #elif defined(HAVE_STATVFS)
 
-    struct statvfs buf = {};
-    return statvfs(path, &buf) != 0 ? (struct tr_sys_path_capacity){ .free = -1, .total = -1 } :
-                                      (struct tr_sys_path_capacity){ .free = (int64_t)buf.f_bavail * (int64_t)buf.f_frsize,
-                                                                     .total = (int64_t)buf.f_blocks * (int64_t)buf.f_frsize };
+    if (struct statvfs buf = {}; statvfs(path, &buf) == 0)
+    {
+        return tr_sys_path_capacity{ .free = buf.f_bavail * buf.f_frsize, .total = buf.f_blocks * buf.f_frsize };
+    }
 
 #else
 
 #warning FIXME: not implemented
 
-    return { .free = -1, .total = -1 };
-
 #endif
+
+    return {};
 }
 
 tr_device_info tr_device_info_create(std::string_view path)
@@ -490,22 +473,20 @@ tr_device_info tr_device_info_create(std::string_view path)
     return out;
 }
 
-tr_sys_path_capacity tr_device_info_get_disk_space(struct tr_device_info const& info)
+std::optional<tr_sys_path_capacity> tr_device_info_get_disk_space(struct tr_device_info const& info)
 {
     if (std::empty(info.path))
     {
         errno = EINVAL;
-        return { .free = -1, .total = -1 };
+        return {};
     }
 
-    auto space = get_quota_space(info);
-
-    if (space.free < 0 || space.total < 0)
+    if (auto space = get_quota_space(info); space.has_value())
     {
-        space = getDiskSpace(info.path.c_str());
+        return space;
     }
 
-    return space;
+    return getDiskSpace(info.path.c_str());
 }
 
 } // namespace
@@ -531,12 +512,11 @@ std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view pa
     }
 
     auto const device = tr_device_info_create(path);
-    auto capacity = tr_device_info_get_disk_space(device);
-    if (capacity.free < 0 || capacity.total < 0)
+    if (auto capacity = tr_device_info_get_disk_space(device); capacity.has_value())
     {
-        error->set_from_errno(EINVAL);
-        return {};
+        return capacity;
     }
 
-    return capacity;
+    error->set_from_errno(EINVAL);
+    return {};
 }
