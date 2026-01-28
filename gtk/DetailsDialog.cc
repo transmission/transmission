@@ -1227,16 +1227,12 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     auto const& store = peer_store_;
 
     /* step 1: get all the peers */
-    std::vector<tr_peer_stat*> peers;
-    std::vector<size_t> peerCount;
+    std::vector<std::vector<tr_peer_stat>> peers;
 
     peers.reserve(torrents.size());
-    peerCount.reserve(torrents.size());
     for (auto const* const torrent : torrents)
     {
-        size_t count = 0;
-        peers.push_back(tr_torrentPeers(torrent, &count));
-        peerCount.push_back(count);
+        peers.push_back(tr_torrentPeers(torrent));
     }
 
     /* step 2: mark all the peers in the list as not-updated */
@@ -1254,10 +1250,11 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     for (size_t i = 0; i < torrents.size(); ++i)
     {
         auto const* tor = torrents.at(i);
+        auto const& torrent_peers = peers.at(i);
 
-        for (size_t j = 0; j < peerCount[i]; ++j)
+        for (auto const& peer : torrent_peers)
         {
-            auto const* s = &peers.at(i)[j];
+            auto const* s = &peer;
             auto const key = make_key(tor, s);
 
             if (hash.find(key) == hash.end())
@@ -1273,10 +1270,11 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     for (size_t i = 0; i < torrents.size(); ++i)
     {
         auto const* tor = torrents.at(i);
+        auto const& torrent_peers = peers.at(i);
 
-        for (size_t j = 0; j < peerCount[i]; ++j)
+        for (auto const& peer : torrent_peers)
         {
-            auto const* s = &peers.at(i)[j];
+            auto const* s = &peer;
             auto const key = make_key(tor, s);
             refreshPeerRow(store->get_iter(hash.at(key).get_path()), s);
         }
@@ -1298,12 +1296,6 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
                 iter = store->erase(iter);
             }
         }
-    }
-
-    /* step 6: cleanup */
-    for (size_t i = 0; i < peers.size(); ++i)
-    {
-        tr_torrentPeersFree(peers[i], peerCount[i]);
     }
 }
 

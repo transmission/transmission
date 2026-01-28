@@ -613,13 +613,11 @@ namespace make_torrent_field_helpers
 
 [[nodiscard]] auto make_peer_vec(tr_torrent const& tor)
 {
-    auto n_peers = size_t{};
-    auto* const peers = tr_torrentPeers(&tor, &n_peers);
+    auto const peers = tr_torrentPeers(&tor);
     auto peers_vec = tr_variant::Vector{};
-    peers_vec.reserve(n_peers);
-    for (size_t idx = 0U; idx != n_peers; ++idx)
+    peers_vec.reserve(std::size(peers));
+    for (auto const& peer : peers)
     {
-        auto const& peer = peers[idx];
         auto peer_map = tr_variant::Map{ 19U };
         peer_map.try_emplace(TR_KEY_address, peer.addr);
         peer_map.try_emplace(TR_KEY_client_is_choked, peer.clientIsChoked);
@@ -642,7 +640,6 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_bytes_to_client, peer.bytes_to_client);
         peers_vec.emplace_back(std::move(peer_map));
     }
-    tr_torrentPeersFree(peers, n_peers);
     return tr_variant{ std::move(peers_vec) };
 }
 

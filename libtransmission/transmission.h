@@ -1190,9 +1190,7 @@ struct tr_peer_stat
 };
 // NOLINTEND(modernize-avoid-c-arrays)
 
-tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, size_t* peer_count);
-
-void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t peer_count);
+std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* torrent);
 
 // --- tr_tracker_stat
 

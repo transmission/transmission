@@ -1006,14 +1006,13 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
 - (NSArray<NSDictionary*>*)peers
 {
-    size_t totalPeers;
-    tr_peer_stat* peers = tr_torrentPeers(self.fHandle, &totalPeers);
+    auto const peers = tr_torrentPeers(self.fHandle);
+    size_t const totalPeers = peers.size();
 
     NSMutableArray* peerDicts = [NSMutableArray arrayWithCapacity:totalPeers];
 
-    for (size_t i = 0; i < totalPeers; i++)
+    for (auto const& peer : peers)
     {
-        tr_peer_stat* peer = &peers[i];
         NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithCapacity:12];
 
         dict[@"Name"] = self.name;
@@ -1038,8 +1037,6 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
         [peerDicts addObject:dict];
     }
-
-    tr_torrentPeersFree(peers, totalPeers);
 
     return peerDicts;
 }
