@@ -1491,16 +1491,11 @@ std::string tr_torrentFilename(tr_torrent const* tor)
 
 // ---
 
-tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, size_t* peer_count)
+std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tr_peerMgrPeerStats(tor, peer_count);
-}
-
-void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t /*peer_count*/)
-{
-    delete[] peer_stats;
+    return tr_peerMgrPeerStats(tor);
 }
 
 void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)

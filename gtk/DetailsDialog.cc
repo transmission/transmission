@@ -1088,17 +1088,17 @@ public:
     Gtk::TreeModelColumn<Glib::ustring> upload_rate_string;
     Gtk::TreeModelColumn<Glib::ustring> client;
     Gtk::TreeModelColumn<int> progress;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::activeReqsToClient)> upload_request_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::active_reqs_to_client)> upload_request_count_number;
     Gtk::TreeModelColumn<Glib::ustring> upload_request_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::activeReqsToPeer)> download_request_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::active_reqs_to_peer)> download_request_count_number;
     Gtk::TreeModelColumn<Glib::ustring> download_request_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocksToClient)> blocks_downloaded_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocks_to_client)> blocks_downloaded_count_number;
     Gtk::TreeModelColumn<Glib::ustring> blocks_downloaded_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocksToPeer)> blocks_uploaded_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocks_to_peer)> blocks_uploaded_count_number;
     Gtk::TreeModelColumn<Glib::ustring> blocks_uploaded_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancelsToPeer)> reqs_cancelled_by_client_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancels_to_peer)> reqs_cancelled_by_client_count_number;
     Gtk::TreeModelColumn<Glib::ustring> reqs_cancelled_by_client_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancelsToClient)> reqs_cancelled_by_peer_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancels_to_client)> reqs_cancelled_by_peer_count_number;
     Gtk::TreeModelColumn<Glib::ustring> reqs_cancelled_by_peer_count_string;
     Gtk::TreeModelColumn<Glib::ustring> encryption_stock_id;
     Gtk::TreeModelColumn<Glib::ustring> flags;
@@ -1111,21 +1111,13 @@ void initPeerRow(
     Gtk::TreeModel::iterator const& iter,
     std::string_view const key,
     std::string_view const torrent_name,
-    tr_peer_stat const* peer)
+    tr_peer_stat const& peer)
 {
-    g_return_if_fail(peer != nullptr);
-
-    char const* client = peer->client;
-    if (client == nullptr || g_strcmp0(client, "Unknown Client") == 0)
-    {
-        client = "";
-    }
-
     auto peer_addr4 = in_addr();
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     auto const* const peer_addr4_octets = reinterpret_cast<uint8_t const*>(&peer_addr4.s_addr);
-    auto const collated_name = inet_pton(AF_INET, std::data(peer->addr), &peer_addr4) != 1 ?
-        std::data(peer->addr) :
+    auto const collated_name = inet_pton(AF_INET, peer.addr.c_str(), &peer_addr4) != 1 ?
+        peer.addr :
         fmt::format(
             "{:03}",
             fmt::join(
@@ -1134,20 +1126,18 @@ void initPeerRow(
                 peer_addr4_octets + sizeof(peer_addr4.s_addr), // TODO(C++20): Use std::span
                 "."));
 
-    (*iter)[peer_cols.address] = std::data(peer->addr);
+    (*iter)[peer_cols.address] = peer.addr;
     (*iter)[peer_cols.address_collated] = collated_name;
-    (*iter)[peer_cols.client] = client;
-    (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
+    (*iter)[peer_cols.client] = peer.user_agent;
+    (*iter)[peer_cols.encryption_stock_id] = peer.is_encrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);
     (*iter)[peer_cols.torrent_name] = std::string(torrent_name);
 }
 
-void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* peer)
+void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const& peer)
 {
-    g_return_if_fail(peer != nullptr);
-
-    auto const down_speed = Speed{ peer->rateToClient_KBps, Speed::Units::KByps };
-    auto const up_speed = Speed{ peer->rateToPeer_KBps, Speed::Units::KByps };
+    auto const down_speed = peer.rate_to_client;
+    auto const up_speed = peer.rate_to_peer;
 
     auto blocks_to_client = std::string{};
     auto blocks_to_peer = std::string{};
@@ -1158,64 +1148,64 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
     auto up_count = std::string{};
     auto up_speed_string = std::string{};
 
-    if (peer->rateToPeer_KBps > 0.01)
+    if (peer.rate_to_peer.base_quantity() > 0U)
     {
         up_speed_string = up_speed.to_string();
     }
 
-    if (peer->rateToClient_KBps > 0)
+    if (peer.rate_to_client.base_quantity() > 0U)
     {
         down_speed_string = down_speed.to_string();
     }
 
-    if (peer->activeReqsToPeer > 0)
+    if (peer.active_reqs_to_peer > 0)
     {
-        down_count = std::to_string(peer->activeReqsToPeer);
+        down_count = std::to_string(peer.active_reqs_to_peer);
     }
 
-    if (peer->activeReqsToClient > 0)
+    if (peer.active_reqs_to_client > 0)
     {
-        up_count = std::to_string(peer->activeReqsToClient);
+        up_count = std::to_string(peer.active_reqs_to_client);
     }
 
-    if (peer->blocksToPeer > 0)
+    if (peer.blocks_to_peer > 0)
     {
-        blocks_to_peer = std::to_string(peer->blocksToPeer);
+        blocks_to_peer = std::to_string(peer.blocks_to_peer);
     }
 
-    if (peer->blocksToClient > 0)
+    if (peer.blocks_to_client > 0)
     {
-        blocks_to_client = std::to_string(peer->blocksToClient);
+        blocks_to_client = std::to_string(peer.blocks_to_client);
     }
 
-    if (peer->cancelsToPeer > 0)
+    if (peer.cancels_to_peer > 0)
     {
-        cancelled_by_client = std::to_string(peer->cancelsToPeer);
+        cancelled_by_client = std::to_string(peer.cancels_to_peer);
     }
 
-    if (peer->cancelsToClient > 0)
+    if (peer.cancels_to_client > 0)
     {
-        cancelled_by_peer = std::to_string(peer->cancelsToClient);
+        cancelled_by_peer = std::to_string(peer.cancels_to_client);
     }
 
-    (*iter)[peer_cols.progress] = static_cast<int>(100.0 * peer->progress);
-    (*iter)[peer_cols.upload_request_count_number] = peer->activeReqsToClient;
+    (*iter)[peer_cols.progress] = static_cast<int>(100.0 * peer.progress);
+    (*iter)[peer_cols.upload_request_count_number] = peer.active_reqs_to_client;
     (*iter)[peer_cols.upload_request_count_string] = up_count;
-    (*iter)[peer_cols.download_request_count_number] = peer->activeReqsToPeer;
+    (*iter)[peer_cols.download_request_count_number] = peer.active_reqs_to_peer;
     (*iter)[peer_cols.download_request_count_string] = down_count;
     (*iter)[peer_cols.download_rate_speed] = down_speed;
     (*iter)[peer_cols.download_rate_string] = down_speed_string;
     (*iter)[peer_cols.upload_rate_speed] = up_speed;
     (*iter)[peer_cols.upload_rate_string] = up_speed_string;
-    (*iter)[peer_cols.flags] = std::data(peer->flagStr);
+    (*iter)[peer_cols.flags] = peer.flag_str;
     (*iter)[peer_cols.was_updated] = true;
-    (*iter)[peer_cols.blocks_downloaded_count_number] = peer->blocksToClient;
+    (*iter)[peer_cols.blocks_downloaded_count_number] = peer.blocks_to_client;
     (*iter)[peer_cols.blocks_downloaded_count_string] = blocks_to_client;
-    (*iter)[peer_cols.blocks_uploaded_count_number] = peer->blocksToPeer;
+    (*iter)[peer_cols.blocks_uploaded_count_number] = peer.blocks_to_peer;
     (*iter)[peer_cols.blocks_uploaded_count_string] = blocks_to_peer;
-    (*iter)[peer_cols.reqs_cancelled_by_client_count_number] = peer->cancelsToPeer;
+    (*iter)[peer_cols.reqs_cancelled_by_client_count_number] = peer.cancels_to_peer;
     (*iter)[peer_cols.reqs_cancelled_by_client_count_string] = cancelled_by_client;
-    (*iter)[peer_cols.reqs_cancelled_by_peer_count_number] = peer->cancelsToClient;
+    (*iter)[peer_cols.reqs_cancelled_by_peer_count_number] = peer.cancels_to_client;
     (*iter)[peer_cols.reqs_cancelled_by_peer_count_string] = cancelled_by_peer;
 }
 
@@ -1227,16 +1217,12 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     auto const& store = peer_store_;
 
     /* step 1: get all the peers */
-    std::vector<tr_peer_stat*> peers;
-    std::vector<size_t> peerCount;
+    std::vector<std::vector<tr_peer_stat>> peers;
 
     peers.reserve(torrents.size());
-    peerCount.reserve(torrents.size());
     for (auto const* const torrent : torrents)
     {
-        size_t count = 0;
-        peers.push_back(tr_torrentPeers(torrent, &count));
-        peerCount.push_back(count);
+        peers.push_back(tr_torrentPeers(torrent));
     }
 
     /* step 2: mark all the peers in the list as not-updated */
@@ -1245,25 +1231,25 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
         row[peer_cols.was_updated] = false;
     }
 
-    auto make_key = [](tr_torrent const* tor, tr_peer_stat const* ps)
+    auto make_key = [](tr_torrent const* tor, tr_peer_stat const& ps)
     {
-        return fmt::format("{:d}.{:s}", tr_torrentId(tor), ps->addr);
+        return fmt::format("{:d}.{:s}", tr_torrentId(tor), ps.addr);
     };
 
     /* step 3: add any new peers */
     for (size_t i = 0; i < torrents.size(); ++i)
     {
         auto const* tor = torrents.at(i);
+        auto const& torrent_peers = peers.at(i);
 
-        for (size_t j = 0; j < peerCount[i]; ++j)
+        for (auto const& peer : torrent_peers)
         {
-            auto const* s = &peers.at(i)[j];
-            auto const key = make_key(tor, s);
+            auto const key = make_key(tor, peer);
 
             if (hash.find(key) == hash.end())
             {
                 auto const iter = store->append();
-                initPeerRow(iter, key, tr_torrentName(tor), s);
+                initPeerRow(iter, key, tr_torrentName(tor), peer);
                 hash.try_emplace(key, Gtk::TreeRowReference(store, store->get_path(iter)));
             }
         }
@@ -1273,12 +1259,12 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     for (size_t i = 0; i < torrents.size(); ++i)
     {
         auto const* tor = torrents.at(i);
+        auto const& torrent_peers = peers.at(i);
 
-        for (size_t j = 0; j < peerCount[i]; ++j)
+        for (auto const& peer : torrent_peers)
         {
-            auto const* s = &peers.at(i)[j];
-            auto const key = make_key(tor, s);
-            refreshPeerRow(store->get_iter(hash.at(key).get_path()), s);
+            auto const key = make_key(tor, peer);
+            refreshPeerRow(store->get_iter(hash.at(key).get_path()), peer);
         }
     }
 
@@ -1298,12 +1284,6 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
                 iter = store->erase(iter);
             }
         }
-    }
-
-    /* step 6: cleanup */
-    for (size_t i = 0; i < peers.size(); ++i)
-    {
-        tr_torrentPeersFree(peers[i], peerCount[i]);
     }
 }
 

@@ -1831,96 +1831,95 @@ namespace peer_stat_helpers
 
     auto const [addr, port] = peer->socket_address();
 
-    addr.display_name(stats.addr, sizeof(stats.addr));
-    stats.client = peer->user_agent().c_str();
+    stats.addr = addr.display_name();
+    stats.user_agent = peer->user_agent();
     stats.peer_id = peer->peer_id();
     stats.port = port.host();
     stats.from = peer->peer_info->from_first();
     stats.progress = peer->percent_done();
-    stats.isUTP = peer->is_utp_connection();
-    stats.isEncrypted = peer->is_encrypted();
-    stats.rateToPeer_KBps = peer->get_piece_speed(now_msec, tr_direction::ClientToPeer).count(Speed::Units::KByps);
-    stats.rateToClient_KBps = peer->get_piece_speed(now_msec, tr_direction::PeerToClient).count(Speed::Units::KByps);
-    stats.peerIsChoked = peer->peer_is_choked();
-    stats.peerIsInterested = peer->peer_is_interested();
-    stats.clientIsChoked = peer->client_is_choked();
-    stats.clientIsInterested = peer->client_is_interested();
-    stats.isIncoming = peer->is_incoming_connection();
-    stats.isDownloadingFrom = peer->is_active(tr_direction::PeerToClient);
-    stats.isUploadingTo = peer->is_active(tr_direction::ClientToPeer);
-    stats.isSeed = peer->is_seed();
+    stats.is_utp = peer->is_utp_connection();
+    stats.is_encrypted = peer->is_encrypted();
+    stats.rate_to_peer = peer->get_piece_speed(now_msec, tr_direction::ClientToPeer);
+    stats.rate_to_client = peer->get_piece_speed(now_msec, tr_direction::PeerToClient);
+    stats.peer_is_choked = peer->peer_is_choked();
+    stats.peer_is_interested = peer->peer_is_interested();
+    stats.client_is_choked = peer->client_is_choked();
+    stats.client_is_interested = peer->client_is_interested();
+    stats.is_incoming = peer->is_incoming_connection();
+    stats.is_downloading_from = peer->is_active(tr_direction::PeerToClient);
+    stats.is_uploading_to = peer->is_active(tr_direction::ClientToPeer);
+    stats.is_seed = peer->is_seed();
 
-    stats.blocksToPeer = peer->blocks_sent_to_peer.count(now, CancelHistorySec);
-    stats.blocksToClient = peer->blocks_sent_to_client.count(now, CancelHistorySec);
-    stats.cancelsToPeer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
-    stats.cancelsToClient = peer->cancels_sent_to_client.count(now, CancelHistorySec);
+    stats.blocks_to_peer = peer->blocks_sent_to_peer.count(now, CancelHistorySec);
+    stats.blocks_to_client = peer->blocks_sent_to_client.count(now, CancelHistorySec);
+    stats.cancels_to_peer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
+    stats.cancels_to_client = peer->cancels_sent_to_client.count(now, CancelHistorySec);
 
     stats.bytes_to_peer = peer->bytes_sent_to_peer.count(now, CancelHistorySec);
     stats.bytes_to_client = peer->bytes_sent_to_client.count(now, CancelHistorySec);
 
-    stats.activeReqsToPeer = peer->active_req_count(tr_direction::ClientToPeer);
-    stats.activeReqsToClient = peer->active_req_count(tr_direction::PeerToClient);
+    stats.active_reqs_to_peer = peer->active_req_count(tr_direction::ClientToPeer);
+    stats.active_reqs_to_client = peer->active_req_count(tr_direction::PeerToClient);
 
-    char* pch = stats.flagStr;
+    stats.flag_str.clear();
+    stats.flag_str.reserve(9);
 
-    if (stats.isUTP)
+    if (stats.is_utp)
     {
-        *pch++ = 'T';
+        stats.flag_str.push_back('T');
     }
 
     if (peer->swarm->optimistic == peer)
     {
-        *pch++ = 'O';
+        stats.flag_str.push_back('O');
     }
 
-    if (stats.isDownloadingFrom)
+    if (stats.is_downloading_from)
     {
-        *pch++ = 'D';
+        stats.flag_str.push_back('D');
     }
-    else if (stats.clientIsInterested)
+    else if (stats.client_is_interested)
     {
-        *pch++ = 'd';
-    }
-
-    if (stats.isUploadingTo)
-    {
-        *pch++ = 'U';
-    }
-    else if (stats.peerIsInterested)
-    {
-        *pch++ = 'u';
+        stats.flag_str.push_back('d');
     }
 
-    if (!stats.clientIsChoked && !stats.clientIsInterested)
+    if (stats.is_uploading_to)
     {
-        *pch++ = 'K';
+        stats.flag_str.push_back('U');
+    }
+    else if (stats.peer_is_interested)
+    {
+        stats.flag_str.push_back('u');
     }
 
-    if (!stats.peerIsChoked && !stats.peerIsInterested)
+    if (!stats.client_is_choked && !stats.client_is_interested)
     {
-        *pch++ = '?';
+        stats.flag_str.push_back('K');
     }
 
-    if (stats.isEncrypted)
+    if (!stats.peer_is_choked && !stats.peer_is_interested)
     {
-        *pch++ = 'E';
+        stats.flag_str.push_back('?');
+    }
+
+    if (stats.is_encrypted)
+    {
+        stats.flag_str.push_back('E');
     }
 
     if (stats.from == TR_PEER_FROM_DHT)
     {
-        *pch++ = 'H';
+        stats.flag_str.push_back('H');
     }
     else if (stats.from == TR_PEER_FROM_PEX)
     {
-        *pch++ = 'X';
+        stats.flag_str.push_back('X');
     }
 
-    if (stats.isIncoming)
+    if (stats.is_incoming)
     {
-        *pch++ = 'I';
+        stats.flag_str.push_back('I');
     }
-
-    *pch = '\0';
 
     return stats;
 }
@@ -1928,24 +1927,22 @@ namespace peer_stat_helpers
 } // namespace peer_stat_helpers
 } // namespace
 
-tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
+std::vector<tr_peer_stat> tr_peerMgrPeerStats(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
     auto const peers = tor->swarm->peers;
-    auto const n = std::size(peers);
-    auto* const ret = new tr_peer_stat[n];
+    auto ret = std::vector<tr_peer_stat>(std::size(peers));
 
     auto const lock = tor->unique_lock();
     auto const now = tr_time();
     auto const now_msec = tr_time_msec();
     std::ranges::transform(
         peers,
-        ret,
+        std::data(ret),
         [&now, &now_msec](auto const& peer) { return peer_stat_helpers::get_peer_stats(peer.get(), now, now_msec); });
 
-    *setme_count = n;
     return ret;
 }
 

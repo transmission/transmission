@@ -234,16 +234,14 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
 
     if (auto ipv4_addr = session->global_address(TR_AF_INET); ipv4_addr)
     {
-        auto buf = std::array<char, INET_ADDRSTRLEN>{};
-        auto const display_name = ipv4_addr->display_name(std::data(buf), std::size(buf));
+        auto const display_name = ipv4_addr->display_name();
         fmt::format_to(out, "&ipv4=");
         tr_urlPercentEncode(out, display_name);
     }
 
     if (auto ipv6_addr = session->global_address(TR_AF_INET6); ipv6_addr)
     {
-        auto buf = std::array<char, INET6_ADDRSTRLEN>{};
-        auto const display_name = ipv6_addr->display_name(std::data(buf), std::size(buf));
+        auto const display_name = ipv6_addr->display_name();
         fmt::format_to(out, "&ipv6=");
         tr_urlPercentEncode(out, display_name);
     }
