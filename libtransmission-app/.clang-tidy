@@ -1,5 +1,5 @@
 ---
-HeaderFilterRegex: .*/libtransmission/.*
+HeaderFilterRegex: .*/libtransmission-app/.*
 
 # TODO: Enable `portability-template-virtual-member-function` after https://github.com/llvm/llvm-project/issues/139031 is fixed
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
