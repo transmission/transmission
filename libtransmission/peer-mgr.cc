@@ -2514,7 +2514,7 @@ namespace bandwidth_helpers
 {
 void pumpAllPeers(tr_peerMgr* mgr)
 {
-    auto peers = std::vector<tr_peerMsgs*>{};
+    auto peers = small::vector<tr_peerMsgs*, TrDefaultPeerLimitGlobal>{};
     for (auto* const tor : mgr->torrents_)
     {
         std::ranges::transform(tor->swarm->peers, std::back_inserter(peers), [](auto const& p) { return p.get(); });
