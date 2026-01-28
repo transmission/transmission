@@ -471,9 +471,8 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 
 // --- tr_num_parse()
 
-template<typename T>
+template<std::integral T>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
-    requires std::is_integral_v<T>
 {
     auto val = T{};
     auto const* const begin_ch = std::data(str);
@@ -502,9 +501,8 @@ template std::optional<unsigned int> tr_num_parse(std::string_view str, std::str
 template std::optional<unsigned short> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 template std::optional<unsigned char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 
-template<typename T>
+template<std::floating_point T>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder)
-    requires std::is_floating_point_v<T>
 {
     auto const* const begin_ch = std::data(str);
     auto const* const end_ch = begin_ch + std::size(str);

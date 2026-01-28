@@ -37,7 +37,7 @@ Glib::Value<T>& column_value_cast(Glib::ValueBase& value, Gtk::TreeModelColumn<T
     return static_cast<Glib::Value<T>&>(value);
 }
 
-template<typename T, typename U, typename = std::enable_if_t<!std::is_floating_point_v<T>>>
+template<typename T, typename U>
 void update_cache_value(T& value, U&& new_value, Torrent::ChangeFlags& changes, Torrent::ChangeFlag flag)
 {
     if (value != new_value)
@@ -47,7 +47,7 @@ void update_cache_value(T& value, U&& new_value, Torrent::ChangeFlags& changes, 
     }
 }
 
-template<typename T, typename U, typename = std::enable_if_t<std::is_floating_point_v<T>>>
+template<std::floating_point T, typename U>
 void update_cache_value(T& value, U new_value, T epsilon, Torrent::ChangeFlags& changes, Torrent::ChangeFlag flag)
 {
     if (std::fabs(value - new_value) >= epsilon)
@@ -115,6 +115,7 @@ Torrent::Columns::Columns()
 class Torrent::Impl
 {
 public:
+    // NOLINTNEXTLINE(performance-enum-size): must be guint to match glib API
     enum class Property : guint
     {
         ICON = 1,

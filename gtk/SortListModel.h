@@ -25,12 +25,16 @@ class SortListModel : public IF_GTKMM4(Gtk::SortListModel, Gtk::TreeModelSort)
 public:
     using SorterType = SorterBase<ItemT>;
 
-public:
     SortListModel(Glib::RefPtr<Gio::ListModel> const& model, Glib::RefPtr<SorterType> const& sorter);
 
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
     SortListModel(Glib::RefPtr<Gtk::TreeModel> const& model, Glib::RefPtr<SorterType> const& sorter);
     ~SortListModel() override;
+
+    SortListModel(SortListModel const& other) = delete;
+    SortListModel(SortListModel&& other) = delete;
+    SortListModel operator=(SortListModel const& other) = delete;
+    SortListModel operator=(SortListModel&& other) = delete;
 #endif
 
     template<typename ModelT>

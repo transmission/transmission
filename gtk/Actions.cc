@@ -53,7 +53,7 @@ void sort_changed_cb(Gio::SimpleAction& action, Glib::VariantBase const& value, 
     myCore->set_pref(TR_KEY_sort_mode, Glib::VariantBase::cast_dynamic<VariantString>(value).get());
 }
 
-constexpr std::array<std::string_view, 2U> const ShowToggleEntries = {
+constexpr auto ShowToggleEntries = std::array{
     "toggle-main-window"sv,
     "toggle-message-log"sv,
 };
@@ -69,7 +69,7 @@ void toggle_pref_cb(Gio::SimpleAction& action, gpointer prefs_key)
 }
 
 // action-name, prefs_name
-constexpr std::array<std::pair<std::string_view, tr_quark>, 6U> const PrefToggleEntries = { {
+constexpr std::array<std::pair<std::string_view, tr_quark>, 6U> PrefToggleEntries = { {
     { "alt-speed-enabled"sv, TR_KEY_alt_speed_enabled },
     { "compact-view"sv, TR_KEY_compact_view },
     { "show-filterbar"sv, TR_KEY_show_filterbar },
@@ -78,7 +78,7 @@ constexpr std::array<std::pair<std::string_view, tr_quark>, 6U> const PrefToggle
     { "sort-reversed"sv, TR_KEY_sort_reversed },
 } };
 
-constexpr std::array<std::string_view, 29U> const Entries = {
+constexpr auto Entries = std::array{
     "copy-magnet-link-to-clipboard"sv,
     "delete-torrent"sv,
     "deselect-all"sv,
