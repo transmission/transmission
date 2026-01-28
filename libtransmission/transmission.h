@@ -1144,10 +1144,7 @@ struct tr_peer_stat
 {
     std::string addr;
     std::string flag_str;
-
-    // the peer's user agent, e.g. `BitTorrent 7.9.1`
-    // this is an interned string that will never go out-of-scope
-    std::string_view client;
+    std::string user_agent;
 
     libtransmission::Values::Speed rate_to_peer;
     libtransmission::Values::Speed rate_to_client;

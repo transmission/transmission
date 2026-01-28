@@ -1023,7 +1023,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
         dict[@"Seed"] = @(peer.is_seed);
         dict[@"Encryption"] = @(peer.is_encrypted);
         dict[@"uTP"] = @(peer.is_utp);
-        dict[@"Client"] = tr_strv_to_utf8_nsstring(peer.client);
+        dict[@"Client"] = tr_strv_to_utf8_nsstring(peer.user_agent);
         dict[@"Flags"] = tr_strv_to_utf8_nsstring(peer.flag_str);
 
         if (peer.is_uploading_to)

@@ -1115,10 +1115,10 @@ void initPeerRow(
 {
     g_return_if_fail(peer != nullptr);
 
-    std::string_view client = peer->client;
-    if (client == "Unknown Client")
+    std::string_view user_agent = peer->user_agent;
+    if (user_agent == "Unknown Client")
     {
-        client = "";
+        user_agent = "";
     }
 
     auto peer_addr4 = in_addr();
@@ -1136,7 +1136,7 @@ void initPeerRow(
 
     (*iter)[peer_cols.address] = peer->addr;
     (*iter)[peer_cols.address_collated] = collated_name;
-    (*iter)[peer_cols.client] = std::string(client);
+    (*iter)[peer_cols.client] = std::string(user_agent);
     (*iter)[peer_cols.encryption_stock_id] = peer->is_encrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);
     (*iter)[peer_cols.torrent_name] = std::string(torrent_name);

@@ -1832,7 +1832,7 @@ namespace peer_stat_helpers
     auto const [addr, port] = peer->socket_address();
 
     stats.addr = addr.display_name();
-    stats.client = peer->user_agent();
+    stats.user_agent = peer->user_agent();
     stats.peer_id = peer->peer_id();
     stats.port = port.host();
     stats.from = peer->peer_info->from_first();
