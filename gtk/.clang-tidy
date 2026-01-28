@@ -2,7 +2,6 @@
 HeaderFilterRegex: .*/gtk/.*
 
 Checks: >
-  -*,
   bugprone-*,
   -bugprone-narrowing-conversions,
   cert-*,
@@ -13,12 +12,16 @@ Checks: >
   -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-narrowing-conversions,
   hicpp-*,
+  -hicpp-no-array-decay,
   misc-*,
   -misc-include-cleaner,
   modernize-*,
+  -modernize-use-designated-initializers,
+  -modernize-use-ranges,
   -modernize-use-trailing-return-type,
   performance-*,
   readability-*,
+  -readability-container-contains,
   -readability-enum-initial-value,
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
