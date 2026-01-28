@@ -186,6 +186,8 @@ auto constexpr PeerReqQDefault = 500U;
 // batch them together to send enough requests to
 // meet our bandwidth goals for the next N seconds
 auto constexpr RequestBufSecs = time_t{ 10 };
+// in sequential mode, target a 1s window to match lower request timeout
+auto constexpr RequestBufSecsSequential = time_t{ 1 };
 
 // ---
 
@@ -470,8 +472,7 @@ public:
         TR_ASSERT(tor_.client_can_download());
         TR_ASSERT(client_is_interested());
         TR_ASSERT(!client_is_choked());
-
-        auto const timeout = tr_time() + RequestTimeoutSecs;
+        auto const timeout = tr_time() + (tor_.is_sequential_download() ? RequestTimeoutSecsSequential : RequestTimeoutSecs);
         for (auto const *span = block_spans, *span_end = span + n_spans; span != span_end; ++span)
         {
             auto const [block_begin, block_end] = *span;
@@ -753,6 +754,7 @@ private:
 
     // how many seconds we expect the next piece block to arrive
     static auto constexpr RequestTimeoutSecs = time_t{ 25 };
+    static auto constexpr RequestTimeoutSecsSequential = time_t{ 3 };
 };
 
 // ---
@@ -1965,6 +1967,7 @@ void tr_peerMsgsImpl::check_request_timeout(time_t const now)
 
         if (now >= timeout)
         {
+            logdbg(this, fmt::format("check_request_timeout cancelling block {}", block));
             // request timed out, discard
             cancel_block_request(block);
             it = request_timeouts_.erase(it);
@@ -2170,12 +2173,15 @@ size_t tr_peerMsgsImpl::max_available_reqs() const
 
     // use this desired rate to figure out how
     // many requests we should send to this peer
-    static auto constexpr Floor = size_t{ 32 };
-    static size_t constexpr Seconds = RequestBufSecs;
-    size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
+    auto const is_sequential = tor_.is_sequential_download();
+    // In sequential mode, peers should target a 1s
+    // window of blocks requests to avoid low timeout value
+    size_t const floor = is_sequential ? size_t{ 1 } : size_t{ 32 };
+    size_t const seconds = is_sequential ? RequestBufSecsSequential : RequestBufSecs;
+    size_t const estimated_blocks_in_period = (rate.base_quantity() * seconds) / tr_block_info::BlockSize;
     auto const ceil = peer_reqq_.value_or(PeerReqQDefault);
 
-    return std::clamp(estimated_blocks_in_period, Floor, ceil);
+    return std::clamp(estimated_blocks_in_period, floor, ceil);
 }
 
 } // namespace
