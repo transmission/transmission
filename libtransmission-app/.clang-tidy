@@ -1,5 +1,5 @@
 ---
-HeaderFilterRegex: .*/libtransmission/.*
+HeaderFilterRegex: .*/libtransmission-app/.*
 
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
 Checks:
@@ -10,7 +10,7 @@ Checks:
   - -bugprone-narrowing-conversions
   - cert-*
   - -cert-err58-cpp
-  - -cert-int09-c
+  - -cert-int09-c # alias of `readability-enum-initial-value`
   - clang-analyzer-*
   - -clang-analyzer-optin.core.EnumCastOutOfRange
   - cppcoreguidelines-avoid-do-while
