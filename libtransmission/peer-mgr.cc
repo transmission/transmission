@@ -1861,66 +1861,65 @@ namespace peer_stat_helpers
     stats.activeReqsToPeer = peer->active_req_count(tr_direction::ClientToPeer);
     stats.activeReqsToClient = peer->active_req_count(tr_direction::PeerToClient);
 
-    char* pch = stats.flagStr;
+    stats.flag_str.clear();
+    stats.flag_str.reserve(9);
 
     if (stats.isUTP)
     {
-        *pch++ = 'T';
+        stats.flag_str.push_back('T');
     }
 
     if (peer->swarm->optimistic == peer)
     {
-        *pch++ = 'O';
+        stats.flag_str.push_back('O');
     }
 
     if (stats.isDownloadingFrom)
     {
-        *pch++ = 'D';
+        stats.flag_str.push_back('D');
     }
     else if (stats.clientIsInterested)
     {
-        *pch++ = 'd';
+        stats.flag_str.push_back('d');
     }
 
     if (stats.isUploadingTo)
     {
-        *pch++ = 'U';
+        stats.flag_str.push_back('U');
     }
     else if (stats.peerIsInterested)
     {
-        *pch++ = 'u';
+        stats.flag_str.push_back('u');
     }
 
     if (!stats.clientIsChoked && !stats.clientIsInterested)
     {
-        *pch++ = 'K';
+        stats.flag_str.push_back('K');
     }
 
     if (!stats.peerIsChoked && !stats.peerIsInterested)
     {
-        *pch++ = '?';
+        stats.flag_str.push_back('?');
     }
 
     if (stats.isEncrypted)
     {
-        *pch++ = 'E';
+        stats.flag_str.push_back('E');
     }
 
     if (stats.from == TR_PEER_FROM_DHT)
     {
-        *pch++ = 'H';
+        stats.flag_str.push_back('H');
     }
     else if (stats.from == TR_PEER_FROM_PEX)
     {
-        *pch++ = 'X';
+        stats.flag_str.push_back('X');
     }
 
     if (stats.isIncoming)
     {
-        *pch++ = 'I';
+        stats.flag_str.push_back('I');
     }
-
-    *pch = '\0';
 
     return stats;
 }

@@ -624,7 +624,7 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_client_is_interested, peer.clientIsInterested);
         peer_map.try_emplace(TR_KEY_client_name, tr_variant::unmanaged_string(peer.client));
         peer_map.try_emplace(TR_KEY_peer_id, tr_base64_encode(std::string_view{ peer.peer_id.data(), peer.peer_id.size() }));
-        peer_map.try_emplace(TR_KEY_flag_str, peer.flagStr);
+        peer_map.try_emplace(TR_KEY_flag_str, peer.flag_str);
         peer_map.try_emplace(TR_KEY_is_downloading_from, peer.isDownloadingFrom);
         peer_map.try_emplace(TR_KEY_is_encrypted, peer.isEncrypted);
         peer_map.try_emplace(TR_KEY_is_incoming, peer.isIncoming);

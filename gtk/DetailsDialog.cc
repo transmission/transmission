@@ -1207,7 +1207,7 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
     (*iter)[peer_cols.download_rate_string] = down_speed_string;
     (*iter)[peer_cols.upload_rate_speed] = up_speed;
     (*iter)[peer_cols.upload_rate_string] = up_speed_string;
-    (*iter)[peer_cols.flags] = std::data(peer->flagStr);
+    (*iter)[peer_cols.flags] = peer->flag_str;
     (*iter)[peer_cols.was_updated] = true;
     (*iter)[peer_cols.blocks_downloaded_count_number] = peer->blocksToClient;
     (*iter)[peer_cols.blocks_downloaded_count_string] = blocks_to_client;

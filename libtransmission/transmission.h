@@ -1159,7 +1159,7 @@ struct tr_peer_stat
     uint16_t port;
 
     char addr[TrInet6AddrStrlen];
-    char flagStr[32];
+    std::string flag_str;
 
     // the peer's user agent, e.g. `BitTorrent 7.9.1`
     // this is an interned string that will never go out-of-scope
