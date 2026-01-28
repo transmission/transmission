@@ -250,6 +250,7 @@ jobs:
           enable-clang-tidy: true
           use-sudo: true
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
       - name: Configure
         run: |
           cmake \
@@ -276,11 +277,14 @@ jobs:
       - name: Make (GTK3)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: cmake --build obj --config Debug --target transmission-gtk 2>&1 | tee -a makelog
+      - name: Make (Qt6)
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        run: cmake --build obj --config Debug --target transmission-qt 2>&1 | tee -a makelog
       - name: Test for warnings
         run: |
           if grep 'warning:' makelog; then exit 1; fi
 
-  clang-tidy-libtransmission-win32:
+  clang-tidy-win32:
     runs-on: windows-2025
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-core == 'true' || needs.what-to-make.outputs.make-tests == 'true' }}
@@ -320,6 +324,11 @@ jobs:
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
           cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
+      - name: Make (Qt6)
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
+          cmake --build obj --config Debug --target transmission-qt 2>&1 | tee -a makelog
       - name: Test for warnings
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
