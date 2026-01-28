@@ -518,7 +518,7 @@ std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view pa
         error = &local_error;
     }
 
-    auto const info = tr_sys_path_get_info(path, 0, &local_error);
+    auto const info = tr_sys_path_get_info(path, 0, error);
     if (!info)
     {
         return {};
