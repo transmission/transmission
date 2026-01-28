@@ -1034,8 +1034,8 @@ struct tr_torrent
 private:
     friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
-    friend tr_stat const* tr_torrentStat(tr_torrent* tor);
-    friend std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+    friend tr_stat tr_torrentStat(tr_torrent* tor);
+    friend std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
@@ -1337,7 +1337,7 @@ private:
 
     [[nodiscard]] bool is_new_torrent_a_seed();
 
-    tr_stat stats_ = {};
+    //tr_stat stats_ = {};
 
     Error error_;
 

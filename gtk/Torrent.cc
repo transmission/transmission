@@ -239,68 +239,59 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
 {
     auto result = ChangeFlags();
 
-    auto const* const stats = tr_torrentStat(raw_torrent_);
-    g_return_val_if_fail(stats != nullptr, Torrent::ChangeFlags());
+    auto const stats = tr_torrentStat(raw_torrent_);
 
     auto seed_ratio = 0.0;
     auto const has_seed_ratio = tr_torrentGetSeedRatio(raw_torrent_, &seed_ratio);
     auto const view = tr_torrentView(raw_torrent_);
 
     update_cache_value(cache_.name, view.name, result, ChangeFlag::NAME);
-    update_cache_value(
-        cache_.speed_up,
-        Speed{ stats->pieceUploadSpeed_KBps, Speed::Units::KByps },
-        result,
-        ChangeFlag::SPEED_UP);
-    update_cache_value(
-        cache_.speed_down,
-        Speed{ stats->pieceDownloadSpeed_KBps, Speed::Units::KByps },
-        result,
-        ChangeFlag::SPEED_DOWN);
-    update_cache_value(cache_.active_peers_up, stats->peersGettingFromUs, result, ChangeFlag::ACTIVE_PEERS_UP);
+    update_cache_value(cache_.speed_up, stats.piece_upload_speed, result, ChangeFlag::SPEED_UP);
+    update_cache_value(cache_.speed_down, stats.piece_download_speed, result, ChangeFlag::SPEED_DOWN);
+    update_cache_value(cache_.active_peers_up, stats.peers_getting_from_us, result, ChangeFlag::ACTIVE_PEERS_UP);
     update_cache_value(
         cache_.active_peers_down,
-        stats->peersSendingToUs + stats->webseedsSendingToUs,
+        stats.peers_sending_to_us + stats.webseeds_sending_to_us,
         result,
         ChangeFlag::ACTIVE_PEERS_DOWN);
-    update_cache_value(cache_.recheck_progress, Percents(stats->recheckProgress), result, ChangeFlag::RECHECK_PROGRESS);
+    update_cache_value(cache_.recheck_progress, Percents(stats.recheck_progress), result, ChangeFlag::RECHECK_PROGRESS);
     update_cache_value(
         cache_.active,
-        stats->peersSendingToUs > 0 || stats->peersGettingFromUs > 0 || stats->activity == TR_STATUS_CHECK,
+        stats.peers_sending_to_us > 0 || stats.peers_getting_from_us > 0 || stats.activity == TR_STATUS_CHECK,
         result,
         ChangeFlag::ACTIVE);
-    update_cache_value(cache_.activity, stats->activity, result, ChangeFlag::ACTIVITY);
+    update_cache_value(cache_.activity, stats.activity, result, ChangeFlag::ACTIVITY);
     update_cache_value(
         cache_.activity_percent_done,
         Percents(
             std::clamp(
-                stats->activity == TR_STATUS_SEED && has_seed_ratio ? stats->seedRatioPercentDone : stats->percentDone,
+                stats.activity == TR_STATUS_SEED && has_seed_ratio ? stats.seed_ratio_percent_done : stats.percent_done,
                 0.0F,
                 1.0F)),
         result,
         ChangeFlag::PERCENT_DONE);
-    update_cache_value(cache_.finished, stats->finished, result, ChangeFlag::FINISHED);
+    update_cache_value(cache_.finished, stats.finished, result, ChangeFlag::FINISHED);
     update_cache_value(cache_.priority, tr_torrentGetPriority(raw_torrent_), result, ChangeFlag::PRIORITY);
-    update_cache_value(cache_.queue_position, stats->queuePosition, result, ChangeFlag::QUEUE_POSITION);
+    update_cache_value(cache_.queue_position, stats.queue_position, result, ChangeFlag::QUEUE_POSITION);
     update_cache_value(cache_.trackers, build_torrent_trackers_hash(*raw_torrent_), result, ChangeFlag::TRACKERS);
-    update_cache_value(cache_.error_code, stats->error, result, ChangeFlag::ERROR_CODE);
-    update_cache_value(cache_.error_message, stats->errorString, result, ChangeFlag::ERROR_MESSAGE);
+    update_cache_value(cache_.error_code, stats.error, result, ChangeFlag::ERROR_CODE);
+    update_cache_value(cache_.error_message, stats.error_string, result, ChangeFlag::ERROR_MESSAGE);
     update_cache_value(
         cache_.active_peer_count,
-        stats->peersSendingToUs + stats->peersGettingFromUs + stats->webseedsSendingToUs,
+        stats.peers_sending_to_us + stats.peers_getting_from_us + stats.webseeds_sending_to_us,
         result,
         ChangeFlag::ACTIVE_PEER_COUNT);
     update_cache_value(cache_.mime_type, get_mime_type(*raw_torrent_), result, ChangeFlag::MIME_TYPE);
     update_cache_value(cache_.has_metadata, tr_torrentHasMetadata(raw_torrent_), result, ChangeFlag::HAS_METADATA);
-    update_cache_value(cache_.stalled, stats->isStalled, result, ChangeFlag::STALLED);
-    update_cache_value(cache_.ratio, stats->ratio, 0.01F, result, ChangeFlag::RATIO);
+    update_cache_value(cache_.stalled, stats.is_stalled, result, ChangeFlag::STALLED);
+    update_cache_value(cache_.ratio, stats.upload_ratio, 0.01F, result, ChangeFlag::RATIO);
 
-    update_cache_value(cache_.added_date, stats->addedDate, result, ChangeFlag::ADDED_DATE);
-    update_cache_value(cache_.eta, stats->eta, result, ChangeFlag::ETA);
-    update_cache_value(cache_.percent_complete, Percents(stats->percentComplete), result, ChangeFlag::PERCENT_COMPLETE);
+    update_cache_value(cache_.added_date, stats.added_date, result, ChangeFlag::ADDED_DATE);
+    update_cache_value(cache_.eta, stats.eta, result, ChangeFlag::ETA);
+    update_cache_value(cache_.percent_complete, Percents(stats.percent_complete), result, ChangeFlag::PERCENT_COMPLETE);
     update_cache_value(
         cache_.seed_ratio_percent_done,
-        Percents(stats->seedRatioPercentDone),
+        Percents(stats.seed_ratio_percent_done),
         result,
         ChangeFlag::SEED_RATIO_PERCENT_DONE);
     update_cache_value(cache_.total_size, Storage{ view.total_size, Storage::Units::Bytes }, result, ChangeFlag::TOTAL_SIZE);
@@ -308,41 +299,41 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
     update_cache_value(cache_.has_seed_ratio, has_seed_ratio, result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(
         cache_.have_unchecked,
-        Storage{ stats->haveUnchecked, Storage::Units::Bytes },
+        Storage{ stats.have_unchecked, Storage::Units::Bytes },
         result,
         ChangeFlag::LONG_PROGRESS);
     update_cache_value(
         cache_.have_valid,
-        Storage{ stats->haveValid, Storage::Units::Bytes },
+        Storage{ stats.have_valid, Storage::Units::Bytes },
         result,
         ChangeFlag::LONG_PROGRESS);
     update_cache_value(
         cache_.left_until_done,
-        Storage{ stats->leftUntilDone, Storage::Units::Bytes },
+        Storage{ stats.left_until_done, Storage::Units::Bytes },
         result,
         ChangeFlag::LONG_PROGRESS);
-    update_cache_value(cache_.percent_done, Percents(stats->percentDone), result, ChangeFlag::LONG_PROGRESS);
+    update_cache_value(cache_.percent_done, Percents(stats.percent_done), result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(cache_.seed_ratio, static_cast<float>(seed_ratio), 0.01F, result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(
         cache_.size_when_done,
-        Storage{ stats->sizeWhenDone, Storage::Units::Bytes },
+        Storage{ stats.size_when_done, Storage::Units::Bytes },
         result,
         ChangeFlag::LONG_PROGRESS);
     update_cache_value(
         cache_.uploaded_ever,
-        Storage{ stats->uploadedEver, Storage::Units::Bytes },
+        Storage{ stats.uploaded_ever, Storage::Units::Bytes },
         result,
         ChangeFlag::LONG_PROGRESS);
 
     update_cache_value(
         cache_.metadata_percent_complete,
-        Percents(stats->metadataPercentComplete),
+        Percents(stats.metadata_percent_complete),
         result,
         ChangeFlag::LONG_STATUS);
-    update_cache_value(cache_.peers_connected, stats->peersConnected, result, ChangeFlag::LONG_STATUS);
-    update_cache_value(cache_.peers_getting_from_us, stats->peersGettingFromUs, result, ChangeFlag::LONG_STATUS);
-    update_cache_value(cache_.peers_sending_to_us, stats->peersSendingToUs, result, ChangeFlag::LONG_STATUS);
-    update_cache_value(cache_.webseeds_sending_to_us, stats->webseedsSendingToUs, result, ChangeFlag::LONG_STATUS);
+    update_cache_value(cache_.peers_connected, stats.peers_connected, result, ChangeFlag::LONG_STATUS);
+    update_cache_value(cache_.peers_getting_from_us, stats.peers_getting_from_us, result, ChangeFlag::LONG_STATUS);
+    update_cache_value(cache_.peers_sending_to_us, stats.peers_sending_to_us, result, ChangeFlag::LONG_STATUS);
+    update_cache_value(cache_.webseeds_sending_to_us, stats.webseeds_sending_to_us, result, ChangeFlag::LONG_STATUS);
 
     if (result.test(ChangeFlag::NAME))
     {

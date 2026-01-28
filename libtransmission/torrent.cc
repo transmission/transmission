@@ -1263,52 +1263,52 @@ tr_stat tr_torrent::stats() const
     stats.id = this->id();
     stats.activity = activity;
     stats.error = this->error().error_type();
-    stats.queuePosition = queue_position();
-    stats.idleSecs = idle_seconds ? *idle_seconds : time_t{ -1 };
-    stats.isStalled = IsStalled(this, idle_seconds);
-    stats.errorString = this->error().errmsg().c_str();
+    stats.queue_position = queue_position();
+    stats.idle_secs = idle_seconds ? *idle_seconds : time_t{ -1 };
+    stats.is_stalled = IsStalled(this, idle_seconds);
+    stats.error_string = this->error().errmsg();
 
-    stats.peersConnected = swarm_stats.peer_count;
-    stats.peersSendingToUs = swarm_stats.active_peer_count[static_cast<uint8_t>(tr_direction::Down)];
-    stats.peersGettingFromUs = swarm_stats.active_peer_count[static_cast<uint8_t>(tr_direction::Up)];
-    stats.webseedsSendingToUs = swarm_stats.active_webseed_count;
+    stats.peers_connected = swarm_stats.peer_count;
+    stats.peers_sending_to_us = swarm_stats.active_peer_count[static_cast<uint8_t>(tr_direction::Down)];
+    stats.peers_getting_from_us = swarm_stats.active_peer_count[static_cast<uint8_t>(tr_direction::Up)];
+    stats.webseeds_sending_to_us = swarm_stats.active_webseed_count;
 
     for (int i = 0; i < TR_PEER_FROM_N_TYPES; i++)
     {
-        stats.peersFrom[i] = swarm_stats.peer_from_count[i];
-        stats.knownPeersFrom[i] = swarm_stats.known_peer_from_count[i];
+        stats.peers_from[i] = swarm_stats.peer_from_count[i];
+        stats.known_peers_from[i] = swarm_stats.known_peer_from_count[i];
     }
 
     auto const piece_upload_speed = bandwidth().get_piece_speed(now_msec, tr_direction::Up);
-    stats.pieceUploadSpeed_KBps = piece_upload_speed.count(Speed::Units::KByps);
     auto const piece_download_speed = bandwidth().get_piece_speed(now_msec, tr_direction::Down);
-    stats.pieceDownloadSpeed_KBps = piece_download_speed.count(Speed::Units::KByps);
+    stats.piece_upload_speed = piece_upload_speed;
+    stats.piece_download_speed = piece_download_speed;
 
-    stats.percentComplete = this->completion_.percent_complete();
-    stats.metadataPercentComplete = get_metadata_percent();
+    stats.percent_complete = this->completion_.percent_complete();
+    stats.metadata_percent_complete = get_metadata_percent();
 
-    stats.percentDone = this->completion_.percent_done();
-    stats.leftUntilDone = this->completion_.left_until_done();
-    stats.sizeWhenDone = this->completion_.size_when_done();
+    stats.percent_done = this->completion_.percent_done();
+    stats.left_until_done = this->completion_.left_until_done();
+    stats.size_when_done = this->completion_.size_when_done();
 
     auto const verify_progress = this->verify_progress();
-    stats.recheckProgress = verify_progress.value_or(0.0);
-    stats.activityDate = this->date_active_;
-    stats.addedDate = this->date_added_;
-    stats.doneDate = this->date_done_;
-    stats.editDate = this->date_edited_;
-    stats.startDate = this->date_started_;
-    stats.secondsSeeding = this->seconds_seeding(now_sec);
-    stats.secondsDownloading = this->seconds_downloading(now_sec);
+    stats.recheck_progress = verify_progress.value_or(0.0);
+    stats.activity_date = this->date_active_;
+    stats.added_date = this->date_added_;
+    stats.done_date = this->date_done_;
+    stats.edit_date = this->date_edited_;
+    stats.start_date = this->date_started_;
+    stats.seconds_seeding = this->seconds_seeding(now_sec);
+    stats.seconds_downloading = this->seconds_downloading(now_sec);
 
-    stats.corruptEver = this->bytes_corrupt_.ever();
-    stats.downloadedEver = this->bytes_downloaded_.ever();
-    stats.uploadedEver = this->bytes_uploaded_.ever();
-    stats.haveValid = this->completion_.has_valid();
-    stats.haveUnchecked = this->has_total() - stats.haveValid;
-    stats.desiredAvailable = tr_peerMgrGetDesiredAvailable(this);
+    stats.corrupt_ever = this->bytes_corrupt_.ever();
+    stats.downloaded_ever = this->bytes_downloaded_.ever();
+    stats.uploaded_ever = this->bytes_uploaded_.ever();
+    stats.have_valid = this->completion_.has_valid();
+    stats.have_unchecked = this->has_total() - stats.have_valid;
+    stats.desired_available = tr_peerMgrGetDesiredAvailable(this);
 
-    stats.ratio = tr_getRatio(stats.uploadedEver, this->size_when_done());
+    stats.upload_ratio = tr_getRatio(stats.uploaded_ever, this->size_when_done());
 
     auto seed_ratio_bytes_left = uint64_t{};
     auto seed_ratio_bytes_goal = uint64_t{};
@@ -1316,16 +1316,16 @@ tr_stat tr_torrent::stats() const
 
     // eta, etaIdle
     stats.eta = TR_ETA_NOT_AVAIL;
-    stats.etaIdle = TR_ETA_NOT_AVAIL;
+    stats.eta_idle = TR_ETA_NOT_AVAIL;
     if (activity == TR_STATUS_DOWNLOAD)
     {
         if (auto const eta_speed_byps = eta_speed_.update(now_msec, piece_download_speed).base_quantity(); eta_speed_byps == 0U)
         {
             stats.eta = TR_ETA_UNKNOWN;
         }
-        else if (stats.leftUntilDone <= stats.desiredAvailable || webseed_count() >= 1U)
+        else if (stats.left_until_done <= stats.desired_available || webseed_count() >= 1U)
         {
-            stats.eta = stats.leftUntilDone / eta_speed_byps;
+            stats.eta = stats.left_until_done / eta_speed_byps;
         }
     }
     else if (activity == TR_STATUS_SEED)
@@ -1341,7 +1341,7 @@ tr_stat tr_torrent::stats() const
         {
             if (auto const secs_left = idle_seconds_left(now_sec); secs_left)
             {
-                stats.etaIdle = *secs_left;
+                stats.eta_idle = *secs_left;
             }
         }
     }
@@ -1349,37 +1349,36 @@ tr_stat tr_torrent::stats() const
     /* stats.haveValid is here to make sure a torrent isn't marked 'finished'
      * when the user hits "uncheck all" prior to starting the torrent... */
     stats.finished = this->finished_seeding_by_idle_ ||
-        (seed_ratio_applies && seed_ratio_bytes_left == 0 && stats.haveValid != 0);
+        (seed_ratio_applies && seed_ratio_bytes_left == 0 && stats.have_valid != 0);
 
     if (!seed_ratio_applies || stats.finished)
     {
-        stats.seedRatioPercentDone = 1.0F;
+        stats.seed_ratio_percent_done = 1.0F;
     }
     else if (seed_ratio_bytes_goal == 0) /* impossible? safeguard for div by zero */
     {
-        stats.seedRatioPercentDone = 0.0F;
+        stats.seed_ratio_percent_done = 0.0F;
     }
     else
     {
-        stats.seedRatioPercentDone = float(seed_ratio_bytes_goal - seed_ratio_bytes_left) / seed_ratio_bytes_goal;
+        stats.seed_ratio_percent_done = float(seed_ratio_bytes_goal - seed_ratio_bytes_left) / seed_ratio_bytes_goal;
     }
 
     /* test some of the constraints */
-    TR_ASSERT(stats.sizeWhenDone <= this->total_size());
-    TR_ASSERT(stats.leftUntilDone <= stats.sizeWhenDone);
-    TR_ASSERT(stats.desiredAvailable <= stats.leftUntilDone);
+    TR_ASSERT(stats.size_when_done <= this->total_size());
+    TR_ASSERT(stats.left_until_done <= stats.size_when_done);
+    TR_ASSERT(stats.desired_available <= stats.left_until_done);
     return stats;
 }
 
-tr_stat const* tr_torrentStat(tr_torrent* const tor)
+tr_stat tr_torrentStat(tr_torrent* const tor)
 {
-    tor->stats_ = tor->stats();
-    return &tor->stats_;
+    return tor->stats();
 }
 
-std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents)
+std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents)
 {
-    auto ret = std::vector<tr_stat const*>{};
+    auto ret = std::vector<tr_stat>{};
 
     if (n_torrents != 0U)
     {
@@ -1389,9 +1388,7 @@ std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n
 
         for (size_t idx = 0U; idx != n_torrents; ++idx)
         {
-            tr_torrent* const tor = torrents[idx];
-            tor->stats_ = tor->stats();
-            ret.emplace_back(&tor->stats_);
+            ret.emplace_back(torrents[idx]->stats());
         }
     }
 

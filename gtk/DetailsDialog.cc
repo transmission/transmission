@@ -604,10 +604,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = stats.front()->addedDate;
+        auto const baseline = stats.front().added_date;
         bool const is_uniform = std::ranges::all_of(
             stats,
-            [baseline](auto const* stat) { return stat->addedDate == baseline; });
+            [baseline](auto const& stat) { return stat.added_date == baseline; });
 
         if (is_uniform)
         {
@@ -707,11 +707,11 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const activity = stats.front()->activity;
-        bool const is_uniform = std::ranges::all_of(stats, [activity](auto const* st) { return activity == st->activity; });
-        bool const allFinished = std::ranges::all_of(stats, [](auto const* st) { return st->finished; });
+        auto const baseline = stats.front().activity;
+        bool const is_uniform = std::ranges::all_of(stats, [baseline](auto const& st) { return baseline == st.activity; });
+        bool const all_finished = std::ranges::all_of(stats, [](auto const& st) { return st.finished; });
 
-        str = is_uniform ? activityString(activity, allFinished) : mixed;
+        str = is_uniform ? activityString(baseline, all_finished) : mixed;
     }
 
     stateString = str;
@@ -724,14 +724,14 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        time_t const baseline = stats.front()->startDate;
-        bool const is_uniform = std::ranges::all_of(stats, [baseline](auto const* st) { return baseline == st->startDate; });
+        time_t const baseline = stats.front().start_date;
+        bool const is_uniform = std::ranges::all_of(stats, [baseline](auto const& st) { return baseline == st.start_date; });
 
         if (!is_uniform)
         {
             str = mixed;
         }
-        else if (baseline <= 0 || stats[0]->activity == TR_STATUS_STOPPED)
+        else if (baseline <= 0 || stats[0].activity == TR_STATUS_STOPPED)
         {
             str = stateString;
         }
@@ -750,8 +750,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = stats.front()->eta;
-        auto const is_uniform = std::ranges::all_of(stats, [baseline](auto const* st) { return baseline == st->eta; });
+        auto const baseline = stats.front().eta;
+        auto const is_uniform = std::ranges::all_of(stats, [baseline](auto const& st) { return baseline == st.eta; });
 
         if (!is_uniform)
         {
@@ -834,13 +834,13 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         uint64_t haveValid = 0;
         uint64_t available = 0;
 
-        for (auto const* const st : stats)
+        for (auto const& st : stats)
         {
-            haveUnchecked += st->haveUnchecked;
-            haveValid += st->haveValid;
-            sizeWhenDone += st->sizeWhenDone;
-            leftUntilDone += st->leftUntilDone;
-            available += st->sizeWhenDone - st->leftUntilDone + st->haveUnchecked + st->desiredAvailable;
+            haveUnchecked += st.have_unchecked;
+            haveValid += st.have_valid;
+            sizeWhenDone += st.size_when_done;
+            leftUntilDone += st.left_until_done;
+            available += st.size_when_done - st.left_until_done + st.have_unchecked + st.desired_available;
         }
 
         {
@@ -896,13 +896,13 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
                 std::begin(stats),
                 std::end(stats),
                 uint64_t{ 0 },
-                [](auto sum, auto const* st) { return sum + st->downloadedEver; }));
+                [](auto sum, auto const& st) { return sum + st.downloaded_ever; }));
 
         auto const failed = std::accumulate(
             std::begin(stats),
             std::end(stats),
             uint64_t{ 0 },
-            [](auto sum, auto const* st) { return sum + st->corruptEver; });
+            [](auto sum, auto const& st) { return sum + st.corrupt_ever; });
 
         if (failed != 0)
         {
@@ -930,12 +930,12 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             std::begin(stats),
             std::end(stats),
             uint64_t{},
-            [](auto sum, auto const* st) { return sum + st->uploadedEver; });
+            [](auto sum, auto const& st) { return sum + st.uploaded_ever; });
         auto const denominator = std::accumulate(
             std::begin(stats),
             std::end(stats),
             uint64_t{},
-            [](auto sum, auto const* st) { return sum + st->sizeWhenDone; });
+            [](auto sum, auto const& st) { return sum + st.size_when_done; });
         str = fmt::format(
             fmt::runtime(_("{uploaded_size} (Ratio: {ratio})")),
             fmt::arg("uploaded_size", tr_strlsize(uploaded)),
@@ -967,8 +967,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = Glib::ustring(stats.front()->errorString);
-        bool const is_uniform = std::ranges::all_of(stats, [&baseline](auto const* st) { return baseline == st->errorString; });
+        auto const baseline = Glib::ustring(stats.front().error_string);
+        bool const is_uniform = std::ranges::all_of(stats, [&baseline](auto const& st) { return baseline == st.error_string; });
 
         str = is_uniform ? baseline : mixed;
     }
@@ -987,16 +987,16 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        time_t const latest = (*std::ranges::max_element(
-                                   stats,
-                                   [](auto const* lhs, auto const* rhs) { return lhs->activityDate < rhs->activityDate; }))
-                                  ->activityDate;
+        auto const iter = std::ranges::max_element(
+            stats,
+            [](auto const& lhs, auto const& rhs) { return lhs.activity_date < rhs.activity_date; });
+        time_t const latest = iter->activity_date;
 
         if (latest <= 0)
         {
             str = _("Never");
         }
-        else if ((now - latest) < 5)
+        else if ((now - latest) < 5U)
         {
             str = _("Active now");
         }
