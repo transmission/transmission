@@ -571,9 +571,8 @@ tr_add_external_auto_library(PSL libpsl
     TARGET psl::psl)
 
 if(ENABLE_UTP)
-    tr_add_external_auto_library_legacy(UTP libutp utp
+    tr_add_external_auto_library(UTP libutp
         SUBPROJECT
-        TARGET libutp::libutp
         CMAKE_ARGS
             -DLIBUTP_SHARED:BOOL=OFF)
 endif()
