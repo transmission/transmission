@@ -1144,6 +1144,9 @@ struct tr_peer_stat
 {
     std::string addr;
     std::string flag_str;
+
+    // The user agent, e.g. `BitTorrent 7.9.1`.
+    // Will be an empty string if the agent cannot be determined.
     std::string user_agent;
 
     libtransmission::Values::Speed rate_to_peer;
