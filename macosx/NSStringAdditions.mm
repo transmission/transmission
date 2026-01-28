@@ -184,23 +184,23 @@
 
     speed /= 1000.0;
 
-    if (speed < 99.995) // 1.00 MB/s to 99.99 MB/s
-    {
-        return [NSString localizedStringWithFormat:@"%.2f %@", speed, mb];
-    }
-    else if (speed < 999.95) // 100.0 MB/s to 999.9 MB/s
+    if (speed < 99.995) // 1.0 MB/s to 99.9 MB/s
     {
         return [NSString localizedStringWithFormat:@"%.1f %@", speed, mb];
+    }
+    else if (speed < 999.95) // 100 MB/s to 999 MB/s
+    {
+        return [NSString localizedStringWithFormat:@"%.0f %@", speed, mb];
     }
 
     speed /= 1000.0;
 
-    if (speed < 99.995) // 1.00 GB/s to 99.99 GB/s
+    if (speed < 99.995) // 1.0 GB/s to 99.9 GB/s
     {
-        return [NSString localizedStringWithFormat:@"%.2f %@", speed, gb];
+        return [NSString localizedStringWithFormat:@"%.1f %@", speed, gb];
     }
-    // 100.0 GB/s and above
-    return [NSString localizedStringWithFormat:@"%.1f %@", speed, gb];
+    // 100 GB/s and above
+    return [NSString localizedStringWithFormat:@"%.0f %@", speed, gb];
 }
 
 + (NSString*)stringForSpeedCompact:(CGFloat)speed kb:(NSString*)kb mb:(NSString*)mb gb:(NSString*)gb
@@ -216,13 +216,13 @@
 
     speed /= 1000.0;
 
-    if (speed < 9.995) // 1.00 MB/s to 9.99 MB/s
-    {
-        return [NSString localizedStringWithFormat:@"%.2f %@", speed, mb];
-    }
-    if (speed < 99.95) // 10.0 MB/s to 99.9 MB/s
+    if (speed < 9.995) // 1.0 MB/s to 9.9 MB/s
     {
         return [NSString localizedStringWithFormat:@"%.1f %@", speed, mb];
+    }
+    if (speed < 99.95) // 10 MB/s to 99 MB/s
+    {
+        return [NSString localizedStringWithFormat:@"%.0f %@", speed, mb];
     }
     if (speed < 999.5) // 100 MB/s to 999 MB/s
     {
@@ -231,13 +231,13 @@
 
     speed /= 1000.0;
 
-    if (speed < 9.995) // 1.00 GB/s to 9.99 GB/s
-    {
-        return [NSString localizedStringWithFormat:@"%.2f %@", speed, gb];
-    }
-    if (speed < 99.95) // 10.0 GB/s to 99.9 GB/s
+    if (speed < 9.995) // 1.0 GB/s to 9.9 GB/s
     {
         return [NSString localizedStringWithFormat:@"%.1f %@", speed, gb];
+    }
+    if (speed < 99.95) // 10 GB/s to 99 GB/s
+    {
+        return [NSString localizedStringWithFormat:@"%.0f %@", speed, gb];
     }
     // 100 GB/s and above
     return [NSString localizedStringWithFormat:@"%.0f %@", speed, gb];
