@@ -160,7 +160,6 @@ public:
         int active_peer_count = {};
         int active_peers_down = {};
         int active_peers_up = {};
-        int error_code = {};
 
         Percents activity_percent_done;
         Percents metadata_percent_complete;
@@ -178,6 +177,8 @@ public:
         float seed_ratio = {};
 
         tr_priority_t priority = {};
+
+        tr_stat::Error error_code = tr_stat::Error::Ok;
 
         bool active = {};
         bool finished = {};
@@ -555,7 +556,7 @@ std::vector<Glib::ustring> Torrent::Impl::get_css_classes() const
         fmt::format("tr-transfer-{}", get_activity_direction(cache_.activity)),
     });
 
-    if (cache_.error_code != 0)
+    if (cache_.error_code != tr_stat::Error::Ok)
     {
         result.emplace_back("tr-error");
     }
@@ -630,13 +631,13 @@ Glib::ustring Torrent::Impl::get_error_text() const
 {
     switch (cache_.error_code)
     {
-    case TR_STAT_TRACKER_WARNING:
+    case tr_stat::Error::TrackerWarning:
         return fmt::format(fmt::runtime(_("Tracker warning: '{warning}'")), fmt::arg("warning", cache_.error_message));
 
-    case TR_STAT_TRACKER_ERROR:
+    case tr_stat::Error::TrackerError:
         return fmt::format(fmt::runtime(_("Tracker Error: '{error}'")), fmt::arg("error", cache_.error_message));
 
-    case TR_STAT_LOCAL_ERROR:
+    case tr_stat::Error::LocalError:
         return fmt::format(fmt::runtime(_("Local error: '{error}'")), fmt::arg("error", cache_.error_message));
 
     default:
@@ -796,7 +797,7 @@ unsigned int Torrent::get_trackers() const
     return impl_->get_cache().trackers;
 }
 
-int Torrent::get_error_code() const
+tr_stat::Error Torrent::get_error_code() const
 {
     return impl_->get_cache().error_code;
 }

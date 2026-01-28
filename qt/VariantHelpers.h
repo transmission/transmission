@@ -10,6 +10,7 @@
 #include <ctime>
 #include <optional>
 #include <string_view>
+#include <type_traits>
 #include <vector>
 
 #include <QString>
@@ -92,6 +93,19 @@ auto getValue(tr_variant const* variant)
     if (auto sv = std::string_view{}; tr_variantGetStrView(variant, &sv))
     {
         ret = std::string_view(std::data(sv), std::size(sv));
+    }
+
+    return ret;
+}
+
+template<typename T, typename std::enable_if_t<std::is_enum_v<T>>* = nullptr>
+auto getValue(tr_variant const* variant)
+{
+    std::optional<T> ret;
+
+    if (auto const value = getValue<int>(variant); value)
+    {
+        ret = static_cast<T>(*value);
     }
 
     return ret;

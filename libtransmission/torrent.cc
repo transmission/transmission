@@ -60,33 +60,33 @@ void tr_torrent::Error::set_tracker_warning(tr_interned_string announce_url, std
 {
     announce_url_ = announce_url;
     errmsg_.assign(errmsg);
-    error_type_ = TR_STAT_TRACKER_WARNING;
+    error_type_ = tr_stat::Error::TrackerWarning;
 }
 
 void tr_torrent::Error::set_tracker_error(tr_interned_string announce_url, std::string_view errmsg)
 {
     announce_url_ = announce_url;
     errmsg_.assign(errmsg);
-    error_type_ = TR_STAT_TRACKER_ERROR;
+    error_type_ = tr_stat::Error::TrackerError;
 }
 
 void tr_torrent::Error::set_local_error(std::string_view errmsg)
 {
     announce_url_.clear();
     errmsg_.assign(errmsg);
-    error_type_ = TR_STAT_LOCAL_ERROR;
+    error_type_ = tr_stat::Error::LocalError;
 }
 
 void tr_torrent::Error::clear() noexcept
 {
     announce_url_.clear();
     errmsg_.clear();
-    error_type_ = TR_STAT_OK;
+    error_type_ = tr_stat::Error::Ok;
 }
 
 void tr_torrent::Error::clear_if_tracker() noexcept
 {
-    if (error_type_ == TR_STAT_TRACKER_WARNING || error_type_ == TR_STAT_TRACKER_ERROR)
+    if (is_tracker())
     {
         clear();
     }
@@ -2260,7 +2260,7 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
             date_done_ = date_added_; // Must be after recheck_completeness()
         }
     }
-    else if (error_.error_type() == TR_STAT_LOCAL_ERROR && !set_local_error_if_files_disappeared(this))
+    else if (error_.is_local_error() && !set_local_error_if_files_disappeared(this))
     {
         error_.clear();
     }

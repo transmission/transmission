@@ -309,17 +309,17 @@ void sigHandler(int signal)
     }
 }
 
-[[nodiscard]] constexpr std::string_view getErrorMessagePrefix(tr_stat_errtype const err)
+[[nodiscard]] constexpr std::string_view getErrorMessagePrefix(auto const err)
 {
     switch (err)
     {
-    case TR_STAT_TRACKER_WARNING:
+    case tr_stat::Error::TrackerWarning:
         return "Tracker gave a warning:"sv;
-    case TR_STAT_TRACKER_ERROR:
+    case tr_stat::Error::TrackerError:
         return "Tracker gave an error:"sv;
-    case TR_STAT_LOCAL_ERROR:
+    case tr_stat::Error::LocalError:
         return "Error:"sv;
-    case TR_STAT_OK:
+    case tr_stat::Error::Ok:
         return ""sv;
     }
 }
