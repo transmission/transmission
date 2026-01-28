@@ -4,6 +4,9 @@
   "repository": "https://github.com/transmission/transmission",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "build": "node esbuild.mjs",
     "dev": "DEV=true node esbuild.mjs",
@@ -15,9 +18,12 @@
     "lint:prettier": "prettier --log-level warn --check .",
     "lint:prettier:fix": "prettier --log-level warn -w .",
     "lint:stylelint": "stylelint assets/css/*scss",
-    "lint:stylelint:fix": "stylelint --fix assets/css/*scss"
+    "lint:stylelint:fix": "stylelint --fix assets/css/*scss",
+    "test": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^24.10.1",
     "@eslint/js": "^9.7.0",
     "@primer/stylelint-config": "^13.4.0",
     "esbuild": "^0.25.11",

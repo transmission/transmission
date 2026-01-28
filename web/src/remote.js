@@ -2,7 +2,9 @@
    It may be used under GPLv2 (SPDX: GPL-2.0-only).
    License text can be found in the licenses/ folder. */
 
+import { AuthManager } from './auth-manager.js';
 import { AlertDialog } from './alert-dialog.js';
+import { getAppRoot } from './utils.js';
 
 export const RPC = {
   _DaemonVersion: 'version',
@@ -13,7 +15,7 @@ export const RPC = {
   _QueueMoveDown: 'queue_move_down',
   _QueueMoveTop: 'queue_move_top',
   _QueueMoveUp: 'queue_move_up',
-  _Root: '../rpc',
+  _Root: new URL(`${getAppRoot()}/../rpc`, globalThis.location.href).pathname,
   _TurtleDownSpeedLimit: 'alt_speed_down',
   _TurtleState: 'alt_speed_enabled',
   _TurtleUpSpeedLimit: 'alt_speed_up',
@@ -35,6 +37,9 @@ export class Remote {
     headers.append('cache-control', 'no-cache');
     headers.append('content-type', 'application/json');
     headers.append('pragma', 'no-cache');
+
+    AuthManager.addAuthHeaders(headers);
+
     if (this._session_id) {
       headers.append(Remote._SessionHeader, this._session_id);
     }
@@ -52,6 +57,12 @@ export class Remote {
             const error = new Error(Remote._SessionHeader);
             error.header = response.headers.get(Remote._SessionHeader);
             throw error;
+          }
+          case 401: {
+            // Even though we checked credentials on boot, the user may have
+            // reconfigured transmission with different credentials.
+            AuthManager.redirectToLogin();
+            return null;
           }
           case 204:
             return null;
