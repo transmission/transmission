@@ -1837,34 +1837,34 @@ namespace peer_stat_helpers
     stats.port = port.host();
     stats.from = peer->peer_info->from_first();
     stats.progress = peer->percent_done();
-    stats.isUTP = peer->is_utp_connection();
-    stats.isEncrypted = peer->is_encrypted();
-    stats.rateToPeer_KBps = peer->get_piece_speed(now_msec, tr_direction::ClientToPeer).count(Speed::Units::KByps);
-    stats.rateToClient_KBps = peer->get_piece_speed(now_msec, tr_direction::PeerToClient).count(Speed::Units::KByps);
-    stats.peerIsChoked = peer->peer_is_choked();
-    stats.peerIsInterested = peer->peer_is_interested();
-    stats.clientIsChoked = peer->client_is_choked();
-    stats.clientIsInterested = peer->client_is_interested();
-    stats.isIncoming = peer->is_incoming_connection();
-    stats.isDownloadingFrom = peer->is_active(tr_direction::PeerToClient);
-    stats.isUploadingTo = peer->is_active(tr_direction::ClientToPeer);
-    stats.isSeed = peer->is_seed();
+    stats.is_utp = peer->is_utp_connection();
+    stats.is_encrypted = peer->is_encrypted();
+    stats.rate_to_peer_KBps = peer->get_piece_speed(now_msec, tr_direction::ClientToPeer).count(Speed::Units::KByps);
+    stats.rate_to_client_KBps = peer->get_piece_speed(now_msec, tr_direction::PeerToClient).count(Speed::Units::KByps);
+    stats.peer_is_choked = peer->peer_is_choked();
+    stats.peer_is_interested = peer->peer_is_interested();
+    stats.client_is_choked = peer->client_is_choked();
+    stats.client_is_interested = peer->client_is_interested();
+    stats.is_incoming = peer->is_incoming_connection();
+    stats.is_downloading_from = peer->is_active(tr_direction::PeerToClient);
+    stats.is_uploading_to = peer->is_active(tr_direction::ClientToPeer);
+    stats.is_seed = peer->is_seed();
 
-    stats.blocksToPeer = peer->blocks_sent_to_peer.count(now, CancelHistorySec);
-    stats.blocksToClient = peer->blocks_sent_to_client.count(now, CancelHistorySec);
-    stats.cancelsToPeer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
-    stats.cancelsToClient = peer->cancels_sent_to_client.count(now, CancelHistorySec);
+    stats.blocks_to_peer = peer->blocks_sent_to_peer.count(now, CancelHistorySec);
+    stats.blocks_to_client = peer->blocks_sent_to_client.count(now, CancelHistorySec);
+    stats.cancels_to_peer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
+    stats.cancels_to_client = peer->cancels_sent_to_client.count(now, CancelHistorySec);
 
     stats.bytes_to_peer = peer->bytes_sent_to_peer.count(now, CancelHistorySec);
     stats.bytes_to_client = peer->bytes_sent_to_client.count(now, CancelHistorySec);
 
-    stats.activeReqsToPeer = peer->active_req_count(tr_direction::ClientToPeer);
-    stats.activeReqsToClient = peer->active_req_count(tr_direction::PeerToClient);
+    stats.active_reqs_to_peer = peer->active_req_count(tr_direction::ClientToPeer);
+    stats.active_reqs_to_client = peer->active_req_count(tr_direction::PeerToClient);
 
     stats.flag_str.clear();
     stats.flag_str.reserve(9);
 
-    if (stats.isUTP)
+    if (stats.is_utp)
     {
         stats.flag_str.push_back('T');
     }
@@ -1874,35 +1874,35 @@ namespace peer_stat_helpers
         stats.flag_str.push_back('O');
     }
 
-    if (stats.isDownloadingFrom)
+    if (stats.is_downloading_from)
     {
         stats.flag_str.push_back('D');
     }
-    else if (stats.clientIsInterested)
+    else if (stats.client_is_interested)
     {
         stats.flag_str.push_back('d');
     }
 
-    if (stats.isUploadingTo)
+    if (stats.is_uploading_to)
     {
         stats.flag_str.push_back('U');
     }
-    else if (stats.peerIsInterested)
+    else if (stats.peer_is_interested)
     {
         stats.flag_str.push_back('u');
     }
 
-    if (!stats.clientIsChoked && !stats.clientIsInterested)
+    if (!stats.client_is_choked && !stats.client_is_interested)
     {
         stats.flag_str.push_back('K');
     }
 
-    if (!stats.peerIsChoked && !stats.peerIsInterested)
+    if (!stats.peer_is_choked && !stats.peer_is_interested)
     {
         stats.flag_str.push_back('?');
     }
 
-    if (stats.isEncrypted)
+    if (stats.is_encrypted)
     {
         stats.flag_str.push_back('E');
     }
@@ -1916,7 +1916,7 @@ namespace peer_stat_helpers
         stats.flag_str.push_back('X');
     }
 
-    if (stats.isIncoming)
+    if (stats.is_incoming)
     {
         stats.flag_str.push_back('I');
     }

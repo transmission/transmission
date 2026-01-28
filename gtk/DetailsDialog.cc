@@ -1088,17 +1088,17 @@ public:
     Gtk::TreeModelColumn<Glib::ustring> upload_rate_string;
     Gtk::TreeModelColumn<Glib::ustring> client;
     Gtk::TreeModelColumn<int> progress;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::activeReqsToClient)> upload_request_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::active_reqs_to_client)> upload_request_count_number;
     Gtk::TreeModelColumn<Glib::ustring> upload_request_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::activeReqsToPeer)> download_request_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::active_reqs_to_peer)> download_request_count_number;
     Gtk::TreeModelColumn<Glib::ustring> download_request_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocksToClient)> blocks_downloaded_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocks_to_client)> blocks_downloaded_count_number;
     Gtk::TreeModelColumn<Glib::ustring> blocks_downloaded_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocksToPeer)> blocks_uploaded_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocks_to_peer)> blocks_uploaded_count_number;
     Gtk::TreeModelColumn<Glib::ustring> blocks_uploaded_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancelsToPeer)> reqs_cancelled_by_client_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancels_to_peer)> reqs_cancelled_by_client_count_number;
     Gtk::TreeModelColumn<Glib::ustring> reqs_cancelled_by_client_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancelsToClient)> reqs_cancelled_by_peer_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancels_to_client)> reqs_cancelled_by_peer_count_number;
     Gtk::TreeModelColumn<Glib::ustring> reqs_cancelled_by_peer_count_string;
     Gtk::TreeModelColumn<Glib::ustring> encryption_stock_id;
     Gtk::TreeModelColumn<Glib::ustring> flags;
@@ -1137,7 +1137,7 @@ void initPeerRow(
     (*iter)[peer_cols.address] = peer->addr;
     (*iter)[peer_cols.address_collated] = collated_name;
     (*iter)[peer_cols.client] = std::string(client);
-    (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
+    (*iter)[peer_cols.encryption_stock_id] = peer->is_encrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);
     (*iter)[peer_cols.torrent_name] = std::string(torrent_name);
 }
@@ -1146,8 +1146,8 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
 {
     g_return_if_fail(peer != nullptr);
 
-    auto const down_speed = Speed{ peer->rateToClient_KBps, Speed::Units::KByps };
-    auto const up_speed = Speed{ peer->rateToPeer_KBps, Speed::Units::KByps };
+    auto const down_speed = Speed{ peer->rate_to_client_KBps, Speed::Units::KByps };
+    auto const up_speed = Speed{ peer->rate_to_peer_KBps, Speed::Units::KByps };
 
     auto blocks_to_client = std::string{};
     auto blocks_to_peer = std::string{};
@@ -1158,50 +1158,50 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
     auto up_count = std::string{};
     auto up_speed_string = std::string{};
 
-    if (peer->rateToPeer_KBps > 0.01)
+    if (peer->rate_to_peer_KBps > 0.01)
     {
         up_speed_string = up_speed.to_string();
     }
 
-    if (peer->rateToClient_KBps > 0)
+    if (peer->rate_to_client_KBps > 0)
     {
         down_speed_string = down_speed.to_string();
     }
 
-    if (peer->activeReqsToPeer > 0)
+    if (peer->active_reqs_to_peer > 0)
     {
-        down_count = std::to_string(peer->activeReqsToPeer);
+        down_count = std::to_string(peer->active_reqs_to_peer);
     }
 
-    if (peer->activeReqsToClient > 0)
+    if (peer->active_reqs_to_client > 0)
     {
-        up_count = std::to_string(peer->activeReqsToClient);
+        up_count = std::to_string(peer->active_reqs_to_client);
     }
 
-    if (peer->blocksToPeer > 0)
+    if (peer->blocks_to_peer > 0)
     {
-        blocks_to_peer = std::to_string(peer->blocksToPeer);
+        blocks_to_peer = std::to_string(peer->blocks_to_peer);
     }
 
-    if (peer->blocksToClient > 0)
+    if (peer->blocks_to_client > 0)
     {
-        blocks_to_client = std::to_string(peer->blocksToClient);
+        blocks_to_client = std::to_string(peer->blocks_to_client);
     }
 
-    if (peer->cancelsToPeer > 0)
+    if (peer->cancels_to_peer > 0)
     {
-        cancelled_by_client = std::to_string(peer->cancelsToPeer);
+        cancelled_by_client = std::to_string(peer->cancels_to_peer);
     }
 
-    if (peer->cancelsToClient > 0)
+    if (peer->cancels_to_client > 0)
     {
-        cancelled_by_peer = std::to_string(peer->cancelsToClient);
+        cancelled_by_peer = std::to_string(peer->cancels_to_client);
     }
 
     (*iter)[peer_cols.progress] = static_cast<int>(100.0 * peer->progress);
-    (*iter)[peer_cols.upload_request_count_number] = peer->activeReqsToClient;
+    (*iter)[peer_cols.upload_request_count_number] = peer->active_reqs_to_client;
     (*iter)[peer_cols.upload_request_count_string] = up_count;
-    (*iter)[peer_cols.download_request_count_number] = peer->activeReqsToPeer;
+    (*iter)[peer_cols.download_request_count_number] = peer->active_reqs_to_peer;
     (*iter)[peer_cols.download_request_count_string] = down_count;
     (*iter)[peer_cols.download_rate_speed] = down_speed;
     (*iter)[peer_cols.download_rate_string] = down_speed_string;
@@ -1209,13 +1209,13 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
     (*iter)[peer_cols.upload_rate_string] = up_speed_string;
     (*iter)[peer_cols.flags] = peer->flag_str;
     (*iter)[peer_cols.was_updated] = true;
-    (*iter)[peer_cols.blocks_downloaded_count_number] = peer->blocksToClient;
+    (*iter)[peer_cols.blocks_downloaded_count_number] = peer->blocks_to_client;
     (*iter)[peer_cols.blocks_downloaded_count_string] = blocks_to_client;
-    (*iter)[peer_cols.blocks_uploaded_count_number] = peer->blocksToPeer;
+    (*iter)[peer_cols.blocks_uploaded_count_number] = peer->blocks_to_peer;
     (*iter)[peer_cols.blocks_uploaded_count_string] = blocks_to_peer;
-    (*iter)[peer_cols.reqs_cancelled_by_client_count_number] = peer->cancelsToPeer;
+    (*iter)[peer_cols.reqs_cancelled_by_client_count_number] = peer->cancels_to_peer;
     (*iter)[peer_cols.reqs_cancelled_by_client_count_string] = cancelled_by_client;
-    (*iter)[peer_cols.reqs_cancelled_by_peer_count_number] = peer->cancelsToClient;
+    (*iter)[peer_cols.reqs_cancelled_by_peer_count_number] = peer->cancels_to_client;
     (*iter)[peer_cols.reqs_cancelled_by_peer_count_string] = cancelled_by_peer;
 }
 
