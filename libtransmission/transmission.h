@@ -1161,7 +1161,7 @@ struct tr_peer_stat
     size_t bytes_to_peer = {};
     size_t bytes_to_client = {};
 
-    tr_peer_id_t peer_id;
+    tr_peer_id_t peer_id = {};
 
     float progress = {};
 
