@@ -977,12 +977,12 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
 - (BOOL)isError
 {
-    return self.fStat.error == TR_STAT_LOCAL_ERROR;
+    return self.fStat.error == tr_stat::Error::LocalError;
 }
 
 - (BOOL)isAnyErrorOrWarning
 {
-    return self.fStat.error != TR_STAT_OK;
+    return self.fStat.error != tr_stat::Error::Ok;
 }
 
 - (NSString*)errorMessage
@@ -1145,13 +1145,13 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     {
         switch (self.fStat.error)
         {
-        case TR_STAT_LOCAL_ERROR:
+        case tr_stat::Error::LocalError:
             string = NSLocalizedString(@"Error", "Torrent -> status string");
             break;
-        case TR_STAT_TRACKER_ERROR:
+        case tr_stat::Error::TrackerError:
             string = NSLocalizedString(@"Tracker returned error", "Torrent -> status string");
             break;
-        case TR_STAT_TRACKER_WARNING:
+        case tr_stat::Error::TrackerWarning:
             string = NSLocalizedString(@"Tracker returned warning", "Torrent -> status string");
             break;
         default:

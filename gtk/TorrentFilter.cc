@@ -201,7 +201,7 @@ bool TorrentFilter::match_mode(Torrent const& torrent, ShowMode const type)
         return activity == TR_STATUS_CHECK || activity == TR_STATUS_CHECK_WAIT;
 
     case ShowMode::ShowError:
-        return torrent.get_error_code() != 0;
+        return torrent.get_error_code() != tr_stat::Error::Ok;
     }
 
     g_assert_not_reached();

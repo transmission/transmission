@@ -1071,12 +1071,22 @@ private:
     public:
         [[nodiscard]] constexpr auto empty() const noexcept
         {
-            return error_type_ == TR_STAT_OK;
+            return error_type_ == tr_stat::Error::Ok;
         }
 
         [[nodiscard]] constexpr auto error_type() const noexcept
         {
             return error_type_;
+        }
+
+        [[nodiscard]] constexpr auto is_local_error() const noexcept
+        {
+            return error_type_ == tr_stat::Error::LocalError;
+        }
+
+        [[nodiscard]] constexpr auto is_tracker() const noexcept
+        {
+            return error_type_ == tr_stat::Error::TrackerError || error_type_ == tr_stat::Error::TrackerWarning;
         }
 
         [[nodiscard]] constexpr auto const& announce_url() const noexcept
@@ -1099,7 +1109,7 @@ private:
     private:
         tr_interned_string announce_url_; // the source for tracker errors/warnings
         std::string errmsg_;
-        tr_stat_errtype error_type_ = TR_STAT_OK;
+        tr_stat::Error error_type_ = tr_stat::Error::Ok;
     };
 
     // Helper class to smooth out speed estimates.

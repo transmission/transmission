@@ -1387,18 +1387,6 @@ enum tr_eta : time_t // NOLINT(performance-enum-size)
     TR_ETA_UNKNOWN = -2,
 };
 
-enum tr_stat_errtype : uint8_t
-{
-    /* everything's fine */
-    TR_STAT_OK = 0,
-    /* when we announced to the tracker, we got a warning in the response */
-    TR_STAT_TRACKER_WARNING = 1,
-    /* when we announced to the tracker, we got an error in the response */
-    TR_STAT_TRACKER_ERROR = 2,
-    /* local trouble, such as disk full or permissions error */
-    TR_STAT_LOCAL_ERROR = 3
-};
-
 /** @brief Used by `tr_torrentStat()` to tell clients about a torrent's state and statistics */
 struct tr_stat
 {
@@ -1529,10 +1517,6 @@ struct tr_stat
     // What is this torrent doing right now?
     tr_torrent_activity activity = {};
 
-    // Defines what kind of text is in error_string.
-    // @see errorString
-    tr_stat_errtype error = {};
-
     // Number of peers that we're connected to
     uint16_t peers_connected = {};
 
@@ -1552,6 +1536,18 @@ struct tr_stat
 
     // Number of webseeds that are sending data to us.
     uint16_t webseeds_sending_to_us = {};
+
+    enum class Error : uint8_t
+    {
+        Ok, // everything's fine
+        TrackerWarning, // tracker returned a warning
+        TrackerError, // tracker returned an error
+        LocalError // local non-tracker error, e.g. disk full or file permissions
+    };
+
+    // Defines what kind of text is in error_string.
+    // @see errorString
+    Error error = Error::Ok;
 
     // A torrent is considered finished if it has met its seed ratio.
     // As a result, only paused torrents can be finished.

@@ -103,7 +103,7 @@ protected:
     {
         auto const stats = tr_torrentStat(tor);
         EXPECT_EQ(TR_STATUS_STOPPED, stats.activity);
-        EXPECT_EQ(TR_STAT_OK, stats.error);
+        EXPECT_EQ(tr_stat::Error::Ok, stats.error);
         EXPECT_EQ(total_size, stats.size_when_done);
         EXPECT_EQ(total_size, stats.left_until_done);
         EXPECT_EQ(total_size, tor->total_size());
@@ -157,7 +157,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     blockingTorrentVerify(tor);
     auto const stats = tr_torrentStat(tor);
     EXPECT_EQ(TR_STATUS_STOPPED, stats.activity);
-    EXPECT_EQ(TR_STAT_OK, stats.error);
+    EXPECT_EQ(tr_stat::Error::Ok, stats.error);
     EXPECT_EQ(0, stats.left_until_done);
     EXPECT_EQ(0, stats.have_unchecked);
     EXPECT_EQ(0, stats.desired_available);
@@ -276,7 +276,7 @@ TEST_F(RenameTest, multifileTorrent)
     blockingTorrentVerify(tor);
     auto const stats = tr_torrentStat(tor);
     EXPECT_EQ(TR_STATUS_STOPPED, stats.activity);
-    EXPECT_EQ(TR_STAT_OK, stats.error);
+    EXPECT_EQ(tr_stat::Error::Ok, stats.error);
     EXPECT_EQ(0, stats.left_until_done);
     EXPECT_EQ(0, stats.have_unchecked);
     EXPECT_EQ(0, stats.desired_available);
