@@ -55,7 +55,6 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
-        file-capacity.cc
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
