@@ -1139,7 +1139,6 @@ bool tr_torrentCanManualUpdate(tr_torrent const* torrent);
 
 // --- tr_peer_stat
 
-// NOLINTBEGIN(modernize-avoid-c-arrays)
 struct tr_peer_stat
 {
     bool isUTP;
@@ -1158,7 +1157,7 @@ struct tr_peer_stat
     uint8_t from;
     uint16_t port;
 
-    char addr[TrInet6AddrStrlen];
+    std::string addr;
     std::string flag_str;
 
     // the peer's user agent, e.g. `BitTorrent 7.9.1`
@@ -1191,7 +1190,6 @@ struct tr_peer_stat
     size_t bytes_to_peer;
     size_t bytes_to_client;
 };
-// NOLINTEND(modernize-avoid-c-arrays)
 
 std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* torrent);
 

@@ -1831,7 +1831,7 @@ namespace peer_stat_helpers
 
     auto const [addr, port] = peer->socket_address();
 
-    addr.display_name(stats.addr, sizeof(stats.addr));
+    stats.addr = addr.display_name();
     stats.client = peer->user_agent();
     stats.peer_id = peer->peer_id();
     stats.port = port.host();

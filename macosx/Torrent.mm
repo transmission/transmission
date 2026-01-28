@@ -1017,7 +1017,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
         dict[@"Name"] = self.name;
         dict[@"From"] = @(peer->from);
-        dict[@"IP"] = @(peer->addr);
+        dict[@"IP"] = tr_strv_to_utf8_nsstring(peer->addr);
         dict[@"Port"] = @(peer->port);
         dict[@"Progress"] = @(peer->progress);
         dict[@"Seed"] = @(peer->isSeed);

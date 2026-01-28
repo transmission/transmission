@@ -159,7 +159,6 @@ struct tr_address
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept;
 
     // --- write the text form of the address, e.g. inet_ntop()
-    std::string_view display_name(char* out, size_t outlen) const;
     [[nodiscard]] std::string display_name() const;
 
     // ---
