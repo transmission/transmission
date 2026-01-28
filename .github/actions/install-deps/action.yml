@@ -58,7 +58,8 @@ runs:
             libnatpmp-devel \
             libpsl-devel \
             miniupnpc-devel \
-            openssl-devel
+            openssl-devel \
+            utf8cpp-devel
 
           # Compiler packages
           if [[ "${{ inputs.compiler }}" == "clang" ]]; then
@@ -116,6 +117,13 @@ runs:
           # https://github.com/transmission/transmission/pull/6900
           if [ "$DISTRO" = 'debian' ]; then
             BASE_PACKAGES+=(libgtest-dev)
+          fi
+
+          if [ ! "$DISTRO" = 'debian' ] || [ ! "$DISTRO_VERSION" = '11' ]; then
+            BASE_PACKAGES+=(
+              libfmt-dev
+              libutfcpp-dev
+            )
           fi
 
           # Compiler packages
@@ -213,6 +221,7 @@ runs:
           libnatpmp
           libpsl
           miniupnpc
+          utf8cpp
         )
 
         brew install --formulae "${BASE_PACKAGES[@]}"
