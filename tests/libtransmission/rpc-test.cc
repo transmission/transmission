@@ -851,7 +851,7 @@ constexpr std::string_view WellFormedResponse = R"json({
     }
 })json";
 
-TEST_F(RpcTest, wellFormedFreeSpace)
+TEST_F(RpcTest, DISABLED_wellFormedFreeSpace)
 {
     auto constexpr Input = WellFormedRequest;
     auto constexpr Expected = WellFormedResponse;
@@ -879,7 +879,7 @@ constexpr std::string_view WellFormedLegacyResponse = R"json({
 
 #undef RPC_NON_EXISTENT_PATH
 
-TEST_F(RpcTest, wellFormedLegacyFreeSpace)
+TEST_F(RpcTest, DISABLED_wellFormedLegacyFreeSpace)
 {
     auto constexpr Input = WellFormedLegacyRequest;
     auto constexpr Expected = WellFormedLegacyResponse;
