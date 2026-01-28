@@ -523,7 +523,7 @@ private:
 
     CandidateVec candidates_;
 
-    std::array<libtransmission::ObserverTag, 15U> const tags_;
+    std::array<tr::ObserverTag, 15U> const tags_;
 
     Mediator& mediator_;
 };

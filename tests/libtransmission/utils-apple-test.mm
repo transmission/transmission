@@ -14,7 +14,7 @@
 
 #include "test-fixtures.h"
 
-using UtilsTest = ::libtransmission::test::TransmissionTest;
+using UtilsTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 namespace

@@ -48,7 +48,7 @@
 #include <string>
 #include <unordered_map>
 
-using namespace transmission::app;
+using namespace tr::app;
 
 namespace
 {

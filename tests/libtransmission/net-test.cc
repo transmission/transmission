@@ -22,7 +22,7 @@
 
 #include "test-fixtures.h"
 
-using NetTest = ::libtransmission::test::TransmissionTest;
+using NetTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(NetTest, conversionsIPv4)

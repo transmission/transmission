@@ -28,7 +28,7 @@ struct tr_session;
 struct tr_variant;
 struct libdeflate_compressor;
 
-namespace libtransmission
+namespace tr
 {
 class Timer;
 }
@@ -48,12 +48,12 @@ public:
 
         void load(tr_variant const& src)
         {
-            libtransmission::serializer::load(*this, Fields, src);
+            tr::serializer::load(*this, Fields, src);
         }
 
         [[nodiscard]] tr_variant::Map save() const
         {
-            return libtransmission::serializer::save(*this, Fields);
+            return tr::serializer::save(*this, Fields);
         }
 
         // NB: When adding a field here, you must also add it to
@@ -75,7 +75,7 @@ public:
 
     private:
         template<auto MemberPtr>
-        using Field = libtransmission::serializer::Field<MemberPtr>;
+        using Field = tr::serializer::Field<MemberPtr>;
 
         static constexpr auto Fields = std::tuple{
             Field<&Settings::is_anti_brute_force_enabled>{ TR_KEY_anti_brute_force_enabled },
@@ -203,8 +203,8 @@ public:
 
     std::unique_ptr<tr_rpc_address> bind_address_;
 
-    std::unique_ptr<libtransmission::Timer> start_retry_timer;
-    libtransmission::evhelpers::evhttp_unique_ptr httpd;
+    std::unique_ptr<tr::Timer> start_retry_timer;
+    tr::evhelpers::evhttp_unique_ptr httpd;
     tr_session* const session;
 
     size_t login_attempts_ = 0U;

@@ -226,7 +226,7 @@ private:
 
     std::map<tr_interned_string, tr_scrape_info> scrape_info_;
 
-    std::unique_ptr<libtransmission::Timer> const upkeep_timer_;
+    std::unique_ptr<tr::Timer> const upkeep_timer_;
 
     std::set<tr_announce_request, StopsCompare> stops_;
 

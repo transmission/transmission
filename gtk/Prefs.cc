@@ -20,8 +20,8 @@
 #include <string_view>
 
 using namespace std::literals;
-using namespace transmission::app;
-using libtransmission::serializer::to_variant;
+using namespace tr::app;
+using tr::serializer::to_variant;
 
 std::string gl_confdir;
 

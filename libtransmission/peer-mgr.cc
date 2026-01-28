@@ -56,7 +56,7 @@
 #include "libtransmission/webseed.h"
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 static auto constexpr CancelHistorySec = 60;
 
@@ -85,10 +85,7 @@ private:
     }
 
 public:
-    explicit HandshakeMediator(
-        tr_session const& session,
-        libtransmission::TimerMaker& timer_maker,
-        tr_torrents& torrents) noexcept
+    explicit HandshakeMediator(tr_session const& session, tr::TimerMaker& timer_maker, tr_torrents& torrents) noexcept
         : session_{ session }
         , timer_maker_{ timer_maker }
         , torrents_{ torrents }
@@ -113,7 +110,7 @@ public:
 
     void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_socket_address const& socket_address) override;
 
-    [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
+    [[nodiscard]] tr::TimerMaker& timer_maker() override
     {
         return timer_maker_;
     }
@@ -127,7 +124,7 @@ public:
 
 private:
     tr_session const& session_;
-    libtransmission::TimerMaker& timer_maker_;
+    tr::TimerMaker& timer_maker_;
     tr_torrents& torrents_;
 };
 
@@ -388,38 +385,36 @@ public:
         [[nodiscard]] tr_piece_index_t piece_count() const override;
         [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override;
 
-        [[nodiscard]] libtransmission::ObserverTag observe_files_wanted_changed(
-            libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer observer)
+        [[nodiscard]] tr::ObserverTag observe_files_wanted_changed(
+            tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_peer_disconnect(
+            tr::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_got_bad_piece(
+            tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_got_bitfield(
+            tr::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_got_block(
+            tr::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_got_choke(
+            tr::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_got_have(
+            tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_got_have_all(tr::SimpleObservable<tr_torrent*>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_got_reject(
+            tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_piece_completed(
+            tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_priority_changed(
+            tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer observer)
             override;
-        [[nodiscard]] libtransmission::ObserverTag observe_peer_disconnect(
-            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_got_bad_piece(
-            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_got_bitfield(
-            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_got_block(
-            libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_got_choke(
-            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_got_have(
-            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_got_have_all(
-            libtransmission::SimpleObservable<tr_torrent*>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_got_reject(
-            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_piece_completed(
-            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_priority_changed(
-            libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer
-                observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_sent_cancel(
-            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_sent_request(
-            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_changed(
-            libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) override;
-        [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_from_piece_changed(
-            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_sent_cancel(
+            tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_sent_request(
+            tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_sequential_download_changed(
+            tr::SimpleObservable<tr_torrent*, bool>::Observer observer) override;
+        [[nodiscard]] tr::ObserverTag observe_sequential_download_from_piece_changed(
+            tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
 
     private:
         tr_torrent& tor_;
@@ -664,16 +659,15 @@ public:
         }
     }
 
-    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const& /*bitfield*/, tr_bitfield const& /*active requests*/>
-        peer_disconnect;
-    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield;
-    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t> got_block;
-    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_choke;
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have;
-    libtransmission::SimpleObservable<tr_torrent*> got_have_all;
-    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t> got_reject;
-    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t> sent_cancel;
-    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t> sent_request;
+    tr::SimpleObservable<tr_torrent*, tr_bitfield const& /*bitfield*/, tr_bitfield const& /*active requests*/> peer_disconnect;
+    tr::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield;
+    tr::SimpleObservable<tr_torrent*, tr_block_index_t> got_block;
+    tr::SimpleObservable<tr_torrent*, tr_bitfield const&> got_choke;
+    tr::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have;
+    tr::SimpleObservable<tr_torrent*> got_have_all;
+    tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t> got_reject;
+    tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t> sent_cancel;
+    tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t> sent_request;
 
     mutable tr_swarm_stats stats = {};
 
@@ -995,7 +989,7 @@ EXIT:
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = 5U;
 
-    std::array<libtransmission::ObserverTag, 8> const tags_;
+    std::array<tr::ObserverTag, 8> const tags_;
 
     mutable std::optional<bool> pool_is_all_upload_only_;
 };
@@ -1050,92 +1044,91 @@ tr_priority_t tr_swarm::WishlistMediator::priority(tr_piece_index_t piece) const
     return tor_.piece_priority(piece);
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_files_wanted_changed(
-    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_files_wanted_changed(
+    tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer observer)
 {
     return tor_.files_wanted_changed_.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_peer_disconnect(
-    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_peer_disconnect(
+    tr::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer)
 {
     return swarm_.peer_disconnect.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_bad_piece(
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_got_bad_piece(
+    tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
 {
     return tor_.got_bad_piece_.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_bitfield(
-    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_got_bitfield(
+    tr::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer)
 {
     return swarm_.got_bitfield.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_block(
-    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_got_block(
+    tr::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer)
 {
     return swarm_.got_block.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_choke(
-    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_got_choke(
+    tr::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer)
 {
     return swarm_.got_choke.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_have(
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_got_have(
+    tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
 {
     return swarm_.got_have.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_have_all(
-    libtransmission::SimpleObservable<tr_torrent*>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_got_have_all(tr::SimpleObservable<tr_torrent*>::Observer observer)
 {
     return swarm_.got_have_all.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_reject(
-    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_got_reject(
+    tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer)
 {
     return swarm_.got_reject.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_piece_completed(
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_piece_completed(
+    tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
 {
     return tor_.piece_completed_.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_priority_changed(
-    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_priority_changed(
+    tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer observer)
 {
     return tor_.priority_changed_.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sent_cancel(
-    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_sent_cancel(
+    tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer)
 {
     return swarm_.sent_cancel.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sent_request(
-    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_sent_request(
+    tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer)
 {
     return swarm_.sent_request.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sequential_download_changed(
-    libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_sequential_download_changed(
+    tr::SimpleObservable<tr_torrent*, bool>::Observer observer)
 {
     return tor_.sequential_download_changed_.observe(std::move(observer));
 }
 
-libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sequential_download_from_piece_changed(
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
+tr::ObserverTag tr_swarm::WishlistMediator::observe_sequential_download_from_piece_changed(
+    tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
 {
     return tor_.sequential_download_from_piece_changed_.observe(std::move(observer));
 }
@@ -1170,11 +1163,7 @@ public:
     using OutboundCandidates = small::
         max_size_vector<std::pair<tr_torrent_id_t, tr_socket_address>, OutboundCandidateListCapacity>;
 
-    explicit tr_peerMgr(
-        tr_session* session_in,
-        libtransmission::TimerMaker& timer_maker,
-        tr_torrents& torrents,
-        libtransmission::Blocklists& blocklist)
+    explicit tr_peerMgr(tr_session* session_in, tr::TimerMaker& timer_maker, tr_torrents& torrents, tr::Blocklists& blocklist)
         : session{ session_in }
         , torrents_{ torrents }
         , blocklists_{ blocklist }
@@ -1218,7 +1207,7 @@ public:
 
     tr_session* const session;
     tr_torrents& torrents_;
-    libtransmission::Blocklists const& blocklists_;
+    tr::Blocklists const& blocklists_;
     Handshakes incoming_handshakes;
 
     HandshakeMediator handshake_mediator_;
@@ -1261,11 +1250,11 @@ private:
 
     OutboundCandidates outbound_candidates_;
 
-    std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;
-    std::unique_ptr<libtransmission::Timer> const peer_info_timer_;
-    std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
+    std::unique_ptr<tr::Timer> const bandwidth_timer_;
+    std::unique_ptr<tr::Timer> const peer_info_timer_;
+    std::unique_ptr<tr::Timer> const rechoke_timer_;
 
-    libtransmission::ObserverTag const blocklists_tag_;
+    tr::ObserverTag const blocklists_tag_;
 };
 
 // --- tr_peer virtual functions

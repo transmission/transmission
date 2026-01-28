@@ -57,9 +57,9 @@ namespace
 auto constexpr MaxBencDepth = 32;
 } // namespace
 
-struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
+struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
 {
-    using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+    using BasicHandler = tr::benc::BasicHandler<MaxBencDepth>;
 
     tr_torrent_metainfo& tm_;
     uint32_t piece_size_ = {};
@@ -614,7 +614,7 @@ private:
 
 bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error* error)
 {
-    auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
+    auto stack = tr::benc::ParserStack<MaxBencDepth>{};
     auto handler = MetainfoHandler{ *this };
 
     auto local_error = tr_error{};
@@ -623,7 +623,7 @@ bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error* error)
         error = &local_error;
     }
 
-    auto const ok = transmission::benc::parse(benc, stack, handler, nullptr, error);
+    auto const ok = tr::benc::parse(benc, stack, handler, nullptr, error);
 
     if (*error)
     {

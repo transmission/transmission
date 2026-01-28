@@ -13,9 +13,9 @@
 
 #include "test-fixtures.h"
 
-using BufferTest = ::libtransmission::test::TransmissionTest;
+using BufferTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
-using Buffer = libtransmission::StackBuffer<1024, std::byte>;
+using Buffer = tr::StackBuffer<1024, std::byte>;
 
 TEST_F(BufferTest, startsWithInSingleSegment)
 {

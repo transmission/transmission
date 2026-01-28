@@ -653,7 +653,7 @@ private:
     std::string const cookie_ = makeCookie();
     Mediator& mediator_;
     std::array<tr_socket_t, NUM_TR_AF_INET_TYPES> mcast_sockets_ = { TR_BAD_SOCKET, TR_BAD_SOCKET }; // multicast sockets
-    std::array<libtransmission::evhelpers::event_unique_ptr, NUM_TR_AF_INET_TYPES> events_;
+    std::array<tr::evhelpers::event_unique_ptr, NUM_TR_AF_INET_TYPES> events_;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };
     sockaddr_in mcast_addr_ = {}; // initialized from the above constants in init()
@@ -662,7 +662,7 @@ private:
     // BEP14: "To avoid causing multicast storms on large networks a
     // client should send no more than 1 announce per minute."
     static auto constexpr AnnounceInterval = 1min;
-    std::unique_ptr<libtransmission::Timer> announce_timer_;
+    std::unique_ptr<tr::Timer> announce_timer_;
 
     // Flood Protection:
     // To protect against message flooding, stop processing search messages
@@ -670,7 +670,7 @@ private:
     // in a *very* crowded multicast group or a hostile host is sending us
     // bogus data. Better to drop a few packets than get DoS'ed.
     static auto constexpr DosInterval = 5s;
-    std::unique_ptr<libtransmission::Timer> dos_timer_;
+    std::unique_ptr<tr::Timer> dos_timer_;
     static auto constexpr MaxIncomingPerSecond = 10;
     static auto constexpr MaxIncomingPerUpkeep = std::chrono::duration_cast<std::chrono::seconds>(DosInterval).count() *
         MaxIncomingPerSecond;

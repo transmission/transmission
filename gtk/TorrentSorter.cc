@@ -23,7 +23,7 @@
 #include <utility>
 
 using namespace std::string_view_literals;
-using namespace transmission::app;
+using namespace tr::app;
 
 namespace
 {

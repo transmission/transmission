@@ -61,13 +61,13 @@
 #include "libtransmission/values.h"
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
-time_t libtransmission::detail::tr_time::current_time = {};
+time_t tr::detail::tr_time::current_time = {};
 
 // ---
 
-namespace libtransmission::Values
+namespace tr::Values
 {
 
 // default values; can be overridden by client apps
@@ -75,7 +75,7 @@ Config::Units<MemoryUnits> Config::memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "
 Config::Units<SpeedUnits> Config::speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
 Config::Units<StorageUnits> Config::storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
 
-} // namespace libtransmission::Values
+} // namespace tr::Values
 
 // ---
 
@@ -778,7 +778,7 @@ void tr_lib_init()
         {
             tr_net_init_impl::tr_net_init_mgr::create();
 
-            libtransmission::serializer::Converters::ensure_default_converters();
+            tr::serializer::Converters::ensure_default_converters();
         });
 }
 

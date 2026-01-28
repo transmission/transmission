@@ -20,7 +20,7 @@
 #include "Speed.h"
 #include "Torrent.h"
 
-namespace ser = libtransmission::serializer;
+namespace ser = tr::serializer;
 
 namespace trqt::variant_helpers
 {
@@ -301,7 +301,7 @@ void register_qt_converters()
         once,
         []
         {
-            using namespace libtransmission::serializer;
+            using namespace tr::serializer;
             Converters::add(toInt, fromInt);
             Converters::add(toQDateTime, fromQDateTime);
             Converters::add(toQString, fromQString);

@@ -46,7 +46,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class FileTest : public SandboxedTest
@@ -1388,4 +1388,4 @@ TEST_F(FileTest, dirOpen)
     EXPECT_FALSE(err) << err;
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

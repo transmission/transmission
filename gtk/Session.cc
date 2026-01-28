@@ -58,7 +58,7 @@
 #include <utility>
 
 using namespace std::literals;
-using namespace transmission::app;
+using namespace tr::app;
 
 class Session::Impl
 {

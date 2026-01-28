@@ -15,7 +15,7 @@
 
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using TorrentMagnetTest = SessionTest;
@@ -90,4 +90,4 @@ TEST_F(TorrentMagnetTest, setMetadataPiece)
     EXPECT_EQ(tor->get_metadata_percent(), 1.0);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

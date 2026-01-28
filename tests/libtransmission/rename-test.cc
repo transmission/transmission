@@ -29,7 +29,7 @@ struct tr_ctor;
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class RenameTest : public SessionTest
@@ -494,4 +494,4 @@ TEST_F(RenameTest, partialFile)
     torrentRemoveAndWait(tor, 0);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

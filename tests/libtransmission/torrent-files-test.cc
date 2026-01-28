@@ -24,7 +24,7 @@
 
 using namespace std::literals;
 
-class TorrentFilesTest : public ::libtransmission::test::SandboxedTest
+class TorrentFilesTest : public ::tr::test::SandboxedTest
 {
 };
 

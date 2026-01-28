@@ -50,7 +50,7 @@
 #include "libtransmission/web.h"
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace JsonRpc
 {
@@ -220,7 +220,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
             data->is_jsonrpc) };
         if (!data->is_jsonrpc)
         {
-            libtransmission::api_compat::convert(response, libtransmission::api_compat::Style::Tr4);
+            tr::api_compat::convert(response, tr::api_compat::Style::Tr4);
         }
         data->callback(std::move(response));
     }
@@ -2004,7 +2004,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 
 [[nodiscard]] auto values_get_units()
 {
-    using namespace libtransmission::Values;
+    using namespace tr::Values;
 
     auto const make_units_vec = [](auto const& units)
     {
@@ -2830,7 +2830,7 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant& request, tr_rpc_r
     }
     else
     {
-        libtransmission::api_compat::convert_incoming_data(request);
+        tr::api_compat::convert_incoming_data(request);
         map = request.get_if<tr_variant::Map>();
         TR_ASSERT(map != nullptr);
         if (map == nullptr)

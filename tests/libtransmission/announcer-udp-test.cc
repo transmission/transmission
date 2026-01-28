@@ -49,9 +49,9 @@ using namespace std::literals;
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
-using MessageBuffer = libtransmission::StackBuffer<4096, std::byte>;
+using MessageBuffer = tr::StackBuffer<4096, std::byte>;
 
-class AnnouncerUdpTest : public ::libtransmission::test::TransmissionTest
+class AnnouncerUdpTest : public ::tr::test::TransmissionTest
 {
 private:
     void SetUp() override
@@ -243,8 +243,7 @@ protected:
         sockaddr* const from = nullptr,
         socklen_t* const fromlen = nullptr)
     {
-        EXPECT_TRUE(
-            libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); }));
+        EXPECT_TRUE(tr::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); }));
         auto& sent = mediator.sent_.front();
         auto const buf = std::move(sent.buf_);
         if (from != nullptr)
@@ -375,7 +374,7 @@ protected:
     // emulate the upkeep timer that tr_announcer runs in production
     static auto createUpkeepTimer(MockMediator& mediator, std::unique_ptr<tr_announcer_udp>& announcer)
     {
-        auto timer_maker = libtransmission::EvTimerMaker{ mediator.eventBase() };
+        auto timer_maker = tr::EvTimerMaker{ mediator.eventBase() };
         auto timer = timer_maker.create();
         timer->set_callback([&announcer]() { announcer->upkeep(); });
         timer->start_repeating(200ms);

@@ -64,7 +64,7 @@
 struct tr_ctor;
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace
 {
@@ -85,7 +85,7 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     {
         return;
     }
-    libtransmission::api_compat::convert_incoming_data(*groups_var);
+    tr::api_compat::convert_incoming_data(*groups_var);
 
     auto const* const groups_map = groups_var->get_if<tr_variant::Map>();
     if (groups_map == nullptr)
@@ -152,7 +152,7 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view const confi
     }
 
     auto out = tr_variant{ std::move(groups_map) };
-    libtransmission::api_compat::convert_outgoing_data(out);
+    tr::api_compat::convert_outgoing_data(out);
     tr_variant_serde::json().to_file(out, tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
 }
 } // namespace bandwidth_group_helpers
@@ -497,7 +497,7 @@ tr_variant tr_sessionLoadSettings(std::string_view const config_dir, tr_variant 
     {
         if (auto file_settings = tr_variant_serde::json().parse_file(filename))
         {
-            libtransmission::api_compat::convert_incoming_data(*file_settings);
+            tr::api_compat::convert_incoming_data(*file_settings);
             settings.merge(*file_settings);
         }
     }
@@ -521,14 +521,14 @@ void tr_sessionSaveSettings(tr_session* session, std::string_view const config_d
     auto settings = tr_sessionGetDefaultSettings();
     if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        libtransmission::api_compat::convert_incoming_data(*file_settings);
+        tr::api_compat::convert_incoming_data(*file_settings);
         settings.merge(*file_settings);
     }
     settings.merge(client_settings);
     settings.merge(tr_sessionGetSettings(session));
 
     // save 'em
-    libtransmission::api_compat::convert_outgoing_data(settings);
+    tr::api_compat::convert_outgoing_data(settings);
     tr_variant_serde::json().to_file(settings, filename);
 
     // write bandwidth groups limits to file
@@ -2174,7 +2174,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , blocklist_dir_{ makeBlocklistDir(config_dir) }
     , session_thread_{ tr_session_thread::create() }
-    , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(event_base()) }
+    , timer_maker_{ std::make_unique<tr::EvTimerMaker>(event_base()) }
     , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }

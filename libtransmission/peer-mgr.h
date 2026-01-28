@@ -301,7 +301,7 @@ public:
 
     // ---
 
-    [[nodiscard]] bool is_blocklisted(libtransmission::Blocklists const& blocklist) const
+    [[nodiscard]] bool is_blocklisted(tr::Blocklists const& blocklist) const
     {
         if (!blocklisted_.has_value())
         {

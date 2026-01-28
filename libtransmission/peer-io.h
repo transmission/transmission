@@ -34,10 +34,10 @@ struct tr_error;
 struct tr_session;
 struct tr_socket_address;
 
-namespace libtransmission::test
+namespace tr::test
 {
 class HandshakeTest;
-} // namespace libtransmission::test
+} // namespace tr::test
 
 enum class ReadState : uint8_t
 {
@@ -152,7 +152,7 @@ public:
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
     template<typename T>
-    void write(libtransmission::BufferReader<T>& buf, bool is_piece_data)
+    void write(tr::BufferReader<T>& buf, bool is_piece_data)
     {
         auto const n_bytes = std::size(buf);
         write_bytes(std::data(buf), n_bytes, is_piece_data);
@@ -321,9 +321,9 @@ private:
     // The buffer size for incoming & outgoing peer messages.
     // Starts off with enough capacity to read a single BT Piece message,
     // but has a 5x GrowthFactor so that it can quickly to high volume.
-    using PeerBuffer = libtransmission::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
+    using PeerBuffer = tr::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
 
-    friend class libtransmission::test::HandshakeTest;
+    friend class tr::test::HandshakeTest;
 
     [[nodiscard]] constexpr auto client_is_seed() const noexcept
     {
@@ -388,8 +388,8 @@ private:
     GotError got_error_ = nullptr;
     void* user_data_ = nullptr;
 
-    libtransmission::evhelpers::event_unique_ptr event_read_;
-    libtransmission::evhelpers::event_unique_ptr event_write_;
+    tr::evhelpers::event_unique_ptr event_read_;
+    tr::evhelpers::event_unique_ptr event_write_;
 
     short int pending_events_ = 0;
 

@@ -30,14 +30,14 @@
 #include "libtransmission/utils-ev.h"
 #include "libtransmission/watchdir-base.h"
 
-namespace libtransmission
+namespace tr
 {
 namespace
 {
 class KQueueWatchdir final : public impl::BaseWatchdir
 {
 public:
-    KQueueWatchdir(std::string_view dirname, Callback callback, libtransmission::TimerMaker& timer_maker, event_base* evbase)
+    KQueueWatchdir(std::string_view dirname, Callback callback, tr::TimerMaker& timer_maker, event_base* evbase)
         : BaseWatchdir{ dirname, std::move(callback), timer_maker }
     {
         init(evbase);
@@ -160,7 +160,7 @@ private:
 
     int kq_ = -1;
     int dirfd_ = -1;
-    libtransmission::evhelpers::event_unique_ptr event_;
+    tr::evhelpers::event_unique_ptr event_;
 };
 
 } // namespace
@@ -174,4 +174,4 @@ std::unique_ptr<Watchdir> Watchdir::create(
     return std::make_unique<KQueueWatchdir>(dirname, std::move(callback), timer_maker, evbase);
 }
 
-} // namespace libtransmission
+} // namespace tr

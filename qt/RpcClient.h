@@ -98,7 +98,7 @@ private:
     [[nodiscard]] int64_t parseResponseId(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
 
-    libtransmission::api_compat::Style network_style_ = libtransmission::api_compat::default_style();
+    tr::api_compat::Style network_style_ = tr::api_compat::default_style();
     tr_session* session_ = {};
     QByteArray session_id_;
     QUrl url_;

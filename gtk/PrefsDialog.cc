@@ -51,7 +51,7 @@
 #include <string>
 #include <string_view>
 
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 /**
 ***

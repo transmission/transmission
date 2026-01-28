@@ -27,7 +27,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 TEST_F(SessionTest, propertiesApi)
@@ -357,4 +357,4 @@ TEST_F(SessionTest, loadTorrentsThenMagnets)
     EXPECT_TRUE(tor->has_metainfo());
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

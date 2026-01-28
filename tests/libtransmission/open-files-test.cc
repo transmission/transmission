@@ -25,7 +25,7 @@
 
 using namespace std::literals;
 
-using OpenFilesTest = libtransmission::test::SessionTest;
+using OpenFilesTest = tr::test::SessionTest;
 
 static auto constexpr PreallocateFull = tr_open_files::Preallocation::Full;
 

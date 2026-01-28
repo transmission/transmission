@@ -54,18 +54,18 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor);
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class RenameTest_multifileTorrent_Test;
 class RenameTest_singleFilenameTorrent_Test;
 
-} // namespace libtransmission::test
+} // namespace tr::test
 
 /** @brief Torrent object */
 struct tr_torrent
 {
-    using Speed = libtransmission::Values::Speed;
+    using Speed = tr::Values::Speed;
 
     class ResumeHelper
     {
@@ -91,8 +91,8 @@ struct tr_torrent
         [[nodiscard]] bool start_when_stable() const noexcept;
 
     private:
-        friend class libtransmission::test::RenameTest_multifileTorrent_Test;
-        friend class libtransmission::test::RenameTest_singleFilenameTorrent_Test;
+        friend class tr::test::RenameTest_multifileTorrent_Test;
+        friend class tr::test::RenameTest_singleFilenameTorrent_Test;
         friend struct tr_torrent;
 
         explicit ResumeHelper(tr_torrent& tor)
@@ -1006,18 +1006,18 @@ struct tr_torrent
 
     // ---
 
-    libtransmission::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
-    libtransmission::SimpleObservable<tr_torrent*> doomed_;
-    libtransmission::SimpleObservable<tr_torrent*> got_metainfo_;
-    libtransmission::SimpleObservable<tr_torrent*> started_;
-    libtransmission::SimpleObservable<tr_torrent*> stopped_;
-    libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_upload_only_;
-    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
-    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
-    libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> sequential_download_from_piece_changed_;
+    tr::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
+    tr::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
+    tr::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
+    tr::SimpleObservable<tr_torrent*> doomed_;
+    tr::SimpleObservable<tr_torrent*> got_metainfo_;
+    tr::SimpleObservable<tr_torrent*> started_;
+    tr::SimpleObservable<tr_torrent*> stopped_;
+    tr::SimpleObservable<tr_torrent*> swarm_is_all_upload_only_;
+    tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
+    tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
+    tr::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
+    tr::SimpleObservable<tr_torrent*, tr_piece_index_t> sequential_download_from_piece_changed_;
 
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;

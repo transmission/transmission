@@ -14,7 +14,7 @@
 #include "libtransmission-app/display-modes.h"
 #include "libtransmission-app/converters.h"
 
-namespace transmission::app::detail
+namespace tr::app::detail
 {
 namespace
 {
@@ -125,10 +125,10 @@ void register_app_converters()
         once,
         []
         {
-            using Converters = libtransmission::serializer::Converters;
+            using Converters = tr::serializer::Converters;
             Converters::add(to_show_mode, from_show_mode);
             Converters::add(to_sort_mode, from_sort_mode);
         });
 }
 
-} // namespace transmission::app::detail
+} // namespace tr::app::detail

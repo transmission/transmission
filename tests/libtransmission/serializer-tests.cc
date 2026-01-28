@@ -19,9 +19,9 @@
 
 #include "test-fixtures.h"
 
-using SerializerTest = ::libtransmission::test::TransmissionTest;
+using SerializerTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
-using libtransmission::serializer::Converters;
+using tr::serializer::Converters;
 
 namespace
 {
@@ -303,9 +303,9 @@ TEST_F(SerializerTest, optionalRejectsWrongType)
 
 // ---
 
-using libtransmission::serializer::Field;
-using libtransmission::serializer::load;
-using libtransmission::serializer::save;
+using tr::serializer::Field;
+using tr::serializer::load;
+using tr::serializer::save;
 
 struct Endpoint
 {

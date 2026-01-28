@@ -25,7 +25,7 @@
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h>
 
-namespace transmission::app
+namespace tr::app
 {
 
 template<typename Icon>
@@ -249,4 +249,4 @@ private:
     std::map<std::string /*sitename*/, Icon, std::less<>> icons_;
 };
 
-} // namespace transmission::app
+} // namespace tr::app

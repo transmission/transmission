@@ -1028,11 +1028,11 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
         if (peer.is_uploading_to)
         {
-            dict[@"UL To Rate"] = @(peer.rate_to_peer.count(libtransmission::Values::Speed::Units::KByps));
+            dict[@"UL To Rate"] = @(peer.rate_to_peer.count(tr::Values::Speed::Units::KByps));
         }
         if (peer.is_downloading_from)
         {
-            dict[@"DL From Rate"] = @(peer.rate_to_client.count(libtransmission::Values::Speed::Units::KByps));
+            dict[@"DL From Rate"] = @(peer.rate_to_client.count(tr::Values::Speed::Units::KByps));
         }
 
         [peerDicts addObject:dict];

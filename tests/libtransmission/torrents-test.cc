@@ -22,7 +22,7 @@
 
 #include "test-fixtures.h"
 
-using TorrentsTest = ::libtransmission::test::TransmissionTest;
+using TorrentsTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(TorrentsTest, simpleTests)
@@ -136,7 +136,7 @@ TEST_F(TorrentsTest, removedSince)
     EXPECT_EQ(remove, torrents.removedSince(50));
 }
 
-using TorrentsPieceSpanTest = libtransmission::test::SessionTest;
+using TorrentsPieceSpanTest = tr::test::SessionTest;
 
 TEST_F(TorrentsPieceSpanTest, exposesFilePieceSpan)
 {

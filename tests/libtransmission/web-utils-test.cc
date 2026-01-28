@@ -20,7 +20,7 @@
 
 #include "test-fixtures.h"
 
-using WebUtilsTest = ::libtransmission::test::TransmissionTest;
+using WebUtilsTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(WebUtilsTest, urlParse)

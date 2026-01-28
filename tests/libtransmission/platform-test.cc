@@ -20,7 +20,7 @@
 #include "test-fixtures.h"
 
 using namespace std::literals;
-using PlatformTest = ::libtransmission::test::SessionTest;
+using PlatformTest = ::tr::test::SessionTest;
 
 #ifdef _WIN32
 #include <windows.h>

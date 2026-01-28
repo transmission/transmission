@@ -5,7 +5,7 @@
 
 #pragma once
 
-namespace transmission::app
+namespace tr::app
 {
 enum class ShowMode
 {
@@ -37,4 +37,4 @@ enum class SortMode
 inline auto constexpr SortModeCount = 10U;
 inline auto constexpr DefaultSortMode = SortMode::SortByName;
 
-} // namespace transmission::app
+} // namespace tr::app

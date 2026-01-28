@@ -51,7 +51,7 @@
 #include <utility>
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 using FileListValue = Glib::Value<GSList*>;
