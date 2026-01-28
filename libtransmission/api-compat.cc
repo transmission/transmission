@@ -661,8 +661,7 @@ void convert_keys(tr_variant& var, State& state)
     var.visit(
         [&state](auto& val)
         {
-            // TODO(c++20): use std::remove_cvref_t (P0550R2) when GCC >= 9.1
-            using ValueType = std::decay_t<decltype(val)>;
+            using ValueType = std::remove_cvref_t<decltype(val)>;
 
             if constexpr (std::is_same_v<ValueType, std::string> || std::is_same_v<ValueType, std::string_view>)
             {

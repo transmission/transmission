@@ -308,9 +308,9 @@ public:
     template<typename Val>
     [[nodiscard]] constexpr auto* get_if() noexcept
     {
-        // TODO(c++20): use std::remove_cvref_t (P0550R2) when GCC >= 9.1
         static_assert(
-            !std::is_same_v<std::decay_t<Val>, std::string> && !std::is_same_v<std::decay_t<Val>, std::string_view>,
+            !std::is_same_v<std::remove_cvref_t<Val>, std::string> &&
+                !std::is_same_v<std::remove_cvref_t<Val>, std::string_view>,
             "not supported -- use value_if<std::string_view>() instead.");
         return std::get_if<Val>(&val_);
     }
@@ -318,9 +318,9 @@ public:
     template<typename Val>
     [[nodiscard]] constexpr auto const* get_if() const noexcept
     {
-        // TODO(c++20): use std::remove_cvref_t (P0550R2) when GCC >= 9.1
         static_assert(
-            !std::is_same_v<std::decay_t<Val>, std::string> && !std::is_same_v<std::decay_t<Val>, std::string_view>,
+            !std::is_same_v<std::remove_cvref_t<Val>, std::string> &&
+                !std::is_same_v<std::remove_cvref_t<Val>, std::string_view>,
             "not supported -- use value_if<std::string_view>() instead.");
         return const_cast<tr_variant*>(this)->get_if<Val>();
     }

@@ -31,10 +31,6 @@ namespace detail
 // NOLINTBEGIN(readability-identifier-naming)
 // use std-style naming for these traits
 
-// TODO(c++20): use std::remove_cvref_t (P0550R2) when GCC >= 9.1
-template<typename T>
-using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
-
 // Type trait: is C a container with push_back (but not a string)?
 template<typename C, typename = void>
 inline constexpr bool is_push_back_range_v = false;
@@ -303,7 +299,7 @@ void load(T& tgt, Fields const& fields, tr_variant const& src)
 template<typename T, typename Fields>
 [[nodiscard]] tr_variant::Map save(T const& src, Fields const& fields)
 {
-    auto map = tr_variant::Map{ std::tuple_size_v<detail::remove_cvref_t<Fields>> };
+    auto map = tr_variant::Map{ std::tuple_size_v<std::remove_cvref_t<Fields>> };
     std::apply([&src, &map](auto const&... field) { (field.save(&src, map), ...); }, fields);
     return map;
 }

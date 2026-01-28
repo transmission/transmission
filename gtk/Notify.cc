@@ -53,8 +53,7 @@ template<typename... Ts>
 Glib::VariantContainerBase make_variant_tuple(Ts&&... args)
 {
     return Glib::VariantContainerBase::create_tuple(
-        // TODO(c++20): use std::remove_cvref_t (P0550R2) when GCC >= 9.1
-        { Glib::Variant<std::remove_cv_t<std::remove_reference_t<Ts>>>::create(std::forward<Ts>(args))... });
+        { Glib::Variant<std::remove_cvref_t<Ts>>::create(std::forward<Ts>(args))... });
 }
 
 void get_capabilities_callback(Glib::RefPtr<Gio::AsyncResult>& res)
