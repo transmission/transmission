@@ -1839,8 +1839,8 @@ namespace peer_stat_helpers
     stats.progress = peer->percent_done();
     stats.is_utp = peer->is_utp_connection();
     stats.is_encrypted = peer->is_encrypted();
-    stats.rate_to_peer_KBps = peer->get_piece_speed(now_msec, tr_direction::ClientToPeer).count(Speed::Units::KByps);
-    stats.rate_to_client_KBps = peer->get_piece_speed(now_msec, tr_direction::PeerToClient).count(Speed::Units::KByps);
+    stats.rate_to_peer = peer->get_piece_speed(now_msec, tr_direction::ClientToPeer);
+    stats.rate_to_client = peer->get_piece_speed(now_msec, tr_direction::PeerToClient);
     stats.peer_is_choked = peer->peer_is_choked();
     stats.peer_is_interested = peer->peer_is_interested();
     stats.client_is_choked = peer->client_is_choked();

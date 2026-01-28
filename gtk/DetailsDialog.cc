@@ -1146,8 +1146,8 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
 {
     g_return_if_fail(peer != nullptr);
 
-    auto const down_speed = Speed{ peer->rate_to_client_KBps, Speed::Units::KByps };
-    auto const up_speed = Speed{ peer->rate_to_peer_KBps, Speed::Units::KByps };
+    auto const down_speed = peer->rate_to_client;
+    auto const up_speed = peer->rate_to_peer;
 
     auto blocks_to_client = std::string{};
     auto blocks_to_peer = std::string{};
@@ -1158,12 +1158,12 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
     auto up_count = std::string{};
     auto up_speed_string = std::string{};
 
-    if (peer->rate_to_peer_KBps > 0.01)
+    if (peer->rate_to_peer.base_quantity() > 0U)
     {
         up_speed_string = up_speed.to_string();
     }
 
-    if (peer->rate_to_client_KBps > 0)
+    if (peer->rate_to_client.base_quantity() > 0U)
     {
         down_speed_string = down_speed.to_string();
     }

@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/values.h"
 
 using tr_file_index_t = size_t;
 using tr_piece_index_t = uint32_t;
@@ -1167,8 +1168,8 @@ struct tr_peer_stat
     tr_peer_id_t peer_id;
 
     float progress;
-    double rate_to_peer_KBps;
-    double rate_to_client_KBps;
+    libtransmission::Values::Speed rate_to_peer;
+    libtransmission::Values::Speed rate_to_client;
 
     // THESE NEXT FOUR FIELDS ARE EXPERIMENTAL.
     // Don't rely on them; they'll probably go away
