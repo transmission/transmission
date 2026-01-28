@@ -1016,23 +1016,23 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
         NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithCapacity:12];
 
         dict[@"Name"] = self.name;
-        dict[@"From"] = @(peer->from);
-        dict[@"IP"] = tr_strv_to_utf8_nsstring(peer->addr);
-        dict[@"Port"] = @(peer->port);
-        dict[@"Progress"] = @(peer->progress);
-        dict[@"Seed"] = @(peer->is_seed);
-        dict[@"Encryption"] = @(peer->is_encrypted);
-        dict[@"uTP"] = @(peer->is_utp);
-        dict[@"Client"] = tr_strv_to_utf8_nsstring(peer->client);
-        dict[@"Flags"] = tr_strv_to_utf8_nsstring(peer->flag_str);
+        dict[@"From"] = @(peer.from);
+        dict[@"IP"] = tr_strv_to_utf8_nsstring(peer.addr);
+        dict[@"Port"] = @(peer.port);
+        dict[@"Progress"] = @(peer.progress);
+        dict[@"Seed"] = @(peer.is_seed);
+        dict[@"Encryption"] = @(peer.is_encrypted);
+        dict[@"uTP"] = @(peer.is_utp);
+        dict[@"Client"] = tr_strv_to_utf8_nsstring(peer.client);
+        dict[@"Flags"] = tr_strv_to_utf8_nsstring(peer.flag_str);
 
-        if (peer->is_uploading_to)
+        if (peer.is_uploading_to)
         {
-            dict[@"UL To Rate"] = @(peer->rate_to_peer.count(libtransmission::Values::Speed::Units::KByps));
+            dict[@"UL To Rate"] = @(peer.rate_to_peer.count(libtransmission::Values::Speed::Units::KByps));
         }
-        if (peer->is_downloading_from)
+        if (peer.is_downloading_from)
         {
-            dict[@"DL From Rate"] = @(peer->rate_to_client.count(libtransmission::Values::Speed::Units::KByps));
+            dict[@"DL From Rate"] = @(peer.rate_to_client.count(libtransmission::Values::Speed::Units::KByps));
         }
 
         [peerDicts addObject:dict];
