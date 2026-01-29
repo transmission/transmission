@@ -1376,7 +1376,7 @@ void Session::blocklist_update()
                 gtr_pref_int_set(TR_KEY_blocklist_date, tr_time());
             }
 
-            impl_->signal_blocklist_updated().emit(*n_rules >= 0);
+            impl_->signal_blocklist_updated().emit(n_rules >= 0);
         });
 }
 
