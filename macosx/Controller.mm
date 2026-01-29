@@ -137,7 +137,7 @@ static NSTimeInterval const kDonateNagTime = 60 * 60 * 24 * 7;
 
 static void initUnits()
 {
-    using Config = libtransmission::Values::Config;
+    using Config = tr::Values::Config;
 
     // use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes,
     // we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)

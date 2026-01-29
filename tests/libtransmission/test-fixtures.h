@@ -37,7 +37,7 @@ inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
     return os;
 }
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using file_func_t = std::function<void(char const* filename)>;
@@ -515,4 +515,4 @@ private:
     std::vector<tr_torrent*> verified_;
 };
 
-} // namespace libtransmission::test
+} // namespace tr::test

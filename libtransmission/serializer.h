@@ -19,7 +19,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/variant.h"
 
-namespace libtransmission::serializer
+namespace tr::serializer
 {
 
 // These type traits are used for serialize() and deserialize() to sniff
@@ -454,4 +454,4 @@ bool to_optional(tr_variant const& src, std::optional<T>* ptgt)
 }
 
 } // namespace detail
-} // namespace libtransmission::serializer
+} // namespace tr::serializer

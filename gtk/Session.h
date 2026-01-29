@@ -75,7 +75,7 @@ public:
     // TODO(c++20) std::span
     [[nodiscard]] std::vector<tr_torrent*> find_torrents(std::vector<tr_torrent_id_t> const& ids) const;
 
-    transmission::app::FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& favicon_cache() const;
+    tr::app::FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& favicon_cache() const;
 
     /******
     *******

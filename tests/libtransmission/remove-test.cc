@@ -23,7 +23,7 @@
 using namespace std::literals;
 using SubpathAndSize = std::pair<std::string_view, uint64_t>;
 
-class RemoveTest : public libtransmission::test::SandboxedTest
+class RemoveTest : public tr::test::SandboxedTest
 {
 protected:
     static constexpr std::string_view Content = "Hello, World!"sv;
@@ -198,7 +198,7 @@ protected:
             filenames.emplace(filename);
         };
 
-        libtransmission::test::depthFirstWalk(tr_pathbuf{ parent_dir }, file_func);
+        tr::test::depthFirstWalk(tr_pathbuf{ parent_dir }, file_func);
 
         return filenames;
     }

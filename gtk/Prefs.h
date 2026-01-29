@@ -19,7 +19,7 @@
 template<typename T>
 [[nodiscard]] std::optional<T> gtr_pref_get(tr_quark const key)
 {
-    using namespace libtransmission::serializer;
+    using namespace tr::serializer;
     auto const& map = gtr_pref_get_map();
     auto const iter = map.find(key);
     return iter != std::end(map) ? to_value<T>(iter->second) : std::nullopt;

@@ -33,7 +33,7 @@
 
 #include "test-fixtures.h"
 
-using UtilsTest = ::libtransmission::test::TransmissionTest;
+using UtilsTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(UtilsTest, trStrvContains)
@@ -312,7 +312,7 @@ TEST_F(UtilsTest, saveFile)
     auto filename = tr_pathbuf{};
 
     // save a file to GoogleTest's temp dir
-    auto const sandbox = libtransmission::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     filename.assign(sandbox, "filename.txt"sv);
     auto contents = "these are the contents"sv;
     auto error = tr_error{};

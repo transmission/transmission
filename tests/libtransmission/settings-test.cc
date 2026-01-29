@@ -22,7 +22,7 @@
 
 #include "test-fixtures.h"
 
-using SettingsTest = ::libtransmission::test::TransmissionTest;
+using SettingsTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(SettingsTest, canInstantiate)

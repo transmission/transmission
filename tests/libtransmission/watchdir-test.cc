@@ -44,7 +44,7 @@ static auto constexpr RetryDuration = 100ms;
 static auto constexpr ProcessEventsTimeout = 300ms;
 static_assert(ProcessEventsTimeout > GenericRescanInterval);
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 enum class WatchMode : uint8_t
@@ -59,14 +59,14 @@ class WatchDirTest
 {
 private:
     std::shared_ptr<struct event_base> ev_base_;
-    std::unique_ptr<libtransmission::TimerMaker> timer_maker_;
+    std::unique_ptr<tr::TimerMaker> timer_maker_;
 
 protected:
     void SetUp() override
     {
         SandboxedTest::SetUp();
         ev_base_.reset(event_base_new(), event_base_free);
-        timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(ev_base_.get());
+        timer_maker_ = std::make_unique<tr::EvTimerMaker>(ev_base_.get());
         Watchdir::set_generic_rescan_interval(GenericRescanInterval);
     }
 
@@ -261,4 +261,4 @@ INSTANTIATE_TEST_SUITE_P( //
         WatchMode::NATIVE,
         WatchMode::GENERIC));
 
-} // namespace libtransmission::test
+} // namespace tr::test

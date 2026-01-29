@@ -16,7 +16,7 @@
 
 #include "libtransmission/error.h"
 
-namespace transmission::benc
+namespace tr::benc
 {
 
 namespace impl
@@ -427,4 +427,4 @@ bool parse(
     return true;
 }
 
-} // namespace transmission::benc
+} // namespace tr::benc

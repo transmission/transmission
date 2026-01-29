@@ -41,7 +41,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
+namespace tr
 {
 namespace
 {
@@ -595,4 +595,4 @@ size_t Blocklists::update_primary_blocklist(std::string_view const external_file
     return n_rules;
 }
 
-} // namespace libtransmission
+} // namespace tr

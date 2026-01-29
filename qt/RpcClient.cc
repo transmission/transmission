@@ -26,7 +26,7 @@
 #include "VariantHelpers.h"
 
 using ::trqt::variant_helpers::dictFind;
-namespace api_compat = libtransmission::api_compat;
+namespace api_compat = tr::api_compat;
 
 namespace
 {
@@ -69,7 +69,7 @@ void RpcClient::stop()
     session_ = nullptr;
     session_id_.clear();
     url_.clear();
-    network_style_ = libtransmission::api_compat::default_style();
+    network_style_ = tr::api_compat::default_style();
 
     QObject::disconnect(nam_, nullptr, this, nullptr);
 }

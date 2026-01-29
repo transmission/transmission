@@ -26,7 +26,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using LpdTest = SessionTest;
@@ -64,7 +64,7 @@ public:
         return torrents_;
     }
 
-    [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+    [[nodiscard]] tr::TimerMaker& timerMaker() override
     {
         return session_.timerMaker();
     }
@@ -219,4 +219,4 @@ TEST_F(LpdTest, DISABLED_DoesNotReannounceTooSoon)
     }
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

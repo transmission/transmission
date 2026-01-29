@@ -34,7 +34,7 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace tr_resume
 {
@@ -635,7 +635,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         return {};
     }
 
-    libtransmission::api_compat::convert_incoming_data(*otop);
+    tr::api_compat::convert_incoming_data(*otop);
     auto const* const p_map = otop->get_if<tr_variant::Map>();
     if (p_map == nullptr)
     {
@@ -984,7 +984,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     save_group(map, tor);
 
     auto out = tr_variant{ std::move(map) };
-    libtransmission::api_compat::convert_outgoing_data(out);
+    tr::api_compat::convert_outgoing_data(out);
     auto serde = tr_variant_serde::benc();
     if (!serde.to_file(out, tor->resume_file()))
     {

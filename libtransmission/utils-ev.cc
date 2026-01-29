@@ -8,7 +8,7 @@
 
 #include "libtransmission/utils-ev.h"
 
-namespace libtransmission::evhelpers
+namespace tr::evhelpers
 {
 
 void EventBaseDeleter::operator()(struct event_base* evbase) const noexcept
@@ -36,4 +36,4 @@ void EvhttpDeleter::operator()(struct evhttp* evh) const noexcept
     }
 }
 
-} // namespace libtransmission::evhelpers
+} // namespace tr::evhelpers

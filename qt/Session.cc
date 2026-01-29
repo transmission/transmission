@@ -46,7 +46,7 @@
 
 using namespace std::literals;
 
-using ::libtransmission::serializer::to_variant;
+using ::tr::serializer::to_variant;
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
 

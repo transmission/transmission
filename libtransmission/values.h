@@ -14,7 +14,7 @@
 
 #include <fmt/format.h>
 
-namespace libtransmission::Values
+namespace tr::Values
 {
 enum class MemoryUnits : uint8_t
 {
@@ -267,4 +267,4 @@ using Memory = Value<MemoryUnits, Config::memory>;
 using Storage = Value<StorageUnits, Config::storage>;
 using Speed = Value<SpeedUnits, Config::speed>;
 
-} // namespace libtransmission::Values
+} // namespace tr::Values

@@ -65,7 +65,7 @@ struct tr_torrent;
 #endif
 
 using namespace std::literals;
-using libtransmission::Watchdir;
+using tr::Watchdir;
 
 namespace
 {
@@ -922,7 +922,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
                 return onFileAdded(session, dirname, basename);
             };
 
-            auto timer_maker = libtransmission::EvTimerMaker{ ev_base_ };
+            auto timer_maker = tr::EvTimerMaker{ ev_base_ };
             watchdir = force_generic ? Watchdir::create_generic(dir, handler, timer_maker) :
                                        Watchdir::create(dir, handler, timer_maker, ev_base_);
         }

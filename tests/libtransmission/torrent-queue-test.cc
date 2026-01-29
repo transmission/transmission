@@ -18,7 +18,7 @@
 
 using namespace std::literals;
 
-struct TorrentQueueTest : public libtransmission::test::SandboxedTest
+struct TorrentQueueTest : public tr::test::SandboxedTest
 {
     class MockMediator final : public tr_torrent_queue::Mediator
     {

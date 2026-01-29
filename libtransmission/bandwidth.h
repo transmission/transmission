@@ -30,8 +30,8 @@ class tr_peerIo;
 
 struct tr_bandwidth_limits
 {
-    libtransmission::Values::Speed up_limit;
-    libtransmission::Values::Speed down_limit;
+    tr::Values::Speed up_limit;
+    tr::Values::Speed down_limit;
     bool up_limited = false;
     bool down_limited = false;
 };
@@ -78,7 +78,7 @@ struct tr_bandwidth_limits
 struct tr_bandwidth
 {
 private:
-    using Speed = libtransmission::Values::Speed;
+    using Speed = tr::Values::Speed;
 
     static constexpr auto HistoryMSec = 2000U;
     static constexpr auto GranularityMSec = 250U;

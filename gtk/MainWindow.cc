@@ -61,7 +61,7 @@
 
 using namespace std::string_literals;
 using namespace std::string_view_literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 using VariantInt = Glib::Variant<int>;
 using VariantDouble = Glib::Variant<double>;

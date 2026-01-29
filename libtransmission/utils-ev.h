@@ -15,7 +15,7 @@ struct event;
 struct event_base;
 struct evhttp;
 
-namespace libtransmission::evhelpers
+namespace tr::evhelpers
 {
 
 struct EventBaseDeleter
@@ -39,4 +39,4 @@ struct EvhttpDeleter
 
 using evhttp_unique_ptr = std::unique_ptr<struct evhttp, EvhttpDeleter>;
 
-} // namespace libtransmission::evhelpers
+} // namespace tr::evhelpers

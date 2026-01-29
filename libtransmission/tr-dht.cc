@@ -605,9 +605,9 @@ private:
 
     Mediator& mediator_;
     std::string const state_filename_;
-    std::unique_ptr<libtransmission::Timer> const announce_timer_;
-    std::unique_ptr<libtransmission::Timer> const bootstrap_timer_;
-    std::unique_ptr<libtransmission::Timer> const periodic_timer_;
+    std::unique_ptr<tr::Timer> const announce_timer_;
+    std::unique_ptr<tr::Timer> const bootstrap_timer_;
+    std::unique_ptr<tr::Timer> const periodic_timer_;
 
     Id id_ = {};
     int64_t id_timestamp_ = {};

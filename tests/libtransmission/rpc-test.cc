@@ -26,7 +26,7 @@ struct tr_session;
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using RpcTest = SessionTest;
@@ -888,4 +888,4 @@ TEST_F(RpcTest, DISABLED_wellFormedLegacyFreeSpace)
 }
 } // namespace free_space_test
 
-} // namespace libtransmission::test
+} // namespace tr::test

@@ -60,8 +60,8 @@ using namespace std::literals;
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
-using InBuf = libtransmission::BufferReader<std::byte>;
-using PayloadBuffer = libtransmission::StackBuffer<4096, std::byte>;
+using InBuf = tr::BufferReader<std::byte>;
+using PayloadBuffer = tr::StackBuffer<4096, std::byte>;
 
 using ipp_t = std::underlying_type_t<tr_address_type>;
 

@@ -34,7 +34,7 @@ auto constexpr MaxBencStrLength = size_t{ 128 * 1024 * 1024 }; // arbitrary
 
 // ---
 
-namespace transmission::benc::impl
+namespace tr::benc::impl
 {
 
 /**
@@ -125,7 +125,7 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
     return string;
 }
 
-} // namespace transmission::benc::impl
+} // namespace tr::benc::impl
 
 // ---
 
@@ -133,7 +133,7 @@ namespace
 {
 namespace parse_helpers
 {
-struct MyHandler : public transmission::benc::Handler
+struct MyHandler : public tr::benc::Handler
 {
     tr_variant* const top_;
     bool inplace_;
@@ -259,12 +259,12 @@ private:
 std::optional<tr_variant> tr_variant_serde::parse_benc(std::string_view input)
 {
     using namespace parse_helpers;
-    using Stack = transmission::benc::ParserStack<512>;
+    using Stack = tr::benc::ParserStack<512>;
 
     auto top = tr_variant{};
     auto stack = Stack{};
     auto handler = MyHandler{ &top, parse_inplace_ };
-    if (transmission::benc::parse(input, stack, handler, &end_, &error_) && std::empty(stack))
+    if (tr::benc::parse(input, stack, handler, &end_, &error_) && std::empty(stack))
     {
         return std::optional<tr_variant>{ std::move(top) };
     }

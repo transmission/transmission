@@ -19,7 +19,7 @@
 
 using namespace std::literals;
 
-using PeerInfoTest = ::libtransmission::test::TransmissionTest;
+using PeerInfoTest = ::tr::test::TransmissionTest;
 
 TEST_F(PeerInfoTest, mergeConnectable)
 {

@@ -1149,8 +1149,8 @@ struct tr_peer_stat
     // Will be an empty string if the agent cannot be determined.
     std::string user_agent;
 
-    libtransmission::Values::Speed rate_to_peer;
-    libtransmission::Values::Speed rate_to_client;
+    tr::Values::Speed rate_to_peer;
+    tr::Values::Speed rate_to_client;
 
     // how many requests the peer has made that we haven't responded to yet
     size_t active_reqs_to_client = {};

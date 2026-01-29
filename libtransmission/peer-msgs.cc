@@ -64,9 +64,9 @@ using namespace std::literals;
 namespace
 {
 // initial capacity is big enough to hold a BtPeerMsgs::Piece message
-using MessageBuffer = libtransmission::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
-using MessageReader = libtransmission::BufferReader<std::byte>;
-using MessageWriter = libtransmission::BufferWriter<std::byte>;
+using MessageBuffer = tr::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
+using MessageReader = tr::BufferReader<std::byte>;
+using MessageWriter = tr::BufferWriter<std::byte>;
 
 // these values are hardcoded by various BEPs as noted
 namespace BtPeerMsgs
@@ -741,7 +741,7 @@ private:
     // supplied a reqq argument, it's stored here.
     std::optional<size_t> peer_reqq_;
 
-    std::unique_ptr<libtransmission::Timer> pex_timer_;
+    std::unique_ptr<tr::Timer> pex_timer_;
 
     tr_bitfield have_;
 

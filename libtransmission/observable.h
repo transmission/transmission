@@ -17,7 +17,7 @@
 
 #include "libtransmission/tr-assert.h"
 
-namespace libtransmission
+namespace tr
 {
 
 // An RAII-based subscription to an Observable.
@@ -107,4 +107,4 @@ private:
     small::map<Key, Observer, 4U> observers_;
 };
 
-} // namespace libtransmission
+} // namespace tr

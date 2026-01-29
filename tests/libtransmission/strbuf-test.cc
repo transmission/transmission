@@ -11,7 +11,7 @@
 
 #include "test-fixtures.h"
 
-using StrbufTest = ::libtransmission::test::TransmissionTest;
+using StrbufTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(StrbufTest, append)

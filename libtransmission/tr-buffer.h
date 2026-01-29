@@ -20,7 +20,7 @@
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR
 #include "libtransmission/utils.h" // for tr_htonll(), tr_ntohll()
 
-namespace libtransmission
+namespace tr
 {
 
 template<typename value_type>
@@ -319,4 +319,4 @@ private:
     size_t end_pos_ = {};
 };
 
-} // namespace libtransmission
+} // namespace tr

@@ -22,8 +22,8 @@
 #include "Prefs.h"
 #include "UserMetaType.h"
 
-namespace api_compat = libtransmission::api_compat;
-namespace ser = libtransmission::serializer;
+namespace api_compat = tr::api_compat;
+namespace ser = tr::serializer;
 using namespace std::string_view_literals;
 
 // ---

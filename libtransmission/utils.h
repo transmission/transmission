@@ -253,7 +253,7 @@ template<typename T>
 
 // ---
 
-namespace libtransmission::detail::tr_time
+namespace tr::detail::tr_time
 {
 extern time_t current_time;
 }
@@ -270,13 +270,13 @@ extern time_t current_time;
  */
 [[nodiscard]] static inline time_t tr_time() noexcept
 {
-    return libtransmission::detail::tr_time::current_time;
+    return tr::detail::tr_time::current_time;
 }
 
 /** @brief Private libtransmission function to update `tr_time()`'s counter */
 constexpr void tr_timeUpdate(time_t now) noexcept
 {
-    libtransmission::detail::tr_time::current_time = now;
+    tr::detail::tr_time::current_time = now;
 }
 
 /** @brief Portability wrapper for `htonll()` that uses the system implementation if available */
