@@ -1430,6 +1430,14 @@ struct tr_stat
         are moved to `corrupt` or `haveValid`. */
     uint64_t have_unchecked = {};
 
+    // Speed of all piece being sent for this torrent.
+    // This ONLY counts piece data.
+    libtransmission::Values::Speed piece_upload_speed = {};
+
+    // Speed of all piece being received for this torrent.
+    // This ONLY counts piece data.
+    libtransmission::Values::Speed piece_download_speed = {};
+
     // When the torrent was first added
     time_t added_date = {};
 
@@ -1447,6 +1455,27 @@ struct tr_stat
     // or download directory. RPC clients can monitor this to know when
     // to reload fields that rarely change.
     time_t edit_date = {};
+
+    // Number of seconds since the last activity (or since started).
+    // -1 if activity is not seeding or downloading.
+    time_t idle_secs = {};
+
+    // Cumulative seconds the torrent's ever spent downloading
+    time_t seconds_downloading = {};
+
+    // Cumulative seconds the torrent's ever spent seeding
+    time_t seconds_seeding = {};
+
+    // If downloading, estimated number of seconds left until the torrent is done.
+    // If seeding, estimated number of seconds left until seed ratio is reached.
+    time_t eta = {};
+
+    // If seeding, number of seconds left until the idle time limit is reached.
+    time_t eta_idle = {};
+
+    // This torrent's queue position.
+    // All torrents have a queue position, even if it's not queued.
+    size_t queue_position = {};
 
     // When `tr_stat.activity` is `TR_STATUS_CHECK` or `TR_STATUS_CHECK_WAIT`,
     // this is the percentage of how much of the files has been
@@ -1476,14 +1505,6 @@ struct tr_stat
     // Range is [0..1] */
     float seed_ratio_percent_done = {};
 
-    // Speed of all piece being sent for this torrent.
-    // This ONLY counts piece data.
-    libtransmission::Values::Speed piece_upload_speed = {};
-
-    // Speed of all piece being received for this torrent.
-    // This ONLY counts piece data.
-    libtransmission::Values::Speed piece_download_speed = {};
-
     // Total uploaded bytes / size_when_done.
     // NB: In Transmission 3.00 and earlier, this was total upload / download,
     // which caused edge cases when total download was less than size_when_done.
@@ -1492,30 +1513,6 @@ struct tr_stat
     // The torrent's unique Id.
     // @see `tr_torrentId()`
     tr_torrent_id_t id = {};
-
-    // Number of seconds since the last activity (or since started).
-    // -1 if activity is not seeding or downloading.
-    time_t idle_secs = {};
-
-    // Cumulative seconds the torrent's ever spent downloading
-    time_t seconds_downloading = {};
-
-    // Cumulative seconds the torrent's ever spent seeding
-    time_t seconds_seeding = {};
-
-    // This torrent's queue position.
-    // All torrents have a queue position, even if it's not queued.
-    size_t queue_position = {};
-
-    // If downloading, estimated number of seconds left until the torrent is done.
-    // If seeding, estimated number of seconds left until seed ratio is reached.
-    time_t eta = {};
-
-    // If seeding, number of seconds left until the idle time limit is reached.
-    time_t eta_idle = {};
-
-    // What is this torrent doing right now?
-    tr_torrent_activity activity = {};
 
     // Number of peers that we're connected to
     uint16_t peers_connected = {};
@@ -1536,6 +1533,9 @@ struct tr_stat
 
     // Number of webseeds that are sending data to us.
     uint16_t webseeds_sending_to_us = {};
+
+    // What is this torrent doing right now?
+    tr_torrent_activity activity = {};
 
     enum class Error : uint8_t
     {
