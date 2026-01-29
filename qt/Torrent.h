@@ -204,7 +204,7 @@ public:
 
     [[nodiscard]] constexpr auto hasError() const noexcept
     {
-        return error_ != TR_STAT_OK;
+        return error_ != tr_stat::Error::Ok;
     }
 
     [[nodiscard]] constexpr auto leftUntilDone() const noexcept
@@ -630,6 +630,8 @@ private:
     bool is_stalled_ = {};
     bool upload_limited_ = {};
 
+    tr_stat::Error error_ = tr_stat::Error::Ok;
+
     time_t activity_date_ = {};
     time_t added_date_ = {};
     time_t date_created_ = {};
@@ -638,7 +640,6 @@ private:
     time_t start_date_ = {};
 
     int bandwidth_priority_ = {};
-    int error_ = {};
     int eta_ = {};
     int peer_limit_ = {};
     int peers_connected_ = {};

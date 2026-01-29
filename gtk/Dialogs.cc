@@ -37,14 +37,14 @@ void gtr_confirm_remove(
     int incomplete = 0;
     // TODO(c++20) remove `torrents` local when tr_torrentStat() takes a span
     auto const torrents = core->find_torrents(torrent_ids);
-    for (auto const* stat : tr_torrentStat(std::data(torrents), std::size(torrents)))
+    for (auto const& stat : tr_torrentStat(std::data(torrents), std::size(torrents)))
     {
-        if (stat->leftUntilDone != 0)
+        if (stat.left_until_done != 0)
         {
             ++incomplete;
         }
 
-        if (stat->peersConnected != 0)
+        if (stat.peers_connected != 0)
         {
             ++connected;
         }

@@ -25,7 +25,7 @@
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h> // tr_sessionFetch()
 
-using namespace std::chrono_literals;
+using namespace std::literals;
 using namespace tr::Values;
 
 #define SPEED_K_STR "kB/s"
@@ -122,45 +122,45 @@ void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
     waitingOnWeb = false;
 }
 
-[[nodiscard]] std::string getStatusStr(tr_stat const* st)
+[[nodiscard]] std::string getStatusStr(tr_stat const& st)
 {
-    if (st->activity == TR_STATUS_CHECK_WAIT)
+    if (st.activity == TR_STATUS_CHECK_WAIT)
     {
         return "Waiting to verify local files";
     }
 
-    if (st->activity == TR_STATUS_CHECK)
+    if (st.activity == TR_STATUS_CHECK)
     {
         return fmt::format(
             "Verifying local files ({:.2f}%, {:.2f}% valid)",
-            tr_truncd(100 * st->recheckProgress, 2),
-            tr_truncd(100 * st->percentDone, 2));
+            tr_truncd(100 * st.recheck_progress, 2),
+            tr_truncd(100 * st.percent_done, 2));
     }
 
-    if (st->activity == TR_STATUS_DOWNLOAD)
+    if (st.activity == TR_STATUS_DOWNLOAD)
     {
         return fmt::format(
             "Progress: {:.1f}%, dl from {:d} of {:d} peers ({:s}), ul to {:d} ({:s}) [{:s}]",
-            tr_truncd(100 * st->percentDone, 1),
-            st->peersSendingToUs,
-            st->peersConnected,
-            Speed{ st->pieceDownloadSpeed_KBps, Speed::Units::KByps }.to_string(),
-            st->peersGettingFromUs,
-            Speed{ st->pieceUploadSpeed_KBps, Speed::Units::KByps }.to_string(),
-            tr_strlratio(st->ratio));
+            tr_truncd(100 * st.percent_done, 1),
+            st.peers_sending_to_us,
+            st.peers_connected,
+            st.piece_download_speed.to_string(),
+            st.peers_getting_from_us,
+            st.piece_upload_speed.to_string(),
+            tr_strlratio(st.upload_ratio));
     }
 
-    if (st->activity == TR_STATUS_SEED)
+    if (st.activity == TR_STATUS_SEED)
     {
         return fmt::format(
             "Seeding, uploading to {:d} of {:d} peer(s), {:s} [{:s}]",
-            st->peersGettingFromUs,
-            st->peersConnected,
-            Speed{ st->pieceUploadSpeed_KBps, Speed::Units::KByps }.to_string(),
-            tr_strlratio(st->ratio));
+            st.peers_getting_from_us,
+            st.peers_connected,
+            st.piece_upload_speed.to_string(),
+            tr_strlratio(st.upload_ratio));
     }
 
-    return "";
+    return {};
 }
 
 [[nodiscard]] std::string getConfigDir(int argc, char const** argv)
@@ -308,6 +308,21 @@ void sigHandler(int signal)
         break;
     }
 }
+
+[[nodiscard]] constexpr std::string_view getErrorMessagePrefix(auto const err)
+{
+    switch (err)
+    {
+    case tr_stat::Error::TrackerWarning:
+        return "Tracker gave a warning:"sv;
+    case tr_stat::Error::TrackerError:
+        return "Tracker gave an error:"sv;
+    case tr_stat::Error::LocalError:
+        return "Error:"sv;
+    case tr_stat::Error::Ok:
+        return ""sv;
+    }
+}
 } // namespace
 
 int tr_main(int argc, char* argv[])
@@ -399,13 +414,6 @@ int tr_main(int argc, char* argv[])
 
     for (;;)
     {
-        static auto constexpr messageName = std::array<char const*, 4>{
-            nullptr,
-            "Tracker gave a warning:",
-            "Tracker gave an error:",
-            "Error:",
-        };
-
         std::this_thread::sleep_for(200ms);
 
         if (gotsig)
@@ -430,8 +438,8 @@ int tr_main(int argc, char* argv[])
             }
         }
 
-        auto const* const st = tr_torrentStat(tor);
-        if (st->activity == TR_STATUS_STOPPED)
+        auto const st = tr_torrentStat(tor);
+        if (st.activity == TR_STATUS_STOPPED)
         {
             break;
         }
@@ -439,9 +447,9 @@ int tr_main(int argc, char* argv[])
         auto const status_str = getStatusStr(st);
         printf("\r%-*s", LineWidth, status_str.c_str());
 
-        if (messageName[st->error])
+        if (auto const prefix = getErrorMessagePrefix(st.error); !std::empty(prefix))
         {
-            fprintf(stderr, "\n%s: %s\n", messageName[st->error], st->errorString);
+            fmt::print(stderr, "\n{:s}: {:s}\n", prefix, st.error_string);
         }
     }
 
