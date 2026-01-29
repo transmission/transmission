@@ -20,7 +20,7 @@
 #import "TrackerNode.h"
 #import "Utils.h"
 
-using libtransmission::Values::Speed;
+using tr::Values::Speed;
 
 NSString* const kTorrentDidChangeGroupNotification = @"TorrentDidChangeGroup";
 
