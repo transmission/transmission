@@ -70,6 +70,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     tr_pathbuf file_subpath_;
     std::string_view pieces_root_;
     int64_t file_length_ = 0;
+    bool file_is_padding_ = false;
 
     enum class State : uint8_t
     {
@@ -310,6 +311,11 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             {
                 // currently unused. TODO support for bittorrent v2
                 // TODO https://github.com/transmission/transmission/issues/458
+
+                if (value.find_first_of('p') != std::string::npos)
+                {
+                    file_is_padding_ = true;
+                }
             }
             else if (
                 pathIs(InfoKey, FilesKey, ""sv, Crc32Key) || //
@@ -460,11 +466,12 @@ private:
         }
         else
         {
-            tm_.files_.add(file_subpath_, file_length_);
+            tm_.files_.add(file_subpath_, file_length_, file_is_padding_);
         }
 
         file_length_ = 0;
         pieces_root_ = {};
+        file_is_padding_ = false;
         // NB: let caller decide how to clear file_tree_.
         // if we're in "files" mode we clear it; if in "file tree" we pop it
         return ok;
@@ -513,7 +520,7 @@ private:
         // In the single file case, length maps to the length of the file in bytes.
         if (tm_.file_count() == 0 && length_ != 0 && !std::empty(tm_.name_))
         {
-            tm_.files_.add(tr_torrent_files::sanitize_subpath(tm_.name_), length_);
+            tm_.files_.add(tr_torrent_files::sanitize_subpath(tm_.name_), length_, file_is_padding_);
         }
 
         if (auto const has_metainfo = tm_.info_dict_size() != 0U; has_metainfo)

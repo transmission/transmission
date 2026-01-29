@@ -2049,19 +2049,24 @@ void tr_peerMsgsImpl::check_request_timeout(time_t const now)
     auto buf = std::array<uint8_t, tr_block_info::BlockSize>{};
     auto ok = is_valid_request(req) && tor_.has_piece(req.index);
 
-    if (ok)
+    // Ignore all checks, padding is zero
+    auto is_padding_data = tor_.piece_is_padded(req.index);
+    if (!is_padding_data)
     {
-        ok = tor_.ensure_piece_is_checked(req.index);
-
-        if (!ok)
+        if (ok)
         {
-            tor_.error().set_local_error(fmt::format("Please Verify Local Data! Piece #{:d} is corrupt.", req.index));
-        }
-    }
+            ok = tor_.ensure_piece_is_checked(req.index);
 
-    if (ok)
-    {
-        ok = session->cache->read_block(tor_, tor_.piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
+            if (!ok)
+            {
+                tor_.error().set_local_error(fmt::format("Please Verify Local Data! Piece #{:d} is corrupt.", req.index));
+            }
+        }
+
+        if (ok)
+        {
+            ok = session->cache->read_block(tor_, tor_.piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
+        }
     }
 
     if (ok)
