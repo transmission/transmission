@@ -7,7 +7,6 @@ HeaderFilterRegex: .*/libtransmission/.*
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
 #
 # -modernize-use-ranges: GCC 10.1, clang 15
-# -modernize-loop-convert (P0896R4): GCC 10.1, clang 15
 # -readability-container-contains (P0458R2): GCC 9.1, clang 13
 # Ref: https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html
 # Ref: https://libcxx.llvm.org/Status/Cxx20.html
@@ -43,7 +42,6 @@ Checks: >
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
-  -modernize-loop-convert,
   -modernize-use-integer-sign-comparison,
   -modernize-use-ranges,
   -modernize-use-trailing-return-type,

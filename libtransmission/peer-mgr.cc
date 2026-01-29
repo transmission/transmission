@@ -2730,9 +2730,9 @@ void get_peer_candidates(size_t global_peer_limit, tr_torrents& torrents, tr_pee
     candidates.resize(n_keep);
 
     // put the best candidates at the end of the list
-    for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
+    for (auto const& candidate : std::ranges::reverse_view(candidates))
     {
-        setme.emplace_back(it->tor->id(), it->peer_info->listen_socket_address());
+        setme.emplace_back(candidate.tor->id(), candidate.peer_info->listen_socket_address());
     }
 }
 
@@ -2793,10 +2793,8 @@ void tr_peerMgr::make_new_peer_connections()
 
     // initiate connections to the last N candidates
     auto const n_this_pass = std::min(std::size(candidates), MaxConnectionsPerPulse);
-    for (auto it = std::crbegin(candidates), end = std::crbegin(candidates) + n_this_pass; it != end; ++it)
+    for (auto const& [tor_id, sock_addr] : candidates | std::views::reverse | std::views::take(n_this_pass))
     {
-        auto const& [tor_id, sock_addr] = *it;
-
         if (auto* const tor = torrents_.get(tor_id); tor != nullptr)
         {
             if (auto const& peer_info = tor->swarm->get_existing_peer_info(sock_addr))

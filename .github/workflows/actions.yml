@@ -123,7 +123,7 @@ jobs:
           exit 1
 
   sanitizer-tests-ubuntu:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
     steps:

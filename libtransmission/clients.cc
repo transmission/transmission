@@ -10,6 +10,7 @@
 #include <cctype> /* isprint() */
 #include <cstdint> // uint8_t
 #include <optional>
+#include <ranges>
 #include <string_view>
 #include <tuple>
 #include <utility>
@@ -190,10 +191,10 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
     }
 
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
-    std::for_each(
-        vals.rbegin(),
-        vals.rend(),
-        [&buf, &buflen](int num) { std::tie(buf, buflen) = buf_append(buf, buflen, num, '.'); });
+    for (auto const num : vals | std::views::reverse)
+    {
+        std::tie(buf, buflen) = buf_append(buf, buflen, num, '.');
+    }
     if (buf > buf_in)
     {
         buf[-1] = '\0'; // remove trailing '.'
