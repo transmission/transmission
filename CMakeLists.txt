@@ -53,6 +53,7 @@ set(GTKMM3_MINIMUM 3.24.0)
 set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 2.7)
+set(MINIUPNPC_MINIMUM 2.2.1)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.0)
 set(QT_MINIMUM 5.15)
@@ -547,14 +548,16 @@ if(WIN32)
 else()
     set(TR_MINIUPNPC_LIBNAME miniupnpc)
 endif()
-tr_add_external_auto_library_legacy(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
-    TARGET miniupnpc::libminiupnpc
+tr_add_external_auto_library(MINIUPNPC miniupnpc
+    LIBNAME ${TR_MINIUPNPC_LIBNAME}
+    SOURCE_DIR miniupnp/miniupnpc
+    TARGET miniupnpc::miniupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
         -DUPNPC_BUILD_SHARED=OFF
         -DUPNPC_BUILD_TESTS=OFF)
 if(NOT USE_SYSTEM_MINIUPNPC)
-    target_compile_definitions(miniupnpc::libminiupnpc
+    target_compile_definitions(miniupnpc::miniupnpc
         INTERFACE
             MINIUPNP_STATICLIB)
 endif()
