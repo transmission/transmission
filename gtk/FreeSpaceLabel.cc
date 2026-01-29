@@ -54,7 +54,7 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
     }
 
     auto ec = std::error_code{};
-    auto const capacity = std::filesystem::space(dir_, ec);
+    auto const capacity = std::filesystem::space(tr_u8path(dir_), ec);
     auto const text = !ec ?
         fmt::format(fmt::runtime(_("{disk_space} free")), fmt::arg("disk_space", tr_strlsize(capacity.available))) :
         _("Error");
