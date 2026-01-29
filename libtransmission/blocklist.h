@@ -21,7 +21,7 @@
 #include "libtransmission/net.h" // for tr_address
 #include "libtransmission/observable.h"
 
-namespace libtransmission
+namespace tr
 {
 
 class Blocklists
@@ -112,8 +112,8 @@ private:
 
     std::string folder_;
 
-    libtransmission::SimpleObservable<> changed_;
+    tr::SimpleObservable<> changed_;
 
     [[nodiscard]] static std::vector<Blocklist> load_folder(std::string_view folder, bool is_enabled);
 };
-} // namespace libtransmission
+} // namespace tr

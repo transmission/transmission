@@ -74,8 +74,8 @@ public:
     using ChangeFlags = Flags<ChangeFlag>;
 
 public:
-    using Speed = libtransmission::Values::Speed;
-    using Storage = libtransmission::Values::Storage;
+    using Speed = tr::Values::Speed;
+    using Storage = tr::Values::Storage;
 
     int get_active_peer_count() const;
     int get_active_peers_down() const;

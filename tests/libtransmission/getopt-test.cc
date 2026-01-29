@@ -61,7 +61,7 @@ auto constexpr Options = std::array<tr_option, 9>{ {
 static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
-class GetoptTest : public ::libtransmission::test::TransmissionTest
+class GetoptTest : public ::tr::test::TransmissionTest
 {
 protected:
     static void runTest( //

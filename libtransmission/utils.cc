@@ -18,6 +18,7 @@
 #include <iterator> // for std::back_inserter
 #include <locale>
 #include <memory>
+#include <ranges>
 #include <mutex>
 #include <optional>
 #include <stdexcept> // std::runtime_error
@@ -60,13 +61,13 @@
 #include "libtransmission/values.h"
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
-time_t libtransmission::detail::tr_time::current_time = {};
+time_t tr::detail::tr_time::current_time = {};
 
 // ---
 
-namespace libtransmission::Values
+namespace tr::Values
 {
 
 // default values; can be overridden by client apps
@@ -74,7 +75,7 @@ Config::Units<MemoryUnits> Config::memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "
 Config::Units<SpeedUnits> Config::speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
 Config::Units<StorageUnits> Config::storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
 
-} // namespace libtransmission::Values
+} // namespace tr::Values
 
 // ---
 
@@ -260,11 +261,11 @@ std::string_view tr_strv_strip(std::string_view str)
         return isspace(static_cast<unsigned char>(ch));
     };
 
-    auto const it = std::find_if_not(std::begin(str), std::end(str), Test);
-    str.remove_prefix(std::distance(std::begin(str), it));
+    auto const it = std::ranges::find_if_not(str, Test);
+    str.remove_prefix(std::ranges::distance(std::ranges::begin(str), it));
 
-    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), Test);
-    str.remove_suffix(std::distance(std::rbegin(str), rit));
+    auto const rit = std::ranges::find_if_not(std::ranges::rbegin(str), std::ranges::rend(str), Test);
+    str.remove_suffix(std::ranges::distance(std::ranges::rbegin(str), rit));
 
     return str;
 }
@@ -777,7 +778,7 @@ void tr_lib_init()
         {
             tr_net_init_impl::tr_net_init_mgr::create();
 
-            libtransmission::serializer::Converters::ensure_default_converters();
+            tr::serializer::Converters::ensure_default_converters();
         });
 }
 
@@ -809,8 +810,9 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 
 // --- tr_num_parse()
 
-template<typename T, std::enable_if_t<std::is_integral_v<T>, bool>>
+template<typename T>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
+    requires std::is_integral_v<T>
 {
     auto val = T{};
     auto const* const begin_ch = std::data(str);
@@ -839,8 +841,9 @@ template std::optional<unsigned int> tr_num_parse(std::string_view str, std::str
 template std::optional<unsigned short> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 template std::optional<unsigned char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool>>
+template<typename T>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder)
+    requires std::is_floating_point_v<T>
 {
     auto const* const begin_ch = std::data(str);
     auto const* const end_ch = begin_ch + std::size(str);

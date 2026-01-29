@@ -11,7 +11,9 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 
+#include <algorithm>
 #include <array>
+#include <ranges>
 #include <utility>
 
 TorrentFilter::TorrentFilter()
@@ -142,11 +144,8 @@ void TorrentFilter::update(Torrent::ChangeFlags changes)
             { ShowMode::ShowVerifying, Flag::ACTIVITY },
         } };
 
-        auto const iter = std::find_if(
-            std::begin(ShowModeFlags),
-            std::end(ShowModeFlags),
-            [key = show_mode_](auto const& row) { return row.first == key; });
-        refilter_needed = iter != std::end(ShowModeFlags) && changes.test(iter->second);
+        auto const iter = std::ranges::find_if(ShowModeFlags, [key = show_mode_](auto const& row) { return row.first == key; });
+        refilter_needed = iter != std::ranges::end(ShowModeFlags) && changes.test(iter->second);
     }
 
     if (!refilter_needed)

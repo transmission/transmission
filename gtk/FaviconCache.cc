@@ -11,7 +11,7 @@
 #include <glibmm/main.h>
 #include <glibmm/miscutils.h>
 
-using namespace transmission::app;
+using namespace tr::app;
 using Icon = Glib::RefPtr<Gdk::Pixbuf>;
 
 template<>

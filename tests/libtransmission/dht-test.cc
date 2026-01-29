@@ -32,6 +32,8 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_rand_obj
@@ -48,7 +50,6 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 #ifdef _WIN32
@@ -58,14 +59,14 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 namespace
 {
 
 bool waitFor(struct event_base* event_base, std::chrono::milliseconds msec)
 {
-    return libtransmission::test::waitFor(event_base, []() { return false; }, msec);
+    return tr::test::waitFor(event_base, []() { return false; }, msec);
 }
 
 auto constexpr IdLength = size_t{ 20U };
@@ -266,7 +267,7 @@ protected:
     };
 
     // Creates real timers, but with shortened intervals so that tests can run faster
-    class MockTimer final : public libtransmission::Timer
+    class MockTimer final : public tr::Timer
     {
     public:
         explicit MockTimer(std::unique_ptr<Timer> real_timer)
@@ -314,7 +315,7 @@ protected:
     };
 
     // Creates MockTimers
-    class MockTimerMaker final : public libtransmission::TimerMaker
+    class MockTimerMaker final : public tr::TimerMaker
     {
     public:
         explicit MockTimerMaker(struct event_base* evb)
@@ -358,7 +359,7 @@ protected:
             return config_dir_;
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
+        [[nodiscard]] tr::TimerMaker& timer_maker() override
         {
             return mock_timer_maker_;
         }
@@ -673,4 +674,4 @@ TEST_F(DhtTest, callsPeriodicPeriodically)
     EXPECT_NEAR(mock_dht.n_periodic_calls_, baseline + Periods, Periods / 2.0);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

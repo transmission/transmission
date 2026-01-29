@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <iterator>
 #include <optional>
+#include <ranges>
 #include <random>
 #include <string>
 #include <string_view>
@@ -70,11 +71,7 @@ std::string tr_ssha1(std::string_view plaintext)
     static_assert(std::size(Salter) == 64);
     auto constexpr SaltSize = size_t{ 8 };
     auto salt = tr_rand_obj<std::array<char, SaltSize>>();
-    std::transform(
-        std::begin(salt),
-        std::end(salt),
-        std::begin(salt),
-        [&Salter](auto ch) { return Salter[ch % std::size(Salter)]; });
+    std::ranges::for_each(salt, [&Salter](auto& ch) { ch = Salter[ch % std::size(Salter)]; });
 
     return tr_salt(plaintext, std::string_view{ std::data(salt), std::size(salt) });
 }
@@ -212,7 +209,7 @@ std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex)
         return {};
     }
 
-    if (!std::all_of(std::begin(hex), std::end(hex), [](unsigned char ch) { return isxdigit(ch); }))
+    if (!std::ranges::all_of(hex, [](unsigned char ch) { return isxdigit(ch); }))
     {
         return {};
     }
@@ -231,7 +228,7 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
         return {};
     }
 
-    if (!std::all_of(std::begin(hex), std::end(hex), [](unsigned char ch) { return isxdigit(ch); }))
+    if (!std::ranges::all_of(hex, [](unsigned char ch) { return isxdigit(ch); }))
     {
         return {};
     }

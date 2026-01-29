@@ -9,6 +9,7 @@
 #include <iterator>
 #include <memory>
 #include <numeric> // std::accumulate()
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -37,7 +38,7 @@
 #include "libtransmission/webseed.h"
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace
 {
@@ -73,7 +74,7 @@ private:
     // the current position in the task; i.e., the next block to save
     tr_block_info::Location loc_;
 
-    libtransmission::StackBuffer<tr_block_info::BlockSize, std::byte, std::ratio<5, 1>> content_;
+    tr::StackBuffer<tr_block_info::BlockSize, std::byte, std::ratio<5, 1>> content_;
 };
 
 /**
@@ -241,7 +242,7 @@ public:
         idle_timer_->stop();
 
         // flag all the pending tasks as dead
-        std::for_each(std::begin(tasks), std::end(tasks), [](auto* task) { task->dead = true; });
+        std::ranges::for_each(tasks, [](auto* task) { task->dead = true; });
         tasks.clear();
     }
 
@@ -351,7 +352,7 @@ public:
 private:
     static auto constexpr IdleTimerInterval = 2s;
 
-    std::unique_ptr<libtransmission::Timer> const idle_timer_;
+    std::unique_ptr<tr::Timer> const idle_timer_;
 
     tr_bitfield have_;
 

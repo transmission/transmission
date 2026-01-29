@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/values.h"
 
 using tr_file_index_t = size_t;
 using tr_piece_index_t = uint32_t;
@@ -807,18 +808,24 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 /** @addtogroup tr_torrent Torrents
     @{ */
 
-using tr_fileFunc = bool (*)(char const* filename, void* user_data, tr_error* error);
+using tr_torrent_remove_func = std::function<bool(std::string_view filename, tr_error* error)>;
+using tr_torrent_remove_done_func = std::function<void(tr_torrent_id_t, bool success)>;
 
-using tr_torrent_remove_done_func = void (*)(tr_torrent_id_t id, bool succeeded, void* user_data);
-
-/** @brief Removes our torrent and .resume files for this torrent */
+/**
+ * @brief Removes our torrent and .resume files for this torrent
+ * @param remove_func A function that deletes a file.
+ *                    The default is `tr_sys_path_remove()`
+ *                    Clients can use this arg to pass in platform-specific code e.g.
+ *                    to move to a recycle bin instead of deleting.
+ *                    The callback is invoked in the session thread and the filename view
+ *                    is only valid for the duration of the call.
+ * @param on_remove_done A callback to invoke in the session thread when removal is done.
+ */
 void tr_torrentRemove(
-    tr_torrent* torrent,
+    tr_torrent* tor,
     bool delete_flag,
-    tr_fileFunc delete_func,
-    void* delete_user_data,
-    tr_torrent_remove_done_func callback,
-    void* callback_user_data);
+    tr_torrent_remove_func remove_func = {},
+    tr_torrent_remove_done_func on_remove_done = {});
 
 /** @brief Start a torrent */
 void tr_torrentStart(tr_torrent* torrent);
@@ -1133,60 +1140,58 @@ bool tr_torrentCanManualUpdate(tr_torrent const* torrent);
 
 // --- tr_peer_stat
 
-// NOLINTBEGIN(modernize-avoid-c-arrays)
 struct tr_peer_stat
 {
-    bool isUTP;
+    std::string addr;
+    std::string flag_str;
 
-    bool isEncrypted;
-    bool isDownloadingFrom;
-    bool isUploadingTo;
-    bool isSeed;
+    // The user agent, e.g. `BitTorrent 7.9.1`.
+    // Will be an empty string if the agent cannot be determined.
+    std::string user_agent;
 
-    bool peerIsChoked;
-    bool peerIsInterested;
-    bool clientIsChoked;
-    bool clientIsInterested;
-    bool isIncoming;
+    tr::Values::Speed rate_to_peer;
+    tr::Values::Speed rate_to_client;
 
-    uint8_t from;
-    uint16_t port;
+    // how many requests the peer has made that we haven't responded to yet
+    size_t active_reqs_to_client = {};
 
-    char addr[TrInet6AddrStrlen];
-    char flagStr[32];
-    char const* client;
+    // how many requests we've made and are currently awaiting a response for
+    size_t active_reqs_to_peer = {};
 
-    tr_peer_id_t peer_id;
+    size_t bytes_to_peer = {};
+    size_t bytes_to_client = {};
 
-    float progress;
-    double rateToPeer_KBps;
-    double rateToClient_KBps;
+    tr_peer_id_t peer_id = {};
+
+    float progress = {};
 
     // THESE NEXT FOUR FIELDS ARE EXPERIMENTAL.
     // Don't rely on them; they'll probably go away
-    /* how many blocks we've sent to this peer in the last 120 seconds */
-    uint32_t blocksToPeer;
-    /* how many blocks this client's sent to us in the last 120 seconds */
-    uint32_t blocksToClient;
-    /* how many requests to this peer that we've cancelled in the last 120 seconds */
-    uint32_t cancelsToPeer;
-    /* how many requests this peer made of us, then cancelled, in the last 120 seconds */
-    uint32_t cancelsToClient;
+    // how many blocks we've sent to this peer in the last 120 seconds
+    uint32_t blocks_to_peer = {};
+    // how many blocks this client's sent to us in the last 120 seconds
+    uint32_t blocks_to_client = {};
+    // how many requests to this peer that we've cancelled in the last 120 seconds
+    uint32_t cancels_to_peer = {};
+    // how many requests this peer made of us, then cancelled, in the last 120 seconds
+    uint32_t cancels_to_client = {};
 
-    /* how many requests the peer has made that we haven't responded to yet */
-    size_t activeReqsToClient;
+    uint16_t port = {};
+    uint8_t from = {};
 
-    /* how many requests we've made and are currently awaiting a response for */
-    size_t activeReqsToPeer;
-
-    size_t bytes_to_peer;
-    size_t bytes_to_client;
+    bool client_is_choked = {};
+    bool client_is_interested = {};
+    bool is_downloading_from = {};
+    bool is_encrypted = {};
+    bool is_incoming = {};
+    bool is_seed = {};
+    bool is_uploading_to = {};
+    bool is_utp = {};
+    bool peer_is_choked = {};
+    bool peer_is_interested = {};
 };
-// NOLINTEND(modernize-avoid-c-arrays)
 
-tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, size_t* peer_count);
-
-void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t peer_count);
+std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* torrent);
 
 // --- tr_tracker_stat
 

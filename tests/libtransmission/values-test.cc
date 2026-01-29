@@ -7,8 +7,8 @@
 
 #include "test-fixtures.h"
 
-using ValuesTest = ::libtransmission::test::TransmissionTest;
-using namespace libtransmission::Values;
+using ValuesTest = ::tr::test::TransmissionTest;
+using namespace tr::Values;
 
 TEST_F(ValuesTest, baseQuantity)
 {

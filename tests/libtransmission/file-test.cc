@@ -25,12 +25,13 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 #if !defined(__OpenBSD__)
@@ -45,7 +46,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class FileTest : public SandboxedTest
@@ -1387,4 +1388,4 @@ TEST_F(FileTest, dirOpen)
     EXPECT_FALSE(err) << err;
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

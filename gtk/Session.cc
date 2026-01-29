@@ -52,12 +52,13 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
 
 using namespace std::literals;
-using namespace transmission::app;
+using namespace tr::app;
 
 class Session::Impl
 {
@@ -360,7 +361,7 @@ bool Session::Impl::watchdir_idle()
 
         adding_from_watch_dir_ = true;
         add_files(unchanging, do_start, do_prompt, true);
-        std::for_each(unchanging.begin(), unchanging.end(), rename_torrent);
+        std::ranges::for_each(unchanging, rename_torrent);
         adding_from_watch_dir_ = false;
     }
 
@@ -386,10 +387,7 @@ void Session::Impl::watchdir_monitor_file(Glib::RefPtr<Gio::File> const& file)
     if (is_torrent)
     {
         /* if we're not already watching this file, start watching it now */
-        bool const found = std::any_of(
-            monitor_files_.begin(),
-            monitor_files_.end(),
-            [file](auto const& f) { return file->equal(f); });
+        bool const found = std::ranges::any_of(monitor_files_, [file](auto const& f) { return file->equal(f); });
 
         if (!found)
         {
@@ -927,31 +925,20 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
     impl_->remove_torrent(id, delete_files);
 }
 
-void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
+void Session::Impl::remove_torrent(tr_torrent_id_t const id, bool const delete_files)
 {
-    static auto const callback = [](tr_torrent_id_t processed_id, bool succeeded, void* user_data)
+    auto const& [torrent, _] = find_torrent_by_id(id);
+    if (!torrent)
     {
-        // "Own" the core since refcount has already been incremented before operation start — only decrement required.
-        auto const core = Glib::make_refptr_for_instance(static_cast<Session*>(user_data));
+        return;
+    }
 
-        Glib::signal_idle().connect_once([processed_id, succeeded, core]()
-                                         { core->impl_->on_torrent_removal_done(processed_id, succeeded); });
+    auto const on_remove_done = [core = get_core_ptr()](tr_torrent_id_t const removed_id, bool const ok)
+    {
+        Glib::signal_idle().connect_once([core, removed_id, ok]() { core->impl_->on_torrent_removal_done(removed_id, ok); });
     };
 
-    if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
-    {
-        // Extend core lifetime, refcount will be decremented in the callback.
-        core_.reference();
-
-        tr_torrentRemove(
-            &torrent->get_underlying(),
-            delete_files,
-            [](char const* filename, void* /*user_data*/, tr_error* error)
-            { return gtr_file_trash_or_remove(filename, error); },
-            nullptr,
-            callback,
-            &core_);
-    }
+    tr_torrentRemove(&torrent->get_underlying(), delete_files, gtr_file_trash_or_remove, std::move(on_remove_done));
 }
 
 void Session::Impl::on_torrent_removal_done(tr_torrent_id_t id, bool succeeded)
@@ -988,8 +975,8 @@ void Session::load(bool force_paused)
 
     auto torrents = std::vector<Glib::RefPtr<Torrent>>();
     torrents.reserve(raw_torrents.size());
-    std::transform(raw_torrents.begin(), raw_torrents.end(), std::back_inserter(torrents), &Torrent::create);
-    std::sort(torrents.begin(), torrents.end(), &Torrent::less_by_id);
+    std::ranges::transform(raw_torrents, std::back_inserter(torrents), &Torrent::create);
+    std::ranges::sort(torrents, &Torrent::less_by_id);
 
     auto const model = impl_->get_raw_model();
     model->splice(0, model->get_n_items(), torrents);

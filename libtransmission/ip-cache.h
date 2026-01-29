@@ -50,7 +50,7 @@ public:
             return {};
         }
 
-        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
+        [[nodiscard]] virtual tr::TimerMaker& timer_maker() = 0;
     };
 
     static std::shared_ptr<tr_ip_cache> create(Mediator& mediator);
@@ -136,7 +136,7 @@ private:
     // Keep the timer at the bottom of the class definition so that it will be destructed first
     // We don't want it to trigger after the IP addresses have been destroyed
     // (The destructor will acquire the IP address locks before proceeding, but still)
-    array_ip_t<std::unique_ptr<libtransmission::Timer>> upkeep_timers_;
+    array_ip_t<std::unique_ptr<tr::Timer>> upkeep_timers_;
 
     // Whether this machine supports this IP protocol
     array_ip_t<bool> has_ip_protocol_ = { true, true };

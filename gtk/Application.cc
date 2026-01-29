@@ -73,6 +73,7 @@
 #include <iterator> // std::back_inserter
 #include <map>
 #include <memory>
+#include <ranges>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -251,7 +252,7 @@ void gtr_window_present(T const& window)
 std::string get_details_dialog_key(std::vector<tr_torrent_id_t> const& id_list)
 {
     auto tmp = id_list;
-    std::sort(tmp.begin(), tmp.end());
+    std::ranges::sort(tmp);
 
     std::ostringstream gstr;
 

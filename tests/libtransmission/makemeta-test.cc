@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/announce-list.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
@@ -23,12 +25,11 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class MakemetaTest : public SandboxedTest
@@ -291,4 +292,4 @@ TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
     EXPECT_NE(private_metainfo.info_hash(), private_source_metainfo.info_hash());
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

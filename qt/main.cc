@@ -105,7 +105,7 @@ bool tryDelegate(QStringList const& filenames)
 
 int tr_main(int argc, char** argv)
 {
-    transmission::app::init();
+    tr::app::init();
     trqt::variant_helpers::register_qt_converters();
 
     // parse the command-line arguments

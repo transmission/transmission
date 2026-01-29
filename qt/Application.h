@@ -121,7 +121,7 @@ private:
     QTranslator qt_translator_;
     QTranslator app_translator_;
 
-    transmission::app::FaviconCache<QPixmap> favicon_cache_;
+    tr::app::FaviconCache<QPixmap> favicon_cache_;
 };
 
 #define trApp dynamic_cast<Application*>(Application::instance())

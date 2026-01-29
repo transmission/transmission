@@ -9,6 +9,8 @@
 #include <string_view>
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/block-info.h>
@@ -20,12 +22,11 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 auto constexpr MaxWaitMsec = 5000;
@@ -136,7 +137,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     }
 
     // cleanup
-    tr_torrentRemove(tor, true, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, true);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -190,7 +191,7 @@ TEST_F(MoveTest, setLocation)
     }
 
     // cleanup
-    tr_torrentRemove(tor, true, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, true);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

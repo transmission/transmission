@@ -11,6 +11,7 @@
 #include <ctime>
 #include <map>
 #include <sstream>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -51,7 +52,7 @@
 struct tr_ctor;
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 // ---
 
@@ -476,7 +477,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position)
 void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t torrent_count)
 {
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
-    std::sort(std::rbegin(torrents), std::rend(torrents), tr_torrent::CompareQueuePosition);
+    std::sort(torrents.rbegin(), torrents.rend(), tr_torrent::CompareQueuePosition);
     for (auto* const tor : torrents)
     {
         tor->set_queue_position(tr_torrent_queue::MinQueuePosition);
@@ -486,7 +487,7 @@ void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t torrent_coun
 void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t torrent_count)
 {
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
-    std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
+    std::ranges::sort(torrents, tr_torrent::CompareQueuePosition);
     for (auto* const tor : torrents)
     {
         if (auto const pos = tor->queue_position(); pos > tr_torrent_queue::MinQueuePosition)
@@ -499,7 +500,7 @@ void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t torrent_count
 void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t torrent_count)
 {
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
-    std::sort(std::rbegin(torrents), std::rend(torrents), tr_torrent::CompareQueuePosition);
+    std::sort(torrents.rbegin(), torrents.rend(), tr_torrent::CompareQueuePosition);
     for (auto* const tor : torrents)
     {
         if (auto const pos = tor->queue_position(); pos < tr_torrent_queue::MaxQueuePosition)
@@ -512,7 +513,7 @@ void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t torrent_cou
 void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents_in, size_t torrent_count)
 {
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
-    std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
+    std::ranges::sort(torrents, tr_torrent::CompareQueuePosition);
     for (auto* const tor : torrents)
     {
         tor->set_queue_position(tr_torrent_queue::MaxQueuePosition);
@@ -530,11 +531,6 @@ bool torrentShouldQueue(tr_torrent const* const tor)
     tr_direction const dir = tor->queue_direction();
 
     return tor->session->count_queue_free_slots(dir) == 0;
-}
-
-bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error* error)
-{
-    return tr_sys_path_remove(filename, error);
 }
 
 void freeTorrent(tr_torrent* tor)
@@ -683,13 +679,12 @@ void tr_torrent::stop_now()
     set_is_queued(false);
 }
 
+// By-value: arguments are moved into the session-thread work item.
 void tr_torrentRemoveInSessionThread(
     tr_torrent* tor,
     bool delete_flag,
-    tr_fileFunc delete_func,
-    void* delete_user_data,
-    tr_torrent_remove_done_func callback,
-    void* callback_user_data)
+    tr_torrent_remove_func remove_func,
+    tr_torrent_remove_done_func on_remove_done) // NOLINT(performance-unnecessary-value-param)
 {
     auto const lock = tor->unique_lock();
 
@@ -700,18 +695,13 @@ void tr_torrentRemoveInSessionThread(
         tor->session->close_torrent_files(tor->id());
         tor->session->verify_remove(tor);
 
-        if (delete_func == nullptr)
+        if (!remove_func)
         {
-            delete_func = start_stop_helpers::removeTorrentFile;
+            remove_func = tr_sys_path_remove;
         }
 
-        auto const delete_func_wrapper = [&delete_func, delete_user_data](char const* filename)
-        {
-            delete_func(filename, delete_user_data, nullptr);
-        };
-
         tr_error error;
-        tor->files().remove(tor->current_dir(), tor->name(), delete_func_wrapper, &error);
+        tor->files().remove(tor->current_dir(), tor->name(), remove_func, &error);
         if (error)
         {
             ok = false;
@@ -726,9 +716,9 @@ void tr_torrentRemoveInSessionThread(
         }
     }
 
-    if (callback != nullptr)
+    if (on_remove_done)
     {
-        callback(tor->id(), ok, callback_user_data);
+        on_remove_done(tor->id(), ok);
     }
 
     if (ok)
@@ -754,13 +744,9 @@ void tr_torrentStop(tr_torrent* tor)
 void tr_torrentRemove(
     tr_torrent* tor,
     bool delete_flag,
-    tr_fileFunc delete_func,
-    void* delete_user_data,
-    tr_torrent_remove_done_func callback,
-    void* callback_user_data)
+    tr_torrent_remove_func remove_func,
+    tr_torrent_remove_done_func on_remove_done)
 {
-    using namespace start_stop_helpers;
-
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->is_deleting_ = true;
@@ -769,10 +755,8 @@ void tr_torrentRemove(
         tr_torrentRemoveInSessionThread,
         tor,
         delete_flag,
-        delete_func,
-        delete_user_data,
-        callback,
-        callback_user_data);
+        std::move(remove_func),
+        std::move(on_remove_done));
 }
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor)
@@ -975,10 +959,7 @@ void tr_torrent::init(tr_ctor const& ctor)
     {
         // if tr_resume::load() loaded progress info, then initCheckedPieces()
         // has already looked for local data on the filesystem
-        has_any_local_data = std::any_of(
-            std::begin(file_mtimes_),
-            std::end(file_mtimes_),
-            [](auto mtime) { return mtime > 0; });
+        has_any_local_data = std::ranges::any_of(file_mtimes_, [](auto mtime) { return mtime > 0; });
     }
 
     auto const file_path = store_file();
@@ -1510,16 +1491,11 @@ std::string tr_torrentFilename(tr_torrent const* tor)
 
 // ---
 
-tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, size_t* peer_count)
+std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tr_peerMgrPeerStats(tor, peer_count);
-}
-
-void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t /*peer_count*/)
-{
-    delete[] peer_stats;
+    return tr_peerMgrPeerStats(tor);
 }
 
 void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
@@ -1887,7 +1863,7 @@ void tr_torrent::set_labels(labels_t const& new_labels)
 
     for (auto label : new_labels)
     {
-        if (std::find(std::begin(labels_), std::end(labels_), label) == std::end(labels_))
+        if (std::ranges::find(labels_, label) == std::ranges::end(labels_))
         {
             labels_.push_back(label);
         }
@@ -1981,7 +1957,7 @@ tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) cons
 
 void tr_torrent::set_file_priorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
 {
-    if (std::any_of(
+    if (std::ranges::any_of(
             files,
             files + file_count,
             [this, priority](tr_file_index_t file) { return priority != file_priorities_.file_priority(file); }))
@@ -2056,10 +2032,7 @@ void tr_torrent::on_announce_list_changed()
     if (auto const& error_url = error_.announce_url(); !std::empty(error_url))
     {
         auto const& ann = metainfo().announce_list();
-        if (std::none_of(
-                std::begin(ann),
-                std::end(ann),
-                [error_url](auto const& tracker) { return tracker.announce == error_url; }))
+        if (std::ranges::none_of(ann, [error_url](auto const& tracker) { return tracker.announce == error_url; }))
         {
             error_.clear();
         }
@@ -2168,9 +2141,8 @@ std::string_view tr_torrent::primary_mime_type() const
         return Fallback;
     }
 
-    auto const it = std::max_element(
-        std::begin(size_per_mime_type),
-        std::end(size_per_mime_type),
+    auto const it = std::ranges::max_element(
+        size_per_mime_type,
         [](auto const& a, auto const& b) { return a.second < b.second; });
     return it->first;
 }

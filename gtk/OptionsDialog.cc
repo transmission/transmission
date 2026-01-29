@@ -92,7 +92,7 @@ void OptionsDialog::Impl::removeOldTorrent()
     if (tor_ != nullptr)
     {
         file_list_->clear();
-        tr_torrentRemove(tor_, false, nullptr, nullptr, nullptr, nullptr);
+        tr_torrentRemove(tor_, false);
         tor_ = nullptr;
     }
 }

@@ -6,6 +6,7 @@
 #include <algorithm> // std::adjacent_find, std::sort
 #include <cstddef>
 #include <functional>
+#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -115,7 +116,7 @@ public:
 private:
     constexpr void dec_replication() noexcept
     {
-        std::for_each(std::begin(candidates_), std::end(candidates_), [](Candidate& candidate) { --candidate.replication; });
+        std::ranges::for_each(candidates_, [](Candidate& candidate) { --candidate.replication; });
     }
 
     constexpr void dec_replication_bitfield(tr_bitfield const& bitfield)
@@ -144,7 +145,7 @@ private:
 
     constexpr void inc_replication() noexcept
     {
-        std::for_each(std::begin(candidates_), std::end(candidates_), [](Candidate& candidate) { ++candidate.replication; });
+        std::ranges::for_each(candidates_, [](Candidate& candidate) { ++candidate.replication; });
     }
 
     void inc_replication_bitfield(tr_bitfield const& bitfield)
@@ -308,18 +309,12 @@ private:
 
     [[nodiscard]] constexpr CandidateVec::iterator find_by_piece(tr_piece_index_t const piece)
     {
-        return std::find_if(
-            std::begin(candidates_),
-            std::end(candidates_),
-            [piece](auto const& c) { return c.piece == piece; });
+        return std::ranges::find_if(candidates_, [piece](auto const& c) { return c.piece == piece; });
     }
 
     [[nodiscard]] constexpr CandidateVec::iterator find_by_block(tr_block_index_t const block)
     {
-        return std::find_if(
-            std::begin(candidates_),
-            std::end(candidates_),
-            [block](auto const& c) { return c.block_belongs(block); });
+        return std::ranges::find_if(candidates_, [block](auto const& c) { return c.block_belongs(block); });
     }
 
     static constexpr tr_piece_index_t get_salt(
@@ -528,7 +523,7 @@ private:
 
     CandidateVec candidates_;
 
-    std::array<libtransmission::ObserverTag, 15U> const tags_;
+    std::array<tr::ObserverTag, 15U> const tags_;
 
     Mediator& mediator_;
 };

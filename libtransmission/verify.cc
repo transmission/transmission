@@ -10,6 +10,7 @@
 #include <cstdint> // uint64_t, uint32_t
 #include <memory>
 #include <mutex>
+#include <ranges>
 #include <thread>
 #include <utility> // for std::move()
 #include <vector>
@@ -180,11 +181,8 @@ void tr_verify_worker::remove(tr_sha1_digest_t const& info_hash)
         stop_current_ = true;
         stop_current_cv_.wait(lock, [this]() { return !stop_current_; });
     }
-    else if (auto const iter = std::find_if(
-                 std::begin(todo_),
-                 std::end(todo_),
-                 [&info_hash](auto const& node) { return node.matches(info_hash); });
-             iter != std::end(todo_))
+    else if (auto const iter = std::ranges::find_if(todo_, [&info_hash](auto const& node) { return node.matches(info_hash); });
+             iter != std::ranges::end(todo_))
     {
         iter->mediator_->on_verify_done(true /*aborted*/);
         todo_.erase(iter);

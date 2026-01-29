@@ -18,10 +18,10 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
-class EvDnsTest : public ::libtransmission::test::TransmissionTest
+class EvDnsTest : public ::tr::test::TransmissionTest
 {
 protected:
     void SetUp() override
@@ -171,4 +171,4 @@ TEST_F(EvDnsTest, doesCacheEntries)
     EXPECT_GT(res->second, 0);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

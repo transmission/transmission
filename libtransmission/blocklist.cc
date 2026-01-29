@@ -11,6 +11,7 @@
 #include <initializer_list>
 #include <ios>
 #include <optional>
+#include <ranges>
 #include <string> // std::getline()
 #include <string_view>
 #include <utility> // for std::move, std::pair
@@ -40,7 +41,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
+namespace tr
 {
 namespace
 {
@@ -286,7 +287,7 @@ auto parseFile(std::string_view filename)
     }
 
     // sort ranges by start address
-    std::sort(std::begin(ranges), std::end(ranges), [](auto const& a, auto const& b) { return a.first < b.first; });
+    std::ranges::sort(ranges, [](auto const& a, auto const& b) { return a.first < b.first; });
 
     // merge overlapping ranges
     auto keep = size_t{ 0U };
@@ -577,11 +578,10 @@ size_t Blocklists::update_primary_blocklist(std::string_view const external_file
     auto const n_rules = std::size(*added);
 
     // Add (or replace) it in our blocklists_ vector
-    if (auto iter = std::find_if(
-            std::begin(blocklists_),
-            std::end(blocklists_),
+    if (auto iter = std::ranges::find_if(
+            blocklists_,
             [&bin_file](auto const& candidate) { return bin_file == candidate.binFile(); });
-        iter != std::end(blocklists_))
+        iter != std::ranges::end(blocklists_))
     {
         *iter = std::move(*added);
     }
@@ -595,4 +595,4 @@ size_t Blocklists::update_primary_blocklist(std::string_view const external_file
     return n_rules;
 }
 
-} // namespace libtransmission
+} // namespace tr

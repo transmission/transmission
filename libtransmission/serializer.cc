@@ -34,7 +34,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission::serializer
+namespace tr::serializer
 {
 namespace
 {
@@ -490,4 +490,4 @@ void Converters::ensure_default_converters()
         });
 }
 
-} // namespace libtransmission::serializer
+} // namespace tr::serializer

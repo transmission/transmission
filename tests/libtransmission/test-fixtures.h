@@ -18,6 +18,8 @@
 
 #include <event2/event.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/crypto-utils.h> // tr_base64_decode()
 #include <libtransmission/error.h>
 #include <libtransmission/file.h> // tr_sys_file_*()
@@ -27,8 +29,6 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
-
 using namespace std::literals;
 
 inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
@@ -37,7 +37,7 @@ inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
     return os;
 }
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using file_func_t = std::function<void(char const* filename)>;
@@ -515,4 +515,4 @@ private:
     std::vector<tr_torrent*> verified_;
 };
 
-} // namespace libtransmission::test
+} // namespace tr::test

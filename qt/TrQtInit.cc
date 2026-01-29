@@ -14,7 +14,7 @@ namespace trqt
 
 void trqt_init()
 {
-    transmission::app::init();
+    tr::app::init();
     trqt::variant_helpers::register_qt_converters();
 }
 

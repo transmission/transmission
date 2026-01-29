@@ -62,7 +62,7 @@
 
 using namespace std::literals;
 
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 /***
 ****
@@ -116,7 +116,7 @@ Glib::ustring tr_strlratio(double ratio)
     return tr_strratio(ratio, Q_("None"), gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
-Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage)
+Glib::ustring tr_strlsize(tr::Values::Storage const& storage)
 {
     return storage.is_zero() ? Q_("None") : storage.to_string();
 }

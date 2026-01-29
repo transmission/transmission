@@ -5,14 +5,15 @@
 
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/api-compat.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-using ApiCompatTest = ::libtransmission::test::TransmissionTest;
+using ApiCompatTest = ::tr::test::TransmissionTest;
 
 namespace
 {
@@ -1204,7 +1205,7 @@ constexpr std::string_view ResumeBenc =
 
 TEST_F(ApiCompatTest, canConvertRpc)
 {
-    using Style = libtransmission::api_compat::Style;
+    using Style = tr::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
     // clang-format off
@@ -1293,14 +1294,14 @@ TEST_F(ApiCompatTest, canConvertRpc)
         auto serde = tr_variant_serde::json();
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value()) << name << ": " << serde.error_;
-        libtransmission::api_compat::convert(*parsed, tgt_style);
+        tr::api_compat::convert(*parsed, tgt_style);
         EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
     }
 }
 
 TEST_F(ApiCompatTest, canConvertJsonDataFiles)
 {
-    using Style = libtransmission::api_compat::Style;
+    using Style = tr::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
     static auto constexpr TestCases = std::array<TestCase, 20U>{ {
@@ -1334,14 +1335,14 @@ TEST_F(ApiCompatTest, canConvertJsonDataFiles)
 
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value());
-        libtransmission::api_compat::convert(*parsed, tgt_style);
+        tr::api_compat::convert(*parsed, tgt_style);
         EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
     }
 }
 
 TEST_F(ApiCompatTest, canConvertBencDataFiles)
 {
-    using Style = libtransmission::api_compat::Style;
+    using Style = tr::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
     static auto constexpr TestCases = std::array<TestCase, 4U>{ {
@@ -1358,7 +1359,7 @@ TEST_F(ApiCompatTest, canConvertBencDataFiles)
 
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value()) << name;
-        libtransmission::api_compat::convert(*parsed, tgt_style);
+        tr::api_compat::convert(*parsed, tgt_style);
         EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
     }
 }

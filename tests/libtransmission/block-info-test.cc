@@ -11,7 +11,7 @@
 
 #include "test-fixtures.h"
 
-using BlockInfoTest = ::libtransmission::test::TransmissionTest;
+using BlockInfoTest = ::tr::test::TransmissionTest;
 
 TEST_F(BlockInfoTest, fieldsAreSet)
 {

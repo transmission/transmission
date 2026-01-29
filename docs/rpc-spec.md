@@ -66,7 +66,7 @@ JSON-RPC 2.0 allows for additional information about an error be included in the
 
 In Transmission, this key is an Object that includes:
 
-1. An optional `errorString` string that provides additional information that is not included in the `message` key of the Error object.
+1. An optional `error_string` string that provides additional information that is not included in the `message` key of the Error object.
 2. An optional `result` Object that contains additional keys defined by the method.
 
 ```json
@@ -76,9 +76,9 @@ In Transmission, this key is an Object that includes:
       "code": 7,
       "message": "HTTP error from backend service",
       "data": {
-         "errorString": "Couldn't test port: No Response (0)",
+         "error_string": "Couldn't test port: No Response (0)",
          "result": {
-            "ipProtocol": "ipv6"
+            "ip_protocol": "ipv6"
          }
       }
    },

@@ -12,7 +12,7 @@
 
 #include "test-fixtures.h"
 
-using QuarkTest = ::libtransmission::test::TransmissionTest;
+using QuarkTest = ::tr::test::TransmissionTest;
 
 TEST_F(QuarkTest, allPredefinedKeysCanBeLookedUp)
 {

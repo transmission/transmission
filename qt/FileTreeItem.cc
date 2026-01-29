@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <utility>
+#include <ranges>
 
 #include <small/set.hpp>
 
@@ -38,8 +39,8 @@ FileTreeItem::~FileTreeItem()
 
     // find the parent's reference to this child
     auto& siblings = parent_->children_;
-    auto it = std::find(std::begin(siblings), std::end(siblings), this);
-    if (it == std::end(siblings))
+    auto it = std::ranges::find(siblings, this);
+    if (it == std::ranges::end(siblings))
     {
         return;
     }

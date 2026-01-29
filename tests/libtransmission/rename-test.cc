@@ -11,6 +11,8 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
@@ -21,14 +23,13 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 struct tr_ctor;
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class RenameTest : public SessionTest
@@ -38,7 +39,7 @@ class RenameTest : public SessionTest
 protected:
     void torrentRemoveAndWait(tr_torrent* tor, size_t expected_torrent_count)
     {
-        tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+        tr_torrentRemove(tor, false);
         auto const test = [this, expected_torrent_count]()
         {
             return std::size(session_->torrents()) == expected_torrent_count;
@@ -493,4 +494,4 @@ TEST_F(RenameTest, partialFile)
     torrentRemoveAndWait(tor, 0);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

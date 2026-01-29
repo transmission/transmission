@@ -22,19 +22,19 @@
 
 using namespace std::literals;
 
-class IPCacheTest : public ::libtransmission::test::TransmissionTest
+class IPCacheTest : public ::tr::test::TransmissionTest
 {
 protected:
-    class MockTimerMaker final : public libtransmission::TimerMaker
+    class MockTimerMaker final : public tr::TimerMaker
     {
     public:
-        [[nodiscard]] std::unique_ptr<libtransmission::Timer> create() override
+        [[nodiscard]] std::unique_ptr<tr::Timer> create() override
         {
             return std::make_unique<MockTimer>();
         }
     };
 
-    class MockTimer final : public libtransmission::Timer
+    class MockTimer final : public tr::Timer
     {
         void stop() override
         {
@@ -70,7 +70,7 @@ protected:
     class MockMediator : public tr_ip_cache::Mediator
     {
     public:
-        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
+        [[nodiscard]] tr::TimerMaker& timer_maker() override
         {
             return timer_maker_;
         }

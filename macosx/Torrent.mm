@@ -77,9 +77,9 @@ void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char
     }
 }
 
-bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
+bool trashDataFile(std::string_view const filename, tr_error* error)
 {
-    if (filename == NULL)
+    if (std::empty(filename))
     {
         return false;
     }
@@ -87,9 +87,12 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     @autoreleasepool
     {
         NSError* localError;
-        if (![Torrent trashFile:@(filename) error:&localError])
+        if (![Torrent trashFile:tr_strv_to_utf8_nsstring(filename) error:&localError])
         {
-            error->set(static_cast<int>(localError.code), localError.description.UTF8String);
+            if (error != nullptr)
+            {
+                error->set(static_cast<int>(localError.code), localError.description.UTF8String);
+            }
             return false;
         }
     }
@@ -193,7 +196,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     //allow the file to be indexed by Time Machine
     [self setTimeMachineExclude:NO];
 
-    tr_torrentRemove(self.fHandle, trashFiles, trashDataFile, nullptr, nullptr, nullptr);
+    tr_torrentRemove(self.fHandle, trashFiles, trashDataFile);
 }
 
 - (void)changeDownloadFolderBeforeUsing:(NSString*)folder determinationType:(TorrentDeterminationType)determinationType
@@ -1003,40 +1006,37 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (NSArray<NSDictionary*>*)peers
 {
-    size_t totalPeers;
-    tr_peer_stat* peers = tr_torrentPeers(self.fHandle, &totalPeers);
+    auto const peers = tr_torrentPeers(self.fHandle);
+    size_t const totalPeers = peers.size();
 
     NSMutableArray* peerDicts = [NSMutableArray arrayWithCapacity:totalPeers];
 
-    for (size_t i = 0; i < totalPeers; i++)
+    for (auto const& peer : peers)
     {
-        tr_peer_stat* peer = &peers[i];
         NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithCapacity:12];
 
         dict[@"Name"] = self.name;
-        dict[@"From"] = @(peer->from);
-        dict[@"IP"] = @(peer->addr);
-        dict[@"Port"] = @(peer->port);
-        dict[@"Progress"] = @(peer->progress);
-        dict[@"Seed"] = @(peer->isSeed);
-        dict[@"Encryption"] = @(peer->isEncrypted);
-        dict[@"uTP"] = @(peer->isUTP);
-        dict[@"Client"] = @(peer->client);
-        dict[@"Flags"] = @(peer->flagStr);
+        dict[@"From"] = @(peer.from);
+        dict[@"IP"] = tr_strv_to_utf8_nsstring(peer.addr);
+        dict[@"Port"] = @(peer.port);
+        dict[@"Progress"] = @(peer.progress);
+        dict[@"Seed"] = @(peer.is_seed);
+        dict[@"Encryption"] = @(peer.is_encrypted);
+        dict[@"uTP"] = @(peer.is_utp);
+        dict[@"Client"] = tr_strv_to_utf8_nsstring(peer.user_agent);
+        dict[@"Flags"] = tr_strv_to_utf8_nsstring(peer.flag_str);
 
-        if (peer->isUploadingTo)
+        if (peer.is_uploading_to)
         {
-            dict[@"UL To Rate"] = @(peer->rateToPeer_KBps);
+            dict[@"UL To Rate"] = @(peer.rate_to_peer.count(tr::Values::Speed::Units::KByps));
         }
-        if (peer->isDownloadingFrom)
+        if (peer.is_downloading_from)
         {
-            dict[@"DL From Rate"] = @(peer->rateToClient_KBps);
+            dict[@"DL From Rate"] = @(peer.rate_to_client.count(tr::Values::Speed::Units::KByps));
         }
 
         [peerDicts addObject:dict];
     }
-
-    tr_torrentPeersFree(peers, totalPeers);
 
     return peerDicts;
 }

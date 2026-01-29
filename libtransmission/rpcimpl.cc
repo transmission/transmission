@@ -8,10 +8,12 @@
 #include <cerrno>
 #include <cstdint>
 #include <ctime>
+#include <filesystem>
 #include <functional>
 #include <iterator>
 #include <memory>
 #include <numeric>
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -49,7 +51,7 @@
 #include "libtransmission/web.h"
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace JsonRpc
 {
@@ -219,7 +221,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
             data->is_jsonrpc) };
         if (!data->is_jsonrpc)
         {
-            libtransmission::api_compat::convert(response, libtransmission::api_compat::Style::Tr4);
+            tr::api_compat::convert(response, tr::api_compat::Style::Tr4);
         }
         data->callback(std::move(response));
     }
@@ -254,7 +256,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
             {
                 auto const cutoff = tr_time() - RecentlyActiveSeconds;
                 auto const recent = torrents.get_matching([cutoff](auto* walk) { return walk->has_changed_since(cutoff); });
-                std::copy(std::begin(recent), std::end(recent), std::back_inserter(torrents_vec));
+                std::ranges::copy(recent, std::back_inserter(torrents_vec));
             }
             else
             {
@@ -274,7 +276,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
 
         if (auto const* ids_vec = ids_var.get_if<tr_variant::Vector>(); ids_vec != nullptr)
         {
-            std::for_each(std::begin(*ids_vec), std::end(*ids_vec), add_torrent_from_var);
+            std::ranges::for_each(*ids_vec, add_torrent_from_var);
         }
         else
         {
@@ -349,7 +351,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     tr_variant::Map& /*args_out*/)
 {
     auto torrents = getTorrents(session, args_in);
-    std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
+    std::ranges::sort(torrents, tr_torrent::CompareQueuePosition);
     for (auto* tor : torrents)
     {
         if (!tor->is_running())
@@ -368,7 +370,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     tr_variant::Map& /*args_out*/)
 {
     auto torrents = getTorrents(session, args_in);
-    std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
+    std::ranges::sort(torrents, tr_torrent::CompareQueuePosition);
     for (auto* tor : torrents)
     {
         if (!tor->is_running())
@@ -410,7 +412,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     {
         if (auto const status = session->rpcNotify(type, tor); (status & TR_RPC_NOREMOVE) == 0)
         {
-            tr_torrentRemove(tor, delete_flag, nullptr, nullptr, nullptr, nullptr);
+            tr_torrentRemove(tor, delete_flag);
         }
     }
 
@@ -612,36 +614,33 @@ namespace make_torrent_field_helpers
 
 [[nodiscard]] auto make_peer_vec(tr_torrent const& tor)
 {
-    auto n_peers = size_t{};
-    auto* const peers = tr_torrentPeers(&tor, &n_peers);
+    auto const peers = tr_torrentPeers(&tor);
     auto peers_vec = tr_variant::Vector{};
-    peers_vec.reserve(n_peers);
-    for (size_t idx = 0U; idx != n_peers; ++idx)
+    peers_vec.reserve(std::size(peers));
+    for (auto const& peer : peers)
     {
-        auto const& peer = peers[idx];
         auto peer_map = tr_variant::Map{ 19U };
         peer_map.try_emplace(TR_KEY_address, peer.addr);
-        peer_map.try_emplace(TR_KEY_client_is_choked, peer.clientIsChoked);
-        peer_map.try_emplace(TR_KEY_client_is_interested, peer.clientIsInterested);
-        peer_map.try_emplace(TR_KEY_client_name, peer.client);
+        peer_map.try_emplace(TR_KEY_client_is_choked, peer.client_is_choked);
+        peer_map.try_emplace(TR_KEY_client_is_interested, peer.client_is_interested);
+        peer_map.try_emplace(TR_KEY_client_name, peer.user_agent);
         peer_map.try_emplace(TR_KEY_peer_id, tr_base64_encode(std::string_view{ peer.peer_id.data(), peer.peer_id.size() }));
-        peer_map.try_emplace(TR_KEY_flag_str, peer.flagStr);
-        peer_map.try_emplace(TR_KEY_is_downloading_from, peer.isDownloadingFrom);
-        peer_map.try_emplace(TR_KEY_is_encrypted, peer.isEncrypted);
-        peer_map.try_emplace(TR_KEY_is_incoming, peer.isIncoming);
-        peer_map.try_emplace(TR_KEY_is_utp, peer.isUTP);
-        peer_map.try_emplace(TR_KEY_is_uploading_to, peer.isUploadingTo);
-        peer_map.try_emplace(TR_KEY_peer_is_choked, peer.peerIsChoked);
-        peer_map.try_emplace(TR_KEY_peer_is_interested, peer.peerIsInterested);
+        peer_map.try_emplace(TR_KEY_flag_str, peer.flag_str);
+        peer_map.try_emplace(TR_KEY_is_downloading_from, peer.is_downloading_from);
+        peer_map.try_emplace(TR_KEY_is_encrypted, peer.is_encrypted);
+        peer_map.try_emplace(TR_KEY_is_incoming, peer.is_incoming);
+        peer_map.try_emplace(TR_KEY_is_utp, peer.is_utp);
+        peer_map.try_emplace(TR_KEY_is_uploading_to, peer.is_uploading_to);
+        peer_map.try_emplace(TR_KEY_peer_is_choked, peer.peer_is_choked);
+        peer_map.try_emplace(TR_KEY_peer_is_interested, peer.peer_is_interested);
         peer_map.try_emplace(TR_KEY_port, peer.port);
         peer_map.try_emplace(TR_KEY_progress, peer.progress);
-        peer_map.try_emplace(TR_KEY_rate_to_client, Speed{ peer.rateToClient_KBps, Speed::Units::KByps }.base_quantity());
-        peer_map.try_emplace(TR_KEY_rate_to_peer, Speed{ peer.rateToPeer_KBps, Speed::Units::KByps }.base_quantity());
+        peer_map.try_emplace(TR_KEY_rate_to_client, peer.rate_to_client.base_quantity());
+        peer_map.try_emplace(TR_KEY_rate_to_peer, peer.rate_to_peer.base_quantity());
         peer_map.try_emplace(TR_KEY_bytes_to_peer, peer.bytes_to_peer);
         peer_map.try_emplace(TR_KEY_bytes_to_client, peer.bytes_to_client);
         peers_vec.emplace_back(std::move(peer_map));
     }
-    tr_torrentPeersFree(peers, n_peers);
     return tr_variant{ std::move(peers_vec) };
 }
 
@@ -1034,11 +1033,7 @@ namespace make_torrent_field_helpers
         /* first entry is an array of property names */
         auto names = tr_variant::Vector{};
         names.reserve(std::size(keys));
-        std::transform(
-            std::begin(keys),
-            std::end(keys),
-            std::back_inserter(names),
-            [](tr_quark key) { return tr_quark_get_string_view(key); });
+        std::ranges::transform(keys, std::back_inserter(names), [](tr_quark key) { return tr_quark_get_string_view(key); });
         torrents_vec.emplace_back(std::move(names));
     }
 
@@ -1716,7 +1711,7 @@ bool isCurlURL(std::string_view url)
 {
     auto constexpr Schemes = std::array<std::string_view, 4>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv };
     auto const parsed = tr_urlParse(url);
-    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
+    return parsed && std::ranges::find(Schemes, parsed->scheme) != std::ranges::end(Schemes);
 }
 
 [[nodiscard]] auto file_list_from_list(tr_variant::Vector const& idx_vec)
@@ -2010,7 +2005,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 
 [[nodiscard]] auto values_get_units()
 {
-    using namespace libtransmission::Values;
+    using namespace tr::Values;
 
     auto const make_units_vec = [](auto const& units)
     {
@@ -2235,7 +2230,11 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
     map.try_emplace(
         TR_KEY_download_dir_free_space,
         [](tr_session const& src) -> tr_variant
-        { return tr_sys_path_get_capacity(src.downloadDir()).value_or(tr_sys_path_capacity{}).free; },
+        {
+            auto ec = std::error_code{};
+            auto const space = std::filesystem::space(src.downloadDir(), ec);
+            return !ec ? space.available : tr_variant{ -1 };
+        },
         nullptr);
 
     map.try_emplace(
@@ -2737,19 +2736,17 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
     }
 
     // get the free space
-    auto const old_errno = errno;
-    auto error = tr_error{};
-    auto const capacity = tr_sys_path_get_capacity(*path, &error);
-    errno = old_errno;
+    auto ec = std::error_code{};
+    auto const capacity = std::filesystem::space(*path, ec);
 
     // response
     args_out.try_emplace(TR_KEY_path, *path);
-    args_out.try_emplace(TR_KEY_size_bytes, capacity ? capacity->free : -1);
-    args_out.try_emplace(TR_KEY_total_size, capacity ? capacity->total : -1);
+    args_out.try_emplace(TR_KEY_size_bytes, !ec ? capacity.available : tr_variant{ -1 });
+    args_out.try_emplace(TR_KEY_total_size, !ec ? capacity.capacity : tr_variant{ -1 });
 
-    if (error)
+    if (ec)
     {
-        return { Error::SYSTEM_ERROR, tr_strerror(error.code()) };
+        return { Error::SYSTEM_ERROR, ec.message() };
     }
     return { Error::SUCCESS, {} };
 }
@@ -2836,7 +2833,7 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant& request, tr_rpc_r
     }
     else
     {
-        libtransmission::api_compat::convert_incoming_data(request);
+        tr::api_compat::convert_incoming_data(request);
         map = request.get_if<tr_variant::Map>();
         TR_ASSERT(map != nullptr);
         if (map == nullptr)

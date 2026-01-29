@@ -14,6 +14,7 @@
 #include <list>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -59,8 +60,8 @@ using namespace std::literals;
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
-using InBuf = libtransmission::BufferReader<std::byte>;
-using PayloadBuffer = libtransmission::StackBuffer<4096, std::byte>;
+using InBuf = tr::BufferReader<std::byte>;
+using PayloadBuffer = tr::StackBuffer<4096, std::byte>;
 
 using ipp_t = std::underlying_type_t<tr_address_type>;
 
@@ -438,7 +439,11 @@ struct tau_tracker
             // do we have a DNS request that's ready?
             if (auto& dns = addr_pending_dns_[ipp]; dns && dns->wait_for(0ms) == std::future_status::ready)
             {
-                addr_[ipp] = dns->get();
+                // TODO(C++23): use std::optional::transform() instead
+                if (auto const& addr = dns->get(); addr.has_value())
+                {
+                    addr_[ipp] = addr->to_sockaddr();
+                }
                 dns.reset();
                 addr_expires_at_[ipp] = now + DnsRetryIntervalSecs;
             }
@@ -452,17 +457,17 @@ struct tau_tracker
 
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
+            auto const ipp_enum = static_cast<tr_address_type>(ipp);
+
             // update the addr if our lookup is past its shelf date
             if (auto& dns = addr_pending_dns_[ipp]; !dns && addr_expires_at_[ipp] <= now)
             {
                 addr_[ipp].reset();
                 dns = std::async(
                     std::launch::async,
-                    [this](tr_address_type ip_protocol) { return lookup(ip_protocol); },
-                    static_cast<tr_address_type>(ipp));
+                    [this, ipp_enum] { return mediator_.dns_lookup(ipp_enum, host_lookup, port.host(), log_name()); });
             }
 
-            auto const ipp_enum = static_cast<tr_address_type>(ipp);
             auto& conn_at = connecting_at[ipp];
             logtrace(
                 log_name(),
@@ -519,52 +524,7 @@ private:
 
     [[nodiscard]] constexpr bool has_addr() const noexcept
     {
-        return std::any_of(std::begin(addr_), std::end(addr_), [](auto const& o) { return !!o; });
-    }
-
-    [[nodiscard]] MaybeSockaddr lookup(tr_address_type ip_protocol)
-    {
-        auto szport = std::array<char, 16>{};
-        *fmt::format_to(std::data(szport), "{:d}", port.host()) = '\0';
-
-        auto hints = addrinfo{};
-        hints.ai_family = tr_ip_protocol_to_af(ip_protocol);
-        hints.ai_protocol = IPPROTO_UDP;
-        hints.ai_socktype = SOCK_DGRAM;
-
-        addrinfo* info = nullptr;
-        auto const szhost = tr_urlbuf{ host_lookup };
-        if (int const rc = getaddrinfo(szhost.c_str(), std::data(szport), &hints, &info); rc != 0)
-        {
-            logwarn(
-                log_name(),
-                fmt::format(
-                    fmt::runtime(_("Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})")),
-                    fmt::arg("address", host),
-                    fmt::arg("port", port.host()),
-                    fmt::arg("ip_protocol", tr_ip_protocol_to_sv(ip_protocol)),
-                    fmt::arg("error", gai_strerror(rc)),
-                    fmt::arg("error_code", static_cast<int>(rc))));
-            return {};
-        }
-        auto const info_uniq = std::unique_ptr<addrinfo, decltype(&freeaddrinfo)>{ info, freeaddrinfo };
-
-        // N.B. getaddrinfo() will return IPv4-mapped addresses by default on macOS
-        auto socket_address = tr_socket_address::from_sockaddr(info->ai_addr);
-        if (!socket_address || socket_address->address().is_ipv6_ipv4_mapped())
-        {
-            logdbg(
-                log_name(),
-                fmt::format(
-                    "Couldn't look up '{address}:{port}' in {ip_protocol}: got invalid address",
-                    fmt::arg("address", host),
-                    fmt::arg("port", port.host()),
-                    fmt::arg("ip_protocol", tr_ip_protocol_to_sv(ip_protocol))));
-            return {};
-        }
-
-        logdbg(log_name(), fmt::format("{} DNS lookup succeeded", tr_ip_protocol_to_sv(ip_protocol)));
-        return socket_address->to_sockaddr();
+        return std::ranges::any_of(addr_, [](auto const& o) { return !!o; });
     }
 
     void fail_all(bool did_connect, bool did_timeout, std::string_view errmsg)
@@ -701,7 +661,7 @@ public:
 private:
     Mediator& mediator_;
 
-    std::array<std::optional<std::future<MaybeSockaddr>>, NUM_TR_AF_INET_TYPES> addr_pending_dns_;
+    std::array<std::optional<std::future<std::optional<tr_socket_address>>>, NUM_TR_AF_INET_TYPES> addr_pending_dns_;
 
     std::array<MaybeSockaddr, NUM_TR_AF_INET_TYPES> addr_ = {};
     std::array<time_t, NUM_TR_AF_INET_TYPES> addr_expires_at_ = {};
@@ -794,11 +754,10 @@ public:
             // is it a response to one of this tracker's announces?
             if (auto& reqs = tracker.announces; !std::empty(reqs))
             {
-                if (auto it = std::find_if(
-                        std::begin(reqs),
-                        std::end(reqs),
+                if (auto it = std::ranges::find_if(
+                        reqs,
                         [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-                    it != std::end(reqs))
+                    it != std::ranges::end(reqs))
                 {
                     logtrace(tracker.log_name(), fmt::format("{} is an announce request!", transaction_id));
                     it->on_response(ip_protocol, action_id, buf);
@@ -810,11 +769,10 @@ public:
             // is it a response to one of this tracker's scrapes?
             if (auto& reqs = tracker.scrapes; !std::empty(reqs))
             {
-                if (auto it = std::find_if(
-                        std::begin(reqs),
-                        std::end(reqs),
+                if (auto it = std::ranges::find_if(
+                        reqs,
                         [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-                    it != std::end(reqs))
+                    it != std::ranges::end(reqs))
                 {
                     logtrace(tracker.log_name(), fmt::format("{} is a scrape request!", transaction_id));
                     it->on_response(action_id, buf);
@@ -830,7 +788,7 @@ public:
 
     [[nodiscard]] bool is_idle() const noexcept override
     {
-        return std::all_of(std::begin(trackers_), std::end(trackers_), [](auto const& tracker) { return tracker.is_idle(); });
+        return std::ranges::all_of(trackers_, [](auto const& tracker) { return tracker.is_idle(); });
     }
 
 private:
@@ -902,4 +860,52 @@ private:
 std::unique_ptr<tr_announcer_udp> tr_announcer_udp::create(Mediator& mediator)
 {
     return std::make_unique<tr_announcer_udp_impl>(mediator);
+}
+
+std::optional<tr_socket_address> tr_announcer_udp::Mediator::dns_lookup(
+    tr_address_type const ip_protocol,
+    std::string_view const name,
+    uint16_t const service,
+    std::string_view const log_name) const
+{
+    auto hints = addrinfo{};
+    hints.ai_family = tr_ip_protocol_to_af(ip_protocol);
+    hints.ai_protocol = IPPROTO_UDP;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    addrinfo* info = nullptr;
+    auto const szname = tr_urlbuf{ name };
+    auto szservice = std::array<char, 16>{};
+    *fmt::format_to(std::data(szservice), "{:d}", service) = '\0';
+    if (int const rc = getaddrinfo(szname.c_str(), std::data(szservice), &hints, &info); rc != 0)
+    {
+        logwarn(
+            log_name,
+            fmt::format(
+                fmt::runtime(_("Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})")),
+                fmt::arg("address", name),
+                fmt::arg("port", service),
+                fmt::arg("ip_protocol", tr_ip_protocol_to_sv(ip_protocol)),
+                fmt::arg("error", gai_strerror(rc)),
+                fmt::arg("error_code", static_cast<int>(rc))));
+        return {};
+    }
+    auto const info_uniq = std::unique_ptr<addrinfo, decltype(&freeaddrinfo)>{ info, freeaddrinfo };
+
+    // N.B. getaddrinfo() will return IPv4-mapped addresses by default on macOS
+    auto socket_address = tr_socket_address::from_sockaddr(info->ai_addr);
+    if (!socket_address || socket_address->address().is_ipv6_ipv4_mapped())
+    {
+        logdbg(
+            log_name,
+            fmt::format(
+                "Couldn't look up '{address}:{port}' in {ip_protocol}: got invalid address",
+                fmt::arg("address", name),
+                fmt::arg("port", service),
+                fmt::arg("ip_protocol", tr_ip_protocol_to_sv(ip_protocol))));
+        return {};
+    }
+
+    logdbg(log_name, fmt::format("{} DNS lookup succeeded", tr_ip_protocol_to_sv(ip_protocol)));
+    return socket_address;
 }

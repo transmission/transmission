@@ -10,6 +10,7 @@
 #include <cstring> /* for strcspn() */
 #include <ctime>
 #include <memory>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -253,7 +254,7 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
         }
         else
         {
-            std::copy(std::begin(content), std::end(content), static_cast<char*>(iov.iov_base));
+            std::ranges::copy(content, static_cast<char*>(iov.iov_base));
             iov.iov_len = std::size(content);
         }
 
@@ -417,7 +418,7 @@ bool is_address_allowed(tr_rpc_server const* server, char const* address)
     auto const* const addr = std::empty(native) ? address : native.c_str();
 
     auto const& src = server->whitelist_;
-    return std::any_of(std::begin(src), std::end(src), [&addr](auto const& s) { return tr_wildmat(addr, s.c_str()); });
+    return std::ranges::any_of(src, [&addr](auto const& s) { return tr_wildmat(addr, s.c_str()); });
 }
 
 bool isIPAddressWithOptionalPort(char const* host)
@@ -468,10 +469,7 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request* const req)
 
     auto const& src = server->host_whitelist_;
     auto const hostname_sz = tr_urlbuf{ hostname };
-    return std::any_of(
-        std::begin(src),
-        std::end(src),
-        [&hostname_sz](auto const& str) { return tr_wildmat(hostname_sz, str.c_str()); });
+    return std::ranges::any_of(src, [&hostname_sz](auto const& str) { return tr_wildmat(hostname_sz, str.c_str()); });
 }
 
 bool test_session_id(tr_rpc_server const* server, evhttp_request* const req)

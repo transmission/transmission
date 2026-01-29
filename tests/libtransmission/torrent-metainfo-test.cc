@@ -9,6 +9,8 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
@@ -20,12 +22,11 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using TorrentMetainfoTest = SessionTest;
@@ -133,7 +134,7 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
 
 TEST_F(TorrentMetainfoTest, ctorSaveContents)
 {
-    auto const sandbox = libtransmission::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
     auto const tgt_filename = tr_pathbuf{ sandbox, "save-contents-test.torrent" };
 
@@ -212,4 +213,4 @@ TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
     EXPECT_FALSE(tm.parse_benc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

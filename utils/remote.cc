@@ -42,8 +42,8 @@
 
 using namespace std::literals;
 
-namespace api_compat = libtransmission::api_compat;
-using namespace libtransmission::Values;
+namespace api_compat = tr::api_compat;
+using namespace tr::Values;
 
 #define SPEED_K_STR "kB/s"
 #define MEM_M_STR "MiB"

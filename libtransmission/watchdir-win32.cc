@@ -29,7 +29,7 @@
 #include "libtransmission/utils.h"
 #include "libtransmission/watchdir-base.h"
 
-namespace libtransmission
+namespace tr
 {
 namespace
 {
@@ -83,11 +83,7 @@ BOOL tr_get_overlapped_result_ex(
 class Win32Watchdir final : public impl::BaseWatchdir
 {
 public:
-    Win32Watchdir(
-        std::string_view dirname,
-        Callback callback,
-        libtransmission::TimerMaker& timer_maker,
-        struct event_base* event_base)
+    Win32Watchdir(std::string_view dirname, Callback callback, tr::TimerMaker& timer_maker, struct event_base* event_base)
         : BaseWatchdir{ dirname, std::move(callback), timer_maker }
     {
         init(event_base);
@@ -377,4 +373,4 @@ std::unique_ptr<Watchdir> Watchdir::create(
     return std::make_unique<Win32Watchdir>(dirname, std::move(callback), timer_maker, evbase);
 }
 
-} // namespace libtransmission
+} // namespace tr

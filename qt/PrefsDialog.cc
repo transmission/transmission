@@ -34,7 +34,7 @@
 #include "UserMetaType.h"
 #include "Utils.h"
 
-using namespace libtransmission;
+using namespace tr;
 
 // ---
 

@@ -5,10 +5,10 @@
 
 #pragma once
 
-namespace transmission::app
+namespace tr::app
 {
 
 // should be called once when starting the app
 void init();
 
-} // namespace transmission::app
+} // namespace tr::app
