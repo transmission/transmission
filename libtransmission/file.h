@@ -7,8 +7,10 @@
 
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
+#include <filesystem>
 #include <functional>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -508,3 +510,25 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error* error = nullptr);
 
 /** @} */
 /** @} */
+
+/**
+ * Temporary replacement of deprecated `std::filesystem::u8path()` while we migrate
+ * from char to char8_t strings.
+ *
+ * https://stackoverflow.com/a/57635139/11390656
+ * @{
+ */
+
+template<typename InputIt>
+[[nodiscard]] std::filesystem::path tr_u8path(InputIt begin, InputIt end)
+{
+    auto const view = std::ranges::subrange(begin, end) | std::views::transform([](char const c) -> char8_t { return c; });
+    return { view.begin(), view.end() };
+}
+
+[[nodiscard]] inline std::filesystem::path tr_u8path(std::string_view path)
+{
+    return tr_u8path(path.begin(), path.end());
+}
+
+/// @}
