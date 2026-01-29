@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <cstdint>
 #include <ctime>
+#include <filesystem>
 #include <functional>
 #include <iterator>
 #include <memory>
@@ -2229,7 +2230,11 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
     map.try_emplace(
         TR_KEY_download_dir_free_space,
         [](tr_session const& src) -> tr_variant
-        { return tr_sys_path_get_capacity(src.downloadDir()).value_or(tr_sys_path_capacity{}).free; },
+        {
+            auto ec = std::error_code{};
+            auto const space = std::filesystem::space(src.downloadDir(), ec);
+            return !ec ? space.available : tr_variant{ -1 };
+        },
         nullptr);
 
     map.try_emplace(
@@ -2731,19 +2736,17 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
     }
 
     // get the free space
-    auto const old_errno = errno;
-    auto error = tr_error{};
-    auto const capacity = tr_sys_path_get_capacity(*path, &error);
-    errno = old_errno;
+    auto ec = std::error_code{};
+    auto const capacity = std::filesystem::space(*path, ec);
 
     // response
     args_out.try_emplace(TR_KEY_path, *path);
-    args_out.try_emplace(TR_KEY_size_bytes, capacity ? capacity->free : -1);
-    args_out.try_emplace(TR_KEY_total_size, capacity ? capacity->total : -1);
+    args_out.try_emplace(TR_KEY_size_bytes, !ec ? capacity.available : tr_variant{ -1 });
+    args_out.try_emplace(TR_KEY_total_size, !ec ? capacity.capacity : tr_variant{ -1 });
 
-    if (error)
+    if (ec)
     {
-        return { Error::SYSTEM_ERROR, tr_strerror(error.code()) };
+        return { Error::SYSTEM_ERROR, ec.message() };
     }
     return { Error::SUCCESS, {} };
 }
