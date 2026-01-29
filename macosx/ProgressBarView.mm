@@ -63,6 +63,13 @@ static NSInteger const kMaxPieces = 18 * 18;
 
 - (void)drawRegularBar:(NSRect)barRect forTorrent:(Torrent*)torrent
 {
+    // Show yellow bar when moving data (like checking)
+    if (torrent.movingData)
+    {
+        [ProgressGradients.progressYellowGradient drawInRect:barRect angle:90];
+        return;
+    }
+
     NSRect haveRect, missingRect;
     NSDivideRect(barRect, &haveRect, &missingRect, round(torrent.progress * NSWidth(barRect)), NSMinXEdge);
 

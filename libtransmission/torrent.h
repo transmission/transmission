@@ -37,6 +37,7 @@
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/relocate.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/verify.h"
 
@@ -168,6 +169,42 @@ struct tr_torrent
     private:
         tr_torrent* const tor_;
         std::optional<time_t> time_started_;
+    };
+
+    enum class RelocateState : uint8_t
+    {
+        None,
+        Queued,
+        Active
+    };
+
+    class RelocateMediator : public tr_relocate_worker::Mediator
+    {
+    public:
+        RelocateMediator(tr_torrent* tor, std::string old_path, std::string new_path, int volatile* setme_state);
+
+        ~RelocateMediator() override = default;
+
+        [[nodiscard]] tr_torrent_files const& files() const override;
+        [[nodiscard]] std::string_view old_path() const override;
+        [[nodiscard]] std::string_view new_path() const override;
+        [[nodiscard]] std::string_view name() const override;
+        [[nodiscard]] tr_torrent_id_t torrent_id() const override;
+
+        void on_relocate_queued() override;
+        void on_relocate_started() override;
+        void on_file_relocated(tr_file_index_t file_index, bool success) override;
+        void on_relocate_done(bool aborted, std::optional<std::string> error_message) override;
+
+    private:
+        tr_torrent_id_t const tor_id_;
+        tr_session* const session_;
+        std::string const old_path_;
+        std::string const new_path_;
+        std::string const name_;
+        tr_torrent_files const files_;
+        int volatile* const setme_state_;
+        tr_file_index_t files_relocated_ = 0;
     };
 
     // ---
@@ -805,6 +842,11 @@ struct tr_torrent
         return is_stopping_;
     }
 
+    [[nodiscard]] constexpr bool is_relocating() const noexcept
+    {
+        return relocate_state_ != RelocateState::None;
+    }
+
     constexpr void stop_soon() noexcept
     {
         is_stopping_ = true;
@@ -1255,6 +1297,8 @@ private:
 
     void set_verify_state(VerifyState state);
 
+    void set_relocate_state(RelocateState state);
+
     [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
     {
         if (verify_state_ == VerifyState::Active)
@@ -1417,6 +1461,8 @@ private:
     tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
     VerifyState verify_state_ = VerifyState::None;
+
+    RelocateState relocate_state_ = RelocateState::None;
 
     tr_completeness completeness_ = TR_LEECH;
 

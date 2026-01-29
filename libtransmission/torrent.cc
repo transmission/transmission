@@ -665,6 +665,7 @@ void tr_torrent::stop_now()
     }
 
     session->verify_remove(this);
+    session->relocate_remove(id());
 
     stopped_.emit(this);
     session->announcer_->stopTorrent(this);
@@ -1067,49 +1068,48 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
 {
     TR_ASSERT(session->am_in_session_thread());
 
-    auto ok = true;
-    if (move_from_old_path)
+    tr_logAddTraceTor(this, fmt::format("set_location_in_session_thread: path='{}', move={}", path, move_from_old_path));
+
+    if (!move_from_old_path)
     {
+        // If not moving, just update the location immediately
+        set_download_dir(path);
         if (setme_state != nullptr)
         {
-            *setme_state = TR_LOC_MOVING;
+            *setme_state = TR_LOC_DONE;
         }
-
-        // ensure the files are all closed and idle before moving
-        session->close_torrent_files(id());
-        session->verify_remove(this);
-
-        auto error = tr_error{};
-        ok = files().move(current_dir(), path, name(), &error);
-        if (error)
-        {
-            this->error().set_local_error(
-                fmt::format(
-                    fmt::runtime(_("Couldn't move '{old_path}' to '{path}': {error} ({error_code})")),
-                    fmt::arg("old_path", current_dir()),
-                    fmt::arg("path", path),
-                    fmt::arg("error", error.message()),
-                    fmt::arg("error_code", error.code())));
-            tr_torrentStop(this);
-        }
+        tr_logAddTraceTor(this, "set_location_in_session_thread: no move needed, done");
+        return;
     }
 
-    // tell the torrent where the files are
-    if (ok)
+    // Check if a relocation is already in progress
+    if (relocate_state_ != RelocateState::None)
     {
-        set_download_dir(path);
-
-        if (move_from_old_path)
+        tr_logAddWarnTor(this, "Relocation already in progress, ignoring new request");
+        if (setme_state != nullptr)
         {
-            incomplete_dir_.clear();
-            current_dir_ = download_dir();
+            *setme_state = TR_LOC_ERROR;
         }
+        return;
     }
 
     if (setme_state != nullptr)
     {
-        *setme_state = ok ? TR_LOC_DONE : TR_LOC_ERROR;
+        *setme_state = TR_LOC_MOVING;
     }
+
+    // Pre-move preparation (fast operations, stay on session thread)
+    tr_logAddTraceTor(this, "set_location_in_session_thread: closing files and removing from verify queue");
+    session->close_torrent_files(id());
+    session->verify_remove(this);
+
+    // Queue async move via the relocate worker
+    tr_logAddTraceTor(
+        this,
+        fmt::format("set_location_in_session_thread: queuing async move from '{}' to '{}'", current_dir(), path));
+    auto mediator = std::make_unique<RelocateMediator>(this, std::string{ current_dir() }, std::string{ path }, setme_state);
+    session->relocate_add(std::move(mediator));
+    tr_logAddTraceTor(this, "set_location_in_session_thread: async move queued, session thread returning");
 }
 
 namespace
@@ -1581,6 +1581,14 @@ void tr_torrent::set_verify_state(VerifyState const state)
     mark_changed();
 }
 
+void tr_torrent::set_relocate_state(RelocateState const state)
+{
+    TR_ASSERT(state == RelocateState::None || state == RelocateState::Queued || state == RelocateState::Active);
+
+    relocate_state_ = state;
+    mark_changed();
+}
+
 tr_torrent_metainfo const& tr_torrent::VerifyMediator::metainfo() const
 {
     return tor_->metainfo_;
@@ -1704,6 +1712,142 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
                 }
             });
     }
+}
+
+// --- RelocateMediator
+
+tr_torrent::RelocateMediator::RelocateMediator(
+    tr_torrent* const tor,
+    std::string old_path,
+    std::string new_path,
+    int volatile* const setme_state)
+    : tor_id_{ tor->id() }
+    , session_{ tor->session }
+    , old_path_{ std::move(old_path) }
+    , new_path_{ std::move(new_path) }
+    , name_{ tor->name() }
+    , files_{ tor->files() }
+    , setme_state_{ setme_state }
+{
+}
+
+tr_torrent_files const& tr_torrent::RelocateMediator::files() const
+{
+    return files_;
+}
+
+std::string_view tr_torrent::RelocateMediator::old_path() const
+{
+    return old_path_;
+}
+
+std::string_view tr_torrent::RelocateMediator::new_path() const
+{
+    return new_path_;
+}
+
+std::string_view tr_torrent::RelocateMediator::name() const
+{
+    return name_;
+}
+
+tr_torrent_id_t tr_torrent::RelocateMediator::torrent_id() const
+{
+    return tor_id_;
+}
+
+void tr_torrent::RelocateMediator::on_relocate_queued()
+{
+    tr_logAddTrace(fmt::format("Queued for relocation from '{}' to '{}'", old_path_, new_path_), name_);
+
+    session_->run_in_session_thread(
+        [tor_id = tor_id_, session = session_]()
+        {
+            if (auto* const tor = session->torrents().get(tor_id); tor != nullptr && !tor->is_deleting_)
+            {
+                tor->set_relocate_state(RelocateState::Queued);
+            }
+        });
+}
+
+void tr_torrent::RelocateMediator::on_relocate_started()
+{
+    tr_logAddDebug(fmt::format("Starting relocation from '{}' to '{}'", old_path_, new_path_), name_);
+
+    session_->run_in_session_thread(
+        [tor_id = tor_id_, session = session_]()
+        {
+            if (auto* const tor = session->torrents().get(tor_id); tor != nullptr && !tor->is_deleting_)
+            {
+                tor->set_relocate_state(RelocateState::Active);
+            }
+        });
+}
+
+void tr_torrent::RelocateMediator::on_file_relocated(tr_file_index_t const file_index, bool const success)
+{
+    ++files_relocated_;
+
+    if (!success)
+    {
+        tr_logAddDebug(fmt::format("Failed to relocate file #{}", file_index), name_);
+    }
+}
+
+void tr_torrent::RelocateMediator::on_relocate_done(bool const aborted, std::optional<std::string> error_message)
+{
+    session_->run_in_session_thread(
+        [tor_id = tor_id_,
+         session = session_,
+         aborted,
+         error_message = std::move(error_message),
+         new_path = new_path_,
+         setme_state = setme_state_]()
+        {
+            auto* const tor = session->torrents().get(tor_id);
+            if (tor == nullptr || tor->is_deleting_)
+            {
+                if (setme_state != nullptr)
+                {
+                    *setme_state = TR_LOC_ERROR;
+                }
+                return;
+            }
+
+            tor->set_relocate_state(RelocateState::None);
+
+            if (!aborted && !error_message)
+            {
+                tor->set_download_dir(new_path);
+                tor->incomplete_dir_.clear();
+                tor->current_dir_ = tor->download_dir();
+
+                if (setme_state != nullptr)
+                {
+                    *setme_state = TR_LOC_DONE;
+                }
+
+                tr_logAddInfoTor(tor, fmt::format("Relocated to '{}'", new_path));
+            }
+            else
+            {
+                if (error_message)
+                {
+                    tor->error().set_local_error(
+                        fmt::format(
+                            fmt::runtime(_("Couldn't move to '{path}': {error}")),
+                            fmt::arg("path", new_path),
+                            fmt::arg("error", *error_message)));
+                }
+
+                tr_torrentStop(tor);
+
+                if (setme_state != nullptr)
+                {
+                    *setme_state = TR_LOC_ERROR;
+                }
+            }
+        });
 }
 
 // ---
