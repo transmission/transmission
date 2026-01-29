@@ -236,9 +236,7 @@ target_compile_definitions(${TR_NAME}
 
 tr_target_compile_definitions_for_headers(${TR_NAME}
     PRIVATE
-        sys/statvfs.h
-        xfs/xfs.h
-        xlocale.h)
+        xfs/xfs.h)
 
 tr_target_compile_definitions_for_functions(${TR_NAME}
     PRIVATE
@@ -246,7 +244,6 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
         copy_file_range
         fallocate64
         flock
-        getmntent
         htonll
         mkdtemp
         ntohll
@@ -254,8 +251,7 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
         posix_fallocate
         pread
         pwrite
-        sendfile64
-        statvfs)
+        sendfile64)
 
 target_include_directories(${TR_NAME}
     PUBLIC
