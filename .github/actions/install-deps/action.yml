@@ -49,6 +49,7 @@ runs:
 
           # Transmission-specific libraries with Fedora names
           dnf install -y \
+            fast_float-devel \
             fmt-devel \
             google-crc32c-devel \
             libb64-devel \
@@ -102,7 +103,6 @@ runs:
             libcurl4-openssl-dev
             libdeflate-dev
             libevent-dev
-            libfmt-dev
             libminiupnpc-dev
             libnatpmp-dev
             libpsl-dev
@@ -121,6 +121,7 @@ runs:
 
           if [ ! "$DISTRO" = 'debian' ] || [ ! "$DISTRO_VERSION" = '11' ]; then
             BASE_PACKAGES+=(
+              libfast-float-dev
               libfmt-dev
               libutfcpp-dev
             )
@@ -214,6 +215,7 @@ runs:
         # Transmission-specific libraries
         BASE_PACKAGES+=(
           crc32c
+          fast_float
           fmt
           libb64
           libdeflate
