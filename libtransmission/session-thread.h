@@ -37,21 +37,12 @@ public:
     template<typename Func, typename... Args>
     void queue(Func&& func, Args&&... args)
     {
-        // TODO(tearfur): Use C++20 P0780R2, GCC 9, clang 9
-        queue(
-            callback_t{
-                [func = std::forward<Func>(func), args = std::make_tuple(std::forward<Args>(args)...)]()
-                { std::apply(std::move(func), std::move(args)); },
-            });
+        queue(callback_t{ std::bind_front(std::forward<Func>(func), std::forward<Args>(args)...) });
     }
 
     template<typename Func, typename... Args>
     void run(Func&& func, Args&&... args)
     {
-        // TODO(tearfur): Use C++20 P0780R2, GCC 9, clang 9
-        run(callback_t{
-            [func = std::forward<Func>(func), args = std::make_tuple(std::forward<Args>(args)...)]()
-            { std::apply(std::move(func), std::move(args)); },
-        });
+        run(callback_t{ std::bind_front(std::forward<Func>(func), std::forward<Args>(args)...) });
     }
 };
