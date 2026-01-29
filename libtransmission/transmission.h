@@ -1432,11 +1432,11 @@ struct tr_stat
 
     // Speed of all piece being sent for this torrent.
     // This ONLY counts piece data.
-    libtransmission::Values::Speed piece_upload_speed = {};
+    tr::Values::Speed piece_upload_speed = {};
 
     // Speed of all piece being received for this torrent.
     // This ONLY counts piece data.
-    libtransmission::Values::Speed piece_download_speed = {};
+    tr::Values::Speed piece_download_speed = {};
 
     // When the torrent was first added
     time_t added_date = {};
