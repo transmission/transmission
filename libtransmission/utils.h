@@ -121,38 +121,6 @@ template<typename T>
     return sv.find(key) != std::string_view::npos;
 }
 
-// c++20 (P0457R2), GCC 9.1, clang 6
-[[nodiscard]] constexpr bool tr_strv_starts_with(std::string_view sv, char key)
-{
-    return !std::empty(sv) && sv.front() == key;
-}
-
-// c++20 (P0457R2), GCC 9.1, clang 6
-[[nodiscard]] constexpr bool tr_strv_starts_with(std::string_view sv, std::string_view key)
-{
-    return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
-}
-
-// c++20 (P0457R2), GCC 9.1, clang 6
-[[nodiscard]] constexpr bool tr_strv_starts_with(
-    std::wstring_view sv,
-    std::wstring_view key) // c++20 (P0457R2), GCC 9.1, clang 6
-{
-    return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
-}
-
-// c++20 (P0457R2), GCC 9.1, clang 6
-[[nodiscard]] constexpr bool tr_strv_ends_with(std::string_view sv, std::string_view key)
-{
-    return std::size(key) <= std::size(sv) && sv.substr(std::size(sv) - std::size(key)) == key;
-}
-
-// c++20 (P0457R2), GCC 9.1, clang 6
-[[nodiscard]] constexpr bool tr_strv_ends_with(std::string_view sv, char key)
-{
-    return !std::empty(sv) && sv.back() == key;
-}
-
 template<typename T>
 [[nodiscard]] constexpr int tr_compare_3way(T const& left, T const& right)
 {

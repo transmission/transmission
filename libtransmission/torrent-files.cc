@@ -96,7 +96,7 @@ bool is_junk_file(std::string_view filename)
 
 #ifdef __APPLE__
     // check for resource forks. <http://web.archive.org/web/20101010051608/http://support.apple.com/kb/TA20578>
-    if (tr_strv_starts_with(base, "._"sv))
+    if (base.starts_with("._"sv))
     {
         return true;
     }
@@ -387,7 +387,7 @@ namespace
     };
     return std::ranges::any_of(
         ReservedPrefixes,
-        [in_upper_sv](auto const& prefix) { return tr_strv_starts_with(in_upper_sv, prefix); });
+        [in_upper_sv](auto const& prefix) { return in_upper_sv.starts_with(prefix); });
 }
 
 [[nodiscard]] bool is_reserved_file(std::string_view in, bool os_specific) noexcept
@@ -454,7 +454,7 @@ void append_sanitized_component(std::string_view in, tr_pathbuf& out, bool os_sp
     in = tr_strv_strip(in);
 
     // remove trailing periods
-    while (tr_strv_ends_with(in, '.'))
+    while (in.ends_with('.'))
     {
         in.remove_suffix(1);
     }

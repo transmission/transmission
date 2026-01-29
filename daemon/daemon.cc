@@ -182,8 +182,8 @@ namespace
 auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view basename)
 {
     auto const lowercase = tr_strlower(basename);
-    auto const is_torrent = tr_strv_ends_with(lowercase, ".torrent"sv);
-    auto const is_magnet = tr_strv_ends_with(lowercase, ".magnet"sv);
+    auto const is_torrent = lowercase.ends_with(".torrent"sv);
+    auto const is_magnet = lowercase.ends_with(".magnet"sv);
 
     if (!is_torrent && !is_magnet)
     {

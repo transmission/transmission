@@ -94,7 +94,7 @@ public:
 
     [[nodiscard]] bool from_string(std::string_view src)
     {
-        if (!tr_strv_starts_with(src, TrUnixSocketPrefix))
+        if (!src.starts_with(TrUnixSocketPrefix))
         {
             return false;
         }
@@ -213,7 +213,7 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
 
     for (auto const& [suffix, mime_type] : Types)
     {
-        if (tr_strv_ends_with(path, suffix))
+        if (path.ends_with(suffix))
         {
             return mime_type;
         }
@@ -491,7 +491,7 @@ bool is_authorized(tr_rpc_server const* server, char const* auth_header)
 
     auto constexpr Prefix = "Basic "sv;
     auto auth = std::string_view{ auth_header != nullptr ? auth_header : "" };
-    if (!tr_strv_starts_with(auth, Prefix))
+    if (!auth.starts_with(Prefix))
     {
         return false;
     }
@@ -591,13 +591,14 @@ void handle_request(struct evhttp_request* req, void* arg)
     auto const deprecated_web_path = tr_urlbuf{ base_path, "web" /*no trailing slash*/ };
 
     char const* const uri = evhttp_request_get_uri(req);
+    auto const uri_sv = std::string_view{ uri != nullptr ? uri : "" };
 
-    if (!tr_strv_starts_with(uri, base_path) || uri == deprecated_web_path)
+    if (!uri_sv.starts_with(base_path) || uri_sv == deprecated_web_path)
     {
         evhttp_add_header(output_headers, "Location", web_base_path.c_str());
         send_simple_response(req, HTTP_MOVEPERM, nullptr);
     }
-    else if (tr_strv_starts_with(uri, web_base_path))
+    else if (uri_sv.starts_with(web_base_path))
     {
         handle_web_client(req, server);
     }
@@ -645,7 +646,7 @@ void handle_request(struct evhttp_request* req, void* arg)
         send_simple_response(req, 409, body.c_str());
     }
 #endif
-    else if (tr_strv_starts_with(uri, rpc_base_path))
+    else if (uri_sv.starts_with(rpc_base_path))
     {
         handle_rpc(req, server);
     }
@@ -990,7 +991,7 @@ void tr_rpc_server::load(Settings&& settings)
 {
     settings_ = std::move(settings);
 
-    if (std::string& path = settings_.url; !tr_strv_ends_with(path, '/'))
+    if (std::string& path = settings_.url; !path.ends_with('/'))
     {
         path = fmt::format("{:s}/", path);
     }
