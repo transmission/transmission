@@ -264,9 +264,6 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     std::vector<tr_torrent*> torrent_handles;
     torrent_handles.reserve(torrents.count);
 
-    std::vector<BOOL> was_transmitting;
-    was_transmitting.reserve(torrents.count);
-
     for (Torrent* torrent in torrents)
     {
         if (torrent == nil || torrent.fHandle == nullptr)
@@ -276,7 +273,6 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
         torrent_objects.emplace_back(torrent);
         torrent_handles.emplace_back(torrent.fHandle);
-        was_transmitting.emplace_back(torrent.transmitting);
     }
 
     if (torrent_handles.empty())
@@ -284,23 +280,25 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
         return;
     }
 
-    auto const stats = tr_torrentStat(torrent_handles.data(), torrent_handles.size());
+    auto stats = tr_torrentStat(torrent_handles.data(), torrent_handles.size());
 
-    // Assign stats and post notifications.
+    // Update stats
+    bool transmitting_changed = false;
     for (size_t i = 0, n = torrent_objects.size(); i < n; ++i)
     {
         Torrent* const torrent = torrent_objects[i];
-        torrent.fStat = stats[i];
+        auto const was_transmitting = torrent.transmitting;
+        torrent.fStat = std::move(stats[i]);
+        transmitting_changed |= was_transmitting != torrent.transmitting;
+    }
 
-        //make sure the "active" filter is updated when transmitting changes
-        if (was_transmitting[i] != torrent.transmitting)
-        {
-            //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
-            [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
-                                                     postingStyle:NSPostASAP
-                                                     coalesceMask:NSNotificationCoalescingOnName
-                                                         forModes:nil];
-        }
+    // make sure the "active" filter is updated if any `transmitting` property changed.
+    if (transmitting_changed)
+    {
+        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
+                                                 postingStyle:NSPostASAP
+                                                 coalesceMask:NSNotificationCoalescingOnName
+                                                     forModes:nil];
     }
 }
 
