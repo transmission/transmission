@@ -145,7 +145,7 @@ private:
     void inc_busy();
     void dec_busy();
 
-    bool add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify);
+    bool add(Glib::ustring const& name, bool do_start, bool do_prompt, bool do_notify);
     void add_file_async_callback(
         Glib::RefPtr<Gio::File> const& file,
         Glib::RefPtr<Gio::AsyncResult>& result,
@@ -818,7 +818,8 @@ void Session::Impl::add_file_async_callback(
     dec_busy();
 }
 
-bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
+// Add `name,` which might be a local filename, a magnet link, or a URI.
+bool Session::Impl::add(Glib::ustring const& name, bool const do_start, bool const do_prompt, bool const do_notify)
 {
     auto* const session = get_session();
     if (session == nullptr)
@@ -832,6 +833,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     tr_ctorSetPaused(ctor, TR_FORCE, !do_start);
 
     bool loaded = false;
+    auto file = Gio::File::create_for_parse_name(name);
     if (auto const path = file->get_path(); !std::empty(path))
     {
         // try to treat it as a file...
@@ -841,7 +843,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     if (!loaded)
     {
         // try to treat it as a magnet link...
-        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri());
+        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, name.raw(), nullptr);
     }
 
     // if we could make sense of it, add it
@@ -876,12 +878,11 @@ bool Session::add_from_url(Glib::ustring const& url)
 
 bool Session::Impl::add_from_url(Glib::ustring const& url)
 {
-    auto const file = Gio::File::create_for_uri(url);
     auto const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
     auto const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
     auto const do_notify = false;
 
-    auto const handled = add_file(file, do_start, do_prompt, do_notify);
+    auto const handled = add(url, do_start, do_prompt, do_notify);
     torrents_added();
     return handled;
 }
@@ -895,7 +896,7 @@ void Session::Impl::add_files(std::vector<Glib::RefPtr<Gio::File>> const& files,
 {
     for (auto const& file : files)
     {
-        add_file(file, do_start, do_prompt, do_notify);
+        add(file->get_parse_name(), do_start, do_prompt, do_notify);
     }
 
     torrents_added();
