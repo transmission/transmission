@@ -2232,7 +2232,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         [](tr_session const& src) -> tr_variant
         {
             auto ec = std::error_code{};
-            auto const space = std::filesystem::space(src.downloadDir(), ec);
+            auto const space = std::filesystem::space(tr_u8path(src.downloadDir()), ec);
             return !ec ? space.available : tr_variant{ -1 };
         },
         nullptr);
@@ -2737,7 +2737,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     // get the free space
     auto ec = std::error_code{};
-    auto const capacity = std::filesystem::space(*path, ec);
+    auto const capacity = std::filesystem::space(tr_u8path(*path), ec);
 
     // response
     args_out.try_emplace(TR_KEY_path, *path);
