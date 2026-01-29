@@ -1129,17 +1129,17 @@ void print_details(tr_variant::Map const& result)
         {
             if (auto const sv = t->value_if<std::string_view>(TR_KEY_error_string).value_or(""sv); !std::empty(sv))
             {
-                switch (i)
+                switch (static_cast<tr_stat::Error>(i))
                 {
-                case TR_STAT_TRACKER_WARNING:
+                case tr_stat::Error::TrackerWarning:
                     fmt::print("  Tracker gave a warning: {:s}\n", sv);
                     break;
 
-                case TR_STAT_TRACKER_ERROR:
+                case tr_stat::Error::TrackerError:
                     fmt::print("  Tracker gave an error: {:s}\n", sv);
                     break;
 
-                case TR_STAT_LOCAL_ERROR:
+                case tr_stat::Error::LocalError:
                     fmt::print("  Error: {:s}\n", sv);
                     break;
 

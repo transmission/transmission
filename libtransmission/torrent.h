@@ -1034,8 +1034,8 @@ struct tr_torrent
 private:
     friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
-    friend tr_stat const* tr_torrentStat(tr_torrent* tor);
-    friend std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+    friend tr_stat tr_torrentStat(tr_torrent* tor);
+    friend std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
@@ -1071,12 +1071,22 @@ private:
     public:
         [[nodiscard]] constexpr auto empty() const noexcept
         {
-            return error_type_ == TR_STAT_OK;
+            return error_type_ == tr_stat::Error::Ok;
         }
 
         [[nodiscard]] constexpr auto error_type() const noexcept
         {
             return error_type_;
+        }
+
+        [[nodiscard]] constexpr auto is_local_error() const noexcept
+        {
+            return error_type_ == tr_stat::Error::LocalError;
+        }
+
+        [[nodiscard]] constexpr auto is_tracker() const noexcept
+        {
+            return error_type_ == tr_stat::Error::TrackerError || error_type_ == tr_stat::Error::TrackerWarning;
         }
 
         [[nodiscard]] constexpr auto const& announce_url() const noexcept
@@ -1099,7 +1109,7 @@ private:
     private:
         tr_interned_string announce_url_; // the source for tracker errors/warnings
         std::string errmsg_;
-        tr_stat_errtype error_type_ = TR_STAT_OK;
+        tr_stat::Error error_type_ = tr_stat::Error::Ok;
     };
 
     // Helper class to smooth out speed estimates.
@@ -1337,7 +1347,7 @@ private:
 
     [[nodiscard]] bool is_new_torrent_a_seed();
 
-    tr_stat stats_ = {};
+    //tr_stat stats_ = {};
 
     Error error_;
 
