@@ -226,24 +226,6 @@ bool tr_sys_path_is_same(std::string_view const path1, std::string_view const pa
     return ret;
 }
 
-std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
-{
-    auto const szpath = tr_pathbuf{ path };
-    auto buf = std::array<char, PATH_MAX>{};
-
-    if (auto const* const ret = realpath(szpath, std::data(buf)); ret != nullptr)
-    {
-        return ret;
-    }
-
-    if (error != nullptr)
-    {
-        error->set_from_errno(errno);
-    }
-
-    return {};
-}
-
 std::string_view tr_sys_path_basename(std::string_view path, tr_error* /*error*/)
 {
     // As per the basename() manpage:
