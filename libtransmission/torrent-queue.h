@@ -41,7 +41,7 @@ public:
     void remove(tr_torrent_id_t id);
 
     [[nodiscard]] size_t get_pos(tr_torrent_id_t id);
-    bool set_pos(tr_torrent_id_t id, size_t new_pos);
+    void set_pos(tr_torrent_id_t id, size_t new_pos);
 
     bool to_file() const; // NOLINT(modernize-use-nodiscard)
     [[nodiscard]] std::vector<std::string> from_file();
