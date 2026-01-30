@@ -991,9 +991,14 @@ struct tr_torrent
         return session->torrent_queue().get_pos(id());
     }
 
-    void set_queue_position(size_t new_pos) // NOLINT(readability-make-member-function-const)
+    bool set_queue_position(size_t new_pos) // NOLINT(readability-make-member-function-const)
     {
-        session->torrent_queue().set_pos(id(), new_pos);
+        if (!session->torrent_queue().set_pos(id(), new_pos))
+        {
+            return false;
+        }
+        mark_changed();
+        return true;
     }
 
     static constexpr struct
