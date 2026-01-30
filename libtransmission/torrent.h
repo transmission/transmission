@@ -991,14 +991,15 @@ struct tr_torrent
         return session->torrent_queue().get_pos(id());
     }
 
-    bool set_queue_position(size_t new_pos) // NOLINT(readability-make-member-function-const)
+    void set_queue_position(size_t const new_pos) // NOLINT(readability-make-member-function-const)
     {
-        if (!session->torrent_queue().set_pos(id(), new_pos))
+        for (auto const& changed_id : session->torrent_queue().set_pos(id(), new_pos))
         {
-            return false;
+            if (auto* const tor = session->torrents().get(changed_id))
+            {
+                tor->mark_changed();
+            }
         }
-        mark_changed();
-        return true;
     }
 
     static constexpr struct
