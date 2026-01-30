@@ -488,48 +488,6 @@ bool tr_sys_path_is_same(std::string_view const path1, std::string_view const pa
         fi1->nFileIndexLow == fi2->nFileIndexLow;
 }
 
-std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
-{
-    auto ret = std::string{};
-
-    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
-    {
-        if (auto const handle = CreateFileW(
-                wide_path.c_str(),
-                FILE_READ_EA,
-                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                nullptr,
-                OPEN_EXISTING,
-                FILE_FLAG_BACKUP_SEMANTICS,
-                nullptr);
-            handle != INVALID_HANDLE_VALUE)
-        {
-            if (auto const wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0); wide_ret_size != 0)
-            {
-                auto wide_ret = std::wstring{};
-                wide_ret.resize(wide_ret_size);
-                if (GetFinalPathNameByHandleW(handle, std::data(wide_ret), wide_ret_size, 0) == wide_ret_size - 1)
-                {
-                    // `wide_ret_size` includes the terminating '\0'; remove it from `wide_ret`
-                    wide_ret.resize(std::size(wide_ret) - 1);
-                    TR_ASSERT(tr_strv_starts_with(wide_ret, NativeLocalPathPrefix));
-                    ret = native_path_to_path(wide_ret);
-                }
-            }
-
-            CloseHandle(handle);
-        }
-    }
-
-    if (!std::empty(ret))
-    {
-        return ret;
-    }
-
-    set_system_error(error, GetLastError());
-    return {};
-}
-
 std::string_view tr_sys_path_basename(std::string_view path, tr_error* error)
 {
     if (std::empty(path))
