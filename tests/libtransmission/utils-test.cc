@@ -204,6 +204,18 @@ TEST_F(UtilsTest, strvReplaceInvalid)
     EXPECT_EQ(out, tr_strv_replace_invalid(out));
 }
 
+TEST_F(UtilsTest, strvFindInvalidUtf8)
+{
+    EXPECT_EQ(std::string_view::npos, tr_strv_find_invalid_utf8("hello"sv));
+    EXPECT_EQ(std::string_view::npos, tr_strv_find_invalid_utf8("Трудно быть Богом"sv));
+
+    auto const invalid = std::string{ static_cast<char>(0xC3), static_cast<char>(0x28) };
+    EXPECT_EQ(0U, tr_strv_find_invalid_utf8(invalid));
+
+    auto const mixed = std::string{ "ok " } + invalid + " end";
+    EXPECT_EQ(3U, tr_strv_find_invalid_utf8(mixed));
+}
+
 TEST_F(UtilsTest, strvConvertUtf8Fuzz)
 {
     auto buf = std::vector<char>{};
