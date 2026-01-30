@@ -389,8 +389,18 @@ void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
     if (auto const cmd = evhttp_request_get_command(req); cmd == EVHTTP_REQ_POST)
     {
         auto* const input_buffer = evhttp_request_get_input_buffer(req);
-        auto json = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(input_buffer, -1)),
-                                      evbuffer_get_length(input_buffer) };
+
+        // The web UI uses an empty RPC request to test the validity of auth
+        // credentials. It expects a 204, which is enough to demonstrate the
+        // request got past the auth layer.
+        auto const body_length = evbuffer_get_length(input_buffer);
+        if (body_length == 0)
+        {
+            evhttp_send_reply(req, HTTP_NOCONTENT, "No Content", nullptr);
+            return;
+        }
+
+        auto json = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(input_buffer, -1)), body_length };
         handle_rpc_from_json(req, server, json);
         return;
     }
@@ -487,7 +497,7 @@ bool is_authorized(tr_rpc_server const* server, char const* auth_header)
     }
 
     // https://datatracker.ietf.org/doc/html/rfc7617
-    // `Basic ${base64(username)}:${base64(password)}`
+    // `Basic ${base64(username:password)}`
 
     auto constexpr Prefix = "Basic "sv;
     auto auth = std::string_view{ auth_header != nullptr ? auth_header : "" };
@@ -566,13 +576,58 @@ void handle_request(struct evhttp_request* req, void* arg)
         return;
     }
 
-    if (!is_authorized(server, evhttp_find_header(input_headers, "Authorization")))
+    // eg '/transmission/web/' and '/transmission/rpc'
+    auto const& base_path = server->url();
+    auto const web_base_path = tr_urlbuf{ base_path, TrHttpServerWebRelativePath };
+    auto const rpc_base_path = tr_urlbuf{ base_path, TrHttpServerRpcRelativePath };
+    auto const deprecated_web_path = tr_urlbuf{ base_path, "web" /*no trailing slash*/ };
+
+    char const* const uri = evhttp_request_get_uri(req);
+
+    // Handle this redirect before the authorization check so all URLs leading
+    // to the UI get funneled through the login redirect flow
+    if (!tr_strv_starts_with(uri, base_path) || uri == deprecated_web_path)
+    {
+        evhttp_add_header(output_headers, "Location", web_base_path.c_str());
+        send_simple_response(req, HTTP_MOVEPERM, nullptr);
+        return;
+    }
+
+    /* We've moved the web UI to an HTML-based login form, away from the old a
+     * basic auth dialog (#716). Unfortunately, there is no API to interact with
+     * the browser's store of basic auth credentials. Thus JavaScript must
+     * manually attach an `Authorization` header to RPC requests, and requests
+     * not initiated by JS won't carry credentials.
+     *
+     * This means the backend cannot distinguish authenticated vs
+     * unauthenticated clients when processing requests for static assets (HTML
+     * files, JS, CSS). Consequently, we must allow unauthenticated access to
+     * all of web/ so the client can make the decision on whether to redirect to
+     * the login page.
+     *
+     * This code is fail-closed: we use an allowlist so that auth exemptions are
+     * deliberate, explicit choices.
+     */
+    auto const is_unauthenticated_route = tr_strv_starts_with(uri, web_base_path);
+    auto const authorized = is_authorized(server, evhttp_find_header(input_headers, "Authorization"));
+
+    if (!is_unauthenticated_route && !authorized)
     {
         tr_logAddWarn(
             fmt::format(
                 fmt::runtime(_("Rejected request from {host} (failed authentication)")),
                 fmt::arg("host", remote_host)));
-        evhttp_add_header(output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
+
+        // The web UI sends this so it can handle auth failures without the
+        // browser throwing up a popup
+        auto const header_suppress_basic_auth = evhttp_find_header(input_headers, "TransmissionRPC-Suppress-Basic-Auth-Popup");
+        auto const is_basic_auth_popup_suppressed = header_suppress_basic_auth != nullptr &&
+            header_suppress_basic_auth == "true"sv;
+        if (!is_basic_auth_popup_suppressed)
+        {
+            evhttp_add_header(output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
+        }
+
         if (server->is_anti_brute_force_enabled())
         {
             ++server->login_attempts_;
@@ -584,20 +639,7 @@ void handle_request(struct evhttp_request* req, void* arg)
 
     server->login_attempts_ = 0;
 
-    // eg '/transmission/web/' and '/transmission/rpc'
-    auto const& base_path = server->url();
-    auto const web_base_path = tr_urlbuf{ base_path, TrHttpServerWebRelativePath };
-    auto const rpc_base_path = tr_urlbuf{ base_path, TrHttpServerRpcRelativePath };
-    auto const deprecated_web_path = tr_urlbuf{ base_path, "web" /*no trailing slash*/ };
-
-    char const* const uri = evhttp_request_get_uri(req);
-
-    if (!tr_strv_starts_with(uri, base_path) || uri == deprecated_web_path)
-    {
-        evhttp_add_header(output_headers, "Location", web_base_path.c_str());
-        send_simple_response(req, HTTP_MOVEPERM, nullptr);
-    }
-    else if (tr_strv_starts_with(uri, web_base_path))
+    if (tr_strv_starts_with(uri, web_base_path))
     {
         handle_web_client(req, server);
     }
