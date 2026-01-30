@@ -166,6 +166,107 @@ bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_erro
     return false;
 }
 
+bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_error* error)
+{
+    auto const filesystem_path = tr_u8path(path);
+    auto const set_error = [error](std::error_code const& ec)
+    {
+        if (error != nullptr)
+        {
+            error->set(ec.value(), ec.message());
+        }
+    };
+
+#ifndef _WIN32
+    auto missing = std::vector<std::filesystem::path>{};
+    if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0 && permissions != 0)
+    {
+        auto current = std::filesystem::path{};
+        for (auto const& part : filesystem_path)
+        {
+            current /= part;
+            if (current == current.root_path())
+            {
+                continue;
+            }
+
+            auto check_ec = std::error_code{};
+            if (std::filesystem::is_directory(current, check_ec))
+            {
+                continue;
+            }
+
+            if (check_ec && check_ec != std::errc::no_such_file_or_directory)
+            {
+                set_error(check_ec);
+                return false;
+            }
+
+            missing.emplace_back(current);
+        }
+    }
+#endif
+
+    if (auto check_ec = std::error_code{}; std::filesystem::is_directory(filesystem_path, check_ec))
+    {
+        return true;
+    }
+    else if (check_ec && check_ec != std::errc::no_such_file_or_directory)
+    {
+        set_error(check_ec);
+        return false;
+    }
+
+    auto ec = std::error_code{};
+    bool const created = (flags & TR_SYS_DIR_CREATE_PARENTS) != 0 ? std::filesystem::create_directories(filesystem_path, ec) :
+                                                                    std::filesystem::create_directory(filesystem_path, ec);
+
+    if (ec)
+    {
+        set_error(ec);
+        return false;
+    }
+
+#ifndef _WIN32
+    if (created && permissions != 0)
+    {
+        auto const apply_permissions = [&](std::filesystem::path const& target)
+        {
+            auto perm_ec = std::error_code{};
+            std::filesystem::permissions(
+                target,
+                static_cast<std::filesystem::perms>(permissions),
+                std::filesystem::perm_options::replace,
+                perm_ec);
+            if (perm_ec)
+            {
+                set_error(perm_ec);
+                return false;
+            }
+
+            return true;
+        };
+
+        if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
+        {
+            for (auto const& created_path : missing)
+            {
+                if (!apply_permissions(created_path))
+                {
+                    return false;
+                }
+            }
+        }
+        else if (!apply_permissions(filesystem_path))
+        {
+            return false;
+        }
+    }
+#endif
+
+    return true;
+}
+
 std::vector<std::string> tr_sys_dir_get_files(
     std::string_view folder,
     std::function<bool(std::string_view)> const& test,

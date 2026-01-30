@@ -852,11 +852,6 @@ std::string tr_sys_dir_get_current(tr_error* error)
     return {};
 }
 
-bool tr_sys_dir_create(std::string_view const path, int const flags, int const permissions, tr_error* error)
-{
-    return create_dir(path, flags, permissions, true, error);
-}
-
 bool tr_sys_dir_create_temp(char* path_template, tr_error* error)
 {
     TR_ASSERT(path_template != nullptr);
