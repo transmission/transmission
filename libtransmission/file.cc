@@ -13,6 +13,19 @@
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 
+namespace
+{
+
+void maybe_set_error(tr_error* error, std::error_code const& ec)
+{
+    if (error != nullptr && ec)
+    {
+        error->set(ec.value(), ec.message());
+    }
+}
+
+} // namespace
+
 std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
 {
     auto ec = std::error_code{};
@@ -20,11 +33,7 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
 
     if (ec)
     {
-        if (error != nullptr)
-        {
-            error->set(ec.value(), ec.message());
-        }
-
+        maybe_set_error(error, ec);
         return {};
     }
 
@@ -66,7 +75,7 @@ bool tr_sys_path_exists(std::string_view path, tr_error* error)
     auto ec = std::error_code{};
     auto const exists = std::filesystem::exists(tr_u8path(path), ec);
 
-    if (ec && ec != std::errc::no_such_file_or_directory && error != nullptr)
+    if (error != nullptr && ec && ec != std::errc::no_such_file_or_directory)
     {
         error->set(ec.value(), ec.message());
     }
@@ -84,19 +93,7 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
 
     if (status_ec || status.type() == std::filesystem::file_type::not_found)
     {
-        if (error != nullptr)
-        {
-            if (status_ec)
-            {
-                error->set(status_ec.value(), status_ec.message());
-            }
-            else
-            {
-                auto const missing_ec = std::make_error_code(std::errc::no_such_file_or_directory);
-                error->set(missing_ec.value(), missing_ec.message());
-            }
-        }
-
+        maybe_set_error(error, status_ec ? status_ec : std::make_error_code(std::errc::no_such_file_or_directory));
         return {};
     }
 
@@ -110,11 +107,7 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
         info.size = std::filesystem::file_size(filesystem_path, size_ec);
         if (size_ec)
         {
-            if (error != nullptr)
-            {
-                error->set(size_ec.value(), size_ec.message());
-            }
-
+            maybe_set_error(error, size_ec);
             return {};
         }
     }
@@ -133,11 +126,7 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
     auto const ftime = std::filesystem::last_write_time(filesystem_path, time_ec);
     if (time_ec)
     {
-        if (error != nullptr)
-        {
-            error->set(time_ec.value(), time_ec.message());
-        }
-
+        maybe_set_error(error, time_ec);
         return {};
     }
 
@@ -158,7 +147,7 @@ bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_erro
         return same;
     }
 
-    if (ec != std::errc::no_such_file_or_directory && error != nullptr)
+    if (error != nullptr && ec != std::errc::no_such_file_or_directory)
     {
         error->set(ec.value(), ec.message());
     }
@@ -169,13 +158,6 @@ bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_erro
 bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_error* error)
 {
     auto const filesystem_path = tr_u8path(path);
-    auto const set_error = [error](std::error_code const& ec)
-    {
-        if (error != nullptr)
-        {
-            error->set(ec.value(), ec.message());
-        }
-    };
 
 #ifndef _WIN32
     auto missing = std::vector<std::filesystem::path>{};
@@ -198,7 +180,7 @@ bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_err
 
             if (check_ec && check_ec != std::errc::no_such_file_or_directory)
             {
-                set_error(check_ec);
+                maybe_set_error(error, check_ec);
                 return false;
             }
 
@@ -213,7 +195,7 @@ bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_err
     }
     else if (check_ec && check_ec != std::errc::no_such_file_or_directory)
     {
-        set_error(check_ec);
+        maybe_set_error(error, check_ec);
         return false;
     }
 
@@ -223,7 +205,7 @@ bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_err
 
     if (ec)
     {
-        set_error(ec);
+        maybe_set_error(error, ec);
         return false;
     }
 
@@ -240,7 +222,7 @@ bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_err
                 perm_ec);
             if (perm_ec)
             {
-                set_error(perm_ec);
+                maybe_set_error(error, perm_ec);
                 return false;
             }
 
@@ -310,9 +292,6 @@ std::optional<std::filesystem::space_info> tr_sys_path_get_capacity(std::filesys
         return space;
     }
 
-    if (error != nullptr)
-    {
-        error->set(ec.value(), ec.message());
-    }
+    maybe_set_error(error, ec);
     return {};
 }
