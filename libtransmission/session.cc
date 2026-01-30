@@ -723,6 +723,7 @@ void tr_session::on_save_timer()
     }
 
     stats().save();
+    torrent_queue().to_file();
 }
 
 void tr_session::initImpl(init_data& data)

@@ -25,6 +25,7 @@ using namespace std::literals;
 size_t tr_torrent_queue::add(tr_torrent_id_t const id)
 {
     queue_.push_back(id);
+    set_dirty();
     return std::size(queue_) - 1U;
 }
 
@@ -41,6 +42,7 @@ void tr_torrent_queue::remove(tr_torrent_id_t const id)
         auto const remove_it = std::remove(std::begin(queue_), std::end(queue_), id);
         queue_.erase(remove_it, std::end(queue_));
     }
+    set_dirty();
 }
 
 size_t tr_torrent_queue::get_pos(tr_torrent_id_t const id)
@@ -99,11 +101,18 @@ std::vector<tr_torrent_id_t> tr_torrent_queue::set_pos(tr_torrent_id_t const id,
         std::rotate(old_it, old_next_it, new_next_it);
     }
 
+    set_dirty();
     return ret;
 }
 
-bool tr_torrent_queue::to_file() const
+bool tr_torrent_queue::to_file()
 {
+    if (!is_dirty())
+    {
+        return false;
+    }
+    set_dirty(false);
+
     auto vec = tr_variant::Vector{};
     vec.reserve(std::size(queue_));
     for (auto const id : queue_)
