@@ -349,35 +349,6 @@ std::optional<tr_sys_path_info> tr_sys_file_get_info_(tr_sys_file_t handle, tr_e
     return {};
 }
 
-[[nodiscard]] std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(std::string_view const path, tr_error* error)
-{
-    auto const wpath = path_to_native_path(path);
-    if (std::empty(wpath))
-    {
-        set_system_error_if_file_found(error, GetLastError());
-        return {};
-    }
-
-    auto const handle = CreateFileW(wpath.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-    if (handle == INVALID_HANDLE_VALUE)
-    {
-        set_system_error_if_file_found(error, GetLastError());
-        return {};
-    }
-
-    // TODO: Use GetFileInformationByHandleEx on >= Server 2012
-    auto info = BY_HANDLE_FILE_INFORMATION{};
-    if (!to_bool(GetFileInformationByHandle(handle, &info)))
-    {
-        set_system_error_if_file_found(error, GetLastError());
-        CloseHandle(handle);
-        return {};
-    }
-
-    CloseHandle(handle);
-    return info;
-}
-
 } // namespace
 
 bool tr_sys_path_exists(std::string_view const path, tr_error* error)
@@ -468,24 +439,6 @@ bool tr_sys_path_is_relative(std::string_view path)
     }
 
     return true;
-}
-
-bool tr_sys_path_is_same(std::string_view const path1, std::string_view const path2, tr_error* error)
-{
-    auto const fi1 = get_file_info(path1, error);
-    if (!fi1)
-    {
-        return false;
-    }
-
-    auto const fi2 = get_file_info(path2, error);
-    if (!fi2)
-    {
-        return false;
-    }
-
-    return fi1->dwVolumeSerialNumber == fi2->dwVolumeSerialNumber && fi1->nFileIndexHigh == fi2->nFileIndexHigh &&
-        fi1->nFileIndexLow == fi2->nFileIndexLow;
 }
 
 std::string_view tr_sys_path_basename(std::string_view path, tr_error* error)
