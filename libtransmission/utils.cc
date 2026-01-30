@@ -305,6 +305,11 @@ std::string tr_strv_to_utf8_string(std::string_view sv)
 
 #endif
 
+std::string_view::size_type tr_strv_find_invalid_utf8(std::string_view const sv)
+{
+    return utf8::find_invalid(sv);
+}
+
 std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
     // stripping characters after first \0
@@ -316,6 +321,13 @@ std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
     out.reserve(std::size(sv));
     utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
     return out;
+}
+
+std::u8string tr_strv_to_u8string(std::string_view const sv)
+{
+    auto str = tr_strv_replace_invalid(sv);
+    auto const view = std::views::transform(str, [](char c) -> char8_t { return c; });
+    return { view.begin(), view.end() };
 }
 
 #ifdef _WIN32

@@ -5,6 +5,7 @@
 
 #include <climits>
 #include <cstdint>
+#include <filesystem>
 #include <list>
 #include <mutex>
 #include <optional>
@@ -13,6 +14,7 @@
 #include <vector>
 
 #include <libtransmission/net.h>
+#include <libtransmission/log.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/serializer.h>
 #include <libtransmission/variant.h>
@@ -145,6 +147,61 @@ TEST_F(SerializerTest, usesBuiltins)
         EXPECT_TRUE(Converters::deserialize(var, &out));
         EXPECT_EQ(out, expected);
     }
+}
+
+TEST_F(SerializerTest, usesU8String)
+{
+    auto const expected = std::u8string{ u8"hello" };
+    auto const var = Converters::serialize(expected);
+    EXPECT_TRUE(var.holds_alternative<std::string_view>());
+    EXPECT_EQ(var.value_if<std::string_view>().value_or(""sv), "hello"sv);
+
+    auto actual = std::u8string{};
+    EXPECT_TRUE(Converters::deserialize(var, &actual));
+    EXPECT_EQ(actual, expected);
+}
+
+TEST_F(SerializerTest, usesFsPath)
+{
+    auto const expected = std::filesystem::path{ std::u8string{ u8"foo/βar" } };
+    auto const var = Converters::serialize(expected);
+    EXPECT_TRUE(var.holds_alternative<std::string_view>());
+    EXPECT_EQ(var.value_if<std::string_view>().value_or(""sv), "foo/βar"sv);
+
+    auto actual = std::filesystem::path{};
+    EXPECT_TRUE(Converters::deserialize(var, &actual));
+    EXPECT_EQ(actual.u8string(), expected.u8string());
+}
+
+TEST_F(SerializerTest, u8StringWarnsOnInvalidUtf8)
+{
+    auto const bad = std::string{ char(0xC3), char(0x28) };
+    auto const var = tr_variant{ std::string_view{ bad } };
+
+    auto const old_level = tr_logGetLevel();
+    tr_logSetLevel(TR_LOG_WARN);
+    tr_logSetQueueEnabled(true);
+    tr_logFreeQueue(tr_logGetQueue());
+
+    auto actual = std::u8string{};
+    EXPECT_TRUE(Converters::deserialize(var, &actual));
+
+    auto* const msgs = tr_logGetQueue();
+    auto warned = false;
+    for (auto* msg = msgs; msg != nullptr; msg = msg->next)
+    {
+        if (msg->level == TR_LOG_WARN && msg->message.find("contains invalid UTF-8") != std::string::npos)
+        {
+            warned = true;
+            break;
+        }
+    }
+
+    tr_logFreeQueue(msgs);
+    tr_logSetQueueEnabled(false);
+    tr_logSetLevel(old_level);
+
+    EXPECT_TRUE(warned);
 }
 
 TEST_F(SerializerTest, usesCustomTypes)
