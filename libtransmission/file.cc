@@ -31,6 +31,24 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
     return { std::begin(u8_path), std::end(u8_path) };
 }
 
+bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_error* error)
+{
+    auto ec = std::error_code{};
+    auto const same = std::filesystem::equivalent(tr_u8path(path1), tr_u8path(path2), ec);
+
+    if (!ec)
+    {
+        return same;
+    }
+
+    if (ec != std::errc::no_such_file_or_directory && error != nullptr)
+    {
+        error->set(ec.value(), ec.message());
+    }
+
+    return false;
+}
+
 std::vector<std::string> tr_sys_dir_get_files(
     std::string_view folder,
     std::function<bool(std::string_view)> const& test,
