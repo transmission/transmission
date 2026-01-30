@@ -351,42 +351,6 @@ std::optional<tr_sys_path_info> tr_sys_file_get_info_(tr_sys_file_t handle, tr_e
 
 } // namespace
 
-bool tr_sys_path_exists(std::string_view const path, tr_error* error)
-{
-    bool ret = false;
-    HANDLE handle = INVALID_HANDLE_VALUE;
-
-    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
-    {
-        DWORD const attributes = GetFileAttributesW(wide_path.c_str());
-
-        if (attributes != INVALID_FILE_ATTRIBUTES)
-        {
-            if ((attributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
-            {
-                handle = CreateFileW(wide_path.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-                ret = handle != INVALID_HANDLE_VALUE;
-            }
-            else
-            {
-                ret = true;
-            }
-        }
-    }
-
-    if (!ret)
-    {
-        set_system_error_if_file_found(error, GetLastError());
-    }
-
-    if (handle != INVALID_HANDLE_VALUE)
-    {
-        CloseHandle(handle);
-    }
-
-    return ret;
-}
-
 std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error* error)
 {
     if (auto const wide_path = path_to_native_path(path); std::empty(wide_path))
