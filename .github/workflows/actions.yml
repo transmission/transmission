@@ -451,6 +451,7 @@ jobs:
             cmake \
             crc32c-dev \
             curl-dev \
+            fast_float \
             fmt-dev \
             gettext-dev \
             git \
@@ -776,6 +777,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian 11` \
+            -DUSE_SYSTEM_FAST_FLOAT=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_FMT=OFF `# Debian 11 package too old` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_UTF8CPP=OFF `# Debian 11 package too old` \
@@ -955,10 +957,10 @@ jobs:
           name: binaries-${{ github.job }}-${{ matrix.version }}
           path: pfx/**/*
 
-  ubuntu-22-04-from-tarball:
+  ubuntu-24-04-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Show Configuration
         run: |
@@ -976,7 +978,7 @@ jobs:
       - name: Get Dependencies
         uses: ./.github/actions/install-deps
         with:
-          compiler: clang
+          compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
           use-sudo: true
@@ -998,6 +1000,8 @@ jobs:
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
