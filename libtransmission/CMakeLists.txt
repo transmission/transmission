@@ -234,10 +234,6 @@ target_compile_definitions(${TR_NAME}
         $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
         $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
 
-tr_target_compile_definitions_for_headers(${TR_NAME}
-    PRIVATE
-        xfs/xfs.h)
-
 tr_target_compile_definitions_for_functions(${TR_NAME}
     PRIVATE
         copyfile

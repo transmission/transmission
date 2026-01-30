@@ -27,10 +27,6 @@
 #include <sys/file.h> /* flock() */
 #endif
 
-#ifdef HAVE_XFS_XFS_H
-#include <xfs/xfs.h>
-#endif
-
 /* OS-specific file copy (copy_file_range, sendfile64, or copyfile). */
 #if defined(__linux__)
 #include <linux/version.h>
@@ -825,31 +821,6 @@ bool preallocate_fallocate64(tr_sys_file_t handle, uint64_t size)
 }
 #endif
 
-#ifdef HAVE_XFS_XFS_H
-bool full_preallocate_xfs(tr_sys_file_t handle, uint64_t size)
-{
-    if (platform_test_xfs_fd(handle) == 0) // true if on xfs filesystem
-    {
-        return false;
-    }
-
-    xfs_flock64_t fl;
-    fl.l_whence = 0;
-    fl.l_start = 0;
-    fl.l_len = size;
-
-    // The blocks are allocated, but not zeroed, and the file size does not change
-    bool ok = xfsctl(nullptr, handle, XFS_IOC_RESVSP64, &fl) != -1;
-
-    if (ok)
-    {
-        ok = ftruncate(handle, size) == 0;
-    }
-
-    return ok;
-}
-#endif
-
 #ifdef __APPLE__
 bool full_preallocate_apple(tr_sys_file_t handle, uint64_t size)
 {
@@ -907,9 +878,6 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
         approaches.insert(
             std::end(approaches),
             {
-#ifdef HAVE_XFS_XFS_H
-                full_preallocate_xfs,
-#endif
 #ifdef __APPLE__
                 full_preallocate_apple,
 #endif
