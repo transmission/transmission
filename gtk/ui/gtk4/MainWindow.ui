@@ -14,7 +14,7 @@ horizontal]]></property>
               <object class="GtkButton" id="open_file_button">
                 <property name="focusable">1</property>
                 <property name="tooltip-text" translatable="1">Open a torrent</property>
-                <property name="action-name">win.open_torrent</property>
+                <property name="action-name">win.open-torrent</property>
                 <child>
                   <object class="GtkBox">
                     <property name="halign">center</property>
@@ -40,7 +40,7 @@ horizontal]]></property>
               <object class="GtkButton" id="start_torrent_button">
                 <property name="focusable">1</property>
                 <property name="tooltip-text" translatable="1">Start torrent</property>
-                <property name="action-name">win.torrent_start</property>
+                <property name="action-name">win.torrent-start</property>
                 <property name="label" translatable="1">_Start</property>
                 <property name="use-underline">1</property>
                 <property name="icon-name">media-playback-start</property>
@@ -50,7 +50,7 @@ horizontal]]></property>
               <object class="GtkButton" id="pause_torrent_button">
                 <property name="focusable">1</property>
                 <property name="tooltip-text" translatable="1">Pause torrent</property>
-                <property name="action-name">win.torrent_stop</property>
+                <property name="action-name">win.torrent-stop</property>
                 <property name="label" translatable="1">_Pause</property>
                 <property name="use-underline">1</property>
                 <property name="icon-name">media-playback-pause</property>
@@ -60,7 +60,7 @@ horizontal]]></property>
               <object class="GtkButton" id="remove_torrent_button">
                 <property name="focusable">1</property>
                 <property name="tooltip-text" translatable="yes">Remove torrent</property>
-                <property name="action-name">win.remove_torrent</property>
+                <property name="action-name">win.remove-torrent</property>
                 <property name="label" translatable="1">Remove torrent</property>
                 <property name="use-underline">1</property>
                 <property name="icon-name">list-remove</property>
@@ -76,7 +76,7 @@ horizontal]]></property>
               <object class="GtkButton" id="torrent_properties_button">
                 <property name="focusable">1</property>
                 <property name="tooltip-text" translatable="1">Torrent properties</property>
-                <property name="action-name">win.show_torrent_properties</property>
+                <property name="action-name">win.show-torrent-properties</property>
                 <child>
                   <object class="GtkBox">
                     <property name="halign">center</property>
