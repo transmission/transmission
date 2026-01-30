@@ -382,29 +382,6 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
     return {};
 }
 
-bool tr_sys_path_is_relative(std::string_view path)
-{
-    /* UNC path: `\\...`. */
-    if (is_unc_path(path))
-    {
-        return false;
-    }
-
-    /* Local path: `X:` */
-    if (std::size(path) == 2 && isalpha(path[0]) != 0 && path[1] == ':')
-    {
-        return false;
-    }
-
-    /* Local path: `X:\...`. */
-    if (std::size(path) > 2 && isalpha(path[0]) != 0 && path[1] == ':' && is_slash(path[2]))
-    {
-        return false;
-    }
-
-    return true;
-}
-
 std::string_view tr_sys_path_basename(std::string_view path, tr_error* error)
 {
     if (std::empty(path))

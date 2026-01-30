@@ -31,6 +31,35 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
     return { std::begin(u8_path), std::end(u8_path) };
 }
 
+bool tr_sys_path_is_relative(std::string_view path)
+{
+#ifdef _WIN32
+    auto const is_slash = [](char ch)
+    {
+        return ch == '/' || ch == '\\';
+    };
+
+    if (std::size(path) >= 2 && is_slash(path[0]) && path[1] == path[0])
+    {
+        return false;
+    }
+
+    if (std::size(path) == 2 && std::isalpha(static_cast<unsigned char>(path[0])) != 0 && path[1] == ':')
+    {
+        return false;
+    }
+
+    if (std::size(path) > 2 && std::isalpha(static_cast<unsigned char>(path[0])) != 0 && path[1] == ':' && is_slash(path[2]))
+    {
+        return false;
+    }
+
+    return true;
+#else
+    return std::empty(path) || path.front() != '/';
+#endif
+}
+
 bool tr_sys_path_exists(std::string_view path, tr_error* error)
 {
     auto ec = std::error_code{};

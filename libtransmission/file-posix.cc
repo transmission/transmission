@@ -186,11 +186,6 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view const path
     return info;
 }
 
-bool tr_sys_path_is_relative(std::string_view path)
-{
-    return std::empty(path) || path.front() != '/';
-}
-
 std::string_view tr_sys_path_basename(std::string_view path, tr_error* /*error*/)
 {
     // As per the basename() manpage:
