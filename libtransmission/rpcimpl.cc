@@ -1494,7 +1494,7 @@ void onPortTested(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    auto const port_is_open = tr_strv_starts_with(body, '1');
+    auto const port_is_open = body.starts_with('1');
     data->args_out.try_emplace(TR_KEY_port_is_open, port_is_open);
     tr_rpc_idle_done(data, Error::SUCCESS, {});
 }

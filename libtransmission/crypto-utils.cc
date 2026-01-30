@@ -80,7 +80,7 @@ bool tr_ssha1_test(std::string_view text)
 {
     using namespace ssha1_impl;
 
-    return tr_strv_starts_with(text, SaltedPrefix) && std::size(text) >= std::size(SaltedPrefix) + DigestStringSize;
+    return text.starts_with(SaltedPrefix) && std::size(text) >= std::size(SaltedPrefix) + DigestStringSize;
 }
 
 bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)

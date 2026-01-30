@@ -54,7 +54,7 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
 
     // find the beginning delimiter
     auto walk = *benc;
-    if (std::size(walk) < 3 || !tr_strv_starts_with(walk, Prefix))
+    if (std::size(walk) < 3 || !walk.starts_with(Prefix))
     {
         return {};
     }
@@ -75,7 +75,7 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
 
     // parse the string and make sure the next char is `Suffix`
     auto value = tr_num_parse<int64_t>(walk, &walk);
-    if (!value || !tr_strv_starts_with(walk, Suffix))
+    if (!value || !walk.starts_with(Suffix))
     {
         return {};
     }

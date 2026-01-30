@@ -241,7 +241,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* err
         {
             this->set_name(tr_urlPercentDecode(value));
         }
-        else if (key == "tr"sv || tr_strv_starts_with(key, "tr."sv))
+        else if (key == "tr"sv || key.starts_with("tr."sv))
         {
             // "tr." explanation @ https://trac.transmissionbt.com/ticket/3341
             this->announce_list_.add(tr_urlPercentDecode(value));
@@ -255,7 +255,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* err
                 this->webseed_urls_.emplace_back(url_sv);
             }
         }
-        else if (static auto constexpr ValPrefix = "urn:btih:"sv; key == "xt"sv && tr_strv_starts_with(value, ValPrefix))
+        else if (static auto constexpr ValPrefix = "urn:btih:"sv; key == "xt"sv && value.starts_with(ValPrefix))
         {
             // v1 info-hash
             if (auto const hash = parseHash(value.substr(std::size(ValPrefix))); hash)
@@ -264,7 +264,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* err
                 got_hash = true;
             }
         }
-        else if (static auto constexpr ValPrefix2 = "urn:btmh:1220"sv; key == "xt"sv && tr_strv_starts_with(value, ValPrefix2))
+        else if (static auto constexpr ValPrefix2 = "urn:btmh:1220"sv; key == "xt"sv && value.starts_with(ValPrefix2))
         {
             // v2 info-hash
             // The 1220 tag identifies the hash as sha256, removing tag before sending to parseHash2

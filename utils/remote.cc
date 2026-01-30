@@ -3570,11 +3570,11 @@ void get_host_and_port_and_rpc_url(
     }
 
     auto const sv = std::string_view{ argv[1] };
-    if (tr_strv_starts_with(sv, "http://")) /* user passed in http rpc url */
+    if (sv.starts_with("http://")) /* user passed in http rpc url */
     {
         rpcurl = fmt::format("{:s}/{:s}", sv.substr(7), TrHttpServerRpcRelativePath);
     }
-    else if (tr_strv_starts_with(sv, "https://")) /* user passed in https rpc url */
+    else if (sv.starts_with("https://")) /* user passed in https rpc url */
     {
         config.use_ssl = true;
         rpcurl = fmt::format("{:s}/{:s}", sv.substr(8), TrHttpServerRpcRelativePath);
@@ -3598,7 +3598,7 @@ void get_host_and_port_and_rpc_url(
     }
     else
     {
-        auto const is_unbracketed_ipv6 = !tr_strv_starts_with(sv, '[') && last_colon != std::string_view::npos;
+        auto const is_unbracketed_ipv6 = !sv.starts_with('[') && last_colon != std::string_view::npos;
         host = is_unbracketed_ipv6 ? fmt::format("[{:s}]", sv) : sv;
     }
 
