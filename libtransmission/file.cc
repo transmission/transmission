@@ -31,6 +31,19 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
     return { std::begin(u8_path), std::end(u8_path) };
 }
 
+bool tr_sys_path_exists(std::string_view path, tr_error* error)
+{
+    auto ec = std::error_code{};
+    auto const exists = std::filesystem::exists(tr_u8path(path), ec);
+
+    if (ec && ec != std::errc::no_such_file_or_directory && error != nullptr)
+    {
+        error->set(ec.value(), ec.message());
+    }
+
+    return exists;
+}
+
 bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_error* error)
 {
     auto ec = std::error_code{};

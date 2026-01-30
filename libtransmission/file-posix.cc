@@ -125,19 +125,6 @@ void set_file_for_single_pass(tr_sys_file_t handle)
 }
 } // namespace
 
-bool tr_sys_path_exists(std::string_view const path, tr_error* error)
-{
-    auto const sz_path = tr_pathbuf{ path };
-    bool const ret = access(sz_path.c_str(), F_OK) != -1;
-
-    if (error != nullptr && !ret && errno != ENOENT)
-    {
-        error->set_from_errno(errno);
-    }
-
-    return ret;
-}
-
 namespace
 {
 [[nodiscard]] auto stat_sv(std::string_view const path, struct stat* sb)
