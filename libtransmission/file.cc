@@ -11,7 +11,6 @@
 
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
-#include "libtransmission/tr-assert.h"
 
 std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
 {
@@ -64,4 +63,20 @@ std::vector<std::string> tr_sys_dir_get_files(
             filenames.emplace_back(name);
         }
     }
+}
+
+std::optional<std::filesystem::space_info> tr_sys_path_get_capacity(std::filesystem::path const& path, tr_error* error)
+{
+    auto ec = std::error_code{};
+    auto space = std::filesystem::space(path, ec);
+    if (!ec)
+    {
+        return space;
+    }
+
+    if (error != nullptr)
+    {
+        error->set(ec.value(), ec.message());
+    }
+    return {};
 }

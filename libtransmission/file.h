@@ -103,6 +103,28 @@ struct tr_sys_path_info
 };
 
 /**
+ * Temporary replacement of deprecated `std::filesystem::u8path()` while we migrate
+ * from char to char8_t strings.
+ *
+ * https://stackoverflow.com/a/57635139/11390656
+ * @{
+ */
+
+template<typename InputIt>
+[[nodiscard]] std::filesystem::path tr_u8path(InputIt begin, InputIt end)
+{
+    auto const view = std::ranges::subrange(begin, end) | std::views::transform([](char const c) -> char8_t { return c; });
+    return { view.begin(), view.end() };
+}
+
+[[nodiscard]] inline std::filesystem::path tr_u8path(std::string_view path)
+{
+    return tr_u8path(path.begin(), path.end());
+}
+
+/// @}
+
+/**
  * @name Platform-specific wrapper functions
  *
  * Following functions accept paths in UTF-8 encoding and convert them to native
@@ -143,6 +165,23 @@ bool tr_sys_path_copy(std::string_view src_path, std::string_view dst_path, tr_e
     std::string_view path,
     int flags = 0,
     tr_error* error = nullptr);
+
+/**
+ * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
+ *
+ * @param[in]  path  Path to directory.
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
+ *                   are not interested in error details.
+ */
+[[nodiscard]] std::optional<std::filesystem::space_info> tr_sys_path_get_capacity(
+    std::filesystem::path const& path,
+    tr_error* error = nullptr);
+[[nodiscard]] inline std::optional<std::filesystem::space_info> tr_sys_path_get_capacity(
+    std::string_view path,
+    tr_error* error = nullptr)
+{
+    return tr_sys_path_get_capacity(tr_u8path(path), error);
+}
 
 /**
  * @brief Portability wrapper for `access()`.
@@ -510,25 +549,3 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error* error = nullptr);
 
 /** @} */
 /** @} */
-
-/**
- * Temporary replacement of deprecated `std::filesystem::u8path()` while we migrate
- * from char to char8_t strings.
- *
- * https://stackoverflow.com/a/57635139/11390656
- * @{
- */
-
-template<typename InputIt>
-[[nodiscard]] std::filesystem::path tr_u8path(InputIt begin, InputIt end)
-{
-    auto const view = std::ranges::subrange(begin, end) | std::views::transform([](char const c) -> char8_t { return c; });
-    return { view.begin(), view.end() };
-}
-
-[[nodiscard]] inline std::filesystem::path tr_u8path(std::string_view path)
-{
-    return tr_u8path(path.begin(), path.end());
-}
-
-/// @}

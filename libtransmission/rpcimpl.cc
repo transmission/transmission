@@ -2231,9 +2231,12 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         TR_KEY_download_dir_free_space,
         [](tr_session const& src) -> tr_variant
         {
-            auto ec = std::error_code{};
-            auto const space = std::filesystem::space(tr_u8path(src.downloadDir()), ec);
-            return !ec ? space.available : tr_variant{ -1 };
+            // TODO(C++23): use std::optional::transform() instead
+            if (auto const space = tr_sys_path_get_capacity(std::string_view{ src.downloadDir() }))
+            {
+                return space->available;
+            }
+            return -1;
         },
         nullptr);
 
@@ -2736,17 +2739,17 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
     }
 
     // get the free space
-    auto ec = std::error_code{};
-    auto const capacity = std::filesystem::space(tr_u8path(*path), ec);
+    auto error = tr_error{};
+    auto const capacity = tr_sys_path_get_capacity(*path, &error);
 
     // response
     args_out.try_emplace(TR_KEY_path, *path);
-    args_out.try_emplace(TR_KEY_size_bytes, !ec ? capacity.available : tr_variant{ -1 });
-    args_out.try_emplace(TR_KEY_total_size, !ec ? capacity.capacity : tr_variant{ -1 });
+    args_out.try_emplace(TR_KEY_size_bytes, capacity ? capacity->available : tr_variant{ -1 });
+    args_out.try_emplace(TR_KEY_total_size, capacity ? capacity->capacity : tr_variant{ -1 });
 
-    if (ec)
+    if (error)
     {
-        return { Error::SYSTEM_ERROR, ec.message() };
+        return { Error::SYSTEM_ERROR, std::string{ error.message() } };
     }
     return { Error::SUCCESS, {} };
 }
