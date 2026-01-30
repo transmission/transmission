@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <chrono>
 #include <filesystem>
 #include <system_error>
 #include <string>
@@ -71,6 +72,80 @@ bool tr_sys_path_exists(std::string_view path, tr_error* error)
     }
 
     return exists;
+}
+
+std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error* error)
+{
+    auto const filesystem_path = tr_u8path(path);
+
+    auto status_ec = std::error_code{};
+    auto const status = (flags & TR_SYS_PATH_NO_FOLLOW) != 0 ? std::filesystem::symlink_status(filesystem_path, status_ec) :
+                                                               std::filesystem::status(filesystem_path, status_ec);
+
+    if (status_ec || status.type() == std::filesystem::file_type::not_found)
+    {
+        if (error != nullptr)
+        {
+            if (status_ec)
+            {
+                error->set(status_ec.value(), status_ec.message());
+            }
+            else
+            {
+                auto const missing_ec = std::make_error_code(std::errc::no_such_file_or_directory);
+                error->set(missing_ec.value(), missing_ec.message());
+            }
+        }
+
+        return {};
+    }
+
+    auto info = tr_sys_path_info{};
+
+    if (std::filesystem::is_regular_file(status))
+    {
+        info.type = TR_SYS_PATH_IS_FILE;
+
+        auto size_ec = std::error_code{};
+        info.size = std::filesystem::file_size(filesystem_path, size_ec);
+        if (size_ec)
+        {
+            if (error != nullptr)
+            {
+                error->set(size_ec.value(), size_ec.message());
+            }
+
+            return {};
+        }
+    }
+    else if (std::filesystem::is_directory(status))
+    {
+        info.type = TR_SYS_PATH_IS_DIRECTORY;
+        info.size = 0;
+    }
+    else
+    {
+        info.type = TR_SYS_PATH_IS_OTHER;
+        info.size = 0;
+    }
+
+    auto time_ec = std::error_code{};
+    auto const ftime = std::filesystem::last_write_time(filesystem_path, time_ec);
+    if (time_ec)
+    {
+        if (error != nullptr)
+        {
+            error->set(time_ec.value(), time_ec.message());
+        }
+
+        return {};
+    }
+
+    auto const sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+        ftime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+    info.last_modified_at = std::chrono::system_clock::to_time_t(sctp);
+
+    return info;
 }
 
 bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_error* error)
