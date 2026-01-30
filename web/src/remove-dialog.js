@@ -11,7 +11,7 @@ export class RemoveDialog extends EventTarget {
 
     // options: prefs, remote, torrents
     this.options = options;
-    this.options.trash = options.prefs?.remove_delete_data ?? false;
+    this.options.trash ??= false;
     this.elements = RemoveDialog._create(options);
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
