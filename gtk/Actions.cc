@@ -50,61 +50,64 @@ void action_cb(Gio::SimpleAction& action, gpointer user_data)
 void sort_changed_cb(Gio::SimpleAction& action, Glib::VariantBase const& value, gpointer /*user_data*/)
 {
     action.set_state(value);
-    myCore->set_pref(TR_KEY_sort_mode, Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(value).get());
+    myCore->set_pref(TR_KEY_sort_mode, Glib::VariantBase::cast_dynamic<VariantString>(value).get());
 }
 
-auto const show_toggle_entries = std::array<Glib::ustring, 2U>{ GTR_KEY_toggle_main_window, GTR_KEY_toggle_message_log };
-
-void toggle_pref_cb(Gio::SimpleAction& action, gpointer /*user_data*/)
-{
-    auto const key = action.get_name();
-    bool val = false;
-    action.get_state(val);
-
-    action.set_state(Glib::Variant<bool>::create(!val));
-
-    myCore->set_pref(tr_quark_new({ key.c_str(), key.size() }), !val);
-}
-
-std::array<tr_quark, 6> const pref_toggle_entries = {
-    TR_KEY_alt_speed_enabled, //
-    TR_KEY_compact_view, //
-    TR_KEY_sort_reversed, //
-    TR_KEY_show_filterbar, //
-    TR_KEY_show_statusbar, //
-    TR_KEY_show_toolbar, //
+constexpr std::array<std::string_view, 2U> const ShowToggleEntries = {
+    "toggle-main-window"sv,
+    "toggle-message-log"sv,
 };
 
-auto const entries = std::array<Glib::ustring, 29>{
-    GTR_KEY_copy_magnet_link_to_clipboard,
-    GTR_KEY_open_torrent_from_url,
-    GTR_KEY_open_torrent,
-    GTR_KEY_torrent_start,
-    GTR_KEY_torrent_start_now,
-    GTR_KEY_show_stats,
-    GTR_KEY_donate,
-    GTR_KEY_torrent_verify,
-    GTR_KEY_torrent_stop,
-    GTR_KEY_pause_all_torrents,
-    GTR_KEY_start_all_torrents,
-    GTR_KEY_relocate_torrent,
-    GTR_KEY_remove_torrent,
-    GTR_KEY_delete_torrent,
-    GTR_KEY_new_torrent,
-    GTR_KEY_quit,
-    GTR_KEY_select_all,
-    GTR_KEY_deselect_all,
-    GTR_KEY_edit_preferences,
-    GTR_KEY_show_torrent_properties,
-    GTR_KEY_open_torrent_folder,
-    GTR_KEY_show_about_dialog,
-    GTR_KEY_help,
-    GTR_KEY_torrent_reannounce,
-    GTR_KEY_queue_move_top,
-    GTR_KEY_queue_move_up,
-    GTR_KEY_queue_move_down,
-    GTR_KEY_queue_move_bottom,
-    GTR_KEY_present_main_window,
+void toggle_pref_cb(Gio::SimpleAction& action, gpointer prefs_key)
+{
+    bool val = false;
+    action.get_state(val);
+    val = !val;
+
+    action.set_state(Glib::Variant<bool>::create(val));
+    myCore->set_pref(GPOINTER_TO_INT(prefs_key), val);
+}
+
+// action-name, prefs_name
+constexpr std::array<std::pair<std::string_view, tr_quark>, 6U> const PrefToggleEntries = { {
+    { "alt-speed-enabled"sv, TR_KEY_alt_speed_enabled },
+    { "compact-view"sv, TR_KEY_compact_view },
+    { "show-filterbar"sv, TR_KEY_show_filterbar },
+    { "show-statusbar"sv, TR_KEY_show_statusbar },
+    { "show-toolbar"sv, TR_KEY_show_toolbar },
+    { "sort-reversed"sv, TR_KEY_sort_reversed },
+} };
+
+constexpr std::array<std::string_view, 29U> const Entries = {
+    "copy-magnet-link-to-clipboard"sv,
+    "delete-torrent"sv,
+    "deselect-all"sv,
+    "donate"sv,
+    "edit-preferences"sv,
+    "help"sv,
+    "new-torrent"sv,
+    "open-torrent"sv,
+    "open-torrent-folder"sv,
+    "open-torrent-from-url"sv,
+    "pause-all-torrents"sv,
+    "present-main-window"sv,
+    "queue-move-bottom"sv,
+    "queue-move-down"sv,
+    "queue-move-top"sv,
+    "queue-move-up"sv,
+    "quit"sv,
+    "relocate-torrent"sv,
+    "remove-torrent"sv,
+    "select-all"sv,
+    "show-about-dialog"sv,
+    "show-stats"sv,
+    "show-torrent-properties"sv,
+    "start-all-torrents"sv,
+    "torrent-reannounce"sv,
+    "torrent-start"sv,
+    "torrent-start-now"sv,
+    "torrent-stop"sv,
+    "torrent-verify"sv,
 };
 
 Gtk::Builder* myBuilder = nullptr;
@@ -124,20 +127,18 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
 
     auto action_group = Gio::SimpleActionGroup::create();
 
-    auto const match = gtr_pref_string_get(TR_KEY_sort_mode);
-
     {
-        auto const action_name = GTR_KEY_sort_torrents;
-        auto const action = Gio::SimpleAction::create_radio_string(action_name, match);
-        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& value)
-                                          { sort_changed_cb(*a, value, callback_user_data); });
+        auto const action_name = Glib::ustring{ "sort-torrents" };
+        auto const current_val = gtr_pref_string_get(TR_KEY_sort_mode);
+        auto const action = Gio::SimpleAction::create_radio_string(action_name, current_val);
+        action->signal_activate().connect([a = action.get()](auto const& value) { sort_changed_cb(*a, value, nullptr); });
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);
     }
 
-    for (auto const& action_name_view : show_toggle_entries)
+    for (auto const& action_name_view : ShowToggleEntries)
     {
-        auto const action_name = Glib::ustring(std::string(action_name_view));
+        auto const action_name = Glib::ustring{ std::string{ action_name_view } };
         auto const action = Gio::SimpleAction::create_bool(action_name);
         action->signal_activate().connect([a = action.get(), callback_user_data](auto const& /*value*/)
                                           { action_cb(*a, callback_user_data); });
@@ -145,20 +146,19 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
         key_to_action.try_emplace(action_name, action);
     }
 
-    for (auto const action_name_quark : pref_toggle_entries)
+    for (auto const& [action_name_view, prefs_name_quark] : PrefToggleEntries)
     {
-        auto const action_name_sv = tr_quark_get_string_view(action_name_quark);
-        auto const action_name = Glib::ustring{ std::data(action_name_sv), std::size(action_name_sv) };
-        auto const action = Gio::SimpleAction::create_bool(action_name, gtr_pref_flag_get(action_name_quark));
-        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& /*value*/)
-                                          { toggle_pref_cb(*a, callback_user_data); });
+        auto const action_name = Glib::ustring{ std::string{ action_name_view } };
+        auto const action = Gio::SimpleAction::create_bool(action_name, gtr_pref_flag_get(prefs_name_quark));
+        auto const key_ptr = GINT_TO_POINTER(prefs_name_quark);
+        action->signal_activate().connect([a = action.get(), key_ptr](auto const& /*value*/) { toggle_pref_cb(*a, key_ptr); });
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);
     }
 
-    for (auto const& action_name_view : entries)
+    for (auto const& action_name_view : Entries)
     {
-        auto const action_name = Glib::ustring(std::string(action_name_view));
+        auto const action_name = Glib::ustring{ std::string{ action_name_view } };
         auto const action = Gio::SimpleAction::create(action_name);
         action->signal_activate().connect([a = action.get(), callback_user_data](auto const& /*value*/)
                                           { action_cb(*a, callback_user_data); });

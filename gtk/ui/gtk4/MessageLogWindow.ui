@@ -15,7 +15,7 @@
 horizontal]]></property>
             <child>
               <object class="GtkButton" id="save_as_button">
-                <property name="action-name">win.save_message_log</property>
+                <property name="action-name">win.save-message-log</property>
                 <child>
                   <object class="GtkBox">
                     <property name="halign">center</property>
@@ -39,7 +39,7 @@ horizontal]]></property>
             </child>
             <child>
               <object class="GtkButton" id="clear_button">
-                <property name="action-name">win.clear_message_log</property>
+                <property name="action-name">win.clear-message-log</property>
                 <child>
                   <object class="GtkBox">
                     <property name="halign">center</property>
@@ -68,7 +68,7 @@ horizontal]]></property>
             </child>
             <child>
               <object class="GtkToggleButton" id="pause_button">
-                <property name="action-name">win.pause_message_log</property>
+                <property name="action-name">win.pause-message-log</property>
                 <child>
                   <object class="GtkBox">
                     <property name="halign">center</property>
