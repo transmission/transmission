@@ -63,20 +63,20 @@ size_t tr_torrent_queue::get_pos(tr_torrent_id_t const id)
     return pos_cache_[uid];
 }
 
-void tr_torrent_queue::set_pos(tr_torrent_id_t const id, size_t new_pos)
+bool tr_torrent_queue::set_pos(tr_torrent_id_t const id, size_t new_pos)
 {
     auto const old_pos = get_pos(id);
     auto const n_queue = std::size(queue_);
     if (old_pos >= n_queue || queue_[old_pos] != id)
     {
-        return;
+        return false;
     }
 
     new_pos = std::min(new_pos, n_queue - 1U);
 
     if (old_pos == new_pos)
     {
-        return;
+        return false;
     }
 
     auto const begin = std::begin(queue_);
@@ -91,6 +91,7 @@ void tr_torrent_queue::set_pos(tr_torrent_id_t const id, size_t new_pos)
     {
         std::rotate(old_it, next_it, std::next(new_it));
     }
+    return true;
 }
 
 bool tr_torrent_queue::to_file() const
