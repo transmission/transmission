@@ -37,8 +37,6 @@ struct tr_sys_dir_win32
 
 namespace
 {
-auto constexpr DeltaEpochInMicrosecs = UINT64_C(11644473600000000);
-
 auto constexpr NativeLocalPathPrefix = L"\\\\?\\"sv;
 auto constexpr NativeUncPathPrefix = L"\\\\?\\UNC\\"sv;
 
@@ -59,47 +57,9 @@ void set_system_error_if_file_found(tr_error* error, DWORD code)
     }
 }
 
-constexpr time_t filetime_to_unix_time(FILETIME const& t)
-{
-    uint64_t tmp = 0;
-    tmp |= t.dwHighDateTime;
-    tmp <<= 32;
-    tmp |= t.dwLowDateTime;
-    tmp /= 10; /* to microseconds */
-    tmp -= DeltaEpochInMicrosecs;
-
-    return tmp / 1000000UL;
-}
-
 constexpr bool to_bool(BOOL value) noexcept
 {
     return value != FALSE;
-}
-
-constexpr auto stat_to_sys_path_info(DWORD attributes, DWORD size_low, DWORD size_high, FILETIME const& mtime)
-{
-    auto info = tr_sys_path_info{};
-
-    if ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
-    {
-        info.type = TR_SYS_PATH_IS_DIRECTORY;
-    }
-    else if ((attributes & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_VIRTUAL)) == 0)
-    {
-        info.type = TR_SYS_PATH_IS_FILE;
-    }
-    else
-    {
-        info.type = TR_SYS_PATH_IS_OTHER;
-    }
-
-    info.size = size_high;
-    info.size <<= 32;
-    info.size |= size_low;
-
-    info.last_modified_at = filetime_to_unix_time(mtime);
-
-    return info;
 }
 
 auto constexpr Slashes = R"(\/)"sv;
@@ -331,57 +291,7 @@ void create_temp_path(char* path_template, CallbackT const& callback, tr_error* 
     }
 }
 
-std::optional<tr_sys_path_info> tr_sys_file_get_info_(tr_sys_file_t handle, tr_error* error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    auto attributes = BY_HANDLE_FILE_INFORMATION{};
-    if (to_bool(GetFileInformationByHandle(handle, &attributes)))
-    {
-        return stat_to_sys_path_info(
-            attributes.dwFileAttributes,
-            attributes.nFileSizeLow,
-            attributes.nFileSizeHigh,
-            attributes.ftLastWriteTime);
-    }
-
-    set_system_error(error, GetLastError());
-    return {};
-}
-
 } // namespace
-
-std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error* error)
-{
-    if (auto const wide_path = path_to_native_path(path); std::empty(wide_path))
-    {
-        // do nothing
-    }
-    else if ((flags & TR_SYS_PATH_NO_FOLLOW) != 0)
-    {
-        auto attributes = WIN32_FILE_ATTRIBUTE_DATA{};
-        if (to_bool(GetFileAttributesExW(wide_path.c_str(), GetFileExInfoStandard, &attributes)))
-        {
-            return stat_to_sys_path_info(
-                attributes.dwFileAttributes,
-                attributes.nFileSizeLow,
-                attributes.nFileSizeHigh,
-                attributes.ftLastWriteTime);
-        }
-    }
-    else if (auto const
-                 handle = CreateFileW(wide_path.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-             handle != INVALID_HANDLE_VALUE)
-    {
-        auto ret = tr_sys_file_get_info_(handle, error);
-        CloseHandle(handle);
-        return ret;
-    }
-
-    set_system_error(error, GetLastError());
-    return {};
-}
-
 std::string_view tr_sys_path_basename(std::string_view path, tr_error* error)
 {
     if (std::empty(path))

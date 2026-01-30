@@ -125,67 +125,6 @@ void set_file_for_single_pass(tr_sys_file_t handle)
 }
 } // namespace
 
-namespace
-{
-[[nodiscard]] auto stat_sv(std::string_view const path, struct stat* sb)
-{
-    auto const sz_path = tr_pathbuf{ path };
-    return stat(sz_path.c_str(), sb);
-}
-
-[[nodiscard]] auto lstat_sv(std::string_view const path, struct stat* sb)
-{
-    auto const sz_path = tr_pathbuf{ path };
-    return lstat(sz_path.c_str(), sb);
-}
-} // namespace
-
-std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view const path, int const flags, tr_error* error)
-{
-    struct stat sb = {};
-
-    bool ok = false;
-
-    if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
-    {
-        ok = stat_sv(path, &sb) != -1;
-    }
-    else
-    {
-        ok = lstat_sv(path, &sb) != -1;
-    }
-
-    if (!ok)
-    {
-        if (error != nullptr)
-        {
-            error->set_from_errno(errno);
-        }
-
-        return {};
-    }
-
-    auto info = tr_sys_path_info{};
-
-    if (S_ISREG(sb.st_mode))
-    {
-        info.type = TR_SYS_PATH_IS_FILE;
-    }
-    else if (S_ISDIR(sb.st_mode))
-    {
-        info.type = TR_SYS_PATH_IS_DIRECTORY;
-    }
-    else
-    {
-        info.type = TR_SYS_PATH_IS_OTHER;
-    }
-
-    info.size = static_cast<uint64_t>(sb.st_size);
-    info.last_modified_at = sb.st_mtime;
-
-    return info;
-}
-
 std::string_view tr_sys_path_basename(std::string_view path, tr_error* /*error*/)
 {
     // As per the basename() manpage:
