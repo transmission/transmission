@@ -9,9 +9,9 @@ export class RemoveDialog extends EventTarget {
   constructor(options) {
     super();
 
-    // options: remote, torrents
+    // options: prefs, remote, torrents
     this.options = options;
-    this.options.trash = false;
+    this.options.trash = options.prefs?.remove_delete_data ?? false;
     this.elements = RemoveDialog._create(options);
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
@@ -44,7 +44,7 @@ export class RemoveDialog extends EventTarget {
   }
 
   static _create(options) {
-    const { torrents } = options;
+    const { prefs, torrents } = options;
     const elements = createDialogContainer('remove-dialog');
     const { confirm, heading, message, workarea } = elements;
 
@@ -56,7 +56,7 @@ export class RemoveDialog extends EventTarget {
     const check = document.createElement('input');
     check.id = 'delete-local-data-check';
     check.type = 'checkbox';
-    check.checked = false;
+    check.checked = prefs?.remove_delete_data ?? false;
     message.append(check);
 
     const label = document.createElement('label');
