@@ -9,7 +9,9 @@
 
 #include <fmt/format.h>
 
+#ifdef WITH_UTP
 #include <libutp/utp.h>
+#endif
 
 #include "libtransmission/error.h"
 #include "libtransmission/log.h"
