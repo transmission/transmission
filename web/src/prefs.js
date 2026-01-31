@@ -127,7 +127,7 @@ Prefs.SortByState = 'state';
 Prefs.SortDescending = 'descending';
 Prefs.SortDirection = 'sort-direction';
 Prefs.SortMode = 'sort-mode';
-Prefs.RemoveDeleteData = 'remove-delete-data';
+Prefs.RemoveDeleteData = 'remove_delete_data';
 
 Prefs._Defaults = {
   [Prefs.AltSpeedEnabled]: false,
