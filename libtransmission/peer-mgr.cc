@@ -1171,7 +1171,7 @@ public:
         , bandwidth_timer_{ timer_maker.create([this]() { bandwidth_pulse(); }) }
         , peer_info_timer_{ timer_maker.create([this]() { peer_info_pulse(); }) }
         , rechoke_timer_{ timer_maker.create([this]() { rechoke_pulse_marshall(); }) }
-        , blocklists_tag_{ blocklist.observe_changes([this]() { on_blocklists_changed(); }) }
+        , blocklists_tag_{ blocklists_.changed.connect_scoped([this]() { on_blocklists_changed(); }) }
     {
         bandwidth_timer_->start_repeating(BandwidthTimerPeriod);
         peer_info_timer_->start_repeating(PeerInfoPeriod);
@@ -1207,7 +1207,7 @@ public:
 
     tr_session* const session;
     tr_torrents& torrents_;
-    tr::Blocklists const& blocklists_;
+    tr::Blocklists& blocklists_;
     Handshakes incoming_handshakes;
 
     HandshakeMediator handshake_mediator_;
@@ -1254,7 +1254,7 @@ private:
     std::unique_ptr<tr::Timer> const peer_info_timer_;
     std::unique_ptr<tr::Timer> const rechoke_timer_;
 
-    tr::ObserverTag const blocklists_tag_;
+    sigslot::scoped_connection blocklists_tag_;
 };
 
 // --- tr_peer virtual functions
