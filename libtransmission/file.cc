@@ -74,12 +74,7 @@ bool tr_sys_path_exists(std::string_view path, tr_error* error)
 {
     auto ec = std::error_code{};
     auto const exists = std::filesystem::exists(tr_u8path(path), ec);
-
-    if (error != nullptr && ec)
-    {
-        error->set(ec.value(), ec.message());
-    }
-
+    maybe_set_error(error, ec);
     return exists;
 }
 
@@ -127,7 +122,10 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
         return {};
     }
 
-    auto const sctp = std::chrono::clock_cast<std::chrono::system_clock>(ftime);
+    // TODO: use std::chrono::clock_cast when available.
+    // https://github.com/llvm/llvm-project/issues/166050
+    auto const sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+        ftime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
     info.last_modified_at = std::chrono::system_clock::to_time_t(sctp);
 
     return info;
@@ -144,6 +142,7 @@ bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_erro
     auto ec = std::error_code{};
     if (!std::filesystem::exists(u8path1, ec) || !std::filesystem::exists(u8path2, ec))
     {
+        maybe_set_error(error, ec);
         return false;
     }
 
