@@ -8,6 +8,8 @@
 #include "Prefs.h"
 #include "Utils.h"
 
+#include <libtransmission-app/app.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
@@ -48,11 +50,9 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
 
 int main(int argc, char** argv)
 {
-    /* init libtransmission */
-    tr_lib_init();
+    tr::app::init();
 
     /* init i18n */
-    tr_locale_set_global("");
     bindtextdomain(AppTranslationDomainName, TRANSMISSIONLOCALEDIR);
     bind_textdomain_codeset(AppTranslationDomainName, "UTF-8");
     textdomain(AppTranslationDomainName);
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
     }
 
     // init the unit formatters
-    using Config = libtransmission::Values::Config;
+    using Config = tr::Values::Config;
     Config::speed = { Config::Base::Kilo, _("B/s"), _("kB/s"), _("MB/s"), _("GB/s"), _("TB/s") };
     Config::memory = { Config::Base::Kibi, _("B"), _("KiB"), _("MiB"), _("GiB"), _("TiB") };
     Config::storage = { Config::Base::Kilo, _("B"), _("kB"), _("MB"), _("GB"), _("TB") };

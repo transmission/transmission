@@ -3,9 +3,11 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <memory>
+#include <ranges>
 #include <utility>
 
 #include <QCheckBox>
@@ -27,9 +29,9 @@
 #include "FilterBar.h"
 #include "Filters.h"
 #include "Formatter.h"
-#include "IconCache.h"
 #include "MainWindow.h"
 #include "MakeDialog.h"
+#include "NativeIcon.h"
 #include "OptionsDialog.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
@@ -76,52 +78,6 @@ public:
     }
 };
 
-QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) const
-{
-    if (base_icon.isNull())
-    {
-        return base_icon;
-    }
-
-    auto const& icons = IconCache::get();
-    QIcon emblem_icon;
-
-    for (QString const& emblem_name : emblem_names)
-    {
-        emblem_icon = icons.getThemeIcon(emblem_name);
-
-        if (!emblem_icon.isNull())
-        {
-            break;
-        }
-    }
-
-    if (emblem_icon.isNull())
-    {
-        return base_icon;
-    }
-
-    QIcon icon;
-
-    for (QSize const& size : base_icon.availableSizes())
-    {
-        auto const emblem_size = size / 2;
-        auto const emblem_rect = QStyle::alignedRect(
-            layoutDirection(),
-            Qt::AlignBottom | Qt::AlignRight,
-            emblem_size,
-            QRect{ QPoint{ 0, 0 }, size });
-
-        auto pixmap = base_icon.pixmap(size);
-        auto const emblem_pixmap = emblem_icon.pixmap(emblem_size);
-        QPainter{ &pixmap }.drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
-
-        icon.addPixmap(pixmap);
-    }
-
-    return icon;
-}
-
 MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool minimized)
     : session_{ session }
     , prefs_{ prefs }
@@ -135,53 +91,13 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 {
     setAcceptDrops(true);
 
-    auto* sep = new QAction{ this };
-    sep->setSeparator(true);
+    // Let the icons-in-menus logic be done by icons::shouldBeShownInMenu()
+    qApp->setAttribute(Qt::ApplicationAttribute::AA_DontShowIconsInMenus, false);
 
     ui_.setupUi(this);
 
     ui_.listView->setStyle(lvp_style_.get());
     ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
-
-    auto const& icons = IconCache::get();
-
-    // icons
-    QIcon const icon_play = icons.getThemeIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);
-    QIcon const icon_pause = icons.getThemeIcon(QStringLiteral("media-playback-pause"), QStyle::SP_MediaPause);
-    QIcon const icon_open = icons.getThemeIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
-    ui_.action_OpenFile->setIcon(icon_open);
-    ui_.action_AddURL->setIcon(
-        addEmblem(icon_open, QStringList{} << QStringLiteral("emblem-web") << QStringLiteral("applications-internet")));
-    ui_.action_New->setIcon(icons.getThemeIcon(QStringLiteral("document-new"), QStyle::SP_DesktopIcon));
-    ui_.action_Properties->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
-    ui_.action_OpenFolder->setIcon(icons.getThemeIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
-    ui_.action_Start->setIcon(icon_play);
-    ui_.action_StartNow->setIcon(icon_play);
-    ui_.action_Announce->setIcon(icons.getThemeIcon(QStringLiteral("network-transmit-receive")));
-    ui_.action_Pause->setIcon(icon_pause);
-    ui_.action_Remove->setIcon(icons.getThemeIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
-    ui_.action_Delete->setIcon(icons.getThemeIcon(QStringLiteral("edit-delete"), QStyle::SP_TrashIcon));
-    ui_.action_StartAll->setIcon(icon_play);
-    ui_.action_PauseAll->setIcon(icon_pause);
-    ui_.action_Quit->setIcon(icons.getThemeIcon(QStringLiteral("application-exit")));
-    ui_.action_SelectAll->setIcon(icons.getThemeIcon(QStringLiteral("edit-select-all")));
-    ui_.action_Preferences->setIcon(icons.getThemeIcon(QStringLiteral("preferences-system")));
-    ui_.action_Contents->setIcon(icons.getThemeIcon(QStringLiteral("help-contents"), QStyle::SP_DialogHelpButton));
-    ui_.action_About->setIcon(icons.getThemeIcon(QStringLiteral("help-about")));
-    ui_.action_QueueMoveTop->setIcon(icons.getThemeIcon(QStringLiteral("go-top")));
-    ui_.action_QueueMoveUp->setIcon(icons.getThemeIcon(QStringLiteral("go-up"), QStyle::SP_ArrowUp));
-    ui_.action_QueueMoveDown->setIcon(icons.getThemeIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
-    ui_.action_QueueMoveBottom->setIcon(icons.getThemeIcon(QStringLiteral("go-bottom")));
-
-    auto make_network_pixmap = [&icons](QString name, QSize size = { 16, 16 })
-    {
-        return icons.getThemeIcon(name, QStyle::SP_DriveNetIcon).pixmap(size);
-    };
-    pixmap_network_error_ = make_network_pixmap(QStringLiteral("network-error"));
-    pixmap_network_idle_ = make_network_pixmap(QStringLiteral("network-idle"));
-    pixmap_network_receive_ = make_network_pixmap(QStringLiteral("network-receive"));
-    pixmap_network_transmit_ = make_network_pixmap(QStringLiteral("network-transmit"));
-    pixmap_network_transmit_receive_ = make_network_pixmap(QStringLiteral("network-transmit-receive"));
 
     // ui signals
     connect(ui_.action_Toolbar, &QAction::toggled, this, &MainWindow::setToolbarVisible);
@@ -232,7 +148,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     filter_model_.setSourceModel(&model_);
     auto refresh_soon_adapter = [this]()
     {
-        refreshSoon();
+        refreshSoon(~REFRESH_ICONS);
     };
     connect(&model_, &TorrentModel::modelReset, this, refresh_soon_adapter);
     connect(&model_, &TorrentModel::rowsRemoved, this, refresh_soon_adapter);
@@ -242,16 +158,16 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setModel(&filter_model_);
     connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
-    std::array<std::pair<QAction*, int>, 9> const sort_modes = { {
-        { ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY },
-        { ui_.action_SortByAge, SortMode::SORT_BY_AGE },
-        { ui_.action_SortByETA, SortMode::SORT_BY_ETA },
-        { ui_.action_SortByName, SortMode::SORT_BY_NAME },
-        { ui_.action_SortByProgress, SortMode::SORT_BY_PROGRESS },
-        { ui_.action_SortByQueue, SortMode::SORT_BY_QUEUE },
-        { ui_.action_SortByRatio, SortMode::SORT_BY_RATIO },
-        { ui_.action_SortBySize, SortMode::SORT_BY_SIZE },
-        { ui_.action_SortByState, SortMode::SORT_BY_STATE },
+    auto const sort_modes = std::array<std::pair<QAction*, SortMode>, 9U>{ {
+        { ui_.action_SortByActivity, SortMode::SortByActivity },
+        { ui_.action_SortByAge, SortMode::SortByAge },
+        { ui_.action_SortByETA, SortMode::SortByEta },
+        { ui_.action_SortByName, SortMode::SortByName },
+        { ui_.action_SortByProgress, SortMode::SortByProgress },
+        { ui_.action_SortByQueue, SortMode::SortByQueue },
+        { ui_.action_SortByRatio, SortMode::SortByRatio },
+        { ui_.action_SortBySize, SortMode::SortBySize },
+        { ui_.action_SortByState, SortMode::SortByState },
     } };
 
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
@@ -259,7 +175,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     for (auto const& [action, mode] : sort_modes)
     {
-        action->setProperty(SortModeKey, mode);
+        action->setProperty(SortModeKey, QVariant::fromValue(mode));
         action_group->addAction(action);
     }
 
@@ -291,7 +207,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&tray_icon_, &QSystemTrayIcon::activated, this, &MainWindow::trayActivated);
 
     toggleWindows(!minimized);
-    ui_.action_TrayIcon->setChecked(minimized || prefs.getBool(Prefs::SHOW_TRAY_ICON));
+    ui_.action_TrayIcon->setChecked(minimized || prefs.get<bool>(Prefs::SHOW_TRAY_ICON));
 
     initStatusBar();
     auto* filter_bar = new FilterBar{ prefs_, model_, filter_model_ };
@@ -346,8 +262,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&network_timer_, &QTimer::timeout, this, &MainWindow::updateNetworkLabel);
     connect(&refresh_timer_, &QTimer::timeout, this, &MainWindow::onRefreshTimer);
 
-    onSessionSourceChanged();
-    refreshSoon();
+    refreshSoon(~0);
 }
 
 void MainWindow::onSessionSourceChanged()
@@ -524,7 +439,7 @@ QMenu* MainWindow::createStatsModeMenu()
 
 void MainWindow::onSortModeChanged(QAction const* action)
 {
-    prefs_.set(Prefs::SORT_MODE, SortMode(action->property(SortModeKey).toInt()));
+    prefs_.set(Prefs::SORT_MODE, action->property(SortModeKey));
 }
 
 void MainWindow::setSortAscendingPref(bool b)
@@ -636,7 +551,7 @@ void openSelect(QString const& path)
     }
 
     auto top = first_filename.left(slash_index);
-    if (!std::all_of(std::begin(files), std::end(files), [&top](auto const& file) { return file.filename.startsWith(top); }))
+    if (!std::ranges::all_of(files, [&top](auto const& file) { return file.filename.startsWith(top); }))
     {
         return {};
     }
@@ -762,6 +677,11 @@ void MainWindow::onRefreshTimer()
         refreshTitle();
     }
 
+    if (fields & REFRESH_ICONS)
+    {
+        refreshIcons();
+    }
+
     if (fields & (REFRESH_TRAY_ICON | REFRESH_STATUS_BAR))
     {
         auto const stats = getTransferStats();
@@ -833,7 +753,7 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     ui_.downloadSpeedLabel->setText(stats.speed_down.to_download_qstring());
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
 
-    auto const mode = prefs_.getString(Prefs::STATUSBAR_STATS);
+    auto const mode = prefs_.get<QString>(Prefs::STATUSBAR_STATS);
     auto str = QString{};
 
     if (mode == session_ratio_stats_mode_name_)
@@ -927,8 +847,8 @@ void MainWindow::refreshActionSensitivity()
     {
         return tor->isPaused();
     };
-    auto const any_paused = std::any_of(std::begin(torrents), std::end(torrents), is_paused);
-    auto const any_not_paused = !std::all_of(std::begin(torrents), std::end(torrents), is_paused);
+    auto const any_paused = std::ranges::any_of(torrents, is_paused);
+    auto const any_not_paused = !std::ranges::all_of(torrents, is_paused);
 
     auto const have_selection = selected > 0;
     auto const have_selection_with_metadata = selected_with_metadata > 0;
@@ -961,6 +881,53 @@ void MainWindow::refreshActionSensitivity()
     {
         details_dialog_->setIds(getSelectedTorrents());
     }
+}
+
+void MainWindow::refreshIcons()
+{
+    auto set_icon = [](QAction* const action, icons::Type const type)
+    {
+        action->setIcon(icons::icon(type));
+        action->setIconVisibleInMenu(icons::shouldBeShownInMenu(type));
+    };
+    set_icon(ui_.action_About, icons::Type::About);
+    set_icon(ui_.action_AddURL, icons::Type::AddTorrentFromURL);
+    set_icon(ui_.action_Contents, icons::Type::Help);
+    set_icon(ui_.action_CopyMagnetToClipboard, icons::Type::CopyMagnetLinkToClipboard);
+    set_icon(ui_.action_Delete, icons::Type::RemoveTorrentAndDeleteData);
+    set_icon(ui_.action_DeselectAll, icons::Type::DeselectAll);
+    set_icon(ui_.action_Donate, icons::Type::Donate);
+    set_icon(ui_.action_New, icons::Type::CreateNewTorrent);
+    set_icon(ui_.action_OpenFile, icons::Type::AddTorrentFromFile);
+    set_icon(ui_.action_OpenFolder, icons::Type::OpenTorrentLocalFolder);
+    set_icon(ui_.action_Pause, icons::Type::PauseTorrent);
+    set_icon(ui_.action_Preferences, icons::Type::Settings);
+    set_icon(ui_.action_Properties, icons::Type::OpenTorrentDetails);
+    set_icon(ui_.action_QueueMoveBottom, icons::Type::QueueMoveBottom);
+    set_icon(ui_.action_QueueMoveDown, icons::Type::QueueMoveDown);
+    set_icon(ui_.action_QueueMoveTop, icons::Type::QueueMoveTop);
+    set_icon(ui_.action_QueueMoveUp, icons::Type::QueueMoveUp);
+    set_icon(ui_.action_Quit, icons::Type::QuitApp);
+    set_icon(ui_.action_Remove, icons::Type::RemoveTorrent);
+    set_icon(ui_.action_SelectAll, icons::Type::SelectAll);
+    set_icon(ui_.action_SetLocation, icons::Type::SetTorrentLocation);
+    set_icon(ui_.action_Start, icons::Type::StartTorrent);
+    set_icon(ui_.action_StartNow, icons::Type::StartTorrentNow);
+    set_icon(ui_.action_Statistics, icons::Type::Statistics);
+    set_icon(ui_.action_Verify, icons::Type::VerifyTorrent);
+
+    // network icons
+
+    auto network_pixmap = [](icons::Type type)
+    {
+        auto constexpr Size = QSize{ 16, 16 };
+        return icons::icon(type).pixmap(Size);
+    };
+    pixmap_network_idle_ = network_pixmap(icons::Type::NetworkIdle);
+    pixmap_network_receive_ = network_pixmap(icons::Type::NetworkReceive);
+    pixmap_network_transmit_ = network_pixmap(icons::Type::NetworkTransmit);
+    pixmap_network_transmit_receive_ = network_pixmap(icons::Type::NetworkTransmitReceive);
+    pixmap_network_error_ = network_pixmap(icons::Type::NetworkError);
 }
 
 /**
@@ -1075,9 +1042,10 @@ void MainWindow::setCompactView(bool visible)
 
 void MainWindow::toggleSpeedMode()
 {
-    prefs_.toggleBool(Prefs::ALT_SPEED_LIMIT_ENABLED);
-    bool const mode = prefs_.get<bool>(Prefs::ALT_SPEED_LIMIT_ENABLED);
-    alt_speed_action_->setChecked(mode);
+    auto const key = Prefs::ALT_SPEED_LIMIT_ENABLED;
+    auto const checked = !prefs_.get<bool>(key);
+    prefs_.set<bool>(key, checked);
+    alt_speed_action_->setChecked(checked);
 }
 
 void MainWindow::setToolbarVisible(bool visible)
@@ -1144,13 +1112,12 @@ void MainWindow::trayActivated(QSystemTrayIcon::ActivationReason reason)
 void MainWindow::refreshPref(int key)
 {
     auto b = bool{};
-    auto i = int{};
     auto str = QString{};
 
     switch (key)
     {
     case Prefs::STATUSBAR_STATS:
-        str = prefs_.getString(key);
+        str = prefs_.get<QString>(key);
 
         for (auto* action : ui_.action_TotalRatio->actionGroup()->actions())
         {
@@ -1161,15 +1128,16 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::SORT_REVERSED:
-        ui_.action_ReverseSortOrder->setChecked(prefs_.getBool(key));
+        ui_.action_ReverseSortOrder->setChecked(prefs_.get<bool>(key));
         break;
 
     case Prefs::SORT_MODE:
-        i = prefs_.get<SortMode>(key).mode();
-
-        for (auto* action : ui_.action_SortByActivity->actionGroup()->actions())
         {
-            action->setChecked(i == action->property(SortModeKey).toInt());
+            auto const sort_mode = prefs_.get<SortMode>(key);
+            for (auto* action : ui_.action_SortByActivity->actionGroup()->actions())
+            {
+                action->setChecked(sort_mode == action->property(SortModeKey).value<SortMode>());
+            }
         }
 
         break;
@@ -1201,25 +1169,25 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::FILTERBAR:
-        b = prefs_.getBool(key);
+        b = prefs_.get<bool>(key);
         filter_bar_->setVisible(b);
         ui_.action_Filterbar->setChecked(b);
         break;
 
     case Prefs::STATUSBAR:
-        b = prefs_.getBool(key);
+        b = prefs_.get<bool>(key);
         ui_.statusBar->setVisible(b);
         ui_.action_Statusbar->setChecked(b);
         break;
 
     case Prefs::TOOLBAR:
-        b = prefs_.getBool(key);
+        b = prefs_.get<bool>(key);
         ui_.toolBar->setVisible(b);
         ui_.action_Toolbar->setChecked(b);
         break;
 
     case Prefs::SHOW_TRAY_ICON:
-        b = prefs_.getBool(key);
+        b = prefs_.get<bool>(key);
         ui_.action_TrayIcon->setChecked(b);
         tray_icon_.setVisible(b);
         QApplication::setQuitOnLastWindowClosed(!b);
@@ -1227,7 +1195,7 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::COMPACT_VIEW:
-        b = prefs_.getBool(key);
+        b = prefs_.get<bool>(key);
         ui_.action_CompactView->setChecked(b);
         ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
         break;
@@ -1237,17 +1205,17 @@ void MainWindow::refreshPref(int key)
     case Prefs::MAIN_WINDOW_WIDTH:
     case Prefs::MAIN_WINDOW_HEIGHT:
         setGeometry(
-            prefs_.getInt(Prefs::MAIN_WINDOW_X),
-            prefs_.getInt(Prefs::MAIN_WINDOW_Y),
-            prefs_.getInt(Prefs::MAIN_WINDOW_WIDTH),
-            prefs_.getInt(Prefs::MAIN_WINDOW_HEIGHT));
+            prefs_.get<int>(Prefs::MAIN_WINDOW_X),
+            prefs_.get<int>(Prefs::MAIN_WINDOW_Y),
+            prefs_.get<int>(Prefs::MAIN_WINDOW_WIDTH),
+            prefs_.get<int>(Prefs::MAIN_WINDOW_HEIGHT));
         break;
 
     case Prefs::ALT_SPEED_LIMIT_ENABLED:
     case Prefs::ALT_SPEED_LIMIT_UP:
     case Prefs::ALT_SPEED_LIMIT_DOWN:
         {
-            b = prefs_.getBool(Prefs::ALT_SPEED_LIMIT_ENABLED);
+            b = prefs_.get<bool>(Prefs::ALT_SPEED_LIMIT_ENABLED);
             alt_speed_action_->setChecked(b);
             ui_.altSpeedButton->setChecked(b);
             auto const fmt = b ? tr("Click to disable Temporary Speed Limits\n (%1 down, %2 up)") :
@@ -1259,7 +1227,7 @@ void MainWindow::refreshPref(int key)
         }
 
     case Prefs::READ_CLIPBOARD:
-        auto_add_clipboard_links_ = prefs_.getBool(Prefs::READ_CLIPBOARD);
+        auto_add_clipboard_links_ = prefs_.get<bool>(Prefs::READ_CLIPBOARD);
         break;
 
     default:
@@ -1282,7 +1250,7 @@ void MainWindow::openTorrent()
 {
     auto* const d = new QFileDialog{ this,
                                      tr("Open Torrent"),
-                                     prefs_.getString(Prefs::OPEN_DIALOG_FOLDER),
+                                     prefs_.get<QString>(Prefs::OPEN_DIALOG_FOLDER),
                                      tr("Torrent Files (*.torrent);;All Files (*.*)") };
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
@@ -1290,7 +1258,7 @@ void MainWindow::openTorrent()
     if (auto* const l = qobject_cast<QGridLayout*>(d->layout()); l != nullptr)
     {
         auto* b = new QCheckBox{ tr("Show &options dialog") };
-        b->setChecked(prefs_.getBool(Prefs::OPTIONS_PROMPT));
+        b->setChecked(prefs_.get<bool>(Prefs::OPTIONS_PROMPT));
         b->setObjectName(show_options_checkbox_name_);
         l->addWidget(b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
     }
@@ -1346,7 +1314,7 @@ void MainWindow::addTorrentFromClipboard()
 
 void MainWindow::addTorrents(QStringList const& filenames)
 {
-    bool show_options = prefs_.getBool(Prefs::OPTIONS_PROMPT);
+    bool show_options = prefs_.get<bool>(Prefs::OPTIONS_PROMPT);
 
     if (auto const* const file_dialog = qobject_cast<QFileDialog const*>(sender()); file_dialog != nullptr)
     {
@@ -1637,7 +1605,16 @@ bool MainWindow::event(QEvent* e)
 
     case QEvent::Clipboard:
         if (auto_add_clipboard_links_)
+        {
             addTorrentFromClipboard();
+        }
+        break;
+
+    case QEvent::PaletteChange:
+        [[fallthrough]];
+
+    case QEvent::ApplicationPaletteChange:
+        refreshSoon(REFRESH_ICONS);
         break;
 
     default:

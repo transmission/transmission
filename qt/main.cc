@@ -7,6 +7,9 @@
 #include <memory>
 #include <string_view>
 
+#include <QDir>
+#include <QNetworkAccessManager>
+
 #include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
@@ -15,9 +18,13 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
+#include <libtransmission-app/app.h>
+
 #include "Application.h"
 #include "InteropHelper.h"
 #include "Prefs.h"
+#include "RpcClient.h"
+#include "VariantHelpers.h"
 
 using namespace std::string_view_literals;
 
@@ -98,9 +105,8 @@ bool tryDelegate(QStringList const& filenames)
 
 int tr_main(int argc, char** argv)
 {
-    tr_lib_init();
-
-    tr_locale_set_global("");
+    tr::app::init();
+    trqt::variant_helpers::register_qt_converters();
 
     // parse the command-line arguments
     bool minimized = false;
@@ -201,40 +207,41 @@ int tr_main(int argc, char** argv)
     }
 
     // initialize the prefs
-    auto prefs = std::make_unique<Prefs>(config_dir);
+    auto prefs = Prefs{};
+    prefs.loadFromConfigDir(config_dir);
 
     if (!host.isNull())
     {
-        prefs->set(Prefs::SESSION_REMOTE_HOST, host);
+        prefs.set(Prefs::SESSION_REMOTE_HOST, host);
     }
 
     if (!port.isNull())
     {
-        prefs->set(Prefs::SESSION_REMOTE_PORT, port.toUInt());
+        prefs.set(Prefs::SESSION_REMOTE_PORT, port.toUInt());
     }
 
     if (!username.isNull())
     {
-        prefs->set(Prefs::SESSION_REMOTE_USERNAME, username);
+        prefs.set(Prefs::SESSION_REMOTE_USERNAME, username);
     }
 
     if (!password.isNull())
     {
-        prefs->set(Prefs::SESSION_REMOTE_PASSWORD, password);
+        prefs.set(Prefs::SESSION_REMOTE_PASSWORD, password);
     }
 
     if (!host.isNull() || !port.isNull() || !username.isNull() || !password.isNull())
     {
-        prefs->set(Prefs::SESSION_IS_REMOTE, true);
+        prefs.set(Prefs::SESSION_IS_REMOTE, true);
     }
 
-    if (prefs->getBool(Prefs::START_MINIMIZED))
+    if (prefs.get<bool>(Prefs::START_MINIMIZED))
     {
         minimized = true;
     }
 
     // start as minimized only if the system tray present
-    if (!prefs->getBool(Prefs::SHOW_TRAY_ICON))
+    if (!prefs.get<bool>(Prefs::SHOW_TRAY_ICON))
     {
         minimized = false;
     }
@@ -245,8 +252,16 @@ int tr_main(int argc, char** argv)
         qt_argv.insert(qt_argv.end(), &argv[qt_args_start_idx], &argv[argc]);
     }
 
+    // run the app
     auto qt_argc = static_cast<int>(std::size(qt_argv));
+    auto nam = QNetworkAccessManager{};
+    auto rpc = RpcClient{ nam };
+    auto const app = Application{ prefs, rpc, minimized, config_dir, filenames, qt_argc, std::data(qt_argv) };
+    auto const ret = QApplication::exec();
 
-    Application const app(std::move(prefs), minimized, config_dir, filenames, qt_argc, std::data(qt_argv));
-    return QApplication::exec();
+    // save prefs before exiting
+    auto const filename = QDir{ config_dir }.absoluteFilePath(QStringLiteral("settings.json"));
+    prefs.save(filename);
+
+    return ret;
 }

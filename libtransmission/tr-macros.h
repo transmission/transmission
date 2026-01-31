@@ -11,10 +11,16 @@
 
 // ---
 
-#if __cplusplus >= 202002L || _MSVC_LANG >= 202002L
-#define TR_CONSTEXPR20 constexpr
+#if __cpp_lib_constexpr_vector >= 201907L
+#define TR_CONSTEXPR_VEC constexpr
 #else
-#define TR_CONSTEXPR20
+#define TR_CONSTEXPR_VEC
+#endif
+
+#if __cpp_lib_constexpr_string >= 201907L
+#define TR_CONSTEXPR_STR constexpr
+#else
+#define TR_CONSTEXPR_STR
 #endif
 
 #if __cplusplus >= 202302L // _MSVC_LANG value for C++23 not available yet

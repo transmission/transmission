@@ -102,6 +102,7 @@ std::vector<tr_torrent_id_t> tr_torrents::removedSince(time_t timestamp) const
     }
 
     std::sort(std::begin(ids), std::end(ids));
-    ids.erase(std::unique(std::begin(ids), std::end(ids)), std::end(ids));
+    auto const unique_it = std::unique(std::begin(ids), std::end(ids));
+    ids.erase(unique_it, std::end(ids));
     return ids;
 }

@@ -9,6 +9,7 @@
 #include <cstring>
 #include <iterator> // back_inserter
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 
@@ -118,9 +119,8 @@ std::optional<tr_sha1_digest_t> parseBase32Hash(std::string_view sv)
         return {};
     }
 
-    if (!std::all_of(
-            std::begin(sv),
-            std::end(sv),
+    if (!std::ranges::all_of(
+            sv,
             [](unsigned char ch)
             { return '0' <= ch && ch < '0' + std::size(bitzi::Base32Lookup) && bitzi::Base32Lookup[ch - '0'] != 0xFF; }))
     {
@@ -195,7 +195,7 @@ std::string tr_magnet_metainfo::magnet() const
 
 void tr_magnet_metainfo::set_name(std::string_view name)
 {
-    name_ = tr_strv_convert_utf8(name);
+    name_ = tr_strv_to_utf8_string(name);
 }
 
 void tr_magnet_metainfo::add_webseed(std::string_view webseed)
@@ -207,7 +207,7 @@ void tr_magnet_metainfo::add_webseed(std::string_view webseed)
 
     auto& urls = webseed_urls_;
 
-    if (auto const it = std::find(std::begin(urls), std::end(urls), webseed); it != std::end(urls))
+    if (auto const it = std::ranges::find(urls, webseed); it != std::ranges::end(urls))
     {
         return;
     }
@@ -235,7 +235,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* err
     }
 
     bool got_hash = false;
-    for (auto const& [key, value] : tr_url_query_view{ parsed->query })
+    for (auto const& [key, value] : parsed->query_entries())
     {
         if (key == "dn"sv)
         {

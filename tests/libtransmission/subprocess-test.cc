@@ -12,13 +12,14 @@
 #include <string>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/subprocess.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 #ifdef _WIN32
@@ -26,7 +27,7 @@
 #define setenv(key, value, unused) SetEnvironmentVariableA(key, value)
 #endif
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 namespace
@@ -42,7 +43,7 @@ std::string getTestProgramPath(std::string_view const filename)
 } // unnamed namespace
 
 class SubprocessTest
-    : public ::testing::Test
+    : public ::tr::test::TransmissionTest
     , public testing::WithParamInterface<std::string>
 {
 protected:
@@ -295,4 +296,4 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values( //
             getTestProgramPath("subprocess-test"))));
 
-} // namespace libtransmission::test
+} // namespace tr::test

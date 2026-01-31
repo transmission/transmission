@@ -47,7 +47,7 @@
 "%lu files" = "%lu fájl";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%lu Fájl";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu bejövő";
@@ -83,7 +83,7 @@
 "%lu tracker" = "%lu tracker";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%lu Tracker";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,7 +94,7 @@
 "%lu web seeds" = "%lu web seed";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%lu Web seed";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u szelet, egyenként %2$@";
@@ -121,7 +121,7 @@
 "1 time" = "1 alkalommal";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "1 Tracker";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "1 átvitel";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "1 Web seed";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "'%@' nem egy érvényes torrent fájl.";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "Torrent fájl létrehozása";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "Létrehozva ekkor: %@";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "Létrehozva ekkor: %1$@, ezzel: %2$@";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "Létrehozva ezzel: %@";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "\"%@\" létrehozása sikertelen.";

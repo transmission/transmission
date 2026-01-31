@@ -189,11 +189,6 @@ std::string tr_getDefaultConfigDir(std::string_view appname)
 #endif
 }
 
-size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen)
-{
-    return tr_strv_to_buf(tr_getDefaultConfigDir(appname != nullptr ? appname : ""), buf, buflen);
-}
-
 std::string tr_getDefaultDownloadDir()
 {
     if (auto dir = getXdgEntryFromUserDirs("XDG_DOWNLOAD_DIR"sv); !std::empty(dir))
@@ -213,11 +208,6 @@ std::string tr_getDefaultDownloadDir()
 #endif
 
     return fmt::format("{:s}/Downloads"sv, getHomeDir());
-}
-
-size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen)
-{
-    return tr_strv_to_buf(tr_getDefaultDownloadDir(), buf, buflen);
 }
 
 // ---

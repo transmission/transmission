@@ -16,7 +16,7 @@ struct event_base;
 struct evhttp;
 using event_callback_fn = void (*)(evutil_socket_t, short, void*);
 
-namespace libtransmission::evhelpers
+namespace tr::evhelpers
 {
 
 struct EventBaseDeleter
@@ -47,4 +47,4 @@ struct event* event_new_pri2(
     event_callback_fn callback,
     void* callback_arg);
 
-} // namespace libtransmission::evhelpers
+} // namespace tr::evhelpers

@@ -6,6 +6,7 @@
 #include <algorithm> // std::adjacent_find, std::sort
 #include <cstddef>
 #include <functional>
+#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -23,7 +24,7 @@
 
 namespace
 {
-[[nodiscard]] std::vector<tr_block_span_t> make_spans(small::vector<tr_block_index_t> const& blocks)
+[[nodiscard]] TR_CONSTEXPR_VEC std::vector<tr_block_span_t> make_spans(small::vector<tr_block_index_t> const& blocks)
 {
     if (std::empty(blocks))
     {
@@ -34,13 +35,13 @@ namespace
     spans.reserve(std::size(blocks));
     for (auto span_begin = std::begin(blocks), end = std::end(blocks); span_begin != end;)
     {
-        static auto constexpr NotAdjacent = [](tr_block_index_t const lhs, tr_block_index_t const rhs)
+        auto constexpr NotAdjacent = [](tr_block_index_t const lhs, tr_block_index_t const rhs)
         {
             return lhs + 1U != rhs;
         };
 
         auto const span_end = std::min(std::adjacent_find(span_begin, end, NotAdjacent), std::prev(end));
-        spans.push_back({ *span_begin, *span_end + 1U });
+        spans.push_back({ .begin = *span_begin, .end = *span_end + 1U });
 
         span_begin = std::next(span_end);
     }
@@ -56,6 +57,7 @@ class Wishlist::Impl
         Candidate(tr_piece_index_t piece_in, tr_piece_index_t salt_in, Mediator const* mediator)
             : piece{ piece_in }
             , block_span{ mediator->block_span(piece_in) }
+            , raw_block_span{ block_span }
             , replication{ mediator->count_piece_replication(piece_in) }
             , priority{ mediator->priority(piece_in) }
             , salt{ salt_in }
@@ -84,8 +86,9 @@ class Wishlist::Impl
 
         tr_piece_index_t piece;
         tr_block_span_t block_span;
+        tr_block_span_t raw_block_span;
 
-        // This is sorted in reverse order so that smaller blocks indices
+        // This is sorted in descending order so that smaller blocks indices
         // can be taken from the end of the list, avoiding a move operation.
         small::set<tr_block_index_t, small::default_inline_storage_v<tr_block_index_t>, std::greater<>> unrequested;
 
@@ -111,12 +114,12 @@ public:
         std::function<bool(tr_piece_index_t)> const& peer_has_piece);
 
 private:
-    TR_CONSTEXPR20 void dec_replication() noexcept
+    constexpr void dec_replication() noexcept
     {
-        std::for_each(std::begin(candidates_), std::end(candidates_), [](Candidate& candidate) { --candidate.replication; });
+        std::ranges::for_each(candidates_, [](Candidate& candidate) { --candidate.replication; });
     }
 
-    TR_CONSTEXPR20 void dec_replication_bitfield(tr_bitfield const& bitfield)
+    constexpr void dec_replication_bitfield(tr_bitfield const& bitfield)
     {
         if (bitfield.has_none())
         {
@@ -140,9 +143,9 @@ private:
         std::sort(std::begin(candidates_), std::end(candidates_));
     }
 
-    TR_CONSTEXPR20 void inc_replication() noexcept
+    constexpr void inc_replication() noexcept
     {
-        std::for_each(std::begin(candidates_), std::end(candidates_), [](Candidate& candidate) { ++candidate.replication; });
+        std::ranges::for_each(candidates_, [](Candidate& candidate) { ++candidate.replication; });
     }
 
     void inc_replication_bitfield(tr_bitfield const& bitfield)
@@ -169,7 +172,7 @@ private:
         std::sort(std::begin(candidates_), std::end(candidates_));
     }
 
-    TR_CONSTEXPR20 void inc_replication_piece(tr_piece_index_t const piece)
+    constexpr void inc_replication_piece(tr_piece_index_t const piece)
     {
         if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
         {
@@ -180,7 +183,7 @@ private:
 
     // ---
 
-    TR_CONSTEXPR20 void requested_block_span(tr_block_span_t const block_span)
+    constexpr void requested_block_span(tr_block_span_t const block_span)
     {
         for (auto block = block_span.begin; block < block_span.end;)
         {
@@ -207,7 +210,7 @@ private:
         }
     }
 
-    TR_CONSTEXPR20 void reset_block(tr_block_index_t block)
+    constexpr void reset_block(tr_block_index_t block)
     {
         if (auto it_p = find_by_block(block); it_p != std::end(candidates_))
         {
@@ -216,7 +219,7 @@ private:
         }
     }
 
-    TR_CONSTEXPR20 void reset_blocks_bitfield(tr_bitfield const& requests)
+    TR_CONSTEXPR_VEC void reset_blocks_bitfield(tr_bitfield const& requests)
     {
         for (auto& candidate : candidates_)
         {
@@ -240,7 +243,18 @@ private:
 
     // ---
 
-    TR_CONSTEXPR20 void peer_disconnect(tr_bitfield const& have, tr_bitfield const& requests)
+    constexpr void client_got_block(tr_block_index_t block)
+    {
+        if (auto const iter = find_by_block(block); iter != std::end(candidates_))
+        {
+            iter->unrequested.erase(block);
+            resort_piece(iter);
+        }
+    }
+
+    // ---
+
+    TR_CONSTEXPR_VEC void peer_disconnect(tr_bitfield const& have, tr_bitfield const& requests)
     {
         dec_replication_bitfield(have);
         reset_blocks_bitfield(requests);
@@ -248,34 +262,59 @@ private:
 
     // ---
 
-    TR_CONSTEXPR20 void got_bad_piece(tr_piece_index_t const piece)
+    void got_bad_piece(tr_piece_index_t const piece)
     {
-        if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
+        auto const iter = find_by_piece(piece);
+        if (iter == std::end(candidates_))
         {
-            for (auto [begin, i] = iter->block_span; i > begin; --i)
-            {
-                iter->unrequested.insert(i - 1U);
-            }
-            resort_piece(iter);
+            return;
         }
+        TR_ASSERT(std::empty(iter->unrequested));
+
+        iter->block_span = iter->raw_block_span;
+        if (piece > 0U)
+        {
+            if (auto const prev = find_by_piece(piece - 1U); prev != std::end(candidates_))
+            {
+                iter->block_span.begin = std::max(iter->block_span.begin, prev->block_span.end);
+                TR_ASSERT(iter->block_span.begin == prev->block_span.end);
+                for (tr_block_index_t i = iter->block_span.begin; i > iter->raw_block_span.begin; --i)
+                {
+                    prev->unrequested.insert(i - 1U);
+                }
+            }
+        }
+        if (piece < mediator_.piece_count() - 1U)
+        {
+            if (auto const next = find_by_piece(piece + 1U); next != std::end(candidates_))
+            {
+                iter->block_span.end = std::min(iter->block_span.end, next->block_span.begin);
+                TR_ASSERT(iter->block_span.end == next->block_span.begin);
+                for (tr_block_index_t i = iter->raw_block_span.end; i > iter->block_span.end; --i)
+                {
+                    next->unrequested.insert(i - 1U);
+                }
+            }
+        }
+
+        for (auto [begin, i] = iter->block_span; i > begin; --i)
+        {
+            iter->unrequested.insert(i - 1U);
+        }
+
+        std::sort(std::begin(candidates_), std::end(candidates_));
     }
 
     // ---
 
-    [[nodiscard]] TR_CONSTEXPR20 CandidateVec::iterator find_by_piece(tr_piece_index_t const piece)
+    [[nodiscard]] constexpr CandidateVec::iterator find_by_piece(tr_piece_index_t const piece)
     {
-        return std::find_if(
-            std::begin(candidates_),
-            std::end(candidates_),
-            [piece](auto const& c) { return c.piece == piece; });
+        return std::ranges::find_if(candidates_, [piece](auto const& c) { return c.piece == piece; });
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 CandidateVec::iterator find_by_block(tr_block_index_t const block)
+    [[nodiscard]] constexpr CandidateVec::iterator find_by_block(tr_block_index_t const block)
     {
-        return std::find_if(
-            std::begin(candidates_),
-            std::end(candidates_),
-            [block](auto const& c) { return c.block_belongs(block); });
+        return std::ranges::find_if(candidates_, [block](auto const& c) { return c.block_belongs(block); });
     }
 
     static constexpr tr_piece_index_t get_salt(
@@ -318,38 +357,106 @@ private:
 
     // ---
 
-    void recalculate_wanted_pieces()
+    void candidate_list_upkeep()
     {
         auto n_old_c = std::size(candidates_);
         auto salter = tr_salt_shaker<tr_piece_index_t>{};
         auto const is_sequential = mediator_.is_sequential_download();
         auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
         auto const n_pieces = mediator_.piece_count();
+        candidates_.reserve(n_pieces);
 
         std::sort(
             std::begin(candidates_),
             std::end(candidates_),
             [](auto const& lhs, auto const& rhs) { return lhs.piece < rhs.piece; });
 
+        Candidate* prev = nullptr;
         for (tr_piece_index_t piece = 0U, idx_c = 0U; piece < n_pieces; ++piece)
         {
             auto const existing_candidate = idx_c < n_old_c && piece == candidates_[idx_c].piece;
-            if (mediator_.client_wants_piece(piece))
+            auto const client_wants_piece = mediator_.client_wants_piece(piece);
+            auto const client_has_piece = mediator_.client_has_piece(piece);
+            if (client_wants_piece && !client_has_piece)
             {
                 if (existing_candidate)
                 {
+                    auto& candidate = candidates_[idx_c];
+
+                    if (auto& begin = candidate.block_span.begin; prev != nullptr)
+                    {
+                        // Shrink the block span of the previous candidate if the
+                        // previous candidate shares the edge block with this candidate.
+                        auto& previous_end = prev->block_span.end;
+                        for (tr_block_index_t i = previous_end; i > begin; --i)
+                        {
+                            prev->unrequested.erase(i - 1U);
+                        }
+                        previous_end = std::min(previous_end, begin);
+                    }
+
                     ++idx_c;
+                    prev = &candidate;
                 }
                 else
                 {
                     auto const salt = get_salt(piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
-                    candidates_.emplace_back(piece, salt, &mediator_);
+                    auto& candidate = candidates_.emplace_back(piece, salt, &mediator_);
+
+                    if (auto& begin = candidate.block_span.begin; prev != nullptr)
+                    {
+                        // Shrink the block span of this candidate if the previous candidate
+                        // shares the edge block with this candidate.
+                        auto const previous_end = prev->block_span.end;
+                        for (tr_block_index_t i = previous_end; i > begin; --i)
+                        {
+                            candidate.unrequested.erase(i - 1U);
+                        }
+                        begin = std::max(previous_end, begin);
+                    }
+
+                    prev = &candidate;
                 }
             }
             else if (existing_candidate)
             {
-                candidates_.erase(std::next(std::begin(candidates_), idx_c));
+                auto const iter = std::next(std::begin(candidates_), idx_c);
+
+                if (prev != nullptr && prev->piece + 1U == iter->piece)
+                {
+                    // If the previous candidate was consecutive with this candidate,
+                    // reset its ending block index and transfer unrequested blocks to it.
+                    for (auto i = prev->raw_block_span.end; i > prev->block_span.end; --i)
+                    {
+                        if (auto const block = i - 1U; iter->unrequested.contains(block))
+                        {
+                            prev->unrequested.insert(block);
+                        }
+                    }
+                    prev->block_span.end = prev->raw_block_span.end;
+                }
+
+                if (auto const idx_next = idx_c + 1U; idx_next < n_old_c && candidates_[idx_next].piece == iter->piece + 1U)
+                {
+                    // If the next candidate was consecutive with this candidate,
+                    // reset its beginning block index and transfer unrequested blocks to it.
+                    auto& next = candidates_[idx_next];
+                    for (auto i = next.block_span.begin; i > next.raw_block_span.begin; --i)
+                    {
+                        if (auto const block = i - 1U; iter->unrequested.contains(block))
+                        {
+                            next.unrequested.insert(block);
+                        }
+                    }
+                    next.block_span.begin = next.raw_block_span.begin;
+                }
+
+                candidates_.erase(iter);
                 --n_old_c;
+
+                // We can be sure that the next candidate's first block will not
+                // be shared with the previous candidate
+                prev = nullptr;
             }
         }
 
@@ -358,7 +465,7 @@ private:
 
     // ---
 
-    TR_CONSTEXPR20 void remove_piece(tr_piece_index_t const piece)
+    constexpr void remove_piece(tr_piece_index_t const piece)
     {
         if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
         {
@@ -396,7 +503,7 @@ private:
 
     // ---
 
-    TR_CONSTEXPR20 void resort_piece(CandidateVec::iterator const& pos_old)
+    constexpr void resort_piece(CandidateVec::iterator const& pos_old)
     {
         auto const pos_begin = std::begin(candidates_);
 
@@ -416,7 +523,7 @@ private:
 
     CandidateVec candidates_;
 
-    std::array<libtransmission::ObserverTag, 14U> const tags_;
+    std::array<tr::ObserverTag, 15U> const tags_;
 
     Mediator& mediator_;
 };
@@ -425,7 +532,7 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
     : tags_{ {
           // candidates
           mediator_in.observe_files_wanted_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool)
-                                                   { recalculate_wanted_pieces(); }),
+                                                   { candidate_list_upkeep(); }),
           // replication, unrequested
           mediator_in.observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b, tr_bitfield const& ar)
                                               { peer_disconnect(b, ar); }),
@@ -433,6 +540,8 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
           mediator_in.observe_got_bad_piece([this](tr_torrent*, tr_piece_index_t p) { got_bad_piece(p); }),
           // replication
           mediator_in.observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_bitfield(b); }),
+          // unrequested
+          mediator_in.observe_got_block([this](tr_torrent*, tr_block_index_t b) { client_got_block(b); }),
           // unrequested
           mediator_in.observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { reset_blocks_bitfield(b); }),
           // replication
@@ -458,22 +567,7 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
       } }
     , mediator_{ mediator_in }
 {
-    auto salter = tr_salt_shaker<tr_piece_index_t>{};
-    auto const is_sequential = mediator_.is_sequential_download();
-    auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
-    auto const n_pieces = mediator_.piece_count();
-    candidates_.reserve(n_pieces);
-    for (tr_piece_index_t piece = 0U; piece < n_pieces; ++piece)
-    {
-        if (mediator_.client_has_piece(piece) || !mediator_.client_wants_piece(piece))
-        {
-            continue;
-        }
-
-        auto const salt = get_salt(piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
-        candidates_.emplace_back(piece, salt, &mediator_);
-    }
-    std::sort(std::begin(candidates_), std::end(candidates_));
+    candidate_list_upkeep();
 }
 
 std::vector<tr_block_span_t> Wishlist::Impl::next(
@@ -489,8 +583,11 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
     blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates_)
     {
+        auto const n_added = std::size(blocks);
+        TR_ASSERT(n_added <= n_wanted_blocks);
+
         // do we have enough?
-        if (std::size(blocks) >= n_wanted_blocks)
+        if (n_added >= n_wanted_blocks)
         {
             break;
         }
@@ -502,15 +599,8 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         }
 
         // walk the blocks in this piece that we don't have or not requested
-        for (auto it = std::rbegin(candidate.unrequested), end = std::rend(candidate.unrequested); it != end; ++it)
-        {
-            if (std::size(blocks) >= n_wanted_blocks)
-            {
-                break;
-            }
-
-            blocks.emplace_back(*it);
-        }
+        auto const n_to_add = std::min(std::size(candidate.unrequested), n_wanted_blocks - n_added);
+        std::copy_n(std::rbegin(candidate.unrequested), n_to_add, std::back_inserter(blocks));
     }
 
     // Ensure the list of blocks are sorted

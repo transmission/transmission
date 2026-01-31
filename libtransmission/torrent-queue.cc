@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -49,49 +50,55 @@ size_t tr_torrent_queue::get_pos(tr_torrent_id_t const id)
     if (auto n_cache = std::size(pos_cache_);
         uid >= n_cache || pos_cache_[uid] >= std::size(queue_) || id != queue_[pos_cache_[uid]])
     {
-        auto const begin = std::begin(queue_);
-        auto const end = std::end(queue_);
-        auto it = std::find(begin, end, id);
-        if (it == end)
+        auto it = std::ranges::find(queue_, id);
+        if (it == std::ranges::cend(queue_))
         {
             return MaxQueuePosition;
         }
 
         pos_cache_.resize(std::max(uid + 1U, n_cache));
-        pos_cache_[uid] = it - begin;
+        pos_cache_[uid] = std::ranges::distance(std::ranges::cbegin(queue_), it);
     }
 
     return pos_cache_[uid];
 }
 
-void tr_torrent_queue::set_pos(tr_torrent_id_t const id, size_t new_pos)
+// returns the list of torrent IDs whose queue position changed
+std::vector<tr_torrent_id_t> tr_torrent_queue::set_pos(tr_torrent_id_t const id, size_t new_pos)
 {
     auto const old_pos = get_pos(id);
     auto const n_queue = std::size(queue_);
     if (old_pos >= n_queue || queue_[old_pos] != id)
     {
-        return;
+        return {};
     }
 
     new_pos = std::min(new_pos, n_queue - 1U);
 
     if (old_pos == new_pos)
     {
-        return;
+        return {};
     }
+
+    auto ret = std::vector<tr_torrent_id_t>{};
 
     auto const begin = std::begin(queue_);
     auto const old_it = std::next(begin, old_pos);
-    auto const next_it = std::next(old_it);
+    auto const old_next_it = std::next(old_it);
     auto const new_it = std::next(begin, new_pos);
     if (old_pos > new_pos)
     {
-        std::rotate(new_it, old_it, next_it);
+        ret.assign(new_it, old_next_it);
+        std::rotate(new_it, old_it, old_next_it);
     }
     else
     {
-        std::rotate(old_it, next_it, std::next(new_it));
+        auto const new_next_it = std::next(new_it);
+        ret.assign(old_it, new_next_it);
+        std::rotate(old_it, old_next_it, new_next_it);
     }
+
+    return ret;
 }
 
 bool tr_torrent_queue::to_file() const

@@ -35,7 +35,7 @@ public:
     void remove(tr_torrent const* tor, time_t current_time);
 
     // O(1)
-    [[nodiscard]] TR_CONSTEXPR20 tr_torrent* get(tr_torrent_id_t id) const
+    [[nodiscard]] constexpr tr_torrent* get(tr_torrent_id_t id) const
     {
         auto const uid = static_cast<size_t>(id);
         return uid >= std::size(by_id_) ? nullptr : by_id_.at(uid);
@@ -65,40 +65,40 @@ public:
 
     [[nodiscard]] std::vector<tr_torrent_id_t> removedSince(time_t timestamp) const;
 
-    [[nodiscard]] TR_CONSTEXPR20 auto cbegin() const noexcept
+    [[nodiscard]] constexpr auto cbegin() const noexcept
     {
         return std::cbegin(by_hash_);
     }
-    [[nodiscard]] TR_CONSTEXPR20 auto begin() const noexcept
+    [[nodiscard]] constexpr auto begin() const noexcept
     {
         return cbegin();
     }
-    [[nodiscard]] TR_CONSTEXPR20 auto begin() noexcept
+    [[nodiscard]] constexpr auto begin() noexcept
     {
         return std::begin(by_hash_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto cend() const noexcept
+    [[nodiscard]] constexpr auto cend() const noexcept
     {
         return std::cend(by_hash_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto end() const noexcept
+    [[nodiscard]] constexpr auto end() const noexcept
     {
         return cend();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto end() noexcept
+    [[nodiscard]] constexpr auto end() noexcept
     {
         return std::end(by_hash_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
+    [[nodiscard]] constexpr auto size() const noexcept
     {
         return std::size(by_hash_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto empty() const noexcept
+    [[nodiscard]] constexpr auto empty() const noexcept
     {
         return std::empty(by_hash_);
     }

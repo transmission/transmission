@@ -34,7 +34,7 @@
  * your system is capable in that IP protocol. And if the global address is
  * the same as the source address, then you are not behind a NAT.
  */
-class tr_ip_cache
+class tr_ip_cache : public std::enable_shared_from_this<tr_ip_cache>
 {
 public:
     struct Mediator
@@ -50,10 +50,10 @@ public:
             return {};
         }
 
-        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
+        [[nodiscard]] virtual tr::TimerMaker& timer_maker() = 0;
     };
 
-    explicit tr_ip_cache(Mediator& mediator_in);
+    static std::shared_ptr<tr_ip_cache> create(Mediator& mediator);
 
     tr_ip_cache() = delete;
     ~tr_ip_cache();
@@ -96,6 +96,8 @@ private:
     template<typename T>
     using array_ip_t = std::array<T, NUM_TR_AF_INET_TYPES>;
 
+    explicit tr_ip_cache(Mediator& mediator_in);
+
     void unset_global_addr(tr_address_type type) noexcept;
     void set_source_addr(tr_address const& addr_new) noexcept;
     void unset_addr(tr_address_type type) noexcept;
@@ -117,9 +119,9 @@ private:
 
     enum class is_updating_t : uint8_t
     {
-        NO = 0,
-        YES,
-        ABORT
+        No = 0,
+        Yes,
+        Abort
     };
     array_ip_t<is_updating_t> is_updating_ = {};
 
@@ -134,7 +136,7 @@ private:
     // Keep the timer at the bottom of the class definition so that it will be destructed first
     // We don't want it to trigger after the IP addresses have been destroyed
     // (The destructor will acquire the IP address locks before proceeding, but still)
-    array_ip_t<std::unique_ptr<libtransmission::Timer>> upkeep_timers_;
+    array_ip_t<std::unique_ptr<tr::Timer>> upkeep_timers_;
 
     // Whether this machine supports this IP protocol
     array_ip_t<bool> has_ip_protocol_ = { true, true };

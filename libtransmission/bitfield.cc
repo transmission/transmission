@@ -4,13 +4,13 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::copy, std::fill_n, std::min, std::max
+#include <bit>
 #include <cstddef>
 #include <cstdint>
 #include <vector> // std::vector
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/tr-assert.h" // TR_ASSERT, TR_ENABLE_ASSERTS
-#include "libtransmission/tr-popcount.h" // tr_popcnt
 
 // ---
 
@@ -49,21 +49,13 @@ void setAllTrue(uint8_t* array, size_t bit_count)
     }
 }
 
-/* Switch to std::popcount if project upgrades to c++20 or newer */
-[[nodiscard]] uint32_t doPopcount(uint8_t flags) noexcept
-{
-    /* If flags are ever expanded to use machine words instead of
-       uint8_t popcnt64 is also available */
-    return tr_popcnt<uint8_t>::count(flags);
-}
-
 [[nodiscard]] size_t rawCountFlags(uint8_t const* flags, size_t n) noexcept
 {
     auto ret = size_t{};
 
     for (auto const* const end = flags + n; flags != end; ++flags)
     {
-        ret += doPopcount(*flags);
+        ret += std::popcount(*flags);
     }
 
     return ret;
@@ -105,7 +97,7 @@ size_t tr_bitfield::count_flags(size_t begin, size_t end) const noexcept
         val <<= i;
         i = (begin - end) & 7U;
         val >>= i;
-        ret = doPopcount(val);
+        ret = std::popcount(val);
     }
     else
     {
@@ -116,7 +108,7 @@ size_t tr_bitfield::count_flags(size_t begin, size_t end) const noexcept
         uint8_t val = flags_[first_byte];
         val <<= first_shift;
         /* No need to shift back val for correct popcount. */
-        ret = doPopcount(val);
+        ret = std::popcount(val);
 
         /* middle bytes */
 
@@ -125,13 +117,13 @@ size_t tr_bitfield::count_flags(size_t begin, size_t end) const noexcept
         size_t tmp_accum = 0;
         for (size_t i = first_byte + 1; i < walk_end;)
         {
-            tmp_accum += doPopcount(flags_[i]);
+            tmp_accum += std::popcount(flags_[i]);
             i += 2;
             if (i > walk_end)
             {
                 break;
             }
-            ret += doPopcount(flags_[i - 1]);
+            ret += std::popcount(flags_[i - 1]);
         }
         ret += tmp_accum;
 
@@ -146,7 +138,7 @@ size_t tr_bitfield::count_flags(size_t begin, size_t end) const noexcept
             val = flags_[last_byte];
             val >>= last_shift;
             /* No need to shift back val for correct popcount. */
-            ret += doPopcount(val);
+            ret += std::popcount(val);
         }
     }
 
@@ -339,11 +331,11 @@ void tr_bitfield::set(size_t nth, bool value)
     /* Already tested that val != nth bit so just swap */
     auto& byte = flags_[nth >> 3U];
 #ifdef TR_ENABLE_ASSERTS
-    auto const old_byte_pop = doPopcount(byte);
+    auto const old_byte_pop = std::popcount(byte);
 #endif
     byte ^= 0x80 >> (nth & 7U);
 #ifdef TR_ENABLE_ASSERTS
-    auto const new_byte_pop = doPopcount(byte);
+    auto const new_byte_pop = std::popcount(byte);
 #endif
 
     if (value)

@@ -301,7 +301,7 @@ public:
 
     // ---
 
-    [[nodiscard]] bool is_blocklisted(libtransmission::Blocklists const& blocklist) const
+    [[nodiscard]] bool is_blocklisted(tr::Blocklists const& blocklist) const
     {
         if (!blocklisted_.has_value())
         {
@@ -716,7 +716,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
 
 [[nodiscard]] uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor);
 
-[[nodiscard]] struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count);
+[[nodiscard]] std::vector<tr_peer_stat> tr_peerMgrPeerStats(tr_torrent const* tor);
 
 [[nodiscard]] tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
 

@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::sort()
+#include <ranges>
 
 #include <QUrl>
 
@@ -100,7 +101,7 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
 
     // sort 'em
     static auto constexpr Comp = CompareTrackers{};
-    std::sort(trackers.begin(), trackers.end(), Comp);
+    std::ranges::sort(trackers, Comp);
 
     // merge 'em with the existing list
     unsigned int old_index = 0;

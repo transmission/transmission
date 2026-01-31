@@ -23,7 +23,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
+namespace tr
 {
 
 class EvTimer final : public Timer
@@ -173,4 +173,4 @@ std::unique_ptr<Timer> EvTimerMaker::create()
     return std::make_unique<EvTimer>(event_base_);
 }
 
-} // namespace libtransmission
+} // namespace tr

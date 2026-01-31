@@ -8,7 +8,7 @@
 
 #include "libtransmission/utils-ev.h"
 
-namespace libtransmission::evhelpers
+namespace tr::evhelpers
 {
 
 void EventBaseDeleter::operator()(struct event_base* evbase) const noexcept
@@ -50,4 +50,4 @@ struct event* event_new_pri2(
     return e;
 }
 
-} // namespace libtransmission::evhelpers
+} // namespace tr::evhelpers

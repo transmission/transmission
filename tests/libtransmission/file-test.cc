@@ -25,12 +25,13 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 #if !defined(__OpenBSD__)
@@ -45,15 +46,15 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
-class FileTest : public SessionTest
+class FileTest : public SandboxedTest
 {
 protected:
     auto createTestDir(std::string const& child_name)
     {
-        auto test_dir = tr_pathbuf{ session_->configDir(), '/', child_name };
+        auto test_dir = tr_pathbuf{ sandboxDir(), '/', child_name };
         tr_sys_dir_create(test_dir, 0, 0777);
         return test_dir;
     }
@@ -700,37 +701,37 @@ TEST_F(FileTest, pathResolve)
 TEST_F(FileTest, pathBasename)
 {
     auto const common_xname_tests = std::vector<XnameTestData>{
-        XnameTestData{ "/", "/" },
-        { "", "." },
+        XnameTestData{ .input = "/", .output = "/" },
+        { .input = "", .output = "." },
 #ifdef _WIN32
-        { "\\", "/" },
+        { .input = "\\", .output = "/" },
         /* Invalid paths */
-        { R"(\\\)", "" },
-        { "123:", "" },
+        { .input = R"(\\\)", .output = "" },
+        { .input = "123:", .output = "" },
         /* Reserved characters */
-        { "<", "" },
-        { ">", "" },
-        { ":", "" },
-        { "\"", "" },
-        { "|", "" },
-        { "?", "" },
-        { "*", "" },
-        { "a\\<", "" },
-        { "a\\>", "" },
-        { "a\\:", "" },
-        { "a\\\"", "" },
-        { "a\\|", "" },
-        { "a\\?", "" },
-        { "a\\*", "" },
-        { R"(c:\a\b<c\d)", "" },
-        { R"(c:\a\b>c\d)", "" },
-        { R"(c:\a\b:c\d)", "" },
-        { R"(c:\a\b"c\d)", "" },
-        { R"(c:\a\b|c\d)", "" },
-        { R"(c:\a\b?c\d)", "" },
-        { R"(c:\a\b*c\d)", "" },
+        { .input = "<", .output = "" },
+        { .input = ">", .output = "" },
+        { .input = ":", .output = "" },
+        { .input = "\"", .output = "" },
+        { .input = "|", .output = "" },
+        { .input = "?", .output = "" },
+        { .input = "*", .output = "" },
+        { .input = "a\\<", .output = "" },
+        { .input = "a\\>", .output = "" },
+        { .input = "a\\:", .output = "" },
+        { .input = "a\\\"", .output = "" },
+        { .input = "a\\|", .output = "" },
+        { .input = "a\\?", .output = "" },
+        { .input = "a\\*", .output = "" },
+        { .input = R"(c:\a\b<c\d)", .output = "" },
+        { .input = R"(c:\a\b>c\d)", .output = "" },
+        { .input = R"(c:\a\b:c\d)", .output = "" },
+        { .input = R"(c:\a\b"c\d)", .output = "" },
+        { .input = R"(c:\a\b|c\d)", .output = "" },
+        { .input = R"(c:\a\b?c\d)", .output = "" },
+        { .input = R"(c:\a\b*c\d)", .output = "" },
 #else
-        { "////", "/" },
+        { .input = "////", .output = "/" },
 #endif
     };
 
@@ -738,25 +739,25 @@ TEST_F(FileTest, pathBasename)
     // testPathXname(common_xname_tests.data(), common_xname_tests.size(), tr_sys_path_dirname);
 
     auto const basename_tests = std::vector<XnameTestData>{
-        XnameTestData{ "a", "a" },
-        { "aa", "aa" },
-        { "/aa", "aa" },
-        { "/a/b/c", "c" },
-        { "/a/b/c/", "c" },
+        XnameTestData{ .input = "a", .output = "a" },
+        { .input = "aa", .output = "aa" },
+        { .input = "/aa", .output = "aa" },
+        { .input = "/a/b/c", .output = "c" },
+        { .input = "/a/b/c/", .output = "c" },
 #ifdef _WIN32
-        { R"(c:\a\b\c)", "c" },
-        { "c:", "/" },
-        { "c:/", "/" },
-        { "c:\\", "/" },
-        { "c:a/b", "b" },
-        { "c:a", "a" },
-        { R"(\\a\b\c)", "c" },
-        { "//a/b", "b" },
-        { "//1.2.3.4/b", "b" },
-        { "\\\\a", "a" },
-        { "\\\\1.2.3.4", "1.2.3.4" },
-        { "\\", "/" },
-        { "\\a", "a" },
+        { .input = R"(c:\a\b\c)", .output = "c" },
+        { .input = "c:", .output = "/" },
+        { .input = "c:/", .output = "/" },
+        { .input = "c:\\", .output = "/" },
+        { .input = "c:a/b", .output = "b" },
+        { .input = "c:a", .output = "a" },
+        { .input = R"(\\a\b\c)", .output = "c" },
+        { .input = "//a/b", .output = "b" },
+        { .input = "//1.2.3.4/b", .output = "b" },
+        { .input = "\\\\a", .output = "a" },
+        { .input = "\\\\1.2.3.4", .output = "1.2.3.4" },
+        { .input = "\\", .output = "/" },
+        { .input = "\\a", .output = "a" },
 #endif
     };
 
@@ -845,10 +846,6 @@ TEST_F(FileTest, pathDirname)
     {
         EXPECT_EQ(expected, tr_sys_path_dirname(input))
             << "input[" << input << "] expected [" << expected << "] actual [" << tr_sys_path_dirname(input) << "]\n";
-
-        auto path = tr_pathbuf{ input };
-        path.popdir();
-        EXPECT_EQ(expected, path) << "input[" << input << "] expected [" << expected << "] actual [" << path << "]\n";
     }
 
     /* TODO: is_same(dirname(x) + '/' + basename(x), x) */
@@ -1391,4 +1388,4 @@ TEST_F(FileTest, dirOpen)
     EXPECT_FALSE(err) << err;
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

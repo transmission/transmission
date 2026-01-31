@@ -26,6 +26,8 @@
 
 #include <event2/event.h>
 
+#include <gtest/gtest.h>
+
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include <libtransmission/announcer.h>
@@ -40,7 +42,6 @@
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_p...
 #include "libtransmission/utils.h"
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -48,15 +49,14 @@ using namespace std::literals;
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
-using MessageBuffer = libtransmission::StackBuffer<4096, std::byte>;
+using MessageBuffer = tr::StackBuffer<4096, std::byte>;
 
-class AnnouncerUdpTest : public ::testing::Test
+class AnnouncerUdpTest : public ::tr::test::TransmissionTest
 {
 private:
     void SetUp() override
     {
         ::testing::Test::SetUp();
-        tr_lib_init();
         tr_timeUpdate(time(nullptr));
     }
 
@@ -83,6 +83,56 @@ protected:
 
         [[nodiscard]] std::optional<tr_address> announce_ip() const override
         {
+            return {};
+        }
+
+        // Mock DNS lookup that only resolves localhost
+        [[nodiscard]] std::optional<tr_socket_address> dns_lookup(
+            tr_address_type const ip_protocol,
+            std::string_view const name,
+            uint16_t const service,
+            std::string_view /*log_name*/) const override
+        {
+            auto const is_localhost = name == "localhost"sv;
+            auto const port = tr_port::from_host(service);
+            switch (ip_protocol)
+            {
+            case TR_AF_INET:
+                if (is_localhost)
+                {
+                    auto const addr = tr_address::from_string("127.0.0.1"sv);
+                    EXPECT_TRUE(addr);
+                    EXPECT_TRUE(addr->is_ipv4_loopback());
+                    return tr_socket_address{ *addr, port };
+                }
+
+                if (auto const addr = tr_address::from_string(name); addr && addr->is_ipv4_loopback())
+                {
+                    return tr_socket_address{ *addr, port };
+                }
+
+                break;
+
+            case TR_AF_INET6:
+                if (is_localhost)
+                {
+                    auto const addr = tr_address::from_string("::1");
+                    EXPECT_TRUE(addr);
+                    EXPECT_TRUE(addr->is_ipv6_loopback());
+                    return tr_socket_address{ *addr, port };
+                }
+
+                if (auto const addr = tr_address::from_string(name); addr && addr->is_ipv6_loopback())
+                {
+                    return tr_socket_address{ *addr, port };
+                }
+
+                break;
+
+            default:
+                break;
+            }
+
             return {};
         }
 
@@ -193,8 +243,7 @@ protected:
         sockaddr* const from = nullptr,
         socklen_t* const fromlen = nullptr)
     {
-        EXPECT_TRUE(
-            libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); }));
+        EXPECT_TRUE(tr::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); }));
         auto& sent = mediator.sent_.front();
         auto const buf = std::move(sent.buf_);
         if (from != nullptr)
@@ -325,7 +374,7 @@ protected:
     // emulate the upkeep timer that tr_announcer runs in production
     static auto createUpkeepTimer(MockMediator& mediator, std::unique_ptr<tr_announcer_udp>& announcer)
     {
-        auto timer_maker = libtransmission::EvTimerMaker{ mediator.eventBase() };
+        auto timer_maker = tr::EvTimerMaker{ mediator.eventBase() };
         auto timer = timer_maker.create();
         timer->set_callback([&announcer]() { announcer->upkeep(); });
         timer->start_repeating(200ms);
@@ -436,8 +485,20 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 2U;
-    expected_response.rows[0] = { tr_rand_obj<tr_sha1_digest_t>(), 1, 2, 3, std::nullopt };
-    expected_response.rows[1] = { tr_rand_obj<tr_sha1_digest_t>(), 4, 5, 6, std::nullopt };
+    expected_response.rows[0] = {
+        .info_hash = tr_rand_obj<tr_sha1_digest_t>(),
+        .seeders = 1,
+        .leechers = 2,
+        .downloads = 3,
+        .downloaders = std::nullopt,
+    };
+    expected_response.rows[1] = {
+        .info_hash = tr_rand_obj<tr_sha1_digest_t>(),
+        .seeders = 4,
+        .leechers = 5,
+        .downloads = 6,
+        .downloaders = std::nullopt,
+    };
     expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
 
@@ -637,35 +698,38 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv4)
         { tr_address::from_string("192.168.1.3"sv).value_or(tr_address{}), tr_port::from_host(2022) },
     } };
 
-    auto request = tr_announce_request{};
-    request.event = TR_ANNOUNCE_EVENT_STARTED;
-    request.port = tr_port::from_host(80);
-    request.key = 0xCAFE;
-    request.numwant = 20;
-    request.up = 1;
-    request.down = 2;
-    request.corrupt = 3;
-    request.leftUntilComplete = 100;
-    request.announce_url = "https://127.0.0.1/announce"sv;
-    request.tracker_id = "fnord"s;
-    request.peer_id = tr_peerIdInit();
-    request.info_hash = tr_rand_obj<tr_sha1_digest_t>();
+    auto const request = tr_announce_request{
+        .event = TR_ANNOUNCE_EVENT_STARTED,
+        .port = tr_port::from_host(80),
+        .key = 0xCAFE,
+        .numwant = 20,
+        .up = 1,
+        .down = 2,
+        .corrupt = 3,
+        .leftUntilComplete = 100,
+        .announce_url = tr_interned_string{ "https://127.0.0.1/announce"sv },
+        .tracker_id = "fnord"s,
+        .peer_id = tr_peerIdInit(),
+        .info_hash = tr_rand_obj<tr_sha1_digest_t>(),
+        .log_name = {},
+    };
 
-    auto expected_response = tr_announce_response{};
-    expected_response.info_hash = request.info_hash;
-    expected_response.did_connect = true;
-    expected_response.did_timeout = false;
-    expected_response.interval = Interval;
-    expected_response.min_interval = 0; // not specified in UDP announce
-    expected_response.seeders = Seeders;
-    expected_response.leechers = Leechers;
-    expected_response.downloads = std::nullopt; // not specified in UDP announce
-    expected_response.pex = std::vector<tr_pex>{ tr_pex{ addresses[0] }, tr_pex{ addresses[1] }, tr_pex{ addresses[2] } };
-    expected_response.pex6 = {};
-    expected_response.errmsg = {};
-    expected_response.warning = {};
-    expected_response.tracker_id = {}; // not specified in UDP announce
-    expected_response.external_ip = {};
+    auto const expected_response = tr_announce_response{
+        .info_hash = request.info_hash,
+        .did_connect = true,
+        .did_timeout = false,
+        .interval = Interval,
+        .min_interval = 0, // not specified in UDP announce
+        .seeders = Seeders,
+        .leechers = Leechers,
+        .downloads = std::nullopt, // not specified in UDP announce
+        .pex = std::vector{ tr_pex{ addresses[0] }, tr_pex{ addresses[1] }, tr_pex{ addresses[2] } },
+        .pex6 = {},
+        .errmsg = {},
+        .warning = {},
+        .tracker_id = {}, // not specified in UDP announce
+        .external_ip = {},
+    };
 
     // build the announcer
     auto mediator = MockMediator{};
@@ -720,35 +784,38 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv6)
         { tr_address::from_string("fd12:3456:789a:1::3"sv).value_or(tr_address{}), tr_port::from_host(2022) },
     } };
 
-    auto request = tr_announce_request{};
-    request.event = TR_ANNOUNCE_EVENT_STARTED;
-    request.port = tr_port::from_host(80);
-    request.key = 0xCAFE;
-    request.numwant = 20;
-    request.up = 1;
-    request.down = 2;
-    request.corrupt = 3;
-    request.leftUntilComplete = 100;
-    request.announce_url = "https://[::1]/announce"sv;
-    request.tracker_id = "fnord"s;
-    request.peer_id = tr_peerIdInit();
-    request.info_hash = tr_rand_obj<tr_sha1_digest_t>();
+    auto const request = tr_announce_request{
+        .event = TR_ANNOUNCE_EVENT_STARTED,
+        .port = tr_port::from_host(80),
+        .key = 0xCAFE,
+        .numwant = 20,
+        .up = 1,
+        .down = 2,
+        .corrupt = 3,
+        .leftUntilComplete = 100,
+        .announce_url = tr_interned_string{ "https://[::1]/announce"sv },
+        .tracker_id = "fnord"s,
+        .peer_id = tr_peerIdInit(),
+        .info_hash = tr_rand_obj<tr_sha1_digest_t>(),
+        .log_name = {},
+    };
 
-    auto expected_response = tr_announce_response{};
-    expected_response.info_hash = request.info_hash;
-    expected_response.did_connect = true;
-    expected_response.did_timeout = false;
-    expected_response.interval = Interval;
-    expected_response.min_interval = 0; // not specified in UDP announce
-    expected_response.seeders = Seeders;
-    expected_response.leechers = Leechers;
-    expected_response.downloads = std::nullopt; // not specified in UDP announce
-    expected_response.pex = {};
-    expected_response.pex6 = std::vector<tr_pex>{ tr_pex{ addresses[0] }, tr_pex{ addresses[1] }, tr_pex{ addresses[2] } };
-    expected_response.errmsg = {};
-    expected_response.warning = {};
-    expected_response.tracker_id = {}; // not specified in UDP announce
-    expected_response.external_ip = {};
+    auto const expected_response = tr_announce_response{
+        .info_hash = request.info_hash,
+        .did_connect = true,
+        .did_timeout = false,
+        .interval = Interval,
+        .min_interval = 0, // not specified in UDP announce
+        .seeders = Seeders,
+        .leechers = Leechers,
+        .downloads = std::nullopt, // not specified in UDP announce
+        .pex = {},
+        .pex6 = std::vector{ tr_pex{ addresses[0] }, tr_pex{ addresses[1] }, tr_pex{ addresses[2] } },
+        .errmsg = {},
+        .warning = {},
+        .tracker_id = {}, // not specified in UDP announce
+        .external_ip = {},
+    };
 
     // build the announcer
     auto mediator = MockMediator{};

@@ -11,8 +11,10 @@
 #include <ios>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility> // std::move
 
 #include <fmt/format.h>
@@ -37,9 +39,11 @@ namespace
 // don't ask for the same metadata piece more than this often
 auto constexpr MinRepeatIntervalSecs = time_t{ 3 };
 
-[[nodiscard]] int64_t div_ceil(int64_t numerator, int64_t denominator)
+template<typename T>
+[[nodiscard]] constexpr T n_metadata_pieces(T const& numerator) noexcept
 {
-    auto const [quot, rem] = std::lldiv(numerator, denominator);
+    auto const quot = numerator / MetadataPieceSize;
+    auto const rem = numerator % MetadataPieceSize;
     return quot + (rem == 0 ? 0 : 1);
 }
 } // namespace
@@ -60,7 +64,7 @@ tr_metadata_download::tr_metadata_download(std::string_view log_name, int64_t co
 {
     TR_ASSERT(is_valid_metadata_size(size));
 
-    auto const n = div_ceil(size, MetadataPieceSize);
+    auto const n = n_metadata_pieces(size);
     tr_logAddDebugMagnet(this, fmt::format("metadata is {} bytes in {} pieces", size, n));
 
     piece_count_ = n;
@@ -94,9 +98,10 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
     }
 
     auto const info_dict_size = this->info_dict_size();
+    using size_type = std::remove_cv_t<decltype(info_dict_size)>;
     TR_ASSERT(info_dict_size > 0);
-    if (auto const n_pieces = std::max(int64_t{ 1 }, div_ceil(info_dict_size, MetadataPieceSize));
-        piece < 0 || piece >= n_pieces)
+    if (auto const n_pieces = std::max(size_type{ 1 }, n_metadata_pieces(info_dict_size));
+        piece < 0 || static_cast<size_type>(piece) >= n_pieces)
     {
         return {};
     }
@@ -107,15 +112,17 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
         return {};
     }
     auto const offset_in_info_dict = piece * MetadataPieceSize;
-    if (auto const offset_in_file = info_dict_offset() + offset_in_info_dict; !in.seekg(offset_in_file))
+    if (auto const offset_in_file = info_dict_offset() + offset_in_info_dict;
+        !in.seekg(static_cast<std::streamoff>(offset_in_file)))
     {
         return {};
     }
 
-    auto const piece_len = static_cast<size_t>(offset_in_info_dict + MetadataPieceSize) <= info_dict_size ?
+    auto const piece_len = static_cast<size_type>(offset_in_info_dict) + MetadataPieceSize <= info_dict_size ?
         MetadataPieceSize :
         info_dict_size - offset_in_info_dict;
-    if (auto ret = tr_metadata_piece(piece_len); in.read(reinterpret_cast<char*>(std::data(ret)), std::size(ret)))
+    if (auto ret = tr_metadata_piece(piece_len);
+        in.read(reinterpret_cast<char*>(std::data(ret)), static_cast<std::streamsize>(std::size(ret))))
     {
         return ret;
     }
@@ -126,7 +133,7 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
 bool tr_torrent::use_metainfo_from_file(tr_torrent_metainfo const* metainfo, char const* filename_in, tr_error* error)
 {
     // add .torrent file
-    if (!tr_sys_path_copy(filename_in, torrent_file().c_str(), error))
+    if (!tr_sys_path_copy(filename_in, torrent_file(), error))
     {
         return false;
     }
@@ -283,11 +290,8 @@ bool tr_metadata_download::set_metadata_piece(int64_t const piece, void const* c
 
     // do we need this piece?
     auto& needed = pieces_needed_;
-    auto const iter = std::find_if(
-        std::begin(needed),
-        std::end(needed),
-        [piece](auto const& item) { return item.piece == piece; });
-    if (iter == std::end(needed))
+    auto const iter = std::ranges::find_if(needed, [piece](auto const& item) { return item.piece == piece; });
+    if (iter == std::ranges::end(needed))
     {
         return false;
     }
@@ -356,7 +360,7 @@ void tr_torrent::set_metadata_piece(int64_t const piece, void const* const data,
 {
     if (auto const n = piece_count_; n != 0)
     {
-        return (n - std::size(pieces_needed_)) / static_cast<double>(n);
+        return static_cast<double>(n - std::size(pieces_needed_)) / static_cast<double>(n);
     }
 
     return 0.0;
@@ -382,9 +386,4 @@ void tr_torrent::set_metadata_piece(int64_t const piece, void const* const data,
 std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
     return tor->magnet();
-}
-
-size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen)
-{
-    return tr_strv_to_buf(tr_torrentGetMagnetLink(tor), buf, buflen);
 }

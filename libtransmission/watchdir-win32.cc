@@ -29,7 +29,7 @@
 #include "libtransmission/utils.h"
 #include "libtransmission/watchdir-base.h"
 
-namespace libtransmission
+namespace tr
 {
 namespace
 {
@@ -83,11 +83,7 @@ BOOL tr_get_overlapped_result_ex(
 class Win32Watchdir final : public impl::BaseWatchdir
 {
 public:
-    Win32Watchdir(
-        std::string_view dirname,
-        Callback callback,
-        libtransmission::TimerMaker& timer_maker,
-        struct event_base* event_base)
+    Win32Watchdir(std::string_view dirname, Callback callback, tr::TimerMaker& timer_maker, struct event_base* event_base)
         : BaseWatchdir{ dirname, std::move(callback), timer_maker }
     {
         init(event_base);
@@ -180,10 +176,11 @@ private:
         if (evutil_socketpair(AF_INET, SOCK_STREAM, 0, std::data(notify_pipe_)) == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                _("Couldn't create pipe: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    _("Couldn't create pipe: {error} ({error_code})"),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -191,10 +188,11 @@ private:
         if (event_ == nullptr)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                _("Couldn't create event: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    _("Couldn't create event: {error} ({error_code})"),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -290,19 +288,21 @@ private:
             if (nread == static_cast<size_t>(-1))
             {
                 auto const error_code = errno;
-                tr_logAddError(fmt::format(
-                    _("Couldn't read event: {error} ({error_code})"),
-                    fmt::arg("error", tr_strerror(error_code)),
-                    fmt::arg("error_code", error_code)));
+                tr_logAddError(
+                    fmt::format(
+                        _("Couldn't read event: {error} ({error_code})"),
+                        fmt::arg("error", tr_strerror(error_code)),
+                        fmt::arg("error_code", error_code)));
                 break;
             }
 
             if (nread != header_size)
             {
-                tr_logAddError(fmt::format(
-                    _("Couldn't read event: expected {expected_size}, got {actual_size}"),
-                    fmt::arg("expected_size", header_size),
-                    fmt::arg("actual_size", nread)));
+                tr_logAddError(
+                    fmt::format(
+                        _("Couldn't read event: expected {expected_size}, got {actual_size}"),
+                        fmt::arg("expected_size", header_size),
+                        fmt::arg("actual_size", nread)));
                 break;
             }
 
@@ -324,19 +324,21 @@ private:
             if (nread == static_cast<size_t>(-1))
             {
                 auto const error_code = errno;
-                tr_logAddError(fmt::format(
-                    _("Couldn't read filename: {error} ({error_code})"),
-                    fmt::arg("error", tr_strerror(error_code)),
-                    fmt::arg("error_code", error_code)));
+                tr_logAddError(
+                    fmt::format(
+                        _("Couldn't read filename: {error} ({error_code})"),
+                        fmt::arg("error", tr_strerror(error_code)),
+                        fmt::arg("error_code", error_code)));
                 break;
             }
 
             if (nread != nleft)
             {
-                tr_logAddError(fmt::format(
-                    _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
-                    fmt::arg("expected_size", nleft),
-                    fmt::arg("actual_size", nread)));
+                tr_logAddError(
+                    fmt::format(
+                        _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
+                        fmt::arg("expected_size", nleft),
+                        fmt::arg("actual_size", nread)));
                 break;
             }
 
@@ -371,4 +373,4 @@ std::unique_ptr<Watchdir> Watchdir::create(
     return std::make_unique<Win32Watchdir>(dirname, std::move(callback), timer_maker, evbase);
 }
 
-} // namespace libtransmission
+} // namespace tr

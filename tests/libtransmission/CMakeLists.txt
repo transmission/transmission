@@ -7,6 +7,7 @@ target_sources(libtransmission-test
         announce-list-test.cc
         announcer-test.cc
         announcer-udp-test.cc
+        api-compat-test.cc
         benc-test.cc
         bitfield-test.cc
         block-info-test.cc
@@ -16,8 +17,8 @@ target_sources(libtransmission-test
         completion-test.cc
         copy-test.cc
         crypto-test.cc
-        error-test.cc
         dht-test.cc
+        error-test.cc
         file-piece-map-test.cc
         file-test.cc
         getopt-test.cc
@@ -38,6 +39,7 @@ target_sources(libtransmission-test
         remove-test.cc
         rename-test.cc
         rpc-test.cc
+        serializer-tests.cc
         session-test.cc
         session-alt-speeds-test.cc
         settings-test.cc
@@ -58,6 +60,12 @@ target_sources(libtransmission-test
         watchdir-test.cc
         web-utils-test.cc)
 
+if(APPLE)
+    target_sources(libtransmission-test
+        PRIVATE
+            utils-apple-test.mm)
+endif()
+
 set_property(
     TARGET libtransmission-test
     PROPERTY FOLDER "tests")
@@ -73,11 +81,28 @@ target_compile_options(libtransmission-test
 target_link_libraries(libtransmission-test
     PRIVATE
         ${TR_NAME}
-        gtestall
+        GTest::gtest_main
         dht::dht
         fmt::fmt-header-only
         libevent::event
         WideInteger::WideInteger)
+
+if (WIN32)
+    cmake_policy(PUSH)
+    cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+
+    add_custom_command(
+        TARGET libtransmission-test POST_BUILD
+        COMMAND
+            ${CMAKE_COMMAND}
+            -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:libtransmission-test>
+            $<TARGET_FILE_DIR:libtransmission-test>
+        COMMAND_EXPAND_LISTS
+    )
+
+    cmake_policy(POP)
+endif ()
 
 if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
     gtest_discover_tests(libtransmission-test

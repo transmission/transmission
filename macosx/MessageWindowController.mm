@@ -252,7 +252,7 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
         auto const secs_since_1970 = std::chrono::system_clock::to_time_t(currentMessage->when);
         NSDictionary* message = @{
-            @"Message" : @(currentMessage->message.c_str()),
+            @"Message" : [NSString convertedStringFromCString:currentMessage->message.c_str()],
             @"Date" : [NSDate dateWithTimeIntervalSince1970:secs_since_1970],
             @"Index" : @(currentIndex++), //more accurate when sorting by date
             @"Level" : @(currentMessage->level),

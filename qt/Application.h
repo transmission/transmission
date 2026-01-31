@@ -17,7 +17,7 @@
 #include <QTranslator>
 #include <QWeakPointer>
 
-#include <libtransmission/favicon-cache.h>
+#include <libtransmission-app/favicon-cache.h>
 
 #include "AddData.h"
 #include "Typedefs.h"
@@ -26,6 +26,7 @@
 class AddData;
 class MainWindow;
 class Prefs;
+class RpcClient;
 class Session;
 class Torrent;
 class TorrentModel;
@@ -37,7 +38,8 @@ class Application : public QApplication
 
 public:
     Application(
-        std::unique_ptr<Prefs> prefs,
+        Prefs& prefs,
+        RpcClient& rpc,
         bool minimized,
         QString const& config_dir,
         QStringList const& filenames,
@@ -87,7 +89,6 @@ public slots:
     void addWatchdirTorrent(QString const& filename) const;
 
 private slots:
-    void consentGiven(int result) const;
     void onSessionSourceChanged() const;
     void onTorrentsAdded(torrent_ids_t const& torrent_ids) const;
     void onTorrentsCompleted(torrent_ids_t const& torrent_ids) const;
@@ -108,7 +109,7 @@ private:
 
     std::unordered_set<QString> interned_strings_;
 
-    std::unique_ptr<Prefs> prefs_;
+    Prefs& prefs_;
     std::unique_ptr<Session> session_;
     std::unique_ptr<TorrentModel> model_;
     std::unique_ptr<MainWindow> window_;
@@ -120,7 +121,7 @@ private:
     QTranslator qt_translator_;
     QTranslator app_translator_;
 
-    FaviconCache<QPixmap> favicon_cache_;
+    tr::app::FaviconCache<QPixmap> favicon_cache_;
 };
 
 #define trApp dynamic_cast<Application*>(Application::instance())

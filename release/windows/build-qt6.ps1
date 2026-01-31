@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:Qt6Version = '6.10.0'
+$global:Qt6Version = '6.10.1'
 
 $global:Qt6Deps = @(
     'DBus'
@@ -31,7 +31,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     $BuildDir = Join-Path $SourceDir .build
 
     $ConfigOptions = @(
-        '-platform'; 'win32-msvc'
         '-opensource'
         '-confirm-license'
         '-prefix'; $PrefixDir
@@ -47,8 +46,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-qt-libpng'
         '-qt-libjpeg'
         '-no-opengl'
-        '-no-freetype'
-        '-no-harfbuzz'
         '-no-feature-androiddeployqt'
         '-no-feature-assistant'
         '-no-feature-brotli'
@@ -66,9 +63,7 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-no-feature-emojisegmenter'
         '-no-feature-fontcombobox'
         '-no-feature-fontdialog'
-        '-no-feature-freetype'
         '-no-feature-gestures'
-        '-no-feature-harfbuzz'
         '-no-feature-keysequenceedit'
         '-no-feature-lcdnumber'
         '-no-feature-listwidget'
@@ -94,7 +89,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-no-feature-syntaxhighlighter'
         '-no-feature-systemsemaphore'
         '-no-feature-tablewidget'
-        '-no-feature-testlib'
         '-no-feature-textmarkdownreader'
         '-no-feature-textmarkdownwriter'
         '-no-feature-textodfwriter'
@@ -116,11 +110,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         "-DCMAKE_PREFIX_PATH=${DepsPrefixDir}"
     )
 
-    if ($env:LDFLAGS) {
-        # Patch to add our linker flags, mainly /PDBALTPATH
-        Edit-TextFile (Join-Path $SourceDir qtbase mkspecs win32-msvc qmake.conf) '(^QMAKE_CXXFLAGS\b.*)' "`$1`nQMAKE_LFLAGS += ${env:LDFLAGS}"
-    }
-
     # No need in GUI and some other tools
     Edit-TextFile (Join-Path $SourceDir qttools src CMakeLists.txt) 'TARGET Qt::Widgets' 'QT_FEATURE_designer'
     Edit-TextFile (Join-Path $SourceDir qttools src CMakeLists.txt) 'add_subdirectory[(]qdoc[)]' ''
@@ -130,6 +119,11 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     Edit-TextFile (Join-Path $SourceDir qtactiveqt CMakeLists.txt) 'OR NOT TARGET Qt::PrintSupport' ''
     Edit-TextFile (Join-Path $SourceDir qtactiveqt CMakeLists.txt) 'PrintSupport' ''
     Edit-TextFile (Join-Path $SourceDir qtactiveqt tools CMakeLists.txt) 'add_subdirectory[(]testcon[)]' ''
+
+    # Fix unity build (due to https://github.com/qt/qtbase/commit/a6ac84731776381ee5ac6b6306acdc4418e900d9)
+    Edit-TextFile (Join-Path $SourceDir qtbase src corelib text qbytearray.h) 'Q_PRESUME.+;' ''
+    Edit-TextFile (Join-Path $SourceDir qtbase src corelib text qstring.h) 'Q_PRESUME.+;' ''
+    Edit-TextFile (Join-Path $SourceDir qtbase src corelib tools qlist.h) 'Q_PRESUME.+;' ''
 
     # Fix build (including because of disabled features)
     Edit-TextFile (Join-Path $SourceDir qtbase src gui text windows qwindowsfontdatabasebase_p.h) 'unique_ptr<QCustomFontFileLoader>' 'unique_ptr<int>'

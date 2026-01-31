@@ -6,8 +6,10 @@
 #pragma once
 
 #include <array>
+#include <functional>
 #include <map>
 #include <optional>
+#include <utility>
 
 #include "BaseDialog.h"
 #include "Prefs.h"
@@ -30,15 +32,7 @@ public:
     PrefsDialog(PrefsDialog const&) = delete;
 
 private slots:
-    void focusChanged(QWidget* old, QWidget* cur);
-    void checkBoxToggled(bool checked);
-    void spinBoxEditingFinished();
-    void timeEditingFinished();
-    void lineEditingFinished();
-    void pathChanged(QString const& path);
     void refreshPref(int key);
-    void encryptionEdited(int);
-    void altSpeedDaysEdited(int);
     void sessionUpdated();
     void onPortTested(std::optional<bool>, Session::PortTestIpProtocol);
     void onPortTest();
@@ -51,27 +45,42 @@ private slots:
     void onBlocklistUpdated(int n);
 
 private:
-    using key2widget_t = std::map<int, QWidget*>;
-
-    enum PortTestStatus : uint8_t
+    enum class PortTestStatus : uint8_t
     {
-        PORT_TEST_UNKNOWN = 0U,
-        PORT_TEST_CHECKING,
-        PORT_TEST_OPEN,
-        PORT_TEST_CLOSED,
-        PORT_TEST_ERROR
+        Unknown = 0U,
+        Checking,
+        Open,
+        Closed,
+        Error
     };
 
-    bool updateWidgetValue(QWidget* widget, int pref_key) const;
+    template<typename T>
+    void set(int const key, T val)
+    {
+        prefs_.set(key, std::move(val));
+        refreshPref(key);
+    }
+
     void portTestSetEnabled();
-    void linkWidgetToPref(QWidget* widget, int pref_key);
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();
     void updatePortStatusLabel();
     void updateSeedingWidgetsLocality();
     static QString getPortStatusText(PortTestStatus status) noexcept;
 
-    void setPref(int key, QVariant const& v);
+    template<typename T, size_t N>
+    void initComboFromItems(std::array<std::pair<QString, T>, N> const& items, QComboBox* w, int key);
+
+    void initAltSpeedDaysCombo(QComboBox* w, int key);
+    void initEncryptionCombo(QComboBox* w, int key);
+    void initWidget(FreeSpaceLabel* w, int key);
+    void initWidget(PathButton* w, int key);
+    void initWidget(QCheckBox* w, int key);
+    void initWidget(QDoubleSpinBox* w, int key);
+    void initWidget(QLineEdit* w, int key);
+    void initWidget(QPlainTextEdit*, int);
+    void initWidget(QSpinBox* w, int key);
+    void initWidget(QTimeEdit* w, int key);
 
     void initDownloadingTab();
     void initSeedingTab();
@@ -90,7 +99,8 @@ private:
     bool is_local_ = {};
     std::array<PortTestStatus, Session::NUM_PORT_TEST_IP_PROTOCOL> port_test_status_ = {};
 
-    key2widget_t widgets_;
+    std::multimap<int, std::function<void()>> updaters_;
+
     QWidgetList web_widgets_;
     QWidgetList web_auth_widgets_;
     QWidgetList web_whitelist_widgets_;

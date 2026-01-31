@@ -10,45 +10,60 @@
 
 #include "libtransmission/utils.h"
 
-// macOS implementation of tr_strv_convert_utf8() that autodetects the encoding.
+// macOS implementation of tr_strv_to_utf8_string() that autodetects the encoding.
 // This replaces the generic implementation of the function in utils.cc.
 
-std::string tr_strv_convert_utf8(std::string_view sv)
+std::string tr_strv_to_utf8_string(std::string_view sv)
 {
     // local pool for non-app tools like transmission-daemon, transmission-remote, transmission-create, ...
     @autoreleasepool
     {
         // UTF-8 encoding
-        char const* validUTF8 = [[NSString alloc] initWithBytes:std::data(sv) length:std::size(sv) encoding:NSUTF8StringEncoding]
-                                    .UTF8String;
-        if (validUTF8)
+        NSString* const utf8 = [[NSString alloc] initWithBytes:std::data(sv) length:std::size(sv) encoding:NSUTF8StringEncoding];
+        if (utf8 != nil && utf8.UTF8String != nullptr)
         {
-            return std::string(validUTF8);
+            return tr_strv_to_utf8_string(utf8);
         }
 
-        // autodetection of the encoding (#3434)
+        // Try to make a UTF8 string from the detected encoding.
+        // 1. Disallow lossy conversion in this step. Lossy conversion
+        // is done as last resort later in `tr_strv_replace_invalid()`.
+        // 2. We only provide the likely language. If we also supplied
+        // suggested encodings, the first one listed could override the
+        // others (e.g. cp932 vs cp866).
         NSString* convertedString;
         NSStringEncoding stringEncoding = [NSString
             stringEncodingForData:[NSData dataWithBytes:std::data(sv) length:std::size(sv)]
                   encodingOptions:@{
-                      // We disallow lossy conversion, and will leave it to `utf8::unchecked::replace_invalid`.
                       NSStringEncodingDetectionAllowLossyKey : @NO,
-                      // We only set the likely language.
-                      // If we were to set suggested encodings, then whatever is listed first would take precedence on all others, making for instance kCFStringEncodingDOSJapanese (cp932) and kCFStringEncodingDOSRussian (cp866) taking priority on each other.
                       NSStringEncodingDetectionLikelyLanguageKey : NSLocale.currentLocale.languageCode
                   }
                   convertedString:&convertedString
               usedLossyConversion:nil];
-        if (stringEncoding)
+
+        if (stringEncoding && convertedString != nil && convertedString.UTF8String != nullptr)
         {
-            validUTF8 = convertedString.UTF8String;
-            if (validUTF8)
-            {
-                return std::string(validUTF8);
-            }
+            return tr_strv_to_utf8_string(convertedString);
         }
 
         // invalid encoding
         return tr_strv_replace_invalid(sv);
     }
+}
+
+std::string tr_strv_to_utf8_string(NSString* str)
+{
+    return std::string{ str.UTF8String };
+}
+
+NSString* tr_strv_to_utf8_nsstring(std::string_view const sv)
+{
+    NSString* str = [[NSString alloc] initWithBytes:std::data(sv) length:std::size(sv) encoding:NSUTF8StringEncoding];
+    return str ?: @"";
+}
+
+NSString* tr_strv_to_utf8_nsstring(std::string_view const sv, NSString* key, NSString* comment)
+{
+    NSString* str = [[NSString alloc] initWithBytes:std::data(sv) length:std::size(sv) encoding:NSUTF8StringEncoding];
+    return str ?: NSLocalizedString(key, comment);
 }

@@ -1,9 +1,14 @@
 include(UtilityFunctions.cmake)
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
+    set(ARCH arm64)
+    set(TR_OPENSSL_ARCH "-arm64")
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ARCH x64)
+    set(TR_OPENSSL_ARCH "-x64")
 else()
     set(ARCH x86)
+    set(TR_OPENSSL_ARCH "")
 endif()
 
 set(VERSION "${TR_USER_AGENT_PREFIX}")
@@ -15,7 +20,9 @@ if(MSVC_TOOLSET_VERSION MATCHES "^([0-9]+)([0-9])$")
     set(MSVC_TOOLSET_VERSION_MINOR ${CMAKE_MATCH_2})
 endif()
 
-if(MSVC_TOOLSET_VERSION EQUAL 143)
+if(MSVC_TOOLSET_VERSION EQUAL 145)
+    set(MSVS_VERSION 18)
+elseif(MSVC_TOOLSET_VERSION EQUAL 143)
     set(MSVS_VERSION 17)
 elseif(MSVC_TOOLSET_VERSION EQUAL 142)
     set(MSVS_VERSION 16)
@@ -39,11 +46,6 @@ endif()
 
 if(NOT TR_QT_DIR)
     set(TR_QT_DIR "$<TARGET_FILE_DIR:Qt${Qt_VERSION_MAJOR}::Core>/..")
-endif()
-
-set(TR_OPENSSL_ARCH)
-if(ARCH STREQUAL "x64")
-    set(TR_OPENSSL_ARCH "-x64")
 endif()
 
 if(OPENSSL_VERSION MATCHES "^3[.]")

@@ -16,9 +16,9 @@
 #include <libtransmission/block-info.h>
 #include <libtransmission/file-piece-map.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-class FilePieceMapTest : public ::testing::Test
+class FilePieceMapTest : public ::tr::test::TransmissionTest
 {
 protected:
     static constexpr size_t PieceSize{ tr_block_info::BlockSize };
@@ -96,23 +96,23 @@ TEST_F(FilePieceMapTest, pieceSpan)
     // Remember everything is zero-indexed, so the 9 valid pieces are [0..10).
     // Piece #10 is the 'end' iterator position.
     auto constexpr ExpectedPieceSpans = std::array<tr_file_piece_map::piece_span_t, 17>{ {
-        { 0U, 5U },
-        { 5U, 6U },
-        { 5U, 6U },
-        { 5U, 6U },
-        { 5U, 6U },
-        { 5U, 6U },
-        { 5U, 7U },
-        { 6U, 7U },
-        { 6U, 7U },
-        { 6U, 7U },
-        { 6U, 7U },
-        { 6U, 7U },
-        { 6U, 10U },
-        { 9U, 10U },
-        { 9U, 10U },
-        { 9U, 10U },
-        { 9U, 10U },
+        { .begin = 0U, .end = 5U },
+        { .begin = 5U, .end = 6U },
+        { .begin = 5U, .end = 6U },
+        { .begin = 5U, .end = 6U },
+        { .begin = 5U, .end = 6U },
+        { .begin = 5U, .end = 6U },
+        { .begin = 5U, .end = 7U },
+        { .begin = 6U, .end = 7U },
+        { .begin = 6U, .end = 7U },
+        { .begin = 6U, .end = 7U },
+        { .begin = 6U, .end = 7U },
+        { .begin = 6U, .end = 7U },
+        { .begin = 6U, .end = 10U },
+        { .begin = 9U, .end = 10U },
+        { .begin = 9U, .end = 10U },
+        { .begin = 9U, .end = 10U },
+        { .begin = 9U, .end = 10U },
     } };
     EXPECT_EQ(std::size(FileSizes), std::size(ExpectedPieceSpans));
 

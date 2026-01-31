@@ -17,7 +17,7 @@
 
 #include "libtransmission/tr-assert.h"
 
-namespace libtransmission
+namespace tr
 {
 
 // An RAII-based subscription to an Observable.
@@ -83,10 +83,9 @@ public:
     {
         auto const key = next_key++;
         observers_.emplace(key, std::move(observer));
-        return ObserverTag{ [this, key]()
-                            {
-                                remove(key);
-                            } };
+        // clang-format off: TODO: remove when we bump to clang-format >= 21
+        return ObserverTag{ [this, key]() { remove(key); } };
+        // clang-format on
     }
 
     void emit(Args... args) const
@@ -108,4 +107,4 @@ private:
     small::map<Key, Observer, 4U> observers_;
 };
 
-} // namespace libtransmission
+} // namespace tr

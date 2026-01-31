@@ -97,31 +97,37 @@ public:
         return byte_loc(uint64_t{ block } * BlockSize);
     }
 
+    // Location of the last byte in `block`.
+    [[nodiscard]] constexpr auto block_last_loc(tr_block_index_t const block) const noexcept
+    {
+        return byte_loc((uint64_t{ block } * BlockSize) + block_size(block) - 1U);
+    }
+
     // Location of the first byte (+ optional offset and length) in `piece`
     [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = {}, uint32_t length = {}) const noexcept
     {
-        return byte_loc(uint64_t{ piece } * piece_size() + offset + length);
+        return byte_loc((uint64_t{ piece } * piece_size()) + offset + length);
     }
 
     [[nodiscard]] constexpr tr_block_span_t block_span_for_piece(tr_piece_index_t const piece) const noexcept
     {
         if (!is_initialized())
         {
-            return { 0U, 0U };
+            return { .begin = 0U, .end = 0U };
         }
 
-        return { piece_loc(piece).block, piece_last_loc(piece).block + 1U };
+        return { .begin = piece_loc(piece).block, .end = piece_last_loc(piece).block + 1U };
     }
 
     [[nodiscard]] constexpr tr_byte_span_t byte_span_for_piece(tr_piece_index_t const piece) const noexcept
     {
         if (!is_initialized())
         {
-            return { 0U, 0U };
+            return { .begin = 0U, .end = 0U };
         }
 
         auto const offset = piece_loc(piece).byte;
-        return { offset, offset + piece_size(piece) };
+        return { .begin = offset, .end = offset + piece_size(piece) };
     }
 
 private:
@@ -130,7 +136,7 @@ private:
     // Location of the last byte in `piece`.
     [[nodiscard]] constexpr Location piece_last_loc(tr_piece_index_t const piece) const noexcept
     {
-        return byte_loc(static_cast<uint64_t>(piece) * piece_size() + piece_size(piece) - 1);
+        return byte_loc((static_cast<uint64_t>(piece) * piece_size()) + piece_size(piece) - 1);
     }
 
     [[nodiscard]] constexpr bool is_initialized() const noexcept

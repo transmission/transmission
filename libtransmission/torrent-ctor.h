@@ -163,7 +163,7 @@ public:
         return optional_args_[mode].paused_;
     }
 
-    TR_CONSTEXPR20 void set_paused(tr_ctorMode const mode, bool const paused)
+    constexpr void set_paused(tr_ctorMode const mode, bool const paused)
     {
         optional_args_[mode].paused_ = paused;
     }
@@ -175,7 +175,7 @@ public:
         return optional_args_[mode].peer_limit_;
     }
 
-    TR_CONSTEXPR20 void set_peer_limit(tr_ctorMode const mode, uint16_t const peer_limit)
+    constexpr void set_peer_limit(tr_ctorMode const mode, uint16_t const peer_limit)
     {
         optional_args_[mode].peer_limit_ = peer_limit;
     }

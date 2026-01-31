@@ -74,8 +74,8 @@ public:
     using ChangeFlags = Flags<ChangeFlag>;
 
 public:
-    using Speed = libtransmission::Values::Speed;
-    using Storage = libtransmission::Values::Storage;
+    using Speed = tr::Values::Speed;
+    using Storage = tr::Values::Storage;
 
     int get_active_peer_count() const;
     int get_active_peers_down() const;
@@ -83,7 +83,7 @@ public:
     bool get_active() const;
     tr_torrent_activity get_activity() const;
     time_t get_added_date() const;
-    int get_error_code() const;
+    tr_stat::Error get_error_code() const;
     Glib::ustring const& get_error_message() const;
     time_t get_eta() const;
     bool get_finished() const;

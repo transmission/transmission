@@ -136,7 +136,7 @@ bool is_valid_path(std::string_view path)
     return path.find_first_of(R"(<>:"|?*)"sv) == std::string_view::npos;
 }
 
-auto path_to_fixed_native_path(std::string_view path)
+[[nodiscard]] auto path_to_fixed_native_path(std::string_view const path)
 {
     auto wide_path = tr_win32_utf8_to_native(path);
 
@@ -161,7 +161,7 @@ auto path_to_fixed_native_path(std::string_view path)
 
 /* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
    https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx for more info */
-auto path_to_native_path(std::string_view path)
+[[nodiscard]] auto path_to_native_path(std::string_view path)
 {
     if (is_unc_path(path))
     {
@@ -207,7 +207,12 @@ std::string native_path_to_path(std::wstring_view wide_path)
     return tr_win32_native_to_utf8(wide_path);
 }
 
-tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD disposition, DWORD flags, tr_error* error)
+[[nodiscard]] tr_sys_file_t open_file(
+    std::string_view const path,
+    DWORD const access,
+    DWORD const disposition,
+    DWORD const flags,
+    tr_error* error)
 {
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
 
@@ -231,7 +236,12 @@ tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD disposition, 
     return ret;
 }
 
-bool create_dir(std::string_view path, int flags, int /*permissions*/, bool okay_if_exists, tr_error* error)
+[[nodiscard]] bool create_dir(
+    std::string_view const path,
+    int const flags,
+    int /*permissions*/,
+    bool const okay_if_exists,
+    tr_error* error)
 {
     bool ret = false;
     DWORD error_code = ERROR_SUCCESS;
@@ -277,7 +287,7 @@ bool create_dir(std::string_view path, int flags, int /*permissions*/, bool okay
 }
 
 template<typename CallbackT>
-void create_temp_path(char* path_template, CallbackT&& callback, tr_error* error)
+void create_temp_path(char* path_template, CallbackT const& callback, tr_error* error)
 {
     TR_ASSERT(path_template != nullptr);
 
@@ -339,7 +349,7 @@ std::optional<tr_sys_path_info> tr_sys_file_get_info_(tr_sys_file_t handle, tr_e
     return {};
 }
 
-std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(char const* path, tr_error* error)
+[[nodiscard]] std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(std::string_view const path, tr_error* error)
 {
     auto const wpath = path_to_native_path(path);
     if (std::empty(wpath))
@@ -370,10 +380,8 @@ std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(char const* path, tr_err
 
 } // namespace
 
-bool tr_sys_path_exists(char const* path, tr_error* error)
+bool tr_sys_path_exists(std::string_view const path, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
-
     bool ret = false;
     HANDLE handle = INVALID_HANDLE_VALUE;
 
@@ -462,11 +470,8 @@ bool tr_sys_path_is_relative(std::string_view path)
     return true;
 }
 
-bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error* error)
+bool tr_sys_path_is_same(std::string_view const path1, std::string_view const path2, tr_error* error)
 {
-    TR_ASSERT(path1 != nullptr);
-    TR_ASSERT(path2 != nullptr);
-
     auto const fi1 = get_file_info(path1, error);
     if (!fi1)
     {
@@ -481,48 +486,6 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error* error)
 
     return fi1->dwVolumeSerialNumber == fi2->dwVolumeSerialNumber && fi1->nFileIndexHigh == fi2->nFileIndexHigh &&
         fi1->nFileIndexLow == fi2->nFileIndexLow;
-}
-
-std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
-{
-    auto ret = std::string{};
-
-    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
-    {
-        if (auto const handle = CreateFileW(
-                wide_path.c_str(),
-                FILE_READ_EA,
-                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                nullptr,
-                OPEN_EXISTING,
-                FILE_FLAG_BACKUP_SEMANTICS,
-                nullptr);
-            handle != INVALID_HANDLE_VALUE)
-        {
-            if (auto const wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0); wide_ret_size != 0)
-            {
-                auto wide_ret = std::wstring{};
-                wide_ret.resize(wide_ret_size);
-                if (GetFinalPathNameByHandleW(handle, std::data(wide_ret), wide_ret_size, 0) == wide_ret_size - 1)
-                {
-                    // `wide_ret_size` includes the terminating '\0'; remove it from `wide_ret`
-                    wide_ret.resize(std::size(wide_ret) - 1);
-                    TR_ASSERT(tr_strv_starts_with(wide_ret, NativeLocalPathPrefix));
-                    ret = native_path_to_path(wide_ret);
-                }
-            }
-
-            CloseHandle(handle);
-        }
-    }
-
-    if (!std::empty(ret))
-    {
-        return ret;
-    }
-
-    set_system_error(error, GetLastError());
-    return {};
 }
 
 std::string_view tr_sys_path_basename(std::string_view path, tr_error* error)
@@ -684,11 +647,8 @@ std::string_view tr_sys_path_dirname(std::string_view path)
     return path.substr(0, end);
 }
 
-bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* error)
+bool tr_sys_path_rename(std::string_view const src_path, std::string_view const dst_path, tr_error* error)
 {
-    TR_ASSERT(src_path != nullptr);
-    TR_ASSERT(dst_path != nullptr);
-
     bool ret = false;
     auto const wide_src_path = path_to_native_path(src_path);
     auto const wide_dst_path = path_to_native_path(dst_path);
@@ -719,11 +679,8 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* er
     return ret;
 }
 
-bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* error)
+bool tr_sys_path_copy(std::string_view const src_path, std::string_view const dst_path, tr_error* error)
 {
-    TR_ASSERT(src_path != nullptr);
-    TR_ASSERT(dst_path != nullptr);
-
     auto const wide_src_path = path_to_native_path(src_path);
     auto const wide_dst_path = path_to_native_path(dst_path);
     if (std::empty(wide_src_path) || std::empty(wide_dst_path))
@@ -743,10 +700,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* erro
     return true;
 }
 
-bool tr_sys_path_remove(char const* path, tr_error* error)
+bool tr_sys_path_remove(std::string_view const path, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
-
     bool ret = false;
 
     if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
@@ -789,9 +744,8 @@ char* tr_sys_path_native_separators(char* path)
     return path;
 }
 
-tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/, tr_error* error)
+tr_sys_file_t tr_sys_file_open(std::string_view const path, int const flags, int /*permissions*/, tr_error* error)
 {
-    TR_ASSERT(path != nullptr);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
 
     DWORD native_access = 0;
@@ -1094,7 +1048,7 @@ std::string tr_sys_dir_get_current(tr_error* error)
     return {};
 }
 
-bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error* error)
+bool tr_sys_dir_create(std::string_view const path, int const flags, int const permissions, tr_error* error)
 {
     return create_dir(path, flags, permissions, true, error);
 }

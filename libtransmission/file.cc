@@ -3,13 +3,33 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <filesystem>
+#include <system_error>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
-#include "libtransmission/tr-assert.h"
+
+std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
+{
+    auto ec = std::error_code{};
+    auto const canonical_path = std::filesystem::canonical(tr_u8path(path), ec);
+
+    if (ec)
+    {
+        if (error != nullptr)
+        {
+            error->set(ec.value(), ec.message());
+        }
+
+        return {};
+    }
+
+    auto const u8_path = canonical_path.u8string();
+    return { std::begin(u8_path), std::end(u8_path) };
+}
 
 std::vector<std::string> tr_sys_dir_get_files(
     std::string_view folder,
@@ -43,4 +63,20 @@ std::vector<std::string> tr_sys_dir_get_files(
             filenames.emplace_back(name);
         }
     }
+}
+
+std::optional<std::filesystem::space_info> tr_sys_path_get_capacity(std::filesystem::path const& path, tr_error* error)
+{
+    auto ec = std::error_code{};
+    auto space = std::filesystem::space(path, ec);
+    if (!ec)
+    {
+        return space;
+    }
+
+    if (error != nullptr)
+    {
+        error->set(ec.value(), ec.message());
+    }
+    return {};
 }

@@ -28,6 +28,8 @@ target_sources(${TR_NAME}
         announcer-udp.cc
         announcer.cc
         announcer.h
+        api-compat.cc
+        api-compat.h
         bandwidth.cc
         bandwidth.h
         benc.h
@@ -53,8 +55,6 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
-        favicon-cache.h
-        file-capacity.cc
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
@@ -110,6 +110,8 @@ target_sources(${TR_NAME}
         rpc-server.h
         rpcimpl.cc
         rpcimpl.h
+        serializer.cc
+        serializer.h
         session-alt-speeds.cc
         session-alt-speeds.h
         session-id.cc
@@ -118,8 +120,6 @@ target_sources(${TR_NAME}
         session-thread.h
         session.cc
         session.h
-        settings.cc
-        settings.h
         stats.cc
         stats.h
         subprocess-posix.cc
@@ -226,17 +226,13 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
+        FMT_USE_EXCEPTIONS=0 # {fmt} >= 11.2.0
+        FMT_EXCEPTIONS=0 # {fmt} < 11.2.0
         $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
         $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
         $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
-
-tr_target_compile_definitions_for_headers(${TR_NAME}
-    PRIVATE
-        sys/statvfs.h
-        xfs/xfs.h
-        xlocale.h)
 
 tr_target_compile_definitions_for_functions(${TR_NAME}
     PRIVATE
@@ -244,7 +240,6 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
         copy_file_range
         fallocate64
         flock
-        getmntent
         htonll
         mkdtemp
         ntohll
@@ -252,8 +247,7 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
         posix_fallocate
         pread
         pwrite
-        sendfile64
-        statvfs)
+        sendfile64)
 
 target_include_directories(${TR_NAME}
     PUBLIC
@@ -268,12 +262,12 @@ endif()
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
-        deflate::deflate
+        libdeflate::libdeflate
         CURL::libcurl
         FastFloat::fast_float
         psl::psl
         natpmp::natpmp
-        miniupnpc::libminiupnpc
+        miniupnpc::miniupnpc
         dht::dht
         libutp::libutp
         libb64::libb64
@@ -284,7 +278,7 @@ target_link_libraries(${TR_NAME}
         RapidJSON
         utf8::cpp
         wildmat
-        WideInteger::WideInteger
+        transmission::WideInteger
         Crc32c::crc32c
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>
@@ -294,7 +288,7 @@ target_link_libraries(${TR_NAME}
     PUBLIC
         transmission::crypto_impl
         fmt::fmt-header-only
-        small::small
+        transmission::small
         libevent::event)
 
 if(INSTALL_LIB)
@@ -305,7 +299,6 @@ if(INSTALL_LIB)
         FILES
             error-types.h
             error.h
-            favicon-cache.h
             file.h
             log.h
             makemeta.h
