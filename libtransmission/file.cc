@@ -147,7 +147,7 @@ bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_erro
         return same;
     }
 
-    if (error != nullptr && ec != std::errc::no_such_file_or_directory)
+    if (error != nullptr && ec != std::errc::no_such_file_or_directory && ec != std::errc::operation_not_supported)
     {
         error->set(ec.value(), ec.message());
     }
