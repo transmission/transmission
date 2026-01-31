@@ -16,7 +16,9 @@
 
 #include <event2/event.h>
 
+#ifdef WITH_UTP
 #include <libutp/utp.h>
+#endif
 
 #include <fmt/format.h>
 
@@ -117,7 +119,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     tr_socket_address const& socket_address,
     tr_sha1_digest_t const& info_hash,
     bool client_is_seed,
-    bool utp)
+    [[maybe_unused]] bool utp)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(socket_address.is_valid());

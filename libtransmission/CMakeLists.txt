@@ -200,8 +200,6 @@ tr_allow_compile_if(
         crypto-utils-openssl.cc
     [=[[CRYPTO_PKG STREQUAL "wolfssl"]]=]
         crypto-utils-wolfssl.cc
-    [=[[ENABLE_UTP]]=]
-        tr-utp.cc
     [=[[WITH_INOTIFY]]=]
         watchdir-inotify.cc
     [=[[WITH_KQUEUE]]=]
@@ -269,7 +267,7 @@ target_link_libraries(${TR_NAME}
         natpmp::natpmp
         miniupnpc::miniupnpc
         dht::dht
-        libutp::libutp
+        $<$<BOOL:${ENABLE_UTP}>:libutp::libutp>
         libb64::libb64
         ${Intl_LIBRARIES}
         ${LIBM_LIBRARY}
