@@ -75,7 +75,7 @@ bool tr_sys_path_exists(std::string_view path, tr_error* error)
     auto ec = std::error_code{};
     auto const exists = std::filesystem::exists(tr_u8path(path), ec);
 
-    if (error != nullptr && ec && ec != std::errc::no_such_file_or_directory)
+    if (error != nullptr && ec)
     {
         error->set(ec.value(), ec.message());
     }
@@ -87,13 +87,13 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
 {
     auto const filesystem_path = tr_u8path(path);
 
-    auto status_ec = std::error_code{};
-    auto const status = (flags & TR_SYS_PATH_NO_FOLLOW) != 0 ? std::filesystem::symlink_status(filesystem_path, status_ec) :
-                                                               std::filesystem::status(filesystem_path, status_ec);
+    auto ec = std::error_code{};
+    auto const status = (flags & TR_SYS_PATH_NO_FOLLOW) != 0 ? std::filesystem::symlink_status(filesystem_path, ec) :
+                                                               std::filesystem::status(filesystem_path, ec);
 
-    if (status_ec || status.type() == std::filesystem::file_type::not_found)
+    if (ec || status.type() == std::filesystem::file_type::not_found)
     {
-        maybe_set_error(error, status_ec ? status_ec : std::make_error_code(std::errc::no_such_file_or_directory));
+        maybe_set_error(error, ec ? ec : std::make_error_code(std::errc::no_such_file_or_directory));
         return {};
     }
 
@@ -102,12 +102,10 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
     if (std::filesystem::is_regular_file(status))
     {
         info.type = TR_SYS_PATH_IS_FILE;
-
-        auto size_ec = std::error_code{};
-        info.size = std::filesystem::file_size(filesystem_path, size_ec);
-        if (size_ec)
+        info.size = std::filesystem::file_size(filesystem_path, ec);
+        if (ec)
         {
-            maybe_set_error(error, size_ec);
+            maybe_set_error(error, ec);
             return {};
         }
     }
@@ -122,16 +120,14 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
         info.size = 0;
     }
 
-    auto time_ec = std::error_code{};
-    auto const ftime = std::filesystem::last_write_time(filesystem_path, time_ec);
-    if (time_ec)
+    auto const ftime = std::filesystem::last_write_time(filesystem_path, ec);
+    if (ec)
     {
-        maybe_set_error(error, time_ec);
+        maybe_set_error(error, ec);
         return {};
     }
 
-    auto const sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-        ftime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+    auto const sctp = std::chrono::clock_cast<std::chrono::system_clock>(ftime);
     info.last_modified_at = std::chrono::system_clock::to_time_t(sctp);
 
     return info;
@@ -139,39 +135,36 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
 
 bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_error* error)
 {
+    auto const u8path1 = tr_u8path(path1);
+    auto const u8path2 = tr_u8path(path2);
+
+    // std::filesystem::equivalent() returns an unspecified error
+    // when either path doesn't exist. libstdc++ and libc++ chose
+    // different errors. So let's check `exists` here for consistency.
     auto ec = std::error_code{};
-    auto const same = std::filesystem::equivalent(tr_u8path(path1), tr_u8path(path2), ec);
-
-    if (!ec)
+    if (!std::filesystem::exists(u8path1, ec) || !std::filesystem::exists(u8path2, ec))
     {
-        return same;
+        return false;
     }
 
-    if (error != nullptr && ec != std::errc::no_such_file_or_directory && ec != std::errc::operation_not_supported)
-    {
-        error->set(ec.value(), ec.message());
-    }
-
-    return false;
+    auto const same = std::filesystem::equivalent(u8path1, u8path2, ec);
+    maybe_set_error(error, ec);
+    return !ec && same;
 }
 
 bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_error* error)
 {
     auto const filesystem_path = tr_u8path(path);
+    auto const parents = (flags & TR_SYS_DIR_CREATE_PARENTS) != 0;
 
 #ifndef _WIN32
     auto missing = std::vector<std::filesystem::path>{};
-    if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0 && permissions != 0)
+    if (parents && permissions != 0)
     {
         auto current = std::filesystem::path{};
         for (auto const& part : filesystem_path)
         {
             current /= part;
-            if (current == current.root_path())
-            {
-                continue;
-            }
-
             auto check_ec = std::error_code{};
             if (std::filesystem::is_directory(current, check_ec))
             {
@@ -200,8 +193,8 @@ bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_err
     }
 
     auto ec = std::error_code{};
-    bool const created = (flags & TR_SYS_DIR_CREATE_PARENTS) != 0 ? std::filesystem::create_directories(filesystem_path, ec) :
-                                                                    std::filesystem::create_directory(filesystem_path, ec);
+    bool const created = parents ? std::filesystem::create_directories(filesystem_path, ec) :
+                                   std::filesystem::create_directory(filesystem_path, ec);
 
     if (ec)
     {
@@ -229,7 +222,7 @@ bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_err
             return true;
         };
 
-        if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
+        if (parents)
         {
             for (auto const& created_path : missing)
             {
