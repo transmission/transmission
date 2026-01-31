@@ -949,7 +949,9 @@ TODO: fix this when notifications get fixed
   _removeSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length > 0) {
-      this.setCurrentPopup(new RemoveDialog({ remote: this.remote, torrents }));
+      this.setCurrentPopup(
+        new RemoveDialog({ trash: this.prefs.remove_delete_data, remote: this.remote, torrents }),
+      );
     }
   }
 

@@ -360,6 +360,21 @@ export class PrefsDialog extends EventTarget {
     const stop_idle_input = input;
 
     label = document.createElement('div');
+    label.textContent = 'Removing';
+    label.classList.add('section-label');
+    root.append(label);
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'remove-delete-data-div',
+      'Delete downloaded data by default',
+    );
+    cal.check.title =
+      'When removing torrents, the "Delete downloaded data" checkbox will be checked by default.';
+    cal.label.title = cal.check.title;
+    root.append(cal.root);
+    const remove_delete_data_check = cal.check;
+
+    label = document.createElement('div');
     label.textContent = 'Magnet Protocol Handler';
     label.classList.add('section-label');
     root.append(label);
@@ -378,6 +393,7 @@ export class PrefsDialog extends EventTarget {
       incomplete_dir_check,
       incomplete_dir_input,
       register_handler_button,
+      remove_delete_data_check,
       root,
       stop_idle_check,
       stop_idle_input,
@@ -800,6 +816,16 @@ export class PrefsDialog extends EventTarget {
       'click',
       (event_) => {
         PrefsDialog._toggleProtocolHandler(event_.currentTarget);
+      },
+    );
+
+    // Web UI preference (stored in cookies, not daemon)
+    this.elements.torrents.remove_delete_data_check.checked =
+      session_manager.prefs.remove_delete_data;
+    this.elements.torrents.remove_delete_data_check.addEventListener(
+      'change',
+      (event_) => {
+        session_manager.prefs.remove_delete_data = event_.target.checked;
       },
     );
     this.elements.dismiss.addEventListener('click', () => this.close());
