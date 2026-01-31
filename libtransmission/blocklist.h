@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "libtransmission/net.h" // for tr_address
-#include "libtransmission/observable.h"
+#include <sigslot/signal.hpp>
 
 namespace tr
 {
@@ -55,11 +55,7 @@ public:
     void set_enabled(bool is_enabled);
     size_t update_primary_blocklist(std::string_view external_file, bool is_enabled);
 
-    template<typename Observer>
-    [[nodiscard]] auto observe_changes(Observer observer)
-    {
-        return changed_.observe(std::move(observer));
-    }
+    sigslot::signal<> changed;
 
 private:
     class Blocklist
@@ -111,8 +107,6 @@ private:
     std::vector<Blocklist> blocklists_;
 
     std::string folder_;
-
-    tr::SimpleObservable<> changed_;
 
     [[nodiscard]] static std::vector<Blocklist> load_folder(std::string_view folder, bool is_enabled);
 };
