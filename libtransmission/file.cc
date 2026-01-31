@@ -181,17 +181,19 @@ bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_err
     }
 #endif
 
-    if (auto check_ec = std::error_code{}; std::filesystem::is_directory(filesystem_path, check_ec))
+    auto ec = std::error_code{};
+    if (std::filesystem::is_directory(filesystem_path, ec))
     {
         return true;
     }
-    else if (check_ec && check_ec != std::errc::no_such_file_or_directory)
+
+    if (ec && ec != std::errc::no_such_file_or_directory)
     {
-        maybe_set_error(error, check_ec);
+        maybe_set_error(error, ec);
         return false;
     }
 
-    auto ec = std::error_code{};
+    ec = {};
     bool const created = parents ? std::filesystem::create_directories(filesystem_path, ec) :
                                    std::filesystem::create_directory(filesystem_path, ec);
 
