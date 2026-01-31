@@ -439,7 +439,7 @@ private:
             }
         }
 
-        events_[ip_protocol].reset(libtransmission::evhelpers::event_new_pri2(
+        events_[ip_protocol].reset(tr::evhelpers::event_new_pri2(
             event_base,
             sock,
             EV_READ | EV_PERSIST,

@@ -164,7 +164,7 @@ private:
 
     struct event_base* const base_;
     evhelpers::event_unique_ptr const evtimer_{
-        libtransmission::evhelpers::event_new_pri2(base_, -1, events(is_repeating_), &EvTimer::onTimer, this)
+        tr::evhelpers::event_new_pri2(base_, -1, events(is_repeating_), &EvTimer::onTimer, this)
     };
 };
 

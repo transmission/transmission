@@ -208,7 +208,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketDiffServ(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
-            udp4_event_.reset(libtransmission::evhelpers::event_new_pri2(
+            udp4_event_.reset(tr::evhelpers::event_new_pri2(
                 session_.event_base(),
                 udp4_socket_,
                 EV_READ | EV_PERSIST,
@@ -260,7 +260,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketDiffServ(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
-            udp6_event_.reset(libtransmission::evhelpers::event_new_pri2(
+            udp6_event_.reset(tr::evhelpers::event_new_pri2(
                 session_.event_base(),
                 udp6_socket_,
                 EV_READ | EV_PERSIST,
