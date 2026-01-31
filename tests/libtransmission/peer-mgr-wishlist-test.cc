@@ -89,7 +89,7 @@ protected:
         return true;
     };
 
-    [[nodiscard]] std::unique_ptr<Wishlist> make_wishlist(MockMediator& mediator)
+    [[nodiscard]] static std::unique_ptr<Wishlist> makeWishlist(MockMediator& mediator)
     {
         return std::make_unique<Wishlist>(mediator);
     }
@@ -113,7 +113,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
     mediator.client_wants_piece_.insert(0);
 
     // we should only get the first piece back
-    auto const spans = make_wishlist(mediator)->next(1000, PeerHasAllPieces);
+    auto const spans = makeWishlist(mediator)->next(1000, PeerHasAllPieces);
     ASSERT_EQ(1U, std::size(spans));
     EXPECT_EQ(mediator.block_span_[0].begin, spans[0].begin);
     EXPECT_EQ(mediator.block_span_[0].end, spans[0].end);
@@ -143,7 +143,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatClientHas)
     mediator.client_wants_piece_.insert(2);
 
     // we should only get piece 2
-    auto const spans = make_wishlist(mediator)->next(1000, PeerHasAllPieces);
+    auto const spans = makeWishlist(mediator)->next(1000, PeerHasAllPieces);
     ASSERT_EQ(1U, std::size(spans));
     EXPECT_EQ(mediator.block_span_[2].begin, spans[0].begin);
     EXPECT_EQ(mediator.block_span_[2].end, spans[0].end);
@@ -177,7 +177,7 @@ TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
 
     // even if we ask wishlist for more blocks than what the peer has,
     // it should only return blocks [100..200)
-    auto const spans = make_wishlist(mediator)->next(250, IsPieceOne);
+    auto const spans = makeWishlist(mediator)->next(250, IsPieceOne);
     auto requested = tr_bitfield{ 250 };
     for (auto const& [begin, end] : spans)
     {
@@ -209,7 +209,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwice)
     mediator.client_wants_piece_.insert(2);
 
     // allow the wishlist to build its cache
-    auto wishlist = make_wishlist(mediator);
+    auto wishlist = makeWishlist(mediator);
 
     // but we've already requested blocks [0..10) from this peer,
     // so we don't want to send repeated requests
@@ -252,7 +252,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
         // we enabled sequential download
         mediator.is_sequential_download_ = true;
 
-        return make_wishlist(mediator)->next(n_wanted, PeerHasAllPieces);
+        return makeWishlist(mediator)->next(n_wanted, PeerHasAllPieces);
     };
 
     // when we ask for blocks, apart from the last piece,
@@ -320,7 +320,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
         mediator.is_sequential_download_ = true;
         mediator.sequential_download_from_piece_ = 2;
 
-        return make_wishlist(mediator)->next(n_wanted, PeerHasAllPieces);
+        return makeWishlist(mediator)->next(n_wanted, PeerHasAllPieces);
     };
 
     // First and last piece come first in sequential download mode regardless
@@ -370,7 +370,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
     // but we only ask for 10 blocks,
     // so that's how many we should get back
     static constexpr auto NumWanted = 10U;
-    auto const spans = make_wishlist(mediator)->next(NumWanted, PeerHasAllPieces);
+    auto const spans = makeWishlist(mediator)->next(NumWanted, PeerHasAllPieces);
     auto n_got = size_t{};
     for (auto const& [begin, end] : spans)
     {
@@ -404,7 +404,7 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
         // and the second piece is high priority
         mediator.piece_priority_[1] = TR_PRI_HIGH;
 
-        return make_wishlist(mediator)->next(n_wanted, PeerHasAllPieces);
+        return makeWishlist(mediator)->next(n_wanted, PeerHasAllPieces);
     };
 
     // wishlist should pick the high priority piece's blocks first.
@@ -464,7 +464,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
             }
         }
 
-        return make_wishlist(mediator)->next(n_wanted, PeerHasAllPieces);
+        return makeWishlist(mediator)->next(n_wanted, PeerHasAllPieces);
     };
 
     // wishlist prefers to get pieces completed ASAP, so it
@@ -526,7 +526,7 @@ TEST_F(PeerMgrWishlistTest, prefersRarerPieces)
         mediator.piece_replication_[1] = 3;
         mediator.piece_replication_[2] = 2;
 
-        return make_wishlist(mediator)->next(n_wanted, PeerHasAllPieces);
+        return makeWishlist(mediator)->next(n_wanted, PeerHasAllPieces);
     };
 
     // wishlist prefers to request rarer pieces, so it
@@ -589,7 +589,7 @@ TEST_F(PeerMgrWishlistTest, peerDisconnectDecrementsReplication)
         mediator.piece_replication_[2] = 2;
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // a peer that has only the first piece disconnected, now the
         // first piece should be the rarest piece according to the cache
@@ -662,7 +662,7 @@ TEST_F(PeerMgrWishlistTest, gotBadPieceResetsPiece)
         mediator.piece_replication_[2] = 2;
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we already requested 50 blocks each from every piece
         wishlist->on_sent_request(tr_block_span_t{ .begin = 0, .end = 50 });
@@ -721,7 +721,7 @@ TEST_F(PeerMgrWishlistTest, gotBitfieldIncrementsReplication)
         mediator.piece_replication_[2] = 2;
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // a peer with first 2 pieces connected and sent a bitfield, now the
         // third piece should be the rarest piece according to the cache
@@ -795,7 +795,7 @@ TEST_F(PeerMgrWishlistTest, sentRequestsResortsPiece)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we requested block 0 from someone, the wishlist should resort the
         // candidate list cache
@@ -863,7 +863,7 @@ TEST_F(PeerMgrWishlistTest, gotBlockResortsPiece)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we received block 0 from someone, the wishlist should resort the
         // candidate list cache
@@ -931,7 +931,7 @@ TEST_F(PeerMgrWishlistTest, gotHaveIncrementsReplication)
         mediator.piece_replication_[2] = 2;
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // a peer sent a "Have" message for the first piece, now the
         // first piece should be the least rare piece according to the cache
@@ -1002,7 +1002,7 @@ TEST_F(PeerMgrWishlistTest, gotChokeResetsRequestedBlocks)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we have active requests to the first 250 blocks
         wishlist->on_sent_request(tr_block_span_t{ .begin = 0, .end = 250 });
@@ -1059,7 +1059,7 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
         mediator.piece_replication_[2] = 3;
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // a peer sent a "Have All" message, this should not affect the piece order
         wishlist->on_got_have_all();
@@ -1130,7 +1130,7 @@ TEST_F(PeerMgrWishlistTest, gotRejectResetsBlock)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we have active requests to the first 250 blocks
         wishlist->on_sent_request(tr_block_span_t{ .begin = 0, .end = 250 });
@@ -1189,7 +1189,7 @@ TEST_F(PeerMgrWishlistTest, gotRejectResortsPiece)
         mediator.client_wants_piece_.insert(1);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we have active requests to the first 50 blocks of each piece
         wishlist->on_sent_request(tr_block_span_t{ .begin = 0, .end = 50 });
@@ -1243,7 +1243,7 @@ TEST_F(PeerMgrWishlistTest, sentCancelResetsBlocks)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we have active requests to the first 250 blocks
         wishlist->on_sent_request(tr_block_span_t{ .begin = 0, .end = 250 });
@@ -1306,7 +1306,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlockAfterBlockCompleted)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we sent "Request" messages
         wishlist->on_sent_request(tr_block_span_t{ .begin = 0, .end = 120 });
@@ -1356,7 +1356,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
 
     // allow the wishlist to build its cache, it should have all 3 pieces
     // at this point
-    auto wishlist = make_wishlist(mediator);
+    auto wishlist = makeWishlist(mediator);
 
     // we just completed piece 0
     wishlist->on_sent_request(mediator.block_span_[0]);
@@ -1404,7 +1404,7 @@ TEST_F(PeerMgrWishlistTest, settingPriorityResortsCandidates)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // a file priority changed, the cache should be rebuilt.
         // let's say the file was in piece 1
@@ -1458,7 +1458,7 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadResortsCandidates)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // the sequential download setting was changed,
         // the cache should be rebuilt
@@ -1529,7 +1529,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPieceResortsCandidates)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we enabled sequential download, from piece 2
         mediator.is_sequential_download_ = true;
@@ -1589,7 +1589,7 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListAdd)
         mediator.client_wants_piece_.insert(1);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // now we want the file that consists of piece 2 and piece 3 also
         mediator.client_wants_piece_.insert(2);
@@ -1649,7 +1649,7 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListAddHad)
         mediator.client_wants_piece_.insert(1);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // now we want piece 2 and piece 3
         mediator.client_wants_piece_.insert(2);
@@ -1706,7 +1706,7 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListRemove)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we no longer want the file that consists of piece 2 and piece 3
         mediator.client_wants_piece_.erase(2);
@@ -1764,7 +1764,7 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrent)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         return wishlist->next(n_wanted, PeerHasAllPieces);
     };
@@ -1829,7 +1829,7 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentPartiallyCompletedPiece)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         return wishlist->next(n_wanted, PeerHasAllPieces);
     };
@@ -1895,7 +1895,7 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentPartiallyCompleted)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         return wishlist->next(n_wanted, PeerHasAllPieces);
     };
@@ -1946,7 +1946,7 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentGotBadPiece)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // requested all blocks and "download" piece 1,
         // as well as parts of piece 0 and piece 2 that
@@ -2014,7 +2014,7 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentGotBadPieceSurroundingCompleted)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // pieces 0, 2 completed normally, piece 3 has pending requests
         wishlist->on_sent_request(tr_block_span_t{ .begin = 0, .end = 134 });
@@ -2084,7 +2084,7 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentGot2ConsectutiveBadPieces)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // pieces 0, 3 completed normally
         wishlist->on_sent_request(tr_block_span_t{ .begin = 0, .end = 134 });
@@ -2162,7 +2162,7 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentPartiallyWanted)
         mediator.client_wants_piece_.insert(2);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         return wishlist->next(n_wanted, PeerHasAllPieces);
     };
@@ -2217,7 +2217,7 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentDeselectedPiece)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we don't want piece 1 anymore
         tr_file_index_t constexpr Deselected = 1;
@@ -2277,7 +2277,7 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentDeselected2ConsecutivePieces)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we don't want pieces 1, 2 anymore
         auto constexpr Deselected = std::array<tr_file_index_t, 2>{ 1, 2 };
@@ -2339,7 +2339,7 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentSelectedPiece)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we want piece 1 now
         tr_file_index_t constexpr Selected = 1;
@@ -2395,11 +2395,10 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentSelected2ConsecutivePieces)
         mediator.client_wants_piece_.insert(3);
 
         // allow the wishlist to build its cache
-        auto wishlist = make_wishlist(mediator);
+        auto wishlist = makeWishlist(mediator);
 
         // we don't want pieces 1, 2 anymore
-        tr_file_index_t constexpr Selected[] = { 1, 2 };
-        for (auto const idx : Selected)
+        for (tr_piece_index_t const idx : { 1U, 2U })
         {
             mediator.client_wants_piece_.insert(idx);
         }
