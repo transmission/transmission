@@ -137,7 +137,9 @@ auto make_event_base()
 {
     tr_session_thread::tr_evthread_init();
 
-    return tr::evhelpers::evbase_unique_ptr{ event_base_new() };
+    struct event_base* b = event_base_new();
+    event_base_priority_init(b, 3);
+    return tr::evhelpers::evbase_unique_ptr{ b };
 }
 
 } // namespace
@@ -280,7 +282,9 @@ private:
     }
 
     tr::evhelpers::evbase_unique_ptr const evbase_{ make_event_base() };
-    tr::evhelpers::event_unique_ptr const work_queue_event_{ event_new(evbase_.get(), -1, 0, on_work_available_static, this) };
+    tr::evhelpers::event_unique_ptr const work_queue_event_{
+        tr::evhelpers::event_new_pri2(evbase_.get(), -1, 0, on_work_available_static, this)
+    };
 
     work_queue_t work_queue_;
     std::mutex work_queue_mutex_;
