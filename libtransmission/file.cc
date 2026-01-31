@@ -74,12 +74,7 @@ bool tr_sys_path_exists(std::string_view path, tr_error* error)
 {
     auto ec = std::error_code{};
     auto const exists = std::filesystem::exists(tr_u8path(path), ec);
-
-    if (error != nullptr && ec)
-    {
-        error->set(ec.value(), ec.message());
-    }
-
+    maybe_set_error(error, ec);
     return exists;
 }
 
