@@ -19,8 +19,17 @@
 #include "libtransmission/torrent.h"
 
 tr_completion::tr_completion(tr_torrent const* tor, tr_block_info const* block_info)
-    : tr_completion{ [tor](tr_piece_index_t const piece) { return tor->piece_is_wanted(piece); }, block_info }
+    : tr_completion{ [tor](tr_piece_index_t const piece) { return tor->piece_is_wanted(piece); },
+                     [tor](tr_piece_index_t const piece) { return tor->piece_is_padded(piece); },
+                     block_info }
 {
+    for (tr_piece_index_t piece = 0, n_pieces = block_info_->piece_count(); piece < n_pieces; ++piece)
+    {
+        if (piece_is_padded_(piece))
+        {
+            add_piece(piece);
+        }
+    }
 }
 
 uint64_t tr_completion::compute_has_valid() const

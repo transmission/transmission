@@ -55,6 +55,11 @@ public:
         return files_.at(file_index).path_;
     }
 
+    [[nodiscard]] TR_CONSTEXPR20 bool const& is_padding(tr_file_index_t file_index) const
+    {
+        return files_.at(file_index).is_padding_;
+    }
+
     void set_path(tr_file_index_t file_index, std::string_view path)
     {
         files_.at(file_index).set_path(path);
@@ -102,10 +107,10 @@ public:
         return ret;
     }
 
-    TR_CONSTEXPR_VEC tr_file_index_t add(std::string_view path, uint64_t file_size)
+    TR_CONSTEXPR_VEC tr_file_index_t add(std::string_view path, uint64_t file_size, bool is_padding)
     {
         auto const ret = static_cast<tr_file_index_t>(std::size(files_));
-        files_.emplace_back(path, file_size);
+        files_.emplace_back(path, file_size, is_padding);
         total_size_ += file_size;
         return ret;
     }
@@ -187,14 +192,17 @@ private:
             }
         }
 
-        TR_CONSTEXPR_STR file_t(std::string_view path, uint64_t size)
+        TR_CONSTEXPR_STR file_t(std::string_view path, uint64_t size, bool is_padding)
+
             : path_{ path }
             , size_{ size }
+            , is_padding_{ is_padding }
         {
         }
 
         std::string path_;
         uint64_t size_ = 0;
+        bool is_padding_ = false;
     };
 
     std::vector<file_t> files_;

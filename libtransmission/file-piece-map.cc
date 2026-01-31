@@ -24,12 +24,20 @@ tr_file_piece_map::tr_file_piece_map(tr_torrent_metainfo const& tm)
     reset(tm);
 }
 
-tr_file_piece_map::tr_file_piece_map(tr_block_info const& block_info, uint64_t const* const file_sizes, size_t const n_files)
+tr_file_piece_map::tr_file_piece_map(
+    tr_block_info const& block_info,
+    uint64_t const* const file_sizes,
+    size_t const n_files,
+    std::vector<uint8_t> is_padding_files)
 {
-    reset(block_info, file_sizes, n_files);
+    reset(block_info, file_sizes, n_files, is_padding_files);
 }
 
-void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* const file_sizes, size_t const n_files)
+void tr_file_piece_map::reset(
+    tr_block_info const& block_info,
+    uint64_t const* const file_sizes,
+    size_t const n_files,
+    std::vector<uint8_t> is_padding_files)
 {
     file_bytes_.resize(n_files);
     file_bytes_.shrink_to_fit();
@@ -37,6 +45,7 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* c
     file_pieces_.resize(n_files);
     file_pieces_.shrink_to_fit();
 
+    is_padding_files_ = is_padding_files;
     auto edge_pieces = small::set<tr_piece_index_t, 1024U>{};
     edge_pieces.reserve(n_files * 2U);
 
@@ -81,11 +90,13 @@ void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
 {
     auto const n = tm.file_count();
     auto file_sizes = std::vector<uint64_t>(n);
+    auto is_padding_files = std::vector<uint8_t>(n);
     for (tr_file_index_t i = 0U; i < n; ++i)
     {
         file_sizes[i] = tm.file_size(i);
+        is_padding_files[i] = tm.file_is_padding(i);
     }
-    reset({ tm.total_size(), tm.piece_size() }, std::data(file_sizes), std::size(file_sizes));
+    reset({ tm.total_size(), tm.piece_size() }, std::data(file_sizes), std::size(file_sizes), is_padding_files);
 }
 
 namespace
@@ -238,4 +249,37 @@ bool tr_files_wanted::piece_wanted(tr_piece_index_t const piece) const
 
     auto const [begin, end] = fpm_->file_span_for_piece(piece);
     return wanted_.count(begin, end) != 0U;
+}
+
+// ---
+
+tr_files_padded::tr_files_padded(tr_file_piece_map const* const fpm)
+    : fpm_{ fpm }
+    , padded_{ fpm->file_count() }
+{
+    padded_.set_has_all(); // by default we want all files
+}
+
+void tr_files_padded::set(tr_file_index_t const file, bool const padded)
+{
+    padded_.set(file, padded);
+}
+
+void tr_files_padded::set(tr_file_index_t const* const files, size_t const n_files, bool const padded)
+{
+    for (size_t idx = 0U; idx < n_files; ++idx)
+    {
+        set(files[idx], padded);
+    }
+}
+
+bool tr_files_padded::piece_padded(tr_piece_index_t const piece) const
+{
+    if (padded_.has_all())
+    {
+        return true;
+    }
+
+    auto const [begin, end] = fpm_->file_span_for_piece(piece);
+    return padded_.count(begin, end) != 0U;
 }
