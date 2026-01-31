@@ -17,7 +17,6 @@
 #include "libtransmission/transmission.h"
 
 class tr_bitfield;
-struct tr_peer;
 
 /**
  * Figures out what blocks we want to request next.
