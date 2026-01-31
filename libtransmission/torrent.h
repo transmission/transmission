@@ -20,6 +20,8 @@
 #include <utility>
 #include <vector>
 
+#include <sigslot/signal.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
@@ -31,7 +33,6 @@
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
-#include "libtransmission/observable.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-magnet.h"
@@ -438,7 +439,7 @@ struct tr_torrent
         if (priority != file_priorities_.file_priority(file))
         {
             file_priorities_.set(file, priority);
-            priority_changed_.emit(this, &file, 1U, priority);
+            priority_changed_(this, &file, 1U, priority);
             set_dirty();
             mark_changed();
         }
@@ -768,7 +769,7 @@ struct tr_torrent
                 session->flush_torrent_files(id());
             }
             sequential_download_ = is_sequential;
-            sequential_download_changed_.emit(this, is_sequential);
+            sequential_download_changed_(this, is_sequential);
             set_dirty();
         }
     }
@@ -784,7 +785,7 @@ struct tr_torrent
         if (is_valid && piece != sequential_download_from_piece_)
         {
             sequential_download_from_piece_ = piece;
-            sequential_download_from_piece_changed_.emit(this, piece);
+            sequential_download_from_piece_changed_(this, piece);
             return true;
         }
         return false;
@@ -1012,18 +1013,18 @@ struct tr_torrent
 
     // ---
 
-    tr::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
-    tr::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
-    tr::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
-    tr::SimpleObservable<tr_torrent*> doomed_;
-    tr::SimpleObservable<tr_torrent*> got_metainfo_;
-    tr::SimpleObservable<tr_torrent*> started_;
-    tr::SimpleObservable<tr_torrent*> stopped_;
-    tr::SimpleObservable<tr_torrent*> swarm_is_all_upload_only_;
-    tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
-    tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
-    tr::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
-    tr::SimpleObservable<tr_torrent*, tr_piece_index_t> sequential_download_from_piece_changed_;
+    sigslot::signal<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
+    sigslot::signal<tr_torrent*, tr_piece_index_t> got_bad_piece_;
+    sigslot::signal<tr_torrent*, tr_piece_index_t> piece_completed_;
+    sigslot::signal<tr_torrent*> doomed_;
+    sigslot::signal<tr_torrent*> got_metainfo_;
+    sigslot::signal<tr_torrent*> started_;
+    sigslot::signal<tr_torrent*> stopped_;
+    sigslot::signal<tr_torrent*> swarm_is_all_upload_only_;
+    sigslot::signal<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
+    sigslot::signal<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
+    sigslot::signal<tr_torrent*, bool> sequential_download_changed_;
+    sigslot::signal<tr_torrent*, tr_piece_index_t> sequential_download_from_piece_changed_;
 
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;
@@ -1260,7 +1261,7 @@ private:
 
         files_wanted_.set(files, n_files, wanted);
         completion_.invalidate_size_when_done();
-        files_wanted_changed_.emit(this, files, n_files, wanted);
+        files_wanted_changed_(this, files, n_files, wanted);
 
         if (!is_bootstrapping)
         {

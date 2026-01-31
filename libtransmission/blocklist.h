@@ -18,8 +18,9 @@
 #include <utility> // for std::pair
 #include <vector>
 
-#include "libtransmission/net.h" // for tr_address
 #include <sigslot/signal.hpp>
+
+#include "libtransmission/net.h" // for tr_address
 
 namespace tr
 {
