@@ -65,6 +65,8 @@ static NSMutableIndexSet* SymmetricDifference(NSIndexSet* lhs, NSIndexSet* rhs)
 
 @property(nonatomic) NSDictionary* fHoverEventDict;
 
+@property(nonatomic) NSMutableIndexSet* fPendingSelectionReloadRows;
+
 @end
 
 @implementation TorrentTableView
@@ -452,7 +454,24 @@ static NSMutableIndexSet* SymmetricDifference(NSIndexSet* lhs, NSIndexSet* rhs)
 
     if (NSMutableIndexSet* changedRows = SymmetricDifference(oldSelection, newSelection); changedRows.count > 0)
     {
-        [self reloadDataForRowIndexes:changedRows columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+        if (!self.fPendingSelectionReloadRows)
+        {
+            self.fPendingSelectionReloadRows = [[NSMutableIndexSet alloc] init];
+            [self performSelector:@selector(flushSelectionReload) withObject:nil afterDelay:0 inModes:@[ NSRunLoopCommonModes ]];
+        }
+
+        [self.fPendingSelectionReloadRows addIndexes:changedRows];
+    }
+}
+
+- (void)flushSelectionReload
+{
+    NSMutableIndexSet* rows = self.fPendingSelectionReloadRows;
+    self.fPendingSelectionReloadRows = nil;
+
+    if (rows.count > 0)
+    {
+        [self reloadDataForRowIndexes:rows columnIndexes:[NSIndexSet indexSetWithIndex:0]];
     }
 }
 
