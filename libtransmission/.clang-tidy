@@ -4,6 +4,10 @@ HeaderFilterRegex: .*/libtransmission/.*
 # TODO: Enable `portability-template-virtual-member-function` after https://github.com/llvm/llvm-project/issues/139031 is fixed
 # TODO: Enable `cppcoreguidelines-pro-bounds-pointer-arithmetic` after converting all pointers to std::span
 # TODO: Enable `modernize-use-integer-sign-comparison` (P0586R2) after GCC >= 10.1, clang >= 13
+# -clang-analyzer-optin.core.EnumCastOutOfRange: disabled due false <filesystem> warning in file.cc calling
+# std::filesystem::last_write_time() on windows ci builds with MSVC STL 14.44.35207.
+# Try re-enabling when the CI runner upgrades to a newer version.
+#
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
 #
 # -modernize-use-ranges: GCC 10.1, clang 15
@@ -20,6 +24,7 @@ Checks: >
   -cert-err58-cpp,
   -cert-int09-c,
   clang-analyzer-*,
+  -clang-analyzer-optin.core.EnumCastOutOfRange,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-c-arrays,
   -cppcoreguidelines-avoid-const-or-ref-data-members,

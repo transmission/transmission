@@ -23,15 +23,10 @@ using namespace std::literals;
 using namespace tr::app;
 using tr::serializer::to_variant;
 
-std::string gl_confdir;
-
-void gtr_pref_init(std::string_view config_dir)
-{
-    gl_confdir = config_dir;
-}
-
 namespace
 {
+std::string gl_confdir;
+
 [[nodiscard]] std::string get_default_download_dir()
 {
     if (auto dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DOWNLOAD)); !std::empty(dir))
@@ -120,6 +115,11 @@ tr_variant& getPrefs()
     return settings;
 }
 } // namespace
+
+void gtr_pref_init(std::string_view config_dir)
+{
+    gl_confdir = config_dir;
+}
 
 tr_variant& gtr_pref_get_all()
 {

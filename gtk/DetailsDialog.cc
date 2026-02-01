@@ -1246,7 +1246,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
         {
             auto const key = make_key(tor, peer);
 
-            if (hash.find(key) == hash.end())
+            if (!hash.contains(key))
             {
                 auto const iter = store->append();
                 initPeerRow(iter, key, tr_torrentName(tor), peer);
@@ -1314,7 +1314,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
             auto const* const url = tr_torrentWebseed(tor, j).url;
             auto const key = make_key(tor, url);
 
-            if (hash.find(key) == hash.end())
+            if (!hash.contains(key))
             {
                 auto const iter = store->append();
                 (*iter)[webseed_cols.url] = url;
@@ -1986,7 +1986,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
         // build the key to find the row
         gstr.str({});
         gstr << torrent_id << '\t' << tracker.tier << '\t' << tracker.announce;
-        if (hash.find(gstr.str()) == hash.end())
+        if (!hash.contains(gstr.str()))
         {
             // if we didn't have that row, add it
             auto const iter = store->append();
