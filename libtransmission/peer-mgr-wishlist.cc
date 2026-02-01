@@ -20,7 +20,7 @@
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
-#include "libtransmission/tr-assert.h" // TR_ASSERT
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/peer-mgr-wishlist.h"
 #include "libtransmission/utils.h"
 
