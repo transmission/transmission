@@ -151,7 +151,7 @@ bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_erro
     return !ec && same;
 }
 
-bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_error* error)
+bool tr_sys_dir_create(std::string_view path, int flags, [[maybe_unused]] int permissions, tr_error* error)
 {
     auto const filesystem_path = tr_u8path(path);
     auto const parents = (flags & TR_SYS_DIR_CREATE_PARENTS) != 0;
@@ -194,8 +194,14 @@ bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_err
     }
 
     ec = {};
-    bool const created = parents ? std::filesystem::create_directories(filesystem_path, ec) :
-                                   std::filesystem::create_directory(filesystem_path, ec);
+    if (parents)
+    {
+        std::filesystem::create_directories(filesystem_path, ec);
+    }
+    else
+    {
+        std::filesystem::create_directory(filesystem_path, ec);
+    }
 
     if (ec)
     {
@@ -204,7 +210,7 @@ bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_err
     }
 
 #ifndef _WIN32
-    if (created && permissions != 0)
+    if (permissions != 0)
     {
         auto const apply_permissions = [&](std::filesystem::path const& target)
         {
