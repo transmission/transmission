@@ -251,6 +251,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             pathIs(InfoKey, UniqueKey) || //
             pathIs(ProfilesKey, HeightKey) || //
             pathIs(ProfilesKey, WidthKey) || //
+            pathIs(UidKey) || //
             pathIs(WidthKey) || //
             pathStartsWith(AzureusPropertiesKey) || //
             pathStartsWith(InfoKey, FileDurationKey) || //
@@ -312,6 +313,13 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
                 // TODO https://github.com/transmission/transmission/issues/458
             }
             else if (
+                pathIs(InfoKey, FilesKey, std::optional<std::string_view>(), Crc32Key) || //
+                pathIs(InfoKey, FilesKey, std::optional<std::string_view>(), Ed2kKey) || //
+                pathIs(InfoKey, FilesKey, std::optional<std::string_view>(), FilehashKey) || //
+                pathIs(InfoKey, FilesKey, std::optional<std::string_view>(), Md5Key) || //
+                pathIs(InfoKey, FilesKey, std::optional<std::string_view>(), Md5sumKey) || //
+                pathIs(InfoKey, FilesKey, std::optional<std::string_view>(), MtimeKey) || // (why a string?)
+                pathIs(InfoKey, FilesKey, std::optional<std::string_view>(), Sha1Key) || //
                 pathIs(InfoKey, FilesKey, ""sv, Crc32Key) || //
                 pathIs(InfoKey, FilesKey, ""sv, Ed2kKey) || //
                 pathIs(InfoKey, FilesKey, ""sv, FilehashKey) || //
@@ -407,6 +415,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
         else if (
             pathIs(ChecksumKey) || //
             pathIs(ErrCallbackKey) || //
+            pathIs(InfoKey, AttrKey) || //
             pathIs(InfoKey, CrossSeedEntryKey) || //
             pathIs(InfoKey, Ed2kKey) || //
             pathIs(InfoKey, EntropyKey) || //
