@@ -28,6 +28,22 @@ static CGFloat const kErrorImageSize = 20.0;
 
 static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
+// return the indexes that are in either lhs or rhs, but not both
+static NSMutableIndexSet* SymmetricDifference(NSIndexSet* lhs, NSIndexSet* rhs)
+{
+    NSMutableIndexSet* result = [lhs mutableCopy];
+    [result addIndexes:rhs];
+
+    [lhs enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL*) {
+        if ([rhs containsIndex:idx])
+        {
+            [result removeIndex:idx];
+        }
+    }];
+
+    return result;
+}
+
 @interface TorrentTableView ()
 
 @property(nonatomic) IBOutlet Controller* fController;
@@ -430,8 +446,14 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (void)outlineViewSelectionDidChange:(NSNotification*)notification
 {
-    self.fSelectedRowIndexes = self.selectedRowIndexes;
-    [self reloadVisibleRows];
+    NSIndexSet* oldSelection = self.fSelectedRowIndexes ?: [NSIndexSet indexSet];
+    NSIndexSet* newSelection = self.selectedRowIndexes;
+    self.fSelectedRowIndexes = newSelection;
+
+    if (NSMutableIndexSet* changedRows = SymmetricDifference(oldSelection, newSelection); changedRows.count > 0)
+    {
+        [self reloadDataForRowIndexes:changedRows columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
 }
 
 - (void)outlineViewItemDidExpand:(NSNotification*)notification
