@@ -56,7 +56,11 @@ public:
     void set_enabled(bool is_enabled);
     size_t update_primary_blocklist(std::string_view external_file, bool is_enabled);
 
-    sigslot::signal<> changed;
+    template<typename Observer>
+    [[nodiscard]] sigslot::scoped_connection observe_changes(Observer observer) const
+    {
+        return changed_.connect_scoped(std::move(observer));
+    }
 
 private:
     class Blocklist
@@ -108,6 +112,8 @@ private:
     std::vector<Blocklist> blocklists_;
 
     std::string folder_;
+
+    mutable sigslot::signal<> changed_;
 
     [[nodiscard]] static std::vector<Blocklist> load_folder(std::string_view folder, bool is_enabled);
 };

@@ -515,7 +515,7 @@ void Blocklists::set_enabled(bool is_enabled)
         blocklist.setEnabled(is_enabled);
     }
 
-    changed();
+    changed_();
 }
 
 void Blocklists::load(std::string_view folder, bool is_enabled)
@@ -523,7 +523,7 @@ void Blocklists::load(std::string_view folder, bool is_enabled)
     folder_ = folder;
     blocklists_ = load_folder(folder, is_enabled);
 
-    changed();
+    changed_();
 }
 
 // static
@@ -590,7 +590,7 @@ size_t Blocklists::update_primary_blocklist(std::string_view const external_file
         blocklists_.emplace_back(std::move(*added));
     }
 
-    changed();
+    changed_();
 
     return n_rules;
 }
