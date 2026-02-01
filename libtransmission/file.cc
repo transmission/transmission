@@ -148,7 +148,7 @@ bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_erro
 
     auto const same = std::filesystem::equivalent(u8path1, u8path2, ec);
     maybe_set_error(error, ec);
-    return !ec && same;
+    return same;
 }
 
 bool tr_sys_dir_create(std::string_view path, int flags, [[maybe_unused]] int permissions, tr_error* error)
