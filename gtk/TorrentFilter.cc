@@ -170,11 +170,11 @@ Glib::RefPtr<TorrentFilter> TorrentFilter::create()
     return Glib::make_refptr_for_instance(new TorrentFilter());
 }
 
-bool TorrentFilter::match_mode(Torrent const& torrent, ShowMode const type)
+bool TorrentFilter::match_mode(Torrent const& torrent, ShowMode const mode)
 {
     auto activity = tr_torrent_activity();
 
-    switch (type)
+    switch (mode)
     {
     case ShowMode::ShowAll:
         return true;
