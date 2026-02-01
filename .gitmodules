@@ -66,4 +66,4 @@
 	url = https://github.com/google/crc32c.git
 [submodule "third-party/sigslot"]
 	path = third-party/sigslot
-	url = https://github.com/palacaze/sigslot
+	url = https://github.com/transmission/sigslot
