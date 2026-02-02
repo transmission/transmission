@@ -62,8 +62,6 @@ When submitting a pull request, please add a one-sentence paragraph that begins 
   - BAD: "address minor clang warning"
   - BAD: "Refactor: add libtransmission::Values."
 
-Notes: address minor clang warning
-
 ## Considerations
 
 - Prefer commonly-used tools over bespoke ones, e.g. use `std::list` instead of rolling your own list. This simplifies the code and makes it easier for other contributors to work with.
