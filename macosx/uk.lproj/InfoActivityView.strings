@@ -1,0 +1,90 @@
+
+/* Class = "NSTextFieldCell"; title = "Downloaded:"; ObjectID = "30"; */
+"30.title" = "Завантажено:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
+"31.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Uploaded:"; ObjectID = "32"; */
+"32.title" = "Відвантажено:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
+"33.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "34"; */
+"34.title" = "Співвідношення:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "35"; */
+"35.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Have:"; ObjectID = "36"; */
+"36.title" = "Є:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
+"37.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "State:"; ObjectID = "38"; */
+"38.title" = "Стан:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "39"; */
+"39.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Error:"; ObjectID = "41"; */
+"41.title" = "Помилка:";
+
+/* Class = "NSTextFieldCell"; title = "Dates"; ObjectID = "42"; */
+"42.title" = "Дати";
+
+/* Class = "NSTextFieldCell"; title = "Added:"; ObjectID = "43"; */
+"43.title" = "Додано:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "44"; */
+"44.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Completed:"; ObjectID = "46"; */
+"46.title" = "Завершено:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "47"; */
+"47.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Transfer"; ObjectID = "50"; */
+"50.title" = "Передача";
+
+/* Class = "NSTextFieldCell"; title = "Last Activity:"; ObjectID = "51"; */
+"51.title" = "Остання дія:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "52"; */
+"52.placeholderString" = "н/д";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Progress"; ObjectID = "54"; */
+"54.ibShadowedLabels[0]" = "Хід";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[1] = "Available"; ObjectID = "54"; */
+"54.ibShadowedLabels[1]" = "Доступно";
+
+/* Class = "NSTextFieldCell"; title = "Progress:"; ObjectID = "55"; */
+"55.title" = "Хід:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "56"; */
+"56.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Failed DL:"; ObjectID = "57"; */
+"57.title" = "Невдалих завантажень:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "58"; */
+"58.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Time Elapsed"; ObjectID = "85"; */
+"85.title" = "Пройшло часу";
+
+/* Class = "NSTextFieldCell"; title = "Downloading:"; ObjectID = "86"; */
+"86.title" = "Завантажується:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "87"; */
+"87.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Seeding:"; ObjectID = "89"; */
+"89.title" = "Сіється:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "90"; */
+"90.placeholderString" = "н/д";

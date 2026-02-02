@@ -1,0 +1,90 @@
+
+/* Class = "NSTextFieldCell"; title = "Downloaded:"; ObjectID = "30"; */
+"30.title" = "Letöltve:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
+"31.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Uploaded:"; ObjectID = "32"; */
+"32.title" = "Feltöltve:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
+"33.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "34"; */
+"34.title" = "Arány:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "35"; */
+"35.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Have:"; ObjectID = "36"; */
+"36.title" = "Megvan:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
+"37.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "State:"; ObjectID = "38"; */
+"38.title" = "Állapot:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "39"; */
+"39.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Error:"; ObjectID = "41"; */
+"41.title" = "Hiba:";
+
+/* Class = "NSTextFieldCell"; title = "Dates"; ObjectID = "42"; */
+"42.title" = "Dátumok";
+
+/* Class = "NSTextFieldCell"; title = "Added:"; ObjectID = "43"; */
+"43.title" = "Hozzáadva:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "44"; */
+"44.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Completed:"; ObjectID = "46"; */
+"46.title" = "Befejezve:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "47"; */
+"47.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Transfer"; ObjectID = "50"; */
+"50.title" = "Átvitel";
+
+/* Class = "NSTextFieldCell"; title = "Last Activity:"; ObjectID = "51"; */
+"51.title" = "Legutóbbi aktivitás:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "52"; */
+"52.placeholderString" = "N/A";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Progress"; ObjectID = "54"; */
+"54.ibShadowedLabels[0]" = "Folyamat";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[1] = "Available"; ObjectID = "54"; */
+"54.ibShadowedLabels[1]" = "Elérhető";
+
+/* Class = "NSTextFieldCell"; title = "Progress:"; ObjectID = "55"; */
+"55.title" = "Folyamat:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "56"; */
+"56.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Failed DL:"; ObjectID = "57"; */
+"57.title" = "Sikertelen LE:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "58"; */
+"58.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Time Elapsed"; ObjectID = "85"; */
+"85.title" = "Eltelt idő";
+
+/* Class = "NSTextFieldCell"; title = "Downloading:"; ObjectID = "86"; */
+"86.title" = "Letöltés:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "87"; */
+"87.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Seeding:"; ObjectID = "89"; */
+"89.title" = "Megosztás:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "90"; */
+"90.placeholderString" = "N/A";

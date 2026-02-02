@@ -1,4 +1,4 @@
-// This file Copyright © 2020-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,6 +10,7 @@
 #include <ctime>
 #include <optional>
 #include <string_view>
+#include <type_traits>
 #include <vector>
 
 #include <QString>
@@ -26,6 +27,7 @@ struct TrackerStat;
 
 namespace trqt::variant_helpers
 {
+void register_qt_converters();
 
 template<typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
 auto getValue(tr_variant const* variant)
@@ -91,6 +93,19 @@ auto getValue(tr_variant const* variant)
     if (auto sv = std::string_view{}; tr_variantGetStrView(variant, &sv))
     {
         ret = std::string_view(std::data(sv), std::size(sv));
+    }
+
+    return ret;
+}
+
+template<typename T, typename std::enable_if_t<std::is_enum_v<T>>* = nullptr>
+auto getValue(tr_variant const* variant)
+{
+    std::optional<T> ret;
+
+    if (auto const value = getValue<int>(variant); value)
+    {
+        ret = static_cast<T>(*value);
     }
 
     return ret;

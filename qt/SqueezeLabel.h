@@ -43,18 +43,30 @@
 
 #include <QLabel>
 
-#include <libtransmission/tr-macros.h>
-
 class SqueezeLabel : public QLabel
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(SqueezeLabel)
 
 public:
     explicit SqueezeLabel(QWidget* parent = nullptr);
     explicit SqueezeLabel(QString const& text, QWidget* parent = nullptr);
+    SqueezeLabel(SqueezeLabel&&) = delete;
+    SqueezeLabel(SqueezeLabel const&) = delete;
+    SqueezeLabel& operator=(SqueezeLabel&&) = delete;
+    SqueezeLabel& operator=(SqueezeLabel const&) = delete;
 
 protected:
     // QWidget
     void paintEvent(QPaintEvent* paint_event) override;
+
+private:
+#if QT_CONFIG(accessibility)
+    void updateAccessibilityIfNeeded();
+#endif
+
+private:
+#if QT_CONFIG(accessibility)
+    QString old_text_;
+    int old_position_ = -1;
+#endif
 };

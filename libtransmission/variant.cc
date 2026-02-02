@@ -1,23 +1,28 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> // std::sort
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 #include <vector>
+#include <variant>
 
 #ifdef _WIN32
 #include <share.h>
 #endif
 
-#include <fmt/core.h>
-
-#include <small/vector.hpp>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
@@ -29,99 +34,201 @@ using namespace std::literals;
 
 namespace
 {
-constexpr bool variant_is_container(tr_variant const* const var)
-{
-    return var != nullptr && (var->holds_alternative<tr_variant::Vector>() || var->holds_alternative<tr_variant::Map>());
-}
-
-constexpr int variant_index(tr_variant const* const var)
+template<typename T>
+[[nodiscard]] bool value_if(tr_variant const* const var, T* const setme)
 {
     if (var != nullptr)
     {
-        return var->index();
+        if (auto val = var->value_if<T>())
+        {
+            if (setme)
+            {
+                *setme = *val;
+            }
+            return true;
+        }
     }
 
-    return tr_variant::NoneIndex;
+    return false;
+}
+
+template<typename T>
+[[nodiscard]] tr_variant* dict_set(tr_variant* const var, tr_quark const key, T&& val)
+{
+    TR_ASSERT(var != nullptr);
+    TR_ASSERT(var->holds_alternative<tr_variant::Map>());
+
+    if (auto* const map = var != nullptr ? var->get_if<tr_variant::MapIndex>() : nullptr; map != nullptr)
+    {
+        return &map->insert_or_assign(key, std::forward<T>(val)).first;
+    }
+
+    return {};
+}
+
+template<typename T>
+[[nodiscard]] tr_variant* vec_add(tr_variant* const var, T&& val)
+{
+    TR_ASSERT(var != nullptr);
+    TR_ASSERT(var->holds_alternative<tr_variant::Vector>());
+
+    if (auto* const vec = var != nullptr ? var->get_if<tr_variant::VectorIndex>() : nullptr; vec != nullptr)
+    {
+        return &vec->emplace_back(std::forward<T>(val));
+    }
+
+    return {};
 }
 } // namespace
 
 // ---
 
-tr_variant::StringHolder::StringHolder(std::string&& str) noexcept
-    : str_{ std::move(str) }
+// Specialisations for int64_t and bool could have been inline and constexpr,
+// but aren't because https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282
+
+template<>
+[[nodiscard]] std::optional<int64_t> tr_variant::value_if() noexcept
 {
-    sv_ = str_;
+    switch (index())
+    {
+    case IntIndex:
+        return *get_if<IntIndex>();
+
+    case BoolIndex:
+        return *get_if<BoolIndex>() ? 1 : 0;
+
+    default:
+        return {};
+    }
 }
 
-tr_variant::StringHolder::StringHolder(StringHolder&& that) noexcept
+template<>
+[[nodiscard]] std::optional<bool> tr_variant::value_if() noexcept
 {
-    *this = std::move(that);
+    switch (index())
+    {
+    case BoolIndex:
+        return *get_if<BoolIndex>();
+
+    case IntIndex:
+        if (auto const val = *get_if<IntIndex>(); val == 0 || val == 1)
+        {
+            return val != 0;
+        }
+        break;
+
+    case StringIndex:
+    case StringViewIndex:
+        if (auto const val = value_if<std::string_view>(); val == "true"sv)
+        {
+            return true;
+        }
+        else if (val == "false"sv)
+        {
+            return false;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return {};
 }
 
-void tr_variant::StringHolder::set_unmanaged(std::string_view sv)
+template<>
+[[nodiscard]] std::optional<double> tr_variant::value_if() noexcept
 {
-    str_.clear();
-    sv_ = sv;
+    switch (index())
+    {
+    case DoubleIndex:
+        return *get_if<DoubleIndex>();
+
+    case IntIndex:
+        return static_cast<double>(*get_if<IntIndex>());
+
+    case StringIndex:
+    case StringViewIndex:
+        if (auto const sv = value_if<std::string_view>())
+        {
+            return tr_num_parse<double>(*sv);
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return {};
 }
 
-tr_variant::StringHolder& tr_variant::StringHolder::operator=(StringHolder&& that) noexcept
+template<>
+[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() noexcept
 {
-    auto const managed = std::data(that.sv_) == std::data(that.str_);
-    std::swap(str_, that.str_);
-    sv_ = managed ? str_ : that.sv_;
-    return *this;
+    switch (index())
+    {
+    case StringIndex:
+        return *std::get_if<std::string>(&val_);
+
+    case StringViewIndex:
+        return *std::get_if<std::string_view>(&val_);
+
+    default:
+        return {};
+    }
 }
 
 // ---
 
-tr_variant::Merge::Merge(tr_variant& tgt)
-    : tgt_{ tgt }
+tr_variant tr_variant::clone() const
 {
+    auto ret = tr_variant{};
+    ret.merge(*this);
+    return ret;
 }
 
-void tr_variant::Merge::operator()(std::monostate const& src)
+tr_variant& tr_variant::merge(tr_variant const& that)
 {
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(bool const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(int64_t const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(double const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(tr_variant::StringHolder const& src)
-{
-    tgt_ = src.sv_;
-}
+    that.visit(
+        [this](auto const& value)
+        {
+            using ValueType = std::remove_cvref_t<decltype(value)>;
 
-void tr_variant::Merge::operator()(tr_variant::Vector const& src)
-{
-    auto const n_items = std::size(src);
-    auto& tgt = tgt_.val_.emplace<Vector>();
-    tgt.resize(n_items);
-    for (size_t i = 0; i < n_items; ++i)
-    {
-        std::visit(Merge{ tgt[i] }, src[i].val_);
-    }
-}
+            if constexpr (
+                std::is_same_v<ValueType, std::monostate> || std::is_same_v<ValueType, std::nullptr_t> ||
+                std::is_same_v<ValueType, bool> || std::is_same_v<ValueType, int64_t> || std::is_same_v<ValueType, double> ||
+                std::is_same_v<ValueType, std::string_view> || std::is_same_v<ValueType, std::string>)
+            {
+                *this = value;
+            }
+            else if constexpr (std::is_same_v<ValueType, Vector>)
+            {
+                auto& dest = val_.emplace<Vector>();
+                dest.resize(std::size(value));
+                for (size_t i = 0; i < std::size(value); ++i)
+                {
+                    dest[i].merge(value[i]);
+                }
+            }
+            else if constexpr (std::is_same_v<ValueType, Map>)
+            {
+                if (index() != MapIndex)
+                {
+                    val_.emplace<Map>();
+                }
 
-void tr_variant::Merge::operator()(tr_variant::Map const& src)
-{
-    if (tgt_.index() != tr_variant::MapIndex)
-    {
-        tgt_.val_.emplace<tr_variant::Map>();
-    }
-    auto* const tgt = tgt_.get_if<tr_variant::MapIndex>();
-    for (auto const& [key, val] : src)
-    {
-        std::visit(Merge{ (*tgt)[key] }, val.val_);
-    }
+                if (auto* dest = this->template get_if<MapIndex>(); dest != nullptr)
+                {
+                    dest->reserve(std::size(*dest) + std::size(value));
+                    for (auto const& [key, child] : value)
+                    {
+                        (*dest)[key].merge(child);
+                    }
+                }
+            }
+        });
+
+    return *this;
 }
 
 // ---
@@ -166,32 +273,12 @@ bool tr_variantListRemove(tr_variant* const var, size_t pos)
 
 bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 {
-    switch (variant_index(var))
-    {
-    case tr_variant::IntIndex:
-        *setme = *var->get_if<tr_variant::IntIndex>();
-        return true;
-
-    case tr_variant::BoolIndex:
-        *setme = *var->get_if<tr_variant::BoolIndex>() ? 1 : 0;
-        return true;
-
-    default:
-        return false;
-    }
+    return value_if(var, setme);
 }
 
 bool tr_variantGetStrView(tr_variant const* const var, std::string_view* setme)
 {
-    switch (variant_index(var))
-    {
-    case tr_variant::StringIndex:
-        *setme = *var->get_if<tr_variant::StringIndex>();
-        return true;
-
-    default:
-        return false;
-    }
+    return value_if(var, setme);
 }
 
 bool tr_variantGetRaw(tr_variant const* v, std::byte const** setme_raw, size_t* setme_len)
@@ -220,63 +307,12 @@ bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* se
 
 bool tr_variantGetBool(tr_variant const* const var, bool* setme)
 {
-    switch (variant_index(var))
-    {
-    case tr_variant::BoolIndex:
-        *setme = *var->get_if<tr_variant::BoolIndex>();
-        return true;
-
-    case tr_variant::IntIndex:
-        if (auto const val = *var->get_if<tr_variant::IntIndex>(); val == 0 || val == 1)
-        {
-            *setme = val != 0;
-            return true;
-        }
-        break;
-
-    case tr_variant::StringIndex:
-        if (auto const val = *var->get_if<tr_variant::StringIndex>(); val == "true"sv)
-        {
-            *setme = true;
-            return true;
-        }
-        else if (val == "false"sv)
-        {
-            *setme = false;
-            return true;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    return false;
+    return value_if(var, setme);
 }
 
 bool tr_variantGetReal(tr_variant const* const var, double* setme)
 {
-    switch (variant_index(var))
-    {
-    case tr_variant::DoubleIndex:
-        *setme = *var->get_if<tr_variant::DoubleIndex>();
-        return true;
-
-    case tr_variant::IntIndex:
-        *setme = static_cast<double>(*var->get_if<tr_variant::IntIndex>());
-        return true;
-
-    case tr_variant::StringIndex:
-        if (auto const val = tr_num_parse<double>(*var->get_if<tr_variant::StringIndex>()); val)
-        {
-            *setme = *val;
-            return true;
-        }
-        [[fallthrough]];
-
-    default:
-        return false;
-    }
+    return value_if(var, setme);
 }
 
 bool tr_variantDictFindInt(tr_variant* const var, tr_quark key, int64_t* setme)
@@ -339,66 +375,38 @@ bool tr_variantDictFindRaw(tr_variant* const var, tr_quark key, std::byte const*
 
 // ---
 
-void tr_variantInitReal(tr_variant* initme, double value)
-{
-    *initme = value;
-}
-
-void tr_variantInitBool(tr_variant* initme, bool value)
-{
-    *initme = value;
-}
-
-void tr_variantInitInt(tr_variant* initme, int64_t value)
-{
-    *initme = value;
-}
-
-void tr_variantInitStrView(tr_variant* initme, std::string_view val)
-{
-    *initme = tr_variant::unmanaged_string(val);
-}
-
-void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len)
-{
-    tr_variantInitStr(initme, std::string_view{ static_cast<char const*>(value), value_len });
-}
-
-void tr_variantInitQuark(tr_variant* initme, tr_quark value)
-{
-    tr_variantInitStrView(initme, tr_quark_get_string_view(value));
-}
-
-void tr_variantInitStr(tr_variant* initme, std::string_view value)
-{
-    *initme = value;
-}
-
-void tr_variantInitList(tr_variant* initme, size_t reserve_count)
+void tr_variantInitList(tr_variant* initme, size_t n_reserve)
 {
     auto vec = tr_variant::Vector{};
-    vec.reserve(reserve_count);
+    vec.reserve(n_reserve);
     *initme = std::move(vec);
 }
 
-void tr_variantListReserve(tr_variant* const var, size_t count)
+void tr_variantListReserve(tr_variant* const var, size_t n_reserve)
 {
     TR_ASSERT(var != nullptr);
     TR_ASSERT(var->holds_alternative<tr_variant::Vector>());
 
     if (auto* const vec = var != nullptr ? var->get_if<tr_variant::VectorIndex>() : nullptr; vec != nullptr)
     {
-        vec->reserve(std::size(*vec) + count);
+        vec->reserve(std::size(*vec) + n_reserve);
     }
 }
 
-void tr_variantInitDict(tr_variant* initme, size_t /*reserve_count*/)
+void tr_variantInitDict(tr_variant* initme, size_t n_reserve)
 {
-    *initme = tr_variant::Map{};
+    *initme = tr_variant::Map{ n_reserve };
 }
 
-void tr_variantDictReserve(tr_variant* const /*var*/, size_t /*reserve_count*/)
+void tr_variantDictReserve(tr_variant* const var, size_t n_reserve)
 {
+    TR_ASSERT(var != nullptr);
+    TR_ASSERT(var->holds_alternative<tr_variant::Map>());
+
+    if (auto* const map = var != nullptr ? var->get_if<tr_variant::MapIndex>() : nullptr; map != nullptr)
+    {
+        map->reserve(std::size(*map) + n_reserve);
+    }
 }
 
 tr_variant* tr_variantListAdd(tr_variant* const var)
@@ -414,67 +422,44 @@ tr_variant* tr_variantListAdd(tr_variant* const var)
     return nullptr;
 }
 
-tr_variant* tr_variantListAddInt(tr_variant* const var, int64_t value)
+tr_variant* tr_variantListAddInt(tr_variant* const var, int64_t const value)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = value;
-    return child;
+    return vec_add(var, value);
 }
 
-tr_variant* tr_variantListAddReal(tr_variant* const var, double value)
+tr_variant* tr_variantListAddReal(tr_variant* const var, double const value)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = value;
-    return child;
+    return vec_add(var, value);
 }
 
-tr_variant* tr_variantListAddBool(tr_variant* const var, bool value)
+tr_variant* tr_variantListAddBool(tr_variant* const var, bool const value)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = value;
-    return child;
+    return vec_add(var, value);
 }
 
-tr_variant* tr_variantListAddStr(tr_variant* const var, std::string_view value)
+tr_variant* tr_variantListAddStr(tr_variant* const var, std::string_view const value)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = value;
-    return child;
+    return vec_add(var, std::string{ value });
 }
 
 tr_variant* tr_variantListAddStrView(tr_variant* const var, std::string_view value)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = tr_variant::unmanaged_string(value);
-    return child;
+    return vec_add(var, tr_variant::unmanaged_string(value));
 }
 
-tr_variant* tr_variantListAddQuark(tr_variant* const var, tr_quark value)
+tr_variant* tr_variantListAddRaw(tr_variant* const var, void const* value, size_t n_bytes)
 {
-    return tr_variantListAddStrView(var, tr_quark_get_string_view(value));
+    return vec_add(var, tr_variant::make_raw(value, n_bytes));
 }
 
-tr_variant* tr_variantListAddRaw(tr_variant* const var, void const* value, size_t value_len)
+tr_variant* tr_variantListAddList(tr_variant* const var, size_t const n_reserve)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = std::string_view{ static_cast<char const*>(value), value_len };
-    return child;
+    return vec_add(var, tr_variant::make_vector(n_reserve));
 }
 
-tr_variant* tr_variantListAddList(tr_variant* const var, size_t reserve_count)
+tr_variant* tr_variantListAddDict(tr_variant* const var, size_t const n_reserve)
 {
-    auto* const child = tr_variantListAdd(var);
-    auto vec = tr_variant::Vector{};
-    vec.reserve(reserve_count);
-    *child = std::move(vec);
-    return child;
-}
-
-tr_variant* tr_variantListAddDict(tr_variant* const var, size_t reserve_count)
-{
-    auto* const child = tr_variantListAdd(var);
-    tr_variantInitDict(child, reserve_count);
-    return child;
+    return vec_add(var, tr_variant::make_map(n_reserve));
 }
 
 tr_variant* tr_variantDictAdd(tr_variant* const var, tr_quark key)
@@ -490,74 +475,44 @@ tr_variant* tr_variantDictAdd(tr_variant* const var, tr_quark key)
     return {};
 }
 
-tr_variant* tr_variantDictAddInt(tr_variant* const var, tr_quark key, int64_t val)
+tr_variant* tr_variantDictAddInt(tr_variant* const var, tr_quark const key, int64_t const val)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitInt(child, val);
-    return child;
+    return dict_set(var, key, val);
 }
 
 tr_variant* tr_variantDictAddBool(tr_variant* const var, tr_quark key, bool val)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitBool(child, val);
-    return child;
+    return dict_set(var, key, val);
 }
 
-tr_variant* tr_variantDictAddReal(tr_variant* const var, tr_quark key, double val)
+tr_variant* tr_variantDictAddReal(tr_variant* const var, tr_quark const key, double const val)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitReal(child, val);
-    return child;
+    return dict_set(var, key, val);
 }
 
-tr_variant* tr_variantDictAddQuark(tr_variant* const var, tr_quark key, tr_quark const val)
+tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark const key, std::string_view const val)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitQuark(child, val);
-    return child;
+    return dict_set(var, key, val);
 }
 
-tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark key, std::string_view val)
+tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark const key, void const* const value, size_t const n_bytes)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitStr(child, val);
-    return child;
+    return dict_set(var, key, std::string{ static_cast<char const*>(value), n_bytes });
 }
 
-tr_variant* tr_variantDictAddStrView(tr_variant* const var, tr_quark key, std::string_view val)
+tr_variant* tr_variantDictAddList(tr_variant* const var, tr_quark const key, size_t const n_reserve)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitStrView(child, val);
-    return child;
+    return dict_set(var, key, tr_variant::make_vector(n_reserve));
 }
 
-tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark key, void const* value, size_t len)
+tr_variant* tr_variantDictAddStrView(tr_variant* const var, tr_quark const key, std::string_view const val)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitRaw(child, value, len);
-    return child;
+    return dict_set(var, key, tr_variant::unmanaged_string(val));
 }
 
-tr_variant* tr_variantDictAddList(tr_variant* const var, tr_quark key, size_t reserve_count)
+tr_variant* tr_variantDictAddDict(tr_variant* const var, tr_quark key, size_t n_reserve)
 {
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitList(child, reserve_count);
-    return child;
-}
-
-tr_variant* tr_variantDictAddDict(tr_variant* const var, tr_quark key, size_t reserve_count)
-{
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitDict(child, reserve_count);
-    return child;
+    return dict_set(var, key, tr_variant::make_map(n_reserve));
 }
 
 bool tr_variantDictRemove(tr_variant* const var, tr_quark key)
@@ -568,261 +523,6 @@ bool tr_variantDictRemove(tr_variant* const var, tr_quark key)
     }
 
     return false;
-}
-
-// --- BENC WALKING
-
-class WalkNode
-{
-public:
-    WalkNode() = default;
-
-    explicit WalkNode(tr_variant const* const var)
-        : var_{ var }
-    {
-    }
-
-    std::pair<tr_quark, tr_variant const*> next_child()
-    {
-        if (var_ == nullptr)
-        {
-            return {};
-        }
-
-        if (auto const* const map = var_->get_if<tr_variant::MapIndex>(); map != nullptr)
-        {
-            if (auto idx = next_index(); idx < std::size(*map))
-            {
-                auto iter = std::cbegin(*map);
-                std::advance(iter, idx);
-                return { iter->first, &iter->second };
-            }
-        }
-        else if (auto const* const vec = var_->get_if<tr_variant::VectorIndex>(); vec != nullptr)
-        {
-            if (auto idx = next_index(); idx < std::size(*vec))
-            {
-                return { {}, &vec->at(idx) };
-            }
-        }
-
-        return {};
-    }
-
-    [[nodiscard]] constexpr auto is_visited() const noexcept
-    {
-        return is_visited_;
-    }
-
-    constexpr void set_visited() noexcept
-    {
-        is_visited_ = true;
-    }
-
-    [[nodiscard]] tr_variant const* current() const noexcept
-    {
-        return var_;
-    }
-
-protected:
-    friend class VariantWalker;
-
-    tr_variant const* var_ = nullptr;
-
-    bool is_visited_ = false;
-
-    void assign(tr_variant const* v_in)
-    {
-        var_ = v_in;
-        is_visited_ = false;
-        child_index_ = 0;
-        sorted.clear();
-    }
-
-    struct ByKey
-    {
-        std::string_view key;
-        size_t idx = {};
-    };
-
-    template<typename Container>
-    void sort(Container& sortbuf)
-    {
-        auto const* const map = var_ != nullptr ? var_->get_if<tr_variant::MapIndex>() : nullptr;
-        if (map == nullptr)
-        {
-            return;
-        }
-
-        auto idx = size_t{};
-        auto const n = std::size(*map);
-        sortbuf.resize(n);
-        for (auto const& [key, val] : *map)
-        {
-            sortbuf[idx] = { tr_quark_get_string_view(key), idx };
-            ++idx;
-        }
-
-        std::sort(std::begin(sortbuf), std::end(sortbuf), [](ByKey const& a, ByKey const& b) { return a.key < b.key; });
-
-        //  keep the sorted indices
-
-        sorted.resize(n);
-        for (size_t i = 0; i < n; ++i)
-        {
-            sorted[i] = sortbuf[i].idx;
-        }
-    }
-
-private:
-    // When walking `v`'s children, this is the index of the next child
-    size_t child_index_ = 0;
-
-    // When `v` is a dict, this is its children's indices sorted by key.
-    // Bencoded dicts must be sorted, so this is useful when writing benc.
-    small::vector<size_t, 128U> sorted;
-
-    [[nodiscard]] size_t next_index()
-    {
-        auto idx = child_index_++;
-
-        if (idx < std::size(sorted))
-        {
-            idx = sorted[idx];
-        }
-
-        return idx;
-    }
-};
-
-class VariantWalker
-{
-public:
-    void emplace(tr_variant const* v_in, bool sort_dicts)
-    {
-        stack_.emplace_back(v_in);
-
-        if (sort_dicts)
-        {
-            top().sort(sortbuf_);
-        }
-    }
-
-    void pop()
-    {
-        TR_ASSERT(!std::empty(stack_));
-        stack_.resize(std::size(stack_) - 1U);
-    }
-
-    [[nodiscard]] bool empty() const noexcept
-    {
-        return std::empty(stack_);
-    }
-
-    WalkNode& top()
-    {
-        TR_ASSERT(!std::empty(stack_));
-        return stack_.back();
-    }
-
-private:
-    static auto constexpr InitialCapacity = size_t{ 24U };
-    small::vector<WalkNode, InitialCapacity> stack_;
-    small::vector<WalkNode::ByKey, InitialCapacity> sortbuf_;
-};
-
-/**
- * This function's previous recursive implementation was
- * easier to read, but was vulnerable to a smash-stacking
- * attack via maliciously-crafted data. (#667)
- */
-void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, void* user_data, bool sort_dicts)
-{
-    auto stack = VariantWalker{};
-    stack.emplace(&top, sort_dicts);
-
-    while (!stack.empty())
-    {
-        auto& node = stack.top();
-        tr_variant const* v = nullptr;
-
-        if (!node.is_visited())
-        {
-            v = node.current();
-            node.set_visited();
-        }
-        else
-        {
-            auto [key, child] = node.next_child();
-
-            v = child;
-
-            if (v != nullptr)
-            {
-                if (node.current()->holds_alternative<tr_variant::Map>())
-                {
-                    auto const keystr = tr_quark_get_string_view(key);
-                    auto tmp = tr_variant{};
-                    tr_variantInitQuark(&tmp, key);
-                    walk_funcs.string_func(tmp, keystr, user_data);
-                }
-            }
-            else // finished with this node
-            {
-                if (variant_is_container(node.current()))
-                {
-                    walk_funcs.container_end_func(*node.current(), user_data);
-                }
-
-                stack.pop();
-                continue;
-            }
-        }
-
-        switch (variant_index(v))
-        {
-        case tr_variant::BoolIndex:
-            walk_funcs.bool_func(*v, *v->get_if<tr_variant::BoolIndex>(), user_data);
-            break;
-
-        case tr_variant::IntIndex:
-            walk_funcs.int_func(*v, *v->get_if<tr_variant::IntIndex>(), user_data);
-            break;
-
-        case tr_variant::DoubleIndex:
-            walk_funcs.double_func(*v, *v->get_if<tr_variant::DoubleIndex>(), user_data);
-            break;
-
-        case tr_variant::StringIndex:
-            walk_funcs.string_func(*v, *v->get_if<tr_variant::StringIndex>(), user_data);
-            break;
-
-        case tr_variant::VectorIndex:
-            if (v == node.current())
-            {
-                walk_funcs.list_begin_func(*v, user_data);
-            }
-            else
-            {
-                stack.emplace(v, sort_dicts);
-            }
-            break;
-
-        case tr_variant::MapIndex:
-            if (v == node.current())
-            {
-                walk_funcs.dict_begin_func(*v, user_data);
-            }
-            else
-            {
-                stack.emplace(v, sort_dicts);
-            }
-            break;
-
-        default: // NoneIndex:
-            break;
-        }
-    }
 }
 
 // ---
@@ -854,14 +554,9 @@ void tr_variantMergeDicts(tr_variant* const tgt, tr_variant const* const src)
 
 // ---
 
-tr_variant_serde::~tr_variant_serde()
-{
-    tr_error_clear(&error_);
-}
-
 std::optional<tr_variant> tr_variant_serde::parse(std::string_view input)
 {
-    tr_error_clear(&error_);
+    error_ = {};
     return type_ == Type::Json ? parse_json(input) : parse_benc(input);
 }
 
@@ -887,13 +582,14 @@ bool tr_variant_serde::to_file(tr_variant const& var, std::string_view filename)
 {
     tr_file_save(filename, to_string(var), &error_);
 
-    if (error_ != nullptr)
+    if (error_)
     {
-        tr_logAddError(fmt::format(
-            _("Couldn't save '{path}': {error} ({error_code})"),
-            fmt::arg("path", filename),
-            fmt::arg("error", error_->message),
-            fmt::arg("error_code", error_->code)));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error_.message()),
+                fmt::arg("error_code", error_.code())));
         return false;
     }
 

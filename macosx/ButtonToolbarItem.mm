@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -14,6 +14,7 @@
 - (NSMenuItem*)menuFormRepresentation
 {
     NSMenuItem* menuItem = [[NSMenuItem alloc] initWithTitle:self.label action:self.action keyEquivalent:@""];
+    menuItem.image = self.image;
     menuItem.target = self.target;
     menuItem.enabled = [self.target validateToolbarItem:self];
 

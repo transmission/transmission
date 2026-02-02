@@ -1,0 +1,150 @@
+// This file Copyright © Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <algorithm>
+#include <ranges>
+#include <string>
+#include <string_view>
+#include <vector>
+
+#include "libtransmission/torrent-queue.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/variant.h"
+
+namespace
+{
+using namespace std::literals;
+
+[[nodiscard]] auto get_file_path(std::string_view config_dir) noexcept
+{
+    return tr_pathbuf{ config_dir, '/', "queue.json"sv };
+}
+} // namespace
+
+size_t tr_torrent_queue::add(tr_torrent_id_t const id)
+{
+    queue_.push_back(id);
+    set_dirty();
+    return std::size(queue_) - 1U;
+}
+
+void tr_torrent_queue::remove(tr_torrent_id_t const id)
+{
+    auto const uid = static_cast<size_t>(id);
+    auto const pos = uid < std::size(pos_cache_) ? pos_cache_[uid] : 0U;
+    if (pos < std::size(queue_) && queue_[pos] == id)
+    {
+        queue_.erase(std::begin(queue_) + pos);
+    }
+    else
+    {
+        auto const remove_it = std::remove(std::begin(queue_), std::end(queue_), id);
+        queue_.erase(remove_it, std::end(queue_));
+    }
+    set_dirty();
+}
+
+size_t tr_torrent_queue::get_pos(tr_torrent_id_t const id)
+{
+    auto const uid = static_cast<size_t>(id);
+    if (auto n_cache = std::size(pos_cache_);
+        uid >= n_cache || pos_cache_[uid] >= std::size(queue_) || id != queue_[pos_cache_[uid]])
+    {
+        auto it = std::ranges::find(queue_, id);
+        if (it == std::ranges::cend(queue_))
+        {
+            return MaxQueuePosition;
+        }
+
+        pos_cache_.resize(std::max(uid + 1U, n_cache));
+        pos_cache_[uid] = std::ranges::distance(std::ranges::cbegin(queue_), it);
+    }
+
+    return pos_cache_[uid];
+}
+
+// returns the list of torrent IDs whose queue position changed
+std::vector<tr_torrent_id_t> tr_torrent_queue::set_pos(tr_torrent_id_t const id, size_t new_pos)
+{
+    auto const old_pos = get_pos(id);
+    auto const n_queue = std::size(queue_);
+    if (old_pos >= n_queue || queue_[old_pos] != id)
+    {
+        return {};
+    }
+
+    new_pos = std::min(new_pos, n_queue - 1U);
+
+    if (old_pos == new_pos)
+    {
+        return {};
+    }
+
+    auto ret = std::vector<tr_torrent_id_t>{};
+
+    auto const begin = std::begin(queue_);
+    auto const old_it = std::next(begin, old_pos);
+    auto const old_next_it = std::next(old_it);
+    auto const new_it = std::next(begin, new_pos);
+    if (old_pos > new_pos)
+    {
+        ret.assign(new_it, old_next_it);
+        std::rotate(new_it, old_it, old_next_it);
+    }
+    else
+    {
+        auto const new_next_it = std::next(new_it);
+        ret.assign(old_it, new_next_it);
+        std::rotate(old_it, old_next_it, new_next_it);
+    }
+
+    set_dirty();
+    return ret;
+}
+
+bool tr_torrent_queue::to_file()
+{
+    if (!is_dirty())
+    {
+        return false;
+    }
+    set_dirty(false);
+
+    auto vec = tr_variant::Vector{};
+    vec.reserve(std::size(queue_));
+    for (auto const id : queue_)
+    {
+        vec.emplace_back(mediator_.store_filename(id));
+    }
+
+    return tr_variant_serde::json().to_file(std::move(vec), get_file_path(mediator_.config_dir()));
+}
+
+std::vector<std::string> tr_torrent_queue::from_file()
+{
+    auto top = tr_variant_serde::json().parse_file(get_file_path(mediator_.config_dir()));
+    if (!top)
+    {
+        return {};
+    }
+
+    auto const* const vec = top->get_if<tr_variant::Vector>();
+    if (vec == nullptr)
+    {
+        return {};
+    }
+
+    auto ret = std::vector<std::string>{};
+    ret.reserve(std::size(*vec));
+    for (auto const& var : *vec)
+    {
+        if (auto file = var.value_if<std::string_view>(); file)
+        {
+            ret.emplace_back(*file);
+        }
+    }
+
+    return ret;
+}

@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -59,7 +59,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
         p.textVisible = true;
         p.progress = static_cast<int>(100.0 * index.data().toDouble());
         p.text = QStringLiteral("%1%").arg(p.progress);
-        StyleHelper::drawProgressBar(*style, *painter, p);
+        StyleHelper::drawProgressBar(*painter, p);
     }
     else if (column == FileTreeModel::COL_WANTED)
     {

@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -20,10 +20,10 @@
 #include <string_view>
 #include <utility>
 
-#include "timer.h"
-#include "watchdir.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/watchdir.h"
 
-namespace libtransmission::impl
+namespace tr::impl
 {
 // base class for concrete tr_watchdirs
 class BaseWatchdir : public Watchdir
@@ -36,6 +36,8 @@ public:
     {
         retry_timer_->set_callback([this]() { onRetryTimer(); });
     }
+
+    ~BaseWatchdir() override = default;
 
     BaseWatchdir(BaseWatchdir&&) = delete;
     BaseWatchdir(BaseWatchdir const&) = delete;
@@ -82,9 +84,9 @@ private:
     struct Pending
     {
         size_t strikes = 0U;
-        Timestamp first_kick_at = {};
-        Timestamp last_kick_at = {};
-        Timestamp next_kick_at = {};
+        Timestamp first_kick_at;
+        Timestamp last_kick_at;
+        Timestamp next_kick_at;
     };
 
     void setNextKickTime(Pending& item)
@@ -150,4 +152,4 @@ private:
     std::chrono::seconds timeout_duration_ = std::chrono::seconds{ 15 };
 };
 
-} // namespace libtransmission::impl
+} // namespace tr::impl

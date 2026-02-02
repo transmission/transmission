@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,8 +10,9 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 
@@ -31,12 +32,17 @@ struct tr_url_parsed_t
     std::string_view scheme; // "http"
     std::string_view authority; // "example.com:80"
     std::string_view host; // "example.com"
+    std::string_view host_wo_brackets; // "example.com" ("[::1]" -> "::1")
     std::string_view sitename; // "example"
     std::string_view path; // /"over/there"
     std::string_view query; // "name=ferret"
     std::string_view fragment; // "nose"
     std::string_view full; // "http://example.com:80/over/there?name=ferret#nose"
     uint16_t port = 0;
+
+    // returns a vector of key,val pairs, e.g.
+    // `first=hello&second=world` -> [<"first","hello">,<"second","world">]
+    [[nodiscard]] std::vector<std::pair<std::string_view, std::string_view>> query_entries() const;
 };
 
 [[nodiscard]] std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);
@@ -48,52 +54,6 @@ struct tr_url_parsed_t
 // Convenience function to get a log-safe version of a tracker URL.
 // This is to avoid logging sensitive info, e.g. a personal announcer id in the URL.
 [[nodiscard]] std::string tr_urlTrackerLogName(std::string_view url);
-
-// example use: `for (auto const [key, val] : tr_url_query_view{ querystr })`
-struct tr_url_query_view
-{
-    std::string_view const query;
-
-    explicit tr_url_query_view(std::string_view query_in)
-        : query{ query_in }
-    {
-    }
-
-    struct iterator
-    {
-        std::pair<std::string_view, std::string_view> keyval = std::make_pair(std::string_view{ "" }, std::string_view{ "" });
-        std::string_view remain = "";
-
-        iterator& operator++();
-
-        [[nodiscard]] constexpr auto const& operator*() const
-        {
-            return keyval;
-        }
-
-        [[nodiscard]] constexpr auto const* operator->() const
-        {
-            return &keyval;
-        }
-
-        [[nodiscard]] constexpr bool operator==(iterator const& that) const
-        {
-            return this->remain == that.remain && this->keyval == that.keyval;
-        }
-
-        [[nodiscard]] constexpr bool operator!=(iterator const& that) const
-        {
-            return !(*this == that);
-        }
-    };
-
-    [[nodiscard]] iterator begin() const;
-
-    [[nodiscard]] constexpr iterator end() const
-    {
-        return iterator{};
-    }
-};
 
 template<typename BackInsertIter>
 constexpr void tr_urlPercentEncode(BackInsertIter out, std::string_view input, bool escape_reserved = true)

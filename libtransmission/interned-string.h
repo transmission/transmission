@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,9 +7,9 @@
 
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
-#include "quark.h"
+#include "libtransmission/quark.h"
 
 /**
  * Helper functions wrapped around tr_quark
@@ -31,7 +31,7 @@ public:
     }
 
     explicit tr_interned_string(char const* c_str)
-        : tr_interned_string{ std::string_view{ c_str ? c_str : "" } }
+        : tr_interned_string{ std::string_view{ c_str != nullptr ? c_str : "" } }
     {
     }
 
@@ -157,6 +157,7 @@ public:
         return *this != std::string_view{ that != nullptr ? that : "" };
     }
 
+    // NOLINTNEXTLINE(google-explicit-constructor)
     [[nodiscard]] constexpr operator std::string_view() const noexcept
     {
         return sv();
@@ -164,7 +165,7 @@ public:
 
 private:
     tr_quark quark_ = TR_KEY_NONE;
-    std::string_view sv_ = "";
+    std::string_view sv_;
 };
 
 template<>

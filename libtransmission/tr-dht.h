@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Juliusz Chroboczek.
+// This file Copyright © Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -29,10 +29,10 @@
 
 struct tr_pex;
 
-namespace libtransmission
+namespace tr
 {
 class TimerMaker;
-} // namespace libtransmission
+} // namespace tr
 
 class tr_dht
 {
@@ -95,7 +95,7 @@ public:
         [[nodiscard]] virtual tr_sha1_digest_t torrent_info_hash(tr_torrent_id_t) const = 0;
 
         [[nodiscard]] virtual std::string_view config_dir() const = 0;
-        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
+        [[nodiscard]] virtual tr::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual API& api()
         {
             return api_;
@@ -114,6 +114,6 @@ public:
         tr_socket_t udp6_socket);
     virtual ~tr_dht() = default;
 
-    virtual void add_node(tr_address const& address, tr_port port) = 0;
+    virtual void maybe_add_node(tr_address const& address, tr_port port) = 0;
     virtual void handle_message(unsigned char const* msg, size_t msglen, struct sockaddr* from, socklen_t fromlen) = 0;
 };

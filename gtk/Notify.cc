@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -20,7 +20,7 @@
 #include <glibmm/ustring.h>
 #include <glibmm/variant.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <map>
 #include <utility>
@@ -53,7 +53,7 @@ template<typename... Ts>
 Glib::VariantContainerBase make_variant_tuple(Ts&&... args)
 {
     return Glib::VariantContainerBase::create_tuple(
-        { Glib::Variant<std::remove_cv_t<std::remove_reference_t<Ts>>>::create(std::forward<Ts>(args))... });
+        { Glib::Variant<std::remove_cvref_t<Ts>>::create(std::forward<Ts>(args))... });
 }
 
 void get_capabilities_callback(Glib::RefPtr<Gio::AsyncResult>& res)
@@ -125,9 +125,9 @@ void g_signal_callback(
         }
         else if (action == "file")
         {
-            char const* dir = tr_torrentGetDownloadDir(tor);
-            auto const path = Glib::build_filename(dir, tr_torrentFile(tor, 0).name);
-            gtr_open_file(path);
+            std::string_view const base_dir = tr_torrentGetDownloadDir(tor);
+            std::string_view const relative_path = tr_torrentFile(tor, 0).name;
+            gtr_open_file(base_dir, relative_path);
         }
         else if (action == "start-now")
         {
@@ -144,11 +144,12 @@ void dbus_proxy_ready_callback(Glib::RefPtr<Gio::AsyncResult>& res)
     }
     catch (Glib::Error const& e)
     {
-        gtr_warning(fmt::format(
-            _("Couldn't create proxy for '{bus}': {error} ({error_code})"),
-            fmt::arg("bus", NotificationsDbusName),
-            fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-            fmt::arg("error_code", e.code())));
+        gtr_warning(
+            fmt::format(
+                fmt::runtime(_("Couldn't create proxy for '{bus}': {error} ({error_code})")),
+                fmt::arg("bus", NotificationsDbusName),
+                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                fmt::arg("error_code", e.code())));
         return;
     }
 
@@ -250,7 +251,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_
             0U,
             Glib::ustring("transmission"),
             Glib::ustring(_("Torrent Complete")),
-            Glib::ustring(tr_torrentName(tor)),
+            Glib::ustring{ tr_torrentName(tor) },
             actions,
             hints,
             -1));
@@ -284,7 +285,7 @@ void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, tr_torrent_id_t
             0U,
             Glib::ustring("transmission"),
             Glib::ustring(_("Torrent Added")),
-            Glib::ustring(tr_torrentName(tor)),
+            Glib::ustring{ tr_torrentName(tor) },
             actions,
             std::map<Glib::ustring, Glib::VariantBase>(),
             -1));

@@ -9,6 +9,8 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
@@ -20,12 +22,11 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using TorrentMetainfoTest = SessionTest;
@@ -45,7 +46,7 @@ TEST_F(TorrentMetainfoTest, magnetLink)
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
     EXPECT_EQ(0U, metainfo.file_count()); // because it's a magnet link
     EXPECT_EQ(2U, std::size(metainfo.announce_list()));
-    EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
+    EXPECT_EQ(MagnetLink, metainfo.magnet());
 }
 
 #define BEFORE_PATH \
@@ -63,20 +64,20 @@ TEST_F(TorrentMetainfoTest, bucket)
     };
 
     auto const tests = std::array<LocalTest, 9>{ {
-        { BEFORE_PATH "5:a.txt" AFTER_PATH, true },
+        { .benc = BEFORE_PATH "5:a.txt" AFTER_PATH, .expected_parse_result = true },
         // allow empty components, but not =all= empty components, see bug #5517
-        { BEFORE_PATH "0:5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "0:0:" AFTER_PATH, false },
+        { .benc = BEFORE_PATH "0:5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "0:0:" AFTER_PATH, .expected_parse_result = false },
         // allow path separators in a filename (replaced with '_')
-        { BEFORE_PATH "7:a/a.txt" AFTER_PATH, true },
+        { .benc = BEFORE_PATH "7:a/a.txt" AFTER_PATH, .expected_parse_result = true },
         // allow "." components (skipped)
-        { BEFORE_PATH "1:.5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "5:a.txt1:." AFTER_PATH, true },
+        { .benc = BEFORE_PATH "1:.5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "5:a.txt1:." AFTER_PATH, .expected_parse_result = true },
         // allow ".." components (replaced with "__")
-        { BEFORE_PATH "2:..5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "5:a.txt2:.." AFTER_PATH, true },
+        { .benc = BEFORE_PATH "2:..5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "5:a.txt2:.." AFTER_PATH, .expected_parse_result = true },
         // fail on empty string
-        { "", false },
+        { .benc = "", .expected_parse_result = false },
     } };
 
     tr_logSetLevel(TR_LOG_OFF);
@@ -116,100 +117,40 @@ TEST_F(TorrentMetainfoTest, parseBencFuzz)
     }
 }
 
-#if 0
-TEST_F(TorrentMetainfoTest, sanitize)
-{
-    struct LocalTest
-    {
-        std::string_view input;
-        std::string_view expected_output;
-    };
-
-    auto const tests = std::array<LocalTest, 29>{
-        // skipped
-        LocalTest{ ""sv, ""sv },
-        { "."sv, ""sv },
-        { ".."sv, ""sv },
-        { "....."sv, ""sv },
-        { "  "sv, ""sv },
-        { " . "sv, ""sv },
-        { ". . ."sv, ""sv },
-        // replaced with '_'
-        { "/"sv, "_"sv },
-        { "////"sv, "____"sv },
-        { "\\\\"sv, "__"sv },
-        { "/../"sv, "_.._"sv },
-        { "foo<bar:baz/boo"sv, "foo_bar_baz_boo"sv },
-        { "t\0e\x01s\tt\ri\nn\fg"sv, "t_e_s_t_i_n_g"sv },
-        // appended with '_'
-        { "con"sv, "con_"sv },
-        { "cOm4"sv, "cOm4_"sv },
-        { "LPt9.txt"sv, "LPt9_.txt"sv },
-        { "NUL.tar.gz"sv, "NUL_.tar.gz"sv },
-        // trimmed
-        { " foo"sv, "foo"sv },
-        { "foo "sv, "foo"sv },
-        { " foo "sv, "foo"sv },
-        { "foo."sv, "foo"sv },
-        { "foo..."sv, "foo"sv },
-        { " foo... "sv, "foo"sv },
-        // unmodified
-        { "foo"sv, "foo"sv },
-        { ".foo"sv, ".foo"sv },
-        { "..foo"sv, "..foo"sv },
-        { "foo.bar.baz"sv, "foo.bar.baz"sv },
-        { "null"sv, "null"sv },
-        { "compass"sv, "compass"sv },
-    };
-
-    auto out = std::string{};
-    for (auto const& test : tests)
-    {
-        out.clear();
-        auto const success = tr_metainfoAppendSanitizedPathComponent(out, test.input);
-        EXPECT_EQ(!std::empty(out), success);
-        EXPECT_EQ(test.expected_output, out);
-    }
-}
-#endif
-
 TEST_F(TorrentMetainfoTest, AndroidTorrent)
 {
     auto const filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
 
     auto* ctor = tr_ctorNew(session_);
-    tr_error* error = nullptr;
-    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    auto error = tr_error{};
+    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename, &error));
+    EXPECT_FALSE(error) << error;
     auto const* const metainfo = tr_ctorGetMetainfo(ctor);
     EXPECT_NE(nullptr, metainfo);
     EXPECT_EQ(336, metainfo->info_dict_offset());
     EXPECT_EQ(26583, metainfo->info_dict_size());
-    EXPECT_EQ(592, metainfo->pieces_offset());
     tr_ctorFree(ctor);
 }
 
 TEST_F(TorrentMetainfoTest, ctorSaveContents)
 {
+    auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
-    auto const tgt_filename = tr_pathbuf{ ::testing::TempDir(), "save-contents-test.torrent" };
+    auto const tgt_filename = tr_pathbuf{ sandbox, "save-contents-test.torrent" };
 
     // try saving without passing any metainfo.
     auto* ctor = tr_ctorNew(session_);
-    tr_error* error = nullptr;
-    EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
-    EXPECT_NE(nullptr, error);
-    if (error != nullptr)
-    {
-        EXPECT_EQ(EINVAL, error->code);
-        tr_error_clear(&error);
-    }
+    auto error = tr_error{};
+    EXPECT_FALSE(ctor->save(tgt_filename, &error));
+    EXPECT_TRUE(error);
+    EXPECT_EQ(EINVAL, error.code());
+    error = {};
 
     // now try saving _with_ metainfo
-    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str(), &error));
-    EXPECT_EQ(nullptr, error) << *error;
-    EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename, &error));
+    EXPECT_FALSE(error) << error;
+    EXPECT_TRUE(ctor->save(tgt_filename, &error));
+    EXPECT_FALSE(error) << error;
 
     // the saved contents should match the source file's contents
     auto src_contents = std::vector<char>{};
@@ -220,8 +161,7 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
 
     // cleanup
     EXPECT_TRUE(tr_sys_path_remove(tgt_filename, &error));
-    EXPECT_EQ(nullptr, error) << *error;
-    tr_error_clear(&error);
+    EXPECT_FALSE(error) << error;
     tr_ctorFree(ctor);
 }
 
@@ -273,4 +213,4 @@ TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
     EXPECT_FALSE(tm.parse_benc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

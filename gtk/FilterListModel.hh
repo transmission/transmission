@@ -1,4 +1,4 @@
-// This file Copyright © 2023-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -30,6 +30,13 @@ FilterListModel<ItemT>::FilterListModel(Glib::RefPtr<Gtk::TreeModel> const& mode
     : Gtk::TreeModelFilter(model)
     , matches_all_(filter->matches_all())
     , matches_none_(filter->matches_none())
+    , signal_changed_tag_{ filter->signal_changed().connect(
+          [this, filter](auto /*changes*/)
+          {
+              matches_all_ = filter->matches_all();
+              matches_none_ = filter->matches_none();
+              refilter();
+          }) }
 {
     static auto const& self_col = ItemT::get_columns().self;
 
@@ -52,14 +59,6 @@ FilterListModel<ItemT>::FilterListModel(Glib::RefPtr<Gtk::TreeModel> const& mode
     };
 
     set_visible_func(filter_func);
-
-    signal_changed_tag_ = filter->signal_changed().connect(
-        [this, filter](auto /*changes*/)
-        {
-            matches_all_ = filter->matches_all();
-            matches_none_ = filter->matches_none();
-            refilter();
-        });
 
     signal_row_inserted().connect([this](auto const& path, auto const& /*iter*/)
                                   { signal_items_changed_.emit(path.front(), 0, 1); });

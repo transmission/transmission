@@ -39,32 +39,27 @@ set(WEB_IMAGES
     assets/img/lock-fill.svg
     assets/img/logo.png
     assets/img/magnet.svg
-    assets/img/modern-tortoise-blue.png
-    assets/img/modern-tortoise.png
     assets/img/music.svg
     assets/img/package.svg
-    assets/img/pause-circle-active.svg
-    assets/img/pause-circle-idle.svg
-    assets/img/play-circle-active.svg
-    assets/img/play-circle-idle.svg
     assets/img/README.md
     assets/img/router.svg
-    assets/img/type.svg)
+    assets/img/type.svg
+    assets/img/turtle.svg)
 
 add_custom_command(
     OUTPUT
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css.LEGAL.txt"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css.map"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LEGAL.txt"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
-        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
     WORKING_DIRECTORY
         "${CMAKE_CURRENT_BINARY_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E copy
-        "${CMAKE_CURRENT_SOURCE_DIR}/babel.config.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/esbuild.mjs"
         "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json"
         "${CMAKE_CURRENT_SOURCE_DIR}/package.json"
-        "${CMAKE_CURRENT_SOURCE_DIR}/prettier.config.js"
-        "${CMAKE_CURRENT_SOURCE_DIR}/stylelint.config.js"
-        "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js"
         "${CMAKE_CURRENT_BINARY_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/assets" "assets"
@@ -82,9 +77,12 @@ add_custom_command(
 add_custom_target("${TR_NAME}-web"
     ALL
     DEPENDS
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css.LEGAL.txt"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css.map"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LEGAL.txt"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
-        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
     SOURCES
         ${WEB_SOURCES})
 

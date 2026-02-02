@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,6 +12,10 @@
 #include "Torrent.h"
 #include "TorrentFilter.h"
 #include "Utils.h"
+
+#include <libtransmission-app/display-modes.h>
+
+#include <libtransmission/tr-macros.h>
 
 #include <gdkmm/pixbuf.h>
 #include <glibmm/i18n.h>
@@ -32,31 +36,39 @@
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gtkmm/filterlistmodel.h>
-#else
-#include <gtkmm/treemodelfilter.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm> // std::transform()
 #include <array>
+#include <map>
 #include <memory>
-#include <set>
+#include <ranges>
 #include <string>
 #include <unordered_map>
+
+using namespace tr::app;
+
+namespace
+{
+using TrackerType = TorrentFilter::Tracker;
+
+constexpr auto ShowModeSeparator = static_cast<ShowMode>(-1);
+constexpr auto TrackerSeparator = static_cast<TrackerType>(-1);
+} // namespace
 
 class FilterBar::Impl
 {
     using FilterModel = IF_GTKMM4(Gtk::FilterListModel, Gtk::TreeModelFilter);
 
-    using TrackerType = TorrentFilter::Tracker;
-    using ActivityType = TorrentFilter::Activity;
-
 public:
     Impl(FilterBar& widget, Glib::RefPtr<Session> const& core);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     [[nodiscard]] Glib::RefPtr<FilterModel> get_filter_model() const;
 
@@ -64,18 +76,20 @@ private:
     template<typename T>
     T* get_template_child(char const* name) const;
 
-    void activity_combo_box_init(Gtk::ComboBox& combo);
-    static void render_activity_pixbuf_func(Gtk::CellRendererPixbuf& cell_renderer, Gtk::TreeModel::const_iterator const& iter);
+    void show_mode_combo_box_init(Gtk::ComboBox& combo);
+    static void render_show_mode_pixbuf_func(
+        Gtk::CellRendererPixbuf& cell_renderer,
+        Gtk::TreeModel::const_iterator const& iter);
 
     void tracker_combo_box_init(Gtk::ComboBox& combo);
     static void render_pixbuf_func(Gtk::CellRendererPixbuf& cell_renderer, Gtk::TreeModel::const_iterator const& iter);
     static void render_number_func(Gtk::CellRendererText& cell_renderer, Gtk::TreeModel::const_iterator const& iter);
 
-    void update_filter_activity();
+    void update_filter_show_mode();
     void update_filter_tracker();
     void update_filter_text();
 
-    bool activity_filter_model_update();
+    bool show_mode_filter_model_update();
 
     bool tracker_filter_model_update();
     void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const* pixbuf, Gtk::TreeModel::Path const& path);
@@ -86,9 +100,9 @@ private:
     void update_count_label_idle();
     bool update_count_label();
 
-    static Glib::RefPtr<Gtk::ListStore> activity_filter_model_new();
+    static Glib::RefPtr<Gtk::ListStore> show_mode_filter_model_new();
     static void status_model_update_count(Gtk::TreeModel::iterator const& iter, int n);
-    static bool activity_is_it_a_separator(Gtk::TreeModel::const_iterator const& iter);
+    static bool show_mode_is_it_a_separator(Gtk::TreeModel::const_iterator const& iter);
 
     static Glib::RefPtr<Gtk::TreeStore> tracker_filter_model_new();
     static void tracker_model_update_count(Gtk::TreeModel::iterator const& iter, int n);
@@ -102,10 +116,10 @@ private:
     FilterBar& widget_;
     Glib::RefPtr<Session> const core_;
 
-    Glib::RefPtr<Gtk::ListStore> const activity_model_;
+    Glib::RefPtr<Gtk::ListStore> const show_mode_model_;
     Glib::RefPtr<Gtk::TreeStore> const tracker_model_;
 
-    Gtk::ComboBox* activity_ = nullptr;
+    Gtk::ComboBox* show_mode_ = nullptr;
     Gtk::ComboBox* tracker_ = nullptr;
     Gtk::Entry* entry_ = nullptr;
     Gtk::Label* show_lb_ = nullptr;
@@ -118,15 +132,10 @@ private:
     sigc::connection update_filter_models_on_change_tag_;
 };
 
-/***
-****
-****  TRACKERS
-****
-***/
+// --- TRACKERS
 
 namespace
 {
-
 class TrackerFilterModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
@@ -141,7 +150,7 @@ public:
 
     Gtk::TreeModelColumn<Glib::ustring> displayname; /* human-readable name; ie, Legaltorrents */
     Gtk::TreeModelColumn<int> count; /* how many matches there are */
-    Gtk::TreeModelColumn<int> type;
+    Gtk::TreeModelColumn<TrackerType> type;
     Gtk::TreeModelColumn<Glib::ustring> sitename; // pattern-matching text; see tr_parsed_url.sitename
     Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> pixbuf;
 };
@@ -202,7 +211,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
     /* Walk through all the torrents, tallying how many matches there are
      * for the various categories. Also make a sorted list of all tracker
      * hosts s.t. we can merge it with the existing list */
-    auto n_torrents = int{ 0 };
+    auto n_torrents = 0;
     auto site_infos = std::unordered_map<std::string /*site*/, site_info>{};
     for (auto i = 0U, count = torrents_model->get_n_items(); i < count; ++i)
     {
@@ -235,7 +244,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
 
     auto const n_sites = std::size(site_infos);
     auto sites_v = std::vector<site_info>(n_sites);
-    std::transform(std::begin(site_infos), std::end(site_infos), std::begin(sites_v), [](auto const& it) { return it.second; });
+    std::ranges::transform(site_infos, std::begin(sites_v), [](auto const& it) { return it.second; });
     std::sort(std::begin(sites_v), std::end(sites_v));
 
     // update the "all" count
@@ -298,7 +307,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
             add->set_value(tracker_filter_cols.sitename, Glib::ustring{ site.sitename });
             add->set_value(tracker_filter_cols.displayname, get_name_from_host(site.sitename));
             add->set_value(tracker_filter_cols.count, site.count);
-            add->set_value(tracker_filter_cols.type, static_cast<int>(TrackerType::HOST));
+            add->set_value(tracker_filter_cols.type, TrackerType::HOST);
             auto path = tracker_model_->get_path(add);
             core_->favicon_cache().load(
                 site.announce_url,
@@ -322,17 +331,17 @@ Glib::RefPtr<Gtk::TreeStore> FilterBar::Impl::tracker_filter_model_new()
 
     auto iter = store->append();
     iter->set_value(tracker_filter_cols.displayname, Glib::ustring(_("All")));
-    iter->set_value(tracker_filter_cols.type, static_cast<int>(TrackerType::ALL));
+    iter->set_value(tracker_filter_cols.type, TrackerType::ALL);
 
     iter = store->append();
-    iter->set_value(tracker_filter_cols.type, -1);
+    iter->set_value(tracker_filter_cols.type, TrackerSeparator);
 
     return store;
 }
 
 bool FilterBar::Impl::is_it_a_separator(Gtk::TreeModel::const_iterator const& iter)
 {
-    return iter->get_value(tracker_filter_cols.type) == -1;
+    return iter->get_value(tracker_filter_cols.type) == TrackerSeparator;
 }
 
 void FilterBar::Impl::render_pixbuf_func(Gtk::CellRendererPixbuf& cell_renderer, Gtk::TreeModel::const_iterator const& iter)
@@ -387,54 +396,50 @@ void FilterBar::Impl::tracker_combo_box_init(Gtk::ComboBox& combo)
 namespace
 {
 
-/***
-****
-****  ACTIVITY
-****
-***/
+// --- Show Mode
 
-class ActivityFilterModelColumns : public Gtk::TreeModelColumnRecord
+class ShowModeFilterModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
-    ActivityFilterModelColumns() noexcept
+    ShowModeFilterModelColumns() noexcept
     {
         add(name);
         add(count);
-        add(type);
+        add(show_mode);
         add(icon_name);
     }
 
     Gtk::TreeModelColumn<Glib::ustring> name;
     Gtk::TreeModelColumn<int> count;
-    Gtk::TreeModelColumn<int> type;
+    Gtk::TreeModelColumn<ShowMode> show_mode;
     Gtk::TreeModelColumn<Glib::ustring> icon_name;
 };
 
-ActivityFilterModelColumns const activity_filter_cols;
+ShowModeFilterModelColumns const show_mode_filter_cols;
 
 } // namespace
 
-bool FilterBar::Impl::activity_is_it_a_separator(Gtk::TreeModel::const_iterator const& iter)
+bool FilterBar::Impl::show_mode_is_it_a_separator(Gtk::TreeModel::const_iterator const& iter)
 {
-    return iter->get_value(activity_filter_cols.type) == -1;
+    return iter->get_value(show_mode_filter_cols.show_mode) == ShowModeSeparator;
 }
 
 void FilterBar::Impl::status_model_update_count(Gtk::TreeModel::iterator const& iter, int n)
 {
-    if (n != iter->get_value(activity_filter_cols.count))
+    if (n != iter->get_value(show_mode_filter_cols.count))
     {
-        iter->set_value(activity_filter_cols.count, n);
+        iter->set_value(show_mode_filter_cols.count, n);
     }
 }
 
-bool FilterBar::Impl::activity_filter_model_update()
+bool FilterBar::Impl::show_mode_filter_model_update()
 {
     auto const torrents_model = core_->get_model();
 
-    for (auto& row : activity_model_->children())
+    for (auto& row : show_mode_model_->children())
     {
-        auto const type = row.get_value(activity_filter_cols.type);
-        if (type == -1)
+        auto const type = row.get_value(show_mode_filter_cols.show_mode);
+        if (type == ShowModeSeparator)
         {
             continue;
         }
@@ -444,7 +449,7 @@ bool FilterBar::Impl::activity_filter_model_update()
         for (auto i = 0U, count = torrents_model->get_n_items(); i < count; ++i)
         {
             auto const torrent = gtr_ptr_dynamic_cast<Torrent>(torrents_model->get_object(i));
-            if (torrent != nullptr && TorrentFilter::match_activity(*torrent, static_cast<ActivityType>(type)))
+            if (torrent != nullptr && TorrentFilter::match_mode(*torrent, static_cast<ShowMode>(type)))
             {
                 ++hits;
             }
@@ -456,29 +461,29 @@ bool FilterBar::Impl::activity_filter_model_update()
     return false;
 }
 
-Glib::RefPtr<Gtk::ListStore> FilterBar::Impl::activity_filter_model_new()
+Glib::RefPtr<Gtk::ListStore> FilterBar::Impl::show_mode_filter_model_new()
 {
     struct FilterTypeInfo
     {
-        ActivityType type;
+        ShowMode show_mode;
         char const* context;
         char const* name;
         char const* icon_name;
     };
 
     static auto constexpr types = std::array<FilterTypeInfo, 9>({ {
-        { ActivityType::ALL, nullptr, N_("All"), nullptr },
-        { ActivityType{ -1 }, nullptr, nullptr, nullptr },
-        { ActivityType::ACTIVE, nullptr, N_("Active"), "system-run" },
-        { ActivityType::DOWNLOADING, "Verb", NC_("Verb", "Downloading"), "network-receive" },
-        { ActivityType::SEEDING, "Verb", NC_("Verb", "Seeding"), "network-transmit" },
-        { ActivityType::PAUSED, nullptr, N_("Paused"), "media-playback-pause" },
-        { ActivityType::FINISHED, nullptr, N_("Finished"), "media-playback-stop" },
-        { ActivityType::VERIFYING, "Verb", NC_("Verb", "Verifying"), "view-refresh" },
-        { ActivityType::ERROR, nullptr, N_("Error"), "dialog-error" },
+        { ShowMode::ShowAll, nullptr, N_("All"), nullptr },
+        { ShowMode{ -1 }, nullptr, nullptr, nullptr },
+        { ShowMode::ShowActive, nullptr, N_("Active"), "system-run" },
+        { ShowMode::ShowDownloading, "Verb", NC_("Verb", "Downloading"), "network-receive" },
+        { ShowMode::ShowSeeding, "Verb", NC_("Verb", "Seeding"), "network-transmit" },
+        { ShowMode::ShowPaused, nullptr, N_("Paused"), "media-playback-pause" },
+        { ShowMode::ShowFinished, nullptr, N_("Finished"), "media-playback-stop" },
+        { ShowMode::ShowVerifying, "Verb", NC_("Verb", "Verifying"), "view-refresh" },
+        { ShowMode::ShowError, nullptr, N_("Error"), "dialog-error" },
     } });
 
-    auto store = Gtk::ListStore::create(activity_filter_cols);
+    auto store = Gtk::ListStore::create(show_mode_filter_cols);
 
     for (auto const& type : types)
     {
@@ -486,40 +491,40 @@ Glib::RefPtr<Gtk::ListStore> FilterBar::Impl::activity_filter_model_new()
             Glib::ustring(type.context != nullptr ? g_dpgettext2(nullptr, type.context, type.name) : _(type.name)) :
             Glib::ustring();
         auto const iter = store->append();
-        iter->set_value(activity_filter_cols.name, name);
-        iter->set_value(activity_filter_cols.type, static_cast<int>(type.type));
-        iter->set_value(activity_filter_cols.icon_name, Glib::ustring(type.icon_name != nullptr ? type.icon_name : ""));
+        iter->set_value(show_mode_filter_cols.name, name);
+        iter->set_value(show_mode_filter_cols.show_mode, type.show_mode);
+        iter->set_value(show_mode_filter_cols.icon_name, Glib::ustring(type.icon_name != nullptr ? type.icon_name : ""));
     }
 
     return store;
 }
 
-void FilterBar::Impl::render_activity_pixbuf_func(
+void FilterBar::Impl::render_show_mode_pixbuf_func(
     Gtk::CellRendererPixbuf& cell_renderer,
     Gtk::TreeModel::const_iterator const& iter)
 {
-    auto const type = ActivityType{ iter->get_value(activity_filter_cols.type) };
-    cell_renderer.property_width() = type == ActivityType::ALL ? 0 : 20;
-    cell_renderer.property_ypad() = type == ActivityType::ALL ? 0 : 2;
+    auto const type = ShowMode{ iter->get_value(show_mode_filter_cols.show_mode) };
+    cell_renderer.property_width() = type == ShowMode::ShowAll ? 0 : 20;
+    cell_renderer.property_ypad() = type == ShowMode::ShowAll ? 0 : 2;
 }
 
-void FilterBar::Impl::activity_combo_box_init(Gtk::ComboBox& combo)
+void FilterBar::Impl::show_mode_combo_box_init(Gtk::ComboBox& combo)
 {
-    combo.set_model(activity_model_);
-    combo.set_row_separator_func(sigc::hide<0>(&Impl::activity_is_it_a_separator));
+    combo.set_model(show_mode_model_);
+    combo.set_row_separator_func(sigc::hide<0>(&Impl::show_mode_is_it_a_separator));
     combo.set_active(0);
 
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererPixbuf>();
         combo.pack_start(*r, false);
-        combo.add_attribute(r->property_icon_name(), activity_filter_cols.icon_name);
-        combo.set_cell_data_func(*r, [r](auto const& iter) { render_activity_pixbuf_func(*r, iter); });
+        combo.add_attribute(r->property_icon_name(), show_mode_filter_cols.icon_name);
+        combo.set_cell_data_func(*r, [r](auto const& iter) { render_show_mode_pixbuf_func(*r, iter); });
     }
 
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
         combo.pack_start(*r, true);
-        combo.add_attribute(r->property_text(), activity_filter_cols.name);
+        combo.add_attribute(r->property_text(), show_mode_filter_cols.name);
     }
 
     {
@@ -534,16 +539,16 @@ void FilterBar::Impl::update_filter_text()
     filter_->set_text(entry_->get_text());
 }
 
-void FilterBar::Impl::update_filter_activity()
+void FilterBar::Impl::update_filter_show_mode()
 {
-    /* set active_activity_type_ from the activity combobox */
-    if (auto const iter = activity_->get_active(); iter)
+    /* set active_show_mode_type_ from the show_mode combobox */
+    if (auto const iter = show_mode_->get_active(); iter)
     {
-        filter_->set_activity(ActivityType{ iter->get_value(activity_filter_cols.type) });
+        filter_->set_mode(ShowMode{ iter->get_value(show_mode_filter_cols.show_mode) });
     }
     else
     {
-        filter_->set_activity(ActivityType::ALL);
+        filter_->set_mode(ShowMode::ShowAll);
     }
 }
 
@@ -574,17 +579,17 @@ bool FilterBar::Impl::update_count_label()
         trackerCount = iter->get_value(tracker_filter_cols.count);
     }
 
-    /* get the activity count */
-    int activityCount = 0;
-    if (auto const iter = activity_->get_active(); iter)
+    /* get the mode count */
+    int modeCount = 0;
+    if (auto const iter = show_mode_->get_active(); iter)
     {
-        activityCount = iter->get_value(activity_filter_cols.count);
+        modeCount = iter->get_value(show_mode_filter_cols.count);
     }
 
     /* set the text */
-    if (auto const new_markup = visibleCount == std::min(activityCount, trackerCount) ?
+    if (auto const new_markup = visibleCount == std::min(modeCount, trackerCount) ?
             _("_Show:") :
-            fmt::format(_("_Show {count:L} of:"), fmt::arg("count", visibleCount));
+            fmt::format(fmt::runtime(_("_Show {count:L} of:")), fmt::arg("count", visibleCount));
         new_markup != show_lb_->get_label().raw())
     {
         show_lb_->set_markup_with_mnemonic(new_markup);
@@ -603,14 +608,14 @@ void FilterBar::Impl::update_count_label_idle()
 
 void FilterBar::Impl::update_filter_models(Torrent::ChangeFlags changes)
 {
-    static auto constexpr activity_flags = Torrent::ChangeFlag::ACTIVE_PEERS_DOWN | Torrent::ChangeFlag::ACTIVE_PEERS_UP |
+    static auto TR_CONSTEXPR23 show_mode_flags = Torrent::ChangeFlag::ACTIVE_PEERS_DOWN | Torrent::ChangeFlag::ACTIVE_PEERS_UP |
         Torrent::ChangeFlag::ACTIVE | Torrent::ChangeFlag::ACTIVITY | Torrent::ChangeFlag::ERROR_CODE |
         Torrent::ChangeFlag::FINISHED;
     static auto constexpr tracker_flags = Torrent::ChangeFlag::TRACKERS;
 
-    if (changes.test(activity_flags))
+    if (changes.test(show_mode_flags))
     {
-        activity_filter_model_update();
+        show_mode_filter_model_update();
     }
 
     if (changes.test(tracker_flags))
@@ -620,7 +625,7 @@ void FilterBar::Impl::update_filter_models(Torrent::ChangeFlags changes)
 
     filter_->update(changes);
 
-    if (changes.test(activity_flags | tracker_flags))
+    if (changes.test(show_mode_flags | tracker_flags))
     {
         update_count_label_idle();
     }
@@ -654,7 +659,7 @@ void FilterBarExtraInit::class_init(void* klass, void* /*user_data*/)
 
     gtk_widget_class_set_template_from_resource(widget_klass, gtr_get_full_resource_path("FilterBar.ui").c_str());
 
-    gtk_widget_class_bind_template_child_full(widget_klass, "activity_combo", FALSE, 0);
+    gtk_widget_class_bind_template_child_full(widget_klass, "show_mode_combo", FALSE, 0);
     gtk_widget_class_bind_template_child_full(widget_klass, "tracker_combo", FALSE, 0);
     gtk_widget_class_bind_template_child_full(widget_klass, "text_entry", FALSE, 0);
     gtk_widget_class_bind_template_child_full(widget_klass, "show_label", FALSE, 0);
@@ -689,9 +694,9 @@ FilterBar::~FilterBar() = default;
 FilterBar::Impl::Impl(FilterBar& widget, Glib::RefPtr<Session> const& core)
     : widget_(widget)
     , core_(core)
-    , activity_model_(activity_filter_model_new())
+    , show_mode_model_(show_mode_filter_model_new())
     , tracker_model_(tracker_filter_model_new())
-    , activity_(get_template_child<Gtk::ComboBox>("activity_combo"))
+    , show_mode_(get_template_child<Gtk::ComboBox>("show_mode_combo"))
     , tracker_(get_template_child<Gtk::ComboBox>("tracker_combo"))
     , entry_(get_template_child<Gtk::Entry>("text_entry"))
     , show_lb_(get_template_child<Gtk::Label>("show_label"))
@@ -701,10 +706,10 @@ FilterBar::Impl::Impl(FilterBar& widget, Glib::RefPtr<Session> const& core)
     update_filter_models_on_change_tag_ = core_->signal_torrents_changed().connect(
         sigc::hide<0>(sigc::mem_fun(*this, &Impl::update_filter_models_idle)));
 
-    activity_filter_model_update();
+    show_mode_filter_model_update();
     tracker_filter_model_update();
 
-    activity_combo_box_init(*activity_);
+    show_mode_combo_box_init(*show_mode_);
     tracker_combo_box_init(*tracker_);
 
     filter_->signal_changed().connect([this](auto /*changes*/) { update_count_label_idle(); });
@@ -712,7 +717,7 @@ FilterBar::Impl::Impl(FilterBar& widget, Glib::RefPtr<Session> const& core)
     filter_model_ = FilterListModel<Torrent>::create(core_->get_sorted_model(), filter_);
 
     tracker_->signal_changed().connect(sigc::mem_fun(*this, &Impl::update_filter_tracker));
-    activity_->signal_changed().connect(sigc::mem_fun(*this, &Impl::update_filter_activity));
+    show_mode_->signal_changed().connect(sigc::mem_fun(*this, &Impl::update_filter_show_mode));
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     entry_->signal_icon_release().connect([this](auto /*icon_position*/) { entry_->set_text({}); });

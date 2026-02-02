@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,18 +8,17 @@
 #include <algorithm> // std::move()
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
-#include <map>
+#include <functional> // std::invoke
 #include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits> // std::is_same_v
-#include <utility> // std::as_const, std::pair
+#include <utility> // std::pair
 #include <variant>
 #include <vector>
 
+#include "libtransmission/error.h"
 #include "libtransmission/quark.h"
-
-struct tr_error;
 
 /**
  * A variant that holds typical benc/json types: bool, int,
@@ -31,54 +30,268 @@ struct tr_error;
 struct tr_variant
 {
 public:
-    enum Type
+    enum Type : uint8_t
     {
-        NoneIndex = 0,
-        BoolIndex = 1,
-        IntIndex = 2,
-        DoubleIndex = 3,
-        StringIndex = 4,
-        VectorIndex = 5,
-        MapIndex = 6
+        NoneIndex,
+        NullIndex,
+        BoolIndex,
+        IntIndex,
+        DoubleIndex,
+        StringIndex,
+        StringViewIndex,
+        VectorIndex,
+        MapIndex
     };
 
     using Vector = std::vector<tr_variant>;
-    using Map = std::map<tr_quark, tr_variant>;
+
+    class Map
+    {
+    public:
+        Map() = default;
+
+        explicit Map(size_t const n_reserve)
+        {
+            vec_.reserve(n_reserve);
+        }
+
+        [[nodiscard]] constexpr auto begin() noexcept
+        {
+            return std::begin(vec_);
+        }
+
+        [[nodiscard]] constexpr auto begin() const noexcept
+        {
+            return std::cbegin(vec_);
+        }
+
+        [[nodiscard]] constexpr auto cbegin() const noexcept
+        {
+            return std::cbegin(vec_);
+        }
+
+        [[nodiscard]] constexpr auto end() noexcept
+        {
+            return std::end(vec_);
+        }
+
+        [[nodiscard]] constexpr auto end() const noexcept
+        {
+            return std::cend(vec_);
+        }
+
+        [[nodiscard]] constexpr auto cend() const noexcept
+        {
+            return std::cend(vec_);
+        }
+
+        [[nodiscard]] constexpr auto find(tr_quark const key) noexcept
+        {
+            auto const predicate = [key](auto const& item)
+            {
+                return item.first == key;
+            };
+            return std::find_if(std::begin(vec_), std::end(vec_), predicate);
+        }
+
+        [[nodiscard]] constexpr auto find(tr_quark const key) const noexcept
+        {
+            return Vector::const_iterator{ const_cast<Map*>(this)->find(key) };
+        }
+
+        [[nodiscard]] constexpr auto contains(tr_quark const key) const noexcept
+        {
+            return find(key) != end();
+        }
+
+        [[nodiscard]] constexpr auto size() const noexcept
+        {
+            return std::size(vec_);
+        }
+
+        [[nodiscard]] constexpr auto empty() const noexcept
+        {
+            return std::empty(vec_);
+        }
+
+        void reserve(size_t const new_cap)
+        {
+            vec_.reserve(std::max(new_cap, size_t{ 16U }));
+        }
+
+        auto erase(tr_quark const key)
+        {
+            if (auto iter = find(key); iter != end())
+            {
+                vec_.erase(iter);
+                return 1U;
+            }
+
+            return 0U;
+        }
+
+        constexpr bool replace_key(tr_quark const old_key, tr_quark const new_key)
+        {
+            if (contains(new_key))
+            {
+                return false;
+            }
+
+            auto iter = find(old_key);
+            if (iter == end())
+            {
+                return false;
+            }
+
+            iter->first = new_key;
+            return true;
+        }
+
+        [[nodiscard]] tr_variant& operator[](tr_quark const& key)
+        {
+            if (auto const iter = find(key); iter != end())
+            {
+                return iter->second;
+            }
+
+            return vec_.emplace_back(key, tr_variant{}).second;
+        }
+
+        template<typename Val>
+        std::pair<tr_variant&, bool> try_emplace(tr_quark const key, Val&& val)
+        {
+            if (auto iter = find(key); iter != end())
+            {
+                return { iter->second, false };
+            }
+
+            return { vec_.emplace_back(key, tr_variant{ std::forward<Val>(val) }).second, true };
+        }
+
+        template<typename Val>
+        std::pair<tr_variant&, bool> insert_or_assign(tr_quark const key, Val&& val)
+        {
+            auto res = try_emplace(key, std::forward<Val>(val));
+            if (!res.second)
+            {
+                res.first = std::forward<Val>(val);
+            }
+            return res;
+        }
+
+        // --- custom functions
+
+        template<typename Type>
+        [[nodiscard]] constexpr auto* find_if(tr_quark const key) noexcept
+        {
+            auto const iter = find(key);
+            return iter != end() ? iter->second.get_if<Type>() : nullptr;
+        }
+
+        template<typename Type>
+        [[nodiscard]] constexpr auto const* find_if(tr_quark const key) const noexcept
+        {
+            return const_cast<Map*>(this)->find_if<Type>(key);
+        }
+
+        template<typename Type>
+        [[nodiscard]] std::optional<Type> value_if(tr_quark const key) const noexcept
+        {
+            if (auto it = find(key); it != end())
+            {
+                return it->second.value_if<Type>();
+            }
+
+            return std::nullopt;
+        }
+
+    private:
+        using Vector = std::vector<std::pair<tr_quark, tr_variant>>;
+        Vector vec_;
+    };
 
     constexpr tr_variant() noexcept = default;
-    tr_variant(tr_variant const&) = delete;
+    ~tr_variant() = default;
     tr_variant(tr_variant&& that) noexcept = default;
-    tr_variant& operator=(tr_variant const&) = delete;
     tr_variant& operator=(tr_variant&& that) noexcept = default;
 
+    // Copying a variant is potentially expensive, so copy assignment
+    // and copy construct are deleted here to prevent accidental copies.
+    // Use clone() instead.
+    tr_variant(tr_variant const&) = delete;
+    tr_variant& operator=(tr_variant const&) = delete;
+
     template<typename Val>
-    explicit tr_variant(Val value)
+    tr_variant(Val&& value) // NOLINT(bugprone-forwarding-reference-overload, google-explicit-constructor)
     {
-        *this = std::move(value);
+        *this = std::forward<Val>(value);
+    }
+
+    [[nodiscard]] static auto make_map(size_t const n_reserve = 0U)
+    {
+        auto ret = tr_variant{};
+        ret.val_.emplace<Map>(n_reserve);
+        return ret;
+    }
+
+    [[nodiscard]] static auto make_vector(size_t const n_reserve = 0U)
+    {
+        auto ret = tr_variant{};
+        ret.val_.emplace<Vector>().reserve(n_reserve);
+        return ret;
+    }
+
+    [[nodiscard]] static auto make_raw(void const* value, size_t n_bytes)
+    {
+        return tr_variant{ std::string_view{ reinterpret_cast<char const*>(value), n_bytes } };
+    }
+
+    template<typename CharSpan>
+    [[nodiscard]] static auto make_raw(CharSpan const& value)
+    {
+        static_assert(sizeof(typename CharSpan::value_type) == 1U);
+        return make_raw(std::data(value), std::size(value));
+    }
+
+    [[nodiscard]] static tr_variant unmanaged_string(std::string_view val)
+    {
+        auto ret = tr_variant{};
+        ret.val_.emplace<std::string_view>(val);
+        return ret;
+    }
+
+    [[nodiscard]] static tr_variant unmanaged_string(tr_quark const key)
+    {
+        return unmanaged_string(tr_quark_get_string_view(key));
     }
 
     template<typename Val>
     tr_variant& operator=(Val value)
     {
-        val_ = std::move(value);
-        return *this;
-    }
-
-    tr_variant& operator=(std::string&& value)
-    {
-        val_.emplace<StringHolder>(std::move(value));
-        return *this;
-    }
-
-    tr_variant& operator=(std::string const& value)
-    {
-        val_.emplace<StringHolder>(std::string(value));
-        return *this;
-    }
-
-    tr_variant& operator=(std::string_view value)
-    {
-        val_.emplace<StringHolder>(std::string(value));
+        if constexpr (std::is_same_v<Val, std::string_view>)
+        {
+            // Note: std::string_view assignment takes ownership by copying.
+            // Use unmanaged_string() if you want the variant to hold a shallow copy.
+            val_.emplace<std::string>(value);
+        }
+        else if constexpr (std::is_same_v<Val, char const*> || std::is_same_v<Val, char*>)
+        {
+            val_.emplace<std::string>(value != nullptr ? value : "");
+        }
+        // note: std::is_integral_v<bool> is true, so this check
+        // must come first to prevent bools from being stored as ints
+        else if constexpr (std::is_same_v<Val, bool>)
+        {
+            val_.emplace<bool>(value);
+        }
+        else if constexpr (std::is_integral_v<Val> || std::is_enum_v<Val>)
+        {
+            val_ = static_cast<int64_t>(value);
+        }
+        else
+        {
+            val_ = std::move(value);
+        }
         return *this;
     }
 
@@ -95,35 +308,27 @@ public:
     template<typename Val>
     [[nodiscard]] constexpr auto* get_if() noexcept
     {
-        if constexpr (std::is_same_v<Val, std::string_view>)
-        {
-            auto const* const str = std::get_if<StringHolder>(&val_);
-            return str != nullptr ? &str->sv_ : nullptr;
-        }
-        else
-        {
-            return std::get_if<Val>(&val_);
-        }
+        static_assert(
+            !std::is_same_v<std::remove_cvref_t<Val>, std::string> &&
+                !std::is_same_v<std::remove_cvref_t<Val>, std::string_view>,
+            "not supported -- use value_if<std::string_view>() instead.");
+        return std::get_if<Val>(&val_);
     }
 
     template<typename Val>
     [[nodiscard]] constexpr auto const* get_if() const noexcept
     {
+        static_assert(
+            !std::is_same_v<std::remove_cvref_t<Val>, std::string> &&
+                !std::is_same_v<std::remove_cvref_t<Val>, std::string_view>,
+            "not supported -- use value_if<std::string_view>() instead.");
         return const_cast<tr_variant*>(this)->get_if<Val>();
     }
 
     template<size_t Index>
-    [[nodiscard]] auto* get_if() noexcept
+    [[nodiscard]] constexpr auto* get_if() noexcept
     {
-        if constexpr (Index == StringIndex)
-        {
-            auto const* const str = std::get_if<StringIndex>(&val_);
-            return str != nullptr ? &str->sv_ : nullptr;
-        }
-        else
-        {
-            return std::get_if<Index>(&val_);
-        }
+        return std::get_if<Index>(&val_);
     }
 
     template<size_t Index>
@@ -132,11 +337,21 @@ public:
         return const_cast<tr_variant*>(this)->get_if<Index>();
     }
 
-    [[nodiscard]] static tr_variant unmanaged_string(std::string_view val)
+    template<typename Val>
+    [[nodiscard]] constexpr std::optional<Val> value_if() noexcept
     {
-        auto ret = tr_variant{};
-        ret.val_.emplace<StringHolder>().set_unmanaged(val);
-        return ret;
+        if (auto const* const val = get_if<Val>())
+        {
+            return *val;
+        }
+
+        return {};
+    }
+
+    template<typename Val>
+    [[nodiscard]] std::optional<Val> value_if() const noexcept
+    {
+        return const_cast<tr_variant*>(this)->value_if<Val>();
     }
 
     template<typename Val>
@@ -144,7 +359,7 @@ public:
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            return std::holds_alternative<StringHolder>(val_);
+            return std::holds_alternative<std::string>(val_) || std::holds_alternative<std::string_view>(val_);
         }
         else
         {
@@ -157,56 +372,44 @@ public:
         val_.emplace<std::monostate>();
     }
 
-    void merge(tr_variant const& that)
+    template<typename Visitor>
+    [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor)
     {
-        std::visit(Merge{ *this }, that.val_);
+        return std::visit(std::forward<Visitor>(visitor), val_);
     }
 
+    template<typename Visitor>
+    [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor) const
+    {
+        return std::visit(std::forward<Visitor>(visitor), val_);
+    }
+
+    // Usually updates `this` to hold a clone of `that`, with two exceptions:
+    // 1. If both sides hold maps, recursively merge each entry and overwrite
+    //    duplicate keys from `this`.
+    // 2. Any unmanaged string taken from `that` is copied so `this` owns its copy.
+    tr_variant& merge(tr_variant const& that);
+
+    // Returns a new copy of `this`.
+    // Any unmanaged strings in `this` are copied so the new variant owns its copy.
+    [[nodiscard]] tr_variant clone() const;
+
 private:
-    // Holds a string_view to either an unmanaged/external string or to
-    // one owned by the class. If the string is unmanaged, only sv_ is used.
-    // If we own the string, then sv_ points to the managed str_.
-    class StringHolder
-    {
-    public:
-        StringHolder() = default;
-        explicit StringHolder(std::string&& str) noexcept;
-        explicit StringHolder(StringHolder&& that) noexcept;
-        void set_unmanaged(std::string_view sv);
-        StringHolder& operator=(StringHolder&& that) noexcept;
-        std::string_view sv_;
-
-    private:
-        std::string str_;
-    };
-
-    class Merge
-    {
-    public:
-        explicit Merge(tr_variant& tgt);
-        void operator()(std::monostate const& src);
-        void operator()(bool const& src);
-        void operator()(int64_t const& src);
-        void operator()(double const& src);
-        void operator()(tr_variant::StringHolder const& src);
-        void operator()(tr_variant::Vector const& src);
-        void operator()(tr_variant::Map const& src);
-
-    private:
-        tr_variant& tgt_;
-    };
-
-    std::variant<std::monostate, bool, int64_t, double, StringHolder, Vector, Map> val_;
+    std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, std::string, std::string_view, Vector, Map> val_;
 };
+
+template<>
+[[nodiscard]] std::optional<int64_t> tr_variant::value_if() noexcept;
+template<>
+[[nodiscard]] std::optional<bool> tr_variant::value_if() noexcept;
+template<>
+[[nodiscard]] std::optional<double> tr_variant::value_if() noexcept;
+template<>
+[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() noexcept;
 
 // --- Strings
 
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
-
-void tr_variantInitStr(tr_variant* initme, std::string_view value);
-void tr_variantInitQuark(tr_variant* initme, tr_quark value);
-void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len);
-void tr_variantInitStrView(tr_variant* initme, std::string_view val);
 
 bool tr_variantGetRaw(tr_variant const* variant, std::byte const** setme_raw, size_t* setme_len);
 bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
@@ -215,24 +418,18 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size
 
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
-void tr_variantInitReal(tr_variant* initme, double value);
-
 // --- Booleans
 
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
-
-void tr_variantInitBool(tr_variant* initme, bool value);
 
 // --- Ints
 
 bool tr_variantGetInt(tr_variant const* var, int64_t* setme);
 
-void tr_variantInitInt(tr_variant* initme, int64_t value);
-
 // --- Lists
 
-void tr_variantInitList(tr_variant* initme, size_t reserve_count);
-void tr_variantListReserve(tr_variant* var, size_t reserve_count);
+void tr_variantInitList(tr_variant* initme, size_t n_reserve);
+void tr_variantListReserve(tr_variant* var, size_t n_reserve);
 
 tr_variant* tr_variantListAdd(tr_variant* var);
 tr_variant* tr_variantListAddBool(tr_variant* var, bool value);
@@ -240,10 +437,9 @@ tr_variant* tr_variantListAddInt(tr_variant* var, int64_t value);
 tr_variant* tr_variantListAddReal(tr_variant* var, double value);
 tr_variant* tr_variantListAddStr(tr_variant* var, std::string_view value);
 tr_variant* tr_variantListAddStrView(tr_variant* var, std::string_view value);
-tr_variant* tr_variantListAddQuark(tr_variant* var, tr_quark value);
-tr_variant* tr_variantListAddRaw(tr_variant* var, void const* value, size_t value_len);
-tr_variant* tr_variantListAddList(tr_variant* var, size_t reserve_count);
-tr_variant* tr_variantListAddDict(tr_variant* var, size_t reserve_count);
+tr_variant* tr_variantListAddRaw(tr_variant* var, void const* value, size_t n_bytes);
+tr_variant* tr_variantListAddList(tr_variant* var, size_t n_reserve);
+tr_variant* tr_variantListAddDict(tr_variant* var, size_t n_reserve);
 tr_variant* tr_variantListChild(tr_variant* var, size_t pos);
 
 bool tr_variantListRemove(tr_variant* var, size_t pos);
@@ -263,8 +459,8 @@ bool tr_variantListRemove(tr_variant* var, size_t pos);
 
 // --- Dictionaries
 
-void tr_variantInitDict(tr_variant* initme, size_t reserve_count);
-void tr_variantDictReserve(tr_variant* var, size_t reserve_count);
+void tr_variantInitDict(tr_variant* initme, size_t n_reserve);
+void tr_variantDictReserve(tr_variant* var, size_t n_reserve);
 bool tr_variantDictRemove(tr_variant* var, tr_quark key);
 
 tr_variant* tr_variantDictAdd(tr_variant* var, tr_quark key);
@@ -273,10 +469,9 @@ tr_variant* tr_variantDictAddInt(tr_variant* var, tr_quark key, int64_t value);
 tr_variant* tr_variantDictAddBool(tr_variant* var, tr_quark key, bool value);
 tr_variant* tr_variantDictAddStr(tr_variant* var, tr_quark key, std::string_view value);
 tr_variant* tr_variantDictAddStrView(tr_variant* var, tr_quark key, std::string_view value);
-tr_variant* tr_variantDictAddQuark(tr_variant* var, tr_quark key, tr_quark val);
-tr_variant* tr_variantDictAddList(tr_variant* var, tr_quark key, size_t reserve_count);
-tr_variant* tr_variantDictAddDict(tr_variant* var, tr_quark key, size_t reserve_count);
-tr_variant* tr_variantDictAddRaw(tr_variant* var, tr_quark key, void const* value, size_t len);
+tr_variant* tr_variantDictAddList(tr_variant* var, tr_quark key, size_t n_reserve);
+tr_variant* tr_variantDictAddDict(tr_variant* var, tr_quark key, size_t n_reserve);
+tr_variant* tr_variantDictAddRaw(tr_variant* var, tr_quark key, void const* value, size_t n_bytes);
 
 bool tr_variantDictChild(tr_variant* var, size_t pos, tr_quark* setme_key, tr_variant** setme_value);
 tr_variant* tr_variantDictFind(tr_variant* var, tr_quark key);
@@ -300,14 +495,12 @@ void tr_variantMergeDicts(tr_variant* tgt, tr_variant const* src);
 class tr_variant_serde
 {
 public:
-    ~tr_variant_serde();
-
-    static tr_variant_serde benc() noexcept
+    [[nodiscard]] static tr_variant_serde benc() noexcept
     {
         return tr_variant_serde{ Type::Benc };
     }
 
-    static tr_variant_serde json() noexcept
+    [[nodiscard]] static tr_variant_serde json() noexcept
     {
         return tr_variant_serde{ Type::Json };
     }
@@ -355,29 +548,18 @@ public:
     // ---
 
     // Tracks errors when parsing / saving
-    tr_error* error_ = nullptr;
+    tr_error error_;
 
 private:
     friend tr_variant;
 
-    enum class Type
+    enum class Type : uint8_t
     {
         Benc,
         Json
     };
 
-    struct WalkFuncs
-    {
-        void (*int_func)(tr_variant const& var, int64_t val, void* user_data);
-        void (*bool_func)(tr_variant const& var, bool val, void* user_data);
-        void (*double_func)(tr_variant const& var, double val, void* user_data);
-        void (*string_func)(tr_variant const& var, std::string_view val, void* user_data);
-        void (*dict_begin_func)(tr_variant const& var, void* user_data);
-        void (*list_begin_func)(tr_variant const& var, void* user_data);
-        void (*container_end_func)(tr_variant const& var, void* user_data);
-    };
-
-    tr_variant_serde(Type type)
+    explicit tr_variant_serde(Type type)
         : type_{ type }
     {
     }
@@ -388,8 +570,6 @@ private:
     [[nodiscard]] std::string to_json_string(tr_variant const& var) const;
     [[nodiscard]] static std::string to_benc_string(tr_variant const& var);
 
-    static void walk(tr_variant const& top, WalkFuncs const& walk_funcs, void* user_data, bool sort_dicts);
-
     Type type_;
 
     bool compact_ = false;
@@ -399,20 +579,5 @@ private:
     // This is set to the first unparsed character after `parse()`.
     char const* end_ = nullptr;
 };
-
-namespace libtransmission
-{
-
-struct VariantConverter
-{
-public:
-    template<typename T>
-    static std::optional<T> load(tr_variant* src);
-
-    template<typename T>
-    static void save(tr_variant* tgt, T const& val);
-};
-
-} // namespace libtransmission
 
 /* @} */

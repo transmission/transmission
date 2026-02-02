@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -18,7 +18,7 @@ export class StatisticsDialog extends EventTarget {
     this.remote = remote;
 
     const updateDaemon = () =>
-      this.remote.loadDaemonStats((data) => this._update(data.arguments));
+      this.remote.loadDaemonStats((data) => this._update(data.result));
     const delay_msec = 5000;
     this.interval = setInterval(updateDaemon, delay_msec);
     updateDaemon();
@@ -33,6 +33,7 @@ export class StatisticsDialog extends EventTarget {
     if (!this.closed) {
       clearInterval(this.interval);
       this.elements.root.remove();
+      this.dispatchEvent(new Event('close'));
       for (const key of Object.keys(this)) {
         delete this[key];
       }
@@ -48,22 +49,25 @@ export class StatisticsDialog extends EventTarget {
     console.log(stats);
     const fmt = Formatter;
 
-    let s = stats['current-stats'];
-    let ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
-    setTextContent(this.elements.session.up, fmt.size(s.uploadedBytes));
-    setTextContent(this.elements.session.down, fmt.size(s.downloadedBytes));
-    setTextContent(this.elements.session.ratio, fmt.ratioString(ratio));
+    let s = stats.current_stats;
+    let ratio = Utils.ratio(s.uploaded_bytes, s.downloaded_bytes);
+    setTextContent(this.elements.session.up, fmt.size(s.uploaded_bytes));
+    setTextContent(this.elements.session.down, fmt.size(s.downloaded_bytes));
+    this.elements.session.ratio.innerHTML = fmt.ratioString(ratio);
     setTextContent(
       this.elements.session.time,
-      fmt.timeInterval(s.secondsActive),
+      fmt.timeInterval(s.seconds_active),
     );
 
-    s = stats['cumulative-stats'];
-    ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
-    setTextContent(this.elements.total.up, fmt.size(s.uploadedBytes));
-    setTextContent(this.elements.total.down, fmt.size(s.downloadedBytes));
-    setTextContent(this.elements.total.ratio, fmt.ratioString(ratio));
-    setTextContent(this.elements.total.time, fmt.timeInterval(s.secondsActive));
+    s = stats.cumulative_stats;
+    ratio = Utils.ratio(s.uploaded_bytes, s.downloaded_bytes);
+    setTextContent(this.elements.total.up, fmt.size(s.uploaded_bytes));
+    setTextContent(this.elements.total.down, fmt.size(s.downloaded_bytes));
+    this.elements.total.ratio.innerHTML = fmt.ratioString(ratio);
+    setTextContent(
+      this.elements.total.time,
+      fmt.timeInterval(s.seconds_active),
+    );
   }
 
   static _create() {

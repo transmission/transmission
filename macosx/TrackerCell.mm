@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -20,6 +20,10 @@ static CGFloat const kPaddingBetweenLines = 1.0;
 static CGFloat const kPaddingBetweenLinesOnSameLine = 4.0;
 static CGFloat const kCountWidth = 60.0;
 
+// make the favicons accessible to all tracker cells
+static NSCache* fTrackerIconCache;
+static NSMutableSet* fTrackerIconLoading;
+
 @interface TrackerCell ()
 
 @property(nonatomic, readonly) NSImage* favIcon;
@@ -31,12 +35,11 @@ static CGFloat const kCountWidth = 60.0;
 
 @implementation TrackerCell
 
-//make the favicons accessible to all tracker cells
-NSCache* fTrackerIconCache;
-NSMutableSet* fTrackerIconLoading;
-
 + (void)initialize
 {
+    if (self != [TrackerCell self])
+        return;
+
     fTrackerIconCache = [[NSCache alloc] init];
     fTrackerIconLoading = [[NSMutableSet alloc] init];
 }
@@ -180,18 +183,13 @@ NSMutableSet* fTrackerIconLoading;
         return icon;
     }
 
-    if (@available(macOS 11.0, *))
-    {
-        NSImage* result = [NSImage imageWithSystemSymbolName:@"globe" accessibilityDescription:nil];
-        [result lockFocus];
-        [NSColor.textColor set];
-        NSRect imageRect = { NSZeroPoint, result.size };
-        NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
-        [result unlockFocus];
-        return result;
-    }
-
-    return [NSImage imageNamed:@"FavIcon"];
+    NSImage* result = [NSImage imageWithSystemSymbolName:@"globe" accessibilityDescription:nil];
+    [result lockFocus];
+    [NSColor.textColor set];
+    NSRect imageRect = { NSZeroPoint, result.size };
+    NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
+    [result unlockFocus];
+    return result;
 }
 
 - (void)loadTrackerIcon:(NSString*)baseAddress
@@ -227,7 +225,7 @@ NSMutableSet* fTrackerIconLoading;
                 {
                     [fTrackerIconCache setObject:icon forKey:baseAddress];
 
-                    [self.controlView setNeedsDisplay:YES];
+                    self.controlView.needsDisplay = YES;
                 }
                 else
                 {

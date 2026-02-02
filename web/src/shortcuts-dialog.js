@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -54,7 +54,7 @@ export class ShortcutsDialog extends EventTarget {
       o[sortKey] = { name, shortcut };
     }
 
-    for (const [, values] of Object.entries(o).sort()) {
+    for (const [, values] of Object.entries(o).toSorted()) {
       const { name, shortcut } = values;
       tr = document.createElement('tr');
       tbody.append(tr);

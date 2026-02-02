@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -12,7 +12,7 @@
 #include <glibmm/ustring.h>
 #include <gtkmm/messagedialog.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <memory>
 #include <vector>
@@ -27,35 +27,36 @@ void gtr_confirm_remove(
     std::vector<tr_torrent_id_t> const& torrent_ids,
     bool delete_files)
 {
-    int connected = 0;
-    int incomplete = 0;
     int const count = torrent_ids.size();
-
     if (count == 0)
     {
         return;
     }
 
-    for (auto const id : torrent_ids)
+    int connected = 0;
+    int incomplete = 0;
+    // TODO(c++20) remove `torrents` local when tr_torrentStat() takes a span
+    auto const torrents = core->find_torrents(torrent_ids);
+    for (auto const& stat : tr_torrentStat(std::data(torrents), std::size(torrents)))
     {
-        tr_torrent* tor = core->find_torrent(id);
-        tr_stat const* stat = tr_torrentStat(tor);
-
-        if (stat->leftUntilDone != 0)
+        if (stat.left_until_done != 0)
         {
             ++incomplete;
         }
 
-        if (stat->peersConnected != 0)
+        if (stat.peers_connected != 0)
         {
             ++connected;
         }
     }
 
     auto const primary_text = fmt::format(
-        !delete_files ?
-            ngettext("Remove torrent?", "Remove {count:L} torrents?", count) :
-            ngettext("Delete this torrent's downloaded files?", "Delete these {count:L} torrents' downloaded files?", count),
+        fmt::runtime(
+            !delete_files ? ngettext("Remove torrent?", "Remove {count:L} torrents?", count) :
+                            ngettext(
+                                "Delete this torrent's downloaded files?",
+                                "Delete these {count:L} torrents' downloaded files?",
+                                count)),
         fmt::arg("count", count));
 
     Glib::ustring secondary_text;

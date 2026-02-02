@@ -1,6 +1,6 @@
 
 /* Class = "NSWindow"; title = "Torrent Creator"; ObjectID = "5"; */
-"5.title" = "Torrent Creator";
+"5.title" = "Torrent-opretter";
 
 /* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "70"; */
 "70.title" = "Kommentar:";
@@ -9,13 +9,13 @@
 "71.title" = "Trackere:";
 
 /* Class = "NSButtonCell"; title = "Change…"; ObjectID = "73"; */
-"73.title" = "Andet...";
+"73.title" = "Skift …";
 
 /* Class = "NSTextFieldCell"; title = "Torrent File:"; ObjectID = "74"; */
-"74.title" = "Torrent fil:";
+"74.title" = "Torrent-fil:";
 
 /* Class = "NSButtonCell"; title = "Private"; ObjectID = "77"; */
-"77.title" = "Dette er en privat torrent";
+"77.title" = "Privat";
 
 /* Class = "NSButtonCell"; title = "Create"; ObjectID = "78"; */
 "78.title" = "Opret";
@@ -24,16 +24,16 @@
 "79.title" = "Annuller";
 
 /* Class = "NSButtonCell"; title = "Open when created"; ObjectID = "81"; */
-"81.title" = "Åbn torrent efter oprettelse";
+"81.title" = "Åbn efter oprettelse";
 
 /* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "82"; */
-"82.title" = "Cancel";
+"82.title" = "Annuller";
 
 /* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
-"83.title" = "Creating torrent file…";
+"83.title" = "Opretter torrent-fil …";
 
 /* Class = "NSTextFieldCell"; title = "Each tracker will be placed into its own tier"; ObjectID = "108"; */
-"108.title" = "Hver tracker vil blive placeret i egen liste";
+"108.title" = "Hver tracker vil blive placeret i sin egen liste";
 
 /* Class = "NSTextFieldCell"; title = "Source:"; ObjectID = "f1g-Kk-weU"; */
-"f1g-Kk-weU.title" = "Source:";
+"f1g-Kk-weU.title" = "Kilde:";

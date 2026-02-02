@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -17,7 +17,7 @@
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/messagedialog.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <memory>
 #include <string>
@@ -37,9 +37,11 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Session> const& core,
         std::vector<tr_torrent_id_t> const& torrent_ids);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void onResponse(int response);
@@ -75,13 +77,13 @@ void RelocateDialog::Impl::startMovingNextTorrent()
 
     if (tor != nullptr)
     {
-        tr_torrentSetLocation(tor, targetLocation.c_str(), do_move_, nullptr, &done_);
+        tr_torrentSetLocation(tor, targetLocation.c_str(), do_move_, &done_);
     }
 
     torrent_ids_.pop_back();
 
     message_dialog_->set_message(
-        fmt::format(_("Moving '{torrent_name}'"), fmt::arg("torrent_name", tr_torrentName(tor))),
+        fmt::format(fmt::runtime(_("Moving '{torrent_name}'")), fmt::arg("torrent_name", tr_torrentName(tor))),
         true);
 }
 

@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -31,6 +31,11 @@ public:
         closenatpmp(&natpmp_);
     }
 
+    tr_natpmp(tr_natpmp const&) = delete;
+    tr_natpmp(tr_natpmp&&) = delete;
+    tr_natpmp& operator=(tr_natpmp const&) = delete;
+    tr_natpmp& operator=(tr_natpmp&&) = delete;
+
     [[nodiscard]] constexpr auto renewTime() const noexcept
     {
         return renew_time_;
@@ -40,14 +45,14 @@ public:
     {
         tr_port_forwarding_state state = TR_PORT_ERROR;
 
-        tr_port local_port = {};
-        tr_port advertised_port = {};
+        tr_port local_port;
+        tr_port advertised_port;
     };
 
     PulseResult pulse(tr_port local_port, bool is_enabled);
 
 private:
-    enum class State
+    enum class State : uint8_t
     {
         Idle,
         Err,
@@ -68,8 +73,8 @@ private:
 
     natpmp_t natpmp_ = {};
 
-    tr_port local_port_ = {};
-    tr_port advertised_port_ = {};
+    tr_port local_port_;
+    tr_port advertised_port_;
 
     time_t renew_time_ = 0;
     time_t command_time_ = 0;

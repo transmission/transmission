@@ -15,7 +15,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView translatesAutoresizingMaskIntoConstraints="NO" id="2" userLabel="Trackers">
+        <customView clipsToBounds="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2" userLabel="Trackers">
             <rect key="frame" x="0.0" y="0.0" width="382" height="352"/>
             <subviews>
                 <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4">

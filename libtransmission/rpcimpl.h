@@ -1,22 +1,55 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <string_view>
+#include <cstdint> // int16_t
+#include <functional>
 
 struct tr_session;
 struct tr_variant;
 
-using tr_rpc_response_func = void (*)(tr_session* session, tr_variant* response, void* user_data);
+#define RPC_VERSION_VARS(major, minor, patch) \
+    auto inline constexpr TrRpcVersionSemver = std::string_view{ #major "." #minor "." #patch }; \
+    auto inline constexpr TrRpcVersionSemverMajor = major;
 
-/* https://www.json.org/ */
-void tr_rpc_request_exec_json(
-    tr_session* session,
-    tr_variant const* request,
-    tr_rpc_response_func callback,
-    void* callback_user_data);
+RPC_VERSION_VARS(6, 0, 0)
 
-void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str);
+#undef RPC_VERSION_VARS
+
+namespace JsonRpc
+{
+auto inline constexpr Version = std::string_view{ "2.0" };
+
+namespace Error
+{
+enum Code : int16_t
+{
+    PARSE_ERROR = -32700,
+    INVALID_REQUEST = -32600,
+    METHOD_NOT_FOUND = -32601,
+    INVALID_PARAMS = -32602,
+    INTERNAL_ERROR = -32603,
+    SUCCESS = 0,
+    SET_ANNOUNCE_LIST,
+    INVALID_TRACKER_LIST,
+    PATH_NOT_ABSOLUTE,
+    UNRECOGNIZED_INFO,
+    SYSTEM_ERROR,
+    FILE_IDX_OOR,
+    PIECE_IDX_OOR,
+    HTTP_ERROR,
+    CORRUPT_TORRENT
+};
+
+[[nodiscard]] std::string_view to_string(Code code);
+} // namespace Error
+} // namespace JsonRpc
+
+using tr_rpc_response_func = std::function<void(tr_variant&& response)>;
+
+void tr_rpc_request_exec(tr_session* session, tr_variant& request, tr_rpc_response_func&& callback = {});
+
+void tr_rpc_request_exec(tr_session* session, std::string_view request, tr_rpc_response_func&& callback = {});

@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -19,13 +19,12 @@ QAXCLASS(InteropObject)
 QAXFACTORY_END() // NOLINT
 
 // These are ActiveQt internals; declaring here as I don't like their WinMain much...
-extern HANDLE qAxInstance; // NOLINT
 extern bool qAxOutProcServer; // NOLINT
 extern wchar_t qAxModuleFilename[MAX_PATH]; // NOLINT
 extern QString qAxInit(); // NOLINT
 
 ComInteropHelper::ComInteropHelper()
-    : client_(new QAxObject(QStringLiteral("Transmission.QtClient")))
+    : client_{ new QAxObject{ QStringLiteral("Transmission.QtClient") } }
 {
 }
 
@@ -43,7 +42,6 @@ void ComInteropHelper::initialize()
 {
     qAxOutProcServer = true;
     ::GetModuleFileNameW(nullptr, qAxModuleFilename, MAX_PATH);
-    qAxInstance = ::GetModuleHandleW(nullptr);
 
     ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     qAxInit();
@@ -52,5 +50,5 @@ void ComInteropHelper::initialize()
 void ComInteropHelper::registerObject(QObject* parent)
 {
     QAxFactory::startServer();
-    QAxFactory::registerActiveObject(new InteropObject(parent));
+    QAxFactory::registerActiveObject(new InteropObject{ parent });
 }

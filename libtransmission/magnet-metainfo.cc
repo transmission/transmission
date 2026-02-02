@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,14 +9,17 @@
 #include <cstring>
 #include <iterator> // back_inserter
 #include <optional>
+#include <ranges>
+#include <string>
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error.h"
 #include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
 #include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/tr-macros.h" // for tr_sha1_digest_t
 #include "libtransmission/tr-strbuf.h" // for tr_urlbuf
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
@@ -116,9 +119,8 @@ std::optional<tr_sha1_digest_t> parseBase32Hash(std::string_view sv)
         return {};
     }
 
-    if (!std::all_of(
-            std::begin(sv),
-            std::end(sv),
+    if (!std::ranges::all_of(
+            sv,
             [](unsigned char ch)
             { return '0' <= ch && ch < '0' + std::size(bitzi::Base32Lookup) && bitzi::Base32Lookup[ch - '0'] != 0xFF; }))
     {
@@ -132,7 +134,7 @@ std::optional<tr_sha1_digest_t> parseBase32Hash(std::string_view sv)
 
 std::optional<tr_sha1_digest_t> parseHash(std::string_view sv)
 {
-    // http://bittorrent.org/beps/bep_0009.html
+    // https://www.bittorrent.org/beps/bep_0009.html
     // Is the info-hash hex encoded, for a total of 40 characters.
     // For compatibility with existing links in the wild, clients
     // should also support the 32 character base32 encoded info-hash.
@@ -151,7 +153,7 @@ std::optional<tr_sha1_digest_t> parseHash(std::string_view sv)
 
 std::optional<tr_sha256_digest_t> parseHash2(std::string_view sv)
 {
-    // http://bittorrent.org/beps/bep_0009.html
+    // https://www.bittorrent.org/beps/bep_0009.html
     // Is the info-hash v2 hex encoded and tag removed, for a total of 64 characters.
 
     if (auto const hash = tr_sha256_from_string(sv); hash)
@@ -166,29 +168,34 @@ std::optional<tr_sha256_digest_t> parseHash2(std::string_view sv)
 
 // ---
 
-tr_urlbuf tr_magnet_metainfo::magnet() const
+std::string tr_magnet_metainfo::magnet() const
 {
-    auto s = tr_urlbuf{ "magnet:?xt=urn:btih:"sv, info_hash_string() };
+    auto buf = tr_urlbuf{ "magnet:?xt=urn:btih:"sv, info_hash_string() };
 
     if (!std::empty(name_))
     {
-        s += "&dn="sv;
-        tr_urlPercentEncode(std::back_inserter(s), name_);
+        buf += "&dn="sv;
+        tr_urlPercentEncode(std::back_inserter(buf), name_);
     }
 
     for (auto const& tracker : this->announce_list())
     {
-        s += "&tr="sv;
-        tr_urlPercentEncode(std::back_inserter(s), tracker.announce.sv());
+        buf += "&tr="sv;
+        tr_urlPercentEncode(std::back_inserter(buf), tracker.announce.sv());
     }
 
     for (auto const& webseed : webseed_urls_)
     {
-        s += "&ws="sv;
-        tr_urlPercentEncode(std::back_inserter(s), webseed);
+        buf += "&ws="sv;
+        tr_urlPercentEncode(std::back_inserter(buf), webseed);
     }
 
-    return s;
+    return std::string{ buf.sv() };
+}
+
+void tr_magnet_metainfo::set_name(std::string_view name)
+{
+    name_ = tr_strv_to_utf8_string(name);
 }
 
 void tr_magnet_metainfo::add_webseed(std::string_view webseed)
@@ -200,7 +207,7 @@ void tr_magnet_metainfo::add_webseed(std::string_view webseed)
 
     auto& urls = webseed_urls_;
 
-    if (auto const it = std::find(std::begin(urls), std::end(urls), webseed); it != std::end(urls))
+    if (auto const it = std::ranges::find(urls, webseed); it != std::ranges::end(urls))
     {
         return;
     }
@@ -208,23 +215,27 @@ void tr_magnet_metainfo::add_webseed(std::string_view webseed)
     urls.emplace_back(webseed);
 }
 
-bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
+bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* error)
 {
     magnet_link = tr_strv_strip(magnet_link);
     if (auto const hash = parseHash(magnet_link); hash)
     {
-        return parseMagnet(fmt::format(FMT_STRING("magnet:?xt=urn:btih:{:s}"), tr_sha1_to_string(*hash)));
+        return parseMagnet(fmt::format("magnet:?xt=urn:btih:{:s}", tr_sha1_to_string(*hash)));
     }
 
     auto const parsed = tr_urlParse(magnet_link);
     if (!parsed || parsed->scheme != "magnet"sv)
     {
-        tr_error_set(error, TR_ERROR_EINVAL, "Error parsing URL"sv);
+        if (error != nullptr)
+        {
+            error->set(TR_ERROR_EINVAL, "Error parsing URL"sv);
+        }
+
         return false;
     }
 
     bool got_hash = false;
-    for (auto const& [key, value] : tr_url_query_view{ parsed->query })
+    for (auto const& [key, value] : parsed->query_entries())
     {
         if (key == "dn"sv)
         {

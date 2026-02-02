@@ -1,10 +1,8 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #pragma once
-
-#include <libtransmission/tr-macros.h>
 
 #include <giomm/file.h>
 #include <glibmm/refptr.h>
@@ -19,9 +17,11 @@ class Application : public Gtk::Application
 {
 public:
     Application(std::string const& config_dir, bool start_paused, bool start_iconified);
+    Application(Application&&) = delete;
+    Application(Application const&) = delete;
+    Application& operator=(Application&&) = delete;
+    Application& operator=(Application const&) = delete;
     ~Application() override;
-
-    TR_DISABLE_COPY_MOVE(Application)
 
     friend void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data);
 

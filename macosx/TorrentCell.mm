@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -8,19 +8,17 @@
 #import "Torrent.h"
 #import "NSImageAdditions.h"
 
-static CGFloat const kPriorityIconWidth = 12.0;
-
 @implementation TorrentCell
 
-//draw progress bar
 - (void)drawRect:(NSRect)dirtyRect
 {
     if (self.fTorrentTableView)
     {
-        NSRect barRect = self.fTorrentProgressBarView.frame;
-        ProgressBarView* progressBar = [[ProgressBarView alloc] init];
         Torrent* torrent = (Torrent*)self.objectValue;
 
+        // draw progress bar
+        NSRect barRect = self.fTorrentProgressBarView.frame;
+        ProgressBarView* progressBar = [[ProgressBarView alloc] init];
         [progressBar drawBarInRect:barRect forTableView:self.fTorrentTableView withTorrent:torrent];
 
         // set priority icon
@@ -31,21 +29,19 @@ static CGFloat const kPriorityIconWidth = 12.0;
                 imageWithColor:priorityColor];
 
             self.fTorrentPriorityView.image = priorityImage;
-            self.fStackView.spacing = 4;
-            self.fTorrentPriorityViewWidthConstraint.constant = kPriorityIconWidth;
+
+            [self.fStackView setVisibilityPriority:NSStackViewVisibilityPriorityMustHold forView:self.fTorrentPriorityView];
         }
         else
         {
-            self.fTorrentPriorityView.image = nil;
-            self.fStackView.spacing = 0;
-            self.fTorrentPriorityViewWidthConstraint.constant = 0;
+            [self.fStackView setVisibilityPriority:NSStackViewVisibilityPriorityNotVisible forView:self.fTorrentPriorityView];
         }
     }
 
     [super drawRect:dirtyRect];
 }
 
-//otherwise progress bar is inverted
+// otherwise progress bar is inverted
 - (BOOL)isFlipped
 {
     return YES;

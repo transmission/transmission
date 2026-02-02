@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -51,6 +51,11 @@ const fmt_MBps = new Intl.NumberFormat(current_locale, {
   style: 'unit',
   unit: 'megabyte-per-second',
 });
+const fmt_GBps = new Intl.NumberFormat(current_locale, {
+  maximumFractionDigits: 2,
+  style: 'unit',
+  unit: 'gigabyte-per-second',
+});
 
 export const Formatter = {
   /** Round a string of a number to a specified number of decimal places */
@@ -94,8 +99,8 @@ export const Formatter = {
   },
 
   // format a percentage to a string
-  percentString(x) {
-    const decimal_places = x < 100 ? 1 : 0;
+  percentString(x, decimal_places) {
+    decimal_places = x < 100 ? decimal_places : 0;
     return this._toTruncFixed(x, decimal_places);
   },
 
@@ -109,7 +114,7 @@ export const Formatter = {
     if (x === -2) {
       return '&infin;';
     }
-    return this.percentString(x);
+    return this.percentString(x, 1);
   },
 
   /**
@@ -122,7 +127,12 @@ export const Formatter = {
   },
 
   speed(KBps) {
-    return KBps < 999.95 ? fmt_kBps.format(KBps) : fmt_MBps.format(KBps / 1000);
+    if (KBps < 999.95) {
+      return fmt_kBps.format(KBps);
+    } else if (KBps < 999_950) {
+      return fmt_MBps.format(KBps / 1000);
+    }
+    return fmt_GBps.format(KBps / 1_000_000);
   },
 
   speedBps(Bps) {
@@ -133,24 +143,28 @@ export const Formatter = {
     return ['E2BIG', 'NaN'].some((badStr) => str.includes(badStr)) ? `…` : str;
   },
 
-  timeInterval(seconds) {
+  timeInterval(seconds, granular_depth = 3) {
     const days = Math.floor(seconds / 86_400);
+    let buffer = [];
     if (days) {
-      return this.countString('day', 'days', days);
+      buffer.push(this.countString('day', 'days', days));
     }
 
     const hours = Math.floor((seconds % 86_400) / 3600);
-    if (hours) {
-      return this.countString('hour', 'hours', hours);
+    if (days || hours) {
+      buffer.push(this.countString('hour', 'hours', hours));
     }
 
     const minutes = Math.floor((seconds % 3600) / 60);
-    if (minutes) {
-      return this.countString('minute', 'minutes', minutes);
+    if (days || hours || minutes) {
+      buffer.push(this.countString('minute', 'minutes', minutes));
+      buffer = buffer.slice(0, granular_depth);
+      return buffer.length > 1
+        ? `${buffer.slice(0, -1).join(', ')} and ${buffer.slice(-1)}`
+        : buffer[0];
     }
 
-    seconds = Math.floor(seconds % 60);
-    return this.countString('second', 'seconds', seconds);
+    return this.countString('second', 'seconds', Math.floor(seconds % 60));
   },
 
   timestamp(seconds) {

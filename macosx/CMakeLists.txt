@@ -9,8 +9,10 @@ find_program(CODESIGN_EXECUTABLE codesign REQUIRED)
 set(MAC_BUNDLE_NAME Transmission)
 
 add_compile_options(
-    $<$<COMPILE_LANGUAGE:C,CXX>:-fmodules>
-    $<$<COMPILE_LANGUAGE:C,CXX>:-fcxx-modules>
+    $<$<COMPILE_LANGUAGE:C>:-fmodules>
+
+    # https://github.com/llvm/llvm-project/issues/57432
+    "$<$<COMPILE_LANG_AND_ID:CXX,AppleClang,Clang>:-fno-modules;-Xclang;-fno-cxx-modules>"
 
     # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
     $<$<COMPILE_LANGUAGE:C,CXX>:-fobjc-arc>
@@ -28,6 +30,7 @@ add_link_options(
     # equivalent of XCODE_ATTRIBUTE_DEAD_CODE_STRIPPING YES for this directory
     $<$<LINK_LANGUAGE:C,CXX>:-dead_strip>)
 
+add_subdirectory(QuickLookExtension)
 add_subdirectory(QuickLookPlugin)
 add_subdirectory(VDKQueue)
 
@@ -62,6 +65,8 @@ target_sources(${TR_NAME}-mac
         Controller.mm
         CreatorWindowController.h
         CreatorWindowController.mm
+        DefaultAppHelper.h
+        DefaultAppHelper.mm
         DragOverlayView.h
         DragOverlayView.mm
         DragOverlayWindow.h
@@ -72,20 +77,20 @@ target_sources(${TR_NAME}-mac
         ExpandedPathToPathTransformer.mm
         FileListNode.h
         FileListNode.mm
-        FileNameCell.h
-        FileNameCell.mm
+        FileCheckCellView.h
+        FileCheckCellView.mm
+        FileNameCellView.h
+        FileNameCellView.mm
         FileOutlineController.h
         FileOutlineController.mm
         FileOutlineView.h
         FileOutlineView.mm
-        FilePriorityCell.h
-        FilePriorityCell.mm
+        FilePriorityCellView.h
+        FilePriorityCellView.mm
         FileRenameSheetController.h
         FileRenameSheetController.mm
         FilterBarController.h
         FilterBarController.mm
-        FilterBarView.h
-        FilterBarView.mm
         FilterButton.h
         FilterButton.mm
         GlobalOptionsPopoverViewController.h
@@ -140,6 +145,8 @@ target_sources(${TR_NAME}-mac
         PiecesView.mm
         PortChecker.h
         PortChecker.mm
+        PowerManager.h
+        PowerManager.mm
         PredicateEditorRowTemplateAny.h
         PredicateEditorRowTemplateAny.mm
         PrefsController.h
@@ -163,8 +170,6 @@ target_sources(${TR_NAME}-mac
         StatsWindowController.mm
         StatusBarController.h
         StatusBarController.mm
-        StatusBarView.h
-        StatusBarView.mm
         Toolbar.h
         Toolbar.mm
         Torrent.h
@@ -189,6 +194,10 @@ target_sources(${TR_NAME}-mac
         TrackerTableView.mm
         URLSheetWindowController.h
         URLSheetWindowController.mm
+        Utils.h
+        Utils.mm
+        VersionComparator.h
+        VersionComparator.mm
         WebSeedTableView.h
         WebSeedTableView.mm)
 
@@ -222,7 +231,6 @@ set_source_files_properties(
 
 set(IMAGESETS
     ActionHover
-    Bandwidth
     CleanupTemplate
     CompleteCheck
     CreateLarge
@@ -230,17 +238,7 @@ set(IMAGESETS
     DownArrowTemplate
     DownloadBadge
     EllipsisTemplate
-    FavIcon
-    GearshapeTemplate
     Globe
-    Groups
-    InfoActivity
-    InfoFiles
-    InfoGeneral
-    InfoOptions
-    InfoPeers
-    InfoTracker
-    Lock
     Magnet
     PauseHover
     PauseOff
@@ -252,7 +250,6 @@ set(IMAGESETS
     PriorityHighTemplate
     PriorityLowTemplate
     PriorityNormalTemplate
-    Remote
     ResumeHover
     ResumeNoWaitHover
     ResumeNoWaitOff
@@ -262,18 +259,7 @@ set(IMAGESETS
     RevealHover
     RevealOff
     RevealOn
-    ToolbarCreateTemplate
-    ToolbarFilterTemplate
-    ToolbarInfoTemplate
-    ToolbarOpenTemplate
-    ToolbarOpenWebTemplate
-    ToolbarPauseAllTemplate
-    ToolbarPauseSelectedTemplate
-    ToolbarRemoveTemplate
-    ToolbarResumeAllTemplate
-    ToolbarResumeSelectedTemplate
     TortoiseTemplate
-    Transfers
     UpArrowGroupTemplate
     UpArrowTemplate
     UploadBadge
@@ -339,12 +325,22 @@ set(LINGUAS
     de
     en
     es
+    eu
     fr
+    he
+    hu
     it
+    ja
     nl
-    pt_PT
+    pl
+    pt-BR
+    pt-PT
     ru
-    tr)
+    sv
+    tr
+    uk
+    zh-CN
+    zh-TW)
 
 if(ENABLE_NLS)
     set(ENABLED_LINGUAS ${LINGUAS})
@@ -418,9 +414,10 @@ target_link_libraries(${TR_NAME}-mac
         "-framework AppKit"
         "-framework Carbon"
         "-framework Foundation"
-        "-framework IOKit"
         "-framework Quartz"
         "-framework Security"
+        "-weak_framework Sparkle"
+        "-weak_framework UniformTypeIdentifiers"
         "-weak_framework UserNotifications")
 
 if(NOT CMAKE_GENERATOR STREQUAL Xcode)
@@ -448,7 +445,7 @@ install(
 tr_install_web(Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
 
 install(CODE
-    "list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")
+    "list(APPEND CMAKE_MODULE_PATH \"${PROJECT_SOURCE_DIR}/cmake\")
     include(TrMacros)
     include(GetPrerequisites)
     tr_fixup_bundle_item(

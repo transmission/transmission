@@ -1,0 +1,39 @@
+
+/* Class = "NSWindow"; title = "Torrent Creator"; ObjectID = "5"; */
+"5.title" = "Torrent Készítő";
+
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "70"; */
+"70.title" = "Megjegyzés:";
+
+/* Class = "NSTextFieldCell"; title = "Trackers:"; ObjectID = "71"; */
+"71.title" = "Trackerek:";
+
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "73"; */
+"73.title" = "Változtat...";
+
+/* Class = "NSTextFieldCell"; title = "Torrent File:"; ObjectID = "74"; */
+"74.title" = "Torrent Fájl:";
+
+/* Class = "NSButtonCell"; title = "Private"; ObjectID = "77"; */
+"77.title" = "Privát";
+
+/* Class = "NSButtonCell"; title = "Create"; ObjectID = "78"; */
+"78.title" = "Létrehozás";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "79"; */
+"79.title" = "Mégse";
+
+/* Class = "NSButtonCell"; title = "Open when created"; ObjectID = "81"; */
+"81.title" = "Létrehozás után nyissa meg";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "82"; */
+"82.title" = "Mégse";
+
+/* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
+"83.title" = "Torrent fájl létrehozása...";
+
+/* Class = "NSTextFieldCell"; title = "Each tracker will be placed into its own tier"; ObjectID = "108"; */
+"108.title" = "Minden egyes tracker a saját szintjébe kerülni";
+
+/* Class = "NSTextFieldCell"; title = "Source:"; ObjectID = "f1g-Kk-weU"; */
+"f1g-Kk-weU.title" = "Forrás:";

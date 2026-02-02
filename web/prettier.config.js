@@ -1,3 +1,3 @@
-module.exports = {
-  "singleQuote": true,
+export default {
+  singleQuote: true,
 };

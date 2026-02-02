@@ -1,4 +1,4 @@
-// This file Copyright © 2013-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,8 +8,6 @@
 #include <QLabel>
 #include <QString>
 #include <QTimer>
-
-#include <libtransmission/tr-macros.h>
 
 class Session;
 
@@ -21,10 +19,13 @@ extern "C"
 class FreeSpaceLabel : public QLabel
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(FreeSpaceLabel)
 
 public:
     explicit FreeSpaceLabel(QWidget* parent = nullptr);
+    FreeSpaceLabel(FreeSpaceLabel&&) = delete;
+    FreeSpaceLabel(FreeSpaceLabel const&) = delete;
+    FreeSpaceLabel& operator=(FreeSpaceLabel&&) = delete;
+    FreeSpaceLabel& operator=(FreeSpaceLabel const&) = delete;
 
     void setSession(Session& session);
     void setPath(QString const& path);

@@ -28,6 +28,8 @@ and
 .Op Fl F Ar filter
 .Op Fl g Ar files
 .Op Fl G Ar files
+.Op Fl gisl Ar number
+.Op Fl GISL Ar number
 .Op Fl gsr Ar ratio
 .Op Fl GSR
 .Op Fl h
@@ -36,6 +38,9 @@ and
 .Op Fl ids
 .Op Fl if
 .Op Fl ip
+.Op Fl isl Ar number
+.Op Fl ISL Ar number
+.Op Fl isld
 .Op Fl it
 .Op Fl j
 .Op Fl l
@@ -150,7 +155,7 @@ Get a file list for the current torrent(s)
 .It Fl g Fl -get Ar all | file-index | files
 Mark file(s) for download.
 .Ar all
-marks all all of the torrent's files for downloading,
+marks all of the torrent's files for downloading,
 .Ar file-index
 adds a single file to the download list, and
 .Ar files
@@ -176,6 +181,17 @@ All torrents, unless overridden by a per-torrent setting, should seed until a sp
 .Ar ratio
 .It Fl GSR Fl -no-global-seedratio
 All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio
+.It Fl isl Fl -idle-seeding-limit Ar minutes
+Let the selected torrent(s) seed until a specific amount of idle time
+.It Fl isld Fl -default-idle-seeding-limit
+Use the default idle-seeding-limit for the selected torrent
+.It Fl ISL Fl -no-idle-seeding-limit
+Let the selected torrent(s) seed regardless of idle time
+.It Fl gisl Fl -global-idle-seeding-limit Ar minutes
+All torrents, unless overridden by a per-torrent, should stop seeding after spending the specified time idling
+.It Fl GISL Fl -no-global-idle-seeding-limit
+All torrents, unless overridden by a per-torrent, should seed regardless of the time spent idle
+Let the selected torrent(s) seed regardless of idle time
 .It Fl h Fl -help
 Print command-line option descriptions.
 .It Fl i Fl -info
@@ -371,12 +387,12 @@ Rename torrent root folder from "test1/examplefile.txt" to "test2/examplefile.tx
 .Bd -literal -offset indent
 $ transmission-remote -t1 --path test1 --rename test2
 .Ed
-Set download and upload limits to 400 kB/sec and 60 kB/sec:
+Set download and upload limits to 400 kB/s and 60 kB/s:
 .Bd -literal -offset indent
 $ transmission-remote \-d400 \-u60
 $ transmission-remote \-\-downlimit=400 \-\-uplimit=60
 .Ed
-Set alternate download and upload limits to 100 kB/sec and 20 kB/sec:
+Set alternate download and upload limits to 100 kB/s and 20 kB/s:
 .Bd -literal -offset indent
 $ transmission-remote \-asd100 \-asu20
 $ transmission-remote \-\-alt-speed-downlimit=100 \-\-alt-speed-uplimit=20

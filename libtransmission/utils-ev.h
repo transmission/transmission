@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,20 +11,13 @@
 
 #include <memory>
 
-struct evbuffer;
 struct event;
 struct event_base;
 struct evhttp;
+using event_callback_fn = void (*)(evutil_socket_t, short, void*);
 
-namespace libtransmission::evhelpers
+namespace tr::evhelpers
 {
-
-struct BufferDeleter
-{
-    void operator()(struct evbuffer* buf) const noexcept;
-};
-
-using evbuffer_unique_ptr = std::unique_ptr<struct evbuffer, BufferDeleter>;
 
 struct EventBaseDeleter
 {
@@ -47,4 +40,11 @@ struct EvhttpDeleter
 
 using evhttp_unique_ptr = std::unique_ptr<struct evhttp, EvhttpDeleter>;
 
-} // namespace libtransmission::evhelpers
+struct event* event_new_pri2(
+    struct event_base* base,
+    evutil_socket_t fd,
+    short events,
+    event_callback_fn callback,
+    void* callback_arg);
+
+} // namespace tr::evhelpers

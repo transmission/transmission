@@ -21,6 +21,9 @@ if grep -q 'set[(]TR_VERSION_DEV TRUE)' CMakeLists.txt; then
 else
   is_dev=false
 fi
+if [ "$is_dev" != true ] && [ -z "${beta_number}" ]; then
+  release_number=1
+fi
 
 # derived from above: semver version string. https://semver.org/
 # '4.0.0-beta.1'
@@ -47,7 +50,7 @@ fi
 # '-TR400B-' (4.0.0 Beta)
 # '-TR400Z-' (4.0.0 Dev)
 # '-TR4000-' (4.0.0)
-BASE62=($(echo {0..9} {A..A} {a..z}))
+BASE62=($(echo {0..9} {A..Z} {a..z}))
 peer_id_prefix="-TR${BASE62[$(( 10#$major_version ))]}${BASE62[$(( 10#$minor_version ))]}${BASE62[$(( 10#$patch_version ))]}"
 if [ "$is_dev" = true ]; then
   peer_id_prefix="${peer_id_prefix}Z"
@@ -90,7 +93,7 @@ cat > libtransmission/version.h.new << EOF
 #define SHORT_VERSION_STRING      "${user_agent_prefix}"
 #define LONG_VERSION_STRING       "${user_agent_prefix} (${vcs_revision})"
 #define VERSION_STRING_INFOPLIST  ${user_agent_prefix}
-#define BUILD_STRING_INFOPLIST    14714.${major_version}.${minor_version}.${patch_version}
+#define BUILD_STRING_INFOPLIST    $((major_version + 14714)).${minor_version}.$((patch_version * 100 + release_number * 99 + beta_number))
 #define MAJOR_VERSION             ${major_version}
 #define MINOR_VERSION             ${minor_version}
 #define PATCH_VERSION             ${patch_version}

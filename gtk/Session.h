@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 
@@ -7,9 +7,9 @@
 #include "GtkCompat.h"
 #include "Torrent.h"
 
+#include <libtransmission-app/favicon-cache.h>
+
 #include <libtransmission/transmission.h>
-#include <libtransmission/favicon-cache.h>
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
 
 #include <gdkmm/pixbuf.h>
@@ -21,7 +21,9 @@
 #include <gtkmm/treemodel.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -29,19 +31,29 @@
 class Session : public Glib::Object
 {
 public:
-    enum ErrorCode
+    Session(Session&&) = delete;
+    Session(Session const&) = delete;
+    Session& operator=(Session&&) = delete;
+    Session& operator=(Session const&) = delete;
+
+    enum ErrorCode : uint16_t
     {
-        ERR_ADD_TORRENT_ERR = TR_PARSE_ERR,
-        ERR_ADD_TORRENT_DUP = TR_PARSE_DUPLICATE,
+        ERR_ADD_TORRENT_ERR = 1,
+        ERR_ADD_TORRENT_DUP = 2,
         ERR_NO_MORE_TORRENTS = 1000 /* finished adding a batch */
+    };
+
+    enum PortTestIpProtocol : uint8_t
+    {
+        PORT_TEST_IPV4,
+        PORT_TEST_IPV6,
+        NUM_PORT_TEST_IP_PROTOCOL // Must always be the last value
     };
 
     using Model = IF_GTKMM4(Gio::ListModel, Gtk::TreeModel);
 
 public:
     ~Session() override;
-
-    TR_DISABLE_COPY_MOVE(Session)
 
     static Glib::RefPtr<Session> create(tr_session* session);
 
@@ -60,7 +72,10 @@ public:
 
     tr_torrent* find_torrent(tr_torrent_id_t id) const;
 
-    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& favicon_cache() const;
+    // TODO(c++20) std::span
+    [[nodiscard]] std::vector<tr_torrent*> find_torrents(std::vector<tr_torrent_id_t> const& ids) const;
+
+    tr::app::FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& favicon_cache() const;
 
     /******
     *******
@@ -123,15 +138,35 @@ public:
     void set_pref(tr_quark key, int val);
     void set_pref(tr_quark key, double val);
 
-    /**
-    ***
-    **/
+    // ---
 
-    void port_test();
+    // Helper for building RPC payloads.
+    // TODO(C++20): fold these two into a single std::span method
+    template<typename T>
+    [[nodiscard]] static auto to_variant(std::vector<T> const& items)
+    {
+        auto vec = tr_variant::Vector{};
+        vec.reserve(std::size(items));
+        for (auto const& item : items)
+        {
+            vec.emplace_back(item);
+        }
+        return vec;
+    }
+    template<typename T>
+    [[nodiscard]] static auto to_variant(std::initializer_list<T> items)
+    {
+        return to_variant(std::vector<T>{ std::move(items) });
+    }
+
+    // ---
+
+    void port_test(PortTestIpProtocol ip_protocol);
+    bool port_test_pending(PortTestIpProtocol ip_protocol) const noexcept;
 
     void blocklist_update();
 
-    void exec(tr_variant const* request);
+    void exec(tr_quark method, tr_variant const& params);
 
     void open_folder(tr_torrent_id_t torrent_id) const;
 
@@ -140,7 +175,7 @@ public:
     sigc::signal<void(bool)>& signal_blocklist_updated();
     sigc::signal<void(bool)>& signal_busy();
     sigc::signal<void(tr_quark)>& signal_prefs_changed();
-    sigc::signal<void(bool)>& signal_port_tested();
+    sigc::signal<void(std::optional<bool>, PortTestIpProtocol)>& signal_port_tested();
     sigc::signal<void(std::unordered_set<tr_torrent_id_t> const&, Torrent::ChangeFlags)>& signal_torrents_changed();
 
 protected:

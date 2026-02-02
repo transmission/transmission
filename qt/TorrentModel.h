@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,8 +10,6 @@
 #include <vector>
 
 #include <QAbstractListModel>
-
-#include <libtransmission/tr-macros.h>
 
 #include "Torrent.h"
 #include "Typedefs.h"
@@ -27,7 +25,6 @@ extern "C"
 class TorrentModel : public QAbstractListModel
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(TorrentModel)
 
 public:
     enum Role
@@ -36,6 +33,10 @@ public:
     };
 
     explicit TorrentModel(Prefs const& prefs);
+    TorrentModel& operator=(TorrentModel&&) = delete;
+    TorrentModel& operator=(TorrentModel const&) = delete;
+    TorrentModel(TorrentModel&&) = delete;
+    TorrentModel(TorrentModel const&) = delete;
     ~TorrentModel() override;
     void clear();
 

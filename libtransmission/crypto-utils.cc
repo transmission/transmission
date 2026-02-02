@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,7 +6,11 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <cstddef>
+#include <cstdint>
 #include <iterator>
+#include <optional>
+#include <ranges>
 #include <random>
 #include <string>
 #include <string_view>
@@ -18,10 +22,13 @@ extern "C"
 #include <b64/cencode.h>
 }
 
-#include <fmt/core.h>
+#include <crc32c/crc32c.h>
+
+#include <fmt/format.h>
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
@@ -49,7 +56,7 @@ std::string tr_salt(std::string_view plaintext, std::string_view salt)
 
     // convert it to a string. string holds three parts:
     // DigestPrefix, stringified digest of plaintext + salt, and the salt.
-    return fmt::format(FMT_STRING("{:s}{:s}{:s}"), SaltedPrefix, tr_sha1_to_string(digest), salt);
+    return fmt::format("{:s}{:s}{:s}", SaltedPrefix, tr_sha1_to_string(digest), salt);
 }
 
 } // namespace ssha1_impl
@@ -64,11 +71,7 @@ std::string tr_ssha1(std::string_view plaintext)
     static_assert(std::size(Salter) == 64);
     auto constexpr SaltSize = size_t{ 8 };
     auto salt = tr_rand_obj<std::array<char, SaltSize>>();
-    std::transform(
-        std::begin(salt),
-        std::end(salt),
-        std::begin(salt),
-        [&Salter](auto ch) { return Salter[ch % std::size(Salter)]; });
+    std::ranges::for_each(salt, [&Salter](auto& ch) { ch = Salter[ch % std::size(Salter)]; });
 
     return tr_salt(plaintext, std::string_view{ std::data(salt), std::size(salt) });
 }
@@ -206,7 +209,7 @@ std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex)
         return {};
     }
 
-    if (!std::all_of(std::begin(hex), std::end(hex), [](unsigned char ch) { return isxdigit(ch); }))
+    if (!std::ranges::all_of(hex, [](unsigned char ch) { return isxdigit(ch); }))
     {
         return {};
     }
@@ -225,7 +228,7 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
         return {};
     }
 
-    if (!std::all_of(std::begin(hex), std::end(hex), [](unsigned char ch) { return isxdigit(ch); }))
+    if (!std::ranges::all_of(hex, [](unsigned char ch) { return isxdigit(ch); }))
     {
         return {};
     }
@@ -235,11 +238,16 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
     return digest;
 }
 
+uint32_t tr_crc32c(uint8_t const* data, size_t count)
+{
+    return crc32c::Crc32c(data, count);
+}
+
 // fallback implementation in case the system crypto library's RNG fails
 void tr_rand_buffer_std(void* buffer, size_t length)
 {
-    thread_local auto gen = std::mt19937{ std::random_device{}() };
-    thread_local auto dist = std::uniform_int_distribution<unsigned long long>{};
+    static thread_local auto gen = std::mt19937{ std::random_device{}() };
+    static thread_local auto dist = std::uniform_int_distribution<unsigned long long>{};
 
     for (auto *walk = static_cast<uint8_t*>(buffer), *end = walk + length; walk < end;)
     {

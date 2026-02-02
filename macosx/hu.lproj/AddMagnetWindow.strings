@@ -1,0 +1,36 @@
+
+/* Class = "NSTextFieldCell"; title = "Download to:"; ObjectID = "15"; */
+"15.title" = "Letöltés ide:";
+
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
+"16.title" = "Változtat...";
+
+/* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
+"18.title" = "Elindítás hozzáadáskor";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
+"20.title" = "Hozzáadás";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "22"; */
+"22.title" = "Mégse";
+
+/* Class = "NSTextFieldCell"; title = "Group:"; ObjectID = "41"; */
+"41.title" = "Csoport:";
+
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "88"; */
+"88.title" = "Alacsony";
+
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "89"; */
+"89.title" = "Normál";
+
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "90"; */
+"90.title" = "Magas";
+
+/* Class = "NSTextFieldCell"; title = "Priority:"; ObjectID = "91"; */
+"91.title" = "Priorítás:";
+
+/* Class = "NSTextFieldCell"; title = "Magnet Link"; ObjectID = "101"; */
+"101.title" = "Magnet Link";
+
+/* Class = "NSMenuItem"; title = "None"; ObjectID = "2zq-5y-smI"; */
+"2zq-5y-smI.title" = "Egyik sem";

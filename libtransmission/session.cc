@@ -1,10 +1,11 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
 #include <condition_variable>
+#include <chrono>
 #include <csignal>
 #include <cstddef> // size_t
 #include <cstdint>
@@ -13,7 +14,8 @@
 #include <iterator> // for std::back_inserter
 #include <limits> // std::numeric_limits
 #include <memory>
-#include <numeric> // for std::accumulate()
+#include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -25,16 +27,17 @@
 
 #include <event2/event.h>
 
-#include <fmt/core.h> // fmt::ptr
+#include <fmt/format.h> // fmt::ptr
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file.h"
-#include "libtransmission/global-ip-cache.h"
+#include "libtransmission/ip-cache.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
@@ -45,9 +48,9 @@
 #include "libtransmission/rpc-server.h"
 #include "libtransmission/session.h"
 #include "libtransmission/session-alt-speeds.h"
-#include "libtransmission/session-settings.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/torrent.h"
+#include "libtransmission/torrent-ctor.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-dht.h"
 #include "libtransmission/tr-lpd.h"
@@ -61,6 +64,7 @@
 struct tr_ctor;
 
 using namespace std::literals;
+using namespace tr::Values;
 
 namespace
 {
@@ -81,88 +85,91 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     {
         return;
     }
+    tr::api_compat::convert_incoming_data(*groups_var);
 
-    auto idx = size_t{ 0 };
-    auto key = tr_quark{};
-    tr_variant* dict = nullptr;
-    while (tr_variantDictChild(&*groups_var, idx, &key, &dict))
+    auto const* const groups_map = groups_var->get_if<tr_variant::Map>();
+    if (groups_map == nullptr)
     {
-        ++idx;
+        return;
+    }
 
-        auto name = tr_interned_string(key);
-        auto& group = session->getBandwidthGroup(name);
+    for (auto const& [key, group_var] : *groups_map)
+    {
+        auto const* const group_map = group_var.get_if<tr_variant::Map>();
+        if (group_map == nullptr)
+        {
+            continue;
+        }
 
+        auto& group = session->getBandwidthGroup(tr_interned_string{ key });
         auto limits = tr_bandwidth_limits{};
 
-        if (auto val = bool{}; tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &val))
+        if (auto const val = group_map->value_if<bool>(TR_KEY_upload_limited); val)
         {
-            limits.up_limited = val;
+            limits.up_limited = *val;
         }
 
-        if (auto val = bool{}; tr_variantDictFindBool(dict, TR_KEY_downloadLimited, &val))
+        if (auto const val = group_map->value_if<bool>(TR_KEY_download_limited); val)
         {
-            limits.down_limited = val;
+            limits.down_limited = *val;
         }
 
-        if (auto val = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &val))
+        if (auto const val = group_map->value_if<int64_t>(TR_KEY_upload_limit); val)
         {
-            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(val);
+            limits.up_limit = Speed{ *val, Speed::Units::KByps };
         }
 
-        if (auto val = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &val))
+        if (auto const val = group_map->value_if<int64_t>(TR_KEY_download_limit); val)
         {
-            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(val);
+            limits.down_limit = Speed{ *val, Speed::Units::KByps };
         }
 
-        group.set_limits(&limits);
+        group.set_limits(limits);
 
-        if (auto honors = bool{}; tr_variantDictFindBool(dict, TR_KEY_honorsSessionLimits, &honors))
+        if (auto const val = group_map->value_if<bool>(TR_KEY_honors_session_limits); val)
         {
-            group.honor_parent_limits(TR_UP, honors);
-            group.honor_parent_limits(TR_DOWN, honors);
+            group.honor_parent_limits(tr_direction::Up, *val);
+            group.honor_parent_limits(tr_direction::Down, *val);
         }
     }
 }
 
-void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
+void bandwidthGroupWrite(tr_session const* session, std::string_view const config_dir)
 {
     auto const& groups = session->bandwidthGroups();
-
-    auto groups_dict = tr_variant{};
-    tr_variantInitDict(&groups_dict, std::size(groups));
-
+    auto groups_map = tr_variant::Map{ std::size(groups) };
     for (auto const& [name, group] : groups)
     {
         auto const limits = group->get_limits();
-
-        auto* const dict = tr_variantDictAddDict(&groups_dict, name.quark(), 5);
-        tr_variantDictAddStrView(dict, TR_KEY_name, name.sv());
-        tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
-        tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
-        tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
-        tr_variantDictAddInt(dict, TR_KEY_downloadLimit, limits.down_limit_KBps);
-        tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
+        auto group_map = tr_variant::Map{ 6U };
+        group_map.try_emplace(TR_KEY_download_limit, limits.down_limit.count(Speed::Units::KByps));
+        group_map.try_emplace(TR_KEY_download_limited, limits.down_limited);
+        group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(tr_direction::Up));
+        group_map.try_emplace(TR_KEY_name, name.sv());
+        group_map.try_emplace(TR_KEY_upload_limit, limits.up_limit.count(Speed::Units::KByps));
+        group_map.try_emplace(TR_KEY_upload_limited, limits.up_limited);
+        groups_map.try_emplace(name.quark(), std::move(group_map));
     }
 
-    auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
-    tr_variant_serde::json().to_file(groups_dict, filename);
+    auto out = tr_variant{ std::move(groups_map) };
+    tr::api_compat::convert_outgoing_data(out);
+    tr_variant_serde::json().to_file(out, tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
 }
-
 } // namespace bandwidth_group_helpers
+} // namespace
 
-void update_bandwidth(tr_session* session, tr_direction dir)
+void tr_session::update_bandwidth(tr_direction const dir)
 {
-    if (auto const limit_bytes_per_second = session->activeSpeedLimitBps(dir); limit_bytes_per_second)
+    if (auto const limit = active_speed_limit(dir); limit)
     {
-        session->top_bandwidth_.set_limited(dir, *limit_bytes_per_second > 0U);
-        session->top_bandwidth_.set_desired_speed_bytes_per_second(dir, *limit_bytes_per_second);
+        top_bandwidth_.set_limited(dir, limit->base_quantity() > 0U);
+        top_bandwidth_.set_desired_speed(dir, *limit);
     }
     else
     {
-        session->top_bandwidth_.set_limited(dir, false);
+        top_bandwidth_.set_limited(dir, false);
     }
 }
-} // namespace
 
 tr_port tr_session::randomPort() const
 {
@@ -188,7 +195,7 @@ tr_peer_id_t tr_peerIdInit()
 
     // remainder is randomly-generated characters
     auto constexpr Pool = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyz" };
-    auto total = int{ 0 };
+    auto total = 0;
     tr_rand_buffer(it, end - it);
     while (it + 1 < end)
     {
@@ -196,7 +203,7 @@ tr_peer_id_t tr_peerIdInit()
         total += val;
         *it++ = Pool[val];
     }
-    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
+    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - (total % std::size(Pool)) : 0;
     *it = Pool[val];
 
     return peer_id;
@@ -237,6 +244,14 @@ void tr_session::DhtMediator::add_pex(tr_sha1_digest_t const& info_hash, tr_pex 
     {
         tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n_pex);
     }
+}
+
+// ---
+
+std::string tr_session::QueueMediator::store_filename(tr_torrent_id_t id) const
+{
+    auto const* const tor = session_.torrents().get(id);
+    return tor != nullptr ? tor->store_filename() : std::string{};
 }
 
 // ---
@@ -334,27 +349,22 @@ size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
     auto const lock = session_->unique_lock();
 
     auto const* const tor = session_->torrents().get(torrent_id);
-    return tor == nullptr ? 0U : tor->bandwidth_.clamp(TR_DOWN, byte_count);
+    return tor == nullptr ? 0U : tor->bandwidth().clamp(tr_direction::Down, byte_count);
 }
 
-void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
+std::optional<std::string> tr_session::WebMediator::proxyUrl() const
 {
-    auto const lock = session_->unique_lock();
-
-    if (auto* const tor = session_->torrents().get(torrent_id); tor != nullptr)
-    {
-        tor->bandwidth_.notify_bandwidth_consumed(TR_DOWN, byte_count, true, tr_time_msec());
-    }
+    return session_->settings().proxy_url;
 }
 
 void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
 {
-    session_->runInSessionThread(std::move(func), std::move(response));
+    session_->run_in_session_thread(std::move(func), std::move(response));
 }
 
-time_t tr_session::WebMediator::now() const
+std::chrono::steady_clock::time_point tr_session::WebMediator::now() const
 {
-    return tr_time();
+    return std::chrono::steady_clock::now();
 }
 
 void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
@@ -402,16 +412,17 @@ tr_session::BoundSocket::BoundSocket(
     : cb_{ cb }
     , cb_data_{ cb_data }
     , socket_{ tr_netBindTCP(addr, port, false) }
-    , ev_{ event_new(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocket::onCanRead, this) }
+    , ev_{ tr::evhelpers::event_new_pri2(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocket::onCanRead, this) }
 {
     if (socket_ == TR_BAD_SOCKET)
     {
         return;
     }
 
-    tr_logAddInfo(fmt::format(
-        _("Listening to incoming peer connections on {hostport}"),
-        fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
+    tr_logAddInfo(
+        fmt::format(
+            fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
+            fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
     event_add(ev_.get(), nullptr);
 }
 
@@ -432,7 +443,7 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
     {
         // if user provided an address, use it.
         // otherwise, use any_ipv4 (0.0.0.0).
-        return global_ip_cache_->bind_addr(type);
+        return ip_cache_->bind_addr(type);
     }
 
     if (type == TR_AF_INET6)
@@ -440,9 +451,8 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
         // if user provided an address, use it.
         // otherwise, if we can determine which one to use via global_source_address(ipv6) magic, use it.
         // otherwise, use any_ipv6 (::).
-        auto const source_addr = global_source_address(type);
-        auto const default_addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr :
-                                                                                            tr_address::any(TR_AF_INET6);
+        auto const source_addr = source_address(type);
+        auto const default_addr = source_addr && source_addr->is_global_unicast() ? *source_addr : tr_address::any(TR_AF_INET6);
         return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
     }
 
@@ -452,117 +462,76 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
 
 // ---
 
-namespace
+tr_variant tr_sessionGetDefaultSettings()
 {
-namespace settings_helpers
-{
-
-void get_settings_filename(tr_pathbuf& setme, char const* config_dir, char const* appname)
-{
-    if (!tr_str_is_empty(config_dir))
-    {
-        setme.assign(std::string_view{ config_dir }, "/settings.json"sv);
-        return;
-    }
-
-    auto const default_config_dir = tr_getDefaultConfigDir(appname);
-    setme.assign(std::string_view{ default_config_dir }, "/settings.json"sv);
+    auto ret = tr_variant::make_map();
+    ret.merge(tr_rpc_server::Settings{}.save());
+    ret.merge(tr_session_alt_speeds::Settings{}.save());
+    ret.merge(tr_session::Settings{}.save());
+    return ret;
 }
 
-} // namespace settings_helpers
-} // namespace
-
-void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
+tr_variant tr_sessionGetSettings(tr_session const* session)
 {
-    tr_session_settings{}.save(setme_dictionary);
-    tr_rpc_server::default_settings(setme_dictionary);
-    tr_session_alt_speeds::default_settings(setme_dictionary);
+    auto settings = tr_variant::make_map();
+    settings.merge(session->alt_speeds_.settings().save());
+    settings.merge(session->rpc_server_->settings().save());
+    settings.merge(session->settings_.save());
+    tr_variantDictAddInt(&settings, TR_KEY_message_level, tr_logGetLevel());
+    return settings;
 }
 
-void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictionary)
+tr_variant tr_sessionLoadSettings(std::string_view const config_dir, tr_variant const* const app_defaults)
 {
-    session->settings_.save(setme_dictionary);
-    session->alt_speeds_.save(setme_dictionary);
-    session->rpc_server_->save(setme_dictionary);
+    // start with session defaults...
+    auto settings = tr_sessionGetDefaultSettings();
 
-    tr_variantDictRemove(setme_dictionary, TR_KEY_message_level);
-    tr_variantDictAddInt(setme_dictionary, TR_KEY_message_level, tr_logGetLevel());
+    // ...app defaults (if provided) override session defaults...
+    if (app_defaults != nullptr && app_defaults->holds_alternative<tr_variant::Map>())
+    {
+        settings.merge(*app_defaults);
+    }
+
+    // ...and settings.json (if available) override the defaults
+    if (auto const filename = fmt::format("{:s}/settings.json", config_dir); tr_sys_path_exists(filename))
+    {
+        if (auto file_settings = tr_variant_serde::json().parse_file(filename))
+        {
+            tr::api_compat::convert_incoming_data(*file_settings);
+            settings.merge(*file_settings);
+        }
+    }
+
+    return settings;
 }
 
-bool tr_sessionLoadSettings(tr_variant* settings_in, char const* config_dir, char const* app_name)
-{
-    using namespace settings_helpers;
-
-    TR_ASSERT(settings_in != nullptr);
-    TR_ASSERT(settings_in->holds_alternative<tr_variant::Map>());
-
-    // first, start with the libtransmission default settings
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
-
-    // now use the app default settings passed in
-    tr_variantMergeDicts(&settings, settings_in);
-
-    // now use a settings file to override all the defaults
-    auto success = bool{};
-    auto filename = tr_pathbuf{};
-    get_settings_filename(filename, config_dir, app_name);
-    if (!tr_sys_path_exists(filename))
-    {
-        success = true;
-    }
-    else if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
-    {
-        tr_variantMergeDicts(&settings, &*file_settings);
-        success = true;
-    }
-    else
-    {
-        success = false;
-    }
-
-    if (success)
-    {
-        std::swap(*settings_in, settings);
-    }
-
-    return success;
-}
-
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const* client_settings)
+void tr_sessionSaveSettings(tr_session* session, std::string_view const config_dir, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(client_settings != nullptr);
-    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
 
-    tr_variant settings;
     auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
 
-    tr_variantInitDict(&settings, 0);
-
-    /* the existing file settings are the fallback values */
-    if (auto const file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+    // from highest to lowest precedence:
+    // - actual values
+    // - client settings
+    // - previous session's settings stored in settings.json
+    // - built-in defaults
+    auto settings = tr_sessionGetDefaultSettings();
+    if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        tr_variantMergeDicts(&settings, &*file_settings);
+        tr::api_compat::convert_incoming_data(*file_settings);
+        settings.merge(*file_settings);
     }
+    settings.merge(client_settings);
+    settings.merge(tr_sessionGetSettings(session));
 
-    /* the client's settings override the file settings */
-    tr_variantMergeDicts(&settings, client_settings);
-
-    /* the session's true values override the file & client settings */
-    {
-        auto session_settings = tr_variant{};
-        tr_variantInitDict(&session_settings, 0);
-        tr_sessionGetSettings(session, &session_settings);
-        tr_variantMergeDicts(&settings, &session_settings);
-    }
-
-    /* save the result */
+    // save 'em
+    tr::api_compat::convert_outgoing_data(settings);
     tr_variant_serde::json().to_file(settings, filename);
 
-    /* Write bandwidth groups limits to file  */
+    // write bandwidth groups limits to file
     bandwidthGroupWrite(session, config_dir);
 }
 
@@ -570,45 +539,58 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 
 struct tr_session::init_data
 {
+    init_data(bool message_queuing_enabled_in, std::string_view config_dir_in, tr_variant const& settings_in)
+        : message_queuing_enabled{ message_queuing_enabled_in }
+        , config_dir{ config_dir_in }
+        , settings{ settings_in }
+    {
+    }
+
     bool message_queuing_enabled;
     std::string_view config_dir;
-    tr_variant* client_settings;
+    tr_variant const& settings;
+
     std::condition_variable_any done_cv;
 };
 
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings)
+tr_session* tr_sessionInit(std::string_view const config_dir, bool message_queueing_enabled, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(client_settings != nullptr);
-    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
 
     tr_timeUpdate(time(nullptr));
 
-    // nice to start logging at the very beginning
-    if (auto val = int64_t{}; tr_variantDictFindInt(client_settings, TR_KEY_message_level, &val))
+    // settings order of precedence from highest to lowest:
+    // - client settings
+    // - previous session's values in settings.json
+    // - hardcoded defaults
+    auto settings = tr_sessionLoadSettings(config_dir);
+    settings.merge(client_settings);
+
+    // if logging is desired, start it now before doing more work
+    if (auto const* settings_map = settings.get_if<tr_variant::Map>(); settings_map != nullptr)
     {
-        tr_logSetLevel(static_cast<tr_log_level>(val));
+        if (auto const val = settings_map->value_if<bool>(TR_KEY_message_level))
+        {
+            tr_logSetLevel(static_cast<tr_log_level>(*val));
+        }
     }
 
-    /* initialize the bare skeleton of the session object */
-    auto* const session = new tr_session{ config_dir };
+    // initialize the bare skeleton of the session object
+    auto* const session = new tr_session{ config_dir, tr_variant::make_map() };
     bandwidthGroupRead(session, config_dir);
 
-    auto data = tr_session::init_data{};
-    data.config_dir = config_dir;
-    data.message_queuing_enabled = message_queueing_enabled;
-    data.client_settings = client_settings;
-
     // run initImpl() in the libtransmission thread
+    auto data = tr_session::init_data{ message_queueing_enabled, config_dir, settings };
     auto lock = session->unique_lock();
-    session->runInSessionThread([&session, &data]() { session->initImpl(data); });
+    session->run_in_session_thread([&session, &data]() { session->initImpl(data); });
     data.done_cv.wait(lock); // wait for the session to be ready
 
     return session;
 }
 
-void tr_session::onNowTimer()
+void tr_session::on_now_timer()
 {
     TR_ASSERT(now_timer_);
     auto const now = std::chrono::system_clock::now();
@@ -627,21 +609,124 @@ void tr_session::onNowTimer()
     now_timer_->set_interval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
 }
 
+namespace
+{
+namespace queue_helpers
+{
+std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_direction dir, size_t num_wanted)
+{
+    auto candidates = torrents.get_matching([dir](auto const* const tor) { return tor->is_queued(dir); });
+
+    // find the best n candidates
+    num_wanted = std::min(num_wanted, std::size(candidates));
+    if (num_wanted < candidates.size())
+    {
+        std::partial_sort(
+            std::begin(candidates),
+            std::begin(candidates) + num_wanted,
+            std::end(candidates),
+            tr_torrent::CompareQueuePosition);
+        candidates.resize(num_wanted);
+    }
+
+    return candidates;
+}
+} // namespace queue_helpers
+} // namespace
+
+size_t tr_session::count_queue_free_slots(tr_direction dir) const noexcept
+{
+    if (!queueEnabled(dir))
+    {
+        return std::numeric_limits<size_t>::max();
+    }
+
+    auto const max = queueSize(dir);
+    auto const activity = dir == tr_direction::Up ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+
+    // count how many torrents are active
+    auto active_count = size_t{};
+    auto const stalled_enabled = queueStalledEnabled();
+    auto const stalled_if_idle_for_n_seconds = static_cast<time_t>(queueStalledMinutes() * 60);
+    auto const now = tr_time();
+    for (auto const* const tor : torrents())
+    {
+        // is it the right activity?
+        if (activity != tor->activity())
+        {
+            continue;
+        }
+
+        // is it stalled?
+        if (stalled_enabled)
+        {
+            auto const idle_seconds = tor->idle_seconds(now);
+            if (idle_seconds && *idle_seconds >= stalled_if_idle_for_n_seconds)
+            {
+                continue;
+            }
+        }
+
+        ++active_count;
+
+        /* if we've reached the limit, no need to keep counting */
+        if (active_count >= max)
+        {
+            return 0;
+        }
+    }
+
+    return max - active_count;
+}
+
+void tr_session::on_queue_timer()
+{
+    using namespace queue_helpers;
+
+    for (auto const dir : { tr_direction::Up, tr_direction::Down })
+    {
+        if (!queueEnabled(dir))
+        {
+            continue;
+        }
+
+        auto const n_wanted = count_queue_free_slots(dir);
+
+        for (auto* tor : get_next_queued_torrents(torrents(), dir, n_wanted))
+        {
+            tr_torrentStartNow(tor);
+
+            if (queue_start_callback_ != nullptr)
+            {
+                queue_start_callback_(this, tor, queue_start_user_data_);
+            }
+        }
+    }
+}
+
+// Periodically save the .resume files of any torrents whose
+// status has recently changed. This prevents loss of metadata
+// in the case of a crash, unclean shutdown, clumsy user, etc.
+void tr_session::on_save_timer()
+{
+    for (auto* const tor : torrents())
+    {
+        tor->save_resume_file();
+    }
+
+    stats().save();
+    torrent_queue().to_file();
+}
+
 void tr_session::initImpl(init_data& data)
 {
     auto lock = unique_lock();
     TR_ASSERT(am_in_session_thread());
 
-    auto* const client_settings = data.client_settings;
-    TR_ASSERT(client_settings != nullptr);
-    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
+    auto const& settings = data.settings;
+    TR_ASSERT(settings.holds_alternative<tr_variant::Map>());
 
     tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&top_bandwidth_)));
-
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
-    tr_variantMergeDicts(&settings, client_settings);
 
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
@@ -650,40 +735,33 @@ void tr_session::initImpl(init_data& data)
 
     tr_logSetQueueEnabled(data.message_queuing_enabled);
 
-    this->blocklists_ = libtransmission::Blocklist::loadBlocklists(blocklist_dir_, useBlocklist());
+    blocklists_.load(blocklist_dir_, blocklist_enabled());
 
-    tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
+    tr_logAddInfo(
+        fmt::format(fmt::runtime(_("Transmission version {version} starting")), fmt::arg("version", LONG_VERSION_STRING)));
 
-    setSettings(client_settings, true);
+    setSettings(settings, true);
 
-    if (this->allowsLPD())
-    {
-        this->lpd_ = tr_lpd::create(lpd_mediator_, event_base());
-    }
-
-    tr_utpInit(this);
+    tr_utp_init(this);
 
     /* cleanup */
     data.done_cv.notify_one();
 }
 
-void tr_session::setSettings(tr_variant* settings_dict, bool force)
+void tr_session::setSettings(tr_variant const& settings, bool force)
 {
     TR_ASSERT(am_in_session_thread());
-    TR_ASSERT(settings_dict != nullptr);
-    TR_ASSERT(settings_dict->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(settings.holds_alternative<tr_variant::Map>());
 
-    // load the session settings
-    auto new_settings = tr_session_settings{};
-    new_settings.load(settings_dict);
-    setSettings(std::move(new_settings), force);
+    setSettings(tr_session::Settings{ settings }, force);
 
     // delegate loading out the other settings
-    alt_speeds_.load(settings_dict);
-    rpc_server_->load(settings_dict);
+    alt_speeds_.load(tr_session_alt_speeds::Settings{ settings });
+    rpc_server_->load(tr_rpc_server::Settings{ settings });
 }
 
-void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved): `std::swap()` also move from the parameter
+void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 {
     auto const lock = unique_lock();
 
@@ -705,18 +783,18 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     }
 #endif
 
-    if (auto const& val = new_settings.cache_size_mb; force || val != old_settings.cache_size_mb)
+    if (auto const& val = new_settings.cache_size_mbytes; force || val != old_settings.cache_size_mbytes)
     {
         tr_sessionSetCacheLimit_MB(this, val);
     }
 
     if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
     {
-        global_ip_cache_->update_addr(TR_AF_INET);
+        ip_cache_->update_addr(TR_AF_INET);
     }
     if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
     {
-        global_ip_cache_->update_addr(TR_AF_INET6);
+        ip_cache_->update_addr(TR_AF_INET6);
     }
 
     if (auto const& val = new_settings.default_trackers_str; force || val != old_settings.default_trackers_str)
@@ -724,12 +802,9 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         setDefaultTrackers(val);
     }
 
-    if (auto const& val = new_settings.utp_enabled; force || val != old_settings.utp_enabled)
-    {
-        tr_sessionSetUTPEnabled(this, val);
-    }
+    bool const utp_changed = new_settings.utp_enabled != old_settings.utp_enabled;
 
-    useBlocklist(new_settings.blocklist_enabled);
+    set_blocklist_enabled(new_settings.blocklist_enabled);
 
     auto local_peer_port = force && settings_.peer_port_random_on_start ? randomPort() : new_settings.peer_port;
     bool port_changed = false;
@@ -774,9 +849,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         port_forwarding_->local_port_changed();
     }
 
-    bool const dht_changed = new_settings.dht_enabled != old_settings.dht_enabled;
-
-    if (!udp_core_ || force || port_changed || dht_changed)
+    if (!udp_core_ || force || addr_changed || port_changed || utp_changed)
     {
         udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
     }
@@ -795,27 +868,33 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         }
     }
 
-    if (!allowsDHT())
+    if (!new_settings.dht_enabled)
     {
         dht_.reset();
     }
-    else if (force || !dht_ || port_changed || addr_changed || dht_changed)
+    else if (force || !dht_ || port_changed || addr_changed || new_settings.dht_enabled != old_settings.dht_enabled)
     {
-        dht_ = tr_dht::create(dht_mediator_, localPeerPort(), udp_core_->socket4(), udp_core_->socket6());
+        dht_ = tr_dht::create(dht_mediator_, advertisedPeerPort(), udp_core_->socket4(), udp_core_->socket6());
+    }
+
+    if (auto const& val = new_settings.sleep_per_seconds_during_verify;
+        force || val != old_settings.sleep_per_seconds_during_verify)
+    {
+        verifier_->set_sleep_per_seconds_during_verify(val);
     }
 
     // We need to update bandwidth if speed settings changed.
     // It's a harmless call, so just call it instead of checking for settings changes
-    update_bandwidth(this, TR_UP);
-    update_bandwidth(this, TR_DOWN);
+    update_bandwidth(tr_direction::Up);
+    update_bandwidth(tr_direction::Down);
 }
 
-void tr_sessionSet(tr_session* session, tr_variant* settings)
+void tr_sessionSet(tr_session* session, tr_variant const& settings)
 {
     // do the work in the session thread
     auto done_promise = std::promise<void>{};
     auto done_future = done_promise.get_future();
-    session->runInSessionThread(
+    session->run_in_session_thread(
         [&session, &settings, &done_promise]()
         {
             session->setSettings(settings, false);
@@ -826,25 +905,72 @@ void tr_sessionSet(tr_session* session, tr_variant* settings)
 
 // ---
 
-void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
+void tr_session::Settings::fixup_from_preferred_transports()
 {
-    TR_ASSERT(session != nullptr);
-
-    session->setDownloadDir(dir != nullptr ? dir : "");
+    utp_enabled = false;
+    tcp_enabled = false;
+    for (auto const& transport : preferred_transports)
+    {
+        switch (transport)
+        {
+        case TR_PREFER_UTP:
+            utp_enabled = true;
+            break;
+        case TR_PREFER_TCP:
+            tcp_enabled = true;
+            break;
+        default:
+            break;
+        }
+    }
 }
 
-char const* tr_sessionGetDownloadDir(tr_session const* session)
+void tr_session::Settings::fixup_to_preferred_transports()
 {
-    TR_ASSERT(session != nullptr);
+    if (!utp_enabled)
+    {
+        auto const remove_it = std::remove(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_UTP);
+        preferred_transports.erase(remove_it, std::end(preferred_transports));
+    }
+    else if (std::ranges::find(preferred_transports, TR_PREFER_UTP) == std::ranges::end(preferred_transports))
+    {
+        TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
+        preferred_transports.emplace(std::begin(preferred_transports), TR_PREFER_UTP);
+    }
 
-    return session->downloadDir().c_str();
+    if (!tcp_enabled)
+    {
+        auto const remove_it = std::remove(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_TCP);
+        preferred_transports.erase(remove_it, std::end(preferred_transports));
+    }
+    else if (std::ranges::find(preferred_transports, TR_PREFER_TCP) == std::ranges::end(preferred_transports))
+    {
+        TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
+        preferred_transports.emplace_back(TR_PREFER_TCP);
+    }
 }
 
-char const* tr_sessionGetConfigDir(tr_session const* session)
+// ---
+
+void tr_sessionSetDownloadDir(tr_session* session, std::string_view const dir)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->configDir().c_str();
+    session->setDownloadDir(dir);
+}
+
+std::string tr_sessionGetDownloadDir(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->downloadDir();
+}
+
+std::string tr_sessionGetConfigDir(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->configDir();
 }
 
 // ---
@@ -865,18 +991,18 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)
 
 // ---
 
-void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
+void tr_sessionSetIncompleteDir(tr_session* session, std::string_view const dir)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setIncompleteDir(dir != nullptr ? dir : "");
+    session->setIncompleteDir(dir);
 }
 
-char const* tr_sessionGetIncompleteDir(tr_session const* session)
+std::string tr_sessionGetIncompleteDir(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->incompleteDir().c_str();
+    return session->incompleteDir();
 }
 
 void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool enabled)
@@ -901,7 +1027,7 @@ void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 
     if (auto const port = tr_port::from_host(hport); port != session->localPeerPort())
     {
-        session->runInSessionThread(
+        session->run_in_session_thread(
             [session, port]()
             {
                 auto settings = session->settings_;
@@ -1014,16 +1140,16 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 
 // --- Speed limits
 
-std::optional<tr_bytes_per_second_t> tr_session::activeSpeedLimitBps(tr_direction dir) const noexcept
+std::optional<Speed> tr_session::active_speed_limit(tr_direction dir) const noexcept
 {
     if (tr_sessionUsesAltSpeed(this))
     {
-        return tr_toSpeedBytes(tr_sessionGetAltSpeed_KBps(this, dir));
+        return alt_speeds_.speed_limit(dir);
     }
 
-    if (this->isSpeedLimited(dir))
+    if (is_speed_limited(dir))
     {
-        return tr_toSpeedBytes(tr_sessionGetSpeedLimit_KBps(this, dir));
+        return speed_limit(dir);
     }
 
     return {};
@@ -1038,8 +1164,8 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
 {
     auto const in_session_thread = [session = &session_, is_active, reason]()
     {
-        update_bandwidth(session, TR_UP);
-        update_bandwidth(session, TR_DOWN);
+        session->update_bandwidth(tr_direction::Up);
+        session->update_bandwidth(tr_direction::Down);
 
         if (session->alt_speed_active_changed_func_ != nullptr)
         {
@@ -1051,42 +1177,28 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
         }
     };
 
-    session_.runInSessionThread(in_session_thread);
+    session_.run_in_session_thread(in_session_thread);
 }
 
 // --- Session primary speed limits
 
-void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit)
+void tr_sessionSetSpeedLimit_KBps(tr_session* const session, tr_direction const dir, size_t const limit_kbyps)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
-    if (dir == TR_DOWN)
-    {
-        session->settings_.speed_limit_down = limit;
-    }
-    else
-    {
-        session->settings_.speed_limit_up = limit;
-    }
-
-    update_bandwidth(session, dir);
+    session->set_speed_limit(dir, Speed{ limit_kbyps, Speed::Units::KByps });
 }
 
-tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
+size_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
-    return dir == TR_DOWN ? session->settings_.speed_limit_down : session->settings_.speed_limit_up;
+    return session->speed_limit(dir).count(Speed::Units::KByps);
 }
 
-void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
+void tr_sessionLimitSpeed(tr_session* session, tr_direction const dir, bool limited)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
+    if (dir == tr_direction::Down)
     {
         session->settings_.speed_limit_down_enabled = limited;
     }
@@ -1095,34 +1207,28 @@ void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
         session->settings_.speed_limit_up_enabled = limited;
     }
 
-    update_bandwidth(session, dir);
+    session->update_bandwidth(dir);
 }
 
-bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
+bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction const dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
-    return session->isSpeedLimited(dir);
+    return session->is_speed_limited(dir);
 }
 
 // --- Session alt speed limits
 
-void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit)
+void tr_sessionSetAltSpeed_KBps(tr_session* const session, tr_direction const dir, size_t const limit_kbyps)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
-    session->alt_speeds_.set_limit_kbps(dir, limit);
-    update_bandwidth(session, dir);
+    session->alt_speeds_.set_speed_limit(dir, Speed{ limit_kbyps, Speed::Units::KByps });
+    session->update_bandwidth(dir);
 }
 
-tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)
+size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
-    return session->alt_speeds_.limit_kbps(dir);
+    return session->alt_speeds_.speed_limit(dir).count(Speed::Units::KByps);
 }
 
 void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled)
@@ -1257,8 +1363,12 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
 {
-    auto const bps = session != nullptr ? session->top_bandwidth_.get_raw_speed_bytes_per_second(0, dir) : 0;
-    return tr_toSpeedKBps(bps);
+    if (session != nullptr)
+    {
+        return session->top_bandwidth_.get_raw_speed(0, dir).count(Speed::Units::KByps);
+    }
+
+    return {};
 }
 
 void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
@@ -1269,6 +1379,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     utp_timer.reset();
     verifier_.reset();
     save_timer_.reset();
+    queue_timer_.reset();
     now_timer_.reset();
     rpc_server_.reset();
     dht_.reset();
@@ -1278,17 +1389,18 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     bound_ipv6_.reset();
     bound_ipv4_.reset();
 
+    torrent_queue().to_file();
+
     // Close the torrents in order of most active to least active
     // so that the most important announce=stopped events are
     // fired out first...
-    auto torrents = getAllTorrents();
-    std::sort(
-        std::begin(torrents),
-        std::end(torrents),
+    auto torrents = torrents_.get_all();
+    std::ranges::sort(
+        torrents,
         [](auto const* a, auto const* b)
         {
-            auto const a_cur = a->downloadedCur + a->uploadedCur;
-            auto const b_cur = b->downloadedCur + b->uploadedCur;
+            auto const a_cur = a->bytes_downloaded_.ever();
+            auto const b_cur = b->bytes_downloaded_.ever();
             return a_cur > b_cur; // larger xfers go first
         });
     for (auto* tor : torrents)
@@ -1304,11 +1416,13 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // ...since global_ip_cache_ relies on web_ to update global addresses,
     // we tell it to stop updating before web_ starts to refuse new requests.
     // But we keep it intact for now, so that udp_core_ can continue.
-    this->global_ip_cache_->try_shutdown();
+    this->ip_cache_->try_shutdown();
     // ...and now that those are done, tell web_ that we're shutting
     // down soon. This leaves the `event=stopped` going but refuses any
     // new tasks.
-    this->web_->startShutdown(10s);
+    auto const now = std::chrono::steady_clock::now();
+    auto const remaining_ms = now < deadline ? std::chrono::duration_cast<std::chrono::milliseconds>(deadline - now) : 0ms;
+    this->web_->startShutdown(remaining_ms);
     this->cache.reset();
 
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
@@ -1319,13 +1433,14 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
 
 void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
 {
-    // try to keep the UDP announcer alive long enough to send out
+    // try to keep web_ and the UDP announcer alive long enough to send out
     // all the &event=stopped tracker announces.
     // also wait for all ip cache updates to finish so that web_ can
     // safely destruct.
-    if ((n_pending_stops_ != 0U || !global_ip_cache_->try_shutdown()) && std::chrono::steady_clock::now() < deadline)
+    if ((!web_->is_idle() || !announcer_udp_->is_idle() || !ip_cache_->try_shutdown()) &&
+        std::chrono::steady_clock::now() < deadline)
     {
-        announcer_udp_->upkeep();
+        announcer_->upkeep();
         return;
     }
 
@@ -1337,24 +1452,27 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     stats().save();
     peer_mgr_.reset();
     openFiles().close_all();
-    tr_utpClose(this);
+    tr_utp_close(this);
     this->udp_core_.reset();
 
     // tada we are done!
     closed_promise->set_value();
 }
 
-void tr_sessionClose(tr_session* session, size_t timeout_secs)
+void tr_sessionClose(tr_session* session, double const timeout_secs)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(!session->am_in_session_thread());
 
-    tr_logAddInfo(fmt::format(_("Transmission version {version} shutting down"), fmt::arg("version", LONG_VERSION_STRING)));
+    tr_logAddInfo(
+        fmt::format(fmt::runtime(_("Transmission version {version} shutting down")), fmt::arg("version", LONG_VERSION_STRING)));
 
     auto closed_promise = std::promise<void>{};
     auto closed_future = closed_promise.get_future();
-    auto const deadline = std::chrono::steady_clock::now() + std::chrono::seconds{ timeout_secs };
-    session->runInSessionThread([&closed_promise, deadline, session]() { session->closeImplPart1(&closed_promise, deadline); });
+    auto const deadline = std::chrono::steady_clock::now() +
+        std::chrono::milliseconds{ static_cast<int64_t>(timeout_secs * 1000.0) };
+    session->run_in_session_thread([&closed_promise, deadline, session]()
+                                   { session->closeImplPart1(&closed_promise, deadline); });
     closed_future.wait();
 
     delete session;
@@ -1364,39 +1482,69 @@ namespace
 {
 namespace load_torrents_helpers
 {
+auto get_remaining_files(std::string_view folder, std::vector<std::string>& queue_order)
+{
+    auto files = tr_sys_dir_get_files(folder);
+    auto ret = std::vector<std::string>{};
+    ret.reserve(std::size(files));
+    std::ranges::sort(queue_order);
+    std::ranges::sort(files);
+
+    std::ranges::set_difference(files, queue_order, std::back_inserter(ret));
+
+    // Read .torrent first if somehow a .magnet of the same hash exists
+    // Example of possible cause: https://github.com/transmission/transmission/issues/5007
+    std::stable_partition(
+        std::begin(ret),
+        std::end(ret),
+        [](std::string_view name) { return tr_strv_ends_with(name, ".torrent"sv); });
+
+    return ret;
+}
+
 void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
 {
     auto n_torrents = size_t{};
     auto const& folder = session->torrentDir();
 
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strv_ends_with(name, ".torrent"sv); }))
+    auto load_func = [&folder, &n_torrents, ctor, buf = std::vector<char>{}](std::string_view name) mutable
     {
-        auto const path = tr_pathbuf{ folder, '/', name };
-
-        if (tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr) && tr_torrentNew(ctor, nullptr) != nullptr)
+        if (tr_strv_ends_with(name, ".torrent"sv))
         {
-            ++n_torrents;
+            auto const path = tr_pathbuf{ folder, '/', name };
+            if (ctor->set_metainfo_from_file(path.sv()) && tr_torrentNew(ctor, nullptr) != nullptr)
+            {
+                ++n_torrents;
+            }
         }
+        else if (tr_strv_ends_with(name, ".magnet"sv))
+        {
+            auto const path = tr_pathbuf{ folder, '/', name };
+            if (tr_file_read(path, buf) &&
+                ctor->set_metainfo_from_magnet_link(std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
+                tr_torrentNew(ctor, nullptr) != nullptr)
+            {
+                ++n_torrents;
+            }
+        }
+    };
+
+    auto queue_order = session->torrent_queue().from_file();
+    for (auto const& filename : queue_order)
+    {
+        load_func(filename);
     }
-
-    auto buf = std::vector<char>{};
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strv_ends_with(name, ".magnet"sv); }))
+    for (auto const& filename : get_remaining_files(folder, queue_order))
     {
-        auto const path = tr_pathbuf{ folder, '/', name };
-
-        if (tr_file_read(path, buf) &&
-            tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
-            tr_torrentNew(ctor, nullptr) != nullptr)
-        {
-            ++n_torrents;
-        }
+        load_func(filename);
     }
 
     if (n_torrents != 0U)
     {
-        tr_logAddInfo(fmt::format(
-            tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents),
-            fmt::arg("count", n_torrents)));
+        tr_logAddInfo(
+            fmt::format(
+                fmt::runtime(tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents)),
+                fmt::arg("count", n_torrents)));
     }
 
     loaded_promise->set_value(n_torrents);
@@ -1411,7 +1559,7 @@ size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
     auto loaded_promise = std::promise<size_t>{};
     auto loaded_future = loaded_promise.get_future();
 
-    session->runInSessionThread(session_load_torrents, session, ctor, &loaded_promise);
+    session->run_in_session_thread(session_load_torrents, session, ctor, &loaded_promise);
     loaded_future.wait();
     auto const n_torrents = loaded_future.get();
 
@@ -1460,7 +1608,7 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 
     if (enabled != session->allowsDHT())
     {
-        session->runInSessionThread(
+        session->run_in_session_thread(
             [session, enabled]()
             {
                 auto settings = session->settings_;
@@ -1497,7 +1645,14 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
         return;
     }
 
-    session->settings_.utp_enabled = enabled;
+    session->run_in_session_thread(
+        [session, enabled]()
+        {
+            auto settings = session->settings_;
+            settings.utp_enabled = enabled;
+            settings.fixup_to_preferred_transports();
+            session->setSettings(std::move(settings), false);
+        });
 }
 
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
@@ -1506,7 +1661,7 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 
     if (enabled != session->allowsLPD())
     {
-        session->runInSessionThread(
+        session->run_in_session_thread(
             [session, enabled]()
             {
                 auto settings = session->settings_;
@@ -1525,19 +1680,28 @@ bool tr_sessionIsLPDEnabled(tr_session const* session)
 
 // ---
 
-void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb)
+void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes)
 {
     TR_ASSERT(session != nullptr);
 
-    session->settings_.cache_size_mb = mb;
-    session->cache->set_limit(tr_toMemBytes(mb));
+    session->settings_.cache_size_mbytes = mbytes;
+    session->cache->set_limit(Memory{ mbytes, Memory::Units::MBytes });
 }
 
 size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->settings_.cache_size_mb;
+    return session->settings_.cache_size_mbytes;
+}
+
+// ---
+
+void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->settings_.torrent_complete_verify_enabled = enabled;
 }
 
 // ---
@@ -1562,11 +1726,11 @@ void tr_session::setDefaultTrackers(std::string_view trackers)
     }
 }
 
-void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
+void tr_sessionSetDefaultTrackers(tr_session* session, std::string_view const trackers)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setDefaultTrackers(trackers != nullptr ? trackers : "");
+    session->setDefaultTrackers(trackers);
 }
 
 // ---
@@ -1583,7 +1747,7 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
         }
     }
 
-    auto& [group_name, group] = groups.emplace_back(name, std::make_unique<tr_bandwidth>(new tr_bandwidth(&top_bandwidth_)));
+    auto& [group_name, group] = groups.emplace_back(name, std::make_unique<tr_bandwidth>(&top_bandwidth_, true));
     return *group;
 }
 
@@ -1591,7 +1755,7 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 {
-    session->runInSessionThread(
+    session->run_in_session_thread(
         [session, enabled]()
         {
             session->settings_.port_forwarding_enabled = enabled;
@@ -1608,103 +1772,53 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 
 // ---
 
-void tr_session::useBlocklist(bool enabled)
-{
-    settings_.blocklist_enabled = enabled;
-
-    std::for_each(
-        std::begin(blocklists_),
-        std::end(blocklists_),
-        [enabled](auto& blocklist) { blocklist.setEnabled(enabled); });
-}
-
-bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
-{
-    return std::any_of(
-        std::begin(blocklists_),
-        std::end(blocklists_),
-        [&addr](auto& blocklist) { return blocklist.contains(addr); });
-}
-
 void tr_sessionReloadBlocklists(tr_session* session)
 {
-    session->blocklists_ = libtransmission::Blocklist::loadBlocklists(session->blocklist_dir_, session->useBlocklist());
-
-    session->blocklist_changed_.emit();
+    session->blocklists_.load(session->blocklist_dir_, session->blocklist_enabled());
 }
 
 size_t tr_blocklistGetRuleCount(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    auto& src = session->blocklists_;
-    return std::accumulate(std::begin(src), std::end(src), 0, [](int sum, auto& cur) { return sum + std::size(cur); });
+    return session->blocklists_.num_rules();
 }
 
 bool tr_blocklistIsEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->useBlocklist();
+    return session->blocklist_enabled();
 }
 
 void tr_blocklistSetEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->useBlocklist(enabled);
+    session->set_blocklist_enabled(enabled);
 }
 
 bool tr_blocklistExists(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return !std::empty(session->blocklists_);
+    return session->blocklists_.num_lists() > 0U;
 }
 
-size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
+size_t tr_blocklistSetContent(tr_session* session, std::string_view const content_filename)
 {
     auto const lock = session->unique_lock();
-
-    // These rules will replace the default blocklist.
-    // Build the path of the default blocklist .bin file where we'll save these rules.
-    auto const bin_file = tr_pathbuf{ session->blocklist_dir_, '/', DEFAULT_BLOCKLIST_FILENAME };
-
-    // Try to save it
-    auto added = libtransmission::Blocklist::saveNew(content_filename, bin_file, session->useBlocklist());
-    if (!added)
-    {
-        return 0U;
-    }
-
-    auto const n_rules = std::size(*added);
-
-    // Add (or replace) it in our blocklists_ vector
-    auto& src = session->blocklists_;
-    if (auto iter = std::find_if(
-            std::begin(src),
-            std::end(src),
-            [&bin_file](auto const& candidate) { return bin_file == candidate.binFile(); });
-        iter != std::end(src))
-    {
-        *iter = std::move(*added);
-    }
-    else
-    {
-        src.emplace_back(std::move(*added));
-    }
-
-    return n_rules;
+    return session->blocklists_.update_primary_blocklist(content_filename, session->blocklist_enabled());
 }
 
-void tr_blocklistSetURL(tr_session* session, char const* url)
+void tr_blocklistSetURL(tr_session* session, std::string_view const url)
 {
-    session->setBlocklistUrl(url != nullptr ? url : "");
+    session->setBlocklistUrl(url);
 }
 
-char const* tr_blocklistGetURL(tr_session const* session)
+std::string tr_blocklistGetURL(tr_session const* session)
 {
-    return session->blocklistUrl().c_str();
+    return session->blocklistUrl();
 }
 
 // ---
@@ -1763,18 +1877,18 @@ void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_
     session->rpc_func_user_data_ = user_data;
 }
 
-void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist)
+void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view const whitelist)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setRpcWhitelist(whitelist != nullptr ? whitelist : "");
+    session->setRpcWhitelist(whitelist);
 }
 
-char const* tr_sessionGetRPCWhitelist(tr_session const* session)
+std::string tr_sessionGetRPCWhitelist(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->whitelist().c_str();
+    return session->rpc_server_->whitelist();
 }
 
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool enabled)
@@ -1791,32 +1905,32 @@ bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session)
     return session->useRpcWhitelist();
 }
 
-void tr_sessionSetRPCPassword(tr_session* session, char const* password)
+void tr_sessionSetRPCPassword(tr_session* session, std::string_view const password)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->set_password(password != nullptr ? password : "");
+    session->rpc_server_->set_password(password);
 }
 
-char const* tr_sessionGetRPCPassword(tr_session const* session)
+std::string tr_sessionGetRPCPassword(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->get_salted_password().c_str();
+    return session->rpc_server_->get_salted_password();
 }
 
-void tr_sessionSetRPCUsername(tr_session* session, char const* username)
+void tr_sessionSetRPCUsername(tr_session* session, std::string_view const username)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->set_username(username != nullptr ? username : "");
+    session->rpc_server_->set_username(username);
 }
 
-char const* tr_sessionGetRPCUsername(tr_session const* session)
+std::string tr_sessionGetRPCUsername(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->username().c_str();
+    return session->rpc_server_->username();
 }
 
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled)
@@ -1851,20 +1965,20 @@ bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type)
     return session->useScript(type);
 }
 
-void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
+void tr_sessionSetScript(tr_session* session, TrScript type, std::string_view const script)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->setScript(type, script != nullptr ? script : "");
+    session->setScript(type, script);
 }
 
-char const* tr_sessionGetScript(tr_session const* session, TrScript type)
+std::string tr_sessionGetScript(tr_session const* const session, TrScript const type)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->script(type).c_str();
+    return session->script(type);
 }
 
 // ---
@@ -1872,9 +1986,8 @@ char const* tr_sessionGetScript(tr_session const* session, TrScript type)
 void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
+    if (dir == tr_direction::Down)
     {
         session->settings_.download_queue_size = max_simultaneous_torrents;
     }
@@ -1887,7 +2000,6 @@ void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_si
 size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
     return session->queueSize(dir);
 }
@@ -1895,9 +2007,8 @@ size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
 void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_torrents)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
+    if (dir == tr_direction::Down)
     {
         session->settings_.download_queue_enabled = do_limit_simultaneous_torrents;
     }
@@ -1910,8 +2021,6 @@ void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_li
 bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     return session->queueEnabled(dir);
 }
 
@@ -1946,120 +2055,38 @@ size_t tr_sessionGetQueueStalledMinutes(tr_session const* session)
 
 // ---
 
-void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests)
+void tr_session::verify_remove(tr_torrent const* const tor)
 {
-    TR_ASSERT(session != nullptr);
-    TR_ASSERT(max_bad_requests > 0);
-
-    session->rpc_server_->set_anti_brute_force_limit(max_bad_requests);
+    if (verifier_)
+    {
+        verifier_->remove(tor->info_hash());
+    }
 }
 
-int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
+void tr_session::verify_add(tr_torrent* const tor)
 {
-    TR_ASSERT(session != nullptr);
-
-    return session->rpc_server_->get_anti_brute_force_limit();
-}
-
-void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
-{
-    TR_ASSERT(session != nullptr);
-
-    session->rpc_server_->set_anti_brute_force_enabled(is_enabled);
-}
-
-bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    return session->rpc_server_->is_anti_brute_force_enabled();
+    if (verifier_)
+    {
+        verifier_->add(std::make_unique<tr_torrent::VerifyMediator>(tor), tor->get_priority());
+    }
 }
 
 // ---
-
-std::vector<tr_torrent*> tr_session::getNextQueuedTorrents(tr_direction dir, size_t num_wanted) const
+void tr_session::flush_torrent_files(tr_torrent_id_t const tor_id) const noexcept
 {
-    TR_ASSERT(tr_isDirection(dir));
-
-    // build an array of the candidates
-    auto candidates = std::vector<tr_torrent*>{};
-    candidates.reserve(std::size(torrents()));
-    for (auto* const tor : torrents())
-    {
-        if (tor->is_queued() && (dir == tor->queue_direction()))
-        {
-            candidates.push_back(tor);
-        }
-    }
-
-    // find the best n candidates
-    num_wanted = std::min(num_wanted, std::size(candidates));
-    if (num_wanted < candidates.size())
-    {
-        std::partial_sort(
-            std::begin(candidates),
-            std::begin(candidates) + num_wanted,
-            std::end(candidates),
-            [](auto const* a, auto const* b) { return tr_torrentGetQueuePosition(a) < tr_torrentGetQueuePosition(b); });
-        candidates.resize(num_wanted);
-    }
-
-    return candidates;
+    this->cache->flush_torrent(tor_id);
 }
 
-size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
+void tr_session::close_torrent_files(tr_torrent_id_t const tor_id) noexcept
 {
-    if (!queueEnabled(dir))
-    {
-        return std::numeric_limits<size_t>::max();
-    }
-
-    auto const max = queueSize(dir);
-    auto const activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
-
-    /* count how many torrents are active */
-    auto active_count = size_t{};
-    bool const stalled_enabled = queueStalledEnabled();
-    auto const stalled_if_idle_for_n_seconds = queueStalledMinutes() * 60;
-    time_t const now = tr_time();
-    for (auto const* const tor : torrents())
-    {
-        /* is it the right activity? */
-        if (activity != tor->activity())
-        {
-            continue;
-        }
-
-        /* is it stalled? */
-        if (stalled_enabled && difftime(now, std::max(tor->startDate, tor->activityDate)) >= stalled_if_idle_for_n_seconds)
-        {
-            continue;
-        }
-
-        ++active_count;
-
-        /* if we've reached the limit, no need to keep counting */
-        if (active_count >= max)
-        {
-            return 0;
-        }
-    }
-
-    return max - active_count;
+    this->cache->flush_torrent(tor_id);
+    openFiles().close_torrent(tor_id);
 }
 
-// ---
-
-void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept
-{
-    this->cache->flush_torrent(tor);
-    openFiles().close_torrent(tor->id());
-}
-
-void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept
+void tr_session::close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept
 {
     this->cache->flush_file(tor, file_num);
-    openFiles().close_file(tor->id(), file_num);
+    openFiles().close_file(tor.id(), file_num);
 }
 
 // ---
@@ -2104,72 +2131,62 @@ void tr_sessionClearStats(tr_session* session)
     session->stats().clear();
 }
 
+// ---
+
 namespace
 {
-auto constexpr SaveIntervalSecs = 360s;
+auto constexpr QueueInterval = 1s;
+auto constexpr SaveInterval = 360s;
+
+[[nodiscard]] auto makeSubdir(std::string_view const parent, std::string_view const child)
+{
+    auto dir = fmt::format("{:s}/{:s}"sv, parent, child);
+    tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return dir;
+}
 
 auto makeResumeDir(std::string_view config_dir)
 {
 #if defined(__APPLE__) || defined(_WIN32)
-    auto dir = fmt::format("{:s}/Resume"sv, config_dir);
+    return makeSubdir(config_dir, "Resume"sv);
 #else
-    auto dir = fmt::format("{:s}/resume"sv, config_dir);
+    return makeSubdir(config_dir, "resume"sv);
 #endif
-    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-    return dir;
 }
 
 auto makeTorrentDir(std::string_view config_dir)
 {
 #if defined(__APPLE__) || defined(_WIN32)
-    auto dir = fmt::format("{:s}/Torrents"sv, config_dir);
+    return makeSubdir(config_dir, "Torrents"sv);
 #else
-    auto dir = fmt::format("{:s}/torrents"sv, config_dir);
+    return makeSubdir(config_dir, "torrents"sv);
 #endif
-    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-    return dir;
 }
 
 auto makeBlocklistDir(std::string_view config_dir)
 {
-    auto dir = fmt::format("{:s}/blocklists"sv, config_dir);
-    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-    return dir;
+    return makeSubdir(config_dir, "blocklists"sv);
 }
-
 } // namespace
 
-tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
+tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_dict)
     : config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , blocklist_dir_{ makeBlocklistDir(config_dir) }
     , session_thread_{ tr_session_thread::create() }
-    , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(event_base()) }
+    , timer_maker_{ std::make_unique<tr::EvTimerMaker>(event_base()) }
     , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }
-    , rpc_server_{ std::make_unique<tr_rpc_server>(this, settings_dict) }
+    , rpc_server_{ std::make_unique<tr_rpc_server>(this, tr_rpc_server::Settings{ settings_dict }) }
+    , now_timer_{ timer_maker_->create([this]() { on_now_timer(); }) }
+    , queue_timer_{ timer_maker_->create([this]() { on_queue_timer(); }) }
+    , save_timer_{ timer_maker_->create([this]() { on_save_timer(); }) }
 {
-    now_timer_ = timerMaker().create([this]() { onNowTimer(); });
     now_timer_->start_repeating(1s);
-
-    // Periodically save the .resume files of any torrents whose
-    // status has recently changed. This prevents loss of metadata
-    // in the case of a crash, unclean shutdown, clumsy user, etc.
-    save_timer_ = timerMaker().create(
-        [this]()
-        {
-            for (auto* const tor : torrents())
-            {
-                tr_torrentSave(tor);
-            }
-
-            stats().save();
-        });
-    save_timer_->start_repeating(SaveIntervalSecs);
-
-    verifier_->add_callback(tr_torrentOnVerifyDone);
+    queue_timer_->start_repeating(QueueInterval);
+    save_timer_->start_repeating(SaveInterval);
 }
 
 void tr_session::addIncoming(tr_peer_socket&& socket)
@@ -2179,7 +2196,8 @@ void tr_session::addIncoming(tr_peer_socket&& socket)
 
 void tr_session::addTorrent(tr_torrent* tor)
 {
-    tor->unique_id_ = torrents().add(tor);
+    tor->init_id(torrents().add(tor));
+    torrent_queue_.add(tor->id());
 
     tr_peerMgrAddTorrent(peer_mgr_.get(), tor);
 }

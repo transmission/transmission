@@ -7,7 +7,7 @@ target_sources(vdkqueue
 
 set_property(
     TARGET vdkqueue
-    PROPERTY FOLDER "third-party")
+    PROPERTY FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
 target_include_directories(vdkqueue
     PUBLIC

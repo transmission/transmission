@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -17,17 +17,17 @@
 
 #include "libtransmission/announce-list.h"
 #include "libtransmission/block-info.h"
+#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/torrent-files.h"
-#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
-#include "libtransmission/utils.h" // for tr_file_save()
-
-struct tr_error;
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR_VEC
 
 class tr_metainfo_builder
 {
 public:
     explicit tr_metainfo_builder(std::string_view single_file_or_parent_directory);
+
+    ~tr_metainfo_builder() = default;
 
     tr_metainfo_builder(tr_metainfo_builder&&) = delete;
     tr_metainfo_builder(tr_metainfo_builder const&) = delete;
@@ -38,14 +38,14 @@ public:
     // - This must be done before calling `benc()` or `save()`.
     // - Runs in a worker thread because it can be time-consuming.
     // - Can be cancelled with `cancelChecksums()` and polled with `checksumStatus()`
-    // - Resolves with a `tr_error*` which is set on failure or nullptr on success.
-    std::future<tr_error*> make_checksums()
+    // - Resolves with a `tr_error` which is set on failure or empty on success.
+    std::future<tr_error> make_checksums()
     {
         return std::async(
             std::launch::async,
             [this]()
             {
-                tr_error* error = nullptr;
+                auto error = tr_error{};
                 blocking_make_checksums(&error);
                 return error;
             });
@@ -65,13 +65,10 @@ public:
     }
 
     // generate the metainfo
-    [[nodiscard]] std::string benc(tr_error** error = nullptr) const;
+    [[nodiscard]] std::string benc(tr_error* error = nullptr) const;
 
     // generate the metainfo and save it to a torrent file
-    bool save(std::string_view filename, tr_error** error = nullptr) const
-    {
-        return tr_file_save(filename, benc(error), error);
-    }
+    bool save(std::string_view filename, tr_error* error = nullptr) const;
 
     /// setters
 
@@ -125,14 +122,14 @@ public:
         return comment_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
+    [[nodiscard]] constexpr auto file_count() const noexcept
     {
-        return files_.fileCount();
+        return files_.file_count();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto file_size(tr_file_index_t i) const noexcept
+    [[nodiscard]] TR_CONSTEXPR_VEC auto file_size(tr_file_index_t i) const noexcept
     {
-        return files_.fileSize(i);
+        return files_.file_size(i);
     }
 
     [[nodiscard]] constexpr auto is_private() const noexcept
@@ -145,7 +142,7 @@ public:
         return tr_sys_path_basename(top_);
     }
 
-    [[nodiscard]] auto const& path(tr_file_index_t i) const noexcept
+    [[nodiscard]] TR_CONSTEXPR_VEC auto const& path(tr_file_index_t i) const noexcept
     {
         return files_.path(i);
     }
@@ -172,7 +169,7 @@ public:
 
     [[nodiscard]] constexpr auto total_size() const noexcept
     {
-        return files_.totalSize();
+        return files_.total_size();
     }
 
     [[nodiscard]] constexpr auto const& webseeds() const noexcept
@@ -187,13 +184,13 @@ public:
     [[nodiscard]] constexpr static bool is_legal_piece_size(uint32_t x)
     {
         // It must be a power of two and at least 16KiB
-        auto const MinSize = uint32_t{ 1024U * 16U };
+        auto constexpr MinSize = uint32_t{ 1024U * 16U };
         auto const is_power_of_two = (x & (x - 1)) == 0;
         return x >= MinSize && is_power_of_two;
     }
 
 private:
-    bool blocking_make_checksums(tr_error** error = nullptr);
+    bool blocking_make_checksums(tr_error* error = nullptr);
 
     std::string top_;
     tr_torrent_files files_;

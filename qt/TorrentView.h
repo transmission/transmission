@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,15 +7,16 @@
 
 #include <QListView>
 
-#include <libtransmission/tr-macros.h>
-
 class TorrentView : public QListView
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(TorrentView)
 
 public:
     explicit TorrentView(QWidget* parent = nullptr);
+    TorrentView(TorrentView&&) = delete;
+    TorrentView(TorrentView const&) = delete;
+    TorrentView& operator=(TorrentView&&) = delete;
+    TorrentView& operator=(TorrentView const&) = delete;
 
 public slots:
     void setHeaderText(QString const& text);

@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -17,7 +17,7 @@
 #include "Utils.h"
 
 AboutDialog::AboutDialog(Session& session, QWidget* parent)
-    : BaseDialog(parent)
+    : BaseDialog{ parent }
 {
     ui_.setupUi(this);
 
@@ -54,9 +54,10 @@ void AboutDialog::showCredits()
     QMessageBox::about(
         this,
         tr("Credits"),
-        QString::fromUtf8("Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
-                          "Mitchell Livingston (macOS)\n"
-                          "Mike Gelfand\n"));
+        QString::fromUtf8(
+            "Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
+            "Mitchell Livingston (macOS)\n"
+            "Mike Gelfand\n"));
 }
 
 void AboutDialog::showLicense()

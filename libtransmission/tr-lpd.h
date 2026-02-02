@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -20,7 +20,7 @@
 
 struct event_base;
 
-namespace libtransmission
+namespace tr
 {
 class TimerMaker;
 }
@@ -49,7 +49,7 @@ public:
 
         [[nodiscard]] virtual std::vector<TorrentInfo> torrents() const = 0;
 
-        [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
+        [[nodiscard]] virtual tr::TimerMaker& timerMaker() = 0;
 
         virtual void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at) = 0;
 

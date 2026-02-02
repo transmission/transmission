@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -15,7 +15,7 @@ import {
 export class PrefsDialog extends EventTarget {
   static _initTimeDropDown(e) {
     for (let index = 0; index < 24 * 4; ++index) {
-      const hour = Number.parseInt(index / 4, 10);
+      const hour = index / 4;
       const mins = (index % 4) * 15;
       const value = index * 15;
       const content = `${hour}:${mins || '00'}`;
@@ -43,17 +43,33 @@ export class PrefsDialog extends EventTarget {
   }
 
   _checkPort() {
-    const element = this.elements.network.port_status_label;
-    delete element.dataset.open;
-    setTextContent(element, 'Checking...');
-    this.remote.checkPort(this._onPortChecked, this);
+    for (const [key, element] of Object.entries(
+      this.elements.network.port_status_label,
+    )) {
+      delete element.dataset.open;
+      setTextContent(element, 'Checking...');
+      this.remote.checkPort(
+        key,
+        (response) => this._onPortChecked(key, response),
+        this,
+      );
+    }
   }
 
-  _onPortChecked(response) {
-    const element = this.elements.network.port_status_label;
-    const is_open = response.arguments['port-is-open'];
+  _onPortChecked(ip_protocol, response) {
+    if (this.closed) {
+      return;
+    }
+
+    const args = response.result ?? response.error?.data ?? {};
+    const element = this.elements.network.port_status_label[ip_protocol];
+    const is_open = args.port_is_open ?? false;
     element.dataset.open = is_open;
-    setTextContent(element, is_open ? 'Open' : 'Closed');
+    if ('port_is_open' in args) {
+      setTextContent(element, is_open ? 'Open' : 'Closed');
+    } else {
+      setTextContent(element, 'Error');
+    }
   }
 
   _setBlocklistButtonEnabled(b) {
@@ -91,6 +107,12 @@ export class PrefsDialog extends EventTarget {
     }
   }
 
+  _onMaybePortChanged(key) {
+    if (key === 'peer_port' || key === 'port_forwarding_enabled') {
+      this._checkPort();
+    }
+  }
+
   // this callback is for controls whose changes can be applied
   // immediately, like checkboxs, radioboxes, and selects
   _onControlChanged(event_) {
@@ -98,9 +120,7 @@ export class PrefsDialog extends EventTarget {
     this.remote.savePrefs({
       [key]: PrefsDialog._getValue(event_.target),
     });
-    if (key === 'peer-port' || key === 'port-forwarding-enabled') {
-      this._checkPort();
-    }
+    this._onMaybePortChanged(key);
   }
 
   _onDialogClosed() {
@@ -108,18 +128,16 @@ export class PrefsDialog extends EventTarget {
   }
 
   // update the dialog's controls
-  _update(o) {
-    if (!o) {
-      return;
-    }
-
+  _update() {
     this._setBlocklistButtonEnabled(true);
 
-    for (const [key, value] of Object.entries(o)) {
+    for (const [key, value] of Object.entries(
+      this.session_manager.session_properties,
+    )) {
       for (const element of this.elements.root.querySelectorAll(
         `[data-key="${key}"]`,
       )) {
-        if (key === 'blocklist-size') {
+        if (key === 'blocklist_size') {
           const n = Formatter.number(value);
           element.innerHTML = `Blocklist has <span class="blocklist-size-number">${n}</span> rules`;
           setTextContent(this.elements.peers.blocklist_update_button, 'Update');
@@ -127,10 +145,7 @@ export class PrefsDialog extends EventTarget {
           switch (element.type) {
             case 'checkbox':
             case 'radio':
-              if (element.checked !== value) {
-                element.checked = value;
-                element.dispatchEvent(new Event('change'));
-              }
+              element.checked = value;
               break;
             case 'text':
             case 'textarea':
@@ -140,32 +155,26 @@ export class PrefsDialog extends EventTarget {
             case 'search':
               // don't change the text if the user's editing it.
               // it's very annoying when that happens!
-              if (
+              if (element !== document.activeElement) {
                 // eslint-disable-next-line eqeqeq
-                element.value != value &&
-                element !== document.activeElement
-              ) {
+                if (element.value != value) {
+                  this._onMaybePortChanged(key);
+                }
                 element.value = value;
-                element.dispatchEvent(new Event('change'));
               }
               break;
             case 'select-one':
-              if (element.value !== value) {
-                element.value = value;
-                element.dispatchEvent(new Event('change'));
-              }
+              element.value = value;
               break;
             default:
               console.log(element.type);
               break;
           }
         }
+
+        element.dispatchEvent(new Event('session-change'));
       }
     }
-  }
-
-  shouldAddedTorrentsStart() {
-    return this.data.elements.root.find('#start-added-torrents')[0].checked;
   }
 
   static _createCheckAndLabel(id, text) {
@@ -193,7 +202,7 @@ export class PrefsDialog extends EventTarget {
         element.classList.toggle('disabled', !check.checked);
       }
     };
-    check.addEventListener('change', callback);
+    check.addEventListener('session-change', callback);
     callback();
   }
 
@@ -227,7 +236,7 @@ export class PrefsDialog extends EventTarget {
   }
 
   static _toggleProtocolHandler(button) {
-    const handlerUrl = new URL(window.location.href);
+    const handlerUrl = new URL(globalThis.location.href);
     handlerUrl.search = 'addtorrent=%s';
     if (this._getProtocolHandlerRegistered()) {
       navigator.unregisterProtocolHandler?.('magnet', handlerUrl.toString());
@@ -260,7 +269,7 @@ export class PrefsDialog extends EventTarget {
     let input = document.createElement('input');
     input.type = 'text';
     input.id = makeUUID();
-    input.dataset.key = 'download-dir';
+    input.dataset.key = 'download_dir';
     label.setAttribute('for', input.id);
     root.append(input);
     const download_dir = input;
@@ -271,20 +280,20 @@ export class PrefsDialog extends EventTarget {
     );
     cal.check.title =
       'Separate folder to temporarily store downloads until they are complete.';
-    cal.check.dataset.key = 'incomplete-dir-enabled';
+    cal.check.dataset.key = 'incomplete_dir_enabled';
     cal.label.title = cal.check.title;
     root.append(cal.root);
     const incomplete_dir_check = cal.check;
 
     input = document.createElement('input');
     input.type = 'text';
-    input.dataset.key = 'incomplete-dir';
+    input.dataset.key = 'incomplete_dir';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);
     const incomplete_dir_input = input;
 
     cal = PrefsDialog._createCheckAndLabel('autostart-div', 'Start when added');
-    cal.check.dataset.key = 'start-added-torrents';
+    cal.check.dataset.key = 'start_added_torrents';
     root.append(cal.root);
     const autostart_check = cal.check;
 
@@ -292,7 +301,7 @@ export class PrefsDialog extends EventTarget {
       'suffix-div',
       `Append "part" to incomplete files' names`,
     );
-    cal.check.dataset.key = 'rename-partial-files';
+    cal.check.dataset.key = 'rename_partial_files';
     root.append(cal.root);
     const suffix_check = cal.check;
 
@@ -300,13 +309,13 @@ export class PrefsDialog extends EventTarget {
       'download-queue-div',
       'Download queue size:',
     );
-    cal.check.dataset.key = 'download-queue-enabled';
+    cal.check.dataset.key = 'download_queue_enabled';
     root.append(cal.root);
     const download_queue_check = cal.check;
 
     input = document.createElement('input');
     input.type = 'number';
-    input.dataset.key = 'download-queue-size';
+    input.dataset.key = 'download_queue_size';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);
     const download_queue_input = input;
@@ -320,7 +329,7 @@ export class PrefsDialog extends EventTarget {
       'stop-ratio-div',
       'Stop seeding at ratio:',
     );
-    cal.check.dataset.key = 'seedRatioLimited';
+    cal.check.dataset.key = 'seed_ratio_limited';
     root.append(cal.root);
     const stop_ratio_check = cal.check;
 
@@ -328,7 +337,7 @@ export class PrefsDialog extends EventTarget {
     input.type = 'number';
     input.min = '0.1';
     input.step = 'any';
-    input.dataset.key = 'seedRatioLimit';
+    input.dataset.key = 'seed_ratio_limit';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);
     const stop_ratio_input = input;
@@ -337,7 +346,7 @@ export class PrefsDialog extends EventTarget {
       'stop-idle-div',
       'Stop seeding if idle for N mins:',
     );
-    cal.check.dataset.key = 'idle-seeding-limit-enabled';
+    cal.check.dataset.key = 'idle_seeding_limit_enabled';
     root.append(cal.root);
     const stop_idle_check = cal.check;
 
@@ -345,7 +354,7 @@ export class PrefsDialog extends EventTarget {
     input.type = 'number';
     input.min = '0.1';
     input.step = 'any';
-    input.dataset.key = 'idle-seeding-limit';
+    input.dataset.key = 'idle_seeding_limit';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);
     const stop_idle_input = input;
@@ -391,13 +400,13 @@ export class PrefsDialog extends EventTarget {
       'upload-speed-div',
       'Upload (kB/s):',
     );
-    cal.check.dataset.key = 'speed-limit-up-enabled';
+    cal.check.dataset.key = 'speed_limit_up_enabled';
     root.append(cal.root);
     const upload_speed_check = cal.check;
 
     let input = document.createElement('input');
     input.type = 'number';
-    input.dataset.key = 'speed-limit-up';
+    input.dataset.key = 'speed_limit_up';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);
     const upload_speed_input = input;
@@ -406,13 +415,13 @@ export class PrefsDialog extends EventTarget {
       'download-speed-div',
       'Download (kB/s):',
     );
-    cal.check.dataset.key = 'speed-limit-down-enabled';
+    cal.check.dataset.key = 'speed_limit_down_enabled';
     root.append(cal.root);
     const download_speed_check = cal.check;
 
     input = document.createElement('input');
     input.type = 'number';
-    input.dataset.key = 'speed-limit-down';
+    input.dataset.key = 'speed_limit_down';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);
     const download_speed_input = input;
@@ -434,7 +443,7 @@ export class PrefsDialog extends EventTarget {
 
     input = document.createElement('input');
     input.type = 'number';
-    input.dataset.key = 'alt-speed-up';
+    input.dataset.key = 'alt_speed_up';
     input.id = makeUUID();
     label.setAttribute('for', input.id);
     root.append(input);
@@ -446,14 +455,14 @@ export class PrefsDialog extends EventTarget {
 
     input = document.createElement('input');
     input.type = 'number';
-    input.dataset.key = 'alt-speed-down';
+    input.dataset.key = 'alt_speed_down';
     input.id = makeUUID();
     label.setAttribute('for', input.id);
     root.append(input);
     const alt_download_speed_input = input;
 
     cal = PrefsDialog._createCheckAndLabel('alt-times-div', 'Scheduled times');
-    cal.check.dataset.key = 'alt-speed-time-enabled';
+    cal.check.dataset.key = 'alt_speed_time_enabled';
     root.append(cal.root);
     const alt_times_check = cal.check;
 
@@ -464,7 +473,7 @@ export class PrefsDialog extends EventTarget {
 
     let select = document.createElement('select');
     select.id = makeUUID();
-    select.dataset.key = 'alt-speed-time-begin';
+    select.dataset.key = 'alt_speed_time_begin';
     PrefsDialog._initTimeDropDown(select);
     label.setAttribute('for', select.id);
     root.append(select);
@@ -478,7 +487,7 @@ export class PrefsDialog extends EventTarget {
 
     select = document.createElement('select');
     select.id = makeUUID();
-    select.dataset.key = 'alt-speed-time-end';
+    select.dataset.key = 'alt_speed_time_end';
     PrefsDialog._initTimeDropDown(select);
     label.setAttribute('for', select.id);
     root.append(select);
@@ -492,7 +501,7 @@ export class PrefsDialog extends EventTarget {
 
     select = document.createElement('select');
     select.id = makeUUID();
-    select.dataset.key = 'alt-speed-time-day';
+    select.dataset.key = 'alt_speed_time_day';
     PrefsDialog._initDayDropDown(select);
     label.setAttribute('for', select.id);
     root.append(select);
@@ -529,7 +538,7 @@ export class PrefsDialog extends EventTarget {
 
     let input = document.createElement('input');
     input.type = 'number';
-    input.dataset.key = 'peer-limit-per-torrent';
+    input.dataset.key = 'peer_limit_per_torrent';
     input.id = makeUUID();
     label.setAttribute('for', input.id);
     root.append(input);
@@ -541,7 +550,7 @@ export class PrefsDialog extends EventTarget {
 
     input = document.createElement('input');
     input.type = 'number';
-    input.dataset.key = 'peer-limit-global';
+    input.dataset.key = 'peer_limit_global';
     input.id = makeUUID();
     label.setAttribute('for', input.id);
     root.append(input);
@@ -571,7 +580,7 @@ export class PrefsDialog extends EventTarget {
     );
     cal.check.title =
       "PEX is a tool for exchanging peer lists with the peers you're connected to.";
-    cal.check.dataset.key = 'pex-enabled';
+    cal.check.dataset.key = 'pex_enabled';
     cal.label.title = cal.check.title;
     root.append(cal.root);
     const pex_check = cal.check;
@@ -581,7 +590,7 @@ export class PrefsDialog extends EventTarget {
       'Use DHT to find more peers',
     );
     cal.check.title = 'DHT is a tool for finding peers without a tracker.';
-    cal.check.dataset.key = 'dht-enabled';
+    cal.check.dataset.key = 'dht_enabled';
     cal.label.title = cal.check.title;
     root.append(cal.root);
     const dht_check = cal.check;
@@ -591,7 +600,7 @@ export class PrefsDialog extends EventTarget {
       'Use LPD to find more peers',
     );
     cal.check.title = 'LPD is a tool for finding peers on your local network.';
-    cal.check.dataset.key = 'lpd-enabled';
+    cal.check.dataset.key = 'lpd_enabled';
     cal.label.title = cal.check.title;
     root.append(cal.root);
     const lpd_check = cal.check;
@@ -605,21 +614,21 @@ export class PrefsDialog extends EventTarget {
       'blocklist-enabled-div',
       'Enable blocklist:',
     );
-    cal.check.dataset.key = 'blocklist-enabled';
+    cal.check.dataset.key = 'blocklist_enabled';
     root.append(cal.root);
     const blocklist_enabled_check = cal.check;
 
     input = document.createElement('input');
     input.type = 'url';
     input.value = 'http://www.example.com/blocklist';
-    input.dataset.key = 'blocklist-url';
+    input.dataset.key = 'blocklist_url';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);
     const blocklist_url_input = input;
 
     label = document.createElement('label');
     label.textContent = 'Blocklist has {n} rules';
-    label.dataset.key = 'blocklist-size';
+    label.dataset.key = 'blocklist_size';
     label.classList.add('blocklist-size-label');
     PrefsDialog._enableIfChecked(label, cal.check);
     root.append(label);
@@ -660,7 +669,7 @@ export class PrefsDialog extends EventTarget {
 
     const input = document.createElement('input');
     input.type = 'number';
-    input.dataset.key = 'peer-port';
+    input.dataset.key = 'peer_port';
     input.id = makeUUID();
     label.setAttribute('for', input.id);
     root.append(input);
@@ -669,19 +678,27 @@ export class PrefsDialog extends EventTarget {
     const port_status_div = document.createElement('div');
     port_status_div.classList.add('port-status');
     label = document.createElement('label');
-    label.textContent = 'Port is';
+    label.textContent = 'IPv4 port is';
     port_status_div.append(label);
-    const port_status_label = document.createElement('label');
-    port_status_label.textContent = '?';
-    port_status_label.classList.add('port-status-label');
-    port_status_div.append(port_status_label);
+    const port_status_label_ipv4 = document.createElement('label');
+    port_status_label_ipv4.textContent = '?';
+    port_status_label_ipv4.classList.add('port-status-label');
+    port_status_div.append(port_status_label_ipv4);
+    port_status_div.append(document.createElement('br'));
+    label = document.createElement('label');
+    label.textContent = 'IPv6 port is';
+    port_status_div.append(label);
+    const port_status_label_ipv6 = document.createElement('label');
+    port_status_label_ipv6.textContent = '?';
+    port_status_label_ipv6.classList.add('port-status-label');
+    port_status_div.append(port_status_label_ipv6);
     root.append(port_status_div);
 
     let cal = PrefsDialog._createCheckAndLabel(
       'randomize-port',
       'Randomize port on launch',
     );
-    cal.check.dataset.key = 'peer-port-random-on-start';
+    cal.check.dataset.key = 'peer_port_random_on_start';
     root.append(cal.root);
     const random_port_check = cal.check;
 
@@ -689,7 +706,7 @@ export class PrefsDialog extends EventTarget {
       'port-forwarding',
       'Use port forwarding from my router',
     );
-    cal.check.dataset.key = 'port-forwarding-enabled';
+    cal.check.dataset.key = 'port_forwarding_enabled';
     root.append(cal.root);
     const port_forwarding_check = cal.check;
 
@@ -702,7 +719,7 @@ export class PrefsDialog extends EventTarget {
       'utp-enabled',
       'Enable uTP for peer communication',
     );
-    cal.check.dataset.key = 'utp-enabled';
+    cal.check.dataset.key = 'utp_enabled';
     root.append(cal.root);
     const utp_check = cal.check;
 
@@ -725,7 +742,7 @@ export class PrefsDialog extends EventTarget {
     }
 
     const textarea = document.createElement('textarea');
-    textarea.dataset.key = 'default-trackers';
+    textarea.dataset.key = 'default_trackers';
     textarea.id = 'default-trackers';
     root.append(textarea);
     const default_trackers_textarea = textarea;
@@ -734,7 +751,10 @@ export class PrefsDialog extends EventTarget {
       default_trackers_textarea,
       port_forwarding_check,
       port_input,
-      port_status_label,
+      port_status_label: {
+        ipv4: port_status_label_ipv4,
+        ipv6: port_status_label_ipv6,
+      },
       random_port_check,
       root,
       utp_check,
@@ -765,8 +785,7 @@ export class PrefsDialog extends EventTarget {
     this.closed = false;
     this.session_manager = session_manager;
     this.remote = remote;
-    this.update_soon = () =>
-      this._update(this.session_manager.session_properties);
+    this.update_from_session = () => this._update();
 
     this.elements = PrefsDialog._create();
     this.elements.peers.blocklist_update_button.addEventListener(
@@ -783,6 +802,7 @@ export class PrefsDialog extends EventTarget {
         PrefsDialog._toggleProtocolHandler(event_.currentTarget);
       },
     );
+    this.elements.dismiss.addEventListener('click', () => this.close());
     this.outside = new OutsideClickListener(this.elements.root);
     this.outside.addEventListener('click', () => this.close());
 
@@ -818,8 +838,11 @@ export class PrefsDialog extends EventTarget {
     walk(this.elements.speed);
     walk(this.elements.torrents);
 
-    this.session_manager.addEventListener('session-change', this.update_soon);
-    this.update_soon();
+    this.session_manager.addEventListener(
+      'session-change',
+      this.update_from_session,
+    );
+    this.update_from_session();
 
     document.body.append(this.elements.root);
   }
@@ -829,10 +852,10 @@ export class PrefsDialog extends EventTarget {
       this.outside.stop();
       this.session_manager.removeEventListener(
         'session-change',
-        this.update_soon,
+        this.update_from_session,
       );
       this.elements.root.remove();
-      dispatchEvent(new Event('close'));
+      this.dispatchEvent(new Event('close'));
       for (const key of Object.keys(this)) {
         this[key] = null;
       }

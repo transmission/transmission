@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -36,6 +36,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     CGFloat const height = [NSUserDefaults.standardUserDefaults floatForKey:@"InspectorContentHeightFiles"];
     if (height != 0.0)
     {
@@ -87,13 +88,13 @@
 
     if (self.fTorrents.count == 1)
     {
-        [self.fFileController refresh];
+        [self.fFileController reloadVisibleRows];
 
 #warning use TorrentFileCheckChange notification as well
         Torrent* torrent = self.fTorrents[0];
         if (torrent.folder)
         {
-            NSInteger const filesCheckState = [torrent
+            NSControlStateValue const filesCheckState = [torrent
                 checkForFiles:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, torrent.fileCount)]];
             self.fCheckAllButton.enabled = filesCheckState != NSControlStateValueOn; //if anything is unchecked
             self.fUncheckAllButton.enabled = !torrent.allDownloaded; //if there are any checked files that aren't finished

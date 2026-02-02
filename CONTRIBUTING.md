@@ -41,7 +41,7 @@ On macOS, Transmission is usually built with Xcode. Everywhere else, it's CMake 
 - Prefer `enum class` over `enum`
 - Prefer new-style headers, e.g. `<cstring>` over `<string.h>`
 - Fix any warnings in new code before merging
-- Run `./code-style.sh` on your code to ensure the whole codebase has consistent indentation.
+- Run `./code_style.sh` on your code to ensure the whole codebase has consistent indentation.
 
 Note that Transmission existed in C for over a decade and those idioms don't change overnight. "Follow the C++ core guidelines" can be difficult when working with older code, and the maintainers will understand that when reviewing your PRs. :smiley:
 

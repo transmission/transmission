@@ -391,3 +391,12 @@
 
 /* Class = "NSTextFieldCell"; title = "Applies to newly added transfers"; ObjectID = "2123"; */
 "2123.title" = "Van toepassing op nieuwe transfers";
+
+/* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
+"A9E-F4-a3c.title" = "Open torrent bestanden";
+
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
+"pgY-W3-HdI.title" = "Stel in als standaard";
+
+/* Class = "NSButtonCell"; title = "Verify data when download completes"; ObjectID = "wM8-cD-WAB"; */
+/* "wM8-cD-WAB.title" = ""; */

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
 <interface domain="transmission-gtk">
   <requires lib="gtk+" version="3.24"/>
   <template class="gtkmm__CustomObject_9FilterBar" parent="GtkBox">
@@ -13,7 +12,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">_Show:</property>
         <property name="use-underline">True</property>
-        <property name="mnemonic-widget">activity_combo</property>
+        <property name="mnemonic-widget">show_mode_combo</property>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -22,7 +21,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkComboBox" id="activity_combo">
+      <object class="GtkComboBox" id="show_mode_combo">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="margin-end">6</property>

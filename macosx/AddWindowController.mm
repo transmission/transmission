@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -87,6 +87,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateCheckButtons:) name:@"TorrentFileCheckChange"
                                              object:self.torrent];
 
@@ -176,8 +177,6 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-
     [_fTimer invalidate];
 }
 
@@ -310,7 +309,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
     {
         //check buttons
         //keep synced with identical code in InfoFileViewController.m
-        NSInteger const filesCheckState = [self.torrent
+        NSControlStateValue const filesCheckState = [self.torrent
             checkForFiles:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.torrent.fileCount)]];
         self.fCheckAllButton.enabled = filesCheckState != NSControlStateValueOn; //if anything is unchecked
         self.fUncheckAllButton.enabled = !self.torrent.allDownloaded; //if there are any checked files that aren't finished
@@ -353,7 +352,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 {
     [self.torrent update];
 
-    [self.fFileController refresh];
+    [self.fFileController reloadVisibleRows];
 
     [self updateCheckButtons:nil]; //call in case button state changed by checking
 

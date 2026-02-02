@@ -31,6 +31,7 @@ Much of this documentation is out-of-date or could be improved. Pull requests ar
  * [RPC protocol specification](rpc-spec.md)
  * [Transmission's Peer ID and User-Agent headers](Peer-ID-and-User-Agent.md)
  * [Peer status text explained](Peer-Status-Text.md)
+ * [Securing Transmission's RPC interface with an open-source reverse proxy (External Link)](https://www.pomerium.com/docs/guides/transmission)
 
 # 3. Report a problem / request a feature #
   * [Check](https://github.com/transmission/transmission/issues) whether the problem has already been reported.

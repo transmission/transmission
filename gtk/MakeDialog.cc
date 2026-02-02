@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -14,7 +14,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
 #include <libtransmission/makemeta.h>
-#include <libtransmission/utils.h> /* tr_formatter_mem_B() */
+#include <libtransmission/values.h>
 
 #include <giomm/file.h>
 #include <glibmm/convert.h>
@@ -41,7 +41,7 @@
 #include <gtkmm/selectiondata.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <chrono>
 #include <future>
@@ -51,6 +51,7 @@
 #include <utility>
 
 using namespace std::literals;
+using namespace tr::Values;
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 using FileListValue = Glib::Value<GSList*>;
@@ -67,17 +68,19 @@ public:
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
         tr_metainfo_builder& metainfo_builder,
-        std::future<tr_error*> future,
+        std::future<tr_error> future,
         std::string_view target,
         Glib::RefPtr<Session> const& core);
+    MakeProgressDialog(MakeProgressDialog&&) = delete;
+    MakeProgressDialog(MakeProgressDialog const&) = delete;
+    MakeProgressDialog& operator=(MakeProgressDialog&&) = delete;
+    MakeProgressDialog& operator=(MakeProgressDialog const&) = delete;
     ~MakeProgressDialog() override;
-
-    TR_DISABLE_COPY_MOVE(MakeProgressDialog)
 
     static std::unique_ptr<MakeProgressDialog> create(
         std::string_view target,
         tr_metainfo_builder& metainfo_builder,
-        std::future<tr_error*> future,
+        std::future<tr_error> future,
         Glib::RefPtr<Session> const& core);
 
     [[nodiscard]] bool success() const
@@ -93,7 +96,7 @@ private:
 
 private:
     tr_metainfo_builder& builder_;
-    std::future<tr_error*> future_;
+    std::future<tr_error> future_;
     std::string const target_;
     Glib::RefPtr<Session> const core_;
     bool success_ = false;
@@ -109,9 +112,11 @@ class MakeDialog::Impl
 {
 public:
     Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl() = default;
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void onSourceToggled(Gtk::CheckButton* tb, PathButton* chooser);
@@ -186,30 +191,29 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     auto const base = Glib::path_get_basename(builder_.top());
     if (!is_done)
     {
-        str = fmt::format(_("Creating '{path}'"), fmt::arg("path", base));
+        str = fmt::format(fmt::runtime(_("Creating '{path}'")), fmt::arg("path", base));
     }
     else
     {
-        tr_error* error = future_.get();
+        auto error = future_.get();
 
-        if (error == nullptr)
+        if (!error)
         {
             builder_.save(target_, &error);
         }
 
-        if (error == nullptr)
+        if (!error)
         {
-            str = fmt::format(_("Created '{path}'"), fmt::arg("path", base));
+            str = fmt::format(fmt::runtime(_("Created '{path}'")), fmt::arg("path", base));
             success = true;
         }
         else
         {
             str = fmt::format(
-                _("Couldn't create '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't create '{path}': {error} ({error_code})")),
                 fmt::arg("path", base),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code));
-            tr_error_free(error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code()));
         }
     }
 
@@ -224,7 +228,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     {
         /* how much data we've scanned through to generate checksums */
         str = fmt::format(
-            _("Scanned {file_size}"),
+            fmt::runtime(_("Scanned {file_size}")),
             fmt::arg("file_size", tr_strlsize(static_cast<uint64_t>(piece_index) * builder_.piece_size())));
     }
 
@@ -248,8 +252,8 @@ MakeProgressDialog::~MakeProgressDialog()
 void MakeProgressDialog::addTorrent()
 {
     tr_ctor* ctor = tr_ctorNew(core_->get_session());
-    tr_ctorSetMetainfoFromFile(ctor, target_.c_str(), nullptr);
-    tr_ctorSetDownloadDir(ctor, TR_FORCE, Glib::path_get_dirname(builder_.top()).c_str());
+    tr_ctorSetMetainfoFromFile(ctor, target_);
+    tr_ctorSetDownloadDir(ctor, TR_FORCE, Glib::path_get_dirname(builder_.top()));
     core_->add_ctor(ctor);
 }
 
@@ -280,7 +284,7 @@ MakeProgressDialog::MakeProgressDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     tr_metainfo_builder& metainfo_builder,
-    std::future<tr_error*> future,
+    std::future<tr_error> future,
     std::string_view target,
     Glib::RefPtr<Session> const& core)
     : Gtk::Dialog(cast_item)
@@ -302,7 +306,7 @@ MakeProgressDialog::MakeProgressDialog(
 std::unique_ptr<MakeProgressDialog> MakeProgressDialog::create(
     std::string_view target,
     tr_metainfo_builder& metainfo_builder,
-    std::future<tr_error*> future,
+    std::future<tr_error> future,
     Glib::RefPtr<Session> const& core)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("MakeProgressDialog.ui"));
@@ -385,17 +389,20 @@ void MakeDialog::Impl::updatePiecesLabel()
     else
     {
         gstr += fmt::format(
-            ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", builder_->file_count()),
+            fmt::runtime(ngettext(
+                "{total_size} in {file_count:L} file",
+                "{total_size} in {file_count:L} files",
+                builder_->file_count())),
             fmt::arg("total_size", tr_strlsize(builder_->total_size())),
             fmt::arg("file_count", builder_->file_count()));
         gstr += ' ';
         gstr += fmt::format(
-            ngettext(
+            fmt::runtime(ngettext(
                 "({piece_count} BitTorrent piece @ {piece_size})",
                 "({piece_count} BitTorrent pieces @ {piece_size})",
-                builder_->piece_count()),
+                builder_->piece_count())),
             fmt::arg("piece_count", builder_->piece_count()),
-            fmt::arg("piece_size", tr_formatter_mem_B(builder_->piece_size())));
+            fmt::arg("piece_size", Memory{ builder_->piece_size(), Memory::Units::Bytes }.to_string()));
     }
 
     pieces_lb_->set_text(gstr);
@@ -403,8 +410,8 @@ void MakeDialog::Impl::updatePiecesLabel()
 
 void MakeDialog::Impl::configurePieceSizeScale(uint32_t piece_size)
 {
-    // the below lower & upper bounds would allow piece size selection between approx 1KiB - 64MiB
-    auto adjustment = Gtk::Adjustment::create(log2(piece_size), 10, 26, 1.0, 1.0);
+    // the below lower & upper bounds would allow piece size selection between approx 16KiB - 256MiB
+    auto adjustment = Gtk::Adjustment::create(log2(piece_size), 14, 28, 1.0, 1.0);
     piece_size_scale_->set_adjustment(adjustment);
     piece_size_scale_->set_visible(true);
 }
@@ -542,7 +549,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
     file_radio_->signal_toggled().connect([this]() { onSourceToggled(file_radio_, file_chooser_); });
     file_chooser_->signal_selection_changed().connect([this]() { onChooserChosen(file_chooser_); });
 
-    pieces_lb_->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), _("No source selected")));
+    pieces_lb_->set_markup(fmt::format("<i>{:s}</i>", _("No source selected")));
 
     piece_size_scale_->set_visible(false);
     piece_size_scale_->signal_value_changed().connect([this]() { onPieceSizeUpdated(); });

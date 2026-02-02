@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ geverifieerd";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -43,14 +42,21 @@
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
-   Inspector -> selected torrents */
+   Inspector -> selected torrents
+   quicklook file count */
 "%lu files" = "%lu bestanden";
+
+/* quicklook file header */
+"%lu Files" = "%lu bestanden";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu inkomend";
 
 /* Prefs -> blocklist -> message */
 "%lu IP address rules in list" = "%lu IP-adressen in de lijst";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Known:" = "%lu Bekend:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu lokale ontdekking";
@@ -76,6 +82,9 @@
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu tracker";
 
+/* quicklook tracker header */
+"%lu Trackers" = "%lu trackers";
+
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
@@ -83,6 +92,9 @@
 
 /* Torrent -> status string */
 "%lu web seeds" = "%lu webseeds";
+
+/* quicklook web seed header */
+"%lu Web Seeds" = "%lu webseeds";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u fragmenten, %2$@ elk";
@@ -108,10 +120,16 @@
 /* stats window -> times opened */
 "1 time" = "1 keer";
 
+/* quicklook tracker header */
+"1 Tracker" = "1 tracker";
+
 /* Filter Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 overdracht";
+
+/* quicklook web seed header */
+"1 Web Seed" = "1 webseed";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "‘%@’ is geen geldig torrentbestand.";
@@ -214,6 +232,9 @@
 /* inspector -> peer table -> header tool tip */
 "Available" = "Beschikbaar";
 
+/* Transfer speed (bytes per second) */
+"B/s" = "B/s";
+
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Bandbreedte";
 
@@ -273,6 +294,15 @@
    Create torrent -> select file */
 "Create Torrent File" = "Torrentbestand aanmaken";
 
+/* quicklook creation info */
+"Created on %@" = "Gemaakt op %@";
+
+/* quicklook creation info */
+"Created on %@ with %@" = "Gemaakt op %1$@ met %2$@";
+
+/* quicklook creation info */
+"Created with %@" = "Gemaakt met %@";
+
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Aanmaken van ‘%@’ mislukt.";
 
@@ -295,7 +325,6 @@
 /* inspector -> peer table -> header
    inspector -> web seed table -> header
    status bar -> status label
-   Torrent -> status image
    Torrent -> status string */
 "DL" = "DL";
 
@@ -444,6 +473,9 @@
 /* View menu -> Status Bar */
 "Hide Status Bar" = "Verberg statusbalk";
 
+/* View menu -> Toolbar */
+"Hide Toolbar" = "Verberg knoppenbalk";
+
 /* File Outline -> Priority Menu */
 "High" = "Hoog";
 
@@ -478,6 +510,9 @@
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "KB/s";
 
+/* Inspector -> Peers tab -> peers */
+"Known:" = "Bekend:";
+
 /* Tracker last announce */
 "Last Announce" = "Laatste aankondiging";
 
@@ -492,9 +527,6 @@
 
 /* About window -> license button */
 "License" = "Licentie";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Gelimiteerd (%ld KB/s)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Het log kon niet worden bewaard";
@@ -673,9 +705,6 @@
    Preferences -> toolbar item title */
 "Peers" = "Peers";
 
-/* Inspector -> Peers tab -> table row tooltip */
-"Port: %@" = "Poort: %@";
-
 /* Preferences -> Network -> port status */
 "Port check site is down" = "Poortcontrolesite onbereikbaar";
 
@@ -684,6 +713,9 @@
 
 /* Preferences -> Network -> port status */
 "Port is open" = "Poort is open";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Port: %@" = "Poort: %@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "640";
@@ -882,6 +914,9 @@
 /* Torrent cell -> button info */
 "Show the data file in Finder" = "Toon gegevensbestand in Finder";
 
+/* View menu -> Toolbar */
+"Show Toolbar" = "Werkbalk weergeven ";
+
 /* Dock item
    Status Bar -> speed tooltip */
 "Speed Limit" = "Snelheidslimiet";
@@ -900,9 +935,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Statistieken";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Stop bij verhouding (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Stop wachten om te starten";
@@ -987,7 +1019,7 @@
 "This folder contains no files." = "Deze map bevat geen bestanden.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Deze optie is niet beschikbaar als Standaardlocatie is ingesteld op Zelfde als torrent-bestand.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Deze overdracht is actief. Eenmaal verwijderd is het torrentbestand of de magnetlink nodig om de overdracht verder te zetten.";

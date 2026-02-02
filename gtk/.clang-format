@@ -3,15 +3,17 @@ BasedOnStyle: InheritParentConfig
 
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '^<libtransmission/transmission.h>'
+  - Regex: '^<libtransmission-app/'
     Priority: 3
+  - Regex: '^<libtransmission/transmission.h>'
+    Priority: 4
     SortPriority: 3
   - Regex: '^<libtransmission/'
-    Priority: 3
+    Priority: 4
     SortPriority: 4
   - Regex: '^<(cairo|gdk|gio|glib|gtk|pango)mm([-./]|config)'
     Priority: 5
-  - Regex: '^<(fmt)/'
+  - Regex: '^<(fmt|small)/'
     Priority: 6
   - Regex: '^<(cairo|gdk|gio|glib|gtk|pango)[-./]'
     Priority: 8

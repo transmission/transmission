@@ -33,10 +33,10 @@
 "42.title" = "Oranda Dur";
 
 /* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
-"43.title" = "Karşıya Yükleme Sınırı:";
+"43.title" = "Karşıya yükleme sınırı:";
 
 /* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
-"44.title" = "İndirme Sınırı:";
+"44.title" = "İndirme sınırı:";
 
 /* Class = "NSButtonCell"; title = "Stay within the global bandwidth limits"; ObjectID = "45"; */
 "45.title" = "Genel bant genişliği sınırlarına uy";
@@ -45,7 +45,7 @@
 "46.title" = "Öncelik";
 
 /* Class = "NSTextFieldCell"; title = "Transfer Priority:"; ObjectID = "47"; */
-"47.title" = "Aktarım Önceliği:";
+"47.title" = "Aktarım önceliği:";
 
 /* Class = "NSMenuItem"; title = "Low"; ObjectID = "50"; */
 "50.title" = "Düşük";

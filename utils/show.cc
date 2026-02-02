@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -19,7 +19,7 @@
 #include <vector>
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -30,40 +30,44 @@
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web.h>
 #include <libtransmission/web-utils.h>
 
-#include "units.h"
-
 using namespace std::literals;
+using namespace tr::Values;
 
 namespace
 {
-
 auto constexpr TimeoutSecs = std::chrono::seconds{ 30 };
 
 char constexpr MyName[] = "transmission-show";
 char constexpr Usage[] = "Usage: transmission-show [options] <torrent-file>";
 
-auto options = std::array<tr_option, 14>{
-    { { 'd', "header", "Show only header section", "d", false, nullptr },
-      { 'i', "info", "Show only info section", "i", false, nullptr },
-      { 't', "trackers", "Show only trackers section", "t", false, nullptr },
-      { 'f', "files", "Show only file list", "f", false, nullptr },
-      { 'D', "no-header", "Do not show header section", "D", false, nullptr },
-      { 'I', "no-info", "Do not show info section", "I", false, nullptr },
-      { 'T', "no-trackers", "Do not show trackers section", "T", false, nullptr },
-      { 'F', "no-files", "Do not show files section", "F", false, nullptr },
-      { 'b', "bytes", "Show file sizes in bytes", "b", false, nullptr },
-      { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
-      { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, nullptr },
-      { 'u', "unsorted", "Do not sort files by name", "u", false, nullptr },
-      { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 0, nullptr, nullptr, nullptr, false, nullptr } }
-};
+using Arg = tr_option::Arg;
+auto constexpr Options = std::array<tr_option, 14>{ {
+    { 'd', "header", "Show only header section", "d", Arg::None, nullptr },
+    { 'i', "info", "Show only info section", "i", Arg::None, nullptr },
+    { 't', "trackers", "Show only trackers section", "t", Arg::None, nullptr },
+    { 'f', "files", "Show only file list", "f", Arg::None, nullptr },
+    { 'D', "no-header", "Do not show header section", "D", Arg::None, nullptr },
+    { 'I', "no-info", "Do not show info section", "I", Arg::None, nullptr },
+    { 'T', "no-trackers", "Do not show trackers section", "T", Arg::None, nullptr },
+    { 'F', "no-files", "Do not show files section", "F", Arg::None, nullptr },
+    { 'b', "bytes", "Show file sizes in bytes", "b", Arg::None, nullptr },
+    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", Arg::None, nullptr },
+    { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", Arg::None, nullptr },
+    { 'u', "unsorted", "Do not sort files by name", "u", Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
+} };
+static_assert(Options[std::size(Options) - 2].val != 0);
+} // namespace
 
+namespace
+{
 struct app_opts
 {
     std::string_view filename;
@@ -83,7 +87,7 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -165,7 +169,7 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
 
 [[nodiscard]] auto toString(time_t now)
 {
-    return now == 0 ? "Unknown" : fmt::format("{:%a %b %d %T %Y}", fmt::localtime(now));
+    return now == 0 ? "Unknown" : fmt::format("{:%a %b %d %T %Y}", *std::localtime(&now));
 }
 
 bool compareSecondField(std::string_view l, std::string_view r)
@@ -216,8 +220,8 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
         }
 
         fmt::print("  Piece Count: {:d}\n", metainfo.piece_count());
-        fmt::print("  Piece Size: {:s}\n", tr_formatter_mem_B(metainfo.piece_size()));
-        fmt::print("  Total Size: {:s}\n", tr_formatter_size_B(metainfo.total_size()));
+        fmt::print("  Piece Size: {:s}\n", Memory{ metainfo.piece_size(), Memory::Units::Bytes }.to_string());
+        fmt::print("  Total Size: {:s}\n", Storage{ metainfo.total_size(), Storage::Units::Bytes }.to_string());
         fmt::print("  Privacy: {:s}\n", metainfo.is_private() ? "Private torrent" : "Public torrent");
     }
 
@@ -283,7 +287,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
                 filename = "  ";
                 filename += metainfo.file_subpath(i);
                 filename += " (";
-                filename += tr_formatter_size_B(metainfo.file_size(i));
+                filename += Storage{ metainfo.file_size(i), Storage::Units::Bytes }.to_string();
                 filename += ')';
             }
             filenames.emplace_back(filename);
@@ -312,9 +316,9 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 {
     class Mediator final : public tr_web::Mediator
     {
-        [[nodiscard]] time_t now() const override
+        [[nodiscard]] std::chrono::steady_clock::time_point now() const override
         {
-            return time(nullptr);
+            return std::chrono::steady_clock::now();
         }
     };
 
@@ -341,14 +345,15 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         auto response_mutex = std::mutex{};
         auto response_cv = std::condition_variable{};
         auto lock = std::unique_lock(response_mutex);
-        web->fetch({ scrape_url,
-                     [&response, &response_cv](tr_web::FetchResponse const& resp)
-                     {
-                         response = resp;
-                         response_cv.notify_one();
-                     },
-                     nullptr,
-                     TimeoutSecs });
+        web->fetch(
+            { scrape_url,
+              [&response, &response_cv](tr_web::FetchResponse const& resp)
+              {
+                  response = resp;
+                  response_cv.notify_one();
+              },
+              nullptr,
+              TimeoutSecs });
         response_cv.wait(lock);
 
         // check the response code
@@ -403,15 +408,12 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
 int tr_main(int argc, char* argv[])
 {
-    auto const init_mgr = tr_lib_init();
+    tr_lib_init();
 
     tr_locale_set_global("");
 
     tr_logSetQueueEnabled(false);
     tr_logSetLevel(TR_LOG_ERROR);
-    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
-    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
-    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     auto opts = app_opts{};
     if (parseCommandLine(opts, argc, (char const* const*)argv) != 0)
@@ -429,19 +431,18 @@ int tr_main(int argc, char* argv[])
     if (std::empty(opts.filename))
     {
         fmt::print(stderr, "ERROR: No torrent file specified.\n");
-        tr_getopt_usage(MyName, Usage, std::data(options));
+        tr_getopt_usage(MyName, Usage, std::data(Options));
         fmt::print(stderr, "\n");
         return EXIT_FAILURE;
     }
 
     /* try to parse the torrent file */
     auto metainfo = tr_torrent_metainfo{};
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const parsed = metainfo.parse_torrent_file(opts.filename, nullptr, &error);
-    if (error != nullptr)
+    if (error)
     {
-        fmt::print(stderr, "Error parsing torrent file '{:s}': {:s} ({:d})\n", opts.filename, error->message, error->code);
-        tr_error_clear(&error);
+        fmt::print(stderr, "Error parsing torrent file '{:s}': {:s} ({:d})\n", opts.filename, error.message(), error.code());
     }
     if (!parsed)
     {

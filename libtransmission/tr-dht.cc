@@ -1,10 +1,11 @@
-// This file Copyright © 2009-2023 Juliusz Chroboczek.
+// This file Copyright © Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstddef>
 #include <cstdint> // uint16_t
 #include <cstring> // memcpy()
 #include <ctime>
@@ -12,11 +13,13 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <ranges>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <tuple> // std::tie()
 #include <utility>
+#include <vector>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -28,7 +31,7 @@
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 
@@ -50,7 +53,6 @@ using namespace std::literals;
 // the dht library needs us to implement these:
 extern "C"
 {
-
     // This function should return true when a node is blacklisted.
     // We don't support using a blacklist with the DHT in Transmission,
     // since massive (ab)use of this feature could harm the DHT. However,
@@ -89,6 +91,7 @@ extern "C"
 
     int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr const* to, int tolen)
     {
+        // NOLINTNEXTLINE(readability-redundant-casting)
         return static_cast<int>(sendto(sockfd, static_cast<char const*>(buf), len, flags, to, tolen));
     }
 
@@ -115,7 +118,7 @@ private:
     using Nodes = std::deque<Node>;
     using Id = std::array<unsigned char, 20>;
 
-    enum class SwarmStatus
+    enum class SwarmStatus : uint8_t
     {
         Stopped,
         Broken,
@@ -137,11 +140,9 @@ public:
     {
         tr_logAddDebug(fmt::format("Starting DHT on port {port}", fmt::arg("port", peer_port.host())));
 
-        // load up the bootstrap nodes
-        if (tr_sys_path_exists(state_filename_.c_str()))
-        {
-            std::tie(id_, bootstrap_queue_) = load_state(state_filename_);
-        }
+        // init state from scratch, or load from state file if it exists
+        init_state(state_filename_);
+
         get_nodes_from_bootstrap_file(tr_pathbuf{ mediator_.config_dir(), "/dht.bootstrap"sv }, bootstrap_queue_);
         get_nodes_from_name("dht.transmissionbt.com", tr_port::from_host(6881), bootstrap_queue_);
         bootstrap_timer_->start_single_shot(100ms);
@@ -174,7 +175,7 @@ public:
         tr_logAddTrace("Done uninitializing DHT");
     }
 
-    void add_node(tr_address const& addr, tr_port port) override
+    void maybe_add_node(tr_address const& addr, tr_port port) override
     {
         if (addr.is_ipv4())
         {
@@ -205,7 +206,7 @@ public:
     }
 
 private:
-    [[nodiscard]] constexpr tr_socket_t udpSocket(int af) const noexcept
+    [[nodiscard]] constexpr tr_socket_t udp_socket(int af) const noexcept
     {
         switch (af)
         {
@@ -222,7 +223,7 @@ private:
 
     [[nodiscard]] SwarmStatus swarm_status(int family, int* const setme_node_count = nullptr) const
     {
-        if (udpSocket(family) == TR_BAD_SOCKET)
+        if (udp_socket(family) == TR_BAD_SOCKET)
         {
             if (setme_node_count != nullptr)
             {
@@ -307,7 +308,7 @@ private:
 
         auto [address, port] = bootstrap_queue_.front();
         bootstrap_queue_.pop_front();
-        add_node(address, port);
+        maybe_add_node(address, port);
         ++n_bootstrapped_;
 
         bootstrap_timer_->start_single_shot(bootstrap_interval(n_bootstrapped_));
@@ -385,8 +386,9 @@ private:
             return candidate.socket_address.port_ == tr_port::from_host(1);
         };
 
-        pex.erase(std::remove_if(std::begin(pex), std::end(pex), IsBadPex), std::end(pex));
-        return pex;
+        auto const remove_it = std::remove_if(std::begin(pex), std::end(pex), IsBadPex);
+        pex.erase(remove_it, std::end(pex));
+        return std::move(pex);
     }
 
     static void callback(void* vself, int event, unsigned char const* info_hash, void const* data, size_t data_len)
@@ -411,12 +413,12 @@ private:
 
     void save_state() const
     {
-        auto constexpr MaxNodes = int{ 300 };
-        auto constexpr PortLen = size_t{ 2 };
-        auto constexpr CompactAddrLen = size_t{ 4 };
-        auto constexpr CompactLen = size_t{ CompactAddrLen + PortLen };
-        auto constexpr Compact6AddrLen = size_t{ 16 };
-        auto constexpr Compact6Len = size_t{ Compact6AddrLen + PortLen };
+        static auto constexpr MaxNodes = 300;
+        static auto constexpr PortLen = tr_port::CompactPortBytes;
+        static auto constexpr CompactAddrLen = tr_address::CompactAddrBytes[TR_AF_INET];
+        static auto constexpr CompactLen = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
+        static auto constexpr Compact6AddrLen = tr_address::CompactAddrBytes[TR_AF_INET6];
+        static auto constexpr Compact6Len = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
 
         auto sins4 = std::array<struct sockaddr_in, MaxNodes>{};
         auto sins6 = std::array<struct sockaddr_in6, MaxNodes>{};
@@ -426,8 +428,9 @@ private:
         tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num4, num6));
 
         tr_variant benc;
-        tr_variantInitDict(&benc, 3);
+        tr_variantInitDict(&benc, 4);
         tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(id_), std::size(id_));
+        tr_variantDictAddInt(&benc, TR_KEY_id_timestamp, id_timestamp_);
 
         if (num4 > 0)
         {
@@ -462,55 +465,69 @@ private:
         tr_variant_serde::benc().to_file(benc, state_filename_);
     }
 
-    [[nodiscard]] static std::pair<Id, Nodes> load_state(std::string_view filename)
+    void init_state(std::string_view const filename)
     {
         // Note that DHT ids need to be distributed uniformly,
         // so it should be something truly random
-        auto id = tr_rand_obj<Id>();
+        id_ = tr_rand_obj<Id>();
+        id_timestamp_ = tr_time();
 
-        auto nodes = Nodes{};
-
-        if (auto otop = tr_variant_serde::benc().parse_file(filename); otop)
+        if (!tr_sys_path_exists(filename))
         {
-            auto& top = *otop;
+            return;
+        }
 
-            if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
-            {
-                std::copy(std::begin(sv), std::end(sv), std::begin(id));
-            }
+        auto otop = tr_variant_serde::benc().parse_file(filename);
+        if (!otop)
+        {
+            return;
+        }
 
-            size_t raw_len = 0U;
-            std::byte const* raw = nullptr;
-            if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
-            {
-                auto* walk = raw;
-                auto const* const end = raw + raw_len;
-                while (walk < end)
-                {
-                    auto addr = tr_address{};
-                    auto port = tr_port{};
-                    std::tie(addr, walk) = tr_address::from_compact_ipv4(walk);
-                    std::tie(port, walk) = tr_port::from_compact(walk);
-                    nodes.emplace_back(addr, port);
-                }
-            }
+        static auto constexpr CompactLen = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
+        static auto constexpr Compact6Len = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
+        static auto constexpr IdTtl = time_t{ 30 * 24 * 60 * 60 }; // 30 days
 
-            if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
+        auto& top = *otop;
+
+        if (auto t = int64_t{}; tr_variantDictFindInt(&top, TR_KEY_id_timestamp, &t) && t + IdTtl > id_timestamp_)
+        {
+            if (auto sv = std::string_view{};
+                tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id_))
             {
-                auto* walk = raw;
-                auto const* const end = raw + raw_len;
-                while (walk < end)
-                {
-                    auto addr = tr_address{};
-                    auto port = tr_port{};
-                    std::tie(addr, walk) = tr_address::from_compact_ipv6(walk);
-                    std::tie(port, walk) = tr_port::from_compact(walk);
-                    nodes.emplace_back(addr, port);
-                }
+                id_timestamp_ = t;
+                std::ranges::copy(sv, std::begin(id_));
             }
         }
 
-        return std::make_pair(id, nodes);
+        size_t raw_len = 0U;
+        std::byte const* raw = nullptr;
+        if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % CompactLen == 0)
+        {
+            auto* walk = raw;
+            auto const* const end = raw + raw_len;
+            while (walk < end)
+            {
+                auto addr = tr_address{};
+                auto port = tr_port{};
+                std::tie(addr, walk) = tr_address::from_compact_ipv4(walk);
+                std::tie(port, walk) = tr_port::from_compact(walk);
+                bootstrap_queue_.emplace_back(addr, port);
+            }
+        }
+
+        if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % Compact6Len == 0)
+        {
+            auto* walk = raw;
+            auto const* const end = raw + raw_len;
+            while (walk < end)
+            {
+                auto addr = tr_address{};
+                auto port = tr_port{};
+                std::tie(addr, walk) = tr_address::from_compact_ipv6(walk);
+                std::tie(port, walk) = tr_port::from_compact(walk);
+                bootstrap_queue_.emplace_back(addr, port);
+            }
+        }
     }
 
     ///
@@ -534,10 +551,11 @@ private:
 
             if (line_stream.bad() || std::empty(addrstr))
             {
-                tr_logAddWarn(fmt::format(
-                    _("Couldn't parse '{filename}' line: '{line}'"),
-                    fmt::arg("filename", filename),
-                    fmt::arg("line", line)));
+                tr_logAddWarn(
+                    fmt::format(
+                        fmt::runtime(_("Couldn't parse '{filename}' line: '{line}'")),
+                        fmt::arg("filename", filename),
+                        fmt::arg("line", line)));
             }
             else
             {
@@ -554,18 +572,17 @@ private:
         hints.ai_protocol = 0;
         hints.ai_flags = 0;
 
-        auto port_str = std::array<char, 16>{};
-        *fmt::format_to(std::data(port_str), FMT_STRING("{:d}"), port_in.host()) = '\0';
-
+        auto const port_str = fmt::format("{:d}", port_in.host());
         addrinfo* info = nullptr;
-        if (int const rc = getaddrinfo(name, std::data(port_str), &hints, &info); rc != 0)
+        if (int const rc = getaddrinfo(name, port_str.c_str(), &hints, &info); rc != 0)
         {
-            tr_logAddWarn(fmt::format(
-                _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
-                fmt::arg("address", name),
-                fmt::arg("port", port_in.host()),
-                fmt::arg("error", gai_strerror(rc)),
-                fmt::arg("error_code", rc)));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't look up '{address}:{port}': {error} ({error_code})")),
+                    fmt::arg("address", name),
+                    fmt::arg("port", port_in.host()),
+                    fmt::arg("error", gai_strerror(rc)),
+                    fmt::arg("error_code", rc)));
             return;
         }
 
@@ -588,11 +605,12 @@ private:
 
     Mediator& mediator_;
     std::string const state_filename_;
-    std::unique_ptr<libtransmission::Timer> const announce_timer_;
-    std::unique_ptr<libtransmission::Timer> const bootstrap_timer_;
-    std::unique_ptr<libtransmission::Timer> const periodic_timer_;
+    std::unique_ptr<tr::Timer> const announce_timer_;
+    std::unique_ptr<tr::Timer> const bootstrap_timer_;
+    std::unique_ptr<tr::Timer> const periodic_timer_;
 
     Id id_ = {};
+    int64_t id_timestamp_ = {};
 
     Nodes bootstrap_queue_;
     size_t n_bootstrapped_ = 0;

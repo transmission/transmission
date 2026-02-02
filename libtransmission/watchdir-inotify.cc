@@ -1,9 +1,10 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <cerrno>
+#include <cstddef>
 #include <cstdint> // uint32_t
 #include <memory>
 #include <string>
@@ -17,7 +18,7 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
@@ -25,9 +26,12 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/watchdir.h"
 #include "libtransmission/watchdir-base.h"
 
-namespace libtransmission
+struct event_base;
+
+namespace tr
 {
 
 class TimerMaker;
@@ -78,11 +82,12 @@ private:
         if (infd_ == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", dirname()),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
+                    fmt::arg("path", dirname()),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -90,11 +95,12 @@ private:
         if (inwd_ == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", dirname()),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
+                    fmt::arg("path", dirname()),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -102,11 +108,12 @@ private:
         if (event_ == nullptr)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", dirname()),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
+                    fmt::arg("path", dirname()),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -131,22 +138,13 @@ private:
         auto nread = size_t{};
         while ((nread = bufferevent_read(event, &ev, sizeof(ev))) != 0)
         {
-            if (nread == (size_t)-1)
-            {
-                auto const error_code = errno;
-                tr_logAddError(fmt::format(
-                    _("Couldn't read event: {error} ({error_code})"),
-                    fmt::arg("error", tr_strerror(error_code)),
-                    fmt::arg("error_code", error_code)));
-                break;
-            }
-
             if (nread != sizeof(ev))
             {
-                tr_logAddError(fmt::format(
-                    _("Couldn't read event: expected {expected_size}, got {actual_size}"),
-                    fmt::arg("expected_size", sizeof(ev)),
-                    fmt::arg("actual_size", nread)));
+                tr_logAddError(
+                    fmt::format(
+                        fmt::runtime(_("Couldn't read event: expected {expected_size}, got {actual_size}")),
+                        fmt::arg("expected_size", sizeof(ev)),
+                        fmt::arg("actual_size", nread)));
                 break;
             }
 
@@ -157,28 +155,20 @@ private:
             // consume entire name into buffer
             name.resize(ev.len);
             nread = bufferevent_read(event, name.data(), ev.len);
-            if (nread == static_cast<size_t>(-1))
-            {
-                auto const error_code = errno;
-                tr_logAddError(fmt::format(
-                    _("Couldn't read filename: {error} ({error_code})"),
-                    fmt::arg("error", tr_strerror(error_code)),
-                    fmt::arg("error_code", error_code)));
-                break;
-            }
 
             if (nread != ev.len)
             {
-                tr_logAddError(fmt::format(
-                    _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
-                    fmt::arg("expected_size", sizeof(ev)),
-                    fmt::arg("actual_size", nread)));
+                tr_logAddError(
+                    fmt::format(
+                        fmt::runtime(_("Couldn't read filename: expected {expected_size}, got {actual_size}")),
+                        fmt::arg("expected_size", sizeof(ev)),
+                        fmt::arg("actual_size", nread)));
                 break;
             }
 
             // NB: `name` may have extra trailing zeroes from inotify;
             // pass the c_str() so that processFile gets the right strlen
-            processFile(name.c_str());
+            processFile(std::data(name));
         }
     }
 
@@ -192,10 +182,10 @@ private:
 std::unique_ptr<Watchdir> Watchdir::create(
     std::string_view dirname,
     Callback callback,
-    libtransmission::TimerMaker& timer_maker,
+    tr::TimerMaker& timer_maker,
     event_base* evbase)
 {
     return std::make_unique<INotifyWatchdir>(dirname, std::move(callback), timer_maker, evbase);
 }
 
-} // namespace libtransmission
+} // namespace tr

@@ -1,9 +1,10 @@
-// This file Copyright © 2011-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #import "StatusBarController.h"
 #import "NSStringAdditions.h"
+#import "Utils.h"
 
 typedef NSString* StatusRatioType NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -54,6 +55,7 @@ typedef NS_ENUM(NSUInteger, StatusTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     //localize menu items
     [self.fStatusButton.menu itemWithTag:StatusTagTotalRatio].title = NSLocalizedString(@"Total Ratio", "Status Bar -> status menu");
     [self.fStatusButton.menu itemWithTag:StatusTagSessionRatio].title = NSLocalizedString(@"Session Ratio", "Status Bar -> status menu");
@@ -73,21 +75,16 @@ typedef NS_ENUM(NSUInteger, StatusTag) {
                                              object:nil];
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)updateWithDownload:(CGFloat)dlRate upload:(CGFloat)ulRate
 {
     //set rates
-    if (dlRate != self.fPreviousDownloadRate)
+    if (!isSpeedEqual(self.fPreviousDownloadRate, dlRate))
     {
         self.fTotalDLField.stringValue = [NSString stringForSpeed:dlRate];
         self.fPreviousDownloadRate = dlRate;
     }
 
-    if (ulRate != self.fPreviousUploadRate)
+    if (!isSpeedEqual(self.fPreviousUploadRate, ulRate))
     {
         self.fTotalULField.stringValue = [NSString stringForSpeed:ulRate];
         self.fPreviousUploadRate = ulRate;

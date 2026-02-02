@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -30,22 +30,16 @@
 #include <gtkmm/snapshot.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm> // std::max()
 #include <cstring> // strchr()
 #include <memory>
 #include <optional>
-#include <string>
-#include <string_view>
 
 /* #define TEST_RTL */
 
-using namespace std::string_literals;
-
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -66,9 +60,11 @@ class TorrentCellRenderer::Impl
 {
 public:
     explicit Impl(TorrentCellRenderer& renderer);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     Gtk::Requisition get_size_compact(Gtk::Widget& widget) const;
     Gtk::Requisition get_size_full(Gtk::Widget& widget) const;
@@ -240,10 +236,11 @@ void set_error_color(
     Gtk::Widget& widget,
     Gtk::CellRendererState flags)
 {
-    static auto const error_color_name = Glib::ustring("tr_error_color"s);
+    static auto const error_color_name = Glib::ustring{ "tr_error_color" };
 
     auto color = Gdk::RGBA();
-    if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{} &&
+    if (torrent.get_error_code() != tr_stat::Error::Ok &&
+        (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{} &&
         widget.get_style_context()->lookup_color(error_color_name, color))
     {
         text_renderer.property_foreground_rgba() = color;
@@ -256,9 +253,9 @@ void set_error_color(
 
 std::optional<Gdk::RGBA> get_progress_bar_color(Torrent const& torrent, Gtk::Widget const& widget)
 {
-    static auto const down_color_name = Glib::ustring("tr_transfer_down_color"s);
-    static auto const up_color_name = Glib::ustring("tr_transfer_up_color"s);
-    static auto const idle_color_name = Glib::ustring("tr_transfer_idle_color"s);
+    static auto const down_color_name = Glib::ustring{ "tr_transfer_down_color" };
+    static auto const up_color_name = Glib::ustring{ "tr_transfer_up_color" };
+    static auto const idle_color_name = Glib::ustring{ "tr_transfer_idle_color" };
 
     auto const* color_name = &idle_color_name;
     switch (torrent.get_activity())
@@ -420,7 +417,7 @@ void TorrentCellRenderer::Impl::render_compact(
     icon_renderer_->render(context, widget, icon_area, icon_area, flags);
 
     progress_renderer_->property_value() = percent_done;
-    progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
+    progress_renderer_->property_text() = fmt::format("{:d}%", percent_done);
     progress_renderer_->property_sensitive() = sensitive;
     render_progress_bar(context, widget, prog_area, flags, progress_color);
 

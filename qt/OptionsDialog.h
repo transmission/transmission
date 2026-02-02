@@ -1,25 +1,22 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <map>
 #include <optional>
 #include <vector>
 
 #include <QDir>
 #include <QFile>
-#include <QSet>
 #include <QString>
 #include <QTimer>
-
-#include <libtransmission/tr-macros.h>
 
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
 #include "Torrent.h" // FileList
+#include "Typedefs.h" // file_indices_t
 #include "ui_OptionsDialog.h"
 
 #include <libtransmission/transmission.h>
@@ -37,16 +34,19 @@ extern "C"
 class OptionsDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(OptionsDialog)
 
 public:
     OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
+    OptionsDialog& operator=(OptionsDialog&&) = delete;
+    OptionsDialog& operator=(OptionsDialog const&) = delete;
+    OptionsDialog(OptionsDialog&&) = delete;
+    OptionsDialog(OptionsDialog const&) = delete;
     ~OptionsDialog() override;
 
 private slots:
     void onAccepted();
-    void onPriorityChanged(QSet<int> const& file_indices, int);
-    void onWantedChanged(QSet<int> const& file_indices, bool);
+    void onPriorityChanged(file_indices_t const& file_indices, int);
+    void onWantedChanged(file_indices_t const& file_indices, bool);
 
     void onSourceChanged();
     void onDestinationChanged();
@@ -54,8 +54,6 @@ private slots:
     void onSessionUpdated();
 
 private:
-    using mybins_t = std::map<uint32_t, int32_t>;
-
     void reload();
     void updateWidgetsLocality();
     void clearInfo();

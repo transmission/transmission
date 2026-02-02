@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -26,19 +26,6 @@ CGFloat const kGroupSeparatorHeight = 18.0;
 static NSInteger const kMaxGroup = 999999;
 static CGFloat const kErrorImageSize = 20.0;
 
-//eliminate when Lion-only
-typedef NS_ENUM(NSUInteger, ActionMenuTag) {
-    ActionMenuTagGlobal = 101,
-    ActionMenuTagUnlimited = 102,
-    ActionMenuTagLimit = 103,
-};
-
-typedef NS_ENUM(NSUInteger, ActionMenuPriorityTag) {
-    ActionMenuPriorityTagHigh = 101,
-    ActionMenuPriorityTagNormal = 102,
-    ActionMenuPriorityTagLow = 103,
-};
-
 static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 @interface TorrentTableView ()
@@ -53,14 +40,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 @property(nonatomic) IBOutlet NSMenu* fContextNoRow;
 
 @property(nonatomic) NSIndexSet* fSelectedRowIndexes;
-
-@property(nonatomic) IBOutlet NSMenu* fActionMenu;
-@property(nonatomic) IBOutlet NSMenu* fUploadMenu;
-@property(nonatomic) IBOutlet NSMenu* fDownloadMenu;
-@property(nonatomic) IBOutlet NSMenu* fRatioMenu;
-@property(nonatomic) IBOutlet NSMenu* fPriorityMenu;
-@property(nonatomic) IBOutlet NSMenuItem* fGlobalLimitItem;
-@property(nonatomic, readonly) Torrent* fMenuTorrent;
 
 @property(nonatomic) CGFloat piecesBarPercent;
 @property(nonatomic) NSAnimation* fPiecesBarAnimation;
@@ -103,30 +82,30 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
         _piecesBarPercent = [_fDefaults boolForKey:@"PiecesBar"] ? 1.0 : 0.0;
 
-        if (@available(macOS 11.0, *))
-        {
-            self.style = NSTableViewStyleFullWidth;
-        }
+        self.style = NSTableViewStyleFullWidth;
     }
 
     return self;
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)awakeFromNib
 {
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(setNeedsDisplay) name:@"RefreshTorrentTable" object:nil];
+    [super awakeFromNib];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshTorrentTable) name:@"RefreshTorrentTable"
+                                             object:nil];
+}
+
+- (void)refreshTorrentTable
+{
+    self.needsDisplay = YES;
 }
 
 //make sure we don't lose selection on manual reloads
 - (void)reloadData
 {
+    NSArray<Torrent*>* selectedTorrents = self.selectedTorrents;
     [super reloadData];
-    [self restoreSelectionIndexes];
+    self.selectedTorrents = selectedTorrents;
 }
 
 - (void)reloadVisibleRows
@@ -143,9 +122,9 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSIndexSet* fullIndexSet = [NSIndexSet indexSetWithIndexesInRange:fullRange];
         NSMutableIndexSet* visibleIndexSet = [[NSMutableIndexSet alloc] init];
 
-        [fullIndexSet enumerateIndexesUsingBlock:^(NSUInteger row, BOOL* stop) {
-            id rowView = [self rowViewAtRow:row makeIfNecessary:NO];
-            if ([rowView isGroupRowStyle])
+        [fullIndexSet enumerateIndexesUsingBlock:^(NSUInteger row, BOOL*) {
+            id rowItem = [self itemAtRow:row];
+            if ([rowItem isKindOfClass:[TorrentGroup class]])
             {
                 [visibleIndexSet addIndex:row];
             }
@@ -169,9 +148,9 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     //redraw fControlButton
     BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
-    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger row, BOOL* stop) {
-        id rowView = [self rowViewAtRow:row makeIfNecessary:NO];
-        if (![rowView isGroupRowStyle])
+    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger row, BOOL*) {
+        id rowItem = [self itemAtRow:row];
+        if (![rowItem isKindOfClass:[TorrentGroup class]])
         {
             if (minimal)
             {
@@ -185,8 +164,11 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             }
         }
     }];
+}
 
-    [self restoreSelectionIndexes];
+- (BOOL)usesAlternatingRowBackgroundColors
+{
+    return ![self.fDefaults boolForKey:@"SmallView"];
 }
 
 - (BOOL)isGroupCollapsed:(NSInteger)value
@@ -222,11 +204,9 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item
 {
-    if ([item isKindOfClass:[Torrent class]])
-    {
-        return NO;
-    }
-    return YES;
+    // We are implementing our own group styling.
+    // Apple's default group styling conflicts with this.
+    return NO;
 }
 
 - (CGFloat)outlineView:(NSOutlineView*)outlineView heightOfRowByItem:(id)item
@@ -242,40 +222,18 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         BOOL const minimal = [self.fDefaults boolForKey:@"SmallView"];
         BOOL const error = torrent.anyErrorOrWarning;
 
+        TorrentCell* torrentCell;
         if (minimal)
         {
-            SmallTorrentCell* smallCell = [outlineView makeViewWithIdentifier:@"SmallTorrentCell" owner:self];
-            smallCell.fTorrentTableView = self;
+            torrentCell = [outlineView makeViewWithIdentifier:@"SmallTorrentCell" owner:self];
 
-            //set this so that we can draw bar in smallCell drawRect
-            smallCell.objectValue = torrent;
+            // set torrent icon or error badge
+            torrentCell.fIconView.image = error ? [NSImage imageNamed:NSImageNameCaution] : torrent.icon;
 
-            smallCell.fTorrentTitleField.stringValue = torrent.name;
-
-            //set torrent icon
-            smallCell.fIconView.image = error ? [NSImage imageNamed:NSImageNameCaution] : torrent.icon;
-
-            smallCell.fTorrentStatusField.stringValue = [self.fDefaults boolForKey:@"DisplaySmallStatusRegular"] ?
+            // set torrent status
+            torrentCell.fTorrentStatusField.stringValue = [self.fDefaults boolForKey:@"DisplaySmallStatusRegular"] ?
                 torrent.shortStatusString :
                 torrent.remainingTimeString;
-            ;
-            smallCell.fActionButton.action = @selector(displayTorrentActionPopover:);
-
-            NSInteger const groupValue = torrent.groupValue;
-            NSImage* groupImage;
-            if (groupValue != -1)
-            {
-                if (![self.fDefaults boolForKey:@"SortByGroup"])
-                {
-                    NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
-                    groupImage = [NSImage discIconWithColor:groupColor insetFactor:0];
-                }
-            }
-
-            smallCell.fGroupIndicatorView.image = groupImage;
-
-            smallCell.fControlButton.action = @selector(toggleControlForTorrent:);
-            smallCell.fRevealButton.action = @selector(revealTorrentFile:);
 
             if (self.fHoverEventDict)
             {
@@ -284,49 +242,35 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
                 if (row == hoverRow)
                 {
-                    smallCell.fTorrentStatusField.hidden = YES;
-                    smallCell.fControlButton.hidden = NO;
-                    smallCell.fRevealButton.hidden = NO;
+                    torrentCell.fTorrentStatusField.hidden = YES;
+                    torrentCell.fControlButton.hidden = NO;
+                    torrentCell.fRevealButton.hidden = NO;
                 }
             }
             else
             {
-                smallCell.fTorrentStatusField.hidden = NO;
-                smallCell.fControlButton.hidden = YES;
-                smallCell.fRevealButton.hidden = YES;
+                torrentCell.fTorrentStatusField.hidden = NO;
+                torrentCell.fControlButton.hidden = YES;
+                torrentCell.fRevealButton.hidden = YES;
             }
-
-            //redraw buttons
-            [smallCell.fControlButton display];
-            [smallCell.fRevealButton display];
-
-            return smallCell;
         }
         else
         {
-            TorrentCell* torrentCell = [outlineView makeViewWithIdentifier:@"TorrentCell" owner:self];
-            torrentCell.fTorrentTableView = self;
-
-            //set this so that we can draw bar in torrentCell drawRect
-            torrentCell.objectValue = torrent;
-
-            torrentCell.fTorrentTitleField.stringValue = torrent.name;
+            torrentCell = [outlineView makeViewWithIdentifier:@"TorrentCell" owner:self];
             torrentCell.fTorrentProgressField.stringValue = torrent.progressString;
 
-            //set torrent icon
+            // set torrent icon and error badge
             NSImage* fileImage = torrent.icon;
-
-            //error badge
             if (error)
             {
                 NSRect frame = torrentCell.fIconView.frame;
                 NSImage* resultImage = [[NSImage alloc] initWithSize:NSMakeSize(frame.size.height, frame.size.width)];
                 [resultImage lockFocus];
 
-                //draw fileImage
+                // draw fileImage
                 [fileImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
 
-                //overlay error badge
+                // overlay error badge
                 NSImage* errorImage = [NSImage imageNamed:NSImageNameCaution];
                 NSRect const errorRect = NSMakeRect(frame.origin.x, 0, kErrorImageSize, kErrorImageSize);
                 [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
@@ -342,6 +286,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
                 torrentCell.fIconView.image = fileImage;
             }
 
+            // set torrent status
             NSString* status;
             if (self.fHoverEventDict)
             {
@@ -353,31 +298,39 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
                     status = self.fHoverEventDict[@"string"];
                 }
             }
-            torrentCell.fTorrentStatusField.stringValue = status ? status : torrent.statusString;
-            torrentCell.fActionButton.action = @selector(displayTorrentActionPopover:);
-
-            NSInteger const groupValue = torrent.groupValue;
-            NSImage* groupImage;
-            if (groupValue != -1)
-            {
-                if (![self.fDefaults boolForKey:@"SortByGroup"])
-                {
-                    NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
-                    groupImage = [NSImage discIconWithColor:groupColor insetFactor:0];
-                }
-            }
-
-            torrentCell.fGroupIndicatorView.image = groupImage;
-
-            torrentCell.fControlButton.action = @selector(toggleControlForTorrent:);
-            torrentCell.fRevealButton.action = @selector(revealTorrentFile:);
-
-            //redraw buttons
-            [torrentCell.fControlButton display];
-            [torrentCell.fRevealButton display];
-
-            return torrentCell;
+            torrentCell.fTorrentStatusField.stringValue = status ?: torrent.statusString;
         }
+
+        torrentCell.fTorrentTableView = self;
+
+        // set this so that we can draw bar in torrentCell drawRect
+        torrentCell.objectValue = torrent;
+
+        torrentCell.fTorrentTitleField.stringValue = torrent.name;
+
+        torrentCell.fActionButton.action = @selector(displayTorrentActionPopover:);
+
+        NSInteger const groupValue = torrent.groupValue;
+        NSImage* groupImage;
+        if (groupValue != -1)
+        {
+            if (![self.fDefaults boolForKey:@"SortByGroup"])
+            {
+                NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
+                groupImage = [NSImage discIconWithColor:groupColor insetFactor:0];
+            }
+        }
+
+        torrentCell.fGroupIndicatorView.image = groupImage;
+
+        torrentCell.fControlButton.action = @selector(toggleControlForTorrent:);
+        torrentCell.fRevealButton.action = @selector(revealTorrentFile:);
+
+        // redraw buttons
+        torrentCell.fControlButton.needsDisplay = YES;
+        torrentCell.fRevealButton.needsDisplay = YES;
+
+        return torrentCell;
     }
     else
     {
@@ -413,6 +366,10 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         groupCell.fGroupDownloadField.stringValue = [NSString stringForSpeed:group.downloadRate];
         groupCell.fGroupDownloadView.image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
 
+        NSString* tooltipDownload = NSLocalizedString(@"Download speed", "Torrent table -> group row -> tooltip");
+        groupCell.fGroupDownloadField.toolTip = tooltipDownload;
+        groupCell.fGroupDownloadView.toolTip = tooltipDownload;
+
         BOOL displayGroupRowRatio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
         groupCell.fGroupDownloadField.hidden = displayGroupRowRatio;
         groupCell.fGroupDownloadView.hidden = displayGroupRowRatio;
@@ -423,6 +380,10 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             groupCell.fGroupUploadAndRatioView.image.accessibilityDescription = NSLocalizedString(@"Ratio", "Torrent -> status image");
 
             groupCell.fGroupUploadAndRatioField.stringValue = [NSString stringForRatio:group.ratio];
+
+            NSString* tooltipRatio = NSLocalizedString(@"Ratio", "Torrent table -> group row -> tooltip");
+            groupCell.fGroupUploadAndRatioField.toolTip = tooltipRatio;
+            groupCell.fGroupUploadAndRatioView.toolTip = tooltipRatio;
         }
         else
         {
@@ -430,7 +391,24 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             groupCell.fGroupUploadAndRatioView.image.accessibilityDescription = NSLocalizedString(@"UL", "Torrent -> status image");
 
             groupCell.fGroupUploadAndRatioField.stringValue = [NSString stringForSpeed:group.uploadRate];
+
+            NSString* tooltipUpload = NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
+            groupCell.fGroupUploadAndRatioField.toolTip = tooltipUpload;
+            groupCell.fGroupUploadAndRatioView.toolTip = tooltipUpload;
         }
+
+        NSString* tooltipGroup;
+        NSUInteger count = group.torrents.count;
+        if (count == 1)
+        {
+            tooltipGroup = NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
+        }
+        else
+        {
+            tooltipGroup = NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip");
+            tooltipGroup = [NSString localizedStringWithFormat:tooltipGroup, count];
+        }
+        groupCell.toolTip = tooltipGroup;
 
         return groupCell;
     }
@@ -447,42 +425,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     {
         return [self.dataSource outlineView:outlineView objectValueForTableColumn:[self tableColumnWithIdentifier:@"Group"]
                                      byItem:item];
-    }
-}
-
-- (NSString*)outlineView:(NSOutlineView*)outlineView
-          toolTipForCell:(NSCell*)cell
-                    rect:(NSRectPointer)rect
-             tableColumn:(NSTableColumn*)column
-                    item:(id)item
-           mouseLocation:(NSPoint)mouseLocation
-{
-    NSString* ident = column.identifier;
-    if ([ident isEqualToString:@"DL"] || [ident isEqualToString:@"DL Image"])
-    {
-        return NSLocalizedString(@"Download speed", "Torrent table -> group row -> tooltip");
-    }
-    else if ([ident isEqualToString:@"UL"] || [ident isEqualToString:@"UL Image"])
-    {
-        return [self.fDefaults boolForKey:@"DisplayGroupRowRatio"] ?
-            NSLocalizedString(@"Ratio", "Torrent table -> group row -> tooltip") :
-            NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
-    }
-    else if (ident)
-    {
-        NSUInteger count = ((TorrentGroup*)item).torrents.count;
-        if (count == 1)
-        {
-            return NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
-        }
-        else
-        {
-            return [NSString localizedStringWithFormat:NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip"), count];
-        }
-    }
-    else
-    {
-        return nil;
     }
 }
 
@@ -586,6 +528,16 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     return torrents;
 }
 
+- (void)setSelectedTorrents:(NSArray<Torrent*>*)selectedTorrents
+{
+    NSMutableIndexSet* selectedIndexes = [NSMutableIndexSet new];
+    for (Torrent* i in selectedTorrents)
+    {
+        [selectedIndexes addIndex:[self rowForItem:i]];
+    }
+    [self selectRowIndexes:selectedIndexes byExtendingSelection:NO];
+}
+
 - (NSMenu*)menuForEvent:(NSEvent*)event
 {
     NSInteger row = [self rowAtPoint:[self convertPoint:event.locationInWindow fromView:nil]];
@@ -602,11 +554,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         [self deselectAll:self];
         return self.fContextNoRow;
     }
-}
-
-- (void)restoreSelectionIndexes
-{
-    [self selectRowIndexes:self.fSelectedRowIndexes byExtendingSelection:NO];
 }
 
 //make sure that the pause buttons become orange when holding down the option key
@@ -676,45 +623,13 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
     NSPasteboard* pasteBoard = NSPasteboard.generalPasteboard;
     NSString* links = [[selectedTorrents valueForKeyPath:@"magnetLink"] componentsJoinedByString:@"\n"];
-    [pasteBoard declareTypes:@[ NSStringPboardType ] owner:nil];
-    [pasteBoard setString:links forType:NSStringPboardType];
+    [pasteBoard declareTypes:@[ NSPasteboardTypeString ] owner:nil];
+    [pasteBoard setString:links forType:NSPasteboardTypeString];
 }
 
 - (void)paste:(id)sender
 {
-    NSURL* url;
-    if ((url = [NSURL URLFromPasteboard:NSPasteboard.generalPasteboard]))
-    {
-        [self.fController openURL:url.absoluteString];
-    }
-    else
-    {
-        NSArray<NSString*>* items = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
-        if (!items)
-        {
-            return;
-        }
-        NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-        for (NSString* itemString in items)
-        {
-            NSArray<NSString*>* itemLines = [itemString componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet];
-            for (__strong NSString* pbItem in itemLines)
-            {
-                pbItem = [pbItem stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-                if ([pbItem rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
-                {
-                    [self.fController openURL:pbItem];
-                }
-                else
-                {
-#warning only accept full text?
-                    for (NSTextCheckingResult* result in [detector matchesInString:pbItem options:0
-                                                                             range:NSMakeRange(0, pbItem.length)])
-                        [self.fController openURL:result.URL.absoluteString];
-                }
-            }
-        }
-    }
+    [self.fController openPasteboard];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
@@ -723,7 +638,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     if (action == @selector(paste:))
     {
-        if ([NSPasteboard.generalPasteboard.types containsObject:NSURLPboardType])
+        if ([NSPasteboard.generalPasteboard.types containsObject:NSPasteboardTypeURL])
         {
             return YES;
         }
@@ -898,7 +813,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     CGFloat width = NSWidth(rect);
 
-    if (NSMinX(self.window.frame) < width || NSMaxX(self.window.screen.frame) - NSMinX(self.window.frame) < 72)
+    if (NSMinX(self.window.frame) < width || NSMaxX(self.window.screen.visibleFrame) - NSMinX(self.window.frame) < 72)
     {
         // Ugly hack to hide NSPopover arrow.
         self.fPositioningView = [[NSView alloc] initWithFrame:rect];
@@ -924,172 +839,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     [self.fPositioningView removeFromSuperview];
     self.fPositioningView = nil;
     self.fActionPopoverShown = NO;
-}
-
-//eliminate when Lion-only, along with all the menu item instance variables
-- (void)menuNeedsUpdate:(NSMenu*)menu
-{
-    //this method seems to be called when it shouldn't be
-    if (!self.fMenuTorrent || !menu.supermenu)
-    {
-        return;
-    }
-
-    if (menu == self.fUploadMenu || menu == self.fDownloadMenu)
-    {
-        NSMenuItem* item;
-        if (menu.numberOfItems == 3)
-        {
-            static NSArray<NSNumber*>* const speedLimitActionValues = @[ @50, @100, @250, @500, @1000, @2500, @5000, @10000 ];
-
-            for (NSNumber* i in speedLimitActionValues)
-            {
-                item = [[NSMenuItem alloc]
-                    initWithTitle:[NSString localizedStringWithFormat:NSLocalizedString(@"%ld KB/s", "Action menu -> upload/download limit"),
-                                                                      i.integerValue]
-                           action:@selector(setQuickLimit:)
-                    keyEquivalent:@""];
-                item.target = self;
-                item.representedObject = i;
-                [menu addItem:item];
-            }
-        }
-
-        BOOL const upload = menu == self.fUploadMenu;
-        BOOL const limit = [self.fMenuTorrent usesSpeedLimit:upload];
-
-        item = [menu itemWithTag:ActionMenuTagLimit];
-        item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
-        item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
-                                                         [self.fMenuTorrent speedLimit:upload]];
-
-        item = [menu itemWithTag:ActionMenuTagUnlimited];
-        item.state = !limit ? NSControlStateValueOn : NSControlStateValueOff;
-    }
-    else if (menu == self.fRatioMenu)
-    {
-        NSMenuItem* item;
-        if (menu.numberOfItems == 4)
-        {
-            static NSArray<NSNumber*>* const ratioLimitActionValue = @[ @0.25, @0.5, @0.75, @1.0, @1.5, @2.0, @3.0 ];
-
-            for (NSNumber* i in ratioLimitActionValue)
-            {
-                item = [[NSMenuItem alloc] initWithTitle:[NSString localizedStringWithFormat:@"%.2f", i.floatValue]
-                                                  action:@selector(setQuickRatio:)
-                                           keyEquivalent:@""];
-                item.target = self;
-                item.representedObject = i;
-                [menu addItem:item];
-            }
-        }
-
-        tr_ratiolimit const mode = self.fMenuTorrent.ratioSetting;
-
-        item = [menu itemWithTag:ActionMenuTagLimit];
-        item.state = mode == TR_RATIOLIMIT_SINGLE ? NSControlStateValueOn : NSControlStateValueOff;
-        item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Stop at Ratio (%.2f)", "torrent action menu -> ratio stop"),
-                                                         self.fMenuTorrent.ratioLimit];
-
-        item = [menu itemWithTag:ActionMenuTagUnlimited];
-        item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSControlStateValueOn : NSControlStateValueOff;
-
-        item = [menu itemWithTag:ActionMenuTagGlobal];
-        item.state = mode == TR_RATIOLIMIT_GLOBAL ? NSControlStateValueOn : NSControlStateValueOff;
-    }
-    else if (menu == self.fPriorityMenu)
-    {
-        tr_priority_t const priority = self.fMenuTorrent.priority;
-
-        NSMenuItem* item = [menu itemWithTag:ActionMenuPriorityTagHigh];
-        item.state = priority == TR_PRI_HIGH ? NSControlStateValueOn : NSControlStateValueOff;
-
-        item = [menu itemWithTag:ActionMenuPriorityTagNormal];
-        item.state = priority == TR_PRI_NORMAL ? NSControlStateValueOn : NSControlStateValueOff;
-
-        item = [menu itemWithTag:ActionMenuPriorityTagLow];
-        item.state = priority == TR_PRI_LOW ? NSControlStateValueOn : NSControlStateValueOff;
-    }
-}
-
-//the following methods might not be needed when Lion-only
-- (void)setQuickLimitMode:(id)sender
-{
-    BOOL const limit = [sender tag] == ActionMenuTagLimit;
-    [self.fMenuTorrent setUseSpeedLimit:limit upload:[sender menu] == self.fUploadMenu];
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-}
-
-- (void)setQuickLimit:(id)sender
-{
-    BOOL const upload = [sender menu] == self.fUploadMenu;
-    [self.fMenuTorrent setUseSpeedLimit:YES upload:upload];
-    [self.fMenuTorrent setSpeedLimit:[[sender representedObject] intValue] upload:upload];
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-}
-
-- (void)setGlobalLimit:(id)sender
-{
-    self.fMenuTorrent.usesGlobalSpeedLimit = ((NSButton*)sender).state != NSControlStateValueOn;
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-}
-
-- (void)setQuickRatioMode:(id)sender
-{
-    tr_ratiolimit mode;
-    switch ([sender tag])
-    {
-    case ActionMenuTagUnlimited:
-        mode = TR_RATIOLIMIT_UNLIMITED;
-        break;
-    case ActionMenuTagLimit:
-        mode = TR_RATIOLIMIT_SINGLE;
-        break;
-    case ActionMenuTagGlobal:
-        mode = TR_RATIOLIMIT_GLOBAL;
-        break;
-    default:
-        return;
-    }
-
-    self.fMenuTorrent.ratioSetting = mode;
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-}
-
-- (void)setQuickRatio:(id)sender
-{
-    self.fMenuTorrent.ratioSetting = TR_RATIOLIMIT_SINGLE;
-    self.fMenuTorrent.ratioLimit = [[sender representedObject] floatValue];
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-}
-
-- (void)setPriority:(id)sender
-{
-    tr_priority_t priority;
-    switch ([sender tag])
-    {
-    case ActionMenuPriorityTagHigh:
-        priority = TR_PRI_HIGH;
-        break;
-    case ActionMenuPriorityTagNormal:
-        priority = TR_PRI_NORMAL;
-        break;
-    case ActionMenuPriorityTagLow:
-        priority = TR_PRI_LOW;
-        break;
-    default:
-        NSAssert1(NO, @"Unknown priority: %ld", [sender tag]);
-        priority = TR_PRI_NORMAL;
-    }
-
-    self.fMenuTorrent.priority = priority;
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil];
 }
 
 - (void)togglePiecesBar

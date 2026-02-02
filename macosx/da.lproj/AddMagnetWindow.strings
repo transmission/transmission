@@ -3,10 +3,10 @@
 "15.title" = "Download til:";
 
 /* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
-"16.title" = "Andet...";
+"16.title" = "Skift …";
 
 /* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
-"18.title" = "Start overførslen nu";
+"18.title" = "Start efter tilføjelse";
 
 /* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
 "20.title" = "Tilføj";
@@ -30,7 +30,7 @@
 "91.title" = "Prioritet:";
 
 /* Class = "NSTextFieldCell"; title = "Magnet Link"; ObjectID = "101"; */
-"101.title" = "Magnet Link";
+"101.title" = "Magnetlink";
 
 /* Class = "NSMenuItem"; title = "None"; ObjectID = "2zq-5y-smI"; */
 "2zq-5y-smI.title" = "Ingen";

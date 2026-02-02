@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -16,7 +16,6 @@
 #include <QStyleOptionProgressBar>
 
 #include "Formatter.h"
-#include "IconCache.h"
 #include "StyleHelper.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
@@ -172,7 +171,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
         //: First part of torrent progress string,
         //: %1 is the percentage of torrent metadata downloaded
         str = tr("Magnetized transfer - retrieving metadata (%1%)")
-                  .arg(Formatter::get().percentToString(tor.metadataPercentDone() * 100.0));
+                  .arg(Formatter::percent_to_string(tor.metadataPercentDone() * 100.0));
     }
     else if (!is_done) // downloading
     {
@@ -181,9 +180,9 @@ QString TorrentDelegate::progressString(Torrent const& tor)
         //: %2 is how much we'll have when done,
         //: %3 is a percentage of the two
         str = tr("%1 of %2 (%3%)")
-                  .arg(Formatter::get().sizeToString(have_total))
-                  .arg(Formatter::get().sizeToString(tor.sizeWhenDone()))
-                  .arg(Formatter::get().percentToString(tor.percentDone() * 100.0));
+                  .arg(Formatter::storage_to_string(have_total))
+                  .arg(Formatter::storage_to_string(tor.sizeWhenDone()))
+                  .arg(Formatter::percent_to_string(tor.percentDone() * 100.0));
     }
     else if (!is_seed) // partial seed
     {
@@ -197,12 +196,12 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: %5 is our upload-to-download ratio,
             //: %6 is the ratio we want to reach before we stop uploading
             str = tr("%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)")
-                      .arg(Formatter::get().sizeToString(have_total))
-                      .arg(Formatter::get().sizeToString(tor.totalSize()))
-                      .arg(Formatter::get().percentToString(tor.percentComplete() * 100.0))
-                      .arg(Formatter::get().sizeToString(tor.uploadedEver()))
-                      .arg(Formatter::get().ratioToString(tor.ratio()))
-                      .arg(Formatter::get().ratioToString(*seed_ratio_limit));
+                      .arg(Formatter::storage_to_string(have_total))
+                      .arg(Formatter::storage_to_string(tor.totalSize()))
+                      .arg(Formatter::percent_to_string(tor.percentComplete() * 100.0))
+                      .arg(Formatter::storage_to_string(tor.uploadedEver()))
+                      .arg(Formatter::ratio_to_string(tor.ratio()))
+                      .arg(Formatter::ratio_to_string(*seed_ratio_limit));
         }
         else
         {
@@ -213,11 +212,11 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: %4 is how much we've uploaded,
             //: %5 is our upload-to-download ratio
             str = tr("%1 of %2 (%3%), uploaded %4 (Ratio: %5)")
-                      .arg(Formatter::get().sizeToString(have_total))
-                      .arg(Formatter::get().sizeToString(tor.totalSize()))
-                      .arg(Formatter::get().percentToString(tor.percentComplete() * 100.0))
-                      .arg(Formatter::get().sizeToString(tor.uploadedEver()))
-                      .arg(Formatter::get().ratioToString(tor.ratio()));
+                      .arg(Formatter::storage_to_string(have_total))
+                      .arg(Formatter::storage_to_string(tor.totalSize()))
+                      .arg(Formatter::percent_to_string(tor.percentComplete() * 100.0))
+                      .arg(Formatter::storage_to_string(tor.uploadedEver()))
+                      .arg(Formatter::ratio_to_string(tor.ratio()));
         }
     }
     else // seeding
@@ -230,10 +229,10 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: %3 is our upload-to-download ratio,
             //: %4 is the ratio we want to reach before we stop uploading
             str = tr("%1, uploaded %2 (Ratio: %3 Goal: %4)")
-                      .arg(Formatter::get().sizeToString(have_total))
-                      .arg(Formatter::get().sizeToString(tor.uploadedEver()))
-                      .arg(Formatter::get().ratioToString(tor.ratio()))
-                      .arg(Formatter::get().ratioToString(*seed_ratio_limit));
+                      .arg(Formatter::storage_to_string(have_total))
+                      .arg(Formatter::storage_to_string(tor.uploadedEver()))
+                      .arg(Formatter::ratio_to_string(tor.ratio()))
+                      .arg(Formatter::ratio_to_string(*seed_ratio_limit));
         }
         else // seeding w/o a ratio
         {
@@ -242,9 +241,9 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: %2 is how much we've uploaded,
             //: %3 is our upload-to-download ratio
             str = tr("%1, uploaded %2 (Ratio: %3)")
-                      .arg(Formatter::get().sizeToString(have_total))
-                      .arg(Formatter::get().sizeToString(tor.uploadedEver()))
-                      .arg(Formatter::get().ratioToString(tor.ratio()));
+                      .arg(Formatter::storage_to_string(have_total))
+                      .arg(Formatter::storage_to_string(tor.uploadedEver()))
+                      .arg(Formatter::ratio_to_string(tor.ratio()));
         }
     }
 
@@ -256,7 +255,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: Second (optional) part of torrent progress string,
             //: %1 is duration,
             //: notice that leading space (before the dash) is included here
-            str += tr(" - %1 left").arg(Formatter::get().timeToString(tor.getETA()));
+            str += tr(" - %1 left").arg(Formatter::time_to_string(tor.getETA()));
         }
         else
         {
@@ -278,12 +277,11 @@ QString TorrentDelegate::shortTransferString(Torrent const& tor)
 
     if (have_down)
     {
-        str = Formatter::get().downloadSpeedToString(tor.downloadSpeed()) + QStringLiteral("   ") +
-            Formatter::get().uploadSpeedToString(tor.uploadSpeed());
+        str = tor.downloadSpeed().to_download_qstring() + QStringLiteral("   ") + tor.uploadSpeed().to_upload_qstring();
     }
     else if (have_up)
     {
-        str = Formatter::get().uploadSpeedToString(tor.uploadSpeed());
+        str = tor.uploadSpeed().to_upload_qstring();
     }
 
     return str.trimmed();
@@ -296,18 +294,37 @@ QString TorrentDelegate::shortStatusString(Torrent const& tor)
     switch (tor.getActivity())
     {
     case TR_STATUS_CHECK:
-        str = tr("Verifying local data (%1% tested)").arg(Formatter::get().percentToString(tor.getVerifyProgress() * 100.0));
+        str = tr("Verifying local data (%1% tested)").arg(Formatter::percent_to_string(tor.getVerifyProgress() * 100.0));
         break;
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
-        str = shortTransferString(tor) + QStringLiteral("    ") +
-            tr("Ratio: %1").arg(Formatter::get().ratioToString(tor.ratio()));
+        str = shortTransferString(tor) + QStringLiteral("    ") + tr("Ratio: %1").arg(Formatter::ratio_to_string(tor.ratio()));
         break;
 
     default:
         str = tor.activityString();
         break;
+    }
+
+    // add time when downloading
+    auto const seed_ratio_limit = tor.getSeedRatioLimit();
+    if ((seed_ratio_limit && tor.isSeeding()) || tor.isDownloading())
+    {
+        str += QStringLiteral("    ");
+        if (tor.hasETA())
+        {
+            //: Second (optional) part of torrent progress string,
+            //: %1 is duration,
+            //: notice that leading space (before the dash) is included here
+            str += tr("%1 left").arg(Formatter::time_to_string(tor.getETA()));
+        }
+        else
+        {
+            //: Second (optional) part of torrent progress string,
+            //: notice that leading space (before the dash) is included here
+            str += tr("Remaining time unknown");
+        }
     }
 
     return str.trimmed();
@@ -337,7 +354,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
             if (!tor.hasMetadata())
             {
                 str = tr("Downloading metadata from %Ln peer(s) (%1% done)", nullptr, tor.peersWeAreDownloadingFrom())
-                          .arg(Formatter::get().percentToString(100.0 * tor.metadataPercentDone()));
+                          .arg(Formatter::percent_to_string(100.0 * tor.metadataPercentDone()));
             }
             else
             {
@@ -400,8 +417,10 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
     auto const m = margin(*QApplication::style());
-    auto const layout = ItemLayout{ tor.name(),  progressString(tor), statusString(tor), QIcon{},
-                                    option.font, option.direction,    QPoint(0, 0),      option.rect.width() - m.width() * 2 };
+    auto const layout = ItemLayout{
+        tor.name(),  progressString(tor), statusString(tor), QIcon{},
+        option.font, option.direction,    QPoint{ 0, 0 },    option.rect.width() - (m.width() * 2)
+    };
     return layout.size() + m * 2;
 }
 
@@ -422,18 +441,6 @@ QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex 
     }
 
     return { option.rect.width(), *height_hint_ };
-}
-
-QIcon& TorrentDelegate::getWarningEmblem() const
-{
-    auto& icon = warning_emblem_;
-
-    if (icon.isNull())
-    {
-        icon = IconCache::get().getThemeIcon(QStringLiteral("emblem-important"), QStyle::SP_MessageBoxWarning);
-    }
-
-    return icon;
 }
 
 void TorrentDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
@@ -462,8 +469,8 @@ void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& opti
         progress_bar_style_.direction = option.direction;
         progress_bar_style_.progress = static_cast<int>(
             progress_bar_style_.minimum +
-            (is_magnet ? tor.metadataPercentDone() : tor.percentDone()) *
-                (progress_bar_style_.maximum - progress_bar_style_.minimum));
+            ((is_magnet ? tor.metadataPercentDone() : tor.percentDone()) *
+             (progress_bar_style_.maximum - progress_bar_style_.minimum)));
     }
 }
 
@@ -507,20 +514,15 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     }
 
     auto const icon_state = is_paused ? QIcon::Off : QIcon::On;
+    auto const color_group = is_item_active ? QPalette::Normal : QPalette::Inactive;
+    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
-    auto color_group = QPalette::Normal;
-
+    auto text_color = (tor.hasError() && !is_item_selected) ? QColor{ Qt::GlobalColor::red } :
+                                                              option.palette.color(color_group, color_role);
     if (is_paused || !is_item_enabled)
     {
-        color_group = QPalette::Disabled;
+        text_color.setAlphaF(0.5);
     }
-
-    if (color_group == QPalette::Normal && !is_item_active)
-    {
-        color_group = QPalette::Inactive;
-    }
-
-    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
     QStyle::State progress_bar_state(option.state);
 
@@ -532,7 +534,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_state |= QStyle::State_Small | QStyle::State_Horizontal;
 
     auto const emblem_im = is_item_selected ? QIcon::Selected : QIcon::Normal;
-    auto const emblem_icon = tor.hasError() ? getWarningEmblem() : QIcon{};
+    auto const emblem_icon = tor.hasError() ? warningEmblem() : QIcon{};
 
     // layout
     auto const m = margin(*style);
@@ -541,14 +543,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
                                     option.font, option.direction,    content_rect.topLeft(), content_rect.width() };
 
     // render
-    if (tor.hasError() && !is_item_selected)
-    {
-        painter->setPen(QColor("red"));
-    }
-    else
-    {
-        painter->setPen(option.palette.color(color_group, color_role));
-    }
+    painter->setPen(text_color);
 
     tor.getMimeTypeIcon().paint(painter, layout.icon_rect, Qt::AlignCenter, icon_mode, icon_state);
 
@@ -587,7 +582,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
 
-    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
+    StyleHelper::drawProgressBar(*painter, progress_bar_style_);
 
     painter->restore();
 }

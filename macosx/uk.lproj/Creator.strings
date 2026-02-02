@@ -1,0 +1,39 @@
+
+/* Class = "NSWindow"; title = "Torrent Creator"; ObjectID = "5"; */
+"5.title" = "Створювач торенту";
+
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "70"; */
+"70.title" = "Коментар:";
+
+/* Class = "NSTextFieldCell"; title = "Trackers:"; ObjectID = "71"; */
+"71.title" = "Відстежувачі:";
+
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "73"; */
+"73.title" = "Змінити...";
+
+/* Class = "NSTextFieldCell"; title = "Torrent File:"; ObjectID = "74"; */
+"74.title" = "Торент-файл:";
+
+/* Class = "NSButtonCell"; title = "Private"; ObjectID = "77"; */
+"77.title" = "Приватний";
+
+/* Class = "NSButtonCell"; title = "Create"; ObjectID = "78"; */
+"78.title" = "Створити";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "79"; */
+"79.title" = "Скасувати";
+
+/* Class = "NSButtonCell"; title = "Open when created"; ObjectID = "81"; */
+"81.title" = "Відкрити коли створеться";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "82"; */
+"82.title" = "Скасувати";
+
+/* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
+"83.title" = "Торент-файл створюється...";
+
+/* Class = "NSTextFieldCell"; title = "Each tracker will be placed into its own tier"; ObjectID = "108"; */
+"108.title" = "Кожний відстежувач буде розміщено на своєму ярусі";
+
+/* Class = "NSTextFieldCell"; title = "Source:"; ObjectID = "f1g-Kk-weU"; */
+"f1g-Kk-weU.title" = "Джерело:";

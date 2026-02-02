@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,21 +7,21 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <QCoreApplication>
-#include <QSet>
 #include <QString>
 #include <QVariant>
 
-#include <libtransmission/tr-macros.h>
-
 #include "Utils.h" // for std::hash<QString>
+#include "Typedefs.h"
+
+#include "libtransmission/tr-macros.h"
 
 class FileTreeItem
 {
     Q_DECLARE_TR_FUNCTIONS(FileTreeItem)
-    TR_DISABLE_COPY_MOVE(FileTreeItem)
 
 public:
     static auto constexpr Low = int{ 1 << 0 };
@@ -29,12 +29,16 @@ public:
     static auto constexpr High = int{ 1 << 2 };
 
     FileTreeItem(QString const& name = QString{}, int file_index = -1, uint64_t size = 0)
-        : name_(name)
-        , total_size_(size)
-        , file_index_(file_index)
+        : name_{ name }
+        , total_size_{ size }
+        , file_index_{ file_index }
     {
     }
 
+    FileTreeItem& operator=(FileTreeItem&&) = delete;
+    FileTreeItem& operator=(FileTreeItem const&) = delete;
+    FileTreeItem(FileTreeItem&&) = delete;
+    FileTreeItem(FileTreeItem const&) = delete;
     ~FileTreeItem();
 
     void appendChild(FileTreeItem* child);
@@ -45,7 +49,7 @@ public:
         return children_.at(row);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 int childCount() const noexcept
+    [[nodiscard]] constexpr int childCount() const noexcept
     {
         return std::size(children_);
     }
@@ -69,8 +73,8 @@ public:
 
     QVariant data(int column, int role) const;
     std::pair<int, int> update(QString const& name, bool want, int priority, uint64_t have, bool update_fields);
-    void setSubtreeWanted(bool, QSet<int>& file_ids);
-    void setSubtreePriority(int priority, QSet<int>& file_ids);
+    void setSubtreeWanted(bool wanted, file_indices_t& setme_changed_ids);
+    void setSubtreePriority(int priority, file_indices_t& setme_changed_ids);
 
     [[nodiscard]] constexpr auto fileIndex() const noexcept
     {
@@ -94,7 +98,7 @@ public:
 private:
     QString priorityString() const;
     QString sizeString() const;
-    void getSubtreeWantedSize(uint64_t& have, uint64_t& total) const;
+    std::pair<uint64_t, uint64_t> get_subtree_wanted_size() const;
     double progress() const;
     uint64_t size() const;
     std::unordered_map<QString, int> const& getMyChildRows() const;

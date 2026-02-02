@@ -1,0 +1,54 @@
+
+/* Class = "NSTextFieldCell"; title = "Download to:"; ObjectID = "15"; */
+"15.title" = "Deskargatu hona:";
+
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
+"16.title" = "Aldatu...";
+
+/* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
+"18.title" = "Hasi gehitzerakoan";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
+"20.title" = "Gehitu";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "22"; */
+"22.title" = "Ezeztatu";
+
+/* Class = "NSTextFieldCell"; title = "Group:"; ObjectID = "41"; */
+"41.title" = "Taldea:";
+
+/* Class = "NSTableColumn"; headerCell.title = "Rank"; ObjectID = "47"; */
+"47.headerCell.title" = "Ordena";
+
+/* Class = "NSTableColumn"; headerCell.title = "DL"; ObjectID = "48"; */
+"48.headerCell.title" = "Deskarga";
+
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "49"; */
+"49.headerCell.title" = "Izena";
+
+/* Class = "NSButtonCell"; title = "Trash torrent file"; ObjectID = "59"; */
+"59.title" = "Bota zakarrontzira torrent fitxategia";
+
+/* Class = "NSButtonCell"; title = "Verify Local Data"; ObjectID = "66"; */
+"66.title" = "Egiaztatu Datu Lokalak";
+
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "88"; */
+"88.title" = "Baxua";
+
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "89"; */
+"89.title" = "Arrunta";
+
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "90"; */
+"90.title" = "Altua";
+
+/* Class = "NSTextFieldCell"; title = "Priority:"; ObjectID = "91"; */
+"91.title" = "Lehentasuna:";
+
+/* Class = "NSButtonCell"; title = "All"; ObjectID = "104"; */
+"104.title" = "Denak";
+
+/* Class = "NSButtonCell"; title = "None"; ObjectID = "105"; */
+"105.title" = "Ezer ez";
+
+/* Class = "NSSearchFieldCell"; placeholderString = "Filter"; ObjectID = "113"; */
+"113.placeholderString" = "Iragazkia";

@@ -15,7 +15,7 @@ tr_allow_compile_if(
 
 target_compile_definitions(${TR_NAME}-daemon
     PRIVATE
-        $<$<BOOL:${WITH_SYSTEMD}>:USE_SYSTEMD>)
+        $<$<BOOL:${WITH_SYSTEMD}>:WITH_SYSTEMD>)
 
 tr_target_compile_definitions_for_headers(${TR_NAME}-daemon
     PRIVATE
@@ -42,14 +42,20 @@ tr_win32_app_info(${TR_NAME}-daemon
     "${TR_NAME}-daemon"
     "${TR_NAME}-daemon.exe")
 
-foreach(P daemon)
-    install(
-        TARGETS ${TR_NAME}-${P}
-        DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(
+    TARGETS ${TR_NAME}-daemon
+    DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-    if(INSTALL_DOC)
-        install(
-            FILES ${TR_NAME}-${P}.1
-            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-    endif()
-endforeach()
+if(INSTALL_DOC)
+    install(
+        FILES ${TR_NAME}-daemon.1
+        DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+endif()
+
+if (WITH_SYSTEMD)
+    configure_file("${TR_NAME}-daemon.service.in" "${TR_NAME}-daemon.service" @ONLY)
+
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/${TR_NAME}-daemon.service"
+        DESTINATION lib/systemd/system)
+endif()

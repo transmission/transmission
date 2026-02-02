@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,23 +8,29 @@
 #include <chrono>
 #include <cstddef> // size_t
 #include <iterator> // back_insert_iterator, empty
-#include <map>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
+
+#ifdef _WIN32
+#include <windows.h> // GetTimeZoneInformation
+#endif
 
 #ifdef __ANDROID__
 #include <android/log.h>
 #endif
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
+
+#include <small/map.hpp>
 
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
@@ -48,7 +54,7 @@ public:
 
     tr_log_message** queue_tail_ = &queue_;
 
-    int queue_length_ = 0;
+    size_t queue_length_ = 0;
 
     std::recursive_mutex message_mutex_;
 };
@@ -109,7 +115,7 @@ void logAddImpl(
     {
         auto* const newmsg = new tr_log_message{};
         newmsg->level = level;
-        newmsg->when = tr_time();
+        newmsg->when = std::chrono::system_clock::now();
         newmsg->message = std::move(msg);
         newmsg->file = file;
         newmsg->line = line;
@@ -119,38 +125,29 @@ void logAddImpl(
         log_state.queue_tail_ = &newmsg->next;
         ++log_state.queue_length_;
 
-        if (log_state.queue_length_ > TR_LOG_MAX_QUEUE_LENGTH)
+        if (log_state.queue_length_ > TrLogMaxQueueLength)
         {
             tr_log_message* old = log_state.queue_;
             log_state.queue_ = old->next;
             old->next = nullptr;
             tr_logFreeQueue(old);
             --log_state.queue_length_;
-            TR_ASSERT(log_state.queue_length_ == TR_LOG_MAX_QUEUE_LENGTH);
+            TR_ASSERT(log_state.queue_length_ == TrLogMaxQueueLength);
         }
     }
     else
     {
-        static auto const fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
-        if (fp == TR_BAD_SYS_FILE)
-        {
-            return;
-        }
+        auto buf = std::array<char, 64U>{};
+        auto const timestr = tr_logGetTimeStr(std::data(buf), std::size(buf));
 
-        auto timestr = std::array<char, 64U>{};
-        tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-
-        auto buf = tr_strbuf<char, 2048U>{};
         if (std::empty(name))
         {
-            fmt::format_to(std::back_inserter(buf), "[{:s}] {:s}", std::data(timestr), msg);
+            fmt::print(stderr, "[{:s}] {:s}\n", timestr, msg);
         }
         else
         {
-            fmt::format_to(std::back_inserter(buf), "[{:s}] {:s}: {:s}", std::data(timestr), name, msg);
+            fmt::print("[{:s}] {:s}: {:s}\n", timestr, name, msg);
         }
-        tr_sys_file_write_line(fp, buf);
-        tr_sys_file_flush(fp);
     }
 #endif
 }
@@ -201,17 +198,43 @@ void tr_logFreeQueue(tr_log_message* freeme)
 
 // ---
 
-char* tr_logGetTimeStr(char* buf, size_t buflen)
+std::string_view tr_logGetTimeStr(std::chrono::system_clock::time_point const now, char* const buf, size_t const buflen)
+{
+    auto* walk = buf;
+    auto const now_time_t = std::chrono::system_clock::to_time_t(now);
+    auto const now_tm = *std::localtime(&now_time_t);
+    walk = fmt::format_to_n(
+               walk,
+               buflen,
+               "{0:%FT%R:}{1:%S}" TR_IF_WIN32("", "{0:%z}"),
+               now_tm,
+               std::chrono::time_point_cast<std::chrono::milliseconds>(now))
+               .out;
+#ifdef _WIN32
+    if (auto tz_info = TIME_ZONE_INFORMATION{}; GetTimeZoneInformation(&tz_info) != TIME_ZONE_ID_INVALID)
+    {
+        // https://learn.microsoft.com/en-us/windows/win32/api/timezoneapi/nf-timezoneapi-gettimezoneinformation
+        // All translations between UTC time and local time are based on the following formula:
+        //     UTC = local time + bias
+        // The bias is the difference, in minutes, between UTC time and local time.
+        auto const offset = tz_info.Bias < 0 ? -tz_info.Bias : tz_info.Bias;
+        walk = fmt::format_to_n(
+                   walk,
+                   buflen - (walk - buf),
+                   "{:c}{:02d}{:02d}",
+                   tz_info.Bias < 0 ? '+' : '-',
+                   offset / 60,
+                   offset % 60)
+                   .out;
+    }
+#endif
+    return { buf, static_cast<size_t>(walk - buf) };
+}
+
+std::string_view tr_logGetTimeStr(char* buf, size_t buflen)
 {
     auto const a = std::chrono::system_clock::now();
-    auto const [out, len] = fmt::format_to_n(
-        buf,
-        buflen - 1,
-        "{0:%F %H:%M:}{1:%S}",
-        a,
-        std::chrono::duration_cast<std::chrono::milliseconds>(a.time_since_epoch()));
-    *out = '\0';
-    return buf;
+    return tr_logGetTimeStr(a, buf, buflen);
 }
 
 void tr_logAddMessage(char const* file, long line, tr_log_level level, std::string&& msg, std::string_view name)
@@ -228,7 +251,7 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     auto name_fallback = std::string{};
     if (std::empty(name))
     {
-        name_fallback = fmt::format(FMT_STRING("{}:{}"), filename, line);
+        name_fallback = fmt::format("{:s}:{:d}", filename, line);
         name = name_fallback;
     }
 
@@ -245,12 +268,12 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     auto const lock = log_state.unique_lock();
 
     // don't log the same warning ad infinitum.
-    // it's not useful after some point.
+    // at some point, it stops being useful.
     bool last_one = false;
     if (level == TR_LOG_CRITICAL || level == TR_LOG_ERROR || level == TR_LOG_WARN)
     {
         static auto constexpr MaxRepeat = size_t{ 30 };
-        static auto counts = new std::map<std::pair<std::string_view, int>, size_t>{};
+        static auto* const counts = new small::map<std::pair<std::string_view, long>, size_t>{};
 
         auto& count = (*counts)[std::make_pair(filename, line)];
         ++count;
@@ -266,12 +289,8 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     logAddImpl(filename, line, level, std::move(msg), name);
     if (last_one)
     {
-        logAddImpl(
-            filename,
-            line,
-            level,
-            _("Too many messages like this! I won't log this message anymore this session."),
-            name);
+        char const* final_msg = _("Too many messages like this! I won't log this message anymore this session.");
+        logAddImpl(filename, line, level, final_msg, name);
     }
 
     errno = err;

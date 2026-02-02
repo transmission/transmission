@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:OpenSslVersion = '3.0.7'
+$global:OpenSslVersion = '3.5.4'
 
 $global:OpenSslDeps = @()
 
@@ -11,14 +11,24 @@ function global:Build-OpenSsl([string] $PrefixDir, [string] $Arch, [string] $Dep
     $SourceDir = Invoke-DownloadAndUnpack $Url $Filename
     $BuildDir = $SourceDir
 
-    $ConfigName = if ($Arch -eq 'x86') { 'VC-WIN32' } else { 'VC-WIN64A' }
+    $ConfigName = switch ($Arch) {
+        'x86' { 'VC-WIN32' }
+        'x64' { 'VC-WIN64A' }
+        'arm64' { 'VC-WIN64-ARM' }
+    }
+
     $ConfigOptions = @(
         "--prefix=${PrefixDir}"
+        '--api=1.1.0'
         $ConfigName
         'shared'
+        'no-capieng'
         'no-comp'
+        'no-deprecated'
         'no-dso'
+        'no-dynamic-engine'
         'no-engine'
+        'no-external-tests'
         'no-hw'
         'no-stdio'
         'no-tests'

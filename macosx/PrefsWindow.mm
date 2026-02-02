@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -12,10 +12,7 @@
 {
     [super awakeFromNib];
 
-    if (@available(macOS 11.0, *))
-    {
-        self.toolbarStyle = NSWindowToolbarStylePreference;
-    }
+    self.toolbarStyle = NSWindowToolbarStylePreference;
 }
 
 - (void)keyDown:(NSEvent*)event

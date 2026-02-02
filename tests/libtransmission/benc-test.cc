@@ -6,16 +6,14 @@
 #include <cstdint> // int64_t
 #include <string_view>
 
-#include <fmt/core.h>
-
-#include <libtransmission/transmission.h>
+#include <fmt/format.h>
 
 #include <libtransmission/benc.h>
 #include <libtransmission/error.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using BencTest = ::testing::Test;
+using BencTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(BencTest, MalformedBenc)
@@ -24,18 +22,14 @@ TEST_F(BencTest, MalformedBenc)
     auto constexpr Benc =
         "d14:failure reason119:The tracker was unable to process your request. It may be down, overloaded, under attack or it just does not like you.12:min intervali1800e8:intervali1800e5:peers0:ee\n"sv;
     auto constexpr MaxBencDepth = 8;
-    using TestHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+    using TestHandler = tr::benc::BasicHandler<MaxBencDepth>;
 
-    auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
+    auto stack = tr::benc::ParserStack<MaxBencDepth>{};
     auto handler = TestHandler{};
-    tr_error* error = nullptr;
-    EXPECT_FALSE(transmission::benc::parse(Benc, stack, handler, nullptr, &error));
-    EXPECT_NE(nullptr, error);
-    if (error != nullptr)
-    {
-        EXPECT_NE(nullptr, error->message);
-    }
-    tr_error_clear(&error);
+    auto error = tr_error{};
+    EXPECT_FALSE(tr::benc::parse(Benc, stack, handler, nullptr, &error));
+    EXPECT_TRUE(error);
+    EXPECT_NE(""sv, error.message());
 }
 
 TEST_F(BencTest, ContextTokenIsCorrect)
@@ -53,9 +47,9 @@ TEST_F(BencTest, ContextTokenIsCorrect)
     // clang-format on
 
     auto constexpr MaxBencDepth = 32;
-    struct ContextHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
+    struct ContextHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     {
-        using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+        using BasicHandler = tr::benc::BasicHandler<MaxBencDepth>;
 
         bool StartArray(Context const& context) override
         {
@@ -87,19 +81,20 @@ TEST_F(BencTest, ContextTokenIsCorrect)
 
         bool Int64(int64_t value, Context const& context) override
         {
-            EXPECT_EQ(fmt::format(FMT_STRING("i{:d}e"), value), context.raw());
+            EXPECT_EQ(fmt::format("i{:d}e", value), context.raw());
             return true;
         }
 
         bool String(std::string_view value, Context const& context) override
         {
-            EXPECT_EQ(fmt::format(FMT_STRING("{:d}:{:s}"), std::size(value), value), context.raw());
+            EXPECT_EQ(fmt::format("{:d}:{:s}", std::size(value), value), context.raw());
             return true;
         }
     };
 
-    auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
+    auto stack = tr::benc::ParserStack<MaxBencDepth>{};
     auto handler = ContextHandler{};
-    tr_error* error = nullptr;
-    transmission::benc::parse(Benc, stack, handler, nullptr, &error);
+    auto error = tr_error{};
+    tr::benc::parse(Benc, stack, handler, nullptr, &error);
+    EXPECT_FALSE(error);
 }

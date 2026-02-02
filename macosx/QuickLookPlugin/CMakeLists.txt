@@ -15,12 +15,22 @@ set(LINGUAS
     de
     en
     es
+    eu
     fr
+    he
+    hu
     it
+    ja
     nl
-    pt_PT
+    pl
+    pt-BR
+    pt-PT
     ru
-    tr)
+    sv
+    tr
+    uk
+    zh-CN
+    zh-TW)
 
 if(ENABLE_NLS)
     set(ENABLED_LINGUAS ${LINGUAS})
@@ -91,7 +101,7 @@ install(
     DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Library/QuickLook)
 
 install(CODE
-    "list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")
+    "list(APPEND CMAKE_MODULE_PATH \"${PROJECT_SOURCE_DIR}/cmake\")
     include(TrMacros)
     include(GetPrerequisites)
     tr_fixup_bundle_item(

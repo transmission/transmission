@@ -1,0 +1,321 @@
+name: 'Install Dependencies'
+description: 'Install build dependencies for Transmission'
+inputs:
+  compiler:
+    description: 'Compiler suite: clang, gcc, or system-default'
+    required: false
+    default: 'clang'
+  enable-clang-tidy:
+    description: 'Install clang-tidy-20'
+    required: false
+    default: 'false'
+  enable-debugging:
+    description: 'Install debugging tools (gdb, lldb, valgrind, etc.)'
+    required: false
+    default: 'false'
+  enable-gtk:
+    description: 'Install GTK dependencies'
+    required: false
+    default: 'false'
+  enable-qt:
+    description: 'Install Qt dependencies (qt5 or qt6)'
+    required: false
+    default: 'false'
+  use-sudo:
+    description: 'Use sudo for package installation (false for containers)'
+    required: false
+    default: 'true'
+runs:
+  using: composite
+  steps:
+    - name: Detect Platform
+      uses: ./.github/actions/detect-platform
+
+    - name: Install Linux dependencies
+      if: env.OS_FAMILY == 'linux'
+      shell: bash
+      run: |
+        set -ex
+
+        if [[ "$PKG_FAMILY" == "dnf" ]]; then
+          # Fedora/DNF-based installation
+          dnf install -y \
+            ca-certificates \
+            cmake \
+            gettext \
+            ninja-build \
+            pkgconf-pkg-config \
+            xz
+
+          # Transmission-specific libraries with Fedora names
+          dnf install -y \
+            fast_float-devel \
+            fmt-devel \
+            google-crc32c-devel \
+            libb64-devel \
+            libcurl-devel \
+            libdeflate-devel \
+            libevent-devel \
+            libnatpmp-devel \
+            libpsl-devel \
+            miniupnpc-devel \
+            openssl-devel \
+            utf8cpp-devel
+
+          # Compiler packages
+          if [[ "${{ inputs.compiler }}" == "clang" ]]; then
+            dnf install -y clang
+          elif [[ "${{ inputs.compiler }}" == "gcc" ]]; then
+            dnf install -y gcc-c++
+          fi
+
+          # Debugging tools
+          if [[ "${{ inputs.enable-debugging }}" == "true" ]]; then
+            dnf install -y gdb valgrind
+          fi
+
+        elif [[ "$PKG_FAMILY" == "apt" ]]; then
+          # Debian/Ubuntu/APT-based installation
+          SUDO_CMD=""
+          if [[ "${{ inputs.use-sudo }}" == "true" ]]; then
+            SUDO_CMD="sudo"
+          fi
+
+          # Setup LLVM repo if clang-tidy is needed
+          if [[ "${{ inputs.enable-clang-tidy }}" == "true" ]]; then
+            wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | $SUDO_CMD apt-key add -
+            if [[ "$DISTRO" == "ubuntu" && "$DISTRO_VERSION" == "24.04" ]]; then
+              $SUDO_CMD add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main"
+            else
+              $SUDO_CMD add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-20 main"
+            fi
+          fi
+
+          $SUDO_CMD apt-get update
+
+          # Base packages
+          BASE_PACKAGES=(
+            appstream
+            ca-certificates
+            cmake
+            gettext
+            libb64-dev
+            libcurl4-openssl-dev
+            libdeflate-dev
+            libevent-dev
+            libminiupnpc-dev
+            libnatpmp-dev
+            libpsl-dev
+            libssl-dev
+            locales
+            ninja-build
+            pkg-config
+            xz-utils
+          )
+
+          # Debian wants to build Transmission with system gtest
+          # https://github.com/transmission/transmission/pull/6900
+          if [ "$DISTRO" = 'debian' ]; then
+            BASE_PACKAGES+=(libgtest-dev)
+          fi
+
+          if [ ! "$DISTRO" = 'debian' ] || [ ! "$DISTRO_VERSION" = '11' ]; then
+            BASE_PACKAGES+=(
+              libfast-float-dev
+              libfmt-dev
+              libutfcpp-dev
+            )
+          fi
+
+          # Compiler packages
+          if [[ "${{ inputs.compiler }}" == "clang" ]]; then
+            BASE_PACKAGES+=(clang)
+          elif [[ "${{ inputs.compiler }}" == "gcc" ]]; then
+            BASE_PACKAGES+=(gcc g++)
+          fi
+
+          # clang-tidy
+          if [[ "${{ inputs.enable-clang-tidy }}" == "true" ]]; then
+            BASE_PACKAGES+=(clang-tidy-20)
+          fi
+
+          # Debugging tools
+          if [[ "${{ inputs.enable-debugging }}" == "true" ]]; then
+            BASE_PACKAGES+=(gdb libc6-dbg valgrind)
+          fi
+
+          $SUDO_CMD apt-get install -y --no-install-recommends "${BASE_PACKAGES[@]}"
+
+          # Setup UTF-8 locale for Qt builds
+          if [[ "${{ inputs.enable-qt }}" != "false" ]]; then
+            if [[ "${{ inputs.use-sudo }}" == "true" ]]; then
+              echo "en_US.UTF-8 UTF-8" | $SUDO_CMD tee /etc/locale.gen
+              $SUDO_CMD locale-gen
+            else
+              echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+              locale-gen
+            fi
+            echo "LANG=C.UTF-8" >> "$GITHUB_ENV"
+            echo "LC_ALL=C.UTF-8" >> "$GITHUB_ENV"
+          fi
+        else
+          echo "Unsupported package family: $PKG_FAMILY"
+          exit 1
+        fi
+
+    - name: Install Linux GTK dependencies
+      if: env.OS_FAMILY == 'linux' && env.PKG_FAMILY != 'unknown' && inputs.enable-gtk == 'true'
+      shell: bash
+      run: |
+        if [[ "$PKG_FAMILY" == "dnf" ]]; then
+          dnf install -y 'pkgconfig(glibmm-2.4)' 'pkgconfig(gtkmm-3.0)'
+        elif [[ "$PKG_FAMILY" == "apt" ]]; then
+          SUDO_CMD=""
+          if [[ "${{ inputs.use-sudo }}" == "true" ]]; then
+            SUDO_CMD="sudo"
+          fi
+          $SUDO_CMD apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
+        else
+          echo "Unsupported package family: $PKG_FAMILY"
+          exit 1
+        fi
+
+    - name: Install Linux Qt dependencies
+      if: env.OS_FAMILY == 'linux' && env.PKG_FAMILY != 'unknown' && inputs.enable-qt != 'false'
+      shell: bash
+      run: |
+        if [[ "$PKG_FAMILY" == "dnf" ]]; then
+          if [[ "${{ inputs.enable-qt }}" == "qt6" ]]; then
+            dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel xcb-util-cursor
+          elif [[ "${{ inputs.enable-qt }}" == "qt5" ]]; then
+            dnf install -y qt5-qtbase-devel qt5-qtsvg-devel qt5-qttools-devel xcb-util-cursor
+          fi
+        elif [[ "$PKG_FAMILY" == "apt" ]]; then
+          SUDO_CMD=""
+          if [[ "${{ inputs.use-sudo }}" == "true" ]]; then
+            SUDO_CMD="sudo"
+          fi
+          if [[ "${{ inputs.enable-qt }}" == "qt5" ]]; then
+            $SUDO_CMD apt-get install -y --no-install-recommends libxcb-cursor0 qtbase5-dev libqt5svg5-dev qttools5-dev
+          elif [[ "${{ inputs.enable-qt }}" == "qt6" ]]; then
+            $SUDO_CMD apt-get install -y --no-install-recommends qt6-base-dev qt6-tools-dev qt6-l10n-tools libqt6svg6-dev
+          fi
+        else
+          echo "Unsupported package family: $PKG_FAMILY"
+          exit 1
+        fi
+
+    - name: Install macOS dependencies
+      if: env.OS_FAMILY == 'macos'
+      shell: bash
+      run: |
+        # Base packages for macOS
+        BASE_PACKAGES=(cmake gettext ninja node pkgconf)
+
+        # Transmission-specific libraries
+        BASE_PACKAGES+=(
+          crc32c
+          fast_float
+          fmt
+          libb64
+          libdeflate
+          libevent
+          libnatpmp
+          libpsl
+          miniupnpc
+          utf8cpp
+        )
+
+        brew install --formulae "${BASE_PACKAGES[@]}"
+
+    - name: Install macOS GTK dependencies
+      if: env.OS_FAMILY == 'macos' && inputs.enable-gtk == 'true'
+      shell: bash
+      run: |
+        brew install --formula gtkmm3
+
+    - name: Install macOS Qt dependencies
+      if: env.OS_FAMILY == 'macos' && inputs.enable-qt != 'false'
+      shell: bash
+      run: |
+        brew install --formula qt
+
+    - name: Report Installed Versions
+      shell: bash
+      run: |
+        echo "=== Installed Dependency Versions ==="
+
+        # Platform info
+        echo "Platform: OS_FAMILY=$OS_FAMILY DISTRO=$DISTRO DISTRO_VERSION=$DISTRO_VERSION PKG_FAMILY=$PKG_FAMILY"
+        if [[ "$OS_FAMILY" == "macos" ]]; then
+          sw_vers
+        else
+          cat /etc/os-release | head -3
+        fi
+        echo ""
+
+        # Base build tools
+        echo "Build Tools:"
+        cmake --version 2>/dev/null | head -1 || echo "cmake: not found"
+        ninja --version 2>/dev/null && echo "ninja: $(ninja --version)" || echo "ninja: not found"
+        pkg-config --version 2>/dev/null && echo "pkg-config: $(pkg-config --version)" || \
+          pkgconf --version 2>/dev/null && echo "pkgconf: $(pkgconf --version)" || echo "pkg-config: not found"
+        echo ""
+
+        # Compilers
+        echo "Compilers:"
+        if [[ "${{ inputs.compiler }}" == "clang" || "${{ inputs.compiler }}" == "system-default" ]]; then
+          clang --version 2>/dev/null | head -1 || echo "clang: not found"
+          clang++ --version 2>/dev/null | head -1 || echo "clang++: not found"
+        fi
+        if [[ "${{ inputs.compiler }}" == "gcc" || "${{ inputs.compiler }}" == "system-default" ]]; then
+          gcc --version 2>/dev/null | head -1 || echo "gcc: not found"
+          g++ --version 2>/dev/null | head -1 || echo "g++: not found"
+        fi
+        echo ""
+
+        # Core libraries
+        echo "Core Libraries:"
+        pkg-config --modversion libcurl 2>/dev/null && echo "libcurl: $(pkg-config --modversion libcurl)" || \
+          curl --version 2>/dev/null | head -1 | sed 's/curl /libcurl: /' || echo "libcurl: not found"
+        pkg-config --modversion openssl 2>/dev/null && echo "openssl: $(pkg-config --modversion openssl)" || \
+          openssl version 2>/dev/null && echo "openssl: $(openssl version)" || echo "openssl: not found"
+        pkg-config --modversion libevent 2>/dev/null && echo "libevent: $(pkg-config --modversion libevent)" || echo "libevent: not found"
+        echo ""
+
+        # Qt versions (if enabled)
+        if [[ "${{ inputs.enable-qt }}" != "false" ]]; then
+          echo "Qt:"
+          if [[ "${{ inputs.enable-qt }}" == "qt5" ]]; then
+            pkg-config --modversion Qt5Core 2>/dev/null && echo "Qt5Core: $(pkg-config --modversion Qt5Core)" || echo "Qt5Core: not found"
+          elif [[ "${{ inputs.enable-qt }}" == "qt6" ]]; then
+            pkg-config --modversion Qt6Core 2>/dev/null && echo "Qt6Core: $(pkg-config --modversion Qt6Core)" || echo "Qt6Core: not found"
+          fi
+          echo ""
+        fi
+
+        # GTK versions (if enabled)
+        if [[ "${{ inputs.enable-gtk }}" == "true" ]]; then
+          echo "GTK:"
+          pkg-config --modversion gtk+-3.0 2>/dev/null && echo "GTK+3: $(pkg-config --modversion gtk+-3.0)" || echo "GTK+3: not found"
+          pkg-config --modversion gtk4 2>/dev/null && echo "GTK4: $(pkg-config --modversion gtk4)" || echo "GTK4: not found"
+          echo ""
+        fi
+
+        # Development tools (if enabled)
+        if [[ "${{ inputs.enable-clang-tidy }}" == "true" ]]; then
+          echo "Static Analysis:"
+          clang-tidy-20 --version 2>/dev/null | head -1 || clang-tidy --version 2>/dev/null | head -1 || echo "clang-tidy: not found"
+          echo ""
+        fi
+
+        if [[ "${{ inputs.enable-debugging }}" == "true" ]]; then
+          echo "Debugging Tools:"
+          gdb --version 2>/dev/null | head -1 || echo "gdb: not found"
+          if [[ "$OS_FAMILY" == "macos" ]]; then
+            lldb --version 2>/dev/null | head -1 || echo "lldb: not found"
+          else
+            valgrind --version 2>/dev/null || echo "valgrind: not found"
+          fi
+          echo ""
+        fi

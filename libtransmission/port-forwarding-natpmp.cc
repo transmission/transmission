@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -14,7 +14,7 @@
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define ENABLE_STRNATPMPERR
 #include "natpmp.h"
@@ -43,13 +43,14 @@ void log_val(char const* func, int ret)
     }
     else
     {
-        tr_logAddDebug(fmt::format(
-            "{} failed. Natpmp returned {} ({}); errno is {} ({})",
-            func,
-            ret,
-            strnatpmperr(ret),
-            errno,
-            tr_strerror(errno)));
+        tr_logAddDebug(
+            fmt::format(
+                "{} failed. Natpmp returned {} ({}); errno is {} ({})",
+                func,
+                ret,
+                strnatpmperr(ret),
+                errno,
+                tr_strerror(errno)));
     }
 }
 } // namespace
@@ -87,7 +88,8 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
         {
             auto str = std::array<char, 128>{};
             evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, std::data(str), std::size(str));
-            tr_logAddInfo(fmt::format(_("Found public address '{address}'"), fmt::arg("address", std::data(str))));
+            tr_logAddInfo(
+                fmt::format(fmt::runtime(_("Found public address '{address}'")), fmt::arg("address", std::data(str))));
             state_ = State::Idle;
         }
         else if (val != NATPMP_TRYAGAIN)
@@ -124,7 +126,8 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
         {
             auto const unmapped_port = tr_port::from_host(resp.pnu.newportmapping.privateport);
 
-            tr_logAddInfo(fmt::format(_("Port {port} is no longer forwarded"), fmt::arg("port", unmapped_port.host())));
+            tr_logAddInfo(
+                fmt::format(fmt::runtime(_("Port {port} is no longer forwarded")), fmt::arg("port", unmapped_port.host())));
 
             if (local_port_ == unmapped_port)
             {
@@ -140,16 +143,10 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
         }
     }
 
-    if (state_ == State::Idle)
+    if ((state_ == State::Idle || state_ == State::Err) &&
+        (is_mapped_ ? tr_time() >= renew_time_ : is_enabled && has_discovered_))
     {
-        if (is_enabled && !is_mapped_ && has_discovered_)
-        {
-            state_ = State::SendMap;
-        }
-        else if (is_mapped_ && tr_time() >= renew_time_)
-        {
-            state_ = State::SendMap;
-        }
+        state_ = State::SendMap;
     }
 
     if (state_ == State::SendMap && canSendCommand())
@@ -178,7 +175,8 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
             renew_time_ = tr_time() + (resp.pnu.newportmapping.lifetime / 2);
             local_port_ = tr_port::from_host(resp.pnu.newportmapping.privateport);
             advertised_port_ = tr_port::from_host(resp.pnu.newportmapping.mappedpublicport);
-            tr_logAddInfo(fmt::format(_("Port {port} forwarded successfully"), fmt::arg("port", local_port_.host())));
+            tr_logAddInfo(
+                fmt::format(fmt::runtime(_("Port {port} forwarded successfully")), fmt::arg("port", local_port_.host())));
         }
         else if (val != NATPMP_TRYAGAIN)
         {
@@ -189,21 +187,25 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
     switch (state_)
     {
     case State::Idle:
-        return { is_mapped_ ? TR_PORT_MAPPED : TR_PORT_UNMAPPED, local_port_, advertised_port_ };
+        return {
+            .state = is_mapped_ ? TR_PORT_MAPPED : TR_PORT_UNMAPPED,
+            .local_port = local_port_,
+            .advertised_port = advertised_port_,
+        };
 
     case State::Discover:
-        return { TR_PORT_UNMAPPED, {}, {} };
+        return { .state = TR_PORT_UNMAPPED, .local_port = {}, .advertised_port = {} };
 
     case State::RecvPub:
     case State::SendMap:
     case State::RecvMap:
-        return { TR_PORT_MAPPING, {}, {} };
+        return { .state = TR_PORT_MAPPING, .local_port = {}, .advertised_port = {} };
 
     case State::SendUnmap:
     case State::RecvUnmap:
-        return { TR_PORT_UNMAPPING, {}, {} };
+        return { .state = TR_PORT_UNMAPPING, .local_port = {}, .advertised_port = {} };
 
     default:
-        return { TR_PORT_ERROR, {}, {} };
+        return { .state = TR_PORT_ERROR, .local_port = {}, .advertised_port = {} };
     }
 }

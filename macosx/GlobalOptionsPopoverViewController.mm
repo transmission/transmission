@@ -1,4 +1,4 @@
-// This file Copyright © 2011-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -35,6 +35,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fUploadLimitField.integerValue = [self.fDefaults integerForKey:@"UploadLimit"];
     self.fDownloadLimitField.integerValue = [self.fDefaults integerForKey:@"DownloadLimit"];
 
@@ -51,7 +52,7 @@
 
 - (IBAction)setDownSpeedSetting:(id)sender
 {
-    tr_sessionLimitSpeed(self.fHandle, TR_DOWN, [self.fDefaults boolForKey:@"CheckDownload"]);
+    tr_sessionLimitSpeed(self.fHandle, tr_direction::Down, [self.fDefaults boolForKey:@"CheckDownload"]);
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
 }
@@ -60,7 +61,7 @@
 {
     NSInteger const limit = [sender integerValue];
     [self.fDefaults setInteger:limit forKey:@"DownloadLimit"];
-    tr_sessionSetSpeedLimit_KBps(self.fHandle, TR_DOWN, limit);
+    tr_sessionSetSpeedLimit_KBps(self.fHandle, tr_direction::Down, limit);
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateSpeedLimitValuesOutsidePrefs" object:nil];
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
@@ -68,7 +69,7 @@
 
 - (IBAction)setUpSpeedSetting:(id)sender
 {
-    tr_sessionLimitSpeed(self.fHandle, TR_UP, [self.fDefaults boolForKey:@"CheckUpload"]);
+    tr_sessionLimitSpeed(self.fHandle, tr_direction::Up, [self.fDefaults boolForKey:@"CheckUpload"]);
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateSpeedLimitValuesOutsidePrefs" object:nil];
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
@@ -78,7 +79,7 @@
 {
     NSInteger const limit = [sender integerValue];
     [self.fDefaults setInteger:limit forKey:@"UploadLimit"];
-    tr_sessionSetSpeedLimit_KBps(self.fHandle, TR_UP, limit);
+    tr_sessionSetSpeedLimit_KBps(self.fHandle, tr_direction::Up, limit);
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
 }

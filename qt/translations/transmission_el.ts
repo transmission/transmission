@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Με την επιφύλαξη παντός δικαιώματος © The Transmission Project</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Πελάτης</translation>
+        <translation>Πελάτης</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Διακομιστής</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -46,27 +46,12 @@
 </context>
 <context>
     <name>Application</name>
-    <message>
-        <location filename="../Application.cc" line="+332"/>
-        <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Το Transmission είναι ένα πρόγραμμα διαμοιρασμού αρχείων.&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Όταν εκκινείτε ένα torrent, τα δεδομένα του θα γίνουν διαθέσιμα σε άλλους μέσω αποστολής. Όποιο περιεχόμενο μοιράζεστε είναι αποκλειστική ευθύνη σας.</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>I &amp;Agree</source>
-        <translation>&amp;Συμφωνώ</translation>
-    </message>
     <message numerus="yes">
-        <location line="+110"/>
+        <location filename="../Application.cc" line="+313"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ολοκληρωμένα Torrent</numerusform>
+            <numerusform>Ολοκληρωμένα Torrent</numerusform>
         </translation>
     </message>
     <message>
@@ -78,7 +63,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+432"/>
+        <location filename="../DetailsDialog.cc" line="+469"/>
         <source>None</source>
         <translation>Κανένα</translation>
     </message>
@@ -89,7 +74,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+267"/>
+        <location line="+268"/>
         <source>Unknown</source>
         <translation>Άγνωστο</translation>
     </message>
@@ -106,10 +91,10 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 απορρίφθηκαν κατόπιν αποτυχημένου ελέγχου αθροίσματος)</translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+130"/>
         <source>Active now</source>
         <translation>Ενεργό τώρα</translation>
     </message>
@@ -127,7 +112,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="+6"/>
         <source>%1 (%Ln pieces)</source>
         <translation>
             <numerusform>%1 (%Ln κομμάτι)</numerusform>
@@ -145,7 +130,7 @@
         <translation>Δημόσιο torrent</translation>
     </message>
     <message>
-        <location line="+69"/>
+        <location line="+102"/>
         <source>Created by %1</source>
         <translation>Δημιουργήθηκε από τον/την %1$</translation>
     </message>
@@ -160,7 +145,7 @@
         <translation>Δημιουργήθηκε από τον/την %1$ την %2</translation>
     </message>
     <message>
-        <location line="+204"/>
+        <location line="+207"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>Κρυπτογραφημένη σύνδεση</translation>
@@ -218,21 +203,12 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="+130"/>
-        <source> minute(s)</source>
-        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation>
-            <numerusform>λεπτό</numerusform>
-            <numerusform>λεπτά</numerusform>
-        </translation>
+        <translation>O διαμοιραστής είναι συνδεδεμένος μέσω µTP</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+161"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Προσθήκη συνδέσμων για ανακοινώσεις ιχνηλατών, ένας ανά γραμμή:</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -242,10 +218,10 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Δεν βρέθηκαν νέοι σύνδεσμοι.</translation>
     </message>
     <message>
-        <location line="-843"/>
+        <location line="-872"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -268,18 +244,27 @@
         <translation>%1 (Αναλογία: %2)</translation>
     </message>
     <message>
-        <location line="+273"/>
+        <location line="+303"/>
         <location line="+55"/>
         <source>N/A</source>
         <translation>N/A</translation>
     </message>
-    <message>
-        <location line="+390"/>
-        <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <location line="+358"/>
+        <source>%1 minute(s)</source>
+        <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
+        <translation>
+            <numerusform>%1 λεπτό</numerusform>
+            <numerusform>%1 λεπτά</numerusform>
+        </translation>
     </message>
     <message>
-        <location line="+114"/>
+        <location line="+31"/>
+        <source>Add URL(s)</source>
+        <translation>Προσθήκη συνδέσμων</translation>
+    </message>
+    <message>
+        <location line="+116"/>
         <source>High</source>
         <translation>Υψηλή</translation>
     </message>
@@ -320,7 +305,7 @@
         <translation>Διακοπή διαμοιρασμού σε περίπτωση αδράνειας για:</translation>
     </message>
     <message>
-        <location line="+75"/>
+        <location line="+73"/>
         <source>Up</source>
         <translation>Αποστολή</translation>
     </message>
@@ -360,102 +345,102 @@
         <translation>Πληροφορίες</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+6"/>
         <source>Activity</source>
         <translation>Δραστηριότητα</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>Have:</source>
         <translation>Έχουμε:</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+32"/>
         <source>Availability:</source>
         <translation>Διαθεσιμότητα:</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+32"/>
         <source>Uploaded:</source>
         <translation>Απεσταλμένα:</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+32"/>
         <source>Downloaded:</source>
         <translation>Ληφθέντα:</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+32"/>
         <source>State:</source>
         <translation>Κατάσταση:</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+32"/>
         <source>Running time:</source>
         <translation>Χρόνος εκτέλεσης:</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+32"/>
         <source>Remaining time:</source>
         <translation>Χρόνος που απομένει:</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+32"/>
         <source>Last activity:</source>
         <translation>Τελευταία δραστηριότητα:</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+32"/>
         <source>Error:</source>
         <translation>Σφάλμα:</translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="+35"/>
         <source>Details</source>
         <translation>Λεπτομέρειες</translation>
     </message>
     <message>
-        <location line="+109"/>
+        <location line="+6"/>
         <source>Size:</source>
         <translation>Μέγεθος:</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+32"/>
         <source>Location:</source>
         <translation>Τοποθεσία:</translation>
     </message>
     <message>
-        <location line="+124"/>
-        <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <location line="+154"/>
+        <source>Labels:</source>
+        <translation>Ετικέτες:</translation>
     </message>
     <message>
-        <location line="-190"/>
+        <location line="-122"/>
         <source>Hash:</source>
         <translation>Hash:</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+32"/>
         <source>Privacy:</source>
         <translation>Απόρρητο:</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+32"/>
         <source>Origin:</source>
         <translation>Προέλευση:</translation>
     </message>
     <message>
-        <location line="+78"/>
+        <location line="+32"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Προστέθηκε:</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+43"/>
         <source>Comment:</source>
         <translation>Σχόλιο:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+27"/>
         <source>Peers</source>
         <translation>Χρήστες</translation>
     </message>
@@ -465,17 +450,7 @@
         <translation>Ιχνηλάτης</translation>
     </message>
     <message>
-        <location line="+22"/>
-        <source>Add Tracker</source>
-        <translation>Προσθήκη Ιχνηλάτη</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Remove Trackers</source>
-        <translation>Αφαίρεση Ιχνηλατών</translation>
-    </message>
-    <message>
-        <location line="+23"/>
+        <location line="+56"/>
         <source>Show &amp;more details</source>
         <translation>Εμφάνιση &amp;περισσότερων  λεπτομερειών</translation>
     </message>
@@ -495,12 +470,12 @@
         <translation>Επιλογές</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+6"/>
         <source>Speed</source>
         <translation>Ταχύτητα</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>Honor global &amp;limits</source>
         <translation>Τήρηση καθολικών &amp;ορίων</translation>
     </message>
@@ -515,32 +490,47 @@
         <translation>Περιορισμός &amp;ταχύτητας αποστολής</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="-100"/>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+126"/>
         <source>Torrent &amp;priority:</source>
         <translation>&amp;Προτεραιότητα torrent</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+16"/>
         <source>Seeding Limits</source>
         <translation>Όρια Διαμοιρασμού</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>&amp;Ratio:</source>
         <translation>&amp;Αναλογία:</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+27"/>
         <source>&amp;Idle:</source>
         <translation>&amp;Αδρανές:</translation>
     </message>
     <message>
-        <location line="+50"/>
+        <location line="+36"/>
         <source>Peer Connections</source>
         <translation>Συνδέσεις Χρηστών</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>&amp;Maximum peers:</source>
         <translation>&amp;Μέγιστος αριθμός χρηστών:</translation>
     </message>
@@ -548,29 +538,29 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+297"/>
-        <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+254"/>
+        <location filename="../FileTreeItem.cc" line="+279"/>
+        <location filename="../FileTreeView.cc" line="+110"/>
+        <location line="+258"/>
         <source>Low</source>
         <translation>Χαμηλή</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-254"/>
-        <location line="+252"/>
+        <location filename="../FileTreeView.cc" line="-258"/>
+        <location line="+256"/>
         <source>High</source>
         <translation>Υψηλή</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
-        <location line="+253"/>
+        <location filename="../FileTreeView.cc" line="-256"/>
+        <location line="+257"/>
         <source>Normal</source>
         <translation>Κανονική</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
+        <location filename="../FileTreeView.cc" line="-256"/>
         <source>Mixed</source>
         <translation>Μικτή</translation>
     </message>
@@ -578,7 +568,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location filename="../FileTreeModel.cc" line="+195"/>
+        <location filename="../FileTreeModel.cc" line="+203"/>
         <source>File</source>
         <translation>Αρχεία</translation>
     </message>
@@ -606,7 +596,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+244"/>
+        <location filename="../FileTreeView.cc" line="+248"/>
         <source>Check Selected</source>
         <translation>Μαρκάρισμα Επιλεγμένων</translation>
     </message>
@@ -633,138 +623,67 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Μετονομασία…</translation>
     </message>
 </context>
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+48"/>
-        <location line="+145"/>
+        <location filename="../FilterBar.cc" line="+47"/>
+        <location line="+138"/>
         <source>All</source>
         <translation>Όλα</translation>
     </message>
     <message>
-        <location line="-136"/>
+        <location line="-125"/>
         <source>Active</source>
         <translation>Ενεργά</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+2"/>
         <source>Downloading</source>
         <translation>Λήψη</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-1"/>
         <source>Seeding</source>
         <translation>Διαμοιρασμός</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+2"/>
         <source>Paused</source>
         <translation>Σε παύση</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+1"/>
         <source>Finished</source>
         <translation>Ολοκληρωμένα</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+1"/>
         <source>Verifying</source>
         <translation>Επαλήθευση</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+1"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location line="+140"/>
+        <location line="+142"/>
         <source>Show:</source>
         <translation>Εμφάνιση:</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+13"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Αναζήτηση…</translation>
     </message>
 </context>
 <context>
     <name>Formatter</name>
     <message>
-        <location filename="../Formatter.cc" line="+24"/>
-        <source>B/s</source>
-        <translation>B/δευτ.</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>kB/s</source>
-        <translation>kB/δευτ.</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>MB/s</source>
-        <translation>MB/δευτ.</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>GB/s</source>
-        <translation>GB/δευτ.</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>TB/s</source>
-        <translation>TB/δευτ.</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <location line="+1"/>
-        <source>B</source>
-        <translation>B</translation>
-    </message>
-    <message>
-        <location line="-1"/>
-        <source>kB</source>
-        <translation>kB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>MB</source>
-        <translation>MB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>GB</source>
-        <translation>GB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>TB</source>
-        <translation>TB</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>KiB</source>
-        <translation>KiB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>MiB</source>
-        <translation>MiB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>GiB</source>
-        <translation>GiB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>TiB</source>
-        <translation>TiB</translation>
-    </message>
-    <message>
-        <location line="+37"/>
+        <location filename="../Formatter.cc" line="+19"/>
         <location line="+25"/>
         <source>Unknown</source>
         <translation>Άγνωστο</translation>
@@ -772,17 +691,12 @@
     <message>
         <location line="-20"/>
         <location line="+10"/>
+        <location line="+19"/>
         <source>None</source>
         <translation>Κανένα</translation>
     </message>
-    <message>
-        <location filename="../Formatter.h" line="+64"/>
-        <location line="+7"/>
-        <source>%1 %2</source>
-        <translation>%1 %2</translation>
-    </message>
     <message numerus="yes">
-        <location filename="../Formatter.cc" line="+41"/>
+        <location line="+30"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln μέρα</numerusform>
@@ -817,9 +731,9 @@
 <context>
     <name>FreeSpaceLabel</name>
     <message>
-        <location filename="../FreeSpaceLabel.cc" line="+52"/>
+        <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Υπολογισμός Ελεύθερου Χώρου…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -895,17 +809,17 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Επιλογές</translation>
+        <translation>Επιλογές</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Στατιστικά</translation>
+        <translation>Στατιστικά</translation>
     </message>
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Άνοιγμα…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -920,7 +834,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Νέο…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1161,17 +1075,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Αλλαγή Συνεδρίας…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>Καθορισμός &amp;Τοποθεσίας…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>Άνοιγμα &amp;Συνδέσμου…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1225,7 +1139,7 @@
         <translation>Ταξινόμηση κατά &amp;Σειρά</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+468"/>
+        <location filename="../MainWindow.cc" line="+385"/>
         <source>Limit Download Speed</source>
         <translation>Περιορισμός Ταχύτητας Λήψης</translation>
     </message>
@@ -1236,13 +1150,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+752"/>
+        <location line="+812"/>
         <location line="+9"/>
         <source>Limited at %1</source>
         <translation>Περιορισμένη σε %1</translation>
     </message>
     <message>
-        <location line="-706"/>
+        <location line="-766"/>
         <source>Limit Upload Speed</source>
         <translation>Περιορισμός Ταχύτητας Αποστολής</translation>
     </message>
@@ -1258,12 +1172,12 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+739"/>
+        <location line="+799"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Διακοπή σε Αναλογία (%1)</translation>
     </message>
     <message>
-        <location line="-393"/>
+        <location line="-448"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session) notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1:%2</translation>
@@ -1274,19 +1188,19 @@
         <translation>Αδρανές</translation>
     </message>
     <message>
-        <location line="+30"/>
-        <location line="+15"/>
+        <location line="+26"/>
+        <location line="+19"/>
         <source>Ratio: %1</source>
         <translation>Αναλογία: %1</translation>
     </message>
     <message>
-        <location line="-10"/>
-        <location line="+5"/>
+        <location line="-14"/>
+        <location line="+7"/>
         <source>Down: %1, Up: %2</source>
         <translation>Λήψη: %1, Αποστολή: %2</translation>
     </message>
     <message>
-        <location line="+424"/>
+        <location line="+480"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Αρχεία Torrent (*.torrent);;Όλα τα Αρχεία(*.*)</translation>
     </message>
@@ -1301,17 +1215,17 @@
         <translation>Άνοιγμα Torrent</translation>
     </message>
     <message>
-        <location line="-1003"/>
+        <location line="-1066"/>
         <source>Speed Limits</source>
         <translation>Όρια Tαχύτητας</translation>
     </message>
     <message>
-        <location line="+537"/>
+        <location line="+546"/>
         <source>Network Error</source>
         <translation>Σφάλμα Δικτύου</translation>
     </message>
     <message>
-        <location line="+434"/>
+        <location line="+489"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>Πατήστε για απενεργοποίηση των Προσωρινών Ορίων Ταχύτητας
@@ -1325,7 +1239,7 @@
 (λήψη %1, αποστολή %2)</translation>
     </message>
     <message>
-        <location line="+136"/>
+        <location line="+160"/>
         <source>Remove torrent?</source>
         <translation>Αφαίρεση torrent;</translation>
     </message>
@@ -1343,7 +1257,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="-505"/>
+        <location line="-584"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
             <numerusform>Εμφάνιση %L1 από %Ln torrent</numerusform>
@@ -1351,7 +1265,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+510"/>
+        <location line="+589"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
             <numerusform>Να διαγραφούν τα ληφθέντα αρχεία αυτού του torrent;</numerusform>
@@ -1437,7 +1351,7 @@
         <translation>Νέο Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+304"/>
+        <location filename="../MakeDialog.cc" line="+305"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;Δεν έχει επιλεγεί πηγή&lt;/i&gt;</translation>
     </message>
@@ -1463,12 +1377,12 @@
         <translation>%1 σε %2· %3 @ %4</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.ui" line="+9"/>
+        <location filename="../MakeDialog.ui" line="+6"/>
         <source>Files</source>
         <translation>Αρχεία</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>Sa&amp;ve to:</source>
         <translation>Απο&amp;θήκευση σε:</translation>
     </message>
@@ -1483,17 +1397,17 @@
         <translation>&amp;Αρχείο προέλευσης:</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+20"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>Μ&amp;έγεθος κομματιού:</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+29"/>
         <source>Properties</source>
         <translation>Ιδιότητες</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>&amp;Trackers:</source>
         <translation>&amp;Ιχνηλάτες</translation>
     </message>
@@ -1512,7 +1426,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Πηγή:</translation>
+        <translation>&amp;Πηγή:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1528,7 +1442,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Νέο Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-184"/>
+        <location filename="../MakeDialog.cc" line="-182"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>Δημιουργία &quot;%1&quot;</translation>
     </message>
@@ -1538,15 +1452,15 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Το &quot;%1&quot; δημιουργήθηκε!</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Αδυναμία δημιουργίας &quot;%1&quot;: %2 (%3)</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+52"/>
+        <location filename="../OptionsDialog.cc" line="+53"/>
         <source>Open Torrent</source>
         <translation>Άνοιγμα Torrent</translation>
     </message>
@@ -1615,12 +1529,12 @@ To add another primary URL, add it after a blank line.</source>
     <name>PathButton</name>
     <message>
         <location filename="../PathButton.cc" line="+23"/>
-        <location line="+71"/>
+        <location line="+67"/>
         <source>(None)</source>
         <translation>(Κανένα)</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="+96"/>
         <source>Select Folder</source>
         <translation>Επιλογή Φακέλου</translation>
     </message>
@@ -1633,7 +1547,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>PrefsDialog</name>
     <message>
-        <location filename="../PrefsDialog.ui" line="+1223"/>
+        <location filename="../PrefsDialog.ui" line="+971"/>
         <source>Use &amp;authentication</source>
         <translation>Χρήση &amp;πιστοποίησης</translation>
     </message>
@@ -1658,17 +1572,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Διευθύνσεις:</translation>
     </message>
     <message>
-        <location line="-1234"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>Όρια Tαχύτητας</translation>
     </message>
     <message>
-        <location line="+99"/>
+        <location line="+64"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
         <translation>&lt;small&gt;Παράκαμψη συνηθισμένων ορίων ταχυτήτων χειροκίνητα ή σε προγραμματισμένες ώρες&lt;/small&gt;</translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="+49"/>
         <source>&amp;Scheduled times:</source>
         <translation>&amp;Προγραμματισμένες ώρες:</translation>
     </message>
@@ -1678,7 +1592,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&amp;Τις ημέρες:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+382"/>
+        <location filename="../PrefsDialog.cc" line="+380"/>
         <source>Every Day</source>
         <translation>Κάθε Μέρα</translation>
     </message>
@@ -1693,7 +1607,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Σαββατοκύριακα</translation>
     </message>
     <message>
-        <location line="-238"/>
+        <location line="-235"/>
         <source>Sunday</source>
         <translation>Κυριακή</translation>
     </message>
@@ -1727,39 +1641,36 @@ To add another primary URL, add it after a blank line.</source>
         <source>Saturday</source>
         <translation>Σάββατο</translation>
     </message>
-    <message>
-        <location line="+299"/>
-        <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
-        <translation>Η θύρα είναι &lt;b&gt;ανοιχτή&lt;/b&gt;</translation>
+    <message numerus="yes">
+        <location line="+464"/>
+        <source>%1 minute(s)</source>
+        <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
+        <translation>
+            <numerusform>%1 λεπτό</numerusform>
+            <numerusform>%1 λεπτά</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+26"/>
+        <source>%1 minute(s) ago</source>
+        <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
+        <translation>
+            <numerusform>πριν %1 λεπτό</numerusform>
+            <numerusform>πριν %1 λεπτά</numerusform>
+        </translation>
     </message>
     <message>
-        <location line="+0"/>
-        <source>Port is &lt;b&gt;closed&lt;/b&gt;</source>
-        <translation>Η θύρα είναι &lt;b&gt;κλειστή&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+154"/>
+        <location line="+16"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Επιλογή Script «Το Torrent Κατέβηκε»</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="+545"/>
+        <location filename="../PrefsDialog.ui" line="+447"/>
         <source>Incoming Peers</source>
         <translation>Εισερχόμενοι Χρήστες</translation>
     </message>
     <message>
-        <location line="+32"/>
-        <location filename="../PrefsDialog.cc" line="+207"/>
-        <source>Status unknown</source>
-        <translation>Άγνωστη κατάσταση</translation>
-    </message>
-    <message>
-        <location line="-20"/>
+        <location line="+6"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Θύρα για εισερχόμενες συνδέσεις:</translation>
     </message>
@@ -1769,80 +1680,73 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Χρήση του UPnP ή του NAT-PMP για την &amp;προώθηση θυρών από τον δρομολογητή μου</translation>
     </message>
     <message>
-        <location line="+107"/>
+        <location line="+65"/>
         <source>Options</source>
         <translation>Επιλογές</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-255"/>
-        <source> minute(s)</source>
-        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation>
-            <numerusform>λεπτό</numerusform>
-            <numerusform>λεπτά</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+10"/>
+        <location filename="../PrefsDialog.cc" line="-35"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="+19"/>
-        <source> minute(s) ago</source>
-        <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation>
-            <numerusform>λεπτό πριν</numerusform>
-            <numerusform>λεπτά πριν</numerusform>
-        </translation>
+        <translation>Επιλογή Script «Το Torrent Διαμοιράστηκε»</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-651"/>
+        <location filename="../PrefsDialog.ui" line="-520"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Αυτόματη προσθήκη αρχείων .torrent &amp;από:</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+22"/>
         <source>Show the Torrent Options &amp;dialog</source>
         <translation>Εμφάνιση του Διαλόγου &amp;Επιλογών Torrent</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="+7"/>
         <source>&amp;Start added torrents</source>
         <translation>&amp;Εκκίνηση των torrent που προστέθηκαν</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+17"/>
         <source>Mo&amp;ve the .torrent file to the trash</source>
         <translation>Μετακ&amp;ίνηση του αρχείου .torrent στα απορρίμματα</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+39"/>
         <source>Download Queue</source>
         <translation>Ουρά Λήψης</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>Ma&amp;ximum active downloads:</source>
         <translation>Μέγιστος αριθμός ενεργών λήψεων:</translation>
     </message>
     <message>
-        <location line="+67"/>
+        <location line="+49"/>
         <source>Incomplete</source>
         <translation>Μη ολοκληρωμένο</translation>
     </message>
     <message>
-        <location line="+79"/>
+        <location line="+74"/>
         <source>Seeding</source>
         <translation>Διαμοιρασμός</translation>
     </message>
     <message>
-        <location line="+622"/>
+        <location line="+361"/>
+        <source>Trackers to use on all public torrents.
+
+To add a backup URL, add it on the next line after a primary URL.
+To add a new primary URL, add it after a blank line.</source>
+        <translation>Ιχνηλάτες για χρήση σε όλα τα δημόσια torrents.
+
+Για την χρήση εφεδρικού συνδέσμου, προσθέστε τον στην επόμενη γραμμή έπειτα από τον κύριο σύνδεσμο.
+Για την προσθήκη νέου κύριου συνδέσμου, προσθέστε τον έπειτα από μία κενή γραμμή.</translation>
+    </message>
+    <message>
+        <location line="+109"/>
         <source>Remote</source>
         <translation>Απομακρυσμένα</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="+168"/>
+        <location filename="../PrefsDialog.cc" line="+180"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;Η λίστα αποκλεισμού περιέχει %Ln κανόνα&lt;/i&gt;</numerusform>
@@ -1850,17 +1754,17 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-339"/>
+        <location filename="../PrefsDialog.ui" line="-236"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>Χρήση μιας &amp;τυχαίας θύρας κάθε φορά που εκκινείται το Transmission</translation>
     </message>
     <message>
-        <location line="-274"/>
+        <location line="-228"/>
         <source>Limits</source>
         <translation>Όρια</translation>
     </message>
     <message>
-        <location line="+321"/>
+        <location line="+251"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>Μέγιστος αριθμός χρηστών ανά &amp;torrent:</translation>
     </message>
@@ -1870,17 +1774,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Μέγιστος αριθμός χρηστών &amp;συνολικά:</translation>
     </message>
     <message>
-        <location line="-193"/>
+        <location line="-155"/>
         <source>Blocklist</source>
         <translation>Λίστα αποκλεισμού</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+36"/>
         <source>Enable &amp;automatic updates</source>
         <translation>Ενεργοποίηση &amp;αυτόματων ενημερώσεων</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-227"/>
+        <location filename="../PrefsDialog.cc" line="-215"/>
         <source>Allow encryption</source>
         <translation>Να επιτρέπεται η κρυπτογράφηση</translation>
     </message>
@@ -1895,33 +1799,33 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Να απαιτείται η κρυπτογράφηση</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-97"/>
+        <location filename="../PrefsDialog.ui" line="-64"/>
         <source>Privacy</source>
         <translation>Απόρρητο</translation>
     </message>
     <message>
-        <location line="-435"/>
+        <location line="-372"/>
         <source>&amp;to</source>
         <translation>&amp;σε</translation>
     </message>
     <message>
-        <location line="+847"/>
-        <location line="+9"/>
+        <location line="+672"/>
+        <location line="+6"/>
         <source>Desktop</source>
         <translation>Επιφάνεια Eργασίας</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Εμφάνιση εικονιδίου του Transmission στην &amp;περιοχή ειδοποιήσεων</translation>
     </message>
     <message>
-        <location line="-265"/>
+        <location line="-192"/>
         <source>Te&amp;st Port</source>
         <translation>Δοκ&amp;ιμή θύρας</translation>
     </message>
     <message>
-        <location line="-101"/>
+        <location line="-86"/>
         <source>Enable &amp;blocklist:</source>
         <translation>Ενεργοποίηση &amp;λίστας αποκλεισμού:</translation>
     </message>
@@ -1931,17 +1835,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&amp;Ενημέρωση</translation>
     </message>
     <message>
-        <location line="-66"/>
+        <location line="-42"/>
         <source>&amp;Encryption mode:</source>
         <translation>&amp;Λειτουργία κρυπτογράφησης:</translation>
     </message>
     <message>
-        <location line="+505"/>
+        <location line="+367"/>
         <source>Remote Control</source>
         <translation>Απομακρυσμένος Έλεγχος</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>Allow &amp;remote access</source>
         <translation>Να επιτρέπεται ο &amp;απομακρυσμένος έλεγχος</translation>
     </message>
@@ -1956,7 +1860,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Επίτρεψε μόνο σε αυτές τις διευθύνσεις IP:</translation>
     </message>
     <message>
-        <location line="-1212"/>
+        <location line="-969"/>
         <source>&amp;Upload:</source>
         <translation>&amp;Αποστολή:</translation>
     </message>
@@ -1966,12 +1870,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&amp;Λήψη:</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+23"/>
         <source>Alternative Speed Limits</source>
         <translation>Εναλλακτικά Όρια Ταχύτητας</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+24"/>
         <source>U&amp;pload:</source>
         <translation>Α&amp;ποστολή:</translation>
     </message>
@@ -1981,57 +1885,52 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Λ&amp;ήψη:</translation>
     </message>
     <message>
-        <location line="+186"/>
+        <location line="+142"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Διαβάζει το περιεχόμενο του προχείρου του χρήστη για torrents</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Εντοπίζει νέα torrents από το πρόχειρο</translation>
     </message>
     <message>
-        <location line="+148"/>
+        <location line="+136"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Κλήση scrip&amp;t όταν το κατέβασμα ολοκληρωθεί:</translation>
     </message>
     <message>
-        <location line="+105"/>
+        <location line="+97"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Κλήση scrip&amp;t όταν ο διαμοιρασμός ολοκληρωθεί:</translation>
     </message>
     <message>
-        <location line="+342"/>
+        <location line="+254"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>Το µTP είναι ένα μέσο μείωσης της δικτυακής συμφόρησης.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Ενεργοποίηση µ&amp;TP για συνδέσεις διαμοιραστών</translation>
+    </message>
+    <message>
+        <location line="+40"/>
+        <source>Default Public Trackers</source>
+        <translation>Προκαθορισμένοι Δημόσιοι Ιχνηλάτες</translation>
     </message>
     <message>
         <location line="+61"/>
-        <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+60"/>
         <source>Start &amp;minimized in notification area</source>
         <translation>Εκκίνηση &amp;ελαχιστοποιημένο στην περιοχή ειδοποιήσεων</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+10"/>
         <source>Notification</source>
         <translation>Ειδοποίηση</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>Show a notification when torrents are a&amp;dded</source>
         <translation>Εμφάνιση ειδοποίησης όταν π&amp;ροστίθενται torrent</translation>
     </message>
@@ -2046,12 +1945,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Αναπαραγωγή ενός &amp;ήχου όταν ολοκληρώνονται torrent</translation>
     </message>
     <message>
-        <location line="-281"/>
+        <location line="-195"/>
         <source>Peer Limits</source>
         <translation>Όρια Χρηστών</translation>
     </message>
     <message>
-        <location line="+104"/>
+        <location line="+74"/>
         <source>Use PE&amp;X to find more peers</source>
         <translation>Χρήση του PE&amp;X για εύρεση επιπλέον χρηστών</translation>
     </message>
@@ -2081,12 +1980,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Το LPD είναι ένα εργαλείο ανεύρεσης χρηστών στο τοπικό σας δίκτυο.</translation>
     </message>
     <message>
-        <location line="-325"/>
+        <location line="-239"/>
         <source>Encryption</source>
         <translation>Κρυπτογράφηση</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+75"/>
+        <location filename="../PrefsDialog.cc" line="+67"/>
         <source>Select Incomplete Directory</source>
         <translation>Επιλογή Καταλόγου Μη Ολοκληρωμένου</translation>
     </message>
@@ -2095,42 +1994,77 @@ To add another primary URL, add it after a blank line.</source>
         <source>Select Watch Directory</source>
         <translation>Επιλογή Καταλόγου Παρακολούθησης</translation>
     </message>
+    <message>
+        <location line="-210"/>
+        <source>unknown</source>
+        <translation>άγνωστο</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>checking…</source>
+        <translation>έλεγχος…</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>open</source>
+        <translation>ανοιχτή</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>closed</source>
+        <translation>κλειστή</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>error</source>
+        <translation>σφάλμα</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Status: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation>Κατάσταση: &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Status: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</source>
+        <translation>Κατάσταση: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</translation>
+    </message>
     <message numerus="yes">
-        <location line="-101"/>
+        <location line="+96"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;Η ενημέρωση πέτυχε!&lt;/b&gt;&lt;p&gt;Η λίστα φραγής τώρα έχει %Ln κανόνα.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Η ενημέρωση πέτυχε!&lt;/b&gt;&lt;p&gt;Η λίστα φραγής τώρα έχει %Ln κανόνες.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+8"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Ενημέρωση λίστα φραγής&lt;/b&gt;&lt;p&gt;Απόκτηση νέας λίστας φραγής…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+85"/>
         <source>Select Destination</source>
         <translation>Επιλογή Προορισμού</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-387"/>
+        <location filename="../PrefsDialog.ui" line="-323"/>
         <source>Adding</source>
         <translation>Προσθήκη</translation>
     </message>
     <message>
-        <location line="+147"/>
+        <location line="+117"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s currently the longest and influences dialog width</extracomment>
         <translation>Η λήψη είναι α&amp;δρανής αν ο διαμοιρασμός των δεδομένων σταμάτησε:</translation>
     </message>
     <message>
-        <location line="-156"/>
+        <location line="-123"/>
         <source>Downloading</source>
         <translation>Λήψη</translation>
     </message>
     <message>
-        <location line="+215"/>
+        <location line="+158"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
         <translation>Προσθήκη της λέξης &quot;.&amp;part&quot; στα ονόματα των μη ολοκληρωμένων αρχείων</translation>
     </message>
@@ -2140,12 +2074,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Διατήρηση &amp;μη ολοκληρωμένων αρχείων σε:</translation>
     </message>
     <message>
-        <location line="-201"/>
+        <location line="-100"/>
         <source>Save to &amp;Location:</source>
         <translation>Αποθήκευση στην &amp;Τοποθεσία:</translation>
     </message>
     <message>
-        <location line="+282"/>
+        <location line="+173"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Διακοπή διαμοιρασμού στην &amp;αναλογία:</translation>
     </message>
@@ -2155,7 +2089,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Διακοπή διαμοιρασμού σε περίπτωση αδράνειας για:</translation>
     </message>
     <message>
-        <location line="-567"/>
+        <location line="-467"/>
         <source>Transmission Preferences</source>
         <translation>Προτιμήσεις του Transmission</translation>
     </message>
@@ -2165,12 +2099,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Ταχύτητα</translation>
     </message>
     <message>
-        <location line="+735"/>
+        <location line="+604"/>
         <source>Network</source>
         <translation>Δίκτυο</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+116"/>
+        <location filename="../PrefsDialog.cc" line="+114"/>
         <source>Not supported by remote sessions</source>
         <translation>Δεν υποστηρίζεται από απομακρυσμένες συνεδρίες</translation>
     </message>
@@ -2178,14 +2112,80 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-313"/>
-        <source>Invalid option</source>
-        <translation>Άκυρη επιλογή</translation>
+        <location filename="../Application.cc" line="-266"/>
+        <source>B/s</source>
+        <translation>B/s</translation>
     </message>
     <message>
-        <location line="+312"/>
+        <location line="+1"/>
+        <source>kB/s</source>
+        <translation>kB/s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MB/s</source>
+        <translation>MB/s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>GB/s</source>
+        <translation>GB/s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>TB/s</source>
+        <translation>TB/s</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+7"/>
+        <source>B</source>
+        <translation>B</translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <source>KiB</source>
+        <translation>KiB</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MiB</source>
+        <translation>MiB</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>GiB</source>
+        <translation>GiB</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>TiB</source>
+        <translation>TiB</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>kB</source>
+        <translation>kB</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MB</source>
+        <translation>MB</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>TB</source>
+        <translation>TB</translation>
+    </message>
+    <message>
+        <location line="+247"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Εκκίνηση Τώρα</translation>
     </message>
 </context>
 <context>
@@ -2201,12 +2201,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Ορισμός Τοποθεσίας Torrent</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+9"/>
         <source>Set Location</source>
         <translation>Ορισμός Τοποθεσίας</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>New &amp;location:</source>
         <translation>Νέα &amp;τοποθεσία:</translation>
     </message>
@@ -2224,7 +2224,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+505"/>
+        <location filename="../Session.cc" line="+515"/>
         <source>Error Renaming Path</source>
         <translation>Σφάλμα Μετονομασίας Διαδρομής</translation>
     </message>
@@ -2234,29 +2234,29 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;Αδύνατη η μετονομασία του &quot;%1&quot; σε &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Παρακαλώ διορθώστε τα λάθη και δοκιμάστε ξανά.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+528"/>
+        <location line="+565"/>
         <source>Error Adding Torrent</source>
         <translation>Σφάλμα Προσθήκης Torrent</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+38"/>
         <source>%1 (copy of %2)</source>
         <translation>%1 (αντίγραφο από %2)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Διπλότυπο Torrent</numerusform>
+            <numerusform>Διπλότυπα Torrents</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Αδυναμία προσθήκης %n διπλότυπου torrent</numerusform>
+            <numerusform>Αδυναμία προσθήκης %n διπλότυπων torrents</numerusform>
         </translation>
     </message>
 </context>
@@ -2268,12 +2268,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Αλλαγή Συνεδρίας</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+9"/>
         <source>Source</source>
         <translation>Πηγή</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
         <source>Start &amp;Local Session</source>
         <translation>Εκκίνηση &amp;Τοπικής Συνεδρίας</translation>
     </message>
@@ -2307,6 +2307,20 @@ To add another primary URL, add it after a blank line.</source>
         <source>Pass&amp;word:</source>
         <translation>Κωδικός &amp;πρόσβασης:</translation>
     </message>
+    <message>
+        <location line="+17"/>
+        <source>RPC URL pa&amp;th:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Speed</name>
+    <message>
+        <location filename="../Speed.h" line="+40"/>
+        <location line="+6"/>
+        <source>%1 %2</source>
+        <translation>%1 %2</translation>
+    </message>
 </context>
 <context>
     <name>StatsDialog</name>
@@ -2316,36 +2330,36 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Στατιστικά</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+9"/>
         <source>Current Session</source>
         <translation>Τρέχουσα Συνεδρία</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <location line="+96"/>
+        <location line="+6"/>
+        <location line="+129"/>
         <source>Uploaded:</source>
         <translation>Απεσταλμένα:</translation>
     </message>
     <message>
-        <location line="-82"/>
-        <location line="+96"/>
+        <location line="-103"/>
+        <location line="+129"/>
         <source>Downloaded:</source>
         <translation>Ληφθέντα:</translation>
     </message>
     <message>
-        <location line="-82"/>
-        <location line="+96"/>
+        <location line="-103"/>
+        <location line="+129"/>
         <source>Ratio:</source>
         <translation>Αναλογία:</translation>
     </message>
     <message>
-        <location line="-82"/>
-        <location line="+96"/>
+        <location line="-103"/>
+        <location line="+129"/>
         <source>Duration:</source>
         <translation>Διάρκεια:</translation>
     </message>
     <message>
-        <location line="-61"/>
+        <location line="-100"/>
         <source>Total</source>
         <translation>Σύνολο</translation>
     </message>
@@ -2361,7 +2375,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+323"/>
+        <location filename="../Torrent.cc" line="+307"/>
         <source>Verifying local data</source>
         <translation>Επαλήθευση τοπικών δεδομένων</translation>
     </message>
@@ -2419,7 +2433,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+174"/>
+        <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Μεταφορά magnet - ανάκτηση μεταδεδομένων (%1%)</translation>
@@ -2467,12 +2481,24 @@ To add another primary URL, add it after a blank line.</source>
         <translation>- Άγνωστος υπολειπόμενος χρόνος</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+38"/>
         <source>Ratio: %1</source>
         <translation>Αναλογία: %1</translation>
     </message>
+    <message>
+        <location line="+18"/>
+        <source>%1 left</source>
+        <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
+        <translation>%1 απομένουν</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Remaining time unknown</source>
+        <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
+        <translation>Άγνωστος υπολειπόμενος χρόνος</translation>
+    </message>
     <message numerus="yes">
-        <location line="+44"/>
+        <location line="+40"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
@@ -2528,7 +2554,7 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="-76"/>
+        <location line="-95"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Επαλήθευση τοπικών δεδομένων (%1% ελέγχθηκαν)</translation>
     </message>
@@ -2536,7 +2562,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+216"/>
+        <location filename="../TrackerDelegate.cc" line="+220"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2576,10 +2602,10 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Αποστολή αιτήματος για αριθμούς διαμοιραστών… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="-40"/>
+        <location line="-37"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2609,10 +2635,10 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Παρουσιάστηκε ένα σφάλμα srcape %1&quot;%2&quot;%3 πριν %4</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-20"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Αποστολή αιτήματος για περισσότερους διαμοιραστές… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>
@@ -2631,27 +2657,27 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Επεξεργασία Ιχνηλατών</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+6"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Σύνδεσμοι Ανακοινώσεων Ιχνηλατών</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <location line="+6"/>
+        <source>To add a backup URL, add it on the next line after a primary URL.</source>
+        <translation>Για την χρήση εφεδρικού συνδέσμου, προσθέστε τον στην επόμενη γραμμή έπειτα ενός κύριου συνδέσμου.</translation>
     </message>
     <message>
         <location line="+7"/>
+        <source>To add a new primary URL, add it after a blank line.</source>
+        <translation>Για την προσθήκη ενός νέου κύριου συνδέσμου, προσθέστε τον έπειτα από μία κενή γραμμή.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Δείτε επίσης τους Προκαθορισμένους Δημόσιους Ιχνηλάτες υπό την Επεξεργασία &gt; Προτιμήσεις &gt; Δίκτυο</translation>
     </message>
 </context>
 </TS>

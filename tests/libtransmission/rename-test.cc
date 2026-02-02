@@ -11,24 +11,25 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
+#include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/resume.h>
 #include <libtransmission/torrent.h> // tr_isTorrent()
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 struct tr_ctor;
-struct tr_error;
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class RenameTest : public SessionTest
@@ -38,7 +39,7 @@ class RenameTest : public SessionTest
 protected:
     void torrentRemoveAndWait(tr_torrent* tor, size_t expected_torrent_count)
     {
-        tr_torrentRemove(tor, false, nullptr, nullptr);
+        tr_torrentRemove(tor, false);
         auto const test = [this, expected_torrent_count]()
         {
             return std::size(session_->torrents()) == expected_torrent_count;
@@ -46,13 +47,13 @@ protected:
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     }
 
-    void createSingleFileTorrentContents(std::string_view top)
+    static void createSingleFileTorrentContents(std::string_view top)
     {
         auto const path = tr_pathbuf{ top, "/hello-world.txt" };
         createFileWithContents(path, "hello, world!\n");
     }
 
-    void createMultifileTorrentContents(std::string_view top)
+    static void createMultifileTorrentContents(std::string_view top)
     {
         auto path = tr_pathbuf{ top, "/Felidae/Felinae/Acinonyx/Cheetah/Chester"sv };
         createFileWithContents(path, "It ain't easy bein' cheesy.\n");
@@ -74,9 +75,9 @@ protected:
         // create the torrent ctor
         auto const benc = tr_base64_decode(benc_base64);
         EXPECT_LT(0U, std::size(benc));
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
-        EXPECT_EQ(nullptr, error) << *error;
+        EXPECT_FALSE(error) << error;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent
@@ -98,18 +99,18 @@ protected:
         return false;
     }
 
-    static void expectHaveNone(tr_torrent* tor, uint64_t total_size)
+    static void expectHaveNone(tr_torrent* tor, uint64_t const total_size)
     {
-        auto const* tst = tr_torrentStat(tor);
-        EXPECT_EQ(TR_STATUS_STOPPED, tst->activity);
-        EXPECT_EQ(TR_STAT_OK, tst->error);
-        EXPECT_EQ(total_size, tst->sizeWhenDone);
-        EXPECT_EQ(total_size, tst->leftUntilDone);
+        auto const stats = tr_torrentStat(tor);
+        EXPECT_EQ(TR_STATUS_STOPPED, stats.activity);
+        EXPECT_EQ(tr_stat::Error::Ok, stats.error);
+        EXPECT_EQ(total_size, stats.size_when_done);
+        EXPECT_EQ(total_size, stats.left_until_done);
         EXPECT_EQ(total_size, tor->total_size());
-        EXPECT_EQ(0, tst->haveValid);
+        EXPECT_EQ(0, stats.have_valid);
     }
 
-    static int torrentRenameAndWait(tr_torrent* tor, char const* oldpath, char const* newname)
+    static int torrentRenameAndWait(tr_torrent* tor, std::string_view const oldpath, std::string_view const newname)
     {
         auto const on_rename_done =
             [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, void* user_data) noexcept
@@ -154,14 +155,14 @@ TEST_F(RenameTest, singleFilenameTorrent)
 
     // sanity check the stats again, now that we've added the file
     blockingTorrentVerify(tor);
-    auto const* st = tr_torrentStat(tor);
-    EXPECT_EQ(TR_STATUS_STOPPED, st->activity);
-    EXPECT_EQ(TR_STAT_OK, st->error);
-    EXPECT_EQ(0, st->leftUntilDone);
-    EXPECT_EQ(0, st->haveUnchecked);
-    EXPECT_EQ(0, st->desiredAvailable);
-    EXPECT_EQ(TotalSize, st->sizeWhenDone);
-    EXPECT_EQ(TotalSize, st->haveValid);
+    auto const stats = tr_torrentStat(tor);
+    EXPECT_EQ(TR_STATUS_STOPPED, stats.activity);
+    EXPECT_EQ(tr_stat::Error::Ok, stats.error);
+    EXPECT_EQ(0, stats.left_until_done);
+    EXPECT_EQ(0, stats.have_unchecked);
+    EXPECT_EQ(0, stats.desired_available);
+    EXPECT_EQ(TotalSize, stats.size_when_done);
+    EXPECT_EQ(TotalSize, stats.have_valid);
 
     /**
     ***  okay! we've finally put together all the scaffolding to test
@@ -170,7 +171,6 @@ TEST_F(RenameTest, singleFilenameTorrent)
 
     // confirm that bad inputs get caught
 
-    EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", nullptr));
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", ""));
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", "."));
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", ".."));
@@ -184,10 +184,10 @@ TEST_F(RenameTest, singleFilenameTorrent)
 
     auto tmpstr = tr_pathbuf{ tor->current_dir(), "/hello-world.txt" };
     EXPECT_TRUE(tr_sys_path_exists(tmpstr));
-    EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
+    EXPECT_EQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_EQ(0, torrentRenameAndWait(tor, tr_torrentName(tor), "foobar"));
     EXPECT_FALSE(tr_sys_path_exists(tmpstr)); // confirm the old filename can't be found
-    EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
+    EXPECT_EQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
     EXPECT_STREQ("foobar", tr_torrentFile(tor, 0).name); // confirm the file's name is now 'foobar'
     auto const torrent_filename = tr_torrentFilename(tor);
     EXPECT_EQ(std::string::npos, torrent_filename.find("foobar")); // confirm torrent file hasn't changed
@@ -196,10 +196,11 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
 
     // (while it's renamed: confirm that the .resume file remembers the changes)
-    tr_resume::save(tor);
+    auto resume_helper = tr_torrent::ResumeHelper{ *tor };
+    tr_resume::save(tor, resume_helper);
     sync();
-    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor);
-    EXPECT_STREQ("foobar", tr_torrentName(tor));
+    auto const loaded = tr_resume::load(tor, resume_helper, tr_resume::All, *ctor);
+    EXPECT_EQ("foobar", tr_torrentName(tor));
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Name));
 
     /***
@@ -210,7 +211,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_TRUE(tr_sys_path_exists(tmpstr));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foobar", "hello-world.txt"));
     EXPECT_FALSE(tr_sys_path_exists(tmpstr));
-    EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
+    EXPECT_EQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n"));
 
@@ -255,7 +256,7 @@ TEST_F(RenameTest, multifileTorrent)
     EXPECT_TRUE(tr_isTorrent(tor));
 
     // sanity check the info
-    EXPECT_STREQ("Felidae", tr_torrentName(tor));
+    EXPECT_EQ("Felidae", tr_torrentName(tor));
     EXPECT_EQ(TotalSize, tor->total_size());
     EXPECT_EQ(tr_file_index_t{ 4 }, tor->file_count());
 
@@ -273,14 +274,14 @@ TEST_F(RenameTest, multifileTorrent)
 
     // sanity check the (full) stats
     blockingTorrentVerify(tor);
-    auto const* st = tr_torrentStat(tor);
-    EXPECT_EQ(TR_STATUS_STOPPED, st->activity);
-    EXPECT_EQ(TR_STAT_OK, st->error);
-    EXPECT_EQ(0, st->leftUntilDone);
-    EXPECT_EQ(0, st->haveUnchecked);
-    EXPECT_EQ(0, st->desiredAvailable);
-    EXPECT_EQ(TotalSize, st->sizeWhenDone);
-    EXPECT_EQ(TotalSize, st->haveValid);
+    auto const stats = tr_torrentStat(tor);
+    EXPECT_EQ(TR_STATUS_STOPPED, stats.activity);
+    EXPECT_EQ(tr_stat::Error::Ok, stats.error);
+    EXPECT_EQ(0, stats.left_until_done);
+    EXPECT_EQ(0, stats.have_unchecked);
+    EXPECT_EQ(0, stats.desired_available);
+    EXPECT_EQ(TotalSize, stats.size_when_done);
+    EXPECT_EQ(TotalSize, stats.have_valid);
 
     /**
     ***  okay! let's test renaming.
@@ -306,10 +307,11 @@ TEST_F(RenameTest, multifileTorrent)
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 2, ExpectedContents[2]));
 
     // (while the branch is renamed: confirm that the .resume file remembers the changes)
-    tr_resume::save(tor);
+    auto resume_helper = tr_torrent::ResumeHelper{ *tor };
+    tr_resume::save(tor, resume_helper);
     // this is a bit dodgy code-wise, but let's make sure the .resume file got the name
     tor->set_file_subpath(1, "gabba gabba hey"sv);
-    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor);
+    auto const loaded = tr_resume::load(tor, resume_helper, tr_resume::All, *ctor);
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Filenames));
     EXPECT_EQ(ExpectedFiles[0], tr_torrentFile(tor, 0).name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Kyphi", tr_torrentFile(tor, 1).name);
@@ -414,15 +416,15 @@ TEST_F(RenameTest, multifileTorrent)
 
     // rename prefix of top
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Feli", "FelidaeX"));
-    EXPECT_STREQ("Felidae", tr_torrentName(tor));
+    EXPECT_EQ("Felidae", tr_torrentName(tor));
 
     // rename false path
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Felidae/FelinaeX", "Genus Felinae"));
-    EXPECT_STREQ("Felidae", tr_torrentName(tor));
+    EXPECT_EQ("Felidae", tr_torrentName(tor));
 
     // rename filename collision
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/catus/Kyphi", "Saffron"));
-    EXPECT_STREQ("Felidae", tr_torrentName(tor));
+    EXPECT_EQ("Felidae", tr_torrentName(tor));
     /***
     ****
     ***/
@@ -447,6 +449,8 @@ TEST_F(RenameTest, partialFile)
     ****  create our test torrent with an incomplete .part file
     ***/
 
+    tr_sessionSetIncompleteFileNamingEnabled(session_, true);
+
     auto* tor = zeroTorrentInit(ZeroTorrentState::Partial);
     EXPECT_EQ(TotalSize, tor->total_size());
     EXPECT_EQ(PieceSize, tor->piece_size());
@@ -458,9 +462,9 @@ TEST_F(RenameTest, partialFile)
     EXPECT_EQ(Length[0], tr_torrentFile(tor, 0).have + PieceSize);
     EXPECT_EQ(Length[1], tr_torrentFile(tor, 1).have);
     EXPECT_EQ(Length[2], tr_torrentFile(tor, 2).have);
-    auto const* st = tr_torrentStat(tor);
-    EXPECT_EQ(TotalSize, st->sizeWhenDone);
-    EXPECT_EQ(PieceSize, st->leftUntilDone);
+    auto const stats = tr_torrentStat(tor);
+    EXPECT_EQ(TotalSize, stats.size_when_done);
+    EXPECT_EQ(PieceSize, stats.left_until_done);
 
     /***
     ****
@@ -490,4 +494,4 @@ TEST_F(RenameTest, partialFile)
     torrentRemoveAndWait(tor, 0);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <cstddef> // size_t
 #include <memory>
 #include <string>
@@ -19,6 +20,7 @@
 
 #include "libtransmission/net.h"
 #include "libtransmission/quark.h"
+#include "libtransmission/serializer.h"
 #include "libtransmission/utils-ev.h"
 
 class tr_rpc_address;
@@ -26,31 +28,74 @@ struct tr_session;
 struct tr_variant;
 struct libdeflate_compressor;
 
-namespace libtransmission
+namespace tr
 {
 class Timer;
 }
 
-#define RPC_SETTINGS_FIELDS(V) \
-    V(TR_KEY_anti_brute_force_enabled, is_anti_brute_force_enabled_, bool, false, "") \
-    V(TR_KEY_anti_brute_force_threshold, anti_brute_force_limit_, size_t, 100U, "") \
-    V(TR_KEY_rpc_authentication_required, authentication_required_, bool, false, "") \
-    V(TR_KEY_rpc_bind_address, bind_address_str_, std::string, "0.0.0.0", "") \
-    V(TR_KEY_rpc_enabled, is_enabled_, bool, false, "") \
-    V(TR_KEY_rpc_host_whitelist, host_whitelist_str_, std::string, "", "") \
-    V(TR_KEY_rpc_host_whitelist_enabled, is_host_whitelist_enabled_, bool, true, "") \
-    V(TR_KEY_rpc_port, port_, tr_port, tr_port::from_host(TR_DEFAULT_RPC_PORT), "") \
-    V(TR_KEY_rpc_password, salted_password_, std::string, "", "") \
-    V(TR_KEY_rpc_socket_mode, socket_mode_, tr_mode_t, 0750, "") \
-    V(TR_KEY_rpc_url, url_, std::string, TR_DEFAULT_RPC_URL_STR, "") \
-    V(TR_KEY_rpc_username, username_, std::string, "", "") \
-    V(TR_KEY_rpc_whitelist, whitelist_str_, std::string, TR_DEFAULT_RPC_WHITELIST, "") \
-    V(TR_KEY_rpc_whitelist_enabled, is_whitelist_enabled_, bool, true, "")
-
 class tr_rpc_server
 {
 public:
-    tr_rpc_server(tr_session* session, tr_variant* settings);
+    class Settings final
+    {
+    public:
+        Settings() = default;
+
+        explicit Settings(tr_variant const& src)
+        {
+            load(src);
+        }
+
+        void load(tr_variant const& src)
+        {
+            tr::serializer::load(*this, Fields, src);
+        }
+
+        [[nodiscard]] tr_variant::Map save() const
+        {
+            return tr::serializer::save(*this, Fields);
+        }
+
+        // NB: When adding a field here, you must also add it to
+        // `fields` if you want it to be in session-settings.json
+        bool authentication_required = false;
+        bool is_anti_brute_force_enabled = false;
+        bool is_enabled = false;
+        bool is_host_whitelist_enabled = true;
+        bool is_whitelist_enabled = true;
+        size_t anti_brute_force_limit = 100U;
+        std::string bind_address_str = "0.0.0.0";
+        std::string host_whitelist_str;
+        std::string salted_password;
+        std::string url = std::string{ TrDefaultHttpServerBasePath };
+        std::string username;
+        std::string whitelist_str = std::string{ TrDefaultRpcWhitelist };
+        tr_mode_t socket_mode = 0750;
+        tr_port port = tr_port::from_host(TrDefaultRpcPort);
+
+    private:
+        template<auto MemberPtr>
+        using Field = tr::serializer::Field<MemberPtr>;
+
+        static constexpr auto Fields = std::tuple{
+            Field<&Settings::is_anti_brute_force_enabled>{ TR_KEY_anti_brute_force_enabled },
+            Field<&Settings::anti_brute_force_limit>{ TR_KEY_anti_brute_force_threshold },
+            Field<&Settings::authentication_required>{ TR_KEY_rpc_authentication_required },
+            Field<&Settings::bind_address_str>{ TR_KEY_rpc_bind_address },
+            Field<&Settings::is_enabled>{ TR_KEY_rpc_enabled },
+            Field<&Settings::host_whitelist_str>{ TR_KEY_rpc_host_whitelist },
+            Field<&Settings::is_host_whitelist_enabled>{ TR_KEY_rpc_host_whitelist_enabled },
+            Field<&Settings::port>{ TR_KEY_rpc_port },
+            Field<&Settings::salted_password>{ TR_KEY_rpc_password },
+            Field<&Settings::socket_mode>{ TR_KEY_rpc_socket_mode },
+            Field<&Settings::url>{ TR_KEY_rpc_url },
+            Field<&Settings::username>{ TR_KEY_rpc_username },
+            Field<&Settings::whitelist_str>{ TR_KEY_rpc_whitelist },
+            Field<&Settings::is_whitelist_enabled>{ TR_KEY_rpc_whitelist_enabled },
+        };
+    };
+
+    tr_rpc_server(tr_session* session, Settings&& settings);
     ~tr_rpc_server();
 
     tr_rpc_server(tr_rpc_server&) = delete;
@@ -58,84 +103,87 @@ public:
     tr_rpc_server& operator=(tr_rpc_server&) = delete;
     tr_rpc_server& operator=(tr_rpc_server&&) = delete;
 
-    void load(tr_variant* src);
-    void save(tr_variant* tgt) const;
-    static void default_settings(tr_variant* tgt);
+    void load(Settings&& settings);
+
+    [[nodiscard]] constexpr Settings const& settings() const
+    {
+        return settings_;
+    }
 
     [[nodiscard]] constexpr tr_port port() const noexcept
     {
-        return port_;
+        return settings_.port;
     }
 
     void set_port(tr_port port) noexcept;
 
     [[nodiscard]] constexpr auto is_enabled() const noexcept
     {
-        return is_enabled_;
+        return settings_.is_enabled;
     }
 
     void set_enabled(bool is_enabled);
 
     [[nodiscard]] constexpr auto is_whitelist_enabled() const noexcept
     {
-        return is_whitelist_enabled_;
+        return settings_.is_whitelist_enabled;
     }
 
     constexpr void set_whitelist_enabled(bool is_whitelist_enabled) noexcept
     {
-        is_whitelist_enabled_ = is_whitelist_enabled;
+        settings_.is_whitelist_enabled = is_whitelist_enabled;
     }
 
     [[nodiscard]] constexpr auto const& whitelist() const noexcept
     {
-        return whitelist_str_;
+        return settings_.whitelist_str;
     }
 
     void set_whitelist(std::string_view whitelist);
 
     [[nodiscard]] constexpr auto const& username() const noexcept
     {
-        return username_;
+        return settings_.username;
     }
 
     void set_username(std::string_view username);
 
     [[nodiscard]] constexpr auto is_password_enabled() const noexcept
     {
-        return is_password_enabled_;
+        return settings_.authentication_required;
     }
 
     void set_password_enabled(bool enabled);
 
     [[nodiscard]] constexpr auto const& get_salted_password() const noexcept
     {
-        return salted_password_;
+        return settings_.salted_password;
     }
 
     void set_password(std::string_view password) noexcept;
 
     [[nodiscard]] constexpr auto is_anti_brute_force_enabled() const noexcept
     {
-        return is_anti_brute_force_enabled_;
+        return settings_.is_anti_brute_force_enabled;
     }
 
     void set_anti_brute_force_enabled(bool enabled) noexcept;
 
     [[nodiscard]] constexpr auto get_anti_brute_force_limit() const noexcept
     {
-        return anti_brute_force_limit_;
+        return settings_.anti_brute_force_limit;
     }
 
-    constexpr void set_anti_brute_force_limit(int limit) noexcept
+    constexpr void set_anti_brute_force_limit(size_t limit) noexcept
     {
-        anti_brute_force_limit_ = limit;
+        settings_.anti_brute_force_limit = limit;
     }
 
     std::unique_ptr<libdeflate_compressor, void (*)(libdeflate_compressor*)> compressor;
 
     [[nodiscard]] constexpr auto const& url() const noexcept
     {
-        return url_;
+        return settings_.url;
     }
 
     void set_url(std::string_view url);
@@ -144,12 +192,10 @@ public:
 
     [[nodiscard]] constexpr auto socket_mode() const noexcept
     {
-        return socket_mode_;
+        return settings_.socket_mode;
     }
 
-#define V(key, name, type, default_value, comment) type name = type{ default_value };
-    RPC_SETTINGS_FIELDS(V)
-#undef V
+    Settings settings_;
 
     std::vector<std::string> host_whitelist_;
     std::vector<std::string> whitelist_;
@@ -157,12 +203,10 @@ public:
 
     std::unique_ptr<tr_rpc_address> bind_address_;
 
-    std::unique_ptr<libtransmission::Timer> start_retry_timer;
-    libtransmission::evhelpers::evhttp_unique_ptr httpd;
+    std::unique_ptr<tr::Timer> start_retry_timer;
+    tr::evhelpers::evhttp_unique_ptr httpd;
     tr_session* const session;
 
     size_t login_attempts_ = 0U;
     int start_retry_counter = 0;
-
-    bool is_password_enabled_ = false;
 };

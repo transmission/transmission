@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -16,19 +16,21 @@
 #include <gtkmm/label.h>
 #include <gtkmm/messagedialog.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <memory>
 
-static auto constexpr TR_RESPONSE_RESET = int{ 1 };
+static auto constexpr TR_RESPONSE_RESET = 1;
 
 class StatsDialog::Impl
 {
 public:
     Impl(StatsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     bool updateStats();
@@ -68,7 +70,7 @@ void setLabelFromRatio(Gtk::Label* l, double d)
 
 auto startedTimesText(uint64_t n)
 {
-    return fmt::format(ngettext("Started {count:L} time", "Started {count:L} times", n), fmt::arg("count", n));
+    return fmt::format(fmt::runtime(ngettext("Started {count:L} time", "Started {count:L} times", n)), fmt::arg("count", n));
 }
 
 } // namespace

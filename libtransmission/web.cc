@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,11 +8,16 @@
 #include <array>
 #endif
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
-#include <cstdint> // uint64_t
+#include <cstddef>
+#include <cstdint> // for uint64_t
+#include <ctime>
+#include <functional> // for std::less()
 #include <list>
 #include <map>
 #include <memory>
+#include <ranges>
 #include <mutex>
 #include <stack>
 #include <string>
@@ -29,25 +34,18 @@
 
 #include <curl/curl.h>
 
-#include <event2/buffer.h>
-
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #ifdef _WIN32
 #include "libtransmission/crypto-utils.h"
 #endif
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils-ev.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web.h"
 #include "libtransmission/web-utils.h"
 
 using namespace std::literals;
-
-#if LIBCURL_VERSION_NUM >= 0x070F06 // CURLOPT_SOCKOPT* was added in 7.15.6
-#define USE_LIBCURL_SOCKOPT
-#endif
 
 // ---
 
@@ -102,10 +100,9 @@ struct EasyDeleter
 using easy_unique_ptr = std::unique_ptr<CURL, EasyDeleter>;
 
 } // namespace curl_helpers
-} // namespace
 
 #ifdef _WIN32
-static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
+CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
 {
     auto const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == nullptr)
@@ -126,7 +123,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 
     for (auto& sys_store_name : SysStoreNames)
     {
-        HCERTSTORE const sys_cert_store = CertOpenSystemStoreW(0, sys_store_name);
+        auto* const sys_cert_store = CertOpenSystemStoreW(0, sys_store_name);
         if (sys_cert_store == nullptr)
         {
             continue;
@@ -142,7 +139,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
                 break;
             }
 
-            tr_x509_cert_t const cert = tr_x509_cert_new(sys_cert->pbCertEncoded, sys_cert->cbCertEncoded);
+            auto* const cert = tr_x509_cert_new(sys_cert->pbCertEncoded, sys_cert->cbCertEncoded);
             if (cert == nullptr)
             {
                 continue;
@@ -158,6 +155,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
     return CURLE_OK;
 }
 #endif
+} // namespace
 
 // ---
 
@@ -167,18 +165,43 @@ public:
     explicit Impl(Mediator& mediator_in)
         : mediator{ mediator_in }
     {
+        auto const curl_version_num = get_curl_version();
+        if (curl_version_num == 0x080901)
+        {
+            tr_logAddWarn(_("Consider upgrading your curl installation."));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("curl {curl_version} is prone to SIGPIPE crashes. {details_url}")),
+                    fmt::arg("curl_version", "8.9.1"),
+                    fmt::arg("details_url", "https://github.com/transmission/transmission/issues/7035")));
+        }
+
+        if (curl_version_num == 0x080B01)
+        {
+            tr_logAddWarn(_("Consider upgrading your curl installation."));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(
+                        _("curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT "
+                          "crashes for the transmission-daemon systemd service. {details_url}")),
+                    fmt::arg("curl_version", "8.11.1"),
+                    fmt::arg("details_url", "https://curl.se/docs/CVE-2025-0665.html")));
+        }
+
         if (auto bundle = tr_env_get_string("CURL_CA_BUNDLE"); !std::empty(bundle))
         {
             curl_ca_bundle = std::move(bundle);
         }
 
-        shareEverything();
+        share_setopt();
 
         if (curl_ssl_verify)
         {
             auto const* bundle = std::empty(curl_ca_bundle) ? "none" : curl_ca_bundle.c_str();
             tr_logAddInfo(
-                fmt::format(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"), fmt::arg("bundle", bundle)));
+                fmt::format(
+                    fmt::runtime(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}")),
+                    fmt::arg("bundle", bundle)));
             tr_logAddInfo(_("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"));
             tr_logAddInfo(_("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"));
         }
@@ -204,14 +227,14 @@ public:
 
     ~Impl()
     {
-        deadline_ = mediator.now();
+        deadline_ns_ = to_ns(mediator.now());
         queued_tasks_cv_.notify_one();
         curl_thread->join();
     }
 
     void startShutdown(std::chrono::milliseconds deadline)
     {
-        deadline_ = mediator.now() + std::chrono::duration_cast<std::chrono::seconds>(deadline).count();
+        deadline_ns_ = to_ns(mediator.now() + deadline);
         queued_tasks_cv_.notify_one();
     }
 
@@ -227,17 +250,29 @@ public:
         queued_tasks_cv_.notify_one();
     }
 
+    [[nodiscard]] bool is_idle() const noexcept
+    {
+        return std::empty(queued_tasks_) && std::empty(running_tasks_);
+    }
+
     class Task
     {
     public:
         Task(tr_web::Impl& impl_in, tr_web::FetchOptions&& options_in)
             : impl{ impl_in }
-            , options{ std::move(options_in) }
+            , options_{ std::move(options_in) }
         {
-            auto const parsed = tr_urlParse(options.url);
+            auto const parsed = tr_urlParse(options_.url);
             easy_ = parsed ? impl.get_easy(parsed->host) : nullptr;
 
-            response.user_data = options.done_func_user_data;
+            response.user_data = options_.done_func_user_data;
+
+            if (options_.range)
+            {
+                // preallocate the response body buffer
+                auto const& [first, last] = *options_.range;
+                response.body.reserve(last + 1U - first);
+            }
         }
 
         // Some of the curl_easy_setopt() args took a pointer to this task.
@@ -257,49 +292,44 @@ public:
             return easy_;
         }
 
-        [[nodiscard]] auto* body() const
-        {
-            return options.buffer != nullptr ? options.buffer : privbuf.get();
-        }
-
         [[nodiscard]] constexpr auto const& speedLimitTag() const
         {
-            return options.speed_limit_tag;
+            return options_.speed_limit_tag;
         }
 
         [[nodiscard]] constexpr auto const& url() const
         {
-            return options.url;
+            return options_.url;
         }
 
         [[nodiscard]] constexpr auto const& range() const
         {
-            return options.range;
+            return options_.range;
         }
 
         [[nodiscard]] constexpr auto const& cookies() const
         {
-            return options.cookies;
+            return options_.cookies;
         }
 
         [[nodiscard]] constexpr auto const& sndbuf() const
         {
-            return options.sndbuf;
+            return options_.sndbuf;
         }
 
         [[nodiscard]] constexpr auto const& rcvbuf() const
         {
-            return options.rcvbuf;
+            return options_.rcvbuf;
         }
 
         [[nodiscard]] constexpr auto const& timeoutSecs() const
         {
-            return options.timeout_secs;
+            return options_.timeout_secs;
         }
 
         [[nodiscard]] constexpr auto ipProtocol() const
         {
-            switch (options.ip_proto)
+            switch (options_.ip_proto)
             {
             case FetchOptions::IPProtocol::V4:
                 return CURL_IPRESOLVE_V4;
@@ -312,7 +342,7 @@ public:
 
         [[nodiscard]] auto bind_address() const
         {
-            switch (options.ip_proto)
+            switch (options_.ip_proto)
             {
             case FetchOptions::IPProtocol::V4:
                 return impl.mediator.bind_address_V4();
@@ -329,16 +359,26 @@ public:
             }
         }
 
+        void add_data(void const* data, size_t const n_bytes)
+        {
+            response.body.append(static_cast<char const*>(data), n_bytes);
+            tr_logAddTrace(fmt::format("wrote {} bytes to task {}'s buffer", n_bytes, fmt::ptr(this)));
+
+            if (options_.on_data_received)
+            {
+                options_.on_data_received(n_bytes);
+            }
+        }
+
         void done()
         {
-            if (!options.done_func)
+            if (!options_.done_func)
             {
                 return;
             }
 
-            response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
-            impl.mediator.run(std::move(options.done_func), std::move(this->response));
-            options.done_func = {};
+            impl.mediator.run(std::move(options_.done_func), std::move(this->response));
+            options_.done_func = {};
         }
 
         [[nodiscard]] bool operator==(Task const& that) const noexcept
@@ -359,7 +399,7 @@ public:
 
             impl.paused_easy_handles.erase(easy_);
 
-            if (auto const url = tr_urlParse(options.url); url)
+            if (auto const url = tr_urlParse(options_.url); url)
             {
                 curl_easy_reset(easy);
                 impl.easy_pool_[std::string{ url->host }].emplace(easy);
@@ -370,12 +410,30 @@ public:
             }
         }
 
-        libtransmission::evhelpers::evbuffer_unique_ptr privbuf{ evbuffer_new() };
-
-        tr_web::FetchOptions options;
+        tr_web::FetchOptions options_;
 
         CURL* easy_;
     };
+
+    [[nodiscard]] static unsigned int get_curl_version() noexcept
+    {
+        static auto const ver = curl_version_info(CURLVERSION_NOW)->version_num;
+        return ver;
+    }
+
+    // https://github.com/curl/curl/issues/10936
+    [[nodiscard]] static bool check_curl_gh10936() noexcept
+    {
+        static bool const in_range = 0x075700 /* 7.87.0 */ <= get_curl_version() && get_curl_version() <= 0x080500 /* 8.5.0 */;
+        return in_range;
+    }
+
+    // https://github.com/curl/curl/issues/6312
+    [[nodiscard]] static bool check_curl_gh6312() noexcept
+    {
+        static bool const in_range = 0x074700 /* 7.71.0 */ <= get_curl_version() && get_curl_version() <= 0x074a00 /* 7.74.0 */;
+        return in_range;
+    }
 
     static auto constexpr BandwidthPauseMsec = long{ 500 };
     static auto constexpr DnsCacheTimeoutSecs = long{ 60 * 60 };
@@ -384,6 +442,7 @@ public:
     bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
     bool const curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
+    bool const curl_avoid_http2 = check_curl_gh10936() || check_curl_gh6312(); // both related to curl http2 bugs
 
     Mediator& mediator;
 
@@ -397,21 +456,29 @@ public:
     // if unset: steady-state, all is good
     // if set: do not accept new tasks
     // if set and deadline reached: kill all remaining tasks
-    std::atomic<time_t> deadline_ = {};
+    using Clock = std::chrono::steady_clock;
+    static auto constexpr NoDeadline = int64_t{ 0 };
 
-    [[nodiscard]] auto deadline() const
+    std::atomic<int64_t> deadline_ns_ = {}; // NOLINT(readability-redundant-member-init)
+
+    [[nodiscard]] static int64_t to_ns(Clock::time_point tp)
     {
-        return deadline_.load();
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(tp.time_since_epoch()).count();
+    }
+
+    [[nodiscard]] auto deadline_ns() const
+    {
+        return deadline_ns_.load();
     }
 
     [[nodiscard]] bool deadline_exists() const
     {
-        return deadline() != time_t{};
+        return deadline_ns() != NoDeadline;
     }
 
     [[nodiscard]] bool deadline_reached() const
     {
-        return deadline_exists() && deadline() <= mediator.now();
+        return deadline_exists() && deadline_ns() <= to_ns(mediator.now());
     }
 
     [[nodiscard]] CURL* get_easy(std::string_view host)
@@ -438,7 +505,7 @@ public:
         auto* task = static_cast<Task*>(vtask);
         TR_ASSERT(std::this_thread::get_id() == task->impl.curl_thread->get_id());
 
-        if (auto const range = task->range(); range)
+        if (auto const range = task->range())
         {
             // https://curl.se/libcurl/c/CURLINFO_RESPONSE_CODE.html
             // "The stored value will be zero if no server response code has been received"
@@ -450,11 +517,13 @@ public:
             (void)curl_easy_getinfo(task->easy(), CURLINFO_RESPONSE_CODE, &code);
             if (code != NoResponseCode && code != PartialContentResponseCode)
             {
-                tr_logAddWarn(fmt::format(
-                    _("Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"),
-                    fmt::arg("url", task->url()),
-                    fmt::arg("expected_code", PartialContentResponseCode),
-                    fmt::arg("actual_code", code)));
+                tr_logAddWarn(
+                    fmt::format(
+                        fmt::runtime(
+                            _("Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}")),
+                        fmt::arg("url", task->url()),
+                        fmt::arg("expected_code", PartialContentResponseCode),
+                        fmt::arg("actual_code", code)));
 
                 // Tell curl to error out. Returning anything that's not
                 // `bytes_used` signals an error and causes the transfer
@@ -473,16 +542,12 @@ public:
                 task->impl.paused_easy_handles.emplace(task->easy(), tr_time_msec());
                 return CURL_WRITEFUNC_PAUSE;
             }
-
-            task->impl.mediator.notifyBandwidthConsumed(*tag, bytes_used);
         }
 
-        evbuffer_add(task->body(), data, bytes_used);
-        tr_logAddTrace(fmt::format("wrote {} bytes to task {}'s buffer", bytes_used, fmt::ptr(task)));
+        task->add_data(data, bytes_used);
         return bytes_used;
     }
 
-#ifdef USE_LIBCURL_SOCKOPT
     static int onSocketCreated(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
     {
         auto const* const task = static_cast<Task const*>(vtask);
@@ -503,7 +568,6 @@ public:
         // return nonzero if this function encountered an error
         return 0;
     }
-#endif
 
     void initEasy(Task& task)
     {
@@ -515,15 +579,12 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
         (void)curl_easy_setopt(e, CURLOPT_ACCEPT_ENCODING, "");
         (void)curl_easy_setopt(e, CURLOPT_FOLLOWLOCATION, 1L);
-        (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, -1L);
+        (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, MaxRedirects);
         (void)curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, &task);
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task.ipProtocol());
-
-#ifdef USE_LIBCURL_SOCKOPT
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, &task);
-#endif
 
         if (!curl_ssl_verify)
         {
@@ -569,7 +630,6 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_VERBOSE, curl_verbose ? 1L : 0L);
         (void)curl_easy_setopt(e, CURLOPT_WRITEDATA, &task);
         (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, &tr_web::Impl::onDataReceived);
-        (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, MaxRedirects);
 
         if (auto const addrstr = task.bind_address(); addrstr)
         {
@@ -586,12 +646,30 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, file.c_str());
         }
 
-        if (auto const& range = task.range(); range)
+        if (auto const& proxy_url = mediator.proxyUrl(); proxy_url)
         {
-            /* don't bother asking the server to compress webseed fragments */
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, proxy_url->c_str());
+        }
+        else
+        {
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, nullptr);
+        }
+
+        if (auto const& range = task.range())
+        {
+            // don't bother asking the server to compress webseed fragments
             (void)curl_easy_setopt(e, CURLOPT_ACCEPT_ENCODING, "identity");
             (void)curl_easy_setopt(e, CURLOPT_HTTP_CONTENT_DECODING, 0L);
-            (void)curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
+
+            // set the range request
+            auto const& [first, last] = *range;
+            auto const str = fmt::format("{:d}-{:d}", first, last);
+            (void)curl_easy_setopt(e, CURLOPT_RANGE, str.c_str());
+        }
+
+        if (curl_avoid_http2)
+        {
+            (void)curl_easy_setopt(e, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
         }
     }
 
@@ -621,18 +699,13 @@ public:
         }
     }
 
-    [[nodiscard]] bool is_idle() const noexcept
-    {
-        return std::empty(queued_tasks_) && std::empty(running_tasks_);
-    }
-
     void remove_task(Task const& task)
     {
         auto const lock = std::unique_lock{ tasks_mutex_ };
 
-        auto const iter = std::find(std::begin(running_tasks_), std::end(running_tasks_), task);
-        TR_ASSERT(iter != std::end(running_tasks_));
-        if (iter == std::end(running_tasks_))
+        auto const iter = std::ranges::find(running_tasks_, task);
+        TR_ASSERT(iter != std::ranges::end(running_tasks_));
+        if (iter == std::ranges::end(running_tasks_))
         {
             return;
         }
@@ -652,6 +725,7 @@ public:
     void curlThreadFunc()
     {
         auto const multi = curl_helpers::multi_unique_ptr{ curl_multi_init() };
+        auto const start_time = mediator.now();
 
         auto repeats = unsigned{};
         for (;;)
@@ -698,13 +772,20 @@ public:
 
             resumePausedTasks();
 
+            // During steady state, wake up once per second.
+            // But during startup, wake up 10x more often. This is so tests
+            // that should take a few msec don't block for a full second
+            // while tr_session waits for this thread to finish.
+            static auto constexpr StartupSecs = std::chrono::seconds{ 15 };
+            auto const timeout_ms = mediator.now() - start_time < StartupSecs ? 50 : 1000;
+
             // Adapted from https://curl.se/libcurl/c/curl_multi_wait.html docs.
             // 'numfds' being zero means either a timeout or no file descriptors to
             // wait for. Try timeout on first occurrence, then assume no file
             // descriptors and no file descriptors to wait for means wait for 100
             // milliseconds.
             auto numfds = int{};
-            curl_multi_wait(multi.get(), nullptr, 0, 1000, &numfds);
+            curl_multi_wait(multi.get(), nullptr, 0, timeout_ms, &numfds);
             if (numfds == 0)
             {
                 ++repeats;
@@ -732,16 +813,19 @@ public:
                     auto* const e = msg->easy_handle;
 
                     Task* task = nullptr;
-                    curl_easy_getinfo(e, CURLINFO_PRIVATE, (void*)&task);
+                    curl_easy_getinfo(e, CURLINFO_PRIVATE, &task);
 
                     auto req_bytes_sent = long{};
                     auto total_time = double{};
+                    char* primary_ip = nullptr;
                     curl_easy_getinfo(e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
                     curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);
                     curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->response.status);
+                    curl_easy_getinfo(e, CURLINFO_PRIMARY_IP, &primary_ip);
                     task->response.did_connect = task->response.status > 0 || req_bytes_sent > 0;
                     task->response.did_timeout = task->response.status == 0 &&
                         std::chrono::duration<double>(total_time) >= task->timeoutSecs();
+                    task->response.primary_ip = primary_ip;
                     curl_multi_remove_handle(multi.get(), e);
                     remove_task(*task);
                 }
@@ -763,24 +847,23 @@ public:
         return curlsh_.get();
     }
 
-    void shareEverything()
+    void share_setopt()
     {
-        // Tell curl to share whatever it can.
-        // https://curl.se/libcurl/c/CURLSHOPT_SHARE.html
-        //
-        // The user's system probably has a different version of curl than
-        // we're compiling with; so instead of listing fields by name, just
-        // loop until curl says we've exhausted the list.
+        // Do *not* share HSTS cache
+        // https://github.com/transmission/transmission/issues/5199
 
         auto* const sh = shared();
-        for (long type = CURL_LOCK_DATA_COOKIE;; ++type)
-        {
-            if (curl_share_setopt(sh, CURLSHOPT_SHARE, type) != CURLSHE_OK)
-            {
-                tr_logAddDebug(fmt::format("CURLOPT_SHARE ended at {}", type));
-                return;
-            }
-        }
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
+#if LIBCURL_VERSION_NUM >= 0x071700 /* 7.23.0 */
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
+#endif
+#if LIBCURL_VERSION_NUM >= 0x073900 /* 7.57.0 */
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_CONNECT);
+#endif
+#if LIBCURL_VERSION_NUM >= 0x073D00 /* 7.61.0 */
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_PSL);
+#endif
     }
 
     std::map<CURL*, uint64_t /*tr_time_msec()*/> paused_easy_handles;
@@ -809,4 +892,9 @@ void tr_web::fetch(FetchOptions&& options)
 void tr_web::startShutdown(std::chrono::milliseconds deadline)
 {
     impl_->startShutdown(deadline);
+}
+
+bool tr_web::is_idle() const noexcept
+{
+    return impl_->is_idle();
 }

@@ -6,8 +6,11 @@
 #include <array>
 #include <cstdint> // uint64_t
 #include <set>
+#include <string>
 #include <string_view>
 #include <utility>
+
+#include <gtest/gtest.h>
 
 #include <libtransmission/transmission.h>
 
@@ -15,23 +18,17 @@
 #include <libtransmission/torrent-files.h>
 #include <libtransmission/tr-strbuf.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 using SubpathAndSize = std::pair<std::string_view, uint64_t>;
 
-class RemoveTest : public libtransmission::test::SandboxedTest
+class RemoveTest : public tr::test::SandboxedTest
 {
 protected:
     static constexpr std::string_view Content = "Hello, World!"sv;
     static constexpr std::string_view JunkBasename = ".DS_Store"sv;
     static constexpr std::string_view NonJunkBasename = "passwords.txt"sv;
-
-    static void sysPathRemove(char const* filename)
-    {
-        tr_sys_path_remove(filename, nullptr);
-    }
 
     static auto aliceFiles()
     {
@@ -171,19 +168,20 @@ protected:
         return files;
     }
 
-    auto createFiles(tr_torrent_files const& files, char const* parent)
+    static auto createFiles(tr_torrent_files const& files, char const* parent)
     {
         auto paths = std::set<std::string>{};
 
-        for (tr_file_index_t i = 0, n = files.fileCount(); i < n; ++i)
+        for (tr_file_index_t i = 0, n = files.file_count(); i < n; ++i)
         {
-            auto walk = tr_pathbuf{ parent, '/', files.path(i) };
-            createFileWithContents(walk, std::data(Content), std::size(Content));
-            paths.emplace(walk);
+            auto const filename = tr_pathbuf{ parent, '/', files.path(i) };
+            createFileWithContents(filename, std::data(Content), std::size(Content));
+            paths.emplace(filename);
 
+            auto walk = filename.sv();
             while (!tr_sys_path_is_same(parent, walk))
             {
-                walk.popdir();
+                walk = tr_sys_path_dirname(walk);
                 paths.emplace(walk);
             }
         }
@@ -200,7 +198,7 @@ protected:
             filenames.emplace(filename);
         };
 
-        libtransmission::test::depthFirstWalk(tr_pathbuf{ parent_dir }, file_func);
+        tr::test::depthFirstWalk(tr_pathbuf{ parent_dir }, file_func);
 
         return filenames;
     }
@@ -216,7 +214,7 @@ TEST_F(RemoveTest, RemovesSingleFile)
     expected_tree = createFiles(files, parent.c_str());
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    files.remove(parent, "tmpdir_prefix"sv, sysPathRemove);
+    files.remove(parent, "tmpdir_prefix"sv, tr_sys_path_remove);
     expected_tree = { parent };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
@@ -231,7 +229,7 @@ TEST_F(RemoveTest, RemovesSubtree)
     expected_tree = createFiles(files, parent.c_str());
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    files.remove(parent, "tmpdir_prefix"sv, sysPathRemove);
+    files.remove(parent, "tmpdir_prefix"sv, tr_sys_path_remove);
     expected_tree = { parent };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
@@ -252,7 +250,7 @@ TEST_F(RemoveTest, RemovesLeftoverJunk)
     expected_tree.emplace(junk_file);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    files.remove(parent, "tmpdir_prefix"sv, sysPathRemove);
+    files.remove(parent, "tmpdir_prefix"sv, tr_sys_path_remove);
     expected_tree = { parent };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
@@ -280,7 +278,7 @@ TEST_F(RemoveTest, LeavesSiblingsAlone)
     expected_tree.emplace(non_junk_file);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    files.remove(parent, "tmpdir_prefix"sv, sysPathRemove);
+    files.remove(parent, "tmpdir_prefix"sv, tr_sys_path_remove);
     expected_tree = { parent, junk_file.c_str(), non_junk_file.c_str() };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
@@ -301,7 +299,7 @@ TEST_F(RemoveTest, LeavesNonJunkAlone)
     expected_tree.emplace(nonjunk_file);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    files.remove(parent, "tmpdir_prefix"sv, sysPathRemove);
+    files.remove(parent, "tmpdir_prefix"sv, tr_sys_path_remove);
     expected_tree = { parent, std::string{ tr_sys_path_dirname(nonjunk_file) }, nonjunk_file.c_str() };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
@@ -323,15 +321,16 @@ TEST_F(RemoveTest, PreservesDirectoryHierarchyIfPossible)
     expected_tree.emplace(recycle_bin);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    auto const recycle_func = [&recycle_bin](char const* filename)
+    auto const recycle_func = [&recycle_bin](std::string_view const old_name, tr_error* error) -> bool
     {
-        tr_sys_path_rename(filename, tr_pathbuf{ recycle_bin, '/', tr_sys_path_basename(filename) });
+        auto const new_name = tr_pathbuf{ recycle_bin, '/', tr_sys_path_basename(old_name) };
+        return tr_sys_path_rename(old_name, new_name, error);
     };
     files.remove(parent, "tmpdir_prefix"sv, recycle_func);
 
     // after remove, the subtree should be:
     expected_tree = { parent, recycle_bin.c_str() };
-    for (tr_file_index_t i = 0, n = files.fileCount(); i < n; ++i)
+    for (tr_file_index_t i = 0, n = files.file_count(); i < n; ++i)
     {
         expected_tree.emplace(tr_pathbuf{ recycle_bin, '/', files.path(i) });
     }

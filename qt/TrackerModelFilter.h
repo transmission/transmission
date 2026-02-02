@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,15 +7,16 @@
 
 #include <QSortFilterProxyModel>
 
-#include <libtransmission/tr-macros.h>
-
 class TrackerModelFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(TrackerModelFilter)
 
 public:
     explicit TrackerModelFilter(QObject* parent = nullptr);
+    TrackerModelFilter(TrackerModelFilter&&) = delete;
+    TrackerModelFilter(TrackerModelFilter const&) = delete;
+    TrackerModelFilter& operator=(TrackerModelFilter&&) = delete;
+    TrackerModelFilter& operator=(TrackerModelFilter const&) = delete;
 
     void setShowBackupTrackers(bool);
 
@@ -26,7 +27,7 @@ public:
 
 protected:
     // QSortFilterProxyModel
-    bool filterAcceptsRow(int source_row, QModelIndex const& source_parent) const override;
+    [[nodiscard]] bool filterAcceptsRow(int source_row, QModelIndex const& source_parent) const override;
 
 private:
     bool show_backups_ = {};

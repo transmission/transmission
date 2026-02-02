@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
@@ -20,8 +20,10 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
-static char constexpr MyName[] = "transmission-edit";
-static char constexpr Usage[] = "Usage: transmission-edit [options] torrent-file(s)";
+namespace
+{
+char constexpr MyName[] = "transmission-edit";
+char constexpr Usage[] = "Usage: transmission-edit [options] torrent-file(s)";
 
 struct app_options
 {
@@ -33,16 +35,21 @@ struct app_options
     bool show_version = false;
 };
 
-static auto constexpr Options = std::array<tr_option, 6>{
-    { { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
-      { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
-      { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },
-      { 's', "source", "Set the source", "s", true, "<source>" },
-      { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 0, nullptr, nullptr, nullptr, false, nullptr } }
-};
+using Arg = tr_option::Arg;
+auto constexpr Options = std::array<tr_option, 6>{ {
+    { 'a', "add", "Add a tracker's announce URL", "a", Arg::Required, "<url>" },
+    { 'd', "delete", "Delete a tracker's announce URL", "d", Arg::Required, "<url>" },
+    { 'r', "replace", "Search and replace a substring in the announce URLs", "r", Arg::Required, "<old> <new>" },
+    { 's', "source", "Set the source", "s", Arg::Required, "<source>" },
+    { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
+} };
+static_assert(Options[std::size(Options) - 2].val != 0);
+} // namespace
 
-static int parseCommandLine(app_options& opts, int argc, char const* const* argv)
+namespace
+{
+int parseCommandLine(app_options& opts, int argc, char const* const* argv)
 {
     int c;
     char const* optarg;
@@ -91,7 +98,7 @@ static int parseCommandLine(app_options& opts, int argc, char const* const* argv
     return 0;
 }
 
-static bool removeURL(tr_variant* metainfo, std::string_view url)
+bool removeURL(tr_variant* metainfo, std::string_view url)
 {
     auto sv = std::string_view{};
     tr_variant* announce_list;
@@ -164,7 +171,7 @@ static bool removeURL(tr_variant* metainfo, std::string_view url)
     return changed;
 }
 
-static std::string replaceSubstr(std::string_view str, std::string_view oldval, std::string_view newval)
+[[nodiscard]] auto replaceSubstr(std::string_view str, std::string_view oldval, std::string_view newval)
 {
     auto ret = std::string{};
 
@@ -183,7 +190,7 @@ static std::string replaceSubstr(std::string_view str, std::string_view oldval, 
     return ret;
 }
 
-static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::string_view newval)
+bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::string_view newval)
 {
     auto sv = std::string_view{};
     tr_variant* announce_list;
@@ -214,7 +221,7 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
                     auto const newstr = replaceSubstr(sv, oldval, newval);
                     fmt::print("\tReplaced in 'announce-list' tier #{:d}: '{:s}' --> '{:s}'\n", tierCount + 1, sv, newstr);
                     node->clear();
-                    tr_variantInitStr(node, newstr);
+                    *node = newstr;
                     changed = true;
                 }
 
@@ -228,7 +235,7 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
     return changed;
 }
 
-static bool announce_list_has_url(tr_variant* announce_list, char const* url)
+[[nodiscard]] bool announce_list_has_url(tr_variant* announce_list, char const* url)
 {
     int tierCount = 0;
     tr_variant* tier;
@@ -254,7 +261,7 @@ static bool announce_list_has_url(tr_variant* announce_list, char const* url)
     return false;
 }
 
-static bool addURL(tr_variant* metainfo, char const* url)
+bool addURL(tr_variant* metainfo, char const* url)
 {
     auto announce = std::string_view{};
     tr_variant* announce_list = nullptr;
@@ -298,7 +305,7 @@ static bool addURL(tr_variant* metainfo, char const* url)
     return changed;
 }
 
-static bool setSource(tr_variant* metainfo, char const* source_value)
+bool setSource(tr_variant* metainfo, char const* source_value)
 {
     auto current_source = std::string_view{};
     bool const had_source = tr_variantDictFindStrView(metainfo, TR_KEY_source, &current_source);
@@ -319,6 +326,7 @@ static bool setSource(tr_variant* metainfo, char const* source_value)
 
     return changed;
 }
+} // namespace
 
 int tr_main(int argc, char* argv[])
 {
@@ -366,7 +374,7 @@ int tr_main(int argc, char* argv[])
         auto otop = serde.parse_file(filename);
         if (!otop)
         {
-            fmt::print("\tError reading file: {:s}\n", serde.error_->message);
+            fmt::print("\tError reading file: {:s}\n", serde.error_.message());
             continue;
         }
         auto& top = *otop;

@@ -1,4 +1,4 @@
-// This file Copyright © 2016-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -15,19 +15,20 @@
 #include <QFutureWatcher>
 #include <QObject>
 
-#include <libtransmission/tr-macros.h>
-
 #include "RpcClient.h"
 
 class RpcQueue : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(RpcQueue)
 
 public:
     explicit RpcQueue(QObject* parent = nullptr);
+    RpcQueue(RpcQueue&&) = delete;
+    RpcQueue(RpcQueue const&) = delete;
+    RpcQueue& operator=(RpcQueue&&) = delete;
+    RpcQueue& operator=(RpcQueue const&) = delete;
 
-    void setTolerateErrors(bool tolerate_errors = true)
+    constexpr void setTolerateErrors(bool tolerate_errors = true)
     {
         tolerate_errors_ = tolerate_errors;
     }

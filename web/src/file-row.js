@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -34,6 +34,7 @@ export class FileRow extends EventTarget {
     const fmt = Formatter;
     const c = `${fmt.size(have)} of ${fmt.size(size)} (${fmt.percentString(
       pct,
+      1,
     )}%)`;
     setTextContent(this.elements.progress, c);
   }
@@ -50,7 +51,7 @@ export class FileRow extends EventTarget {
     const files = this.fields.torrent.getFiles();
     for (const index of this.fields.indices) {
       const file = files[index];
-      have += file.bytesCompleted;
+      have += file.bytes_completed;
       size += file.length;
       wanted |= file.wanted;
       switch (file.priority.toString()) {
@@ -96,14 +97,37 @@ export class FileRow extends EventTarget {
     this.dispatchEvent(e);
   }
 
-  createRow(torrent, depth, name, even) {
+  createRow(torrent, subtree) {
     const root = document.createElement('li');
-    root.classList.add(
-      'inspector-torrent-file-list-entry',
-      even ? 'even' : 'odd',
-    );
-
+    root.classList.add('inspector-torrent-file-list-entry');
+    root.subtree = subtree;
     this.elements.root = root;
+
+    const right_click = (e_) => {
+      if (this.controller.handler) {
+        this.controller.handler.classList.remove('selected');
+      }
+      setTimeout(() => {
+        root.classList.add('selected');
+      }, 0);
+
+      let file_path = subtree.name;
+      let sub = subtree.parent;
+      while (sub.name) {
+        root.subdir = true;
+        file_path = `${sub.name}/${file_path}`;
+        const { parent } = sub;
+        sub = parent;
+      }
+
+      root.file_path = file_path;
+      this.controller.handler = root;
+
+      const menu_items = ['show-rename-dialog', null, 'copy-name'];
+      this.controller.context_menu('#inspector', menu_items);
+      e_.preventDefault();
+    };
+    this.controller.pointer_event(root, right_click);
 
     let e = document.createElement('input');
     const check_id = makeUUID();
@@ -120,8 +144,9 @@ export class FileRow extends EventTarget {
     e = document.createElement('label');
     e.className = 'inspector-torrent-file-list-entry-name';
     e.setAttribute('for', check_id);
-    setTextContent(e, name);
+    setTextContent(e, subtree.name);
     root.append(e);
+    root.name_container = e;
 
     e = document.createElement('div');
     e.className = 'inspector-torrent-file-list-entry-progress';
@@ -164,7 +189,7 @@ export class FileRow extends EventTarget {
 
     root.append(box);
 
-    root.style.paddingLeft = `${depth * 20}px`;
+    root.style.paddingLeft = `${subtree.depth * 20}px`;
 
     this.refresh();
   }
@@ -175,12 +200,13 @@ export class FileRow extends EventTarget {
     return this.elements.root;
   }
 
-  constructor(torrent, depth, name, indices, even) {
+  constructor(controller, torrent, subtree) {
     super();
 
+    this.controller = controller;
     this.fields = {
       have: 0,
-      indices,
+      indices: subtree.file_indices,
       isWanted: true,
       // priorityHigh: false,
       // priorityLow: false,
@@ -195,6 +221,6 @@ export class FileRow extends EventTarget {
       progress: null,
       root: null,
     };
-    this.createRow(torrent, depth, name, even);
+    this.createRow(torrent, subtree);
   }
 }

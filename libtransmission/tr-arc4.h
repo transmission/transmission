@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mike Gelfand
+// This file Copyright © Mike Gelfand
 // It may be used under the 3-clause BSD (SPDX: BSD-3-Clause).
 // License text can be found in the licenses/ folder.
 
@@ -42,7 +42,7 @@ public:
 
         for (size_t i = 0, j = 0; i < 256; ++i)
         {
-            j = static_cast<uint8_t>(j + s_[i] + ((uint8_t const*)key)[i % key_length]);
+            j = static_cast<uint8_t>(j + s_[i] + reinterpret_cast<uint8_t const*>(key)[i % key_length]);
             arc4_swap(i, j);
         }
     }

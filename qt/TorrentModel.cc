@@ -1,18 +1,22 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
+#include <ctime>
 #include <iterator> // for std::back_inserter
-#include <set>
+#include <ranges>
 #include <string_view>
+#include <vector>
 
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
-#include "Speed.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
@@ -65,7 +69,7 @@ auto getIds(Iter it, Iter end)
 ***/
 
 TorrentModel::TorrentModel(Prefs const& prefs)
-    : prefs_(prefs)
+    : prefs_{ prefs }
 {
 }
 
@@ -190,8 +194,8 @@ void TorrentModel::updateTorrents(tr_variant* torrent_list, bool is_complete_lis
     }
 
     // Find the position of TR_KEY_id so we can do torrent lookup
-    auto const id_it = std::find(std::begin(keys), std::end(keys), TR_KEY_id);
-    if (id_it == std::end(keys)) // no ids provided; we can't proceed
+    auto const id_it = std::ranges::find(keys, TR_KEY_id);
+    if (id_it == std::ranges::end(keys)) // no ids provided; we can't proceed
     {
         return;
     }
@@ -322,10 +326,10 @@ void TorrentModel::updateTorrents(tr_variant* torrent_list, bool is_complete_lis
 
     if (is_complete_list)
     {
-        std::sort(processed.begin(), processed.end(), TorrentIdLessThan());
+        std::ranges::sort(processed, TorrentIdLessThan());
         torrents_t removed;
         removed.reserve(old.size());
-        std::set_difference(old.begin(), old.end(), processed.begin(), processed.end(), std::back_inserter(removed));
+        std::ranges::set_difference(old, processed, std::back_inserter(removed), TorrentIdLessThan());
         rowsRemove(removed);
     }
 }
@@ -378,7 +382,7 @@ std::vector<TorrentModel::span_t> TorrentModel::getSpans(torrent_ids_t const& id
         }
     }
 
-    std::sort(rows.begin(), rows.end());
+    std::ranges::sort(rows);
 
     // rows -> spans
     std::vector<span_t> spans;
@@ -435,14 +439,14 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
     {
         beginInsertRows(QModelIndex{}, 0, torrents.size() - 1);
         torrents_ = torrents;
-        std::sort(torrents_.begin(), torrents_.end(), TorrentIdLessThan{});
+        std::ranges::sort(torrents_, TorrentIdLessThan{});
         endInsertRows();
     }
     else
     {
         for (auto const& tor : torrents)
         {
-            auto const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
+            auto const it = std::ranges::lower_bound(torrents_, tor, compare);
             auto const row = static_cast<int>(std::distance(torrents_.begin(), it));
 
             beginInsertRows(QModelIndex{}, row, row);
@@ -478,5 +482,5 @@ bool TorrentModel::hasTorrent(TorrentHash const& hash) const
     {
         return tor->hash() == hash;
     };
-    return std::any_of(torrents_.cbegin(), torrents_.cend(), test);
+    return std::ranges::any_of(torrents_, test);
 }

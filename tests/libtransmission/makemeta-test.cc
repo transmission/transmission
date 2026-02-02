@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/announce-list.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
@@ -23,14 +25,11 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
-
-struct tr_error;
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class MakemetaTest : public SandboxedTest
@@ -39,22 +38,17 @@ protected:
     static auto constexpr DefaultMaxFileCount = size_t{ 16 };
     static auto constexpr DefaultMaxFileSize = size_t{ 1024 };
 
-    auto makeRandomFiles(
+    static auto makeRandomFiles(
         std::string_view top,
-        size_t n_files = std::max(size_t{ 1U }, static_cast<size_t>(tr_rand_int(DefaultMaxFileCount))),
+        size_t n_files = std::max(size_t{ 1U }, tr_rand_int(DefaultMaxFileCount)),
         size_t max_size = DefaultMaxFileSize)
     {
         auto files = std::vector<std::pair<std::string, std::vector<std::byte>>>{};
 
-        for (size_t i = 0; i < n_files; ++i)
+        for (size_t i = 0U; i < n_files; ++i)
         {
             auto payload = std::vector<std::byte>{};
-            // TODO(5.0.0): zero-sized files are disabled in these test
-            // because tr_torrent_metainfo discards them, throwing off the
-            // builder-to-metainfo comparisons here. tr_torrent_metainfo
-            // will behave when BEP52 support is added in Transmission 5.
-            static auto constexpr MinFileSize = size_t{ 1U };
-            payload.resize(std::max(MinFileSize, static_cast<size_t>(tr_rand_int(max_size))));
+            payload.resize(tr_rand_int(max_size) + 1U);
             tr_rand_buffer(std::data(payload), std::size(payload));
 
             auto filename = tr_pathbuf{ top, '/', "test.XXXXXX" };
@@ -69,8 +63,8 @@ protected:
 
     static auto testBuilder(tr_metainfo_builder& builder)
     {
-        tr_error* error = builder.make_checksums().get();
-        EXPECT_EQ(error, nullptr) << *error;
+        auto error = builder.make_checksums().get();
+        EXPECT_FALSE(error) << error;
 
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parse_benc(builder.benc()));
@@ -80,7 +74,7 @@ protected:
         EXPECT_EQ(builder.total_size(), metainfo.total_size());
         for (size_t i = 0, n = std::min(builder.file_count(), metainfo.file_count()); i < n; ++i)
         {
-            EXPECT_EQ(builder.file_size(i), metainfo.files().fileSize(i));
+            EXPECT_EQ(builder.file_size(i), metainfo.files().file_size(i));
             EXPECT_EQ(builder.path(i), metainfo.files().path(i));
         }
         EXPECT_EQ(builder.name(), metainfo.name());
@@ -233,17 +227,18 @@ TEST_F(MakemetaTest, announceSingleTracker)
     builder.set_announce_list(std::move(trackers));
 
     // generate the torrent and parse it as a variant
-    EXPECT_EQ(nullptr, builder.make_checksums().get());
+    EXPECT_FALSE(builder.make_checksums().get().has_value());
     auto top = tr_variant_serde::benc().parse(builder.benc());
-    EXPECT_TRUE(top.has_value());
+    ASSERT_TRUE(top);
+    auto* map = top->get_if<tr_variant::Map>();
 
     // confirm there's an "announce" entry
-    auto single_announce = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&*top, TR_KEY_announce, &single_announce));
-    EXPECT_EQ(SingleAnnounce, single_announce);
+    auto single_announce = map->value_if<std::string_view>(TR_KEY_announce);
+    ASSERT_TRUE(single_announce);
+    EXPECT_EQ(SingleAnnounce, *single_announce);
 
     // confirm there's not an "announce-list" entry
-    EXPECT_EQ(nullptr, tr_variantDictFind(&*top, TR_KEY_announce_list));
+    EXPECT_EQ(map->find(TR_KEY_announce_list), std::end(*map));
 }
 
 TEST_F(MakemetaTest, announceMultiTracker)
@@ -261,20 +256,20 @@ TEST_F(MakemetaTest, announceMultiTracker)
     builder.set_announce_list(std::move(trackers));
 
     // generate the torrent and parse it as a variant
-    EXPECT_EQ(nullptr, builder.make_checksums().get());
+    EXPECT_FALSE(builder.make_checksums().get().has_value());
     auto top = tr_variant_serde::benc().parse(builder.benc());
-    EXPECT_TRUE(top.has_value());
+    ASSERT_TRUE(top);
+    auto* map = top->get_if<tr_variant::Map>();
 
     // confirm there's an "announce" entry
-    auto single_announce = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&*top, TR_KEY_announce, &single_announce));
-    EXPECT_EQ(builder.announce_list().at(0).announce.sv(), single_announce);
+    auto single_announce = map->value_if<std::string_view>(TR_KEY_announce);
+    ASSERT_TRUE(single_announce);
+    EXPECT_EQ(builder.announce_list().at(0).announce.sv(), *single_announce);
 
     // confirm there's an "announce-list" entry
-    tr_variant* announce_list_variant = nullptr;
-    EXPECT_TRUE(tr_variantDictFindList(&*top, TR_KEY_announce_list, &announce_list_variant));
-    EXPECT_NE(nullptr, announce_list_variant);
-    EXPECT_EQ(std::size(builder.announce_list()), tr_variantListSize(announce_list_variant));
+    auto* announce_list_variant = map->find_if<tr_variant::Vector>(TR_KEY_announce_list);
+    ASSERT_NE(announce_list_variant, nullptr);
+    EXPECT_EQ(std::size(builder.announce_list()), std::size(*announce_list_variant));
 }
 
 TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
@@ -297,4 +292,4 @@ TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
     EXPECT_NE(private_metainfo.info_hash(), private_source_metainfo.info_hash());
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

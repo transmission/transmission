@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -16,8 +16,6 @@
 #include <QPixmap>
 #include <QPixmapCache>
 #include <QStyleOptionProgressBar>
-
-#include <libtransmission/transmission.h>
 
 #include <libtransmission/utils.h>
 
@@ -121,7 +119,7 @@ ItemLayout::ItemLayout(
     bar_style.progress = 100;
     bar_style.textVisible = true;
     QSize const bar_size(
-        bar_style.rect.width() * 2 - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
+        (bar_style.rect.width() * 2) - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
         bar_style.rect.height());
 
     QRect base_rect{ top_left,
@@ -155,7 +153,7 @@ QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent c
                                     option.font,
                                     option.direction,
                                     QPoint{},
-                                    option.rect.width() - m.width() * 2 };
+                                    option.rect.width() - (m.width() * 2) };
     return layout.size() + m * 2;
 }
 
@@ -199,20 +197,15 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     }
 
     auto const icon_state = is_paused ? QIcon::Off : QIcon::On;
+    auto const color_group = is_item_active ? QPalette::Normal : QPalette::Inactive;
+    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
-    QPalette::ColorGroup color_group = QPalette::Normal;
-
+    auto text_color = (tor.hasError() && !is_item_selected) ? QColor{ Qt::GlobalColor::red } :
+                                                              option.palette.color(color_group, color_role);
     if (is_paused || !is_item_enabled)
     {
-        color_group = QPalette::Disabled;
+        text_color.setAlphaF(0.5);
     }
-
-    if (color_group == QPalette::Normal && !is_item_active)
-    {
-        color_group = QPalette::Inactive;
-    }
-
-    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
     QStyle::State progress_bar_state(option.state);
 
@@ -224,7 +217,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progress_bar_state |= QStyle::State_Small | QStyle::State_Horizontal;
 
     QIcon::Mode const emblem_im = is_item_selected ? QIcon::Selected : QIcon::Normal;
-    QIcon const emblem_icon = tor.hasError() ? getWarningEmblem() : QIcon{};
+    QIcon const emblem_icon = tor.hasError() ? warningEmblem() : QIcon{};
 
     // layout
     QSize const m(margin(*style));
@@ -238,14 +231,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
                                     content_rect.width() };
 
     // render
-    if (tor.hasError() && !is_item_selected)
-    {
-        painter->setPen(QColor("red"));
-    }
-    else
-    {
-        painter->setPen(option.palette.color(color_group, color_role));
-    }
+    painter->setPen(text_color);
 
     tor.getMimeTypeIcon().paint(painter, layout.icon_rect, Qt::AlignCenter, icon_mode, icon_state);
 
@@ -284,7 +270,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progress_bar_style_.textVisible = true;
     progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
-    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
+    StyleHelper::drawProgressBar(*painter, progress_bar_style_);
 
     painter->restore();
 }

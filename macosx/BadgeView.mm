@@ -1,10 +1,11 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #import "BadgeView.h"
 #import "NSStringAdditions.h"
 #import "NSImageAdditions.h"
+#import "Utils.h"
 
 static CGFloat const kBetweenPadding = 2.0;
 static NSImage* kWhiteUpArrow = [[NSImage imageNamed:@"UpArrowTemplate"] imageWithColor:NSColor.whiteColor];
@@ -61,7 +62,7 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
 - (BOOL)setRatesWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate
 {
     //only needs update if the badges were displayed or are displayed now
-    if (self.fDownloadRate == downloadRate && self.fUploadRate == uploadRate)
+    if (isSpeedEqual(self.fDownloadRate, downloadRate) && isSpeedEqual(self.fUploadRate, uploadRate))
     {
         return NO;
     }

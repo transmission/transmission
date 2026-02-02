@@ -7,6 +7,9 @@ cmake-build-*/*
 libtransmission/version.h
 web/node_modules/*
 
+# android
+android/*
+
 # third-party maintained projects
 third-party/*
 

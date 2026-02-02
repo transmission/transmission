@@ -1,4 +1,4 @@
-// This file Copyright © 2020-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,15 +6,21 @@
 #include "VariantHelpers.h"
 
 #include <cmath>
+#include <cstdint>
 #include <limits>
+#include <mutex>
 #include <string_view>
 
+#include <QDateTime>
 #include <QUrl>
 
+#include <libtransmission/serializer.h>
+
 #include "Application.h" // qApp
-#include "Filters.h"
 #include "Speed.h"
 #include "Torrent.h"
+
+namespace ser = tr::serializer;
 
 namespace trqt::variant_helpers
 {
@@ -33,19 +39,19 @@ bool change(double& setme, double const& value)
 
 bool change(Speed& setme, tr_variant const* value)
 {
-    auto const bytes_per_second = getValue<int>(value);
-    return bytes_per_second && change(setme, Speed::fromBps(*bytes_per_second));
+    auto const byps = getValue<int>(value);
+    return byps && change(setme, Speed{ *byps, Speed::Units::Byps });
 }
 
 bool change(TorrentHash& setme, tr_variant const* value)
 {
     auto const hash_string = getValue<std::string_view>(value);
-    return hash_string && change(setme, TorrentHash(hash_string->data()));
+    return hash_string && change(setme, TorrentHash{ *hash_string });
 }
 
 bool change(Peer& setme, tr_variant const* value)
 {
-    auto changed = bool{ false };
+    auto changed = false;
 
     auto pos = size_t{ 0 };
     auto key = tr_quark{};
@@ -60,20 +66,20 @@ bool change(Peer& setme, tr_variant const* value)
         break;
 
             HANDLE_KEY(address, address)
-            HANDLE_KEY(clientIsChoked, client_is_choked)
-            HANDLE_KEY(clientIsInterested, client_is_interested)
-            HANDLE_KEY(clientName, client_name)
-            HANDLE_KEY(flagStr, flags)
-            HANDLE_KEY(isDownloadingFrom, is_downloading_from)
-            HANDLE_KEY(isEncrypted, is_encrypted)
-            HANDLE_KEY(isIncoming, is_incoming)
-            HANDLE_KEY(isUploadingTo, is_uploading_to)
-            HANDLE_KEY(peerIsChoked, peer_is_choked)
-            HANDLE_KEY(peerIsInterested, peer_is_interested)
+            HANDLE_KEY(client_is_choked, client_is_choked)
+            HANDLE_KEY(client_is_interested, client_is_interested)
+            HANDLE_KEY(client_name, client_name)
+            HANDLE_KEY(flag_str, flags)
+            HANDLE_KEY(is_downloading_from, is_downloading_from)
+            HANDLE_KEY(is_encrypted, is_encrypted)
+            HANDLE_KEY(is_incoming, is_incoming)
+            HANDLE_KEY(is_uploading_to, is_uploading_to)
+            HANDLE_KEY(peer_is_choked, peer_is_choked)
+            HANDLE_KEY(peer_is_interested, peer_is_interested)
             HANDLE_KEY(port, port)
             HANDLE_KEY(progress, progress)
-            HANDLE_KEY(rateToClient, rate_to_client)
-            HANDLE_KEY(rateToPeer, rate_to_peer)
+            HANDLE_KEY(rate_to_client, rate_to_client)
+            HANDLE_KEY(rate_to_peer, rate_to_peer)
 #undef HANDLE_KEY
         default:
             break;
@@ -85,7 +91,7 @@ bool change(Peer& setme, tr_variant const* value)
 
 bool change(TorrentFile& setme, tr_variant const* value)
 {
-    auto changed = bool{ false };
+    auto changed = false;
 
     auto pos = size_t{ 0 };
     auto key = tr_quark{};
@@ -99,7 +105,6 @@ bool change(TorrentFile& setme, tr_variant const* value)
         changed = change(setme.key, child) || changed; \
         break;
 
-            HANDLE_KEY(have)
             HANDLE_KEY(priority)
             HANDLE_KEY(wanted)
 #undef HANDLE_KEY
@@ -108,7 +113,7 @@ bool change(TorrentFile& setme, tr_variant const* value)
         changed = change(setme.field, child) || changed; \
         break;
 
-            HANDLE_KEY(bytesCompleted, have)
+            HANDLE_KEY(bytes_completed, have)
             HANDLE_KEY(length, size)
             HANDLE_KEY(name, filename)
 #undef HANDLE_KEY
@@ -134,35 +139,35 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
         switch (key)
         {
-#define HANDLE_KEY(key, field) \
+#define HANDLE_KEY(key) \
     case TR_KEY_##key: \
-        field_changed = change(setme.field, child); \
+        field_changed = change(setme.key, child); \
         break;
-            HANDLE_KEY(announce, announce)
-            HANDLE_KEY(announceState, announce_state)
-            HANDLE_KEY(downloadCount, download_count)
-            HANDLE_KEY(hasAnnounced, has_announced)
-            HANDLE_KEY(hasScraped, has_scraped)
-            HANDLE_KEY(id, id)
-            HANDLE_KEY(isBackup, is_backup)
-            HANDLE_KEY(lastAnnouncePeerCount, last_announce_peer_count)
-            HANDLE_KEY(lastAnnounceResult, last_announce_result)
-            HANDLE_KEY(lastAnnounceStartTime, last_announce_start_time)
-            HANDLE_KEY(lastAnnounceSucceeded, last_announce_succeeded)
-            HANDLE_KEY(lastAnnounceTime, last_announce_time)
-            HANDLE_KEY(lastAnnounceTimedOut, last_announce_timed_out)
-            HANDLE_KEY(lastScrapeResult, last_scrape_result)
-            HANDLE_KEY(lastScrapeStartTime, last_scrape_start_time)
-            HANDLE_KEY(lastScrapeSucceeded, last_scrape_succeeded)
-            HANDLE_KEY(lastScrapeTime, last_scrape_time)
-            HANDLE_KEY(lastScrapeTimedOut, last_scrape_timed_out)
-            HANDLE_KEY(leecherCount, leecher_count)
-            HANDLE_KEY(nextAnnounceTime, next_announce_time)
-            HANDLE_KEY(nextScrapeTime, next_scrape_time)
-            HANDLE_KEY(scrapeState, scrape_state)
-            HANDLE_KEY(seederCount, seeder_count)
-            HANDLE_KEY(sitename, sitename)
-            HANDLE_KEY(tier, tier)
+            HANDLE_KEY(announce)
+            HANDLE_KEY(announce_state)
+            HANDLE_KEY(download_count)
+            HANDLE_KEY(has_announced)
+            HANDLE_KEY(has_scraped)
+            HANDLE_KEY(id)
+            HANDLE_KEY(is_backup)
+            HANDLE_KEY(last_announce_peer_count)
+            HANDLE_KEY(last_announce_result)
+            HANDLE_KEY(last_announce_start_time)
+            HANDLE_KEY(last_announce_succeeded)
+            HANDLE_KEY(last_announce_time)
+            HANDLE_KEY(last_announce_timed_out)
+            HANDLE_KEY(last_scrape_result)
+            HANDLE_KEY(last_scrape_start_time)
+            HANDLE_KEY(last_scrape_succeeded)
+            HANDLE_KEY(last_scrape_time)
+            HANDLE_KEY(last_scrape_timed_out)
+            HANDLE_KEY(leecher_count)
+            HANDLE_KEY(next_announce_time)
+            HANDLE_KEY(next_scrape_time)
+            HANDLE_KEY(scrape_state)
+            HANDLE_KEY(seeder_count)
+            HANDLE_KEY(sitename)
+            HANDLE_KEY(tier)
 
 #undef HANDLE_KEY
         default:
@@ -177,8 +182,14 @@ bool change(TrackerStat& setme, tr_variant const* value)
         changed = true;
     }
 
-    if (site_changed && !setme.sitename.isEmpty() && !setme.announce.isEmpty())
+    if (site_changed && !setme.announce.isEmpty() && trApp != nullptr)
     {
+        if (setme.sitename.isEmpty())
+        {
+            QStringList const separated_host = QUrl{ setme.announce }.host().split(QStringLiteral("."));
+            setme.sitename = separated_host.at(separated_host.size() - 2);
+        }
+
         setme.announce = trApp->intern(setme.announce);
         trApp->load_favicon(setme.announce);
     }
@@ -190,37 +201,111 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
 void variantInit(tr_variant* init_me, bool value)
 {
-    tr_variantInitBool(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, int64_t value)
 {
-    tr_variantInitInt(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, int value)
 {
-    tr_variantInitInt(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, double value)
 {
-    tr_variantInitReal(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, QByteArray const& value)
 {
-    tr_variantInitRaw(init_me, value.constData(), value.size());
+    *init_me = std::string_view{ value.constData(), static_cast<size_t>(value.size()) };
 }
 
 void variantInit(tr_variant* init_me, QString const& value)
 {
-    variantInit(init_me, value.toUtf8());
+    *init_me = value.toStdString();
 }
 
 void variantInit(tr_variant* init_me, std::string_view value)
 {
-    tr_variantInitStr(init_me, value);
+    *init_me = value;
+}
+
+namespace
+{
+bool toInt(tr_variant const& src, int* tgt)
+{
+    if (auto const val = src.value_if<int64_t>())
+    {
+        if (*val < std::numeric_limits<int>::min() || *val > std::numeric_limits<int>::max())
+        {
+            return false;
+        }
+
+        *tgt = static_cast<int>(*val);
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromInt(int const& val)
+{
+    return static_cast<int64_t>(val);
+}
+
+// ---
+
+bool toQDateTime(tr_variant const& src, QDateTime* tgt)
+{
+    if (auto const val = ser::to_value<int64_t>(src))
+    {
+        *tgt = QDateTime::fromSecsSinceEpoch(*val);
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromQDateTime(QDateTime const& src)
+{
+    return ser::to_variant(int64_t{ src.toSecsSinceEpoch() });
+}
+
+// ---
+
+bool toQString(tr_variant const& src, QString* tgt)
+{
+    if (auto const val = src.value_if<std::string_view>())
+    {
+        *tgt = QString::fromUtf8(std::data(*val), std::size(*val));
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromQString(QString const& val)
+{
+    return val.toStdString();
+}
+} // namespace
+
+void register_qt_converters()
+{
+    static auto once = std::once_flag{};
+    std::call_once(
+        once,
+        []
+        {
+            using namespace tr::serializer;
+            Converters::add(toInt, fromInt);
+            Converters::add(toQDateTime, fromQDateTime);
+            Converters::add(toQString, fromQString);
+        });
 }
 
 } // namespace trqt::variant_helpers

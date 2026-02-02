@@ -1,11 +1,9 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
-
-#include <libtransmission/tr-macros.h>
 
 #include "BaseDialog.h"
 #include "Typedefs.h"
@@ -17,10 +15,13 @@ class TorrentModel;
 class RelocateDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(RelocateDialog)
 
 public:
     RelocateDialog(Session&, TorrentModel const&, torrent_ids_t ids, QWidget* parent = nullptr);
+    RelocateDialog(RelocateDialog&&) = delete;
+    RelocateDialog(RelocateDialog const&) = delete;
+    RelocateDialog& operator=(RelocateDialog&&) = delete;
+    RelocateDialog& operator=(RelocateDialog const&) = delete;
 
 private slots:
     void onSetLocation();

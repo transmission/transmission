@@ -1,4 +1,4 @@
-// This file Copyright © 2017-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,15 +12,10 @@
 #include <atomic>
 #include <cstddef> // size_t
 #include <string>
-#include <string_view>
 #include <utility> // for std::make_pair()
 
-#include "transmission.h"
-
-#include "error.h"
-#include "net.h"
-#include "tr-assert.h"
-#include "tr-buffer.h"
+#include "libtransmission/net.h"
+#include "libtransmission/tr-buffer.h"
 
 struct UTPSocket;
 struct tr_session;
@@ -28,8 +23,8 @@ struct tr_session;
 class tr_peer_socket
 {
 public:
-    using InBuf = libtransmission::BufferWriter<std::byte>;
-    using OutBuf = libtransmission::BufferReader<std::byte>;
+    using InBuf = tr::BufferWriter<std::byte>;
+    using OutBuf = tr::BufferReader<std::byte>;
 
     tr_peer_socket() = default;
     tr_peer_socket(tr_session const* session, tr_socket_address const& socket_address, tr_socket_t sock);
@@ -57,8 +52,8 @@ public:
     }
     void close();
 
-    size_t try_read(InBuf& buf, size_t max, bool buf_is_empty, tr_error** error) const;
-    size_t try_write(OutBuf& buf, size_t max, tr_error** error) const;
+    size_t try_read(InBuf& buf, size_t max, bool buf_is_empty, tr_error* error) const;
+    size_t try_write(OutBuf& buf, size_t max, tr_error* error) const;
 
     [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
@@ -99,42 +94,16 @@ public:
 #endif
     }
 
-    [[nodiscard]] constexpr size_t guess_packet_overhead(size_t n_bytes) const noexcept
-    {
-        if (is_tcp())
-        {
-            // https://web.archive.org/web/20140912230020/http://sd.wareonearth.com:80/~phil/net/overhead/
-            // TCP over Ethernet:
-            // Assuming no header compression (e.g. not PPP)
-            // Add 20 IPv4 header or 40 IPv6 header (no options)
-            // Add 20 TCP header
-            // Add 12 bytes optional TCP timestamps
-            // Max TCP Payload data rates over ethernet are thus:
-            // (1500-40)/ (38+1500) = 94.9285 %  IPv4, minimal headers
-            // (1500-52)/ (38+1500) = 94.1482 %  IPv4, TCP timestamps
-            // (1500-52)/ (42+1500) = 93.9040 %  802.1q, IPv4, TCP timestamps
-            // (1500-60)/ (38+1500) = 93.6281 %  IPv6, minimal headers
-            // (1500-72)/ (38+1500) = 92.8479 %  IPv6, TCP timestamps
-            // (1500-72)/ (42+1500) = 92.6070 %  802.1q, IPv6, TCP timestamps
-
-            // So, let's guess around 7% overhead
-            return n_bytes / 14U;
-        }
-
-        // We only guess for TCP; uTP tracks its overhead via UTP_ON_OVERHEAD_STATISTICS
-        return {};
-    }
-
     union
     {
         tr_socket_t tcp;
         struct UTPSocket* utp;
     } handle = {};
 
-    [[nodiscard]] static bool limit_reached(tr_session* session) noexcept;
+    [[nodiscard]] static bool limit_reached(tr_session const* session) noexcept;
 
 private:
-    enum class Type
+    enum class Type : uint8_t
     {
         None,
         TCP,
@@ -145,7 +114,5 @@ private:
 
     enum Type type_ = Type::None;
 
-    static inline std::atomic<size_t> n_open_sockets_ = {};
+    static inline std::atomic<size_t> n_open_sockets = {};
 };
-
-tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const& socket_address, bool client_is_seed);

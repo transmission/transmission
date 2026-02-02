@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,14 +6,13 @@
 #pragma once
 
 #include <bitset>
-#include <map>
+
+#include <small/map.hpp>
 
 #include <QLineEdit>
 #include <QStandardItemModel>
 #include <QTimer>
 #include <QWidget>
-
-#include <libtransmission/tr-macros.h>
 
 #include "Torrent.h"
 #include "Typedefs.h"
@@ -29,10 +28,13 @@ class TorrentModel;
 class FilterBar : public QWidget
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(FilterBar)
 
 public:
     FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent = nullptr);
+    FilterBar(FilterBar&&) = delete;
+    FilterBar(FilterBar const&) = delete;
+    FilterBar& operator=(FilterBar&&) = delete;
+    FilterBar& operator=(FilterBar const&) = delete;
 
 public slots:
     void clear();
@@ -56,13 +58,15 @@ private:
     TorrentModel const& torrents_;
     TorrentFilter const& filter_;
 
-    std::map<QString, int> sitename_counts_;
-    FilterBarComboBox* const activity_combo_ = createActivityCombo();
-    FilterBarComboBox* tracker_combo_ = {};
-    QLabel* count_label_ = {};
     QStandardItemModel* const tracker_model_ = new QStandardItemModel{ this };
-    QTimer recount_timer_;
+
+    QLabel* const count_label_ = {};
+    FilterBarComboBox* const activity_combo_ = createActivityCombo();
+    FilterBarComboBox* const tracker_combo_ = createTrackerCombo(tracker_model_);
     QLineEdit* const line_edit_ = new QLineEdit{ this };
+
+    small::map<QString, int> sitename_counts_;
+    QTimer recount_timer_;
     Pending pending_ = {};
     bool is_bootstrapping_ = {};
 

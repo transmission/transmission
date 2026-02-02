@@ -8,17 +8,17 @@
 
 #include <event2/event.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/timer.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/utils-ev.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace tr::test
 {
-
-class TimerTest : public ::testing::Test
+class TimerTest : public TransmissionTest
 {
 protected:
     // setup + teardown to manage an event_base
@@ -42,10 +42,7 @@ protected:
 
     void sleepMsec(std::chrono::milliseconds msec)
     {
-        EXPECT_FALSE(waitFor(
-            evbase_.get(),
-            []() { return false; },
-            msec));
+        EXPECT_FALSE(waitFor(evbase_.get(), []() { return false; }, msec));
     }
 
     static void expectTime(
@@ -177,7 +174,8 @@ TEST_F(TimerTest, repeatingHonorsInterval)
     EXPECT_EQ(DesiredLoops, n_calls);
 }
 
-TEST_F(TimerTest, restartWithDifferentInterval)
+// TODO(ckerr): flaky test should be fixed instead of disabled
+TEST_F(TimerTest, DISABLED_restartWithDifferentInterval)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
     auto timer = timer_maker.create();
@@ -206,6 +204,7 @@ TEST_F(TimerTest, restartWithDifferentInterval)
     test(200ms);
 }
 
+// TODO(ckerr): flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_restartWithSameInterval)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
@@ -235,6 +234,7 @@ TEST_F(TimerTest, DISABLED_restartWithSameInterval)
     test(timer->interval());
 }
 
+// TODO(ckerr): flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_repeatingThenSingleShot)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
@@ -277,6 +277,7 @@ TEST_F(TimerTest, DISABLED_repeatingThenSingleShot)
     EXPECT_EQ(baseline + 1, n_calls);
 }
 
+// TODO(ckerr): flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_singleShotStop)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
@@ -367,4 +368,4 @@ TEST_F(TimerTest, destroyedTimersStop)
     EXPECT_EQ(0U, n_calls);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

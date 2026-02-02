@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -6,7 +6,7 @@
 
 @class Torrent;
 
-@interface TrackerTableView : NSTableView
+@interface TrackerTableView : NSTableView<NSMenuItemValidation>
 
 @property(nonatomic, weak) Torrent* torrent;
 @property(nonatomic, weak) NSArray* trackers;

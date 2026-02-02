@@ -197,6 +197,7 @@ target_include_directories(${TR_NAME}-gtk SYSTEM
 
 target_link_libraries(${TR_NAME}-gtk
     PRIVATE
+        ${TR_NAME}-app
         ${TR_NAME}
         transmission::gtk_impl
         fmt::fmt-header-only
@@ -226,7 +227,7 @@ foreach(ICON ${PUBLIC_ICONS})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\1/\\3/\\2" ICON_DIR ${ICON})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\4" ICON_NAME ${ICON})
     install(
-        FILES icons/${ICON}
+        FILES ${SOURCE_ICONS_DIR}/${ICON}
         DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/${ICON_DIR}/
         RENAME ${ICON_NAME})
 endforeach()

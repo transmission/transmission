@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -13,8 +13,9 @@
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -23,9 +24,11 @@ class FreeSpaceLabel::Impl
 {
 public:
     Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string_view dir);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     void set_dir(std::string_view dir);
 
@@ -50,10 +53,11 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
         return false;
     }
 
-    auto const capacity = tr_sys_path_get_capacity(dir_);
-    auto const text = capacity ? fmt::format(_("{disk_space} free"), fmt::arg("disk_space", tr_strlsize(capacity->free))) :
-                                 _("Error");
-    label_.set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), text));
+    auto const capacity = tr_sys_path_get_capacity(std::string_view{ dir_ });
+    auto const text = capacity ?
+        fmt::format(fmt::runtime(_("{disk_space} free")), fmt::arg("disk_space", tr_strlsize(capacity->available))) :
+        _("Error");
+    label_.set_markup(fmt::format("<i>{:s}</i>", text));
 
     return true;
 }

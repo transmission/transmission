@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -21,15 +21,23 @@
 #include <string_view>
 #include <utility>
 
+#include <small/vector.hpp>
+
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/net.h"
 #include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
 #include "libtransmission/peer-io.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_peer_id_t
 
 struct tr_error;
+struct tr_socket_address;
+
+namespace tr
+{
+template<typename value_type>
+class BufferWriter;
+}
 
 // short-term class which manages the handshake phase of a tr_peerIo
 class tr_handshake
@@ -56,15 +64,15 @@ public:
             tr_peer_id_t client_peer_id;
             tr_torrent_id_t id;
             bool is_done;
+            bool is_running;
         };
 
         virtual ~Mediator() = default;
 
         [[nodiscard]] virtual std::optional<TorrentInfo> torrent(tr_sha1_digest_t const& info_hash) const = 0;
         [[nodiscard]] virtual std::optional<TorrentInfo> torrent_from_obfuscated(tr_sha1_digest_t const& info_hash) const = 0;
-        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
+        [[nodiscard]] virtual tr::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual bool allows_dht() const = 0;
-        [[nodiscard]] virtual bool allows_tcp() const = 0;
         [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;
         [[nodiscard]] virtual DH::private_key_bigend_t private_key() const
         {
@@ -76,123 +84,15 @@ public:
 
     tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc on_done);
 
-private:
-    enum class ParseResult
+    ~tr_handshake()
     {
-        Ok,
-        EncryptionWrong,
-        BadTorrent,
-        PeerIsSelf,
-    };
-
-    enum class State
-    {
-        // incoming
-        AwaitingHandshake,
-        AwaitingPeerId,
-        AwaitingYa,
-        AwaitingPadA,
-        AwaitingCryptoProvide,
-        AwaitingPadC,
-        AwaitingIa,
-        AwaitingPayloadStream,
-
-        // outgoing
-        AwaitingYb,
-        AwaitingVc,
-        AwaitingCryptoSelect,
-        AwaitingPadD
-    };
-
-    ///
-
-    [[nodiscard]] static std::string_view state_string(State state) noexcept;
-
-    [[nodiscard]] static uint32_t get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept;
-
-    static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
-
-    static void on_error(tr_peerIo* io, tr_error const&, void* vhandshake);
-
-    bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
-
-    ReadState read_crypto_provide(tr_peerIo*);
-    ReadState read_crypto_select(tr_peerIo*);
-    ReadState read_handshake(tr_peerIo*);
-    ReadState read_ia(tr_peerIo*);
-    ReadState read_pad_a(tr_peerIo*);
-    ReadState read_pad_c(tr_peerIo*);
-    ReadState read_pad_d(tr_peerIo*);
-    ReadState read_payload_stream(tr_peerIo*);
-    ReadState read_peer_id(tr_peerIo*);
-    ReadState read_vc(tr_peerIo*);
-    ReadState read_ya(tr_peerIo*);
-    ReadState read_yb(tr_peerIo*);
-
-    void send_ya(tr_peerIo*);
-
-    ParseResult parse_handshake(tr_peerIo* peer_io);
-
-    void set_peer_id(tr_peer_id_t const& id) noexcept
-    {
-        peer_id_ = id;
+        maybe_recycle_dh();
     }
 
-    constexpr void set_have_read_anything_from_peer(bool val) noexcept
-    {
-        have_read_anything_from_peer_ = val;
-    }
-
-    ReadState done(bool is_connected)
-    {
-        peer_io_->clear_callbacks();
-        return fire_done(is_connected) ? READ_LATER : READ_ERR;
-    }
-
-    [[nodiscard]] auto is_incoming() const noexcept
-    {
-        return peer_io_->is_incoming();
-    }
-
-    [[nodiscard]] constexpr auto state() const noexcept
-    {
-        return state_;
-    }
-
-    [[nodiscard]] constexpr auto is_state(State state) const noexcept
-    {
-        return state_ == state;
-    }
-
-    constexpr void set_state(State state) noexcept
-    {
-        state_ = state;
-    }
-
-    [[nodiscard]] std::string_view state_string() const noexcept
-    {
-        return state_string(state_);
-    }
-
-    [[nodiscard]] uint32_t crypto_provide() const noexcept;
-
-    template<size_t PadMax>
-    void send_public_key_and_pad(tr_peerIo* io)
-    {
-        auto const public_key = dh_.publicKey();
-        auto outbuf = std::array<std::byte, std::size(public_key) + PadMax>{};
-        auto const data = std::data(outbuf);
-        auto walk = data;
-        walk = std::copy(std::begin(public_key), std::end(public_key), walk);
-        walk += mediator_->pad(walk, PadMax);
-        io->write_bytes(data, walk - data, false);
-    }
-
-    bool fire_done(bool is_connected);
-
-    ///
-
-    static auto constexpr HandshakeTimeoutSec = std::chrono::seconds{ 30 };
+    tr_handshake(tr_handshake const&) = delete;
+    tr_handshake(tr_handshake&&) = delete;
+    tr_handshake& operator=(tr_handshake const&) = delete;
+    tr_handshake& operator=(tr_handshake&&) = delete;
 
     // bittorrent handshake constants
     // https://www.bittorrent.org/beps/bep_0003.html#peer-protocol
@@ -217,33 +117,35 @@ private:
     static auto constexpr DhtFlag = size_t{ 63U };
 
     // Next comes the 20 byte sha1 info_hash and the 20-byte peer_id
-    static auto constexpr HandshakeSize = sizeof(HandshakeName) + HandshakeFlagsBytes + sizeof(tr_sha1_digest_t) +
-        sizeof(tr_peer_id_t);
-    static_assert(HandshakeSize == 68);
+    static auto constexpr HandshakeSize = std::size(HandshakeName) + HandshakeFlagsBytes + std::tuple_size_v<tr_sha1_digest_t> +
+        std::tuple_size_v<tr_peer_id_t>;
+    static_assert(HandshakeSize == 68U);
 
     // Length of handhshake up through the info_hash. From theory.org:
     // > The recipient may wait for the initiator's handshake... however,
     // > the recipient must respond as soon as it sees the info_hash part
     // > of the handshake (the peer id will presumably be sent after the
     // > recipient sends its own handshake).
-    static auto constexpr IncomingHandshakeLen = sizeof(HandshakeName) + HandshakeFlagsBytes + sizeof(tr_sha1_digest_t);
-    static_assert(IncomingHandshakeLen == 48);
+    static auto constexpr IncomingHandshakeLen = std::size(HandshakeName) + HandshakeFlagsBytes +
+        std::tuple_size_v<tr_sha1_digest_t>;
+    static_assert(IncomingHandshakeLen == 48U);
 
     // MSE constants.
     // http://wiki.vuze.com/w/Message_Stream_Encryption
     // > crypto_provide and crypto_select are a 32bit bitfields.
     // > As of now 0x01 means plaintext, 0x02 means RC4. (see Functions)
     // > The remaining bits are reserved for future use.
-    static auto constexpr CryptoProvidePlaintext = size_t{ 0x01 };
-    static auto constexpr CryptoProvideCrypto = size_t{ 0x02 };
+    static auto constexpr CryptoProvidePlaintext = uint32_t{ 0x01 };
+    static auto constexpr CryptoProvideRC4 = uint32_t{ 0x02 };
 
     // MSE constants.
     // http://wiki.vuze.com/w/Message_Stream_Encryption
     // > PadA, PadB: Random data with a random length of 0 to 512 bytes each
     // > PadC, PadD: Arbitrary data with a length of 0 to 512 bytes
-    static auto constexpr PadaMaxlen = int{ 512 };
-    static auto constexpr PadbMaxlen = int{ 512 };
-    static auto constexpr PadcMaxlen = int{ 512 };
+    static auto constexpr PadaMaxlen = uint16_t{ 512U };
+    static auto constexpr PadbMaxlen = uint16_t{ 512U };
+    static auto constexpr PadcMaxlen = uint16_t{ 512U };
+    static auto constexpr PaddMaxlen = uint16_t{ 512U };
 
     // "VC is a verification constant that is used to verify whether the
     // other side knows S and SKEY and thus defeats replay attacks of the
@@ -252,42 +154,147 @@ private:
     using vc_t = std::array<std::byte, 8>;
     static auto constexpr VC = vc_t{};
 
-    // Used when resynchronizing in read_vc(). This value is cached to avoid
-    // the cost of recomputing it. MSE spec: "Since the length of [PadB is]
-    // unknown, A will be able to resynchronize on ENCRYPT(VC)".
-    std::optional<vc_t> encrypted_vc_;
-
-    ///
-
-    static constexpr auto DhPoolMaxSize = size_t{ 32 };
-    static inline auto dh_pool_size_ = size_t{};
-    static inline auto dh_pool_ = std::array<tr_message_stream_encryption::DH, DhPoolMaxSize>{};
-    static inline auto dh_pool_mutex_ = std::mutex{};
-
-    [[nodiscard]] static DH get_dh(Mediator* mediator)
+private:
+    enum class State : uint8_t
     {
-        auto lock = std::unique_lock(dh_pool_mutex_);
+        // incoming and outgoing
+        AwaitingHandshake,
+        AwaitingPeerId,
 
-        if (dh_pool_size_ > 0U)
-        {
-            auto dh = DH{};
-            std::swap(dh, dh_pool_[dh_pool_size_ - 1U]);
-            --dh_pool_size_;
-            return dh;
-        }
+        // incoming
+        AwaitingYa,
+        AwaitingPadA,
+        AwaitingCryptoProvide,
+        AwaitingPadC,
+        AwaitingIa,
 
-        return DH{ mediator->private_key() };
+        // outgoing
+        AwaitingYb,
+        AwaitingVc,
+        AwaitingCryptoSelect,
+        AwaitingPadD
+    };
+
+    // ---
+
+    ReadState read_crypto_provide(tr_peerIo* peer_io);
+    ReadState read_crypto_select(tr_peerIo* peer_io);
+    ReadState read_handshake(tr_peerIo* peer_io);
+    ReadState read_ia(tr_peerIo* peer_io);
+    ReadState read_pad_a(tr_peerIo* peer_io);
+    ReadState read_pad_c(tr_peerIo* peer_io);
+    ReadState read_pad_d(tr_peerIo* peer_io);
+    ReadState read_peer_id(tr_peerIo* peer_io);
+    ReadState read_vc(tr_peerIo* peer_io);
+    ReadState read_ya(tr_peerIo* peer_io);
+    ReadState read_yb(tr_peerIo* peer_io);
+
+    void send_ya(tr_peerIo* io);
+
+    void set_peer_id(tr_peer_id_t const& id) noexcept
+    {
+        peer_id_ = id;
     }
 
-    static void add_dh(DH&& dh)
+    ReadState done(bool is_connected)
     {
-        auto lock = std::unique_lock(dh_pool_mutex_);
+        // The responding client of a handshake usually starts sending BT messages immediately after
+        // the handshake, so we need to return ReadState::Break to ensure those messages are processed.
+        return fire_done(is_connected) ? ReadState::Break : ReadState::Err;
+    }
 
-        if (dh_pool_size_ < std::size(dh_pool_))
+    [[nodiscard]] auto is_incoming() const noexcept
+    {
+        return peer_io_->is_incoming();
+    }
+
+    [[nodiscard]] constexpr auto state() const noexcept
+    {
+        return state_;
+    }
+
+    [[nodiscard]] constexpr auto is_state(State state) const noexcept
+    {
+        return state_ == state;
+    }
+
+    constexpr void set_state(State state) noexcept
+    {
+        state_ = state;
+    }
+
+    [[nodiscard]] static std::string_view state_string(State state) noexcept;
+
+    [[nodiscard]] std::string_view state_string() const noexcept
+    {
+        return state_string(state_);
+    }
+
+    static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
+
+    static void on_error(tr_peerIo* io, tr_error const& error, void* vhandshake);
+
+    bool build_handshake_message(tr_peerIo* io, tr::BufferWriter<std::byte>& buf) const;
+
+    bool send_handshake(tr_peerIo* io);
+
+    template<size_t PadMax>
+    auto send_public_key_and_pad(tr_peerIo* io)
+    {
+        auto const public_key = get_dh().publicKey();
+        auto outbuf = std::array<std::byte, std::size(public_key) + PadMax>{};
+        auto const data = std::data(outbuf);
+        auto walk = data;
+        walk = std::copy(std::begin(public_key), std::end(public_key), walk);
+        auto const pad_len = mediator_->pad(walk, PadMax);
+        walk += pad_len;
+        io->write_bytes(data, walk - data, false);
+        return pad_len;
+    }
+
+    [[nodiscard]] uint32_t crypto_provide() const noexcept;
+
+    [[nodiscard]] static uint32_t get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept;
+
+    bool fire_done(bool is_connected);
+    void fire_timer();
+
+    static constexpr auto DhPoolMaxSize = size_t{ 32 };
+    static inline auto dh_pool = small::max_size_vector<DH, DhPoolMaxSize>{};
+    static inline auto dh_pool_mutex = std::mutex{};
+
+    [[nodiscard]] static std::optional<DH> pop_dh_pool()
+    {
+        auto lock = std::unique_lock(dh_pool_mutex);
+
+        if (std::empty(dh_pool))
         {
-            dh_pool_[dh_pool_size_] = std::move(dh);
-            ++dh_pool_size_;
+            return {};
         }
+
+        auto dh = std::move(dh_pool.back());
+        dh_pool.pop_back();
+        return dh;
+    }
+
+    static void push_dh_pool(DH dh)
+    {
+        auto lock = std::unique_lock(dh_pool_mutex);
+
+        if (std::size(dh_pool) < dh_pool.max_size())
+        {
+            dh_pool.emplace_back(std::move(dh));
+        }
+    }
+
+    [[nodiscard]] DH& get_dh()
+    {
+        if (!dh_)
+        {
+            dh_.emplace(pop_dh_pool().value_or(DH{ mediator_->private_key() }));
+        }
+
+        return *dh_;
     }
 
     void maybe_recycle_dh()
@@ -299,14 +306,18 @@ private:
             return;
         }
 
-        auto dh = DH{};
-        std::swap(dh_, dh);
-        add_dh(std::move(dh));
+        if (dh_)
+        {
+            push_dh_pool(std::move(*dh_));
+            dh_.reset();
+        }
     }
 
-    ///
+    std::optional<DH> dh_;
 
-    DH dh_ = {};
+    // ---
+
+    static auto constexpr HandshakeTimeoutSec = std::chrono::seconds{ 30 };
 
     DoneFunc on_done_;
 
@@ -314,7 +325,7 @@ private:
 
     std::shared_ptr<tr_peerIo> peer_io_;
 
-    std::unique_ptr<libtransmission::Timer> timeout_timer_;
+    std::unique_ptr<tr::Timer> timeout_timer_;
 
     Mediator* mediator_ = nullptr;
 
@@ -322,8 +333,15 @@ private:
 
     tr_encryption_mode encryption_mode_;
 
+    // Used when resynchronizing in read_vc(). This value is cached to avoid
+    // the cost of recomputing it. MSE spec: "Since the length of [PadB is]
+    // unknown, A will be able to resynchronize on ENCRYPT(VC)".
+    std::optional<vc_t> encrypted_vc_;
+
     uint32_t crypto_select_ = {};
     uint32_t crypto_provide_ = {};
+    uint16_t pad_a_len_ = {};
+    uint16_t pad_b_len_ = {};
     uint16_t pad_c_len_ = {};
     uint16_t pad_d_len_ = {};
     uint16_t ia_len_ = {};

@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -13,7 +13,7 @@
 @property(nonatomic) Torrent* torrent;
 @property(nonatomic) NSString* filterText;
 
-- (void)refresh;
+- (void)reloadVisibleRows;
 
 - (void)setCheck:(id)sender;
 - (void)setOnlySelectedCheck:(id)sender;

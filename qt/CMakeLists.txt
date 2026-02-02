@@ -1,11 +1,16 @@
 set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
 
-add_executable(${TR_NAME}-qt WIN32)
+# https://doc.qt.io/qt-6/macos.html#supported-versions
+set(CMAKE_OSX_DEPLOYMENT_TARGET 11)
 
-target_sources(${TR_NAME}-qt
+add_library(${TR_NAME}-qt-lib STATIC)
+
+target_sources(${TR_NAME}-qt-lib
     PRIVATE
         AboutDialog.cc
         AboutDialog.h
+        AccessibleSqueezeLabel.cc
+        AccessibleSqueezeLabel.h
         AddData.cc
         AddData.h
         Application.cc
@@ -15,7 +20,6 @@ target_sources(${TR_NAME}-qt
         ColumnResizer.h
         ComInteropHelper.cc
         ComInteropHelper.h
-        CustomVariantType.h
         DBusInteropHelper.cc
         DBusInteropHelper.h
         DetailsDialog.cc
@@ -55,6 +59,9 @@ target_sources(${TR_NAME}-qt
         MainWindow.h
         MakeDialog.cc
         MakeDialog.h
+        NativeIcon.cc
+        $<$<BOOL:${APPLE}>:NativeIconMac.mm>
+        NativeIcon.h
         OptionsDialog.cc
         OptionsDialog.h
         PathButton.cc
@@ -98,7 +105,10 @@ target_sources(${TR_NAME}-qt
         TrackerModel.h
         TrackerModelFilter.cc
         TrackerModelFilter.h
+        TrQtInit.cc
+        TrQtInit.h
         Typedefs.h
+        UserMetaType.h
         Utils.cc
         Utils.h
         VariantHelpers.cc
@@ -112,7 +122,7 @@ tr_allow_compile_if(
     [=[[ENABLE_QT_DBUS_INTEROP]]=]
         DBusInteropHelper.cc)
 
-target_sources(${TR_NAME}-qt
+target_sources(${TR_NAME}-qt-lib
     PRIVATE
         AboutDialog.ui
         DetailsDialog.ui
@@ -130,15 +140,9 @@ target_sources(${TR_NAME}-qt
 source_group(Ui
     REGULAR_EXPRESSION [[.*\.ui$]])
 
-target_sources(${TR_NAME}-qt
+target_sources(${TR_NAME}-qt-lib
     PRIVATE
         application.qrc)
-
-if(WIN32 OR APPLE)
-    target_sources(${TR_NAME}-qt
-        PRIVATE
-            icons/Faenza/Faenza.qrc)
-endif()
 
 source_group(Resources
     REGULAR_EXPRESSION [[.*\.qrc$]])
@@ -154,9 +158,11 @@ set(LINGUAS
     eu
     fi
     fr
+    he
     hu
     id
-    it_IT
+    is
+    it
     ja
     ka
     kk
@@ -173,7 +179,8 @@ set(LINGUAS
     sv
     tr
     uk
-    zh_CN)
+    zh_CN
+    zh_TW)
 
 if(ENABLE_NLS)
     set(ENABLED_LINGUAS ${LINGUAS})
@@ -190,34 +197,49 @@ if(TS_FILES)
     tr_qt_add_translation(QM_FILES ${TS_FILES})
 endif()
 
-target_sources(${TR_NAME}-qt
+target_sources(${TR_NAME}-qt-lib
     PRIVATE
         ${QM_FILES})
 
 if(ENABLE_QT_COM_INTEROP)
-    tr_target_idl_files(${TR_NAME}-qt
+    tr_target_idl_files(${TR_NAME}-qt-lib
         transmission-qt.idl)
 endif()
 
-target_include_directories(${TR_NAME}-qt
-    PRIVATE
+target_include_directories(${TR_NAME}-qt-lib
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${TR_NAME}-qt
-    PRIVATE
+target_link_libraries(${TR_NAME}-qt-lib
+    PUBLIC
+        ${TR_NAME}-app
         ${TR_NAME}
         transmission::qt_impl)
 
-target_compile_definitions(${TR_NAME}-qt
+target_compile_definitions(${TR_NAME}-qt-lib
     PRIVATE
         "TRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
         QT_NO_CAST_FROM_ASCII
         $<$<BOOL:${ENABLE_QT_COM_INTEROP}>:ENABLE_COM_INTEROP>
         $<$<BOOL:${ENABLE_QT_DBUS_INTEROP}>:ENABLE_DBUS_INTEROP>)
 
-if(MSVC)
-    tr_append_target_property(${TR_NAME}-qt LINK_FLAGS "/ENTRY:mainCRTStartup")
-endif()
+set_target_properties(
+    ${TR_NAME}-qt-lib
+    PROPERTIES
+        AUTOMOC ON
+        AUTORCC ON
+        AUTOUIC ON)
+
+add_executable(${TR_NAME}-qt WIN32)
+
+target_sources(${TR_NAME}-qt
+    PRIVATE
+        main.cc
+        application.qrc)
+
+target_link_libraries(${TR_NAME}-qt
+    PRIVATE
+        ${TR_NAME}-qt-lib)
 
 set_target_properties(
     ${TR_NAME}-qt
@@ -226,15 +248,34 @@ set_target_properties(
         AUTORCC ON
         AUTOUIC ON)
 
+if(MSVC)
+    tr_append_target_property(${TR_NAME}-qt LINK_FLAGS "/ENTRY:mainCRTStartup")
+endif()
+
 tr_win32_app_info(${TR_NAME}-qt
     "Transmission Qt Client"
-    "transmission-qt"
-    "transmission-qt.exe"
-    "qtr.ico")
+    "${TR_NAME}-qt"
+    "${TR_NAME}-qt.exe"
+    "${SOURCE_ICONS_DIR}/${TR_NAME}.ico")
 
 install(
     TARGETS ${TR_NAME}-qt
     DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+set(PUBLIC_ICONS
+    hicolor_apps_scalable_transmission.svg
+    hicolor_apps_scalable_transmission-devel.svg
+    hicolor_apps_symbolic_transmission-symbolic.svg)
+
+set(ICON_NAME_REGEX "^([^_]+)_([^_]+)_([^_]+)_(.+)$")
+foreach(ICON ${PUBLIC_ICONS})
+    string(REGEX REPLACE ${ICON_NAME_REGEX} "\\1/\\3/\\2" ICON_DIR ${ICON})
+    string(REGEX REPLACE ${ICON_NAME_REGEX} "\\4" ICON_NAME ${ICON})
+    install(
+        FILES ${SOURCE_ICONS_DIR}/${ICON}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/${ICON_DIR}/
+        RENAME ${ICON_NAME})
+endforeach()
 
 if(INSTALL_DOC)
     install(

@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
@@ -20,7 +19,9 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
+
+#include <gtest/gtest.h>
 
 #include <libtransmission/transmission.h>
 
@@ -30,10 +31,9 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-using UtilsTest = ::testing::Test;
+using UtilsTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(UtilsTest, trStrvContains)
@@ -86,24 +86,73 @@ TEST_F(UtilsTest, trStrvEndsWith)
 
 TEST_F(UtilsTest, trStrvSep)
 {
-    auto constexpr Delim = ',';
+    static auto constexpr CommaCh = ',';
+    static auto constexpr SemiColonCh = ';';
+    static auto constexpr CommaSemiColonSv = ",;"sv;
+    static auto constexpr CommaSemiColonArr = std::array{ ',', ';' };
 
     auto sv = "token1,token2,token3"sv;
-    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, Delim));
-    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, Delim));
-    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, Delim));
-    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaCh));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2,token3"sv, tr_strv_sep(&sv, SemiColonCh));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, SemiColonCh));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, CommaSemiColonSv));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, CommaSemiColonSv));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, CommaSemiColonSv));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaSemiColonSv));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2"sv, tr_strv_sep(&sv, CommaCh, 7));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaCh));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2,token3"sv, tr_strv_sep(&sv, SemiColonCh, 7));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, SemiColonCh));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2"sv, tr_strv_sep(&sv, CommaSemiColonSv, 7));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, CommaSemiColonSv));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaSemiColonSv));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2"sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 7, std::size(CommaSemiColonArr)));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, std::data(CommaSemiColonArr), 0, std::size(CommaSemiColonArr)));
+
+    sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1,token2"sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv), 7));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, std::data(CommaSemiColonSv)));
 
     sv = " token1,token2"sv;
-    EXPECT_EQ(" token1"sv, tr_strv_sep(&sv, Delim));
-    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ(" token1"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, CommaCh));
 
     sv = "token1;token2"sv;
-    EXPECT_EQ("token1;token2"sv, tr_strv_sep(&sv, Delim));
-    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ("token1;token2"sv, tr_strv_sep(&sv, CommaCh));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaCh));
 
     sv = ""sv;
-    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, CommaCh));
 }
 
 TEST_F(UtilsTest, trStrvStrip)
@@ -162,8 +211,8 @@ TEST_F(UtilsTest, strvConvertUtf8Fuzz)
     {
         buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        auto const out = tr_strv_convert_utf8({ std::data(buf), std::size(buf) });
-        EXPECT_EQ(out, tr_strv_convert_utf8(out));
+        auto const out = tr_strv_to_utf8_string({ std::data(buf), std::size(buf) });
+        EXPECT_EQ(out, tr_strv_to_utf8_string(out));
     }
 }
 
@@ -226,60 +275,6 @@ TEST_F(UtilsTest, truncd)
 #endif
 }
 
-TEST_F(UtilsTest, trStrlcpy)
-{
-    // destination will be initialized with this char
-    char const initial_char = '1';
-    std::array<char, 100> destination = { initial_char };
-
-    std::vector<std::string> const tests{
-        "a",
-        "",
-        "12345678901234567890",
-        "This, very useful string contains a total of 105 characters not counting null. Almost like an easter egg!"
-    };
-
-    for (auto const& test : tests)
-    {
-        auto c_string = test.c_str();
-        auto length = strlen(c_string);
-
-        destination.fill(initial_char);
-
-        auto response = tr_strlcpy(&destination, c_string, 98);
-
-        // Check response length
-        ASSERT_EQ(response, length);
-
-        // Check what was copied
-        for (unsigned i = 0U; i < 97U; ++i)
-        {
-            if (i <= length)
-            {
-                ASSERT_EQ(destination[i], c_string[i]);
-            }
-            else
-            {
-                ASSERT_EQ(destination[i], initial_char);
-            }
-        }
-
-        // tr_strlcpy should only write this far if (length >= 98)
-        if (length >= 98)
-        {
-            ASSERT_EQ(destination[97], '\0');
-        }
-        else
-        {
-            ASSERT_EQ(destination[97], initial_char);
-        }
-
-        // tr_strlcpy should not write this far
-        ASSERT_EQ(destination[98], initial_char);
-        ASSERT_EQ(destination[99], initial_char);
-    }
-}
-
 TEST_F(UtilsTest, env)
 {
     char const* test_key = "TR_TEST_ENV";
@@ -317,29 +312,29 @@ TEST_F(UtilsTest, saveFile)
     auto filename = tr_pathbuf{};
 
     // save a file to GoogleTest's temp dir
-    filename.assign(::testing::TempDir(), "filename.txt"sv);
+    auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    filename.assign(sandbox, "filename.txt"sv);
     auto contents = "these are the contents"sv;
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     EXPECT_TRUE(tr_file_save(filename.sv(), contents, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     // now read the file back in and confirm the contents are the same
     auto buf = std::vector<char>{};
     EXPECT_TRUE(tr_file_read(filename.sv(), buf, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
     auto sv = std::string_view{ std::data(buf), std::size(buf) };
     EXPECT_EQ(contents, sv);
 
     // remove the tempfile
     EXPECT_TRUE(tr_sys_path_remove(filename, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     // try saving a file to a path that doesn't exist
     filename = "/this/path/does/not/exist/foo.txt";
     EXPECT_FALSE(tr_file_save(filename.sv(), contents, &error));
-    ASSERT_NE(nullptr, error);
-    EXPECT_NE(0, error->code);
-    tr_error_clear(&error);
+    ASSERT_TRUE(error);
+    EXPECT_NE(0, error.code());
 }
 
 TEST_F(UtilsTest, ratioToString)
@@ -363,13 +358,13 @@ TEST_F(UtilsTest, ratioToString)
                                                                                          { TR_RATIO_INF, "inf" } } };
     char const nullchar = '\0';
 
-    ASSERT_EQ(tr_strratio(TR_RATIO_NA, "Ratio is NaN"), "None");
-    ASSERT_EQ(tr_strratio(TR_RATIO_INF, "A bit longer text for infinity"), "A bit longer text for infinity");
+    ASSERT_EQ(tr_strratio(TR_RATIO_NA, "None", "Ratio is NaN"), "None");
+    ASSERT_EQ(tr_strratio(TR_RATIO_INF, "None", "A bit longer text for infinity"), "A bit longer text for infinity");
     // Inf contains only null character
-    ASSERT_EQ(tr_strratio(TR_RATIO_INF, &nullchar), "");
+    ASSERT_EQ(tr_strratio(TR_RATIO_INF, "None", &nullchar), "");
 
     for (auto const& [input, expected] : Tests)
     {
-        ASSERT_EQ(tr_strratio(input, "inf"), expected);
+        ASSERT_EQ(tr_strratio(input, "None", "inf"), expected);
     }
 }

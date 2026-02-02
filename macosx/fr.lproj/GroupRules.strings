@@ -1,6 +1,6 @@
 
 /* Class = "NSButtonCell"; title = "OK"; ObjectID = "11"; */
-"11.title" = "OK";
+"11.title" = "Valider";
 
 /* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "12"; */
 "12.title" = "Annuler";
@@ -15,7 +15,7 @@
 "49.title" = "conditions suivantes sont vraies";
 
 /* Class = "NSMenuItem"; title = "Any"; ObjectID = "50"; */
-"50.title" = "L'une des";
+"50.title" = "L’une des";
 
 /* Class = "NSMenuItem"; title = "All"; ObjectID = "51"; */
 "51.title" = "Toutes les";
@@ -30,7 +30,7 @@
 "118.title" = "correspond à";
 
 /* Class = "NSMenuItem"; title = "contains"; ObjectID = "153"; */
-"153.title" = "contient";
+"153.title" = "comprend";
 
 /* Class = "NSMenuItem"; title = "begins with"; ObjectID = "154"; */
 "154.title" = "commence par";
@@ -45,16 +45,16 @@
 "161.title" = "Un fichier";
 
 /* Class = "NSMenuItem"; title = "Any Tracker"; ObjectID = "162"; */
-"162.title" = "Un trackeur";
+"162.title" = "N’importe quel traceur";
 
 /* Class = "NSMenuItem"; title = "ends with"; ObjectID = "163"; */
 "163.title" = "se termine par";
 
 /* Class = "NSMenuItem"; title = "is not"; ObjectID = "164"; */
-"164.title" = "n'est pas";
+"164.title" = "n’est pas";
 
 /* Class = "NSMenuItem"; title = "contains"; ObjectID = "165"; */
-"165.title" = "contient";
+"165.title" = "comprend";
 
 /* Class = "NSMenuItem"; title = "None"; ObjectID = "166"; */
 "166.title" = "Aucun";

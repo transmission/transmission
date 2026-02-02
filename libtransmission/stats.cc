@@ -1,76 +1,69 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <initializer_list>
+#include <optional>
+#include <utility>
+
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/file.h"
 #include "libtransmission/quark.h"
+#include "libtransmission/serializer.h"
 #include "libtransmission/stats.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h" // for tr_getRatio(), tr_time()
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
+using namespace tr;
 
 namespace
 {
-std::optional<tr_variant> load_stats(std::string_view config_dir)
-{
-    if (auto filename = tr_pathbuf{ config_dir, "/stats.json"sv }; tr_sys_path_exists(filename))
-    {
-        return tr_variant_serde::json().parse_file(filename);
-    }
+template<auto MemberPtr>
+using Field = serializer::Field<MemberPtr>;
 
-    // maybe the user just upgraded from an old version of Transmission
-    // that was still using stats.benc
-    if (auto filename = tr_pathbuf{ config_dir, "/stats.benc"sv }; tr_sys_path_exists(filename))
-    {
-        return tr_variant_serde::benc().parse_file(filename);
-    }
-
-    return {};
-}
+constexpr auto Fields = std::tuple{
+    Field<&tr_session_stats::downloadedBytes>{ TR_KEY_downloaded_bytes },
+    Field<&tr_session_stats::filesAdded>{ TR_KEY_files_added },
+    Field<&tr_session_stats::secondsActive>{ TR_KEY_seconds_active },
+    Field<&tr_session_stats::sessionCount>{ TR_KEY_session_count },
+    Field<&tr_session_stats::uploadedBytes>{ TR_KEY_uploaded_bytes },
+};
 } // namespace
 
-tr_session_stats tr_stats::load_old_stats(std::string_view config_dir)
+tr_session_stats tr_stats::load_old_stats(std::string_view const config_dir)
 {
-    auto ret = tr_session_stats{};
+    auto var = std::optional<tr_variant>{};
 
-    if (auto stats = load_stats(config_dir); stats)
+    if (auto file = tr_pathbuf{ config_dir, "/stats.json"sv }; tr_sys_path_exists(file))
     {
-        auto const key_tgts = std::array<std::pair<tr_quark, uint64_t*>, 5>{
-            { { TR_KEY_downloaded_bytes, &ret.downloadedBytes },
-              { TR_KEY_files_added, &ret.filesAdded },
-              { TR_KEY_seconds_active, &ret.secondsActive },
-              { TR_KEY_session_count, &ret.sessionCount },
-              { TR_KEY_uploaded_bytes, &ret.uploadedBytes } }
-        };
-
-        for (auto& [key, tgt] : key_tgts)
-        {
-            if (auto val = int64_t{}; tr_variantDictFindInt(&*stats, key, &val))
-            {
-                *tgt = val;
-            }
-        }
+        var = tr_variant_serde::json().parse_file(file);
+    }
+    else if (auto oldfile = tr_pathbuf{ config_dir, "/stats.benc"sv }; tr_sys_path_exists(oldfile))
+    {
+        var = tr_variant_serde::benc().parse_file(oldfile);
     }
 
+    if (!var)
+    {
+        return {};
+    }
+
+    api_compat::convert_incoming_data(*var);
+    auto ret = tr_session_stats{};
+    serializer::load(ret, Fields, *var);
     return ret;
 }
 
 void tr_stats::save() const
 {
-    auto const saveme = cumulative();
-    auto top = tr_variant{};
-    tr_variantInitDict(&top, 5);
-    tr_variantDictAddInt(&top, TR_KEY_downloaded_bytes, saveme.downloadedBytes);
-    tr_variantDictAddInt(&top, TR_KEY_files_added, saveme.filesAdded);
-    tr_variantDictAddInt(&top, TR_KEY_seconds_active, saveme.secondsActive);
-    tr_variantDictAddInt(&top, TR_KEY_session_count, saveme.sessionCount);
-    tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, saveme.uploadedBytes);
-    tr_variant_serde::json().to_file(top, tr_pathbuf{ config_dir_, "/stats.json"sv });
+    auto var = tr_variant{ serializer::save(cumulative(), Fields) };
+    api_compat::convert_outgoing_data(var);
+    tr_variant_serde::json().to_file(var, tr_pathbuf{ config_dir_, "/stats.json"sv });
 }
 
 void tr_stats::clear()

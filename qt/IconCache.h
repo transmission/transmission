@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -43,8 +43,6 @@ public:
     QIcon guessMimeIcon(QString const& filename, QIcon fallback = {}) const;
     QIcon getMimeTypeIcon(QString const& mime_type, bool multifile) const;
 
-    QIcon getThemeIcon(QString const& name, std::optional<QStyle::StandardPixmap> const& fallback = {}) const;
-
 protected:
     IconCache() = default;
 
@@ -62,6 +60,8 @@ private:
     mutable std::unordered_map<QString, QIcon> ext_to_icon_;
     QIcon getMimeIcon(QString const& filename) const;
 #endif
+
+    QIcon getThemeIcon(QString const& name, std::optional<QStyle::StandardPixmap> const& fallback = {}) const;
 
     QIcon getThemeIcon(
         QString const& name,

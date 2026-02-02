@@ -1,45 +1,40 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
+#include <array>
+#include <functional>
 #include <map>
-
-#include <libtransmission/tr-macros.h>
+#include <optional>
+#include <utility>
 
 #include "BaseDialog.h"
 #include "Prefs.h"
+#include "Session.h"
 #include "ui_PrefsDialog.h"
 
 class QHttp;
 class QMessageBox;
 class QString;
 
-class Prefs;
-class Session;
-
 class PrefsDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(PrefsDialog)
 
 public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
+    PrefsDialog& operator=(PrefsDialog&&) = delete;
+    PrefsDialog& operator=(PrefsDialog const&) = delete;
+    PrefsDialog(PrefsDialog&&) = delete;
+    PrefsDialog(PrefsDialog const&) = delete;
 
 private slots:
-    void focusChanged(QWidget* old, QWidget* cur);
-    void checkBoxToggled(bool checked);
-    void spinBoxEditingFinished();
-    void timeEditingFinished();
-    void lineEditingFinished();
-    void pathChanged(QString const& path);
     void refreshPref(int key);
-    void encryptionEdited(int);
-    void altSpeedDaysEdited(int);
     void sessionUpdated();
-    void onPortTested(bool);
+    void onPortTested(std::optional<bool>, Session::PortTestIpProtocol);
     void onPortTest();
     void onIdleLimitChanged();
     void onQueueStalledMinutesChanged();
@@ -50,15 +45,42 @@ private slots:
     void onBlocklistUpdated(int n);
 
 private:
-    using key2widget_t = std::map<int, QWidget*>;
+    enum class PortTestStatus : uint8_t
+    {
+        Unknown = 0U,
+        Checking,
+        Open,
+        Closed,
+        Error
+    };
 
-    bool updateWidgetValue(QWidget* widget, int pref_key) const;
-    void linkWidgetToPref(QWidget* widget, int pref_key);
+    template<typename T>
+    void set(int const key, T val)
+    {
+        prefs_.set(key, std::move(val));
+        refreshPref(key);
+    }
+
+    void portTestSetEnabled();
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();
+    void updatePortStatusLabel();
     void updateSeedingWidgetsLocality();
+    static QString getPortStatusText(PortTestStatus status) noexcept;
 
-    void setPref(int key, QVariant const& v);
+    template<typename T, size_t N>
+    void initComboFromItems(std::array<std::pair<QString, T>, N> const& items, QComboBox* w, int key);
+
+    void initAltSpeedDaysCombo(QComboBox* w, int key);
+    void initEncryptionCombo(QComboBox* w, int key);
+    void initWidget(FreeSpaceLabel* w, int key);
+    void initWidget(PathButton* w, int key);
+    void initWidget(QCheckBox* w, int key);
+    void initWidget(QDoubleSpinBox* w, int key);
+    void initWidget(QLineEdit* w, int key);
+    void initWidget(QPlainTextEdit*, int);
+    void initWidget(QSpinBox* w, int key);
+    void initWidget(QTimeEdit* w, int key);
 
     void initDownloadingTab();
     void initSeedingTab();
@@ -75,8 +97,10 @@ private:
 
     bool const is_server_;
     bool is_local_ = {};
+    std::array<PortTestStatus, Session::NUM_PORT_TEST_IP_PROTOCOL> port_test_status_ = {};
 
-    key2widget_t widgets_;
+    std::multimap<int, std::function<void()>> updaters_;
+
     QWidgetList web_widgets_;
     QWidgetList web_auth_widgets_;
     QWidgetList web_whitelist_widgets_;

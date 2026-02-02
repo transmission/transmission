@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,7 +7,6 @@
 
 #include <optional>
 
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/makemeta.h>
 
 #include "BaseDialog.h"
@@ -19,10 +18,13 @@ class Session;
 class MakeDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(MakeDialog)
 
 public:
     MakeDialog(Session&, QWidget* parent = nullptr);
+    MakeDialog(MakeDialog&&) = delete;
+    MakeDialog(MakeDialog const&) = delete;
+    MakeDialog& operator=(MakeDialog&&) = delete;
+    MakeDialog& operator=(MakeDialog const&) = delete;
 
 protected:
     // QWidget
@@ -35,7 +37,7 @@ private slots:
     void onPieceSizeUpdated(int);
 
 private:
-    QString getSource() const;
+    [[nodiscard]] QString getSource() const;
     void updatePiecesLabel();
     Session& session_;
 

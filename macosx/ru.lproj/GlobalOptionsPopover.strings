@@ -15,7 +15,7 @@
 "44.title" = "Ограничить скорость скачивания:";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
-"98.title" = "мин";
+"98.title" = "мин.";
 
 /* Class = "NSButtonCell"; title = "Status of selected files"; ObjectID = "114"; */
 "114.title" = "Статус выбранных файлов";

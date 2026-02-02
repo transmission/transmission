@@ -1,4 +1,4 @@
-// This file Copyright 2016-2022 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -36,11 +36,11 @@ public:
      * relative paths to absolute before passing through RPC, or presenting
      * different UI for local and remote sessions.
      */
-    [[nodiscard]] static bool is_local(std::string_view) noexcept;
+    [[nodiscard]] static bool is_local(std::string_view session_id);
 
     // current session identifier
-    [[nodiscard]] std::string_view sv() const noexcept;
-    [[nodiscard]] char const* c_str() const noexcept;
+    [[nodiscard]] std::string_view sv() const;
+    [[nodiscard]] char const* c_str() const;
 
 private:
     static auto constexpr SessionIdSize = size_t{ 48 };

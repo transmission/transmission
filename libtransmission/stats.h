@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -32,6 +32,11 @@ public:
     {
         save();
     }
+
+    tr_stats(tr_stats const&) = delete;
+    tr_stats(tr_stats&&) = delete;
+    tr_stats& operator=(tr_stats const&) = delete;
+    tr_stats& operator=(tr_stats&&) = delete;
 
     void clear();
 
@@ -67,7 +72,14 @@ private:
     std::string const config_dir_;
     time_t start_time_;
 
-    static constexpr auto Zero = tr_session_stats{ TR_RATIO_NA, 0U, 0U, 0U, 0U, 0U };
+    static constexpr auto Zero = tr_session_stats{
+        .ratio = TR_RATIO_NA,
+        .uploadedBytes = 0U,
+        .downloadedBytes = 0U,
+        .filesAdded = 0U,
+        .sessionCount = 0U,
+        .secondsActive = 0U,
+    };
     tr_session_stats single_ = Zero;
     tr_session_stats old_ = Zero;
 };

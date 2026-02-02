@@ -7,19 +7,17 @@
 #include <array>
 #include <cassert>
 #include <cstddef> // std::byte
+#include <optional>
 #include <string_view>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/announcer-common.h>
 #include <libtransmission/net.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-using AnnouncerTest = ::testing::Test;
+using AnnouncerTest = ::tr::test::TransmissionTest;
 
 using namespace std::literals;
 
@@ -86,7 +84,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexCompact)
 
     if (std::size(response.pex) == 1)
     {
-        EXPECT_EQ("[127.0.0.1]:64551"sv, response.pex[0].display_name());
+        EXPECT_EQ("127.0.0.1:64551"sv, response.pex[0].display_name());
     }
 }
 
@@ -125,7 +123,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexList)
 
     if (std::size(response.pex) == 1)
     {
-        EXPECT_EQ("[8.8.4.4]:53"sv, response.pex[0].display_name());
+        EXPECT_EQ("8.8.4.4:53"sv, response.pex[0].display_name());
     }
 }
 
@@ -192,7 +190,7 @@ TEST_F(AnnouncerTest, parseHttpScrapeResponseMulti)
     std::fill_n(std::data(response.rows[0].info_hash), std::size(response.rows[0].info_hash), std::byte{ 'a' });
     std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
     std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
-    response.row_count = 3;
+    response.row_count = 3U;
     tr_announcerParseHttpScrapeResponse(response, ResponseBenc, LogName);
 
     EXPECT_EQ(1, response.rows[0].seeders);
@@ -250,7 +248,7 @@ TEST_F(AnnouncerTest, parseHttpScrapeResponseMultiWithUnexpected)
     std::fill_n(std::data(response.rows[0].info_hash), std::size(response.rows[0].info_hash), std::byte{ 'a' });
     std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
     std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
-    response.row_count = 3;
+    response.row_count = 3U;
     tr_announcerParseHttpScrapeResponse(response, ResponseBenc, LogName);
 
     EXPECT_EQ(1, response.rows[0].seeders);
@@ -294,16 +292,16 @@ TEST_F(AnnouncerTest, parseHttpScrapeResponseMultiWithMissing)
     std::fill_n(std::data(response.rows[0].info_hash), std::size(response.rows[0].info_hash), std::byte{ 'a' });
     std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
     std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
-    response.row_count = 3;
+    response.row_count = 3U;
     tr_announcerParseHttpScrapeResponse(response, ResponseBenc, LogName);
 
     EXPECT_EQ(1, response.rows[0].seeders);
     EXPECT_EQ(2, response.rows[0].leechers);
     EXPECT_EQ(3, response.rows[0].downloads);
 
-    EXPECT_EQ(0, response.rows[1].seeders);
-    EXPECT_EQ(0, response.rows[1].leechers);
-    EXPECT_EQ(0, response.rows[1].downloads);
+    EXPECT_EQ(std::nullopt, response.rows[1].seeders);
+    EXPECT_EQ(std::nullopt, response.rows[1].leechers);
+    EXPECT_EQ(std::nullopt, response.rows[1].downloads);
 
     EXPECT_EQ(7, response.rows[2].seeders);
     EXPECT_EQ(8, response.rows[2].leechers);

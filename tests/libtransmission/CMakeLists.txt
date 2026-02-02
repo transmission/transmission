@@ -7,6 +7,7 @@ target_sources(libtransmission-test
         announce-list-test.cc
         announcer-test.cc
         announcer-udp-test.cc
+        api-compat-test.cc
         benc-test.cc
         bitfield-test.cc
         block-info-test.cc
@@ -15,16 +16,15 @@ target_sources(libtransmission-test
         clients-test.cc
         completion-test.cc
         copy-test.cc
-        crypto-test-ref.h
         crypto-test.cc
-        error-test.cc
         dht-test.cc
+        error-test.cc
         file-piece-map-test.cc
         file-test.cc
         getopt-test.cc
-        global-ip-cache-test.cc
         handshake-test.cc
         history-test.cc
+        ip-cache-test.cc
         json-test.cc
         lpd-test.cc
         magnet-metainfo-test.cc
@@ -32,7 +32,6 @@ target_sources(libtransmission-test
         move-test.cc
         net-test.cc
         open-files-test.cc
-        peer-mgr-active-requests-test.cc
         peer-mgr-wishlist-test.cc
         peer-msgs-test.cc
         platform-test.cc
@@ -40,6 +39,7 @@ target_sources(libtransmission-test
         remove-test.cc
         rename-test.cc
         rpc-test.cc
+        serializer-tests.cc
         session-test.cc
         session-alt-speeds-test.cc
         settings-test.cc
@@ -51,12 +51,20 @@ target_sources(libtransmission-test
         torrent-files-test.cc
         torrent-magnet-test.cc
         torrent-metainfo-test.cc
+        torrent-queue-test.cc
         torrents-test.cc
         tr-peer-info-test.cc
         utils-test.cc
+        values-test.cc
         variant-test.cc
         watchdir-test.cc
         web-utils-test.cc)
+
+if(APPLE)
+    target_sources(libtransmission-test
+        PRIVATE
+            utils-apple-test.mm)
+endif()
 
 set_property(
     TARGET libtransmission-test
@@ -73,11 +81,28 @@ target_compile_options(libtransmission-test
 target_link_libraries(libtransmission-test
     PRIVATE
         ${TR_NAME}
-        gtestall
+        GTest::gtest_main
         dht::dht
         fmt::fmt-header-only
         libevent::event
         WideInteger::WideInteger)
+
+if (WIN32)
+    cmake_policy(PUSH)
+    cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+
+    add_custom_command(
+        TARGET libtransmission-test POST_BUILD
+        COMMAND
+            ${CMAKE_COMMAND}
+            -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:libtransmission-test>
+            $<TARGET_FILE_DIR:libtransmission-test>
+        COMMAND_EXPAND_LISTS
+    )
+
+    cmake_policy(POP)
+endif ()
 
 if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
     gtest_discover_tests(libtransmission-test
@@ -106,10 +131,6 @@ target_sources(subprocess-test
 set_property(
     TARGET subprocess-test
     PROPERTY FOLDER "tests")
-
-target_include_directories(subprocess-test
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/libtransmission)
 
 target_link_libraries(subprocess-test
     PRIVATE

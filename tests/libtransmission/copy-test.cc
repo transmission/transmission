@@ -9,16 +9,17 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class CopyTest : public SandboxedTest
@@ -36,11 +37,10 @@ protected:
 
         auto const path2 = tr_pathbuf{ sandboxDir(), '/', filename2 };
 
-        tr_error* err = nullptr;
         /* Copy it. */
-        EXPECT_TRUE(tr_sys_path_copy(path1, path2, &err));
-        EXPECT_EQ(nullptr, err) << ' ' << *err;
-        tr_error_clear(&err);
+        auto error = tr_error{};
+        EXPECT_TRUE(tr_sys_path_copy(path1, path2, &error));
+        EXPECT_FALSE(error) << error;
 
         EXPECT_TRUE(filesAreIdentical(path1, path2));
 
@@ -88,4 +88,4 @@ TEST_F(CopyTest, copy)
     testImpl(filename1, filename2, random_file_length);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

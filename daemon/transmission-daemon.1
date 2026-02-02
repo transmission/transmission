@@ -47,14 +47,14 @@ Example: "127.0.0.*,192.168.1.*"
 .It Fl b Fl -blocklist
 Enable peer blocklists. Transmission understands the bluetack blocklist file format.
 New blocklists can be added by copying them into the config-dir's "blocklists" subdirectory.
-.It Fl c Ar directory
+.It Fl c Fl -watch-dir Ar directory
 Directory to watch for new .torrent files to be added. As they are added to this directory,
 the daemon will load them into Transmission.
 .It Fl C
 Do not watch for new .torrent files.
 .It Fl B Fl -no-blocklist
 Disable blocklists.
-.It Fl d
+.It Fl d Fl -dump-settings
 Dump transmission-daemon's settings to stderr.
 .It Fl f Fl -foreground
 Run in the foreground and print errors to stderr.
@@ -127,12 +127,14 @@ Disable uTP for peer connections.
 Where to store downloaded data.
 .It Fl e Fl -logfile
 Where to store transmission's log messages.
+.It Fl -log-level Ar level
+Log level. Must be 'critical', 'error', 'warn', 'info', 'debug', or 'trace'.
 .It Fl -log-error
-Show error messages
+Deprecated. Use --log-level=error
 .It Fl -log-info
-Show error and info messages
+Deprecated. Use --log-level=info
 .It Fl -log-debug
-Show error, info, and debug messages
+Deprecated. Use --log-level=debug
 .It Fl x Fl -pid-file
 Name of PID file
 .El

@@ -11,20 +11,22 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h> // tr_torrent_activity
 
 #include <libtransmission/crypto-utils.h> // tr_rand_obj()
 #include <libtransmission/net.h>
 #include <libtransmission/session.h>
+#include <libtransmission/timer.h>
 #include <libtransmission/tr-lpd.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using LpdTest = SessionTest;
@@ -40,9 +42,11 @@ public:
     {
     }
 
-    [[nodiscard]] tr_address bind_address(tr_address_type /* type */) const override
+    [[nodiscard]] tr_address bind_address(tr_address_type type) const override
     {
-        return {};
+        auto ret = tr_address{};
+        ret.type = type;
+        return ret;
     }
 
     [[nodiscard]] tr_port port() const override
@@ -60,7 +64,7 @@ public:
         return torrents_;
     }
 
-    [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+    [[nodiscard]] tr::TimerMaker& timerMaker() override
     {
         return session_.timerMaker();
     }
@@ -111,6 +115,7 @@ TEST_F(LpdTest, HelloWorld)
     EXPECT_EQ(0U, std::size(mediator.found_));
 }
 
+// TODO(anyone): flaky test should be fixed instead of disabled
 TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
 {
     auto mediator_a = MyMediator{ *session_ };
@@ -133,6 +138,7 @@ TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
     EXPECT_EQ(0U, mediator_b.found_.count(info_hash_str));
 }
 
+// TODO(anyone): flaky test should be fixed instead of disabled
 TEST_F(LpdTest, DISABLED_canMultiAnnounce)
 {
     auto mediator_a = MyMediator{ *session_ };
@@ -169,6 +175,7 @@ TEST_F(LpdTest, DISABLED_canMultiAnnounce)
     }
 }
 
+// TODO(anyone): flaky test should be fixed instead of disabled
 TEST_F(LpdTest, DISABLED_DoesNotReannounceTooSoon)
 {
     auto mediator_a = MyMediator{ *session_ };
@@ -212,4 +219,4 @@ TEST_F(LpdTest, DISABLED_DoesNotReannounceTooSoon)
     }
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

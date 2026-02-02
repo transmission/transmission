@@ -6,13 +6,13 @@
 "16.title" = "Изменить...";
 
 /* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
-"18.title" = "Начать скачивание";
+"18.title" = "Запустить после добавления";
 
 /* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
 "20.title" = "Добавить";
 
 /* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "22"; */
-"22.title" = "Отменить";
+"22.title" = "Отмена";
 
 /* Class = "NSTextFieldCell"; title = "Group:"; ObjectID = "41"; */
 "41.title" = "Группа:";

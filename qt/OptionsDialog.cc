@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,6 +11,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/torrent-metainfo.h>
 
@@ -69,7 +70,7 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     int const width = font_metrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
     ui_.sourceStack->setMinimumWidth(width);
 
-    auto const download_dir = Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR));
+    auto const download_dir = Utils::removeTrailingDirSeparator(prefs.get<QString>(Prefs::DOWNLOAD_DIR));
     ui_.freeSpaceLabel->setSession(session_);
     ui_.freeSpaceLabel->setPath(download_dir);
 
@@ -93,8 +94,8 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
     ui_.priorityCombo->setCurrentIndex(1); // Normal
 
-    ui_.startCheck->setChecked(prefs.getBool(Prefs::START));
-    ui_.trashCheck->setChecked(prefs.getBool(Prefs::TRASH_ORIGINAL));
+    ui_.startCheck->setChecked(prefs.get<bool>(Prefs::START));
+    ui_.trashCheck->setChecked(prefs.get<bool>(Prefs::TRASH_ORIGINAL));
 
     connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &QObject::deleteLater);
     connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &OptionsDialog::onAccepted);
@@ -205,7 +206,7 @@ void OptionsDialog::onSessionUpdated()
     }
 }
 
-void OptionsDialog::onPriorityChanged(QSet<int> const& file_indices, int priority)
+void OptionsDialog::onPriorityChanged(file_indices_t const& file_indices, int priority)
 {
     for (int const i : file_indices)
     {
@@ -213,7 +214,7 @@ void OptionsDialog::onPriorityChanged(QSet<int> const& file_indices, int priorit
     }
 }
 
-void OptionsDialog::onWantedChanged(QSet<int> const& file_indices, bool is_wanted)
+void OptionsDialog::onWantedChanged(file_indices_t const& file_indices, bool is_wanted)
 {
     for (int const i : file_indices)
     {
@@ -247,9 +248,9 @@ void OptionsDialog::onAccepted()
     // priority
     int const index = ui_.priorityCombo->currentIndex();
     int const priority = ui_.priorityCombo->itemData(index).toInt();
-    dictAdd(&args, TR_KEY_bandwidthPriority, priority);
+    dictAdd(&args, TR_KEY_bandwidth_priority, priority);
 
-    // files-unwanted
+    // files_unwanted
     auto count = std::count(wanted_.begin(), wanted_.end(), false);
 
     if (count > 0)
@@ -265,7 +266,7 @@ void OptionsDialog::onAccepted()
         }
     }
 
-    // priority-low
+    // priority_low
     count = std::count(priorities_.begin(), priorities_.end(), TR_PRI_LOW);
 
     if (count > 0)
@@ -281,7 +282,7 @@ void OptionsDialog::onAccepted()
         }
     }
 
-    // priority-high
+    // priority_high
     count = std::count(priorities_.begin(), priorities_.end(), TR_PRI_HIGH);
 
     if (count > 0)
@@ -297,7 +298,10 @@ void OptionsDialog::onAccepted()
         }
     }
 
-    session_.addTorrent(add_, &args, ui_.trashCheck->isChecked());
+    auto const disposal = ui_.trashCheck->isChecked() ? AddData::FilenameDisposal::Delete : AddData::FilenameDisposal::NoAction;
+    add_.setFileDisposal(disposal);
+
+    session_.addTorrent(add_, &args);
 
     deleteLater();
 }

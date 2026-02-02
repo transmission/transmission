@@ -1,0 +1,63 @@
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "11"; */
+"11.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "12"; */
+"12.title" = "キャンセル";
+
+/* Class = "NSMenuItem"; title = "begins with"; ObjectID = "40"; */
+"40.title" = "これで開始";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "42"; */
+"42.title" = "これと同じ";
+
+/* Class = "NSMenuItem"; title = "of the following are true"; ObjectID = "49"; */
+"49.title" = "に以下が該当する";
+
+/* Class = "NSMenuItem"; title = "Any"; ObjectID = "50"; */
+"50.title" = "いずれか";
+
+/* Class = "NSMenuItem"; title = "All"; ObjectID = "51"; */
+"51.title" = "すべて";
+
+/* Class = "NSMenuItem"; title = "Name"; ObjectID = "100"; */
+"100.title" = "名前";
+
+/* Class = "NSMenuItem"; title = "Comment"; ObjectID = "102"; */
+"102.title" = "コメント";
+
+/* Class = "NSMenuItem"; title = "matches"; ObjectID = "118"; */
+"118.title" = "これに一致";
+
+/* Class = "NSMenuItem"; title = "contains"; ObjectID = "153"; */
+"153.title" = "これを含む";
+
+/* Class = "NSMenuItem"; title = "begins with"; ObjectID = "154"; */
+"154.title" = "これで開始";
+
+/* Class = "NSMenuItem"; title = "ends with"; ObjectID = "155"; */
+"155.title" = "これで終了";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "156"; */
+"156.title" = "これと同じ";
+
+/* Class = "NSMenuItem"; title = "Any File"; ObjectID = "161"; */
+"161.title" = "いずれかのファイル";
+
+/* Class = "NSMenuItem"; title = "Any Tracker"; ObjectID = "162"; */
+"162.title" = "いずれかのトラッカー";
+
+/* Class = "NSMenuItem"; title = "ends with"; ObjectID = "163"; */
+"163.title" = "これで終了";
+
+/* Class = "NSMenuItem"; title = "is not"; ObjectID = "164"; */
+"164.title" = "これではない";
+
+/* Class = "NSMenuItem"; title = "contains"; ObjectID = "165"; */
+"165.title" = "これを含む";
+
+/* Class = "NSMenuItem"; title = "None"; ObjectID = "166"; */
+"166.title" = "なし";
+
+/* Class = "NSMenuItem"; title = "matches"; ObjectID = "167"; */
+"167.title" = "これに一致";

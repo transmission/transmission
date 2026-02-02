@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -31,9 +31,13 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 @property(nonatomic, readonly) NSString* currentDirectory;
 
-- (void)getAvailability:(int8_t*)tab size:(NSInteger)size;
-- (void)getAmountFinished:(float*)tab size:(NSInteger)size;
+- (void)getAvailability:(int8_t*)tab size:(int)size;
+- (void)getAmountFinished:(float*)tab size:(int)size;
 @property(nonatomic) NSIndexSet* previousFinishedPieces;
+
+// Updates one or more torrents by refreshing their libtransmission stats.
+// Prefer using this batch method when updating many torrents at once.
++ (void)updateTorrents:(NSArray<Torrent*>*)torrents;
 
 - (void)update;
 
@@ -42,7 +46,6 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 - (void)startTransfer;
 - (void)startMagnetTransferAfterMetaDownload;
 - (void)stopTransfer;
-- (void)startQueue;
 - (void)sleep;
 - (void)wakeUp;
 - (void)idleLimitHit;
@@ -111,6 +114,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 @property(nonatomic, readonly) NSString* torrentLocation;
 @property(nonatomic, readonly) NSString* dataLocation;
+@property(nonatomic, readonly) NSString* lastKnownDataLocation;
 - (NSString*)fileLocation:(FileListNode*)node;
 
 - (void)renameTorrent:(NSString*)newName completionHandler:(void (^)(BOOL didRename))completionHandler;
@@ -160,6 +164,14 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 @property(nonatomic, readonly) NSUInteger totalPeersLocal;
 @property(nonatomic, readonly) NSUInteger totalPeersLTEP;
 
+@property(nonatomic, readonly) NSUInteger totalKnownPeersTracker;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersIncoming;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersCache;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersPex;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersDHT;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersLocal;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersLTEP;
+
 @property(nonatomic, readonly) NSUInteger peersSendingToUs;
 @property(nonatomic, readonly) NSUInteger peersGettingFromUs;
 
@@ -187,8 +199,8 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 - (CGFloat)fileProgress:(FileListNode*)node;
 - (BOOL)canChangeDownloadCheckForFile:(NSUInteger)index;
 - (BOOL)canChangeDownloadCheckForFiles:(NSIndexSet*)indexSet;
-- (NSInteger)checkForFiles:(NSIndexSet*)indexSet;
-- (void)setFileCheckState:(NSInteger)state forIndexes:(NSIndexSet*)indexSet;
+- (NSControlStateValue)checkForFiles:(NSIndexSet*)indexSet;
+- (void)setFileCheckState:(NSControlStateValue)state forIndexes:(NSIndexSet*)indexSet;
 - (void)setFilePriority:(tr_priority_t)priority forIndexes:(NSIndexSet*)indexSet;
 - (BOOL)hasFilePriority:(tr_priority_t)priority forIndexes:(NSIndexSet*)indexSet;
 - (NSSet*)filePrioritiesForIndexes:(NSIndexSet*)indexSet;

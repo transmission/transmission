@@ -1,10 +1,12 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
 #include <cstddef> // size_t
+#include <ctime>
+#include <utility>
 
 #include <fmt/chrono.h>
 
@@ -17,44 +19,12 @@
 
 using namespace std::literals;
 
-void tr_session_alt_speeds::load(tr_variant* src)
+void tr_session_alt_speeds::load(Settings&& settings)
 {
-#define V(key, field, type, default_value, comment) \
-    if (auto* const child = tr_variantDictFind(src, key); child != nullptr) \
-    { \
-        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(child); val) \
-        { \
-            this->field = *val; \
-        } \
-    }
-    ALT_SPEEDS_FIELDS(V)
-#undef V
-
+    settings_ = std::move(settings);
     update_scheduler();
+    set_active(settings_.is_active, ChangeReason::LoadSettings, true);
 }
-
-void tr_session_alt_speeds::save(tr_variant* tgt) const
-{
-#define V(key, field, type, default_value, comment) \
-    tr_variantDictRemove(tgt, key); \
-    libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), field);
-    ALT_SPEEDS_FIELDS(V)
-#undef V
-}
-
-void tr_session_alt_speeds::default_settings(tr_variant* tgt)
-{
-#define V(key, field, type, default_value, comment) \
-    { \
-        type const val = default_value; \
-        tr_variantDictRemove(tgt, key); \
-        libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), val); \
-    }
-    ALT_SPEEDS_FIELDS(V)
-#undef V
-}
-
-// --- minutes
 
 void tr_session_alt_speeds::update_minutes()
 {
@@ -62,10 +32,11 @@ void tr_session_alt_speeds::update_minutes()
 
     for (int day = 0; day < 7; ++day)
     {
-        if ((static_cast<tr_sched_day>(use_on_these_weekdays_) & (1 << day)) != 0)
+        if ((settings_.use_on_these_weekdays & (1 << day)) != 0)
         {
-            auto const begin = minute_begin_;
-            auto const end = minute_end_ > minute_begin_ ? minute_end_ : minute_end_ + MinutesPerDay;
+            auto const begin = settings_.minute_begin;
+            auto const end = settings_.minute_end > settings_.minute_begin ? settings_.minute_end :
+                                                                             settings_.minute_end + MinutesPerDay;
             for (auto i = begin; i < end; ++i)
             {
                 minutes_.set((i + day * MinutesPerDay) % MinutesPerWeek);
@@ -97,20 +68,20 @@ void tr_session_alt_speeds::check_scheduler()
     }
 }
 
-void tr_session_alt_speeds::set_active(bool active, ChangeReason reason)
+void tr_session_alt_speeds::set_active(bool active, ChangeReason reason, bool force)
 {
-    if (is_active_ != active)
+    if (auto& tgt = settings_.is_active; force || tgt != active)
     {
-        is_active_ = active;
-        mediator_.is_active_changed(is_active_, reason);
+        tgt = active;
+        mediator_.is_active_changed(tgt, reason);
     }
 }
 
-[[nodiscard]] bool tr_session_alt_speeds::is_active_minute(time_t time) const noexcept
+[[nodiscard]] bool tr_session_alt_speeds::is_active_minute(time_t time) const
 {
-    auto const tm = fmt::localtime(time);
+    auto const tm = *std::localtime(&time);
 
-    size_t minute_of_the_week = tm.tm_wday * MinutesPerDay + tm.tm_hour * MinutesPerHour + tm.tm_min;
+    size_t minute_of_the_week = (tm.tm_wday * MinutesPerDay) + (tm.tm_hour * MinutesPerHour) + tm.tm_min;
 
     if (minute_of_the_week >= MinutesPerWeek) /* leap minutes? */
     {

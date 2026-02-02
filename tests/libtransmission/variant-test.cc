@@ -3,16 +3,18 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
-#include <cassert>
 #include <cerrno>
-#include <cmath> // lrint()
-#include <cctype> // isspace()
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <map>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
+#include <gtest/gtest.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -22,21 +24,24 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
+using VariantTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
-class VariantTest : public ::testing::Test
+namespace
 {
-protected:
-    static std::string stripWhitespace(std::string const& in)
-    {
-        auto s = in;
-        s.erase(s.begin(), std::find_if_not(s.begin(), s.end(), ::isspace));
-        s.erase(std::find_if_not(s.rbegin(), s.rend(), ::isspace).base(), s.end());
-        return s;
-    }
+
+template<class... Ts>
+struct Overloaded : Ts...
+{
+    using Ts::operator()...;
 };
+
+template<class... Ts>
+Overloaded(Ts...) -> Overloaded<Ts...>;
+
+} // namespace
 
 #ifndef _WIN32
 #define STACK_SMASH_DEPTH (1 * 1000 * 1000)
@@ -46,136 +51,175 @@ protected:
 
 TEST_F(VariantTest, getType)
 {
-    auto i = int64_t{};
-    auto b = bool{};
-    auto d = double{};
-    auto sv = std::string_view{};
     auto v = tr_variant{};
 
-    tr_variantInitInt(&v, 30);
-    EXPECT_TRUE(tr_variantGetInt(&v, &i));
-    EXPECT_EQ(30, i);
-    EXPECT_TRUE(tr_variantGetReal(&v, &d));
-    EXPECT_EQ(30, int(d));
-    EXPECT_FALSE(tr_variantGetBool(&v, &b));
-    EXPECT_FALSE(tr_variantGetStrView(&v, &sv));
+    v = 30;
+    auto i = v.value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(30, *i);
+    auto d = v.value_if<double>();
+    ASSERT_TRUE(d);
+    EXPECT_EQ(30, static_cast<int>(*d));
+    EXPECT_FALSE(v.holds_alternative<bool>());
+    EXPECT_FALSE(v.holds_alternative<std::string_view>());
 
     auto strkey = "foo"sv;
-    tr_variantInitStr(&v, strkey);
-    EXPECT_FALSE(tr_variantGetBool(&v, &b));
-    EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
-    EXPECT_EQ(strkey, sv);
-    EXPECT_NE(std::data(strkey), std::data(sv));
+    v = tr_variant{ strkey };
+    EXPECT_FALSE(v.holds_alternative<bool>());
+    auto sv = v.value_if<std::string_view>();
+    ASSERT_TRUE(sv);
+    EXPECT_EQ(strkey, *sv);
+    EXPECT_NE(std::data(strkey), std::data(*sv));
+    EXPECT_EQ(std::size(strkey), std::size(*sv));
 
     strkey = "anything"sv;
-    tr_variantInitStrView(&v, strkey);
-    EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
-    EXPECT_EQ(strkey, sv);
-    EXPECT_EQ(std::data(strkey), std::data(sv)); // literally the same memory
-    EXPECT_EQ(std::size(strkey), std::size(sv));
+    v = tr_variant::unmanaged_string(strkey);
+    sv = v.value_if<std::string_view>();
+    ASSERT_TRUE(sv);
+    EXPECT_EQ(strkey, *sv);
+    EXPECT_EQ(std::data(strkey), std::data(*sv)); // literally the same memory
+    EXPECT_EQ(std::size(strkey), std::size(*sv));
 
     strkey = "true"sv;
-    tr_variantInitStr(&v, strkey);
-    EXPECT_TRUE(tr_variantGetBool(&v, &b));
-    EXPECT_TRUE(b);
-    EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
-    EXPECT_EQ(strkey, sv);
+    v = tr_variant{ strkey };
+    auto b = v.value_if<bool>();
+    ASSERT_TRUE(b);
+    EXPECT_TRUE(*b);
+    sv = v.value_if<std::string_view>();
+    ASSERT_TRUE(sv);
+    EXPECT_EQ(strkey, *sv);
 
     strkey = "false"sv;
-    tr_variantInitStr(&v, strkey);
-    EXPECT_TRUE(tr_variantGetBool(&v, &b));
-    EXPECT_FALSE(b);
-    EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
-    EXPECT_EQ(strkey, sv);
+    v = tr_variant{ strkey };
+    b = v.value_if<bool>();
+    ASSERT_TRUE(b);
+    EXPECT_FALSE(*b);
+    sv = v.value_if<std::string_view>();
+    ASSERT_TRUE(sv);
+    EXPECT_EQ(strkey, *sv);
+}
+
+TEST_F(VariantTest, mergeStringsTakesOwnership)
+{
+    auto const is_equal_string = [](std::string_view const a, std::string_view const b)
+    {
+        return a == b;
+    };
+
+    auto const is_same_address = [](std::string_view const a, std::string_view const b)
+    {
+        return std::data(a) == std::data(b);
+    };
+
+    // set up `src` to hold an unmanaged string
+    auto constexpr Original = "this is the string"sv;
+    auto const src = tr_variant::unmanaged_string(Original);
+    auto src_sv = src.value_if<std::string_view>().value_or(""sv);
+
+    // set up `tgt` to hold another unmanaged string
+    auto constexpr WillBeReplaced = "some other string"sv;
+    static_assert(Original != WillBeReplaced);
+    auto tgt = tr_variant::unmanaged_string(WillBeReplaced);
+    auto tgt_sv = tgt.value_if<std::string_view>().value_or(""sv);
+
+    // test that `src` and `tgt` hold unmanaged strings
+    EXPECT_TRUE(is_equal_string(Original, src_sv));
+    EXPECT_TRUE(is_equal_string(WillBeReplaced, tgt_sv));
+    EXPECT_TRUE(is_same_address(Original, src_sv));
+    EXPECT_TRUE(is_same_address(WillBeReplaced, tgt_sv));
+
+    tgt.merge(src);
+
+    // test that `tgt` now holds its own copy of `Original`.
+    auto const actual = tgt.value_if<std::string_view>().value_or(""sv);
+    EXPECT_TRUE(is_equal_string(Original, actual));
+    EXPECT_FALSE(is_same_address(Original, actual));
 }
 
 TEST_F(VariantTest, parseInt)
 {
-    auto constexpr Benc = "i64e"sv;
-    auto constexpr ExpectVal = int64_t{ 64 };
+    static auto constexpr Benc = "i64e"sv;
+    static auto constexpr ExpectVal = int64_t{ 64 };
 
     auto benc = Benc;
-    auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    auto const value = tr::benc::impl::ParseInt(&benc);
+    ASSERT_TRUE(value);
     EXPECT_EQ(ExpectVal, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntWithMissingEnd)
 {
-    auto constexpr Benc = "i64"sv;
+    static auto constexpr Benc = "i64"sv;
 
     auto benc = Benc;
-    EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
+    EXPECT_FALSE(tr::benc::impl::ParseInt(&benc));
     EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntEmptyBuffer)
 {
-    auto constexpr Benc = ""sv;
+    static auto constexpr Benc = ""sv;
 
     auto benc = Benc;
-    EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
+    EXPECT_FALSE(tr::benc::impl::ParseInt(&benc));
     EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntWithBadDigits)
 {
-    auto constexpr Benc = "i6z4e"sv;
+    static auto constexpr Benc = "i6z4e"sv;
 
     auto benc = Benc;
-    EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
+    EXPECT_FALSE(tr::benc::impl::ParseInt(&benc));
     EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseNegativeInt)
 {
-    auto constexpr Benc = "i-3e"sv;
-    auto constexpr Expected = int64_t{ -3 };
+    static auto constexpr Benc = "i-3e"sv;
+    static auto constexpr Expected = int64_t{ -3 };
 
     auto benc = Benc;
-    auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    auto const value = tr::benc::impl::ParseInt(&benc);
+    ASSERT_TRUE(value);
     EXPECT_EQ(Expected, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseNegativeWithLeadingZero)
 {
-    auto constexpr Benc = "i-03e"sv;
+    static auto constexpr Benc = "i-03e"sv;
 
     auto benc = Benc;
-    EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
+    EXPECT_FALSE(tr::benc::impl::ParseInt(&benc));
     EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntZero)
 {
-    auto constexpr Benc = "i0e"sv;
-    auto constexpr Expected = int64_t{ 0 };
+    static auto constexpr Benc = "i0e"sv;
+    static auto constexpr Expected = int64_t{ 0 };
 
     auto benc = Benc;
-    auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    auto const value = tr::benc::impl::ParseInt(&benc);
+    ASSERT_TRUE(value);
     EXPECT_EQ(Expected, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntWithLeadingZero)
 {
-    auto constexpr Benc = "i04e"sv;
+    static auto constexpr Benc = "i04e"sv;
 
     auto benc = Benc;
-    EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
+    EXPECT_FALSE(tr::benc::impl::ParseInt(&benc));
     EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, str)
 {
-    using namespace transmission::benc::impl;
+    using namespace tr::benc::impl;
 
     // string len is designed to overflow
     auto benc = "99999999999999999999:boat"sv;
@@ -187,8 +231,7 @@ TEST_F(VariantTest, str)
     // good string
     inout = benc = "4:boat";
     value = ParseString(&inout);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    ASSERT_TRUE(value);
     EXPECT_EQ("boat"sv, *value);
     EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
@@ -201,16 +244,14 @@ TEST_F(VariantTest, str)
     // empty string
     inout = benc = "0:"sv;
     value = ParseString(&inout);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    ASSERT_TRUE(value);
     EXPECT_EQ(""sv, *value);
     EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
     // short string
     inout = benc = "3:boat";
     value = ParseString(&inout);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    ASSERT_TRUE(value);
     EXPECT_EQ("boa"sv, *value);
     EXPECT_EQ(std::data(benc) + benc.find('t'), std::data(inout));
 }
@@ -222,23 +263,27 @@ TEST_F(VariantTest, parse)
 
     auto benc = "i64e"sv;
     auto var = serde.parse(benc).value_or(tr_variant{});
-    auto i = int64_t{};
-    EXPECT_TRUE(tr_variantGetInt(&var, &i));
-    EXPECT_EQ(64, i);
+    auto i = var.value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(64, *i);
     EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
     var.clear();
 
     benc = "li64ei32ei16ee"sv;
     var = serde.parse(benc).value_or(tr_variant{});
-    EXPECT_TRUE(var.holds_alternative<tr_variant::Vector>());
+    auto* l = var.get_if<tr_variant::Vector>();
+    ASSERT_NE(l, nullptr);
     EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
-    EXPECT_EQ(3, tr_variantListSize(&var));
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&var, 0), &i));
-    EXPECT_EQ(64, i);
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&var, 1), &i));
-    EXPECT_EQ(32, i);
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&var, 2), &i));
-    EXPECT_EQ(16, i);
+    ASSERT_EQ(3, std::size(*l));
+    i = (*l)[0].value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(64, *i);
+    i = (*l)[1].value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(32, *i);
+    i = (*l)[2].value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(16, *i);
     EXPECT_EQ(benc, serde.to_string(var));
     var.clear();
 
@@ -263,13 +308,7 @@ TEST_F(VariantTest, parse)
 
 TEST_F(VariantTest, bencParseAndReencode)
 {
-    struct LocalTest
-    {
-        std::string_view benc;
-        bool is_good;
-    };
-
-    auto constexpr Tests = std::array<LocalTest, 9>{ {
+    static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 9>{ {
         { "llleee"sv, true },
         { "d3:cow3:moo4:spam4:eggse"sv, true },
         { "d4:spaml1:a1:bee"sv, true },
@@ -284,14 +323,14 @@ TEST_F(VariantTest, bencParseAndReencode)
     auto serde = tr_variant_serde::benc();
     serde.inplace();
 
-    for (auto const& test : Tests)
+    for (auto const& [benc, is_good] : Tests)
     {
-        auto var = serde.parse(test.benc);
-        EXPECT_EQ(test.is_good, var.has_value());
+        auto var = serde.parse(benc);
+        EXPECT_EQ(is_good, var.has_value());
         if (var)
         {
-            EXPECT_EQ(test.benc.data() + test.benc.size(), serde.end());
-            EXPECT_EQ(test.benc, serde.to_string(*var));
+            EXPECT_EQ(benc.data() + benc.size(), serde.end());
+            EXPECT_EQ(benc, serde.to_string(*var));
         }
     }
 }
@@ -340,13 +379,7 @@ TEST_F(VariantTest, bencMalformedIncompleteString)
 
 TEST_F(VariantTest, bencToJson)
 {
-    struct LocalTest
-    {
-        std::string_view benc;
-        std::string_view expected;
-    };
-
-    auto constexpr Tests = std::array<LocalTest, 5>{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 5>{
         { { "i6e"sv, "6"sv },
           { "d5:helloi1e5:worldi2ee"sv, R"({"hello":1,"world":2})"sv },
           { "d5:helloi1e5:worldi2e3:fooli1ei2ei3eee"sv, R"({"foo":[1,2,3],"hello":1,"world":2})"sv },
@@ -360,123 +393,208 @@ TEST_F(VariantTest, bencToJson)
     benc_serde.inplace();
     json_serde.compact();
 
-    for (auto const& test : Tests)
+    for (auto const& [benc, expected] : Tests)
     {
-        auto top = benc_serde.parse(test.benc).value_or(tr_variant{});
-        EXPECT_EQ(test.expected, stripWhitespace(json_serde.to_string(top)));
+        auto top = benc_serde.parse(benc).value_or(tr_variant{});
+        EXPECT_EQ(expected, json_serde.to_string(top));
     }
 }
 
-TEST_F(VariantTest, merge)
+TEST_F(VariantTest, mergeMapsCreatesCombinedMap)
 {
-    auto const i1 = tr_quark_new("i1"sv);
-    auto const i2 = tr_quark_new("i2"sv);
-    auto const i3 = tr_quark_new("i3"sv);
-    auto const i4 = tr_quark_new("i4"sv);
-    auto const s5 = tr_quark_new("s5"sv);
-    auto const s6 = tr_quark_new("s6"sv);
-    auto const s7 = tr_quark_new("s7"sv);
-    auto const s8 = tr_quark_new("s8"sv);
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
 
-    /* initial dictionary (default values) */
-    tr_variant dest;
-    tr_variantInitDict(&dest, 10);
-    tr_variantDictAddInt(&dest, i1, 1);
-    tr_variantDictAddInt(&dest, i2, 2);
-    tr_variantDictAddInt(&dest, i4, -35); /* remains untouched */
-    tr_variantDictAddStrView(&dest, s5, "abc");
-    tr_variantDictAddStrView(&dest, s6, "def");
-    tr_variantDictAddStrView(&dest, s7, "127.0.0.1"); /* remains untouched */
-
-    /* new dictionary, will overwrite items in dest */
-    tr_variant src;
-    tr_variantInitDict(&src, 10);
-    tr_variantDictAddInt(&src, i1, 1); /* same value */
-    tr_variantDictAddInt(&src, i2, 4); /* new value */
-    tr_variantDictAddInt(&src, i3, 3); /* new key:value */
-    tr_variantDictAddStrView(&src, s5, "abc"); /* same value */
-    tr_variantDictAddStrView(&src, s6, "xyz"); /* new value */
-    tr_variantDictAddStrView(&src, s8, "ghi"); /* new key:value */
-
-    tr_variantMergeDicts(&dest, /*const*/ &src);
-
-    auto i = int64_t{};
-    EXPECT_TRUE(tr_variantDictFindInt(&dest, i1, &i));
-    EXPECT_EQ(1, i);
-    EXPECT_TRUE(tr_variantDictFindInt(&dest, i2, &i));
-    EXPECT_EQ(4, i);
-    EXPECT_TRUE(tr_variantDictFindInt(&dest, i3, &i));
-    EXPECT_EQ(3, i);
-    EXPECT_TRUE(tr_variantDictFindInt(&dest, i4, &i));
-    EXPECT_EQ(-35, i);
-    auto sv = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&dest, s5, &sv));
-    EXPECT_EQ("abc"sv, sv);
-    EXPECT_TRUE(tr_variantDictFindStrView(&dest, s6, &sv));
-    EXPECT_EQ("xyz"sv, sv);
-    EXPECT_TRUE(tr_variantDictFindStrView(&dest, s7, &sv));
-    EXPECT_EQ("127.0.0.1"sv, sv);
-    EXPECT_TRUE(tr_variantDictFindStrView(&dest, s8, &sv));
-    EXPECT_EQ("ghi"sv, sv);
+    auto src = serde.parse(R"({"src_key":123})"sv).value_or(tr_variant{});
+    auto tgt = serde.parse(R"({"tgt_key":456})"sv).value_or(tr_variant{});
+    tgt.merge(src);
+    EXPECT_EQ(R"({"src_key":123,"tgt_key":456})"sv, serde.to_string(tgt));
 }
 
-TEST_F(VariantTest, stackSmash)
+TEST_F(VariantTest, mergeMapsOverwritesSrcMapEntries)
 {
-    // make a nested list of list of lists.
-    int constexpr Depth = STACK_SMASH_DEPTH;
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
+
+    auto src = serde.parse(R"({"src_key": 123, "dup_key":789})"sv).value_or(tr_variant{});
+    auto tgt = serde.parse(R"({"tgt_key": 456, "dup_key":456})"sv).value_or(tr_variant{});
+    tgt.merge(src);
+    EXPECT_EQ(R"({"dup_key":789,"src_key":123,"tgt_key":456})"sv, serde.to_string(tgt));
+}
+
+TEST_F(VariantTest, variantConstructor)
+{
+    auto const var_none = tr_variant{};
+    auto const var_null = tr_variant{ nullptr };
+    auto const var_true = tr_variant{ true };
+    auto const var_false = tr_variant{ false };
+    auto const var_int = tr_variant{ 123 };
+    auto const var_real = tr_variant{ 4.5 };
+    auto const var_sv = tr_variant{ "foo"sv };
+    auto const var_s = tr_variant{ "foo"s };
+    auto const var_char_ptr = tr_variant{ "foo" };
+    auto const var_char_nullptr = tr_variant{ static_cast<char const*>(nullptr) };
+
+    EXPECT_EQ(var_none.index(), tr_variant::NoneIndex);
+    EXPECT_EQ(var_null.index(), tr_variant::NullIndex);
+    EXPECT_EQ(var_true.index(), tr_variant::BoolIndex);
+    EXPECT_EQ(var_false.index(), tr_variant::BoolIndex);
+    EXPECT_EQ(var_int.index(), tr_variant::IntIndex);
+    EXPECT_EQ(var_real.index(), tr_variant::DoubleIndex);
+    EXPECT_EQ(var_sv.index(), tr_variant::StringIndex);
+    EXPECT_EQ(var_s.index(), tr_variant::StringIndex);
+    EXPECT_EQ(var_char_ptr.index(), tr_variant::StringIndex);
+    EXPECT_EQ(var_char_nullptr.index(), tr_variant::StringIndex);
+}
+
+TEST_F(VariantTest, variantAssingmentOperator)
+{
+    auto var = tr_variant{};
+
+    var = nullptr;
+    EXPECT_EQ(var.index(), tr_variant::NullIndex);
+
+    var = true;
+    EXPECT_EQ(var.index(), tr_variant::BoolIndex);
+
+    var = false;
+    EXPECT_EQ(var.index(), tr_variant::BoolIndex);
+
+    var = 123;
+    EXPECT_EQ(var.index(), tr_variant::IntIndex);
+
+    var = 4.5;
+    EXPECT_EQ(var.index(), tr_variant::DoubleIndex);
+
+    var = "foo"sv;
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+
+    var = "foo"s;
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+
+    var = "foo";
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+
+    var = static_cast<char const*>(nullptr);
+    EXPECT_EQ(var.index(), tr_variant::StringIndex);
+}
+
+TEST_F(VariantTest, mergeOverwritesDifferingTypes)
+{
+    auto const variants = std::array<std::pair<tr_variant, std::string_view>, 7U>{ {
+        { tr_variant{ true }, "true" },
+        { tr_variant{ int64_t{ 123 } }, "123" },
+        { tr_variant{ 4.5 }, "4.5" },
+        { tr_variant{ "foo"sv }, R"("foo")"sv },
+        { tr_variant{ nullptr }, "null"sv },
+        { tr_variant::make_map(0U), "{}"sv },
+        { tr_variant::make_vector(), "[]"sv },
+    } };
+
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
+
+    for (auto const& [src, src_expected] : variants)
+    {
+        for (auto const& [tgt, tgt_expected] : variants)
+        {
+            if (&src != &tgt)
+            {
+                // set up `var` to be a copy of `src`
+                auto var = src.clone();
+                EXPECT_EQ(src_expected, serde.to_string(var));
+
+                var.merge(tgt);
+
+                // test that `var` is now a copy of `tgt`
+                EXPECT_EQ(tgt_expected, serde.to_string(var));
+            }
+        }
+    }
+}
+
+TEST_F(VariantTest, stackSmashBenc)
+{
+    // set up a nested list of list of lists.
+    static int constexpr Depth = STACK_SMASH_DEPTH;
     std::string const in = std::string(Depth, 'l') + std::string(Depth, 'e');
 
-    // confirm that it fails instead of crashing
+    // test that parsing fails without crashing
     auto serde = tr_variant_serde::benc();
     auto var = serde.inplace().parse(in);
     EXPECT_FALSE(var.has_value());
-    EXPECT_NE(nullptr, serde.error_);
-    EXPECT_EQ(E2BIG, serde.error_ != nullptr ? serde.error_->code : 0);
+    EXPECT_TRUE(serde.error_);
+    EXPECT_EQ(E2BIG, serde.error_.code());
 }
 
-TEST_F(VariantTest, boolAndIntRecast)
+TEST_F(VariantTest, stackSmashJson)
+{
+    auto serde = tr_variant_serde::json();
+    serde.inplace();
+
+    // set up a nested array of arrays of arrays.
+    static auto constexpr Depth = STACK_SMASH_DEPTH;
+    auto const in = std::string(Depth, '[') + std::string(Depth, ']');
+
+    // test that parsing fails without crashing
+    auto var = serde.inplace().parse(in);
+    EXPECT_FALSE(var.has_value());
+    EXPECT_TRUE(serde.error_);
+    EXPECT_EQ(E2BIG, serde.error_.code());
+}
+
+TEST_F(VariantTest, valueIfCanReadBoolsAndIntsInterchangeably)
 {
     auto const key1 = tr_quark_new("key1"sv);
     auto const key2 = tr_quark_new("key2"sv);
     auto const key3 = tr_quark_new("key3"sv);
     auto const key4 = tr_quark_new("key4"sv);
 
-    auto top = tr_variant{};
-    tr_variantInitDict(&top, 10);
-    tr_variantDictAddBool(&top, key1, false);
-    tr_variantDictAddBool(&top, key2, 0); // NOLINT modernize-use-bool-literals
-    tr_variantDictAddInt(&top, key3, true); // NOLINT readability-implicit-bool-conversion
-    tr_variantDictAddInt(&top, key4, 1);
+    auto top = tr_variant::make_map(4U);
+    auto* map = top.get_if<tr_variant::Map>();
+    map->try_emplace(key1, false);
+    map->try_emplace(key2, 0);
+    map->try_emplace(key3, true);
+    map->try_emplace(key4, 1);
 
     // confirm we can read both bools and ints as bools
-    auto b = bool{};
-    EXPECT_TRUE(tr_variantDictFindBool(&top, key1, &b));
-    EXPECT_FALSE(b);
-    EXPECT_TRUE(tr_variantDictFindBool(&top, key2, &b));
-    EXPECT_FALSE(b);
-    EXPECT_TRUE(tr_variantDictFindBool(&top, key3, &b));
-    EXPECT_TRUE(b);
-    EXPECT_TRUE(tr_variantDictFindBool(&top, key4, &b));
-    EXPECT_TRUE(b);
+    auto b = map->value_if<bool>(key1);
+    ASSERT_TRUE(b);
+    EXPECT_FALSE(*b);
+    b = map->value_if<bool>(key2);
+    ASSERT_TRUE(b);
+    EXPECT_FALSE(*b);
+    b = map->value_if<bool>(key3);
+    ASSERT_TRUE(b);
+    EXPECT_TRUE(*b);
+    b = map->value_if<bool>(key4);
+    ASSERT_TRUE(b);
+    EXPECT_TRUE(*b);
 
     // confirm we can read both bools and ints as ints
-    auto i = int64_t{};
-    EXPECT_TRUE(tr_variantDictFindInt(&top, key1, &i));
-    EXPECT_EQ(0, i);
-    EXPECT_TRUE(tr_variantDictFindInt(&top, key2, &i));
-    EXPECT_EQ(0, i);
-    EXPECT_TRUE(tr_variantDictFindInt(&top, key3, &i));
-    EXPECT_NE(0, i);
-    EXPECT_TRUE(tr_variantDictFindInt(&top, key4, &i));
-    EXPECT_NE(0, i);
+    auto i = map->value_if<int64_t>(key1);
+    ASSERT_TRUE(i);
+    EXPECT_EQ(0, *i);
+    i = map->value_if<int64_t>(key2);
+    ASSERT_TRUE(i);
+    EXPECT_EQ(0, *i);
+    i = map->value_if<int64_t>(key3);
+    ASSERT_TRUE(i);
+    EXPECT_NE(0, *i);
+    i = map->value_if<int64_t>(key4);
+    ASSERT_TRUE(i);
+    EXPECT_NE(0, *i);
 }
 
 TEST_F(VariantTest, dictFindType)
 {
-    auto constexpr ExpectedStr = "this-is-a-string"sv;
-    auto constexpr ExpectedBool = bool{ true };
-    auto constexpr ExpectedInt = int{ 1234 };
-    auto constexpr ExpectedReal = double{ 0.3 };
+    static auto constexpr ExpectedStr = "this-is-a-string"sv;
+    static auto constexpr ExpectedBool = true;
+    static auto constexpr ExpectedInt = 1234;
+    static auto constexpr ExpectedReal = 0.3;
 
     auto const key_bool = tr_quark_new("this-is-a-bool"sv);
     auto const key_real = tr_quark_new("this-is-a-real"sv);
@@ -485,50 +603,192 @@ TEST_F(VariantTest, dictFindType)
     auto const key_unknown = tr_quark_new("this-is-a-missing-entry"sv);
 
     // populate a dict
-    tr_variant top;
-    tr_variantInitDict(&top, 0);
-    tr_variantDictAddBool(&top, key_bool, ExpectedBool);
-    tr_variantDictAddInt(&top, key_int, ExpectedInt);
-    tr_variantDictAddReal(&top, key_real, ExpectedReal);
-    tr_variantDictAddStr(&top, key_str, ExpectedStr.data());
+    auto top = tr_variant::make_map(4U);
+    auto* map = top.get_if<tr_variant::Map>();
+    map->try_emplace(key_bool, ExpectedBool);
+    map->try_emplace(key_int, ExpectedInt);
+    map->try_emplace(key_real, ExpectedReal);
+    map->try_emplace(key_str, ExpectedStr);
 
     // look up the keys as strings
-    auto sv = std::string_view{};
-    EXPECT_FALSE(tr_variantDictFindStrView(&top, key_bool, &sv));
-    EXPECT_FALSE(tr_variantDictFindStrView(&top, key_real, &sv));
-    EXPECT_FALSE(tr_variantDictFindStrView(&top, key_int, &sv));
-    EXPECT_TRUE(tr_variantDictFindStrView(&top, key_str, &sv));
-    EXPECT_EQ(ExpectedStr, sv);
-    EXPECT_TRUE(tr_variantDictFindStrView(&top, key_str, &sv));
-    EXPECT_EQ(ExpectedStr, sv);
-    EXPECT_FALSE(tr_variantDictFindStrView(&top, key_unknown, &sv));
-    EXPECT_FALSE(tr_variantDictFindStrView(&top, key_unknown, &sv));
+    EXPECT_FALSE(map->value_if<std::string_view>(key_bool));
+    EXPECT_FALSE(map->value_if<std::string_view>(key_real));
+    EXPECT_FALSE(map->value_if<std::string_view>(key_int));
+    auto sv = map->value_if<std::string_view>(key_str);
+    ASSERT_TRUE(sv);
+    EXPECT_EQ(ExpectedStr, *sv);
+    EXPECT_FALSE(map->value_if<std::string_view>(key_unknown));
 
     // look up the keys as bools
-    auto b = bool{};
-    EXPECT_FALSE(tr_variantDictFindBool(&top, key_int, &b));
-    EXPECT_FALSE(tr_variantDictFindBool(&top, key_real, &b));
-    EXPECT_FALSE(tr_variantDictFindBool(&top, key_str, &b));
-    EXPECT_TRUE(tr_variantDictFindBool(&top, key_bool, &b));
+    EXPECT_FALSE(map->value_if<bool>(key_int));
+    EXPECT_FALSE(map->value_if<bool>(key_real));
+    EXPECT_FALSE(map->value_if<bool>(key_str));
+    auto b = map->value_if<bool>(key_bool);
+    ASSERT_TRUE(b);
     EXPECT_EQ(ExpectedBool, b);
+    EXPECT_FALSE(map->value_if<bool>(key_unknown));
 
     // look up the keys as doubles
-    auto d = double{};
-    EXPECT_FALSE(tr_variantDictFindReal(&top, key_bool, &d));
-    EXPECT_TRUE(tr_variantDictFindReal(&top, key_int, &d));
-    EXPECT_EQ(ExpectedInt, std::lrint(d));
-    EXPECT_FALSE(tr_variantDictFindReal(&top, key_str, &d));
-    EXPECT_TRUE(tr_variantDictFindReal(&top, key_real, &d));
-    EXPECT_EQ(std::lrint(ExpectedReal * 100), std::lrint(d * 100));
+    EXPECT_FALSE(map->value_if<double>(key_bool));
+    auto d = map->value_if<double>(key_int);
+    ASSERT_TRUE(d);
+    EXPECT_EQ(static_cast<double>(ExpectedInt), *d);
+    EXPECT_FALSE(map->value_if<double>(key_str));
+    d = map->value_if<double>(key_real);
+    ASSERT_TRUE(d);
+    EXPECT_EQ(ExpectedReal, *d);
 
     // look up the keys as ints
-    auto i = int64_t{};
-    EXPECT_TRUE(tr_variantDictFindInt(&top, key_bool, &i));
-    EXPECT_EQ(ExpectedBool ? 1 : 0, i);
-    EXPECT_FALSE(tr_variantDictFindInt(&top, key_real, &i));
-    EXPECT_FALSE(tr_variantDictFindInt(&top, key_str, &i));
-    EXPECT_TRUE(tr_variantDictFindInt(&top, key_int, &i));
-    EXPECT_EQ(ExpectedInt, i);
+    auto i = map->value_if<int64_t>(key_bool);
+    ASSERT_TRUE(i);
+    EXPECT_EQ(ExpectedBool ? 1 : 0, *i);
+    EXPECT_FALSE(map->value_if<int64_t>(key_real));
+    EXPECT_FALSE(map->value_if<int64_t>(key_str));
+    i = map->value_if<int64_t>(key_int);
+    ASSERT_TRUE(i);
+    EXPECT_EQ(ExpectedInt, *i);
+}
+
+TEST_F(VariantTest, mapContains)
+{
+    auto serde = tr_variant_serde::json();
+    serde.inplace();
+    serde.compact();
+
+    // set up a map with some sample entries
+    static auto constexpr Input = R"({
+        "id": 42,
+        "is_finished": true,
+        "labels": ["a", "b"],
+        "units": { "speed_units": ["KB/s", "MB/s", "GB/s", "TB/s"] },
+        "upload_ratio": 4.2,
+        "version": "5.0"
+    })"sv;
+    auto top = serde.parse(Input).value_or(tr_variant{});
+    auto* const map = top.get_if<tr_variant::Map>();
+    ASSERT_NE(nullptr, map);
+
+    // test that contains() returns true for entries that exist
+    EXPECT_TRUE(map->contains(TR_KEY_id));
+    EXPECT_TRUE(map->contains(TR_KEY_is_finished));
+    EXPECT_TRUE(map->contains(TR_KEY_labels));
+    EXPECT_TRUE(map->contains(TR_KEY_units));
+    EXPECT_TRUE(map->contains(TR_KEY_upload_ratio));
+    EXPECT_TRUE(map->contains(TR_KEY_version));
+
+    // test that contains() returns false for entries that never existed
+    EXPECT_FALSE(map->contains(TR_KEY_umask));
+
+    // test that contains() returns false for entries that were removed
+    auto const key = TR_KEY_labels;
+    EXPECT_TRUE(map->contains(key));
+    EXPECT_EQ(1U, map->erase(key));
+    EXPECT_FALSE(map->contains(key));
+}
+
+TEST_F(VariantTest, visitConstVariant)
+{
+    auto var = tr_variant::make_vector(1U);
+    auto* vec = var.get_if<tr_variant::Vector>();
+    ASSERT_NE(vec, nullptr);
+    vec->emplace_back(int64_t{ 99 });
+
+    auto const result = std::as_const(var).visit(
+        Overloaded{ [](tr_variant::Vector const& values) -> int64_t
+                    {
+                        EXPECT_EQ(1U, std::size(values));
+                        return values[0].value_if<int64_t>().value_or(-1);
+                    },
+                    [](auto&&) -> int64_t
+                    {
+                        ADD_FAILURE() << "unexpected alternative";
+                        return -1;
+                    } });
+
+    EXPECT_EQ(99, result);
+}
+
+TEST_F(VariantTest, visitsNodesDepthFirst)
+{
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
+
+    // set up a test variant to be visited
+    static auto constexpr Input = R"({
+        "files": [
+            { "name": "file1", "size": 5, "pieces": [1, 2] },
+            { "name": "file2", "size": 7, "pieces": [] }
+        ],
+        "meta": { "active": true }
+    })"sv;
+    auto const var = serde.parse(Input).value_or(tr_variant{});
+
+    // set up some containers that we'll populate during `var.visit()`
+    auto visited_counts = std::map<size_t, size_t>{};
+    auto flattened = tr_variant::Vector{};
+    flattened.reserve(64U);
+
+    // set up the visitor
+    auto flatten = [&](tr_variant const& node, auto const& self) -> void
+    {
+        ++visited_counts[node.index()];
+
+        node.visit(
+            [&](auto const& val)
+            {
+                using ValueType = std::remove_cvref_t<decltype(val)>;
+
+                if constexpr (
+                    std::is_same_v<ValueType, bool> || //
+                    std::is_same_v<ValueType, double> || //
+                    std::is_same_v<ValueType, int64_t> || //
+                    std::is_same_v<ValueType, std::monostate> || //
+                    std::is_same_v<ValueType, std::nullptr_t> || //
+                    std::is_same_v<ValueType, std::string_view> || //
+                    std::is_same_v<ValueType, std::string>)
+                {
+                    flattened.emplace_back(val);
+                }
+                else if constexpr (std::is_same_v<ValueType, tr_variant::Vector>)
+                {
+                    for (auto const& child : val)
+                    {
+                        self(child, self);
+                    }
+                }
+                else if constexpr (std::is_same_v<ValueType, tr_variant::Map>)
+                {
+                    for (auto const& [key, child] : val)
+                    {
+                        flattened.emplace_back(tr_variant::unmanaged_string(key));
+                        self(child, self);
+                    }
+                }
+            });
+    };
+
+    flatten(var, flatten);
+
+    // test that the nodes were visited depth-first
+    auto const actual = serde.to_string({ std::move(flattened) });
+    auto constexpr Expected =
+        R"(["files","name","file1","size",5,"pieces",1,2,"name","file2","size",7,"pieces","meta","active",true])"sv;
+    EXPECT_EQ(Expected, actual);
+
+    // test that we visited the expected number of nodes.
+    //
+    // FIXME(ckerr): `serde.inplace()` doesn't work on JSON right now.
+    // RapidJSON always copies strings unless given mutable JSON input.
+    // That's why StringViewIndex is missing two counts here.
+    auto const expected_visited_count = std::map<size_t, size_t>{
+        { tr_variant::BoolIndex, 1U }, //
+        { tr_variant::IntIndex, 4U }, //
+        { tr_variant::MapIndex, 4U }, //
+        { tr_variant::StringIndex, 2U }, //
+        { tr_variant::VectorIndex, 3U }, //
+    };
+    EXPECT_EQ(expected_visited_count, visited_counts);
 }
 
 TEST_F(VariantTest, variantFromBufFuzz)
@@ -544,5 +804,35 @@ TEST_F(VariantTest, variantFromBufFuzz)
 
         (void)benc_serde.inplace().parse(buf);
         (void)json_serde.inplace().parse(buf);
+    }
+}
+
+TEST_F(VariantTest, serdeEnd)
+{
+    static auto constexpr TestsJson = std::array{
+        std::tuple{ R"({ "json1": 1 }{ "json2": 2 })"sv, '{', 14U },
+        std::tuple{ R"({ "json1": 1 })"sv, '\0', 14U },
+    };
+    static auto constexpr TestsBenc = std::array{
+        std::tuple{ "d5:benc1i1eed5:benc2i2ee"sv, 'd', 12U },
+        std::tuple{ "d5:benc1i1ee"sv, '\0', 12U },
+    };
+
+    for (auto [in, c, pos] : TestsJson)
+    {
+        auto json_serde = tr_variant_serde::json().inplace();
+        auto json_var = json_serde.parse(in).value_or(tr_variant{});
+        EXPECT_TRUE(json_var.holds_alternative<tr_variant::Map>()) << json_serde.error_;
+        EXPECT_EQ(*json_serde.end(), c);
+        EXPECT_EQ(json_serde.end() - std::data(in), pos);
+    }
+
+    for (auto [in, c, pos] : TestsBenc)
+    {
+        auto benc_serde = tr_variant_serde::benc().inplace();
+        auto benc_var = benc_serde.parse(in).value_or(tr_variant{});
+        EXPECT_TRUE(benc_var.holds_alternative<tr_variant::Map>()) << benc_serde.error_;
+        EXPECT_EQ(*benc_serde.end(), c);
+        EXPECT_EQ(benc_serde.end() - std::data(in), pos);
     }
 }

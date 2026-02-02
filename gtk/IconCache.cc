@@ -11,11 +11,11 @@
 
 #include <giomm/contenttype.h>
 
-#include <algorithm>
+#include <functional> // for std::less<>
 #include <map>
 #include <string>
 #include <string_view>
-#include <utility>
+#include <utility> // for std::move()
 
 using namespace std::literals;
 

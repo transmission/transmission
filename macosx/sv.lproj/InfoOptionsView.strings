@@ -1,0 +1,75 @@
+
+/* Class = "NSTextFieldCell"; title = "Seeding Limits"; ObjectID = "22"; */
+"22.title" = "Distributionsgränser";
+
+/* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
+"23.title" = "Överföringsbandbredd";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
+"26.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "29"; */
+"29.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "30"; */
+"30.title" = "Kvot:";
+
+/* Class = "NSTextFieldCell"; title = "Advanced"; ObjectID = "31"; */
+"31.title" = "Avancerat";
+
+/* Class = "NSTextFieldCell"; title = "Maximum connections:"; ObjectID = "32"; */
+"32.title" = "Maximalt antal anslutningar:";
+
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "35"; */
+"35.title" = "jämlikar";
+
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "40"; */
+"40.title" = "Obegränsad";
+
+/* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "41"; */
+"41.title" = "Globala inställningar";
+
+/* Class = "NSMenuItem"; title = "Stop at Ratio"; ObjectID = "42"; */
+"42.title" = "Stoppa vid kvot";
+
+/* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
+"43.title" = "Begränsa sändning:";
+
+/* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
+"44.title" = "Begränsa hämtning:";
+
+/* Class = "NSButtonCell"; title = "Stay within the global bandwidth limits"; ObjectID = "45"; */
+"45.title" = "Håll dig inom de globala bandbreddsgränserna";
+
+/* Class = "NSTextFieldCell"; title = "Priority"; ObjectID = "46"; */
+"46.title" = "Prioritet";
+
+/* Class = "NSTextFieldCell"; title = "Transfer Priority:"; ObjectID = "47"; */
+"47.title" = "Överföringsprioritet:";
+
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "50"; */
+"50.title" = "Låg";
+
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "51"; */
+"51.title" = "Normal";
+
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "52"; */
+"52.title" = "Hög";
+
+/* Class = "NSMenuItem"; title = "Stop When Inactive"; ObjectID = "86"; */
+"86.title" = "Stoppa vid inaktivitet";
+
+/* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "87"; */
+"87.title" = "Globala inställningar";
+
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "88"; */
+"88.title" = "Obegränsad";
+
+/* Class = "NSTextFieldCell"; title = "Inactivity:"; ObjectID = "89"; */
+"89.title" = "Inaktivitet:";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
+"98.title" = "minuter";
+
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "114"; */
+"114.title" = "Ta bort från överföringslistan när distributionen är klar";

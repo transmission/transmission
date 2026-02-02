@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,13 +11,15 @@
 
 #include <functional>
 #include <memory>
-#include <tuple>
 #include <utility>
 
 struct event_base;
 
 class tr_session_thread
 {
+protected:
+    using callback_t = std::function<void()>;
+
 public:
     static void tr_evthread_init();
 
@@ -28,15 +30,19 @@ public:
 
     [[nodiscard]] virtual bool am_in_session_thread() const noexcept = 0;
 
-    virtual void run(std::function<void(void)>&& func) = 0;
+    virtual void queue(callback_t&& func) = 0;
+
+    virtual void run(callback_t&& func) = 0;
+
+    template<typename Func, typename... Args>
+    void queue(Func&& func, Args&&... args)
+    {
+        queue(callback_t{ std::bind_front(std::forward<Func>(func), std::forward<Args>(args)...) });
+    }
 
     template<typename Func, typename... Args>
     void run(Func&& func, Args&&... args)
     {
-        run(std::function<void(void)>{
-            [func = std::forward<Func&&>(func), args = std::make_tuple(std::forward<Args>(args)...)]()
-            {
-                std::apply(std::move(func), std::move(args));
-            } });
+        run(callback_t{ std::bind_front(std::forward<Func>(func), std::forward<Args>(args)...) });
     }
 };

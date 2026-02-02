@@ -1,11 +1,10 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <cstddef> // size_t
 #include <utility>
 
 #include <QPointer>
@@ -18,24 +17,6 @@ class QColor;
 class QHeaderView;
 class QIcon;
 class QModelIndex;
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-
-namespace std
-{
-
-template<>
-struct hash<QString>
-{
-    std::size_t operator()(QString const& s) const
-    {
-        return qHash(s);
-    }
-};
-
-} // namespace std
-
-#endif
 
 class Utils
 {

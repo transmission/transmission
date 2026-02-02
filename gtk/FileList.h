@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,7 +6,6 @@
 #pragma once
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
 
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
@@ -26,9 +25,11 @@ public:
         Glib::ustring const& view_name,
         Glib::RefPtr<Session> const& core,
         tr_torrent_id_t torrent_id);
+    FileList(FileList&&) = delete;
+    FileList(FileList const&) = delete;
+    FileList& operator=(FileList&&) = delete;
+    FileList& operator=(FileList const&) = delete;
     ~FileList() override;
-
-    TR_DISABLE_COPY_MOVE(FileList)
 
     void clear();
     void set_torrent(tr_torrent_id_t torrent_id);

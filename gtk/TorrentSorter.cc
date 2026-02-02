@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,15 +9,25 @@
 #include "SorterBase.hh"
 #include "Utils.h"
 
+#include <libtransmission-app/display-modes.h>
+
 #include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
+#include <small/map.hpp>
+
 #include <algorithm>
+#include <array>
+#include <ranges>
+#include <utility>
 
 using namespace std::string_view_literals;
+using namespace tr::app;
 
 namespace
 {
+using CompareFunc = int (*)(Torrent const&, Torrent const&);
 
 constexpr bool is_valid_eta(time_t value)
 {
@@ -148,6 +158,12 @@ int compare_by_progress(Torrent const& lhs, Torrent const& rhs)
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+int compare_by_id(Torrent const& lhs, Torrent const& rhs)
+{
+    return -tr_compare_3way(lhs.get_id(), rhs.get_id());
+}
+
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_eta(Torrent const& lhs, Torrent const& rhs)
 {
     if (auto val = compare_eta(lhs.get_eta(), rhs.get_eta()); val != 0)
@@ -168,7 +184,6 @@ int compare_by_state(Torrent const& lhs, Torrent const& rhs)
 
     return compare_by_queue(lhs, rhs);
 }
-
 } // namespace
 
 TorrentSorter::TorrentSorter()
@@ -176,26 +191,24 @@ TorrentSorter::TorrentSorter()
 {
 }
 
-void TorrentSorter::set_mode(std::string_view mode)
+void TorrentSorter::set_mode(SortMode const mode)
 {
-    static auto const compare_funcs = std::map<std::string_view, CompareFunc>({
-        { "sort-by-activity"sv, &compare_by_activity },
-        { "sort-by-age"sv, &compare_by_age },
-        { "sort-by-name"sv, &compare_by_name },
-        { "sort-by-progress"sv, &compare_by_progress },
-        { "sort-by-queue"sv, &compare_by_queue },
-        { "sort-by-ratio"sv, &compare_by_ratio },
-        { "sort-by-size"sv, &compare_by_size },
-        { "sort-by-state"sv, &compare_by_state },
-        { "sort-by-time-left"sv, &compare_by_eta },
-    });
+    static auto constexpr DefaultCompareFunc = &compare_by_name;
+    static auto const CompareFuncs = small::max_size_map<SortMode, CompareFunc, SortModeCount>{ {
+        { SortMode::SortByActivity, &compare_by_activity },
+        { SortMode::SortByAge, &compare_by_age },
+        { SortMode::SortByEta, &compare_by_eta },
+        { SortMode::SortById, &compare_by_id },
+        { SortMode::SortByName, &compare_by_name },
+        { SortMode::SortByProgress, &compare_by_progress },
+        { SortMode::SortByQueue, &compare_by_queue },
+        { SortMode::SortByRatio, &compare_by_ratio },
+        { SortMode::SortBySize, &compare_by_size },
+        { SortMode::SortByState, &compare_by_state },
+    } };
 
-    auto compare_func = &compare_by_name;
-    if (auto const compare_func_it = compare_funcs.find(mode); compare_func_it != compare_funcs.end())
-    {
-        compare_func = compare_func_it->second;
-    }
-
+    auto const iter = CompareFuncs.find(mode);
+    auto const compare_func = iter != std::end(CompareFuncs) ? iter->second : DefaultCompareFunc;
     if (compare_func_ == compare_func)
     {
         return;
@@ -224,8 +237,7 @@ int TorrentSorter::compare(Torrent const& lhs, Torrent const& rhs) const
 void TorrentSorter::update(Torrent::ChangeFlags changes)
 {
     using Flag = Torrent::ChangeFlag;
-
-    static auto const compare_flags = std::map<CompareFunc, Torrent::ChangeFlags>({
+    static auto TR_CONSTEXPR23 CompareFlags = std::array<std::pair<CompareFunc, Torrent::ChangeFlags>, 9U>{ {
         { &compare_by_activity, Flag::ACTIVE_PEER_COUNT | Flag::QUEUE_POSITION | Flag::SPEED_DOWN | Flag::SPEED_UP },
         { &compare_by_age, Flag::ADDED_DATE | Flag::NAME },
         { &compare_by_eta, Flag::ETA | Flag::NAME },
@@ -235,10 +247,12 @@ void TorrentSorter::update(Torrent::ChangeFlags changes)
         { &compare_by_ratio, Flag::QUEUE_POSITION | Flag::RATIO },
         { &compare_by_size, Flag::NAME | Flag::TOTAL_SIZE },
         { &compare_by_state, Flag::ACTIVITY | Flag::QUEUE_POSITION },
-    });
+    } };
 
-    if (auto const compare_flags_it = compare_flags.find(compare_func_);
-        compare_flags_it != compare_flags.end() && changes.test(compare_flags_it->second))
+    if (auto const iter = std::ranges::find_if(
+            CompareFlags,
+            [key = compare_func_](auto const& row) { return row.first == key; });
+        iter != std::ranges::end(CompareFlags) && changes.test(iter->second))
     {
         changed(Change::DIFFERENT);
     }

@@ -1,9 +1,10 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::sort()
+#include <ranges>
 
 #include <QUrl>
 
@@ -33,7 +34,7 @@ QVariant TrackerModel::data(QModelIndex const& index, int role) const
             break;
 
         case Qt::DecorationRole:
-            var = QIcon(tracker_info.st.getFavicon());
+            var = QIcon{ tracker_info.st.getFavicon() };
             break;
 
         case TrackerRole:
@@ -100,7 +101,7 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
 
     // sort 'em
     static auto constexpr Comp = CompareTrackers{};
-    std::sort(trackers.begin(), trackers.end(), Comp);
+    std::ranges::sort(trackers, Comp);
 
     // merge 'em with the existing list
     unsigned int old_index = 0;
