@@ -29,7 +29,7 @@ static CGFloat const kErrorImageSize = 20.0;
 static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 // return the indexes that are in either lhs or rhs, but not both
-static NSMutableIndexSet* SymmetricDifference(NSIndexSet* lhs, NSIndexSet* rhs)
+static NSIndexSet* SymmetricDifference(NSIndexSet* lhs, NSIndexSet* rhs)
 {
     NSMutableIndexSet* result = [lhs mutableCopy];
     [result addIndexes:rhs];
@@ -41,7 +41,7 @@ static NSMutableIndexSet* SymmetricDifference(NSIndexSet* lhs, NSIndexSet* rhs)
         }
     }];
 
-    return result;
+    return [result copy];
 }
 
 @interface TorrentTableView ()
