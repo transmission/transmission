@@ -37,7 +37,7 @@ static CGFloat const kImageOverlap = 1.0;
             [segmentedControl setLabel:@"" forSegment:i];
             [segmentedControl setWidth:9.0f forSegment:i];
         }
-        
+
         [segmentedControl setImage:[NSImage imageNamed:@"PriorityControlLow"] forSegment:0];
         [segmentedControl setImage:[NSImage imageNamed:@"PriorityControlNormal"] forSegment:1];
         [segmentedControl setImage:[NSImage imageNamed:@"PriorityControlHigh"] forSegment:2];
@@ -65,7 +65,7 @@ static CGFloat const kImageOverlap = 1.0;
             [iconsContainerView.widthAnchor constraintLessThanOrEqualToAnchor:self.widthAnchor],
             [iconsContainerView.heightAnchor constraintLessThanOrEqualToAnchor:self.heightAnchor],
         ]];
-        
+
         [self updateIconsContainerView];
 
         _hovered = NO;
@@ -73,37 +73,37 @@ static CGFloat const kImageOverlap = 1.0;
     return self;
 }
 
-- (void)updateIconsContainerView {
-        
-    NSImage *lowPriority = [NSImage imageNamed:@"PriorityLowTemplate"];
-    NSImage *mediumPriority = [NSImage imageNamed:@"PriorityNormalTemplate"];
-    NSImage *highPriority = [NSImage imageNamed:@"PriorityHighTemplate"];
-    
+- (void)updateIconsContainerView
+{
+    NSImage* lowPriority = [NSImage imageNamed:@"PriorityLowTemplate"];
+    NSImage* mediumPriority = [NSImage imageNamed:@"PriorityNormalTemplate"];
+    NSImage* highPriority = [NSImage imageNamed:@"PriorityHighTemplate"];
+
     CGSize size = lowPriority.size;
-    
-    NSImageView *lowPriorityView = [[NSImageView alloc] init];
+
+    NSImageView* lowPriorityView = [[NSImageView alloc] init];
     lowPriorityView.image = lowPriority;
-    NSImageView *mediumPriorityView = [[NSImageView alloc] init];
+    NSImageView* mediumPriorityView = [[NSImageView alloc] init];
     mediumPriorityView.image = mediumPriority;
-    NSImageView *highPriorityView = [[NSImageView alloc] init];
+    NSImageView* highPriorityView = [[NSImageView alloc] init];
     highPriorityView.image = highPriority;
-    
-    NSStackView *stackView = [[NSStackView alloc] init];
+
+    NSStackView* stackView = [[NSStackView alloc] init];
     [stackView addArrangedSubview:lowPriorityView];
     [stackView addArrangedSubview:mediumPriorityView];
     [stackView addArrangedSubview:highPriorityView];
-    
+
     self.stackView = stackView;
     self.lowPriorityView = lowPriorityView;
     self.mediumPriorityView = mediumPriorityView;
     self.highPriorityView = highPriorityView;
-    
+
     [self.iconsContainerView addSubview:stackView];
-    
+
     __auto_type view = stackView;
     __auto_type superview = stackView.superview;
     view.translatesAutoresizingMaskIntoConstraints = NO;
-    
+
     [NSLayoutConstraint activateConstraints:@[
         [view.leadingAnchor constraintEqualToAnchor:superview.leadingAnchor],
         [view.trailingAnchor constraintEqualToAnchor:superview.trailingAnchor],
@@ -165,12 +165,14 @@ static CGFloat const kImageOverlap = 1.0;
 - (void)updatePriorityIcons:(NSSet*)priorities
 {
     NSUInteger const count = priorities.count;
-    if (count == 0) {
+    if (count == 0)
+    {
         self.lowPriorityView.hidden = YES;
         self.mediumPriorityView.hidden = NO;
         self.highPriorityView.hidden = YES;
     }
-    else {
+    else
+    {
         self.lowPriorityView.hidden = [priorities containsObject:@(TR_PRI_LOW)] == NO;
         self.mediumPriorityView.hidden = [priorities containsObject:@(TR_PRI_NORMAL)] == NO;
         self.highPriorityView.hidden = [priorities containsObject:@(TR_PRI_HIGH)] == NO;
