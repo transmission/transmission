@@ -452,7 +452,8 @@ static NSIndexSet* SymmetricDifference(NSIndexSet* lhs, NSIndexSet* rhs)
     NSIndexSet* newSelection = self.selectedRowIndexes;
     self.fSelectedRowIndexes = newSelection;
 
-    if (NSMutableIndexSet* changedRows = SymmetricDifference(oldSelection, newSelection); changedRows.count > 0)
+    NSIndexSet* changedRows = SymmetricDifference(oldSelection, newSelection);
+    if (changedRows.count > 0)
     {
         if (!self.fPendingSelectionReloadRows)
         {
