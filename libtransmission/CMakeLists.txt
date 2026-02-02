@@ -221,7 +221,6 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${WITH_INOTIFY}>:WITH_INOTIFY>
         $<$<BOOL:${WITH_KQUEUE}>:WITH_KQUEUE>
         $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>
-        $<$<BOOL:${ENABLE_PSL}>:WITH_PSL>
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
@@ -231,6 +230,7 @@ target_compile_definitions(${TR_NAME}
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
         $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
+        $<$<BOOL:${ENABLE_PSL}>:WITH_PSL>
         $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
 
 tr_target_compile_definitions_for_functions(${TR_NAME}
