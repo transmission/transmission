@@ -28,14 +28,19 @@ static CGFloat const kErrorImageSize = 20.0;
 
 static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
-// return the indexes that are in either lhs or rhs, but not both
-static NSIndexSet* SymmetricDifference(NSIndexSet* lhs, NSIndexSet* rhs)
-{
-    NSMutableIndexSet* result = [lhs mutableCopy];
-    [result addIndexes:rhs];
+@interface NSIndexSet (Transmission)
+- (NSIndexSet*)symmetricDifference:(NSIndexSet*)otherSet;
+@end
 
-    [lhs enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL*) {
-        if ([rhs containsIndex:idx])
+@implementation NSIndexSet (Transmission)
+
+- (NSIndexSet*)symmetricDifference:(NSIndexSet*)otherSet
+{
+    NSMutableIndexSet* result = [self mutableCopy];
+    [result addIndexes:otherSet];
+
+    [self enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL*) {
+        if ([otherSet containsIndex:idx])
         {
             [result removeIndex:idx];
         }
@@ -43,6 +48,8 @@ static NSIndexSet* SymmetricDifference(NSIndexSet* lhs, NSIndexSet* rhs)
 
     return [result copy];
 }
+
+@end
 
 @interface TorrentTableView ()
 
@@ -452,7 +459,7 @@ static NSIndexSet* SymmetricDifference(NSIndexSet* lhs, NSIndexSet* rhs)
     NSIndexSet* newSelection = self.selectedRowIndexes;
     self.fSelectedRowIndexes = newSelection;
 
-    NSIndexSet* changedRows = SymmetricDifference(oldSelection, newSelection);
+    NSIndexSet* changedRows = [oldSelection symmetricDifference:newSelection];
     if (changedRows.count > 0)
     {
         if (!self.fPendingSelectionReloadRows)
