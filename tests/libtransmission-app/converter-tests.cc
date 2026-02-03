@@ -15,7 +15,7 @@
 
 #include "test-fixtures.h"
 
-using DisplayModeTest = TransmissionTest;
+using ConverterTest = TransmissionTest;
 using namespace std::literals;
 using tr::serializer::Converters;
 
@@ -39,7 +39,7 @@ void testModeRoundtrip(std::array<std::pair<std::string_view, T>, N> const& item
 
 } // namespace
 
-TEST_F(DisplayModeTest, showModeStringsRoundtrip)
+TEST_F(ConverterTest, showModeStringsRoundtrip)
 {
     auto constexpr Items = std::array<std::pair<std::string_view, tr::app::ShowMode>, tr::app::ShowModeCount>{ {
         { "show_active", tr::app::ShowMode::ShowActive },
@@ -55,7 +55,7 @@ TEST_F(DisplayModeTest, showModeStringsRoundtrip)
     testModeRoundtrip(Items);
 }
 
-TEST_F(DisplayModeTest, sortModeStringsRoundtrip)
+TEST_F(ConverterTest, sortModeStringsRoundtrip)
 {
     auto constexpr Items = std::array<std::pair<std::string_view, tr::app::SortMode>, tr::app::SortModeCount>{ {
         { "sort_by_activity", tr::app::SortMode::SortByActivity },
@@ -73,7 +73,7 @@ TEST_F(DisplayModeTest, sortModeStringsRoundtrip)
     testModeRoundtrip(Items);
 }
 
-TEST_F(DisplayModeTest, statsModeStringsRoundtrip)
+TEST_F(ConverterTest, statsModeStringsRoundtrip)
 {
     auto constexpr Items = std::array<std::pair<std::string_view, tr::app::StatsMode>, tr::app::StatsModeCount>{ {
         { "total_ratio", tr::app::StatsMode::TotalRatio },
