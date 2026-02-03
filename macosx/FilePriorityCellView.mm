@@ -79,8 +79,6 @@ static CGFloat const kImageOverlap = 1.0;
     NSImage* mediumPriority = [NSImage imageNamed:@"PriorityNormalTemplate"];
     NSImage* highPriority = [NSImage imageNamed:@"PriorityHighTemplate"];
 
-    CGSize size = lowPriority.size;
-
     NSImageView* lowPriorityView = [[NSImageView alloc] init];
     lowPriorityView.image = lowPriority;
     NSImageView* mediumPriorityView = [[NSImageView alloc] init];
@@ -89,6 +87,8 @@ static CGFloat const kImageOverlap = 1.0;
     highPriorityView.image = highPriority;
 
     NSStackView* stackView = [[NSStackView alloc] init];
+    stackView.spacing = -kImageOverlap;
+
     [stackView addArrangedSubview:lowPriorityView];
     [stackView addArrangedSubview:mediumPriorityView];
     [stackView addArrangedSubview:highPriorityView];
@@ -104,12 +104,14 @@ static CGFloat const kImageOverlap = 1.0;
     __auto_type superview = stackView.superview;
     view.translatesAutoresizingMaskIntoConstraints = NO;
 
+    CGFloat height = lowPriority.size.height;
+    
     [NSLayoutConstraint activateConstraints:@[
         [view.leadingAnchor constraintEqualToAnchor:superview.leadingAnchor],
         [view.trailingAnchor constraintEqualToAnchor:superview.trailingAnchor],
         [view.topAnchor constraintEqualToAnchor:superview.topAnchor],
         [view.bottomAnchor constraintEqualToAnchor:superview.bottomAnchor],
-        [view.heightAnchor constraintEqualToConstant:size.height]
+        [view.heightAnchor constraintEqualToConstant:height]
     ]];
 }
 
