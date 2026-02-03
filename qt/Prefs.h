@@ -24,7 +24,7 @@ class Prefs : public QObject
     Q_OBJECT
 
 public:
-    enum
+    enum : uint8_t
     {
         /* client prefs */
         OPTIONS_PROMPT,
@@ -142,7 +142,7 @@ public:
 
     [[nodiscard]] std::pair<tr_quark, tr_variant> keyval(int idx) const;
 
-    void loadFromConfigDir(QString dir);
+    void loadFromConfigDir(QString const& dir);
 
     void load(tr_variant::Map const& settings);
 
@@ -160,6 +160,8 @@ public:
             emit changed(key);
         }
     }
+
+    void set(int key, char const* value) = delete;
 
     template<typename T>
     [[nodiscard]] T get(int const idx) const
@@ -182,7 +184,7 @@ private:
         int type;
     };
 
-    static inline auto constexpr Items = std::array<PrefItem, PREFS_COUNT>{ {
+    static auto constexpr Items = std::array<PrefItem, PREFS_COUNT>{ {
         // gui settings
         { OPTIONS_PROMPT, TR_KEY_show_options_window, QMetaType::Bool },
         { OPEN_DIALOG_FOLDER, TR_KEY_open_dialog_dir, QMetaType::QString },
@@ -283,8 +285,6 @@ private:
     } };
 
     [[nodiscard]] static tr_variant::Map defaults();
-
-    void set(int key, char const* value) = delete;
 
     std::array<QVariant, PREFS_COUNT> mutable values_;
 };

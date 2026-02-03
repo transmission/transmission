@@ -38,21 +38,21 @@ extern "C"
 
 struct Peer
 {
-    bool client_is_choked;
-    bool client_is_interested;
-    bool is_downloading_from;
-    bool is_encrypted;
-    bool is_incoming;
-    bool is_uploading_to;
-    bool peer_is_choked;
-    bool peer_is_interested;
+    bool client_is_choked = {};
+    bool client_is_interested = {};
+    bool is_downloading_from = {};
+    bool is_encrypted = {};
+    bool is_incoming = {};
+    bool is_uploading_to = {};
+    bool peer_is_choked = {};
+    bool peer_is_interested = {};
     QString address;
     QString client_name;
     QString flags;
-    int port;
+    int port = {};
     Speed rate_to_client;
     Speed rate_to_peer;
-    double progress;
+    double progress = {};
 };
 
 using PeerList = std::vector<Peer>;
@@ -61,27 +61,27 @@ struct TrackerStat
 {
     [[nodiscard]] QPixmap getFavicon() const;
 
-    bool has_announced;
-    bool has_scraped;
-    bool is_backup;
-    bool last_announce_succeeded;
-    bool last_announce_timed_out;
-    bool last_scrape_succeeded;
-    bool last_scrape_timed_out;
-    int announce_state;
-    int download_count;
-    int id;
-    int last_announce_peer_count;
-    int last_announce_start_time;
-    int last_announce_time;
-    int last_scrape_start_time;
-    int last_scrape_time;
-    int leecher_count;
-    int next_announce_time;
-    int next_scrape_time;
-    int scrape_state;
-    int seeder_count;
-    int tier;
+    bool has_announced = {};
+    bool has_scraped = {};
+    bool is_backup = {};
+    bool last_announce_succeeded = {};
+    bool last_announce_timed_out = {};
+    bool last_scrape_succeeded = {};
+    bool last_scrape_timed_out = {};
+    int announce_state = {};
+    int download_count = {};
+    int id = {};
+    int last_announce_peer_count = {};
+    int last_announce_start_time = {};
+    int last_announce_time = {};
+    int last_scrape_start_time = {};
+    int last_scrape_time = {};
+    int leecher_count = {};
+    int next_announce_time = {};
+    int next_scrape_time = {};
+    int scrape_state = {};
+    int seeder_count = {};
+    int tier = {};
     QString announce;
     QString last_announce_result;
     QString last_scrape_result;
@@ -149,7 +149,8 @@ class Torrent : public QObject
     Q_OBJECT
 
 public:
-    Torrent(Prefs const&, int id);
+    Torrent(Prefs const& prefs, int id);
+    ~Torrent() override = default;
     Torrent(Torrent&&) = delete;
     Torrent(Torrent const&) = delete;
     Torrent& operator=(Torrent&&) = delete;
@@ -313,9 +314,9 @@ public:
         return failed_ever_;
     }
 
-    int compareSeedProgress(Torrent const&) const;
-    int compareRatio(Torrent const&) const;
-    int compareETA(Torrent const&) const;
+    int compareSeedProgress(Torrent const& that) const;
+    int compareRatio(Torrent const& that) const;
+    int compareETA(Torrent const& that) const;
 
     [[nodiscard]] constexpr auto getETA() const noexcept
     {
@@ -553,7 +554,7 @@ public:
 
     QIcon getMimeTypeIcon() const;
 
-    enum Field
+    enum Field : uint8_t
     {
         ACTIVITY_DATE,
         ADDED_DATE,

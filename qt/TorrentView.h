@@ -13,6 +13,7 @@ class TorrentView : public QListView
 
 public:
     explicit TorrentView(QWidget* parent = nullptr);
+    ~TorrentView() override = default;
     TorrentView(TorrentView&&) = delete;
     TorrentView(TorrentView const&) = delete;
     TorrentView& operator=(TorrentView&&) = delete;

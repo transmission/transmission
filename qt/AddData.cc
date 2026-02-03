@@ -49,7 +49,7 @@ QString getNameFromMagnet(QString const& magnet)
 
 } // namespace
 
-int AddData::set(QString const& key)
+AddData::Type AddData::set(QString const& key)
 {
     if (auto const key_std = key.toStdString(); tr_urlIsValid(key_std))
     {
