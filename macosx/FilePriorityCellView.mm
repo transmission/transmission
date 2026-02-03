@@ -105,7 +105,7 @@ static CGFloat const kImageOverlap = 1.0;
     view.translatesAutoresizingMaskIntoConstraints = NO;
 
     CGFloat height = lowPriority.size.height;
-    
+
     [NSLayoutConstraint activateConstraints:@[
         [view.leadingAnchor constraintEqualToAnchor:superview.leadingAnchor],
         [view.trailingAnchor constraintEqualToAnchor:superview.trailingAnchor],
