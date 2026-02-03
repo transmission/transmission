@@ -145,3 +145,12 @@ TEST_F(TorrentsPieceSpanTest, exposesFilePieceSpan)
     EXPECT_EQ(file_view.beginPiece, 0);
     EXPECT_EQ(file_view.endPiece, 32);
 }
+
+TEST_F(TorrentsTest, missingPiecesKeyTest)
+{
+    auto constexpr* const TorrentFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/missing-pieces-key.torrent";
+    auto owned = std::vector<std::unique_ptr<tr_torrent>>{};
+
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_FALSE(tm.parse_torrent_file(TorrentFile));
+}

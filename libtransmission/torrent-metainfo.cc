@@ -478,6 +478,12 @@ private:
             return false;
         }
 
+        if (!tm_.has_v1_metadata())
+        {
+            context.error.set(EINVAL, "missing v1 metadata");
+            return false;
+        }
+
         auto root = tr_pathbuf{};
         tr_torrent_files::sanitize_subpath(tm_.name_, root);
         if (!std::empty(root))
