@@ -1140,52 +1140,6 @@ void Session::Impl::maybe_inhibit_hibernation()
     set_hibernation_allowed(hibernation_allowed);
 }
 
-/**
-***  Prefs
-**/
-
-void Session::Impl::commit_prefs_change(tr_quark const key)
-{
-    signal_prefs_changed_.emit(key);
-    gtr_pref_save(session_);
-}
-
-void Session::set_pref(tr_quark const key, std::string const& newval)
-{
-    if (newval != gtr_pref_string_get(key))
-    {
-        gtr_pref_string_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, bool newval)
-{
-    if (newval != gtr_pref_flag_get(key))
-    {
-        gtr_pref_flag_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, int newval)
-{
-    if (newval != gtr_pref_int_get(key))
-    {
-        gtr_pref_int_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, double newval)
-{
-    if (std::fabs(newval - gtr_pref_double_get(key)) >= 0.0001)
-    {
-        gtr_pref_double_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
 /***
 ****
 ****  RPC Interface

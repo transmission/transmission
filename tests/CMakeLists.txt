@@ -1,6 +1,7 @@
 include(TrGTest)
 
 add_subdirectory(libtransmission)
+add_subdirectory(libtransmission-app)
 if(ENABLE_UTILS)
     add_subdirectory(utils)
 endif()
@@ -18,6 +19,8 @@ set_property(
 if(TARGET libtransmission-test)
     add_dependencies(all-tests libtransmission-test)
 endif()
+
+add_dependencies(all-tests libtransmission-app-test)
 
 if(TARGET qt-tests)
     add_dependencies(all-tests qt-tests)

@@ -170,7 +170,7 @@ jobs:
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
       - name: Make
-        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
+        run: cmake --build obj --config Debug --target all-tests
       - name: Test with sanitizers
         uses: ./.github/actions/run-tests
         with:
@@ -221,7 +221,7 @@ jobs:
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Homebrew`
       - name: Make
-        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
+        run: cmake --build obj --config Debug --target all-tests
       - name: Test with sanitizers
         uses: ./.github/actions/run-tests
         with:

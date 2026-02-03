@@ -639,6 +639,23 @@ struct State
         }
     }
 
+    if (state.is_settings && state.current_key_is_any_of({ TR_KEY_statusbar_stats, TR_KEY_statusbar_stats_kebab_APICOMPAT }))
+    {
+        static auto constexpr Strings = std::array<std::pair<std::string_view, std::string_view>, 4U>{ {
+            { "total_ratio", "total-ratio" },
+            { "total_transfer", "total-transfer" },
+            { "session_ratio", "session-ratio" },
+            { "session_transfer", "session-transfer" },
+        } };
+        for (auto const& [current, legacy] : Strings)
+        {
+            if (src == current || src == legacy)
+            {
+                return state.style == Style::Tr5 ? current : legacy;
+            }
+        }
+    }
+
     // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` here to turn on convert
     // if it's an array inside an array val whose key was `torrents`.
     // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
