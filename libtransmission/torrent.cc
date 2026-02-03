@@ -682,13 +682,11 @@ void tr_torrent::stop_now()
 // By-value: arguments are moved into the session-thread work item.
 void tr_torrentRemoveInSessionThread(
     tr_torrent* tor,
-    bool delete_flag,
-    tr_torrent_remove_func remove_func,
-    tr_torrent_remove_done_func on_remove_done) // NOLINT(performance-unnecessary-value-param)
+    bool const delete_flag,
+    tr_torrent_remove_func remove_func) // NOLINT(performance-unnecessary-value-param)
 {
     auto const lock = tor->unique_lock();
 
-    bool ok = true;
     if (delete_flag && tor->has_metainfo())
     {
         // ensure the files are all closed and idle before moving
@@ -700,31 +698,20 @@ void tr_torrentRemoveInSessionThread(
             remove_func = tr_sys_path_remove;
         }
 
-        tr_error error;
+        auto error = tr_error{};
         tor->files().remove(tor->current_dir(), tor->name(), remove_func, &error);
         if (error)
         {
-            ok = false;
-            tor->is_deleting_ = false;
-
-            tor->error().set_local_error(
+            tr_logAddWarnTor(
+                tor,
                 fmt::format(
                     fmt::runtime(_("Couldn't remove all torrent files: {error} ({error_code})")),
                     fmt::arg("error", error.message()),
                     fmt::arg("error_code", error.code())));
-            tr_torrentStop(tor);
         }
     }
 
-    if (on_remove_done)
-    {
-        on_remove_done(tor->id(), ok);
-    }
-
-    if (ok)
-    {
-        tr_torrentFreeInSessionThread(tor);
-    }
+    tr_torrentFreeInSessionThread(tor);
 }
 
 void tr_torrentStop(tr_torrent* tor)
@@ -741,22 +728,13 @@ void tr_torrentStop(tr_torrent* tor)
     tor->session->run_in_session_thread([tor]() { tor->stop_now(); });
 }
 
-void tr_torrentRemove(
-    tr_torrent* tor,
-    bool delete_flag,
-    tr_torrent_remove_func remove_func,
-    tr_torrent_remove_done_func on_remove_done)
+void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_torrent_remove_func remove_func)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->is_deleting_ = true;
 
-    tor->session->run_in_session_thread(
-        tr_torrentRemoveInSessionThread,
-        tor,
-        delete_flag,
-        std::move(remove_func),
-        std::move(on_remove_done));
+    tor->session->run_in_session_thread(tr_torrentRemoveInSessionThread, tor, delete_flag, std::move(remove_func));
 }
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor)

@@ -930,10 +930,7 @@ void Session::Impl::remove_torrent(tr_torrent_id_t const id, bool const delete_f
     {
         get_raw_model()->remove(position);
 
-        tr_torrentRemove(
-            &torrent->get_underlying(),
-            delete_files,
-            gtr_file_trash_or_remove);
+        tr_torrentRemove(&torrent->get_underlying(), delete_files, gtr_file_trash_or_remove);
     }
 }
 
