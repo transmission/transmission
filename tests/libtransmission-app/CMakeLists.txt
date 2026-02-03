@@ -17,11 +17,4 @@ target_link_libraries(libtransmission-app-test
 		${TR_NAME}
 		GTest::gtest_main)
 
-if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
-	gtest_discover_tests(libtransmission-app-test
-		TEST_PREFIX "LTA.")
-else()
-	add_test(
-		NAME libtransmission-app-test
-		COMMAND libtransmission-app-test)
-endif()
+tr_setup_gtest_target(libtransmission-app-test "LTA.")
