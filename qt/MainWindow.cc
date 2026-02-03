@@ -410,21 +410,21 @@ QMenu* MainWindow::createOptionsMenu()
 
 QMenu* MainWindow::createStatsModeMenu()
 {
-    auto const stats_modes = std::array<std::pair<QAction*, QString>, 4>{ {
-        { ui_.action_TotalRatio, total_ratio_stats_mode_name_ },
-        { ui_.action_TotalTransfer, total_transfer_stats_mode_name_ },
-        { ui_.action_SessionRatio, session_ratio_stats_mode_name_ },
-        { ui_.action_SessionTransfer, session_transfer_stats_mode_name_ },
+    auto const stats_modes = std::array<std::pair<QAction*, StatsMode>, StatsModeCount>{ {
+        { ui_.action_TotalRatio, StatsMode::TotalRatio },
+        { ui_.action_TotalTransfer, StatsMode::TotalTransfer },
+        { ui_.action_SessionRatio, StatsMode::SessionRatio },
+        { ui_.action_SessionTransfer, StatsMode::SessionTransfer },
     } };
 
     auto* action_group = new QActionGroup{ this };
     auto* menu = new QMenu{ this };
 
-    for (auto const& mode : stats_modes)
+    for (auto const& [action, mode] : stats_modes)
     {
-        mode.first->setProperty(StatsModeKey, QString{ mode.second });
-        action_group->addAction(mode.first);
-        menu->addAction(mode.first);
+        action->setProperty(StatsModeKey, QVariant::fromValue(mode));
+        action_group->addAction(action);
+        menu->addAction(action);
     }
 
     connect(action_group, &QActionGroup::triggered, this, &MainWindow::onStatsModeChanged);
@@ -753,34 +753,16 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     ui_.downloadSpeedLabel->setText(stats.speed_down.to_download_qstring());
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
 
-    auto const mode = prefs_.get<QString>(Prefs::STATUSBAR_STATS);
-    auto str = QString{};
-
-    if (mode == session_ratio_stats_mode_name_)
-    {
-        str = tr("Ratio: %1").arg(Formatter::ratio_to_string(session_.getStats().ratio));
-    }
-    else if (mode == session_transfer_stats_mode_name_)
-    {
-        auto const& st = session_.getStats();
-        str = tr("Down: %1, Up: %2")
-                  .arg(Formatter::storage_to_string(st.downloadedBytes))
-                  .arg(Formatter::storage_to_string(st.uploadedBytes));
-    }
-    else if (mode == total_transfer_stats_mode_name_)
-    {
-        auto const& st = session_.getCumulativeStats();
-        str = tr("Down: %1, Up: %2")
-                  .arg(Formatter::storage_to_string(st.downloadedBytes))
-                  .arg(Formatter::storage_to_string(st.uploadedBytes));
-    }
-    else // default is "total-ratio"
-    {
-        assert(mode == total_ratio_stats_mode_name_);
-        str = tr("Ratio: %1").arg(Formatter::ratio_to_string(session_.getCumulativeStats().ratio));
-    }
-
-    ui_.statsLabel->setText(str);
+    static_assert(StatsModeCount == 4U && "StatsMode changed: update this code");
+    auto const mode = prefs_.get<StatsMode>(Prefs::STATUSBAR_STATS);
+    auto const use_session_stats = mode == StatsMode::SessionRatio || mode == StatsMode::SessionTransfer;
+    auto const& st = use_session_stats ? session_.getStats() : session_.getCumulativeStats();
+    ui_.statsLabel->setText(
+        mode == StatsMode::SessionTransfer || mode == StatsMode::TotalTransfer ?
+            tr("Down: %1, Up: %2")
+                .arg(Formatter::storage_to_string(st.downloadedBytes))
+                .arg(Formatter::storage_to_string(st.uploadedBytes)) :
+            tr("Ratio: %1").arg(Formatter::ratio_to_string(st.ratio)));
 }
 
 void MainWindow::refreshTorrentViewHeader()
@@ -1028,7 +1010,7 @@ void MainWindow::reannounceSelected()
 
 void MainWindow::onStatsModeChanged(QAction const* action)
 {
-    prefs_.set(Prefs::STATUSBAR_STATS, action->property(StatsModeKey).toString());
+    prefs_.set(Prefs::STATUSBAR_STATS, action->property(StatsModeKey).value<StatsMode>());
 }
 
 /**
@@ -1109,31 +1091,33 @@ void MainWindow::trayActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void MainWindow::refreshPref(int key)
+void MainWindow::refreshPref(int const idx)
 {
     auto b = bool{};
     auto str = QString{};
 
-    switch (key)
+    switch (idx)
     {
     case Prefs::STATUSBAR_STATS:
-        str = prefs_.get<QString>(key);
-
-        for (auto* action : ui_.action_TotalRatio->actionGroup()->actions())
         {
-            action->setChecked(str == action->property(StatsModeKey).toString());
-        }
+            auto const needle = QVariant::fromValue(prefs_.get<StatsMode>(idx));
 
-        refreshSoon(REFRESH_STATUS_BAR);
+            for (auto* action : ui_.action_TotalRatio->actionGroup()->actions())
+            {
+                action->setChecked(needle == action->property(StatsModeKey));
+            }
+
+            refreshSoon(REFRESH_STATUS_BAR);
+        }
         break;
 
     case Prefs::SORT_REVERSED:
-        ui_.action_ReverseSortOrder->setChecked(prefs_.get<bool>(key));
+        ui_.action_ReverseSortOrder->setChecked(prefs_.get<bool>(idx));
         break;
 
     case Prefs::SORT_MODE:
         {
-            auto const sort_mode = prefs_.get<SortMode>(key);
+            auto const sort_mode = prefs_.get<SortMode>(idx);
             for (auto* action : ui_.action_SortByActivity->actionGroup()->actions())
             {
                 action->setChecked(sort_mode == action->property(SortModeKey).value<SortMode>());
@@ -1143,51 +1127,51 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::DSPEED_ENABLED:
-        (prefs_.get<bool>(key) ? dlimit_on_action_ : dlimit_off_action_)->setChecked(true);
+        (prefs_.get<bool>(idx) ? dlimit_on_action_ : dlimit_off_action_)->setChecked(true);
         break;
 
     case Prefs::DSPEED:
         dlimit_on_action_->setText(
-            tr("Limited at %1").arg(Speed{ prefs_.get<unsigned int>(key), Speed::Units::KByps }.to_qstring()));
+            tr("Limited at %1").arg(Speed{ prefs_.get<unsigned int>(idx), Speed::Units::KByps }.to_qstring()));
         break;
 
     case Prefs::USPEED_ENABLED:
-        (prefs_.get<bool>(key) ? ulimit_on_action_ : ulimit_off_action_)->setChecked(true);
+        (prefs_.get<bool>(idx) ? ulimit_on_action_ : ulimit_off_action_)->setChecked(true);
         break;
 
     case Prefs::USPEED:
         ulimit_on_action_->setText(
-            tr("Limited at %1").arg(Speed{ prefs_.get<unsigned int>(key), Speed::Units::KByps }.to_qstring()));
+            tr("Limited at %1").arg(Speed{ prefs_.get<unsigned int>(idx), Speed::Units::KByps }.to_qstring()));
         break;
 
     case Prefs::RATIO_ENABLED:
-        (prefs_.get<bool>(key) ? ratio_on_action_ : ratio_off_action_)->setChecked(true);
+        (prefs_.get<bool>(idx) ? ratio_on_action_ : ratio_off_action_)->setChecked(true);
         break;
 
     case Prefs::RATIO:
-        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(prefs_.get<double>(key))));
+        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(prefs_.get<double>(idx))));
         break;
 
     case Prefs::FILTERBAR:
-        b = prefs_.get<bool>(key);
+        b = prefs_.get<bool>(idx);
         filter_bar_->setVisible(b);
         ui_.action_Filterbar->setChecked(b);
         break;
 
     case Prefs::STATUSBAR:
-        b = prefs_.get<bool>(key);
+        b = prefs_.get<bool>(idx);
         ui_.statusBar->setVisible(b);
         ui_.action_Statusbar->setChecked(b);
         break;
 
     case Prefs::TOOLBAR:
-        b = prefs_.get<bool>(key);
+        b = prefs_.get<bool>(idx);
         ui_.toolBar->setVisible(b);
         ui_.action_Toolbar->setChecked(b);
         break;
 
     case Prefs::SHOW_TRAY_ICON:
-        b = prefs_.get<bool>(key);
+        b = prefs_.get<bool>(idx);
         ui_.action_TrayIcon->setChecked(b);
         tray_icon_.setVisible(b);
         QApplication::setQuitOnLastWindowClosed(!b);
@@ -1195,7 +1179,7 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::COMPACT_VIEW:
-        b = prefs_.get<bool>(key);
+        b = prefs_.get<bool>(idx);
         ui_.action_CompactView->setChecked(b);
         ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
         break;

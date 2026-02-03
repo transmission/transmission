@@ -1,6 +1,34 @@
 include(CheckFunctionExists)
 include(CheckIncludeFile)
 
+macro(tr_setup_gtest_target TARGET_NAME TEST_PREFIX)
+    if(WIN32)
+        cmake_policy(PUSH)
+        cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+
+        add_custom_command(
+            TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND
+                ${CMAKE_COMMAND}
+                -E copy_if_different
+                $<TARGET_RUNTIME_DLLS:${TARGET_NAME}>
+                $<TARGET_FILE_DIR:${TARGET_NAME}>
+            COMMAND_EXPAND_LISTS
+        )
+
+        cmake_policy(POP)
+    endif()
+
+    if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
+        gtest_discover_tests(${TARGET_NAME}
+            TEST_PREFIX "${TEST_PREFIX}")
+    else()
+        add_test(
+            NAME ${TARGET_NAME}
+            COMMAND ${TARGET_NAME})
+    endif()
+endmacro()
+
 macro(tr_auto_option_changed NAME ACC VAL FIL STK)
     if(NOT ("${VAL}" STREQUAL "AUTO" OR "${VAL}" STREQUAL "ON" OR "${VAL}" STREQUAL "OFF"))
         if("${VAL}" STREQUAL "0" OR "${VAL}" STREQUAL "NO" OR "${VAL}" STREQUAL "FALSE" OR "${VAL}" STREQUAL "N")

@@ -116,6 +116,49 @@ tr_variant from_sort_mode(SortMode const& src)
 
     return from_sort_mode(DefaultSortMode);
 }
+
+// ---
+
+auto constexpr StatsKeys = std::array<std::pair<std::string_view, StatsMode>, StatsModeCount>{ {
+    { "session_ratio", StatsMode::SessionRatio },
+    { "session_transfer", StatsMode::SessionTransfer },
+    { "total_ratio", StatsMode::TotalRatio },
+    { "total_transfer", StatsMode::TotalTransfer },
+} };
+
+bool to_stats_mode(tr_variant const& src, StatsMode* tgt)
+{
+    static constexpr auto& Keys = StatsKeys;
+
+    if (auto const str = src.value_if<std::string_view>())
+    {
+        for (auto const& [key, val] : Keys)
+        {
+            if (str == key)
+            {
+                *tgt = val;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+tr_variant from_stats_mode(StatsMode const& src)
+{
+    static constexpr auto& Keys = StatsKeys;
+
+    for (auto const& [key, val] : Keys)
+    {
+        if (src == val)
+        {
+            return tr_variant::unmanaged_string(key);
+        }
+    }
+
+    return from_stats_mode(DefaultStatsMode);
+}
 } // unnamed namespace
 
 void register_app_converters()
@@ -128,6 +171,7 @@ void register_app_converters()
             using Converters = tr::serializer::Converters;
             Converters::add(to_show_mode, from_show_mode);
             Converters::add(to_sort_mode, from_sort_mode);
+            Converters::add(to_stats_mode, from_stats_mode);
         });
 }
 

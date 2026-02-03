@@ -73,7 +73,7 @@ std::string gl_confdir;
     map.try_emplace(TR_KEY_show_tracker_scrapes, false);
     map.try_emplace(TR_KEY_sort_mode, to_variant(DefaultSortMode));
     map.try_emplace(TR_KEY_sort_reversed, false);
-    map.try_emplace(TR_KEY_statusbar_stats, "total-ratio"sv);
+    map.try_emplace(TR_KEY_statusbar_stats, to_variant(DefaultStatsMode));
     map.try_emplace(TR_KEY_torrent_added_notification_enabled, true);
     map.try_emplace(TR_KEY_torrent_complete_notification_enabled, true);
     map.try_emplace(TR_KEY_torrent_complete_sound_enabled, true);
