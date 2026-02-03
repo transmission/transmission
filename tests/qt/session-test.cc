@@ -45,6 +45,9 @@ Q_DECLARE_METATYPE(Style)
                 .arg(dir)
         };
     }
+
+    abort();
+    return {};
 }
 
 class SessionTest
