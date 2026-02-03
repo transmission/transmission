@@ -940,8 +940,6 @@ void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
             delete_files,
             [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
-            nullptr,
-            nullptr,
             nullptr);
     }
 }

@@ -686,17 +686,10 @@ void tr_torrent::stop_now()
     set_is_queued(false);
 }
 
-void tr_torrentRemoveInSessionThread(
-    tr_torrent* tor,
-    bool delete_flag,
-    tr_fileFunc delete_func,
-    void* delete_user_data,
-    tr_torrent_remove_done_func callback,
-    void* callback_user_data)
+void tr_torrentRemoveInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* delete_user_data)
 {
     auto const lock = tor->unique_lock();
 
-    bool ok = true;
     if (delete_flag && tor->has_metainfo())
     {
         // ensure the files are all closed and idle before moving
@@ -713,31 +706,20 @@ void tr_torrentRemoveInSessionThread(
             delete_func(filename, delete_user_data, nullptr);
         };
 
-        tr_error error;
+        auto error = tr_error{};
         tor->files().remove(tor->current_dir(), tor->name(), delete_func_wrapper, &error);
         if (error)
         {
-            ok = false;
-            tor->is_deleting_ = false;
-
-            tor->error().set_local_error(
+            tr_logAddWarnTor(
+                tor,
                 fmt::format(
                     fmt::runtime(_("Couldn't remove all torrent files: {error} ({error_code})")),
                     fmt::arg("error", error.message()),
                     fmt::arg("error_code", error.code())));
-            tr_torrentStop(tor);
         }
     }
 
-    if (callback != nullptr)
-    {
-        callback(tor->id(), ok, callback_user_data);
-    }
-
-    if (ok)
-    {
-        tr_torrentFreeInSessionThread(tor);
-    }
+    tr_torrentFreeInSessionThread(tor);
 }
 
 void tr_torrentStop(tr_torrent* tor)
@@ -754,13 +736,7 @@ void tr_torrentStop(tr_torrent* tor)
     tor->session->run_in_session_thread([tor]() { tor->stop_now(); });
 }
 
-void tr_torrentRemove(
-    tr_torrent* tor,
-    bool delete_flag,
-    tr_fileFunc delete_func,
-    void* delete_user_data,
-    tr_torrent_remove_done_func callback,
-    void* callback_user_data)
+void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* delete_user_data)
 {
     using namespace start_stop_helpers;
 
@@ -768,14 +744,7 @@ void tr_torrentRemove(
 
     tor->is_deleting_ = true;
 
-    tor->session->run_in_session_thread(
-        tr_torrentRemoveInSessionThread,
-        tor,
-        delete_flag,
-        delete_func,
-        delete_user_data,
-        callback,
-        callback_user_data);
+    tor->session->run_in_session_thread(tr_torrentRemoveInSessionThread, tor, delete_flag, delete_func, delete_user_data);
 }
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor)
