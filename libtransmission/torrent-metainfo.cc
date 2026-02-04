@@ -68,7 +68,6 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     std::string_view info_dict_begin_;
     tr_tracker_tier_t tier_ = 0;
     tr_pathbuf file_subpath_;
-    std::string_view pieces_root_;
     int64_t file_length_ = 0;
 
     enum class State : uint8_t
@@ -366,7 +365,12 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
         }
         else if (pathIs(InfoKey, PiecesKey))
         {
-            if (std::size(value) % sizeof(tr_sha1_digest_t) == 0)
+            if (tm_.has_v1_metadata())
+            {
+                context.error.set(EINVAL, "invalid duplicate 'pieces'");
+                unhandled = true;
+            }
+            else if (std::size(value) % sizeof(tr_sha1_digest_t) == 0)
             {
                 auto const n = std::size(value) / sizeof(tr_sha1_digest_t);
                 tm_.pieces_.resize(n);
@@ -374,7 +378,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             }
             else
             {
-                context.error.set(EINVAL, fmt::format("invalid piece size: {}", std::size(value)));
+                context.error.set(EINVAL, fmt::format("invalid 'pieces' size: {}", std::size(value)));
                 unhandled = true;
             }
         }
@@ -467,7 +471,6 @@ private:
         }
 
         file_length_ = 0;
-        pieces_root_ = {};
         // NB: let caller decide how to clear file_tree_.
         // if we're in "files" mode we clear it; if in "file tree" we pop it
         return ok;
