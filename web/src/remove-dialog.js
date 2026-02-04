@@ -9,9 +9,8 @@ export class RemoveDialog extends EventTarget {
   constructor(options) {
     super();
 
-    // options: remote, torrents
+    // options: remote, torrents, trash
     this.options = options;
-    this.options.trash = false;
     this.elements = RemoveDialog._create(options);
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
@@ -44,50 +43,38 @@ export class RemoveDialog extends EventTarget {
   }
 
   static _create(options) {
-    const { torrents } = options;
+    const { trash } = options;
+    const { heading, message } = RemoveDialog._createMessage(options);
+
     const elements = createDialogContainer('remove-dialog');
-    const { confirm, heading, message, workarea } = elements;
-
-    heading.textContent =
-      torrents.length === 1
-        ? `Remove ${torrents[0].getName()}?`
-        : `Remove ${torrents.length} transfers?`;
-
-    const check = document.createElement('input');
-    check.id = 'delete-local-data-check';
-    check.type = 'checkbox';
-    check.checked = false;
-    message.append(check);
-
-    const label = document.createElement('label');
-    label.id = 'delete-local-data-label';
-    label.setAttribute('for', check.id);
-    label.textContent = 'Delete downloaded data';
-    message.append(label);
-
-    const body = document.createElement('div');
-    const rewrite = (checked) => {
-      if (checked && torrents.length === 1) {
-        body.textContent =
-          'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
-      } else if (checked) {
-        body.textContent =
-          'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';
-      } else if (torrents.length === 1) {
-        body.textContent =
-          'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
-      } else {
-        body.textContent =
-          'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
-      }
-      confirm.textContent = checked ? 'Delete' : 'Remove';
-    };
-    rewrite(check.checked);
-    check.addEventListener('click', () => {
-      options.trash = check.checked;
-      rewrite(check.checked);
-    });
-    workarea.append(body);
+    elements.heading.textContent = heading;
+    elements.message.textContent = message;
+    elements.confirm.textContent = trash ? 'Trash' : 'Remove';
     return elements;
+  }
+
+  static _createMessage(options) {
+    let heading = null;
+    let message = null;
+    const { torrents, trash } = options;
+    const [torrent] = torrents;
+    if (trash && torrents.length === 1) {
+      heading = `Remove ${torrent.getName()} and delete data?`;
+      message =
+        'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
+    } else if (trash) {
+      heading = `Remove ${torrents.length} transfers and delete data?`;
+      message =
+        'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';
+    } else if (torrents.length === 1) {
+      heading = `Remove ${torrent.getName()}?`;
+      message =
+        'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
+    } else {
+      heading = `Remove ${torrents.length} transfers?`;
+      message =
+        'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
+    }
+    return { heading, message };
   }
 }
