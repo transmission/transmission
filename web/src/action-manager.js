@@ -16,6 +16,10 @@ export class ActionManager extends EventTarget {
         shortcut: 'D',
         text: 'Deselect all',
       },
+      logout: {
+        enabled: true,
+        text: 'Log out',
+      },
       'move-bottom': { enabled: false, text: 'Bottom' },
       'move-down': { enabled: false, text: 'Down' },
       'move-top': { enabled: false, text: 'Top' },

@@ -4,14 +4,18 @@ import { sassPlugin } from 'esbuild-sass-plugin';
 
 const ctx = await esbuild.context({
   bundle: true,
-  entryPoints: ['./src/main.js'],
+  entryNames: '[dir]/[name]',
+  entryPoints: {
+    'login/login': './src/login/login.js',
+    'transmission-app': './src/main.js',
+  },
   legalComments: 'external',
   loader: {
     '.png': 'dataurl',
     '.svg': 'dataurl',
   },
   minify: true,
-  outfile: './public_html/transmission-app.js',
+  outdir: './public_html/',
   plugins: [sassPlugin()],
   sourcemap: true,
 });
