@@ -23,7 +23,7 @@
                       <object class="GtkFrame">
                         <child type="label">
                           <object class="GtkLabel" id="activity_section_label">
-                            <property name="label" translatable="1">Activity</property>
+                            <property name="label" translatable="yes">Activity</property>
                             <attributes>
                               <attribute name="weight" value="bold"/>
                             </attributes>
@@ -35,7 +35,7 @@
                             <property name="column-spacing">12</property>
                             <child>
                               <object class="GtkLabel" id="torrent_size_label">
-                                <property name="label" translatable="1">Torrent size:</property>
+                                <property name="label" translatable="yes">Torrent size:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -45,7 +45,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="have_label">
-                                <property name="label" translatable="1">Have:</property>
+                                <property name="label" translatable="yes">Have:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -55,7 +55,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="uploaded_label">
-                                <property name="label" translatable="1">Uploaded:</property>
+                                <property name="label" translatable="yes">Uploaded:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -65,7 +65,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="downloaded_label">
-                                <property name="label" translatable="1">Downloaded:</property>
+                                <property name="label" translatable="yes">Downloaded:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -75,7 +75,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="state_label">
-                                <property name="label" translatable="1">State:</property>
+                                <property name="label" translatable="yes">State:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -85,7 +85,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="running_time_label">
-                                <property name="label" translatable="1">Running time:</property>
+                                <property name="label" translatable="yes">Running time:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -95,7 +95,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="remaining_time_label">
-                                <property name="label" translatable="1">Remaining time:</property>
+                                <property name="label" translatable="yes">Remaining time:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -105,7 +105,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="last_activity_label">
-                                <property name="label" translatable="1">Last activity:</property>
+                                <property name="label" translatable="yes">Last activity:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -115,7 +115,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="error_label">
-                                <property name="label" translatable="1">Error:</property>
+                                <property name="label" translatable="yes">Error:</property>
                                 <property name="xalign">0</property>
                                 <property name="yalign">0</property>
                                 <layout>
@@ -271,7 +271,7 @@
                       <object class="GtkFrame">
                         <child type="label">
                           <object class="GtkLabel" id="details_section_label">
-                            <property name="label" translatable="1">Details</property>
+                            <property name="label" translatable="yes">Details</property>
                             <attributes>
                               <attribute name="weight" value="bold"/>
                             </attributes>
@@ -283,7 +283,7 @@
                             <property name="column-spacing">12</property>
                             <child>
                               <object class="GtkLabel" id="location_label">
-                                <property name="label" translatable="1">Location:</property>
+                                <property name="label" translatable="yes">Location:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -293,7 +293,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="hash_label">
-                                <property name="label" translatable="1">Hash:</property>
+                                <property name="label" translatable="yes">Hash:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -303,7 +303,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="privacy_label">
-                                <property name="label" translatable="1">Privacy:</property>
+                                <property name="label" translatable="yes">Privacy:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -313,7 +313,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="origin_label">
-                                <property name="label" translatable="1">Origin:</property>
+                                <property name="label" translatable="yes">Origin:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -323,7 +323,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="added_label">
-                                <property name="label" translatable="1">Added:</property>
+                                <property name="label" translatable="yes">Added:</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -335,7 +335,7 @@
                               <object class="GtkLabel" id="comment_label">
                                 <property name="margin-top">6</property>
                                 <property name="margin-bottom">6</property>
-                                <property name="label" translatable="1">Comment:</property>
+                                <property name="label" translatable="yes">Comment:</property>
                                 <property name="use-underline">1</property>
                                 <property name="mnemonic-widget">comment_value_view</property>
                                 <property name="xalign">0</property>
@@ -448,7 +448,7 @@
                 </property>
                 <property name="tab">
                   <object class="GtkLabel" id="info_page_label">
-                    <property name="label" translatable="1">Information</property>
+                    <property name="label" translatable="yes">Information</property>
                   </object>
                 </property>
               </object>
@@ -499,7 +499,7 @@
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="more_peer_details_check">
-                        <property name="label" translatable="1">Show _more details</property>
+                        <property name="label" translatable="yes">Show _more details</property>
                         <property name="focusable">1</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
@@ -509,7 +509,7 @@
                 </property>
                 <property name="tab">
                   <object class="GtkLabel" id="peers_page_label">
-                    <property name="label" translatable="1">Peers</property>
+                    <property name="label" translatable="yes">Peers</property>
                   </object>
                 </property>
               </object>
@@ -548,7 +548,7 @@
                             <property name="spacing">6</property>
                             <child>
                               <object class="GtkButton" id="add_tracker_button">
-                                <property name="label" translatable="1">_Add</property>
+                                <property name="label" translatable="yes">_Add</property>
                                 <property name="focusable">1</property>
                                 <property name="receives-default">1</property>
                                 <property name="use-underline">1</property>
@@ -556,7 +556,7 @@
                             </child>
                             <child>
                               <object class="GtkButton" id="edit_tracker_button">
-                                <property name="label" translatable="1">_Edit</property>
+                                <property name="label" translatable="yes">_Edit</property>
                                 <property name="focusable">1</property>
                                 <property name="receives-default">1</property>
                                 <property name="use-underline">1</property>
@@ -564,7 +564,7 @@
                             </child>
                             <child>
                               <object class="GtkButton" id="remove_tracker_button">
-                                <property name="label" translatable="1">_Remove</property>
+                                <property name="label" translatable="yes">_Remove</property>
                                 <property name="focusable">1</property>
                                 <property name="receives-default">1</property>
                                 <property name="use-underline">1</property>
@@ -576,7 +576,7 @@
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="more_tracker_details_check">
-                        <property name="label" translatable="1">Show _more details</property>
+                        <property name="label" translatable="yes">Show _more details</property>
                         <property name="focusable">1</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
@@ -584,7 +584,7 @@
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="backup_trackers_check">
-                        <property name="label" translatable="1">Show _backup trackers</property>
+                        <property name="label" translatable="yes">Show _backup trackers</property>
                         <property name="focusable">1</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
@@ -594,7 +594,7 @@
                 </property>
                 <property name="tab">
                   <object class="GtkLabel" id="trackers_page_label">
-                    <property name="label" translatable="1">Trackers</property>
+                    <property name="label" translatable="yes">Trackers</property>
                   </object>
                 </property>
               </object>
@@ -624,14 +624,14 @@
                     <child>
                       <object class="GtkLabel" id="files_label">
                         <property name="vexpand">1</property>
-                        <property name="label" translatable="1">File listing not available for combined torrent properties</property>
+                        <property name="label" translatable="yes">File listing not available for combined torrent properties</property>
                       </object>
                     </child>
                   </object>
                 </property>
                 <property name="tab">
                   <object class="GtkLabel" id="files_page_label">
-                    <property name="label" translatable="1">Files</property>
+                    <property name="label" translatable="yes">Files</property>
                   </object>
                 </property>
               </object>
@@ -648,7 +648,7 @@
                       <object class="GtkFrame">
                         <child type="label">
                           <object class="GtkLabel" id="speed_section_label">
-                            <property name="label" translatable="1">Speed</property>
+                            <property name="label" translatable="yes">Speed</property>
                             <attributes>
                               <attribute name="weight" value="bold"/>
                             </attributes>
@@ -660,7 +660,7 @@
                             <property name="column-spacing">12</property>
                             <child>
                               <object class="GtkCheckButton" id="honor_limits_check">
-                                <property name="label" translatable="1">Honor global _limits</property>
+                                <property name="label" translatable="yes">Honor global _limits</property>
                                 <property name="focusable">1</property>
                                 <property name="valign">center</property>
                                 <property name="use-underline">1</property>
@@ -673,7 +673,7 @@
                             </child>
                             <child>
                               <object class="GtkCheckButton" id="download_limit_check">
-                                <property name="label" translatable="1">Limit _download speed ({speed_units}):</property>
+                                <property name="label" translatable="yes">Limit _download speed ({speed_units}):</property>
                                 <property name="focusable">1</property>
                                 <property name="valign">center</property>
                                 <property name="use-underline">1</property>
@@ -685,7 +685,7 @@
                             </child>
                             <child>
                               <object class="GtkCheckButton" id="upload_limit_check">
-                                <property name="label" translatable="1">Limit _upload speed ({speed_units}):</property>
+                                <property name="label" translatable="yes">Limit _upload speed ({speed_units}):</property>
                                 <property name="focusable">1</property>
                                 <property name="valign">center</property>
                                 <property name="use-underline">1</property>
@@ -697,7 +697,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="priority_label">
-                                <property name="label" translatable="1">Torrent _priority:</property>
+                                <property name="label" translatable="yes">Torrent _priority:</property>
                                 <property name="use-underline">1</property>
                                 <property name="mnemonic-widget">priority_combo</property>
                                 <property name="xalign">0</property>
@@ -746,7 +746,7 @@
                       <object class="GtkFrame">
                         <child type="label">
                           <object class="GtkLabel" id="seeding_limits_section_label">
-                            <property name="label" translatable="1">Seeding Limits</property>
+                            <property name="label" translatable="yes">Seeding Limits</property>
                             <attributes>
                               <attribute name="weight" value="bold"/>
                             </attributes>
@@ -758,7 +758,7 @@
                             <property name="column-spacing">12</property>
                             <child>
                               <object class="GtkLabel" id="ratio_limit_label">
-                                <property name="label" translatable="1">_Ratio:</property>
+                                <property name="label" translatable="yes">_Ratio:</property>
                                 <property name="use-underline">1</property>
                                 <property name="mnemonic-widget">ratio_limit_combo</property>
                                 <property name="xalign">0</property>
@@ -770,7 +770,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel" id="idle_limit_label">
-                                <property name="label" translatable="1">_Idle:</property>
+                                <property name="label" translatable="yes">_Idle:</property>
                                 <property name="use-underline">1</property>
                                 <property name="mnemonic-widget">idle_limit_combo</property>
                                 <property name="xalign">0</property>
@@ -828,7 +828,7 @@
                       <object class="GtkFrame">
                         <child type="label">
                           <object class="GtkLabel" id="peer_connections_section_label">
-                            <property name="label" translatable="1">Peer Connections</property>
+                            <property name="label" translatable="yes">Peer Connections</property>
                             <attributes>
                               <attribute name="weight" value="bold"/>
                             </attributes>
@@ -840,7 +840,7 @@
                             <property name="column-spacing">12</property>
                             <child>
                               <object class="GtkLabel" id="max_peers_label">
-                                <property name="label" translatable="1">_Maximum peers:</property>
+                                <property name="label" translatable="yes">_Maximum peers:</property>
                                 <property name="use-underline">1</property>
                                 <property name="mnemonic-widget">max_peers_spin</property>
                                 <property name="xalign">0</property>
@@ -868,7 +868,7 @@
                 </property>
                 <property name="tab">
                   <object class="GtkLabel" id="options_page_label">
-                    <property name="label" translatable="1">Options</property>
+                    <property name="label" translatable="yes">Options</property>
                   </object>
                 </property>
               </object>
@@ -883,7 +883,7 @@
         <property name="spacing">6</property>
         <child>
           <object class="GtkButton" id="close_button">
-            <property name="label" translatable="1">_Close</property>
+            <property name="label" translatable="yes">_Close</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
