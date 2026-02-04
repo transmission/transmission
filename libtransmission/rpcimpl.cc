@@ -410,7 +410,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     {
         if (auto const status = session->rpcNotify(type, tor); (status & TR_RPC_NOREMOVE) == 0)
         {
-            tr_torrentRemove(tor, delete_flag, nullptr, nullptr, nullptr, nullptr);
+            tr_torrentRemove(tor, delete_flag, nullptr, nullptr);
         }
     }
 

@@ -325,7 +325,7 @@ TEST_F(RpcTest, idAsync)
         }
 
         // cleanup
-        tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+        tr_torrentRemove(tor, false, nullptr, nullptr);
     }
 }
 
@@ -362,7 +362,7 @@ TEST_F(RpcTest, tagAsyncLegacy)
     EXPECT_EQ(*tag, 12345);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, false, nullptr, nullptr);
 }
 
 TEST_F(RpcTest, NotificationSync)
@@ -407,7 +407,7 @@ TEST_F(RpcTest, NotificationAsync)
     EXPECT_FALSE(response.has_value());
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, false, nullptr, nullptr);
 }
 
 TEST_F(RpcTest, tagNoHandler)
@@ -736,7 +736,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, false, nullptr, nullptr);
 }
 
 TEST_F(RpcTest, torrentGet)
@@ -779,7 +779,7 @@ TEST_F(RpcTest, torrentGet)
     EXPECT_EQ(1, *first_torrent_id);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, false, nullptr, nullptr);
 }
 
 TEST_F(RpcTest, torrentGetLegacy)
@@ -820,7 +820,7 @@ TEST_F(RpcTest, torrentGetLegacy)
     EXPECT_EQ(1, *first_torrent_id);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, false, nullptr, nullptr);
 }
 
 namespace free_space_test

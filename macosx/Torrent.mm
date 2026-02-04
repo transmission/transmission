@@ -195,7 +195,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     //allow the file to be indexed by Time Machine
     [self setTimeMachineExclude:NO];
 
-    tr_torrentRemove(self.fHandle, trashFiles, trashDataFile, nullptr, nullptr, nullptr);
+    tr_torrentRemove(self.fHandle, trashFiles, trashDataFile, nullptr);
 }
 
 - (void)changeDownloadFolderBeforeUsing:(NSString*)folder determinationType:(TorrentDeterminationType)determinationType
