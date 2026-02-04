@@ -244,6 +244,29 @@ export class OverflowMenu extends EventTarget {
 
     add_checkbox(this.action_manager.text('toggle-compact-rows'), listener);
 
+    // limit width
+
+    div = document.createElement('div');
+    div.classList.add('table-row');
+    options.append(div);
+
+    check = document.createElement('input');
+    check.id = makeUUID();
+    check.type = 'checkbox';
+
+    label = document.createElement('label');
+    label.htmlFor = check.id;
+    label.textContent = 'Limit width to 640px';
+
+    div.append(check, label);
+    check.checked = document
+      .querySelector('#torrent-list')
+      .classList.contains('limit-width');
+    check.addEventListener('change', (event_) => {
+      const { checked } = event_.target;
+      this.prefs.limit_width = checked;
+    });
+
     // contrast
 
     div = document.createElement('div');
