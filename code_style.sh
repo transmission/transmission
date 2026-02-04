@@ -53,6 +53,15 @@ for name in ${clang_format_exe_names[@]}; do
     break
   fi
 done
+
+# Xcode toolchain lookup
+if [ -z "${clang_format_exe}" ]; then
+  xcrun=$(command -v xcrun)
+  if [ "$?" -eq 0 ]; then
+    clang_format_exe=$("$xcrun" --find clang-format)
+  fi
+fi
+
 if [ -z "${clang_format_exe}" ]; then
   echo "error: clang-format not found";
   exit 1;
