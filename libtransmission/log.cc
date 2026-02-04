@@ -12,6 +12,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 
 #ifdef _WIN32
@@ -37,6 +38,11 @@ using namespace std::literals;
 
 namespace
 {
+template<typename, typename = void>
+inline constexpr bool HasTmGmtoffV = false;
+
+template<typename T>
+inline constexpr bool HasTmGmtoffV<T, std::void_t<decltype(std::declval<T>().tm_gmtoff)>> = true;
 
 class tr_log_state
 {
@@ -203,13 +209,9 @@ std::string_view tr_logGetTimeStr(std::chrono::system_clock::time_point const no
     auto* walk = buf;
     auto const now_time_t = std::chrono::system_clock::to_time_t(now);
     auto const now_tm = *std::localtime(&now_time_t);
-    walk = fmt::format_to_n(
-               walk,
-               buflen,
-               "{0:%FT%R:}{1:%S}" TR_IF_WIN32("", "{0:%z}"),
-               now_tm,
-               std::chrono::time_point_cast<std::chrono::milliseconds>(now))
-               .out;
+    static bool constexpr HasTmGmtoff = HasTmGmtoffV<std::tm>;
+    static auto constexpr Fmt = HasTmGmtoff ? "{0:%FT%R:}{1:%S}{0:%z}"sv : "{0:%FT%R:}{1:%S}"sv;
+    walk = fmt::format_to_n(walk, buflen, Fmt, now_tm, std::chrono::time_point_cast<std::chrono::milliseconds>(now)).out;
 #ifdef _WIN32
     if (auto tz_info = TIME_ZONE_INFORMATION{}; GetTimeZoneInformation(&tz_info) != TIME_ZONE_ID_INVALID)
     {
