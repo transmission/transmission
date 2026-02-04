@@ -1041,7 +1041,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     config_dir_ = getConfigDir(argc, argv);
 
     /* load settings from defaults + config file */
-    settings_ = load_settings(config_dir_.c_str());
+    settings_ = load_settings(config_dir_);
 
     bool dumpSettings;
 
