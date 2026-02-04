@@ -59,7 +59,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
         p.textVisible = true;
         p.progress = static_cast<int>(100.0 * index.data().toDouble());
         p.text = QStringLiteral("%1%").arg(p.progress);
-        StyleHelper::drawProgressBar(*painter, p);
+        StyleHelper::draw_progress_bar(*painter, p);
     }
     else if (column == FileTreeModel::COL_WANTED)
     {

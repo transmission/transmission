@@ -22,7 +22,7 @@ bool InteropObject::AddMetainfo(QString const& metainfo) const
 {
     if (auto addme = AddData(metainfo); addme.type != AddData::NONE)
     {
-        trApp->addTorrent(addme);
+        trApp->add_torrent(addme);
     }
 
     return true;

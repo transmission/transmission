@@ -21,11 +21,11 @@ class QModelIndex;
 class Utils
 {
 public:
-    static QIcon getIconFromIndex(QModelIndex const& index);
+    static QIcon get_icon_from_index(QModelIndex const& index);
 
-    static QString removeTrailingDirSeparator(QString const& path);
+    static QString remove_trailing_dir_separator(QString const& path);
 
-    static void narrowRect(QRect& rect, int dx1, int dx2, Qt::LayoutDirection direction)
+    static void narrow_rect(QRect& rect, int dx1, int dx2, Qt::LayoutDirection direction)
     {
         if (direction == Qt::RightToLeft)
         {
@@ -35,13 +35,13 @@ public:
         rect.adjust(dx1, 0, -dx2, 0);
     }
 
-    static int measureViewItem(QAbstractItemView const* view, QString const& text);
-    static int measureHeaderItem(QHeaderView const* view, QString const& text);
+    static int measure_view_item(QAbstractItemView const* view, QString const& text);
+    static int measure_header_item(QHeaderView const* view, QString const& text);
 
-    static QColor getFadedColor(QColor const& color);
+    static QColor get_faded_color(QColor const& color);
 
     template<typename DialogT, typename... ArgsT>
-    static void openDialog(QPointer<DialogT>& dialog, ArgsT&&... args)
+    static void open_dialog(QPointer<DialogT>& dialog, ArgsT&&... args)
     {
         if (dialog.isNull())
         {
@@ -56,5 +56,5 @@ public:
         }
     }
 
-    static void updateSpinBoxFormat(QSpinBox* spinBox, char const* context, char const* format, QString const& placeholder);
+    static void update_spin_box_format(QSpinBox* spinBox, char const* context, char const* format, QString const& placeholder);
 };

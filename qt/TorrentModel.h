@@ -16,11 +16,7 @@
 
 class Prefs;
 class Speed;
-
-extern "C"
-{
-    struct tr_variant;
-}
+struct tr_variant;
 
 class TorrentModel : public QAbstractListModel
 {
@@ -41,10 +37,10 @@ public:
     ~TorrentModel() override;
     void clear();
 
-    bool hasTorrent(TorrentHash const& hash) const;
+    bool has_torrent(TorrentHash const& hash) const;
 
-    Torrent* getTorrentFromId(int id);
-    Torrent const* getTorrentFromId(int id) const;
+    Torrent* get_torrent_from_id(int id);
+    Torrent const* get_torrent_from_id(int id) const;
 
     using torrents_t = std::vector<Torrent*>;
 
@@ -58,24 +54,24 @@ public:
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 public slots:
-    void updateTorrents(tr_variant* torrent_list, bool is_complete_list);
-    void removeTorrents(tr_variant* torrent_list);
+    void update_torrents(tr_variant* torrent_list, bool is_complete_list);
+    void remove_torrents(tr_variant* torrent_list);
 
 signals:
-    void torrentsAdded(torrent_ids_t const&);
-    void torrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
-    void torrentsCompleted(torrent_ids_t const&);
-    void torrentsEdited(torrent_ids_t const&);
-    void torrentsNeedInfo(torrent_ids_t const&);
+    void torrents_added(torrent_ids_t const&);
+    void torrents_changed(torrent_ids_t const&, Torrent::fields_t const& fields);
+    void torrents_completed(torrent_ids_t const&);
+    void torrents_edited(torrent_ids_t const&);
+    void torrents_need_info(torrent_ids_t const&);
 
 private:
-    void rowsAdd(torrents_t const& torrents);
-    void rowsRemove(torrents_t const& torrents);
-    void rowsEmitChanged(torrent_ids_t const& ids);
+    void rows_add(torrents_t const& torrents);
+    void rows_remove(torrents_t const& torrents);
+    void rows_emit_changed(torrent_ids_t const& ids);
 
-    std::optional<int> getRow(int id) const;
+    std::optional<int> get_row(int id) const;
     using span_t = std::pair<int, int>;
-    std::vector<span_t> getSpans(torrent_ids_t const& ids) const;
+    std::vector<span_t> get_spans(torrent_ids_t const& ids) const;
 
     Prefs const& prefs_;
     torrent_ids_t already_added_;

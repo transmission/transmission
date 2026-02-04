@@ -10,10 +10,10 @@
 RpcQueue::RpcQueue(QObject* parent)
     : QObject{ parent }
 {
-    connect(&future_watcher_, &QFutureWatcher<RpcResponse>::finished, this, &RpcQueue::stepFinished);
+    connect(&future_watcher_, &QFutureWatcher<RpcResponse>::finished, this, &RpcQueue::step_finished);
 }
 
-void RpcQueue::stepFinished()
+void RpcQueue::step_finished()
 {
     RpcResponse result;
 
@@ -41,7 +41,7 @@ void RpcQueue::stepFinished()
         // run next request, if we have one to run and there was no error (or if we tolerate errors)
         if ((result.success || tolerate_errors_) && !std::empty(queue_))
         {
-            runNext(future);
+            run_next(future);
             return;
         }
     }
@@ -59,7 +59,7 @@ void RpcQueue::stepFinished()
     deleteLater();
 }
 
-void RpcQueue::runNext(RpcResponseFuture const& response)
+void RpcQueue::run_next(RpcResponseFuture const& response)
 {
     assert(!std::empty(queue_));
 
@@ -72,5 +72,5 @@ void RpcQueue::runNext(RpcResponseFuture const& response)
 
 void RpcQueue::run()
 {
-    runNext(RpcResponseFuture());
+    run_next(RpcResponseFuture());
 }

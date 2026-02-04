@@ -108,16 +108,16 @@ static_assert(Opts[std::size(Opts) - 2].val != 0);
 
 namespace
 {
-char const* getUsage()
+char const* get_usage()
 {
     return "Usage:\n"
            "  transmission-qt [options...] [[--] torrent files...] [--- Qt options...]";
 }
 
-bool tryDelegate(QStringList const& filenames)
+bool try_delegate(QStringList const& filenames)
 {
     InteropHelper const interop_client;
-    if (!interop_client.isConnected())
+    if (!interop_client.is_connected())
     {
         return false;
     }
@@ -141,14 +141,14 @@ bool tryDelegate(QStringList const& filenames)
 
         case AddData::FILENAME:
         case AddData::METAINFO:
-            metainfo = QString::fromUtf8(add_data.toBase64());
+            metainfo = QString::fromUtf8(add_data.to_base64());
             break;
 
         default:
             break;
         }
 
-        if (!metainfo.isEmpty() && interop_client.addMetainfo(metainfo))
+        if (!metainfo.isEmpty() && interop_client.add_metainfo(metainfo))
         {
             delegated = true;
         }
@@ -178,7 +178,7 @@ int tr_main(int argc, char** argv)
     int file_args_start_idx = -1;
     int qt_args_start_idx = -1;
     while (file_args_start_idx < 0 && qt_args_start_idx < 0 &&
-           (opt = tr_getopt(getUsage(), argc, static_cast<char const* const*>(argv), std::data(Opts), &arg)) != TR_OPT_DONE)
+           (opt = tr_getopt(get_usage(), argc, static_cast<char const* const*>(argv), std::data(Opts), &arg)) != TR_OPT_DONE)
     {
         switch (opt)
         {
@@ -212,7 +212,7 @@ int tr_main(int argc, char** argv)
 
         case TR_OPT_ERR:
             fmt::print(stderr, "Invalid option\n");
-            tr_getopt_usage(DisplayName, getUsage(), std::data(Opts));
+            tr_getopt_usage(DisplayName, get_usage(), std::data(Opts));
             return 1;
 
         default:
@@ -251,7 +251,7 @@ int tr_main(int argc, char** argv)
 
     // try to delegate the work to an existing copy of Transmission
     // before starting ourselves...
-    if (tryDelegate(filenames))
+    if (try_delegate(filenames))
     {
         return 0;
     }
@@ -264,7 +264,7 @@ int tr_main(int argc, char** argv)
 
     // initialize the prefs
     auto prefs = Prefs{};
-    prefs.loadFromConfigDir(config_dir);
+    prefs.load_from_config_dir(config_dir);
 
     if (!host.isNull())
     {

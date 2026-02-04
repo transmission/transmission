@@ -11,7 +11,7 @@
 namespace
 {
 
-int itemColumnSpan(QGridLayout const* layout, QLayoutItem const* item)
+int item_column_span(QGridLayout const* layout, QLayoutItem const* item)
 {
     for (int i = 0, count = layout->count(); i < count; ++i)
     {
@@ -40,17 +40,17 @@ ColumnResizer::ColumnResizer(QObject* parent)
     connect(&timer_, &QTimer::timeout, this, &ColumnResizer::update);
 }
 
-void ColumnResizer::addLayout(QGridLayout* layout)
+void ColumnResizer::add_layout(QGridLayout* layout)
 {
     layouts_.emplace(layout);
-    scheduleUpdate();
+    schedule_update();
 }
 
 bool ColumnResizer::eventFilter(QObject* object, QEvent* event)
 {
     if (event->type() == QEvent::Resize)
     {
-        scheduleUpdate();
+        schedule_update();
     }
 
     return QObject::eventFilter(object, event);
@@ -66,7 +66,7 @@ void ColumnResizer::update() const
         {
             QLayoutItem const* const item = layout->itemAtPosition(i, 0);
 
-            if (item == nullptr || itemColumnSpan(layout, item) > 1)
+            if (item == nullptr || item_column_span(layout, item) > 1)
             {
                 continue;
             }
@@ -81,7 +81,7 @@ void ColumnResizer::update() const
     }
 }
 
-void ColumnResizer::scheduleUpdate()
+void ColumnResizer::schedule_update()
 {
     timer_.start(0);
 }

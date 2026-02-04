@@ -100,37 +100,37 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     // ui signals
-    connect(ui_.action_Toolbar, &QAction::toggled, this, &MainWindow::setToolbarVisible);
-    connect(ui_.action_Filterbar, &QAction::toggled, this, &MainWindow::setFilterbarVisible);
-    connect(ui_.action_Statusbar, &QAction::toggled, this, &MainWindow::setStatusbarVisible);
-    connect(ui_.action_CompactView, &QAction::toggled, this, &MainWindow::setCompactView);
-    connect(ui_.action_ReverseSortOrder, &QAction::toggled, this, &MainWindow::setSortAscendingPref);
-    connect(ui_.action_Start, &QAction::triggered, this, &MainWindow::startSelected);
-    connect(ui_.action_QueueMoveTop, &QAction::triggered, this, &MainWindow::queueMoveTop);
-    connect(ui_.action_QueueMoveUp, &QAction::triggered, this, &MainWindow::queueMoveUp);
-    connect(ui_.action_QueueMoveDown, &QAction::triggered, this, &MainWindow::queueMoveDown);
-    connect(ui_.action_QueueMoveBottom, &QAction::triggered, this, &MainWindow::queueMoveBottom);
-    connect(ui_.action_StartNow, &QAction::triggered, this, &MainWindow::startSelectedNow);
-    connect(ui_.action_Pause, &QAction::triggered, this, &MainWindow::pauseSelected);
-    connect(ui_.action_Remove, &QAction::triggered, this, &MainWindow::removeSelected);
-    connect(ui_.action_Delete, &QAction::triggered, this, &MainWindow::deleteSelected);
-    connect(ui_.action_Verify, &QAction::triggered, this, &MainWindow::verifySelected);
-    connect(ui_.action_Announce, &QAction::triggered, this, &MainWindow::reannounceSelected);
-    connect(ui_.action_StartAll, &QAction::triggered, this, &MainWindow::startAll);
-    connect(ui_.action_PauseAll, &QAction::triggered, this, &MainWindow::pauseAll);
-    connect(ui_.action_OpenFile, &QAction::triggered, this, &MainWindow::openTorrent);
-    connect(ui_.action_AddURL, &QAction::triggered, this, &MainWindow::openURL);
-    connect(ui_.action_New, &QAction::triggered, this, &MainWindow::newTorrent);
-    connect(ui_.action_Preferences, &QAction::triggered, this, &MainWindow::openPreferences);
-    connect(ui_.action_Statistics, &QAction::triggered, this, &MainWindow::openStats);
-    connect(ui_.action_Donate, &QAction::triggered, this, &MainWindow::openDonate);
-    connect(ui_.action_About, &QAction::triggered, this, &MainWindow::openAbout);
-    connect(ui_.action_Contents, &QAction::triggered, this, &MainWindow::openHelp);
-    connect(ui_.action_OpenFolder, &QAction::triggered, this, &MainWindow::openFolder);
-    connect(ui_.action_CopyMagnetToClipboard, &QAction::triggered, this, &MainWindow::copyMagnetLinkToClipboard);
-    connect(ui_.action_SetLocation, &QAction::triggered, this, &MainWindow::setLocation);
-    connect(ui_.action_Properties, &QAction::triggered, this, &MainWindow::openProperties);
-    connect(ui_.action_SessionDialog, &QAction::triggered, this, &MainWindow::openSession);
+    connect(ui_.action_Toolbar, &QAction::toggled, this, &MainWindow::set_toolbar_visible);
+    connect(ui_.action_Filterbar, &QAction::toggled, this, &MainWindow::set_filterbar_visible);
+    connect(ui_.action_Statusbar, &QAction::toggled, this, &MainWindow::set_statusbar_visible);
+    connect(ui_.action_CompactView, &QAction::toggled, this, &MainWindow::set_compact_view);
+    connect(ui_.action_ReverseSortOrder, &QAction::toggled, this, &MainWindow::set_sort_ascending_pref);
+    connect(ui_.action_Start, &QAction::triggered, this, &MainWindow::start_selected);
+    connect(ui_.action_QueueMoveTop, &QAction::triggered, this, &MainWindow::queue_move_top);
+    connect(ui_.action_QueueMoveUp, &QAction::triggered, this, &MainWindow::queue_move_up);
+    connect(ui_.action_QueueMoveDown, &QAction::triggered, this, &MainWindow::queue_move_down);
+    connect(ui_.action_QueueMoveBottom, &QAction::triggered, this, &MainWindow::queue_move_bottom);
+    connect(ui_.action_StartNow, &QAction::triggered, this, &MainWindow::start_selected_now);
+    connect(ui_.action_Pause, &QAction::triggered, this, &MainWindow::pause_selected);
+    connect(ui_.action_Remove, &QAction::triggered, this, &MainWindow::remove_selected);
+    connect(ui_.action_Delete, &QAction::triggered, this, &MainWindow::delete_selected);
+    connect(ui_.action_Verify, &QAction::triggered, this, &MainWindow::verify_selected);
+    connect(ui_.action_Announce, &QAction::triggered, this, &MainWindow::reannounce_selected);
+    connect(ui_.action_StartAll, &QAction::triggered, this, &MainWindow::start_all);
+    connect(ui_.action_PauseAll, &QAction::triggered, this, &MainWindow::pause_all);
+    connect(ui_.action_OpenFile, &QAction::triggered, this, &MainWindow::open_torrent);
+    connect(ui_.action_AddURL, &QAction::triggered, this, &MainWindow::open_url);
+    connect(ui_.action_New, &QAction::triggered, this, &MainWindow::new_torrent);
+    connect(ui_.action_Preferences, &QAction::triggered, this, &MainWindow::open_preferences);
+    connect(ui_.action_Statistics, &QAction::triggered, this, &MainWindow::open_stats);
+    connect(ui_.action_Donate, &QAction::triggered, this, &MainWindow::open_donate);
+    connect(ui_.action_About, &QAction::triggered, this, &MainWindow::open_about);
+    connect(ui_.action_Contents, &QAction::triggered, this, &MainWindow::open_help);
+    connect(ui_.action_OpenFolder, &QAction::triggered, this, &MainWindow::open_folder);
+    connect(ui_.action_CopyMagnetToClipboard, &QAction::triggered, this, &MainWindow::copy_magnet_link_to_clipboard);
+    connect(ui_.action_SetLocation, &QAction::triggered, this, &MainWindow::set_location);
+    connect(ui_.action_Properties, &QAction::triggered, this, &MainWindow::open_properties);
+    connect(ui_.action_SessionDialog, &QAction::triggered, this, &MainWindow::open_session);
     connect(ui_.listView, &QAbstractItemView::activated, ui_.action_Properties, &QAction::trigger);
     connect(ui_.action_SelectAll, &QAction::triggered, ui_.listView, &QAbstractItemView::selectAll);
     connect(ui_.action_DeselectAll, &QAction::triggered, ui_.listView, &QAbstractItemView::clearSelection);
@@ -138,22 +138,22 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     auto refresh_action_sensitivity_soon = [this]()
     {
-        refreshSoon(RefreshActionSensitivity);
+        refresh_soon(RefreshActionSensitivity);
     };
     connect(&filter_model_, &TorrentFilter::rowsInserted, this, refresh_action_sensitivity_soon);
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_action_sensitivity_soon);
-    connect(&model_, &TorrentModel::torrentsChanged, this, refresh_action_sensitivity_soon);
+    connect(&model_, &TorrentModel::torrents_changed, this, refresh_action_sensitivity_soon);
 
     // torrent view
     filter_model_.setSourceModel(&model_);
     auto refresh_soon_adapter = [this]()
     {
-        refreshSoon(~RefreshIcon);
+        refresh_soon(~RefreshIcon);
     };
     connect(&model_, &TorrentModel::modelReset, this, refresh_soon_adapter);
     connect(&model_, &TorrentModel::rowsRemoved, this, refresh_soon_adapter);
     connect(&model_, &TorrentModel::rowsInserted, this, refresh_soon_adapter);
-    connect(&model_, &TorrentModel::torrentsChanged, this, refresh_soon_adapter);
+    connect(&model_, &TorrentModel::torrents_changed, this, refresh_soon_adapter);
 
     ui_.listView->setModel(&filter_model_);
     connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
@@ -179,13 +179,13 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
         action_group->addAction(action);
     }
 
-    connect(action_group, &QActionGroup::triggered, this, &MainWindow::onSortModeChanged);
+    connect(action_group, &QActionGroup::triggered, this, &MainWindow::on_sort_mode_changed);
 
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     alt_speed_action_ = new QAction{ tr("Speed Limits"), this };
     alt_speed_action_->setIcon(ui_.altSpeedButton->icon());
     alt_speed_action_->setCheckable(true);
-    connect(alt_speed_action_, &QAction::triggered, this, &MainWindow::toggleSpeedMode);
+    connect(alt_speed_action_, &QAction::triggered, this, &MainWindow::toggle_speed_mode);
 
     auto* menu = new QMenu{ this };
     menu->addAction(ui_.action_OpenFile);
@@ -202,27 +202,27 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     tray_icon_.setContextMenu(menu);
     tray_icon_.setIcon(QIcon::fromTheme(QStringLiteral("transmission-tray-icon"), QApplication::windowIcon()));
 
-    connect(&prefs_, &Prefs::changed, this, &MainWindow::refreshPref);
-    connect(ui_.action_ShowMainWindow, &QAction::triggered, this, &MainWindow::toggleWindows);
-    connect(&tray_icon_, &QSystemTrayIcon::activated, this, &MainWindow::trayActivated);
+    connect(&prefs_, &Prefs::changed, this, &MainWindow::refresh_pref);
+    connect(ui_.action_ShowMainWindow, &QAction::triggered, this, &MainWindow::toggle_windows);
+    connect(&tray_icon_, &QSystemTrayIcon::activated, this, &MainWindow::tray_activated);
 
-    toggleWindows(!minimized);
+    toggle_windows(!minimized);
     ui_.action_TrayIcon->setChecked(minimized || prefs.get<bool>(Prefs::SHOW_TRAY_ICON));
 
-    initStatusBar();
+    init_status_bar();
     auto* filter_bar = new FilterBar{ prefs_, model_, filter_model_ };
     ui_.verticalLayout->insertWidget(0, filter_bar);
     filter_bar_ = filter_bar;
 
     auto refresh_header_soon = [this]()
     {
-        refreshSoon(RefreshTorrentViewHeader);
+        refresh_soon(RefreshTorrentViewHeader);
     };
     connect(&model_, &TorrentModel::rowsInserted, this, refresh_header_soon);
     connect(&model_, &TorrentModel::rowsRemoved, this, refresh_header_soon);
     connect(&filter_model_, &TorrentFilter::rowsInserted, this, refresh_header_soon);
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_header_soon);
-    connect(ui_.listView, &TorrentView::headerDoubleClicked, filter_bar, &FilterBar::clear);
+    connect(ui_.listView, &TorrentView::header_double_clicked, filter_bar, &FilterBar::clear);
 
     static std::array<int, 17> constexpr InitKeys = {
         Prefs::ALT_SPEED_LIMIT_ENABLED, //
@@ -245,33 +245,33 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     };
     for (auto const key : InitKeys)
     {
-        refreshPref(key);
+        refresh_pref(key);
     }
 
     auto refresh_status_soon = [this]()
     {
-        refreshSoon(RefreshStatusBar);
+        refresh_soon(RefreshStatusBar);
     };
-    connect(&session_, &Session::sourceChanged, this, &MainWindow::onSessionSourceChanged);
-    connect(&session_, &Session::statsUpdated, this, refresh_status_soon);
-    connect(&session_, &Session::dataReadProgress, this, &MainWindow::dataReadProgress);
-    connect(&session_, &Session::dataSendProgress, this, &MainWindow::dataSendProgress);
-    connect(&session_, &Session::httpAuthenticationRequired, this, &MainWindow::wrongAuthentication);
-    connect(&session_, &Session::networkResponse, this, &MainWindow::onNetworkResponse);
+    connect(&session_, &Session::source_changed, this, &MainWindow::on_session_source_changed);
+    connect(&session_, &Session::stats_updated, this, refresh_status_soon);
+    connect(&session_, &Session::data_read_progress, this, &MainWindow::data_read_progress);
+    connect(&session_, &Session::data_send_progress, this, &MainWindow::data_send_progress);
+    connect(&session_, &Session::http_authentication_required, this, &MainWindow::wrong_authentication);
+    connect(&session_, &Session::network_response, this, &MainWindow::on_network_response);
 
-    connect(&network_timer_, &QTimer::timeout, this, &MainWindow::updateNetworkLabel);
-    connect(&refresh_timer_, &QTimer::timeout, this, &MainWindow::onRefreshTimer);
+    connect(&network_timer_, &QTimer::timeout, this, &MainWindow::update_network_label);
+    connect(&refresh_timer_, &QTimer::timeout, this, &MainWindow::on_refresh_timer);
 
-    refreshSoon(~0);
+    refresh_soon(~0);
 }
 
-void MainWindow::onSessionSourceChanged()
+void MainWindow::on_session_source_changed()
 {
     model_.clear();
 
-    if (session_.isServer())
+    if (session_.is_server())
     {
-        updateNetworkLabel();
+        update_network_label();
         ui_.networkLabel->show();
         network_timer_.start(1000);
     }
@@ -286,7 +286,7 @@ void MainWindow::onSessionSourceChanged()
 *****
 ****/
 
-void MainWindow::onSetPrefs()
+void MainWindow::on_set_prefs()
 {
     QVariantList const p = sender()->property(PrefVariantsKey).toList();
     assert(p.size() % 2 == 0);
@@ -297,17 +297,17 @@ void MainWindow::onSetPrefs()
     }
 }
 
-void MainWindow::onSetPrefs(bool is_checked)
+void MainWindow::on_set_prefs(bool is_checked)
 {
     if (is_checked)
     {
-        onSetPrefs();
+        on_set_prefs();
     }
 }
 
-void MainWindow::initStatusBar()
+void MainWindow::init_status_bar()
 {
-    ui_.optionsButton->setMenu(createOptionsMenu());
+    ui_.optionsButton->setMenu(create_options_menu());
 
     int const minimum_speed_width = ui_.downloadSpeedLabel->fontMetrics()
                                         .size(0, Speed{ 999.99, Speed::Units::KByps }.to_qstring())
@@ -315,12 +315,12 @@ void MainWindow::initStatusBar()
     ui_.downloadSpeedLabel->setMinimumWidth(minimum_speed_width);
     ui_.uploadSpeedLabel->setMinimumWidth(minimum_speed_width);
 
-    ui_.statsModeButton->setMenu(createStatsModeMenu());
+    ui_.statsModeButton->setMenu(create_stats_mode_menu());
 
-    connect(ui_.altSpeedButton, &QAbstractButton::clicked, this, &MainWindow::toggleSpeedMode);
+    connect(ui_.altSpeedButton, &QAbstractButton::clicked, this, &MainWindow::toggle_speed_mode);
 }
 
-QMenu* MainWindow::createOptionsMenu()
+QMenu* MainWindow::create_options_menu()
 {
     auto const init_speed_sub_menu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
     {
@@ -333,13 +333,13 @@ QMenu* MainWindow::createOptionsMenu()
         off_action->setCheckable(true);
         off_action->setProperty(PrefVariantsKey, QVariantList{ enabled_pref, false });
         action_group->addAction(off_action);
-        connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
+        connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::on_set_prefs));
 
         on_action = menu->addAction(tr("Limited at %1").arg(Speed{ current_value, Speed::Units::KByps }.to_qstring()));
         on_action->setCheckable(true);
         on_action->setProperty(PrefVariantsKey, QVariantList{ pref, current_value, enabled_pref, true });
         action_group->addAction(on_action);
-        connect(on_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
+        connect(on_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::on_set_prefs));
 
         menu->addSeparator();
 
@@ -347,7 +347,7 @@ QMenu* MainWindow::createOptionsMenu()
         {
             auto* const action = menu->addAction(Speed{ kbyps, Speed::Units::KByps }.to_qstring());
             action->setProperty(PrefVariantsKey, QVariantList{ pref, kbyps, enabled_pref, true });
-            connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
+            connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::on_set_prefs));
         }
     };
 
@@ -363,13 +363,13 @@ QMenu* MainWindow::createOptionsMenu()
         off_action->setCheckable(true);
         off_action->setProperty(PrefVariantsKey, QVariantList{ enabled_pref, false });
         action_group->addAction(off_action);
-        connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
+        connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::on_set_prefs));
 
         on_action = menu->addAction(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(current_value)));
         on_action->setCheckable(true);
         on_action->setProperty(PrefVariantsKey, QVariantList{ pref, current_value, enabled_pref, true });
         action_group->addAction(on_action);
-        connect(on_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
+        connect(on_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::on_set_prefs));
 
         menu->addSeparator();
 
@@ -377,7 +377,7 @@ QMenu* MainWindow::createOptionsMenu()
         {
             QAction* action = menu->addAction(Formatter::ratio_to_string(i));
             action->setProperty(PrefVariantsKey, QVariantList{ pref, i, enabled_pref, true });
-            connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
+            connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::on_set_prefs));
         }
     };
 
@@ -408,7 +408,7 @@ QMenu* MainWindow::createOptionsMenu()
     return menu;
 }
 
-QMenu* MainWindow::createStatsModeMenu()
+QMenu* MainWindow::create_stats_mode_menu()
 {
     auto const stats_modes = std::array<std::pair<QAction*, StatsMode>, StatsModeCount>{ {
         { ui_.action_TotalRatio, StatsMode::TotalRatio },
@@ -427,7 +427,7 @@ QMenu* MainWindow::createStatsModeMenu()
         menu->addAction(action);
     }
 
-    connect(action_group, &QActionGroup::triggered, this, &MainWindow::onStatsModeChanged);
+    connect(action_group, &QActionGroup::triggered, this, &MainWindow::on_stats_mode_changed);
 
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     return menu;
@@ -437,12 +437,12 @@ QMenu* MainWindow::createStatsModeMenu()
 *****
 ****/
 
-void MainWindow::onSortModeChanged(QAction const* action)
+void MainWindow::on_sort_mode_changed(QAction const* action)
 {
     prefs_.set(Prefs::SORT_MODE, action->property(SortModeKey));
 }
 
-void MainWindow::setSortAscendingPref(bool b)
+void MainWindow::set_sort_ascending_pref(bool b)
 {
     prefs_.set(Prefs::SORT_REVERSED, b);
 }
@@ -476,25 +476,25 @@ void MainWindow::hideEvent(QHideEvent* event)
 *****
 ****/
 
-void MainWindow::openSession()
+void MainWindow::open_session()
 {
-    Utils::openDialog(session_dialog_, session_, prefs_, this);
+    Utils::open_dialog(session_dialog_, session_, prefs_, this);
 }
 
-void MainWindow::openPreferences()
+void MainWindow::open_preferences()
 {
-    Utils::openDialog(prefs_dialog_, session_, prefs_, this);
+    Utils::open_dialog(prefs_dialog_, session_, prefs_, this);
 }
 
-void MainWindow::openProperties()
+void MainWindow::open_properties()
 {
-    Utils::openDialog(details_dialog_, session_, prefs_, model_, this);
-    details_dialog_->setIds(getSelectedTorrents());
+    Utils::open_dialog(details_dialog_, session_, prefs_, model_, this);
+    details_dialog_->set_ids(get_selected_torrents());
 }
 
-void MainWindow::setLocation()
+void MainWindow::set_location()
 {
-    auto* d = new RelocateDialog{ session_, model_, getSelectedTorrents(), this };
+    auto* d = new RelocateDialog{ session_, model_, get_selected_torrents(), this };
     d->setAttribute(Qt::WA_DeleteOnClose, true);
     d->show();
 }
@@ -504,7 +504,7 @@ namespace
 namespace open_folder_helpers
 {
 #if defined(Q_OS_WIN)
-void openSelect(QString const& path)
+void open_select(QString const& path)
 {
     auto const explorer = QStringLiteral("explorer");
     QString param;
@@ -518,7 +518,7 @@ void openSelect(QString const& path)
     QProcess::startDetached(explorer, QStringList{ param });
 }
 #elif defined(Q_OS_MAC)
-void openSelect(QString const& path)
+void open_select(QString const& path)
 {
     QStringList script_args;
     script_args << QStringLiteral("-e") << QStringLiteral("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(path);
@@ -529,14 +529,14 @@ void openSelect(QString const& path)
     QProcess::execute(QStringLiteral("/usr/bin/osascript"), script_args);
 }
 #else
-void openSelect(QString const& path)
+void open_select(QString const& path)
 {
     QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 }
 #endif
 
 // if all torrents in a list have the same top folder, return it
-[[nodiscard]] QString getTopFolder(FileList const& files)
+[[nodiscard]] QString get_top_folder(FileList const& files)
 {
     if (std::empty(files))
     {
@@ -559,7 +559,7 @@ void openSelect(QString const& path)
     return top;
 }
 
-[[nodiscard]] bool isTopFolder(QDir const& parent, QString const& child)
+[[nodiscard]] bool is_top_folder(QDir const& parent, QString const& child)
 {
     if (child.isEmpty())
     {
@@ -570,14 +570,14 @@ void openSelect(QString const& path)
     return info.exists() && info.isDir();
 }
 
-[[nodiscard]] QString getTopFolder(QDir const& parent, Torrent const* const tor)
+[[nodiscard]] QString get_top_folder(QDir const& parent, Torrent const* const tor)
 {
-    if (auto top = getTopFolder(tor->files()); isTopFolder(parent, top))
+    if (auto top = get_top_folder(tor->files()); is_top_folder(parent, top))
     {
         return top;
     }
 
-    if (auto const& top = tor->name(); isTopFolder(parent, top))
+    if (auto const& top = tor->name(); is_top_folder(parent, top))
     {
         return top;
     }
@@ -587,50 +587,50 @@ void openSelect(QString const& path)
 } // namespace open_folder_helpers
 } // namespace
 
-void MainWindow::openFolder()
+void MainWindow::open_folder()
 {
     using namespace open_folder_helpers;
 
-    auto const selected_torrents = getSelectedTorrents();
+    auto const selected_torrents = get_selected_torrents();
     if (std::size(selected_torrents) != 1U)
     {
         return;
     }
 
     auto const torrent_id = *selected_torrents.begin();
-    auto const* const tor = model_.getTorrentFromId(torrent_id);
+    auto const* const tor = model_.get_torrent_from_id(torrent_id);
     if (tor == nullptr)
     {
         return;
     }
 
-    auto const parent = QDir{ tor->getPath() };
-    auto const child = getTopFolder(parent, tor);
-    openSelect(parent.filePath(child));
+    auto const parent = QDir{ tor->get_path() };
+    auto const child = get_top_folder(parent, tor);
+    open_select(parent.filePath(child));
 }
 
-void MainWindow::copyMagnetLinkToClipboard()
+void MainWindow::copy_magnet_link_to_clipboard()
 {
-    int const id(*getSelectedTorrents().begin());
-    session_.copyMagnetLinkToClipboard(id);
+    int const id(*get_selected_torrents().begin());
+    session_.copy_magnet_link_to_clipboard(id);
 }
 
-void MainWindow::openStats()
+void MainWindow::open_stats()
 {
-    Utils::openDialog(stats_dialog_, session_, this);
+    Utils::open_dialog(stats_dialog_, session_, this);
 }
 
-void MainWindow::openDonate() const
+void MainWindow::open_donate() const
 {
     QDesktopServices::openUrl(QUrl{ QStringLiteral("https://transmissionbt.com/donate/") });
 }
 
-void MainWindow::openAbout()
+void MainWindow::open_about()
 {
-    Utils::openDialog(about_dialog_, session_, this);
+    Utils::open_dialog(about_dialog_, session_, this);
 }
 
-void MainWindow::openHelp() const
+void MainWindow::open_help() const
 {
     QDesktopServices::openUrl(
         QUrl{ QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).arg(MINOR_VERSION / 10) });
@@ -640,7 +640,7 @@ void MainWindow::openHelp() const
 *****
 ****/
 
-void MainWindow::refreshSoon(int fields)
+void MainWindow::refresh_soon(int fields)
 {
     refresh_fields_ |= fields;
 
@@ -651,68 +651,68 @@ void MainWindow::refreshSoon(int fields)
     }
 }
 
-MainWindow::TransferStats MainWindow::getTransferStats() const
+MainWindow::TransferStats MainWindow::get_transfer_stats() const
 {
     TransferStats stats;
 
     for (auto const& tor : model_.torrents())
     {
-        stats.speed_up += tor->uploadSpeed();
-        stats.speed_down += tor->downloadSpeed();
-        stats.peers_sending += tor->webseedsWeAreDownloadingFrom();
-        stats.peers_sending += tor->peersWeAreDownloadingFrom();
-        stats.peers_receiving += tor->peersWeAreUploadingTo();
+        stats.speed_up += tor->upload_speed();
+        stats.speed_down += tor->download_speed();
+        stats.peers_sending += tor->webseeds_we_are_downloading_from();
+        stats.peers_sending += tor->peers_we_are_downloading_from();
+        stats.peers_receiving += tor->peers_we_are_uploading_to();
     }
 
     return stats;
 }
 
-void MainWindow::onRefreshTimer()
+void MainWindow::on_refresh_timer()
 {
     int fields = 0;
     std::swap(fields, refresh_fields_);
 
     if (fields & RefreshTitle)
     {
-        refreshTitle();
+        refresh_title();
     }
 
     if (fields & RefreshIcon)
     {
-        refreshIcons();
+        refresh_icons();
     }
 
     if (fields & (RefreshTrayIcon | RefreshStatusBar))
     {
-        auto const stats = getTransferStats();
+        auto const stats = get_transfer_stats();
 
         if (fields & RefreshTrayIcon)
         {
-            refreshTrayIcon(stats);
+            refresh_tray_icon(stats);
         }
 
         if (fields & RefreshStatusBar)
         {
-            refreshStatusBar(stats);
+            refresh_status_bar(stats);
         }
     }
 
     if (fields & RefreshTorrentViewHeader)
     {
-        refreshTorrentViewHeader();
+        refresh_torrent_view_header();
     }
 
     if (fields & RefreshActionSensitivity)
     {
-        refreshActionSensitivity();
+        refresh_action_sensitivity();
     }
 }
 
-void MainWindow::refreshTitle()
+void MainWindow::refresh_title()
 {
     QString title(QStringLiteral("Transmission"));
 
-    if (auto const url = QUrl{ session_.getRemoteUrl() }; !url.isEmpty())
+    if (auto const url = QUrl{ session_.get_remote_url() }; !url.isEmpty())
     {
         //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session)
         //: notice that leading space (before the dash) is included here
@@ -722,7 +722,7 @@ void MainWindow::refreshTitle()
     setWindowTitle(title);
 }
 
-void MainWindow::refreshTrayIcon(TransferStats const& stats)
+void MainWindow::refresh_tray_icon(TransferStats const& stats)
 {
     QString tip;
 
@@ -746,7 +746,7 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
     tray_icon_.setToolTip(tip);
 }
 
-void MainWindow::refreshStatusBar(TransferStats const& stats)
+void MainWindow::refresh_status_bar(TransferStats const& stats)
 {
     ui_.uploadSpeedLabel->setText(stats.speed_up.to_upload_qstring());
     ui_.uploadSpeedLabel->setVisible(stats.peers_sending || stats.peers_receiving);
@@ -756,7 +756,7 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     static_assert(StatsModeCount == 4U && "StatsMode changed: update this code");
     auto const mode = prefs_.get<StatsMode>(Prefs::STATUSBAR_STATS);
     auto const use_session_stats = mode == StatsMode::SessionRatio || mode == StatsMode::SessionTransfer;
-    auto const& st = use_session_stats ? session_.getStats() : session_.getCumulativeStats();
+    auto const& st = use_session_stats ? session_.get_stats() : session_.get_cumulative_stats();
     ui_.statsLabel->setText(
         mode == StatsMode::SessionTransfer || mode == StatsMode::TotalTransfer ?
             tr("Down: %1, Up: %2")
@@ -765,22 +765,22 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
             tr("Ratio: %1").arg(Formatter::ratio_to_string(st.ratio)));
 }
 
-void MainWindow::refreshTorrentViewHeader()
+void MainWindow::refresh_torrent_view_header()
 {
     int const total_count = model_.rowCount();
     int const visible_count = filter_model_.rowCount();
 
     if (visible_count == total_count)
     {
-        ui_.listView->setHeaderText(QString{});
+        ui_.listView->set_header_text(QString{});
     }
     else
     {
-        ui_.listView->setHeaderText(tr("Showing %L1 of %Ln torrent(s)", nullptr, total_count).arg(visible_count));
+        ui_.listView->set_header_text(tr("Showing %L1 of %Ln torrent(s)", nullptr, total_count).arg(visible_count));
     }
 }
 
-void MainWindow::refreshActionSensitivity()
+void MainWindow::refresh_action_sensitivity()
 {
     auto const* model = ui_.listView->model();
     auto const* selection_model = ui_.listView->selectionModel();
@@ -803,22 +803,22 @@ void MainWindow::refreshActionSensitivity()
 
         ++selected;
 
-        if (tor->isPaused())
+        if (tor->is_paused())
         {
             ++selected_and_paused;
         }
 
-        if (tor->isQueued())
+        if (tor->is_queued())
         {
             ++selected_and_queued;
         }
 
-        if (tor->hasMetadata())
+        if (tor->has_metadata())
         {
             ++selected_with_metadata;
         }
 
-        if (tor->canManualAnnounceAt(now))
+        if (tor->can_manual_announce_at(now))
         {
             ++selected_and_can_announce;
         }
@@ -827,7 +827,7 @@ void MainWindow::refreshActionSensitivity()
     auto const& torrents = model_.torrents();
     auto const is_paused = [](auto const* tor)
     {
-        return tor->isPaused();
+        return tor->is_paused();
     };
     auto const any_paused = std::ranges::any_of(torrents, is_paused);
     auto const any_not_paused = !std::ranges::all_of(torrents, is_paused);
@@ -843,7 +843,7 @@ void MainWindow::refreshActionSensitivity()
     ui_.action_DeselectAll->setEnabled(have_selection);
     ui_.action_SetLocation->setEnabled(have_selection);
 
-    ui_.action_OpenFolder->setEnabled(one_selection && have_selection_with_metadata && session_.isLocal());
+    ui_.action_OpenFolder->setEnabled(one_selection && have_selection_with_metadata && session_.is_local());
     ui_.action_CopyMagnetToClipboard->setEnabled(one_selection);
 
     ui_.action_SelectAll->setEnabled(selected < row_count);
@@ -861,16 +861,16 @@ void MainWindow::refreshActionSensitivity()
 
     if (!details_dialog_.isNull())
     {
-        details_dialog_->setIds(getSelectedTorrents());
+        details_dialog_->set_ids(get_selected_torrents());
     }
 }
 
-void MainWindow::refreshIcons()
+void MainWindow::refresh_icons()
 {
     auto set_icon = [](QAction* const action, icons::Type const type)
     {
         action->setIcon(icons::icon(type));
-        action->setIconVisibleInMenu(icons::shouldBeShownInMenu(type));
+        action->setIconVisibleInMenu(icons::should_be_shown_in_menu(type));
     };
     set_icon(ui_.action_About, icons::Type::About);
     set_icon(ui_.action_AddURL, icons::Type::AddTorrentFromURL);
@@ -917,12 +917,12 @@ void MainWindow::refreshIcons()
 **/
 
 // NOLINTNEXTLINE(readability-make-member-function-const)
-void MainWindow::clearSelection()
+void MainWindow::clear_selection()
 {
     ui_.action_DeselectAll->trigger();
 }
 
-torrent_ids_t MainWindow::getSelectedTorrents(bool with_metadata_only) const
+torrent_ids_t MainWindow::get_selected_torrents(bool with_metadata_only) const
 {
     torrent_ids_t ids;
 
@@ -930,7 +930,7 @@ torrent_ids_t MainWindow::getSelectedTorrents(bool with_metadata_only) const
     {
         auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
 
-        if (tor != nullptr && (!with_metadata_only || tor->hasMetadata()))
+        if (tor != nullptr && (!with_metadata_only || tor->has_metadata()))
         {
             ids.insert(tor->id());
         }
@@ -939,76 +939,76 @@ torrent_ids_t MainWindow::getSelectedTorrents(bool with_metadata_only) const
     return ids;
 }
 
-void MainWindow::startSelected()
+void MainWindow::start_selected()
 {
-    session_.startTorrents(getSelectedTorrents());
+    session_.start_torrents(get_selected_torrents());
 }
 
-void MainWindow::startSelectedNow()
+void MainWindow::start_selected_now()
 {
-    session_.startTorrentsNow(getSelectedTorrents());
+    session_.start_torrents_now(get_selected_torrents());
 }
 
-void MainWindow::pauseSelected()
+void MainWindow::pause_selected()
 {
-    session_.pauseTorrents(getSelectedTorrents());
+    session_.pause_torrents(get_selected_torrents());
 }
 
-void MainWindow::queueMoveTop()
+void MainWindow::queue_move_top()
 {
-    session_.queueMoveTop(getSelectedTorrents());
+    session_.queue_move_top(get_selected_torrents());
 }
 
-void MainWindow::queueMoveUp()
+void MainWindow::queue_move_up()
 {
-    session_.queueMoveUp(getSelectedTorrents());
+    session_.queue_move_up(get_selected_torrents());
 }
 
-void MainWindow::queueMoveDown()
+void MainWindow::queue_move_down()
 {
-    session_.queueMoveDown(getSelectedTorrents());
+    session_.queue_move_down(get_selected_torrents());
 }
 
-void MainWindow::queueMoveBottom()
+void MainWindow::queue_move_bottom()
 {
-    session_.queueMoveBottom(getSelectedTorrents());
+    session_.queue_move_bottom(get_selected_torrents());
 }
 
-void MainWindow::startAll()
+void MainWindow::start_all()
 {
-    session_.startTorrents();
+    session_.start_torrents();
 }
 
-void MainWindow::pauseAll()
+void MainWindow::pause_all()
 {
-    session_.pauseTorrents();
+    session_.pause_torrents();
 }
 
-void MainWindow::removeSelected()
+void MainWindow::remove_selected()
 {
-    removeTorrents(false);
+    remove_torrents(false);
 }
 
-void MainWindow::deleteSelected()
+void MainWindow::delete_selected()
 {
-    removeTorrents(true);
+    remove_torrents(true);
 }
 
-void MainWindow::verifySelected()
+void MainWindow::verify_selected()
 {
-    session_.verifyTorrents(getSelectedTorrents(true));
+    session_.verify_torrents(get_selected_torrents(true));
 }
 
-void MainWindow::reannounceSelected()
+void MainWindow::reannounce_selected()
 {
-    session_.reannounceTorrents(getSelectedTorrents());
+    session_.reannounce_torrents(get_selected_torrents());
 }
 
 /**
 ***
 **/
 
-void MainWindow::onStatsModeChanged(QAction const* action)
+void MainWindow::on_stats_mode_changed(QAction const* action)
 {
     prefs_.set(Prefs::STATUSBAR_STATS, action->property(StatsModeKey).value<StatsMode>());
 }
@@ -1017,12 +1017,12 @@ void MainWindow::onStatsModeChanged(QAction const* action)
 ***
 **/
 
-void MainWindow::setCompactView(bool visible)
+void MainWindow::set_compact_view(bool visible)
 {
     prefs_.set(Prefs::COMPACT_VIEW, visible);
 }
 
-void MainWindow::toggleSpeedMode()
+void MainWindow::toggle_speed_mode()
 {
     auto const key = Prefs::ALT_SPEED_LIMIT_ENABLED;
     auto const checked = !prefs_.get<bool>(key);
@@ -1030,17 +1030,17 @@ void MainWindow::toggleSpeedMode()
     alt_speed_action_->setChecked(checked);
 }
 
-void MainWindow::setToolbarVisible(bool visible)
+void MainWindow::set_toolbar_visible(bool visible)
 {
     prefs_.set(Prefs::TOOLBAR, visible);
 }
 
-void MainWindow::setFilterbarVisible(bool visible)
+void MainWindow::set_filterbar_visible(bool visible)
 {
     prefs_.set(Prefs::FILTERBAR, visible);
 }
 
-void MainWindow::setStatusbarVisible(bool visible)
+void MainWindow::set_statusbar_visible(bool visible)
 {
     prefs_.set(Prefs::STATUSBAR, visible);
 }
@@ -1049,7 +1049,7 @@ void MainWindow::setStatusbarVisible(bool visible)
 ***
 **/
 
-void MainWindow::toggleWindows(bool do_show)
+void MainWindow::toggle_windows(bool do_show)
 {
     if (!do_show)
     {
@@ -1076,22 +1076,22 @@ void MainWindow::toggleWindows(bool do_show)
     }
 }
 
-void MainWindow::trayActivated(QSystemTrayIcon::ActivationReason reason)
+void MainWindow::tray_activated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::Trigger || reason == QSystemTrayIcon::DoubleClick)
     {
         if (isMinimized())
         {
-            toggleWindows(true);
+            toggle_windows(true);
         }
         else
         {
-            toggleWindows(!isVisible());
+            toggle_windows(!isVisible());
         }
     }
 }
 
-void MainWindow::refreshPref(int const idx)
+void MainWindow::refresh_pref(int const idx)
 {
     auto b = bool{};
     auto str = QString{};
@@ -1107,7 +1107,7 @@ void MainWindow::refreshPref(int const idx)
                 action->setChecked(needle == action->property(StatsModeKey));
             }
 
-            refreshSoon(RefreshStatusBar);
+            refresh_soon(RefreshStatusBar);
         }
         break;
 
@@ -1175,7 +1175,7 @@ void MainWindow::refreshPref(int const idx)
         ui_.action_TrayIcon->setChecked(b);
         tray_icon_.setVisible(b);
         QApplication::setQuitOnLastWindowClosed(!b);
-        refreshSoon(RefreshTrayIcon);
+        refresh_soon(RefreshTrayIcon);
         break;
 
     case Prefs::COMPACT_VIEW:
@@ -1223,14 +1223,14 @@ void MainWindow::refreshPref(int const idx)
 ****
 ***/
 
-void MainWindow::newTorrent()
+void MainWindow::new_torrent()
 {
     auto* dialog = new MakeDialog{ session_, this };
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 
-void MainWindow::openTorrent()
+void MainWindow::open_torrent()
 {
     auto* const d = new QFileDialog{ this,
                                      tr("Open Torrent"),
@@ -1247,12 +1247,12 @@ void MainWindow::openTorrent()
         l->addWidget(b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
     }
 
-    connect(d, &QFileDialog::filesSelected, this, &MainWindow::addTorrents);
+    connect(d, &QFileDialog::filesSelected, this, &MainWindow::add_torrents);
 
     d->open();
 }
 
-void MainWindow::openURL()
+void MainWindow::open_url()
 {
     auto add = AddData::create(QApplication::clipboard()->text(QClipboard::Selection));
 
@@ -1266,10 +1266,10 @@ void MainWindow::openURL()
         add = AddData{};
     }
 
-    addTorrent(*add, true);
+    add_torrent(*add, true);
 }
 
-void MainWindow::addTorrentFromClipboard()
+void MainWindow::add_torrent_from_clipboard()
 {
     if (auto const text = QGuiApplication::clipboard()->text().trimmed();
         text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) || tr_magnet_metainfo{}.parseMagnet(text.toStdString()))
@@ -1290,13 +1290,13 @@ void MainWindow::addTorrentFromClipboard()
             if (!clipboard_processed_keys_.contains(key))
             {
                 clipboard_processed_keys_.append(key);
-                trApp->addTorrent(AddData{ key });
+                trApp->add_torrent(AddData{ key });
             }
         }
     }
 }
 
-void MainWindow::addTorrents(QStringList const& filenames)
+void MainWindow::add_torrents(QStringList const& filenames)
 {
     bool show_options = prefs_.get<bool>(Prefs::OPTIONS_PROMPT);
 
@@ -1310,11 +1310,11 @@ void MainWindow::addTorrents(QStringList const& filenames)
 
     for (QString const& filename : filenames)
     {
-        addTorrent(AddData{ filename }, show_options);
+        add_torrent(AddData{ filename }, show_options);
     }
 }
 
-void MainWindow::addTorrent(AddData const& add_me, bool show_options)
+void MainWindow::add_torrent(AddData const& add_me, bool show_options)
 {
     if (show_options)
     {
@@ -1324,12 +1324,12 @@ void MainWindow::addTorrent(AddData const& add_me, bool show_options)
     }
     else
     {
-        session_.addTorrent(add_me);
+        session_.add_torrent(add_me);
         QApplication::alert(this);
     }
 }
 
-void MainWindow::removeTorrents(bool const delete_files)
+void MainWindow::remove_torrents(bool const delete_files)
 {
     torrent_ids_t ids;
     QMessageBox msg_box(this);
@@ -1343,12 +1343,12 @@ void MainWindow::removeTorrents(bool const delete_files)
         auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
         ids.insert(tor->id());
 
-        if (tor->connectedPeers())
+        if (tor->connected_peers())
         {
             ++connected;
         }
 
-        if (!tor->isDone())
+        if (!tor->is_done())
         {
             ++incomplete;
         }
@@ -1427,7 +1427,7 @@ void MainWindow::removeTorrents(bool const delete_files)
     if (msg_box.exec() == QMessageBox::Ok)
     {
         ui_.listView->selectionModel()->clear();
-        session_.removeTorrents(ids, delete_files);
+        session_.remove_torrents(ids, delete_files);
     }
 }
 
@@ -1435,7 +1435,7 @@ void MainWindow::removeTorrents(bool const delete_files)
 ****
 ***/
 
-void MainWindow::updateNetworkLabel()
+void MainWindow::update_network_label()
 {
     static constexpr int const Period = 3;
     time_t const now = time(nullptr);
@@ -1467,7 +1467,7 @@ void MainWindow::updateNetworkLabel()
     }
 
     QString tip;
-    QString const url = session_.getRemoteUrl().host();
+    QString const url = session_.get_remote_url().host();
 
     if (last_read_time_ == 0)
     {
@@ -1494,7 +1494,7 @@ void MainWindow::updateNetworkLabel()
     ui_.networkLabel->setToolTip(tip);
 }
 
-void MainWindow::dataReadProgress()
+void MainWindow::data_read_progress()
 {
     if (!network_error_)
     {
@@ -1502,20 +1502,20 @@ void MainWindow::dataReadProgress()
     }
 }
 
-void MainWindow::dataSendProgress()
+void MainWindow::data_send_progress()
 {
     last_send_time_ = time(nullptr);
 }
 
-void MainWindow::onNetworkResponse(QNetworkReply::NetworkError code, QString const& message)
+void MainWindow::on_network_response(QNetworkReply::NetworkError code, QString const& message)
 {
     bool const had_error = network_error_;
     bool const have_error = code != QNetworkReply::NoError && code != QNetworkReply::UnknownContentError;
 
     network_error_ = have_error;
     error_message_ = message;
-    refreshSoon(RefreshTrayIcon);
-    updateNetworkLabel();
+    refresh_soon(RefreshTrayIcon);
+    update_network_label();
 
     // Refresh our model if we've just gotten a clean connection to the session.
     // That way we can rebuild after a restart of transmission-daemon
@@ -1525,10 +1525,10 @@ void MainWindow::onNetworkResponse(QNetworkReply::NetworkError code, QString con
     }
 }
 
-void MainWindow::wrongAuthentication()
+void MainWindow::wrong_authentication()
 {
     session_.stop();
-    openSession();
+    open_session();
 }
 
 /***
@@ -1574,7 +1574,7 @@ void MainWindow::dropEvent(QDropEvent* event)
                 key = url.toLocalFile();
             }
 
-            trApp->addTorrent(AddData{ key });
+            trApp->add_torrent(AddData{ key });
         }
     }
 }
@@ -1584,13 +1584,13 @@ bool MainWindow::event(QEvent* e)
     switch (e->type())
     {
     case QEvent::WindowActivate:
-        addTorrentFromClipboard();
+        add_torrent_from_clipboard();
         break;
 
     case QEvent::Clipboard:
         if (auto_add_clipboard_links_)
         {
-            addTorrentFromClipboard();
+            add_torrent_from_clipboard();
         }
         break;
 
@@ -1598,7 +1598,7 @@ bool MainWindow::event(QEvent* e)
         [[fallthrough]];
 
     case QEvent::ApplicationPaletteChange:
-        refreshSoon(RefreshIcon);
+        refresh_soon(RefreshIcon);
         break;
 
     default:

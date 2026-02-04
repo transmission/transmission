@@ -41,9 +41,9 @@ public slots:
     void clear();
 
 private:
-    FilterBarComboBox* createTrackerCombo(QStandardItemModel* model);
-    FilterBarComboBox* createActivityCombo();
-    void refreshTrackers();
+    FilterBarComboBox* create_tracker_combo(QStandardItemModel* model);
+    FilterBarComboBox* create_activity_combo();
+    void refresh_trackers();
 
     enum : uint8_t
     {
@@ -62,8 +62,8 @@ private:
     QStandardItemModel* const tracker_model_ = new QStandardItemModel{ this };
 
     QLabel* const count_label_ = {};
-    FilterBarComboBox* const activity_combo_ = createActivityCombo();
-    FilterBarComboBox* const tracker_combo_ = createTrackerCombo(tracker_model_);
+    FilterBarComboBox* const activity_combo_ = create_activity_combo();
+    FilterBarComboBox* const tracker_combo_ = create_tracker_combo(tracker_model_);
     QLineEdit* const line_edit_ = new QLineEdit{ this };
 
     small::map<QString, int> sitename_counts_;
@@ -73,26 +73,26 @@ private:
 
 private slots:
     void recount();
-    void recountSoon(Pending const& fields);
+    void recount_soon(Pending const& fields);
 
-    void recountActivitySoon()
+    void recount_activity_soon()
     {
-        recountSoon(Pending().set(ACTIVITY));
+        recount_soon(Pending().set(ACTIVITY));
     }
 
-    void recountTrackersSoon()
+    void recount_trackers_soon()
     {
-        recountSoon(Pending().set(TRACKERS));
+        recount_soon(Pending().set(TRACKERS));
     }
 
-    void recountAllSoon()
+    void recount_all_soon()
     {
-        recountSoon(Pending().set(ACTIVITY).set(TRACKERS));
+        recount_soon(Pending().set(ACTIVITY).set(TRACKERS));
     }
 
-    void refreshPref(int key);
-    void onActivityIndexChanged(int index);
-    void onTextChanged(QString const& str);
-    void onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields);
-    void onTrackerIndexChanged(int index);
+    void refresh_pref(int key);
+    void on_activity_index_changed(int index);
+    void on_text_changed(QString const& str);
+    void on_torrents_changed(torrent_ids_t const& ids, Torrent::fields_t const& fields);
+    void on_tracker_index_changed(int index);
 };

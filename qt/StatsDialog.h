@@ -28,7 +28,7 @@ public:
     void setVisible(bool visible) override;
 
 private slots:
-    void updateStats();
+    void update_stats();
 
 private:
     Session& session_;

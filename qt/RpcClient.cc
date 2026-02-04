@@ -25,7 +25,7 @@
 
 #include "VariantHelpers.h"
 
-using ::trqt::variant_helpers::dictFind;
+using ::trqt::variant_helpers::dict_find;
 namespace api_compat = tr::api_compat;
 
 namespace
@@ -34,15 +34,15 @@ namespace
 char constexpr const* const RequestBodyKey{ "requestBody" };
 char constexpr const* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
-[[nodiscard]] int64_t nextId()
+[[nodiscard]] int64_t next_id()
 {
     static int64_t id = {};
     return id++;
 }
 
-[[nodiscard]] std::pair<tr_variant, int64_t> buildRequest(tr_quark const method, tr_variant* params)
+[[nodiscard]] std::pair<tr_variant, int64_t> build_request(tr_quark const method, tr_variant* params)
 {
-    auto const id = nextId();
+    auto const id = next_id();
 
     auto req = tr_variant::Map{ 4U };
     req.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
@@ -81,14 +81,14 @@ void RpcClient::start(tr_session* session)
 
 void RpcClient::start(QUrl const& url)
 {
-    connectNetworkAccessManager();
+    connect_network_access_manager();
     url_ = url;
     url_is_loopback_ = QHostAddress{ url_.host() }.isLoopback();
 }
 
 RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 {
-    auto [req, id] = buildRequest(method, args);
+    auto [req, id] = build_request(method, args);
 
     auto promise = QFutureInterface<RpcResponse>{};
     promise.setExpectedResultCount(1);
@@ -98,20 +98,20 @@ RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 
     if (session_ != nullptr)
     {
-        sendLocalRequest(req, promise, id);
+        send_local_request(req, promise, id);
     }
     else if (!url_.isEmpty())
     {
         api_compat::convert(req, network_style_);
         auto const json = tr_variant_serde::json().compact().to_string(req);
         auto const body = QByteArray::fromStdString(json);
-        sendNetworkRequest(body, promise);
+        send_network_request(body, promise);
     }
 
     return promise.future();
 }
 
-void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise)
+void RpcClient::send_network_request(QByteArray const& body, QFutureInterface<RpcResponse> const& promise)
 {
     auto req = QNetworkRequest{};
     req.setUrl(url_);
@@ -140,12 +140,12 @@ void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcR
         reply->setProperty(RequestBodyKey, body);
         reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
 
-        connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::dataReadProgress);
-        connect(reply, &QNetworkReply::uploadProgress, this, &RpcClient::dataSendProgress);
+        connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::data_read_progress);
+        connect(reply, &QNetworkReply::uploadProgress, this, &RpcClient::data_send_progress);
     }
 }
 
-void RpcClient::sendLocalRequest(tr_variant& req, QFutureInterface<RpcResponse> const& promise, int64_t const id)
+void RpcClient::send_local_request(tr_variant& req, QFutureInterface<RpcResponse> const& promise, int64_t const id)
 {
     if (verbose_)
     {
@@ -170,18 +170,18 @@ void RpcClient::sendLocalRequest(tr_variant& req, QFutureInterface<RpcResponse> 
             // this callback is invoked in the libtransmission thread, so we don't want
             // to process the response here... let's push it over to the Qt thread.
             auto shared = std::make_shared<tr_variant>(std::move(response));
-            QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, shared));
+            QMetaObject::invokeMethod(this, "local_request_finished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, shared));
         });
 }
 
-void RpcClient::connectNetworkAccessManager()
+void RpcClient::connect_network_access_manager()
 {
     QObject::disconnect(nam_, nullptr, this, nullptr);
-    connect(nam_, &QNetworkAccessManager::finished, this, &RpcClient::networkRequestFinished);
-    connect(nam_, &QNetworkAccessManager::authenticationRequired, this, &RpcClient::httpAuthenticationRequired);
+    connect(nam_, &QNetworkAccessManager::finished, this, &RpcClient::network_request_finished);
+    connect(nam_, &QNetworkAccessManager::authenticationRequired, this, &RpcClient::http_authentication_required);
 }
 
-void RpcClient::networkRequestFinished(QNetworkReply* reply)
+void RpcClient::network_request_finished(QNetworkReply* reply)
 {
     reply->deleteLater();
 
@@ -234,11 +234,11 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
         }
 
         session_id_ = reply->rawHeader(SessionIdHeaderName);
-        sendNetworkRequest(reply->property(RequestBodyKey).toByteArray(), promise);
+        send_network_request(reply->property(RequestBodyKey).toByteArray(), promise);
         return;
     }
 
-    emit networkResponse(reply->error(), reply->errorString());
+    emit network_response(reply->error(), reply->errorString());
 
     if (reply->error() != QNetworkReply::NoError)
     {
@@ -270,7 +270,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
                 fmt::print("{:s}:{:d} compat response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(*var));
             }
 
-            response = parseResponseData(*var);
+            response = parse_response_data(*var);
         }
 
         promise.setProgressValue(1);
@@ -279,11 +279,11 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 }
 
 // NOLINTNEXTLINE(performance-unnecessary-value-param): DO NOT make the parameter a reference as this method is called from another thread
-void RpcClient::localRequestFinished(TrVariantPtr response)
+void RpcClient::local_request_finished(TrVariantPtr response)
 {
-    if (auto node = local_requests_.extract(parseResponseId(*response)))
+    if (auto node = local_requests_.extract(parse_response_id(*response)))
     {
-        auto const result = parseResponseData(*response);
+        auto const result = parse_response_data(*response);
 
         auto& promise = node.mapped();
         promise.setProgressRange(0, 1);
@@ -292,12 +292,12 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
     }
 }
 
-int64_t RpcClient::parseResponseId(tr_variant& response) const
+int64_t RpcClient::parse_response_id(tr_variant& response) const
 {
-    return dictFind<int>(&response, TR_KEY_id).value_or(-1);
+    return dict_find<int>(&response, TR_KEY_id).value_or(-1);
 }
 
-RpcResponse RpcClient::parseResponseData(tr_variant& response) const
+RpcResponse RpcClient::parse_response_data(tr_variant& response) const
 {
     auto ret = RpcResponse{};
 

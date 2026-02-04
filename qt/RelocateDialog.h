@@ -25,11 +25,11 @@ public:
     RelocateDialog& operator=(RelocateDialog const&) = delete;
 
 private slots:
-    void onSetLocation();
-    void onMoveToggled(bool b) const;
+    void on_set_location();
+    void on_move_toggled(bool b) const;
 
 private:
-    QString newLocation() const;
+    QString new_location() const;
 
     Session& session_;
     torrent_ids_t const ids_;

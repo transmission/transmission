@@ -25,7 +25,7 @@ WatchDir::WatchDir(TorrentModel const& model)
 
 // ---
 
-WatchDir::AddResult WatchDir::metainfoTest(QString const& filename) const
+WatchDir::AddResult WatchDir::metainfo_test(QString const& filename) const
 {
     auto metainfo = tr_torrent_metainfo();
     if (!metainfo.parse_torrent_file(filename.toUtf8().constData()))
@@ -33,7 +33,7 @@ WatchDir::AddResult WatchDir::metainfoTest(QString const& filename) const
         return AddResult::Error;
     }
 
-    if (model_.hasTorrent(TorrentHash{ metainfo.info_hash() }))
+    if (model_.has_torrent(TorrentHash{ metainfo.info_hash() }))
     {
         return AddResult::Duplicate;
     }
@@ -41,19 +41,19 @@ WatchDir::AddResult WatchDir::metainfoTest(QString const& filename) const
     return AddResult::Success;
 }
 
-void WatchDir::onTimeout()
+void WatchDir::on_timeout()
 {
     auto* t = qobject_cast<QTimer*>(sender());
 
-    if (auto const filename = t->objectName(); metainfoTest(filename) == AddResult::Success)
+    if (auto const filename = t->objectName(); metainfo_test(filename) == AddResult::Success)
     {
-        emit torrentFileAdded(filename);
+        emit torrent_file_added(filename);
     }
 
     t->deleteLater();
 }
 
-void WatchDir::setPath(QString const& path, bool is_enabled)
+void WatchDir::set_path(QString const& path, bool is_enabled)
 {
     // clear out any remnants of the previous watcher, if any
     watch_dir_files_.clear();
@@ -63,13 +63,13 @@ void WatchDir::setPath(QString const& path, bool is_enabled)
     if (is_enabled)
     {
         watcher_ = std::make_unique<QFileSystemWatcher>(QStringList{ path });
-        connect(watcher_.get(), &QFileSystemWatcher::directoryChanged, this, &WatchDir::watcherActivated);
+        connect(watcher_.get(), &QFileSystemWatcher::directoryChanged, this, &WatchDir::watcher_activated);
         // trigger the watchdir for torrent files in there already
-        QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories()));
+        QTimer::singleShot(0, this, SLOT(rescan_all_watched_directories()));
     }
 }
 
-void WatchDir::watcherActivated(QString const& path)
+void WatchDir::watcher_activated(QString const& path)
 {
     // get the list of files currently in the watch directory
     auto const dir = QDir{ path };
@@ -85,10 +85,10 @@ void WatchDir::watcherActivated(QString const& path)
         }
 
         auto const filename = dir.absoluteFilePath(name);
-        switch (metainfoTest(filename))
+        switch (metainfo_test(filename))
         {
         case AddResult::Success:
-            emit torrentFileAdded(filename);
+            emit torrent_file_added(filename);
             break;
 
         case AddResult::Duplicate:
@@ -100,7 +100,7 @@ void WatchDir::watcherActivated(QString const& path)
                 auto* t = new QTimer{ this };
                 t->setObjectName(dir.absoluteFilePath(name));
                 t->setSingleShot(true);
-                connect(t, &QTimer::timeout, this, &WatchDir::onTimeout);
+                connect(t, &QTimer::timeout, this, &WatchDir::on_timeout);
                 t->start(5000);
             }
         }
@@ -111,7 +111,7 @@ void WatchDir::watcherActivated(QString const& path)
     watch_dir_files_ = { std::begin(files), std::end(files) };
 }
 
-void WatchDir::rescanAllWatchedDirectories()
+void WatchDir::rescan_all_watched_directories()
 {
     if (!watcher_)
     {
@@ -120,6 +120,6 @@ void WatchDir::rescanAllWatchedDirectories()
 
     for (auto const& path : watcher_->directories())
     {
-        watcherActivated(path);
+        watcher_activated(path);
     }
 }

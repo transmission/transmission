@@ -41,7 +41,7 @@ public:
     DetailsDialog& operator=(DetailsDialog const&) = delete;
     ~DetailsDialog() override;
 
-    void setIds(torrent_ids_t const& ids);
+    void set_ids(torrent_ids_t const& ids);
 
     // QWidget
     QSize sizeHint() const override
@@ -50,50 +50,50 @@ public:
     }
 
 private:
-    void initPeersTab();
-    void initTrackerTab();
-    void initInfoTab();
-    void initFilesTab() const;
-    void initOptionsTab();
+    void init_peers_tab();
+    void init_tracker_tab();
+    void init_info_tab();
+    void init_files_tab() const;
+    void init_options_tab();
 
     void setEnabled(bool enabled);
 
 private slots:
-    void refreshModel();
-    void refreshPref(int key);
-    void refreshUI();
+    void refresh_model();
+    void refresh_pref(int key);
+    void refresh_ui();
 
-    void onTorrentsEdited(torrent_ids_t const& ids);
-    void onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields);
-    void onSessionCalled(Session::Tag tag);
+    void on_torrents_edited(torrent_ids_t const& ids);
+    void on_torrents_changed(torrent_ids_t const& ids, Torrent::fields_t const& fields);
+    void on_session_called(Session::Tag tag);
 
     // Details tab
-    void onButtonBoxClicked(QAbstractButton* button);
+    void on_button_box_clicked(QAbstractButton* button);
 
     // Tracker tab
-    void onTrackerSelectionChanged();
-    void onAddTrackerClicked();
-    void onEditTrackersClicked();
-    void onRemoveTrackerClicked();
-    void onShowTrackerScrapesToggled(bool val);
-    void onShowBackupTrackersToggled(bool val);
-    void onTrackerListEdited(QString const& tracker_list);
+    void on_tracker_selection_changed();
+    void on_add_tracker_clicked();
+    void on_edit_trackers_clicked();
+    void on_remove_tracker_clicked();
+    void on_show_tracker_scrapes_toggled(bool val);
+    void on_show_backup_trackers_toggled(bool val);
+    void on_tracker_list_edited(QString const& tracker_list);
 
     // Files tab
-    void onFilePriorityChanged(file_indices_t const& file_indices, int priority);
-    void onFileWantedChanged(file_indices_t const& file_indices, bool wanted);
-    void onPathEdited(QString const& old_path, QString const& new_name);
-    void onOpenRequested(QString const& path) const;
+    void on_file_priority_changed(file_indices_t const& file_indices, int priority);
+    void on_file_wanted_changed(file_indices_t const& file_indices, bool wanted);
+    void on_path_edited(QString const& old_path, QString const& new_name);
+    void on_open_requested(QString const& path) const;
 
     // Options tab
-    void onBandwidthPriorityChanged(int index);
-    void onHonorsSessionLimitsToggled(bool val);
-    void onDownloadLimitedToggled(bool val);
-    void onSpinBoxEditingFinished();
-    void onUploadLimitedToggled(bool val);
-    void onRatioModeChanged(int index);
-    void onIdleModeChanged(int index);
-    void onIdleLimitChanged();
+    void on_bandwidth_priority_changed(int index);
+    void on_honors_session_limits_toggled(bool val);
+    void on_download_limited_toggled(bool val);
+    void on_spin_box_editing_finished();
+    void on_upload_limited_toggled(bool val);
+    void on_ratio_mode_changed(int index);
+    void on_idle_mode_changed(int index);
+    void on_idle_limit_changed();
 
 private:
     /* When a torrent property is edited in the details dialog (e.g.
@@ -101,7 +101,7 @@ private:
        until we know the server has processed the request. This keeps
        the UI from appearing to undo the change if we receive a refresh
        that was already in-flight _before_ the property was edited. */
-    bool canEdit() const
+    bool can_edit() const
     {
         return std::empty(pending_changes_tags_);
     }
@@ -109,20 +109,20 @@ private:
     QMetaObject::Connection pending_changes_connection_;
 
     template<typename T>
-    void torrentSet(torrent_ids_t const& ids, tr_quark key, T const& val)
+    void torrent_set(torrent_ids_t const& ids, tr_quark key, T const& val)
     {
-        auto const tag = session_.torrentSet(ids, key, val);
+        auto const tag = session_.torrent_set(ids, key, val);
         pending_changes_tags_.insert(tag);
         if (!pending_changes_connection_)
         {
-            pending_changes_connection_ = connect(&session_, &Session::sessionCalled, this, &DetailsDialog::onSessionCalled);
+            pending_changes_connection_ = connect(&session_, &Session::session_called, this, &DetailsDialog::on_session_called);
         }
     }
 
     template<typename T>
-    void torrentSet(tr_quark key, T const& val)
+    void torrent_set(tr_quark key, T const& val)
     {
-        torrentSet(ids_, key, val);
+        torrent_set(ids_, key, val);
     }
 
     Session& session_;

@@ -23,7 +23,7 @@ AboutDialog::AboutDialog(Session& session, QWidget* parent)
 
     ui_.iconLabel->setPixmap(QApplication::windowIcon().pixmap(48));
 
-    if (session.isServer())
+    if (session.is_server())
     {
         auto const title = QStringLiteral("<b style='font-size:x-large'>Transmission %1</b>")
                                .arg(QStringLiteral(LONG_VERSION_STRING));
@@ -36,20 +36,22 @@ AboutDialog::AboutDialog(Session& session, QWidget* parent)
         title += QStringLiteral("<div style='text-align: center'>%1: %2</div>")
                      .arg(tr("Client"))
                      .arg(QStringLiteral(LONG_VERSION_STRING));
-        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>").arg(tr("Server")).arg(session.sessionVersion());
+        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>")
+                     .arg(tr("Server"))
+                     .arg(session.session_version());
         ui_.titleLabel->setText(title);
     }
 
     QPushButton const* b = ui_.dialogButtons->addButton(tr("C&redits"), QDialogButtonBox::ActionRole);
-    connect(b, &QAbstractButton::clicked, this, &AboutDialog::showCredits);
+    connect(b, &QAbstractButton::clicked, this, &AboutDialog::show_credits);
 
     b = ui_.dialogButtons->addButton(tr("&License"), QDialogButtonBox::ActionRole);
-    connect(b, &QAbstractButton::clicked, this, &AboutDialog::showLicense);
+    connect(b, &QAbstractButton::clicked, this, &AboutDialog::show_license);
 
     ui_.dialogButtons->button(QDialogButtonBox::Close)->setDefault(true);
 }
 
-void AboutDialog::showCredits()
+void AboutDialog::show_credits()
 {
     QMessageBox::about(
         this,
@@ -60,7 +62,7 @@ void AboutDialog::showCredits()
             "Mike Gelfand\n"));
 }
 
-void AboutDialog::showLicense()
+void AboutDialog::show_license()
 {
-    Utils::openDialog(license_dialog_, this); // NOLINT clang-analyzer-cplusplus.NewDelete
+    Utils::open_dialog(license_dialog_, this); // NOLINT clang-analyzer-cplusplus.NewDelete
 }

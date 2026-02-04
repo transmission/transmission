@@ -34,7 +34,7 @@ QVariant TrackerModel::data(QModelIndex const& index, int role) const
             break;
 
         case Qt::DecorationRole:
-            var = QIcon{ tracker_info.st.getFavicon() };
+            var = QIcon{ tracker_info.st.get_favicon() };
             break;
 
         case TrackerRole:
@@ -83,11 +83,11 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
 
     for (int const id : ids)
     {
-        Torrent const* tor = torrent_model.getTorrentFromId(id);
+        Torrent const* tor = torrent_model.get_torrent_from_id(id);
 
         if (tor != nullptr)
         {
-            TrackerStatsList const tracker_list = tor->trackerStats();
+            TrackerStatsList const tracker_list = tor->tracker_stats();
 
             for (TrackerStat const& st : tracker_list)
             {

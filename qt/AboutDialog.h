@@ -26,8 +26,8 @@ public:
     AboutDialog& operator=(AboutDialog const&) = delete;
 
 private slots:
-    void showCredits();
-    void showLicense();
+    void show_credits();
+    void show_license();
 
 private:
     Ui::AboutDialog ui_{};

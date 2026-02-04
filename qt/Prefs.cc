@@ -31,44 +31,44 @@ using namespace std::string_view_literals;
 namespace
 {
 template<typename T>
-[[nodiscard]] QVariant qvarFromOptional(std::optional<T> const& val)
+[[nodiscard]] QVariant qvar_from_optional(std::optional<T> const& val)
 {
     return val ? QVariant::fromValue(*val) : QVariant{};
 }
 
-[[nodiscard]] QVariant qvarFromTVar(tr_variant const& var, int const qt_metatype)
+[[nodiscard]] QVariant qvar_from_trvar(tr_variant const& var, int const qt_metatype)
 {
     switch (qt_metatype)
     {
     case QMetaType::Int:
-        return qvarFromOptional(ser::to_value<int64_t>(var));
+        return qvar_from_optional(ser::to_value<int64_t>(var));
 
     case UserMetaType::EncryptionModeType:
-        return qvarFromOptional(ser::to_value<tr_encryption_mode>(var));
+        return qvar_from_optional(ser::to_value<tr_encryption_mode>(var));
 
     case UserMetaType::SortModeType:
-        return qvarFromOptional(ser::to_value<SortMode>(var));
+        return qvar_from_optional(ser::to_value<SortMode>(var));
 
     case UserMetaType::StatsModeType:
-        return qvarFromOptional(ser::to_value<StatsMode>(var));
+        return qvar_from_optional(ser::to_value<StatsMode>(var));
 
     case UserMetaType::ShowModeType:
-        return qvarFromOptional(ser::to_value<ShowMode>(var));
+        return qvar_from_optional(ser::to_value<ShowMode>(var));
 
     case QMetaType::QString:
-        return qvarFromOptional(ser::to_value<QString>(var));
+        return qvar_from_optional(ser::to_value<QString>(var));
 
     case QMetaType::QStringList:
-        return qvarFromOptional(ser::to_value<QStringList>(var));
+        return qvar_from_optional(ser::to_value<QStringList>(var));
 
     case QMetaType::Bool:
-        return qvarFromOptional(ser::to_value<bool>(var));
+        return qvar_from_optional(ser::to_value<bool>(var));
 
     case QMetaType::Double:
-        return qvarFromOptional(ser::to_value<double>(var));
+        return qvar_from_optional(ser::to_value<double>(var));
 
     case QMetaType::QDateTime:
-        return qvarFromOptional(ser::to_value<QDateTime>(var));
+        return qvar_from_optional(ser::to_value<QDateTime>(var));
 
     default:
         assert(false && "unhandled type");
@@ -76,7 +76,7 @@ template<typename T>
     }
 }
 
-[[nodiscard]] tr_variant trvarFromQVar(QVariant const& var, int const qt_metatype)
+[[nodiscard]] tr_variant trvar_from_qvar(QVariant const& var, int const qt_metatype)
 {
     switch (qt_metatype)
     {
@@ -116,7 +116,7 @@ template<typename T>
     }
 }
 
-void ensureSoundCommandIsAList(tr_variant::Map& map)
+void ensure_sound_command_is_a_list(tr_variant::Map& map)
 {
     auto constexpr Key = TR_KEY_torrent_complete_sound_command;
     auto constexpr DefaultVal = std::array<std::string_view, 5U>{ "canberra-gtk-play",
@@ -133,7 +133,7 @@ void ensureSoundCommandIsAList(tr_variant::Map& map)
 
 namespace
 {
-[[nodiscard]] constexpr auto prefIsSavable(int pref)
+[[nodiscard]] constexpr auto pref_is_savable(int pref)
 {
     switch (pref)
     {
@@ -163,12 +163,12 @@ Prefs::Prefs()
     load(defaults());
 }
 
-void Prefs::loadFromConfigDir(QString const& dir)
+void Prefs::load_from_config_dir(QString const& dir)
 {
     auto settings = tr_sessionLoadSettings(dir.toStdString());
     if (auto* const map = settings.get_if<tr_variant::Map>())
     {
-        ensureSoundCommandIsAList(*map);
+        ensure_sound_command_is_a_list(*map);
         load(*map);
     }
 }
@@ -179,14 +179,14 @@ void Prefs::load(tr_variant::Map const& settings)
     {
         if (auto const iter = settings.find(Items[idx].key); iter != settings.end())
         {
-            values_[idx] = qvarFromTVar(iter->second, Items[idx].type);
+            values_[idx] = qvar_from_trvar(iter->second, Items[idx].type);
         }
     }
 }
 
 void Prefs::set(int const key, tr_variant const& value)
 {
-    auto const tmp = qvarFromTVar(value, Items[key].type);
+    auto const tmp = qvar_from_trvar(value, Items[key].type);
     if (tmp.isNull())
     {
         return;
@@ -206,7 +206,7 @@ tr_variant::Map Prefs::current_settings() const
 
     for (int idx = 0; idx < PREFS_COUNT; ++idx)
     {
-        if (prefIsSavable(idx))
+        if (pref_is_savable(idx))
         {
             auto [key, val] = keyval(idx);
             map.try_emplace(key, std::move(val));
@@ -218,7 +218,7 @@ tr_variant::Map Prefs::current_settings() const
 
 std::pair<tr_quark, tr_variant> Prefs::keyval(int const idx) const
 {
-    return { Items[idx].key, trvarFromQVar(values_[idx], Items[idx].type) };
+    return { Items[idx].key, trvar_from_qvar(values_[idx], Items[idx].type) };
 }
 
 void Prefs::save(QString const& filename) const

@@ -36,5 +36,5 @@ protected:
     void paintEvent(QPaintEvent* e) override;
 
 private:
-    [[nodiscard]] QSize calculateSize(QSize const& text_size, QSize const& count_size) const;
+    [[nodiscard]] QSize calculate_size(QSize const& text_size, QSize const& count_size) const;
 };

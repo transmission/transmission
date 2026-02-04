@@ -30,7 +30,7 @@ namespace trqt::variant_helpers
 void register_qt_converters();
 
 template<typename T>
-auto getValue(tr_variant const* variant)
+auto get_value(tr_variant const* variant)
     requires std::is_same_v<T, bool>
 {
     std::optional<T> ret;
@@ -44,7 +44,7 @@ auto getValue(tr_variant const* variant)
 }
 
 template<typename T>
-auto getValue(tr_variant const* variant)
+auto get_value(tr_variant const* variant)
     requires std::is_same_v<T, int64_t> || std::is_same_v<T, uint64_t> || std::is_same_v<T, int> || std::is_same_v<T, time_t>
 {
     std::optional<T> ret;
@@ -58,7 +58,7 @@ auto getValue(tr_variant const* variant)
 }
 
 template<typename T>
-auto getValue(tr_variant const* variant)
+auto get_value(tr_variant const* variant)
     requires std::is_same_v<T, double>
 {
     std::optional<T> ret;
@@ -72,7 +72,7 @@ auto getValue(tr_variant const* variant)
 }
 
 template<typename T>
-auto getValue(tr_variant const* variant)
+auto get_value(tr_variant const* variant)
     requires std::is_same_v<T, QString>
 {
     std::optional<T> ret;
@@ -86,7 +86,7 @@ auto getValue(tr_variant const* variant)
 }
 
 template<typename T>
-auto getValue(tr_variant const* variant)
+auto get_value(tr_variant const* variant)
     requires std::is_same_v<T, std::string_view>
 {
     std::optional<T> ret;
@@ -100,12 +100,12 @@ auto getValue(tr_variant const* variant)
 }
 
 template<typename T>
-auto getValue(tr_variant const* variant)
+auto get_value(tr_variant const* variant)
     requires std::is_enum_v<T>
 {
     std::optional<T> ret;
 
-    if (auto const value = getValue<int>(variant); value)
+    if (auto const value = get_value<int>(variant); value)
     {
         ret = static_cast<T>(*value);
     }
@@ -114,7 +114,7 @@ auto getValue(tr_variant const* variant)
 }
 
 template<typename C, typename T = typename C::value_type>
-auto getValue(tr_variant const* var)
+auto get_value(tr_variant const* var)
     requires std::is_same_v<C, QStringList> || std::is_same_v<C, QList<T>> || std::is_same_v<C, std::vector<T>>
 {
     std::optional<C> ret;
@@ -126,7 +126,7 @@ auto getValue(tr_variant const* var)
         for (size_t i = 0, n = tr_variantListSize(var); i < n; ++i)
         {
             tr_variant* const child = tr_variantListChild(const_cast<tr_variant*>(var), i);
-            auto const value = getValue<T>(child);
+            auto const value = get_value<T>(child);
             if (value)
             {
                 list.push_back(*value);
@@ -162,7 +162,7 @@ bool change(TrackerStat& setme, tr_variant const* value);
 template<typename T>
 bool change(T& setme, tr_variant const* variant)
 {
-    auto const value = getValue<T>(variant);
+    auto const value = get_value<T>(variant);
     return value && change(setme, *value);
 }
 
@@ -189,13 +189,13 @@ bool change(std::vector<T>& setme, tr_variant const* value)
 ///
 
 template<typename T>
-auto dictFind(tr_variant* dict, tr_quark key)
+auto dict_find(tr_variant* dict, tr_quark key)
 {
     std::optional<T> ret;
 
     if (auto const* child = tr_variantDictFind(dict, key); child != nullptr)
     {
-        ret = getValue<T>(child);
+        ret = get_value<T>(child);
     }
 
     return ret;
@@ -203,35 +203,35 @@ auto dictFind(tr_variant* dict, tr_quark key)
 
 ///
 
-void variantInit(tr_variant* init_me, bool value);
-void variantInit(tr_variant* init_me, int64_t value);
-void variantInit(tr_variant* init_me, int value);
-void variantInit(tr_variant* init_me, double value);
-void variantInit(tr_variant* init_me, QByteArray const& value);
-void variantInit(tr_variant* init_me, QString const& value);
-void variantInit(tr_variant* init_me, std::string_view value);
-void variantInit(tr_variant* init_me, char const* value) = delete; // use string_view
+void variant_init(tr_variant* init_me, bool value);
+void variant_init(tr_variant* init_me, int64_t value);
+void variant_init(tr_variant* init_me, int value);
+void variant_init(tr_variant* init_me, double value);
+void variant_init(tr_variant* init_me, QByteArray const& value);
+void variant_init(tr_variant* init_me, QString const& value);
+void variant_init(tr_variant* init_me, std::string_view value);
+void variant_init(tr_variant* init_me, char const* value) = delete; // use string_view
 
 template<typename C, typename T = typename C::value_type>
-void variantInit(tr_variant* init_me, C const& value)
+void variant_init(tr_variant* init_me, C const& value)
 {
     tr_variantInitList(init_me, std::size(value));
     for (auto const& item : value)
     {
-        variantInit(tr_variantListAdd(init_me), item);
+        variant_init(tr_variantListAdd(init_me), item);
     }
 }
 
 template<typename T>
-void listAdd(tr_variant* list, T const& value)
+void list_add(tr_variant* list, T const& value)
 {
-    variantInit(tr_variantListAdd(list), value);
+    variant_init(tr_variantListAdd(list), value);
 }
 
 template<typename T>
-void dictAdd(tr_variant* dict, tr_quark key, T const& value)
+void dict_add(tr_variant* dict, tr_quark key, T const& value)
 {
-    variantInit(tr_variantDictAdd(dict, key), value);
+    variant_init(tr_variantDictAdd(dict, key), value);
 }
 
 } // namespace trqt::variant_helpers

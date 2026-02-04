@@ -16,7 +16,7 @@
 namespace
 {
 
-int getHSpacing(QWidget const* w)
+int get_h_spacing(QWidget const* w)
 {
     return qMax(3, w->style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing, nullptr, w));
 }
@@ -29,12 +29,12 @@ FilterBarComboBoxDelegate::FilterBarComboBoxDelegate(QObject* parent, QComboBox*
 {
 }
 
-bool FilterBarComboBoxDelegate::isSeparator(QModelIndex const& index)
+bool FilterBarComboBoxDelegate::is_separator(QModelIndex const& index)
 {
     return index.data(Qt::AccessibleDescriptionRole).toString() == QStringLiteral("separator");
 }
 
-void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, QModelIndex const& index)
+void FilterBarComboBoxDelegate::set_separator(QAbstractItemModel* model, QModelIndex const& index)
 {
     model->setData(index, QStringLiteral("separator"), Qt::AccessibleDescriptionRole);
 
@@ -49,7 +49,7 @@ void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, QModelIn
 
 void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    if (isSeparator(index))
+    if (is_separator(index))
     {
         QRect rect = option.rect;
 
@@ -70,11 +70,11 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
             QPalette::Text;
         disabled_option.palette.setColor(
             disabled_color_role,
-            Utils::getFadedColor(disabled_option.palette.color(disabled_color_role)));
+            Utils::get_faded_color(disabled_option.palette.color(disabled_color_role)));
 
         QRect bounding_box = option.rect;
 
-        int const hmargin = getHSpacing(combo_);
+        int const hmargin = get_h_spacing(combo_);
         bounding_box.adjust(hmargin, 0, -hmargin, 0);
 
         QRect decoration_rect = rect(option, index, Qt::DecorationRole);
@@ -84,17 +84,17 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
             Qt::AlignLeft | Qt::AlignVCenter,
             decoration_rect.size(),
             bounding_box);
-        Utils::narrowRect(bounding_box, decoration_rect.width() + hmargin, 0, option.direction);
+        Utils::narrow_rect(bounding_box, decoration_rect.width() + hmargin, 0, option.direction);
 
         QRect count_rect = rect(option, index, FilterBarComboBox::CountStringRole);
         count_rect = QStyle::alignedRect(option.direction, Qt::AlignRight | Qt::AlignVCenter, count_rect.size(), bounding_box);
-        Utils::narrowRect(bounding_box, 0, count_rect.width() + hmargin, option.direction);
+        Utils::narrow_rect(bounding_box, 0, count_rect.width() + hmargin, option.direction);
         QRect const display_rect = bounding_box;
 
-        QIcon const icon = Utils::getIconFromIndex(index);
+        QIcon const icon = Utils::get_icon_from_index(index);
 
         drawBackground(painter, option, index);
-        icon.paint(painter, decoration_rect, Qt::AlignCenter, StyleHelper::getIconMode(option.state), QIcon::Off);
+        icon.paint(painter, decoration_rect, Qt::AlignCenter, StyleHelper::get_icon_mode(option.state), QIcon::Off);
         drawDisplay(painter, option, display_rect, index.data(Qt::DisplayRole).toString());
         drawDisplay(painter, disabled_option, count_rect, index.data(FilterBarComboBox::CountStringRole).toString());
         drawFocus(painter, option, display_rect | count_rect);
@@ -103,14 +103,14 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
 
 QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    if (isSeparator(index))
+    if (is_separator(index))
     {
         int const pm = combo_->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, combo_);
         return { pm, pm + 10 };
     }
 
     QStyle const* const s = combo_->style();
-    int const hmargin = getHSpacing(combo_);
+    int const hmargin = get_h_spacing(combo_);
 
     QSize size = QItemDelegate::sizeHint(option, index);
     size.setHeight(qMax(size.height(), combo_->iconSize().height() + 6));

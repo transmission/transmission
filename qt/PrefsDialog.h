@@ -33,17 +33,17 @@ public:
     PrefsDialog(PrefsDialog const&) = delete;
 
 private slots:
-    void refreshPref(int key);
-    void sessionUpdated();
-    void onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol);
-    void onPortTest();
-    void onIdleLimitChanged();
-    void onQueueStalledMinutesChanged();
+    void refresh_pref(int key);
+    void session_updated();
+    void on_port_tested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol);
+    void on_port_test();
+    void on_idle_limit_changed();
+    void on_queue_stalled_minutes_changed();
 
-    void onUpdateBlocklistClicked();
-    void onUpdateBlocklistCancelled();
-    void onBlocklistDialogDestroyed(QObject* o);
-    void onBlocklistUpdated(int n);
+    void on_update_blocklist_clicked();
+    void on_update_blocklist_cancelled();
+    void on_blocklist_dialog_destroyed(QObject* o);
+    void on_blocklist_updated(int n);
 
 private:
     enum class PortTestStatus : uint8_t
@@ -59,37 +59,37 @@ private:
     void set(int const key, T const& val)
     {
         prefs_.set(key, val);
-        refreshPref(key);
+        refresh_pref(key);
     }
 
-    void portTestSetEnabled();
-    void updateBlocklistLabel();
-    void updateDownloadingWidgetsLocality();
-    void updatePortStatusLabel();
-    void updateSeedingWidgetsLocality();
-    static QString getPortStatusText(PortTestStatus status) noexcept;
+    void port_test_set_enabled();
+    void update_blocklist_label();
+    void update_downloading_widgets_locality();
+    void update_port_status_label();
+    void update_seeding_widgets_locality();
+    static QString get_port_status_text(PortTestStatus status) noexcept;
 
     template<typename T, size_t N>
-    void initComboFromItems(std::array<std::pair<QString, T>, N> const& items, QComboBox* w, int key);
+    void init_combo_from_items(std::array<std::pair<QString, T>, N> const& items, QComboBox* w, int key);
 
-    void initAltSpeedDaysCombo(QComboBox* w, int key);
-    void initEncryptionCombo(QComboBox* w, int key);
-    void initWidget(FreeSpaceLabel* w, int key);
-    void initWidget(PathButton* w, int key);
-    void initWidget(QCheckBox* w, int key);
-    void initWidget(QDoubleSpinBox* w, int key);
-    void initWidget(QLineEdit* w, int key);
-    void initWidget(QPlainTextEdit* w, int key);
-    void initWidget(QSpinBox* w, int key);
-    void initWidget(QTimeEdit* w, int key);
+    void init_alt_speed_days_combo(QComboBox* w, int key);
+    void init_encryption_combo(QComboBox* w, int key);
+    void init_widget(FreeSpaceLabel* w, int key);
+    void init_widget(PathButton* w, int key);
+    void init_widget(QCheckBox* w, int key);
+    void init_widget(QDoubleSpinBox* w, int key);
+    void init_widget(QLineEdit* w, int key);
+    void init_widget(QPlainTextEdit* w, int key);
+    void init_widget(QSpinBox* w, int key);
+    void init_widget(QTimeEdit* w, int key);
 
-    void initDownloadingTab();
-    void initSeedingTab();
-    void initSpeedTab();
-    void initPrivacyTab();
-    void initNetworkTab();
-    void initDesktopTab();
-    void initRemoteTab();
+    void init_downloading_tab();
+    void init_seeding_tab();
+    void init_speed_tab();
+    void init_privacy_tab();
+    void init_network_tab();
+    void init_desktop_tab();
+    void init_remote_tab();
 
     Session& session_;
     Prefs& prefs_;

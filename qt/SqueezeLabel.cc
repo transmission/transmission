@@ -64,7 +64,7 @@ void SqueezeLabel::paintEvent(QPaintEvent* paint_event)
 {
 #if QT_CONFIG(accessibility)
     // NOTE: QLabel doesn't notify on text/cursor changes so we're checking for it when repaint is requested
-    updateAccessibilityIfNeeded();
+    update_accessibility_if_needed();
 #endif
 
     if (hasFocus() && (textInteractionFlags() & (Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse)) != 0)
@@ -88,7 +88,7 @@ void SqueezeLabel::paintEvent(QPaintEvent* paint_event)
 
 #if QT_CONFIG(accessibility)
 
-void SqueezeLabel::updateAccessibilityIfNeeded()
+void SqueezeLabel::update_accessibility_if_needed()
 {
     // NOTE: Dispatching events asynchronously to avoid blocking the painting
 

@@ -29,7 +29,7 @@ public:
     TorrentFilter& operator=(TorrentFilter&&) = delete;
     TorrentFilter& operator=(TorrentFilter const&) = delete;
 
-    [[nodiscard]] std::array<int, ShowModeCount> countTorrentsPerMode() const;
+    [[nodiscard]] std::array<int, ShowModeCount> count_torrents_per_mode() const;
 
 protected:
     // QSortFilterProxyModel
@@ -37,7 +37,7 @@ protected:
     [[nodiscard]] bool lessThan(QModelIndex const& source_left, QModelIndex const& source_right) const override;
 
 private slots:
-    void onPrefChanged(int key);
+    void on_pref_changed(int key);
     void refilter();
 
 private:

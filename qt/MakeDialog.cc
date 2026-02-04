@@ -46,8 +46,8 @@ public:
         QWidget* parent = nullptr);
 
 private slots:
-    void onButtonBoxClicked(QAbstractButton* button);
-    void onProgress();
+    void on_button_box_clicked(QAbstractButton* button);
+    void on_progress();
 
 private:
     Session& session_;
@@ -74,20 +74,20 @@ MakeProgressDialog::MakeProgressDialog(
 {
     ui_.setupUi(this);
 
-    connect(ui_.dialogButtons, &QDialogButtonBox::clicked, this, &MakeProgressDialog::onButtonBoxClicked);
+    connect(ui_.dialogButtons, &QDialogButtonBox::clicked, this, &MakeProgressDialog::on_button_box_clicked);
 
-    connect(&timer_, &QTimer::timeout, this, &MakeProgressDialog::onProgress);
+    connect(&timer_, &QTimer::timeout, this, &MakeProgressDialog::on_progress);
     timer_.start(100);
 
-    onProgress();
+    on_progress();
 }
 
-void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
+void MakeProgressDialog::on_button_box_clicked(QAbstractButton* button)
 {
     switch (ui_.dialogButtons->standardButton(button))
     {
     case QDialogButtonBox::Open:
-        session_.addNewlyCreatedTorrent(outfile_, QFileInfo{ QString::fromStdString(builder_.top()) }.dir().path());
+        session_.add_newly_created_torrent(outfile_, QFileInfo{ QString::fromStdString(builder_.top()) }.dir().path());
         break;
 
     case QDialogButtonBox::Abort:
@@ -101,7 +101,7 @@ void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
     close();
 }
 
-void MakeProgressDialog::onProgress()
+void MakeProgressDialog::on_progress()
 {
     auto const is_done = !future_.valid() || future_.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
 
@@ -164,7 +164,7 @@ void MakeProgressDialog::onProgress()
 ****
 ***/
 
-void MakeDialog::makeTorrent()
+void MakeDialog::make_torrent()
 {
     if (!builder_)
     {
@@ -205,7 +205,7 @@ void MakeDialog::makeTorrent()
 ****
 ***/
 
-QString MakeDialog::getSource() const
+QString MakeDialog::get_source() const
 {
     return (ui_.sourceFileRadio->isChecked() ? ui_.sourceFileButton : ui_.sourceFolderButton)->path();
 }
@@ -214,16 +214,16 @@ QString MakeDialog::getSource() const
 ****
 ***/
 
-void MakeDialog::onSourceChanged()
+void MakeDialog::on_source_changed()
 {
     builder_.reset();
 
-    if (auto const filename = getSource(); !filename.isEmpty())
+    if (auto const filename = get_source(); !filename.isEmpty())
     {
         builder_.emplace(filename.toStdString());
     }
 
-    updatePiecesLabel();
+    update_pieces_label();
 
     if (builder_)
     {
@@ -237,29 +237,29 @@ MakeDialog::MakeDialog(Session& session, QWidget* parent)
 {
     ui_.setupUi(this);
 
-    ui_.destinationButton->setMode(PathButton::DirectoryMode);
-    ui_.destinationButton->setPath(QDir::homePath());
+    ui_.destinationButton->set_mode(PathButton::DirectoryMode);
+    ui_.destinationButton->set_path(QDir::homePath());
 
-    ui_.sourceFolderButton->setMode(PathButton::DirectoryMode);
-    ui_.sourceFileButton->setMode(PathButton::FileMode);
+    ui_.sourceFolderButton->set_mode(PathButton::DirectoryMode);
+    ui_.sourceFileButton->set_mode(PathButton::FileMode);
 
     auto* cr = new ColumnResizer{ this };
-    cr->addLayout(ui_.filesSectionLayout);
-    cr->addLayout(ui_.propertiesSectionLayout);
+    cr->add_layout(ui_.filesSectionLayout);
+    cr->add_layout(ui_.propertiesSectionLayout);
     cr->update();
 
     resize(minimumSizeHint());
 
-    connect(ui_.sourceFolderRadio, &QAbstractButton::toggled, this, &MakeDialog::onSourceChanged);
-    connect(ui_.sourceFolderButton, &PathButton::pathChanged, this, &MakeDialog::onSourceChanged);
-    connect(ui_.sourceFileRadio, &QAbstractButton::toggled, this, &MakeDialog::onSourceChanged);
-    connect(ui_.sourceFileButton, &PathButton::pathChanged, this, &MakeDialog::onSourceChanged);
+    connect(ui_.sourceFolderRadio, &QAbstractButton::toggled, this, &MakeDialog::on_source_changed);
+    connect(ui_.sourceFolderButton, &PathButton::path_changed, this, &MakeDialog::on_source_changed);
+    connect(ui_.sourceFileRadio, &QAbstractButton::toggled, this, &MakeDialog::on_source_changed);
+    connect(ui_.sourceFileButton, &PathButton::path_changed, this, &MakeDialog::on_source_changed);
 
-    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &MakeDialog::makeTorrent);
+    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &MakeDialog::make_torrent);
     connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &MakeDialog::close);
-    connect(ui_.pieceSizeSlider, &QSlider::valueChanged, this, &MakeDialog::onPieceSizeUpdated);
+    connect(ui_.pieceSizeSlider, &QSlider::valueChanged, this, &MakeDialog::on_piece_size_updated);
 
-    onSourceChanged();
+    on_source_changed();
 }
 
 /***
@@ -286,17 +286,17 @@ void MakeDialog::dropEvent(QDropEvent* event)
         if (file_info.isDir())
         {
             ui_.sourceFolderRadio->setChecked(true);
-            ui_.sourceFolderButton->setPath(filename);
+            ui_.sourceFolderButton->set_path(filename);
         }
         else // it's a file
         {
             ui_.sourceFileRadio->setChecked(true);
-            ui_.sourceFileButton->setPath(filename);
+            ui_.sourceFileButton->set_path(filename);
         }
     }
 }
 
-void MakeDialog::updatePiecesLabel()
+void MakeDialog::update_pieces_label()
 {
     QString text;
 
@@ -320,7 +320,7 @@ void MakeDialog::updatePiecesLabel()
     ui_.sourceSizeLabel->setText(text);
 }
 
-void MakeDialog::onPieceSizeUpdated(int value)
+void MakeDialog::on_piece_size_updated(int value)
 {
     auto new_size = static_cast<uint64_t>(pow(2, value));
 
@@ -329,5 +329,5 @@ void MakeDialog::onPieceSizeUpdated(int value)
         builder_->set_piece_size(new_size);
     }
 
-    updatePiecesLabel();
+    update_pieces_label();
 }

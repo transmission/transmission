@@ -73,7 +73,7 @@ QImage CGImageToQImage(CGImageRef cgImage)
 
 } // namespace bribri
 
-QPixmap loadSFSymbol(QString const symbol_name, int const pixel_size)
+QPixmap load_sf_symbol(QString const symbol_name, int const pixel_size)
 {
     if (NSImage* image = [NSImage imageWithSystemSymbolName:symbol_name.toNSString() accessibilityDescription:nil])
     {

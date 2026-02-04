@@ -22,8 +22,8 @@ public:
     FilterBarComboBoxDelegate& operator=(FilterBarComboBoxDelegate&&) = delete;
     FilterBarComboBoxDelegate& operator=(FilterBarComboBoxDelegate const&) = delete;
 
-    static bool isSeparator(QModelIndex const& index);
-    static void setSeparator(QAbstractItemModel* model, QModelIndex const& index);
+    static bool is_separator(QModelIndex const& index);
+    static void set_separator(QAbstractItemModel* model, QModelIndex const& index);
 
 protected:
     // QAbstractItemDelegate

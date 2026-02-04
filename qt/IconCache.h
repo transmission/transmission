@@ -30,18 +30,18 @@ class IconCache
 public:
     static IconCache& get();
 
-    [[nodiscard]] constexpr auto const& folderIcon() const noexcept
+    [[nodiscard]] constexpr auto const& folder_icon() const noexcept
     {
         return folder_icon_;
     }
 
-    [[nodiscard]] constexpr auto const& fileIcon() const noexcept
+    [[nodiscard]] constexpr auto const& file_icon() const noexcept
     {
         return file_icon_;
     }
 
-    QIcon guessMimeIcon(QString const& filename, QIcon fallback = {}) const;
-    QIcon getMimeTypeIcon(QString const& mime_type, bool multifile) const;
+    QIcon guess_mime_icon(QString const& filename, QIcon fallback = {}) const;
+    QIcon get_mime_type_icon(QString const& mime_type, bool multifile) const;
 
 protected:
     IconCache() = default;
@@ -54,16 +54,16 @@ private:
     mutable std::unordered_map<QString, QIcon> name_to_emblem_icon_;
 
 #if defined(_WIN32)
-    void addAssociatedFileIcon(QFileInfo const& file_info, unsigned int icon_size, QIcon& icon) const;
+    void add_associated_file_icon(QFileInfo const& file_info, unsigned int icon_size, QIcon& icon) const;
 #else
     mutable std::unordered_set<QString> suffixes_;
     mutable std::unordered_map<QString, QIcon> ext_to_icon_;
-    QIcon getMimeIcon(QString const& filename) const;
+    QIcon get_mime_icon(QString const& filename) const;
 #endif
 
-    QIcon getThemeIcon(QString const& name, std::optional<QStyle::StandardPixmap> const& fallback = {}) const;
+    QIcon get_theme_icon(QString const& name, std::optional<QStyle::StandardPixmap> const& fallback = {}) const;
 
-    QIcon getThemeIcon(
+    QIcon get_theme_icon(
         QString const& name,
         QString const& fallbackName,
         std::optional<QStyle::StandardPixmap> const& fallbackPixmap) const;

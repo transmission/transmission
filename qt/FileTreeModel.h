@@ -47,10 +47,10 @@ public:
     FileTreeModel(FileTreeModel const&) = delete;
     ~FileTreeModel() override;
 
-    void setEditable(bool editable);
+    void set_editable(bool editable);
 
     void clear();
-    void addFile(
+    void add_file(
         int index,
         QString const& filename,
         bool wanted,
@@ -59,13 +59,13 @@ public:
         uint64_t have,
         bool update_fields);
 
-    bool openFile(QModelIndex const& index);
+    bool open_file(QModelIndex const& index);
 
-    void twiddleWanted(QModelIndexList const& indices);
-    void twiddlePriority(QModelIndexList const& indices);
+    void twiddle_wanted(QModelIndexList const& indices);
+    void twiddle_priority(QModelIndexList const& indices);
 
-    void setWanted(QModelIndexList const& indices, bool wanted);
-    void setPriority(QModelIndexList const& indices, int priority);
+    void set_wanted(QModelIndexList const& indices, bool wanted);
+    void set_priority(QModelIndexList const& indices, int priority);
 
     [[nodiscard]] QModelIndex parent(QModelIndex const& child, int column) const;
 
@@ -80,23 +80,23 @@ public:
     bool setData(QModelIndex const& index, QVariant const& value, int role = Qt::EditRole) override;
 
 signals:
-    void priorityChanged(file_indices_t const& file_indices, int);
-    void wantedChanged(file_indices_t const& file_indices, bool);
-    void pathEdited(QString const& oldpath, QString const& new_name);
-    void openRequested(QString const& path);
+    void priority_changed(file_indices_t const& file_indices, int);
+    void wanted_changed(file_indices_t const& file_indices, bool);
+    void path_edited(QString const& oldpath, QString const& new_name);
+    void open_requested(QString const& path);
 
 private:
-    void clearSubtree(QModelIndex const& top);
-    QModelIndex indexOf(FileTreeItem* item, int column) const;
-    void emitParentsChanged(
+    void clear_subtree(QModelIndex const& top);
+    QModelIndex index_of(FileTreeItem* item, int column) const;
+    void emit_parents_changed(
         QModelIndex const& index,
         int first_column,
         int last_column,
         std::set<QModelIndex>* visited_parent_indices = nullptr);
-    void emitSubtreeChanged(QModelIndex const& idx, int first_column, int last_column);
-    [[nodiscard]] FileTreeItem* findItemForFileIndex(int file_index) const;
-    [[nodiscard]] FileTreeItem* itemFromIndex(QModelIndex const& index) const;
-    [[nodiscard]] QModelIndexList getOrphanIndices(QModelIndexList const& indices) const;
+    void emit_subtree_changed(QModelIndex const& idx, int first_column, int last_column);
+    [[nodiscard]] FileTreeItem* find_item_for_file_index(int file_index) const;
+    [[nodiscard]] FileTreeItem* item_from_index(QModelIndex const& index) const;
+    [[nodiscard]] QModelIndexList get_orphan_indices(QModelIndexList const& indices) const;
 
     std::map<int, FileTreeItem*> index_cache_;
     std::unique_ptr<FileTreeItem> root_item_;

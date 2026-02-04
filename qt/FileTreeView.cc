@@ -46,25 +46,25 @@ FileTreeView::FileTreeView(QWidget* parent, bool is_editable)
     setItemDelegate(delegate_);
     sortByColumn(FileTreeModel::COL_NAME, Qt::AscendingOrder);
 
-    connect(this, &QAbstractItemView::clicked, this, &FileTreeView::onClicked);
+    connect(this, &QAbstractItemView::clicked, this, &FileTreeView::on_clicked);
 
-    connect(model_, &FileTreeModel::openRequested, this, &FileTreeView::openRequested);
-    connect(model_, &FileTreeModel::pathEdited, this, &FileTreeView::pathEdited);
-    connect(model_, &FileTreeModel::priorityChanged, this, &FileTreeView::priorityChanged);
-    connect(model_, &FileTreeModel::wantedChanged, this, &FileTreeView::wantedChanged);
+    connect(model_, &FileTreeModel::open_requested, this, &FileTreeView::open_requested);
+    connect(model_, &FileTreeModel::path_edited, this, &FileTreeView::path_edited);
+    connect(model_, &FileTreeModel::priority_changed, this, &FileTreeView::priority_changed);
+    connect(model_, &FileTreeModel::wanted_changed, this, &FileTreeView::wanted_changed);
 }
 
-void FileTreeView::onClicked(QModelIndex const& proxy_index)
+void FileTreeView::on_clicked(QModelIndex const& proxy_index)
 {
     QModelIndex const model_index = proxy_->mapToSource(proxy_index);
 
     if (model_index.column() == FileTreeModel::COL_WANTED)
     {
-        model_->twiddleWanted(QModelIndexList{} << model_index);
+        model_->twiddle_wanted(QModelIndexList{} << model_index);
     }
     else if (model_index.column() == FileTreeModel::COL_PRIORITY)
     {
-        model_->twiddlePriority(QModelIndexList{} << model_index);
+        model_->twiddle_priority(QModelIndexList{} << model_index);
     }
 }
 
@@ -120,11 +120,11 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
 
         for (QString const& item_text : item_texts)
         {
-            item_width = std::max(item_width, Utils::measureViewItem(this, item_text));
+            item_width = std::max(item_width, Utils::measure_view_item(this, item_text));
         }
 
         QString const header_text = model_->headerData(column, Qt::Horizontal).toString();
-        int const header_width = Utils::measureHeaderItem(this->header(), header_text);
+        int const header_width = Utils::measure_header_item(this->header(), header_text);
 
         int const width = std::max({ min_width, item_width, header_width });
         setColumnWidth(column, width);
@@ -146,13 +146,13 @@ void FileTreeView::keyPressEvent(QKeyEvent* event)
 
         if (modifiers == Qt::NoModifier)
         {
-            model_->twiddleWanted(selectedSourceRows());
+            model_->twiddle_wanted(selected_source_rows());
             return;
         }
 
         if (modifiers == Qt::ShiftModifier)
         {
-            model_->twiddlePriority(selectedSourceRows());
+            model_->twiddle_priority(selected_source_rows());
             return;
         }
     }
@@ -168,7 +168,7 @@ void FileTreeView::mouseDoubleClickEvent(QMouseEvent* event)
         return;
     }
 
-    if (openSelectedItem())
+    if (open_selected_item())
     {
         return;
     }
@@ -185,7 +185,7 @@ void FileTreeView::contextMenuEvent(QContextMenuEvent* event)
 
     if (context_menu_ == nullptr)
     {
-        initContextMenu();
+        init_context_menu();
     }
 
     context_menu_->popup(event->globalPos());
@@ -197,7 +197,7 @@ void FileTreeView::update(FileList const& files, bool update_fields)
 
     for (TorrentFile const& file : files)
     {
-        model_->addFile(file.index, file.filename, file.wanted, file.priority, file.size, file.have, update_fields);
+        model_->add_file(file.index, file.filename, file.wanted, file.priority, file.size, file.have, update_fields);
     }
 
     if (model_was_empty)
@@ -213,9 +213,9 @@ void FileTreeView::clear()
     model_->clear();
 }
 
-void FileTreeView::setEditable(bool editable)
+void FileTreeView::set_editable(bool editable)
 {
-    model_->setEditable(editable);
+    model_->set_editable(editable);
 }
 
 bool FileTreeView::edit(QModelIndex const& index, EditTrigger trigger, QEvent* event)
@@ -235,17 +235,17 @@ bool FileTreeView::edit(QModelIndex const& index, EditTrigger trigger, QEvent* e
     return QTreeView::edit(name_index, trigger, event);
 }
 
-void FileTreeView::checkSelectedItems()
+void FileTreeView::check_selected_items()
 {
-    model_->setWanted(selectedSourceRows(), true);
+    model_->set_wanted(selected_source_rows(), true);
 }
 
-void FileTreeView::uncheckSelectedItems()
+void FileTreeView::uncheck_selected_items()
 {
-    model_->setWanted(selectedSourceRows(), false);
+    model_->set_wanted(selected_source_rows(), false);
 }
 
-void FileTreeView::onlyCheckSelectedItems()
+void FileTreeView::only_check_selected_items()
 {
     QModelIndex const root_index = model_->index(0, 0);
 
@@ -254,8 +254,8 @@ void FileTreeView::onlyCheckSelectedItems()
         return;
     }
 
-    QModelIndexList wanted_indices = selectedSourceRows();
-    model_->setWanted(wanted_indices, true);
+    QModelIndexList wanted_indices = selected_source_rows();
+    model_->set_wanted(wanted_indices, true);
 
     // NOLINTNEXTLINE(modernize-use-ranges)
     std::sort(wanted_indices.begin(), wanted_indices.end());
@@ -314,32 +314,32 @@ void FileTreeView::onlyCheckSelectedItems()
         }
     }
 
-    model_->setWanted(unwanted_indices, false);
+    model_->set_wanted(unwanted_indices, false);
 }
 
-void FileTreeView::setSelectedItemsPriority()
+void FileTreeView::set_selected_items_priority()
 {
     auto const* action = qobject_cast<QAction const*>(sender());
     assert(action != nullptr);
-    model_->setPriority(selectedSourceRows(), action->property(PriorityKey).toInt());
+    model_->set_priority(selected_source_rows(), action->property(PriorityKey).toInt());
 }
 
-bool FileTreeView::openSelectedItem()
+bool FileTreeView::open_selected_item()
 {
-    return model_->openFile(proxy_->mapToSource(currentIndex()));
+    return model_->open_file(proxy_->mapToSource(currentIndex()));
 }
 
-void FileTreeView::renameSelectedItem()
+void FileTreeView::rename_selected_item()
 {
     QTreeView::edit(currentIndex());
 }
 
-void FileTreeView::refreshContextMenuActionsSensitivity()
+void FileTreeView::refresh_context_menu_actions_sensitivity()
 {
     assert(context_menu_ != nullptr);
 
     QModelIndexList const selected_rows = selectionModel()->selectedRows();
-    Qt::CheckState const check_state = getCumulativeCheckState(selected_rows);
+    Qt::CheckState const check_state = get_cumulative_check_state(selected_rows);
 
     bool const have_selection = !selected_rows.isEmpty();
     bool const have_single_selection = selected_rows.size() == 1;
@@ -356,20 +356,20 @@ void FileTreeView::refreshContextMenuActionsSensitivity()
     rename_action_->setEnabled(have_single_selection);
 }
 
-void FileTreeView::initContextMenu()
+void FileTreeView::init_context_menu()
 {
     context_menu_ = new QMenu{ this };
 
-    check_selected_action_ = context_menu_->addAction(tr("Check Selected"), this, SLOT(checkSelectedItems()));
-    uncheck_selected_action_ = context_menu_->addAction(tr("Uncheck Selected"), this, SLOT(uncheckSelectedItems()));
-    only_check_selected_action_ = context_menu_->addAction(tr("Only Check Selected"), this, SLOT(onlyCheckSelectedItems()));
+    check_selected_action_ = context_menu_->addAction(tr("Check Selected"), this, SLOT(check_selected_items()));
+    uncheck_selected_action_ = context_menu_->addAction(tr("Uncheck Selected"), this, SLOT(uncheck_selected_items()));
+    only_check_selected_action_ = context_menu_->addAction(tr("Only Check Selected"), this, SLOT(only_check_selected_items()));
 
     context_menu_->addSeparator();
 
     priority_menu_ = context_menu_->addMenu(tr("Priority"));
-    high_priority_action_ = priority_menu_->addAction(FileTreeItem::tr("High"), this, SLOT(setSelectedItemsPriority()));
-    normal_priority_action_ = priority_menu_->addAction(FileTreeItem::tr("Normal"), this, SLOT(setSelectedItemsPriority()));
-    low_priority_action_ = priority_menu_->addAction(FileTreeItem::tr("Low"), this, SLOT(setSelectedItemsPriority()));
+    high_priority_action_ = priority_menu_->addAction(FileTreeItem::tr("High"), this, SLOT(set_selected_items_priority()));
+    normal_priority_action_ = priority_menu_->addAction(FileTreeItem::tr("Normal"), this, SLOT(set_selected_items_priority()));
+    low_priority_action_ = priority_menu_->addAction(FileTreeItem::tr("Low"), this, SLOT(set_selected_items_priority()));
 
     high_priority_action_->setProperty(PriorityKey, TR_PRI_HIGH);
     normal_priority_action_->setProperty(PriorityKey, TR_PRI_NORMAL);
@@ -377,13 +377,13 @@ void FileTreeView::initContextMenu()
 
     context_menu_->addSeparator();
 
-    open_action_ = context_menu_->addAction(tr("Open"), this, SLOT(openSelectedItem()));
-    rename_action_ = context_menu_->addAction(tr("Rename…"), this, SLOT(renameSelectedItem()));
+    open_action_ = context_menu_->addAction(tr("Open"), this, SLOT(open_selected_item()));
+    rename_action_ = context_menu_->addAction(tr("Rename…"), this, SLOT(rename_selected_item()));
 
-    connect(context_menu_, &QMenu::aboutToShow, this, &FileTreeView::refreshContextMenuActionsSensitivity);
+    connect(context_menu_, &QMenu::aboutToShow, this, &FileTreeView::refresh_context_menu_actions_sensitivity);
 }
 
-QModelIndexList FileTreeView::selectedSourceRows(int column) const
+QModelIndexList FileTreeView::selected_source_rows(int column) const
 {
     QModelIndexList indices;
 
@@ -395,7 +395,7 @@ QModelIndexList FileTreeView::selectedSourceRows(int column) const
     return indices;
 }
 
-Qt::CheckState FileTreeView::getCumulativeCheckState(QModelIndexList const& indices)
+Qt::CheckState FileTreeView::get_cumulative_check_state(QModelIndexList const& indices)
 {
     bool have_checked = false;
     bool have_unchecked = false;

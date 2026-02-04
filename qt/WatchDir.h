@@ -26,16 +26,16 @@ public:
     WatchDir& operator=(WatchDir&&) = delete;
     WatchDir& operator=(WatchDir const&) = delete;
 
-    void setPath(QString const& path, bool is_enabled);
+    void set_path(QString const& path, bool is_enabled);
 
 signals:
-    void torrentFileAdded(QString const& filename);
+    void torrent_file_added(QString const& filename);
 
 private slots:
-    void watcherActivated(QString const& path);
-    void onTimeout();
+    void watcher_activated(QString const& path);
+    void on_timeout();
 
-    void rescanAllWatchedDirectories();
+    void rescan_all_watched_directories();
 
 private:
     enum class AddResult : uint8_t
@@ -45,7 +45,7 @@ private:
         Error
     };
 
-    [[nodiscard]] AddResult metainfoTest(QString const& filename) const;
+    [[nodiscard]] AddResult metainfo_test(QString const& filename) const;
 
     TorrentModel const& model_;
 

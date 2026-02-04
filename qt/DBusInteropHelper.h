@@ -14,9 +14,9 @@ class DBusInteropHelper
 public:
     DBusInteropHelper() = default;
 
-    [[nodiscard]] bool isConnected() const;
+    [[nodiscard]] bool is_connected() const;
 
-    [[nodiscard]] QVariant addMetainfo(QString const& metainfo) const;
+    [[nodiscard]] QVariant add_metainfo(QString const& metainfo) const;
 
-    static void registerObject(QObject* parent);
+    static void register_object(QObject* parent);
 };

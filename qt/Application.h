@@ -52,7 +52,7 @@ public:
     ~Application() override;
 
     void raise() const;
-    bool notifyApp(QString const& title, QString const& body, QStringList const& actions = {}) const;
+    bool notify_app(QString const& title, QString const& body, QStringList const& actions = {}) const;
 
     QString const& intern(QString const& in)
     {
@@ -76,36 +76,36 @@ public:
             {
                 if (!weak_self.isNull())
                 {
-                    weak_self.data()->faviconsChanged();
+                    weak_self.data()->favicons_changed();
                 }
             });
     }
 
 signals:
-    void faviconsChanged();
+    void favicons_changed();
 
 public slots:
-    void addTorrent(AddData addme) const;
-    void addWatchdirTorrent(QString const& filename) const;
+    void add_torrent(AddData addme) const;
+    void add_watchdir_torrent(QString const& filename) const;
 
 private slots:
-    void onSessionSourceChanged() const;
-    void onTorrentsAdded(torrent_ids_t const& torrent_ids) const;
-    void onTorrentsCompleted(torrent_ids_t const& torrent_ids) const;
-    void onTorrentsEdited(torrent_ids_t const& torrent_ids) const;
-    void onTorrentsNeedInfo(torrent_ids_t const& torrent_ids) const;
-    void refreshPref(int key) const;
-    void refreshTorrents();
-    void saveGeometry() const;
+    void on_session_source_changed() const;
+    void on_torrents_added(torrent_ids_t const& torrent_ids) const;
+    void on_torrents_completed(torrent_ids_t const& torrent_ids) const;
+    void on_torrents_edited(torrent_ids_t const& torrent_ids) const;
+    void on_torrents_need_info(torrent_ids_t const& torrent_ids) const;
+    void refresh_pref(int key) const;
+    void refresh_torrents();
+    void save_geometry() const;
 #ifdef QT_DBUS_LIB
-    void onNotificationActionInvoked(quint32 notification_id, QString action_key);
+    void on_notification_action_invoked(quint32 notification_id, QString action_key);
 #endif
 
 private:
-    void maybeUpdateBlocklist() const;
-    void loadTranslations();
-    QStringList getNames(torrent_ids_t const& ids) const;
-    void notifyTorrentAdded(Torrent const* tor) const;
+    void maybe_update_blocklist() const;
+    void load_translations();
+    QStringList get_names(torrent_ids_t const& ids) const;
+    void notify_torrent_added(Torrent const* tor) const;
 
     std::unordered_set<QString> interned_strings_;
 

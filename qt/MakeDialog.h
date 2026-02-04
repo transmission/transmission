@@ -33,13 +33,13 @@ protected:
     void dropEvent(QDropEvent* event) override;
 
 private slots:
-    void onSourceChanged();
-    void makeTorrent();
-    void onPieceSizeUpdated(int value);
+    void on_source_changed();
+    void make_torrent();
+    void on_piece_size_updated(int value);
 
 private:
-    [[nodiscard]] QString getSource() const;
-    void updatePiecesLabel();
+    [[nodiscard]] QString get_source() const;
+    void update_pieces_label();
     Session& session_;
 
     Ui::MakeDialog ui_ = {};

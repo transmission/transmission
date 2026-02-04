@@ -44,7 +44,7 @@ public:
         return (icon_rect | text_rect).size();
     }
 
-    [[nodiscard]] QAbstractTextDocumentLayout* textLayout() const
+    [[nodiscard]] QAbstractTextDocumentLayout* text_layout() const
     {
         return text_document_.documentLayout();
     }
@@ -65,7 +65,7 @@ ItemLayout::ItemLayout(
     QRect base_rect{ top_left, QSize{ width, 0 } };
 
     icon_rect = QStyle::alignedRect(direction, Qt::AlignLeft | Qt::AlignTop, icon_size, base_rect);
-    Utils::narrowRect(base_rect, icon_size.width() + Spacing, 0, direction);
+    Utils::narrow_rect(base_rect, icon_size.width() + Spacing, 0, direction);
 
     text_document_.setDocumentMargin(0);
     text_document_.setTextWidth(base_rect.width());
@@ -91,9 +91,9 @@ ItemLayout::ItemLayout(
 ****
 ***/
 
-QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, TrackerInfo const& info) const
+QSize TrackerDelegate::size_hint(QStyleOptionViewItem const& option, TrackerInfo const& info) const
 {
-    ItemLayout const layout{ getText(info),
+    ItemLayout const layout{ get_text(info),
                              true,
                              option.direction,
                              QPoint{ 0, 0 },
@@ -104,7 +104,7 @@ QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, TrackerInfo 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
     auto const tracker_info = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
-    return sizeHint(option, tracker_info);
+    return size_hint(option, tracker_info);
 }
 
 void TrackerDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
@@ -113,21 +113,21 @@ void TrackerDelegate::paint(QPainter* painter, QStyleOptionViewItem const& optio
     painter->save();
     painter->setClipRect(option.rect);
     drawBackground(painter, option, index);
-    drawTracker(painter, option, tracker_info);
+    draw_tracker(painter, option, tracker_info);
     drawFocus(painter, option, option.rect);
     painter->restore();
 }
 
-void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const& option, TrackerInfo const& inf) const
+void TrackerDelegate::draw_tracker(QPainter* painter, QStyleOptionViewItem const& option, TrackerInfo const& inf) const
 {
     bool const is_item_selected((option.state & QStyle::State_Selected) != 0);
     bool const is_item_enabled((option.state & QStyle::State_Enabled) != 0);
     bool const is_item_active((option.state & QStyle::State_Active) != 0);
 
-    QIcon const tracker_icon(inf.st.getFavicon());
+    QIcon const tracker_icon(inf.st.get_favicon());
 
     QRect const content_rect(option.rect.adjusted(Margin.width(), Margin.height(), -Margin.width(), -Margin.height()));
-    ItemLayout const layout(getText(inf), is_item_selected, option.direction, content_rect.topLeft(), content_rect.width());
+    ItemLayout const layout(get_text(inf), is_item_selected, option.direction, content_rect.topLeft(), content_rect.width());
 
     painter->save();
 
@@ -152,19 +152,19 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
         QPalette::Text,
         option.palette.color(is_item_selected ? QPalette::HighlightedText : QPalette::Text));
     painter->translate(layout.text_rect.topLeft());
-    layout.textLayout()->draw(painter, paint_context);
+    layout.text_layout()->draw(painter, paint_context);
 
     painter->restore();
 }
 
-void TrackerDelegate::setShowMore(bool b)
+void TrackerDelegate::set_show_more(bool b)
 {
     show_more_ = b;
 }
 
 namespace
 {
-QString timeToRoundedString(int seconds)
+QString time_to_rounded_string(int seconds)
 {
     if (seconds > 60)
     {
@@ -175,7 +175,7 @@ QString timeToRoundedString(int seconds)
 }
 } // namespace
 
-QString TrackerDelegate::getText(TrackerInfo const& inf) const
+QString TrackerDelegate::get_text(TrackerInfo const& inf) const
 {
     QString str;
     auto const err_markup_begin = QStringLiteral("<span style=\"color:red\">");
@@ -188,11 +188,11 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
     auto const now = time(nullptr);
     auto const time_until = [&now](auto t)
     {
-        return timeToRoundedString(static_cast<int>(t - now));
+        return time_to_rounded_string(static_cast<int>(t - now));
     };
     auto const time_since = [&now](auto t)
     {
-        return timeToRoundedString(static_cast<int>(now - t));
+        return time_to_rounded_string(static_cast<int>(now - t));
     };
 
     // hostname

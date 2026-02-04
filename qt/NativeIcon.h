@@ -66,6 +66,6 @@ enum class Type : uint8_t
 
 [[nodiscard]] QIcon icon(Type type, QStyle const* style = QApplication::style());
 
-[[nodiscard]] bool shouldBeShownInMenu(Type type);
+[[nodiscard]] bool should_be_shown_in_menu(Type type);
 
 } // namespace icons
