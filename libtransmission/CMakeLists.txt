@@ -289,7 +289,8 @@ target_link_libraries(${TR_NAME}
         fmt::fmt-header-only
         sigslot
         transmission::small
-        libevent::event)
+        libevent::core
+        libevent::extra)
 
 if(INSTALL_LIB)
     install(
