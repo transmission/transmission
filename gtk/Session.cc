@@ -172,8 +172,6 @@ private:
     void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running);
     void on_torrent_metadata_changed(tr_torrent* raw_torrent);
 
-    void on_torrent_removal_done(tr_torrent_id_t id, bool succeeded);
-
 private:
     Session& core_;
 
@@ -928,30 +926,11 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 
 void Session::Impl::remove_torrent(tr_torrent_id_t const id, bool const delete_files)
 {
-    auto const& [torrent, _] = find_torrent_by_id(id);
-    if (!torrent)
-    {
-        return;
-    }
-
-    auto const on_remove_done = [core = get_core_ptr()](tr_torrent_id_t const removed_id, bool const ok)
-    {
-        Glib::signal_idle().connect_once([core, removed_id, ok]() { core->impl_->on_torrent_removal_done(removed_id, ok); });
-    };
-
-    tr_torrentRemove(&torrent->get_underlying(), delete_files, gtr_file_trash_or_remove, std::move(on_remove_done));
-}
-
-void Session::Impl::on_torrent_removal_done(tr_torrent_id_t id, bool succeeded)
-{
-    if (!succeeded)
-    {
-        return;
-    }
-
     if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
     {
         get_raw_model()->remove(position);
+
+        tr_torrentRemove(&torrent->get_underlying(), delete_files, gtr_file_trash_or_remove);
     }
 }
 
