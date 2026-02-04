@@ -1046,16 +1046,8 @@ private:
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
-    friend void tr_torrentRemoveInSessionThread(
-        tr_torrent* tor,
-        bool delete_flag,
-        tr_torrent_remove_func remove_func,
-        tr_torrent_remove_done_func on_remove_done);
-    friend void tr_torrentRemove(
-        tr_torrent* tor,
-        bool delete_flag,
-        tr_torrent_remove_func remove_func,
-        tr_torrent_remove_done_func on_remove_done);
+    friend void tr_torrentRemoveInSessionThread(tr_torrent* tor, bool delete_flag, tr_torrent_remove_func remove_func);
+    friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_torrent_remove_func remove_func);
     friend void tr_torrentSetDownloadDir(tr_torrent* tor, std::string_view path);
     friend void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
     friend void tr_torrentStart(tr_torrent* tor);
