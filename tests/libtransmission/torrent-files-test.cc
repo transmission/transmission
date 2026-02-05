@@ -152,6 +152,15 @@ TEST_F(TorrentFilesTest, mimeType)
     EXPECT_EQ("audio/mpeg"sv, metainfo.files().primary_mime_type());
 }
 
+TEST_F(TorrentFilesTest, mimeTypeVideoMp4)
+{
+    auto files = tr_torrent_files{};
+    files.add("name/name.mp4"sv, 4'500'000'000U);
+    files.add("name/name.info"sv, 2048U);
+    files.add("name/SHA512sum"sv, 139U);
+    EXPECT_EQ("video/mp4"sv, files.primary_mime_type());
+}
+
 TEST_F(TorrentFilesTest, isSubpathPortable)
 {
     static auto constexpr NotWin32 = TR_IF_WIN32(false, true);

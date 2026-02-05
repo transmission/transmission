@@ -797,7 +797,18 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
         auto const it = std::lower_bound(std::begin(MimeTypeSuffixes), std::end(MimeTypeSuffixes), suffix_lc, Compare);
         if (it != std::end(MimeTypeSuffixes) && suffix_lc == it->suffix)
         {
-            return it->mime_type;
+            std::string_view mime_type = it->mime_type;
+
+            // https://github.com/transmission/transmission/issues/5965#issuecomment-1704421231
+            // An mp4 file's correct mime-type depends on the codecs used in the file,
+            // which we have no way of inspecting and which might not be downloaded yet.
+            // Let's use `video/mp4` since that's by far the most common use case for torrents.
+            if (mime_type == "application/mp4")
+            {
+                mime_type = "video/mp4";
+            }
+
+            return mime_type;
         }
     }
 
