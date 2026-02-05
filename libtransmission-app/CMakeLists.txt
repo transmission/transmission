@@ -20,12 +20,6 @@ target_include_directories(${LIBNAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CMAKE_CURRENT_BINARY_DIR}/..)
 
-target_compile_definitions(${LIBNAME}
-    PUBLIC
-        FMT_USE_EXCEPTIONS=0 # {fmt} >= 11.2.0
-        FMT_EXCEPTIONS=0 # {fmt} < 11.2.0
-)
-
 target_link_libraries(${LIBNAME}
     PUBLIC
         transmission::fmt-header-only)
