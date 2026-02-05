@@ -33,7 +33,7 @@ target_include_directories(${TR_NAME}-daemon SYSTEM
 target_link_libraries(${TR_NAME}-daemon
     PRIVATE
         ${TR_NAME}
-        libevent::event
+        libevent::core
         fmt::fmt-header-only
         $<$<BOOL:${WITH_SYSTEMD}>:${SYSTEMD_LIBRARIES}>)
 

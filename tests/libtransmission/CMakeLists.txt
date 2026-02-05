@@ -84,7 +84,7 @@ target_link_libraries(libtransmission-test
         GTest::gtest_main
         dht::dht
         fmt::fmt-header-only
-        libevent::event
+        libevent::core
         WideInteger::WideInteger)
 
 tr_setup_gtest_target(libtransmission-test "LT.")
