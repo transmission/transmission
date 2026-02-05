@@ -34,7 +34,7 @@ target_link_libraries(${TR_NAME}-daemon
     PRIVATE
         ${TR_NAME}
         libevent::core
-        fmt::fmt-header-only
+        transmission::fmt-header-only
         $<$<BOOL:${WITH_SYSTEMD}>:${SYSTEMD_LIBRARIES}>)
 
 tr_win32_app_info(${TR_NAME}-daemon

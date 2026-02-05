@@ -623,6 +623,17 @@ tr_add_external_auto_library(FMT fmt
     CMAKE_ARGS
         -DFMT_INSTALL=OFF
         -DFMT_SYSTEM_HEADERS=ON)
+if(NOT TARGET transmission::fmt-header-only)
+    add_library(transmission::fmt-header-only INTERFACE IMPORTED)
+    target_link_libraries(transmission::fmt-header-only
+        INTERFACE
+            fmt::fmt-header-only)
+    target_compile_definitions(transmission::fmt-header-only
+        INTERFACE
+            FMT_USE_EXCEPTIONS=0 # {fmt} >= 11.2.0
+            FMT_EXCEPTIONS=0 # {fmt} < 11.2.0
+    )
+endif()
 
 tr_add_external_auto_library(SIGSLOT PalSigslot
     SUBPROJECT
