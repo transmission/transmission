@@ -148,7 +148,7 @@ TEST_F(TorrentsPieceSpanTest, exposesFilePieceSpan)
 
 TEST_F(TorrentsTest, piecesKeyTest)
 {
-    auto constexpr badTorrents = std::array<std::string_view, 5>{ "missing-pieces-key.torrent"sv,
+    auto constexpr BadTorrents = std::array<std::string_view, 5>{ "missing-pieces-key.torrent"sv,
                                                                   "bad-pieces-key.torrent"sv,
                                                                   "empty-pieces-key.torrent"sv,
                                                                   "too-few-pieces.torrent"sv,
@@ -160,7 +160,7 @@ TEST_F(TorrentsTest, piecesKeyTest)
         EXPECT_TRUE(tm.parse_torrent_file(path));
     }
 
-    for (auto const& name : badTorrents)
+    for (auto const& name : BadTorrents)
     {
         auto tm = tr_torrent_metainfo{};
         auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
