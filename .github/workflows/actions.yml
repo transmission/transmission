@@ -166,6 +166,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -217,6 +218,7 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Homebrew` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Homebrew`
@@ -264,6 +266,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -408,6 +411,7 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Homebrew` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Homebrew`
@@ -500,6 +504,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_B64=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Alpine` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Alpine`
@@ -779,6 +784,7 @@ jobs:
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_FAST_FLOAT=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_FMT=OFF `# Debian 11 package too old` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_UTF8CPP=OFF `# Debian 11 package too old` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian 11` \
@@ -860,6 +866,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Debian`
@@ -939,6 +946,7 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Fedora` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Fedora` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Fedora` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Fedora` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Fedora`
@@ -1021,6 +1029,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -1136,6 +1145,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
