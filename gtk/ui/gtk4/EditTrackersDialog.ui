@@ -17,7 +17,7 @@
               <object class="GtkFrame">
                 <child type="label">
                   <object class="GtkLabel" id="urls_section_title">
-                    <property name="label" translatable="1">Tracker Announce URLs</property>
+                    <property name="label" translatable="yes">Tracker Announce URLs</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
                     </attributes>
@@ -29,7 +29,7 @@
                     <property name="column-spacing">12</property>
                     <child>
                       <object class="GtkLabel" id="urls_section_top_comment_label">
-                        <property name="label" translatable="1"><![CDATA[To add a backup URL, add it on the next line after a primary URL.
+                        <property name="label" translatable="yes"><![CDATA[To add a backup URL, add it on the next line after a primary URL.
 To add a new primary URL, add it after a blank line.]]></property>
                         <property name="xalign">0</property>
                         <layout>
@@ -60,7 +60,7 @@ To add a new primary URL, add it after a blank line.]]></property>
                     </child>
                     <child>
                       <object class="GtkLabel" id="urls_section_bottom_comment_label">
-                        <property name="label" translatable="1">Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</property>
+                        <property name="label" translatable="yes">Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</property>
                         <property name="xalign">0</property>
                         <layout>
                           <property name="column">0</property>
@@ -83,7 +83,7 @@ To add a new primary URL, add it after a blank line.]]></property>
         <property name="spacing">6</property>
         <child>
           <object class="GtkButton" id="cancel_button">
-            <property name="label" translatable="1">_Cancel</property>
+            <property name="label" translatable="yes">_Cancel</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
@@ -91,7 +91,7 @@ To add a new primary URL, add it after a blank line.]]></property>
         </child>
         <child>
           <object class="GtkButton" id="save_button">
-            <property name="label" translatable="1">_Save</property>
+            <property name="label" translatable="yes">_Save</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
