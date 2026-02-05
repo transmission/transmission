@@ -9,7 +9,7 @@ foreach(P create edit remote show)
         PRIVATE
             ${TR_NAME}
             CURL::libcurl
-            fmt::fmt-header-only
+            transmission::fmt-header-only
             libevent::core)
 
     tr_win32_app_info(${TR_NAME}-${P}
