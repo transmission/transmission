@@ -161,8 +161,6 @@ bool tr_torrent_files::has_any_local_data(std::string_view const* paths, size_t 
 std::string_view tr_torrent_files::primary_mime_type() const
 {
     // count up how many bytes there are for each mime-type in the torrent
-    // NB: get_mime_type_for_filename() always returns the same ptr for a
-    // mime_type, so its raw pointer can be used as a key.
     auto size_per_mime_type = small::unordered_map<std::string_view, size_t, 256U>{};
     for (tr_file_index_t i = 0, n = file_count(); i < n; ++i)
     {
