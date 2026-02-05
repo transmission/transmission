@@ -12,8 +12,6 @@ add_compile_options(
     # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
     $<$<AND:$<BOOL:${APPLE}>,$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>,$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>>:-fobjc-arc>)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/sigslot ${CMAKE_BINARY_DIR}/third-party/sigslot)
-
 add_library(${TR_NAME} STATIC)
 
 set(IS_APPLE_CLANG FALSE)
@@ -287,7 +285,7 @@ target_link_libraries(${TR_NAME}
     PUBLIC
         transmission::crypto_impl
         fmt::fmt-header-only
-        sigslot
+        Pal::Sigslot
         transmission::small
         libevent::core
         libevent::extra)
