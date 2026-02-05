@@ -69,6 +69,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     tr_tracker_tier_t tier_ = 0;
     tr_pathbuf file_subpath_;
     int64_t file_length_ = 0;
+    size_t files_cum_length_ = 0;
 
     enum class State : uint8_t
     {
@@ -460,14 +461,27 @@ private:
 
         // FIXME: Check to see if we already added this file. This is a safeguard
         // for hybrid torrents with duplicate info between "file tree" and "files"
+        // This logic needs updating when "file tree" (bittorrent v2) supported
+        auto const n_files = tm_.files_.file_count();
+        for (tr_file_index_t i = 0; i < n_files; ++i)
+        {
+            if (file_subpath_ == tm_.files_.path(i))
+            {
+                context.error.set(EINVAL, fmt::format("duplicate path [{:s}]", file_subpath_));
+                ok = false;
+                break;
+            }
+        }
+
         if (std::empty(file_subpath_))
         {
             context.error.set(EINVAL, fmt::format("invalid path [{:s}]", file_subpath_));
             ok = false;
         }
-        else
+        else if (ok)
         {
             tm_.files_.add(file_subpath_, file_length_);
+            files_cum_length_ += file_length_;
         }
 
         file_length_ = 0;
@@ -518,14 +532,14 @@ private:
         // bittorrent 1.0 spec
         // https://www.bittorrent.org/beps/bep_0003.html
         //
-        // "There is also a key length or a key files, but not both or neither.
-        //
-        // "If length is present then the download represents a single file,
+        // "There is also a key 'length' or a key 'files', but not both or neither.
+        // If 'length' is present then the download represents a single file,
         // otherwise it represents a set of files which go in a directory structure.
-        // In the single file case, length maps to the length of the file in bytes.
+        // In the single file case, 'length' maps to the length of the file in bytes."
         if (tm_.file_count() == 0 && length_ != 0 && !std::empty(tm_.name_))
         {
             tm_.files_.add(tr_torrent_files::sanitize_subpath(tm_.name_), length_);
+            files_cum_length_ = length_;
         }
 
         if (auto const has_metainfo = tm_.info_dict_size() != 0U; has_metainfo)
@@ -544,7 +558,16 @@ private:
             {
                 if (!context.error)
                 {
-                    context.error.set(EINVAL, fmt::format("invalid piece size: {}", piece_size_));
+                    context.error.set(EINVAL, fmt::format("invalid 'piece length': {}", piece_size_));
+                }
+                return false;
+            }
+
+            if ((files_cum_length_ + piece_size_ - 1) / piece_size_ != std::size(tm_.pieces_))
+            {
+                if (!context.error)
+                {
+                    context.error.set(EINVAL, fmt::format("'pieces' and torrent size mismatch"));
                 }
                 return false;
             }

@@ -146,11 +146,24 @@ TEST_F(TorrentsPieceSpanTest, exposesFilePieceSpan)
     EXPECT_EQ(file_view.endPiece, 32);
 }
 
-TEST_F(TorrentsTest, missingPiecesKeyTest)
+TEST_F(TorrentsTest, piecesKeyTest)
 {
-    auto constexpr* const TorrentFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/missing-pieces-key.torrent";
-    auto owned = std::vector<std::unique_ptr<tr_torrent>>{};
+    auto constexpr badTorrents = std::array<std::string_view, 5>{ "missing-pieces-key.torrent"sv,
+                                                                  "bad-pieces-key.torrent"sv,
+                                                                  "empty-pieces-key.torrent"sv,
+                                                                  "too-few-pieces.torrent"sv,
+                                                                  "too-many-pieces.torrent"sv };
 
-    auto tm = tr_torrent_metainfo{};
-    EXPECT_FALSE(tm.parse_torrent_file(TorrentFile));
+    {
+        auto tm = tr_torrent_metainfo{};
+        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/perfect-pieces.torrent" };
+        EXPECT_TRUE(tm.parse_torrent_file(path));
+    }
+
+    for (auto const& name : badTorrents)
+    {
+        auto tm = tr_torrent_metainfo{};
+        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
+        EXPECT_FALSE(tm.parse_torrent_file(path));
+    }
 }
