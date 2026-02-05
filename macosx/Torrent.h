@@ -35,6 +35,10 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 - (void)getAmountFinished:(float*)tab size:(int)size;
 @property(nonatomic) NSIndexSet* previousFinishedPieces;
 
+// Updates one or more torrents by refreshing their libtransmission stats.
+// Prefer using this batch method when updating many torrents at once.
++ (void)updateTorrents:(NSArray<Torrent*>*)torrents;
+
 - (void)update;
 
 - (void)startTransferIgnoringQueue:(BOOL)ignoreQueue;

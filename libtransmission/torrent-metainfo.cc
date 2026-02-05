@@ -57,9 +57,9 @@ namespace
 auto constexpr MaxBencDepth = 32;
 } // namespace
 
-struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
+struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
 {
-    using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+    using BasicHandler = tr::benc::BasicHandler<MaxBencDepth>;
 
     tr_torrent_metainfo& tm_;
     uint32_t piece_size_ = {};
@@ -212,7 +212,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             {
                 file_length_ = value;
             }
-            else if (pathIs(InfoKey, FilesKey, ""sv, MtimeKey))
+            else if (pathIs(InfoKey, FilesKey, ArrayKey, MtimeKey))
             {
                 // unused by Transmission
             }
@@ -244,6 +244,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             tm_.is_v2_ = value == 2;
         }
         else if (
+            pathIs(CodepageKey) || //
             pathIs(DurationKey) || //
             pathIs(EncodedRateKey) || //
             pathIs(HeightKey) || //
@@ -251,6 +252,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathIs(InfoKey, UniqueKey) || //
             pathIs(ProfilesKey, HeightKey) || //
             pathIs(ProfilesKey, WidthKey) || //
+            pathIs(UidKey) || //
             pathIs(WidthKey) || //
             pathStartsWith(AzureusPropertiesKey) || //
             pathStartsWith(InfoKey, FileDurationKey) || //
@@ -312,13 +314,13 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 // TODO https://github.com/transmission/transmission/issues/458
             }
             else if (
-                pathIs(InfoKey, FilesKey, ""sv, Crc32Key) || //
-                pathIs(InfoKey, FilesKey, ""sv, Ed2kKey) || //
-                pathIs(InfoKey, FilesKey, ""sv, FilehashKey) || //
-                pathIs(InfoKey, FilesKey, ""sv, Md5Key) || //
-                pathIs(InfoKey, FilesKey, ""sv, Md5sumKey) || //
-                pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || // (why a string?)
-                pathIs(InfoKey, FilesKey, ""sv, Sha1Key))
+                pathIs(InfoKey, FilesKey, ArrayKey, Crc32Key) || //
+                pathIs(InfoKey, FilesKey, ArrayKey, Ed2kKey) || //
+                pathIs(InfoKey, FilesKey, ArrayKey, FilehashKey) || //
+                pathIs(InfoKey, FilesKey, ArrayKey, Md5Key) || //
+                pathIs(InfoKey, FilesKey, ArrayKey, Md5sumKey) || //
+                pathIs(InfoKey, FilesKey, ArrayKey, MtimeKey) || // (why a string?)
+                pathIs(InfoKey, FilesKey, ArrayKey, Sha1Key))
             {
                 // unused by Transmission
             }
@@ -329,11 +331,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(CommentKey) || pathIs(CommentUtf8Key))
         {
-            tm_.comment_ = tr_strv_convert_utf8(value);
+            tm_.comment_ = tr_strv_to_utf8_string(value);
         }
         else if (pathIs(CreatedByKey) || pathIs(CreatedByUtf8Key))
         {
-            tm_.creator_ = tr_strv_convert_utf8(value);
+            tm_.creator_ = tr_strv_to_utf8_string(value);
         }
         else if (
             pathIs(SourceKey) || pathIs(InfoKey, SourceKey) || //
@@ -344,7 +346,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             // to have the same use as the 'source' key
             // http://wiki.bitcomet.com/inside_bitcomet
 
-            tm_.source_ = tr_strv_convert_utf8(value);
+            tm_.source_ = tr_strv_to_utf8_string(value);
         }
         else if (pathIs(AnnounceKey))
         {
@@ -369,7 +371,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 auto const n = std::size(value) / sizeof(tr_sha1_digest_t);
                 tm_.pieces_.resize(n);
                 std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
-                tm_.pieces_offset_ = context.tokenSpan().first;
             }
             else
             {
@@ -408,6 +409,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         else if (
             pathIs(ChecksumKey) || //
             pathIs(ErrCallbackKey) || //
+            pathIs(InfoKey, AttrKey) || //
             pathIs(InfoKey, CrossSeedEntryKey) || //
             pathIs(InfoKey, Ed2kKey) || //
             pathIs(InfoKey, EntropyKey) || //
@@ -554,6 +556,7 @@ private:
     static constexpr std::string_view AzureusPrivatePropertiesKey = "azureus_private_properties"sv;
     static constexpr std::string_view AzureusPropertiesKey = "azureus_properties"sv;
     static constexpr std::string_view ChecksumKey = "checksum"sv;
+    static constexpr std::string_view CodepageKey = "codepage"sv;
     static constexpr std::string_view CollectionsKey = "collections"sv;
     static constexpr std::string_view CommentKey = "comment"sv;
     static constexpr std::string_view CommentUtf8Key = "comment.utf-8"sv;
@@ -615,7 +618,7 @@ private:
 
 bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error* error)
 {
-    auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
+    auto stack = tr::benc::ParserStack<MaxBencDepth>{};
     auto handler = MetainfoHandler{ *this };
 
     auto local_error = tr_error{};
@@ -624,7 +627,7 @@ bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error* error)
         error = &local_error;
     }
 
-    auto const ok = transmission::benc::parse(benc, stack, handler, nullptr, error);
+    auto const ok = tr::benc::parse(benc, stack, handler, nullptr, error);
 
     if (*error)
     {

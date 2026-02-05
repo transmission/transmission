@@ -11,11 +11,11 @@
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/tr-buffer.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using BufferTest = ::testing::Test;
+using BufferTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
-using Buffer = libtransmission::StackBuffer<1024, std::byte>;
+using Buffer = tr::StackBuffer<1024, std::byte>;
 
 TEST_F(BufferTest, startsWithInSingleSegment)
 {

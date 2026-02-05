@@ -40,10 +40,10 @@ find_cfiles() {
        ! \( $(get_find_path_args $(trim_comments .clang-format-ignore)) \) "$@"
 }
 
-# We're targeting clang-format version 17 and other versions give slightly
-# different results, so prefer `clang-format-17` if it's installed.
+# We're targeting clang-format version 20 and other versions give slightly
+# different results, so prefer `clang-format-20` if it's installed.
 clang_format_exe_names=(
-  'clang-format-17'
+  'clang-format-20'
   'clang-format'
 )
 for name in ${clang_format_exe_names[@]}; do
@@ -53,6 +53,15 @@ for name in ${clang_format_exe_names[@]}; do
     break
   fi
 done
+
+# Xcode toolchain lookup
+if [ -z "${clang_format_exe}" ]; then
+  xcrun=$(command -v xcrun)
+  if [ "$?" -eq 0 ]; then
+    clang_format_exe=$("$xcrun" --find clang-format)
+  fi
+fi
+
 if [ -z "${clang_format_exe}" ]; then
   echo "error: clang-format not found";
   exit 1;

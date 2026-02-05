@@ -4,7 +4,7 @@
 
   <menu id="main-window-menu">
     <submenu>
-      <attribute name="label" translatable="true">_File</attribute>
+      <attribute name="label" translatable="yes">_File</attribute>
       <section>
         <item>
           <attribute name="action">win.open-torrent</attribute>
@@ -51,7 +51,7 @@
       </section>
     </submenu>
     <submenu>
-      <attribute name="label" translatable="true">_Edit</attribute>
+      <attribute name="label" translatable="yes">_Edit</attribute>
       <section>
         <item>
           <attribute name="action">win.select-all</attribute>
@@ -74,7 +74,7 @@
       </section>
     </submenu>
     <submenu>
-      <attribute name="label" translatable="true">_Torrent</attribute>
+      <attribute name="label" translatable="yes">_Torrent</attribute>
       <section>
         <item>
           <attribute name="action">win.show-torrent-properties</attribute>
@@ -111,7 +111,7 @@
           <attribute name="label" translatable="yes">Ask Tracker for _More Peers</attribute>
         </item>
         <submenu>
-          <attribute name="label" translatable="true">_Queue</attribute>
+          <attribute name="label" translatable="yes">_Queue</attribute>
           <section>
             <item>
               <attribute name="action">win.queue-move-top</attribute>
@@ -175,7 +175,7 @@
       </section>
     </submenu>
     <submenu>
-      <attribute name="label" translatable="true">_View</attribute>
+      <attribute name="label" translatable="yes">_View</attribute>
       <section>
         <item>
           <attribute name="action">win.compact-view</attribute>
@@ -201,47 +201,47 @@
         <item>
           <attribute name="action">win.sort-torrents</attribute>
           <attribute name="label" translatable="yes">Sort by _Activity</attribute>
-          <attribute name="target">sort-by-activity</attribute>
+          <attribute name="target">sort_by_activity</attribute>
         </item>
         <item>
           <attribute name="action">win.sort-torrents</attribute>
           <attribute name="label" translatable="yes">Sort by A_ge</attribute>
-          <attribute name="target">sort-by-age</attribute>
+          <attribute name="target">sort_by_age</attribute>
         </item>
         <item>
           <attribute name="action">win.sort-torrents</attribute>
           <attribute name="label" translatable="yes">Sort by _Name</attribute>
-          <attribute name="target">sort-by-name</attribute>
+          <attribute name="target">sort_by_name</attribute>
         </item>
         <item>
           <attribute name="action">win.sort-torrents</attribute>
           <attribute name="label" translatable="yes">Sort by _Progress</attribute>
-          <attribute name="target">sort-by-progress</attribute>
+          <attribute name="target">sort_by_progress</attribute>
         </item>
         <item>
           <attribute name="action">win.sort-torrents</attribute>
           <attribute name="label" translatable="yes">Sort by _Queue</attribute>
-          <attribute name="target">sort-by-queue</attribute>
+          <attribute name="target">sort_by_queue</attribute>
         </item>
         <item>
           <attribute name="action">win.sort-torrents</attribute>
           <attribute name="label" translatable="yes">Sort by Rati_o</attribute>
-          <attribute name="target">sort-by-ratio</attribute>
+          <attribute name="target">sort_by_ratio</attribute>
         </item>
         <item>
           <attribute name="action">win.sort-torrents</attribute>
           <attribute name="label" translatable="yes">Sort by Si_ze</attribute>
-          <attribute name="target">sort-by-size</attribute>
+          <attribute name="target">sort_by_size</attribute>
         </item>
         <item>
           <attribute name="action">win.sort-torrents</attribute>
           <attribute name="label" translatable="yes">Sort by Stat_e</attribute>
-          <attribute name="target">sort-by-state</attribute>
+          <attribute name="target">sort_by_state</attribute>
         </item>
         <item>
           <attribute name="action">win.sort-torrents</attribute>
           <attribute name="label" translatable="yes">Sort by Time _Left</attribute>
-          <attribute name="target">sort-by-time-left</attribute>
+          <attribute name="target">sort_by_time_left</attribute>
         </item>
       </section>
       <section>
@@ -252,7 +252,7 @@
       </section>
     </submenu>
     <submenu>
-      <attribute name="label" translatable="true">_Help</attribute>
+      <attribute name="label" translatable="yes">_Help</attribute>
       <section>
         <item>
           <attribute name="action">win.toggle-message-log</attribute>
@@ -303,52 +303,52 @@
     </section>
     <section>
       <submenu>
-        <attribute name="label" translatable="true">_Sort Torrents By</attribute>
+        <attribute name="label" translatable="yes">_Sort Torrents By</attribute>
         <section>
           <item>
             <attribute name="action">win.sort-torrents</attribute>
             <attribute name="label" translatable="yes">Sort by _Activity</attribute>
-            <attribute name="target">sort-by-activity</attribute>
+            <attribute name="target">sort_by_activity</attribute>
           </item>
           <item>
             <attribute name="action">win.sort-torrents</attribute>
             <attribute name="label" translatable="yes">Sort by A_ge</attribute>
-            <attribute name="target">sort-by-age</attribute>
+            <attribute name="target">sort_by_age</attribute>
           </item>
           <item>
             <attribute name="action">win.sort-torrents</attribute>
             <attribute name="label" translatable="yes">Sort by _Name</attribute>
-            <attribute name="target">sort-by-name</attribute>
+            <attribute name="target">sort_by_name</attribute>
           </item>
           <item>
             <attribute name="action">win.sort-torrents</attribute>
             <attribute name="label" translatable="yes">Sort by _Progress</attribute>
-            <attribute name="target">sort-by-progress</attribute>
+            <attribute name="target">sort_by_progress</attribute>
           </item>
           <item>
             <attribute name="action">win.sort-torrents</attribute>
             <attribute name="label" translatable="yes">Sort by _Queue</attribute>
-            <attribute name="target">sort-by-queue</attribute>
+            <attribute name="target">sort_by_queue</attribute>
           </item>
           <item>
             <attribute name="action">win.sort-torrents</attribute>
             <attribute name="label" translatable="yes">Sort by Rati_o</attribute>
-            <attribute name="target">sort-by-ratio</attribute>
+            <attribute name="target">sort_by_ratio</attribute>
           </item>
           <item>
             <attribute name="action">win.sort-torrents</attribute>
             <attribute name="label" translatable="yes">Sort by Si_ze</attribute>
-            <attribute name="target">sort-by-size</attribute>
+            <attribute name="target">sort_by_size</attribute>
           </item>
           <item>
             <attribute name="action">win.sort-torrents</attribute>
             <attribute name="label" translatable="yes">Sort by Stat_e</attribute>
-            <attribute name="target">sort-by-state</attribute>
+            <attribute name="target">sort_by_state</attribute>
           </item>
           <item>
             <attribute name="action">win.sort-torrents</attribute>
             <attribute name="label" translatable="yes">Sort by Time _Left</attribute>
-            <attribute name="target">sort-by-time-left</attribute>
+            <attribute name="target">sort_by_time_left</attribute>
           </item>
         </section>
         <section>
@@ -380,7 +380,7 @@
         <attribute name="label" translatable="yes">Ask Tracker for _More Peers</attribute>
       </item>
       <submenu>
-        <attribute name="label" translatable="true">_Queue</attribute>
+        <attribute name="label" translatable="yes">_Queue</attribute>
         <section>
           <item>
             <attribute name="action">win.queue-move-top</attribute>

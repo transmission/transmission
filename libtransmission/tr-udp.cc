@@ -144,11 +144,12 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
             }
             else
             {
-                tr_logAddTrace(fmt::format(
-                    "{} Unexpected UDP packet... len {} [{}]",
-                    from_str(),
-                    n_read,
-                    tr_base64_encode({ reinterpret_cast<char const*>(std::data(buf)), static_cast<size_t>(n_read) })));
+                tr_logAddTrace(
+                    fmt::format(
+                        "{} Unexpected UDP packet... len {} [{}]",
+                        from_str(),
+                        n_read,
+                        tr_base64_encode({ reinterpret_cast<char const*>(std::data(buf)), static_cast<size_t>(n_read) })));
             }
         }
     }
@@ -180,32 +181,40 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         if (evutil_make_socket_nonblocking(sock) != 0)
         {
             auto const error_code = errno;
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})")),
-                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})")),
+                    fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
 
             tr_net_close_socket(sock);
         }
         else if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
         {
             auto const error_code = errno;
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("Couldn't bind IPv4 socket {address}: {error} ({error_code})")),
-                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't bind IPv4 socket {address}: {error} ({error_code})")),
+                    fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
 
             tr_net_close_socket(sock);
         }
         else
         {
             tr_logAddInfo(fmt::format("Bound UDP IPv4 address {:s}", tr_socket_address::display_name(addr, udp_port_)));
-            session_.setSocketTOS(sock, TR_AF_INET);
+            session_.setSocketDiffServ(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
-            udp4_event_.reset(event_new(session_.event_base(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp4_event_.reset(
+                tr::evhelpers::event_new_pri2(
+                    session_.event_base(),
+                    udp4_socket_,
+                    EV_READ | EV_PERSIST,
+                    event_callback,
+                    &session_));
             event_add(udp4_event_.get(), nullptr);
         }
     }
@@ -225,32 +234,40 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         if (evutil_make_socket_nonblocking(sock) != 0)
         {
             auto const error_code = errno;
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})")),
-                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})")),
+                    fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
 
             tr_net_close_socket(sock);
         }
         else if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
         {
             auto const error_code = errno;
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("Couldn't bind IPv6 socket {address}: {error} ({error_code})")),
-                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't bind IPv6 socket {address}: {error} ({error_code})")),
+                    fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
 
             tr_net_close_socket(sock);
         }
         else
         {
             tr_logAddInfo(fmt::format("Bound UDP IPv6 address {:s}", tr_socket_address::display_name(addr, udp_port_)));
-            session_.setSocketTOS(sock, TR_AF_INET6);
+            session_.setSocketDiffServ(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
-            udp6_event_.reset(event_new(session_.event_base(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp6_event_.reset(
+                tr::evhelpers::event_new_pri2(
+                    session_.event_base(),
+                    udp6_socket_,
+                    EV_READ | EV_PERSIST,
+                    event_callback,
+                    &session_));
             event_add(udp6_event_.get(), nullptr);
         }
     }
@@ -310,9 +327,10 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         display_name = addrport->display_name();
     }
 
-    tr_logAddWarn(fmt::format(
-        "Couldn't send to {address}: {errno} ({error})",
-        fmt::arg("address", display_name),
-        fmt::arg("errno", errno),
-        fmt::arg("error", tr_strerror(errno))));
+    tr_logAddWarn(
+        fmt::format(
+            "Couldn't send to {address}: {errno} ({error})",
+            fmt::arg("address", display_name),
+            fmt::arg("errno", errno),
+            fmt::arg("error", tr_strerror(errno))));
 }

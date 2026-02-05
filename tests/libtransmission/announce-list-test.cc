@@ -13,6 +13,8 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/announce-list.h>
@@ -21,10 +23,9 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-using AnnounceListTest = ::testing::Test;
+using AnnounceListTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(AnnounceListTest, canAdd)
@@ -339,9 +340,9 @@ TEST_F(AnnounceListTest, announceToScrape)
     };
 
     auto constexpr Tests = std::array<ScrapeTest, 3>{ {
-        { "https://www.example.com/announce"sv, "https://www.example.com/scrape"sv },
-        { "https://www.example.com/foo"sv, ""sv },
-        { "udp://www.example.com:999/"sv, "udp://www.example.com:999/"sv },
+        { .announce = "https://www.example.com/announce"sv, .expected_scrape = "https://www.example.com/scrape"sv },
+        { .announce = "https://www.example.com/foo"sv, .expected_scrape = ""sv },
+        { .announce = "udp://www.example.com:999/"sv, .expected_scrape = "udp://www.example.com:999/"sv },
     } };
 
     for (auto const& test : Tests)
@@ -363,7 +364,7 @@ TEST_F(AnnounceListTest, save)
     // first, set up a scratch torrent
     auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
     auto original_content = std::vector<char>{};
-    auto const sandbox = libtransmission::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     auto const test_file = tr_pathbuf{ sandbox, "transmission-announce-list-test.torrent"sv };
     auto error = tr_error{};
     EXPECT_TRUE(tr_file_read(OriginalFile, original_content, &error));
@@ -402,11 +403,12 @@ TEST_F(AnnounceListTest, save)
     EXPECT_EQ(original_tm.piece_count(), modified_tm.piece_count());
 
     // test that the saved version has the updated announce list
-    EXPECT_TRUE(std::equal(
-        std::begin(announce_list),
-        std::end(announce_list),
-        std::begin(modified_tm.announce_list()),
-        std::end(modified_tm.announce_list())));
+    EXPECT_TRUE(
+        std::equal(
+            std::begin(announce_list),
+            std::end(announce_list),
+            std::begin(modified_tm.announce_list()),
+            std::end(modified_tm.announce_list())));
 
     // cleanup
     (void)std::remove(test_file.c_str());

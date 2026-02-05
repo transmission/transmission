@@ -8,17 +8,17 @@
 
 #include <event2/event.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/timer.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/utils-ev.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace tr::test
 {
-
-class TimerTest : public ::testing::Test
+class TimerTest : public TransmissionTest
 {
 protected:
     // setup + teardown to manage an event_base
@@ -42,10 +42,7 @@ protected:
 
     void sleepMsec(std::chrono::milliseconds msec)
     {
-        EXPECT_FALSE(waitFor( //
-            evbase_.get(),
-            []() { return false; },
-            msec));
+        EXPECT_FALSE(waitFor(evbase_.get(), []() { return false; }, msec));
     }
 
     static void expectTime(
@@ -371,4 +368,4 @@ TEST_F(TimerTest, destroyedTimersStop)
     EXPECT_EQ(0U, n_calls);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

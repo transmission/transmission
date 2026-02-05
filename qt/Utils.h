@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <cstddef> // size_t
 #include <utility>
 
 #include <QPointer>
@@ -18,24 +17,6 @@ class QColor;
 class QHeaderView;
 class QIcon;
 class QModelIndex;
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-
-namespace std
-{
-
-template<>
-struct hash<QString>
-{
-    std::size_t operator()(QString const& s) const
-    {
-        return qHash(s);
-    }
-};
-
-} // namespace std
-
-#endif
 
 class Utils
 {

@@ -30,8 +30,8 @@ class tr_peerIo;
 
 struct tr_bandwidth_limits
 {
-    libtransmission::Values::Speed up_limit;
-    libtransmission::Values::Speed down_limit;
+    tr::Values::Speed up_limit;
+    tr::Values::Speed down_limit;
     bool up_limited = false;
     bool down_limited = false;
 };
@@ -78,7 +78,7 @@ struct tr_bandwidth_limits
 struct tr_bandwidth
 {
 private:
-    using Speed = libtransmission::Values::Speed;
+    using Speed = tr::Values::Speed;
 
     static constexpr auto HistoryMSec = 2000U;
     static constexpr auto GranularityMSec = 250U;
@@ -141,17 +141,13 @@ public:
     /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
     [[nodiscard]] auto get_raw_speed(uint64_t const now, tr_direction const dir) const
     {
-        TR_ASSERT(tr_isDirection(dir));
-
-        return get_speed(band_[dir].raw_, HistoryMSec, now);
+        return get_speed(band_[static_cast<uint8_t>(dir)].raw_, HistoryMSec, now);
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
     [[nodiscard]] auto get_piece_speed(uint64_t const now, tr_direction const dir) const
     {
-        TR_ASSERT(tr_isDirection(dir));
-
-        return get_speed(band_[dir].piece_, HistoryMSec, now);
+        return get_speed(band_[static_cast<uint8_t>(dir)].piece_, HistoryMSec, now);
     }
 
     /**
@@ -161,7 +157,7 @@ public:
      */
     constexpr bool set_desired_speed(tr_direction dir, Speed desired_speed)
     {
-        auto& value = band_[dir].desired_speed_;
+        auto& value = band_[static_cast<uint8_t>(dir)].desired_speed_;
         auto const did_change = desired_speed != value;
         value = desired_speed;
         return did_change;
@@ -173,7 +169,7 @@ public:
      */
     [[nodiscard]] constexpr auto get_desired_speed(tr_direction dir) const
     {
-        return band_[dir].desired_speed_;
+        return band_[static_cast<uint8_t>(dir)].desired_speed_;
     }
 
     [[nodiscard]] bool is_maxed_out(tr_direction dir, uint64_t now_msec) const noexcept
@@ -193,7 +189,7 @@ public:
      */
     constexpr bool set_limited(tr_direction dir, bool is_limited)
     {
-        auto& value = band_[dir].is_limited_;
+        auto& value = band_[static_cast<uint8_t>(dir)].is_limited_;
         auto const did_change = is_limited != value;
         value = is_limited;
         return did_change;
@@ -204,7 +200,7 @@ public:
      */
     [[nodiscard]] constexpr bool is_limited(tr_direction dir) const noexcept
     {
-        return band_[dir].is_limited_;
+        return band_[static_cast<uint8_t>(dir)].is_limited_;
     }
 
     /**
@@ -215,7 +211,7 @@ public:
      */
     constexpr bool honor_parent_limits(tr_direction direction, bool is_enabled)
     {
-        auto& value = band_[direction].honor_parent_limits_;
+        auto& value = band_[static_cast<uint8_t>(direction)].honor_parent_limits_;
         auto const did_change = is_enabled != value;
         value = is_enabled;
         return did_change;
@@ -223,7 +219,7 @@ public:
 
     [[nodiscard]] constexpr bool are_parent_limits_honored(tr_direction direction) const
     {
-        return band_[direction].honor_parent_limits_;
+        return band_[static_cast<uint8_t>(direction)].honor_parent_limits_;
     }
 
     [[nodiscard]] tr_bandwidth_limits get_limits() const;
@@ -237,7 +233,7 @@ private:
         std::array<size_t, HistorySize> size_;
         uint64_t cache_time_;
         Speed cache_val_;
-        int newest_;
+        size_t newest_;
     };
 
     struct Band

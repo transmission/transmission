@@ -14,7 +14,7 @@ extern "C"
     struct event_base;
 }
 
-namespace libtransmission
+namespace tr
 {
 
 class EvTimerMaker final : public TimerMaker
@@ -31,4 +31,4 @@ private:
     event_base* const event_base_;
 };
 
-} // namespace libtransmission
+} // namespace tr

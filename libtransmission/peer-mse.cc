@@ -7,6 +7,7 @@
 #include <cstddef> // std::byte
 #include <cstdint>
 #include <limits> // std::numeric_limits
+#include <ranges>
 #include <string_view>
 
 #include <math/wide_integer/uintwide_t.h>
@@ -31,7 +32,7 @@ namespace
 {
 namespace wi
 {
-// clang-format off
+// clang-format off: compatibility with #ifdef
 using key_t = math::wide_integer::uintwide_t<
     tr_message_stream_encryption::DH::KeySize * std::numeric_limits<unsigned char>::digits
 #ifdef WIDE_INTEGER_HAS_LIMB_TYPE_UINT64
@@ -63,9 +64,9 @@ auto export_bits(UIntWide i)
 {
     auto ret = std::array<std::byte, UIntWide::my_width2 / std::numeric_limits<uint8_t>::digits>{};
 
-    for (auto walk = std::rbegin(ret), end = std::rend(ret); walk != end; ++walk)
+    for (auto& walk : ret | std::views::reverse)
     {
-        *walk = std::byte(static_cast<uint8_t>(i & 0xFF));
+        walk = std::byte(static_cast<uint8_t>(i & 0xFF));
         i >>= 8;
     }
 

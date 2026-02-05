@@ -31,7 +31,7 @@
 
 struct event_base;
 
-namespace libtransmission
+namespace tr
 {
 
 class TimerMaker;
@@ -82,11 +82,12 @@ private:
         if (infd_ == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
-                fmt::arg("path", dirname()),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
+                    fmt::arg("path", dirname()),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -94,11 +95,12 @@ private:
         if (inwd_ == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
-                fmt::arg("path", dirname()),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
+                    fmt::arg("path", dirname()),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -106,11 +108,12 @@ private:
         if (event_ == nullptr)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
-                fmt::arg("path", dirname()),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
+                    fmt::arg("path", dirname()),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -135,22 +138,13 @@ private:
         auto nread = size_t{};
         while ((nread = bufferevent_read(event, &ev, sizeof(ev))) != 0)
         {
-            if (nread == (size_t)-1)
-            {
-                auto const error_code = errno;
-                tr_logAddError(fmt::format(
-                    fmt::runtime(_("Couldn't read event: {error} ({error_code})")),
-                    fmt::arg("error", tr_strerror(error_code)),
-                    fmt::arg("error_code", error_code)));
-                break;
-            }
-
             if (nread != sizeof(ev))
             {
-                tr_logAddError(fmt::format(
-                    fmt::runtime(_("Couldn't read event: expected {expected_size}, got {actual_size}")),
-                    fmt::arg("expected_size", sizeof(ev)),
-                    fmt::arg("actual_size", nread)));
+                tr_logAddError(
+                    fmt::format(
+                        fmt::runtime(_("Couldn't read event: expected {expected_size}, got {actual_size}")),
+                        fmt::arg("expected_size", sizeof(ev)),
+                        fmt::arg("actual_size", nread)));
                 break;
             }
 
@@ -161,22 +155,14 @@ private:
             // consume entire name into buffer
             name.resize(ev.len);
             nread = bufferevent_read(event, name.data(), ev.len);
-            if (nread == static_cast<size_t>(-1))
-            {
-                auto const error_code = errno;
-                tr_logAddError(fmt::format(
-                    fmt::runtime(_("Couldn't read filename: {error} ({error_code})")),
-                    fmt::arg("error", tr_strerror(error_code)),
-                    fmt::arg("error_code", error_code)));
-                break;
-            }
 
             if (nread != ev.len)
             {
-                tr_logAddError(fmt::format(
-                    fmt::runtime(_("Couldn't read filename: expected {expected_size}, got {actual_size}")),
-                    fmt::arg("expected_size", sizeof(ev)),
-                    fmt::arg("actual_size", nread)));
+                tr_logAddError(
+                    fmt::format(
+                        fmt::runtime(_("Couldn't read filename: expected {expected_size}, got {actual_size}")),
+                        fmt::arg("expected_size", sizeof(ev)),
+                        fmt::arg("actual_size", nread)));
                 break;
             }
 
@@ -196,10 +182,10 @@ private:
 std::unique_ptr<Watchdir> Watchdir::create(
     std::string_view dirname,
     Callback callback,
-    libtransmission::TimerMaker& timer_maker,
+    tr::TimerMaker& timer_maker,
     event_base* evbase)
 {
     return std::make_unique<INotifyWatchdir>(dirname, std::move(callback), timer_maker, evbase);
 }
 
-} // namespace libtransmission
+} // namespace tr

@@ -16,7 +16,7 @@
 
 #include "libtransmission/error.h"
 
-namespace transmission::benc
+namespace tr::benc
 {
 
 namespace impl
@@ -225,16 +225,6 @@ struct ParserStack
         return depth > 0 && stack[depth].parent_type == ParentType::Dict && (stack[depth].n_children_walked % 2) == 0;
     }
 
-    [[nodiscard]] constexpr std::optional<ParentType> parentType() const
-    {
-        if (depth == 0)
-        {
-            return {};
-        }
-
-        return stack[depth].parent_type;
-    }
-
     std::optional<ParentType> pop(tr_error& error)
     {
         if (depth == 0)
@@ -437,4 +427,4 @@ bool parse(
     return true;
 }
 
-} // namespace transmission::benc
+} // namespace tr::benc

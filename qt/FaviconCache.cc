@@ -4,12 +4,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/favicon-cache.h>
+#include <libtransmission-app/favicon-cache.h>
 
 #include <QApplication>
 #include <QPixmap>
 #include <QStandardPaths>
 
+using namespace tr::app;
 using Icon = QPixmap;
 
 template<>

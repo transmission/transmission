@@ -18,11 +18,11 @@
 #include <utility> // for std::pair
 #include <vector>
 
-#include "libtransmission/tr-macros.h" // for TR_CONSTEXPR20
-#include "libtransmission/net.h" // for tr_address
-#include "libtransmission/observable.h"
+#include <sigslot/signal.hpp>
 
-namespace libtransmission
+#include "libtransmission/net.h" // for tr_address
+
+namespace tr
 {
 
 class Blocklists
@@ -38,12 +38,12 @@ public:
             [&addr](auto const& blocklist) { return blocklist.enabled() && blocklist.contains(addr); });
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto num_lists() const noexcept
+    [[nodiscard]] constexpr auto num_lists() const noexcept
     {
         return std::size(blocklists_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto num_rules() const noexcept
+    [[nodiscard]] constexpr auto num_rules() const noexcept
     {
         return std::accumulate(
             std::begin(blocklists_),
@@ -57,9 +57,9 @@ public:
     size_t update_primary_blocklist(std::string_view external_file, bool is_enabled);
 
     template<typename Observer>
-    [[nodiscard]] auto observe_changes(Observer observer)
+    [[nodiscard]] sigslot::scoped_connection observe_changes(Observer observer) const
     {
-        return changed_.observe(std::move(observer));
+        return changed_.connect_scoped(std::move(observer));
     }
 
 private:
@@ -113,8 +113,8 @@ private:
 
     std::string folder_;
 
-    libtransmission::SimpleObservable<> changed_;
+    mutable sigslot::signal<> changed_;
 
     [[nodiscard]] static std::vector<Blocklist> load_folder(std::string_view folder, bool is_enabled);
 };
-} // namespace libtransmission
+} // namespace tr

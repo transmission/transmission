@@ -37,7 +37,7 @@
 #include <libtransmission/web-utils.h>
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace
 {
@@ -316,9 +316,9 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 {
     class Mediator final : public tr_web::Mediator
     {
-        [[nodiscard]] time_t now() const override
+        [[nodiscard]] std::chrono::steady_clock::time_point now() const override
         {
-            return time(nullptr);
+            return std::chrono::steady_clock::now();
         }
     };
 
@@ -345,14 +345,15 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         auto response_mutex = std::mutex{};
         auto response_cv = std::condition_variable{};
         auto lock = std::unique_lock(response_mutex);
-        web->fetch({ scrape_url,
-                     [&response, &response_cv](tr_web::FetchResponse const& resp)
-                     {
-                         response = resp;
-                         response_cv.notify_one();
-                     },
-                     nullptr,
-                     TimeoutSecs });
+        web->fetch(
+            { scrape_url,
+              [&response, &response_cv](tr_web::FetchResponse const& resp)
+              {
+                  response = resp;
+                  response_cv.notify_one();
+              },
+              nullptr,
+              TimeoutSecs });
         response_cv.wait(lock);
 
         // check the response code

@@ -7,7 +7,10 @@
 #include "GtkCompat.h"
 #include "PrefsDialog.h"
 
+#include <libtransmission-app/display-modes.h>
+
 #include <libtransmission/transmission.h>
+#include <libtransmission/serializer.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
@@ -17,16 +20,13 @@
 #include <string_view>
 
 using namespace std::literals;
-
-std::string gl_confdir;
-
-void gtr_pref_init(std::string_view config_dir)
-{
-    gl_confdir = config_dir;
-}
+using namespace tr::app;
+using tr::serializer::to_variant;
 
 namespace
 {
+std::string gl_confdir;
+
 [[nodiscard]] std::string get_default_download_dir()
 {
     if (auto dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DOWNLOAD)); !std::empty(dir))
@@ -71,14 +71,13 @@ namespace
     map.try_emplace(TR_KEY_show_statusbar, true);
     map.try_emplace(TR_KEY_show_toolbar, true);
     map.try_emplace(TR_KEY_show_tracker_scrapes, false);
-    map.try_emplace(TR_KEY_sort_mode, "sort-by-name"sv);
+    map.try_emplace(TR_KEY_sort_mode, to_variant(DefaultSortMode));
     map.try_emplace(TR_KEY_sort_reversed, false);
-    map.try_emplace(TR_KEY_statusbar_stats, "total-ratio"sv);
+    map.try_emplace(TR_KEY_statusbar_stats, to_variant(DefaultStatsMode));
     map.try_emplace(TR_KEY_torrent_added_notification_enabled, true);
     map.try_emplace(TR_KEY_torrent_complete_notification_enabled, true);
     map.try_emplace(TR_KEY_torrent_complete_sound_enabled, true);
     map.try_emplace(TR_KEY_trash_can_enabled, true);
-    map.try_emplace(TR_KEY_user_has_given_informed_consent, false);
     map.try_emplace(TR_KEY_watch_dir, dir);
     map.try_emplace(TR_KEY_watch_dir_enabled, false);
     return tr_variant{ std::move(map) };
@@ -109,7 +108,7 @@ tr_variant& getPrefs()
     if (!settings.has_value())
     {
         auto const app_defaults = get_default_app_settings();
-        settings.merge(tr_sessionLoadSettings(&app_defaults, gl_confdir.c_str(), nullptr));
+        settings.merge(tr_sessionLoadSettings(gl_confdir, &app_defaults));
         ensure_sound_cmd_is_a_list(&settings);
     }
 
@@ -117,9 +116,19 @@ tr_variant& getPrefs()
 }
 } // namespace
 
+void gtr_pref_init(std::string_view config_dir)
+{
+    gl_confdir = config_dir;
+}
+
 tr_variant& gtr_pref_get_all()
 {
     return getPrefs();
+}
+
+tr_variant::Map& gtr_pref_get_map()
+{
+    return *getPrefs().get_if<tr_variant::Map>();
 }
 
 int64_t gtr_pref_int_get(tr_quark const key)
@@ -200,5 +209,5 @@ void gtr_pref_string_set(tr_quark const key, std::string_view value)
 
 void gtr_pref_save(tr_session* session)
 {
-    tr_sessionSaveSettings(session, gl_confdir.c_str(), getPrefs());
+    tr_sessionSaveSettings(session, gl_confdir, getPrefs());
 }

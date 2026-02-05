@@ -3,12 +3,17 @@ HeaderFilterRegex: .*/tests/libtransmission/.*
 
 # Many of these checks are disabled only because the code hasn't been
 # cleaned up yet. Pull requests welcomed.
+#
+# -readability-container-contains (P0458R2): GCC 9.1, clang 13
+# Ref: https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html
+# Ref: https://libcxx.llvm.org/Status/Cxx20.html
 Checks: >
   bugprone-*,
   -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions,
   -bugprone-unchecked-optional-access,
   cert-*,
+  -cert-int09-c,
   clang-analyzer-optin*,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-const-or-ref-data-members,
@@ -29,9 +34,12 @@ Checks: >
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
+  -modernize-use-ranges,
   -modernize-use-trailing-return-type,
   performance-*,
   readability-*,
+  -readability-container-contains,
+  -readability-enum-initial-value,
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
   -readability-magic-numbers,

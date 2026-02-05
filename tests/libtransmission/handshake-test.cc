@@ -23,6 +23,8 @@
 
 #include <event2/util.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_sha1_to_string, tr_base...
@@ -37,14 +39,13 @@
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
 #define LOCAL_SOCKETPAIR_AF TR_IF_WIN32(AF_INET, AF_UNIX)
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 auto constexpr MaxWaitMsec = 5000;
@@ -83,7 +84,7 @@ public:
             return {};
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
+        [[nodiscard]] tr::TimerMaker& timer_maker() override
         {
             return session_->timerMaker();
         }
@@ -91,11 +92,6 @@ public:
         [[nodiscard]] bool allows_dht() const override
         {
             return false;
-        }
-
-        [[nodiscard]] bool allows_tcp() const override
-        {
-            return true;
         }
 
         [[nodiscard]] size_t pad(void* setme, [[maybe_unused]] size_t maxlen) const override
@@ -152,16 +148,20 @@ public:
     static auto constexpr PlaintextProtocolName = "\023BitTorrent protocol"sv;
 
     tr_socket_address const DefaultPeerSockAddr{ *tr_address::from_string("127.0.0.1"sv), tr_port::from_host(8080) };
-    tr_handshake::Mediator::TorrentInfo const TorrentWeAreSeeding{ tr_sha1::digest("abcde"sv),
-                                                                   tr_peerIdInit(),
-                                                                   tr_torrent_id_t{ 100 },
-                                                                   true /*is_done*/,
-                                                                   true /*is_running*/ };
-    tr_handshake::Mediator::TorrentInfo const UbuntuTorrent{ *tr_sha1_from_string("2c6b6858d61da9543d4231a71db4b1c9264b0685"sv),
-                                                             tr_peerIdInit(),
-                                                             tr_torrent_id_t{ 101 },
-                                                             false /*is_done*/,
-                                                             true /*is_running*/ };
+    tr_handshake::Mediator::TorrentInfo const TorrentWeAreSeeding{
+        .info_hash = tr_sha1::digest("abcde"sv),
+        .client_peer_id = tr_peerIdInit(),
+        .id = tr_torrent_id_t{ 100 },
+        .is_done = true,
+        .is_running = true,
+    };
+    tr_handshake::Mediator::TorrentInfo const UbuntuTorrent{
+        .info_hash = *tr_sha1_from_string("2c6b6858d61da9543d4231a71db4b1c9264b0685"sv),
+        .client_peer_id = tr_peerIdInit(),
+        .id = tr_torrent_id_t{ 101 },
+        .is_done = false,
+        .is_running = true,
+    };
 
     auto createIncomingIo(tr_session* session)
     {
@@ -468,7 +468,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     static auto constexpr WantedLen = tr_handshake::PadbMaxlen + std::tuple_size_v<tr_sha1_digest_t>;
     static auto constexpr NeedleBase64 = "mbpZFBwdi4U1snVvboN3sMEpNmU="sv;
     auto const needle = tr_base64_decode(NeedleBase64);
-    auto buf = libtransmission::StackBuffer<WantedLen, char>{};
+    auto buf = tr::StackBuffer<WantedLen, char>{};
     ASSERT_TRUE(waitFor(
         [&s = sock, &buf, &needle, n_read = size_t{}]() mutable
         {
@@ -525,4 +525,4 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     tr_net_close_socket(sock);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

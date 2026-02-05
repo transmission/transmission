@@ -2,9 +2,12 @@
 The source code for both official and nightly releases can be found on our [download page](https://transmissionbt.com/download/).
 
 ## On macOS ##
-Software prerequisites:
+While the prerequisites for running the app are:
  * macOS 11.0 or newer
- * Xcode 12.5.1 or newer
+
+The actual software prerequisites for building the app are based on GitHub Actions [macos-14](https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md):
+ * macOS 14.8.3 or newer
+ * Xcode 15.0.1 or newer
 
 Building the project on Mac requires the source to be retrieved from GitHub. Pre-packaged source code will not compile.
 ```bash
@@ -197,7 +200,7 @@ vcpkg install curl zlib openssl
 
 Additional dependencies for the Qt client:
 ```bat
-vcpkg install qtsvg qttools
+vcpkg install qtactiveqt qtsvg qttools
 ```
 
 ### Get Transmission source

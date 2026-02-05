@@ -6,11 +6,32 @@
 
 #include <libtransmission/transmission.h> /* tr_variant, tr_session */
 #include <libtransmission/quark.h>
+#include <libtransmission/serializer.h>
+#include <libtransmission/variant.h>
 
 #include <cstdint> // int64_t
 #include <string>
 #include <string_view>
 #include <vector>
+
+[[nodiscard]] tr_variant::Map& gtr_pref_get_map();
+
+template<typename T>
+[[nodiscard]] std::optional<T> gtr_pref_get(tr_quark const key)
+{
+    using namespace tr::serializer;
+    auto const& map = gtr_pref_get_map();
+    auto const iter = map.find(key);
+    return iter != std::end(map) ? to_value<T>(iter->second) : std::nullopt;
+}
+
+template<typename T>
+void gtr_pref_set(tr_quark const key, T const& val)
+{
+    using namespace tr::serializer;
+    auto& map = gtr_pref_get_map();
+    map.insert_or_assign(key, to_variant(val));
+}
 
 void gtr_pref_init(std::string_view config_dir);
 
