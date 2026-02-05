@@ -69,7 +69,6 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     tr_tracker_tier_t tier_ = 0;
     tr_pathbuf file_subpath_;
     int64_t file_length_ = 0;
-    size_t files_cum_length_ = 0;
 
     enum class State : uint8_t
     {
@@ -481,7 +480,6 @@ private:
         else if (ok)
         {
             tm_.files_.add(file_subpath_, file_length_);
-            files_cum_length_ += file_length_;
         }
 
         file_length_ = 0;
@@ -539,7 +537,6 @@ private:
         if (tm_.file_count() == 0 && length_ != 0 && !std::empty(tm_.name_))
         {
             tm_.files_.add(tr_torrent_files::sanitize_subpath(tm_.name_), length_);
-            files_cum_length_ = length_;
         }
 
         if (auto const has_metainfo = tm_.info_dict_size() != 0U; has_metainfo)
@@ -563,7 +560,7 @@ private:
                 return false;
             }
 
-            if ((files_cum_length_ + piece_size_ - 1) / piece_size_ != std::size(tm_.pieces_))
+            if ((tm_.files_.total_size() + piece_size_ - 1) / piece_size_ != std::size(tm_.pieces_))
             {
                 if (!context.error)
                 {
