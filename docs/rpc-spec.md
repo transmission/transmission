@@ -25,6 +25,7 @@ Some people outside of the Transmission project have written libraries that wrap
 
 | Language | Link
 |:---|:---
+| C# .NET10 | https://www.nuget.org/packages/Transmission.API.RPC.NET/
 | C# | https://www.nuget.org/packages/Transmission.API.RPC
 | Go | https://github.com/hekmon/transmissionrpc
 | Python | https://github.com/Trim21/transmission-rpc
