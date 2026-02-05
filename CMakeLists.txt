@@ -60,6 +60,7 @@ set(MINIUPNPC_MINIMUM 2.2.1)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.0)
 set(QT_MINIMUM 5.15)
+set(SIGSLOT_MINIMUM 1.2.3)
 set(SMALL_MINIMUM 0.2.2)
 # utf8cpp v4's version file is configured with `COMPATIBILITY SameMajorVersion`
 # and does not support version range.
@@ -89,6 +90,7 @@ tr_auto_option(USE_SYSTEM_FAST_FLOAT "Use system fast_float library" ${USE_SYSTE
 tr_auto_option(USE_SYSTEM_FMT "Use system fmt library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_SIGSLOT "Use system sigslot library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_SMALL "Use system small library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_UTF8CPP "Use system uft8cpp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" ${USE_SYSTEM_DEFAULT})
@@ -621,6 +623,10 @@ tr_add_external_auto_library(FMT fmt
     CMAKE_ARGS
         -DFMT_INSTALL=OFF
         -DFMT_SYSTEM_HEADERS=ON)
+
+tr_add_external_auto_library(SIGSLOT PalSigslot
+    SUBPROJECT
+    SOURCE_DIR sigslot)
 
 tr_add_external_auto_library(SMALL small
     SUBPROJECT
