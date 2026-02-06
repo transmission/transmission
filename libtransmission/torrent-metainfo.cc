@@ -463,7 +463,7 @@ private:
             context.error.set(EINVAL, fmt::format("invalid path [{:s}]", file_subpath_));
             ok = false;
         }
-        else if (ok)
+        else
         {
             tm_.files_.add(file_subpath_, file_length_);
         }
