@@ -3,6 +3,7 @@
    License text can be found in the licenses/ folder. */
 
 import { AboutDialog } from './about-dialog.js';
+import { Appearance } from './appearance-settings.js';
 import { ContextMenu } from './context-menu.js';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
@@ -141,6 +142,17 @@ export class Transmission extends EventTarget {
         case 'move-up':
           this._moveUp();
           break;
+        case 'open-appearance-settings':
+          if (
+            this.popup[Transmission.default_popup_level] instanceof Appearance
+          ) {
+            this.popup[Transmission.default_popup_level].close();
+          } else {
+            this.setCurrentPopup(
+              new Appearance(this.prefs, this.action_manager),
+            );
+          }
+          break;
         case 'open-torrent':
           this.setCurrentPopup(new OpenDialog(this, this.remote));
           break;
@@ -154,7 +166,7 @@ export class Transmission extends EventTarget {
           this._reannounceTorrents(this.getSelectedTorrents());
           break;
         case 'remove-selected-torrents':
-          this._removeSelectedTorrents();
+          this._removeSelectedTorrents(false);
           break;
         case 'resume-selected-torrents':
           this._startSelectedTorrents(false);
@@ -217,6 +229,9 @@ export class Transmission extends EventTarget {
             this.prefs.display_mode === Prefs.DisplayCompact
               ? Prefs.DisplayFull
               : Prefs.DisplayCompact;
+          break;
+        case 'trash-selected-torrents':
+          this._removeSelectedTorrents(true);
           break;
         case 'verify-selected-torrents':
           this._verifyTorrents(this.getSelectedTorrents());
@@ -402,7 +417,6 @@ export class Transmission extends EventTarget {
         // Add custom class to the body/html element to get the appropriate contrast color scheme
         document.body.classList.remove('contrast-more', 'contrast-less');
         document.body.classList.add(`contrast-${value}`);
-        // this.refilterAllSoon();
         break;
       }
 
@@ -411,6 +425,16 @@ export class Transmission extends EventTarget {
       case Prefs.SortMode:
         this.refilterAllSoon();
         break;
+
+      case Prefs.HighlightColor: {
+        document.body.classList.remove('highlight-legacy', 'highlight-system');
+        if (!value) {
+          document.body.classList.add('highlight-legacy');
+        } else if (value === 'Highlight') {
+          document.body.classList.add('highlight-system');
+        }
+        break;
+      }
 
       case Prefs.RefreshRate: {
         clearInterval(this.refreshTorrentsInterval);
@@ -946,10 +970,12 @@ TODO: fix this when notifications get fixed
     }
   }
 
-  _removeSelectedTorrents() {
+  _removeSelectedTorrents(trash) {
     const torrents = this.getSelectedTorrents();
     if (torrents.length > 0) {
-      this.setCurrentPopup(new RemoveDialog({ remote: this.remote, torrents }));
+      this.setCurrentPopup(
+        new RemoveDialog({ remote: this.remote, torrents, trash }),
+      );
     }
   }
 

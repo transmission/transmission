@@ -810,7 +810,6 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     @{ */
 
 using tr_torrent_remove_func = std::function<bool(std::string_view filename, tr_error* error)>;
-using tr_torrent_remove_done_func = std::function<void(tr_torrent_id_t, bool success)>;
 
 /**
  * @brief Removes our torrent and .resume files for this torrent
@@ -820,13 +819,8 @@ using tr_torrent_remove_done_func = std::function<void(tr_torrent_id_t, bool suc
  *                    to move to a recycle bin instead of deleting.
  *                    The callback is invoked in the session thread and the filename view
  *                    is only valid for the duration of the call.
- * @param on_remove_done A callback to invoke in the session thread when removal is done.
  */
-void tr_torrentRemove(
-    tr_torrent* tor,
-    bool delete_flag,
-    tr_torrent_remove_func remove_func = {},
-    tr_torrent_remove_done_func on_remove_done = {});
+void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_torrent_remove_func remove_func = {});
 
 /** @brief Start a torrent */
 void tr_torrentStart(tr_torrent* torrent);

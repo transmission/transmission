@@ -18,6 +18,8 @@
 #include "TorrentCellRenderer.h"
 #endif
 
+#include <libtransmission-app/display-modes.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/values.h>
 
@@ -62,6 +64,7 @@
 using namespace std::string_literals;
 using namespace std::string_view_literals;
 using namespace tr::Values;
+using namespace tr::app;
 
 using VariantInt = Glib::Variant<int>;
 using VariantDouble = Glib::Variant<double>;
@@ -132,7 +135,6 @@ private:
 
     void syncAltSpeedButton();
 
-    void status_menu_toggled_cb(std::string const& action_name, Glib::ustring const& val);
     void onOptionsClicked();
     void alt_speed_toggled_cb();
     void onAltSpeedToggledIdle();
@@ -144,7 +146,6 @@ private:
     sigc::signal<void()> signal_selection_changed_;
 
     Glib::RefPtr<Gio::ActionGroup> options_actions_;
-    Glib::RefPtr<Gio::ActionGroup> stats_actions_;
 
     std::array<OptionMenuInfo, 2> speed_menu_info_;
     OptionMenuInfo ratio_menu_info_;
@@ -369,12 +370,6 @@ MainWindow::Impl::~Impl()
     pref_handler_id_.disconnect();
 }
 
-void MainWindow::Impl::status_menu_toggled_cb(std::string const& action_name, Glib::ustring const& val)
-{
-    stats_actions_->change_action_state(action_name, VariantString::create(val));
-    core_->set_pref(TR_KEY_statusbar_stats, val.raw());
-}
-
 void MainWindow::Impl::syncAltSpeedButton()
 {
     bool const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
@@ -589,38 +584,45 @@ void MainWindow::Impl::onOptionsClicked()
 
 Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createStatsMenu()
 {
-    struct StatsModeInfo
+    using StatsType = gint32;
+    using StatsVariant = Glib::Variant<StatsType>;
+
+    auto const to_var = [](auto const mode)
     {
-        char const* val;
-        char const* i18n;
+        return StatsVariant::create(static_cast<StatsType>(mode));
     };
 
-    static auto const stats_modes = std::array<StatsModeInfo, 4>({ {
-        { "total-ratio", N_("Total Ratio") },
-        { "session-ratio", N_("Session Ratio") },
-        { "total-transfer", N_("Total Transfer") },
-        { "session-transfer", N_("Session Transfer") },
-    } });
-
-    auto top = Gio::Menu::create();
-    auto actions = Gio::SimpleActionGroup::create();
-
+    // build the action group
+    static auto constexpr Key = TR_KEY_statusbar_stats;
     auto const action_name = "stats-mode"s;
-    auto const full_action_name = fmt::format("{}.{}", StatsMenuActionGroupName, action_name);
-    auto stats_mode_action = actions->add_action_radio_string(
+    auto const current_value = gtr_pref_get<StatsMode>(Key).value_or(DefaultStatsMode);
+    auto actions = Gio::SimpleActionGroup::create();
+    actions->add_action_radio_integer(
         action_name,
-        [this, action_name](Glib::ustring const& value) { status_menu_toggled_cb(action_name, value); },
-        gtr_pref_string_get(TR_KEY_statusbar_stats));
+        [this, action_name, actions, to_var](gint32 const ival)
+        {
+            actions->change_action_state(action_name, to_var(ival));
+            core_->set_pref(Key, static_cast<StatsMode>(ival));
+        },
+        static_cast<StatsType>(current_value));
 
-    for (auto const& mode : stats_modes)
+    // build the menu
+    auto const full_action_name = fmt::format("{}.{}", StatsMenuActionGroupName, action_name);
+    auto top = Gio::Menu::create();
+    auto const stats_modes = std::array<std::pair<StatsMode, char const*>, StatsModeCount>({ {
+        { StatsMode::TotalRatio, N_("Total Ratio") },
+        { StatsMode::SessionRatio, N_("Session Ratio") },
+        { StatsMode::TotalTransfer, N_("Total Transfer") },
+        { StatsMode::SessionTransfer, N_("Session Transfer") },
+    } });
+    for (auto const& [mode, display_name] : stats_modes)
     {
-        auto item = Gio::MenuItem::create(_(mode.i18n), full_action_name);
-        item->set_action_and_target(full_action_name, VariantString::create(mode.val));
-        top->append_item(item);
+        auto item = Gio::MenuItem::create(_(display_name), full_action_name);
+        item->set_action_and_target(full_action_name, to_var(mode));
+        top->append_item(std::move(item));
     }
 
     window_.insert_action_group(std::string(StatsMenuActionGroupName), actions);
-    stats_actions_ = actions;
 
     return top;
 }
@@ -755,40 +757,24 @@ MainWindow::Impl::Impl(
 #endif
 }
 
+namespace
+{
+} // namespace
+
 void MainWindow::Impl::updateStats()
 {
-    Glib::ustring buf;
-    auto const* const session = core_->get_session();
-
-    /* update the stats */
-    if (auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats); pch == "session-ratio")
-    {
-        auto const stats = tr_sessionGetStats(session);
-        buf = fmt::format(fmt::runtime(_("Ratio: {ratio}")), fmt::arg("ratio", tr_strlratio(stats.ratio)));
-    }
-    else if (pch == "session-transfer")
-    {
-        auto const stats = tr_sessionGetStats(session);
-        buf = fmt::format(
-            fmt::runtime(C_("current session totals", "Down: {downloaded_size}, Up: {uploaded_size}")),
-            fmt::arg("downloaded_size", tr_strlsize(stats.downloadedBytes)),
-            fmt::arg("uploaded_size", tr_strlsize(stats.uploadedBytes)));
-    }
-    else if (pch == "total-transfer")
-    {
-        auto const stats = tr_sessionGetCumulativeStats(session);
-        buf = fmt::format(
-            fmt::runtime(C_("all-time totals", "Down: {downloaded_size}, Up: {uploaded_size}")),
-            fmt::arg("downloaded_size", tr_strlsize(stats.downloadedBytes)),
-            fmt::arg("uploaded_size", tr_strlsize(stats.uploadedBytes)));
-    }
-    else /* default is total-ratio */
-    {
-        auto const stats = tr_sessionGetCumulativeStats(session);
-        buf = fmt::format(fmt::runtime(_("Ratio: {ratio}")), fmt::arg("ratio", tr_strlratio(stats.ratio)));
-    }
-
-    stats_lb_->set_text(buf);
+    static_assert(StatsModeCount == 4U && "StatsMode changed: update this code");
+    auto const mode = gtr_pref_get<StatsMode>(TR_KEY_statusbar_stats).value_or(DefaultStatsMode);
+    auto const use_session_stats = mode == StatsMode::SessionRatio || mode == StatsMode::SessionTransfer;
+    auto const* const ses = core_->get_session();
+    auto const stats = use_session_stats ? tr_sessionGetStats(ses) : tr_sessionGetCumulativeStats(ses);
+    stats_lb_->set_text(
+        mode == StatsMode::SessionTransfer || mode == StatsMode::TotalTransfer ?
+            fmt::format(
+                fmt::runtime(_("Down: {downloaded_size}, Up: {uploaded_size}")),
+                fmt::arg("downloaded_size", tr_strlsize(stats.downloadedBytes)),
+                fmt::arg("uploaded_size", tr_strlsize(stats.uploadedBytes))) :
+            fmt::format(fmt::runtime(_("Ratio: {ratio}")), fmt::arg("ratio", tr_strlratio(stats.ratio))));
 }
 
 void MainWindow::Impl::updateSpeeds()

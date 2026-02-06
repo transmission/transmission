@@ -200,7 +200,7 @@ target_link_libraries(${TR_NAME}-gtk
         ${TR_NAME}-app
         ${TR_NAME}
         transmission::gtk_impl
-        fmt::fmt-header-only
+        transmission::fmt-header-only
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
 
 if(MSVC)
@@ -226,6 +226,7 @@ set(ICON_NAME_REGEX "^([^_]+)_([^_]+)_([^_]+)_(.+)$")
 foreach(ICON ${PUBLIC_ICONS})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\1/\\3/\\2" ICON_DIR ${ICON})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\4" ICON_NAME ${ICON})
+    string(REGEX REPLACE "^transmission" "transmission-gtk" ICON_NAME ${ICON_NAME})
     install(
         FILES ${SOURCE_ICONS_DIR}/${ICON}
         DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/${ICON_DIR}/

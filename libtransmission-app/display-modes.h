@@ -37,4 +37,14 @@ enum class SortMode
 inline auto constexpr SortModeCount = 10U;
 inline auto constexpr DefaultSortMode = SortMode::SortByName;
 
+enum class StatsMode
+{
+    TotalRatio,
+    TotalTransfer,
+    SessionRatio,
+    SessionTransfer,
+};
+inline auto constexpr StatsModeCount = 4U;
+inline auto constexpr DefaultStatsMode = StatsMode::TotalRatio;
+
 } // namespace tr::app

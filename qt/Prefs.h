@@ -199,7 +199,7 @@ private:
         { COMPACT_VIEW, TR_KEY_compact_view, QMetaType::Bool },
         { FILTERBAR, TR_KEY_show_filterbar, QMetaType::Bool },
         { STATUSBAR, TR_KEY_show_statusbar, QMetaType::Bool },
-        { STATUSBAR_STATS, TR_KEY_statusbar_stats, QMetaType::QString },
+        { STATUSBAR_STATS, TR_KEY_statusbar_stats, UserMetaType::StatsModeType },
         { SHOW_TRACKER_SCRAPES, TR_KEY_show_tracker_scrapes, QMetaType::Bool },
         { SHOW_BACKUP_TRACKERS, TR_KEY_show_backup_trackers, QMetaType::Bool },
         { TOOLBAR, TR_KEY_show_toolbar, QMetaType::Bool },
