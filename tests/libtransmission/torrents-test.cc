@@ -167,3 +167,15 @@ TEST_F(TorrentsTest, piecesKeyTest)
         EXPECT_FALSE(tm.parse_torrent_file(path));
     }
 }
+
+TEST_F(TorrentsTest, pathKeyTest)
+{
+    auto constexpr BadTorrents = std::array<std::string_view, 1>{ "dup-files.torrent"sv };
+
+    for (auto const& name : BadTorrents)
+    {
+        auto tm = tr_torrent_metainfo{};
+        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
+        EXPECT_FALSE(tm.parse_torrent_file(path));
+    }
+}
