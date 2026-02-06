@@ -458,20 +458,6 @@ private:
     {
         bool ok = true;
 
-        // FIXME: Check to see if we already added this file. This is a safeguard
-        // for hybrid torrents with duplicate info between "file tree" and "files"
-        // This logic needs updating when "file tree" (bittorrent v2) supported
-        auto const n_files = tm_.files_.file_count();
-        for (tr_file_index_t i = 0; i < n_files; ++i)
-        {
-            if (file_subpath_ == tm_.files_.path(i))
-            {
-                context.error.set(EINVAL, fmt::format("duplicate path [{:s}]", file_subpath_));
-                ok = false;
-                break;
-            }
-        }
-
         if (std::empty(file_subpath_))
         {
             context.error.set(EINVAL, fmt::format("invalid path [{:s}]", file_subpath_));
@@ -499,6 +485,18 @@ private:
         if (!tm_.has_v1_metadata())
         {
             context.error.set(EINVAL, "missing v1 metadata");
+            return false;
+        }
+
+        // FIXME: update for hybrid torrents with duplicate info between "file tree" and "files"
+        // when "file tree" (bittorrent v2) supported
+        auto sorted_paths = tm_.files_.sorted_by_path();
+        if (auto dupe = std::ranges::adjacent_find(
+                sorted_paths,
+                [](auto const& p1, auto const& p2) { return p1.first == p2.first; });
+            dupe != sorted_paths.end())
+        {
+            context.error.set(EINVAL, fmt::format("duplicate path [{:s}]", dupe->first));
             return false;
         }
 
