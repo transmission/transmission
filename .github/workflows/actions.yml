@@ -694,6 +694,8 @@ jobs:
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_CXX_FLAGS='--system-header-prefix=fmt/' `# Needed to supress system header warnings in macos-26` \
+            -DCMAKE_C_FLAGS='--system-header-prefix=fmt/' `# Needed to supress system header warnings in macos26` \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
