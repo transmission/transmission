@@ -218,13 +218,13 @@ public:
 
             if (val < 99.995) // 0.98 to 99.99
             {
-                *fmt::format_to_n(buf, buflen - 1, "{:.2Lf} {:s}", val, units_.display_name(idx)).out = '\0';
+                *fmt::format_to_n(buf, buflen - 1, "{:.1Lf} {:s}", val, units_.display_name(idx)).out = '\0';
                 return buf;
             }
 
             if (val < 999.95 || std::empty(units_.display_name(idx + 1))) // 100.0 to 999.9
             {
-                *fmt::format_to_n(buf, buflen - 1, "{:.1Lf} {:s}", val, units_.display_name(idx)).out = '\0';
+                *fmt::format_to_n(buf, buflen - 1, "{:.0Lf} {:s}", val, units_.display_name(idx)).out = '\0';
                 return buf;
             }
 
