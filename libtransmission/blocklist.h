@@ -18,8 +18,9 @@
 #include <utility> // for std::pair
 #include <vector>
 
+#include <sigslot/signal.hpp>
+
 #include "libtransmission/net.h" // for tr_address
-#include "libtransmission/observable.h"
 
 namespace tr
 {
@@ -56,9 +57,9 @@ public:
     size_t update_primary_blocklist(std::string_view external_file, bool is_enabled);
 
     template<typename Observer>
-    [[nodiscard]] auto observe_changes(Observer observer)
+    [[nodiscard]] sigslot::scoped_connection observe_changes(Observer observer) const
     {
-        return changed_.observe(std::move(observer));
+        return changed_.connect_scoped(std::move(observer));
     }
 
 private:
@@ -112,7 +113,7 @@ private:
 
     std::string folder_;
 
-    tr::SimpleObservable<> changed_;
+    mutable sigslot::signal<> changed_;
 
     [[nodiscard]] static std::vector<Blocklist> load_folder(std::string_view folder, bool is_enabled);
 };

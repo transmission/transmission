@@ -16,11 +16,7 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/observable.h"
-#include "libtransmission/utils.h"
-
 class tr_bitfield;
-struct tr_peer;
 
 /**
  * Figures out what blocks we want to request next.
@@ -39,42 +35,27 @@ public:
         [[nodiscard]] virtual tr_block_span_t block_span(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual tr_piece_index_t piece_count() const = 0;
         [[nodiscard]] virtual tr_priority_t priority(tr_piece_index_t piece) const = 0;
-
-        [[nodiscard]] virtual tr::ObserverTag observe_files_wanted_changed(
-            tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_peer_disconnect(
-            tr::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_got_bad_piece(
-            tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_got_bitfield(
-            tr::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_got_block(
-            tr::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_got_choke(
-            tr::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_got_have(
-            tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_got_have_all(tr::SimpleObservable<tr_torrent*>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_got_reject(
-            tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_piece_completed(
-            tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_priority_changed(
-            tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_sent_cancel(
-            tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_sent_request(
-            tr::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_sequential_download_changed(
-            tr::SimpleObservable<tr_torrent*, bool>::Observer observer) = 0;
-        [[nodiscard]] virtual tr::ObserverTag observe_sequential_download_from_piece_changed(
-            tr::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) = 0;
-
         virtual ~Mediator() = default;
     };
 
     explicit Wishlist(Mediator& mediator_in);
     ~Wishlist();
+
+    void on_files_wanted_changed();
+    void on_got_bad_piece(tr_piece_index_t piece);
+    void on_got_bitfield(tr_bitfield const& bitfield);
+    void on_got_block(tr_block_index_t block);
+    void on_got_choke(tr_bitfield const& requests);
+    void on_got_have(tr_piece_index_t piece);
+    void on_got_have_all();
+    void on_got_reject(tr_block_index_t block);
+    void on_peer_disconnect(tr_bitfield const& have, tr_bitfield const& requests);
+    void on_piece_completed(tr_piece_index_t piece);
+    void on_priority_changed();
+    void on_sent_cancel(tr_block_index_t block);
+    void on_sent_request(tr_block_span_t block_span);
+    void on_sequential_download_changed();
+    void on_sequential_download_from_piece_changed();
 
     // the next blocks that we should request from a peer
     [[nodiscard]] std::vector<tr_block_span_t> next(

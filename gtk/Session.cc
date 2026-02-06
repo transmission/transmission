@@ -172,8 +172,6 @@ private:
     void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running);
     void on_torrent_metadata_changed(tr_torrent* raw_torrent);
 
-    void on_torrent_removal_done(tr_torrent_id_t id, bool succeeded);
-
 private:
     Session& core_;
 
@@ -928,30 +926,11 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 
 void Session::Impl::remove_torrent(tr_torrent_id_t const id, bool const delete_files)
 {
-    auto const& [torrent, _] = find_torrent_by_id(id);
-    if (!torrent)
-    {
-        return;
-    }
-
-    auto const on_remove_done = [core = get_core_ptr()](tr_torrent_id_t const removed_id, bool const ok)
-    {
-        Glib::signal_idle().connect_once([core, removed_id, ok]() { core->impl_->on_torrent_removal_done(removed_id, ok); });
-    };
-
-    tr_torrentRemove(&torrent->get_underlying(), delete_files, gtr_file_trash_or_remove, std::move(on_remove_done));
-}
-
-void Session::Impl::on_torrent_removal_done(tr_torrent_id_t id, bool succeeded)
-{
-    if (!succeeded)
-    {
-        return;
-    }
-
     if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
     {
         get_raw_model()->remove(position);
+
+        tr_torrentRemove(&torrent->get_underlying(), delete_files, gtr_file_trash_or_remove);
     }
 }
 
@@ -1138,52 +1117,6 @@ void Session::Impl::maybe_inhibit_hibernation()
      * (b) there aren't any active torrents */
     bool const hibernation_allowed = !gtr_pref_flag_get(TR_KEY_inhibit_desktop_hibernation) || get_active_torrent_count() == 0;
     set_hibernation_allowed(hibernation_allowed);
-}
-
-/**
-***  Prefs
-**/
-
-void Session::Impl::commit_prefs_change(tr_quark const key)
-{
-    signal_prefs_changed_.emit(key);
-    gtr_pref_save(session_);
-}
-
-void Session::set_pref(tr_quark const key, std::string const& newval)
-{
-    if (newval != gtr_pref_string_get(key))
-    {
-        gtr_pref_string_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, bool newval)
-{
-    if (newval != gtr_pref_flag_get(key))
-    {
-        gtr_pref_flag_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, int newval)
-{
-    if (newval != gtr_pref_int_get(key))
-    {
-        gtr_pref_int_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, double newval)
-{
-    if (std::fabs(newval - gtr_pref_double_get(key)) >= 0.0001)
-    {
-        gtr_pref_double_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
 }
 
 /***

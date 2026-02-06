@@ -4,7 +4,7 @@
 
   <menu id="main-window-menu">
     <submenu>
-      <attribute name="label" translatable="true">_File</attribute>
+      <attribute name="label" translatable="yes">_File</attribute>
       <section>
         <item>
           <attribute name="action">win.open-torrent</attribute>
@@ -51,7 +51,7 @@
       </section>
     </submenu>
     <submenu>
-      <attribute name="label" translatable="true">_Edit</attribute>
+      <attribute name="label" translatable="yes">_Edit</attribute>
       <section>
         <item>
           <attribute name="action">win.select-all</attribute>
@@ -74,7 +74,7 @@
       </section>
     </submenu>
     <submenu>
-      <attribute name="label" translatable="true">_Torrent</attribute>
+      <attribute name="label" translatable="yes">_Torrent</attribute>
       <section>
         <item>
           <attribute name="action">win.show-torrent-properties</attribute>
@@ -111,7 +111,7 @@
           <attribute name="label" translatable="yes">Ask Tracker for _More Peers</attribute>
         </item>
         <submenu>
-          <attribute name="label" translatable="true">_Queue</attribute>
+          <attribute name="label" translatable="yes">_Queue</attribute>
           <section>
             <item>
               <attribute name="action">win.queue-move-top</attribute>
@@ -175,7 +175,7 @@
       </section>
     </submenu>
     <submenu>
-      <attribute name="label" translatable="true">_View</attribute>
+      <attribute name="label" translatable="yes">_View</attribute>
       <section>
         <item>
           <attribute name="action">win.compact-view</attribute>
@@ -252,7 +252,7 @@
       </section>
     </submenu>
     <submenu>
-      <attribute name="label" translatable="true">_Help</attribute>
+      <attribute name="label" translatable="yes">_Help</attribute>
       <section>
         <item>
           <attribute name="action">win.toggle-message-log</attribute>
@@ -303,7 +303,7 @@
     </section>
     <section>
       <submenu>
-        <attribute name="label" translatable="true">_Sort Torrents By</attribute>
+        <attribute name="label" translatable="yes">_Sort Torrents By</attribute>
         <section>
           <item>
             <attribute name="action">win.sort-torrents</attribute>
@@ -380,7 +380,7 @@
         <attribute name="label" translatable="yes">Ask Tracker for _More Peers</attribute>
       </item>
       <submenu>
-        <attribute name="label" translatable="true">_Queue</attribute>
+        <attribute name="label" translatable="yes">_Queue</attribute>
         <section>
           <item>
             <attribute name="action">win.queue-move-top</attribute>

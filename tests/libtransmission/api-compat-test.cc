@@ -747,7 +747,7 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "speed_limit_up_enabled": false,
     "start_added_torrents": true,
     "start_minimized": false,
-    "statusbar_stats": "total-ratio",
+    "statusbar_stats": "total_ratio",
     "torrent_added_notification_enabled": true,
     "torrent_complete_notification_enabled": true,
     "torrent_complete_sound_command": [

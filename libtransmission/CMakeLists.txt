@@ -78,7 +78,6 @@ target_sources(${TR_NAME}
         mime-types.h
         net.cc
         net.h
-        observable.h
         open-files.cc
         open-files.h
         peer-common.h
@@ -225,8 +224,6 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
-        FMT_USE_EXCEPTIONS=0 # {fmt} >= 11.2.0
-        FMT_EXCEPTIONS=0 # {fmt} < 11.2.0
         $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
@@ -286,9 +283,11 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
         transmission::crypto_impl
-        fmt::fmt-header-only
+        transmission::fmt-header-only
+        Pal::Sigslot
         transmission::small
-        libevent::event)
+        libevent::core
+        libevent::extra)
 
 if(INSTALL_LIB)
     install(
