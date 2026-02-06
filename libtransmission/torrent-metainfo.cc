@@ -558,7 +558,8 @@ private:
                 return false;
             }
 
-            if ((tm_.files_.total_size() + piece_size_ - 1) / piece_size_ != std::size(tm_.pieces_))
+            tm_.block_info_ = tr_block_info{ tm_.files_.total_size(), piece_size_ };
+            if (tm_.block_info_.piece_count() != std::size(tm_.pieces_))
             {
                 if (!context.error)
                 {
@@ -567,7 +568,6 @@ private:
                 return false;
             }
 
-            tm_.block_info_ = tr_block_info{ tm_.files_.total_size(), piece_size_ };
             return true;
         }
 
