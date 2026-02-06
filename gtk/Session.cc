@@ -93,7 +93,7 @@ public:
 
     void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
-    void send_rpc_request(tr_quark method, tr_variant const& params, std::function<void(tr_variant&)> on_response);
+    void send_rpc_request(tr_quark method, tr_variant&& params, std::function<void(tr_variant&)> on_response);
 
     void commit_prefs_change(tr_quark key);
 
@@ -1167,10 +1167,7 @@ void core_read_rpc_response(tr_variant&& response)
 
 } // namespace
 
-void Session::Impl::send_rpc_request(
-    tr_quark const method,
-    tr_variant const& params,
-    std::function<void(tr_variant&)> on_response)
+void Session::Impl::send_rpc_request(tr_quark const method, tr_variant&& params, std::function<void(tr_variant&)> on_response)
 {
     if (session_ == nullptr)
     {
@@ -1186,7 +1183,7 @@ void Session::Impl::send_rpc_request(
     // add params if there are any
     if (params.has_value())
     {
-        reqmap.try_emplace(TR_KEY_params, params.clone());
+        reqmap.try_emplace(TR_KEY_params, std::move(params));
     }
 
     // add id if we want a response
@@ -1300,9 +1297,9 @@ void Session::blocklist_update()
 
 // ---
 
-void Session::exec(tr_quark method, tr_variant const& params)
+void Session::exec(tr_quark method, tr_variant&& params)
 {
-    impl_->send_rpc_request(method, params, {});
+    impl_->send_rpc_request(method, std::move(params), {});
 }
 
 /***
