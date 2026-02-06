@@ -200,7 +200,7 @@ target_link_libraries(${TR_NAME}-gtk
         ${TR_NAME}-app
         ${TR_NAME}
         transmission::gtk_impl
-        transmission::fmt-header-only
+        fmt::fmt-header-only
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
 
 if(MSVC)
