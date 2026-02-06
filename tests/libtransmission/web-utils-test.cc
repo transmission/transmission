@@ -23,7 +23,11 @@
 using WebUtilsTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
+#ifdef WITH_PSL
 TEST_F(WebUtilsTest, urlParse)
+#else
+TEST_F(WebUtilsTest, urlParseWithoutPSL)
+#endif
 {
     auto url = "http://1"sv;
     auto parsed = tr_urlParse(url);
