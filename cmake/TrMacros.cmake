@@ -255,6 +255,9 @@ macro(tr_add_external_auto_library ID PACKAGENAME)
                 "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
                 "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                 "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
+                "-DCMAKE_AR=${CMAKE_AR}"
+                "-DCMAKE_NM=${CMAKE_NM}"
+                "-DCMAKE_RANLIB=${CMAKE_RANLIB}"
                 "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
                 "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
                 "-DCMAKE_INSTALL_LIBDIR:STRING=lib"
@@ -283,109 +286,6 @@ macro(tr_add_external_auto_library ID PACKAGENAME)
 
         if(${PACKAGENAME}_UPSTREAM_TARGET)
             add_dependencies(${_TAEAL_ARG_TARGET} ${${PACKAGENAME}_UPSTREAM_TARGET})
-        endif()
-    endif()
-
-    if(_TAEAL_ARG_TARGET AND NOT TARGET ${_TAEAL_ARG_TARGET})
-        message(FATAL_ERROR "Build system is misconfigured, this shouldn't happen! Can't find target '${_TAEAL_ARG_TARGET}'")
-    endif()
-endmacro()
-
-macro(tr_add_external_auto_library_legacy ID DIRNAME LIBNAME)
-    cmake_parse_arguments(_TAEAL_ARG "SUBPROJECT" "TARGET" "CMAKE_ARGS" ${ARGN})
-
-    if(USE_SYSTEM_${ID})
-        tr_get_required_flag(USE_SYSTEM_${ID} SYSTEM_${ID}_IS_REQUIRED)
-        find_package(${ID} ${${ID}_MINIMUM} ${SYSTEM_${ID}_IS_REQUIRED})
-        tr_fixup_auto_option(USE_SYSTEM_${ID} ${ID}_FOUND SYSTEM_${ID}_IS_REQUIRED)
-    endif()
-
-    if(USE_SYSTEM_${ID})
-        unset(${ID}_UPSTREAM_TARGET)
-    elseif(_TAEAL_ARG_SUBPROJECT)
-        foreach(ARG IN LISTS _TAEAL_ARG_CMAKE_ARGS)
-            if(ARG MATCHES "^-D([^=: ]+)(:[^= ]+)?=(.*)$")
-                set(${CMAKE_MATCH_1} ${CMAKE_MATCH_3} CACHE INTERNAL "")
-            endif()
-        endforeach()
-        add_subdirectory("${TR_THIRD_PARTY_SOURCE_DIR}/${DIRNAME}" "${TR_THIRD_PARTY_BINARY_DIR}/${DIRNAME}.bld")
-    else()
-        set(${ID}_UPSTREAM_TARGET ${LIBNAME})
-        set(${ID}_PREFIX "${TR_THIRD_PARTY_BINARY_DIR}/${DIRNAME}.bld/pfx")
-
-        set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include"
-            CACHE INTERNAL "")
-        set(${ID}_LIBRARY "${${ID}_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBNAME}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-            CACHE INTERNAL "")
-
-        set(${ID}_INCLUDE_DIRS ${${ID}_INCLUDE_DIR})
-        set(${ID}_LIBRARIES ${${ID}_LIBRARY})
-
-        set(${ID}_EXT_PROJ_CMAKE_ARGS)
-
-        if(APPLE)
-            string(REPLACE ";" "$<SEMICOLON>" ${ID}_CMAKE_OSX_ARCHITECTURES "${CMAKE_OSX_ARCHITECTURES}")
-            list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
-                "-DCMAKE_OSX_ARCHITECTURES:STRING=${${ID}_CMAKE_OSX_ARCHITECTURES}"
-                "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}"
-                "-DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}")
-        endif()
-
-        if(ANDROID)
-            list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
-                "-DANDROID_PLATFORM=${ANDROID_PLATFORM}"
-                "-DANDROID_NDK=${ANDROID_NDK}"
-                "-DANDROID_ABI=${ANDROID_ABI}"
-                "-DANDROID_STL=${ANDROID_STL}"
-                "-DCMAKE_ANDROID_NDK=${CMAKE_ANDROID_NDK}"
-                "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}")
-        endif()
-
-        if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
-            list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
-                "-DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
-        endif()
-
-        ExternalProject_Add(
-            ${${ID}_UPSTREAM_TARGET}
-            PREFIX "${TR_THIRD_PARTY_BINARY_DIR}/${DIRNAME}.bld"
-            SOURCE_DIR "${TR_THIRD_PARTY_SOURCE_DIR}/${DIRNAME}"
-            INSTALL_DIR "${${ID}_PREFIX}"
-            CMAKE_ARGS
-                -Wno-dev # We don't want to be warned over unused variables
-                --no-warn-unused-cli
-                "-DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}"
-                "-DCMAKE_USER_MAKE_RULES_OVERRIDE=${CMAKE_USER_MAKE_RULES_OVERRIDE}"
-                "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-                "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
-                "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-                "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
-                "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
-                "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
-                "-DCMAKE_INSTALL_LIBDIR:STRING=lib"
-                ${${ID}_EXT_PROJ_CMAKE_ARGS}
-                ${_TAEAL_ARG_CMAKE_ARGS}
-            BUILD_BYPRODUCTS "${${ID}_LIBRARY}")
-
-        set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
-
-        # Imported target (below) requires include directories to be present at configuration time
-        file(MAKE_DIRECTORY ${${ID}_INCLUDE_DIRS})
-    endif()
-
-    if(_TAEAL_ARG_TARGET AND (USE_SYSTEM_${ID} OR NOT _TAEAL_ARG_SUBPROJECT))
-        add_library(${_TAEAL_ARG_TARGET} INTERFACE IMPORTED)
-
-        target_include_directories(${_TAEAL_ARG_TARGET}
-            INTERFACE
-                ${${ID}_INCLUDE_DIRS})
-
-        target_link_libraries(${_TAEAL_ARG_TARGET}
-            INTERFACE
-                ${${ID}_LIBRARIES})
-
-        if(${ID}_UPSTREAM_TARGET)
-            add_dependencies(${_TAEAL_ARG_TARGET} ${${ID}_UPSTREAM_TARGET})
         endif()
     endif()
 

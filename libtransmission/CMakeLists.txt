@@ -12,8 +12,6 @@ add_compile_options(
     # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
     $<$<AND:$<BOOL:${APPLE}>,$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>,$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>>:-fobjc-arc>)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/sigslot ${CMAKE_BINARY_DIR}/third-party/sigslot)
-
 add_library(${TR_NAME} STATIC)
 
 set(IS_APPLE_CLANG FALSE)
@@ -225,8 +223,6 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
-        FMT_USE_EXCEPTIONS=0 # {fmt} >= 11.2.0
-        FMT_EXCEPTIONS=0 # {fmt} < 11.2.0
         $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
@@ -286,10 +282,11 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
         transmission::crypto_impl
-        fmt::fmt-header-only
-        sigslot
+        transmission::fmt-header-only
+        Pal::Sigslot
         transmission::small
-        libevent::event)
+        libevent::core
+        libevent::extra)
 
 if(INSTALL_LIB)
     install(
