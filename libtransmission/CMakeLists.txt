@@ -119,6 +119,8 @@ target_sources(${TR_NAME}
         session-thread.h
         session.cc
         session.h
+        socks5.cc
+        socks5.h
         stats.cc
         stats.h
         subprocess-posix.cc

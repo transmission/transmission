@@ -99,6 +99,14 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic) NSTimer* fPortStatusTimer;
 @property(nonatomic) int fPeerPort, fNatStatus;
 
+@property(nonatomic) NSButton* fProxyEnabledCheck;
+@property(nonatomic) NSPopUpButton* fProxyTypePopUp;
+@property(nonatomic) NSTextField* fProxyURLField;
+@property(nonatomic) NSTextField* fProxyPortField;
+@property(nonatomic) NSButton* fProxyAuthCheck;
+@property(nonatomic) NSTextField* fProxyUsernameField;
+@property(nonatomic) NSSecureTextField* fProxyPasswordField;
+
 @property(nonatomic) IBOutlet NSTextField* fRPCPortField;
 @property(nonatomic) IBOutlet NSTextField* fRPCPasswordField;
 @property(nonatomic) IBOutlet NSTableView* fRPCWhitelistTable;
@@ -249,6 +257,9 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     self.fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(updatePortStatus)
                                                            userInfo:nil
                                                             repeats:YES];
+
+    //set proxy controls
+    [self buildProxyUI];
 
     //set peer connections
     self.fPeersGlobalField.integerValue = [self.fDefaults integerForKey:@"PeersTotal"];
@@ -492,6 +503,364 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         break;
     }
     self.fPortChecker = nil;
+}
+
+#pragma mark - Proxy
+
+- (void)buildProxyUI
+{
+    // The fNetworkView contains an inner container (first customView subview) and a help button.
+    // We need to expand the network view and add proxy controls.
+
+    NSView* innerContainer = nil;
+    for (NSView* subview in self.fNetworkView.subviews)
+    {
+        if (![subview isKindOfClass:[NSButton class]])
+        {
+            innerContainer = subview;
+            break;
+        }
+    }
+    if (!innerContainer)
+    {
+        return;
+    }
+
+    // Find the "System sleep:" label and "Prevent sleeping" checkbox to insert above them.
+    // The sleep checkbox is the one bound to "SleepPrevent" — it's the lowest control.
+    // We'll find it by looking for the checkbox with the sleep title.
+    NSButton* sleepCheck = nil;
+    NSTextField* sleepLabel = nil;
+    NSTextField* natExplanation = nil;
+    for (NSView* subview in innerContainer.subviews)
+    {
+        if ([subview isKindOfClass:[NSButton class]])
+        {
+            NSButton* btn = (NSButton*)subview;
+            if ([btn.title containsString:@"sleeping"] || [btn.title containsString:@"Prevent"])
+            {
+                sleepCheck = btn;
+            }
+        }
+        else if ([subview isKindOfClass:[NSTextField class]])
+        {
+            NSTextField* tf = (NSTextField*)subview;
+            if ([tf.stringValue isEqualToString:@"System sleep:"] || [((NSTextFieldCell*)tf.cell).title isEqualToString:@"System sleep:"])
+            {
+                sleepLabel = tf;
+            }
+            if ([((NSTextFieldCell*)tf.cell).title containsString:@"NAT traversal"])
+            {
+                natExplanation = tf;
+            }
+        }
+    }
+
+    if (!sleepCheck || !sleepLabel || !natExplanation)
+    {
+        return;
+    }
+
+    // Remove existing constraint linking sleep section to NAT explanation
+    // (the constraint: sleepCheck.top = natExplanation.bottom + 20)
+    for (NSLayoutConstraint* constraint in innerContainer.constraints)
+    {
+        if ((constraint.firstItem == sleepCheck && constraint.secondItem == natExplanation) ||
+            (constraint.firstItem == natExplanation && constraint.secondItem == sleepCheck))
+        {
+            [innerContainer removeConstraint:constraint];
+        }
+        // Also remove the bottom constraint (innerContainer.bottom = sleepCheck.bottom)
+        if (constraint.firstAttribute == NSLayoutAttributeBottom && constraint.secondItem == sleepCheck)
+        {
+            [innerContainer removeConstraint:constraint];
+        }
+    }
+
+    // --- Proxy label ---
+    NSTextField* proxyLabel = [NSTextField labelWithString:NSLocalizedString(@"Proxy:", "Preferences -> Network -> proxy label")];
+    proxyLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    proxyLabel.alignment = NSTextAlignmentRight;
+    proxyLabel.font = [NSFont systemFontOfSize:0]; // system font
+    proxyLabel.textColor = NSColor.controlTextColor;
+    [innerContainer addSubview:proxyLabel];
+
+    // --- Enable proxy checkbox ---
+    self.fProxyEnabledCheck = [NSButton
+        checkboxWithTitle:NSLocalizedString(@"Route connections through proxy", "Preferences -> Network -> proxy enable")
+                   target:self
+                   action:@selector(setProxyEnabled:)];
+    self.fProxyEnabledCheck.translatesAutoresizingMaskIntoConstraints = NO;
+    self.fProxyEnabledCheck.state = [self.fDefaults boolForKey:@"ProxyEnabled"] ? NSControlStateValueOn : NSControlStateValueOff;
+    [innerContainer addSubview:self.fProxyEnabledCheck];
+
+    // --- Type label ---
+    NSTextField* typeLabel = [NSTextField labelWithString:NSLocalizedString(@"Type:", "Preferences -> Network -> proxy type label")];
+    typeLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    typeLabel.font = [NSFont systemFontOfSize:0];
+    typeLabel.textColor = NSColor.controlTextColor;
+    [innerContainer addSubview:typeLabel];
+
+    // --- Type popup ---
+    self.fProxyTypePopUp = [[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO];
+    self.fProxyTypePopUp.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.fProxyTypePopUp addItemsWithTitles:@[ @"SOCKS5", @"SOCKS4", @"HTTP" ]];
+    // Map stored string to index
+    NSString* proxyTypeStr = [self.fDefaults stringForKey:@"ProxyType"];
+    if ([proxyTypeStr isEqualToString:@"socks4"])
+    {
+        [self.fProxyTypePopUp selectItemAtIndex:1];
+    }
+    else if ([proxyTypeStr isEqualToString:@"http"])
+    {
+        [self.fProxyTypePopUp selectItemAtIndex:2];
+    }
+    else
+    {
+        [self.fProxyTypePopUp selectItemAtIndex:0]; // socks5 default
+    }
+    self.fProxyTypePopUp.target = self;
+    self.fProxyTypePopUp.action = @selector(setProxyType:);
+    [innerContainer addSubview:self.fProxyTypePopUp];
+
+    // --- Address label ---
+    NSTextField* addressLabel = [NSTextField labelWithString:NSLocalizedString(@"Address:", "Preferences -> Network -> proxy address label")];
+    addressLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    addressLabel.font = [NSFont systemFontOfSize:0];
+    addressLabel.textColor = NSColor.controlTextColor;
+    [innerContainer addSubview:addressLabel];
+
+    // --- Address field ---
+    self.fProxyURLField = [[NSTextField alloc] initWithFrame:NSZeroRect];
+    self.fProxyURLField.translatesAutoresizingMaskIntoConstraints = NO;
+    self.fProxyURLField.placeholderString = NSLocalizedString(@"hostname or IP", "Preferences -> Network -> proxy address placeholder");
+    self.fProxyURLField.stringValue = [self.fDefaults stringForKey:@"ProxyURL"] ?: @"";
+    self.fProxyURLField.target = self;
+    self.fProxyURLField.action = @selector(setProxyURL:);
+    ((NSTextFieldCell*)self.fProxyURLField.cell).sendsActionOnEndEditing = YES;
+    [innerContainer addSubview:self.fProxyURLField];
+
+    // --- Port label ---
+    NSTextField* portLabel = [NSTextField labelWithString:NSLocalizedString(@"Port:", "Preferences -> Network -> proxy port label")];
+    portLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    portLabel.font = [NSFont systemFontOfSize:0];
+    portLabel.textColor = NSColor.controlTextColor;
+    [innerContainer addSubview:portLabel];
+
+    // --- Port field ---
+    self.fProxyPortField = [[NSTextField alloc] initWithFrame:NSZeroRect];
+    self.fProxyPortField.translatesAutoresizingMaskIntoConstraints = NO;
+    NSNumberFormatter* portFormatter = [[NSNumberFormatter alloc] init];
+    portFormatter.numberStyle = NSNumberFormatterNoStyle;
+    portFormatter.allowsFloats = NO;
+    portFormatter.minimum = @1;
+    portFormatter.maximum = @65535;
+    self.fProxyPortField.formatter = portFormatter;
+    self.fProxyPortField.integerValue = [self.fDefaults integerForKey:@"ProxyPort"];
+    self.fProxyPortField.target = self;
+    self.fProxyPortField.action = @selector(setProxyPort:);
+    ((NSTextFieldCell*)self.fProxyPortField.cell).sendsActionOnEndEditing = YES;
+    [innerContainer addSubview:self.fProxyPortField];
+
+    // --- Auth checkbox ---
+    self.fProxyAuthCheck = [NSButton checkboxWithTitle:NSLocalizedString(@"Proxy requires authentication", "Preferences -> Network -> proxy auth")
+                                                target:self
+                                                action:@selector(setProxyAuth:)];
+    self.fProxyAuthCheck.translatesAutoresizingMaskIntoConstraints = NO;
+    self.fProxyAuthCheck.state = [self.fDefaults boolForKey:@"ProxyAuthEnabled"] ? NSControlStateValueOn : NSControlStateValueOff;
+    [innerContainer addSubview:self.fProxyAuthCheck];
+
+    // --- Username label ---
+    NSTextField* usernameLabel = [NSTextField
+        labelWithString:NSLocalizedString(@"Username:", "Preferences -> Network -> proxy username label")];
+    usernameLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    usernameLabel.font = [NSFont systemFontOfSize:0];
+    usernameLabel.textColor = NSColor.controlTextColor;
+    [innerContainer addSubview:usernameLabel];
+
+    // --- Username field ---
+    self.fProxyUsernameField = [[NSTextField alloc] initWithFrame:NSZeroRect];
+    self.fProxyUsernameField.translatesAutoresizingMaskIntoConstraints = NO;
+    self.fProxyUsernameField.stringValue = [self.fDefaults stringForKey:@"ProxyUsername"] ?: @"";
+    self.fProxyUsernameField.target = self;
+    self.fProxyUsernameField.action = @selector(setProxyUsername:);
+    ((NSTextFieldCell*)self.fProxyUsernameField.cell).sendsActionOnEndEditing = YES;
+    [innerContainer addSubview:self.fProxyUsernameField];
+
+    // --- Password label ---
+    NSTextField* passwordLabel = [NSTextField
+        labelWithString:NSLocalizedString(@"Password:", "Preferences -> Network -> proxy password label")];
+    passwordLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    passwordLabel.font = [NSFont systemFontOfSize:0];
+    passwordLabel.textColor = NSColor.controlTextColor;
+    [innerContainer addSubview:passwordLabel];
+
+    // --- Password field ---
+    self.fProxyPasswordField = [[NSSecureTextField alloc] initWithFrame:NSZeroRect];
+    self.fProxyPasswordField.translatesAutoresizingMaskIntoConstraints = NO;
+    self.fProxyPasswordField.stringValue = [self.fDefaults stringForKey:@"ProxyPassword"] ?: @"";
+    self.fProxyPasswordField.target = self;
+    self.fProxyPasswordField.action = @selector(setProxyPassword:);
+    ((NSTextFieldCell*)self.fProxyPasswordField.cell).sendsActionOnEndEditing = YES;
+    [innerContainer addSubview:self.fProxyPasswordField];
+
+    // --- Constraints ---
+    CGFloat const kLabelWidth = 132.0; // match existing label widths in XIB
+    CGFloat const kFieldMinWidth = 120.0;
+    CGFloat const kPortWidth = 60.0;
+    CGFloat const kSectionSpacing = 20.0;
+
+    [NSLayoutConstraint activateConstraints:@[
+        // Proxy label — same width and trailing edge as existing labels
+        [proxyLabel.widthAnchor constraintEqualToConstant:kLabelWidth],
+        [proxyLabel.leadingAnchor constraintEqualToAnchor:sleepLabel.leadingAnchor],
+        [proxyLabel.centerYAnchor constraintEqualToAnchor:self.fProxyEnabledCheck.centerYAnchor],
+
+        // Enable checkbox — top anchored below NAT explanation with section spacing
+        [self.fProxyEnabledCheck.topAnchor constraintEqualToAnchor:natExplanation.bottomAnchor constant:kSectionSpacing],
+        [self.fProxyEnabledCheck.leadingAnchor constraintEqualToAnchor:proxyLabel.trailingAnchor constant:6],
+
+        // Row 2: Type popup, Address field, Port field
+        [typeLabel.leadingAnchor constraintEqualToAnchor:self.fProxyEnabledCheck.leadingAnchor constant:20],
+        [typeLabel.centerYAnchor constraintEqualToAnchor:self.fProxyTypePopUp.centerYAnchor],
+
+        [self.fProxyTypePopUp.leadingAnchor constraintEqualToAnchor:typeLabel.trailingAnchor constant:4],
+        [self.fProxyTypePopUp.topAnchor constraintEqualToAnchor:self.fProxyEnabledCheck.bottomAnchor constant:8],
+
+        [addressLabel.leadingAnchor constraintEqualToAnchor:self.fProxyTypePopUp.trailingAnchor constant:12],
+        [addressLabel.centerYAnchor constraintEqualToAnchor:self.fProxyTypePopUp.centerYAnchor],
+
+        [self.fProxyURLField.leadingAnchor constraintEqualToAnchor:addressLabel.trailingAnchor constant:4],
+        [self.fProxyURLField.centerYAnchor constraintEqualToAnchor:self.fProxyTypePopUp.centerYAnchor],
+        [self.fProxyURLField.widthAnchor constraintGreaterThanOrEqualToConstant:kFieldMinWidth],
+
+        [portLabel.leadingAnchor constraintEqualToAnchor:self.fProxyURLField.trailingAnchor constant:12],
+        [portLabel.centerYAnchor constraintEqualToAnchor:self.fProxyTypePopUp.centerYAnchor],
+
+        [self.fProxyPortField.leadingAnchor constraintEqualToAnchor:portLabel.trailingAnchor constant:4],
+        [self.fProxyPortField.centerYAnchor constraintEqualToAnchor:self.fProxyTypePopUp.centerYAnchor],
+        [self.fProxyPortField.widthAnchor constraintEqualToConstant:kPortWidth],
+
+        // Row 3: Auth checkbox
+        [self.fProxyAuthCheck.topAnchor constraintEqualToAnchor:self.fProxyTypePopUp.bottomAnchor constant:8],
+        [self.fProxyAuthCheck.leadingAnchor constraintEqualToAnchor:self.fProxyEnabledCheck.leadingAnchor],
+
+        // Row 4: Username and Password
+        [usernameLabel.leadingAnchor constraintEqualToAnchor:self.fProxyAuthCheck.leadingAnchor constant:20],
+        [usernameLabel.centerYAnchor constraintEqualToAnchor:self.fProxyUsernameField.centerYAnchor],
+
+        [self.fProxyUsernameField.leadingAnchor constraintEqualToAnchor:usernameLabel.trailingAnchor constant:4],
+        [self.fProxyUsernameField.topAnchor constraintEqualToAnchor:self.fProxyAuthCheck.bottomAnchor constant:8],
+        [self.fProxyUsernameField.widthAnchor constraintGreaterThanOrEqualToConstant:kFieldMinWidth],
+
+        [passwordLabel.leadingAnchor constraintEqualToAnchor:self.fProxyUsernameField.trailingAnchor constant:12],
+        [passwordLabel.centerYAnchor constraintEqualToAnchor:self.fProxyUsernameField.centerYAnchor],
+
+        [self.fProxyPasswordField.leadingAnchor constraintEqualToAnchor:passwordLabel.trailingAnchor constant:4],
+        [self.fProxyPasswordField.centerYAnchor constraintEqualToAnchor:self.fProxyUsernameField.centerYAnchor],
+        [self.fProxyPasswordField.widthAnchor constraintGreaterThanOrEqualToConstant:kFieldMinWidth],
+
+        // Sleep section below proxy
+        [sleepCheck.topAnchor constraintEqualToAnchor:self.fProxyUsernameField.bottomAnchor constant:kSectionSpacing],
+        [sleepLabel.centerYAnchor constraintEqualToAnchor:sleepCheck.centerYAnchor],
+
+        // Re-attach bottom of container to sleep checkbox
+        [innerContainer.bottomAnchor constraintEqualToAnchor:sleepCheck.bottomAnchor],
+    ]];
+
+    // Grow the network view frame to accommodate the new controls
+    NSRect frame = self.fNetworkView.frame;
+    frame.size.height += 140;
+    self.fNetworkView.frame = frame;
+
+    [self updateProxyControlStates];
+}
+
+- (void)updateProxyControlStates
+{
+    BOOL proxyEnabled = self.fProxyEnabledCheck.state == NSControlStateValueOn;
+    BOOL authEnabled = self.fProxyAuthCheck.state == NSControlStateValueOn;
+
+    self.fProxyTypePopUp.enabled = proxyEnabled;
+    self.fProxyURLField.enabled = proxyEnabled;
+    self.fProxyPortField.enabled = proxyEnabled;
+    self.fProxyAuthCheck.enabled = proxyEnabled;
+    self.fProxyUsernameField.enabled = proxyEnabled && authEnabled;
+    self.fProxyPasswordField.enabled = proxyEnabled && authEnabled;
+}
+
+- (void)setProxyEnabled:(id)sender
+{
+    BOOL enabled = ((NSButton*)sender).state == NSControlStateValueOn;
+    [self.fDefaults setBool:enabled forKey:@"ProxyEnabled"];
+    tr_sessionSetProxyEnabled(self.fHandle, enabled);
+    [self updateProxyControlStates];
+}
+
+- (void)setProxyType:(id)sender
+{
+    NSInteger index = ((NSPopUpButton*)sender).indexOfSelectedItem;
+    auto type = static_cast<tr_proxy_type>(index);
+    NSString* typeStr;
+    switch (type)
+    {
+    case TR_PROXY_SOCKS4:
+        typeStr = @"socks4";
+        break;
+    case TR_PROXY_HTTP:
+        typeStr = @"http";
+        break;
+    case TR_PROXY_SOCKS5:
+    default:
+        typeStr = @"socks5";
+        break;
+    }
+    [self.fDefaults setObject:typeStr forKey:@"ProxyType"];
+    tr_sessionSetProxyType(self.fHandle, type);
+}
+
+- (void)setProxyURL:(id)sender
+{
+    NSString* url = ((NSTextField*)sender).stringValue;
+    [self.fDefaults setObject:url forKey:@"ProxyURL"];
+    tr_sessionSetProxyUrl(self.fHandle, url.UTF8String);
+}
+
+- (void)setProxyPort:(id)sender
+{
+    NSInteger port = ((NSTextField*)sender).integerValue;
+    if (port < 1)
+    {
+        port = 1;
+    }
+    else if (port > 65535)
+    {
+        port = 65535;
+    }
+    [self.fDefaults setInteger:port forKey:@"ProxyPort"];
+    tr_sessionSetProxyPort(self.fHandle, static_cast<size_t>(port));
+}
+
+- (void)setProxyAuth:(id)sender
+{
+    BOOL enabled = ((NSButton*)sender).state == NSControlStateValueOn;
+    [self.fDefaults setBool:enabled forKey:@"ProxyAuthEnabled"];
+    tr_sessionSetProxyAuthEnabled(self.fHandle, enabled);
+    [self updateProxyControlStates];
+}
+
+- (void)setProxyUsername:(id)sender
+{
+    NSString* username = ((NSTextField*)sender).stringValue;
+    [self.fDefaults setObject:username forKey:@"ProxyUsername"];
+    tr_sessionSetProxyUsername(self.fHandle, username.UTF8String);
+}
+
+- (void)setProxyPassword:(id)sender
+{
+    NSString* password = ((NSSecureTextField*)sender).stringValue;
+    [self.fDefaults setObject:password forKey:@"ProxyPassword"];
+    tr_sessionSetProxyPassword(self.fHandle, password.UTF8String);
 }
 
 - (NSArray<NSString*>*)sounds
@@ -1460,6 +1829,42 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     NSString* doneScriptPath = tr_strv_to_utf8_nsstring(tr_sessionGetScript(self.fHandle, TR_SCRIPT_ON_TORRENT_DONE));
     [self.fDefaults setObject:doneScriptPath forKey:@"DoneScriptPath"];
 
+    //proxy
+    BOOL const proxyEnabled = tr_sessionIsProxyEnabled(self.fHandle);
+    [self.fDefaults setBool:proxyEnabled forKey:@"ProxyEnabled"];
+
+    auto const proxyType = tr_sessionGetProxyType(self.fHandle);
+    NSString* proxyTypeStr;
+    switch (proxyType)
+    {
+    case TR_PROXY_SOCKS4:
+        proxyTypeStr = @"socks4";
+        break;
+    case TR_PROXY_HTTP:
+        proxyTypeStr = @"http";
+        break;
+    case TR_PROXY_SOCKS5:
+    default:
+        proxyTypeStr = @"socks5";
+        break;
+    }
+    [self.fDefaults setObject:proxyTypeStr forKey:@"ProxyType"];
+
+    auto const proxyPort = tr_sessionGetProxyPort(self.fHandle);
+    [self.fDefaults setInteger:proxyPort forKey:@"ProxyPort"];
+
+    NSString* proxyUrlStr = [NSString stringWithUTF8String:tr_sessionGetProxyUrl(self.fHandle)];
+    [self.fDefaults setObject:proxyUrlStr forKey:@"ProxyURL"];
+
+    BOOL const proxyAuthEnabled = tr_sessionIsProxyAuthEnabled(self.fHandle);
+    [self.fDefaults setBool:proxyAuthEnabled forKey:@"ProxyAuthEnabled"];
+
+    NSString* proxyUsername = [NSString stringWithUTF8String:tr_sessionGetProxyUsername(self.fHandle)];
+    [self.fDefaults setObject:proxyUsername forKey:@"ProxyUsername"];
+
+    NSString* proxyPassword = [NSString stringWithUTF8String:tr_sessionGetProxyPassword(self.fHandle)];
+    [self.fDefaults setObject:proxyPassword forKey:@"ProxyPassword"];
+
     //update gui if loaded
     if (self.fHasLoaded)
     {
@@ -1512,6 +1917,16 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
         //check stalled handled by bindings
         self.fStalledField.integerValue = stalledMinutes;
+
+        //proxy
+        self.fProxyEnabledCheck.state = proxyEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+        [self.fProxyTypePopUp selectItemAtIndex:static_cast<NSInteger>(proxyType)];
+        self.fProxyURLField.stringValue = proxyUrlStr;
+        self.fProxyPortField.integerValue = proxyPort;
+        self.fProxyAuthCheck.state = proxyAuthEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+        self.fProxyUsernameField.stringValue = proxyUsername;
+        self.fProxyPasswordField.stringValue = proxyPassword;
+        [self updateProxyControlStates];
     }
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];

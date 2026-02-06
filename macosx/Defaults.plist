@@ -112,6 +112,20 @@
 	<true/>
 	<key>PlaySeedingSound</key>
 	<false/>
+	<key>ProxyAuthEnabled</key>
+	<false/>
+	<key>ProxyEnabled</key>
+	<false/>
+	<key>ProxyPassword</key>
+	<string></string>
+	<key>ProxyPort</key>
+	<integer>1080</integer>
+	<key>ProxyType</key>
+	<string>socks5</string>
+	<key>ProxyURL</key>
+	<string></string>
+	<key>ProxyUsername</key>
+	<string></string>
 	<key>Queue</key>
 	<false/>
 	<key>QueueDownloadNumber</key>

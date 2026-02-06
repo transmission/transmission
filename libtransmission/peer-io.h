@@ -108,6 +108,11 @@ public:
         return socket_.is_utp();
     }
 
+    [[nodiscard]] constexpr auto tcp_socket() const noexcept
+    {
+        return socket_.handle.tcp;
+    }
+
     void clear();
 
     [[nodiscard]] bool reconnect();

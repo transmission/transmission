@@ -131,7 +131,8 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         [&]() -> tr_peer_socket
         {
 #ifdef WITH_UTP
-            if (utp)
+            // UTP cannot be tunneled through a SOCKS5 proxy, so skip it
+            if (utp && !session->isProxyEnabled())
             {
                 auto* const sock = utp_create_socket(session->utp_context);
                 auto const [ss, sslen] = socket_address.to_sockaddr();
@@ -145,6 +146,33 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         },
         [&]() -> tr_peer_socket
         {
+            if (session->isProxyEnabled() && session->proxyType() == TR_PROXY_SOCKS5)
+            {
+                // Resolve proxy hostname (supports both IP literals and hostnames)
+                if (auto const& proxy_url = session->proxyUrl(); proxy_url)
+                {
+                    auto const proxy_addr = tr_net_resolve_hostname(*proxy_url);
+                    if (proxy_addr)
+                    {
+                        auto const proxy_sa = tr_socket_address{ *proxy_addr,
+                                                                 tr_port::from_host(
+                                                                     static_cast<uint16_t>(session->proxyPort())) };
+                        if (auto sock = tr_net_open_peer_socket_via_proxy(session, proxy_sa, client_is_seed);
+                            sock != TR_BAD_SOCKET)
+                        {
+                            // Use the peer's socket_address for identification,
+                            // even though the socket is connected to the proxy
+                            return { session, socket_address, sock };
+                        }
+                    }
+                    else
+                    {
+                        tr_logAddWarn(fmt::format("Could not resolve SOCKS5 proxy address '{}'", *proxy_url));
+                    }
+                }
+                return {};
+            }
+
             if (auto sock = tr_net_open_peer_socket(session, socket_address, client_is_seed); sock != TR_BAD_SOCKET)
             {
                 return { session, socket_address, sock };
@@ -244,7 +272,25 @@ bool tr_peerIo::reconnect()
 
     close();
 
-    auto const s = tr_net_open_peer_socket(session_, socket_address(), client_is_seed());
+    auto s = TR_BAD_SOCKET;
+
+    if (session_->isProxyEnabled() && session_->proxyType() == TR_PROXY_SOCKS5)
+    {
+        if (auto const& proxy_url = session_->proxyUrl(); proxy_url)
+        {
+            if (auto const proxy_addr = tr_net_resolve_hostname(*proxy_url); proxy_addr)
+            {
+                auto const proxy_sa = tr_socket_address{ *proxy_addr,
+                                                         tr_port::from_host(static_cast<uint16_t>(session_->proxyPort())) };
+                s = tr_net_open_peer_socket_via_proxy(session_, proxy_sa, client_is_seed());
+            }
+        }
+    }
+    else
+    {
+        s = tr_net_open_peer_socket(session_, socket_address(), client_is_seed());
+    }
+
     if (s == TR_BAD_SOCKET)
     {
         return false;

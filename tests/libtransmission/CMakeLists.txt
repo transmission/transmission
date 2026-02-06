@@ -41,6 +41,7 @@ target_sources(libtransmission-test
         rpc-test.cc
         serializer-tests.cc
         session-test.cc
+        socks5-test.cc
         session-alt-speeds-test.cc
         settings-test.cc
         strbuf-test.cc

@@ -180,6 +180,20 @@ public:
         }
         else if (tr_strv_starts_with(scrape_sv, "udp://"sv))
         {
+            if (session->isProxyEnabled())
+            {
+                tr_logAddDebug("Skipping UDP scrape because SOCKS proxy is enabled");
+                auto response = tr_scrape_response{};
+                response.scrape_url = request.scrape_url;
+                response.row_count = request.info_hash_count;
+                for (size_t i = 0; i < request.info_hash_count; ++i)
+                {
+                    response.rows[i].info_hash = request.info_hash[i];
+                }
+                response.errmsg = "UDP trackers are not supported when a proxy is enabled";
+                on_response(response);
+                return;
+            }
             announcer_udp_.scrape(request, std::move(on_response));
         }
         else
@@ -199,6 +213,15 @@ public:
         }
         else if (tr_strv_starts_with(announce_sv, "udp://"sv))
         {
+            if (session->isProxyEnabled())
+            {
+                tr_logAddDebug("Skipping UDP announce because SOCKS proxy is enabled");
+                auto response = tr_announce_response{};
+                response.info_hash = request.info_hash;
+                response.errmsg = "UDP trackers are not supported when a proxy is enabled";
+                on_response(response);
+                return;
+            }
             announcer_udp_.announce(request, std::move(on_response));
         }
         else

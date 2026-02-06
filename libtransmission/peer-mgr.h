@@ -22,6 +22,7 @@
 #include "libtransmission/blocklist.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/net.h" /* tr_address */
+#include "libtransmission/socks5.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" /* tr_compare_3way */
 #include "libtransmission/variant.h"
@@ -294,9 +295,30 @@ public:
         outgoing_handshake_.reset();
     }
 
+    [[nodiscard]] auto has_socks5_handshake() const noexcept
+    {
+        return static_cast<bool>(socks5_handshake_);
+    }
+
+    template<typename... Args>
+    void start_socks5_handshake(Args&&... args)
+    {
+        TR_ASSERT(!socks5_handshake_);
+        if (!socks5_handshake_)
+        {
+            socks5_handshake_ = std::make_unique<tr_socks5_handshake>(std::forward<Args>(args)...);
+            socks5_handshake_->start();
+        }
+    }
+
+    void destroy_socks5_handshake() noexcept
+    {
+        socks5_handshake_.reset();
+    }
+
     [[nodiscard]] auto is_in_use() const noexcept
     {
-        return is_connected() || has_handshake();
+        return is_connected() || has_handshake() || has_socks5_handshake();
     }
 
     // ---
@@ -588,6 +610,7 @@ private:
     bool is_upload_only_ = false;
 
     std::unique_ptr<tr_handshake> outgoing_handshake_;
+    std::unique_ptr<tr_socks5_handshake> socks5_handshake_;
 
     std::function<tr_port()> const get_client_advertised_port_;
 };

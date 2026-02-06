@@ -2681,6 +2681,76 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
         peer_info.set_connectable(false);
         peer_info.on_fruitless_connection();
     }
+    else if (session->isProxyEnabled() && session->proxyType() == TR_PROXY_SOCKS5)
+    {
+        // When SOCKS5 proxy is enabled, we need to perform a SOCKS5 handshake
+        // before the BT handshake. The socket is connected to the proxy;
+        // the SOCKS5 handshake will negotiate a tunnel to the actual peer.
+        auto socks_config = tr_socks5_config{};
+        socks_config.proxy_port = static_cast<uint16_t>(session->proxyPort());
+        socks_config.auth_enabled = session->proxyAuthEnabled();
+        socks_config.username = session->proxyUsername();
+        socks_config.password = session->proxyPassword();
+        socks_config.target = peer_info.listen_socket_address();
+
+        // Capture what we need for the BT handshake callback
+        auto* mediator = &mgr->handshake_mediator_;
+        auto enc_mode = session->encryptionMode();
+
+        peer_info.start_socks5_handshake(
+            session->event_base(),
+            peer_io->tcp_socket(),
+            std::move(socks_config),
+            [mgr, mediator, peer_io, enc_mode](socks5::Result const& result)
+            {
+                // Copy captures to local variables before destroying the SOCKS5
+                // handshake, because destroy_socks5_handshake() will destroy the
+                // std::function that holds this lambda and its captures.
+                auto const local_mgr = mgr;
+                auto const local_mediator = mediator;
+                auto const local_peer_io = peer_io;
+                auto const local_enc_mode = enc_mode;
+                auto const local_success = result.success;
+                auto const local_error = result.error_message;
+
+                // Look up peer_info from the socket address stored in peer_io,
+                // rather than capturing a reference that may dangle.
+                auto const& socket_address = local_peer_io->socket_address();
+                auto* const swarm = local_mgr->get_existing_swarm(local_peer_io->torrent_hash());
+                auto info = swarm != nullptr ? swarm->get_existing_peer_info(socket_address) : std::shared_ptr<tr_peer_info>{};
+
+                if (!info)
+                {
+                    tr_logAddDebug(
+                        fmt::format("SOCKS5 handshake completed but peer info gone for {}", socket_address.display_name()));
+                    return;
+                }
+
+                // Clean up the SOCKS5 handshake object. This destroys the
+                // tr_socks5_handshake which owns the std::function containing
+                // this lambda, so all captures are invalidated after this call.
+                // That's why we copied everything to locals above.
+                info->destroy_socks5_handshake();
+
+                if (local_success)
+                {
+                    // SOCKS5 tunnel established; now start the BT handshake
+                    info->start_handshake(
+                        local_mediator,
+                        local_peer_io,
+                        local_enc_mode,
+                        [local_mgr](tr_handshake::Result const& hs_result) { return on_handshake_done(local_mgr, hs_result); });
+                }
+                else
+                {
+                    tr_logAddDebug(fmt::format("SOCKS5 handshake failed for {}: {}", info->display_name(), local_error));
+                    if (!info->is_connected())
+                    {
+                        info->on_fruitless_connection();
+                    }
+                }
+            });
+    }
     else
     {
         peer_info.start_handshake(

@@ -25,6 +25,8 @@
 #include <sys/stat.h> /* umask() */
 #endif
 
+#include <curl/curl.h>
+
 #include <event2/event.h>
 
 #include <fmt/format.h> // fmt::ptr
@@ -354,7 +356,42 @@ size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
 
 std::optional<std::string> tr_session::WebMediator::proxyUrl() const
 {
+    if (!session_->isProxyEnabled())
+    {
+        return std::nullopt;
+    }
+
     return session_->settings().proxy_url;
+}
+
+std::optional<long> tr_session::WebMediator::proxyType() const
+{
+    if (!session_->isProxyEnabled())
+    {
+        return std::nullopt;
+    }
+
+    switch (session_->proxyType())
+    {
+    case TR_PROXY_SOCKS5:
+        return CURLPROXY_SOCKS5;
+    case TR_PROXY_SOCKS4:
+        return CURLPROXY_SOCKS4;
+    case TR_PROXY_HTTP:
+        return CURLPROXY_HTTP;
+    default:
+        return CURLPROXY_SOCKS5;
+    }
+}
+
+std::optional<std::string> tr_session::WebMediator::proxyAuth() const
+{
+    if (!session_->isProxyEnabled() || !session_->proxyAuthEnabled())
+    {
+        return std::nullopt;
+    }
+
+    return fmt::format("{}:{}", session_->proxyUsername(), session_->proxyPassword());
 }
 
 void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
@@ -1623,7 +1660,7 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 bool tr_session::allowsUTP() const noexcept
 {
 #ifdef WITH_UTP
-    return settings_.utp_enabled;
+    return settings_.utp_enabled && !isProxyEnabled();
 #else
     return false;
 #endif
@@ -1676,6 +1713,93 @@ bool tr_sessionIsLPDEnabled(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->allowsLPD();
+}
+
+// --- Proxy
+
+bool tr_sessionIsProxyEnabled(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+    return session->isProxyEnabled();
+}
+
+void tr_sessionSetProxyEnabled(tr_session* session, bool enabled)
+{
+    TR_ASSERT(session != nullptr);
+    session->setProxyEnabled(enabled);
+}
+
+tr_proxy_type tr_sessionGetProxyType(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+    return session->proxyType();
+}
+
+void tr_sessionSetProxyType(tr_session* session, tr_proxy_type type)
+{
+    TR_ASSERT(session != nullptr);
+    session->setProxyType(type);
+}
+
+char const* tr_sessionGetProxyUrl(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+    auto const& url = session->proxyUrl();
+    return url.has_value() ? url->c_str() : "";
+}
+
+void tr_sessionSetProxyUrl(tr_session* session, char const* url)
+{
+    TR_ASSERT(session != nullptr);
+    session->setProxyUrl(url != nullptr ? url : "");
+}
+
+size_t tr_sessionGetProxyPort(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+    return session->proxyPort();
+}
+
+void tr_sessionSetProxyPort(tr_session* session, size_t port)
+{
+    TR_ASSERT(session != nullptr);
+    session->setProxyPort(port);
+}
+
+bool tr_sessionIsProxyAuthEnabled(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+    return session->proxyAuthEnabled();
+}
+
+void tr_sessionSetProxyAuthEnabled(tr_session* session, bool enabled)
+{
+    TR_ASSERT(session != nullptr);
+    session->setProxyAuthEnabled(enabled);
+}
+
+char const* tr_sessionGetProxyUsername(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+    return session->proxyUsername().c_str();
+}
+
+void tr_sessionSetProxyUsername(tr_session* session, char const* username)
+{
+    TR_ASSERT(session != nullptr);
+    session->setProxyUsername(username != nullptr ? username : "");
+}
+
+char const* tr_sessionGetProxyPassword(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+    return session->proxyPassword().c_str();
+}
+
+void tr_sessionSetProxyPassword(tr_session* session, char const* password)
+{
+    TR_ASSERT(session != nullptr);
+    session->setProxyPassword(password != nullptr ? password : "");
 }
 
 // ---

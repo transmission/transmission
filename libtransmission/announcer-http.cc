@@ -199,7 +199,6 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
         "&left={left}"
         "&numwant={numwant}"
         "&key={key:08X}"
-        "&compact=1"
         "&supportcrypto=1",
         fmt::arg("url", req.announce_url),
         fmt::arg("sep", tr_strv_contains(req.announce_url.sv(), '?') ? '&' : '?'),
@@ -211,6 +210,14 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
         fmt::arg("left", req.leftUntilComplete),
         fmt::arg("numwant", req.numwant),
         fmt::arg("key", req.key));
+
+    // Always request compact format. Compact responses include both IPv4
+    // peers (in "peers") and IPv6 peers (in "peers6"), whereas non-compact
+    // dictionary responses from some trackers (e.g. Ubuntu's) only include
+    // IPv6 peers. Since compact is the de-facto standard (BEP 23) and
+    // supported by virtually all trackers, always requesting it gives us
+    // the best chance of receiving usable IPv4 peers.
+    fmt::format_to(out, "&compact=1");
 
     if (session->encryptionMode() == TR_ENCRYPTION_REQUIRED)
     {

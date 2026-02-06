@@ -626,7 +626,19 @@ void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
     tr_socket_address const& socket_address,
     bool client_is_seed);
 
+// Open a TCP socket and initiate a non-blocking connection to the given
+// proxy address (instead of directly to a peer). After the socket connects,
+// a SOCKS5 handshake must be performed before the BT handshake.
+[[nodiscard]] tr_socket_t tr_net_open_peer_socket_via_proxy(
+    tr_session* session,
+    tr_socket_address const& proxy_address,
+    bool client_is_seed);
+
 void tr_net_close_socket(tr_socket_t fd);
+
+// Resolve a hostname (or IP literal) to a tr_address using getaddrinfo().
+// Returns the first resolved address, or nullopt on failure.
+[[nodiscard]] std::optional<tr_address> tr_net_resolve_hostname(std::string_view hostname);
 
 // --- TOS / DSCP
 

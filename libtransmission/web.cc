@@ -649,6 +649,16 @@ public:
         if (auto const& proxy_url = mediator.proxyUrl(); proxy_url)
         {
             (void)curl_easy_setopt(e, CURLOPT_PROXY, proxy_url->c_str());
+
+            if (auto const proxy_type = mediator.proxyType(); proxy_type)
+            {
+                (void)curl_easy_setopt(e, CURLOPT_PROXYTYPE, *proxy_type);
+            }
+
+            if (auto const proxy_auth = mediator.proxyAuth(); proxy_auth)
+            {
+                (void)curl_easy_setopt(e, CURLOPT_PROXYUSERPWD, proxy_auth->c_str());
+            }
         }
         else
         {
