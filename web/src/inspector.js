@@ -952,7 +952,18 @@ export class Inspector extends EventTarget {
       this.addNodeToView(tor, parent, sub);
     }
     if (sub.children) {
-      for (const value of Object.values(sub.children)) {
+      // sort entries - directories first
+      const sorted = Object.values(sub.children).toSorted((a, b) => {
+        if (a.children && !b.children) {
+          return -1;
+        }
+        if (!a.children && b.children) {
+          return 1;
+        }
+        return a.name.localeCompare(b.name);
+      });
+
+      for (const value of sorted) {
         this.addSubtreeToView(tor, parent, value);
       }
     }
