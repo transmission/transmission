@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>1028.title</key>
+	<string>Избрано е резюме</string>
+	<key>103.title</key>
+	<string>Помощ</string>
+	<key>106.title</key>
+	<string>Помощ</string>
+	<key>1222.title</key>
+	<string>Скрий лентата с инструменти</string>
+	<key>129.title</key>
+	<string>Предпочитания...</string>
+	<key>130.title</key>
+	<string>Услуги</string>
+	<key>131.title</key>
+	<string>Услуги</string>
+	<key>134.title</key>
+	<string>Скрий Transmission</string>
+	<key>136.title</key>
+	<string>Излез от Transmission</string>
+	<key>1399.title</key>
+	<string>Трансфери</string>
+	<key>1400.title</key>
+	<string>Трансфери</string>
+	<key>1403.title</key>
+	<string>Избрана пауза</string>
+	<key>1404.title</key>
+	<string>Избрано е резюме</string>
+	<key>1413.title</key>
+	<string>Пауза на всички</string>
+	<key>1414.title</key>
+	<string>Възобнови всички</string>
+	<key>145.title</key>
+	<string>Скрий другите</string>
+	<key>150.title</key>
+	<string>Покажи всички</string>
+	<key>1514.title</key>
+	<string>Премахване и изхвърляне на файл с данни</string>
+	<key>1516.title</key>
+	<string>Премахване от списъка</string>
+	<key>1533.title</key>
+	<string>Запази торент файла като…</string>
+	<key>1536.title</key>
+	<string>Покажи инспектора</string>
+	<key>1539.title</key>
+	<string>Покажи във Finder</string>
+	<key>1550.title</key>
+	<string>Премахване от списъка</string>
+	<key>1551.title</key>
+	<string>Премахване и изхвърляне на файл с данни</string>
+	<key>1558.title</key>
+	<string>Начална страница на Transmission</string>
+	<key>1561.title</key>
+	<string>Помощ за Transmission</string>
+	<key>1566.title</key>
+	<string>Ограничение на скоростта</string>
+	<key>157.title</key>
+	<string>копие</string>
+	<key>1578.title</key>
+	<string>Компактен изглед</string>
+	<key>160.title</key>
+	<string>Изрежи</string>
+	<key>1620.title</key>
+	<string>Скрий филтърната лента</string>
+	<key>163.title</key>
+	<string>Редактиране</string>
+	<key>1678.title</key>
+	<string>Резюме избрано веднага</string>
+	<key>1680.title</key>
+	<string>Отваряне с прозорец с опции…</string>
+	<key>1683.title</key>
+	<string>прозорец</string>
+	<key>1684.title</key>
+	<string>прозорец</string>
+	<key>1685.title</key>
+	<string>Минимизиране</string>
+	<key>1687.title</key>
+	<string>Изведи всички отпред</string>
+	<key>1688.title</key>
+	<string>мащабиране</string>
+	<key>169.title</key>
+	<string>Редактиране</string>
+	<key>1693.title</key>
+	<string>Следващ раздел Инспектор</string>
+	<key>1694.title</key>
+	<string>Предишен раздел инспектор</string>
+	<key>1696.title</key>
+	<string>Transmission</string>
+	<key>171.title</key>
+	<string>Залепи</string>
+	<key>172.title</key>
+	<string>Избери Всички</string>
+	<key>1766.title</key>
+	<string>Изтриване</string>
+	<key>1795.title</key>
+	<string>Регистър на съобщенията</string>
+	<key>1797.title</key>
+	<string>Бутон за следващ филтър</string>
+	<key>1798.title</key>
+	<string>Бутон за предишен филтър</string>
+	<key>1804.title</key>
+	<string>Възобнови всички чакащи</string>
+	<key>1808.title</key>
+	<string>Резюме избрано веднага</string>
+	<key>1846.title</key>
+	<string>Отвори адреса на торент…</string>
+	<key>1858.title</key>
+	<string>Отвори адреса на торент…</string>
+	<key>1860.title</key>
+	<string>Обнови тракер</string>
+	<key>1877.title</key>
+	<string>Провери локалните данни</string>
+	<key>1891.title</key>
+	<string>Преместване на файл с данни в...</string>
+	<key>1894.title</key>
+	<string>Сортиране на трансферите по</string>
+	<key>1895.title</key>
+	<string>Сортиране на трансферите по</string>
+	<key>1896.title</key>
+	<string>Напредък</string>
+	<key>1897.title</key>
+	<string>състояние</string>
+	<key>1899.title</key>
+	<string>Възходящо</string>
+	<key>1900.title</key>
+	<string>Дата на добавяне</string>
+	<key>1901.title</key>
+	<string>Опашка Поръчка</string>
+	<key>1902.title</key>
+	<string>Името</string>
+	<key>1921.title</key>
+	<string>Създай торент файл…</string>
+	<key>1923.title</key>
+	<string>Създай торент файл…</string>
+	<key>1933.title</key>
+	<string>Тракер</string>
+	<key>21.title</key>
+	<string>Transmission</string>
+	<key>2122.title</key>
+	<string>Обнови тракер</string>
+	<key>2185.title</key>
+	<string>Парчета Бар</string>
+	<key>2279.title</key>
+	<string>Наличност</string>
+	<key>2301.title</key>
+	<string>Статистика</string>
+	<key>2324.title</key>
+	<string>активност</string>
+	<key>2839.title</key>
+	<string>Група</string>
+	<key>2840.title</key>
+	<string>Група</string>
+	<key>2849.title</key>
+	<string>Група</string>
+	<key>2850.title</key>
+	<string>Група</string>
+	<key>301.title</key>
+	<string>Преглед</string>
+	<key>302.title</key>
+	<string>Преглед</string>
+	<key>3049.title</key>
+	<string>Трансфери</string>
+	<key>3078.title</key>
+	<string>Използвай Групи</string>
+	<key>3093.headerCell.title</key>
+	<string>Торент</string>
+	<key>3166.title</key>
+	<string>Бърз поглед</string>
+	<key>3170.title</key>
+	<string>Поддръжка и развитие</string>
+	<key>3207.title</key>
+	<string>Запази торент файла като…</string>
+	<key>3209.title</key>
+	<string>Преместване на файл с данни в...</string>
+	<key>3212.title</key>
+	<string>Дари...</string>
+	<key>3216.title</key>
+	<string>Копирай магнитната връзка в клипборда</string>
+	<key>3218.title</key>
+	<string>Копирай магнитната връзка в клипборда</string>
+	<key>3221.title</key>
+	<string>Провери локалните данни</string>
+	<key>3321.title</key>
+	<string>Отмяна</string>
+	<key>3400.title</key>
+	<string>Повтори</string>
+	<key>3405.title</key>
+	<string>Спускане</string>
+	<key>3407.title</key>
+	<string>Премахване на всички завършени от списъка</string>
+	<key>3430.title</key>
+	<string>Размер</string>
+	<key>3445.title</key>
+	<string>Преименуване на файл...</string>
+	<key>3448.title</key>
+	<string>Преименуване на файл...</string>
+	<key>418.title</key>
+	<string>Форуми</string>
+	<key>456.title</key>
+	<string>Меню</string>
+	<key>457.title</key>
+	<string>Избрана пауза</string>
+	<key>459.title</key>
+	<string>Покажи инспектора</string>
+	<key>516.title</key>
+	<string>Покажи във Finder</string>
+	<key>545.title</key>
+	<string>Персонализиране на лентата с инструменти...</string>
+	<key>547.title</key>
+	<string>Скрий лентата на състоянието</string>
+	<key>56.title</key>
+	<string>Transmission</string>
+	<key>57.title</key>
+	<string>Transmission</string>
+	<key>58.title</key>
+	<string>Относно Transmission</string>
+	<key>589.title</key>
+	<string>Меню</string>
+	<key>598.title</key>
+	<string>Покажи инспектора</string>
+	<key>611.title</key>
+	<string>Отвори торент файл…</string>
+	<key>72.title</key>
+	<string>Отвори торент файл…</string>
+	<key>73.title</key>
+	<string>Затваряне на прозореца</string>
+	<key>81.title</key>
+	<string>Файл</string>
+	<key>83.title</key>
+	<string>Файл</string>
+	<key>8t6-wh-5UW.title</key>
+	<string>Сподели торент файла</string>
+	<key>975.title</key>
+	<string>Провери за актуализации...</string>
+	<key>Cay-iU-bH4.title</key>
+	<string>Сподели торент файла</string>
+	<key>HmT-FI-amY.title</key>
+	<string>0,0 КБ/сек</string>
+	<key>Zmj-A9-NPf.title</key>
+	<string>Низ за състояние</string>
+	<key>kbX-Av-eP4.title</key>
+	<string>Заглавие</string>
+	<key>lmp-Y3-ZQO.title</key>
+	<string>Статус</string>
+	<key>lvU-Va-GzM.title</key>
+	<string>Сподели торент файла</string>
+	<key>oSz-TE-8jj.title</key>
+	<string>Напредък</string>
+	<key>s5v-VO-G2y.title</key>
+	<string>Сподели торент файла</string>
+	<key>x8g-Nv-jcD.title</key>
+	<string>0,0 КБ/сек</string>
+	<key>y9O-gd-sXA.title</key>
+	<string>Заглавие</string>
+	<key>zIM-6D-jsa.title</key>
+	<string>Заглавие на групата</string>
+	<key>zLF-YR-Oq6.title</key>
+	<string>Ост.</string>
+</dict>
+</plist>
