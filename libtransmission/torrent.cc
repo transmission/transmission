@@ -20,8 +20,6 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
-#include <small/map.hpp>
-
 #include "libtransmission/transmission.h"
 #include "libtransmission/tr-macros.h"
 
@@ -2097,29 +2095,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 
 std::string_view tr_torrent::primary_mime_type() const
 {
-    // count up how many bytes there are for each mime-type in the torrent
-    // NB: get_mime_type_for_filename() always returns the same ptr for a
-    // mime_type, so its raw pointer can be used as a key.
-    auto size_per_mime_type = small::unordered_map<std::string_view, size_t, 256U>{};
-    for (tr_file_index_t i = 0, n = this->file_count(); i < n; ++i)
-    {
-        auto const mime_type = tr_get_mime_type_for_filename(this->file_subpath(i));
-        size_per_mime_type[mime_type] += this->file_size(i);
-    }
-
-    if (std::empty(size_per_mime_type))
-    {
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-        // application/octet-stream is the default value for all other cases.
-        // An unknown file type should use this type.
-        auto constexpr Fallback = "application/octet-stream"sv;
-        return Fallback;
-    }
-
-    auto const it = std::ranges::max_element(
-        size_per_mime_type,
-        [](auto const& a, auto const& b) { return a.second < b.second; });
-    return it->first;
+    return files().primary_mime_type();
 }
 
 // ---
