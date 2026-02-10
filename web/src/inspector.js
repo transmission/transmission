@@ -147,7 +147,7 @@ export class Inspector extends EventTarget {
     const webseedsThead = document.createElement('thead');
     const webseedsTr = document.createElement('tr');
     const webseedsHeaders = [
-      { name: 'URL', class: 'webseed-url' },
+      { name: 'Web Seeds', class: 'webseed-url' },
       { name: 'Down', class: 'speed-down' }
     ];
     for (const header of webseedsHeaders) {
@@ -677,7 +677,7 @@ export class Inspector extends EventTarget {
         tortr.classList.add('torrent-row');
         const tortd = document.createElement('td');
         tortd.setAttribute('colspan', 2);
-        setTextContent(tortd, `${tor.getName()} - Webseeds`);
+        setTextContent(tortd, tor.getName());
         tortr.append(tortd);
         webseedsRows.push(tortr);
 
