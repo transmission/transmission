@@ -15,6 +15,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 #include <event2/event.h>
 
@@ -436,7 +437,7 @@ protected:
                 auto fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
                 auto const file_size = metainfo->file_size(i);
                 static auto constexpr BlockSize = uint64_t{ 524288U };
-                auto buf = std::array<char, BlockSize>{};
+                auto buf = std::vector<char>(BlockSize);
                 for (uint64_t j = 0; j < file_size;)
                 {
                     auto const piece_0_size = metainfo->piece_size(0U);
