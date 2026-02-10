@@ -206,10 +206,14 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
 }
 
 // Test for https://github.com/transmission/transmission/issues/3591
-TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
+TEST_F(TorrentMetainfoTest, parseBencPiecesSize)
 {
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/invalid-pieces-length.torrent"sv };
+    auto error = tr_error{};
     auto tm = tr_torrent_metainfo{};
-    EXPECT_FALSE(tm.parse_benc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
+    EXPECT_FALSE(tm.parse_torrent_file(src_filename, nullptr, &error));
+    EXPECT_EQ(error.code(), EINVAL);
+    EXPECT_EQ(error.message(), "invalid 'pieces' size: 119"sv);
 }
 
 } // namespace libtransmission::test
