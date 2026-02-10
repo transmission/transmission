@@ -382,6 +382,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
                 tm_.pieces_.resize(len / Sha1Len);
                 std::copy_n(std::data(value), len, reinterpret_cast<char*>(std::data(tm_.pieces_)));
             }
+        }
         else if (pathStartsWith(PieceLayersKey))
         {
             // currently unused. TODO support for bittorrent v2
