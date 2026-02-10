@@ -18,6 +18,7 @@
 #include <libtransmission/env.h>
 #include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h> // tr_time()
 #include <libtransmission/variant.h>
@@ -146,7 +147,7 @@ private:
     void inc_busy();
     void dec_busy();
 
-    bool add(Glib::ustring const& name, bool do_start, bool do_prompt, bool do_notify);
+    bool add(Glib::ustring const& name_in, bool do_start, bool do_prompt, bool do_notify);
     void add_file_async_callback(
         Glib::RefPtr<Gio::File> const& file,
         Glib::RefPtr<Gio::AsyncResult>& result,
@@ -818,8 +819,18 @@ void Session::Impl::add_file_async_callback(
 }
 
 // Add `name,` which might be a local filename, a magnet link, or a URI.
-bool Session::Impl::add(Glib::ustring const& name, bool const do_start, bool const do_prompt, bool const do_notify)
+bool Session::Impl::add(Glib::ustring const& name_in, bool const do_start, bool const do_prompt, bool const do_notify)
 {
+    auto name = name_in;
+
+    // `gio::File` doesn't seem to know how to stringify magnet links correctly.
+    // Unfortunately there are some code paths that unavoidably use `gio::File`
+    // e.g. Gtk::Application::on_open() so we have to do this:
+    if (auto constexpr BrokenMagnetLinkPrefix = "magnet:///?"sv; tr_strv_starts_with(name.raw(), BrokenMagnetLinkPrefix))
+    {
+        name.replace(0, std::size(BrokenMagnetLinkPrefix), "magnet:?");
+    }
+
     auto* const session = get_session();
     if (session == nullptr)
     {
