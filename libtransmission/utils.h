@@ -5,20 +5,14 @@
 
 #pragma once
 
-#include <algorithm> // for std::for_each()
-#include <cctype>
-#include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <ctime> // time_t
 #include <locale>
-#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <vector>
-
-struct tr_error;
 
 /**
  * @addtogroup utils Utilities
@@ -41,23 +35,6 @@ std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexc
 // ---
 
 [[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
-
-bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error* error = nullptr);
-
-/**
- * Tries to move a file by renaming, and [optionally] if that fails, by copying.
- *
- * Creates the destination directory if it doesn't exist.
- */
-bool tr_file_move(std::string_view oldpath, std::string_view newpath, bool allow_copy, tr_error* error = nullptr);
-
-bool tr_file_save(std::string_view filename, std::string_view contents, tr_error* error = nullptr);
-
-template<typename ContiguousRange>
-constexpr auto tr_file_save(std::string_view filename, ContiguousRange const& x, tr_error* error = nullptr)
-{
-    return tr_file_save(filename, std::string_view{ std::data(x), std::size(x) }, error);
-}
 
 /** @brief return the current date in milliseconds */
 [[nodiscard]] uint64_t tr_time_msec();

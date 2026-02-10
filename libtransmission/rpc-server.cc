@@ -38,6 +38,7 @@
 
 #include "libtransmission/crypto-utils.h" /* tr_ssha1_matches() */
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/platform.h" /* tr_getWebClientDir() */

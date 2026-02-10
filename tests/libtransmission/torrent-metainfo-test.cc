@@ -15,6 +15,7 @@
 
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
+#include <libtransmission/file-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
 #include <libtransmission/torrent-metainfo.h>

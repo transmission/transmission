@@ -24,6 +24,7 @@
 
 #include "libtransmission/api-compat.h"
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"

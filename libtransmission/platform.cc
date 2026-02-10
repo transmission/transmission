@@ -40,6 +40,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/platform.h"

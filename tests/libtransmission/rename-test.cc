@@ -17,6 +17,7 @@
 
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
+#include <libtransmission/file-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/resume.h>
 #include <libtransmission/torrent.h> // tr_isTorrent()

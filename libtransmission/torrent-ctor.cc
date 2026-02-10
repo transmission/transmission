@@ -7,6 +7,7 @@
 
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/utils.h" // for tr_file_read()
 
 using namespace std::literals;

@@ -7,7 +7,7 @@
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
 #include <cstring>
-#include <iostream>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -25,10 +25,7 @@
 
 #include <libtransmission/transmission.h>
 
-#include <libtransmission/crypto-utils.h> // tr_rand_int()
-#include <libtransmission/error.h>
-#include <libtransmission/file.h>
-#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/env.h>
 #include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
@@ -114,36 +111,6 @@ TEST_F(UtilsTest, mimeTypes)
     EXPECT_EQ("video/x-msvideo"sv, tr_get_mime_type_for_filename(".avi"sv));
     EXPECT_EQ("video/x-msvideo"sv, tr_get_mime_type_for_filename("/path/to/FILENAME.AVI"sv));
     EXPECT_EQ("application/octet-stream"sv, tr_get_mime_type_for_filename("music.ajoijfeisfe"sv));
-}
-
-TEST_F(UtilsTest, saveFile)
-{
-    auto filename = tr_pathbuf{};
-
-    // save a file to GoogleTest's temp dir
-    auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
-    filename.assign(sandbox, "filename.txt"sv);
-    auto contents = "these are the contents"sv;
-    auto error = tr_error{};
-    EXPECT_TRUE(tr_file_save(filename.sv(), contents, &error));
-    EXPECT_FALSE(error) << error;
-
-    // now read the file back in and confirm the contents are the same
-    auto buf = std::vector<char>{};
-    EXPECT_TRUE(tr_file_read(filename.sv(), buf, &error));
-    EXPECT_FALSE(error) << error;
-    auto sv = std::string_view{ std::data(buf), std::size(buf) };
-    EXPECT_EQ(contents, sv);
-
-    // remove the tempfile
-    EXPECT_TRUE(tr_sys_path_remove(filename, &error));
-    EXPECT_FALSE(error) << error;
-
-    // try saving a file to a path that doesn't exist
-    filename = "/this/path/does/not/exist/foo.txt";
-    EXPECT_FALSE(tr_file_save(filename.sv(), contents, &error));
-    ASSERT_TRUE(error);
-    EXPECT_NE(0, error.code());
 }
 
 TEST_F(UtilsTest, ratioToString)

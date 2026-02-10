@@ -20,6 +20,7 @@ target_sources(libtransmission-test
         dht-test.cc
         error-test.cc
         file-piece-map-test.cc
+        file-utils-test.cc
         file-test.cc
         getopt-test.cc
         handshake-test.cc

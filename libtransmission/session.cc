@@ -36,6 +36,7 @@
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
 #include "libtransmission/crypto-utils.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/ip-cache.h"
 #include "libtransmission/interned-string.h"

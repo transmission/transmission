@@ -58,6 +58,8 @@ target_sources(${TR_NAME}
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
+        file-utils.cc
+        file-utils.h
         file-win32.cc
         file.cc
         file.h

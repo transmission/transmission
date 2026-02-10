@@ -12,6 +12,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/file-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/platform.h>
 #include <libtransmission/tr-strbuf.h>

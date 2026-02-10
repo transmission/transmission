@@ -23,6 +23,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/string-utils.h"

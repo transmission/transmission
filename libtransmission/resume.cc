@@ -19,6 +19,7 @@
 #include "libtransmission/api-compat.h"
 #include "libtransmission/bitfield.h"
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"

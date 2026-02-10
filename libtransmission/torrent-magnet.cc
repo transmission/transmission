@@ -23,6 +23,7 @@
 
 #include "libtransmission/crypto-utils.h" // for tr_sha1()
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/torrent-magnet.h"
