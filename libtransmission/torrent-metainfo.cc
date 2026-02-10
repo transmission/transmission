@@ -368,20 +368,20 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             if (tm_.has_v1_metadata())
             {
                 context.error.set(EINVAL, "invalid duplicate 'pieces'");
-                unhandled = true;
-            }
-            else if (std::size(value) % sizeof(tr_sha1_digest_t) == 0)
-            {
-                auto const n = std::size(value) / sizeof(tr_sha1_digest_t);
-                tm_.pieces_.resize(n);
-                std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
+                return false;
             }
             else
             {
-                context.error.set(EINVAL, fmt::format("invalid 'pieces' size: {}", std::size(value)));
-                unhandled = true;
+                static auto constexpr Sha1Len = std::tuple_size_v<tr_sha1_digest_t>;
+                auto const len = std::size(value);
+                if (len % Sha1Len != 0U)
+                {
+                    context.error.set(EINVAL, fmt::format("invalid 'pieces' size: {}", len));
+                    return false;
+                }
+                tm_.pieces_.resize(len / Sha1Len);
+                std::copy_n(std::data(value), len, reinterpret_cast<char*>(std::data(tm_.pieces_)));
             }
-        }
         else if (pathStartsWith(PieceLayersKey))
         {
             // currently unused. TODO support for bittorrent v2
