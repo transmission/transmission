@@ -73,14 +73,12 @@ export class Transmission extends EventTarget {
     // Initialize the implementation fields
     this.filterText = '';
     this._torrents = {};
+    this._selectedTorrentIds = new Set();
+    this._torrentOrder = [];
+    this._clusterize = null;
     this.oldTrackers = [];
-    this.dirtyTorrents = new Set();
-    this._selectedTorrentIds = new Set(); // Track selected torrents by ID
-    this._torrentOrder = []; // Track torrent display order
-    this.clusterize = null; // Will be initialized later
 
     this.changeStatus = false;
-    this.refilterSoon = debounce(() => this._refilter());
     this.refilterAllSoon = debounce(() => this._refilter());
 
     this.pointer_device = Object.seal({
@@ -346,8 +344,8 @@ export class Transmission extends EventTarget {
       event_.preventDefault();
     };
 
+    // Set up click handlers
     this.pointer_event(this.elements.torrent_list, right_click);
-
     this.elements.torrent_list.addEventListener('click', this._onRowClicked.bind(this));
 
     // Get preferences & torrents from the daemon
@@ -368,7 +366,7 @@ export class Transmission extends EventTarget {
 
   _initializeClusterize() {
     // Initialize clusterize.js for virtual scrolling
-    this.clusterize = new Clusterize({
+    this._clusterize = new Clusterize({
       blocks_in_cluster: 4,
       callbacks: {
         clusterChanged: () => {
@@ -377,9 +375,9 @@ export class Transmission extends EventTarget {
         }
       },
       contentId: 'torrent-list',
-      no_data_class: 'clusterize-no-data',
+      no_data_class: '',
       no_data_text: '',
-      rows: ['<li class="clusterize-no-data"></li>'],
+      rows: ['<li></li>'],
       rows_in_block: 25,
       scrollId: 'torrent-container',
       show_no_data_row: true,
@@ -606,11 +604,6 @@ export class Transmission extends EventTarget {
 
   /// SELECTION
 
-  _getSelectedRows() {
-    // For compatibility, return torrent objects that match selected IDs
-    return this.getSelectedTorrents();
-  }
-
   getSelectedTorrents() {
     return [...this._selectedTorrentIds]
       .map(id => this._torrents[id])
@@ -666,27 +659,6 @@ export class Transmission extends EventTarget {
           element.classList.toggle('selected', this._selectedTorrentIds.has(torrentId));
         }
       }
-    }
-  }
-
-  // Legacy methods for compatibility with existing code
-  _setSelectedRow(row) {
-    if (row && row.getTorrent) {
-      this._setSelectedTorrent(row.getTorrent().getId());
-    } else {
-      this._setSelectedTorrent(null);
-    }
-  }
-
-  _selectRow(row) {
-    if (row && row.getTorrent) {
-      this._selectTorrent(row.getTorrent().getId());
-    }
-  }
-
-  _deselectRow(row) {
-    if (row && row.getTorrent) {
-      this._deselectTorrent(row.getTorrent().getId());
     }
   }
 
@@ -963,12 +935,8 @@ export class Transmission extends EventTarget {
       this.changeStatus = false;
     }
 
-    // update our dirty fields
-    const tor = event_.currentTarget;
-    this.dirtyTorrents.add(tor.getId());
-
     // enqueue ui refreshes
-    this.refilterSoon();
+    this.refilterAllSoon();
   }
 
   updateTorrents(ids, fields) {
@@ -992,7 +960,6 @@ export class Transmission extends EventTarget {
         } else {
           t = this._torrents[id] = new Torrent(o);
           t.addEventListener('dataChanged', this._onTorrentChanged.bind(this));
-          this.dirtyTorrents.add(id);
           // do we need more info for this torrent?
           if (!('name' in t.fields) || !('status' in t.fields)) {
             needinfo.push(id);
@@ -1008,12 +975,12 @@ export class Transmission extends EventTarget {
           ...Torrent.Fields.Stats,
         ];
         this.updateTorrents(needinfo, more_fields);
-        this.refilterSoon();
+        this.refilterAllSoon();
       }
 
       if (removed_ids) {
         this._deleteTorrents(removed_ids);
-        this.refilterSoon();
+        this.refilterAllSoon();
       }
     });
   }
@@ -1103,10 +1070,9 @@ TODO: fix this when notifications get fixed
   _deleteTorrents(ids) {
     if (ids && ids.length > 0) {
       for (const id of ids) {
-        this.dirtyTorrents.add(id);
         delete this._torrents[id];
       }
-      this.refilterSoon();
+      this.refilterAllSoon();
     }
   }
 
@@ -1323,20 +1289,17 @@ TODO: fix this when notifications get fixed
 
     // Update clusterize with new data
     if (rowsHTML.length === 0) {
-      this.clusterize.update(['<li class="clusterize-no-data"></li>']);
+      this._clusterize.update(['<li></li>']);
     } else {
-      this.clusterize.update(rowsHTML);
+      this._clusterize.update(rowsHTML);
     }
 
-    // Force refresh to recalculate row heights for large lists
-    if (rowsHTML.length > 1000) {
+    // Refresh clusterize if virtual scrolling is being performed
+    if (rowsHTML.length > 100) { // 25 blocks * 4 clusters
       setTimeout(() => {
-        this.clusterize.refresh(true);
+        this._clusterize.refresh(true);
       }, 50);
     }
-
-    // Clear dirty torrents set
-    this.dirtyTorrents.clear();
 
     // Update status bar
     this._updateStatusbar();
