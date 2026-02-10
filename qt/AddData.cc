@@ -55,22 +55,24 @@ int AddData::set(QString const& key)
     if (auto const key_std = key.toStdString(); tr_urlIsValid(key_std))
     {
         this->url = key;
-        type = URL;
-    }
-    else if (QFile{ key }.exists())
-    {
-        this->filename = QDir::fromNativeSeparators(key);
-        type = FILENAME;
-
-        auto file = QFile{ key };
-        file.open(QIODevice::ReadOnly);
-        this->metainfo = file.readAll();
-        file.close();
+        this->type = URL;
     }
     else if (tr_magnet_metainfo{}.parseMagnet(key_std))
     {
         this->magnet = key;
         this->type = MAGNET;
+    }
+    else if (auto const kurl = QUrl::fromUserInput(key, QDir::currentPath()); kurl.isValid() && kurl.isLocalFile())
+    {
+        if (auto file = QFile{ kurl.toLocalFile() }; file.exists())
+        {
+            this->filename = file.fileName();
+            this->type = FILENAME;
+
+            file.open(QIODevice::ReadOnly);
+            this->metainfo = file.readAll();
+            file.close();
+        }
     }
     else if (auto const raw = QByteArray::fromBase64(key.toUtf8()); !raw.isEmpty())
     {
@@ -82,7 +84,7 @@ int AddData::set(QString const& key)
         this->type = NONE;
     }
 
-    return type;
+    return this->type;
 }
 
 QByteArray AddData::toBase64() const
