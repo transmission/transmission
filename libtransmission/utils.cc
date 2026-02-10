@@ -305,6 +305,11 @@ std::string tr_strv_to_utf8_string(std::string_view sv)
 
 #endif
 
+std::string_view::size_type tr_strv_find_invalid_utf8(std::string_view const sv)
+{
+    return utf8::find_invalid(sv);
+}
+
 std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
     // stripping characters after first \0
@@ -316,6 +321,13 @@ std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
     out.reserve(std::size(sv));
     utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
     return out;
+}
+
+std::u8string tr_strv_to_u8string(std::string_view const sv)
+{
+    auto u8str = tr_strv_to_utf8_string(sv);
+    auto const view = std::views::transform(u8str, [](char c) -> char8_t { return c; });
+    return { view.begin(), view.end() };
 }
 
 #ifdef _WIN32
@@ -797,7 +809,18 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
         auto const it = std::lower_bound(std::begin(MimeTypeSuffixes), std::end(MimeTypeSuffixes), suffix_lc, Compare);
         if (it != std::end(MimeTypeSuffixes) && suffix_lc == it->suffix)
         {
-            return it->mime_type;
+            std::string_view mime_type = it->mime_type;
+
+            // https://github.com/transmission/transmission/issues/5965#issuecomment-1704421231
+            // An mp4 file's correct mime-type depends on the codecs used in the file,
+            // which we have no way of inspecting and which might not be downloaded yet.
+            // Let's use `video/mp4` since that's by far the most common use case for torrents.
+            if (mime_type == "application/mp4")
+            {
+                mime_type = "video/mp4";
+            }
+
+            return mime_type;
         }
     }
 

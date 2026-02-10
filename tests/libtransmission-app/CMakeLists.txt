@@ -4,7 +4,7 @@ add_executable(libtransmission-app-test)
 
 target_sources(libtransmission-app-test
 	PRIVATE
-		display-mode-tests.cc
+		converter-tests.cc
 		test-fixtures.h)
 
 set_property(

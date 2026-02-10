@@ -157,6 +157,7 @@ public:
 
     [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t file, std::string_view const* paths, size_t n_paths) const;
     [[nodiscard]] bool has_any_local_data(std::string_view const* paths, size_t n_paths) const;
+    [[nodiscard]] std::string_view primary_mime_type() const;
 
     static void sanitize_subpath(std::string_view path, tr_pathbuf& append_me, bool os_specific = true);
 
