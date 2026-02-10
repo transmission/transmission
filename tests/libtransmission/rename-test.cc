@@ -22,7 +22,6 @@
 #include <libtransmission/resume.h>
 #include <libtransmission/torrent.h> // tr_isTorrent()
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 

@@ -16,7 +16,6 @@
 #include <libtransmission/file.h>
 #include <libtransmission/platform.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 

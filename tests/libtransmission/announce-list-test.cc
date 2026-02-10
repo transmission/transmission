@@ -22,7 +22,6 @@
 #include <libtransmission/file-utils.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 

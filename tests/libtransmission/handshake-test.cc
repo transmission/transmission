@@ -38,7 +38,6 @@
 #include <libtransmission/timer.h>
 #include <libtransmission/tr-assert.h>
 #include <libtransmission/tr-macros.h>
-#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 

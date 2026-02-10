@@ -48,7 +48,6 @@
 #include "libtransmission/session.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-strbuf.h"
-#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

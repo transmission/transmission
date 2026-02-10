@@ -20,7 +20,6 @@
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/serializer.h"
 #include "libtransmission/string-utils.h"
-#include "libtransmission/utils.h" // tr_env_get_string()
 #include "libtransmission/variant.h"
 
 namespace tr::api_compat
