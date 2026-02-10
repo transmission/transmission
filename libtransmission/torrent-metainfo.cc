@@ -370,18 +370,17 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
                 context.error.set(EINVAL, "invalid duplicate 'pieces'");
                 return false;
             }
-            else
+
+            static auto constexpr Sha1Len = std::tuple_size_v<tr_sha1_digest_t>;
+            auto const len = std::size(value);
+            if (len % Sha1Len != 0U)
             {
-                static auto constexpr Sha1Len = std::tuple_size_v<tr_sha1_digest_t>;
-                auto const len = std::size(value);
-                if (len % Sha1Len != 0U)
-                {
-                    context.error.set(EINVAL, fmt::format("invalid 'pieces' size: {}", len));
-                    return false;
-                }
-                tm_.pieces_.resize(len / Sha1Len);
-                std::copy_n(std::data(value), len, reinterpret_cast<char*>(std::data(tm_.pieces_)));
+                context.error.set(EINVAL, fmt::format("invalid 'pieces' size: {}", len));
+                return false;
             }
+
+            tm_.pieces_.resize(len / Sha1Len);
+            std::copy_n(std::data(value), len, reinterpret_cast<char*>(std::data(tm_.pieces_)));
         }
         else if (pathStartsWith(PieceLayersKey))
         {
