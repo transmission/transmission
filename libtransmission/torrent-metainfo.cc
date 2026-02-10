@@ -364,17 +364,16 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(InfoKey, PiecesKey))
         {
-            if (std::size(value) % sizeof(tr_sha1_digest_t) == 0)
+            static auto constexpr Sha1Len = std::tuple_size_v<tr_sha1_digest_t>;
+            auto const len = std::size(value);
+            if (len % Sha1Len != 0U)
             {
-                auto const n = std::size(value) / sizeof(tr_sha1_digest_t);
-                tm_.pieces_.resize(n);
-                std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
+                context.error.set(EINVAL, fmt::format("invalid 'pieces' size: {}", len));
+                return false;
             }
-            else
-            {
-                context.error.set(EINVAL, fmt::format("invalid piece size: {}", std::size(value)));
-                unhandled = true;
-            }
+
+            tm_.pieces_.resize(len / Sha1Len);
+            std::copy_n(std::data(value), len, reinterpret_cast<char*>(std::data(tm_.pieces_)));
         }
         else if (pathStartsWith(PieceLayersKey))
         {
