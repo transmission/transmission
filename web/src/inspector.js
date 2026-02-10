@@ -138,6 +138,30 @@ export class Inspector extends EventTarget {
   }
 
   static _createPeersPage() {
+    const container = document.createElement('div');
+    container.classList.add('peers-container');
+
+    // Webseeds table
+    const webseedsTable = document.createElement('table');
+    webseedsTable.classList.add('peer-list', 'webseeds-list');
+    const webseedsThead = document.createElement('thead');
+    const webseedsTr = document.createElement('tr');
+    const webseedsHeaders = [
+      { name: 'URL', class: 'webseed-url' },
+      { name: 'Down', class: 'speed-down' }
+    ];
+    for (const header of webseedsHeaders) {
+      const th = document.createElement('th');
+      th.classList.add(header.class);
+      setTextContent(th, header.name);
+      webseedsTr.append(th);
+    }
+    const webseedsTbody = document.createElement('tbody');
+    webseedsThead.append(webseedsTr);
+    webseedsTable.append(webseedsThead);
+    webseedsTable.append(webseedsTbody);
+
+    // Peers table
     const table = document.createElement('table');
     table.classList.add('peer-list');
     const thead = document.createElement('thead');
@@ -157,8 +181,15 @@ export class Inspector extends EventTarget {
     thead.append(tr);
     table.append(thead);
     table.append(tbody);
+
+    container.append(webseedsTable);
+    container.append(table);
+
     return {
-      root: table,
+      root: container,
+      webseedsTable,
+      webseedsTbody,
+      peersTable: table,
       tbody,
     };
   }
@@ -601,7 +632,7 @@ export class Inspector extends EventTarget {
   _updatePeers() {
     const fmt = Formatter;
     const { elements, torrents } = this;
-    const { tbody } = elements.peers;
+    const { tbody, webseedsTbody, webseedsTable } = elements.peers;
 
     const cell_setters = [
       (peer, td) => {
@@ -632,8 +663,45 @@ export class Inspector extends EventTarget {
       },
     ];
 
-    const rows = [];
+    const webseedsRows = [];
+    const peersRows = [];
+    let hasWebseeds = false;
+
     for (const tor of torrents) {
+      // webseeds
+      const webseeds = tor.getWebseedsEx();
+      if (webseeds.length > 0) {
+        hasWebseeds = true;
+        // torrent name for webseeds
+        const tortr = document.createElement('tr');
+        tortr.classList.add('torrent-row');
+        const tortd = document.createElement('td');
+        tortd.setAttribute('colspan', 2);
+        setTextContent(tortd, `${tor.getName()} - Webseeds`);
+        tortr.append(tortd);
+        webseedsRows.push(tortr);
+
+        // webseed rows
+        for (const webseed of webseeds) {
+          const tr = document.createElement('tr');
+          tr.classList.add('webseed-row');
+
+          const urlTd = document.createElement('td');
+          urlTd.classList.add('webseed-url');
+          setTextContent(urlTd, webseed.url);
+          urlTd.setAttribute('title', webseed.url);
+          tr.append(urlTd);
+
+          const speedTd = document.createElement('td');
+          speedTd.classList.add('speed-down');
+          setTextContent(speedTd, webseed.download_bytes_per_second ? fmt.speedBps(webseed.download_bytes_per_second) : '');
+          tr.append(speedTd);
+
+          webseedsRows.push(tr);
+        }
+      }
+
+      // peers
       // torrent name
       const tortr = document.createElement('tr');
       tortr.classList.add('torrent-row');
@@ -641,7 +709,7 @@ export class Inspector extends EventTarget {
       tortd.setAttribute('colspan', cell_setters.length);
       setTextContent(tortd, tor.getName());
       tortr.append(tortd);
-      rows.push(tortr);
+      peersRows.push(tortr);
 
       // peers
       for (const peer of tor.getPeers()) {
@@ -653,15 +721,23 @@ export class Inspector extends EventTarget {
           setter(peer, td);
           tr.append(td);
         }
-        rows.push(tr);
+        peersRows.push(tr);
       }
-
-      // TODO: modify instead of rebuilding wholesale?
-      while (tbody.firstChild) {
-        tbody.firstChild.remove();
-      }
-      tbody.append(...rows);
     }
+
+    // TODO: modify instead of rebuilding wholesale?
+    webseedsTable.style.display = hasWebseeds ? '' : 'none';
+    while (webseedsTbody.firstChild) {
+      webseedsTbody.firstChild.remove();
+    }
+    if (hasWebseeds) {
+      webseedsTbody.append(...webseedsRows);
+    }
+
+    while (tbody.firstChild) {
+      tbody.firstChild.remove();
+    }
+    tbody.append(...peersRows);
   }
 
   /// TRACKERS PAGE

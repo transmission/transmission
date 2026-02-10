@@ -313,6 +313,7 @@ The 'source' column here corresponds to the data structure there.
 | `upload_ratio`| double| tr_stat
 | `wanted`| array (see below)| n/a
 | `webseeds`| array of strings | tr_tracker_view
+| `webseeds_ex`| array (see below)| n/a
 | `webseeds_sending_to_us`| number| tr_stat
 
 `availability`: An array of `piece_count` numbers representing the number of connected peers that have each piece, or -1 if we already have the piece ourselves.
@@ -436,6 +437,14 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `sitename`                 | string     | tr_tracker_view
 | `tier`                     | number     | tr_tracker_view
 
+
+`webseeds_ex`: array of objects, each containing:
+
+| Key | Value Type | transmission.h source
+|:--|:--|:--
+| `url` | string | tr_webseed_view
+| `is_downloading` | boolean | tr_webseed_view
+| `download_bytes_per_second` | number | tr_webseed_view
 
 `wanted`: An array of `tr_torrentFileCount()` booleans, true if the corresponding file is to be downloaded. (Source: `tr_file_view`)
 
