@@ -477,6 +477,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     NSMutableIndexSet* rows = self.fPendingSelectionReloadRows;
     self.fPendingSelectionReloadRows = nil;
 
+    NSInteger const numberOfRows = self.numberOfRows;
+    [rows removeIndexesInRange:NSMakeRange(numberOfRows, NSIntegerMax - numberOfRows)];
     if (rows.count > 0)
     {
         [self reloadDataForRowIndexes:rows columnIndexes:[NSIndexSet indexSetWithIndex:0]];
