@@ -328,6 +328,19 @@ RpcResponse RpcClient::parseResponseData(tr_variant& response) const
             {
                 ret.errmsg = QString::fromUtf8(std::data(*errmsg), std::size(*errmsg));
             }
+
+            if (auto* const data = error_map->find_if<tr_variant::Map>(TR_KEY_data))
+            {
+                if (auto const errstr = data->value_if<std::string_view>(TR_KEY_error_string))
+                {
+                    ret.errmsg = QString::fromUtf8(std::data(*errstr), std::size(*errstr));
+                }
+
+                if (auto* const result = data->find_if<tr_variant::Map>(TR_KEY_result))
+                {
+                    ret.args = std::make_shared<tr_variant>(std::move(*result));
+                }
+            }
         }
     }
 
