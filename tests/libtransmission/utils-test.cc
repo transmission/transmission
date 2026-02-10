@@ -5,19 +5,12 @@
 
 #include <array>
 #include <cmath> // sqrt()
-#include <cstdlib> // setenv(), unsetenv()
 #include <cstring>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#ifdef _WIN32
-#include <windows.h>
-#define setenv(key, value, unused) SetEnvironmentVariableA(key, value)
-#define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
-#endif
 
 #include <fmt/format.h>
 
@@ -79,29 +72,6 @@ TEST_F(UtilsTest, truncd)
     auto const nanstr = fmt::format("{:.2f}", tr_truncd(nan, 2));
     EXPECT_TRUE(strstr(nanstr.c_str(), "nan") != nullptr || strstr(nanstr.c_str(), "NaN") != nullptr);
 #endif
-}
-
-TEST_F(UtilsTest, env)
-{
-    char const* test_key = "TR_TEST_ENV";
-
-    unsetenv(test_key);
-
-    EXPECT_FALSE(tr_env_key_exists(test_key));
-    EXPECT_EQ(""sv, tr_env_get_string(test_key));
-    EXPECT_EQ("a"sv, tr_env_get_string(test_key, "a"sv));
-
-    setenv(test_key, "", 1);
-
-    EXPECT_TRUE(tr_env_key_exists(test_key));
-    EXPECT_EQ("", tr_env_get_string(test_key, ""));
-    EXPECT_EQ("", tr_env_get_string(test_key, "b"));
-
-    setenv(test_key, "135", 1);
-
-    EXPECT_TRUE(tr_env_key_exists(test_key));
-    EXPECT_EQ("135", tr_env_get_string(test_key, ""));
-    EXPECT_EQ("135", tr_env_get_string(test_key, "c"));
 }
 
 TEST_F(UtilsTest, mimeTypes)

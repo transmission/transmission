@@ -30,6 +30,7 @@
 
 #include <libtransmission/api-compat.h>
 #include <libtransmission/crypto-utils.h>
+#include <libtransmission/env.h>
 #include <libtransmission/file-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/quark.h>

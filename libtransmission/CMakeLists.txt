@@ -55,6 +55,8 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
+        env.cc
+        env.h
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc

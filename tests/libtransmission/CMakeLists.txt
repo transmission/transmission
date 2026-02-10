@@ -19,6 +19,7 @@ target_sources(libtransmission-test
         crypto-test.cc
         dht-test.cc
         error-test.cc
+        env-test.cc
         file-piece-map-test.cc
         file-utils-test.cc
         file-test.cc

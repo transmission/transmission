@@ -15,6 +15,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/api-compat.h"
+#include "libtransmission/env.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/serializer.h"
