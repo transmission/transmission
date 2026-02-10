@@ -35,6 +35,7 @@
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h" // tr_strbuf, tr_urlbuf

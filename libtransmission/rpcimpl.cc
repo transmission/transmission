@@ -39,6 +39,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"

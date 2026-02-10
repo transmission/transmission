@@ -46,6 +46,7 @@
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent.h"

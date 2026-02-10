@@ -121,6 +121,9 @@ target_sources(${TR_NAME}
         session.h
         stats.cc
         stats.h
+        string-utils.cc
+        string-utils.h
+        $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
         subprocess-posix.cc
         subprocess-win32.cc
         subprocess.h
@@ -160,7 +163,6 @@ target_sources(${TR_NAME}
         utils-ev.h
         utils.cc
         utils.h
-        $<$<BOOL:${IS_APPLE_CLANG}>:utils.mm>
         variant-benc.cc
         variant-json.cc
         variant.cc

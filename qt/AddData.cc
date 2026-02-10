@@ -11,7 +11,6 @@
 
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/web-utils.h>
 
 #include "AddData.h"

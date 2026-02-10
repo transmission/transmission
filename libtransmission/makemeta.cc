@@ -27,6 +27,7 @@
 #include "libtransmission/makemeta.h"
 #include "libtransmission/quark.h" // TR_KEY_length, TR_KEY_a...
 #include "libtransmission/session.h" // TR_NAME
+#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h" // tr_pathbuf

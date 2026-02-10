@@ -12,12 +12,14 @@
 #include <string_view>
 #include <vector>
 
+#include "libtransmission/transmission.h"
+
 #include "libtransmission/api-compat.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/serializer.h"
-#include "libtransmission/transmission.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/string-utils.h"
+#include "libtransmission/utils.h" // tr_env_get_string()
 #include "libtransmission/variant.h"
 
 namespace tr::api_compat

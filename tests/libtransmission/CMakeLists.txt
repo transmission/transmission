@@ -40,10 +40,11 @@ target_sources(libtransmission-test
         rename-test.cc
         rpc-test.cc
         serializer-tests.cc
-        session-test.cc
         session-alt-speeds-test.cc
+        session-test.cc
         settings-test.cc
         strbuf-test.cc
+        string-utils-test.cc
         subprocess-test-script.cmd
         subprocess-test.cc
         test-fixtures.h

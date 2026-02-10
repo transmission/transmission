@@ -29,6 +29,7 @@
 
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"

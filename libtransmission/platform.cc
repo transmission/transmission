@@ -44,6 +44,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/platform.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 

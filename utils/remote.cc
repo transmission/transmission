@@ -33,6 +33,7 @@
 #include <libtransmission/file.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/rpcimpl.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/tr-assert.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>

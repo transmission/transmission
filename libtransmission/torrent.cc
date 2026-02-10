@@ -36,6 +36,7 @@
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/resume.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/subprocess.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent-magnet.h"
