@@ -14,6 +14,8 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
+
+#include "tr-strbuf.h"
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
@@ -79,8 +81,16 @@ bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url
 
 bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier)
 {
+    // This step allows for URLs that contain character outside the allowed set
+    // defined by RFC 3986. The URL we store is "equivalent" to the provided URL
+    // according to the definition in RFC 3986 Section 6.1, while consisting
+    // of only ASCII characters. This ensures the URLs be represented correctly
+    // when transmitted via UTF-8 mediums, for example JSON.
+    auto normalized_url = tr_urlbuf{};
+    tr_urlPercentEncode(std::back_inserter(normalized_url), announce_url, false);
+
     // Make sure the announce URL is usable before we intern it.
-    if (auto const announce = tr_urlParseTracker(announce_url); !announce || !can_add(*announce))
+    if (auto const announce = tr_urlParseTracker(normalized_url); !announce || !can_add(*announce))
     {
         return false;
     }
@@ -88,7 +98,7 @@ bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier
     // Parse again with the interned string so that `parsed` fields all
     // point to the interned addresses. This second call should never
     // fail, but check anyway to make the linter happy.
-    auto const announce_interned = tr_interned_string{ announce_url };
+    auto const announce_interned = tr_interned_string{ normalized_url.sv() };
     auto const parsed = tr_urlParseTracker(announce_interned.sv());
     if (!parsed)
     {
