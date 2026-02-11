@@ -139,21 +139,16 @@ export class Inspector extends EventTarget {
 
   static _createPeersPage() {
     const container = document.createElement('div');
-    container.classList.add('peers-container');
 
     // Webseeds table
     const webseedsTable = document.createElement('table');
-    webseedsTable.classList.add('peer-list', 'webseeds-list');
+    webseedsTable.classList.add('peer-list');
     const webseedsThead = document.createElement('thead');
     const webseedsTr = document.createElement('tr');
-    const webseedsHeaders = [
-      { name: 'Web Seeds', class: 'webseed-url' },
-      { name: 'Down', class: 'speed-down' }
-    ];
-    for (const header of webseedsHeaders) {
+    const webseedsHeaders = ['Web Seeds', 'Down'];
+    for (const name of webseedsHeaders) {
       const th = document.createElement('th');
-      th.classList.add(header.class);
-      setTextContent(th, header.name);
+      setTextContent(th, name);
       webseedsTr.append(th);
     }
     const webseedsTbody = document.createElement('tbody');
@@ -186,11 +181,11 @@ export class Inspector extends EventTarget {
     container.append(table);
 
     return {
+      peersTable: table,
       root: container,
+      tbody,
       webseedsTable,
       webseedsTbody,
-      peersTable: table,
-      tbody,
     };
   }
 
@@ -668,17 +663,19 @@ export class Inspector extends EventTarget {
     let hasWebseeds = false;
 
     for (const tor of torrents) {
+      // create base torrent row
+      const baseTortr = document.createElement('tr');
+      baseTortr.classList.add('torrent-row');
+      const baseTortd = document.createElement('td');
+      setTextContent(baseTortd, tor.getName());
+      baseTortr.append(baseTortd);
+
       // webseeds
       const webseeds = tor.getWebseedsEx();
       if (webseeds.length > 0) {
         hasWebseeds = true;
-        // torrent name for webseeds
-        const tortr = document.createElement('tr');
-        tortr.classList.add('torrent-row');
-        const tortd = document.createElement('td');
-        tortd.setAttribute('colspan', 2);
-        setTextContent(tortd, tor.getName());
-        tortr.append(tortd);
+        const tortr = baseTortr.cloneNode(true);
+        tortr.firstChild.setAttribute('colspan', 2);
         webseedsRows.push(tortr);
 
         // webseed rows
@@ -702,13 +699,8 @@ export class Inspector extends EventTarget {
       }
 
       // peers
-      // torrent name
-      const tortr = document.createElement('tr');
-      tortr.classList.add('torrent-row');
-      const tortd = document.createElement('td');
-      tortd.setAttribute('colspan', cell_setters.length);
-      setTextContent(tortd, tor.getName());
-      tortr.append(tortd);
+      const tortr = baseTortr.cloneNode(true);
+      tortr.firstChild.setAttribute('colspan', cell_setters.length);
       peersRows.push(tortr);
 
       // peers
