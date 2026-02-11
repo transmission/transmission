@@ -658,6 +658,23 @@ export class Inspector extends EventTarget {
       },
     ];
 
+    const webseed_cell_setters = [
+      (webseed, td) => {
+        td.classList.add('webseed-url');
+        setTextContent(td, webseed.url);
+        td.setAttribute('title', webseed.url);
+      },
+      (webseed, td) => {
+        td.classList.add('speed-down');
+        setTextContent(
+          td,
+          webseed.download_bytes_per_second
+            ? fmt.speedBps(webseed.download_bytes_per_second)
+            : '',
+        );
+      },
+    ];
+
     const webseedsRows = [];
     const peersRows = [];
     let hasWebseeds = false;
@@ -682,18 +699,11 @@ export class Inspector extends EventTarget {
         for (const webseed of webseeds) {
           const tr = document.createElement('tr');
           tr.classList.add('webseed-row');
-
-          const urlTd = document.createElement('td');
-          urlTd.classList.add('webseed-url');
-          setTextContent(urlTd, webseed.url);
-          urlTd.setAttribute('title', webseed.url);
-          tr.append(urlTd);
-
-          const speedTd = document.createElement('td');
-          speedTd.classList.add('speed-down');
-          setTextContent(speedTd, webseed.download_bytes_per_second ? fmt.speedBps(webseed.download_bytes_per_second) : '');
-          tr.append(speedTd);
-
+          for (const setter of webseed_cell_setters) {
+            const td = document.createElement('td');
+            setter(webseed, td);
+            tr.append(td);
+          }
           webseedsRows.push(tr);
         }
       }
@@ -706,7 +716,6 @@ export class Inspector extends EventTarget {
       // peers
       for (const peer of tor.getPeers()) {
         const tr = document.createElement('tr');
-        tr.classList.add('peer-row');
         for (const [index, setter] of cell_setters.entries()) {
           const td = document.createElement('td');
           td.classList.add(peer_column_classes[index]);
