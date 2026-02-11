@@ -23,6 +23,8 @@
 #include "libtransmission-app/display-modes.h"
 #include "libtransmission-app/converters.h"
 
+using namespace std::literals;
+
 namespace tr::app::detail
 {
 namespace
@@ -344,11 +346,12 @@ tr_variant from_stats_mode(StatsMode const& src)
     {
         if (auto const* local = std::localtime(&tt))
         {
-            return fmt::format(FMT_STRING("{:%FT%T%z}"), *local);
+            // fmt::runtime to workaround FTBFS in clang
+            return fmt::format(fmt::runtime("{:%FT%T%z}"), *local);
         }
     }
 
-    return fmt::format(FMT_STRING("{:%FT%TZ}"), src);
+    return fmt::format("{:%FT%TZ}", src);
 }
 
 bool to_sys_seconds(tr_variant const& src, std::chrono::sys_seconds* tgt)
