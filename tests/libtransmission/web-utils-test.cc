@@ -267,3 +267,26 @@ TEST_F(WebUtilsTest, urlPercentDecode)
         EXPECT_EQ(decoded, tr_urlPercentDecode(encoded));
     }
 }
+
+TEST_F(WebUtilsTest, urlPercentEncode)
+{
+    static auto constexpr Tests = std::array<std::tuple<std::string_view, std::string_view, bool>, 10U>{ {
+        { "192.168.202.101"sv, "192.168.202.101"sv, true },
+        { "8.8.8.8"sv, "8.8.8.8"sv, true },
+        { "[2001:0:0eab:dead::a0:abcd:4e]"sv, "%5B2001%3A0%3A0eab%3Adead%3A%3Aa0%3Aabcd%3A4e%5D"sv, true },
+        { "你好"sv, "%E4%BD%A0%E5%A5%BD"sv, true },
+        { "Letöltések"sv, "Let%C3%B6lt%C3%A9sek"sv, true },
+        { "Дыскаграфія"sv, "%D0%94%D1%8B%D1%81%D0%BA%D0%B0%D0%B3%D1%80%D0%B0%D1%84%D1%96%D1%8F"sv, true },
+        { "https://example.com/Letöltések"sv, "https://example.com/Let%C3%B6lt%C3%A9sek"sv, false },
+        { "https://example.com/Let%C3%B6lt%C3%A9sek"sv, "https://example.com/Let%C3%B6lt%C3%A9sek"sv, false },
+        { "udp://你好.com/announce"sv, "udp://%E4%BD%A0%E5%A5%BD.com/announce"sv, false },
+        { "udp://%E4%BD%A0%E5%A5%BD.com/announce"sv, "udp://%E4%BD%A0%E5%A5%BD.com/announce"sv, false },
+    } };
+
+    for (auto const& [decoded, encoded, escape_reserved] : Tests)
+    {
+        auto buf = tr_urlbuf{};
+        tr_urlPercentEncode(std::back_inserter(buf), decoded, escape_reserved);
+        EXPECT_EQ(encoded, buf);
+    }
+}
