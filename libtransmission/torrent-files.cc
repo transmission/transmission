@@ -20,8 +20,6 @@
 
 #include <small/map.hpp>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
@@ -29,6 +27,7 @@
 #include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

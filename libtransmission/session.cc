@@ -58,6 +58,7 @@
 #include "libtransmission/tr-lpd.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/tr-utp.h"
+#include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web.h"
@@ -905,6 +906,11 @@ void tr_sessionSet(tr_session* session, tr_variant const& settings)
 }
 
 // ---
+
+std::string tr_session::Settings::get_default_download_dir()
+{
+    return tr_getDefaultDownloadDir();
+}
 
 void tr_session::Settings::fixup_from_preferred_transports()
 {

@@ -27,8 +27,6 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
@@ -36,6 +34,7 @@
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-lpd.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for tr_net_init()
 #include "libtransmission/utils-ev.h" // for tr_net_init()
 

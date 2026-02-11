@@ -22,8 +22,6 @@
 #include <fmt/format.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/log.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-strbuf.h"

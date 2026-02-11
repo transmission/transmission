@@ -26,8 +26,6 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announce-list.h"
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/announcer.h"
@@ -39,7 +37,7 @@
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, TR_C...
+#include "libtransmission/types.h" // tr_sha1_digest_t
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 

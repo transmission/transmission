@@ -13,8 +13,6 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
@@ -25,8 +23,8 @@
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

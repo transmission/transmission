@@ -11,8 +11,6 @@
 
 #include <small/map.hpp>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announce-list.h"
 
 #include "tr-strbuf.h"
@@ -21,6 +19,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 
