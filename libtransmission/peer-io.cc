@@ -85,6 +85,7 @@ tr_peerIo::tr_peerIo(
     : bandwidth_{ parent_bandwidth }
     , info_hash_{ info_hash != nullptr ? *info_hash : tr_sha1_digest_t{} }
     , session_{ session }
+    , flush_outbuf_trigger_{ session->timerMaker().create() }
     , client_is_seed_{ client_is_seed }
     , is_incoming_{ is_incoming }
 {
@@ -106,7 +107,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
         new tr_peerIo{ session, std::move(socket), parent, info_hash, is_incoming, is_seed }
     };
     io->bandwidth().set_peer(io);
-    io->flush_outbuf_trigger_ = session->timerMaker().create(
+    io->flush_outbuf_trigger_->set_callback(
         [weak = io->weak_from_this()]
         {
             if (auto const ptr = weak.lock())

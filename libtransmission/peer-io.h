@@ -395,7 +395,7 @@ private:
     GotError got_error_ = nullptr;
     void* user_data_ = nullptr;
 
-    std::unique_ptr<tr::Timer> flush_outbuf_trigger_;
+    std::unique_ptr<tr::Timer> const flush_outbuf_trigger_;
 
     tr::evhelpers::event_unique_ptr event_read_;
     tr::evhelpers::event_unique_ptr event_write_;
