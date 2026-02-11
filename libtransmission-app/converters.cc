@@ -88,10 +88,10 @@ struct TrYearMonthDay
         }
 
         auto const dim = days_in_month(y, m);
-        return d >= 1 && d <= static_cast<unsigned>(dim);
+        return d >= 1 && std::cmp_less_equal(d, dim);
     };
 
-    return TrYearMonthDay{ year, month, day, is_valid_ymd(year, month, day) };
+    return TrYearMonthDay{ .year = year, .month = month, .day = day, .valid = is_valid_ymd(year, month, day) };
 }
 
 // c++20 (P0355) replace with std::chrono::sys_days{} after Debian 11 is EOL
