@@ -35,9 +35,10 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
-#include "libtransmission/utils.h" // for _(), tr_strerror(), tr_strv_ends_with()
+#include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;
 

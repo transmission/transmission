@@ -55,9 +55,13 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
+        env.cc
+        env.h
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
+        file-utils.cc
+        file-utils.h
         file-win32.cc
         file.cc
         file.h
@@ -121,6 +125,9 @@ target_sources(${TR_NAME}
         session.h
         stats.cc
         stats.h
+        string-utils.cc
+        string-utils.h
+        $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
         subprocess-posix.cc
         subprocess-win32.cc
         subprocess.h
@@ -160,7 +167,6 @@ target_sources(${TR_NAME}
         utils-ev.h
         utils.cc
         utils.h
-        $<$<BOOL:${IS_APPLE_CLANG}>:utils.mm>
         variant-benc.cc
         variant-json.cc
         variant.cc

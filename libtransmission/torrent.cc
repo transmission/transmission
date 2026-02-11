@@ -28,6 +28,7 @@
 #include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h" // for tr_sha1()
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/inout.h" // tr_ioTestPiece()
 #include "libtransmission/log.h"
@@ -36,6 +37,7 @@
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/resume.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/subprocess.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent-magnet.h"

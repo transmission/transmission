@@ -20,8 +20,9 @@
 #include "libtransmission/file.h"
 #include "libtransmission/inout.h"
 #include "libtransmission/session.h"
-#include "libtransmission/torrent.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-files.h"
+#include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 #include "libtransmission/tr-strbuf.h" // tr_pathbuf
