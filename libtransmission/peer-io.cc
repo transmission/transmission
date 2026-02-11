@@ -584,6 +584,11 @@ size_t tr_peerIo::flush_outgoing_protocol_msgs()
     return flush(tr_direction::Up, byte_count);
 }
 
+void tr_peerIo::flush_outbuf_soon()
+{
+    flush_outbuf_trigger_->start_single_shot(std::chrono::milliseconds::zero());
+}
+
 void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
 {
     if (n_bytes == 0U)
@@ -597,7 +602,7 @@ void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_dat
     filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
     outbuf_.commit_space(n_bytes);
 
-    flush_outbuf_trigger_->start_single_shot(std::chrono::milliseconds::zero());
+    flush_outbuf_soon();
 }
 
 // ---

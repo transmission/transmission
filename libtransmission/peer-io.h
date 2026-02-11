@@ -350,6 +350,8 @@ private:
 
     void close();
 
+    void flush_outbuf_soon();
+
     static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
     static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio);
 
