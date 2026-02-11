@@ -19,7 +19,7 @@ const peer_column_classes = [
 ];
 
 const webseed_column_classes = [
-  '',
+  'url',
   'speed-down'
 ];
 
