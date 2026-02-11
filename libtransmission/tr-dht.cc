@@ -112,7 +112,7 @@ extern "C"
 namespace
 {
 
-constexpr std::array<std::pair<char const*, uint16_t>, 3> const default_bootstraps = { {
+constexpr std::array<std::pair<char const*, uint16_t>, 3> const DefaultBootstraps = { {
     { "dht.transmissionbt.com", 6881 },
     { "router.bittorrent.com", 6881 },
     { "dht.libtorrent.org", 25401 },
@@ -153,7 +153,7 @@ public:
         init_state(state_filename_);
 
         get_nodes_from_bootstrap_file(tr_pathbuf{ mediator_.config_dir(), "/dht.bootstrap"sv }, bootstrap_queue_);
-        for (auto const [host, port] : default_bootstraps)
+        for (auto const [host, port] : DefaultBootstraps)
         {
             get_nodes_from_name(host, tr_port::from_host(port), bootstrap_queue_);
         }
