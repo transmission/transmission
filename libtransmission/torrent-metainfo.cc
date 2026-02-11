@@ -13,16 +13,17 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
-#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-metainfo.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"

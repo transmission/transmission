@@ -17,10 +17,11 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/error.h"
 #include "libtransmission/subprocess.h"
-#include "libtransmission/string-utils.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 
 using namespace std::literals;

@@ -15,8 +15,9 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
+#include "lib/base/string-utils.h"
+
 #include "libtransmission/serializer.h"
-#include "libtransmission/string-utils.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 

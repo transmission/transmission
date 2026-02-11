@@ -19,7 +19,7 @@
 #include "libtransmission/error-types.h"
 #include "libtransmission/error.h"
 #include "libtransmission/magnet-metainfo.h"
-#include "libtransmission/string-utils.h"
+#include "lib/base/string-utils.h"
 #include "libtransmission/tr-strbuf.h" // for tr_urlbuf
 #include "libtransmission/types.h" // for tr_sha1_digest_t
 #include "libtransmission/web-utils.h"

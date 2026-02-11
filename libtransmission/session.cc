@@ -29,8 +29,10 @@
 
 #include <fmt/format.h> // fmt::ptr
 
-#include "libtransmission/transmission.h"
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
 
+#include "libtransmission/transmission.h"
 #include "libtransmission/api-compat.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
@@ -49,11 +51,9 @@
 #include "libtransmission/rpc-server.h"
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/session.h"
-#include "libtransmission/string-utils.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrent-ctor.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-dht.h"
 #include "libtransmission/tr-lpd.h"
 #include "libtransmission/tr-strbuf.h"

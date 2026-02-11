@@ -20,14 +20,14 @@
 
 #include <fmt/format.h>
 
-#define LIBTRANSMISSION_VARIANT_MODULE
+#include "lib/base/tr-assert.h"
 
+#define LIBTRANSMISSION_VARIANT_MODULE
 #include "libtransmission/api-compat.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 

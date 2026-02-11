@@ -7,15 +7,13 @@
 
 #include "FilterListModel.hh"
 #include "HigWorkarea.h" // GUI_PAD
+#include "lib/base/tr-macros.h"
+#include "libtransmission-app/display-modes.h"
 #include "ListModelAdapter.h"
 #include "Session.h" // torrent_cols
 #include "Torrent.h"
 #include "TorrentFilter.h"
 #include "Utils.h"
-
-#include <libtransmission-app/display-modes.h>
-
-#include <libtransmission/tr-macros.h>
 
 #include <gdkmm/pixbuf.h>
 #include <glibmm/i18n.h>

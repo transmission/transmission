@@ -24,8 +24,8 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-upnp.h"
-#include "libtransmission/string-utils.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for _(), tr_strerror()
 

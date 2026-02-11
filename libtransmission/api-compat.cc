@@ -17,7 +17,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/serializer.h"
-#include "libtransmission/string-utils.h"
+#include "lib/base/string-utils.h"
 #include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 

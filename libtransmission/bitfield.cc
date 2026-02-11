@@ -10,7 +10,7 @@
 #include <vector> // std::vector
 
 #include "libtransmission/bitfield.h"
-#include "libtransmission/tr-assert.h" // TR_ASSERT, TR_ENABLE_ASSERTS
+#include "lib/base/tr-assert.h" // TR_ASSERT, TR_ENABLE_ASSERTS
 
 // ---
 

@@ -914,6 +914,7 @@ function(tr_install_web DST_DIR)
     endif()
 endfunction()
 
+add_subdirectory(lib/base)
 add_subdirectory(libtransmission)
 add_subdirectory(libtransmission-app)
 

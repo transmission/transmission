@@ -13,14 +13,14 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/transmission.h> // tr_torrent_activity
+#include "lib/base/string-utils.h"
 
-#include <libtransmission/crypto-utils.h> // tr_rand_obj()
-#include <libtransmission/net.h>
-#include <libtransmission/session.h>
-#include <libtransmission/string-utils.h>
-#include <libtransmission/timer.h>
-#include <libtransmission/tr-lpd.h>
+#include "libtransmission/transmission.h" // tr_torrent_activity
+#include "libtransmission/crypto-utils.h" // tr_rand_obj()
+#include "libtransmission/net.h"
+#include "libtransmission/session.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-lpd.h"
 
 #include "test-fixtures.h"
 

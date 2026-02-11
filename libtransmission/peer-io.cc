@@ -31,7 +31,7 @@
 #include "libtransmission/peer-socket.h" // tr_peer_socket, tr_netOpen...
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for _()
 

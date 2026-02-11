@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-#include "libtransmission/string-utils.h"
+#include "lib/base/string-utils.h"
 
 // macOS implementation of tr_strv_to_utf8_string() that autodetects the encoding.
 // This replaces the generic implementation of the function in utils.cc.

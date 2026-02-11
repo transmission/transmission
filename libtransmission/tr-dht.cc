@@ -33,6 +33,8 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
@@ -40,7 +42,6 @@
 #include "libtransmission/peer-mgr.h" // for tr_peerMgrCompactToPex()
 #include "libtransmission/quark.h"
 #include "libtransmission/timer.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-dht.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/variant.h"

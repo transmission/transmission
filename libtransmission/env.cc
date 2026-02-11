@@ -13,8 +13,8 @@
 #include <windows.h>
 #endif
 
-#include "libtransmission/string-utils.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 
 bool tr_env_key_exists(char const* key) noexcept

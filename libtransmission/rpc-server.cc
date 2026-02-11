@@ -44,7 +44,7 @@
 #include "libtransmission/rpc-server.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/session.h"
-#include "libtransmission/string-utils.h"
+#include "lib/base/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/types.h"

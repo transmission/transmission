@@ -12,14 +12,15 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/error.h>
-#include <libtransmission/log.h>
-#include <libtransmission/quark.h>
-#include <libtransmission/string-utils.h>
-#include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/variant.h>
-#include <libtransmission/version.h>
+#include "lib/base/string-utils.h"
+
+#include "libtransmission/error.h"
+#include "libtransmission/log.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/tr-getopt.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
+#include "libtransmission/version.h"
 
 namespace
 {

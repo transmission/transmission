@@ -5,6 +5,7 @@
 
 #include "TorrentSorter.h"
 
+#include "lib/base/tr-macros.h"
 #include "Percents.h"
 #include "SorterBase.hh"
 #include "Utils.h"
@@ -12,7 +13,6 @@
 #include <libtransmission-app/display-modes.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
 #include <small/map.hpp>

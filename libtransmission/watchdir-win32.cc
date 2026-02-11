@@ -19,11 +19,12 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
+
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
-#include "libtransmission/string-utils.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/watchdir-base.h"

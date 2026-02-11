@@ -33,10 +33,10 @@
 #include "libtransmission/interned-string.h" // tr_interned_string
 #include "libtransmission/log.h"
 #include "libtransmission/session.h"
-#include "libtransmission/string-utils.h"
+#include "lib/base/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h" // tr_sha1_digest_t
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"

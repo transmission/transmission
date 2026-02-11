@@ -7,11 +7,11 @@
 
 #include "DynamicPropertyStore.h"
 #include "IconCache.h"
+#include "lib/base/tr-macros.h"
 #include "Percents.h"
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/values.h>
 

@@ -16,7 +16,7 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/open-files.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // _()

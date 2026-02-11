@@ -15,7 +15,7 @@
 #include "libtransmission/crypto-utils.h" // tr_sha1
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/tr-arc4.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h" // tr_sha1_digest_t
 
 // workaround bug in GCC < 10.4

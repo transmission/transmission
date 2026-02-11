@@ -34,7 +34,7 @@
 
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 

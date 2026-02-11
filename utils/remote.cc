@@ -26,22 +26,22 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
-#include <libtransmission/transmission.h>
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
 
-#include <libtransmission/api-compat.h>
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/env.h>
-#include <libtransmission/file-utils.h>
-#include <libtransmission/file.h>
-#include <libtransmission/quark.h>
-#include <libtransmission/rpcimpl.h>
-#include <libtransmission/string-utils.h>
-#include <libtransmission/tr-assert.h>
-#include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/values.h>
-#include <libtransmission/variant.h>
-#include <libtransmission/version.h>
+#include "libtransmission/transmission.h"
+#include "libtransmission/api-compat.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/env.h"
+#include "libtransmission/file-utils.h"
+#include "libtransmission/file.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/rpcimpl.h"
+#include "libtransmission/tr-getopt.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/values.h"
+#include "libtransmission/variant.h"
+#include "libtransmission/version.h"
 
 using namespace std::literals;
 

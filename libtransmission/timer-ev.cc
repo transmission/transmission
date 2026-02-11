@@ -18,7 +18,7 @@
 
 #include "libtransmission/timer.h"
 #include "libtransmission/timer-ev.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/utils-ev.h"
 
 using namespace std::literals;

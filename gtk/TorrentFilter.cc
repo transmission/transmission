@@ -6,10 +6,9 @@
 #include "TorrentFilter.h"
 
 #include "FilterBase.hh"
+#include "lib/base/tr-macros.h"
+#include "libtransmission/transmission.h"
 #include "Utils.h"
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
 
 #include <algorithm>
 #include <array>

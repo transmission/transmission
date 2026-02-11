@@ -16,7 +16,7 @@
 #include <utility> // for std::move()
 #include <vector>
 
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h"
 #include "libtransmission/values.h"
 

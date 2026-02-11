@@ -25,19 +25,19 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/transmission.h>
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
+#include "lib/base/tr-macros.h"
 
-#include <libtransmission/crypto-utils.h> // tr_sha1_to_string, tr_base...
-#include <libtransmission/handshake.h>
-#include <libtransmission/net.h>
-#include <libtransmission/peer-io.h>
-#include <libtransmission/peer-mse.h>
-#include <libtransmission/peer-socket.h>
-#include <libtransmission/session.h> // tr_peerIdInit()
-#include <libtransmission/string-utils.h>
-#include <libtransmission/timer.h>
-#include <libtransmission/tr-assert.h>
-#include <libtransmission/tr-macros.h>
+#include "libtransmission/transmission.h"
+#include "libtransmission/crypto-utils.h" // tr_sha1_to_string, tr_base...
+#include "libtransmission/handshake.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mse.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/session.h" // tr_peerIdInit()
+#include "libtransmission/timer.h"
 
 #include "test-fixtures.h"
 

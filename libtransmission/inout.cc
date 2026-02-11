@@ -12,16 +12,17 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/inout.h"
 #include "libtransmission/session.h"
-#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h" // tr_pathbuf
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"

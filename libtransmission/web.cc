@@ -41,7 +41,7 @@
 #endif
 #include "libtransmission/env.h"
 #include "libtransmission/log.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web.h"
 #include "libtransmission/web-utils.h"

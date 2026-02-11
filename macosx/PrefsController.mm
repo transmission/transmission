@@ -4,7 +4,7 @@
 
 #import <Sparkle/Sparkle.h>
 
-#include <libtransmission/string-utils.h>
+#include "lib/base/string-utils.h"
 
 #import "VDKQueue.h"
 

@@ -9,13 +9,14 @@
 #include "FileList.h"
 #include "GtkCompat.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG, GUI_PAD_SMALL
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-macros.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
 
 #include <libtransmission/file-utils.h>
-#include <libtransmission/string-utils.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/values.h>
 #include <libtransmission/web-utils.h>

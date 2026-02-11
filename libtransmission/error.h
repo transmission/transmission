@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-#include "libtransmission/tr-macros.h"
+#include "lib/base/tr-macros.h"
 
 /** @brief Structure holding error information. */
 struct tr_error

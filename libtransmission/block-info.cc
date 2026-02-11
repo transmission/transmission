@@ -5,8 +5,9 @@
 
 #include <cstdint>
 
+#include "lib/base/tr-assert.h" // TR_ASSERT
+
 #include "libtransmission/block-info.h"
-#include "libtransmission/tr-assert.h" // TR_ASSERT
 
 void tr_block_info::init_sizes(uint64_t const total_size_in, uint32_t const piece_size_in) noexcept
 {

@@ -21,8 +21,8 @@
 
 #include <wildmat.h>
 
-#include "libtransmission/string-utils.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
 
 /* User-level routine. returns whether or not 'text' and 'pattern' matched */
 bool tr_wildmat(char const* text, char const* pattern)

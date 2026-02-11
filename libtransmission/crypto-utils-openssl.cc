@@ -24,7 +24,7 @@
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/log.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 

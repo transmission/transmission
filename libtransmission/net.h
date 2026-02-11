@@ -61,7 +61,8 @@ using tr_socket_t = int;
 #define set_sockerrno(save) (sockerrno) = (save)
 #endif
 
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for tr_compare_3way()
 

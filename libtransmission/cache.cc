@@ -20,7 +20,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrents.h"
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h"
 
 Cache::Key Cache::make_key(tr_torrent const& tor, tr_block_info::Location const loc) noexcept

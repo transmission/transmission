@@ -11,8 +11,10 @@
 
 #include <small/map.hpp>
 
-#include "libtransmission/announce-list.h"
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
 
+#include "libtransmission/announce-list.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/quark.h"

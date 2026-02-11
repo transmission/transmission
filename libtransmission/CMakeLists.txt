@@ -126,9 +126,6 @@ target_sources(${TR_NAME}
         session.h
         stats.cc
         stats.h
-        string-utils.cc
-        string-utils.h
-        $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
         subprocess-posix.cc
         subprocess-win32.cc
         subprocess.h
@@ -149,8 +146,6 @@ target_sources(${TR_NAME}
         torrent.h
         torrents.cc
         torrents.h
-        tr-assert.cc
-        tr-assert.h
         tr-buffer.h
         tr-dht.cc
         tr-dht.h
@@ -158,7 +153,6 @@ target_sources(${TR_NAME}
         tr-getopt.h
         tr-lpd.cc
         tr-lpd.h
-        tr-macros.h
         tr-strbuf.h
         tr-udp.cc
         tr-utp.cc
@@ -279,8 +273,6 @@ target_link_libraries(${TR_NAME}
         ${LIBQUOTA_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
         RapidJSON
-        utf8::cpp
-        wildmat
         transmission::WideInteger
         Crc32c::crc32c
         $<$<BOOL:${WIN32}>:crypt32>
@@ -289,6 +281,7 @@ target_link_libraries(${TR_NAME}
         "$<$<BOOL:${ANDROID}>:${log-lib}>"
         $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
+        trbase
         transmission::crypto_impl
         transmission::fmt-header-only
         Pal::Sigslot
@@ -312,10 +305,10 @@ if(INSTALL_LIB)
             session-id.h
             timer-ev.h
             timer.h
-            tr-assert.h
+            ${CMAKE_SOURCE_DIR}/lib/base/tr-assert.h
             tr-buffer.h
             tr-getopt.h
-            tr-macros.h
+            ${CMAKE_SOURCE_DIR}/lib/base/tr-macros.h
             tr-strbuf.h
             transmission.h
             utils.h

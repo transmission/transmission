@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string_view>
 
-#include "libtransmission/tr-assert.h"
+#include "lib/base/tr-assert.h"
 
 [[noreturn]] bool tr_assert_report(std::string_view file, long line, std::string_view message)
 {

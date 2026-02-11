@@ -21,11 +21,11 @@
 
 #include <small/vector.hpp>
 
-#define LIBTRANSMISSION_VARIANT_MODULE
+#include "lib/base/string-utils.h"
 
+#define LIBTRANSMISSION_VARIANT_MODULE
 #include "libtransmission/benc.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/string-utils.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 

@@ -27,10 +27,11 @@
 
 #include <small/map.hpp>
 
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
-#include "libtransmission/string-utils.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

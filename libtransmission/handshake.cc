@@ -14,6 +14,8 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/bitfield.h"
 #include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
@@ -23,7 +25,6 @@
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
 #include "libtransmission/timer.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/types.h" // tr_peer_id_t
 
