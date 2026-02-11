@@ -10,7 +10,7 @@
 
 #include "libtransmission/values.h"
 
-class Speed : public libtransmission::Values::Speed
+class Speed : public tr::Values::Speed
 {
     Q_DECLARE_TR_FUNCTIONS(Speed)
 
@@ -19,13 +19,13 @@ public:
 
     template<typename Number, typename std::enable_if_t<std::is_integral_v<Number>>* = nullptr>
     constexpr Speed(Number value, Units multiple)
-        : libtransmission::Values::Speed{ value, multiple }
+        : tr::Values::Speed{ value, multiple }
     {
     }
 
     template<typename Number, typename std::enable_if_t<std::is_floating_point_v<Number>>* = nullptr>
     Speed(Number value, Units multiple)
-        : libtransmission::Values::Speed{ value, multiple }
+        : tr::Values::Speed{ value, multiple }
     {
     }
 

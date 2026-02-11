@@ -166,9 +166,9 @@ public:
             func(response);
         }
 
-        [[nodiscard]] virtual time_t now() const
+        [[nodiscard]] virtual std::chrono::steady_clock::time_point now() const
         {
-            return time(nullptr);
+            return std::chrono::steady_clock::now();
         }
     };
 

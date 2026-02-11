@@ -23,7 +23,7 @@ struct tr_error;
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
 public:
-    [[nodiscard]] TR_CONSTEXPR20 auto empty() const noexcept
+    [[nodiscard]] constexpr auto empty() const noexcept
     {
         return std::empty(files_);
     }
@@ -42,7 +42,7 @@ public:
     {
         return files_;
     }
-    [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
+    [[nodiscard]] constexpr auto file_count() const noexcept
     {
         return files().file_count();
     }
@@ -137,7 +137,7 @@ public:
         return pieces_[piece];
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool has_v1_metadata() const noexcept
+    [[nodiscard]] constexpr bool has_v1_metadata() const noexcept
     {
         // need 'pieces' field and 'files' or 'length'
         // TODO check for 'files' or 'length'
@@ -162,11 +162,6 @@ public:
     [[nodiscard]] constexpr auto info_dict_offset() const noexcept
     {
         return info_dict_offset_;
-    }
-
-    [[nodiscard]] constexpr auto pieces_offset() const noexcept
-    {
-        return pieces_offset_;
     }
 
     // UTILS
@@ -238,10 +233,6 @@ private:
     // See https://www.bittorrent.org/beps/bep_0009.html
     uint64_t info_dict_size_ = 0;
     uint64_t info_dict_offset_ = 0;
-
-    // Offset of the bencoded 'pieces' checksums subset of the bencoded data.
-    // Used when loading piece checksums on demand.
-    uint64_t pieces_offset_ = 0;
 
     bool has_magnet_info_hash_ = false;
     bool is_private_ = false;

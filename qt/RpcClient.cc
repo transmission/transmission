@@ -26,7 +26,7 @@
 #include "VariantHelpers.h"
 
 using ::trqt::variant_helpers::dictFind;
-namespace api_compat = libtransmission::api_compat;
+namespace api_compat = tr::api_compat;
 
 namespace
 {
@@ -69,7 +69,7 @@ void RpcClient::stop()
     session_ = nullptr;
     session_id_.clear();
     url_.clear();
-    network_style_ = libtransmission::api_compat::default_style();
+    network_style_ = tr::api_compat::default_style();
 
     QObject::disconnect(nam_, nullptr, this, nullptr);
 }
@@ -317,6 +317,19 @@ RpcResponse RpcClient::parseResponseData(tr_variant& response) const
             if (auto const errmsg = error_map->value_if<std::string_view>(TR_KEY_message))
             {
                 ret.errmsg = QString::fromUtf8(std::data(*errmsg), std::size(*errmsg));
+            }
+
+            if (auto* const data = error_map->find_if<tr_variant::Map>(TR_KEY_data))
+            {
+                if (auto const errstr = data->value_if<std::string_view>(TR_KEY_error_string))
+                {
+                    ret.errmsg = QString::fromUtf8(std::data(*errstr), std::size(*errstr));
+                }
+
+                if (auto* const result = data->find_if<tr_variant::Map>(TR_KEY_result))
+                {
+                    ret.args = std::make_shared<tr_variant>(std::move(*result));
+                }
             }
         }
     }

@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/announce-list.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
@@ -23,12 +25,11 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class MakemetaTest : public SandboxedTest
@@ -39,26 +40,15 @@ protected:
 
     static auto makeRandomFiles(
         std::string_view top,
-        size_t n_files = std::max(size_t{ 1U }, static_cast<size_t>(tr_rand_int(DefaultMaxFileCount))),
+        size_t n_files = std::max(size_t{ 1U }, tr_rand_int(DefaultMaxFileCount)),
         size_t max_size = DefaultMaxFileSize)
     {
         auto files = std::vector<std::pair<std::string, std::vector<std::byte>>>{};
 
-        auto file_sizes = std::vector<size_t>(n_files);
-        EXPECT_EQ(std::size(file_sizes), n_files);
-        while (
-            std::all_of(std::begin(file_sizes), std::end(file_sizes), [](size_t const file_size) { return file_size == 0U; }))
-        {
-            for (auto& file_size : file_sizes)
-            {
-                file_size = tr_rand_int(max_size);
-            }
-        }
-
         for (size_t i = 0U; i < n_files; ++i)
         {
             auto payload = std::vector<std::byte>{};
-            payload.resize(file_sizes[i]);
+            payload.resize(tr_rand_int(max_size) + 1U);
             tr_rand_buffer(std::data(payload), std::size(payload));
 
             auto filename = tr_pathbuf{ top, '/', "test.XXXXXX" };
@@ -302,4 +292,4 @@ TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
     EXPECT_NE(private_metainfo.info_hash(), private_source_metainfo.info_hash());
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

@@ -137,7 +137,7 @@ static NSTimeInterval const kDonateNagTime = 60 * 60 * 24 * 7;
 
 static void initUnits()
 {
-    using Config = libtransmission::Values::Config;
+    using Config = tr::Values::Config;
 
     // use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes,
     // we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
@@ -4693,20 +4693,22 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 
     //enable toggle status bar
+    BOOL statusBarVisible = self.fStatusBar && !self.fStatusBar.isHidden;
     if (action == @selector(toggleStatusBar:))
     {
-        NSString* title = !self.fStatusBar ? NSLocalizedString(@"Show Status Bar", "View menu -> Status Bar") :
-                                             NSLocalizedString(@"Hide Status Bar", "View menu -> Status Bar");
+        NSString* title = !statusBarVisible ? NSLocalizedString(@"Show Status Bar", "View menu -> Status Bar") :
+                                              NSLocalizedString(@"Hide Status Bar", "View menu -> Status Bar");
         menuItem.title = title;
 
         return self.fWindow.visible;
     }
 
     //enable toggle filter bar
+    BOOL filterBarVisible = self.fFilterBar && !self.fFilterBar.isHidden;
     if (action == @selector(toggleFilterBar:))
     {
-        NSString* title = !self.fFilterBar ? NSLocalizedString(@"Show Filter Bar", "View menu -> Filter Bar") :
-                                             NSLocalizedString(@"Hide Filter Bar", "View menu -> Filter Bar");
+        NSString* title = !filterBarVisible ? NSLocalizedString(@"Show Filter Bar", "View menu -> Filter Bar") :
+                                              NSLocalizedString(@"Hide Filter Bar", "View menu -> Filter Bar");
         menuItem.title = title;
 
         return self.fWindow.visible;
@@ -4725,7 +4727,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //enable prev/next filter button
     if (action == @selector(switchFilter:))
     {
-        return self.fWindow.visible && self.fFilterBar;
+        return self.fWindow.visible && filterBarVisible;
     }
 
     //enable reveal in finder

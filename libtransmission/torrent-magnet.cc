@@ -11,6 +11,7 @@
 #include <ios>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -132,7 +133,7 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
 bool tr_torrent::use_metainfo_from_file(tr_torrent_metainfo const* metainfo, char const* filename_in, tr_error* error)
 {
     // add .torrent file
-    if (!tr_sys_path_copy(filename_in, torrent_file().c_str(), error))
+    if (!tr_sys_path_copy(filename_in, torrent_file(), error))
     {
         return false;
     }
@@ -289,11 +290,8 @@ bool tr_metadata_download::set_metadata_piece(int64_t const piece, void const* c
 
     // do we need this piece?
     auto& needed = pieces_needed_;
-    auto const iter = std::find_if(
-        std::begin(needed),
-        std::end(needed),
-        [piece](auto const& item) { return item.piece == piece; });
-    if (iter == std::end(needed))
+    auto const iter = std::ranges::find_if(needed, [piece](auto const& item) { return item.piece == piece; });
+    if (iter == std::ranges::end(needed))
     {
         return false;
     }

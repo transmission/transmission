@@ -101,11 +101,6 @@ public:
         hport_ = hport;
     }
 
-    void set_network(uint16_t nport) noexcept
-    {
-        hport_ = ntohs(nport);
-    }
-
     [[nodiscard]] static std::pair<tr_port, std::byte const*> from_compact(std::byte const* compact) noexcept;
 
     [[nodiscard]] constexpr auto operator<(tr_port const& that) const noexcept
@@ -164,7 +159,6 @@ struct tr_address
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept;
 
     // --- write the text form of the address, e.g. inet_ntop()
-    std::string_view display_name(char* out, size_t outlen) const;
     [[nodiscard]] std::string display_name() const;
 
     // ---
@@ -427,9 +421,9 @@ struct tr_address
         switch (type)
         {
         case TR_AF_INET:
-            return tr_address{ TR_AF_INET, { .addr4 = { INADDR_ANY } } };
+            return tr_address{ .type = TR_AF_INET, .addr = { .addr4 = { INADDR_ANY } } };
         case TR_AF_INET6:
-            return tr_address{ TR_AF_INET6, { .addr6 = IN6ADDR_ANY_INIT } };
+            return tr_address{ .type = TR_AF_INET6, .addr = { .addr6 = IN6ADDR_ANY_INIT } };
         default:
             TR_ASSERT_MSG(false, "invalid type");
             return tr_address{};

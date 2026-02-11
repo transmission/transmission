@@ -11,19 +11,21 @@
 #include <utility>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/file.h>
 #include <libtransmission/torrent-files.h>
+#include <libtransmission/torrent-metainfo.h>
 #include "libtransmission/tr-macros.h"
 #include <libtransmission/tr-strbuf.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-class TorrentFilesTest : public ::libtransmission::test::SandboxedTest
+class TorrentFilesTest : public ::tr::test::SandboxedTest
 {
 };
 
@@ -140,6 +142,23 @@ TEST_F(TorrentFilesTest, hasAnyLocalData)
     EXPECT_TRUE(files.has_any_local_data(std::data(search_path), 1U));
     EXPECT_FALSE(files.has_any_local_data(std::data(search_path) + 1, 1U));
     EXPECT_FALSE(files.has_any_local_data(std::data(search_path), 0U));
+}
+
+TEST_F(TorrentFilesTest, mimeType)
+{
+    auto const filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/alice_in_wonderland_librivox_archive.torrent"sv };
+    auto metainfo = tr_torrent_metainfo{};
+    EXPECT_TRUE(metainfo.parse_torrent_file(filename));
+    EXPECT_EQ("audio/mpeg"sv, metainfo.files().primary_mime_type());
+}
+
+TEST_F(TorrentFilesTest, mimeTypeVideoMp4)
+{
+    auto files = tr_torrent_files{};
+    files.add("name/name.mp4"sv, 4'500'000'000U);
+    files.add("name/name.info"sv, 2048U);
+    files.add("name/SHA512sum"sv, 139U);
+    EXPECT_EQ("video/mp4"sv, files.primary_mime_type());
 }
 
 TEST_F(TorrentFilesTest, isSubpathPortable)

@@ -2,7 +2,7 @@
 <interface domain="transmission-gtk">
   <requires lib="gtk" version="4.0"/>
   <object class="GtkWindow" id="MessageLogWindow">
-    <property name="title" translatable="1">Message Log</property>
+    <property name="title" translatable="yes">Message Log</property>
     <property name="default-width">750</property>
     <property name="default-height">350</property>
     <property name="child">
@@ -15,7 +15,7 @@
 horizontal]]></property>
             <child>
               <object class="GtkButton" id="save_as_button">
-                <property name="action-name">win.save_message_log</property>
+                <property name="action-name">win.save-message-log</property>
                 <child>
                   <object class="GtkBox">
                     <property name="halign">center</property>
@@ -28,7 +28,7 @@ horizontal]]></property>
                     </child>
                     <child>
                       <object class="GtkLabel">
-                        <property name="label" translatable="1">Save _As</property>
+                        <property name="label" translatable="yes">Save _As</property>
                         <property name="single-line-mode">1</property>
                         <property name="use-underline">1</property>
                       </object>
@@ -39,7 +39,7 @@ horizontal]]></property>
             </child>
             <child>
               <object class="GtkButton" id="clear_button">
-                <property name="action-name">win.clear_message_log</property>
+                <property name="action-name">win.clear-message-log</property>
                 <child>
                   <object class="GtkBox">
                     <property name="halign">center</property>
@@ -52,7 +52,7 @@ horizontal]]></property>
                     </child>
                     <child>
                       <object class="GtkLabel">
-                        <property name="label" translatable="1">Clear</property>
+                        <property name="label" translatable="yes">Clear</property>
                         <property name="single-line-mode">1</property>
                         <property name="use-underline">1</property>
                       </object>
@@ -68,7 +68,7 @@ horizontal]]></property>
             </child>
             <child>
               <object class="GtkToggleButton" id="pause_button">
-                <property name="action-name">win.pause_message_log</property>
+                <property name="action-name">win.pause-message-log</property>
                 <child>
                   <object class="GtkBox">
                     <property name="halign">center</property>
@@ -81,7 +81,7 @@ horizontal]]></property>
                     </child>
                     <child>
                       <object class="GtkLabel">
-                        <property name="label" translatable="1">P_ause</property>
+                        <property name="label" translatable="yes">P_ause</property>
                         <property name="single-line-mode">1</property>
                         <property name="use-underline">1</property>
                       </object>
@@ -97,7 +97,7 @@ horizontal]]></property>
             </child>
             <child>
               <object class="GtkLabel" id="level_label">
-                <property name="label" translatable="1">Level</property>
+                <property name="label" translatable="yes">Level</property>
                 <property name="use-underline">1</property>
                 <property name="mnemonic-widget">level_combo</property>
                 <property name="css-classes">tr-pad-normal</property>

@@ -15,8 +15,11 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 #include <event2/event.h>
+
+#include <gtest/gtest.h>
 
 #include <libtransmission/crypto-utils.h> // tr_base64_decode()
 #include <libtransmission/error.h>
@@ -27,8 +30,6 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
-
 using namespace std::literals;
 
 inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
@@ -37,7 +38,7 @@ inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
     return os;
 }
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using file_func_t = std::function<void(char const* filename)>;
@@ -153,7 +154,7 @@ public:
 
     static std::string createSandbox(std::string const& parent_dir, std::string const& tmpl)
     {
-        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
+        auto path = fmt::format("{:s}/{:s}"sv, tr_sys_path_resolve(parent_dir), tmpl);
         tr_sys_dir_create_temp(std::data(path));
         tr_sys_path_native_separators(std::data(path));
         return path;
@@ -208,13 +209,11 @@ protected:
         return child;
     }
 
-    static void buildParentDir(std::string_view path)
+    static void buildParentDir(std::string_view const path)
     {
         auto const tmperr = errno;
 
-        auto dir = tr_pathbuf{ path };
-        dir.popdir();
-        if (auto const info = tr_sys_path_get_info(path); !info)
+        if (auto const dir = tr_sys_path_dirname(path); !tr_sys_path_exists(dir))
         {
             auto error = tr_error{};
             tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
@@ -433,16 +432,21 @@ protected:
                 auto const suffix = std::string_view{ partial ? ".part" : "" };
                 auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
 
-                auto dirname = tr_pathbuf{ filename.sv() };
-                dirname.popdir();
-                tr_sys_dir_create(dirname, TR_SYS_DIR_CREATE_PARENTS, 0700);
+                tr_sys_dir_create(tr_sys_path_dirname(filename), TR_SYS_DIR_CREATE_PARENTS, 0700);
 
                 auto fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
                 auto const file_size = metainfo->file_size(i);
-                for (uint64_t j = 0; j < file_size; ++j)
+                static auto constexpr BlockSize = uint64_t{ 524288U };
+                auto buf = std::vector<char>(BlockSize);
+                for (uint64_t j = 0; j < file_size;)
                 {
-                    auto const ch = partial && j < metainfo->piece_size() ? '\1' : '\0';
-                    tr_sys_file_write(fd, &ch, 1, nullptr);
+                    auto const piece_0_size = metainfo->piece_size(0U);
+                    auto const is_one = partial && j < piece_0_size;
+                    auto const n_write = std::min(BlockSize, (is_one ? piece_0_size : file_size) - j);
+                    auto const ch = is_one ? '\1' : '\0';
+                    std::fill_n(std::begin(buf), n_write, ch);
+                    tr_sys_file_write(fd, std::data(buf), n_write, nullptr);
+                    j += n_write;
                 }
 
                 tr_sys_file_close(fd);
@@ -519,4 +523,4 @@ private:
     std::vector<tr_torrent*> verified_;
 };
 
-} // namespace libtransmission::test
+} // namespace tr::test

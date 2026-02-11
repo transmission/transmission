@@ -19,7 +19,6 @@
 
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
 
 /**
  * A variant that holds typical benc/json types: bool, int,
@@ -56,37 +55,37 @@ public:
             vec_.reserve(n_reserve);
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto begin() noexcept
+        [[nodiscard]] constexpr auto begin() noexcept
         {
             return std::begin(vec_);
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto begin() const noexcept
+        [[nodiscard]] constexpr auto begin() const noexcept
         {
             return std::cbegin(vec_);
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto cbegin() const noexcept
+        [[nodiscard]] constexpr auto cbegin() const noexcept
         {
             return std::cbegin(vec_);
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto end() noexcept
+        [[nodiscard]] constexpr auto end() noexcept
         {
             return std::end(vec_);
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto end() const noexcept
+        [[nodiscard]] constexpr auto end() const noexcept
         {
             return std::cend(vec_);
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto cend() const noexcept
+        [[nodiscard]] constexpr auto cend() const noexcept
         {
             return std::cend(vec_);
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) noexcept
+        [[nodiscard]] constexpr auto find(tr_quark const key) noexcept
         {
             auto const predicate = [key](auto const& item)
             {
@@ -95,22 +94,22 @@ public:
             return std::find_if(std::begin(vec_), std::end(vec_), predicate);
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) const noexcept
+        [[nodiscard]] constexpr auto find(tr_quark const key) const noexcept
         {
             return Vector::const_iterator{ const_cast<Map*>(this)->find(key) };
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto contains(tr_quark const key) const noexcept
+        [[nodiscard]] constexpr auto contains(tr_quark const key) const noexcept
         {
             return find(key) != end();
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
+        [[nodiscard]] constexpr auto size() const noexcept
         {
             return std::size(vec_);
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto empty() const noexcept
+        [[nodiscard]] constexpr auto empty() const noexcept
         {
             return std::empty(vec_);
         }
@@ -131,7 +130,7 @@ public:
             return 0U;
         }
 
-        TR_CONSTEXPR20 bool replace_key(tr_quark const old_key, tr_quark const new_key)
+        constexpr bool replace_key(tr_quark const old_key, tr_quark const new_key)
         {
             if (contains(new_key))
             {
@@ -183,14 +182,14 @@ public:
         // --- custom functions
 
         template<typename Type>
-        [[nodiscard]] TR_CONSTEXPR20 auto* find_if(tr_quark const key) noexcept
+        [[nodiscard]] constexpr auto* find_if(tr_quark const key) noexcept
         {
             auto const iter = find(key);
             return iter != end() ? iter->second.get_if<Type>() : nullptr;
         }
 
         template<typename Type>
-        [[nodiscard]] TR_CONSTEXPR20 auto const* find_if(tr_quark const key) const noexcept
+        [[nodiscard]] constexpr auto const* find_if(tr_quark const key) const noexcept
         {
             return const_cast<Map*>(this)->find_if<Type>(key);
         }
@@ -309,9 +308,9 @@ public:
     template<typename Val>
     [[nodiscard]] constexpr auto* get_if() noexcept
     {
-        // TODO(c++20): use std::remove_cvref_t (P0550R2) when GCC >= 9.1
         static_assert(
-            !std::is_same_v<std::decay_t<Val>, std::string> && !std::is_same_v<std::decay_t<Val>, std::string_view>,
+            !std::is_same_v<std::remove_cvref_t<Val>, std::string> &&
+                !std::is_same_v<std::remove_cvref_t<Val>, std::string_view>,
             "not supported -- use value_if<std::string_view>() instead.");
         return std::get_if<Val>(&val_);
     }
@@ -319,9 +318,9 @@ public:
     template<typename Val>
     [[nodiscard]] constexpr auto const* get_if() const noexcept
     {
-        // TODO(c++20): use std::remove_cvref_t (P0550R2) when GCC >= 9.1
         static_assert(
-            !std::is_same_v<std::decay_t<Val>, std::string> && !std::is_same_v<std::decay_t<Val>, std::string_view>,
+            !std::is_same_v<std::remove_cvref_t<Val>, std::string> &&
+                !std::is_same_v<std::remove_cvref_t<Val>, std::string_view>,
             "not supported -- use value_if<std::string_view>() instead.");
         return const_cast<tr_variant*>(this)->get_if<Val>();
     }

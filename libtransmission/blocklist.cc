@@ -11,6 +11,7 @@
 #include <initializer_list>
 #include <ios>
 #include <optional>
+#include <ranges>
 #include <string> // std::getline()
 #include <string_view>
 #include <utility> // for std::move, std::pair
@@ -40,7 +41,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
+namespace tr
 {
 namespace
 {
@@ -286,7 +287,7 @@ auto parseFile(std::string_view filename)
     }
 
     // sort ranges by start address
-    std::sort(std::begin(ranges), std::end(ranges), [](auto const& a, auto const& b) { return a.first < b.first; });
+    std::ranges::sort(ranges, [](auto const& a, auto const& b) { return a.first < b.first; });
 
     // merge overlapping ranges
     auto keep = size_t{ 0U };
@@ -467,8 +468,8 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
 }
 
 std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
-    std::string_view external_file,
-    std::string_view bin_file,
+    std::string_view const external_file,
+    std::string_view const bin_file,
     bool is_enabled)
 {
     // if we can't parse the file, do nothing
@@ -480,9 +481,9 @@ std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
 
     // make a copy of `external_file` for our own safekeeping
     auto const src_file = std::string{ std::data(bin_file), std::size(bin_file) - std::size(BinFileSuffix) };
-    tr_sys_path_remove(src_file.c_str());
+    tr_sys_path_remove(src_file);
     auto error = tr_error{};
-    auto const copied = tr_sys_path_copy(tr_pathbuf{ external_file }, src_file.c_str(), &error);
+    auto const copied = tr_sys_path_copy(external_file, src_file, &error);
     if (error)
     {
         tr_logAddWarn(
@@ -514,7 +515,7 @@ void Blocklists::set_enabled(bool is_enabled)
         blocklist.setEnabled(is_enabled);
     }
 
-    changed_.emit();
+    changed_();
 }
 
 void Blocklists::load(std::string_view folder, bool is_enabled)
@@ -522,7 +523,7 @@ void Blocklists::load(std::string_view folder, bool is_enabled)
     folder_ = folder;
     blocklists_ = load_folder(folder, is_enabled);
 
-    changed_.emit();
+    changed_();
 }
 
 // static
@@ -561,7 +562,7 @@ std::vector<Blocklists::Blocklist> Blocklists::Blocklists::load_folder(std::stri
     return ret;
 }
 
-size_t Blocklists::update_primary_blocklist(std::string_view external_file, bool is_enabled)
+size_t Blocklists::update_primary_blocklist(std::string_view const external_file, bool const is_enabled)
 {
     // These rules will replace the default blocklist.
     // Build the path of the default blocklist .bin file where we'll save these rules.
@@ -577,11 +578,10 @@ size_t Blocklists::update_primary_blocklist(std::string_view external_file, bool
     auto const n_rules = std::size(*added);
 
     // Add (or replace) it in our blocklists_ vector
-    if (auto iter = std::find_if(
-            std::begin(blocklists_),
-            std::end(blocklists_),
+    if (auto iter = std::ranges::find_if(
+            blocklists_,
             [&bin_file](auto const& candidate) { return bin_file == candidate.binFile(); });
-        iter != std::end(blocklists_))
+        iter != std::ranges::end(blocklists_))
     {
         *iter = std::move(*added);
     }
@@ -590,9 +590,9 @@ size_t Blocklists::update_primary_blocklist(std::string_view external_file, bool
         blocklists_.emplace_back(std::move(*added));
     }
 
-    changed_.emit();
+    changed_();
 
     return n_rules;
 }
 
-} // namespace libtransmission
+} // namespace tr

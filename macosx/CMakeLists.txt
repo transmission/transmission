@@ -408,7 +408,7 @@ find_library(SPARKLE_FRAMEWORK Sparkle
 target_link_libraries(${TR_NAME}-mac
     PRIVATE
         ${TR_NAME}
-        fmt::fmt-header-only
+        transmission::fmt-header-only
         vdkqueue
         ${SPARKLE_FRAMEWORK}
         "-framework AppKit"

@@ -88,7 +88,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
      * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
     static auto constexpr BufSize = (std::tuple_size_v<tr_sha1_digest_t> * 2U) + std::size(VC) + sizeof(crypto_provide_) +
         sizeof(pad_c_len_) + sizeof(ia_len_) + HandshakeSize;
-    auto outbuf = libtransmission::StackBuffer<BufSize, std::byte>{};
+    auto outbuf = tr::StackBuffer<BufSize, std::byte>{};
 
     /* HASH('req1', S) */
     outbuf.add(tr_sha1::digest("req1"sv, get_dh().secret()));
@@ -527,7 +527,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "read_ia requires an info_hash");
 
     static auto constexpr BufSize = std::size(VC) + sizeof(crypto_select_) + sizeof(pad_d_len_) + HandshakeSize;
-    auto outbuf = libtransmission::StackBuffer<BufSize, std::byte>{};
+    auto outbuf = tr::StackBuffer<BufSize, std::byte>{};
     peer_io->encrypt_init(peer_io->is_incoming(), get_dh(), info_hash);
 
     // send VC
@@ -704,7 +704,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 
 // ---
 
-bool tr_handshake::build_handshake_message(tr_peerIo* io, libtransmission::BufferWriter<std::byte>& buf) const
+bool tr_handshake::build_handshake_message(tr_peerIo* io, tr::BufferWriter<std::byte>& buf) const
 {
     auto const& info_hash = io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "build_handshake_message requires an info_hash");
@@ -734,7 +734,7 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, libtransmission::Buffe
 
 bool tr_handshake::send_handshake(tr_peerIo* io)
 {
-    auto msg = libtransmission::StackBuffer<HandshakeSize, std::byte>{};
+    auto msg = tr::StackBuffer<HandshakeSize, std::byte>{};
     if (!build_handshake_message(io, msg))
     {
         return false;
@@ -813,7 +813,12 @@ bool tr_handshake::fire_done(bool is_connected)
     auto cb = DoneFunc{};
     std::swap(cb, on_done_);
 
-    return (cb)(Result{ peer_io_, peer_id_, have_read_anything_from_peer_, is_connected });
+    return (cb)(Result{
+        .io = peer_io_,
+        .peer_id = peer_id_,
+        .read_anything_from_peer = have_read_anything_from_peer_,
+        .is_connected = is_connected,
+    });
 }
 
 void tr_handshake::fire_timer()

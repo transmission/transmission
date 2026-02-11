@@ -30,12 +30,12 @@ struct tr_error;
 struct tr_torrent_files
 {
 public:
-    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
+    [[nodiscard]] constexpr bool empty() const noexcept
     {
         return std::empty(files_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t file_count() const noexcept
+    [[nodiscard]] constexpr size_t file_count() const noexcept
     {
         return std::size(files_);
     }
@@ -116,9 +116,11 @@ public:
         std::string_view parent_name = "",
         tr_error* error = nullptr) const;
 
-    using FileFunc = std::function<void(char const* filename)>;
-    void remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func, tr_error* error = nullptr)
-        const;
+    void remove(
+        std::string_view parent_in,
+        std::string_view tmpdir_prefix,
+        tr_torrent_remove_func const& func,
+        tr_error* error = nullptr) const;
 
     struct FoundFile : public tr_sys_path_info
     {
@@ -155,6 +157,7 @@ public:
 
     [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t file, std::string_view const* paths, size_t n_paths) const;
     [[nodiscard]] bool has_any_local_data(std::string_view const* paths, size_t n_paths) const;
+    [[nodiscard]] std::string_view primary_mime_type() const;
 
     static void sanitize_subpath(std::string_view path, tr_pathbuf& append_me, bool os_specific = true);
 

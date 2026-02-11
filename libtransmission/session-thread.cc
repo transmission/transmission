@@ -110,15 +110,22 @@ unsigned long thread_current_id()
 void init_evthreads_once()
 {
     evthread_lock_callbacks constexpr LockCbs{
-        EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
+        .lock_api_version = EVTHREAD_LOCK_API_VERSION,
+        .supported_locktypes = EVTHREAD_LOCKTYPE_RECURSIVE,
+        .alloc = lock_alloc,
+        .free = lock_free,
+        .lock = lock_lock,
+        .unlock = lock_unlock,
     };
     evthread_set_lock_callbacks(&LockCbs);
 
-    evthread_condition_callbacks constexpr CondCbs{ EVTHREAD_CONDITION_API_VERSION,
-                                                    cond_alloc,
-                                                    cond_free,
-                                                    cond_signal,
-                                                    cond_wait };
+    evthread_condition_callbacks constexpr CondCbs{
+        .condition_api_version = EVTHREAD_CONDITION_API_VERSION,
+        .alloc_condition = cond_alloc,
+        .free_condition = cond_free,
+        .signal_condition = cond_signal,
+        .wait_condition = cond_wait,
+    };
     evthread_set_condition_callbacks(&CondCbs);
 
     evthread_set_id_callback(thread_current_id);
@@ -130,7 +137,9 @@ auto make_event_base()
 {
     tr_session_thread::tr_evthread_init();
 
-    return libtransmission::evhelpers::evbase_unique_ptr{ event_base_new() };
+    struct event_base* b = event_base_new();
+    event_base_priority_init(b, 3);
+    return tr::evhelpers::evbase_unique_ptr{ b };
 }
 
 } // namespace
@@ -193,7 +202,7 @@ public:
         return thread_id_ == std::this_thread::get_id();
     }
 
-    void queue(std::function<void(void)>&& func) override
+    void queue(callback_t&& func) override
     {
         work_queue_mutex_.lock();
         work_queue_.emplace_back(std::move(func));
@@ -202,7 +211,7 @@ public:
         event_active(work_queue_event_.get(), 0, {});
     }
 
-    void run(std::function<void(void)>&& func) override
+    void run(callback_t&& func) override
     {
         if (am_in_session_thread())
         {
@@ -215,8 +224,7 @@ public:
     }
 
 private:
-    using callback = std::function<void(void)>;
-    using work_queue_t = std::list<callback>;
+    using work_queue_t = std::list<callback_t>;
 
     void session_thread_func(struct event_base* evbase)
     {
@@ -273,9 +281,9 @@ private:
         }
     }
 
-    libtransmission::evhelpers::evbase_unique_ptr const evbase_{ make_event_base() };
-    libtransmission::evhelpers::event_unique_ptr const work_queue_event_{
-        event_new(evbase_.get(), -1, 0, on_work_available_static, this)
+    tr::evhelpers::evbase_unique_ptr const evbase_{ make_event_base() };
+    tr::evhelpers::event_unique_ptr const work_queue_event_{
+        tr::evhelpers::event_new_pri2(evbase_.get(), -1, 0, on_work_available_static, this)
     };
 
     work_queue_t work_queue_;

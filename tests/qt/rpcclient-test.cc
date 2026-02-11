@@ -15,7 +15,7 @@
 #include "RpcClient.h"
 #include "rpc-test-fixtures.h"
 
-namespace api_compat = libtransmission::api_compat;
+namespace api_compat = tr::api_compat;
 using Style = api_compat::Style;
 
 Q_DECLARE_METATYPE(Style)

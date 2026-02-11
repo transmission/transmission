@@ -49,6 +49,7 @@ runs:
 
           # Transmission-specific libraries with Fedora names
           dnf install -y \
+            fast_float-devel \
             fmt-devel \
             google-crc32c-devel \
             libb64-devel \
@@ -58,7 +59,8 @@ runs:
             libnatpmp-devel \
             libpsl-devel \
             miniupnpc-devel \
-            openssl-devel
+            openssl-devel \
+            utf8cpp-devel
 
           # Compiler packages
           if [[ "${{ inputs.compiler }}" == "clang" ]]; then
@@ -101,7 +103,6 @@ runs:
             libcurl4-openssl-dev
             libdeflate-dev
             libevent-dev
-            libfmt-dev
             libminiupnpc-dev
             libnatpmp-dev
             libpsl-dev
@@ -111,6 +112,20 @@ runs:
             pkg-config
             xz-utils
           )
+
+          # Debian wants to build Transmission with system gtest
+          # https://github.com/transmission/transmission/pull/6900
+          if [ "$DISTRO" = 'debian' ]; then
+            BASE_PACKAGES+=(libgtest-dev)
+          fi
+
+          if [ ! "$DISTRO" = 'debian' ] || [ ! "$DISTRO_VERSION" = '11' ]; then
+            BASE_PACKAGES+=(
+              libfast-float-dev
+              libfmt-dev
+              libutfcpp-dev
+            )
+          fi
 
           # Compiler packages
           if [[ "${{ inputs.compiler }}" == "clang" ]]; then
@@ -200,12 +215,15 @@ runs:
         # Transmission-specific libraries
         BASE_PACKAGES+=(
           crc32c
+          fast_float
+          fmt
           libb64
           libdeflate
           libevent
           libnatpmp
           libpsl
           miniupnpc
+          utf8cpp
         )
 
         brew install --formulae "${BASE_PACKAGES[@]}"

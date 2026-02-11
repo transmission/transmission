@@ -149,7 +149,6 @@
 		A23F4FF20D1D98AD002FCB97 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */; };
 		A23F50020D1D99D7002FCB97 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F50000D1D99D7002FCB97 /* MainMenu.xib */; };
 		A23F526F0F14395900AA02E3 /* PredicateEditorRowTemplateAny.mm in Sources */ = {isa = PBXBuildFile; fileRef = A23F526E0F14395900AA02E3 /* PredicateEditorRowTemplateAny.mm */; };
-		A23FAE54178BC2950053DC5B /* file-capacity.cc in Sources */ = {isa = PBXBuildFile; fileRef = A23FAE52178BC2950053DC5B /* file-capacity.cc */; };
 		A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A242AD9115F05D23002B3A6C /* Localizable.strings */; };
 		A2451E6916ACE4EB00586E0E /* FileRenameSheetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2451E6716ACE4EB00586E0E /* FileRenameSheetController.mm */; };
 		A2451E6A16ACE4EB00586E0E /* FileRenameSheetController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */; };
@@ -949,7 +948,6 @@
 		A23F29A0132A447400E9A83B /* announcer-http.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "announcer-http.cc"; sourceTree = "<group>"; };
 		A23F526D0F14395900AA02E3 /* PredicateEditorRowTemplateAny.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PredicateEditorRowTemplateAny.h; sourceTree = "<group>"; };
 		A23F526E0F14395900AA02E3 /* PredicateEditorRowTemplateAny.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PredicateEditorRowTemplateAny.mm; sourceTree = "<group>"; };
-		A23FAE52178BC2950053DC5B /* file-capacity.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-capacity.cc"; sourceTree = "<group>"; };
 		A242AD9215F05D23002B3A6C /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2451E6616ACE4EB00586E0E /* FileRenameSheetController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileRenameSheetController.h; sourceTree = "<group>"; };
 		A2451E6716ACE4EB00586E0E /* FileRenameSheetController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileRenameSheetController.mm; sourceTree = "<group>"; };
@@ -1995,7 +1993,6 @@
 				4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */,
 				C1425B381EE9C805001DB851 /* peer-socket.h */,
 				C1425B381EE9C805001DB853 /* peer-socket.cc */,
-				A23FAE52178BC2950053DC5B /* file-capacity.cc */,
 				BEFC1E030C07861A00B0BB3C /* platform.cc */,
 				BEFC1E020C07861A00B0BB3C /* platform.h */,
 				BEFC1DFD0C07861A00B0BB3C /* port-forwarding.cc */,
@@ -3513,7 +3510,6 @@
 				A25BFD6D167BED3B0039D1AA /* variant.cc in Sources */,
 				A2EA52311686AC0D00180493 /* quark.cc in Sources */,
 				A2AF23C816B44FA0003BC59E /* log.cc in Sources */,
-				A23FAE54178BC2950053DC5B /* file-capacity.cc in Sources */,
 				62F644738FE3D8788EBF73A9 /* block-info.cc in Sources */,
 				E975121263DD973CAF4AEBA4 /* timer-ev.cc in Sources */,
 			);
@@ -4350,6 +4346,7 @@
 					"third-party/dht",
 					"third-party/fast_float/include",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/rapidjson/include",
 					"third-party/libb64/include",
@@ -4393,6 +4390,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = app;
@@ -4411,6 +4409,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -4433,6 +4432,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -4451,6 +4451,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -4596,6 +4597,7 @@
 					"third-party/dht",
 					"third-party/fast_float/include",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/rapidjson/include",
 					"third-party/libb64/include",
@@ -4628,6 +4630,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -4657,6 +4660,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = app;
@@ -4863,6 +4867,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = app;
@@ -4881,6 +4886,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -4922,6 +4928,7 @@
 					"third-party/dht",
 					"third-party/fast_float/include",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/rapidjson/include",
 					"third-party/libb64/include",
@@ -4958,6 +4965,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -4976,6 +4984,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5050,6 +5059,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = qlgenerator;
@@ -5078,6 +5088,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = qlgenerator;
@@ -5106,6 +5117,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = qlgenerator;
@@ -5168,6 +5180,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5186,6 +5199,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5336,6 +5350,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5354,6 +5369,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5372,6 +5388,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5390,6 +5407,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5408,6 +5426,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5426,6 +5445,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5444,6 +5464,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5462,6 +5483,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5480,6 +5502,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -5513,6 +5536,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 				);
 			};
@@ -5545,6 +5569,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 				);
 			};
@@ -5577,6 +5602,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
+					"third-party/sigslot/include",
 					"third-party/small/include",
 				);
 			};

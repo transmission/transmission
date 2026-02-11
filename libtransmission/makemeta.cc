@@ -8,6 +8,7 @@
 #include <cmath>
 #include <ctime> // time()
 #include <iterator>
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -232,7 +233,7 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
         TR_ASSERT(left_in_piece == 0);
         sha.add(std::data(buf), std::size(buf));
         auto const digest = sha.finish();
-        walk = std::copy(std::begin(digest), std::end(digest), walk);
+        walk = std::ranges::copy(digest, walk).out;
         sha.clear();
 
         total_remain -= piece_size;

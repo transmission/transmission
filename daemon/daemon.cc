@@ -65,7 +65,7 @@ struct tr_torrent;
 #endif
 
 using namespace std::literals;
-using libtransmission::Watchdir;
+using tr::Watchdir;
 
 namespace
 {
@@ -436,8 +436,8 @@ bool tr_daemon::reopen_log_file(char const* filename)
 
 void tr_daemon::report_status()
 {
-    double const up = tr_sessionGetRawSpeed_KBps(my_session_, TR_UP);
-    double const dn = tr_sessionGetRawSpeed_KBps(my_session_, TR_DOWN);
+    auto const up = tr_sessionGetRawSpeed_KBps(my_session_, tr_direction::Up);
+    auto const dn = tr_sessionGetRawSpeed_KBps(my_session_, tr_direction::Down);
 
     if (up > 0 || dn > 0)
     {
@@ -864,13 +864,13 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
         return 1;
     }
 
-    auto const sz_pid_filename = std::string{ settings_map->value_if<std::string_view>(TR_KEY_pidfile).value_or(""sv) };
     auto pidfile_created = false;
-    if (!std::empty(sz_pid_filename))
+    auto const pid_filename = settings_map->value_if<std::string_view>(TR_KEY_pidfile).value_or(""sv);
+    if (!std::empty(pid_filename))
     {
         auto error = tr_error{};
         tr_sys_file_t fp = tr_sys_file_open(
-            sz_pid_filename.c_str(),
+            pid_filename,
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0666,
             &error);
@@ -880,7 +880,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             auto const out = std::to_string(getpid());
             tr_sys_file_write(fp, std::data(out), std::size(out), nullptr);
             tr_sys_file_close(fp);
-            tr_logAddInfo(fmt::format(fmt::runtime(_("Saved pidfile '{path}'")), fmt::arg("path", sz_pid_filename)));
+            tr_logAddInfo(fmt::format(fmt::runtime(_("Saved pidfile '{path}'")), fmt::arg("path", pid_filename)));
             pidfile_created = true;
         }
         else
@@ -888,7 +888,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             tr_logAddError(
                 fmt::format(
                     fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
-                    fmt::arg("path", sz_pid_filename),
+                    fmt::arg("path", pid_filename),
                     fmt::arg("error", error.message()),
                     fmt::arg("error_code", error.code())));
         }
@@ -922,7 +922,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
                 return onFileAdded(session, dirname, basename);
             };
 
-            auto timer_maker = libtransmission::EvTimerMaker{ ev_base_ };
+            auto timer_maker = tr::EvTimerMaker{ ev_base_ };
             watchdir = force_generic ? Watchdir::create_generic(dir, handler, timer_maker) :
                                        Watchdir::create(dir, handler, timer_maker, ev_base_);
         }
@@ -1028,7 +1028,7 @@ CLEANUP:
     /* cleanup */
     if (pidfile_created)
     {
-        tr_sys_path_remove(sz_pid_filename);
+        tr_sys_path_remove(pid_filename);
     }
 
     sd_notify(0, "STATUS=\n");
@@ -1041,7 +1041,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     config_dir_ = getConfigDir(argc, argv);
 
     /* load settings from defaults + config file */
-    settings_ = load_settings(config_dir_.c_str());
+    settings_ = load_settings(config_dir_);
 
     bool dumpSettings;
 

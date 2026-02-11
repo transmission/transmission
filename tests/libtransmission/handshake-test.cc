@@ -23,6 +23,8 @@
 
 #include <event2/util.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_sha1_to_string, tr_base...
@@ -37,14 +39,13 @@
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
 #define LOCAL_SOCKETPAIR_AF TR_IF_WIN32(AF_INET, AF_UNIX)
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 auto constexpr MaxWaitMsec = 5000;
@@ -83,7 +84,7 @@ public:
             return {};
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
+        [[nodiscard]] tr::TimerMaker& timer_maker() override
         {
             return session_->timerMaker();
         }
@@ -467,7 +468,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     static auto constexpr WantedLen = tr_handshake::PadbMaxlen + std::tuple_size_v<tr_sha1_digest_t>;
     static auto constexpr NeedleBase64 = "mbpZFBwdi4U1snVvboN3sMEpNmU="sv;
     auto const needle = tr_base64_decode(NeedleBase64);
-    auto buf = libtransmission::StackBuffer<WantedLen, char>{};
+    auto buf = tr::StackBuffer<WantedLen, char>{};
     ASSERT_TRUE(waitFor(
         [&s = sock, &buf, &needle, n_read = size_t{}]() mutable
         {
@@ -524,4 +525,4 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     tr_net_close_socket(sock);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

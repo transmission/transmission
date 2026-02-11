@@ -49,7 +49,7 @@
 #endif
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace
 {
@@ -114,7 +114,7 @@ SystemTrayIcon::Impl::~Impl() = default;
 
 void SystemTrayIcon::Impl::activated()
 {
-    gtr_action_activate(GTR_KEY_toggle_main_window);
+    gtr_action_activate("toggle-main-window");
 }
 
 void SystemTrayIcon::Impl::popup(guint /*button*/, guint /*when*/)
@@ -205,6 +205,10 @@ std::string SystemTrayIcon::Impl::make_tooltip_text() const
     auto const* const session = core_->get_session();
     return fmt::format(
         fmt::runtime(_("{upload_speed} ▲ {download_speed} ▼")),
-        fmt::arg("upload_speed", Speed{ tr_sessionGetRawSpeed_KBps(session, TR_UP), Speed::Units::KByps }.to_string()),
-        fmt::arg("download_speed", Speed{ tr_sessionGetRawSpeed_KBps(session, TR_DOWN), Speed::Units::KByps }.to_string()));
+        fmt::arg(
+            "upload_speed",
+            Speed{ tr_sessionGetRawSpeed_KBps(session, tr_direction::Up), Speed::Units::KByps }.to_string()),
+        fmt::arg(
+            "download_speed",
+            Speed{ tr_sessionGetRawSpeed_KBps(session, tr_direction::Down), Speed::Units::KByps }.to_string()));
 }

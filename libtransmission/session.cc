@@ -15,6 +15,7 @@
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -63,7 +64,7 @@
 struct tr_ctor;
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace
 {
@@ -84,7 +85,7 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     {
         return;
     }
-    libtransmission::api_compat::convert_incoming_data(*groups_var);
+    tr::api_compat::convert_incoming_data(*groups_var);
 
     auto const* const groups_map = groups_var->get_if<tr_variant::Map>();
     if (groups_map == nullptr)
@@ -127,8 +128,8 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 
         if (auto const val = group_map->value_if<bool>(TR_KEY_honors_session_limits); val)
         {
-            group.honor_parent_limits(TR_UP, *val);
-            group.honor_parent_limits(TR_DOWN, *val);
+            group.honor_parent_limits(tr_direction::Up, *val);
+            group.honor_parent_limits(tr_direction::Down, *val);
         }
     }
 }
@@ -143,7 +144,7 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view const confi
         auto group_map = tr_variant::Map{ 6U };
         group_map.try_emplace(TR_KEY_download_limit, limits.down_limit.count(Speed::Units::KByps));
         group_map.try_emplace(TR_KEY_download_limited, limits.down_limited);
-        group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(TR_UP));
+        group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(tr_direction::Up));
         group_map.try_emplace(TR_KEY_name, name.sv());
         group_map.try_emplace(TR_KEY_upload_limit, limits.up_limit.count(Speed::Units::KByps));
         group_map.try_emplace(TR_KEY_upload_limited, limits.up_limited);
@@ -151,7 +152,7 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view const confi
     }
 
     auto out = tr_variant{ std::move(groups_map) };
-    libtransmission::api_compat::convert_outgoing_data(out);
+    tr::api_compat::convert_outgoing_data(out);
     tr_variant_serde::json().to_file(out, tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
 }
 } // namespace bandwidth_group_helpers
@@ -348,7 +349,7 @@ size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
     auto const lock = session_->unique_lock();
 
     auto const* const tor = session_->torrents().get(torrent_id);
-    return tor == nullptr ? 0U : tor->bandwidth().clamp(TR_DOWN, byte_count);
+    return tor == nullptr ? 0U : tor->bandwidth().clamp(tr_direction::Down, byte_count);
 }
 
 std::optional<std::string> tr_session::WebMediator::proxyUrl() const
@@ -361,9 +362,9 @@ void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchRes
     session_->run_in_session_thread(std::move(func), std::move(response));
 }
 
-time_t tr_session::WebMediator::now() const
+std::chrono::steady_clock::time_point tr_session::WebMediator::now() const
 {
-    return tr_time();
+    return std::chrono::steady_clock::now();
 }
 
 void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
@@ -411,7 +412,7 @@ tr_session::BoundSocket::BoundSocket(
     : cb_{ cb }
     , cb_data_{ cb_data }
     , socket_{ tr_netBindTCP(addr, port, false) }
-    , ev_{ event_new(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocket::onCanRead, this) }
+    , ev_{ tr::evhelpers::event_new_pri2(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocket::onCanRead, this) }
 {
     if (socket_ == TR_BAD_SOCKET)
     {
@@ -496,7 +497,7 @@ tr_variant tr_sessionLoadSettings(std::string_view const config_dir, tr_variant 
     {
         if (auto file_settings = tr_variant_serde::json().parse_file(filename))
         {
-            libtransmission::api_compat::convert_incoming_data(*file_settings);
+            tr::api_compat::convert_incoming_data(*file_settings);
             settings.merge(*file_settings);
         }
     }
@@ -520,14 +521,14 @@ void tr_sessionSaveSettings(tr_session* session, std::string_view const config_d
     auto settings = tr_sessionGetDefaultSettings();
     if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        libtransmission::api_compat::convert_incoming_data(*file_settings);
+        tr::api_compat::convert_incoming_data(*file_settings);
         settings.merge(*file_settings);
     }
     settings.merge(client_settings);
     settings.merge(tr_sessionGetSettings(session));
 
     // save 'em
-    libtransmission::api_compat::convert_outgoing_data(settings);
+    tr::api_compat::convert_outgoing_data(settings);
     tr_variant_serde::json().to_file(settings, filename);
 
     // write bandwidth groups limits to file
@@ -614,8 +615,6 @@ namespace queue_helpers
 {
 std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_direction dir, size_t num_wanted)
 {
-    TR_ASSERT(tr_isDirection(dir));
-
     auto candidates = torrents.get_matching([dir](auto const* const tor) { return tor->is_queued(dir); });
 
     // find the best n candidates
@@ -643,7 +642,7 @@ size_t tr_session::count_queue_free_slots(tr_direction dir) const noexcept
     }
 
     auto const max = queueSize(dir);
-    auto const activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+    auto const activity = dir == tr_direction::Up ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
 
     // count how many torrents are active
     auto active_count = size_t{};
@@ -684,7 +683,7 @@ void tr_session::on_queue_timer()
 {
     using namespace queue_helpers;
 
-    for (auto const dir : { TR_UP, TR_DOWN })
+    for (auto const dir : { tr_direction::Up, tr_direction::Down })
     {
         if (!queueEnabled(dir))
         {
@@ -716,6 +715,7 @@ void tr_session::on_save_timer()
     }
 
     stats().save();
+    torrent_queue().to_file();
 }
 
 void tr_session::initImpl(init_data& data)
@@ -885,8 +885,8 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 
     // We need to update bandwidth if speed settings changed.
     // It's a harmless call, so just call it instead of checking for settings changes
-    update_bandwidth(TR_UP);
-    update_bandwidth(TR_DOWN);
+    update_bandwidth(tr_direction::Up);
+    update_bandwidth(tr_direction::Down);
 }
 
 void tr_sessionSet(tr_session* session, tr_variant const& settings)
@@ -932,9 +932,7 @@ void tr_session::Settings::fixup_to_preferred_transports()
         auto const remove_it = std::remove(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_UTP);
         preferred_transports.erase(remove_it, std::end(preferred_transports));
     }
-    else if (
-        std::find(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_UTP) ==
-        std::end(preferred_transports))
+    else if (std::ranges::find(preferred_transports, TR_PREFER_UTP) == std::ranges::end(preferred_transports))
     {
         TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
         preferred_transports.emplace(std::begin(preferred_transports), TR_PREFER_UTP);
@@ -945,9 +943,7 @@ void tr_session::Settings::fixup_to_preferred_transports()
         auto const remove_it = std::remove(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_TCP);
         preferred_transports.erase(remove_it, std::end(preferred_transports));
     }
-    else if (
-        std::find(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_TCP) ==
-        std::end(preferred_transports))
+    else if (std::ranges::find(preferred_transports, TR_PREFER_TCP) == std::ranges::end(preferred_transports))
     {
         TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
         preferred_transports.emplace_back(TR_PREFER_TCP);
@@ -1168,8 +1164,8 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
 {
     auto const in_session_thread = [session = &session_, is_active, reason]()
     {
-        session->update_bandwidth(TR_UP);
-        session->update_bandwidth(TR_DOWN);
+        session->update_bandwidth(tr_direction::Up);
+        session->update_bandwidth(tr_direction::Down);
 
         if (session->alt_speed_active_changed_func_ != nullptr)
         {
@@ -1189,25 +1185,20 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
 void tr_sessionSetSpeedLimit_KBps(tr_session* const session, tr_direction const dir, size_t const limit_kbyps)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     session->set_speed_limit(dir, Speed{ limit_kbyps, Speed::Units::KByps });
 }
 
 size_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     return session->speed_limit(dir).count(Speed::Units::KByps);
 }
 
 void tr_sessionLimitSpeed(tr_session* session, tr_direction const dir, bool limited)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
+    if (dir == tr_direction::Down)
     {
         session->settings_.speed_limit_down_enabled = limited;
     }
@@ -1222,8 +1213,6 @@ void tr_sessionLimitSpeed(tr_session* session, tr_direction const dir, bool limi
 bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction const dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     return session->is_speed_limited(dir);
 }
 
@@ -1232,8 +1221,6 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction const dir)
 void tr_sessionSetAltSpeed_KBps(tr_session* const session, tr_direction const dir, size_t const limit_kbyps)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     session->alt_speeds_.set_speed_limit(dir, Speed{ limit_kbyps, Speed::Units::KByps });
     session->update_bandwidth(dir);
 }
@@ -1241,8 +1228,6 @@ void tr_sessionSetAltSpeed_KBps(tr_session* const session, tr_direction const di
 size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     return session->alt_speeds_.speed_limit(dir).count(Speed::Units::KByps);
 }
 
@@ -1410,9 +1395,8 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // so that the most important announce=stopped events are
     // fired out first...
     auto torrents = torrents_.get_all();
-    std::sort(
-        std::begin(torrents),
-        std::end(torrents),
+    std::ranges::sort(
+        torrents,
         [](auto const* a, auto const* b)
         {
             auto const a_cur = a->bytes_downloaded_.ever();
@@ -1503,15 +1487,10 @@ auto get_remaining_files(std::string_view folder, std::vector<std::string>& queu
     auto files = tr_sys_dir_get_files(folder);
     auto ret = std::vector<std::string>{};
     ret.reserve(std::size(files));
-    std::sort(std::begin(queue_order), std::end(queue_order));
-    std::sort(std::begin(files), std::end(files));
+    std::ranges::sort(queue_order);
+    std::ranges::sort(files);
 
-    std::set_difference(
-        std::begin(files),
-        std::end(files),
-        std::begin(queue_order),
-        std::end(queue_order),
-        std::back_inserter(ret));
+    std::ranges::set_difference(files, queue_order, std::back_inserter(ret));
 
     // Read .torrent first if somehow a .magnet of the same hash exists
     // Example of possible cause: https://github.com/transmission/transmission/issues/5007
@@ -1826,7 +1805,7 @@ bool tr_blocklistExists(tr_session const* session)
     return session->blocklists_.num_lists() > 0U;
 }
 
-size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
+size_t tr_blocklistSetContent(tr_session* session, std::string_view const content_filename)
 {
     auto const lock = session->unique_lock();
     return session->blocklists_.update_primary_blocklist(content_filename, session->blocklist_enabled());
@@ -2007,9 +1986,8 @@ std::string tr_sessionGetScript(tr_session const* const session, TrScript const 
 void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
+    if (dir == tr_direction::Down)
     {
         session->settings_.download_queue_size = max_simultaneous_torrents;
     }
@@ -2022,7 +2000,6 @@ void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_si
 size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
     return session->queueSize(dir);
 }
@@ -2030,9 +2007,8 @@ size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
 void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_torrents)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
+    if (dir == tr_direction::Down)
     {
         session->settings_.download_queue_enabled = do_limit_simultaneous_torrents;
     }
@@ -2045,8 +2021,6 @@ void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_li
 bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
     return session->queueEnabled(dir);
 }
 
@@ -2164,33 +2138,34 @@ namespace
 auto constexpr QueueInterval = 1s;
 auto constexpr SaveInterval = 360s;
 
+[[nodiscard]] auto makeSubdir(std::string_view const parent, std::string_view const child)
+{
+    auto dir = fmt::format("{:s}/{:s}"sv, parent, child);
+    tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return dir;
+}
+
 auto makeResumeDir(std::string_view config_dir)
 {
 #if defined(__APPLE__) || defined(_WIN32)
-    auto dir = fmt::format("{:s}/Resume"sv, config_dir);
+    return makeSubdir(config_dir, "Resume"sv);
 #else
-    auto dir = fmt::format("{:s}/resume"sv, config_dir);
+    return makeSubdir(config_dir, "resume"sv);
 #endif
-    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-    return dir;
 }
 
 auto makeTorrentDir(std::string_view config_dir)
 {
 #if defined(__APPLE__) || defined(_WIN32)
-    auto dir = fmt::format("{:s}/Torrents"sv, config_dir);
+    return makeSubdir(config_dir, "Torrents"sv);
 #else
-    auto dir = fmt::format("{:s}/torrents"sv, config_dir);
+    return makeSubdir(config_dir, "torrents"sv);
 #endif
-    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-    return dir;
 }
 
 auto makeBlocklistDir(std::string_view config_dir)
 {
-    auto dir = fmt::format("{:s}/blocklists"sv, config_dir);
-    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-    return dir;
+    return makeSubdir(config_dir, "blocklists"sv);
 }
 } // namespace
 
@@ -2200,7 +2175,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , blocklist_dir_{ makeBlocklistDir(config_dir) }
     , session_thread_{ tr_session_thread::create() }
-    , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(event_base()) }
+    , timer_maker_{ std::make_unique<tr::EvTimerMaker>(event_base()) }
     , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }

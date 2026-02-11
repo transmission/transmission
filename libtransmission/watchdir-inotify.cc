@@ -31,7 +31,7 @@
 
 struct event_base;
 
-namespace libtransmission
+namespace tr
 {
 
 class TimerMaker;
@@ -182,10 +182,10 @@ private:
 std::unique_ptr<Watchdir> Watchdir::create(
     std::string_view dirname,
     Callback callback,
-    libtransmission::TimerMaker& timer_maker,
+    tr::TimerMaker& timer_maker,
     event_base* evbase)
 {
     return std::make_unique<INotifyWatchdir>(dirname, std::move(callback), timer_maker, evbase);
 }
 
-} // namespace libtransmission
+} // namespace tr

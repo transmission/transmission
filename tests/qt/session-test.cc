@@ -24,7 +24,7 @@
 #define QCOMPARE_NE(actual, expected) QVERIFY((actual) != (expected))
 #endif
 
-namespace api_compat = libtransmission::api_compat;
+namespace api_compat = tr::api_compat;
 using Style = api_compat::Style;
 
 Q_DECLARE_METATYPE(Style)
@@ -45,6 +45,9 @@ Q_DECLARE_METATYPE(Style)
                 .arg(dir)
         };
     }
+
+    abort();
+    return {};
 }
 
 class SessionTest

@@ -21,6 +21,8 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_rand_int()
@@ -29,10 +31,9 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-using UtilsTest = ::libtransmission::test::TransmissionTest;
+using UtilsTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(UtilsTest, trStrvContains)
@@ -203,6 +204,18 @@ TEST_F(UtilsTest, strvReplaceInvalid)
     EXPECT_EQ(out, tr_strv_replace_invalid(out));
 }
 
+TEST_F(UtilsTest, strvFindInvalidUtf8)
+{
+    EXPECT_EQ(std::string_view::npos, tr_strv_find_invalid_utf8("hello"sv));
+    EXPECT_EQ(std::string_view::npos, tr_strv_find_invalid_utf8("Трудно быть Богом"sv));
+
+    auto const invalid = std::string{ static_cast<char>(0xC3), static_cast<char>(0x28) };
+    EXPECT_EQ(0U, tr_strv_find_invalid_utf8(invalid));
+
+    auto const mixed = std::string{ "ok " } + invalid + " end";
+    EXPECT_EQ(3U, tr_strv_find_invalid_utf8(mixed));
+}
+
 TEST_F(UtilsTest, strvConvertUtf8Fuzz)
 {
     auto buf = std::vector<char>{};
@@ -311,7 +324,7 @@ TEST_F(UtilsTest, saveFile)
     auto filename = tr_pathbuf{};
 
     // save a file to GoogleTest's temp dir
-    auto const sandbox = libtransmission::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     filename.assign(sandbox, "filename.txt"sv);
     auto contents = "these are the contents"sv;
     auto error = tr_error{};

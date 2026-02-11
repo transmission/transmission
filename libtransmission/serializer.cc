@@ -8,6 +8,7 @@
 #include <chrono>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t, uint32_t, uint64_t
+#include <filesystem>
 #include <limits>
 #include <mutex>
 #include <optional>
@@ -34,7 +35,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission::serializer
+namespace tr::serializer
 {
 namespace
 {
@@ -463,6 +464,47 @@ tr_variant from_verify_added_mode(tr_verify_added_mode const& val)
 {
     return from_enum_or_integral_with_lookup(VerifyModeKeys, val);
 }
+
+// ---
+
+bool to_u8string(tr_variant const& src, std::u8string* tgt)
+{
+    if (auto const val = src.value_if<std::string_view>())
+    {
+        if (tr_strv_find_invalid_utf8(*val) != std::string_view::npos)
+        {
+            tr_logAddWarn(fmt::format(fmt::runtime(_("String '{string}' contains invalid UTF-8")), fmt::arg("string", *val)));
+        }
+
+        *tgt = tr_strv_to_u8string(tr_strv_replace_invalid(*val));
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant from_u8string(std::u8string const& val)
+{
+    return std::string{ reinterpret_cast<char const*>(std::data(val)), std::size(val) };
+}
+
+// ---
+
+bool to_fs_path(tr_variant const& src, std::filesystem::path* tgt)
+{
+    if (auto u8str = std::u8string{}; to_u8string(src, &u8str))
+    {
+        *tgt = std::filesystem::path{ u8str };
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant from_fs_path(std::filesystem::path const& path)
+{
+    return from_u8string(path.u8string());
+}
 } // unnamed namespace
 
 void Converters::ensure_default_converters()
@@ -476,6 +518,7 @@ void Converters::ensure_default_converters()
             Converters::add(to_diffserv_t, from_diffserv_t);
             Converters::add(to_double, from_double);
             Converters::add(to_encryption_mode, from_encryption_mode);
+            Converters::add(to_fs_path, from_fs_path);
             Converters::add(to_int64, from_int64);
             Converters::add(to_log_level, from_log_level);
             Converters::add(to_mode_t, from_mode_t);
@@ -485,9 +528,10 @@ void Converters::ensure_default_converters()
             Converters::add(to_preferred_transport, from_preferred_transport);
             Converters::add(to_size_t, from_size_t);
             Converters::add(to_string, from_string);
+            Converters::add(to_u8string, from_u8string);
             Converters::add(to_uint64, from_uint64);
             Converters::add(to_verify_added_mode, from_verify_added_mode);
         });
 }
 
-} // namespace libtransmission::serializer
+} // namespace tr::serializer

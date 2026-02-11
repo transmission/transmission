@@ -9,7 +9,7 @@
 
 struct tr_variant;
 
-namespace libtransmission::api_compat
+namespace tr::api_compat
 {
 enum class Style : uint8_t
 {
@@ -24,4 +24,4 @@ void convert_outgoing_data(tr_variant& var);
 [[nodiscard]] Style default_style();
 void set_default_style(Style style);
 
-} // namespace libtransmission::api_compat
+} // namespace tr::api_compat

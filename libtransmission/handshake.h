@@ -33,7 +33,7 @@
 struct tr_error;
 struct tr_socket_address;
 
-namespace libtransmission
+namespace tr
 {
 template<typename value_type>
 class BufferWriter;
@@ -71,7 +71,7 @@ public:
 
         [[nodiscard]] virtual std::optional<TorrentInfo> torrent(tr_sha1_digest_t const& info_hash) const = 0;
         [[nodiscard]] virtual std::optional<TorrentInfo> torrent_from_obfuscated(tr_sha1_digest_t const& info_hash) const = 0;
-        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
+        [[nodiscard]] virtual tr::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual bool allows_dht() const = 0;
         [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;
         [[nodiscard]] virtual DH::private_key_bigend_t private_key() const
@@ -234,7 +234,7 @@ private:
 
     static void on_error(tr_peerIo* io, tr_error const& error, void* vhandshake);
 
-    bool build_handshake_message(tr_peerIo* io, libtransmission::BufferWriter<std::byte>& buf) const;
+    bool build_handshake_message(tr_peerIo* io, tr::BufferWriter<std::byte>& buf) const;
 
     bool send_handshake(tr_peerIo* io);
 
@@ -325,7 +325,7 @@ private:
 
     std::shared_ptr<tr_peerIo> peer_io_;
 
-    std::unique_ptr<libtransmission::Timer> timeout_timer_;
+    std::unique_ptr<tr::Timer> timeout_timer_;
 
     Mediator* mediator_ = nullptr;
 

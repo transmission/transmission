@@ -26,7 +26,7 @@ struct tr_variant;
 /** Manages alternate speed limits and a scheduler to auto-toggle them. */
 class tr_session_alt_speeds
 {
-    using Speed = libtransmission::Values::Speed;
+    using Speed = tr::Values::Speed;
 
 public:
     class Settings final
@@ -41,12 +41,12 @@ public:
 
         void load(tr_variant const& src)
         {
-            libtransmission::serializer::load(*this, Fields, src);
+            tr::serializer::load(*this, Fields, src);
         }
 
         [[nodiscard]] tr_variant::Map save() const
         {
-            return libtransmission::serializer::save(*this, Fields);
+            return tr::serializer::save(*this, Fields);
         }
 
         // NB: When adding a field here, you must also add it to
@@ -61,7 +61,7 @@ public:
 
     private:
         template<auto MemberPtr>
-        using Field = libtransmission::serializer::Field<MemberPtr>;
+        using Field = tr::serializer::Field<MemberPtr>;
 
         static constexpr auto Fields = std::tuple{
             Field<&Settings::is_active>{ TR_KEY_alt_speed_enabled },
@@ -158,13 +158,13 @@ public:
 
     [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
     {
-        auto const kbyps = dir == TR_DOWN ? settings().speed_down_kbyps : settings().speed_up_kbyps;
+        auto const kbyps = dir == tr_direction::Down ? settings().speed_down_kbyps : settings().speed_up_kbyps;
         return Speed{ kbyps, Speed::Units::KByps };
     }
 
     constexpr void set_speed_limit(tr_direction dir, Speed const limit) noexcept
     {
-        if (dir == TR_DOWN)
+        if (dir == tr_direction::Down)
         {
             settings_.speed_down_kbyps = limit.count(Speed::Units::KByps);
         }

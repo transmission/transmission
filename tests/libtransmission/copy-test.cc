@@ -9,16 +9,17 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 class CopyTest : public SandboxedTest
@@ -87,4 +88,4 @@ TEST_F(CopyTest, copy)
     testImpl(filename1, filename2, random_file_length);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

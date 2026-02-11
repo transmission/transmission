@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
@@ -21,12 +23,11 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 TEST_F(SessionTest, propertiesApi)
@@ -356,4 +357,4 @@ TEST_F(SessionTest, loadTorrentsThenMagnets)
     EXPECT_TRUE(tor->has_metainfo());
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

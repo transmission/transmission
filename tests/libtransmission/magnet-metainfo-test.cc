@@ -13,7 +13,7 @@
 
 #include "test-fixtures.h"
 
-using MagnetMetainfoTest = ::libtransmission::test::TransmissionTest;
+using MagnetMetainfoTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(MagnetMetainfoTest, magnetParse)

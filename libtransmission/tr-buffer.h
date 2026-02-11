@@ -20,7 +20,7 @@
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR
 #include "libtransmission/utils.h" // for tr_htonll(), tr_ntohll()
 
-namespace libtransmission
+namespace tr
 {
 
 template<typename value_type>
@@ -48,7 +48,7 @@ public:
     }
 
     template<typename T>
-    [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
+    [[nodiscard]] constexpr bool starts_with(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
         auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
@@ -319,4 +319,4 @@ private:
     size_t end_pos_ = {};
 };
 
-} // namespace libtransmission
+} // namespace tr

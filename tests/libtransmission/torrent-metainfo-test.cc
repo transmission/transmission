@@ -9,6 +9,8 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
@@ -20,12 +22,11 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using TorrentMetainfoTest = SessionTest;
@@ -63,20 +64,20 @@ TEST_F(TorrentMetainfoTest, bucket)
     };
 
     auto const tests = std::array<LocalTest, 9>{ {
-        { BEFORE_PATH "5:a.txt" AFTER_PATH, true },
+        { .benc = BEFORE_PATH "5:a.txt" AFTER_PATH, .expected_parse_result = true },
         // allow empty components, but not =all= empty components, see bug #5517
-        { BEFORE_PATH "0:5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "0:0:" AFTER_PATH, false },
+        { .benc = BEFORE_PATH "0:5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "0:0:" AFTER_PATH, .expected_parse_result = false },
         // allow path separators in a filename (replaced with '_')
-        { BEFORE_PATH "7:a/a.txt" AFTER_PATH, true },
+        { .benc = BEFORE_PATH "7:a/a.txt" AFTER_PATH, .expected_parse_result = true },
         // allow "." components (skipped)
-        { BEFORE_PATH "1:.5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "5:a.txt1:." AFTER_PATH, true },
+        { .benc = BEFORE_PATH "1:.5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "5:a.txt1:." AFTER_PATH, .expected_parse_result = true },
         // allow ".." components (replaced with "__")
-        { BEFORE_PATH "2:..5:a.txt" AFTER_PATH, true },
-        { BEFORE_PATH "5:a.txt2:.." AFTER_PATH, true },
+        { .benc = BEFORE_PATH "2:..5:a.txt" AFTER_PATH, .expected_parse_result = true },
+        { .benc = BEFORE_PATH "5:a.txt2:.." AFTER_PATH, .expected_parse_result = true },
         // fail on empty string
-        { "", false },
+        { .benc = "", .expected_parse_result = false },
     } };
 
     tr_logSetLevel(TR_LOG_OFF);
@@ -128,13 +129,12 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
     EXPECT_NE(nullptr, metainfo);
     EXPECT_EQ(336, metainfo->info_dict_offset());
     EXPECT_EQ(26583, metainfo->info_dict_size());
-    EXPECT_EQ(592, metainfo->pieces_offset());
     tr_ctorFree(ctor);
 }
 
 TEST_F(TorrentMetainfoTest, ctorSaveContents)
 {
-    auto const sandbox = libtransmission::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
     auto const tgt_filename = tr_pathbuf{ sandbox, "save-contents-test.torrent" };
 
@@ -173,6 +173,31 @@ TEST_F(TorrentMetainfoTest, magnetInfoHash)
     EXPECT_TRUE(tm.parse_torrent_file(src_filename));
 }
 
+TEST_F(TorrentMetainfoTest, addWebseed)
+{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 2>{ {
+        { "http://www.webseed-one.com/"sv, "http://www.webseed-one.com/"sv },
+        { "http://你好.com/"sv, "http://%E4%BD%A0%E5%A5%BD.com/"sv },
+    } };
+
+    for (auto const& [decoded, encoded] : Tests)
+    {
+        auto tm = tr_torrent_metainfo{};
+        tm.add_webseed(decoded);
+        EXPECT_EQ(1U, tm.webseed_count());
+        EXPECT_EQ(encoded, tm.webseed(0U));
+    }
+
+    // This ensures the URL doesn't get double-encoded
+    for (auto const& [decoded, encoded] : Tests)
+    {
+        auto tm = tr_torrent_metainfo{};
+        tm.add_webseed(encoded);
+        EXPECT_EQ(1U, tm.webseed_count());
+        EXPECT_EQ(encoded, tm.webseed(0U));
+    }
+}
+
 TEST_F(TorrentMetainfoTest, HoffmanStyleWebseeds)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv };
@@ -207,10 +232,14 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
 }
 
 // Test for https://github.com/transmission/transmission/issues/3591
-TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
+TEST_F(TorrentMetainfoTest, parseBencPiecesSize)
 {
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/invalid-pieces-length.torrent"sv };
+    auto error = tr_error{};
     auto tm = tr_torrent_metainfo{};
-    EXPECT_FALSE(tm.parse_benc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
+    EXPECT_FALSE(tm.parse_torrent_file(src_filename, nullptr, &error));
+    EXPECT_EQ(error.code(), EINVAL);
+    EXPECT_EQ(error.message(), "invalid 'pieces' size: 119"sv);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

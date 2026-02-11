@@ -193,6 +193,7 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, Args&&
 [[nodiscard]] std::string_view tr_strv_strip(std::string_view str);
 
 [[nodiscard]] std::string tr_strv_to_utf8_string(std::string_view sv);
+[[nodiscard]] std::u8string tr_strv_to_u8string(std::string_view sv);
 
 #ifdef __APPLE__
 #ifdef __OBJC__
@@ -203,15 +204,18 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, Args&&
 #endif
 #endif
 
+[[nodiscard]] std::string_view::size_type tr_strv_find_invalid_utf8(std::string_view sv);
 [[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement = 0xFFFD /*�*/);
 
 // ---
 
-template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10);
+template<typename T>
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10)
+    requires std::is_integral_v<T>;
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr);
+template<typename T>
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr)
+    requires std::is_floating_point_v<T>;
 
 /**
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
@@ -251,7 +255,7 @@ template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 
 // ---
 
-namespace libtransmission::detail::tr_time
+namespace tr::detail::tr_time
 {
 extern time_t current_time;
 }
@@ -268,13 +272,13 @@ extern time_t current_time;
  */
 [[nodiscard]] static inline time_t tr_time() noexcept
 {
-    return libtransmission::detail::tr_time::current_time;
+    return tr::detail::tr_time::current_time;
 }
 
 /** @brief Private libtransmission function to update `tr_time()`'s counter */
 constexpr void tr_timeUpdate(time_t now) noexcept
 {
-    libtransmission::detail::tr_time::current_time = now;
+    tr::detail::tr_time::current_time = now;
 }
 
 /** @brief Portability wrapper for `htonll()` that uses the system implementation if available */

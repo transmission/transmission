@@ -105,7 +105,7 @@ bool tryDelegate(QStringList const& filenames)
 
 int tr_main(int argc, char** argv)
 {
-    transmission::app::init();
+    tr::app::init();
     trqt::variant_helpers::register_qt_converters();
 
     // parse the command-line arguments
@@ -118,32 +118,32 @@ int tr_main(int argc, char** argv)
     QStringList filenames;
 
     int opt = 0;
-    char const* optarg = nullptr;
+    char const* arg = nullptr;
     int file_args_start_idx = -1;
     int qt_args_start_idx = -1;
     while (file_args_start_idx < 0 && qt_args_start_idx < 0 &&
-           (opt = tr_getopt(getUsage(), argc, static_cast<char const* const*>(argv), std::data(Opts), &optarg)) != TR_OPT_DONE)
+           (opt = tr_getopt(getUsage(), argc, static_cast<char const* const*>(argv), std::data(Opts), &arg)) != TR_OPT_DONE)
     {
         switch (opt)
         {
         case 'g':
-            config_dir = QString::fromUtf8(optarg);
+            config_dir = QString::fromUtf8(arg);
             break;
 
         case 'p':
-            port = QString::fromUtf8(optarg);
+            port = QString::fromUtf8(arg);
             break;
 
         case 'r':
-            host = QString::fromUtf8(optarg);
+            host = QString::fromUtf8(arg);
             break;
 
         case 'u':
-            username = QString::fromUtf8(optarg);
+            username = QString::fromUtf8(arg);
             break;
 
         case 'w':
-            password = QString::fromUtf8(optarg);
+            password = QString::fromUtf8(arg);
             break;
 
         case 'm':
@@ -160,17 +160,17 @@ int tr_main(int argc, char** argv)
             return 1;
 
         default:
-            if (optarg == FileArgsSeparator)
+            if (arg == FileArgsSeparator)
             {
                 file_args_start_idx = tr_optind;
             }
-            else if (optarg == QtArgsSeparator)
+            else if (arg == QtArgsSeparator)
             {
                 qt_args_start_idx = tr_optind;
             }
             else
             {
-                filenames.append(QString::fromUtf8(optarg));
+                filenames.append(QString::fromUtf8(arg));
             }
 
             break;

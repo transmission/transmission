@@ -38,6 +38,7 @@
 #include <memory>
 #include <optional>
 #include <queue>
+#include <ranges>
 #include <stack>
 #include <string>
 #include <string_view>
@@ -669,7 +670,7 @@ std::string build_filename(tr_torrent const* tor, Gtk::TreeModel::iterator const
     }
 
     tokens.emplace_back(tr_torrentGetCurrentDir(tor));
-    std::reverse(tokens.begin(), tokens.end());
+    std::ranges::reverse(tokens);
     return Glib::build_filename(tokens);
 }
 

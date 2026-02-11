@@ -15,6 +15,7 @@
 #include <memory>
 #include <numeric>
 #include <optional>
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -225,7 +226,7 @@ private:
 
     std::map<tr_interned_string, tr_scrape_info> scrape_info_;
 
-    std::unique_ptr<libtransmission::Timer> const upkeep_timer_;
+    std::unique_ptr<tr::Timer> const upkeep_timer_;
 
     std::set<tr_announce_request, StopsCompare> stops_;
 
@@ -611,7 +612,7 @@ struct tr_torrent_announcer
 
     [[nodiscard]] bool canManualAnnounce() const
     {
-        return std::any_of(std::begin(tiers), std::end(tiers), [](auto const& tier) { return tier.canManualAnnounce(); });
+        return std::ranges::any_of(tiers, [](auto const& tier) { return tier.canManualAnnounce(); });
     }
 
     [[nodiscard]] bool findTracker(
@@ -829,8 +830,7 @@ void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t announc
          * dump everything leading up to it except "completed" */
         if (e == TR_ANNOUNCE_EVENT_STOPPED)
         {
-            auto const has_completed = std::find(std::begin(events), std::end(events), TR_ANNOUNCE_EVENT_COMPLETED) !=
-                std::end(events);
+            auto const has_completed = std::ranges::find(events, TR_ANNOUNCE_EVENT_COMPLETED) != std::ranges::end(events);
             events.clear();
             if (has_completed)
             {
@@ -868,7 +868,7 @@ bool isUnregistered(char const* errmsg)
 
     auto constexpr Keys = std::array<std::string_view, 2>{ "unregistered torrent"sv, "torrent not registered"sv };
 
-    return std::any_of(std::begin(Keys), std::end(Keys), [&lower](auto const& key) { return tr_strv_contains(lower, key); });
+    return std::ranges::any_of(Keys, [&lower](auto const& key) { return tr_strv_contains(lower, key); });
 }
 
 void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e, time_t interval = {})
@@ -1234,7 +1234,7 @@ namespace
 {
 namespace on_scrape_done_helpers
 {
-[[nodiscard]] TR_CONSTEXPR20 bool multiscrape_too_big(std::string_view errmsg)
+[[nodiscard]] constexpr bool multiscrape_too_big(std::string_view errmsg)
 {
     /* Found a tracker that returns some bespoke string for this case?
        Add your patch here and open a PR */
@@ -1244,10 +1244,7 @@ namespace on_scrape_done_helpers
         "Request-URI Too Long",
     };
 
-    return std::any_of(
-        std::begin(too_long_errors),
-        std::end(too_long_errors),
-        [&errmsg](auto const& substr) { return tr_strv_contains(errmsg, substr); });
+    return std::ranges::any_of(too_long_errors, [&errmsg](auto const& substr) { return tr_strv_contains(errmsg, substr); });
 }
 
 void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char const* errmsg)

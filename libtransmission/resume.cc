@@ -34,7 +34,7 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace tr_resume
 {
@@ -245,8 +245,8 @@ tr_variant::Map save_single_speed_limit(tr_torrent const* tor, tr_direction dir)
 
 void save_speed_limits(tr_variant::Map& map, tr_torrent const* tor)
 {
-    map.insert_or_assign(TR_KEY_speed_limit_down, save_single_speed_limit(tor, TR_DOWN));
-    map.insert_or_assign(TR_KEY_speed_limit_up, save_single_speed_limit(tor, TR_UP));
+    map.insert_or_assign(TR_KEY_speed_limit_down, save_single_speed_limit(tor, tr_direction::Down));
+    map.insert_or_assign(TR_KEY_speed_limit_up, save_single_speed_limit(tor, tr_direction::Up));
 }
 
 void save_ratio_limits(tr_variant::Map& map, tr_torrent const* tor)
@@ -293,13 +293,13 @@ auto load_speed_limits(tr_variant::Map const& map, tr_torrent* tor)
 
     if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_up))
     {
-        load_single_speed_limit(*child, TR_UP, tor);
+        load_single_speed_limit(*child, tr_direction::Up, tor);
         ret = tr_resume::Speedlimit;
     }
 
     if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_down))
     {
-        load_single_speed_limit(*child, TR_DOWN, tor);
+        load_single_speed_limit(*child, tr_direction::Down, tor);
         ret = tr_resume::Speedlimit;
     }
 
@@ -635,7 +635,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         return {};
     }
 
-    libtransmission::api_compat::convert_incoming_data(*otop);
+    tr::api_compat::convert_incoming_data(*otop);
     auto const* const p_map = otop->get_if<tr_variant::Map>();
     if (p_map == nullptr)
     {
@@ -984,7 +984,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     save_group(map, tor);
 
     auto out = tr_variant{ std::move(map) };
-    libtransmission::api_compat::convert_outgoing_data(out);
+    tr::api_compat::convert_outgoing_data(out);
     auto serde = tr_variant_serde::benc();
     if (!serde.to_file(out, tor->resume_file()))
     {

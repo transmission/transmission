@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <queue>
+#include <ranges>
 #include <set>
 
 #include <QHeaderView>
@@ -22,7 +23,7 @@
 #include "Formatter.h"
 #include "Utils.h"
 
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace
 {

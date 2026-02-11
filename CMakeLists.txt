@@ -43,17 +43,28 @@ include(TrMacros)
 
 set(CURL_MINIMUM 7.28.0)
 set(WOLFSSL_MINIMUM 3.4)
+set(CRC32C_MINIMUM 1.1.0)
 set(DEFLATE_MINIMUM 1.7)
 set(EVENT2_MINIMUM 2.1.0)
+# fast_float's version file is configured with `COMPATIBILITY SameMajorVersion`
+# The version range currently distributed varies greatly (e.g. Debian Trixie -> 8.0.0, Ubuntu 24.04 -> 3.9.0)
+# set(FAST_FLOAT_MINIMUM 3...8)
+set(FMT_MINIMUM 8.0.1)
 set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
 set(GTKMM3_MINIMUM 3.24.0)
 set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 2.7)
+set(MINIUPNPC_MINIMUM 2.2.1)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
-set(PSL_MINIMUM 0.21.1)
+set(PSL_MINIMUM 0.21.0)
 set(QT_MINIMUM 5.15)
+set(SIGSLOT_MINIMUM 1.2.3)
+set(SMALL_MINIMUM 0.2.2)
+# utf8cpp v4's version file is configured with `COMPATIBILITY SameMajorVersion`
+# and does not support version range.
+# set(UTF8CPP_MINIMUM 3.1...4)
 
 option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
@@ -75,9 +86,15 @@ tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" ${USE_SYSTEM_DEFAULT}
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_FAST_FLOAT "Use system fast_float library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_FMT "Use system fmt library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_SIGSLOT "Use system sigslot library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_SMALL "Use system small library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_UTF8CPP "Use system uft8cpp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_WIDE_INTEGER "Use system WideInteger library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_CRC32C "Use system crc32c library" ${USE_SYSTEM_DEFAULT})
@@ -243,12 +260,7 @@ set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
 set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
-find_package(FastFloat)
-find_package(Fmt)
 find_package(RapidJSON)
-find_package(Small)
-find_package(UtfCpp)
-find_package(WideInteger)
 
 find_package(Threads)
 find_package(PkgConfig QUIET)
@@ -500,19 +512,24 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
+# Don't build libdeflate as subdirectory as its CMakeLists.txt
+# messes with global CMAKE_* variables and global compiler options
 if(WIN32 AND NOT MINGW)
     set(DEFLATE_LIB_NAME deflatestatic)
 else()
     set(DEFLATE_LIB_NAME deflate)
 endif()
-tr_add_external_auto_library_legacy(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
-    TARGET deflate::deflate
+tr_add_external_auto_library(DEFLATE libdeflate
+    LIBNAME ${DEFLATE_LIB_NAME}
+    TARGET libdeflate::libdeflate
     CMAKE_ARGS
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
 
-tr_add_external_auto_library_legacy(EVENT2 libevent event
-    TARGET libevent::event
+tr_add_external_auto_library(EVENT2 Libevent
+    SUBPROJECT
+    SOURCE_DIR libevent
+    COMPONENTS core extra
     CMAKE_ARGS
         -DEVENT__DISABLE_OPENSSL:BOOL=ON
         -DEVENT__DISABLE_BENCHMARK:BOOL=ON
@@ -520,8 +537,14 @@ tr_add_external_auto_library_legacy(EVENT2 libevent event
         -DEVENT__DISABLE_REGRESS:BOOL=ON
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
+# Workaround, perm fix: https://github.com/libevent/libevent/pull/1791
+if(NOT TARGET libevent::core)
+    add_library(libevent::core ALIAS event_core)
+    add_library(libevent::extra ALIAS event_extra)
+endif()
 
-tr_add_external_auto_library_legacy(NATPMP libnatpmp natpmp
+tr_add_external_auto_library(NATPMP libnatpmp
+    LIBNAME natpmp
     TARGET natpmp::natpmp
     CMAKE_ARGS
         -DBUILD_SHARED_LIBS=OFF)
@@ -537,14 +560,16 @@ if(WIN32)
 else()
     set(TR_MINIUPNPC_LIBNAME miniupnpc)
 endif()
-tr_add_external_auto_library_legacy(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
-    TARGET miniupnpc::libminiupnpc
+tr_add_external_auto_library(MINIUPNPC miniupnpc
+    LIBNAME ${TR_MINIUPNPC_LIBNAME}
+    SOURCE_DIR miniupnp/miniupnpc
+    TARGET miniupnpc::miniupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
         -DUPNPC_BUILD_SHARED=OFF
         -DUPNPC_BUILD_TESTS=OFF)
 if(NOT USE_SYSTEM_MINIUPNPC)
-    target_compile_definitions(miniupnpc::libminiupnpc
+    target_compile_definitions(miniupnpc::miniupnpc
         INTERFACE
             MINIUPNP_STATICLIB)
 endif()
@@ -552,33 +577,105 @@ unset(TR_MINIUPNPC_LIBNAME)
 
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
-tr_add_external_auto_library_legacy(DHT dht dht
+tr_add_external_auto_library(DHT dht
+    LIBNAME dht
     TARGET dht::dht)
 
-tr_add_external_auto_library_legacy(PSL libpsl psl
+tr_add_external_auto_library(PSL libpsl
+    LIBNAME psl
     TARGET psl::psl)
 
 if(ENABLE_UTP)
-    tr_add_external_auto_library_legacy(UTP libutp utp
+    tr_add_external_auto_library(UTP libutp
         SUBPROJECT
-        TARGET libutp::libutp
         CMAKE_ARGS
             -DLIBUTP_SHARED:BOOL=OFF)
 endif()
 
-tr_add_external_auto_library_legacy(B64 libb64 b64
+tr_add_external_auto_library(B64 libb64
     SUBPROJECT
-    TARGET libb64::libb64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
-tr_add_external_auto_library_legacy(CRC32C crc32c crc32c
+# Don't build crc32c as subdirectory as its CMakeLists.txt
+# messes with global CMAKE_* variables and global compiler options
+tr_add_external_auto_library(CRC32C Crc32c
     TARGET Crc32c::crc32c
+    LIBNAME crc32c
+    SOURCE_DIR crc32c
     CMAKE_ARGS
         -DCRC32C_BUILD_TESTS=OFF
         -DCRC32C_BUILD_BENCHMARKS=OFF
         -DCRC32C_USE_GLOG=OFF
         -DCRC32C_INSTALL=ON)
+
+tr_add_external_auto_library(FAST_FLOAT FastFloat
+    SUBPROJECT
+    SOURCE_DIR fast_float
+    CMAKE_ARGS
+        -DFASTFLOAT_INSTALL=OFF
+        -DFASTFLOAT_TEST=OFF
+        -DFASTFLOAT_SANITIZE=OFF
+        -DFASTFLOAT_CXX_STANDARD=${CMAKE_CXX_STANDARD})
+
+tr_add_external_auto_library(FMT fmt
+    SUBPROJECT
+    CMAKE_ARGS
+        -DFMT_INSTALL=OFF
+        -DFMT_SYSTEM_HEADERS=ON)
+if(NOT TARGET transmission::fmt-header-only)
+    add_library(transmission::fmt-header-only INTERFACE IMPORTED)
+    target_link_libraries(transmission::fmt-header-only
+        INTERFACE
+            fmt::fmt-header-only)
+    target_compile_definitions(transmission::fmt-header-only
+        INTERFACE
+            FMT_USE_EXCEPTIONS=0 # {fmt} >= 11.2.0
+            FMT_EXCEPTIONS=0 # {fmt} < 11.2.0
+    )
+endif()
+
+tr_add_external_auto_library(SIGSLOT PalSigslot
+    SUBPROJECT
+    SOURCE_DIR sigslot)
+
+tr_add_external_auto_library(SMALL small
+    SUBPROJECT
+    CMAKE_ARGS
+        -DSMALL_BUILD_WITH_EXCEPTIONS=OFF)
+add_library(transmission::small INTERFACE IMPORTED)
+target_link_libraries(transmission::small
+    INTERFACE
+        small::small)
+target_compile_definitions(transmission::small
+    INTERFACE
+        SMALL_DISABLE_EXCEPTIONS=1)
+
+tr_add_external_auto_library(UTF8CPP utf8cpp
+    SUBPROJECT
+    SOURCE_DIR utfcpp)
+if (NOT TARGET utf8::cpp)
+    add_library(utf8::cpp ALIAS utf8cpp)
+endif()
+
+tr_add_external_auto_library(WIDE_INTEGER WideInteger
+    SUBPROJECT
+    SOURCE_DIR wide-integer)
+add_library(transmission::WideInteger INTERFACE IMPORTED)
+target_link_libraries(transmission::WideInteger
+    INTERFACE
+        WideInteger::WideInteger)
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles(
+"int main()
+{
+    unsigned __int128 u;
+    signed __int128 i;
+    return 0;
+}" TR_HAVE_INT128)
+target_compile_definitions(transmission::WideInteger
+    INTERFACE
+        $<$<BOOL:${TR_HAVE_INT128}>:WIDE_INTEGER_HAS_LIMB_TYPE_UINT64>)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)

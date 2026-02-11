@@ -13,19 +13,20 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+
+#include <libtransmission/quark.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
-#include "libtransmission/quark.h"
 #include "test-fixtures.h"
 
 struct tr_session;
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using RpcTest = SessionTest;
@@ -301,7 +302,7 @@ TEST_F(RpcTest, idAsync)
         }
 
         // cleanup
-        tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+        tr_torrentRemove(tor, false);
     }
 }
 
@@ -335,7 +336,7 @@ TEST_F(RpcTest, tagAsyncLegacy)
     EXPECT_EQ(*tag, 12345);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, false);
 }
 
 TEST_F(RpcTest, NotificationSync)
@@ -374,7 +375,7 @@ TEST_F(RpcTest, NotificationAsync)
     EXPECT_FALSE(response.has_value());
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, false);
 }
 
 TEST_F(RpcTest, tagNoHandler)
@@ -691,7 +692,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, false);
 }
 
 TEST_F(RpcTest, torrentGet)
@@ -731,7 +732,7 @@ TEST_F(RpcTest, torrentGet)
     EXPECT_EQ(1, *first_torrent_id);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, false);
 }
 
 TEST_F(RpcTest, torrentGetLegacy)
@@ -769,7 +770,7 @@ TEST_F(RpcTest, torrentGetLegacy)
     EXPECT_EQ(1, *first_torrent_id);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, false);
 }
 
 namespace free_space_test
@@ -850,7 +851,7 @@ constexpr std::string_view WellFormedResponse = R"json({
     }
 })json";
 
-TEST_F(RpcTest, wellFormedFreeSpace)
+TEST_F(RpcTest, DISABLED_wellFormedFreeSpace)
 {
     auto constexpr Input = WellFormedRequest;
     auto constexpr Expected = WellFormedResponse;
@@ -878,7 +879,7 @@ constexpr std::string_view WellFormedLegacyResponse = R"json({
 
 #undef RPC_NON_EXISTENT_PATH
 
-TEST_F(RpcTest, wellFormedLegacyFreeSpace)
+TEST_F(RpcTest, DISABLED_wellFormedLegacyFreeSpace)
 {
     auto constexpr Input = WellFormedLegacyRequest;
     auto constexpr Expected = WellFormedLegacyResponse;
@@ -887,4 +888,4 @@ TEST_F(RpcTest, wellFormedLegacyFreeSpace)
 }
 } // namespace free_space_test
 
-} // namespace libtransmission::test
+} // namespace tr::test

@@ -26,6 +26,8 @@
 
 #include <event2/event.h>
 
+#include <gtest/gtest.h>
+
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include <libtransmission/announcer.h>
@@ -47,9 +49,9 @@ using namespace std::literals;
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
-using MessageBuffer = libtransmission::StackBuffer<4096, std::byte>;
+using MessageBuffer = tr::StackBuffer<4096, std::byte>;
 
-class AnnouncerUdpTest : public ::libtransmission::test::TransmissionTest
+class AnnouncerUdpTest : public ::tr::test::TransmissionTest
 {
 private:
     void SetUp() override
@@ -81,6 +83,56 @@ protected:
 
         [[nodiscard]] std::optional<tr_address> announce_ip() const override
         {
+            return {};
+        }
+
+        // Mock DNS lookup that only resolves localhost
+        [[nodiscard]] std::optional<tr_socket_address> dns_lookup(
+            tr_address_type const ip_protocol,
+            std::string_view const name,
+            uint16_t const service,
+            std::string_view /*log_name*/) const override
+        {
+            auto const is_localhost = name == "localhost"sv;
+            auto const port = tr_port::from_host(service);
+            switch (ip_protocol)
+            {
+            case TR_AF_INET:
+                if (is_localhost)
+                {
+                    auto const addr = tr_address::from_string("127.0.0.1"sv);
+                    EXPECT_TRUE(addr);
+                    EXPECT_TRUE(addr->is_ipv4_loopback());
+                    return tr_socket_address{ *addr, port };
+                }
+
+                if (auto const addr = tr_address::from_string(name); addr && addr->is_ipv4_loopback())
+                {
+                    return tr_socket_address{ *addr, port };
+                }
+
+                break;
+
+            case TR_AF_INET6:
+                if (is_localhost)
+                {
+                    auto const addr = tr_address::from_string("::1");
+                    EXPECT_TRUE(addr);
+                    EXPECT_TRUE(addr->is_ipv6_loopback());
+                    return tr_socket_address{ *addr, port };
+                }
+
+                if (auto const addr = tr_address::from_string(name); addr && addr->is_ipv6_loopback())
+                {
+                    return tr_socket_address{ *addr, port };
+                }
+
+                break;
+
+            default:
+                break;
+            }
+
             return {};
         }
 
@@ -191,8 +243,7 @@ protected:
         sockaddr* const from = nullptr,
         socklen_t* const fromlen = nullptr)
     {
-        EXPECT_TRUE(
-            libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); }));
+        EXPECT_TRUE(tr::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); }));
         auto& sent = mediator.sent_.front();
         auto const buf = std::move(sent.buf_);
         if (from != nullptr)
@@ -323,7 +374,7 @@ protected:
     // emulate the upkeep timer that tr_announcer runs in production
     static auto createUpkeepTimer(MockMediator& mediator, std::unique_ptr<tr_announcer_udp>& announcer)
     {
-        auto timer_maker = libtransmission::EvTimerMaker{ mediator.eventBase() };
+        auto timer_maker = tr::EvTimerMaker{ mediator.eventBase() };
         auto timer = timer_maker.create();
         timer->set_callback([&announcer]() { announcer->upkeep(); });
         timer->start_repeating(200ms);
@@ -434,8 +485,20 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 2U;
-    expected_response.rows[0] = { tr_rand_obj<tr_sha1_digest_t>(), 1, 2, 3, std::nullopt };
-    expected_response.rows[1] = { tr_rand_obj<tr_sha1_digest_t>(), 4, 5, 6, std::nullopt };
+    expected_response.rows[0] = {
+        .info_hash = tr_rand_obj<tr_sha1_digest_t>(),
+        .seeders = 1,
+        .leechers = 2,
+        .downloads = 3,
+        .downloaders = std::nullopt,
+    };
+    expected_response.rows[1] = {
+        .info_hash = tr_rand_obj<tr_sha1_digest_t>(),
+        .seeders = 4,
+        .leechers = 5,
+        .downloads = 6,
+        .downloaders = std::nullopt,
+    };
     expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
 

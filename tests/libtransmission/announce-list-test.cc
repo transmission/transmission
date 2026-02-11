@@ -13,6 +13,8 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/announce-list.h>
@@ -23,7 +25,7 @@
 
 #include "test-fixtures.h"
 
-using AnnounceListTest = ::libtransmission::test::TransmissionTest;
+using AnnounceListTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(AnnounceListTest, canAdd)
@@ -32,7 +34,7 @@ TEST_F(AnnounceListTest, canAdd)
     auto constexpr Announce = "https://example.org/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(1, announce_list.add(Announce, Tier));
+    EXPECT_TRUE(announce_list.add(Announce, Tier));
     auto const tracker = announce_list.at(0);
     EXPECT_EQ(Announce, tracker.announce.sv());
     EXPECT_EQ("https://example.org/scrape"sv, tracker.scrape.sv());
@@ -40,6 +42,34 @@ TEST_F(AnnounceListTest, canAdd)
     EXPECT_EQ("example.org", tracker.announce_parsed.host);
     EXPECT_EQ("example.org"sv, tracker.announce_parsed.authority);
     EXPECT_EQ(443, tracker.announce_parsed.port);
+}
+
+TEST_F(AnnounceListTest, canAddForeignCharset)
+{
+    auto constexpr Tier = tr_tracker_tier_t{ 2 };
+    auto constexpr Announce = "udp://你好.com:6771/announce"sv;
+    auto constexpr AnnounceEncoded = "udp://%E4%BD%A0%E5%A5%BD.com:6771/announce"sv;
+
+    auto announce_list = tr_announce_list{};
+    EXPECT_TRUE(announce_list.add(Announce, Tier));
+    auto tracker = announce_list.at(0);
+    EXPECT_EQ(AnnounceEncoded, tracker.announce.sv());
+    EXPECT_EQ("udp://%E4%BD%A0%E5%A5%BD.com:6771/scrape"sv, tracker.scrape.sv());
+    EXPECT_EQ(Tier, tracker.tier);
+    EXPECT_EQ("%E4%BD%A0%E5%A5%BD.com", tracker.announce_parsed.host);
+    EXPECT_EQ("%E4%BD%A0%E5%A5%BD.com:6771"sv, tracker.announce_parsed.authority);
+    EXPECT_EQ(6771, tracker.announce_parsed.port);
+
+    // This ensures the URL doesn't get double-encoded
+    announce_list = tr_announce_list{};
+    EXPECT_TRUE(announce_list.add(AnnounceEncoded, Tier));
+    tracker = announce_list.at(0);
+    EXPECT_EQ(AnnounceEncoded, tracker.announce.sv());
+    EXPECT_EQ("udp://%E4%BD%A0%E5%A5%BD.com:6771/scrape"sv, tracker.scrape.sv());
+    EXPECT_EQ(Tier, tracker.tier);
+    EXPECT_EQ("%E4%BD%A0%E5%A5%BD.com", tracker.announce_parsed.host);
+    EXPECT_EQ("%E4%BD%A0%E5%A5%BD.com:6771"sv, tracker.announce_parsed.authority);
+    EXPECT_EQ(6771, tracker.announce_parsed.port);
 }
 
 TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
@@ -338,9 +368,9 @@ TEST_F(AnnounceListTest, announceToScrape)
     };
 
     auto constexpr Tests = std::array<ScrapeTest, 3>{ {
-        { "https://www.example.com/announce"sv, "https://www.example.com/scrape"sv },
-        { "https://www.example.com/foo"sv, ""sv },
-        { "udp://www.example.com:999/"sv, "udp://www.example.com:999/"sv },
+        { .announce = "https://www.example.com/announce"sv, .expected_scrape = "https://www.example.com/scrape"sv },
+        { .announce = "https://www.example.com/foo"sv, .expected_scrape = ""sv },
+        { .announce = "udp://www.example.com:999/"sv, .expected_scrape = "udp://www.example.com:999/"sv },
     } };
 
     for (auto const& test : Tests)
@@ -362,7 +392,7 @@ TEST_F(AnnounceListTest, save)
     // first, set up a scratch torrent
     auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
     auto original_content = std::vector<char>{};
-    auto const sandbox = libtransmission::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     auto const test_file = tr_pathbuf{ sandbox, "transmission-announce-list-test.torrent"sv };
     auto error = tr_error{};
     EXPECT_TRUE(tr_file_read(OriginalFile, original_content, &error));

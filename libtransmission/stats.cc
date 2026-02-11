@@ -19,7 +19,7 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
-using namespace libtransmission;
+using namespace tr;
 
 namespace
 {

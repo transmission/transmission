@@ -22,19 +22,19 @@
 
 using namespace std::literals;
 
-class IPCacheTest : public ::libtransmission::test::TransmissionTest
+class IPCacheTest : public ::tr::test::TransmissionTest
 {
 protected:
-    class MockTimerMaker final : public libtransmission::TimerMaker
+    class MockTimerMaker final : public tr::TimerMaker
     {
     public:
-        [[nodiscard]] std::unique_ptr<libtransmission::Timer> create() override
+        [[nodiscard]] std::unique_ptr<tr::Timer> create() override
         {
             return std::make_unique<MockTimer>();
         }
     };
 
-    class MockTimer final : public libtransmission::Timer
+    class MockTimer final : public tr::Timer
     {
         void stop() override
         {
@@ -70,7 +70,7 @@ protected:
     class MockMediator : public tr_ip_cache::Mediator
     {
     public:
-        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
+        [[nodiscard]] tr::TimerMaker& timer_maker() override
         {
             return timer_maker_;
         }
@@ -231,7 +231,12 @@ TEST_F(IPCacheTest, onResponseIPQuery)
         void fetch(tr_web::FetchOptions&& options) override // NOLINT(cppcoreguidelines-rvalue-reference-param-not-moved)
         {
             auto response = tr_web::FetchResponse{
-                http_code, std::string{ AddrStr[k_] }, std::string{}, true, false, options.done_func_user_data,
+                .status = http_code,
+                .body = std::string{ AddrStr[k_] },
+                .primary_ip = std::string{},
+                .did_connect = true,
+                .did_timeout = false,
+                .user_data = options.done_func_user_data,
             };
             options.done_func(response);
         }

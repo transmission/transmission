@@ -51,7 +51,7 @@
 #include <string>
 #include <string_view>
 
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 /**
 ***
@@ -315,7 +315,8 @@ Gtk::ComboBox* PageBase::init_encryption_combo(Glib::ustring const& name, tr_qua
             { _("Prefer encryption"), TR_ENCRYPTION_PREFERRED },
             { _("Require encryption"), TR_ENCRYPTION_REQUIRED },
         });
-    gtr_combo_box_set_active_enum(*combo, gtr_pref_int_get(key));
+    auto const mode = gtr_pref_get<tr_encryption_mode>(key).value_or(TR_ENCRYPTION_PREFERRED);
+    gtr_combo_box_set_active_enum(*combo, static_cast<int>(mode));
     combo->signal_changed().connect([this, combo, key]() { onIntComboChanged(*combo, key); });
     return combo;
 }

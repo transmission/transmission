@@ -9,6 +9,8 @@
 #include <string_view>
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/block-info.h>
@@ -20,12 +22,11 @@
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 auto constexpr MaxWaitMsec = 5000;
@@ -67,7 +68,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(path, tr_torrentFindFile(tor, 0));
     path.assign(incomplete_dir, '/', tr_torrentFile(tor, 1).name);
     EXPECT_EQ(path, tr_torrentFindFile(tor, 1));
-    EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor).left_until_done);
 
     auto completeness = TR_LEECH;
     auto const zeroes_completeness_func =
@@ -119,7 +120,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     }
 
     blockingTorrentVerify(tor);
-    EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
 
     auto test = [&completeness]()
     {
@@ -136,7 +137,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     }
 
     // cleanup
-    tr_torrentRemove(tor, true, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, true);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -159,12 +160,12 @@ using MoveTest = SessionTest;
 TEST_F(MoveTest, setLocation)
 {
     auto const target_dir = tr_pathbuf{ session_->configDir(), "/target"sv };
-    tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+    tr_sys_dir_create(target_dir, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
     // init a torrent.
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
     blockingTorrentVerify(tor);
-    EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
 
     // now move it
     auto state = -1;
@@ -178,7 +179,7 @@ TEST_F(MoveTest, setLocation)
 
     // confirm the torrent is still complete after being moved
     blockingTorrentVerify(tor);
-    EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
 
     // confirm the files really got moved
     sync();
@@ -190,7 +191,7 @@ TEST_F(MoveTest, setLocation)
     }
 
     // cleanup
-    tr_torrentRemove(tor, true, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, true);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

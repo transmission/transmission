@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -13,6 +14,8 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
+
+#include "tr-strbuf.h"
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
@@ -78,8 +81,16 @@ bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url
 
 bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier)
 {
+    // This step allows for URLs that contain character outside the allowed set
+    // defined by RFC 3986. The URL we store is "equivalent" to the provided URL
+    // according to the definition in RFC 3986 Section 6.1, while consisting
+    // of only ASCII characters. This ensures the URLs be represented correctly
+    // when transmitted via UTF-8 mediums, for example JSON.
+    auto normalized_url = tr_urlbuf{};
+    tr_urlPercentEncode(std::back_inserter(normalized_url), announce_url, false);
+
     // Make sure the announce URL is usable before we intern it.
-    if (auto const announce = tr_urlParseTracker(announce_url); !announce || !can_add(*announce))
+    if (auto const announce = tr_urlParseTracker(normalized_url); !announce || !can_add(*announce))
     {
         return false;
     }
@@ -87,7 +98,7 @@ bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier
     // Parse again with the interned string so that `parsed` fields all
     // point to the interned addresses. This second call should never
     // fail, but check anyway to make the linter happy.
-    auto const announce_interned = tr_interned_string{ announce_url };
+    auto const announce_interned = tr_interned_string{ normalized_url.sv() };
     auto const parsed = tr_urlParseTracker(announce_interned.sv());
     if (!parsed)
     {
@@ -175,7 +186,7 @@ tr_announce_list::trackers_t::iterator tr_announce_list::find(tr_tracker_id_t id
     {
         return tracker.id == id;
     };
-    return std::find_if(std::begin(trackers_), std::end(trackers_), test);
+    return std::ranges::find_if(trackers_, test);
 }
 
 tr_announce_list::trackers_t::iterator tr_announce_list::find(std::string_view announce)
@@ -184,7 +195,7 @@ tr_announce_list::trackers_t::iterator tr_announce_list::find(std::string_view a
     {
         return announce == tracker.announce.sv();
     };
-    return std::find_if(std::begin(trackers_), std::end(trackers_), test);
+    return std::ranges::find_if(trackers_, test);
 }
 
 // if two announce URLs differ only by scheme, put them in the same tier.
@@ -206,8 +217,8 @@ tr_tracker_tier_t tr_announce_list::get_tier(tr_tracker_tier_t tier, tr_url_pars
         return candidate->host == announce.host && candidate->path == announce.path;
     };
 
-    auto const it = std::find_if(std::begin(trackers_), std::end(trackers_), is_sibling);
-    return it != std::end(trackers_) ? it->tier : tier;
+    auto const it = std::ranges::find_if(trackers_, is_sibling);
+    return it != std::ranges::end(trackers_) ? it->tier : tier;
 }
 
 bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
@@ -230,7 +241,7 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
             tracker_parsed->port == announce.port && tracker_parsed->path == announce.path &&
             tracker_parsed->query == announce.query;
     };
-    return std::none_of(std::begin(trackers_), std::end(trackers_), is_same);
+    return std::ranges::none_of(trackers_, is_same);
 }
 
 tr_variant tr_announce_list::to_tiers_variant() const

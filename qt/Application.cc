@@ -70,7 +70,7 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 
 void initUnits()
 {
-    using Config = libtransmission::Values::Config;
+    using Config = tr::Values::Config;
 
     Config::speed = { Config::Base::Kilo,
                       QObject::tr("B/s").toStdString(),

@@ -14,7 +14,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/interned-string.h"
-#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR_VEC
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 
@@ -62,22 +62,22 @@ private:
     using trackers_t = std::vector<tracker_info>;
 
 public:
-    [[nodiscard]] TR_CONSTEXPR20 auto begin() const noexcept
+    [[nodiscard]] constexpr auto begin() const noexcept
     {
         return std::begin(trackers_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto end() const noexcept
+    [[nodiscard]] constexpr auto end() const noexcept
     {
         return std::end(trackers_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
+    [[nodiscard]] constexpr bool empty() const noexcept
     {
         return std::empty(trackers_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t size() const noexcept
+    [[nodiscard]] constexpr size_t size() const noexcept
     {
         return std::size(trackers_);
     }

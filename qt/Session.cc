@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <ranges>
 #include <string_view>
 #include <utility>
 
@@ -45,7 +46,7 @@
 
 using namespace std::literals;
 
-using ::libtransmission::serializer::to_variant;
+using ::tr::serializer::to_variant;
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
 
@@ -650,11 +651,7 @@ void Session::refreshTorrents(torrent_ids_t const& torrent_ids, TorrentPropertie
     auto fields = tr_variant::Vector{};
     auto const keys = getKeys(props);
     fields.reserve(std::size(keys));
-    std::transform(
-        std::begin(keys),
-        std::end(keys),
-        std::back_inserter(fields),
-        [](auto key) { return tr_variant::unmanaged_string(key); });
+    std::ranges::transform(keys, std::back_inserter(fields), [](auto key) { return tr_variant::unmanaged_string(key); });
 
     auto map = tr_variant::Map{ 3U };
     map.try_emplace(TR_KEY_format, tr_variant::unmanaged_string("table"sv));

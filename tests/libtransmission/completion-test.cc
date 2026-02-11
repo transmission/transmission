@@ -18,7 +18,7 @@
 
 #include "test-fixtures.h"
 
-using CompletionTest = ::libtransmission::test::TransmissionTest;
+using CompletionTest = ::tr::test::TransmissionTest;
 
 namespace
 {

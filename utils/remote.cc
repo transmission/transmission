@@ -42,8 +42,8 @@
 
 using namespace std::literals;
 
-namespace api_compat = libtransmission::api_compat;
-using namespace libtransmission::Values;
+namespace api_compat = tr::api_compat;
+using namespace tr::Values;
 
 #define SPEED_K_STR "kB/s"
 #define MEM_M_STR "MiB"
@@ -557,7 +557,7 @@ enum
     }
 }
 
-[[nodiscard]] std::string get_encoded_metainfo(char const* filename)
+[[nodiscard]] std::string get_encoded_metainfo(std::string_view const filename)
 {
     if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_file_read(filename, contents))
     {
@@ -1129,17 +1129,17 @@ void print_details(tr_variant::Map const& result)
         {
             if (auto const sv = t->value_if<std::string_view>(TR_KEY_error_string).value_or(""sv); !std::empty(sv))
             {
-                switch (i)
+                switch (static_cast<tr_stat::Error>(i))
                 {
-                case TR_STAT_TRACKER_WARNING:
+                case tr_stat::Error::TrackerWarning:
                     fmt::print("  Tracker gave a warning: {:s}\n", sv);
                     break;
 
-                case TR_STAT_TRACKER_ERROR:
+                case tr_stat::Error::TrackerError:
                     fmt::print("  Tracker gave an error: {:s}\n", sv);
                     break;
 
-                case TR_STAT_LOCAL_ERROR:
+                case tr_stat::Error::LocalError:
                     fmt::print("  Error: {:s}\n", sv);
                     break;
 

@@ -18,6 +18,7 @@
 #include <iterator> // for std::back_inserter
 #include <locale>
 #include <memory>
+#include <ranges>
 #include <mutex>
 #include <optional>
 #include <stdexcept> // std::runtime_error
@@ -60,13 +61,13 @@
 #include "libtransmission/values.h"
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
-time_t libtransmission::detail::tr_time::current_time = {};
+time_t tr::detail::tr_time::current_time = {};
 
 // ---
 
-namespace libtransmission::Values
+namespace tr::Values
 {
 
 // default values; can be overridden by client apps
@@ -74,7 +75,7 @@ Config::Units<MemoryUnits> Config::memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "
 Config::Units<SpeedUnits> Config::speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
 Config::Units<StorageUnits> Config::storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
 
-} // namespace libtransmission::Values
+} // namespace tr::Values
 
 // ---
 
@@ -260,11 +261,11 @@ std::string_view tr_strv_strip(std::string_view str)
         return isspace(static_cast<unsigned char>(ch));
     };
 
-    auto const it = std::find_if_not(std::begin(str), std::end(str), Test);
-    str.remove_prefix(std::distance(std::begin(str), it));
+    auto const it = std::ranges::find_if_not(str, Test);
+    str.remove_prefix(std::ranges::distance(std::ranges::begin(str), it));
 
-    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), Test);
-    str.remove_suffix(std::distance(std::rbegin(str), rit));
+    auto const rit = std::ranges::find_if_not(std::ranges::rbegin(str), std::ranges::rend(str), Test);
+    str.remove_suffix(std::ranges::distance(std::ranges::rbegin(str), rit));
 
     return str;
 }
@@ -304,6 +305,11 @@ std::string tr_strv_to_utf8_string(std::string_view sv)
 
 #endif
 
+std::string_view::size_type tr_strv_find_invalid_utf8(std::string_view const sv)
+{
+    return utf8::find_invalid(sv);
+}
+
 std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
     // stripping characters after first \0
@@ -315,6 +321,13 @@ std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
     out.reserve(std::size(sv));
     utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
     return out;
+}
+
+std::u8string tr_strv_to_u8string(std::string_view const sv)
+{
+    auto u8str = tr_strv_to_utf8_string(sv);
+    auto const view = std::views::transform(u8str, [](char c) -> char8_t { return c; });
+    return { view.begin(), view.end() };
 }
 
 #ifdef _WIN32
@@ -566,11 +579,8 @@ std::string tr_strratio(double ratio, std::string_view const none, std::string_v
 
 // ---
 
-bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool allow_copy, tr_error* error)
+bool tr_file_move(std::string_view oldpath, std::string_view newpath, bool allow_copy, tr_error* error)
 {
-    auto const oldpath = tr_pathbuf{ oldpath_in };
-    auto const newpath = tr_pathbuf{ newpath_in };
-
     auto local_error = tr_error{};
     if (error == nullptr)
     {
@@ -591,9 +601,7 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool
     }
 
     // ensure the target directory exists
-    auto newdir = tr_pathbuf{ newpath };
-    newdir.popdir();
-    if (!tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error))
+    if (!tr_sys_dir_create(tr_sys_path_dirname(newpath), TR_SYS_DIR_CREATE_PARENTS, 0777, error))
     {
         error->prefix_message("Unable to create directory for new file: ");
         return false;
@@ -782,7 +790,7 @@ void tr_lib_init()
         {
             tr_net_init_impl::tr_net_init_mgr::create();
 
-            libtransmission::serializer::Converters::ensure_default_converters();
+            tr::serializer::Converters::ensure_default_converters();
         });
 }
 
@@ -801,7 +809,18 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
         auto const it = std::lower_bound(std::begin(MimeTypeSuffixes), std::end(MimeTypeSuffixes), suffix_lc, Compare);
         if (it != std::end(MimeTypeSuffixes) && suffix_lc == it->suffix)
         {
-            return it->mime_type;
+            std::string_view mime_type = it->mime_type;
+
+            // https://github.com/transmission/transmission/issues/5965#issuecomment-1704421231
+            // An mp4 file's correct mime-type depends on the codecs used in the file,
+            // which we have no way of inspecting and which might not be downloaded yet.
+            // Let's use `video/mp4` since that's by far the most common use case for torrents.
+            if (mime_type == "application/mp4")
+            {
+                mime_type = "video/mp4";
+            }
+
+            return mime_type;
         }
     }
 
@@ -814,8 +833,9 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 
 // --- tr_num_parse()
 
-template<typename T, std::enable_if_t<std::is_integral_v<T>, bool>>
+template<typename T>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
+    requires std::is_integral_v<T>
 {
     auto val = T{};
     auto const* const begin_ch = std::data(str);
@@ -844,8 +864,9 @@ template std::optional<unsigned int> tr_num_parse(std::string_view str, std::str
 template std::optional<unsigned short> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 template std::optional<unsigned char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool>>
+template<typename T>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder)
+    requires std::is_floating_point_v<T>
 {
     auto const* const begin_ch = std::data(str);
     auto const* const end_ch = begin_ch + std::size(str);

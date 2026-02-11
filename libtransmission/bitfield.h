@@ -13,8 +13,6 @@
 #include <cstdint> // uint8_t
 #include <vector> // std::vector
 
-#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
-
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
  *
@@ -73,7 +71,7 @@ public:
         return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool test(size_t bit) const
+    [[nodiscard]] constexpr bool test(size_t bit) const
     {
         return has_all() || (!has_none() && test_flag(bit));
     }
@@ -120,7 +118,7 @@ private:
     [[nodiscard]] size_t count_flags() const noexcept;
     [[nodiscard]] size_t count_flags(size_t begin, size_t end) const noexcept;
 
-    [[nodiscard]] TR_CONSTEXPR20 bool test_flag(size_t n) const
+    [[nodiscard]] constexpr bool test_flag(size_t n) const
     {
         if (n >> 3U >= std::size(flags_))
         {

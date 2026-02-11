@@ -8,6 +8,7 @@
 #include <ctime>
 #include <map>
 #include <set>
+#include <ranges>
 #include <utility>
 
 #include <QDateTime>
@@ -348,18 +349,13 @@ void DetailsDialog::onTorrentsEdited(torrent_ids_t const& ids)
 {
     // std::set_intersection requires sorted inputs
     auto a = std::vector<tr_torrent_id_t>{ ids.begin(), ids.end() };
-    std::sort(std::begin(a), std::end(a));
+    std::ranges::sort(a);
     auto b = std::vector<tr_torrent_id_t>{ ids_.begin(), ids_.end() };
-    std::sort(std::begin(b), std::end(b));
+    std::ranges::sort(b);
 
     // are any of the edited torrents on display here?
     torrent_ids_t interesting_ids;
-    std::set_intersection(
-        std::begin(a),
-        std::end(a),
-        std::begin(b),
-        std::end(b),
-        std::inserter(interesting_ids, std::begin(interesting_ids)));
+    std::ranges::set_intersection(a, b, std::inserter(interesting_ids, std::begin(interesting_ids)));
 
     if (!interesting_ids.empty())
     {
@@ -376,7 +372,7 @@ void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_
         return;
     }
 
-    if (!std::any_of(ids.begin(), ids.end(), [this](auto const& id) { return ids_.count(id) != 0; }))
+    if (!std::ranges::any_of(ids, [this](auto const& id) { return ids_.count(id) != 0; }))
     {
         return;
     }
@@ -897,10 +893,8 @@ void DetailsDialog::refreshUI()
             ui_.labelsTextEdit->setReadOnly(true);
             ui_.labelsTextEdit->setEnabled(true);
         }
-        else if (auto const& baseline = torrents[0]->labels(); std::all_of(
-                     std::begin(torrents),
-                     std::end(torrents),
-                     [&baseline](auto const* tor) { return tor->labels() == baseline; }))
+        else if (auto const& baseline = torrents[0]->labels();
+                 std::ranges::all_of(torrents, [&baseline](auto const* tor) { return tor->labels() == baseline; }))
         {
             labels_baseline_ = baseline.join(QStringLiteral(", "));
             ui_.labelsTextEdit->setPlainText(labels_baseline_);

@@ -8,13 +8,15 @@
 
 #include <event2/event.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/timer.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/utils-ev.h>
 
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace tr::test
 {
 class TimerTest : public TransmissionTest
 {
@@ -366,4 +368,4 @@ TEST_F(TimerTest, destroyedTimersStop)
     EXPECT_EQ(0U, n_calls);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

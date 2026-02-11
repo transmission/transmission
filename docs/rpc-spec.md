@@ -66,7 +66,7 @@ JSON-RPC 2.0 allows for additional information about an error be included in the
 
 In Transmission, this key is an Object that includes:
 
-1. An optional `errorString` string that provides additional information that is not included in the `message` key of the Error object.
+1. An optional `error_string` string that provides additional information that is not included in the `message` key of the Error object.
 2. An optional `result` Object that contains additional keys defined by the method.
 
 ```json
@@ -76,9 +76,9 @@ In Transmission, this key is an Object that includes:
       "code": 7,
       "message": "HTTP error from backend service",
       "data": {
-         "errorString": "Couldn't test port: No Response (0)",
+         "error_string": "Couldn't test port: No Response (0)",
          "result": {
-            "ipProtocol": "ipv6"
+            "ip_protocol": "ipv6"
          }
       }
    },
@@ -120,7 +120,7 @@ matches it to one of the whitelisted names. Regardless of host whitelist
 content, `localhost` and `localhost.` domain names as well as all the IP
 addresses are always implicitly allowed.
 
-For more information on configuration, see settings.json documentation for
+For more information on configuration, see [Editing Configuration Files](Editing-Configuration-Files.md#rpc) documentation for
 `rpc_host_whitelist_enabled` and `rpc_host_whitelist` keys.
 
 #### 2.2.3 Authentication
@@ -591,7 +591,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `peer_port` | number | port number
 | `pex_enabled` | boolean | true means allow PEX in public torrents
 | `port_forwarding_enabled` | boolean | true means ask upstream router to forward the configured peer port to transmission using UPnP or NAT-PMP
-| `preferred_transports` | string[] | preference of transport protocols, see `settings.json` for details
+| `preferred_transports` | string[] | preference of transport protocols, see [Editing Configuration Files](Editing-Configuration-Files.md#misc) for details
 | `queue_stalled_enabled` | boolean | whether or not to consider idle torrents as stalled
 | `queue_stalled_minutes` | number | torrents that are idle for N minuets aren't counted toward `seed_queue_size` or `download_queue_size`
 | `rename_partial_files` | boolean | true means append `.part` to incomplete files
