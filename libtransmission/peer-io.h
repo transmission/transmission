@@ -19,14 +19,12 @@
 
 #include <event2/util.h> // for evutil_socket_t
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
+#include "libtransmission/types.h"
 #include "libtransmission/utils-ev.h"
 
 struct struct_utp_context;

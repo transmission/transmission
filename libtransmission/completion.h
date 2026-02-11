@@ -16,11 +16,9 @@
 #include <optional>
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/block-info.h"
 #include "libtransmission/bitfield.h"
-#include "libtransmission/tr-macros.h"
+#include "libtransmission/types.h"
 
 /**
  * @brief knows which blocks and pieces we have

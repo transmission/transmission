@@ -17,8 +17,6 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
@@ -31,8 +29,8 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/web-utils.h"
 #include "libtransmission/web.h"
 #include "libtransmission/webseed.h"
@@ -392,7 +390,7 @@ void tr_webseed_task::use_fetched_blocks()
                 [session = session_, tor_id = tor.id(), block = loc_.block, block_buf, webseed = webseed_]()
                 {
                     auto data = std::unique_ptr<Cache::BlockData>{ block_buf };
-                    if (auto const* const torrent = tr_torrentFindFromId(session, tor_id); torrent != nullptr)
+                    if (auto const* const torrent = session->torrents().get(tor_id); torrent != nullptr)
                     {
                         webseed->active_requests.unset(block);
                         session->cache->write_block(tor_id, block, std::move(data));

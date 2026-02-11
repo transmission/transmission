@@ -10,13 +10,12 @@
 #include <utility>
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/completion.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/torrent.h"
+#include "libtransmission/types.h"
 
 tr_completion::tr_completion(tr_torrent const* tor, tr_block_info const* block_info)
     : tr_completion{ [tor](tr_piece_index_t const piece) { return tor->piece_is_wanted(piece); }, block_info }

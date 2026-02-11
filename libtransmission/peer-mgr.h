@@ -17,12 +17,11 @@
 #include <string>
 #include <vector>
 
-#include "libtransmission/transmission.h" // tr_block_span_t (ptr only)
-
 #include "libtransmission/blocklist.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/net.h" /* tr_address */
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h" /* tr_compare_3way */
 #include "libtransmission/variant.h"
 

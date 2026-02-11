@@ -25,8 +25,6 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
@@ -38,8 +36,8 @@
 #include "libtransmission/session.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h" // tr_strbuf, tr_urlbuf
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 #include "libtransmission/web.h"

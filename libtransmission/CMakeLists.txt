@@ -45,6 +45,7 @@ target_sources(${TR_NAME}
         clients.h
         completion.cc
         completion.h
+        constants.h
         crypto-utils-ccrypto.cc
         crypto-utils-fallback.cc
         crypto-utils-mbedtls.cc
@@ -163,6 +164,7 @@ target_sources(${TR_NAME}
         tr-utp.cc
         tr-utp.h
         transmission.h
+        types.h
         utils-ev.cc
         utils-ev.h
         utils.cc

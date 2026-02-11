@@ -25,7 +25,7 @@
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha25...
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
 #if !defined(WITH_OPENSSL)

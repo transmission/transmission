@@ -22,8 +22,6 @@
 
 #include <sigslot/signal.hpp>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announce-list.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/bitfield.h"
@@ -39,6 +37,7 @@
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/types.h"
 #include "libtransmission/verify.h"
 
 struct tr_ctor;
