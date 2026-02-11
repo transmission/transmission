@@ -84,6 +84,13 @@ enum tr_encryption_mode : uint8_t
     TR_ENCRYPTION_REQUIRED
 };
 
+enum tr_proxy_type : uint8_t
+{
+    TR_PROXY_SOCKS5 = 0,
+    TR_PROXY_SOCKS4 = 1,
+    TR_PROXY_HTTP = 2,
+};
+
 enum tr_priority_t : int8_t
 {
     TR_PRI_LOW = -1,
@@ -436,6 +443,29 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool is_enabled);
 
 bool tr_sessionIsLPDEnabled(tr_session const* session);
 void tr_sessionSetLPDEnabled(tr_session* session, bool is_enabled);
+
+// --- Proxy
+
+bool tr_sessionIsProxyEnabled(tr_session const* session);
+void tr_sessionSetProxyEnabled(tr_session* session, bool enabled);
+
+tr_proxy_type tr_sessionGetProxyType(tr_session const* session);
+void tr_sessionSetProxyType(tr_session* session, tr_proxy_type type);
+
+char const* tr_sessionGetProxyUrl(tr_session const* session);
+void tr_sessionSetProxyUrl(tr_session* session, char const* url);
+
+size_t tr_sessionGetProxyPort(tr_session const* session);
+void tr_sessionSetProxyPort(tr_session* session, size_t port);
+
+bool tr_sessionIsProxyAuthEnabled(tr_session const* session);
+void tr_sessionSetProxyAuthEnabled(tr_session* session, bool enabled);
+
+char const* tr_sessionGetProxyUsername(tr_session const* session);
+void tr_sessionSetProxyUsername(tr_session* session, char const* username);
+
+char const* tr_sessionGetProxyPassword(tr_session const* session);
+void tr_sessionSetProxyPassword(tr_session* session, char const* password);
 
 size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
 void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes);

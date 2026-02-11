@@ -2041,7 +2041,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
 [[nodiscard]] auto& session_accessors()
 {
-    static auto map = small::max_size_map<tr_quark, SessionAccessors, 64U>{};
+    static auto map = small::max_size_map<tr_quark, SessionAccessors, 72U>{};
 
     if (!std::empty(map))
     {
@@ -2639,6 +2639,92 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
                 }
             });
     }
+
+    // --- proxy settings
+
+    map.try_emplace(
+        TR_KEY_proxy_enabled,
+        [](tr_session const& src) -> tr_variant { return src.settings().proxy_enabled; },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tgt.setProxyEnabled(*val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_proxy_url,
+        [](tr_session const& src) -> tr_variant
+        {
+            if (auto const& url = src.proxyUrl(); url)
+            {
+                return *url;
+            }
+            return tr_variant{};
+        },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<std::string_view>())
+            {
+                tgt.setProxyUrl(*val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_proxy_port,
+        [](tr_session const& src) -> tr_variant { return static_cast<int64_t>(src.proxyPort()); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tgt.setProxyPort(static_cast<size_t>(*val));
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_proxy_type,
+        [](tr_session const& src) -> tr_variant { return static_cast<int64_t>(src.proxyType()); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<int64_t>())
+            {
+                tgt.setProxyType(static_cast<tr_proxy_type>(*val));
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_proxy_auth_enabled,
+        [](tr_session const& src) -> tr_variant { return src.proxyAuthEnabled(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tgt.setProxyAuthEnabled(*val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_proxy_username,
+        [](tr_session const& src) -> tr_variant { return src.proxyUsername(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<std::string_view>())
+            {
+                tgt.setProxyUsername(*val);
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_proxy_password,
+        [](tr_session const& src) -> tr_variant { return src.proxyPassword(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<std::string_view>())
+            {
+                tgt.setProxyPassword(*val);
+            }
+        });
 
     return map;
 }

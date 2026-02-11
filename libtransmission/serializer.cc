@@ -171,6 +171,24 @@ tr_variant from_encryption_mode(tr_encryption_mode const& val)
 
 // ---
 
+auto constexpr ProxyTypeKeys = LookupTable<tr_proxy_type, 3U>{ {
+    { "socks5", TR_PROXY_SOCKS5 },
+    { "socks4", TR_PROXY_SOCKS4 },
+    { "http", TR_PROXY_HTTP },
+} };
+
+bool to_proxy_type(tr_variant const& src, tr_proxy_type* tgt)
+{
+    return to_enum_or_integral_with_lookup(ProxyTypeKeys, src, tgt);
+}
+
+tr_variant from_proxy_type(tr_proxy_type const& val)
+{
+    return from_enum_or_integral_with_lookup(ProxyTypeKeys, val);
+}
+
+// ---
+
 auto constexpr LogKeys = LookupTable<tr_log_level, 7U>{ {
     { "critical", TR_LOG_CRITICAL },
     { "debug", TR_LOG_DEBUG },
@@ -525,6 +543,7 @@ void Converters::ensure_default_converters()
             Converters::add(to_msec, from_msec);
             Converters::add(to_port, from_port);
             Converters::add(to_preallocation_mode, from_preallocation_mode);
+            Converters::add(to_proxy_type, from_proxy_type);
             Converters::add(to_preferred_transport, from_preferred_transport);
             Converters::add(to_size_t, from_size_t);
             Converters::add(to_string, from_string);

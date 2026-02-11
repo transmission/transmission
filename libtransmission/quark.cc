@@ -426,7 +426,13 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "progress"sv, // .resume, rpc
     "prompt-before-exit"sv, // qt app
     "prompt_before_exit"sv, // qt app
+    "proxy_auth_enabled"sv, // tr_session::Settings
+    "proxy_enabled"sv, // tr_session::Settings
+    "proxy_password"sv, // tr_session::Settings
+    "proxy_port"sv, // tr_session::Settings
+    "proxy_type"sv, // tr_session::Settings
     "proxy_url"sv, // tr_session::Settings
+    "proxy_username"sv, // tr_session::Settings
     "queue-move-bottom"sv, // rpc
     "queue-move-down"sv, // rpc
     "queue-move-top"sv, // rpc

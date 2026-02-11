@@ -566,6 +566,40 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [_fDefaults stringForKey:@"RPCHostWhitelist"].UTF8String);
         }
 
+        // Proxy settings (no GUI yet, configure via settings.json or defaults write)
+        if ([_fDefaults objectForKey:@"ProxyEnabled"])
+        {
+            tr_variantDictAddBool(&settings, TR_KEY_proxy_enabled, [_fDefaults boolForKey:@"ProxyEnabled"]);
+        }
+        if ([_fDefaults objectForKey:@"ProxyURL"])
+        {
+            tr_variantDictAddStr(&settings, TR_KEY_proxy_url, [_fDefaults stringForKey:@"ProxyURL"].UTF8String);
+        }
+        if ([_fDefaults objectForKey:@"ProxyPort"])
+        {
+            tr_variantDictAddInt(&settings, TR_KEY_proxy_port, [_fDefaults integerForKey:@"ProxyPort"]);
+        }
+        if ([_fDefaults objectForKey:@"ProxyType"])
+        {
+            tr_variantDictAddStr(&settings, TR_KEY_proxy_type, [_fDefaults stringForKey:@"ProxyType"].UTF8String);
+        }
+        if ([_fDefaults objectForKey:@"ProxyAuthEnabled"])
+        {
+            tr_variantDictAddBool(&settings, TR_KEY_proxy_auth_enabled, [_fDefaults boolForKey:@"ProxyAuthEnabled"]);
+        }
+        if ([_fDefaults objectForKey:@"ProxyUsername"])
+        {
+            tr_variantDictAddStr(&settings, TR_KEY_proxy_username, [_fDefaults stringForKey:@"ProxyUsername"].UTF8String);
+        }
+        if ([_fDefaults objectForKey:@"ProxyPassword"])
+        {
+            tr_variantDictAddStr(&settings, TR_KEY_proxy_password, [_fDefaults stringForKey:@"ProxyPassword"].UTF8String);
+        }
+        if ([_fDefaults objectForKey:@"DefaultTrackers"])
+        {
+            tr_variantDictAddStr(&settings, TR_KEY_default_trackers, [_fDefaults stringForKey:@"DefaultTrackers"].UTF8String);
+        }
+
         initUnits();
 
         auto const default_config_dir = tr_getDefaultConfigDir("Transmission");

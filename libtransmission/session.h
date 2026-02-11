@@ -266,6 +266,8 @@ private:
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
         [[nodiscard]] size_t clamp(int torrent_id, size_t byte_count) const override;
         [[nodiscard]] std::optional<std::string> proxyUrl() const override;
+        [[nodiscard]] std::optional<long> proxyType() const override;
+        [[nodiscard]] std::optional<std::string> proxyAuth() const override;
         [[nodiscard]] std::chrono::steady_clock::time_point now() const override;
         // runs the tr_web::fetch response callback in the libtransmission thread
         void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
@@ -430,6 +432,8 @@ public:
         bool peer_port_random_on_start = false;
         bool pex_enabled = true;
         bool port_forwarding_enabled = true;
+        bool proxy_auth_enabled = false;
+        bool proxy_enabled = false;
         bool queue_stalled_enabled = true;
         bool ratio_limit_enabled = false;
         bool script_torrent_added_enabled = false;
@@ -462,7 +466,11 @@ public:
             TR_PREFER_TCP,
         };
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
+        size_t proxy_port = 1080U;
         std::optional<std::string> proxy_url;
+        std::string proxy_password;
+        std::string proxy_username;
+        tr_proxy_type proxy_type = TR_PROXY_SOCKS5;
         std::string announce_ip;
         std::string bind_address_ipv4;
         std::string bind_address_ipv6;
@@ -520,7 +528,13 @@ public:
             Field<&Settings::port_forwarding_enabled>{ TR_KEY_port_forwarding_enabled },
             Field<&Settings::preallocation_mode>{ TR_KEY_preallocation },
             Field<&Settings::preferred_transports>{ TR_KEY_preferred_transports },
+            Field<&Settings::proxy_auth_enabled>{ TR_KEY_proxy_auth_enabled },
+            Field<&Settings::proxy_enabled>{ TR_KEY_proxy_enabled },
+            Field<&Settings::proxy_password>{ TR_KEY_proxy_password },
+            Field<&Settings::proxy_port>{ TR_KEY_proxy_port },
+            Field<&Settings::proxy_type>{ TR_KEY_proxy_type },
             Field<&Settings::proxy_url>{ TR_KEY_proxy_url },
+            Field<&Settings::proxy_username>{ TR_KEY_proxy_username },
             Field<&Settings::queue_stalled_enabled>{ TR_KEY_queue_stalled_enabled },
             Field<&Settings::queue_stalled_minutes>{ TR_KEY_queue_stalled_minutes },
             Field<&Settings::ratio_limit>{ TR_KEY_ratio_limit },
@@ -1009,12 +1023,12 @@ public:
 
     [[nodiscard]] constexpr auto allowsDHT() const noexcept
     {
-        return settings().dht_enabled;
+        return settings().dht_enabled && !isProxyEnabled();
     }
 
     [[nodiscard]] constexpr bool allowsLPD() const noexcept
     {
-        return settings().lpd_enabled;
+        return settings().lpd_enabled && !isProxyEnabled();
     }
 
     [[nodiscard]] constexpr auto allows_pex() const noexcept
@@ -1028,6 +1042,78 @@ public:
     }
 
     [[nodiscard]] bool allowsUTP() const noexcept;
+
+    // --- proxy
+
+    [[nodiscard]] constexpr bool isProxyEnabled() const noexcept
+    {
+        return settings().proxy_enabled && settings().proxy_url.has_value();
+    }
+
+    [[nodiscard]] auto const& proxyUrl() const noexcept
+    {
+        return settings().proxy_url;
+    }
+
+    [[nodiscard]] constexpr auto proxyType() const noexcept
+    {
+        return settings().proxy_type;
+    }
+
+    [[nodiscard]] constexpr auto proxyPort() const noexcept
+    {
+        return settings().proxy_port;
+    }
+
+    [[nodiscard]] constexpr bool proxyAuthEnabled() const noexcept
+    {
+        return settings().proxy_auth_enabled;
+    }
+
+    [[nodiscard]] auto const& proxyUsername() const noexcept
+    {
+        return settings().proxy_username;
+    }
+
+    [[nodiscard]] auto const& proxyPassword() const noexcept
+    {
+        return settings().proxy_password;
+    }
+
+    void setProxyEnabled(bool enabled)
+    {
+        settings_.proxy_enabled = enabled;
+    }
+
+    void setProxyUrl(std::string_view url)
+    {
+        settings_.proxy_url = std::string{ url };
+    }
+
+    void setProxyPort(size_t port)
+    {
+        settings_.proxy_port = port;
+    }
+
+    void setProxyType(tr_proxy_type type)
+    {
+        settings_.proxy_type = type;
+    }
+
+    void setProxyAuthEnabled(bool enabled)
+    {
+        settings_.proxy_auth_enabled = enabled;
+    }
+
+    void setProxyUsername(std::string_view username)
+    {
+        settings_.proxy_username = username;
+    }
+
+    void setProxyPassword(std::string_view password)
+    {
+        settings_.proxy_password = password;
+    }
 
     [[nodiscard]] constexpr auto const& preferred_transports() const noexcept
     {

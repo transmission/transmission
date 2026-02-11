@@ -159,6 +159,18 @@ public:
             return std::nullopt;
         }
 
+        // Return the preferred proxy type as a CURLPROXY_* value, or nullopt
+        [[nodiscard]] virtual std::optional<long> proxyType() const
+        {
+            return std::nullopt;
+        }
+
+        // Return "username:password" for proxy auth, or nullopt
+        [[nodiscard]] virtual std::optional<std::string> proxyAuth() const
+        {
+            return std::nullopt;
+        }
+
         // Invoke the user-provided fetch callback
         // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
         virtual void run(FetchDoneFunc&& func, FetchResponse&& response) const

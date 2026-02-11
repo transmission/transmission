@@ -22,6 +22,7 @@
 #else
 #include <ifaddrs.h>
 #include <net/if.h>
+#include <netdb.h> // getaddrinfo
 #include <netinet/tcp.h> /* TCP_CONGESTION */
 #endif
 
@@ -279,6 +280,121 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, socket_address.display_name()));
 
     return s;
+}
+
+tr_socket_t tr_net_open_peer_socket_via_proxy(tr_session* session, tr_socket_address const& proxy_address, bool client_is_seed)
+{
+    auto const& [addr, port] = proxy_address;
+
+    TR_ASSERT(addr.is_valid());
+
+    if (!session->allowsTCP() || !proxy_address.is_valid())
+    {
+        return TR_BAD_SOCKET;
+    }
+
+    auto const s = createSocket(tr_ip_protocol_to_af(addr.type), SOCK_STREAM);
+    if (s == TR_BAD_SOCKET)
+    {
+        return TR_BAD_SOCKET;
+    }
+
+    // seeds don't need a big read buffer, so make it smaller
+    if (client_is_seed)
+    {
+        int n = 8192;
+        if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&n), sizeof(n)) == -1)
+        {
+            tr_logAddDebug(fmt::format("Unable to set SO_RCVBUF on socket {}: {}", s, tr_net_strerror(sockerrno)));
+        }
+    }
+
+    auto const [sock, addrlen] = proxy_address.to_sockaddr();
+
+    // set source address
+    auto const source_addr = session->bind_address(addr.type);
+    auto const [source_sock, sourcelen] = tr_socket_address::to_sockaddr(source_addr, {});
+
+    if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
+    {
+        tr_logAddWarn(
+            fmt::format(
+                fmt::runtime(_("Couldn't set source address {address} on {socket}: {error} ({error_code})")),
+                fmt::arg("address", source_addr.display_name()),
+                fmt::arg("socket", s),
+                fmt::arg("error", tr_net_strerror(sockerrno)),
+                fmt::arg("error_code", sockerrno)));
+        tr_net_close_socket(s);
+        return TR_BAD_SOCKET;
+    }
+
+    if (connect(s, reinterpret_cast<sockaddr const*>(&sock), addrlen) == -1 &&
+#ifdef _WIN32
+        sockerrno != WSAEWOULDBLOCK &&
+#endif
+        sockerrno != EINPROGRESS)
+    {
+        if (auto const tmperrno = sockerrno; tmperrno != ECONNREFUSED && tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH)
+        {
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(
+                        _("Couldn't connect socket {socket} to SOCKS5 proxy {address}:{port}: {error} ({error_code})")),
+                    fmt::arg("socket", s),
+                    fmt::arg("address", addr.display_name()),
+                    fmt::arg("port", port.host()),
+                    fmt::arg("error", tr_net_strerror(tmperrno)),
+                    fmt::arg("error_code", tmperrno)));
+        }
+
+        tr_net_close_socket(s);
+        return TR_BAD_SOCKET;
+    }
+
+    tr_logAddTrace(fmt::format("New OUTGOING proxy connection {} ({})", s, proxy_address.display_name()));
+
+    return s;
+}
+
+std::optional<tr_address> tr_net_resolve_hostname(std::string_view hostname)
+{
+    // First try parsing as an IP literal (fast path, no DNS)
+    if (auto addr = tr_address::from_string(hostname); addr)
+    {
+        return addr;
+    }
+
+    // Fall back to DNS resolution via getaddrinfo
+    auto const hostname_sz = tr_strbuf<char, 256>{ hostname };
+    auto hints = addrinfo{};
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    addrinfo* res = nullptr;
+    if (int const rc = getaddrinfo(hostname_sz.c_str(), nullptr, &hints, &res); rc != 0 || res == nullptr)
+    {
+        tr_logAddWarn(fmt::format("Failed to resolve proxy hostname '{}': {}", hostname, gai_strerror(rc)));
+        return {};
+    }
+
+    auto addr = tr_address{};
+    bool ok = false;
+    if (res->ai_family == AF_INET)
+    {
+        addr.type = TR_AF_INET;
+        addr.addr.addr4 = reinterpret_cast<sockaddr_in const*>(res->ai_addr)->sin_addr;
+        ok = true;
+    }
+    else if (res->ai_family == AF_INET6)
+    {
+        addr.type = TR_AF_INET6;
+        addr.addr.addr6 = reinterpret_cast<sockaddr_in6 const*>(res->ai_addr)->sin6_addr;
+        ok = true;
+    }
+
+    freeaddrinfo(res);
+    return ok ? std::make_optional(addr) : std::nullopt;
 }
 
 namespace
