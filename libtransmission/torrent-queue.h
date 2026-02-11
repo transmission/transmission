@@ -41,17 +41,29 @@ public:
     void remove(tr_torrent_id_t id);
 
     [[nodiscard]] size_t get_pos(tr_torrent_id_t id);
-    void set_pos(tr_torrent_id_t id, size_t new_pos);
+    [[nodiscard]] std::vector<tr_torrent_id_t> set_pos(tr_torrent_id_t id, size_t new_pos);
 
-    bool to_file() const; // NOLINT(modernize-use-nodiscard)
+    bool to_file(); // NOLINT(modernize-use-nodiscard)
     [[nodiscard]] std::vector<std::string> from_file();
 
     static auto constexpr MinQueuePosition = size_t{};
     static auto constexpr MaxQueuePosition = ~size_t{};
 
 private:
+    [[nodiscard]] constexpr auto is_dirty() const noexcept
+    {
+        return is_dirty_;
+    }
+
+    constexpr void set_dirty(bool is_dirty = true) noexcept
+    {
+        is_dirty_ = is_dirty;
+    }
+
     std::vector<tr_torrent_id_t> queue_;
     std::vector<size_t> pos_cache_;
+
+    bool is_dirty_ = false;
 
     Mediator const& mediator_;
 };

@@ -15,6 +15,7 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/env.h>
 #include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/torrent-metainfo.h>
@@ -93,7 +94,7 @@ public:
 
     void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
-    void send_rpc_request(tr_quark method, tr_variant const& params, std::function<void(tr_variant&)> on_response);
+    void send_rpc_request(tr_quark method, tr_variant&& params, std::function<void(tr_variant&)> on_response);
 
     void commit_prefs_change(tr_quark key);
 
@@ -145,7 +146,7 @@ private:
     void inc_busy();
     void dec_busy();
 
-    bool add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify);
+    bool add(Glib::ustring const& name, bool do_start, bool do_prompt, bool do_notify);
     void add_file_async_callback(
         Glib::RefPtr<Gio::File> const& file,
         Glib::RefPtr<Gio::AsyncResult>& result,
@@ -171,8 +172,6 @@ private:
 
     void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running);
     void on_torrent_metadata_changed(tr_torrent* raw_torrent);
-
-    void on_torrent_removal_done(tr_torrent_id_t id, bool succeeded);
 
 private:
     Session& core_;
@@ -585,7 +584,7 @@ tr_session* Session::Impl::close()
    so delegate to the GTK+ thread before calling notify's dbus code... */
 void Session::Impl::on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running)
 {
-    if (was_running && completeness != TR_LEECH && tr_torrentStat(tor)->sizeWhenDone != 0)
+    if (was_running && completeness != TR_LEECH && tr_torrentStat(tor).size_when_done != 0U)
     {
         Glib::signal_idle().connect(
             [core = get_core_ptr(), torrent_id = tr_torrentId(tor)]()
@@ -818,7 +817,8 @@ void Session::Impl::add_file_async_callback(
     dec_busy();
 }
 
-bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
+// Add `name,` which might be a local filename, a magnet link, or a URI.
+bool Session::Impl::add(Glib::ustring const& name, bool const do_start, bool const do_prompt, bool const do_notify)
 {
     auto* const session = get_session();
     if (session == nullptr)
@@ -832,6 +832,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     tr_ctorSetPaused(ctor, TR_FORCE, !do_start);
 
     bool loaded = false;
+    auto file = Gio::File::create_for_parse_name(name);
     if (auto const path = file->get_path(); !std::empty(path))
     {
         // try to treat it as a file...
@@ -841,7 +842,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     if (!loaded)
     {
         // try to treat it as a magnet link...
-        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri());
+        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, name.raw(), nullptr);
     }
 
     // if we could make sense of it, add it
@@ -876,12 +877,11 @@ bool Session::add_from_url(Glib::ustring const& url)
 
 bool Session::Impl::add_from_url(Glib::ustring const& url)
 {
-    auto const file = Gio::File::create_for_uri(url);
     auto const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
     auto const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
     auto const do_notify = false;
 
-    auto const handled = add_file(file, do_start, do_prompt, do_notify);
+    auto const handled = add(url, do_start, do_prompt, do_notify);
     torrents_added();
     return handled;
 }
@@ -895,7 +895,7 @@ void Session::Impl::add_files(std::vector<Glib::RefPtr<Gio::File>> const& files,
 {
     for (auto const& file : files)
     {
-        add_file(file, do_start, do_prompt, do_notify);
+        add(file->get_parse_name(), do_start, do_prompt, do_notify);
     }
 
     torrents_added();
@@ -927,30 +927,11 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 
 void Session::Impl::remove_torrent(tr_torrent_id_t const id, bool const delete_files)
 {
-    auto const& [torrent, _] = find_torrent_by_id(id);
-    if (!torrent)
-    {
-        return;
-    }
-
-    auto const on_remove_done = [core = get_core_ptr()](tr_torrent_id_t const removed_id, bool const ok)
-    {
-        Glib::signal_idle().connect_once([core, removed_id, ok]() { core->impl_->on_torrent_removal_done(removed_id, ok); });
-    };
-
-    tr_torrentRemove(&torrent->get_underlying(), delete_files, gtr_file_trash_or_remove, std::move(on_remove_done));
-}
-
-void Session::Impl::on_torrent_removal_done(tr_torrent_id_t id, bool succeeded)
-{
-    if (!succeeded)
-    {
-        return;
-    }
-
     if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
     {
         get_raw_model()->remove(position);
+
+        tr_torrentRemove(&torrent->get_underlying(), delete_files, gtr_file_trash_or_remove);
     }
 }
 
@@ -1139,52 +1120,6 @@ void Session::Impl::maybe_inhibit_hibernation()
     set_hibernation_allowed(hibernation_allowed);
 }
 
-/**
-***  Prefs
-**/
-
-void Session::Impl::commit_prefs_change(tr_quark const key)
-{
-    signal_prefs_changed_.emit(key);
-    gtr_pref_save(session_);
-}
-
-void Session::set_pref(tr_quark const key, std::string const& newval)
-{
-    if (newval != gtr_pref_string_get(key))
-    {
-        gtr_pref_string_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, bool newval)
-{
-    if (newval != gtr_pref_flag_get(key))
-    {
-        gtr_pref_flag_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, int newval)
-{
-    if (newval != gtr_pref_int_get(key))
-    {
-        gtr_pref_int_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, double newval)
-{
-    if (std::fabs(newval - gtr_pref_double_get(key)) >= 0.0001)
-    {
-        gtr_pref_double_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
 /***
 ****
 ****  RPC Interface
@@ -1233,10 +1168,7 @@ void core_read_rpc_response(tr_variant&& response)
 
 } // namespace
 
-void Session::Impl::send_rpc_request(
-    tr_quark const method,
-    tr_variant const& params,
-    std::function<void(tr_variant&)> on_response)
+void Session::Impl::send_rpc_request(tr_quark const method, tr_variant&& params, std::function<void(tr_variant&)> on_response)
 {
     if (session_ == nullptr)
     {
@@ -1252,7 +1184,7 @@ void Session::Impl::send_rpc_request(
     // add params if there are any
     if (params.has_value())
     {
-        reqmap.try_emplace(TR_KEY_params, params.clone());
+        reqmap.try_emplace(TR_KEY_params, std::move(params));
     }
 
     // add id if we want a response
@@ -1360,15 +1292,15 @@ void Session::blocklist_update()
                 gtr_pref_int_set(TR_KEY_blocklist_date, tr_time());
             }
 
-            impl_->signal_blocklist_updated().emit(*n_rules >= 0);
+            impl_->signal_blocklist_updated().emit(n_rules >= 0);
         });
 }
 
 // ---
 
-void Session::exec(tr_quark method, tr_variant const& params)
+void Session::exec(tr_quark method, tr_variant&& params)
 {
-    impl_->send_rpc_request(method, params, {});
+    impl_->send_rpc_request(method, std::move(params), {});
 }
 
 /***

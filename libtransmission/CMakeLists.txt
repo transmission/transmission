@@ -55,9 +55,13 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
+        env.cc
+        env.h
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
+        file-utils.cc
+        file-utils.h
         file-win32.cc
         file.cc
         file.h
@@ -78,7 +82,6 @@ target_sources(${TR_NAME}
         mime-types.h
         net.cc
         net.h
-        observable.h
         open-files.cc
         open-files.h
         peer-common.h
@@ -122,6 +125,9 @@ target_sources(${TR_NAME}
         session.h
         stats.cc
         stats.h
+        string-utils.cc
+        string-utils.h
+        $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
         subprocess-posix.cc
         subprocess-win32.cc
         subprocess.h
@@ -161,7 +167,6 @@ target_sources(${TR_NAME}
         utils-ev.h
         utils.cc
         utils.h
-        $<$<BOOL:${IS_APPLE_CLANG}>:utils.mm>
         variant-benc.cc
         variant-json.cc
         variant.cc
@@ -200,8 +205,6 @@ tr_allow_compile_if(
         crypto-utils-openssl.cc
     [=[[CRYPTO_PKG STREQUAL "wolfssl"]]=]
         crypto-utils-wolfssl.cc
-    [=[[ENABLE_UTP]]=]
-        tr-utp.cc
     [=[[WITH_INOTIFY]]=]
         watchdir-inotify.cc
     [=[[WITH_KQUEUE]]=]
@@ -226,17 +229,11 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
-        FMT_USE_EXCEPTIONS=0 # {fmt} >= 11.2.0
-        FMT_EXCEPTIONS=0 # {fmt} < 11.2.0
         $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
         $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
         $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
-
-tr_target_compile_definitions_for_headers(${TR_NAME}
-    PRIVATE
-        xfs/xfs.h)
 
 tr_target_compile_definitions_for_functions(${TR_NAME}
     PRIVATE
@@ -271,9 +268,9 @@ target_link_libraries(${TR_NAME}
         FastFloat::fast_float
         psl::psl
         natpmp::natpmp
-        miniupnpc::libminiupnpc
+        miniupnpc::miniupnpc
         dht::dht
-        libutp::libutp
+        $<$<BOOL:${ENABLE_UTP}>:libutp::libutp>
         libb64::libb64
         ${Intl_LIBRARIES}
         ${LIBM_LIBRARY}
@@ -291,9 +288,11 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
         transmission::crypto_impl
-        fmt::fmt-header-only
+        transmission::fmt-header-only
+        Pal::Sigslot
         transmission::small
-        libevent::event)
+        libevent::core
+        libevent::extra)
 
 if(INSTALL_LIB)
     install(

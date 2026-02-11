@@ -30,11 +30,13 @@
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
+#include "libtransmission/env.h"
 #include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h" // tr_strbuf, tr_urlbuf

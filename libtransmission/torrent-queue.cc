@@ -26,6 +26,7 @@ using namespace std::literals;
 size_t tr_torrent_queue::add(tr_torrent_id_t const id)
 {
     queue_.push_back(id);
+    set_dirty();
     return std::size(queue_) - 1U;
 }
 
@@ -42,6 +43,7 @@ void tr_torrent_queue::remove(tr_torrent_id_t const id)
         auto const remove_it = std::remove(std::begin(queue_), std::end(queue_), id);
         queue_.erase(remove_it, std::end(queue_));
     }
+    set_dirty();
 }
 
 size_t tr_torrent_queue::get_pos(tr_torrent_id_t const id)
@@ -63,38 +65,53 @@ size_t tr_torrent_queue::get_pos(tr_torrent_id_t const id)
     return pos_cache_[uid];
 }
 
-void tr_torrent_queue::set_pos(tr_torrent_id_t const id, size_t new_pos)
+// returns the list of torrent IDs whose queue position changed
+std::vector<tr_torrent_id_t> tr_torrent_queue::set_pos(tr_torrent_id_t const id, size_t new_pos)
 {
     auto const old_pos = get_pos(id);
     auto const n_queue = std::size(queue_);
     if (old_pos >= n_queue || queue_[old_pos] != id)
     {
-        return;
+        return {};
     }
 
     new_pos = std::min(new_pos, n_queue - 1U);
 
     if (old_pos == new_pos)
     {
-        return;
+        return {};
     }
+
+    auto ret = std::vector<tr_torrent_id_t>{};
 
     auto const begin = std::begin(queue_);
     auto const old_it = std::next(begin, old_pos);
-    auto const next_it = std::next(old_it);
+    auto const old_next_it = std::next(old_it);
     auto const new_it = std::next(begin, new_pos);
     if (old_pos > new_pos)
     {
-        std::rotate(new_it, old_it, next_it);
+        ret.assign(new_it, old_next_it);
+        std::rotate(new_it, old_it, old_next_it);
     }
     else
     {
-        std::rotate(old_it, next_it, std::next(new_it));
+        auto const new_next_it = std::next(new_it);
+        ret.assign(old_it, new_next_it);
+        std::rotate(old_it, old_next_it, new_next_it);
     }
+
+    set_dirty();
+    return ret;
 }
 
-bool tr_torrent_queue::to_file() const
+bool tr_torrent_queue::to_file()
 {
+    if (!is_dirty())
+    {
+        return false;
+    }
+    set_dirty(false);
+
     auto vec = tr_variant::Vector{};
     vec.reserve(std::size(queue_));
     for (auto const id : queue_)

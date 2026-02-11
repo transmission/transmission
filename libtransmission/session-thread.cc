@@ -137,7 +137,9 @@ auto make_event_base()
 {
     tr_session_thread::tr_evthread_init();
 
-    return tr::evhelpers::evbase_unique_ptr{ event_base_new() };
+    struct event_base* b = event_base_new();
+    event_base_priority_init(b, 3);
+    return tr::evhelpers::evbase_unique_ptr{ b };
 }
 
 } // namespace
@@ -200,7 +202,7 @@ public:
         return thread_id_ == std::this_thread::get_id();
     }
 
-    void queue(std::function<void(void)>&& func) override
+    void queue(callback_t&& func) override
     {
         work_queue_mutex_.lock();
         work_queue_.emplace_back(std::move(func));
@@ -209,7 +211,7 @@ public:
         event_active(work_queue_event_.get(), 0, {});
     }
 
-    void run(std::function<void(void)>&& func) override
+    void run(callback_t&& func) override
     {
         if (am_in_session_thread())
         {
@@ -222,8 +224,7 @@ public:
     }
 
 private:
-    using callback = std::function<void(void)>;
-    using work_queue_t = std::list<callback>;
+    using work_queue_t = std::list<callback_t>;
 
     void session_thread_func(struct event_base* evbase)
     {
@@ -281,7 +282,9 @@ private:
     }
 
     tr::evhelpers::evbase_unique_ptr const evbase_{ make_event_base() };
-    tr::evhelpers::event_unique_ptr const work_queue_event_{ event_new(evbase_.get(), -1, 0, on_work_available_static, this) };
+    tr::evhelpers::event_unique_ptr const work_queue_event_{
+        tr::evhelpers::event_new_pri2(evbase_.get(), -1, 0, on_work_available_static, this)
+    };
 
     work_queue_t work_queue_;
     std::mutex work_queue_mutex_;

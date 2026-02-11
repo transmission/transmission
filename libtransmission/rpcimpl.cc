@@ -31,6 +31,7 @@
 #include "libtransmission/announcer.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
@@ -39,6 +40,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
@@ -646,7 +648,7 @@ namespace make_torrent_field_helpers
 
 [[nodiscard]] auto make_peer_counts_map(tr_stat const& st)
 {
-    auto const& from = st.peersFrom;
+    auto const& from = st.peers_from;
     auto peer_counts_map = tr_variant::Map{ 7U };
     peer_counts_map.try_emplace(TR_KEY_from_cache, from[TR_PEER_FROM_RESUME]);
     peer_counts_map.try_emplace(TR_KEY_from_dht, from[TR_PEER_FROM_DHT]);
@@ -782,9 +784,9 @@ namespace make_torrent_field_helpers
     switch (key)
     {
     case TR_KEY_activity_date:
-        return st.activityDate;
+        return st.activity_date;
     case TR_KEY_added_date:
-        return st.addedDate;
+        return st.added_date;
     case TR_KEY_availability:
         return make_piece_availability_vec(tor);
     case TR_KEY_bandwidth_priority:
@@ -794,15 +796,15 @@ namespace make_torrent_field_helpers
     case TR_KEY_comment:
         return tor.comment();
     case TR_KEY_corrupt_ever:
-        return st.corruptEver;
+        return st.corrupt_ever;
     case TR_KEY_creator:
         return tor.creator();
     case TR_KEY_date_created:
         return tor.date_created();
     case TR_KEY_desired_available:
-        return st.desiredAvailable;
+        return st.desired_available;
     case TR_KEY_done_date:
-        return st.doneDate;
+        return st.done_date;
     case TR_KEY_download_dir:
         return tr_variant::unmanaged_string(tor.download_dir().sv());
     case TR_KEY_download_limit:
@@ -810,17 +812,17 @@ namespace make_torrent_field_helpers
     case TR_KEY_download_limited:
         return tor.uses_speed_limit(tr_direction::Down);
     case TR_KEY_downloaded_ever:
-        return st.downloadedEver;
+        return st.downloaded_ever;
     case TR_KEY_edit_date:
-        return st.editDate;
+        return st.edit_date;
     case TR_KEY_error:
         return st.error;
     case TR_KEY_error_string:
-        return st.errorString;
+        return st.error_string;
     case TR_KEY_eta:
         return st.eta;
     case TR_KEY_eta_idle:
-        return st.etaIdle;
+        return st.eta_idle;
     case TR_KEY_file_count:
         return tor.file_count();
     case TR_KEY_file_stats:
@@ -832,9 +834,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_hash_string:
         return tr_variant::unmanaged_string(tor.info_hash_string().sv());
     case TR_KEY_have_unchecked:
-        return st.haveUnchecked;
+        return st.have_unchecked;
     case TR_KEY_have_valid:
-        return st.haveValid;
+        return st.have_valid;
     case TR_KEY_honors_session_limits:
         return tor.uses_session_limits();
     case TR_KEY_id:
@@ -844,11 +846,11 @@ namespace make_torrent_field_helpers
     case TR_KEY_is_private:
         return tor.is_private();
     case TR_KEY_is_stalled:
-        return st.isStalled;
+        return st.is_stalled;
     case TR_KEY_labels:
         return make_labels_vec(tor);
     case TR_KEY_left_until_done:
-        return st.leftUntilDone;
+        return st.left_until_done;
     case TR_KEY_magnet_link:
         return tor.magnet();
     case TR_KEY_manual_announce_time:
@@ -856,7 +858,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_max_connected_peers:
         return tor.peer_limit();
     case TR_KEY_metadata_percent_complete:
-        return st.metadataPercentComplete;
+        return st.metadata_percent_complete;
     case TR_KEY_name:
         return tor.name();
     case TR_KEY_peer_limit:
@@ -864,17 +866,17 @@ namespace make_torrent_field_helpers
     case TR_KEY_peers:
         return make_peer_vec(tor);
     case TR_KEY_peers_connected:
-        return st.peersConnected;
+        return st.peers_connected;
     case TR_KEY_peers_from:
         return make_peer_counts_map(st);
     case TR_KEY_peers_getting_from_us:
-        return st.peersGettingFromUs;
+        return st.peers_getting_from_us;
     case TR_KEY_peers_sending_to_us:
-        return st.peersSendingToUs;
+        return st.peers_sending_to_us;
     case TR_KEY_percent_complete:
-        return st.percentComplete;
+        return st.percent_complete;
     case TR_KEY_percent_done:
-        return st.percentDone;
+        return st.percent_done;
     case TR_KEY_piece_count:
         return tor.piece_count();
     case TR_KEY_piece_size:
@@ -886,17 +888,17 @@ namespace make_torrent_field_helpers
     case TR_KEY_priorities:
         return make_file_priorities_vec(tor);
     case TR_KEY_queue_position:
-        return st.queuePosition;
+        return st.queue_position;
     case TR_KEY_rate_download:
-        return Speed{ st.pieceDownloadSpeed_KBps, Speed::Units::KByps }.base_quantity();
+        return st.piece_download_speed.base_quantity();
     case TR_KEY_rate_upload:
-        return Speed{ st.pieceUploadSpeed_KBps, Speed::Units::KByps }.base_quantity();
+        return st.piece_upload_speed.base_quantity();
     case TR_KEY_recheck_progress:
-        return st.recheckProgress;
+        return st.recheck_progress;
     case TR_KEY_seconds_downloading:
-        return st.secondsDownloading;
+        return st.seconds_downloading;
     case TR_KEY_seconds_seeding:
-        return st.secondsSeeding;
+        return st.seconds_seeding;
     case TR_KEY_seed_idle_limit:
         return tor.idle_limit_minutes();
     case TR_KEY_seed_idle_mode:
@@ -910,11 +912,11 @@ namespace make_torrent_field_helpers
     case TR_KEY_sequential_download_from_piece:
         return tor.sequential_download_from_piece();
     case TR_KEY_size_when_done:
-        return st.sizeWhenDone;
+        return st.size_when_done;
     case TR_KEY_source:
         return tor.source();
     case TR_KEY_start_date:
-        return st.startDate;
+        return st.start_date;
     case TR_KEY_status:
         return st.activity;
     case TR_KEY_torrent_file:
@@ -932,15 +934,15 @@ namespace make_torrent_field_helpers
     case TR_KEY_upload_limited:
         return tor.uses_speed_limit(tr_direction::Up);
     case TR_KEY_upload_ratio:
-        return st.ratio;
+        return st.upload_ratio;
     case TR_KEY_uploaded_ever:
-        return st.uploadedEver;
+        return st.uploaded_ever;
     case TR_KEY_wanted:
         return make_file_wanted_vec(tor);
     case TR_KEY_webseeds:
         return make_webseed_vec(tor);
     case TR_KEY_webseeds_sending_to_us:
-        return st.webseedsSendingToUs;
+        return st.webseeds_sending_to_us;
     default:
         return tr_variant{};
     }
@@ -948,23 +950,23 @@ namespace make_torrent_field_helpers
 
 [[nodiscard]] auto make_torrent_info_map(tr_torrent* const tor, tr_quark const* const fields, size_t const field_count)
 {
-    auto const* const st = tr_torrentStat(tor);
+    auto const st = tr_torrentStat(tor);
     auto info_map = tr_variant::Map{ field_count };
     for (size_t i = 0; i < field_count; ++i)
     {
-        info_map.try_emplace(fields[i], make_torrent_field(*tor, *st, fields[i]));
+        info_map.try_emplace(fields[i], make_torrent_field(*tor, st, fields[i]));
     }
     return tr_variant{ std::move(info_map) };
 }
 
 [[nodiscard]] auto make_torrent_info_vec(tr_torrent* const tor, tr_quark const* const fields, size_t const field_count)
 {
-    auto const* const st = tr_torrentStat(tor);
+    auto const st = tr_torrentStat(tor);
     auto info_vec = tr_variant::Vector{};
     info_vec.reserve(field_count);
     for (size_t i = 0; i < field_count; ++i)
     {
-        info_vec.emplace_back(make_torrent_field(*tor, *st, fields[i]));
+        info_vec.emplace_back(make_torrent_field(*tor, st, fields[i]));
     }
     return tr_variant{ std::move(info_vec) };
 }
@@ -1907,9 +1909,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
             auto group_map = tr_variant::Map{ 6U };
             group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(tr_direction::Up));
             group_map.try_emplace(TR_KEY_name, name.sv());
-            group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
+            group_map.try_emplace(TR_KEY_speed_limit_down, static_cast<int64_t>(limits.down_limit.count(Speed::Units::KByps)));
             group_map.try_emplace(TR_KEY_speed_limit_down_enabled, limits.down_limited);
-            group_map.try_emplace(TR_KEY_speed_limit_up, limits.up_limit.count(Speed::Units::KByps));
+            group_map.try_emplace(TR_KEY_speed_limit_up, static_cast<int64_t>(limits.up_limit.count(Speed::Units::KByps)));
             group_map.try_emplace(TR_KEY_speed_limit_up_enabled, limits.up_limited);
             groups_vec.emplace_back(std::move(group_map));
         }
@@ -2231,9 +2233,12 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         TR_KEY_download_dir_free_space,
         [](tr_session const& src) -> tr_variant
         {
-            auto ec = std::error_code{};
-            auto const space = std::filesystem::space(src.downloadDir(), ec);
-            return !ec ? space.available : tr_variant{ -1 };
+            // TODO(C++23): use std::optional::transform() instead
+            if (auto const space = tr_sys_path_get_capacity(std::string_view{ src.downloadDir() }))
+            {
+                return space->available;
+            }
+            return -1;
         },
         nullptr);
 
@@ -2521,7 +2526,8 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_speed_limit_down,
-        [](tr_session const& src) -> tr_variant { return src.speed_limit(tr_direction::Down).count(Speed::Units::KByps); },
+        [](tr_session const& src) -> tr_variant
+        { return static_cast<int64_t>(src.speed_limit(tr_direction::Down).count(Speed::Units::KByps)); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())
@@ -2543,7 +2549,8 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_speed_limit_up,
-        [](tr_session const& src) -> tr_variant { return src.speed_limit(tr_direction::Up).count(Speed::Units::KByps); },
+        [](tr_session const& src) -> tr_variant
+        { return static_cast<int64_t>(src.speed_limit(tr_direction::Up).count(Speed::Units::KByps)); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())
@@ -2736,17 +2743,17 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
     }
 
     // get the free space
-    auto ec = std::error_code{};
-    auto const capacity = std::filesystem::space(*path, ec);
+    auto error = tr_error{};
+    auto const capacity = tr_sys_path_get_capacity(*path, &error);
 
     // response
     args_out.try_emplace(TR_KEY_path, *path);
-    args_out.try_emplace(TR_KEY_size_bytes, !ec ? capacity.available : tr_variant{ -1 });
-    args_out.try_emplace(TR_KEY_total_size, !ec ? capacity.capacity : tr_variant{ -1 });
+    args_out.try_emplace(TR_KEY_size_bytes, capacity ? capacity->available : tr_variant{ -1 });
+    args_out.try_emplace(TR_KEY_total_size, capacity ? capacity->capacity : tr_variant{ -1 });
 
-    if (ec)
+    if (error)
     {
-        return { Error::SYSTEM_ERROR, ec.message() };
+        return { Error::SYSTEM_ERROR, std::string{ error.message() } };
     }
     return { Error::SUCCESS, {} };
 }

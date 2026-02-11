@@ -19,9 +19,9 @@
 #include "libtransmission/error-types.h"
 #include "libtransmission/error.h"
 #include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-macros.h" // for tr_sha1_digest_t
 #include "libtransmission/tr-strbuf.h" // for tr_urlbuf
-#include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 
 using namespace std::literals;
@@ -200,19 +200,27 @@ void tr_magnet_metainfo::set_name(std::string_view name)
 
 void tr_magnet_metainfo::add_webseed(std::string_view webseed)
 {
-    if (!tr_urlIsValid(webseed))
+    // This step allows for URLs that contain character outside the allowed set
+    // defined by RFC 3986. The URL we store is "equivalent" to the provided URL
+    // according to the definition in RFC 3986 Section 6.1, while consisting
+    // of only ASCII characters. This ensures the URLs be represented correctly
+    // when transmitted via UTF-8 mediums, for example JSON.
+    auto normalized = tr_urlbuf{};
+    tr_urlPercentEncode(std::back_inserter(normalized), webseed, false);
+
+    if (!tr_urlIsValid(normalized))
     {
         return;
     }
 
     auto& urls = webseed_urls_;
 
-    if (auto const it = std::ranges::find(urls, webseed); it != std::ranges::end(urls))
+    if (auto const it = std::ranges::find(urls, normalized.sv()); it != std::ranges::end(urls))
     {
         return;
     }
 
-    urls.emplace_back(webseed);
+    urls.emplace_back(normalized.sv());
 }
 
 bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* error)

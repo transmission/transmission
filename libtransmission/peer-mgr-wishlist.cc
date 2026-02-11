@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::adjacent_find, std::sort
+#include <array>
 #include <cstddef>
 #include <functional>
 #include <ranges>
@@ -19,8 +20,9 @@
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
-#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/peer-mgr-wishlist.h"
+#include "libtransmission/utils.h"
 
 namespace
 {
@@ -108,6 +110,81 @@ class Wishlist::Impl
 
 public:
     explicit Impl(Mediator& mediator_in);
+
+    void on_files_wanted_changed()
+    {
+        candidate_list_upkeep();
+    }
+
+    void on_got_bad_piece(tr_piece_index_t const piece)
+    {
+        got_bad_piece(piece);
+    }
+
+    void on_got_bitfield(tr_bitfield const& bitfield)
+    {
+        inc_replication_bitfield(bitfield);
+    }
+
+    void on_got_block(tr_block_index_t const block)
+    {
+        client_got_block(block);
+    }
+
+    void on_got_choke(tr_bitfield const& requests)
+    {
+        reset_blocks_bitfield(requests);
+    }
+
+    void on_got_have(tr_piece_index_t const piece)
+    {
+        inc_replication_piece(piece);
+    }
+
+    void on_got_have_all()
+    {
+        inc_replication();
+    }
+
+    void on_got_reject(tr_block_index_t const block)
+    {
+        reset_block(block);
+    }
+
+    void on_peer_disconnect(tr_bitfield const& have, tr_bitfield const& requests)
+    {
+        peer_disconnect(have, requests);
+    }
+
+    void on_piece_completed(tr_piece_index_t const piece)
+    {
+        remove_piece(piece);
+    }
+
+    void on_priority_changed()
+    {
+        recalculate_priority();
+    }
+
+    void on_sent_cancel(tr_block_index_t const block)
+    {
+        reset_block(block);
+    }
+
+    void on_sent_request(tr_block_span_t const block_span)
+    {
+        requested_block_span(block_span);
+    }
+
+    void on_sequential_download_changed()
+    {
+        recalculate_salt();
+    }
+
+    void on_sequential_download_from_piece_changed()
+    {
+        recalculate_salt();
+    }
 
     [[nodiscard]] std::vector<tr_block_span_t> next(
         size_t n_wanted_blocks,
@@ -523,49 +600,11 @@ private:
 
     CandidateVec candidates_;
 
-    std::array<tr::ObserverTag, 15U> const tags_;
-
     Mediator& mediator_;
 };
 
 Wishlist::Impl::Impl(Mediator& mediator_in)
-    : tags_{ {
-          // candidates
-          mediator_in.observe_files_wanted_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool)
-                                                   { candidate_list_upkeep(); }),
-          // replication, unrequested
-          mediator_in.observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b, tr_bitfield const& ar)
-                                              { peer_disconnect(b, ar); }),
-          // unrequested
-          mediator_in.observe_got_bad_piece([this](tr_torrent*, tr_piece_index_t p) { got_bad_piece(p); }),
-          // replication
-          mediator_in.observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_bitfield(b); }),
-          // unrequested
-          mediator_in.observe_got_block([this](tr_torrent*, tr_block_index_t b) { client_got_block(b); }),
-          // unrequested
-          mediator_in.observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { reset_blocks_bitfield(b); }),
-          // replication
-          mediator_in.observe_got_have([this](tr_torrent*, tr_piece_index_t p) { inc_replication_piece(p); }),
-          // replication
-          mediator_in.observe_got_have_all([this](tr_torrent*) { inc_replication(); }),
-          // unrequested
-          mediator_in.observe_got_reject([this](tr_torrent*, tr_peer*, tr_block_index_t b) { reset_block(b); }),
-          // candidates
-          mediator_in.observe_piece_completed([this](tr_torrent*, tr_piece_index_t p) { remove_piece(p); }),
-          // priority
-          mediator_in.observe_priority_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t)
-                                               { recalculate_priority(); }),
-          // unrequested
-          mediator_in.observe_sent_cancel([this](tr_torrent*, tr_peer*, tr_block_index_t b) { reset_block(b); }),
-          // unrequested
-          mediator_in.observe_sent_request([this](tr_torrent*, tr_peer*, tr_block_span_t bs) { requested_block_span(bs); }),
-          // salt
-          mediator_in.observe_sequential_download_changed([this](tr_torrent*, bool) { recalculate_salt(); }),
-          // salt
-          mediator_in.observe_sequential_download_from_piece_changed([this](tr_torrent*, tr_piece_index_t)
-                                                                     { recalculate_salt(); }),
-      } }
-    , mediator_{ mediator_in }
+    : mediator_{ mediator_in }
 {
     candidate_list_upkeep();
 }
@@ -640,6 +679,81 @@ Wishlist::Wishlist(Mediator& mediator_in)
 }
 
 Wishlist::~Wishlist() = default;
+
+void Wishlist::on_files_wanted_changed()
+{
+    impl_->on_files_wanted_changed();
+}
+
+void Wishlist::on_got_bad_piece(tr_piece_index_t const piece)
+{
+    impl_->on_got_bad_piece(piece);
+}
+
+void Wishlist::on_got_bitfield(tr_bitfield const& bitfield)
+{
+    impl_->on_got_bitfield(bitfield);
+}
+
+void Wishlist::on_got_block(tr_block_index_t const block)
+{
+    impl_->on_got_block(block);
+}
+
+void Wishlist::on_got_choke(tr_bitfield const& requests)
+{
+    impl_->on_got_choke(requests);
+}
+
+void Wishlist::on_got_have(tr_piece_index_t const piece)
+{
+    impl_->on_got_have(piece);
+}
+
+void Wishlist::on_got_have_all()
+{
+    impl_->on_got_have_all();
+}
+
+void Wishlist::on_got_reject(tr_block_index_t const block)
+{
+    impl_->on_got_reject(block);
+}
+
+void Wishlist::on_peer_disconnect(tr_bitfield const& have, tr_bitfield const& requests)
+{
+    impl_->on_peer_disconnect(have, requests);
+}
+
+void Wishlist::on_piece_completed(tr_piece_index_t const piece)
+{
+    impl_->on_piece_completed(piece);
+}
+
+void Wishlist::on_priority_changed()
+{
+    impl_->on_priority_changed();
+}
+
+void Wishlist::on_sent_cancel(tr_block_index_t const block)
+{
+    impl_->on_sent_cancel(block);
+}
+
+void Wishlist::on_sent_request(tr_block_span_t const block_span)
+{
+    impl_->on_sent_request(block_span);
+}
+
+void Wishlist::on_sequential_download_changed()
+{
+    impl_->on_sequential_download_changed();
+}
+
+void Wishlist::on_sequential_download_from_piece_changed()
+{
+    impl_->on_sequential_download_from_piece_changed();
+}
 
 std::vector<tr_block_span_t> Wishlist::next(
     size_t const n_wanted_blocks,

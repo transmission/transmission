@@ -92,6 +92,17 @@ TEST_F(TorrentQueueTest, addRemoveToFromQueue)
 TEST_F(TorrentQueueTest, setQueuePos)
 {
     static auto constexpr QueuePos = std::array{ 1U, 3U, 0U, 2U };
+    static auto const ExpectedChangedIds = std::array<std::vector<tr_torrent_id_t>, std::size(QueuePos)>{ {
+        // Queue order: 1, 2, 3, 4
+        { 1, 2 },
+        // Queue order: 2, 1, 3, 4
+        { 1, 2, 3, 4 },
+        // Queue order: 1, 3, 4, 2
+        { 1, 3 },
+        // Queue order: 3, 1, 4, 2
+        {},
+        // Queue order: 3, 1, 4, 2
+    } };
 
     auto queue = tr_torrent_queue{ mediator_ };
 
@@ -117,8 +128,11 @@ TEST_F(TorrentQueueTest, setQueuePos)
     {
         auto const id = owned[i]->id();
         auto const pos = QueuePos[i];
-        queue.set_pos(id, pos);
+        auto changed_ids = queue.set_pos(id, pos);
+        std::ranges::sort(changed_ids);
         EXPECT_EQ(queue.get_pos(id), pos);
+        EXPECT_EQ(changed_ids, ExpectedChangedIds[i]);
+        EXPECT_EQ(std::ranges::adjacent_find(changed_ids), std::ranges::end(changed_ids)); // check if unique
     }
 
     for (size_t i = 0; i < std::size(owned); ++i)

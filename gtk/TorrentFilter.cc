@@ -170,11 +170,11 @@ Glib::RefPtr<TorrentFilter> TorrentFilter::create()
     return Glib::make_refptr_for_instance(new TorrentFilter());
 }
 
-bool TorrentFilter::match_mode(Torrent const& torrent, ShowMode const type)
+bool TorrentFilter::match_mode(Torrent const& torrent, ShowMode const mode)
 {
     auto activity = tr_torrent_activity();
 
-    switch (type)
+    switch (mode)
     {
     case ShowMode::ShowAll:
         return true;
@@ -201,7 +201,7 @@ bool TorrentFilter::match_mode(Torrent const& torrent, ShowMode const type)
         return activity == TR_STATUS_CHECK || activity == TR_STATUS_CHECK_WAIT;
 
     case ShowMode::ShowError:
-        return torrent.get_error_code() != 0;
+        return torrent.get_error_code() != tr_stat::Error::Ok;
     }
 
     g_assert_not_reached();

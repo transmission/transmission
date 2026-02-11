@@ -36,6 +36,7 @@
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
 #include "libtransmission/crypto-utils.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/ip-cache.h"
 #include "libtransmission/interned-string.h"
@@ -46,8 +47,9 @@
 #include "libtransmission/port-forwarding.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpc-server.h"
-#include "libtransmission/session.h"
 #include "libtransmission/session-alt-speeds.h"
+#include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrent-ctor.h"
@@ -56,7 +58,6 @@
 #include "libtransmission/tr-lpd.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/tr-utp.h"
-#include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web.h"
@@ -412,7 +413,7 @@ tr_session::BoundSocket::BoundSocket(
     : cb_{ cb }
     , cb_data_{ cb_data }
     , socket_{ tr_netBindTCP(addr, port, false) }
-    , ev_{ event_new(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocket::onCanRead, this) }
+    , ev_{ tr::evhelpers::event_new_pri2(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocket::onCanRead, this) }
 {
     if (socket_ == TR_BAD_SOCKET)
     {
@@ -715,6 +716,7 @@ void tr_session::on_save_timer()
     }
 
     stats().save();
+    torrent_queue().to_file();
 }
 
 void tr_session::initImpl(init_data& data)

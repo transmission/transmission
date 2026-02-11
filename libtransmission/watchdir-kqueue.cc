@@ -25,6 +25,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h" // for _()
 #include "libtransmission/utils-ev.h"

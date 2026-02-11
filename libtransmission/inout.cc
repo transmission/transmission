@@ -20,8 +20,9 @@
 #include "libtransmission/file.h"
 #include "libtransmission/inout.h"
 #include "libtransmission/session.h"
-#include "libtransmission/torrent.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-files.h"
+#include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 #include "libtransmission/tr-strbuf.h" // tr_pathbuf
@@ -259,7 +260,7 @@ int tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, size_t const
     read_or_write_piece(tor, true /*writable*/, loc, const_cast<uint8_t*>(writeme), len, error);
 
     // if IO failed, set torrent's error if not already set
-    if (error && tor.error().error_type() != TR_STAT_LOCAL_ERROR)
+    if (error && !tor.error().is_local_error())
     {
         tor.error().set_local_error(error.message());
         tr_torrentStop(&tor);

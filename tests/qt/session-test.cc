@@ -11,8 +11,9 @@
 #include <QRegularExpression>
 #include <QTest>
 
-#include <libtransmission/api-compat.h>
 #include <libtransmission/transmission.h>
+#include <libtransmission/api-compat.h>
+#include <libtransmission/env.h>
 
 #include "Prefs.h"
 #include "Session.h"
@@ -45,6 +46,9 @@ Q_DECLARE_METATYPE(Style)
                 .arg(dir)
         };
     }
+
+    abort();
+    return {};
 }
 
 class SessionTest

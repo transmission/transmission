@@ -32,9 +32,11 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
+#include <libtransmission/file-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-strbuf.h>
@@ -1041,7 +1043,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     config_dir_ = getConfigDir(argc, argv);
 
     /* load settings from defaults + config file */
-    settings_ = load_settings(config_dir_.c_str());
+    settings_ = load_settings(config_dir_);
 
     bool dumpSettings;
 

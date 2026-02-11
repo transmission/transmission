@@ -35,9 +35,10 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
-#include "libtransmission/utils.h" // for _(), tr_strerror(), tr_strv_ends_with()
+#include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;
 
@@ -515,7 +516,7 @@ void Blocklists::set_enabled(bool is_enabled)
         blocklist.setEnabled(is_enabled);
     }
 
-    changed_.emit();
+    changed_();
 }
 
 void Blocklists::load(std::string_view folder, bool is_enabled)
@@ -523,7 +524,7 @@ void Blocklists::load(std::string_view folder, bool is_enabled)
     folder_ = folder;
     blocklists_ = load_folder(folder, is_enabled);
 
-    changed_.emit();
+    changed_();
 }
 
 // static
@@ -590,7 +591,7 @@ size_t Blocklists::update_primary_blocklist(std::string_view const external_file
         blocklists_.emplace_back(std::move(*added));
     }
 
-    changed_.emit();
+    changed_();
 
     return n_rules;
 }

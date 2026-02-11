@@ -20,6 +20,8 @@
 #include <utility>
 #include <vector>
 
+#include <sigslot/signal.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
@@ -31,7 +33,6 @@
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
-#include "libtransmission/observable.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-magnet.h"
@@ -438,7 +439,7 @@ struct tr_torrent
         if (priority != file_priorities_.file_priority(file))
         {
             file_priorities_.set(file, priority);
-            priority_changed_.emit(this, &file, 1U, priority);
+            priority_changed_(this, &file, 1U, priority);
             set_dirty();
             mark_changed();
         }
@@ -768,7 +769,7 @@ struct tr_torrent
                 session->flush_torrent_files(id());
             }
             sequential_download_ = is_sequential;
-            sequential_download_changed_.emit(this, is_sequential);
+            sequential_download_changed_(this, is_sequential);
             set_dirty();
         }
     }
@@ -784,7 +785,7 @@ struct tr_torrent
         if (is_valid && piece != sequential_download_from_piece_)
         {
             sequential_download_from_piece_ = piece;
-            sequential_download_from_piece_changed_.emit(this, piece);
+            sequential_download_from_piece_changed_(this, piece);
             return true;
         }
         return false;
@@ -991,9 +992,15 @@ struct tr_torrent
         return session->torrent_queue().get_pos(id());
     }
 
-    void set_queue_position(size_t new_pos) // NOLINT(readability-make-member-function-const)
+    void set_queue_position(size_t const new_pos) // NOLINT(readability-make-member-function-const)
     {
-        session->torrent_queue().set_pos(id(), new_pos);
+        for (auto const& changed_id : session->torrent_queue().set_pos(id(), new_pos))
+        {
+            if (auto* const tor = session->torrents().get(changed_id))
+            {
+                tor->mark_changed();
+            }
+        }
     }
 
     static constexpr struct
@@ -1006,18 +1013,18 @@ struct tr_torrent
 
     // ---
 
-    tr::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
-    tr::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
-    tr::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
-    tr::SimpleObservable<tr_torrent*> doomed_;
-    tr::SimpleObservable<tr_torrent*> got_metainfo_;
-    tr::SimpleObservable<tr_torrent*> started_;
-    tr::SimpleObservable<tr_torrent*> stopped_;
-    tr::SimpleObservable<tr_torrent*> swarm_is_all_upload_only_;
-    tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
-    tr::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
-    tr::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
-    tr::SimpleObservable<tr_torrent*, tr_piece_index_t> sequential_download_from_piece_changed_;
+    sigslot::signal<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
+    sigslot::signal<tr_torrent*, tr_piece_index_t> got_bad_piece_;
+    sigslot::signal<tr_torrent*, tr_piece_index_t> piece_completed_;
+    sigslot::signal<tr_torrent*> doomed_;
+    sigslot::signal<tr_torrent*> got_metainfo_;
+    sigslot::signal<tr_torrent*> started_;
+    sigslot::signal<tr_torrent*> stopped_;
+    sigslot::signal<tr_torrent*> swarm_is_all_upload_only_;
+    sigslot::signal<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
+    sigslot::signal<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
+    sigslot::signal<tr_torrent*, bool> sequential_download_changed_;
+    sigslot::signal<tr_torrent*, tr_piece_index_t> sequential_download_from_piece_changed_;
 
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;
@@ -1034,21 +1041,13 @@ struct tr_torrent
 private:
     friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
-    friend tr_stat const* tr_torrentStat(tr_torrent* tor);
-    friend std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+    friend tr_stat tr_torrentStat(tr_torrent* tor);
+    friend std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
-    friend void tr_torrentRemoveInSessionThread(
-        tr_torrent* tor,
-        bool delete_flag,
-        tr_torrent_remove_func remove_func,
-        tr_torrent_remove_done_func on_remove_done);
-    friend void tr_torrentRemove(
-        tr_torrent* tor,
-        bool delete_flag,
-        tr_torrent_remove_func remove_func,
-        tr_torrent_remove_done_func on_remove_done);
+    friend void tr_torrentRemoveInSessionThread(tr_torrent* tor, bool delete_flag, tr_torrent_remove_func remove_func);
+    friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_torrent_remove_func remove_func);
     friend void tr_torrentSetDownloadDir(tr_torrent* tor, std::string_view path);
     friend void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
     friend void tr_torrentStart(tr_torrent* tor);
@@ -1071,12 +1070,22 @@ private:
     public:
         [[nodiscard]] constexpr auto empty() const noexcept
         {
-            return error_type_ == TR_STAT_OK;
+            return error_type_ == tr_stat::Error::Ok;
         }
 
         [[nodiscard]] constexpr auto error_type() const noexcept
         {
             return error_type_;
+        }
+
+        [[nodiscard]] constexpr auto is_local_error() const noexcept
+        {
+            return error_type_ == tr_stat::Error::LocalError;
+        }
+
+        [[nodiscard]] constexpr auto is_tracker() const noexcept
+        {
+            return error_type_ == tr_stat::Error::TrackerError || error_type_ == tr_stat::Error::TrackerWarning;
         }
 
         [[nodiscard]] constexpr auto const& announce_url() const noexcept
@@ -1099,7 +1108,7 @@ private:
     private:
         tr_interned_string announce_url_; // the source for tracker errors/warnings
         std::string errmsg_;
-        tr_stat_errtype error_type_ = TR_STAT_OK;
+        tr_stat::Error error_type_ = tr_stat::Error::Ok;
     };
 
     // Helper class to smooth out speed estimates.
@@ -1244,7 +1253,7 @@ private:
 
         files_wanted_.set(files, n_files, wanted);
         completion_.invalidate_size_when_done();
-        files_wanted_changed_.emit(this, files, n_files, wanted);
+        files_wanted_changed_(this, files, n_files, wanted);
 
         if (!is_bootstrapping)
         {
@@ -1337,7 +1346,7 @@ private:
 
     [[nodiscard]] bool is_new_torrent_a_seed();
 
-    tr_stat stats_ = {};
+    //tr_stat stats_ = {};
 
     Error error_;
 

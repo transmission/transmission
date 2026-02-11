@@ -4,7 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include "libtransmission/error.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/string-utils.h"
 
 void tr_error::set_from_errno(int errnum)
 {

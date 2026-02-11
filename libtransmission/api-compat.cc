@@ -12,12 +12,14 @@
 #include <string_view>
 #include <vector>
 
+#include "libtransmission/transmission.h"
+
 #include "libtransmission/api-compat.h"
+#include "libtransmission/env.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/serializer.h"
-#include "libtransmission/transmission.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/variant.h"
 
 namespace tr::api_compat
@@ -629,6 +631,23 @@ struct State
             { "show_paused", "show-paused" },
             { "show_seeding", "show-seeding" },
             { "show_verifying", "show-verifying" },
+        } };
+        for (auto const& [current, legacy] : Strings)
+        {
+            if (src == current || src == legacy)
+            {
+                return state.style == Style::Tr5 ? current : legacy;
+            }
+        }
+    }
+
+    if (state.is_settings && state.current_key_is_any_of({ TR_KEY_statusbar_stats, TR_KEY_statusbar_stats_kebab_APICOMPAT }))
+    {
+        static auto constexpr Strings = std::array<std::pair<std::string_view, std::string_view>, 4U>{ {
+            { "total_ratio", "total-ratio" },
+            { "total_transfer", "total-transfer" },
+            { "session_ratio", "session-ratio" },
+            { "session_transfer", "session-transfer" },
         } };
         for (auto const& [current, legacy] : Strings)
         {

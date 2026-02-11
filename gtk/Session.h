@@ -5,11 +5,13 @@
 #pragma once
 
 #include "GtkCompat.h"
+#include "Prefs.h"
 #include "Torrent.h"
 
 #include <libtransmission-app/favicon-cache.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/serializer.h>
 #include <libtransmission/variant.h>
 
 #include <gdkmm/pixbuf.h>
@@ -133,10 +135,16 @@ public:
     ***  Set a preference value, save the prefs file, and emit the "prefs-changed" signal
     **/
 
-    void set_pref(tr_quark key, std::string const& val);
-    void set_pref(tr_quark key, bool val);
-    void set_pref(tr_quark key, int val);
-    void set_pref(tr_quark key, double val);
+    template<typename T>
+    void set_pref(tr_quark const key, T const& val)
+    {
+        if (gtr_pref_get<T>(key) != val)
+        {
+            gtr_pref_set<T>(key, val);
+            signal_prefs_changed().emit(key);
+            gtr_pref_save(get_session());
+        }
+    }
 
     // ---
 
@@ -166,7 +174,7 @@ public:
 
     void blocklist_update();
 
-    void exec(tr_quark method, tr_variant const& params);
+    void exec(tr_quark method, tr_variant&& params);
 
     void open_folder(tr_torrent_id_t torrent_id) const;
 

@@ -15,12 +15,12 @@
 
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
+#include <libtransmission/file-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/torrent.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 
@@ -173,6 +173,31 @@ TEST_F(TorrentMetainfoTest, magnetInfoHash)
     EXPECT_TRUE(tm.parse_torrent_file(src_filename));
 }
 
+TEST_F(TorrentMetainfoTest, addWebseed)
+{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 2>{ {
+        { "http://www.webseed-one.com/"sv, "http://www.webseed-one.com/"sv },
+        { "http://你好.com/"sv, "http://%E4%BD%A0%E5%A5%BD.com/"sv },
+    } };
+
+    for (auto const& [decoded, encoded] : Tests)
+    {
+        auto tm = tr_torrent_metainfo{};
+        tm.add_webseed(decoded);
+        EXPECT_EQ(1U, tm.webseed_count());
+        EXPECT_EQ(encoded, tm.webseed(0U));
+    }
+
+    // This ensures the URL doesn't get double-encoded
+    for (auto const& [decoded, encoded] : Tests)
+    {
+        auto tm = tr_torrent_metainfo{};
+        tm.add_webseed(encoded);
+        EXPECT_EQ(1U, tm.webseed_count());
+        EXPECT_EQ(encoded, tm.webseed(0U));
+    }
+}
+
 TEST_F(TorrentMetainfoTest, HoffmanStyleWebseeds)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv };
@@ -207,10 +232,14 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
 }
 
 // Test for https://github.com/transmission/transmission/issues/3591
-TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
+TEST_F(TorrentMetainfoTest, parseBencPiecesSize)
 {
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/invalid-pieces-length.torrent"sv };
+    auto error = tr_error{};
     auto tm = tr_torrent_metainfo{};
-    EXPECT_FALSE(tm.parse_benc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
+    EXPECT_FALSE(tm.parse_torrent_file(src_filename, nullptr, &error));
+    EXPECT_EQ(error.code(), EINVAL);
+    EXPECT_EQ(error.message(), "invalid 'pieces' size: 119"sv);
 }
 
 } // namespace tr::test

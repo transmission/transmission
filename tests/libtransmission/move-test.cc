@@ -68,7 +68,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(path, tr_torrentFindFile(tor, 0));
     path.assign(incomplete_dir, '/', tr_torrentFile(tor, 1).name);
     EXPECT_EQ(path, tr_torrentFindFile(tor, 1));
-    EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor).left_until_done);
 
     auto completeness = TR_LEECH;
     auto const zeroes_completeness_func =
@@ -120,7 +120,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     }
 
     blockingTorrentVerify(tor);
-    EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
 
     auto test = [&completeness]()
     {
@@ -165,7 +165,7 @@ TEST_F(MoveTest, setLocation)
     // init a torrent.
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
     blockingTorrentVerify(tor);
-    EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
 
     // now move it
     auto state = -1;
@@ -179,7 +179,7 @@ TEST_F(MoveTest, setLocation)
 
     // confirm the torrent is still complete after being moved
     blockingTorrentVerify(tor);
-    EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
 
     // confirm the files really got moved
     sync();

@@ -49,6 +49,9 @@ template<typename T>
     case UserMetaType::SortModeType:
         return qvarFromOptional(ser::to_value<SortMode>(var));
 
+    case UserMetaType::StatsModeType:
+        return qvarFromOptional(ser::to_value<StatsMode>(var));
+
     case UserMetaType::ShowModeType:
         return qvarFromOptional(ser::to_value<ShowMode>(var));
 
@@ -88,6 +91,9 @@ template<typename T>
 
     case UserMetaType::ShowModeType:
         return ser::to_variant(var.value<ShowMode>());
+
+    case UserMetaType::StatsModeType:
+        return ser::to_variant(var.value<StatsMode>());
 
     case QMetaType::QString:
         return ser::to_variant(var.value<QString>());

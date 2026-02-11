@@ -18,11 +18,15 @@
 
 #include <fmt/format.h>
 
+#include <small/map.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
@@ -154,6 +158,31 @@ bool tr_torrent_files::has_any_local_data(std::string_view const* paths, size_t 
     }
 
     return false;
+}
+
+std::string_view tr_torrent_files::primary_mime_type() const
+{
+    // count up how many bytes there are for each mime-type in the torrent
+    auto size_per_mime_type = small::unordered_map<std::string_view, size_t, 256U>{};
+    for (tr_file_index_t i = 0, n = file_count(); i < n; ++i)
+    {
+        auto const mime_type = tr_get_mime_type_for_filename(path(i));
+        size_per_mime_type[mime_type] += file_size(i);
+    }
+
+    if (std::empty(size_per_mime_type))
+    {
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+        // application/octet-stream is the default value for all other cases.
+        // An unknown file type should use this type.
+        auto constexpr Fallback = "application/octet-stream"sv;
+        return Fallback;
+    }
+
+    auto const it = std::ranges::max_element(
+        size_per_mime_type,
+        [](auto const& a, auto const& b) { return a.second < b.second; });
+    return it->first;
 }
 
 // ---

@@ -15,6 +15,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 #include <event2/event.h>
 
@@ -153,7 +154,7 @@ public:
 
     static std::string createSandbox(std::string const& parent_dir, std::string const& tmpl)
     {
-        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
+        auto path = fmt::format("{:s}/{:s}"sv, tr_sys_path_resolve(parent_dir), tmpl);
         tr_sys_dir_create_temp(std::data(path));
         tr_sys_path_native_separators(std::data(path));
         return path;
@@ -435,10 +436,17 @@ protected:
 
                 auto fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
                 auto const file_size = metainfo->file_size(i);
-                for (uint64_t j = 0; j < file_size; ++j)
+                static auto constexpr BlockSize = uint64_t{ 524288U };
+                auto buf = std::vector<char>(BlockSize);
+                for (uint64_t j = 0; j < file_size;)
                 {
-                    auto const ch = partial && j < metainfo->piece_size() ? '\1' : '\0';
-                    tr_sys_file_write(fd, &ch, 1, nullptr);
+                    auto const piece_0_size = metainfo->piece_size(0U);
+                    auto const is_one = partial && j < piece_0_size;
+                    auto const n_write = std::min(BlockSize, (is_one ? piece_0_size : file_size) - j);
+                    auto const ch = is_one ? '\1' : '\0';
+                    std::fill_n(std::begin(buf), n_write, ch);
+                    tr_sys_file_write(fd, std::data(buf), n_write, nullptr);
+                    j += n_write;
                 }
 
                 tr_sys_file_close(fd);

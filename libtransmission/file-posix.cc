@@ -27,10 +27,6 @@
 #include <sys/file.h> /* flock() */
 #endif
 
-#ifdef HAVE_XFS_XFS_H
-#include <xfs/xfs.h>
-#endif
-
 /* OS-specific file copy (copy_file_range, sendfile64, or copyfile). */
 #if defined(__linux__)
 #include <linux/version.h>
@@ -128,121 +124,6 @@ void set_file_for_single_pass(tr_sys_file_t handle)
     errno = err;
 }
 } // namespace
-
-bool tr_sys_path_exists(std::string_view const path, tr_error* error)
-{
-    auto const sz_path = tr_pathbuf{ path };
-    bool const ret = access(sz_path.c_str(), F_OK) != -1;
-
-    if (error != nullptr && !ret && errno != ENOENT)
-    {
-        error->set_from_errno(errno);
-    }
-
-    return ret;
-}
-
-namespace
-{
-[[nodiscard]] auto stat_sv(std::string_view const path, struct stat* sb)
-{
-    auto const sz_path = tr_pathbuf{ path };
-    return stat(sz_path.c_str(), sb);
-}
-
-[[nodiscard]] auto lstat_sv(std::string_view const path, struct stat* sb)
-{
-    auto const sz_path = tr_pathbuf{ path };
-    return lstat(sz_path.c_str(), sb);
-}
-} // namespace
-
-std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view const path, int const flags, tr_error* error)
-{
-    struct stat sb = {};
-
-    bool ok = false;
-
-    if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
-    {
-        ok = stat_sv(path, &sb) != -1;
-    }
-    else
-    {
-        ok = lstat_sv(path, &sb) != -1;
-    }
-
-    if (!ok)
-    {
-        if (error != nullptr)
-        {
-            error->set_from_errno(errno);
-        }
-
-        return {};
-    }
-
-    auto info = tr_sys_path_info{};
-
-    if (S_ISREG(sb.st_mode))
-    {
-        info.type = TR_SYS_PATH_IS_FILE;
-    }
-    else if (S_ISDIR(sb.st_mode))
-    {
-        info.type = TR_SYS_PATH_IS_DIRECTORY;
-    }
-    else
-    {
-        info.type = TR_SYS_PATH_IS_OTHER;
-    }
-
-    info.size = static_cast<uint64_t>(sb.st_size);
-    info.last_modified_at = sb.st_mtime;
-
-    return info;
-}
-
-bool tr_sys_path_is_relative(std::string_view path)
-{
-    return std::empty(path) || path.front() != '/';
-}
-
-bool tr_sys_path_is_same(std::string_view const path1, std::string_view const path2, tr_error* error)
-{
-    bool ret = false;
-    struct stat sb1 = {};
-    struct stat sb2 = {};
-
-    if (stat_sv(path1, &sb1) != -1 && stat_sv(path2, &sb2) != -1)
-    {
-        ret = sb1.st_dev == sb2.st_dev && sb1.st_ino == sb2.st_ino;
-    }
-    else if (error != nullptr && errno != ENOENT)
-    {
-        error->set_from_errno(errno);
-    }
-
-    return ret;
-}
-
-std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
-{
-    auto const szpath = tr_pathbuf{ path };
-    auto buf = std::array<char, PATH_MAX>{};
-
-    if (auto const* const ret = realpath(szpath, std::data(buf)); ret != nullptr)
-    {
-        return ret;
-    }
-
-    if (error != nullptr)
-    {
-        error->set_from_errno(errno);
-    }
-
-    return {};
-}
 
 std::string_view tr_sys_path_basename(std::string_view path, tr_error* /*error*/)
 {
@@ -825,31 +706,6 @@ bool preallocate_fallocate64(tr_sys_file_t handle, uint64_t size)
 }
 #endif
 
-#ifdef HAVE_XFS_XFS_H
-bool full_preallocate_xfs(tr_sys_file_t handle, uint64_t size)
-{
-    if (platform_test_xfs_fd(handle) == 0) // true if on xfs filesystem
-    {
-        return false;
-    }
-
-    xfs_flock64_t fl;
-    fl.l_whence = 0;
-    fl.l_start = 0;
-    fl.l_len = size;
-
-    // The blocks are allocated, but not zeroed, and the file size does not change
-    bool ok = xfsctl(nullptr, handle, XFS_IOC_RESVSP64, &fl) != -1;
-
-    if (ok)
-    {
-        ok = ftruncate(handle, size) == 0;
-    }
-
-    return ok;
-}
-#endif
-
 #ifdef __APPLE__
 bool full_preallocate_apple(tr_sys_file_t handle, uint64_t size)
 {
@@ -907,9 +763,6 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
         approaches.insert(
             std::end(approaches),
             {
-#ifdef HAVE_XFS_XFS_H
-                full_preallocate_xfs,
-#endif
 #ifdef __APPLE__
                 full_preallocate_apple,
 #endif
@@ -1050,95 +903,6 @@ std::string tr_sys_dir_get_current(tr_error* error)
 
         return {};
     }
-}
-
-namespace
-{
-#ifndef HAVE_MKDIRP
-[[nodiscard]] bool tr_mkdirp_(std::string_view path, int permissions, tr_error* error)
-{
-    auto walk = path.find_first_not_of('/'); // walk past the root
-    auto subpath = tr_pathbuf{};
-
-    while (walk < std::size(path))
-    {
-        auto const end = path.find('/', walk);
-        subpath.assign(path.substr(0, end));
-        auto const info = tr_sys_path_get_info(subpath, 0);
-        if (info && !info->isFolder())
-        {
-            if (error != nullptr)
-            {
-                error->set(ENOTDIR, fmt::format("File is in the way: {:s}", path));
-            }
-
-            return false;
-        }
-        if (!info && mkdir(subpath, permissions) == -1)
-        {
-            if (error != nullptr)
-            {
-                error->set_from_errno(errno);
-            }
-
-            return false;
-        }
-        if (end == std::string_view::npos)
-        {
-            break;
-        }
-        walk = end + 1;
-    }
-
-    return true;
-}
-#endif
-} // namespace
-
-bool tr_sys_dir_create(std::string_view const path, int const flags, int const permissions, tr_error* error)
-{
-    auto ret = false;
-    auto local_error = tr_error{};
-
-    auto const sz_path = tr_pathbuf{ path };
-
-    if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
-    {
-#ifdef HAVE_MKDIRP
-        ret = mkdirp(sz_path.c_str(), permissions) != -1;
-#else
-        ret = tr_mkdirp_(path, permissions, &local_error);
-#endif
-    }
-    else
-    {
-        ret = mkdir(sz_path.c_str(), permissions) != -1;
-    }
-
-    if (!ret && errno == EEXIST)
-    {
-        if (auto const info = tr_sys_path_get_info(path); info && info->type == TR_SYS_PATH_IS_DIRECTORY)
-        {
-            local_error = {};
-            ret = true;
-        }
-        else
-        {
-            errno = EEXIST;
-        }
-    }
-
-    if (error != nullptr && !ret)
-    {
-        if (!local_error)
-        {
-            local_error.set_from_errno(errno);
-        }
-
-        *error = std::move(local_error);
-    }
-
-    return ret;
 }
 
 bool tr_sys_dir_create_temp(char* path_template, tr_error* error)

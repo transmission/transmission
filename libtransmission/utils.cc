@@ -5,20 +5,17 @@
 
 #include <algorithm> // for std::sort, std::transform
 #include <array> // std::array
-#include <cctype>
 #include <cfloat> // DBL_DIG
 #include <charconv> // std::from_chars()
 #include <chrono>
 #include <cstdint> // SIZE_MAX
 #include <cstdlib> // getenv()
-#include <cstring> /* strerror() */
 #include <ctime>
 #include <exception>
 #include <iostream>
 #include <iterator> // for std::back_inserter
 #include <locale>
 #include <memory>
-#include <ranges>
 #include <mutex>
 #include <optional>
 #include <stdexcept> // std::runtime_error
@@ -35,26 +32,20 @@
 #include <shellapi.h> /* CommandLineToArgv() */
 #else
 #include <arpa/inet.h>
-#include <sys/stat.h> /* umask() */
 #endif
-
-#include <utf8.h>
 
 #include <curl/curl.h>
 
 #include <fmt/format.h>
 
 #include <fast_float/fast_float.h>
-#include <wildmat.h>
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/error-types.h"
-#include "libtransmission/error.h"
-#include "libtransmission/file.h"
-#include "libtransmission/log.h"
+#include "libtransmission/env.h"
 #include "libtransmission/mime-types.h"
 #include "libtransmission/serializer.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
@@ -123,155 +114,6 @@ std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexc
 
 // ---
 
-bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error* error)
-{
-    auto const szfilename = tr_pathbuf{ filename };
-
-    /* try to stat the file */
-    auto local_error = tr_error{};
-    if (error == nullptr)
-    {
-        error = &local_error;
-    }
-
-    auto const info = tr_sys_path_get_info(szfilename, 0, error);
-    if (*error)
-    {
-        tr_logAddError(
-            fmt::format(
-                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-                fmt::arg("path", filename),
-                fmt::arg("error", error->message()),
-                fmt::arg("error_code", error->code())));
-        return false;
-    }
-
-    if (!info || !info->isFile())
-    {
-        tr_logAddError(fmt::format(fmt::runtime(_("Couldn't read '{path}': Not a regular file")), fmt::arg("path", filename)));
-        error->set(TR_ERROR_EISDIR, "Not a regular file"sv);
-        return false;
-    }
-
-    /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(szfilename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
-    if (fd == TR_BAD_SYS_FILE)
-    {
-        tr_logAddError(
-            fmt::format(
-                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-                fmt::arg("path", filename),
-                fmt::arg("error", error->message()),
-                fmt::arg("error_code", error->code())));
-        return false;
-    }
-
-    contents.resize(info->size);
-    if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, error))
-    {
-        tr_logAddError(
-            fmt::format(
-                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-                fmt::arg("path", filename),
-                fmt::arg("error", error->message()),
-                fmt::arg("error_code", error->code())));
-        tr_sys_file_close(fd);
-        return false;
-    }
-
-    tr_sys_file_close(fd);
-    return true;
-}
-
-bool tr_file_save(std::string_view filename, std::string_view contents, tr_error* error)
-{
-    // follow symlinks to find the "real" file, to make sure the temporary
-    // we build with tr_sys_file_open_temp() is created on the right partition
-    if (auto const realname = tr_sys_path_resolve(filename); !std::empty(realname) && realname != filename)
-    {
-        return tr_file_save(realname, contents, error);
-    }
-
-    // Write it to a temp file first.
-    // This is a safeguard against edge cases, e.g. disk full, crash while writing, etc.
-    auto tmp = tr_pathbuf{ filename, ".tmp.XXXXXX"sv };
-    auto const fd = tr_sys_file_open_temp(std::data(tmp), error);
-    if (fd == TR_BAD_SYS_FILE)
-    {
-        return false;
-    }
-#ifndef _WIN32
-    // set file mode per settings umask()
-    {
-        auto const val = ::umask(0);
-        ::umask(val);
-        fchmod(fd, 0666 & ~val);
-    }
-#endif
-
-    // Save the contents. This might take >1 pass.
-    auto ok = true;
-    while (!std::empty(contents))
-    {
-        auto n_written = uint64_t{};
-        if (!tr_sys_file_write(fd, std::data(contents), std::size(contents), &n_written, error))
-        {
-            ok = false;
-            break;
-        }
-        contents.remove_prefix(n_written);
-    }
-
-    // If we saved it to disk successfully, move it from '.tmp' to the correct filename
-    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, tr_pathbuf{ filename }, error))
-    {
-        return false;
-    }
-
-    tr_logAddTrace(fmt::format("Saved '{}'", filename));
-    return true;
-}
-
-// ---
-
-/* User-level routine. returns whether or not 'text' and 'pattern' matched */
-bool tr_wildmat(char const* text, char const* pattern)
-{
-    // TODO(ckerr): replace wildmat with base/strings/pattern.cc
-    // wildmat wants these to be zero-terminated.
-    return (pattern[0] == '*' && pattern[1] == '\0') || DoMatch(text, pattern) > 0;
-}
-
-char const* tr_strerror(int errnum)
-{
-    if (char const* const ret = strerror(errnum); ret != nullptr)
-    {
-        return ret;
-    }
-
-    return "Unknown Error";
-}
-
-// ---
-
-std::string_view tr_strv_strip(std::string_view str)
-{
-    auto constexpr Test = [](auto ch)
-    {
-        return isspace(static_cast<unsigned char>(ch));
-    };
-
-    auto const it = std::ranges::find_if_not(str, Test);
-    str.remove_prefix(std::ranges::distance(std::ranges::begin(str), it));
-
-    auto const rit = std::ranges::find_if_not(std::ranges::rbegin(str), std::ranges::rend(str), Test);
-    str.remove_suffix(std::ranges::distance(std::ranges::rbegin(str), rit));
-
-    return str;
-}
-
-// ---
-
 uint64_t tr_time_msec()
 {
     return std::chrono::system_clock::now().time_since_epoch() / 1ms;
@@ -294,85 +136,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
     return TR_RATIO_NA;
 }
 
-// ---
-
-#if !(defined(__APPLE__) && defined(__clang__))
-
-std::string tr_strv_to_utf8_string(std::string_view sv)
-{
-    return tr_strv_replace_invalid(sv);
-}
-
-#endif
-
-std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
-{
-    // stripping characters after first \0
-    if (auto first_null = sv.find('\0'); first_null != std::string::npos)
-    {
-        sv = { std::data(sv), first_null };
-    }
-    auto out = std::string{};
-    out.reserve(std::size(sv));
-    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
-    return out;
-}
-
 #ifdef _WIN32
-
-std::string tr_win32_native_to_utf8(std::wstring_view in)
-{
-    auto out = std::string{};
-    out.resize(WideCharToMultiByte(CP_UTF8, 0, std::data(in), std::size(in), nullptr, 0, nullptr, nullptr));
-    [[maybe_unused]] auto
-        len = WideCharToMultiByte(CP_UTF8, 0, std::data(in), std::size(in), std::data(out), std::size(out), nullptr, nullptr);
-    TR_ASSERT(len == std::size(out));
-    return out;
-}
-
-std::wstring tr_win32_utf8_to_native(std::string_view in)
-{
-    auto out = std::wstring{};
-    out.resize(MultiByteToWideChar(CP_UTF8, 0, std::data(in), std::size(in), nullptr, 0));
-    [[maybe_unused]] auto len = MultiByteToWideChar(CP_UTF8, 0, std::data(in), std::size(in), std::data(out), std::size(out));
-    TR_ASSERT(len == std::size(out));
-    return out;
-}
-
-std::string tr_win32_format_message(uint32_t code)
-{
-    wchar_t* wide_text = nullptr;
-    auto const wide_size = FormatMessageW(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        nullptr,
-        code,
-        0,
-        reinterpret_cast<LPWSTR>(&wide_text),
-        0,
-        nullptr);
-
-    if (wide_size == 0)
-    {
-        return fmt::format("Unknown error ({:#08x})", code);
-    }
-
-    auto text = std::string{};
-
-    if (wide_size != 0 && wide_text != nullptr)
-    {
-        text = tr_win32_native_to_utf8({ wide_text, wide_size });
-    }
-
-    LocalFree(wide_text);
-
-    // Most (all?) messages contain "\r\n" in the end, chop it
-    while (!std::empty(text) && isspace(text.back()) != 0)
-    {
-        text.resize(text.size() - 1);
-    }
-
-    return text;
-}
 
 namespace
 {
@@ -567,73 +331,6 @@ std::string tr_strratio(double ratio, std::string_view const none, std::string_v
 
 // ---
 
-bool tr_file_move(std::string_view oldpath, std::string_view newpath, bool allow_copy, tr_error* error)
-{
-    auto local_error = tr_error{};
-    if (error == nullptr)
-    {
-        error = &local_error;
-    }
-
-    // make sure the old file exists
-    auto const info = tr_sys_path_get_info(oldpath, 0, error);
-    if (!info)
-    {
-        error->prefix_message("Unable to get information on old file: ");
-        return false;
-    }
-    if (!info->isFile())
-    {
-        error->set(TR_ERROR_EINVAL, "Old path does not point to a file."sv);
-        return false;
-    }
-
-    // ensure the target directory exists
-    if (!tr_sys_dir_create(tr_sys_path_dirname(newpath), TR_SYS_DIR_CREATE_PARENTS, 0777, error))
-    {
-        error->prefix_message("Unable to create directory for new file: ");
-        return false;
-    }
-
-    if (allow_copy)
-    {
-        // they might be on the same filesystem...
-        if (tr_sys_path_rename(oldpath, newpath))
-        {
-            return true;
-        }
-    }
-    else
-    {
-        // do the actual moving
-        if (tr_sys_path_rename(oldpath, newpath, error))
-        {
-            return true;
-        }
-        error->prefix_message("Unable to move file: ");
-        return false;
-    }
-
-    /* Otherwise, copy the file. */
-    if (!tr_sys_path_copy(oldpath, newpath, error))
-    {
-        error->prefix_message("Unable to copy: ");
-        return false;
-    }
-
-    if (auto log_error = tr_error{}; !tr_sys_path_remove(oldpath, &log_error))
-    {
-        tr_logAddError(
-            fmt::format(
-                fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
-                fmt::arg("path", oldpath),
-                fmt::arg("error", log_error.message()),
-                fmt::arg("error_code", log_error.code())));
-    }
-
-    return true;
-}
-
 // ---
 
 uint64_t tr_htonll(uint64_t hostlonglong)
@@ -675,52 +372,6 @@ uint64_t tr_ntohll(uint64_t netlonglong)
     return ((uint64_t)ntohl(u.lx[0]) << 32) | (uint64_t)ntohl(u.lx[1]);
 
 #endif
-}
-
-// --- ENVIRONMENT
-
-bool tr_env_key_exists(char const* key) noexcept
-{
-    TR_ASSERT(key != nullptr);
-
-#ifdef _WIN32
-    return GetEnvironmentVariableA(key, nullptr, 0) != 0;
-#else
-    return getenv(key) != nullptr;
-#endif
-}
-
-std::string tr_env_get_string(std::string_view key, std::string_view default_value)
-{
-#ifdef _WIN32
-
-    if (auto const wide_key = tr_win32_utf8_to_native(key); !std::empty(wide_key))
-    {
-        if (auto const size = GetEnvironmentVariableW(wide_key.c_str(), nullptr, 0); size != 0)
-        {
-            auto wide_val = std::wstring{};
-            wide_val.resize(size);
-            if (GetEnvironmentVariableW(wide_key.c_str(), std::data(wide_val), std::size(wide_val)) == std::size(wide_val) - 1)
-            {
-                TR_ASSERT(wide_val.back() == L'\0');
-                wide_val.resize(std::size(wide_val) - 1);
-                return tr_win32_native_to_utf8(wide_val);
-            }
-        }
-    }
-
-#else
-
-    auto const szkey = tr_strbuf<char, 256>{ key };
-
-    if (auto const* const value = getenv(szkey); value != nullptr)
-    {
-        return value;
-    }
-
-#endif
-
-    return std::string{ default_value };
 }
 
 // ---
@@ -797,7 +448,18 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
         auto const it = std::lower_bound(std::begin(MimeTypeSuffixes), std::end(MimeTypeSuffixes), suffix_lc, Compare);
         if (it != std::end(MimeTypeSuffixes) && suffix_lc == it->suffix)
         {
-            return it->mime_type;
+            std::string_view mime_type = it->mime_type;
+
+            // https://github.com/transmission/transmission/issues/5965#issuecomment-1704421231
+            // An mp4 file's correct mime-type depends on the codecs used in the file,
+            // which we have no way of inspecting and which might not be downloaded yet.
+            // Let's use `video/mp4` since that's by far the most common use case for torrents.
+            if (mime_type == "application/mp4")
+            {
+                mime_type = "video/mp4";
+            }
+
+            return mime_type;
         }
     }
 

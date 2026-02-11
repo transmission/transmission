@@ -5,20 +5,14 @@
 
 #pragma once
 
-#include <algorithm> // for std::for_each()
-#include <cctype>
-#include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <ctime> // time_t
 #include <locale>
-#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <vector>
-
-struct tr_error;
 
 /**
  * @addtogroup utils Utilities
@@ -42,31 +36,10 @@ std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexc
 
 [[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
 
-bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error* error = nullptr);
-
-/**
- * Tries to move a file by renaming, and [optionally] if that fails, by copying.
- *
- * Creates the destination directory if it doesn't exist.
- */
-bool tr_file_move(std::string_view oldpath, std::string_view newpath, bool allow_copy, tr_error* error = nullptr);
-
-bool tr_file_save(std::string_view filename, std::string_view contents, tr_error* error = nullptr);
-
-template<typename ContiguousRange>
-constexpr auto tr_file_save(std::string_view filename, ContiguousRange const& x, tr_error* error = nullptr)
-{
-    return tr_file_save(filename, std::string_view{ std::data(x), std::size(x) }, error);
-}
-
 /** @brief return the current date in milliseconds */
 [[nodiscard]] uint64_t tr_time_msec();
 
 #ifdef _WIN32
-
-[[nodiscard]] std::string tr_win32_format_message(uint32_t code);
-[[nodiscard]] std::string tr_win32_native_to_utf8(std::wstring_view);
-[[nodiscard]] std::wstring tr_win32_utf8_to_native(std::string_view);
 
 int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 
@@ -86,73 +59,6 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 
 // ---
 
-/** @brief Convenience wrapper around `strerorr()` guaranteed to not return nullptr
-    @param errnum the error number to describe */
-[[nodiscard]] char const* tr_strerror(int errnum);
-
-template<typename T>
-[[nodiscard]] std::string tr_strlower(T in)
-{
-    auto out = std::string{ std::move(in) };
-    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::tolower(ch); });
-    return out;
-}
-
-template<typename T>
-[[nodiscard]] std::string tr_strupper(T in)
-{
-    auto out = std::string{ std::move(in) };
-    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::toupper(ch); });
-    return out;
-}
-
-// --- std::string_view utils
-
-/**
- * @brief Rich Salz's classic implementation of shell-style pattern matching for `?`, `\`, `[]`, and `*` characters.
- * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
- */
-[[nodiscard]] bool tr_wildmat(char const* text, char const* pattern);
-
-// c++23 (P1679R3), GCC 11.1, clang 12
-template<typename T>
-[[nodiscard]] constexpr bool tr_strv_contains(std::string_view sv, T key) noexcept
-{
-    return sv.find(key) != std::string_view::npos;
-}
-
-// c++20 (P0457R2), GCC 9.1, clang 6
-[[nodiscard]] constexpr bool tr_strv_starts_with(std::string_view sv, char key)
-{
-    return !std::empty(sv) && sv.front() == key;
-}
-
-// c++20 (P0457R2), GCC 9.1, clang 6
-[[nodiscard]] constexpr bool tr_strv_starts_with(std::string_view sv, std::string_view key)
-{
-    return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
-}
-
-// c++20 (P0457R2), GCC 9.1, clang 6
-[[nodiscard]] constexpr bool tr_strv_starts_with(
-    std::wstring_view sv,
-    std::wstring_view key) // c++20 (P0457R2), GCC 9.1, clang 6
-{
-    return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
-}
-
-// c++20 (P0457R2), GCC 9.1, clang 6
-[[nodiscard]] constexpr bool tr_strv_ends_with(std::string_view sv, std::string_view key)
-{
-    return std::size(key) <= std::size(sv) && sv.substr(std::size(sv) - std::size(key)) == key;
-}
-
-// c++20 (P0457R2), GCC 9.1, clang 6
-[[nodiscard]] constexpr bool tr_strv_ends_with(std::string_view sv, char key)
-{
-    return !std::empty(sv) && sv.back() == key;
-}
-
 template<typename T>
 [[nodiscard]] constexpr int tr_compare_3way(T const& left, T const& right)
 {
@@ -168,42 +74,6 @@ template<typename T>
 
     return 0;
 }
-
-template<typename... Args>
-constexpr std::string_view tr_strv_sep(std::string_view* sv, Args&&... args)
-{
-    auto pos = sv->find_first_of(std::forward<Args>(args)...);
-    auto const ret = sv->substr(0, pos);
-    sv->remove_prefix(pos != std::string_view::npos ? pos + 1 : std::size(*sv));
-    return ret;
-}
-
-template<typename... Args>
-constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, Args&&... args)
-{
-    if (std::empty(*sv))
-    {
-        return false;
-    }
-
-    *token = tr_strv_sep(sv, std::forward<Args>(args)...);
-    return true;
-}
-
-[[nodiscard]] std::string_view tr_strv_strip(std::string_view str);
-
-[[nodiscard]] std::string tr_strv_to_utf8_string(std::string_view sv);
-
-#ifdef __APPLE__
-#ifdef __OBJC__
-@class NSString;
-[[nodiscard]] std::string tr_strv_to_utf8_string(NSString* str);
-[[nodiscard]] NSString* tr_strv_to_utf8_nsstring(std::string_view sv);
-[[nodiscard]] NSString* tr_strv_to_utf8_nsstring(std::string_view sv, NSString* key, NSString* comment);
-#endif
-#endif
-
-[[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement = 0xFFFD /*�*/);
 
 // ---
 
@@ -284,14 +154,6 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 
 /** @brief Portability wrapper for `ntohll()` that uses the system implementation if available */
 [[nodiscard]] uint64_t tr_ntohll(uint64_t netlonglong);
-
-// ---
-
-/** @brief Check if environment variable exists. */
-[[nodiscard]] bool tr_env_key_exists(char const* key) noexcept;
-
-/** @brief Get environment variable value as string. */
-[[nodiscard]] std::string tr_env_get_string(std::string_view key, std::string_view default_value = {});
 
 // ---
 

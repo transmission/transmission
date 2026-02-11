@@ -10,6 +10,7 @@
 
 // --- Basic Types
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <ctime>
@@ -809,7 +810,6 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     @{ */
 
 using tr_torrent_remove_func = std::function<bool(std::string_view filename, tr_error* error)>;
-using tr_torrent_remove_done_func = std::function<void(tr_torrent_id_t, bool success)>;
 
 /**
  * @brief Removes our torrent and .resume files for this torrent
@@ -819,13 +819,8 @@ using tr_torrent_remove_done_func = std::function<void(tr_torrent_id_t, bool suc
  *                    to move to a recycle bin instead of deleting.
  *                    The callback is invoked in the session thread and the filename view
  *                    is only valid for the duration of the call.
- * @param on_remove_done A callback to invoke in the session thread when removal is done.
  */
-void tr_torrentRemove(
-    tr_torrent* tor,
-    bool delete_flag,
-    tr_torrent_remove_func remove_func = {},
-    tr_torrent_remove_done_func on_remove_done = {});
+void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_torrent_remove_func remove_func = {});
 
 /** @brief Start a torrent */
 void tr_torrentStart(tr_torrent* torrent);
@@ -1386,189 +1381,183 @@ enum tr_eta : time_t // NOLINT(performance-enum-size)
     TR_ETA_UNKNOWN = -2,
 };
 
-enum tr_stat_errtype : uint8_t
-{
-    /* everything's fine */
-    TR_STAT_OK = 0,
-    /* when we announced to the tracker, we got a warning in the response */
-    TR_STAT_TRACKER_WARNING = 1,
-    /* when we announced to the tracker, we got an error in the response */
-    TR_STAT_TRACKER_ERROR = 2,
-    /* local trouble, such as disk full or permissions error */
-    TR_STAT_LOCAL_ERROR = 3
-};
-
-// NOLINTBEGIN(modernize-avoid-c-arrays)
 /** @brief Used by `tr_torrentStat()` to tell clients about a torrent's state and statistics */
 struct tr_stat
 {
     /** A warning or error message regarding the torrent.
         @see error */
-    char const* errorString;
+    std::string error_string;
 
     /** Byte count of all the piece data we'll have downloaded when we're done,
         whether or not we have it yet. If we only want some of the files,
         this may be less than `tr_torrent_view.total_size`.
         [0...tr_torrent_view.total_size] */
-    uint64_t sizeWhenDone;
+    uint64_t size_when_done = {};
 
     /** Byte count of how much data is left to be downloaded until we've got
         all the pieces that we want. [0...tr_stat.sizeWhenDone] */
-    uint64_t leftUntilDone;
+    uint64_t left_until_done = {};
 
     /** Byte count of all the piece data we want and don't have yet,
         but that a connected peer does have. [0...leftUntilDone] */
-    uint64_t desiredAvailable;
+    uint64_t desired_available = {};
 
     /** Byte count of all the corrupt data you've ever downloaded for
         this torrent. If you're on a poisoned torrent, this number can
         grow very large. */
-    uint64_t corruptEver;
+    uint64_t corrupt_ever = {};
 
     /** Byte count of all data you've ever uploaded for this torrent. */
-    uint64_t uploadedEver;
+    uint64_t uploaded_ever = {};
 
     /** Byte count of all the non-corrupt data you've ever downloaded
         for this torrent. If you deleted the files and downloaded a second
         time, this will be `2*totalSize`.. */
-    uint64_t downloadedEver;
+    uint64_t downloaded_ever = {};
 
     /** Byte count of all the checksum-verified data we have for this torrent.
       */
-    uint64_t haveValid;
+    uint64_t have_valid = {};
 
     /** Byte count of all the partial piece data we have for this torrent.
         As pieces become complete, this value may decrease as portions of it
         are moved to `corrupt` or `haveValid`. */
-    uint64_t haveUnchecked;
+    uint64_t have_unchecked = {};
 
-    /** When the torrent was first added. */
-    time_t addedDate;
+    // Speed of all piece being sent for this torrent.
+    // This ONLY counts piece data.
+    tr::Values::Speed piece_upload_speed;
 
-    /** When the torrent finished downloading. */
-    time_t doneDate;
+    // Speed of all piece being received for this torrent.
+    // This ONLY counts piece data.
+    tr::Values::Speed piece_download_speed;
 
-    /** When the torrent was last started. */
-    time_t startDate;
+    // When the torrent was first added
+    time_t added_date = {};
 
-    /** The last time we uploaded or downloaded piece data on this torrent. */
-    time_t activityDate;
+    // When the torrent finished downloading
+    time_t done_date = {};
 
-    /** The last time during this session that a rarely-changing field
-        changed -- e.g. any `tr_torrent_metainfo` field (trackers, filenames, name)
-        or download directory. RPC clients can monitor this to know when
-        to reload fields that rarely change. */
-    time_t editDate;
+    // When the torrent was last started
+    time_t start_date = {};
 
-    /** When `tr_stat.activity` is `TR_STATUS_CHECK` or `TR_STATUS_CHECK_WAIT`,
-        this is the percentage of how much of the files has been
-        verified. When it gets to 1, the verify process is done.
-        Range is [0..1]
-        @see `tr_stat.activity` */
-    float recheckProgress;
+    // The last time we uploaded or downloaded piece data on this torrent
+    time_t activity_date = {};
 
-    /** How much has been downloaded of the entire torrent.
-        Range is [0..1] */
-    float percentComplete;
+    // The last time during this session that a rarely-changing field
+    // changed -- e.g. any `tr_torrent_metainfo` field (trackers, filenames, name)
+    // or download directory. RPC clients can monitor this to know when
+    // to reload fields that rarely change.
+    time_t edit_date = {};
 
-    /** How much of the metadata the torrent has.
-        For torrents added from a torrent this will always be 1.
-        For magnet links, this number will from from 0 to 1 as the metadata is downloaded.
-        Range is [0..1] */
-    float metadataPercentComplete;
+    // Number of seconds since the last activity (or since started).
+    // -1 if activity is not seeding or downloading.
+    time_t idle_secs = {};
 
-    /** How much has been downloaded of the files the user wants. This differs
-        from percentComplete if the user wants only some of the torrent's files.
-        Range is [0..1]
-        @see tr_stat.leftUntilDone */
-    float percentDone;
+    // Cumulative seconds the torrent's ever spent downloading
+    time_t seconds_downloading = {};
 
-    /** How much has been uploaded to satisfy the seed ratio.
-        This is 1 if the ratio is reached or the torrent is set to seed forever.
-        Range is [0..1] */
-    float seedRatioPercentDone;
+    // Cumulative seconds the torrent's ever spent seeding
+    time_t seconds_seeding = {};
 
-    /** Speed all piece being sent for this torrent.
-        This ONLY counts piece data. */
-    float pieceUploadSpeed_KBps;
+    // If downloading, estimated number of seconds left until the torrent is done.
+    // If seeding, estimated number of seconds left until seed ratio is reached.
+    time_t eta = {};
 
-    /** Speed all piece being received for this torrent.
-        This ONLY counts piece data. */
-    float pieceDownloadSpeed_KBps;
+    // If seeding, number of seconds left until the idle time limit is reached.
+    time_t eta_idle = {};
 
-    /** Total uploaded bytes / sizeWhenDone.
-        NB: In Transmission 3.00 and earlier, this was total upload / download,
-        which caused edge cases when total download was less than sizeWhenDone. */
-    float ratio;
+    // This torrent's queue position.
+    // All torrents have a queue position, even if it's not queued.
+    size_t queue_position = {};
 
-    /** The torrent's unique Id.
-        @see `tr_torrentId()` */
-    tr_torrent_id_t id;
+    // When `tr_stat.activity` is `TR_STATUS_CHECK` or `TR_STATUS_CHECK_WAIT`,
+    // this is the percentage of how much of the files has been
+    // verified. When it gets to 1, the verify process is done.
+    // Range is [0..1]
+    // @see `tr_stat.activity`
+    float recheck_progress = {};
 
-    /** Number of seconds since the last activity (or since started).
-        -1 if activity is not seeding or downloading. */
-    time_t idleSecs;
+    // How much has been downloaded of the entire torrent.
+    // Range is [0..1]
+    float percent_complete = {};
 
-    /** Cumulative seconds the torrent's ever spent downloading */
-    time_t secondsDownloading;
+    // How much of the metadata the torrent has.
+    // For torrents added from a torrent this will always be 1.
+    // For magnet links, this number will from from 0 to 1 as the metadata is downloaded.
+    // Range is [0..1]
+    float metadata_percent_complete = {};
 
-    /** Cumulative seconds the torrent's ever spent seeding */
-    time_t secondsSeeding;
+    // How much has been downloaded of the files the user wants. This differs
+    // from percentComplete if the user wants only some of the torrent's files.
+    // Range is [0..1]
+    // @see tr_stat.left_until_done
+    float percent_done = {};
 
-    /** This torrent's queue position.
-        All torrents have a queue position, even if it's not queued. */
-    size_t queuePosition;
+    // How much has been uploaded to satisfy the seed ratio.
+    // This is 1 if the ratio is reached or the torrent is set to seed forever.
+    // Range is [0..1] */
+    float seed_ratio_percent_done = {};
 
-    /** If downloading, estimated number of seconds left until the torrent is done.
-        If seeding, estimated number of seconds left until seed ratio is reached. */
-    time_t eta;
+    // Total uploaded bytes / size_when_done.
+    // NB: In Transmission 3.00 and earlier, this was total upload / download,
+    // which caused edge cases when total download was less than size_when_done.
+    float upload_ratio = {};
 
-    /** If seeding, number of seconds left until the idle time limit is reached. */
-    time_t etaIdle;
+    // The torrent's unique Id.
+    // @see `tr_torrentId()`
+    tr_torrent_id_t id = {};
 
-    /** What is this torrent doing right now? */
-    tr_torrent_activity activity;
+    // Number of peers that we're connected to
+    uint16_t peers_connected = {};
 
-    /** Defines what kind of text is in errorString.
-        @see errorString */
-    tr_stat_errtype error;
+    // How many connected peers we found out about from the tracker, or from pex,
+    // or from incoming connections, or from our resume file.
+    std::array<uint16_t, TR_PEER_FROM_N_TYPES> peers_from = {};
 
-    /** Number of peers that we're connected to */
-    uint16_t peersConnected;
+    // How many known peers we found out about from the tracker, or from pex,
+    // or from incoming connections, or from our resume file.
+    std::array<uint16_t, TR_PEER_FROM_N_TYPES> known_peers_from = {};
 
-    /** How many connected peers we found out about from the tracker, or from pex,
-        or from incoming connections, or from our resume file. */
-    uint16_t peersFrom[TR_PEER_FROM_N_TYPES];
+    // Number of peers that are sending data to us.
+    uint16_t peers_sending_to_us = {};
 
-    /** How many known peers we found out about from the tracker, or from pex,
-        or from incoming connections, or from our resume file. */
-    uint16_t knownPeersFrom[TR_PEER_FROM_N_TYPES];
+    // Number of peers that we're sending data to
+    uint16_t peers_getting_from_us = {};
 
-    /** Number of peers that are sending data to us. */
-    uint16_t peersSendingToUs;
+    // Number of webseeds that are sending data to us.
+    uint16_t webseeds_sending_to_us = {};
 
-    /** Number of peers that we're sending data to */
-    uint16_t peersGettingFromUs;
+    // What is this torrent doing right now?
+    tr_torrent_activity activity = {};
 
-    /** Number of webseeds that are sending data to us. */
-    uint16_t webseedsSendingToUs;
+    enum class Error : uint8_t
+    {
+        Ok, // everything's fine
+        TrackerWarning, // tracker returned a warning
+        TrackerError, // tracker returned an error
+        LocalError // local non-tracker error, e.g. disk full or file permissions
+    };
 
-    /** A torrent is considered finished if it has met its seed ratio.
-        As a result, only paused torrents can be finished. */
-    bool finished;
+    // Defines what kind of text is in error_string.
+    // @see errorString
+    Error error = Error::Ok;
 
-    /** True if the torrent is running, but has been idle for long enough
-        to be considered stalled.  @see `tr_sessionGetQueueStalledMinutes()` */
-    bool isStalled;
+    // A torrent is considered finished if it has met its seed ratio.
+    // As a result, only paused torrents can be finished.
+    bool finished = {};
+
+    // True if the torrent is running, but has been idle for long enough
+    // to be considered stalled.  @see `tr_sessionGetQueueStalledMinutes()`
+    bool is_stalled = {};
 };
-// NOLINTEND(modernize-avoid-c-arrays)
 
-/** Return a pointer to an `tr_stat` structure with updated information
-    on the torrent. This is typically called by the GUI clients every
-    second or so to get a new snapshot of the torrent's status. */
-tr_stat const* tr_torrentStat(tr_torrent* torrent);
+// Return a `tr_stat` structure with updated information on the torrent.
+// This is typically called by the GUI clients every
+// second or so to get a new snapshot of the torrent's status.
+tr_stat tr_torrentStat(tr_torrent* torrent);
 
 // Batch version of tr_torrentStat().
 // Prefer calling this over calling the single-torrent version in a loop.
 // TODO(c++20) take a std::span argument
-std::vector<tr_stat const*> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);

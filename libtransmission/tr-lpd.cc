@@ -32,6 +32,7 @@
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-lpd.h"
@@ -439,7 +440,8 @@ private:
             }
         }
 
-        events_[ip_protocol].reset(event_new(event_base, sock, EV_READ | EV_PERSIST, event_callback<ip_protocol>, this));
+        events_[ip_protocol].reset(
+            tr::evhelpers::event_new_pri2(event_base, sock, EV_READ | EV_PERSIST, event_callback<ip_protocol>, this));
         event_add(events_[ip_protocol].get(), nullptr);
 
         tr_logAddDebug(fmt::format("{} Local Peer Discovery initialised", tr_ip_protocol_to_sv(ip_protocol)));

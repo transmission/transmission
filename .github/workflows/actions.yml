@@ -166,11 +166,12 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
       - name: Make
-        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
+        run: cmake --build obj --config Debug --target all-tests
       - name: Test with sanitizers
         uses: ./.github/actions/run-tests
         with:
@@ -217,11 +218,12 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Homebrew` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Homebrew`
       - name: Make
-        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
+        run: cmake --build obj --config Debug --target all-tests
       - name: Test with sanitizers
         uses: ./.github/actions/run-tests
         with:
@@ -264,6 +266,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -408,6 +411,7 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Homebrew` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Homebrew` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Homebrew`
@@ -451,6 +455,7 @@ jobs:
             cmake \
             crc32c-dev \
             curl-dev \
+            fast_float \
             fmt-dev \
             gettext-dev \
             git \
@@ -499,6 +504,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_B64=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Alpine` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Alpine`
@@ -688,6 +694,8 @@ jobs:
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_CXX_FLAGS='--system-header-prefix=fmt/' `# Needed to supress system header warnings in macos-26` \
+            -DCMAKE_C_FLAGS='--system-header-prefix=fmt/' `# Needed to supress system header warnings in macos26` \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
@@ -776,7 +784,9 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian 11` \
+            -DUSE_SYSTEM_FAST_FLOAT=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_FMT=OFF `# Debian 11 package too old` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_UTF8CPP=OFF `# Debian 11 package too old` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian 11` \
@@ -858,6 +868,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Debian`
@@ -937,6 +948,7 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Fedora` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Fedora` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Fedora` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Fedora` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Fedora`
@@ -955,10 +967,14 @@ jobs:
           name: binaries-${{ github.job }}-${{ matrix.version }}
           path: pfx/**/*
 
-  ubuntu-22-04-from-tarball:
+  ubuntu-24-04-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        enable-utp: [true, false]
     steps:
       - name: Show Configuration
         run: |
@@ -976,7 +992,7 @@ jobs:
       - name: Get Dependencies
         uses: ./.github/actions/install-deps
         with:
-          compiler: clang
+          compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
           use-sudo: true
@@ -998,6 +1014,8 @@ jobs:
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
@@ -1006,12 +1024,14 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=OFF \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTP=${{ matrix.enable-utp && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -1029,7 +1049,7 @@ jobs:
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}
+          name: binaries-${{ github.job }}-${{ matrix.enable-utp && 'with' || 'without' }}-utp
           path: pfx/**/*
 
   android:
@@ -1127,6 +1147,7 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
