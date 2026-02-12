@@ -62,7 +62,6 @@ target_sources(${TR_NAME}
         magnet-metainfo.h
         makemeta.cc
         makemeta.h
-        mime-types.h
         net.cc
         net.h
         open-files.cc

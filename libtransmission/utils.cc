@@ -44,7 +44,6 @@
 #include "lib/base/tr-strbuf.h"
 #include "lib/base/values.h"
 
-#include "libtransmission/mime-types.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
@@ -434,41 +433,4 @@ void tr_lib_init()
             tr::serializer::Converters::ensure_default_converters();
             tr::serializer::install_libtransmission_converters();
         });
-}
-
-// --- mime-type
-
-std::string_view tr_get_mime_type_for_filename(std::string_view filename)
-{
-    auto constexpr Compare = [](mime_type_suffix const& entry, auto const& suffix)
-    {
-        return entry.suffix < suffix;
-    };
-
-    if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
-    {
-        auto const suffix_lc = tr_strlower(filename.substr(pos + 1));
-        auto const it = std::lower_bound(std::begin(MimeTypeSuffixes), std::end(MimeTypeSuffixes), suffix_lc, Compare);
-        if (it != std::end(MimeTypeSuffixes) && suffix_lc == it->suffix)
-        {
-            std::string_view mime_type = it->mime_type;
-
-            // https://github.com/transmission/transmission/issues/5965#issuecomment-1704421231
-            // An mp4 file's correct mime-type depends on the codecs used in the file,
-            // which we have no way of inspecting and which might not be downloaded yet.
-            // Let's use `video/mp4` since that's by far the most common use case for torrents.
-            if (mime_type == "application/mp4")
-            {
-                mime_type = "video/mp4";
-            }
-
-            return mime_type;
-        }
-    }
-
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-    // application/octet-stream is the default value.
-    // An unknown file type should use this type.
-    auto constexpr Fallback = "application/octet-stream"sv;
-    return Fallback;
 }

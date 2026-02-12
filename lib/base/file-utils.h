@@ -18,6 +18,8 @@ struct tr_error;
 
 bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error* error = nullptr);
 
+[[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
+
 /**
  * Tries to move a file by renaming, and [optionally] if that fails, by copying.
  *

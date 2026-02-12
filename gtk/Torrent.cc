@@ -13,6 +13,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
+#include "lib/base/file-utils.h"
 #include "lib/base/tr-macros.h"
 #include "lib/base/values.h"
 

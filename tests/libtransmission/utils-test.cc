@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 
 #include "lib/base/env.h"
+#include "lib/base/file-utils.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/utils.h"

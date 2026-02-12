@@ -25,8 +25,6 @@ std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexc
 
 // ---
 
-[[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
-
 /** @brief return the current date in milliseconds */
 [[nodiscard]] uint64_t tr_time_msec();
 

@@ -21,6 +21,7 @@ target_sources(trbase
         i18n.h
         log.cc
         log.h
+        mime-types.h
         quark.cc
         quark.h
         serializer.cc

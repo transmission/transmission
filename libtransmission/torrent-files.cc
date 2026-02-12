@@ -30,7 +30,6 @@
 
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

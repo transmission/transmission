@@ -1,4 +1,4 @@
-// This file was generated with libtransmission/mime-types.js
+// This file was generated with lib/base/mime-types.js
 // DO NOT EDIT MANUALLY
 
 // This file Copyright © Mnemosyne LLC.
