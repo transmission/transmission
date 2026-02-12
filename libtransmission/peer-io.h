@@ -34,10 +34,15 @@ struct tr_error;
 struct tr_session;
 struct tr_socket_address;
 
-namespace libtransmission::test
+namespace libtransmission
+{
+class Timer;
+
+namespace test
 {
 class HandshakeTest;
-} // namespace libtransmission::test
+}
+} // namespace libtransmission
 
 enum class ReadState : uint8_t
 {
@@ -63,14 +68,6 @@ class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
     using GotError = void (*)(tr_peerIo* io, tr_error const& error, void* user_data);
 
 public:
-    tr_peerIo(
-        tr_session* session,
-        tr_peer_socket&& socket,
-        tr_bandwidth* parent_bandwidth,
-        tr_sha1_digest_t const* info_hash,
-        bool is_incoming,
-        bool client_is_seed);
-
     ~tr_peerIo();
 
     tr_peerIo(tr_peerIo const&) = delete;
@@ -322,6 +319,14 @@ private:
 
     friend class libtransmission::test::HandshakeTest;
 
+    tr_peerIo(
+        tr_session* session,
+        tr_peer_socket&& socket,
+        tr_bandwidth* parent_bandwidth,
+        tr_sha1_digest_t const* info_hash,
+        bool is_incoming,
+        bool client_is_seed);
+
     [[nodiscard]] constexpr auto client_is_seed() const noexcept
     {
         return client_is_seed_;
@@ -341,6 +346,8 @@ private:
 #endif
 
     void close();
+
+    void flush_outbuf_soon();
 
     static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
     static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio);
@@ -384,6 +391,8 @@ private:
     DidWrite did_write_ = nullptr;
     GotError got_error_ = nullptr;
     void* user_data_ = nullptr;
+
+    std::unique_ptr<libtransmission::Timer> const flush_outbuf_trigger_;
 
     libtransmission::evhelpers::event_unique_ptr event_read_;
     libtransmission::evhelpers::event_unique_ptr event_write_;
