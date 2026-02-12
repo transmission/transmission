@@ -3,8 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "libtransmission/file-utils.h"
-
 #include <string_view>
 #include <vector>
 
@@ -15,9 +13,10 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/file.h"
+#include "lib/base/file-utils.h"
 
 #include "libtransmission/error-types.h"
-#include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"

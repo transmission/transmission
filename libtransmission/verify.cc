@@ -15,8 +15,9 @@
 #include <utility> // for std::move()
 #include <vector>
 
+#include "lib/base/file.h"
+
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/file.h"
 #include "libtransmission/types.h"
 #include "libtransmission/verify.h"
 

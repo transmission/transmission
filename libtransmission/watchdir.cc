@@ -10,10 +10,10 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/file.h"
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 #include "libtransmission/error-types.h"
-#include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h" // for _()

@@ -20,10 +20,11 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/file-utils.h>
-#include <libtransmission/file.h>
-#include <libtransmission/web-utils.h>
-#include <libtransmission/web.h>
+#include "lib/base/file-utils.h"
+#include "lib/base/file.h"
+
+#include "libtransmission/web-utils.h"
+#include "libtransmission/web.h"
 
 namespace tr::app
 {

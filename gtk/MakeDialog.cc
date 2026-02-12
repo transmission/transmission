@@ -6,7 +6,6 @@
 #include "MakeDialog.h"
 
 #include "GtkCompat.h"
-#include "lib/base/error.h"
 #include "PathButton.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -15,6 +14,8 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/values.h>
+
+#include "lib/base/error.h"
 
 #include <giomm/file.h>
 #include <glibmm/convert.h>

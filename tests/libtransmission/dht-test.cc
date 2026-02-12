@@ -34,11 +34,11 @@
 
 #include <gtest/gtest.h>
 
+#include "lib/base/file.h"
 #include "lib/base/tr-macros.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/crypto-utils.h" // tr_rand_obj
-#include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/quark.h"

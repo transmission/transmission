@@ -22,10 +22,10 @@
 #include <gtest/gtest.h>
 
 #include "lib/base/error.h"
+#include "lib/base/file.h" // tr_sys_file_*()
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/crypto-utils.h" // tr_base64_decode()
-#include "libtransmission/file.h" // tr_sys_file_*()
 #include "libtransmission/quark.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent.h"

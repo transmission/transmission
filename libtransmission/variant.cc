@@ -21,11 +21,11 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/file-utils.h"
 #include "lib/base/tr-assert.h"
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 #include "libtransmission/api-compat.h"
-#include "libtransmission/file-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/utils.h"

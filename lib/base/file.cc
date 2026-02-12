@@ -11,8 +11,7 @@
 #include <vector>
 
 #include "lib/base/error.h"
-
-#include "libtransmission/file.h"
+#include "lib/base/file.h"
 
 namespace
 {

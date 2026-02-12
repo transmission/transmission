@@ -14,11 +14,11 @@
 
 #include <gtest/gtest.h>
 
+#include "lib/base/file.h"
 #include "lib/base/string-utils.h"
 
 #include "libtransmission/announce-list.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/file.h"
 #include "libtransmission/makemeta.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/session.h" // TR_NAME

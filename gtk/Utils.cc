@@ -5,8 +5,6 @@
 
 #include "Utils.h"
 
-#include "lib/base/error.h"
-#include "lib/base/string-utils.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -18,6 +16,9 @@
 #include <libtransmission/values.h>
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 #include <libtransmission/web-utils.h>
+
+#include "lib/base/error.h"
+#include "lib/base/string-utils.h"
 
 #include <gdkmm/display.h>
 #include <giomm/appinfo.h>

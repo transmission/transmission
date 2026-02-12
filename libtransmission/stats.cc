@@ -7,8 +7,9 @@
 #include <optional>
 #include <utility>
 
+#include "lib/base/file.h"
+
 #include "libtransmission/api-compat.h"
-#include "libtransmission/file.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/serializer.h"
 #include "libtransmission/stats.h"

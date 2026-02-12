@@ -8,13 +8,14 @@
 #include "GtkCompat.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG
 #include "IconCache.h"
-#include "lib/base/string-utils.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/file-utils.h>
 #include <libtransmission/utils.h>
+
+#include "lib/base/string-utils.h"
+#include <lib/base/file-utils.h>
 
 #include <giomm/icon.h>
 #include <glibmm/fileutils.h>

@@ -14,10 +14,10 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/file.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/env.h"
-#include "libtransmission/file.h"
 #include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h" // _()
 #include "libtransmission/values.h"

@@ -9,9 +9,9 @@
 #include <gtest/gtest.h>
 
 #include "lib/base/error.h"
+#include "lib/base/file-utils.h"
+#include "lib/base/file.h"
 
-#include "libtransmission/file-utils.h"
-#include "libtransmission/file.h"
 #include "libtransmission/tr-strbuf.h"
 
 #include "test-fixtures.h"

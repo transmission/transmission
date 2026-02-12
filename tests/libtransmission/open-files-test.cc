@@ -15,9 +15,9 @@
 #include <gtest/gtest.h>
 
 #include "lib/base/error.h"
+#include "lib/base/file.h"
 
 #include "libtransmission/transmission.h"
-#include "libtransmission/file.h"
 #include "libtransmission/open-files.h"
 #include "libtransmission/tr-strbuf.h"
 

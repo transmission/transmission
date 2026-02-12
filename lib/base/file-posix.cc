@@ -51,10 +51,10 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/file.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-macros.h" // TR_UCLIBC_CHECK_VERSION
 
-#include "libtransmission/file.h"
 #include "libtransmission/tr-strbuf.h"
 
 #ifndef O_LARGEFILE

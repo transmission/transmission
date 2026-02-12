@@ -16,10 +16,10 @@
 #include <gtest/gtest.h>
 
 #include "lib/base/error.h"
+#include "lib/base/file-utils.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/announce-list.h"
-#include "libtransmission/file-utils.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-strbuf.h"
 

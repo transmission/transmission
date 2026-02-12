@@ -5,10 +5,10 @@
 
 #include "lib/base/error.h"
 
-#include "libtransmission/transmission.h"
+#include "lib/base/file-utils.h"
 
+#include "libtransmission/transmission.h"
 #include "libtransmission/torrent-ctor.h"
-#include "libtransmission/file-utils.h"
 #include "libtransmission/types.h"
 
 using namespace std::literals;

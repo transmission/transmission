@@ -33,10 +33,10 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/file.h"
 #include "lib/base/tr-assert.h"
 
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // for tr_peerMgrCompactToPex()

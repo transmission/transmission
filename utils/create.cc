@@ -18,10 +18,10 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/file.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/announce-list.h"
-#include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/makemeta.h"
 #include "libtransmission/torrent-files.h"

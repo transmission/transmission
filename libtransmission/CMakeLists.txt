@@ -58,12 +58,6 @@ target_sources(${TR_NAME}
         env.h
         file-piece-map.cc
         file-piece-map.h
-        file-posix.cc
-        file-utils.cc
-        file-utils.h
-        file-win32.cc
-        file.cc
-        file.h
         handshake.cc
         handshake.h
         history.h
@@ -204,11 +198,9 @@ tr_allow_compile_if(
     [=[[WITH_KQUEUE]]=]
         watchdir-kqueue.cc
     [=[[WIN32]]=]
-        file-win32.cc
         subprocess-win32.cc
         watchdir-win32.cc
     [=[[NOT WIN32]]=]
-        file-posix.cc
         subprocess-posix.cc)
 
 target_compile_definitions(${TR_NAME}
@@ -228,21 +220,6 @@ target_compile_definitions(${TR_NAME}
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
         $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
         $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
-
-tr_target_compile_definitions_for_functions(${TR_NAME}
-    PRIVATE
-        copyfile
-        copy_file_range
-        fallocate64
-        flock
-        htonll
-        mkdtemp
-        ntohll
-        posix_fadvise
-        posix_fallocate
-        pread
-        pwrite
-        sendfile64)
 
 target_include_directories(${TR_NAME}
     PUBLIC
@@ -294,7 +271,7 @@ if(INSTALL_LIB)
     install(
         FILES
             error-types.h
-            file.h
+            ../lib/base/file.h
             log.h
             makemeta.h
             quark.h

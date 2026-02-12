@@ -15,7 +15,8 @@
 #include <string_view>
 #include <utility>
 
-#include "libtransmission/file.h" // tr_sys_file_t
+#include "lib/base/file.h" // tr_sys_file_t
+
 #include "libtransmission/lru-cache.h"
 #include "libtransmission/types.h"
 

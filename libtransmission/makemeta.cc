@@ -19,17 +19,18 @@
 
 #include "lib/base/error.h"
 
+#include "lib/base/file.h"
+#include "lib/base/file-utils.h"
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/file.h"
-#include "libtransmission/file-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/makemeta.h"
 #include "libtransmission/quark.h" // TR_KEY_length, TR_KEY_a...
 #include "libtransmission/session.h" // TR_NAME
-#include "lib/base/string-utils.h"
 #include "libtransmission/torrent-files.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/tr-strbuf.h" // tr_pathbuf
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for _()

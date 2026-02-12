@@ -21,16 +21,16 @@
 
 #include "lib/base/error.h"
 
-#include "libtransmission/transmission.h"
+#include "lib/base/file-utils.h"
+#include "lib/base/file.h"
+#include "lib/base/tr-assert.h"
 
+#include "libtransmission/transmission.h"
 #include "libtransmission/crypto-utils.h" // for tr_sha1()
-#include "libtransmission/file-utils.h"
-#include "libtransmission/file.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/torrent.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/variant.h"
 
 #define tr_logAddDebugMagnet(magnet, msg) tr_logAddDebug(msg, (magnet)->log_name())
