@@ -30,6 +30,7 @@
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-socket.h" // tr_peer_socket, tr_netOpen...
 #include "libtransmission/session.h"
+#include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" // for _()
 
@@ -82,6 +83,7 @@ tr_peerIo::tr_peerIo(
     : bandwidth_{ parent_bandwidth }
     , info_hash_{ info_hash != nullptr ? *info_hash : tr_sha1_digest_t{} }
     , session_{ session }
+    , flush_outbuf_trigger_{ session->timerMaker().create() }
     , client_is_seed_{ client_is_seed }
     , is_incoming_{ is_incoming }
 {
@@ -99,8 +101,18 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     TR_ASSERT(session != nullptr);
     auto lock = session->unique_lock();
 
-    auto io = std::make_shared<tr_peerIo>(session, std::move(socket), parent, info_hash, is_incoming, is_seed);
+    auto const io = std::shared_ptr<tr_peerIo>{
+        new tr_peerIo{ session, std::move(socket), parent, info_hash, is_incoming, is_seed }
+    };
     io->bandwidth().set_peer(io);
+    io->flush_outbuf_trigger_->set_callback(
+        [weak = io->weak_from_this()]
+        {
+            if (auto const ptr = weak.lock())
+            {
+                ptr->try_write(SIZE_MAX);
+            }
+        });
     tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
     return io;
 }
@@ -567,6 +579,11 @@ size_t tr_peerIo::flush_outgoing_protocol_msgs()
     return flush(TR_UP, byte_count);
 }
 
+void tr_peerIo::flush_outbuf_soon()
+{
+    flush_outbuf_trigger_->start_single_shot(std::chrono::milliseconds::zero());
+}
+
 void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
 {
     if (n_bytes == 0U)
@@ -580,14 +597,7 @@ void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_dat
     filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
     outbuf_.commit_space(n_bytes);
 
-    session_->queue_session_thread(
-        [ptr = weak_from_this()]()
-        {
-            if (auto io = ptr.lock(); io)
-            {
-                io->try_write(SIZE_MAX);
-            }
-        });
+    flush_outbuf_soon();
 }
 
 // ---
