@@ -53,7 +53,6 @@ target_sources(${TR_NAME}
         crypto-utils-wolfssl.cc
         crypto-utils.cc
         crypto-utils.h
-        error-types.h
         file-piece-map.cc
         file-piece-map.h
         handshake.cc
@@ -267,7 +266,6 @@ if(INSTALL_LIB)
         DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(
         FILES
-            error-types.h
             ../lib/base/file.h
             log.h
             makemeta.h

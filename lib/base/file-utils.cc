@@ -12,12 +12,12 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error-types.h"
 #include "lib/base/error.h"
-#include "lib/base/file.h"
 #include "lib/base/file-utils.h"
+#include "lib/base/file.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/error-types.h"
 #include "libtransmission/log.h"
 #include "libtransmission/utils.h"
 
