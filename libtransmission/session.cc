@@ -33,6 +33,7 @@
 #include "lib/base/file.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/api-compat.h"
@@ -56,7 +57,6 @@
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/tr-dht.h"
 #include "libtransmission/tr-lpd.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/types.h"
 #include "libtransmission/variant.h"

@@ -31,12 +31,12 @@
 
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 

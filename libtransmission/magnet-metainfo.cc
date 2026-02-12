@@ -16,12 +16,12 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/tr-strbuf.h" // for tr_urlbuf
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error-types.h"
 #include "libtransmission/magnet-metainfo.h"
 #include "lib/base/string-utils.h"
-#include "libtransmission/tr-strbuf.h" // for tr_urlbuf
 #include "libtransmission/types.h" // for tr_sha1_digest_t
 #include "libtransmission/web-utils.h"
 

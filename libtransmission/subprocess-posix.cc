@@ -20,9 +20,9 @@
 #include "lib/base/error.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/subprocess.h"
-#include "libtransmission/tr-strbuf.h"
 
 using namespace std::literals;
 

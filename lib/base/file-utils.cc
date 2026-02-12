@@ -15,10 +15,10 @@
 #include "lib/base/error.h"
 #include "lib/base/file.h"
 #include "lib/base/file-utils.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/error-types.h"
 #include "libtransmission/log.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

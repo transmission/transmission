@@ -31,8 +31,7 @@
 #include "lib/base/file.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-macros.h"
-
-#include "libtransmission/tr-strbuf.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "test-fixtures.h"
 

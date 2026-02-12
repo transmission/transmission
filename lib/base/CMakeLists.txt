@@ -17,6 +17,7 @@ target_sources(trbase
         $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
         tr-assert.cc
         tr-assert.h
+        tr-strbuf.h
         tr-macros.h)
 
 tr_allow_compile_if(

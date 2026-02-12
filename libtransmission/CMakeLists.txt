@@ -143,7 +143,6 @@ target_sources(${TR_NAME}
         tr-getopt.h
         tr-lpd.cc
         tr-lpd.h
-        tr-strbuf.h
         tr-udp.cc
         tr-utp.cc
         tr-utp.h
@@ -279,7 +278,6 @@ if(INSTALL_LIB)
             timer.h
             tr-buffer.h
             tr-getopt.h
-            tr-strbuf.h
             transmission.h
             utils.h
             values.h

@@ -12,6 +12,7 @@
 #include <gtest/gtest.h>
 
 #include "lib/base/file.h" // tr_sys_path_*()
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/block-info.h"
@@ -19,7 +20,6 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrent-files.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/variant.h"
 
 #include "test-fixtures.h"

@@ -11,7 +11,6 @@
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 #include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h> /* tr_strratio() */
 #include <libtransmission/values.h>
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
@@ -19,6 +18,7 @@
 
 #include "lib/base/error.h"
 #include "lib/base/string-utils.h"
+#include "lib/base/tr-strbuf.h"
 
 #include <gdkmm/display.h>
 #include <giomm/appinfo.h>

@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "libtransmission/torrent-queue.h"
-#include "libtransmission/tr-strbuf.h"
+#include "lib/base/tr-strbuf.h"
 #include "libtransmission/variant.h"
 
 namespace

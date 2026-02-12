@@ -15,13 +15,13 @@
 
 #include "lib/base/error.h"
 #include "lib/base/file.h"
+#include "lib/base/tr-strbuf.h" // for tr_pathbuf
 
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/error-types.h"
 #include "libtransmission/log.h"
 #include "libtransmission/platform.h"
 #include "libtransmission/session-id.h"
-#include "libtransmission/tr-strbuf.h" // for tr_pathbuf
 #include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;

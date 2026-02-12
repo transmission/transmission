@@ -35,6 +35,7 @@
 
 #include "lib/base/file.h"
 #include "lib/base/tr-assert.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/log.h"
@@ -43,7 +44,6 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-dht.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/utils.h" // for tr_time(), _()
 

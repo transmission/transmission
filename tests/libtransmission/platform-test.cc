@@ -12,10 +12,10 @@
 
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/platform.h"
-#include "libtransmission/tr-strbuf.h"
 
 #include "test-fixtures.h"
 

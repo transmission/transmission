@@ -14,9 +14,9 @@
 #include "lib/base/error.h"
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/tr-strbuf.h"
 
 #include "test-fixtures.h"
 

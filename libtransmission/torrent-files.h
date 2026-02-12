@@ -18,8 +18,8 @@
 
 #include "lib/base/file.h"
 #include "lib/base/tr-macros.h"
+#include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/types.h"
 
 struct tr_error;

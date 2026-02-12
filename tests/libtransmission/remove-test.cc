@@ -13,10 +13,10 @@
 #include <gtest/gtest.h>
 
 #include "lib/base/file.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/torrent-files.h"
-#include "libtransmission/tr-strbuf.h"
 
 #include "test-fixtures.h"
 

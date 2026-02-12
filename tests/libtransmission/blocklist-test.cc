@@ -12,7 +12,7 @@
 
 #include <libtransmission/net.h>
 #include <libtransmission/session.h> // tr_session.addressIsBlocked()
-#include <libtransmission/tr-strbuf.h>
+#include <lib/base/tr-strbuf.h>
 
 #include "test-fixtures.h"
 

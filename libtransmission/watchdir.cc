@@ -11,11 +11,11 @@
 
 #include "lib/base/error.h"
 #include "lib/base/file.h"
+#include "lib/base/tr-strbuf.h"
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 #include "libtransmission/error-types.h"
 #include "libtransmission/log.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h" // for _()
 #include "libtransmission/watchdir-base.h"
 

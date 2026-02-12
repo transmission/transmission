@@ -31,6 +31,7 @@
 #include "lib/base/file.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/announcer.h"
@@ -44,7 +45,6 @@
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/values.h"

@@ -37,6 +37,7 @@
 #include "lib/base/error.h"
 #include "lib/base/file-utils.h"
 #include "lib/base/string-utils.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/crypto-utils.h" /* tr_ssha1_matches() */
 #include "libtransmission/log.h"
@@ -47,7 +48,6 @@
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"

@@ -23,13 +23,13 @@
 
 #include "lib/base/error.h"
 #include "lib/base/string-utils.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-getopt.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/values.h"
 #include "libtransmission/variant.h"

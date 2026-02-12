@@ -18,6 +18,7 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/tr-strbuf.h" // tr_pathbuf
 
 #include "lib/base/file.h"
 #include "lib/base/file-utils.h"
@@ -31,7 +32,6 @@
 #include "libtransmission/quark.h" // TR_KEY_length, TR_KEY_a...
 #include "libtransmission/session.h" // TR_NAME
 #include "libtransmission/torrent-files.h"
-#include "libtransmission/tr-strbuf.h" // tr_pathbuf
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for _()
 #include "libtransmission/variant.h"

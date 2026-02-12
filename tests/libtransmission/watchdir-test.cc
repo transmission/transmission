@@ -23,11 +23,11 @@
 #include <gtest/gtest.h>
 
 #include "lib/base/file.h"
+#include "lib/base/tr-strbuf.h"
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 #include "libtransmission/timer.h"
 #include "libtransmission/timer-ev.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/watchdir.h"
 #include "libtransmission/watchdir-base.h"
 

@@ -54,8 +54,7 @@
 #include "lib/base/file.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-macros.h" // TR_UCLIBC_CHECK_VERSION
-
-#include "libtransmission/tr-strbuf.h"
+#include "lib/base/tr-strbuf.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0

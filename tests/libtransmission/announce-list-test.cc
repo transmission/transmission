@@ -17,11 +17,11 @@
 
 #include "lib/base/error.h"
 #include "lib/base/file-utils.h"
+#include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/announce-list.h"
 #include "libtransmission/torrent-metainfo.h"
-#include "libtransmission/tr-strbuf.h"
 
 #include "test-fixtures.h"
 
