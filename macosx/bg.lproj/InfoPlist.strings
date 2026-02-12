@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MDItemKeywords</key>
+	<string>torrent,torrents,magnet,magnets,tor,bt,bit,торент,торенти,магнит,магнити</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Авторски права © 2005-2026 The Transmission Project</string>
+</dict>
+</plist>

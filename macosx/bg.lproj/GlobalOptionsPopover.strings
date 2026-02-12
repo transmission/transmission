@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>114.title</key>
+	<string>Състояние на избраните файлове</string>
+	<key>116.title</key>
+	<string>Спри качването при съотношение:</string>
+	<key>118.title</key>
+	<string>Спри качването, когато е неактивно за:</string>
+	<key>130.title</key>
+	<string>Оставащо време</string>
+	<key>180.title</key>
+	<string>КБ/с</string>
+	<key>22.title</key>
+	<string>Ограничения за качване</string>
+	<key>23.title</key>
+	<string>Пропускателна способност</string>
+	<key>26.title</key>
+	<string>КБ/с</string>
+	<key>43.title</key>
+	<string>Ограничи качването:</string>
+	<key>44.title</key>
+	<string>Ограничи изтеглянето:</string>
+	<key>98.title</key>
+	<string>минути</string>
+</dict>
+</plist>
