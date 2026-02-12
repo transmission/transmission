@@ -45,6 +45,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/session.h"
 #include "lib/base/string-utils.h"
+#include "lib/base/values.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent.h"
@@ -52,7 +53,6 @@
 #include "lib/base/tr-assert.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/values.h"
 #include "libtransmission/webseed.h"
 
 using namespace std::literals;

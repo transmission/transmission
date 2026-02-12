@@ -16,11 +16,11 @@
 #include "lib/base/env.h"
 #include "lib/base/error.h"
 #include "lib/base/file.h"
+#include "lib/base/values.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h" // _()
-#include "libtransmission/values.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web-utils.h"

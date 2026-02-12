@@ -44,12 +44,12 @@
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h"
+#include "lib/base/values.h"
 
 #include "libtransmission/mime-types.h"
 #include "libtransmission/serializer.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/values.h"
 
 using namespace std::literals;
 using namespace tr::Values;

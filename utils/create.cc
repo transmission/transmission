@@ -19,6 +19,7 @@
 
 #include "lib/base/error.h"
 #include "lib/base/file.h"
+#include "lib/base/values.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/announce-list.h"
@@ -27,7 +28,6 @@
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/values.h"
 #include "libtransmission/version.h"
 
 using namespace std::literals;

@@ -31,6 +31,7 @@
 #include "lib/base/file.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
+#include "lib/base/values.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/api-compat.h"
@@ -39,7 +40,6 @@
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/values.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 

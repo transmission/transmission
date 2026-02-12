@@ -8,7 +8,8 @@
 #include "GtkCompat.h"
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/values.h>
+
+#include <lib/base/values.h>
 
 #include <glibmm/objectbase.h>
 #include <glibmm/refptr.h>

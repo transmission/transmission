@@ -27,7 +27,7 @@
 
 #include <libtransmission/transmission.h>
 
-#include <libtransmission/values.h>
+#include <lib/base/values.h>
 
 #include "AccessibleSqueezeLabel.h"
 #include "AddData.h"

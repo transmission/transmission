@@ -10,7 +10,6 @@
 #include "GtkCompat.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG, GUI_PAD_SMALL
 #include "libtransmission/utils.h"
-#include "libtransmission/values.h"
 #include "libtransmission/web-utils.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
@@ -20,6 +19,7 @@
 #include "lib/base/file-utils.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-macros.h"
+#include "lib/base/values.h"
 
 #include <gdkmm/pixbuf.h>
 #include <glibmm/i18n.h>

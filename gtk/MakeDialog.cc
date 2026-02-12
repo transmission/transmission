@@ -13,9 +13,9 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
-#include <libtransmission/values.h>
 
 #include "lib/base/error.h"
+#include "lib/base/values.h"
 
 #include <giomm/file.h>
 #include <glibmm/convert.h>

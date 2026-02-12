@@ -17,6 +17,7 @@
 #include <fmt/format.h>
 
 #include "lib/base/tr-assert.h"
+#include "lib/base/values.h"
 
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/crypto-utils.h"
@@ -24,7 +25,6 @@
 #include "libtransmission/peer-io.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // tr_time_msec()
-#include "libtransmission/values.h"
 
 using namespace tr::Values;
 

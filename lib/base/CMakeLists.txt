@@ -18,6 +18,7 @@ target_sources(trbase
         tr-assert.cc
         tr-assert.h
         tr-strbuf.h
+        values.h
         tr-macros.h)
 
 tr_allow_compile_if(

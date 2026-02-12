@@ -22,7 +22,7 @@
 
 #include "libtransmission/constants.h"
 #include "libtransmission/types.h"
-#include "libtransmission/values.h"
+#include "lib/base/values.h"
 
 // --- Startup & Shutdown
 

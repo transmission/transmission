@@ -18,7 +18,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/serializer.h"
 #include "libtransmission/types.h" // for TR_SCHED_ALL
-#include "libtransmission/values.h"
+#include "lib/base/values.h"
 
 struct tr_variant;
 

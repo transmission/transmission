@@ -280,7 +280,6 @@ if(INSTALL_LIB)
             tr-getopt.h
             transmission.h
             utils.h
-            values.h
             variant.h
             watchdir.h
             web-utils.h

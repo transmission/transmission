@@ -32,6 +32,7 @@
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h"
+#include "lib/base/values.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/announcer.h"
@@ -47,7 +48,6 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/values.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web-utils.h"
