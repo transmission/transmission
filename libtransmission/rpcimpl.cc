@@ -45,6 +45,7 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/values.h"
 #include "libtransmission/variant.h"
@@ -184,7 +185,7 @@ namespace
 namespace
 {
 auto constexpr RecentlyActiveSeconds = time_t{ 60 };
-auto constexpr RpcVersion = int64_t{ 18 };
+auto constexpr RpcVersion = int64_t{ 18 }; // TODO: 18 == 6.0.0, bump after all 6.0.x releases and before releasing 6.1.0
 auto constexpr RpcVersionMin = int64_t{ 14 };
 
 enum class TrFormat : uint8_t

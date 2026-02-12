@@ -22,8 +22,6 @@
 #include <small/set.hpp>
 #include <small/vector.hpp>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port
 #include "libtransmission/open-files.h" // for tr_open_files::Preallocation
@@ -33,6 +31,7 @@
 #include "libtransmission/utils.h" // for tr_strv_strip(), tr_strlower()
 #include "libtransmission/variant.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/types.h"
 
 using namespace std::literals;
 

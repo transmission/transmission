@@ -20,15 +20,15 @@
 #define PSL_STATIC
 #include <libpsl.h>
 
+#include "libtransmission/web-utils.h"
+
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/punycode.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 

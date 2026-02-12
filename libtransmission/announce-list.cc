@@ -11,16 +11,15 @@
 
 #include <small/map.hpp>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announce-list.h"
 
-#include "tr-strbuf.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 
@@ -82,10 +81,10 @@ bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url
 
 bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier)
 {
-    // This step allows for URLs that contain character outside the allowed set
+    // This step allows for URLs that contain characters outside the allowed set
     // defined by RFC 3986. The URL we store is "equivalent" to the provided URL
-    // according to the definition in RFC 3986 Section 6.1, while consisting
-    // of only ASCII characters. This ensures the URLs be represented correctly
+    // according to the definition in RFC 3986 Section 6.1, while consisting of
+    // only US-ASCII characters. This ensures the URLs be represented correctly
     // when transmitted via UTF-8 mediums, for example JSON.
     auto normalized_url = tr_urlbuf{};
     tr_urlPercentEncode(std::back_inserter(normalized_url), announce_url, false);

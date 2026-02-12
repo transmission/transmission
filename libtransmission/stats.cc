@@ -7,8 +7,6 @@
 #include <optional>
 #include <utility>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/api-compat.h"
 #include "libtransmission/file.h"
 #include "libtransmission/quark.h"

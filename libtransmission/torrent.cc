@@ -21,7 +21,6 @@
 #include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
-#include "libtransmission/tr-macros.h"
 
 #include "libtransmission/announcer.h"
 #include "libtransmission/bandwidth.h"
@@ -45,6 +44,7 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web-utils.h"

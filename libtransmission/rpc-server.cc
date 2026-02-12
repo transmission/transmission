@@ -34,8 +34,6 @@
 
 #include <libdeflate.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h" /* tr_ssha1_matches() */
 #include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
@@ -49,6 +47,7 @@
 #include "libtransmission/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 
