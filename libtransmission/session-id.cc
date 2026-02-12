@@ -23,7 +23,6 @@
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/platform.h"
 #include "libtransmission/session-id.h"
-#include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;
 

@@ -16,7 +16,6 @@
 
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;
 

@@ -17,7 +17,6 @@
 #include "lib/base/tr-strbuf.h"
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
-#include "libtransmission/utils.h" // for _()
 #include "libtransmission/watchdir-base.h"
 
 using namespace std::literals;

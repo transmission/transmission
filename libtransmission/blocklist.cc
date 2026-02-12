@@ -40,7 +40,6 @@
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/net.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;
 

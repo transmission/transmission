@@ -28,7 +28,6 @@
 #include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-upnp.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils.h" // for _(), tr_strerror()
 
 #ifndef MINIUPNPC_API_VERSION
 #error miniupnpc >= 1.7 is required

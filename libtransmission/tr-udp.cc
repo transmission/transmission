@@ -25,7 +25,6 @@
 #include "libtransmission/net.h"
 #include "libtransmission/session.h"
 #include "libtransmission/tr-utp.h"
-#include "libtransmission/utils.h"
 
 namespace
 {

@@ -35,7 +35,6 @@
 #include "libtransmission/session.h" // TR_NAME
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils.h" // for _()
 #include "libtransmission/version.h"
 
 using namespace std::literals;

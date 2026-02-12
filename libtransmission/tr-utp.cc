@@ -22,7 +22,6 @@
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
 #include "libtransmission/tr-utp.h"
-#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

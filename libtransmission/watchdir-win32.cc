@@ -27,7 +27,6 @@
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 #include "libtransmission/net.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils.h"
 #include "libtransmission/watchdir-base.h"
 
 namespace tr

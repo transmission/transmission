@@ -25,8 +25,7 @@
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/net.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/net.h" // tr_address::from_string()
 #include "libtransmission/web-utils.h"
 
 using namespace std::literals;

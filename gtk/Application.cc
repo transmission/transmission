@@ -24,11 +24,10 @@
 #include "Torrent.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/api-compat.h>
-#include <libtransmission/rpcimpl.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/version.h>
+#include "libtransmission/transmission.h"
+#include "libtransmission/api-compat.h"
+#include "libtransmission/rpcimpl.h"
+#include "libtransmission/version.h"
 
 #include "lib/base/log.h"
 #include "lib/base/quark.h"

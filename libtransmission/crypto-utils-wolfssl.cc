@@ -20,7 +20,6 @@
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils.h"
 
 #ifndef WITH_WOLFSSL
 #error wolfssl module

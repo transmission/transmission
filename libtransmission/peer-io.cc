@@ -35,7 +35,6 @@
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils.h" // for _()
 
 struct sockaddr;
 

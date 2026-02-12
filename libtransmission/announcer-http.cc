@@ -39,7 +39,6 @@
 #include "libtransmission/peer-mgr.h" /* pex */
 #include "libtransmission/session.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 #include "libtransmission/web.h"
 

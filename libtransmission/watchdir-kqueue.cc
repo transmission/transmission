@@ -27,7 +27,6 @@
 #include "lib/base/tr-strbuf.h"
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
-#include "libtransmission/utils.h" // for _()
 #include "libtransmission/utils-ev.h"
 #include "libtransmission/watchdir-base.h"
 

@@ -4,14 +4,12 @@
 
 #include "Application.h"
 #include "GtkCompat.h"
+#include "libtransmission-app/app.h"
 #include "Notify.h"
 #include "Prefs.h"
 #include "Utils.h"
 
-#include "libtransmission-app/app.h"
-
 #include "libtransmission/transmission.h"
-#include "libtransmission/utils.h"
 #include "libtransmission/version.h"
 
 #include "lib/base/serializer.h"

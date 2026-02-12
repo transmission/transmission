@@ -5,10 +5,10 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: '^<libtransmission-app/'
     Priority: 3
-  - Regex: '^<libtransmission/transmission.h>'
+  - Regex: '^[<"]libtransmission/transmission.h[">]'
     Priority: 4
     SortPriority: 3
-  - Regex: '^<libtransmission/'
+  - Regex: '^[<"]libtransmission/'
     Priority: 4
     SortPriority: 4
   - Regex: '^[<"]lib/base/'
