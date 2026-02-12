@@ -109,6 +109,17 @@ extern "C"
 
 } // extern "C"
 
+namespace
+{
+
+constexpr std::array<std::pair<char const*, uint16_t>, 3> const DefaultBootstraps = { {
+    { "dht.transmissionbt.com", 6881 },
+    { "router.bittorrent.com", 6881 },
+    { "dht.libtorrent.org", 25401 },
+} };
+
+}
+
 class tr_dht_impl final : public tr_dht
 {
 private:
@@ -142,7 +153,10 @@ public:
         init_state(state_filename_);
 
         get_nodes_from_bootstrap_file(tr_pathbuf{ mediator_.config_dir(), "/dht.bootstrap"sv }, bootstrap_queue_);
-        get_nodes_from_name("dht.transmissionbt.com", tr_port::from_host(6881), bootstrap_queue_);
+        for (auto const [host, port] : DefaultBootstraps)
+        {
+            get_nodes_from_name(host, tr_port::from_host(port), bootstrap_queue_);
+        }
         bootstrap_timer_->start_single_shot(100ms);
 
         mediator_.api().init(udp4_socket_, udp6_socket_, std::data(id_), nullptr);
