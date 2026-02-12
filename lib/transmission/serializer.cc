@@ -313,7 +313,7 @@ tr_variant from_verify_added_mode(tr_verify_added_mode const& val)
 
 } // unnamed namespace
 
-void install_libtransmission_converters()
+void install_libtransmission_converters() // NOLINT(misc-use-internal-linkage)
 {
     static auto once = std::once_flag{};
     std::call_once(
