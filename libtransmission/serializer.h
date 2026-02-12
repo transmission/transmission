@@ -16,8 +16,8 @@
 
 #include <fmt/core.h>
 
-#include "libtransmission/quark.h"
-#include "libtransmission/variant.h"
+#include "lib/base/quark.h"
+#include "lib/base/variant.h"
 
 namespace tr::serializer
 {

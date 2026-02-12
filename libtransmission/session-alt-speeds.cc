@@ -11,11 +11,11 @@
 #include <fmt/chrono.h>
 
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
+#include "lib/base/variant.h"
 
-#include "libtransmission/log.h"
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/types.h"
-#include "libtransmission/variant.h"
 #include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;

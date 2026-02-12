@@ -31,11 +31,10 @@
 #include <rapidjson/writer.h>
 
 #include "lib/base/error.h"
-#include "lib/base/tr-assert.h"
 #include "lib/base/i18n.h"
-
-#include "libtransmission/quark.h"
-#include "libtransmission/variant.h"
+#include "lib/base/quark.h"
+#include "lib/base/tr-assert.h"
+#include "lib/base/variant.h"
 
 namespace
 {

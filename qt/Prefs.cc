@@ -12,11 +12,11 @@
 #include <QDateTime>
 #include <QDir>
 
-#include <libtransmission/transmission.h>
+#include "lib/base/variant.h"
 
-#include <libtransmission/api-compat.h>
-#include <libtransmission/serializer.h>
-#include <libtransmission/variant.h>
+#include "libtransmission/transmission.h"
+#include "libtransmission/api-compat.h"
+#include "libtransmission/serializer.h"
 
 #include "Filters.h"
 #include "Prefs.h"

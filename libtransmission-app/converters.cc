@@ -16,10 +16,10 @@
 #include <fmt/format.h>
 
 #include "lib/base/string-utils.h"
+#include "lib/base/variant.h"
 
 #include "libtransmission/serializer.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant.h"
 
 #include "libtransmission-app/display-modes.h"
 #include "libtransmission-app/converters.h"

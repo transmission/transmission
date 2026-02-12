@@ -23,14 +23,14 @@
 
 #include "lib/base/error.h"
 #include "lib/base/file.h" // tr_sys_file_*()
+#include "lib/base/quark.h"
+#include "lib/base/variant.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/crypto-utils.h" // tr_base64_decode()
-#include "libtransmission/quark.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant.h"
 
 using namespace std::literals;
 

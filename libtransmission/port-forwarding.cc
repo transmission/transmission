@@ -9,9 +9,9 @@
 
 #include <fmt/format.h>
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
-#include "libtransmission/log.h"
 #include "libtransmission/port-forwarding-natpmp.h"
 #include "libtransmission/port-forwarding-upnp.h"
 #include "libtransmission/port-forwarding.h"

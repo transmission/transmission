@@ -24,6 +24,7 @@
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h"
@@ -34,7 +35,6 @@
 #include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h" // for tr_sha1()
 #include "libtransmission/inout.h" // tr_ioTestPiece()
-#include "libtransmission/log.h"
 #include "libtransmission/magnet-metainfo.h"
 #include "libtransmission/peer-common.h"
 #include "libtransmission/peer-mgr.h"

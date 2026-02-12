@@ -8,10 +8,10 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/log.h"
 #include "lib/base/string-utils.h"
 
 #include "libtransmission/transmission.h"
-#include "libtransmission/log.h"
 
 #import "Torrent.h"
 #import "GroupsController.h"

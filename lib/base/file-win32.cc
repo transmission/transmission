@@ -9,6 +9,7 @@
 #include <ctime>
 #include <iterator> // for std::back_inserter
 #include <optional>
+#include <random>
 #include <string>
 #include <string_view>
 
@@ -21,9 +22,6 @@
 #include "lib/base/file.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
-
-#include "libtransmission/crypto-utils.h" /* tr_rand_int() */
-#include "libtransmission/types.h"
 
 using namespace std::literals;
 
@@ -39,6 +37,13 @@ namespace
 {
 auto constexpr NativeLocalPathPrefix = L"\\\\?\\"sv;
 auto constexpr NativeUncPathPrefix = L"\\\\?\\UNC\\"sv;
+
+[[nodiscard]] size_t rand_index(size_t upper_bound)
+{
+    static thread_local auto rng = std::mt19937{ std::random_device{}() };
+    auto dist = std::uniform_int_distribution<size_t>{ 0U, upper_bound > 0U ? upper_bound - 1U : 0U };
+    return dist(rng);
+}
 
 void set_system_error(tr_error* error, DWORD code)
 {
@@ -265,7 +270,7 @@ void create_temp_path(char* path_template, CallbackT const& callback, tr_error* 
         while (i > 0 && path_template[i - 1] == 'X')
         {
             static auto constexpr Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"sv;
-            path[i - 1] = Chars[tr_rand_int(std::size(Chars))];
+            path[i - 1] = Chars[rand_index(std::size(Chars))];
             --i;
         }
 

@@ -32,8 +32,7 @@
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 
-#include "libtransmission/log.h"
-#include "libtransmission/utils.h"
+#include "lib/base/log.h"
 
 using namespace std::literals;
 

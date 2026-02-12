@@ -28,7 +28,6 @@ target_sources(${TR_NAME}
         api-compat.h
         bandwidth.cc
         bandwidth.h
-        benc.h
         bitfield.cc
         bitfield.h
         block-info.cc
@@ -58,8 +57,6 @@ target_sources(${TR_NAME}
         inout.h
         ip-cache.cc
         ip-cache.h
-        log.cc
-        log.h
         lru-cache.h
         magnet-metainfo.cc
         magnet-metainfo.h
@@ -91,8 +88,6 @@ target_sources(${TR_NAME}
         port-forwarding-upnp.h
         port-forwarding.cc
         port-forwarding.h
-        quark.cc
-        quark.h
         resume.cc
         resume.h
         rpc-server.cc
@@ -147,10 +142,6 @@ target_sources(${TR_NAME}
         utils-ev.h
         utils.cc
         utils.h
-        variant-benc.cc
-        variant-json.cc
-        variant.cc
-        variant.h
         verify.cc
         verify.h
         version.h.in
@@ -260,10 +251,7 @@ if(INSTALL_LIB)
         DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(
         FILES
-            ../lib/base/file.h
-            log.h
             makemeta.h
-            quark.h
             rpcimpl.h
             session-id.h
             timer-ev.h
@@ -272,7 +260,6 @@ if(INSTALL_LIB)
             tr-getopt.h
             transmission.h
             utils.h
-            variant.h
             watchdir.h
             web-utils.h
             web.h

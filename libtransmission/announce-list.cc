@@ -13,14 +13,14 @@
 
 #include "lib/base/error.h"
 #include "lib/base/file-utils.h"
+#include "lib/base/quark.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h"
+#include "lib/base/variant.h"
 
 #include "libtransmission/announce-list.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/types.h"
-#include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 
 using namespace std::literals;

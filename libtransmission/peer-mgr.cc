@@ -28,6 +28,8 @@
 #include <fmt/format.h>
 
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
+#include "lib/base/quark.h"
 
 #define LIBTRANSMISSION_PEER_MODULE
 #include "libtransmission/announcer.h"
@@ -36,7 +38,6 @@
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/interned-string.h"
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-common.h"
 #include "libtransmission/peer-io.h"
@@ -44,7 +45,6 @@
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-msgs.h"
 #include "libtransmission/peer-socket.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/session.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/values.h"

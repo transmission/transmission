@@ -3,7 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/log.h>
+#include <lib/base/log.h>
 
 #import "MessageWindowController.h"
 #import "Controller.h"

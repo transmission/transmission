@@ -26,11 +26,12 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/api-compat.h>
-#include <libtransmission/log.h>
-#include <libtransmission/quark.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
+
+#include "lib/base/log.h"
+#include "lib/base/quark.h"
 
 #include <gdkmm/display.h>
 #include <giomm/appinfo.h>

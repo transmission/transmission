@@ -14,11 +14,11 @@
 #include "lib/base/error.h"
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
+#include "lib/base/log.h"
 #include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/log.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/torrent.h"
 

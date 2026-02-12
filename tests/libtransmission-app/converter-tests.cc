@@ -12,7 +12,7 @@
 #include <gtest/gtest.h>
 
 #include <libtransmission/serializer.h>
-#include <libtransmission/variant.h>
+#include <lib/base/variant.h>
 
 #include "libtransmission-app/display-modes.h"
 

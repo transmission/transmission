@@ -15,7 +15,7 @@
 #include <ctime> // for time_t
 #include <optional>
 
-#include "libtransmission/quark.h"
+#include "lib/base/quark.h"
 #include "libtransmission/serializer.h"
 #include "libtransmission/types.h" // for TR_SCHED_ALL
 #include "lib/base/values.h"

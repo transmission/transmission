@@ -20,11 +20,11 @@
 #include "lib/base/error.h"
 #include "lib/base/file.h"
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 #include "lib/base/values.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/announce-list.h"
-#include "libtransmission/log.h"
 #include "libtransmission/makemeta.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-getopt.h"

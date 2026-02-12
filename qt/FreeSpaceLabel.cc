@@ -11,8 +11,8 @@
 #include <QWidget>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/quark.h>
-#include <libtransmission/variant.h>
+#include <lib/base/quark.h>
+#include <lib/base/variant.h>
 
 #include "Formatter.h"
 #include "FreeSpaceLabel.h"

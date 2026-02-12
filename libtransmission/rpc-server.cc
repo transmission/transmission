@@ -16,6 +16,9 @@
 #include <utility>
 #include <vector>
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
+#include "lib/base/quark.h"
+#include "lib/base/variant.h"
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -41,16 +44,13 @@
 #include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/crypto-utils.h" /* tr_ssha1_matches() */
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/platform.h" /* tr_getWebClientDir() */
-#include "libtransmission/quark.h"
 #include "libtransmission/rpc-server.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/types.h"
-#include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 
 struct evbuffer;

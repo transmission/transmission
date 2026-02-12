@@ -8,9 +8,8 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/benc.h"
 #include "lib/base/error.h"
-
-#include "libtransmission/benc.h"
 
 #include "test-fixtures.h"
 

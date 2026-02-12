@@ -15,13 +15,13 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/log.h"
 #include "lib/base/tr-assert.h"
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/handshake.h"
-#include "libtransmission/log.h"
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
 #include "libtransmission/timer.h"

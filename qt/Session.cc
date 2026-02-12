@@ -27,11 +27,11 @@
 
 #include <libtransmission/transmission.h>
 
-#include <libtransmission/quark.h>
+#include <lib/base/quark.h>
+#include <lib/base/variant.h>
 #include <libtransmission/serializer.h>
 #include <libtransmission/session-id.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/variant.h>
 
 #include "Session.h"
 

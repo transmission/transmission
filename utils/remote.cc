@@ -29,18 +29,18 @@
 #include "lib/base/env.h"
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
+#include "lib/base/quark.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/values.h"
+#include "lib/base/variant.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/api-compat.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 
 using namespace std::literals;

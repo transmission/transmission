@@ -20,6 +20,7 @@
 #include <type_traits>
 #include <utility>
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -41,7 +42,6 @@
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/interned-string.h"
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
 #include "libtransmission/tr-buffer.h"

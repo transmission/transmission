@@ -9,7 +9,7 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/quark.h"
+#include "lib/base/quark.h"
 
 /**
  * Helper functions wrapped around tr_quark

@@ -12,7 +12,8 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/serializer.h>
-#include <libtransmission/variant.h>
+
+#include <lib/base/variant.h>
 
 #include <gdkmm/pixbuf.h>
 #include <giomm/file.h>

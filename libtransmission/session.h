@@ -38,6 +38,10 @@
 #include <small/vector.hpp>
 
 #include "lib/base/i18n.h"
+#include "lib/base/log.h" // for tr_log_level
+#include "lib/base/quark.h"
+#include "lib/base/tr-assert.h"
+#include "lib/base/tr-macros.h"
 
 #include "libtransmission/announce-list.h"
 #include "libtransmission/announcer.h"
@@ -46,13 +50,11 @@
 #include "libtransmission/cache.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/ip-cache.h"
-#include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port, tr_tos_t
 #include "libtransmission/open-files.h"
 #include "libtransmission/peer-io.h" // tr_preferred_transport
 #include "libtransmission/platform.h"
 #include "libtransmission/port-forwarding.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/rpc-server.h"
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/session-id.h"
@@ -62,10 +64,8 @@
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-queue.h"
 #include "libtransmission/torrents.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/tr-dht.h"
 #include "libtransmission/tr-lpd.h"
-#include "lib/base/tr-macros.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils-ev.h"
 #include "libtransmission/verify.h"

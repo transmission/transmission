@@ -14,8 +14,8 @@
 #endif
 
 #include "lib/base/error.h"
+#include "lib/base/log.h"
 
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"

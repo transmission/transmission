@@ -21,9 +21,9 @@
 #include "libtransmission/handshake.h"
 #include "libtransmission/net.h" /* tr_address */
 #include "lib/base/tr-assert.h"
+#include "lib/base/variant.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" /* tr_compare_3way */
-#include "libtransmission/variant.h"
 
 /**
  * @addtogroup peers Peers

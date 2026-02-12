@@ -12,10 +12,10 @@
 #include <vector>
 
 #include "lib/base/tr-macros.h" // TR_CONSTEXPR_VEC
+#include "lib/base/variant.h"
 
 #include "libtransmission/interned-string.h"
 #include "libtransmission/types.h"
-#include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 
 struct tr_error;

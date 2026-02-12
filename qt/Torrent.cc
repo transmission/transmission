@@ -12,9 +12,9 @@
 #include <QUrl>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/quark.h>
+#include <lib/base/quark.h>
+#include <lib/base/variant.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/variant.h>
 
 #include "Application.h"
 #include "IconCache.h"

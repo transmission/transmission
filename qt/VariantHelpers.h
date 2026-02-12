@@ -15,7 +15,7 @@
 
 #include <QString>
 
-#include <libtransmission/variant.h>
+#include <lib/base/variant.h>
 
 class QByteArray;
 

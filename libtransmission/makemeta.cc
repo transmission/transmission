@@ -18,7 +18,10 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/log.h"
+#include "lib/base/quark.h" // TR_KEY_length, TR_KEY_a...
 #include "lib/base/tr-strbuf.h" // tr_pathbuf
+#include "lib/base/variant.h"
 
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
@@ -28,14 +31,11 @@
 
 #include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/log.h"
 #include "libtransmission/makemeta.h"
-#include "libtransmission/quark.h" // TR_KEY_length, TR_KEY_a...
 #include "libtransmission/session.h" // TR_NAME
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for _()
-#include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 
 using namespace std::literals;

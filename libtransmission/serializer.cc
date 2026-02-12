@@ -23,16 +23,16 @@
 #include <small/vector.hpp>
 
 #include "lib/base/i18n.h"
+#include "lib/base/log.h" // for tr_log_level
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
+#include "lib/base/variant.h"
 
-#include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port
 #include "libtransmission/open-files.h" // for tr_open_files::Preallocation
 #include "libtransmission/peer-io.h" // tr_preferred_transport
 #include "libtransmission/serializer.h"
 #include "libtransmission/utils.h" // for tr_strv_strip(), tr_strlower()
-#include "libtransmission/variant.h"
 #include "libtransmission/types.h"
 
 using namespace std::literals;

@@ -6,6 +6,7 @@ add_library(trbase STATIC)
 
 target_sources(trbase
     PRIVATE
+        benc.h
         env.cc
         env.h
         error-types.h
@@ -18,6 +19,10 @@ target_sources(trbase
         file.cc
         file.h
         i18n.h
+        log.cc
+        log.h
+        quark.cc
+        quark.h
         string-utils.cc
         string-utils.h
         $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
@@ -25,6 +30,10 @@ target_sources(trbase
         tr-assert.h
         tr-strbuf.h
         values.h
+        variant-benc.cc
+        variant-json.cc
+        variant.cc
+        variant.h
         tr-macros.h)
 
 tr_allow_compile_if(

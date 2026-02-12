@@ -20,6 +20,8 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/quark.h"
+#include "lib/base/variant.h"
 
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
@@ -27,11 +29,9 @@
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/crypto-utils.h" // for tr_sha1()
-#include "libtransmission/quark.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/torrent.h"
-#include "libtransmission/variant.h"
 
 #define tr_logAddDebugMagnet(magnet, msg) tr_logAddDebug(msg, (magnet)->log_name())
 

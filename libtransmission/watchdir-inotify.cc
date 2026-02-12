@@ -21,12 +21,12 @@
 #include <fmt/format.h>
 
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h"
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
-#include "libtransmission/log.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/watchdir.h"
 #include "libtransmission/watchdir-base.h"

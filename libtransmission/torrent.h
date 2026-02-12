@@ -30,7 +30,7 @@
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/interned-string.h"
-#include "libtransmission/log.h"
+#include "lib/base/log.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-magnet.h"

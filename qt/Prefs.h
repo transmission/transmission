@@ -12,8 +12,8 @@
 #include <QString>
 #include <QVariant>
 
-#include <libtransmission/quark.h>
-#include <libtransmission/variant.h>
+#include <lib/base/quark.h>
+#include <lib/base/variant.h>
 
 #include <libtransmission-app/display-modes.h>
 

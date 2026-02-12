@@ -11,7 +11,7 @@
 
 #include "libtransmission/torrent-queue.h"
 #include "lib/base/tr-strbuf.h"
-#include "libtransmission/variant.h"
+#include "lib/base/variant.h"
 
 namespace
 {

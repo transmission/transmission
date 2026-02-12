@@ -20,9 +20,9 @@
 #include "natpmp.h"
 
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-natpmp.h"
 #include "lib/base/string-utils.h"

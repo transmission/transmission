@@ -28,8 +28,11 @@
 
 #include <small/vector.hpp>
 
+#include "lib/base/log.h"
+#include "lib/base/quark.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
+#include "lib/base/variant.h"
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
@@ -37,19 +40,16 @@
 #include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/interned-string.h"
-#include "libtransmission/log.h"
 #include "libtransmission/peer-common.h"
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-msgs.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/types.h"
-#include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 
 struct tr_error;

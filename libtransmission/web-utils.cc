@@ -20,11 +20,11 @@
 #define PSL_STATIC
 #include <libpsl.h>
 
+#include "lib/base/log.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"

@@ -21,6 +21,9 @@
 #include <utility>
 #include <vector>
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
+#include "lib/base/quark.h"
+#include "lib/base/variant.h"
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -39,13 +42,10 @@
 #include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // for tr_peerMgrCompactToPex()
-#include "libtransmission/quark.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-dht.h"
-#include "libtransmission/variant.h"
 #include "libtransmission/utils.h" // for tr_time(), _()
 
 using namespace std::literals;

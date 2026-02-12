@@ -23,9 +23,9 @@
 
 #include "lib/base/string-utils.h"
 
-#include "libtransmission/benc.h"
-#include "libtransmission/quark.h"
-#include "libtransmission/variant.h"
+#include "lib/base/benc.h"
+#include "lib/base/quark.h"
+#include "lib/base/variant.h"
 
 using namespace std::literals;
 

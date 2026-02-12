@@ -8,14 +8,14 @@
 #include <utility>
 
 #include "lib/base/file.h"
+#include "lib/base/quark.h"
 #include "lib/base/tr-strbuf.h"
+#include "lib/base/variant.h"
 
 #include "libtransmission/api-compat.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/serializer.h"
 #include "libtransmission/stats.h"
 #include "libtransmission/utils.h" // for tr_getRatio(), tr_time()
-#include "libtransmission/variant.h"
 
 using namespace std::literals;
 using namespace tr;

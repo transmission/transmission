@@ -12,10 +12,10 @@
 #include <fmt/format.h>
 
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 #include "lib/base/tr-assert.h"
 
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/log.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 

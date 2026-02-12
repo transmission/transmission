@@ -13,10 +13,10 @@
 #endif
 
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 #include "lib/base/tr-assert.h"
 
 #include "libtransmission/crypto-utils.h" // tr_rand_int()
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-socket.h"

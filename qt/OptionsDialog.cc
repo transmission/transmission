@@ -9,11 +9,11 @@
 #include <QFileInfo>
 #include <QPushButton>
 
-#include <libtransmission/transmission.h>
+#include "lib/base/quark.h"
+#include "lib/base/variant.h"
 
-#include <libtransmission/quark.h>
-#include <libtransmission/variant.h>
-#include <libtransmission/torrent-metainfo.h>
+#include "libtransmission/transmission.h"
+#include "libtransmission/torrent-metainfo.h"
 
 #include "AddData.h"
 #include "FileTreeModel.h"

@@ -13,13 +13,13 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/log.h"
+#include "lib/base/quark.h"
 #include "lib/base/string-utils.h"
+#include "lib/base/variant.h"
 
-#include "libtransmission/log.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 
 namespace

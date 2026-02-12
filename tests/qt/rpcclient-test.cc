@@ -8,9 +8,10 @@
 #include <QTest>
 #include <QUrl>
 
-#include <libtransmission/api-compat.h>
-#include <libtransmission/rpcimpl.h>
-#include <libtransmission/quark.h>
+#include "lib/base/quark.h"
+
+#include "libtransmission/api-compat.h"
+#include "libtransmission/rpcimpl.h"
 
 #include "RpcClient.h"
 #include "rpc-test-fixtures.h"

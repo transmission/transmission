@@ -25,6 +25,7 @@
 #include <fmt/format.h>
 
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 
@@ -34,7 +35,6 @@
 #include "libtransmission/announcer.h"
 #include "libtransmission/crypto-utils.h" /* tr_rand_int() */
 #include "libtransmission/interned-string.h" // tr_interned_string
-#include "libtransmission/log.h"
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent.h"

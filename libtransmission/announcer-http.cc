@@ -23,18 +23,18 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/benc.h"
 #include "lib/base/env.h"
 #include "lib/base/error.h"
+#include "lib/base/i18n.h"
+#include "lib/base/log.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h" // tr_strbuf, tr_urlbuf
-#include "lib/base/i18n.h"
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 #include "libtransmission/announcer-common.h"
-#include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
 #include "libtransmission/session.h"

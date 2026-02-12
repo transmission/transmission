@@ -24,11 +24,11 @@
 
 #include "lib/base/error.h"
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 #include "lib/base/tr-assert.h"
 
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h" // tr_block_info
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-socket.h" // tr_peer_socket, tr_netOpen...

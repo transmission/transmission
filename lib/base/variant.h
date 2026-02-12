@@ -19,7 +19,7 @@
 
 #include "lib/base/error.h"
 
-#include "libtransmission/quark.h"
+#include "lib/base/quark.h"
 
 /**
  * A variant that holds typical benc/json types: bool, int,

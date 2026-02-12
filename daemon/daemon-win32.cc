@@ -11,9 +11,8 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/log.h"
 #include "lib/base/string-utils.h"
-
-#include "libtransmission/log.h"
 
 #include "daemon.h"
 

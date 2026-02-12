@@ -15,10 +15,9 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/quark.h>
-#include <libtransmission/variant.h>
-
+#include "lib/base/quark.h"
 #include "lib/base/string-utils.h"
+#include "lib/base/variant.h"
 
 #include "Prefs.h"
 #include "TrQtInit.h"

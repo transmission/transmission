@@ -17,15 +17,16 @@
 #include "lib/base/error.h"
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
+#include "lib/base/log.h"
+#include "lib/base/quark.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
+#include "lib/base/variant.h"
 
 #include "libtransmission/api-compat.h"
 #include "libtransmission/bitfield.h"
-#include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
-#include "libtransmission/quark.h"
 #include "libtransmission/resume.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-ctor.h"
@@ -33,7 +34,6 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant.h"
 
 using namespace std::literals;
 using namespace tr::Values;

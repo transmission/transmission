@@ -41,11 +41,11 @@
 #include "lib/base/env.h"
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
+#include "lib/base/log.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-strbuf.h"
 
 #include "libtransmission/transmission.h"
-#include "libtransmission/log.h"
 #include "libtransmission/platform.h"
 #include "libtransmission/session.h"
 

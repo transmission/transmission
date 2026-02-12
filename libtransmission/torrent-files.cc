@@ -24,10 +24,10 @@
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
 #include "lib/base/i18n.h"
+#include "lib/base/log.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/log.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"

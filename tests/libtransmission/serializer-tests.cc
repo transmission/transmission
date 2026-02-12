@@ -14,10 +14,10 @@
 #include <vector>
 
 #include <libtransmission/net.h>
-#include <libtransmission/log.h>
-#include <libtransmission/quark.h>
+#include <lib/base/log.h>
+#include <lib/base/quark.h>
+#include <lib/base/variant.h>
 #include <libtransmission/serializer.h>
-#include <libtransmission/variant.h>
 
 #include "test-fixtures.h"
 
