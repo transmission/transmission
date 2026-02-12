@@ -8,7 +8,7 @@
 #include "FilterBase.h"
 #include "Torrent.h"
 
-#include <libtransmission-app/display-modes.h>
+#include <lib/app/display-modes.h>
 
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>

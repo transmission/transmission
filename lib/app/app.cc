@@ -5,8 +5,8 @@
 
 #include <lib/transmission/utils.h> // tr_lib_init()
 
-#include "libtransmission-app/app.h"
-#include "libtransmission-app/converters.h"
+#include "lib/app/app.h"
+#include "lib/app/converters.h"
 
 namespace tr::app
 {

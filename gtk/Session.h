@@ -8,9 +8,9 @@
 #include "Prefs.h"
 #include "Torrent.h"
 
-#include <lib/transmission/transmission.h>
+#include <lib/app/favicon-cache.h>
 
-#include <libtransmission-app/favicon-cache.h>
+#include <lib/transmission/transmission.h>
 
 #include <lib/base/serializer.h>
 #include <lib/base/variant.h>

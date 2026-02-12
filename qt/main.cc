@@ -18,7 +18,7 @@
 #include "lib/transmission/utils.h"
 #include "lib/transmission/version.h"
 
-#include "libtransmission-app/app.h"
+#include "lib/app/app.h"
 
 #include "Application.h"
 #include "InteropHelper.h"

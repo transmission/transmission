@@ -7,7 +7,7 @@
 
 #include <lib/transmission/transmission.h>
 
-#include <libtransmission-app/display-modes.h>
+#include <lib/app/display-modes.h>
 
 #include <QMetaType>
 

@@ -8,10 +8,9 @@
 #include "Prefs.h"
 #include "Utils.h"
 
+#include "lib/app/app.h"
+
 #include "lib/transmission/transmission.h"
-
-#include "libtransmission-app/app.h"
-
 #include "lib/transmission/version.h"
 
 #include "lib/base/serializer.h"

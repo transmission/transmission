@@ -17,7 +17,7 @@
 #include <QTranslator>
 #include <QWeakPointer>
 
-#include <libtransmission-app/favicon-cache.h>
+#include <lib/app/favicon-cache.h>
 
 #include "AddData.h"
 #include "Typedefs.h"

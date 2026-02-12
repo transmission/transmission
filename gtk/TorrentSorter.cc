@@ -9,10 +9,9 @@
 #include "SorterBase.hh"
 #include "Utils.h"
 
+#include <lib/app/display-modes.h>
+
 #include <lib/transmission/transmission.h>
-
-#include <libtransmission-app/display-modes.h>
-
 #include <lib/transmission/utils.h>
 
 #include "lib/base/tr-macros.h"

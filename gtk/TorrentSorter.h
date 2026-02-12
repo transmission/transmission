@@ -8,7 +8,7 @@
 #include "SorterBase.h"
 #include "Torrent.h"
 
-#include <libtransmission-app/display-modes.h>
+#include <lib/app/display-modes.h>
 
 #include <glibmm/refptr.h>
 

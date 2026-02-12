@@ -19,8 +19,8 @@
 #include "lib/base/string-utils.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission-app/display-modes.h"
-#include "libtransmission-app/converters.h"
+#include "lib/app/display-modes.h"
+#include "lib/app/converters.h"
 
 using namespace std::literals;
 

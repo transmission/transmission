@@ -11,7 +11,7 @@
 
 #include <lib/transmission/web-utils.h>
 
-#include <libtransmission-app/favicon-cache.h>
+#include <lib/app/favicon-cache.h>
 
 #include "Formatter.h"
 #include "Torrent.h"

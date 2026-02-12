@@ -916,7 +916,7 @@ endfunction()
 
 add_subdirectory(lib/base)
 add_subdirectory(lib/transmission)
-add_subdirectory(libtransmission-app)
+add_subdirectory(lib/app)
 
 set(MAC_PROJECT_DIR macosx)
 

@@ -13,7 +13,7 @@
 #include "TorrentFilter.h"
 #include "Utils.h"
 
-#include "libtransmission-app/display-modes.h"
+#include "lib/app/display-modes.h"
 
 #include "lib/base/tr-macros.h"
 
