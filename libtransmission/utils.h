@@ -19,15 +19,6 @@
  * @{
  */
 
-#ifdef ENABLE_GETTEXT
-#include <libintl.h>
-#define _ gettext
-#define tr_ngettext ngettext
-#else
-#define _(a) (a)
-#define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
-#endif
-
 std::optional<std::locale> tr_locale_set_global(char const* locale_name) noexcept;
 
 std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexcept;

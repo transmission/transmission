@@ -23,6 +23,8 @@
 #include <fmt/format.h>
 
 #include "lib/base/error.h"
+#include "lib/base/i18n.h"
+#include "lib/base/tr-assert.h"
 
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h" // tr_block_info
@@ -32,7 +34,6 @@
 #include "libtransmission/peer-socket.h" // tr_peer_socket, tr_netOpen...
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for _()
 

@@ -21,6 +21,7 @@
 
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
+#include "lib/base/i18n.h"
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 #include "libtransmission/log.h"

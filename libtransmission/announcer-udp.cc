@@ -19,6 +19,7 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include "lib/base/i18n.h"
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -32,8 +33,10 @@
 
 #include <fmt/format.h>
 
-#define LIBTRANSMISSION_ANNOUNCER_MODULE
+#include "lib/base/tr-assert.h"
+#include "lib/base/tr-strbuf.h"
 
+#define LIBTRANSMISSION_ANNOUNCER_MODULE
 #include "libtransmission/announcer.h"
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
@@ -41,8 +44,6 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
-#include "lib/base/tr-assert.h"
-#include "lib/base/tr-strbuf.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"

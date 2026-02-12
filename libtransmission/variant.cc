@@ -22,6 +22,7 @@
 
 #include "lib/base/error.h"
 #include "lib/base/file-utils.h"
+#include "lib/base/i18n.h"
 #include "lib/base/tr-assert.h"
 
 #include "libtransmission/log.h"

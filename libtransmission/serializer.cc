@@ -22,6 +22,7 @@
 #include <small/set.hpp>
 #include <small/vector.hpp>
 
+#include "lib/base/i18n.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 

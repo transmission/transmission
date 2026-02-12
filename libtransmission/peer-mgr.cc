@@ -27,6 +27,8 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/i18n.h"
+
 #define LIBTRANSMISSION_PEER_MODULE
 #include "libtransmission/announcer.h"
 #include "libtransmission/block-info.h" // tr_block_info

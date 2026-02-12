@@ -18,6 +18,7 @@
 
 #include "lib/base/tr-assert.h"
 #include "lib/base/values.h"
+#include "lib/base/i18n.h"
 
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/crypto-utils.h"

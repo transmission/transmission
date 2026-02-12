@@ -37,6 +37,7 @@
 #include "libtransmission/torrent-metainfo.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-macros.h"
+#include "lib/base/i18n.h"
 #include "libtransmission/types.h"
 #include "libtransmission/verify.h"
 

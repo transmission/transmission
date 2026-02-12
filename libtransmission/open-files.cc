@@ -14,6 +14,7 @@
 #include "lib/base/error-types.h"
 #include "lib/base/error.h"
 #include "lib/base/file.h"
+#include "lib/base/i18n.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h"
 

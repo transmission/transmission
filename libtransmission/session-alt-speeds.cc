@@ -10,6 +10,8 @@
 
 #include <fmt/chrono.h>
 
+#include "lib/base/i18n.h"
+
 #include "libtransmission/log.h"
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/types.h"

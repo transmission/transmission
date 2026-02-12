@@ -12,13 +12,15 @@
 #include <libutp/utp.h>
 #endif
 
+#include "lib/base/i18n.h"
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/crypto-utils.h" // tr_rand_int()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 

@@ -8,6 +8,7 @@
 #include <memory>
 
 #include <fmt/format.h>
+#include "lib/base/i18n.h"
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 #include "libtransmission/log.h"

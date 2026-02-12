@@ -20,8 +20,9 @@
 #include "lib/base/error.h"
 #include "lib/base/tr-strbuf.h" // tr_pathbuf
 
-#include "lib/base/file.h"
 #include "lib/base/file-utils.h"
+#include "lib/base/file.h"
+#include "lib/base/i18n.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 

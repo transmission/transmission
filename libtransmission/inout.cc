@@ -17,6 +17,7 @@
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h" // tr_pathbuf
+#include "lib/base/i18n.h"
 
 #include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/crypto-utils.h"

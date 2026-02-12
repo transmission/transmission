@@ -37,6 +37,7 @@
 #include <fmt/format.h>
 
 #include "lib/base/env.h"
+#include "lib/base/i18n.h"
 #include "lib/base/tr-assert.h"
 
 #ifdef _WIN32

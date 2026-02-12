@@ -28,6 +28,7 @@
 #include <small/map.hpp>
 
 #include "lib/base/file.h"
+#include "lib/base/i18n.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 

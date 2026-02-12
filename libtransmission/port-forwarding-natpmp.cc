@@ -19,8 +19,9 @@
 #define ENABLE_STRNATPMPERR
 #include "natpmp.h"
 
-#define LIBTRANSMISSION_PORT_FORWARDING_MODULE
+#include "lib/base/i18n.h"
 
+#define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-natpmp.h"

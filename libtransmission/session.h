@@ -37,6 +37,8 @@
 
 #include <small/vector.hpp>
 
+#include "lib/base/i18n.h"
+
 #include "libtransmission/announce-list.h"
 #include "libtransmission/announcer.h"
 #include "libtransmission/bandwidth.h"

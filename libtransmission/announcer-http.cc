@@ -28,6 +28,7 @@
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h" // tr_strbuf, tr_urlbuf
+#include "lib/base/i18n.h"
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 #include "libtransmission/announcer-common.h"

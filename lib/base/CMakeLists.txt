@@ -1,3 +1,7 @@
+if(ENABLE_NLS)
+    find_package(Intl)
+endif()
+
 add_library(trbase STATIC)
 
 target_sources(trbase
@@ -13,6 +17,7 @@ target_sources(trbase
         file-win32.cc
         file.cc
         file.h
+        i18n.h
         string-utils.cc
         string-utils.h
         $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
@@ -27,6 +32,10 @@ tr_allow_compile_if(
         file-win32.cc
     [=[[NOT WIN32]]=]
         file-posix.cc)
+
+target_compile_definitions(trbase
+    PUBLIC
+        $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
 
 tr_target_compile_definitions_for_functions(trbase
     PRIVATE

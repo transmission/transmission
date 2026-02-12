@@ -29,6 +29,7 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/i18n.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h"

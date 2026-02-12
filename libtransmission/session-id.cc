@@ -16,6 +16,7 @@
 #include "lib/base/error-types.h"
 #include "lib/base/error.h"
 #include "lib/base/file.h"
+#include "lib/base/i18n.h"
 #include "lib/base/tr-strbuf.h" // for tr_pathbuf
 
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()

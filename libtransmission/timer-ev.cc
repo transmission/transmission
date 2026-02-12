@@ -16,9 +16,11 @@
 
 #include <event2/event.h>
 
+#include "lib/base/i18n.h"
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/timer.h"
 #include "libtransmission/timer-ev.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/utils-ev.h"
 
 using namespace std::literals;

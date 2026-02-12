@@ -10,10 +10,12 @@
 #include <utility>
 #include <vector>
 
+#include "lib/base/i18n.h"
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/completion.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/types.h"
 

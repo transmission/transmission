@@ -19,6 +19,7 @@
 
 #include "lib/base/error.h"
 #include "lib/base/file.h"
+#include "lib/base/i18n.h"
 #include "lib/base/values.h"
 
 #include "libtransmission/transmission.h"

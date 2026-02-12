@@ -24,8 +24,11 @@
 
 #include <fmt/format.h>
 
-#define LIBTRANSMISSION_ANNOUNCER_MODULE
+#include "lib/base/i18n.h"
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
 
+#define LIBTRANSMISSION_ANNOUNCER_MODULE
 #include "libtransmission/announce-list.h"
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/announcer.h"
@@ -33,10 +36,8 @@
 #include "libtransmission/interned-string.h" // tr_interned_string
 #include "libtransmission/log.h"
 #include "libtransmission/session.h"
-#include "lib/base/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h" // tr_sha1_digest_t
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"

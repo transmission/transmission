@@ -13,6 +13,7 @@
 #include "lib/base/error.h"
 #include "lib/base/file.h"
 #include "lib/base/tr-strbuf.h"
+#include "lib/base/i18n.h"
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 #include "libtransmission/log.h"

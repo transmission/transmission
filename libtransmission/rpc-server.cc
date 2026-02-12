@@ -15,6 +15,7 @@
 #include <string_view>
 #include <utility>
 #include <vector>
+#include "lib/base/i18n.h"
 
 #ifdef _WIN32
 #include <ws2tcpip.h>

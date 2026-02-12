@@ -19,6 +19,8 @@
 
 #include <event2/util.h> // for evutil_socket_t
 
+#include "lib/base/i18n.h"
+
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/peer-mse.h"

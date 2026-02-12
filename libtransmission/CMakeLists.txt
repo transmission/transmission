@@ -2,10 +2,6 @@ include(CheckAtomic)
 include(CheckLibraryExists)
 include(CheckSymbolExists)
 
-if(ENABLE_NLS)
-    find_package(Intl)
-endif()
-
 check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
 
 add_compile_options(
@@ -214,8 +210,7 @@ target_compile_definitions(${TR_NAME}
         $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
-        $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
-        $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
+        $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>)
 
 target_include_directories(${TR_NAME}
     PUBLIC
