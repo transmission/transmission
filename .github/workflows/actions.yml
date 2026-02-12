@@ -235,8 +235,8 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [ what-to-make ]
     if: |
-      needs.what-to-make.outputs.make-core ||
-      needs.what-to-make.outputs.make-tests
+      needs.what-to-make.outputs.make-core == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true'
     steps:
       - name: Show Configuration
         run: |
@@ -263,7 +263,7 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }} \
             -DRUN_CLANG_TIDY=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
@@ -281,7 +281,7 @@ jobs:
           set -euo pipefail
           cmake --build obj --config Debug --target transmission-app 2>&1 | tee -a makelog
       - name: Make (Tests)
-        if: needs.what-to-make.outputs.make-tests
+        if: needs.what-to-make.outputs.make-tests == 'true'
         run: |
           set -euo pipefail
           cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
@@ -293,8 +293,8 @@ jobs:
     runs-on: windows-2025
     needs: what-to-make
     if: |
-      needs.what-to-make.outputs.make-core ||
-      needs.what-to-make.outputs.make-tests
+      needs.what-to-make.outputs.make-core == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true'
     steps:
       - name: Show Configuration
         run: |
@@ -319,7 +319,7 @@ jobs:
             -G Ninja `
             -DCMAKE_BUILD_TYPE=Debug `
             -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
-            -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests && 'ON' || 'OFF' }} `
+            -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }} `
             -DRUN_CLANG_TIDY=ON `
             -DUSE_SYSTEM_DEFAULT=OFF
       - name: Make (Core)
@@ -331,7 +331,7 @@ jobs:
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
           cmake --build obj --config Debug --target transmission-app 2>&1 | tee -a makelog
       - name: Make (Tests)
-        if: needs.what-to-make.outputs.make-tests
+        if: needs.what-to-make.outputs.make-tests == 'true'
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
           cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
