@@ -16,6 +16,7 @@
 #include <fmt/format.h>
 
 #include "libtransmission/serializer.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 

@@ -29,6 +29,7 @@
 
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
 

@@ -17,13 +17,12 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h" /* tr_rand_int() */
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/types.h"
 
 using namespace std::literals;
 
@@ -292,6 +291,7 @@ void create_temp_path(char* path_template, CallbackT const& callback, tr_error* 
 }
 
 } // namespace
+
 std::string_view tr_sys_path_basename(std::string_view path, tr_error* error)
 {
     if (std::empty(path))

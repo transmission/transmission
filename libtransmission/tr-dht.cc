@@ -33,8 +33,6 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"

@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
 
 #import "InfoPeersViewController.h"
 #import "NSStringAdditions.h"

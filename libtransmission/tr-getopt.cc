@@ -12,8 +12,8 @@
 
 #include <fmt/format.h>
 
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-getopt.h"
-#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

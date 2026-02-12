@@ -13,18 +13,18 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
@@ -289,8 +289,8 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
         {
             if (current_key == AttrKey || current_key == PiecesRootKey)
             {
-                // currently unused. TODO support for bittorrent v2
-                // TODO https://github.com/transmission/transmission/issues/458
+                // currently unused. TODO support for BEP0047
+                // TODO https://github.com/transmission/transmission/issues/3387
             }
             else
             {
@@ -309,8 +309,8 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             }
             else if (current_key == AttrKey)
             {
-                // currently unused. TODO support for bittorrent v2
-                // TODO https://github.com/transmission/transmission/issues/458
+                // currently unused. TODO support for BEP0047
+                // TODO https://github.com/transmission/transmission/issues/3387
             }
             else if (
                 pathIs(InfoKey, FilesKey, ArrayKey, Crc32Key) || //
