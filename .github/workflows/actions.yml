@@ -402,7 +402,7 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: clang
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk4' || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
       - name: Configure
         run: |
@@ -764,7 +764,7 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: gcc
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk3' || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
           use-sudo: false
       - name: Get NPM
@@ -848,7 +848,7 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: gcc
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk4' || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
           use-sudo: false
       - name: Get NPM
@@ -929,7 +929,7 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: gcc
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk4' || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
           use-sudo: false
       - name: Get NPM
@@ -1008,7 +1008,7 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk3' || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
           use-sudo: true
       - name: Get NPM
@@ -1135,7 +1135,7 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: clang
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk3' || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
           use-sudo: true
       - name: Configure
