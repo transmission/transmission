@@ -10,8 +10,8 @@
 #include <libtransmission-app/display-modes.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/serializer.h>
 
+#include <lib/base/serializer.h>
 #include <lib/base/variant.h>
 
 #include <glibmm/miscutils.h>

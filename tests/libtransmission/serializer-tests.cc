@@ -15,10 +15,10 @@
 
 #include "lib/base/log.h"
 #include "lib/base/quark.h"
+#include "lib/base/serializer.h"
 #include "lib/base/variant.h"
 
 #include "libtransmission/net.h"
-#include "libtransmission/serializer.h"
 
 #include "test-fixtures.h"
 

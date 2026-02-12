@@ -17,10 +17,10 @@
 #include <vector>
 
 #include "lib/base/quark.h"
+#include "lib/base/serializer.h"
 
 #include "libtransmission/constants.h" // TrDefaultHttpServerBasePath
 #include "libtransmission/net.h"
-#include "libtransmission/serializer.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils-ev.h"
 

@@ -11,8 +11,8 @@
 #include <libtransmission-app/favicon-cache.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/serializer.h>
 
+#include <lib/base/serializer.h>
 #include <lib/base/variant.h>
 
 #include <gdkmm/pixbuf.h>

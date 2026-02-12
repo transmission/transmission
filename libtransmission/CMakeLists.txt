@@ -95,7 +95,6 @@ target_sources(${TR_NAME}
         rpcimpl.cc
         rpcimpl.h
         serializer.cc
-        serializer.h
         session-alt-speeds.cc
         session-alt-speeds.h
         session-id.cc
@@ -226,7 +225,6 @@ target_link_libraries(${TR_NAME}
         ${LIBM_LIBRARY}
         ${LIBQUOTA_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
-        RapidJSON
         transmission::WideInteger
         Crc32c::crc32c
         $<$<BOOL:${WIN32}>:crypt32>

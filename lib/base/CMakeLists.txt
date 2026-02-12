@@ -23,6 +23,8 @@ target_sources(trbase
         log.h
         quark.cc
         quark.h
+        serializer.cc
+        serializer.h
         string-utils.cc
         string-utils.h
         $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
@@ -70,8 +72,10 @@ target_include_directories(trbase
 target_link_libraries(trbase
     PRIVATE
         FastFloat::fast_float
+        RapidJSON
     PUBLIC
         transmission::fmt-header-only
+        transmission::small
         utf8::cpp
         wildmat)
 

@@ -38,18 +38,23 @@
 #include <fmt/format.h>
 
 #include "lib/base/env.h"
+#include "lib/base/serializer.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-strbuf.h"
 #include "lib/base/values.h"
 
 #include "libtransmission/mime-types.h"
-#include "libtransmission/serializer.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
 using namespace tr::Values;
+
+namespace tr::serializer
+{
+void install_libtransmission_converters();
+}
 
 time_t tr::detail::tr_time::current_time = {};
 
@@ -427,6 +432,7 @@ void tr_lib_init()
             tr_net_init_impl::tr_net_init_mgr::create();
 
             tr::serializer::Converters::ensure_default_converters();
+            tr::serializer::install_libtransmission_converters();
         });
 }
 

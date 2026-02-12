@@ -14,12 +14,12 @@
 
 #include "lib/base/env.h"
 #include "lib/base/quark.h"
+#include "lib/base/serializer.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/variant.h"
 
 #include "libtransmission/api-compat.h"
 #include "libtransmission/rpcimpl.h"
-#include "libtransmission/serializer.h"
 #include "libtransmission/types.h"
 
 namespace tr::api_compat

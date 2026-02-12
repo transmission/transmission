@@ -26,10 +26,10 @@
 #include <small/vector.hpp>
 
 #include "lib/base/quark.h"
+#include "lib/base/serializer.h"
 #include "lib/base/variant.h"
 
 #include "libtransmission/transmission.h"
-#include "libtransmission/serializer.h"
 #include "libtransmission/session-id.h"
 #include "libtransmission/utils.h"
 

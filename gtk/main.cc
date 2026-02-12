@@ -8,12 +8,13 @@
 #include "Prefs.h"
 #include "Utils.h"
 
-#include <libtransmission-app/app.h>
+#include "libtransmission-app/app.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/serializer.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/version.h>
+#include "libtransmission/transmission.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/version.h"
+
+#include "lib/base/serializer.h"
 
 #include <giomm/file.h>
 #include <giomm/init.h>

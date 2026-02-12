@@ -14,9 +14,10 @@
 
 #include "lib/base/variant.h"
 
+#include "lib/base/serializer.h"
+
 #include "libtransmission/transmission.h"
 #include "libtransmission/api-compat.h"
-#include "libtransmission/serializer.h"
 
 #include "Filters.h"
 #include "Prefs.h"

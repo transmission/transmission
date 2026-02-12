@@ -15,10 +15,10 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
+#include "lib/base/serializer.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/serializer.h"
 #include "libtransmission/utils.h"
 
 #include "libtransmission-app/display-modes.h"

@@ -5,9 +5,9 @@
 #pragma once
 
 #include <libtransmission/transmission.h> /* tr_variant, tr_session */
-#include <libtransmission/serializer.h>
 
 #include <lib/base/quark.h>
+#include <lib/base/serializer.h>
 #include <lib/base/variant.h>
 
 #include <cstdint> // int64_t

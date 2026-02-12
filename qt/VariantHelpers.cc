@@ -14,7 +14,7 @@
 #include <QDateTime>
 #include <QUrl>
 
-#include <libtransmission/serializer.h>
+#include <lib/base/serializer.h>
 
 #include "Application.h" // qApp
 #include "Speed.h"

@@ -13,7 +13,7 @@
 
 #include "lib/base/variant.h"
 
-#include "libtransmission/serializer.h"
+#include "lib/base/serializer.h"
 
 #include "libtransmission-app/display-modes.h"
 

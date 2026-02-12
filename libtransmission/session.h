@@ -40,6 +40,7 @@
 #include "lib/base/i18n.h"
 #include "lib/base/log.h" // for tr_log_level
 #include "lib/base/quark.h"
+#include "lib/base/serializer.h"
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-macros.h"
 
@@ -59,7 +60,6 @@
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/session-id.h"
 #include "libtransmission/session-thread.h"
-#include "libtransmission/serializer.h"
 #include "libtransmission/stats.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-queue.h"
