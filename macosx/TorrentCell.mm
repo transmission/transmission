@@ -13,7 +13,8 @@
 
 @implementation CustomProgressView
 
-- (NSView *)hitTest:(NSPoint)point {
+- (NSView*)hitTest:(NSPoint)point
+{
     return nil;
 }
 
