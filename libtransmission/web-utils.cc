@@ -22,6 +22,7 @@
 
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/punycode.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
@@ -651,7 +652,10 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
             remain.remove_prefix(std::size(parsed.host));
         }
 
-        if (!hostIsValid(parsed.host))
+        // just encode to punycode (RFC 3492), if not needed then this will do nothing
+        // for now this allows us to check whether to host *would be* valid if used later
+        auto host_idn = punycode::to_ascii(parsed.host);
+        if (!hostIsValid(*host_idn))
         {
             return std::nullopt;
         }
