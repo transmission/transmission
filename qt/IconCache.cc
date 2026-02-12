@@ -84,21 +84,10 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
 
     if (!multifile)
     {
-        QMimeDatabase const mime_db;
+        static auto const mime_db = QMimeDatabase{};
         auto const type = mime_db.mimeTypeForName(mime_type_name);
-        icon = getThemeIcon(type.iconName());
-
-        if (icon.isNull())
-        {
-            icon = getThemeIcon(type.genericIconName());
-        }
-
-        if (icon.isNull())
-        {
-            icon = file_icon_;
-        }
-
-        return icon;
+        auto const filename = QStringLiteral("filename.%1").arg(type.preferredSuffix());
+        return guessMimeIcon(filename, file_icon_);
     }
 
     auto const mime_icon = getMimeTypeIcon(mime_type_name, false);
