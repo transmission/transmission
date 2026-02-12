@@ -19,10 +19,11 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h" // for tr_sha1()
-#include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/quark.h"

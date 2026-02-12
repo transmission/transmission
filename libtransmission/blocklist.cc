@@ -27,10 +27,11 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
+
 #include "libtransmission/blocklist.h"
 #include "libtransmission/constants.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"

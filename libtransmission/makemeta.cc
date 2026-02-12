@@ -17,9 +17,10 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
+
 #include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/log.h"

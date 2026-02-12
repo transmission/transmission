@@ -54,8 +54,6 @@ target_sources(${TR_NAME}
         crypto-utils.cc
         crypto-utils.h
         error-types.h
-        error.cc
-        error.h
         env.cc
         env.h
         file-piece-map.cc
@@ -296,7 +294,6 @@ if(INSTALL_LIB)
     install(
         FILES
             error-types.h
-            error.h
             file.h
             log.h
             makemeta.h
@@ -305,10 +302,8 @@ if(INSTALL_LIB)
             session-id.h
             timer-ev.h
             timer.h
-            ${CMAKE_SOURCE_DIR}/lib/base/tr-assert.h
             tr-buffer.h
             tr-getopt.h
-            ${CMAKE_SOURCE_DIR}/lib/base/tr-macros.h
             tr-strbuf.h
             transmission.h
             utils.h

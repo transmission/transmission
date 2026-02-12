@@ -17,11 +17,11 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 
 #include "libtransmission/crypto-utils.h" /* tr_rand_int() */
-#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/types.h"
 

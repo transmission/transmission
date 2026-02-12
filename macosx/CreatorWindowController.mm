@@ -8,12 +8,11 @@
 #include <optional>
 #include <utility>
 
+#include "lib/base/error.h"
 #include "lib/base/string-utils.h"
 
 #include "libtransmission/transmission.h"
-#include "libtransmission/error.h"
 #include "libtransmission/makemeta.h"
-#include "lib/base/string-utils.h"
 #include "libtransmission/web-utils.h" // tr_urlIsValidTracker()
 
 #import "CreatorWindowController.h"

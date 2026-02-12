@@ -29,10 +29,10 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
 #include "lib/base/string-utils.h"
 
 #include "libtransmission/transmission.h"
-#include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"

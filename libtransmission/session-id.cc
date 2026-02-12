@@ -13,9 +13,10 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
+
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/error-types.h"
-#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/platform.h"

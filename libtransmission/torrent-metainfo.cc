@@ -13,12 +13,12 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 
 #include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"

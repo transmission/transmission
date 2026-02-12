@@ -15,9 +15,10 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
+
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error-types.h"
-#include "libtransmission/error.h"
 #include "libtransmission/magnet-metainfo.h"
 #include "lib/base/string-utils.h"
 #include "libtransmission/tr-strbuf.h" // for tr_urlbuf

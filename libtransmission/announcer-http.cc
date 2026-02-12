@@ -23,13 +23,13 @@
 
 #include <fmt/format.h>
 
-#define LIBTRANSMISSION_ANNOUNCER_MODULE
+#include "lib/base/error.h"
 
+#define LIBTRANSMISSION_ANNOUNCER_MODULE
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/env.h"
-#include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */

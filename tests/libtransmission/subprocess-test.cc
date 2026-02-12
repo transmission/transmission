@@ -14,10 +14,10 @@
 
 #include <gtest/gtest.h>
 
+#include "lib/base/error.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-macros.h"
 
-#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/subprocess.h"
 

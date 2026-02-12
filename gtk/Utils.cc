@@ -5,13 +5,13 @@
 
 #include "Utils.h"
 
+#include "lib/base/error.h"
 #include "lib/base/string-utils.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
-#include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h> /* tr_strratio() */

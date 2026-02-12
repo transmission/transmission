@@ -20,11 +20,12 @@
 
 #include <small/map.hpp>
 
-#include "libtransmission/error.h"
+#include "lib/base/error.h"
+#include "lib/base/string-utils.h"
+
 #include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
-#include "lib/base/string-utils.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/types.h"

@@ -21,10 +21,10 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
 #include "lib/base/string-utils.h"
 
 #include "libtransmission/transmission.h"
-#include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/torrent-metainfo.h"

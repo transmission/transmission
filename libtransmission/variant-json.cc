@@ -30,11 +30,11 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-#define LIBTRANSMISSION_VARIANT_MODULE
-
-#include "libtransmission/error.h"
-#include "libtransmission/quark.h"
+#include "lib/base/error.h"
 #include "lib/base/tr-assert.h"
+
+#define LIBTRANSMISSION_VARIANT_MODULE
+#include "libtransmission/quark.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 

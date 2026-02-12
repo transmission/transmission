@@ -13,15 +13,15 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/transmission.h>
+#include "lib/base/error.h"
 
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/error.h>
-#include <libtransmission/file-utils.h>
-#include <libtransmission/file.h>
-#include <libtransmission/resume.h>
-#include <libtransmission/torrent.h> // tr_isTorrent()
-#include <libtransmission/tr-strbuf.h>
+#include "libtransmission/transmission.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/file-utils.h"
+#include "libtransmission/file.h"
+#include "libtransmission/resume.h"
+#include "libtransmission/torrent.h" // tr_isTorrent()
+#include "libtransmission/tr-strbuf.h"
 
 #include "test-fixtures.h"
 

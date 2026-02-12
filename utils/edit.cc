@@ -12,9 +12,9 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
 #include "lib/base/string-utils.h"
 
-#include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-getopt.h"

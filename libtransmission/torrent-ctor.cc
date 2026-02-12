@@ -3,10 +3,11 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include "lib/base/error.h"
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/torrent-ctor.h"
-#include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/types.h"
 

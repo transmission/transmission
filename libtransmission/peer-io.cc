@@ -22,9 +22,10 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
+
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h" // tr_block_info
-#include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"

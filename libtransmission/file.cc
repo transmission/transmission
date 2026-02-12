@@ -10,7 +10,8 @@
 #include <string_view>
 #include <vector>
 
-#include "libtransmission/error.h"
+#include "lib/base/error.h"
+
 #include "libtransmission/file.h"
 
 namespace

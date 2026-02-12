@@ -13,7 +13,8 @@
 #include <libutp/utp.h>
 #endif
 
-#include "libtransmission/error.h"
+#include "lib/base/error.h"
+
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-socket.h"

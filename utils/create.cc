@@ -17,18 +17,18 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/transmission.h>
+#include "lib/base/error.h"
 
-#include <libtransmission/announce-list.h>
-#include <libtransmission/error.h>
-#include <libtransmission/file.h>
-#include <libtransmission/log.h>
-#include <libtransmission/makemeta.h>
-#include <libtransmission/torrent-files.h>
-#include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/values.h>
-#include <libtransmission/version.h>
+#include "libtransmission/transmission.h"
+#include "libtransmission/announce-list.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/makemeta.h"
+#include "libtransmission/torrent-files.h"
+#include "libtransmission/tr-getopt.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/values.h"
+#include "libtransmission/version.h"
 
 using namespace std::literals;
 

@@ -14,9 +14,9 @@
 
 #include <small/vector.hpp>
 
+#include "lib/base/error.h"
 #include "lib/base/tr-assert.h"
 
-#include "libtransmission/error.h"
 #include "libtransmission/net.h" // tr_socket_t
 #include "libtransmission/utils.h" // for tr_htonll(), tr_ntohll()
 

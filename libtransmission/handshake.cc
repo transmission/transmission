@@ -14,12 +14,12 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/error.h"
 #include "lib/base/tr-assert.h"
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/log.h"
 #include "libtransmission/peer-io.h"

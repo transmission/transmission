@@ -14,7 +14,7 @@
 #include <string_view>
 #include <utility> // make_pair
 
-#include "libtransmission/error.h"
+#include "lib/base/error.h"
 
 namespace tr::benc
 {

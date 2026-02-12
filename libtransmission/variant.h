@@ -17,7 +17,8 @@
 #include <variant>
 #include <vector>
 
-#include "libtransmission/error.h"
+#include "lib/base/error.h"
+
 #include "libtransmission/quark.h"
 
 /**

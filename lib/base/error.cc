@@ -3,9 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include "lib/base/error.h"
 #include "lib/base/string-utils.h"
-
-#include "libtransmission/error.h"
 
 void tr_error::set_from_errno(int errnum)
 {

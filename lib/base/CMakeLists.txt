@@ -2,6 +2,8 @@ add_library(trbase STATIC)
 
 target_sources(trbase
     PRIVATE
+        error.cc
+        error.h
         string-utils.cc
         string-utils.h
         $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
@@ -22,3 +24,17 @@ target_link_libraries(trbase
 set_property(
     TARGET trbase
     PROPERTY FOLDER "lib")
+
+if(INSTALL_LIB)
+    install(
+        TARGETS trbase
+        DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(
+        FILES
+            error.h
+            string-utils.h
+            tr-assert.h
+            tr-macros.h
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lib/base")
+endif()
+
