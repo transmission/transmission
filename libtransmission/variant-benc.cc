@@ -23,7 +23,6 @@
 
 #include "lib/base/string-utils.h"
 
-#define LIBTRANSMISSION_VARIANT_MODULE
 #include "libtransmission/benc.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/utils.h"

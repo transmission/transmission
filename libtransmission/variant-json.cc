@@ -33,7 +33,6 @@
 #include "lib/base/error.h"
 #include "lib/base/tr-assert.h"
 
-#define LIBTRANSMISSION_VARIANT_MODULE
 #include "libtransmission/quark.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
