@@ -1095,3 +1095,17 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | `session_set` | :bomb: renamed `cache_size_mb` to `cache_size_mib`
 | `session_get` | :bomb: renamed `tolerated` to `allowed` in `encryption`
 | `session_set` | :bomb: renamed `tolerated` to `allowed` in `encryption`
+
+Transmission 4.1.1 (`rpc_version_semver` 6.0.1, `rpc_version`: 19)
+
+| Method | Description
+|:---|:---
+| `session_get` | `speed_limit_down` reverted to return an integer
+| `session_get` | `speed_limit_up` reverted to return an integer
+| `group_get` | `speed_limit_down` reverted to return an integer
+| `group_get` | `speed_limit_up` reverted to return an integer
+
+Transmission 4.2.0 (`rpc_version_semver` 6.1.0, `rpc_version`: ?)
+
+| Method | Description
+|:---|:---
