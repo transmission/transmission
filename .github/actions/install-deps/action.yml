@@ -238,7 +238,7 @@ runs:
       if: env.OS_FAMILY == 'macos' && inputs.enable-qt != 'false'
       shell: bash
       run: |
-        brew install --formula qt
+        brew install --formula qtsvg qttools
 
     - name: Report Installed Versions
       shell: bash
