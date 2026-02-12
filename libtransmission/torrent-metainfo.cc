@@ -563,7 +563,12 @@ private:
             {
                 if (!context.error)
                 {
-                    context.error.set(EINVAL, fmt::format("'pieces' and torrent size mismatch"));
+                    context.error.set(
+                        EINVAL,
+                        fmt::format(
+                            "'pieces' and torrent size mismatch: {}, {}",
+                            tm_.block_info_.piece_count(),
+                            std::size(tm_.pieces_)));
                 }
                 return false;
             }

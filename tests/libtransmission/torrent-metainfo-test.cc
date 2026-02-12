@@ -231,40 +231,39 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
 }
 
-// Test for https://github.com/transmission/transmission/issues/3591
-TEST_F(TorrentMetainfoTest, parseBencPiecesSize)
-{
-    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/invalid-pieces-length.torrent"sv };
-    auto error = tr_error{};
-    auto tm = tr_torrent_metainfo{};
-    EXPECT_FALSE(tm.parse_torrent_file(src_filename, nullptr, &error));
-    EXPECT_EQ(error.code(), EINVAL);
-    EXPECT_EQ(error.message(), "invalid 'pieces' size: 119"sv);
-}
-
 TEST_F(TorrentMetainfoTest, piecesKeyTest)
 {
-    auto constexpr BadTorrents = std::array<std::string_view, 6>{ "missing-pieces-key.torrent"sv, "bad-pieces-key.torrent"sv,
-                                                                  "empty-pieces-key.torrent"sv,   "too-few-pieces.torrent"sv,
-                                                                  "too-many-pieces.torrent"sv,    "dup-pieces-key.torrent"sv };
+    static auto constexpr BadTorrents = std::array<std::pair<std::string_view, std::string_view>, 7U>{ {
+        { "missing-pieces-key.torrent"sv, "missing v1 metadata"sv },
+        { "bad-pieces-key.torrent"sv, "missing v1 metadata"sv },
+        { "empty-pieces-key.torrent"sv, "missing v1 metadata"sv },
+        { "too-few-pieces.torrent"sv, "'pieces' and torrent size mismatch: 7, 6"sv },
+        { "too-many-pieces.torrent"sv, "'pieces' and torrent size mismatch: 5, 6"sv },
+        { "dup-pieces-key.torrent"sv, "invalid duplicate 'pieces'"sv },
+        { "invalid-pieces-length.torrent"sv,
+          "invalid 'pieces' size: 119"sv }, // Test for https://github.com/transmission/transmission/issues/3591
+    } };
 
     {
         auto tm = tr_torrent_metainfo{};
-        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/perfect-pieces.torrent" };
-        EXPECT_TRUE(tm.parse_torrent_file(path));
+        static auto constexpr Path = LIBTRANSMISSION_TEST_ASSETS_DIR "/perfect-pieces.torrent"sv;
+        EXPECT_TRUE(tm.parse_torrent_file(Path));
     }
 
-    for (auto const& name : BadTorrents)
+    for (auto const& [name, errmsg] : BadTorrents)
     {
+        auto error = tr_error{};
         auto tm = tr_torrent_metainfo{};
         auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
-        EXPECT_FALSE(tm.parse_torrent_file(path));
+        EXPECT_FALSE(tm.parse_torrent_file(path, nullptr, &error));
+        EXPECT_EQ(error.code(), EINVAL);
+        EXPECT_EQ(error.message(), errmsg);
     }
 }
 
 TEST_F(TorrentMetainfoTest, pathKeyTest)
 {
-    auto constexpr BadTorrents = std::array<std::string_view, 1>{ "dup-files.torrent"sv };
+    static auto constexpr BadTorrents = std::array{ "dup-files.torrent"sv };
 
     for (auto const& name : BadTorrents)
     {
