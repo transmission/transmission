@@ -180,7 +180,7 @@ namespace
 namespace
 {
 auto constexpr RecentlyActiveSeconds = time_t{ 60 };
-auto constexpr RpcVersion = int64_t{ 18 };
+auto constexpr RpcVersion = int64_t{ 19 };
 auto constexpr RpcVersionMin = int64_t{ 14 };
 
 enum class TrFormat : uint8_t
