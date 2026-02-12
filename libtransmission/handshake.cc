@@ -14,8 +14,6 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bitfield.h"
 #include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
@@ -27,7 +25,7 @@
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/tr-macros.h" // tr_peer_id_t
+#include "libtransmission/types.h" // tr_peer_id_t
 
 #define tr_logAddTraceHand(handshake, msg) \
     tr_logAddTrace(msg, fmt::format("handshake {}", (handshake)->peer_io_->display_name()))

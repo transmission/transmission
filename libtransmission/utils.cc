@@ -40,14 +40,13 @@
 
 #include <fast_float/fast_float.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/env.h"
 #include "libtransmission/mime-types.h"
 #include "libtransmission/serializer.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/values.h"
 

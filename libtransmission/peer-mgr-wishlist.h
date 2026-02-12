@@ -14,7 +14,7 @@
 #include <memory>
 #include <vector>
 
-#include "libtransmission/transmission.h"
+#include "libtransmission/types.h"
 
 class tr_bitfield;
 

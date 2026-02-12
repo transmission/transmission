@@ -17,12 +17,11 @@
 
 #include <windows.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/subprocess.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

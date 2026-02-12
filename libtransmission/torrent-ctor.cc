@@ -8,6 +8,7 @@
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
+#include "libtransmission/types.h"
 
 using namespace std::literals;
 

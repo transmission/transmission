@@ -22,8 +22,6 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/error.h"
@@ -34,6 +32,7 @@
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for _()
 
 struct sockaddr;
