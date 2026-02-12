@@ -17,11 +17,11 @@
 #include "lib/base/error.h"
 #include "lib/base/file.h"
 #include "lib/base/i18n.h"
+#include "lib/base/tr-getopt.h"
 #include "lib/base/values.h"
 #include "lib/base/variant.h"
 
 #include "libtransmission/transmission.h"
-#include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h" // _()
 #include "libtransmission/version.h"
 #include "libtransmission/web-utils.h"

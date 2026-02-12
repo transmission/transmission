@@ -16,9 +16,9 @@
 #include "lib/base/log.h"
 #include "lib/base/quark.h"
 #include "lib/base/string-utils.h"
+#include "lib/base/tr-getopt.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/version.h"
 

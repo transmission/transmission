@@ -28,6 +28,8 @@ target_sources(trbase
         $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
         tr-assert.cc
         tr-assert.h
+        tr-getopt.cc
+        tr-getopt.h
         tr-strbuf.h
         values.h
         variant-benc.cc

@@ -36,12 +36,12 @@
 #include "lib/base/log.h"
 #include "lib/base/quark.h"
 #include "lib/base/string-utils.h"
+#include "lib/base/tr-getopt.h"
 #include "lib/base/tr-strbuf.h"
 #include "lib/base/variant.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/timer-ev.h"
-#include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/version.h"
 #include "libtransmission/watchdir.h"

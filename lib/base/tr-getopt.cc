@@ -13,8 +13,7 @@
 #include <fmt/format.h>
 
 #include "lib/base/string-utils.h"
-
-#include "libtransmission/tr-getopt.h"
+#include "lib/base/tr-getopt.h"
 
 using namespace std::literals;
 

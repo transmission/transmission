@@ -129,8 +129,6 @@ target_sources(${TR_NAME}
         tr-buffer.h
         tr-dht.cc
         tr-dht.h
-        tr-getopt.cc
-        tr-getopt.h
         tr-lpd.cc
         tr-lpd.h
         tr-udp.cc
@@ -257,7 +255,7 @@ if(INSTALL_LIB)
             timer-ev.h
             timer.h
             tr-buffer.h
-            tr-getopt.h
+            ../lib/base/tr-getopt.h
             transmission.h
             utils.h
             watchdir.h

@@ -21,13 +21,13 @@
 #include "lib/base/file.h"
 #include "lib/base/i18n.h"
 #include "lib/base/log.h"
+#include "lib/base/tr-getopt.h"
 #include "lib/base/values.h"
 
 #include "libtransmission/transmission.h"
 #include "libtransmission/announce-list.h"
 #include "libtransmission/makemeta.h"
 #include "libtransmission/torrent-files.h"
-#include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/version.h"
 
