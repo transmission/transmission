@@ -46,7 +46,6 @@
 #include "lib/transmission/peer-mgr.h" // for tr_peerMgrCompactToPex()
 #include "lib/transmission/timer.h"
 #include "lib/transmission/tr-dht.h"
-#include "lib/transmission/utils.h" // for tr_time(), _()
 
 using namespace std::literals;
 

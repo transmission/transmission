@@ -22,7 +22,6 @@
 #include "lib/base/variant.h"
 
 #include "lib/transmission/transmission.h"
-#include "lib/transmission/utils.h" // _()
 #include "lib/transmission/version.h"
 #include "lib/transmission/web-utils.h"
 #include "lib/transmission/web.h" // tr_sessionFetch()
