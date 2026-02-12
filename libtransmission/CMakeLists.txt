@@ -227,7 +227,6 @@ target_link_libraries(${TR_NAME}
         Threads::Threads
         libdeflate::libdeflate
         CURL::libcurl
-        FastFloat::fast_float
         psl::psl
         natpmp::natpmp
         miniupnpc::miniupnpc

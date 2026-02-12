@@ -25,7 +25,6 @@
 
 #include "libtransmission/benc.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 
 using namespace std::literals;

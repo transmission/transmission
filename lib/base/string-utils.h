@@ -9,8 +9,10 @@
 #include <cctype>
 #include <cstdint>
 #include <iterator>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 
 #ifdef _WIN32
@@ -99,6 +101,14 @@ template <typename... Args> constexpr bool tr_strv_sep(std::string_view* sv, std
     *token = tr_strv_sep(sv, std::forward<Args>(args)...);
     return true;
 }
+
+template <typename T>
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10)
+    requires std::is_integral_v<T>;
+
+template <typename T>
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr)
+    requires std::is_floating_point_v<T>;
 
 [[nodiscard]] std::string_view tr_strv_strip(std::string_view str);
 

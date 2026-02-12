@@ -23,11 +23,11 @@
 #include "lib/base/error.h"
 #include "lib/base/file-utils.h"
 #include "lib/base/i18n.h"
+#include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
 
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 
 using namespace std::literals;

@@ -35,7 +35,6 @@
 #include "lib/base/i18n.h"
 
 #include "libtransmission/quark.h"
-#include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 
 namespace

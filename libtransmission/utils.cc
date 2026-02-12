@@ -6,7 +6,6 @@
 #include <algorithm> // for std::sort, std::transform
 #include <array> // std::array
 #include <cfloat> // DBL_DIG
-#include <charconv> // std::from_chars()
 #include <chrono>
 #include <cstdint> // SIZE_MAX
 #include <cstdlib> // getenv()
@@ -37,8 +36,6 @@
 #include <curl/curl.h>
 
 #include <fmt/format.h>
-
-#include <fast_float/fast_float.h>
 
 #include "lib/base/env.h"
 #include "lib/base/string-utils.h"
@@ -469,58 +466,3 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     auto constexpr Fallback = "application/octet-stream"sv;
     return Fallback;
 }
-
-// --- tr_num_parse()
-
-template<typename T>
-[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
-    requires std::is_integral_v<T>
-{
-    auto val = T{};
-    auto const* const begin_ch = std::data(str);
-    auto const* const end_ch = begin_ch + std::size(str);
-    auto const result = std::from_chars(begin_ch, end_ch, val, base);
-    if (result.ec != std::errc{})
-    {
-        return std::nullopt;
-    }
-    if (remainder != nullptr)
-    {
-        *remainder = str;
-        remainder->remove_prefix(result.ptr - std::data(str));
-    }
-    return val;
-}
-
-template std::optional<long long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
-template std::optional<long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
-template std::optional<int> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
-template std::optional<char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
-
-template std::optional<unsigned long long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned int> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned short> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
-
-template<typename T>
-[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder)
-    requires std::is_floating_point_v<T>
-{
-    auto const* const begin_ch = std::data(str);
-    auto const* const end_ch = begin_ch + std::size(str);
-    auto val = T{};
-    auto const result = fast_float::from_chars(begin_ch, end_ch, val);
-    if (result.ec != std::errc{})
-    {
-        return std::nullopt;
-    }
-    if (remainder != nullptr)
-    {
-        *remainder = str;
-        remainder->remove_prefix(result.ptr - std::data(str));
-    }
-    return val;
-}
-
-template std::optional<double> tr_num_parse(std::string_view sv, std::string_view* remainder);

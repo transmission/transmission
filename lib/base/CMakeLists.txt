@@ -57,6 +57,8 @@ target_include_directories(trbase
         ${CMAKE_SOURCE_DIR})
 
 target_link_libraries(trbase
+    PRIVATE
+        FastFloat::fast_float
     PUBLIC
         transmission::fmt-header-only
         utf8::cpp

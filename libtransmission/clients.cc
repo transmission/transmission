@@ -18,9 +18,10 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/string-utils.h"
+
 #include "libtransmission/clients.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
