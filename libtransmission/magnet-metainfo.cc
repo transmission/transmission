@@ -200,10 +200,10 @@ void tr_magnet_metainfo::set_name(std::string_view name)
 
 void tr_magnet_metainfo::add_webseed(std::string_view webseed)
 {
-    // This step allows for URLs that contain character outside the allowed set
+    // This step allows for URLs that contain characters outside the allowed set
     // defined by RFC 3986. The URL we store is "equivalent" to the provided URL
-    // according to the definition in RFC 3986 Section 6.1, while consisting
-    // of only ASCII characters. This ensures the URLs be represented correctly
+    // according to the definition in RFC 3986 Section 6.1, while consisting of
+    // only US-ASCII characters. This ensures the URLs be represented correctly
     // when transmitted via UTF-8 mediums, for example JSON.
     auto normalized = tr_urlbuf{};
     tr_urlPercentEncode(std::back_inserter(normalized), webseed, false);
