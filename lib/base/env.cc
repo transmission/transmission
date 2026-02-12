@@ -3,19 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "libtransmission/env.h"
-
 #include <cstdlib>
-#include <iterator>
 #include <string>
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
+#include "lib/base/env.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
-#include "libtransmission/tr-strbuf.h"
 
 bool tr_env_key_exists(char const* key) noexcept
 {
@@ -49,9 +46,9 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
 #else
 
-    auto const szkey = tr_strbuf<char, 256>{ key };
+    auto const szkey = std::string{ key };
 
-    if (auto const* const value = getenv(szkey); value != nullptr)
+    if (auto const* const value = getenv(szkey.c_str()); value != nullptr)
     {
         return value;
     }

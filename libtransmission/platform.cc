@@ -38,12 +38,12 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/env.h"
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
 #include "lib/base/string-utils.h"
 
 #include "libtransmission/transmission.h"
-#include "libtransmission/env.h"
 #include "libtransmission/log.h"
 #include "libtransmission/platform.h"
 #include "libtransmission/session.h"

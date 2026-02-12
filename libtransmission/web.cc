@@ -36,12 +36,13 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/env.h"
+#include "lib/base/tr-assert.h"
+
 #ifdef _WIN32
 #include "libtransmission/crypto-utils.h"
 #endif
-#include "libtransmission/env.h"
 #include "libtransmission/log.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web.h"
 #include "libtransmission/web-utils.h"

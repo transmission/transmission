@@ -15,13 +15,14 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/env.h>
 #include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h> // tr_time()
 #include <libtransmission/variant.h>
 #include <libtransmission/web-utils.h> // tr_urlIsValid()
+
+#include "lib/base/env.h"
 
 #include <giomm/asyncresult.h>
 #include <giomm/dbusconnection.h>

@@ -23,19 +23,19 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/env.h"
 #include "lib/base/error.h"
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/env.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
 #include "libtransmission/session.h"
-#include "lib/base/string-utils.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/tr-strbuf.h" // tr_strbuf, tr_urlbuf
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"

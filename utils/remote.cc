@@ -26,6 +26,7 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
+#include "lib/base/env.h"
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
 #include "lib/base/string-utils.h"
@@ -34,7 +35,6 @@
 #include "libtransmission/transmission.h"
 #include "libtransmission/api-compat.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/env.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/tr-getopt.h"

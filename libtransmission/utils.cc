@@ -40,11 +40,12 @@
 
 #include <fast_float/fast_float.h>
 
-#include "libtransmission/env.h"
-#include "libtransmission/mime-types.h"
-#include "libtransmission/serializer.h"
+#include "lib/base/env.h"
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-assert.h"
+
+#include "libtransmission/mime-types.h"
+#include "libtransmission/serializer.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"

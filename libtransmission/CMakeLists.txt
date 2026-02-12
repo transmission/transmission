@@ -54,8 +54,6 @@ target_sources(${TR_NAME}
         crypto-utils.cc
         crypto-utils.h
         error-types.h
-        env.cc
-        env.h
         file-piece-map.cc
         file-piece-map.h
         handshake.cc

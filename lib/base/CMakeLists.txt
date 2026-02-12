@@ -2,6 +2,8 @@ add_library(trbase STATIC)
 
 target_sources(trbase
     PRIVATE
+        env.cc
+        env.h
         error.cc
         error.h
         file-posix.cc

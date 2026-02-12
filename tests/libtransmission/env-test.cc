@@ -11,7 +11,7 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include <libtransmission/env.h>
+#include "lib/base/env.h"
 
 #include "test-fixtures.h"
 

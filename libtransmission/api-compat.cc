@@ -12,12 +12,13 @@
 #include <string_view>
 #include <vector>
 
+#include "lib/base/env.h"
+#include "lib/base/string-utils.h"
+
 #include "libtransmission/api-compat.h"
-#include "libtransmission/env.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/serializer.h"
-#include "lib/base/string-utils.h"
 #include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 
