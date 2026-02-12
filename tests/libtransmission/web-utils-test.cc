@@ -28,14 +28,17 @@ TEST_F(WebUtilsTest, urlParse)
     auto url = "http://1"sv;
     auto parsed = tr_urlParse(url);
     EXPECT_FALSE(parsed);
-    //    EXPECT_TRUE(parsed);
-    //    EXPECT_EQ("http"sv, parsed->scheme);
-    //    EXPECT_EQ("1"sv, parsed->host);
-    //    EXPECT_EQ("1"sv, parsed->sitename);
-    //    EXPECT_EQ(""sv, parsed->path);
-    //    EXPECT_EQ(""sv, parsed->query);
-    //    EXPECT_EQ(""sv, parsed->fragment);
-    //    EXPECT_EQ(80, parsed->port);
+
+    url = "http://a"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("a"sv, parsed->host);
+    EXPECT_EQ("a"sv, parsed->sitename);
+    EXPECT_EQ(""sv, parsed->path);
+    EXPECT_EQ(""sv, parsed->query);
+    EXPECT_EQ(""sv, parsed->fragment);
+    EXPECT_EQ(80, parsed->port);
 
     url = "http://www.some-tracker.org/some/path"sv;
     parsed = tr_urlParse(url);
