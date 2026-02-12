@@ -9,8 +9,9 @@
 #include <cstdint>
 #include <vector> // std::vector
 
-#include "libtransmission/bitfield.h"
 #include "lib/base/tr-assert.h" // TR_ASSERT, TR_ENABLE_ASSERTS
+
+#include "libtransmission/bitfield.h"
 
 // ---
 

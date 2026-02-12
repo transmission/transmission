@@ -20,9 +20,10 @@
 #include <string_view>
 #include <vector>
 
+#include "lib/base/values.h"
+
 #include "libtransmission/constants.h"
 #include "libtransmission/types.h"
-#include "lib/base/values.h"
 
 // --- Startup & Shutdown
 

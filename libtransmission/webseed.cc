@@ -17,6 +17,10 @@
 
 #include <fmt/format.h>
 
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
+#include "lib/base/tr-strbuf.h"
+
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
@@ -24,11 +28,8 @@
 #include "libtransmission/peer-common.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/session.h"
-#include "lib/base/string-utils.h"
-#include "lib/base/tr-strbuf.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/types.h"
 #include "libtransmission/web-utils.h"

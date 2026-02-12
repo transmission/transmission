@@ -9,9 +9,10 @@
 #include <string_view>
 #include <vector>
 
-#include "libtransmission/torrent-queue.h"
 #include "lib/base/tr-strbuf.h"
 #include "lib/base/variant.h"
+
+#include "libtransmission/torrent-queue.h"
 
 namespace
 {

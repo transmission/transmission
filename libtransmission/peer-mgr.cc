@@ -30,6 +30,9 @@
 #include "lib/base/i18n.h"
 #include "lib/base/log.h"
 #include "lib/base/quark.h"
+#include "lib/base/string-utils.h"
+#include "lib/base/tr-assert.h"
+#include "lib/base/values.h"
 
 #define LIBTRANSMISSION_PEER_MODULE
 #include "libtransmission/announcer.h"
@@ -46,13 +49,10 @@
 #include "libtransmission/peer-msgs.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
-#include "lib/base/string-utils.h"
-#include "lib/base/values.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrents.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/webseed.h"

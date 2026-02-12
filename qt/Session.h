@@ -18,8 +18,9 @@
 #include <QNetworkReply>
 #include <QTimer>
 
-#include <libtransmission/transmission.h>
-#include <lib/base/quark.h>
+#include "lib/base/quark.h"
+
+#include "libtransmission/transmission.h"
 
 #include "RpcClient.h"
 #include "RpcQueue.h"

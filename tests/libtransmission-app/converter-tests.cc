@@ -11,8 +11,9 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/serializer.h>
-#include <lib/base/variant.h>
+#include "lib/base/variant.h"
+
+#include "libtransmission/serializer.h"
 
 #include "libtransmission-app/display-modes.h"
 

@@ -8,15 +8,16 @@
 #include <memory>
 
 #include <fmt/format.h>
+
 #include "lib/base/i18n.h"
 #include "lib/base/log.h"
+#include "lib/base/tr-assert.h"
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 #include "libtransmission/port-forwarding-natpmp.h"
 #include "libtransmission/port-forwarding-upnp.h"
 #include "libtransmission/port-forwarding.h"
 #include "libtransmission/timer.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/utils.h" // for _()
 
 struct tr_upnp;

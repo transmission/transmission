@@ -13,11 +13,12 @@
 #include <string_view>
 #include <vector>
 
-#include <libtransmission/net.h>
-#include <lib/base/log.h>
-#include <lib/base/quark.h>
-#include <lib/base/variant.h>
-#include <libtransmission/serializer.h>
+#include "lib/base/log.h"
+#include "lib/base/quark.h"
+#include "lib/base/variant.h"
+
+#include "libtransmission/net.h"
+#include "libtransmission/serializer.h"
 
 #include "test-fixtures.h"
 

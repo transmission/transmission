@@ -17,11 +17,11 @@
 
 #include "lib/base/error-types.h"
 #include "lib/base/error.h"
+#include "lib/base/string-utils.h"
 #include "lib/base/tr-strbuf.h" // for tr_urlbuf
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/magnet-metainfo.h"
-#include "lib/base/string-utils.h"
 #include "libtransmission/types.h" // for tr_sha1_digest_t
 #include "libtransmission/web-utils.h"
 

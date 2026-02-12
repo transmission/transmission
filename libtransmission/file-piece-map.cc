@@ -11,11 +11,12 @@
 
 #include <small/set.hpp>
 
+#include "lib/base/tr-assert.h"
+
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/torrent-metainfo.h"
-#include "lib/base/tr-assert.h"
 #include "libtransmission/types.h"
 
 tr_file_piece_map::tr_file_piece_map(tr_torrent_metainfo const& tm)

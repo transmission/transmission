@@ -13,10 +13,11 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/crypto-utils.h>
-#include <lib/base/quark.h>
-#include <lib/base/variant.h>
-#include <libtransmission/utils.h>
+#include "lib/base/quark.h"
+#include "lib/base/variant.h"
+
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

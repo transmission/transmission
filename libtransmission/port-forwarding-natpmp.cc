@@ -21,11 +21,11 @@
 
 #include "lib/base/i18n.h"
 #include "lib/base/log.h"
+#include "lib/base/string-utils.h"
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 #include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-natpmp.h"
-#include "lib/base/string-utils.h"
 #include "libtransmission/utils.h"
 
 namespace

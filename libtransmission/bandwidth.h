@@ -18,6 +18,7 @@
 
 #include "lib/base/tr-assert.h"
 #include "lib/base/values.h"
+
 #include "libtransmission/types.h"
 
 class tr_peerIo;

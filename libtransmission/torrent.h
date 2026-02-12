@@ -22,6 +22,11 @@
 
 #include <sigslot/signal.hpp>
 
+#include "lib/base/i18n.h"
+#include "lib/base/log.h"
+#include "lib/base/tr-assert.h"
+#include "lib/base/tr-macros.h"
+
 #include "libtransmission/announce-list.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/bitfield.h"
@@ -30,14 +35,10 @@
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/interned-string.h"
-#include "lib/base/log.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
-#include "lib/base/tr-assert.h"
-#include "lib/base/tr-macros.h"
-#include "lib/base/i18n.h"
 #include "libtransmission/types.h"
 #include "libtransmission/verify.h"
 

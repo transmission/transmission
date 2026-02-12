@@ -14,8 +14,9 @@
 #include <cstddef> // for size_t
 #include <vector>
 
-#include "libtransmission/bitfield.h"
 #include "lib/base/tr-macros.h" // TR_CONSTEXPR_VEC
+
+#include "libtransmission/bitfield.h"
 #include "libtransmission/types.h"
 
 struct tr_block_info;
