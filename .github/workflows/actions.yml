@@ -234,7 +234,9 @@ jobs:
   clang-tidy-libtransmission:
     runs-on: ubuntu-24.04
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-core == 'true' || needs.what-to-make.outputs.make-tests == 'true' }}
+    if: |
+      needs.what-to-make.outputs.make-core ||
+      needs.what-to-make.outputs.make-tests
     steps:
       - name: Show Configuration
         run: |
@@ -261,7 +263,7 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests && 'ON' || 'OFF' }} \
             -DRUN_CLANG_TIDY=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
@@ -271,18 +273,28 @@ jobs:
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
       - name: Make (Core)
-        run: cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
+        run: |
+          set -euo pipefail
+          cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
+      - name: Make (App)
+        run: |
+          set -euo pipefail
+          cmake --build obj --config Debug --target transmission-app 2>&1 | tee -a makelog
       - name: Make (Tests)
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
+        if: needs.what-to-make.outputs.make-tests
+        run: |
+          set -euo pipefail
+          cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
       - name: Test for warnings
         run: |
           if grep 'warning:' makelog; then exit 1; fi
 
   clang-tidy-libtransmission-win32:
     runs-on: windows-2025
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-core == 'true' || needs.what-to-make.outputs.make-tests == 'true' }}
+    needs: what-to-make
+    if: |
+      needs.what-to-make.outputs.make-core ||
+      needs.what-to-make.outputs.make-tests
     steps:
       - name: Show Configuration
         run: |
@@ -307,15 +319,19 @@ jobs:
             -G Ninja `
             -DCMAKE_BUILD_TYPE=Debug `
             -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests && 'ON' || 'OFF' }} `
             -DRUN_CLANG_TIDY=ON `
             -DUSE_SYSTEM_DEFAULT=OFF
       - name: Make (Core)
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
           cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
+      - name: Make (App)
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
+          cmake --build obj --config Debug --target transmission-app 2>&1 | tee -a makelog
       - name: Make (Tests)
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: needs.what-to-make.outputs.make-tests
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
           cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog

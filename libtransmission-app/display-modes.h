@@ -7,7 +7,7 @@
 
 namespace tr::app
 {
-enum class ShowMode
+enum class ShowMode : uint8_t
 {
     ShowAll,
     ShowActive,
@@ -21,7 +21,7 @@ enum class ShowMode
 inline auto constexpr ShowModeCount = 8U;
 inline auto constexpr DefaultShowMode = ShowMode::ShowAll;
 
-enum class SortMode
+enum class SortMode : uint8_t
 {
     SortByActivity,
     SortByAge,
@@ -37,7 +37,7 @@ enum class SortMode
 inline auto constexpr SortModeCount = 10U;
 inline auto constexpr DefaultSortMode = SortMode::SortByName;
 
-enum class StatsMode
+enum class StatsMode : uint8_t
 {
     TotalRatio,
     TotalTransfer,
