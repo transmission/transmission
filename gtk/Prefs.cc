@@ -7,9 +7,9 @@
 #include "GtkCompat.h"
 #include "PrefsDialog.h"
 
-#include <libtransmission-app/display-modes.h>
+#include <lib/transmission/transmission.h>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission-app/display-modes.h>
 
 #include <lib/base/serializer.h>
 #include <lib/base/variant.h>

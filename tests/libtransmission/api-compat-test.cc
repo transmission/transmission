@@ -10,7 +10,7 @@
 #include "lib/base/quark.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/api-compat.h"
+#include "lib/transmission/api-compat.h"
 
 #include "test-fixtures.h"
 

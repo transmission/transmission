@@ -18,8 +18,8 @@
 #include "lib/base/tr-macros.h"
 #include "lib/base/string-utils.h"
 
-#include "libtransmission/peer-mse.h"
-#include "libtransmission/crypto-utils.h"
+#include "lib/transmission/peer-mse.h"
+#include "lib/transmission/crypto-utils.h"
 
 using namespace std::literals;
 

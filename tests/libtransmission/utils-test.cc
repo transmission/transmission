@@ -19,8 +19,8 @@
 #include "lib/base/env.h"
 #include "lib/base/file-utils.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/utils.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/utils.h"
 
 #include "test-fixtures.h"
 

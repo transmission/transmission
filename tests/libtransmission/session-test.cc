@@ -17,11 +17,11 @@
 #include "lib/base/quark.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/crypto-utils.h"
-#include "libtransmission/session-id.h"
-#include "libtransmission/session.h"
-#include "libtransmission/version.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/crypto-utils.h"
+#include "lib/transmission/session-id.h"
+#include "lib/transmission/session.h"
+#include "lib/transmission/version.h"
 
 #include "test-fixtures.h"
 

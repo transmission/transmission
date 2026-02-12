@@ -7,7 +7,7 @@
 
 #include "GtkCompat.h"
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
 #include <lib/base/values.h>
 

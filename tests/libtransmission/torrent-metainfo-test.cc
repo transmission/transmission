@@ -17,10 +17,10 @@
 #include "lib/base/log.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/crypto-utils.h"
-#include "libtransmission/torrent-metainfo.h"
-#include "libtransmission/torrent.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/crypto-utils.h"
+#include "lib/transmission/torrent-metainfo.h"
+#include "lib/transmission/torrent.h"
 
 #include "test-fixtures.h"
 

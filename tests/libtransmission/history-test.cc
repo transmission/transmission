@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/history.h>
+#include <lib/transmission/history.h>
 
 TEST(History, recentHistory)
 {

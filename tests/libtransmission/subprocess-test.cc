@@ -19,7 +19,7 @@
 #include "lib/base/string-utils.h"
 #include "lib/base/tr-macros.h"
 
-#include "libtransmission/subprocess.h"
+#include "lib/transmission/subprocess.h"
 
 #include "test-fixtures.h"
 

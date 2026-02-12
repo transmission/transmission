@@ -1,5 +1,5 @@
 ---
-HeaderFilterRegex: .*/libtransmission/.*
+HeaderFilterRegex: .*/lib/base/.*
 
 # TODO: Enable `portability-template-virtual-member-function` after https://github.com/llvm/llvm-project/issues/139031 is fixed
 # TODO: Enable `cppcoreguidelines-pro-bounds-pointer-arithmetic` after converting all pointers to std::span

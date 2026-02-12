@@ -41,14 +41,14 @@
 #include "lib/base/tr-strbuf.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/crypto-utils.h" // tr_rand_obj
-#include "libtransmission/net.h"
-#include "libtransmission/session-thread.h" // for tr_evthread_init();
-#include "libtransmission/timer.h"
-#include "libtransmission/timer-ev.h"
-#include "libtransmission/tr-dht.h"
-#include "libtransmission/utils.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/crypto-utils.h" // tr_rand_obj
+#include "lib/transmission/net.h"
+#include "lib/transmission/session-thread.h" // for tr_evthread_init();
+#include "lib/transmission/timer.h"
+#include "lib/transmission/timer-ev.h"
+#include "lib/transmission/tr-dht.h"
+#include "lib/transmission/utils.h"
 
 #include "test-fixtures.h"
 

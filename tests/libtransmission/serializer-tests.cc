@@ -18,7 +18,7 @@
 #include "lib/base/serializer.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/net.h"
+#include "lib/transmission/net.h"
 
 #include "test-fixtures.h"
 

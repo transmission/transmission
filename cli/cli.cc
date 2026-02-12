@@ -21,11 +21,11 @@
 #include "lib/base/values.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/utils.h" // _()
-#include "libtransmission/version.h"
-#include "libtransmission/web-utils.h"
-#include "libtransmission/web.h" // tr_sessionFetch()
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/utils.h" // _()
+#include "lib/transmission/version.h"
+#include "lib/transmission/web-utils.h"
+#include "lib/transmission/web.h" // tr_sessionFetch()
 
 using namespace std::literals;
 using namespace tr::Values;

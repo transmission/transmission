@@ -1,6 +1,6 @@
 #include "Percents.h"
 
-#include <libtransmission/utils.h>
+#include <lib/transmission/utils.h>
 
 std::string Percents::to_string() const
 {

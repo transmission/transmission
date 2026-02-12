@@ -14,7 +14,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
 #include <lib/base/file.h> /* tr_sys_path_is_same() */
 

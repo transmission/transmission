@@ -3,12 +3,12 @@ BasedOnStyle: InheritParentConfig
 
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '^<libtransmission-app/'
+  - Regex: '^[<"]libtransmission-app/'
     Priority: 3
-  - Regex: '^[<"]libtransmission/transmission.h[">]'
+  - Regex: '^[<"]lib/transmission/transmission.h[">]'
     Priority: 4
     SortPriority: 3
-  - Regex: '^[<"]libtransmission/'
+  - Regex: '^[<"]lib/transmission/'
     Priority: 4
     SortPriority: 4
   - Regex: '^[<"]lib/base/'

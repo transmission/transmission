@@ -9,9 +9,9 @@
 
 #include "lib/base/error.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/torrent-metainfo.h"
-#include "libtransmission/web-utils.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/torrent-metainfo.h"
+#include "lib/transmission/web-utils.h"
 
 #include "AddData.h"
 #include "Utils.h"

@@ -40,11 +40,11 @@
 #include "lib/base/tr-strbuf.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/timer-ev.h"
-#include "libtransmission/utils.h"
-#include "libtransmission/version.h"
-#include "libtransmission/watchdir.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/timer-ev.h"
+#include "lib/transmission/utils.h"
+#include "lib/transmission/version.h"
+#include "lib/transmission/watchdir.h"
 
 #include "daemon.h"
 

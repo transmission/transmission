@@ -2197,7 +2197,7 @@
 				A292A6E50DFB45EC004B9C0A /* webseed.cc */,
 				A292A6E60DFB45EC004B9C0A /* webseed.h */,
 			);
-			path = libtransmission;
+			path = lib/transmission;
 			sourceTree = "<group>";
 		};
 		4DDBB70A09E16B3200284745 /* GUI */ = {
@@ -3467,8 +3467,8 @@
 			);
 			name = "Generate version file";
 			outputPaths = (
-				"$(SRCROOT)/libtransmission/version.h",
-				"$(SRCROOT)/libtransmission/version.h.new",
+				"$(SRCROOT)/lib/transmission/version.h",
+				"$(SRCROOT)/lib/transmission/version.h.new",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -4906,7 +4906,7 @@
 				IBC_WARNINGS = YES;
 				INFOPLIST_FILE = macosx/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
-				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
+				INFOPLIST_PREFIX_HEADER = lib/transmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				ONLY_ACTIVE_ARCH = YES;
@@ -5114,7 +5114,7 @@
 				IBC_WARNINGS = YES;
 				INFOPLIST_FILE = macosx/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
-				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
+				INFOPLIST_PREFIX_HEADER = lib/transmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				OTHER_CFLAGS = (
@@ -5218,7 +5218,7 @@
 				IBC_WARNINGS = YES;
 				INFOPLIST_FILE = macosx/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
-				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
+				INFOPLIST_PREFIX_HEADER = lib/transmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				ONLY_ACTIVE_ARCH = YES;

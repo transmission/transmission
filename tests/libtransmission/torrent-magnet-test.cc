@@ -11,8 +11,8 @@
 
 #include "lib/base/error.h"
 
-#include "libtransmission/torrent-magnet.h"
-#include "libtransmission/torrent-metainfo.h"
+#include "lib/transmission/torrent-magnet.h"
+#include "lib/transmission/torrent-metainfo.h"
 
 #include "test-fixtures.h"
 

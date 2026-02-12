@@ -29,9 +29,9 @@
 #include "lib/base/serializer.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/session-id.h"
-#include "libtransmission/utils.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/session-id.h"
+#include "lib/transmission/utils.h"
 
 #include "Session.h"
 

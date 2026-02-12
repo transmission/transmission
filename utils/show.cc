@@ -30,12 +30,12 @@
 #include "lib/base/values.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/torrent-metainfo.h"
-#include "libtransmission/utils.h"
-#include "libtransmission/version.h"
-#include "libtransmission/web.h"
-#include "libtransmission/web-utils.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/torrent-metainfo.h"
+#include "lib/transmission/utils.h"
+#include "lib/transmission/version.h"
+#include "lib/transmission/web.h"
+#include "lib/transmission/web-utils.h"
 
 using namespace std::literals;
 using namespace tr::Values;

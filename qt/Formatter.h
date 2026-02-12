@@ -11,7 +11,7 @@
 #include <QCoreApplication> // Q_DECLARE_TR_FUNCTIONS
 #include <QString>
 
-#include <libtransmission/utils.h>
+#include <lib/transmission/utils.h>
 
 #include "Speed.h"
 

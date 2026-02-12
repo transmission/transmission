@@ -12,8 +12,8 @@
 
 #include "lib/base/tr-macros.h"
 
-#include "libtransmission/crypto-utils.h" // tr_rand_obj()
-#include "libtransmission/clients.h"
+#include "lib/transmission/crypto-utils.h" // tr_rand_obj()
+#include "lib/transmission/clients.h"
 
 using namespace std::literals;
 

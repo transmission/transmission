@@ -10,7 +10,7 @@
 
 #include "lib/base/string-utils.h"
 
-#include "libtransmission/torrent-metainfo.h"
+#include "lib/transmission/torrent-metainfo.h"
 
 #import "NSStringAdditions.h"
 

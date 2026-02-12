@@ -21,8 +21,8 @@
 #include "lib/base/quark.h"
 #include "lib/base/tr-macros.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/crypto-utils.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/crypto-utils.h"
 
 #include "IconCache.h"
 #include "Speed.h"

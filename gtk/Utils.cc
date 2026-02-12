@@ -9,11 +9,11 @@
 #include "PrefsDialog.h"
 #include "Session.h"
 
-#include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
-#include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/utils.h> /* tr_strratio() */
-#include <libtransmission/version.h> /* SHORT_VERSION_STRING */
-#include <libtransmission/web-utils.h>
+#include <lib/transmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
+#include <lib/transmission/torrent-metainfo.h>
+#include <lib/transmission/utils.h> /* tr_strratio() */
+#include <lib/transmission/version.h> /* SHORT_VERSION_STRING */
+#include <lib/transmission/web-utils.h>
 
 #include "lib/base/error.h"
 #include "lib/base/string-utils.h"

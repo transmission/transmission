@@ -10,8 +10,8 @@
 #include "Percents.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
+#include <lib/transmission/transmission.h>
+#include <lib/transmission/utils.h>
 
 #include "lib/base/file-utils.h"
 #include "lib/base/tr-macros.h"

@@ -8,8 +8,8 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/version.h>
+#include <lib/transmission/transmission.h>
+#include <lib/transmission/version.h>
 
 #include "AboutDialog.h"
 #include "LicenseDialog.h"

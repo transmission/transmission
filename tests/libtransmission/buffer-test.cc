@@ -8,8 +8,8 @@
 #include <memory>
 #include <string_view>
 
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/tr-buffer.h>
+#include <lib/transmission/crypto-utils.h>
+#include <lib/transmission/tr-buffer.h>
 
 #include "test-fixtures.h"
 

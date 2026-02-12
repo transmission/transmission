@@ -13,7 +13,7 @@
 
 #include <small/map.hpp>
 
-#include <libtransmission/transmission.h> // priorities
+#include <lib/transmission/transmission.h> // priorities
 
 #include <QAbstractItemModel>
 #include <QMutableListIterator>

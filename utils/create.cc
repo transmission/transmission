@@ -24,12 +24,12 @@
 #include "lib/base/tr-getopt.h"
 #include "lib/base/values.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/announce-list.h"
-#include "libtransmission/makemeta.h"
-#include "libtransmission/torrent-files.h"
-#include "libtransmission/utils.h"
-#include "libtransmission/version.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/announce-list.h"
+#include "lib/transmission/makemeta.h"
+#include "lib/transmission/torrent-files.h"
+#include "lib/transmission/utils.h"
+#include "lib/transmission/version.h"
 
 using namespace std::literals;
 

@@ -9,7 +9,7 @@
 #include <QPixmap>
 #include <QTextDocument>
 
-#include <libtransmission/web-utils.h>
+#include <lib/transmission/web-utils.h>
 
 #include <libtransmission-app/favicon-cache.h>
 

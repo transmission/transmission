@@ -18,8 +18,8 @@
 #include "lib/base/file.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/open-files.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/open-files.h"
 
 #include "test-fixtures.h"
 

@@ -23,8 +23,8 @@
 #include "lib/base/file-utils.h"
 #include "lib/base/file.h"
 
-#include "libtransmission/web-utils.h"
-#include "libtransmission/web.h"
+#include "lib/transmission/web-utils.h"
+#include "lib/transmission/web.h"
 
 namespace tr::app
 {

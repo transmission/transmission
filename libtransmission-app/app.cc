@@ -3,7 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/utils.h> // tr_lib_init()
+#include <lib/transmission/utils.h> // tr_lib_init()
 
 #include "libtransmission-app/app.h"
 #include "libtransmission-app/converters.h"

@@ -19,9 +19,9 @@
 #include "lib/base/file-utils.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/announce-list.h"
-#include "libtransmission/torrent-metainfo.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/announce-list.h"
+#include "lib/transmission/torrent-metainfo.h"
 
 #include "test-fixtures.h"
 

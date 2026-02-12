@@ -16,7 +16,7 @@
 #include "lib/base/file.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/crypto-utils.h"
+#include "lib/transmission/crypto-utils.h"
 
 #include "test-fixtures.h"
 

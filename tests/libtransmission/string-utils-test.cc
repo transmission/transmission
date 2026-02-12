@@ -11,7 +11,7 @@
 
 #include "lib/base/string-utils.h"
 
-#include "libtransmission/crypto-utils.h" // tr_rand_int()
+#include "lib/transmission/crypto-utils.h" // tr_rand_int()
 
 #include "test-fixtures.h"
 

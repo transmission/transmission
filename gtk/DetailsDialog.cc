@@ -14,8 +14,8 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include "libtransmission/utils.h"
-#include "libtransmission/web-utils.h"
+#include "lib/transmission/utils.h"
+#include "lib/transmission/web-utils.h"
 
 #include "lib/base/file-utils.h"
 #include "lib/base/string-utils.h"

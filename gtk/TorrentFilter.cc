@@ -8,7 +8,7 @@
 #include "FilterBase.hh"
 #include "Utils.h"
 
-#include "libtransmission/transmission.h"
+#include "lib/transmission/transmission.h"
 
 #include "lib/base/tr-macros.h"
 

@@ -11,9 +11,9 @@
 #include "lib/base/error.h"
 #include "lib/base/string-utils.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/makemeta.h"
-#include "libtransmission/web-utils.h" // tr_urlIsValidTracker()
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/makemeta.h"
+#include "lib/transmission/web-utils.h" // tr_urlIsValidTracker()
 
 #import "CreatorWindowController.h"
 #import "Controller.h"

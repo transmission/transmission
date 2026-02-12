@@ -32,16 +32,16 @@
 
 #include "lib/base/tr-macros.h" // tr_sha1_digest_t, tr_p...
 
-#include "libtransmission/announcer.h"
-#include "libtransmission/announcer-common.h"
-#include "libtransmission/crypto-utils.h" // for tr_rand_obj()
-#include "libtransmission/net.h"
-#include "libtransmission/peer-mgr.h" // for tr_pex
-#include "libtransmission/session.h" // tr_peerIdInit
-#include "libtransmission/timer.h"
-#include "libtransmission/timer-ev.h"
-#include "libtransmission/tr-buffer.h"
-#include "libtransmission/utils.h"
+#include "lib/transmission/announcer.h"
+#include "lib/transmission/announcer-common.h"
+#include "lib/transmission/crypto-utils.h" // for tr_rand_obj()
+#include "lib/transmission/net.h"
+#include "lib/transmission/peer-mgr.h" // for tr_pex
+#include "lib/transmission/session.h" // tr_peerIdInit
+#include "lib/transmission/timer.h"
+#include "lib/transmission/timer-ev.h"
+#include "lib/transmission/tr-buffer.h"
+#include "lib/transmission/utils.h"
 
 #include "test-fixtures.h"
 

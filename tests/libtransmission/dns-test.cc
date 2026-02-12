@@ -8,7 +8,7 @@
 
 #include <event2/event.h>
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
 #include "dns-ev.h"
 #include "dns.h"

@@ -6,7 +6,7 @@
 #include <array>
 #include <optional>
 
-#include "libtransmission/utils.h"
+#include "lib/transmission/utils.h"
 
 #include "Filters.h"
 #include "Prefs.h"

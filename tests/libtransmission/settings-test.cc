@@ -14,11 +14,11 @@
 #include "lib/base/quark.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/net.h"
-#include "libtransmission/open-files.h"
-#include "libtransmission/peer-io.h"
-#include "libtransmission/session.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/net.h"
+#include "lib/transmission/open-files.h"
+#include "lib/transmission/peer-io.h"
+#include "lib/transmission/session.h"
 
 #include "test-fixtures.h"
 

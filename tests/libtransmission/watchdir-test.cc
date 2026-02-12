@@ -26,10 +26,10 @@
 #include "lib/base/tr-strbuf.h"
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
-#include "libtransmission/timer.h"
-#include "libtransmission/timer-ev.h"
-#include "libtransmission/watchdir.h"
-#include "libtransmission/watchdir-base.h"
+#include "lib/transmission/timer.h"
+#include "lib/transmission/timer-ev.h"
+#include "lib/transmission/watchdir.h"
+#include "lib/transmission/watchdir-base.h"
 
 #include "test-fixtures.h"
 

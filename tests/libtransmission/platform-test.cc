@@ -14,8 +14,8 @@
 #include "lib/base/file.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/platform.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/platform.h"
 
 #include "test-fixtures.h"
 

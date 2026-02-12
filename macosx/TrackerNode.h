@@ -4,7 +4,7 @@
 
 #import <Foundation/Foundation.h>
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
 @class Torrent;
 

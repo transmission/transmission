@@ -26,11 +26,11 @@
 #include "lib/base/quark.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/crypto-utils.h" // tr_base64_decode()
-#include "libtransmission/torrent-ctor.h"
-#include "libtransmission/torrent.h"
-#include "libtransmission/utils.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/crypto-utils.h" // tr_base64_decode()
+#include "lib/transmission/torrent-ctor.h"
+#include "lib/transmission/torrent.h"
+#include "lib/transmission/utils.h"
 
 using namespace std::literals;
 

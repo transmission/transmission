@@ -10,9 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/timer.h>
-#include <libtransmission/timer-ev.h>
-#include <libtransmission/utils-ev.h>
+#include <lib/transmission/timer.h>
+#include <lib/transmission/timer-ev.h>
+#include <lib/transmission/utils-ev.h>
 
 #include "test-fixtures.h"
 

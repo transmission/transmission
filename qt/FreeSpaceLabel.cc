@@ -13,7 +13,7 @@
 #include "lib/base/quark.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
+#include "lib/transmission/transmission.h"
 
 #include "Formatter.h"
 #include "FreeSpaceLabel.h"

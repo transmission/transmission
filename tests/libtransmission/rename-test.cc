@@ -18,10 +18,10 @@
 #include "lib/base/file.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/crypto-utils.h"
-#include "libtransmission/resume.h"
-#include "libtransmission/torrent.h" // tr_isTorrent()
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/crypto-utils.h"
+#include "lib/transmission/resume.h"
+#include "lib/transmission/torrent.h" // tr_isTorrent()
 
 #include "test-fixtures.h"
 

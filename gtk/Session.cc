@@ -14,11 +14,11 @@
 #include "TorrentSorter.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/rpcimpl.h>
-#include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/utils.h> // tr_time()
-#include <libtransmission/web-utils.h> // tr_urlIsValid()
+#include <lib/transmission/transmission.h>
+#include <lib/transmission/rpcimpl.h>
+#include <lib/transmission/torrent-metainfo.h>
+#include <lib/transmission/utils.h> // tr_time()
+#include <lib/transmission/web-utils.h> // tr_urlIsValid()
 
 #include "lib/base/env.h"
 #include <lib/base/log.h>

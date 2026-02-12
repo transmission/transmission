@@ -12,7 +12,7 @@
 #include <string_view>
 #include <vector>
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
 #include <lib/base/quark.h>
 #include <lib/base/variant.h>

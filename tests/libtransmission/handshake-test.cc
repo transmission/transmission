@@ -29,15 +29,15 @@
 #include "lib/base/tr-assert.h"
 #include "lib/base/tr-macros.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/crypto-utils.h" // tr_sha1_to_string, tr_base...
-#include "libtransmission/handshake.h"
-#include "libtransmission/net.h"
-#include "libtransmission/peer-io.h"
-#include "libtransmission/peer-mse.h"
-#include "libtransmission/peer-socket.h"
-#include "libtransmission/session.h" // tr_peerIdInit()
-#include "libtransmission/timer.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/crypto-utils.h" // tr_sha1_to_string, tr_base...
+#include "lib/transmission/handshake.h"
+#include "lib/transmission/net.h"
+#include "lib/transmission/peer-io.h"
+#include "lib/transmission/peer-mse.h"
+#include "lib/transmission/peer-socket.h"
+#include "lib/transmission/session.h" // tr_peerIdInit()
+#include "lib/transmission/timer.h"
 
 #include "test-fixtures.h"
 

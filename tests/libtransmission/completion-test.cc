@@ -9,12 +9,12 @@
 #include <cstdint>
 #include <set>
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
-#include <libtransmission/bitfield.h>
-#include <libtransmission/block-info.h>
-#include <libtransmission/crypto-utils.h> // for tr_rand_obj()
-#include <libtransmission/completion.h>
+#include <lib/transmission/bitfield.h>
+#include <lib/transmission/block-info.h>
+#include <lib/transmission/crypto-utils.h> // for tr_rand_obj()
+#include <lib/transmission/completion.h>
 
 #include "test-fixtures.h"
 

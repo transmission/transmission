@@ -10,7 +10,13 @@ replace_if_differs() {
   fi
 }
 
-echo "creating libtransmission/version.h"
+out_dir="lib/transmission"
+out_h="${out_dir}/version.h"
+out_new="${out_h}.new"
+
+mkdir -p "${out_dir}"
+
+echo "creating ${out_h}"
 
 major_version=$(grep 'set[(]TR_VERSION_MAJOR' CMakeLists.txt | cut -d \" -f 2)
 minor_version=$(grep 'set[(]TR_VERSION_MINOR' CMakeLists.txt | cut -d \" -f 2)
@@ -83,7 +89,7 @@ fi
 
 vcs_revision=$(echo $vcs_revision | head -c10)
 
-cat > libtransmission/version.h.new << EOF
+cat > "${out_new}" << EOF
 #pragma once
 
 #define PEERID_PREFIX             "${peer_id_prefix}"
@@ -104,6 +110,6 @@ case "${peer_id_prefix}" in
   *X-) echo '#define TR_BETA_RELEASE           1' ;;
   *Z-) echo '#define TR_NIGHTLY_RELEASE        1' ;;
   *)   echo '#define TR_STABLE_RELEASE         1' ;;
-esac >> "libtransmission/version.h.new"
+esac >> "${out_new}"
 
-replace_if_differs libtransmission/version.h.new libtransmission/version.h
+replace_if_differs "${out_new}" "${out_h}"

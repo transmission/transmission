@@ -19,8 +19,8 @@
 #include "lib/base/tr-getopt.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/utils.h"
-#include "libtransmission/version.h"
+#include "lib/transmission/utils.h"
+#include "lib/transmission/version.h"
 
 namespace
 {

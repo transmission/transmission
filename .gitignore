@@ -12,8 +12,8 @@ Transmission.xcodeproj/xcuserdata
 /daemon/transmission-remote
 /gtk/defines.h
 /gtk/transmission-gtk
-/libtransmission/*.a
-/libtransmission/version.h
+/lib/transmission/*.a
+/lib/transmission/version.h
 /macosx/Info.plist
 /macosx/**/*~.nib
 node_modules/

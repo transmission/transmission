@@ -18,8 +18,8 @@
 #include "lib/base/quark.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/rpcimpl.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/rpcimpl.h"
 
 #include "test-fixtures.h"
 

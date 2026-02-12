@@ -4,7 +4,7 @@
 
 #import <AppKit/AppKit.h>
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
 @interface CreatorWindowController : NSWindowController
 

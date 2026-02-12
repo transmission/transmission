@@ -20,11 +20,11 @@
 #include "lib/base/tr-strbuf.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/announce-list.h"
-#include "libtransmission/crypto-utils.h"
-#include "libtransmission/makemeta.h"
-#include "libtransmission/session.h" // TR_NAME
-#include "libtransmission/torrent-metainfo.h"
+#include "lib/transmission/announce-list.h"
+#include "lib/transmission/crypto-utils.h"
+#include "lib/transmission/makemeta.h"
+#include "lib/transmission/session.h" // TR_NAME
+#include "lib/transmission/torrent-metainfo.h"
 
 #include "test-fixtures.h"
 

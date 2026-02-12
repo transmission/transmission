@@ -15,12 +15,12 @@
 
 #include "lib/base/string-utils.h"
 
-#include "libtransmission/transmission.h" // tr_torrent_activity
-#include "libtransmission/crypto-utils.h" // tr_rand_obj()
-#include "libtransmission/net.h"
-#include "libtransmission/session.h"
-#include "libtransmission/timer.h"
-#include "libtransmission/tr-lpd.h"
+#include "lib/transmission/transmission.h" // tr_torrent_activity
+#include "lib/transmission/crypto-utils.h" // tr_rand_obj()
+#include "lib/transmission/net.h"
+#include "lib/transmission/session.h"
+#include "lib/transmission/timer.h"
+#include "lib/transmission/tr-lpd.h"
 
 #include "test-fixtures.h"
 

@@ -20,7 +20,7 @@
 
 #include "lib/base/quark.h"
 
-#include "libtransmission/transmission.h"
+#include "lib/transmission/transmission.h"
 
 #include "RpcClient.h"
 #include "RpcQueue.h"

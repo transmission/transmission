@@ -22,8 +22,8 @@
 #include "lib/base/quark.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/api-compat.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/api-compat.h"
 
 class QNetworkAccessManager;
 

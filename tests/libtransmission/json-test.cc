@@ -16,8 +16,8 @@
 #include "lib/base/quark.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/crypto-utils.h"
-#include "libtransmission/utils.h"
+#include "lib/transmission/crypto-utils.h"
+#include "lib/transmission/utils.h"
 
 using namespace std::literals;
 

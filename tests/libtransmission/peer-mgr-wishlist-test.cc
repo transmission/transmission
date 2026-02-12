@@ -10,11 +10,11 @@
 
 #define LIBTRANSMISSION_PEER_MODULE
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
-#include <libtransmission/bitfield.h>
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/peer-mgr-wishlist.h>
+#include <lib/transmission/bitfield.h>
+#include <lib/transmission/crypto-utils.h>
+#include <lib/transmission/peer-mgr-wishlist.h>
 
 #include "test-fixtures.h"
 

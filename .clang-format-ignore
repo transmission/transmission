@@ -4,7 +4,7 @@
 .*/*
 build/*
 cmake-build-*/*
-libtransmission/version.h
+lib/transmission/version.h
 web/node_modules/*
 
 # android

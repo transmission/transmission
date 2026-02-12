@@ -10,9 +10,9 @@
 
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/net.h"
-#include "libtransmission/session.h" // tr_session.addressIsBlocked()
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/net.h"
+#include "lib/transmission/session.h" // tr_session.addressIsBlocked()
 
 #include "test-fixtures.h"
 

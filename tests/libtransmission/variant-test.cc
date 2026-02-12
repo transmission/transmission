@@ -22,7 +22,7 @@
 #include "lib/base/variant.h"
 
 #define LIBTRANSMISSION_VARIANT_MODULE
-#include "libtransmission/crypto-utils.h" // tr_rand_buffer(), tr_rand_int()
+#include "lib/transmission/crypto-utils.h" // tr_rand_buffer(), tr_rand_int()
 
 #include "test-fixtures.h"
 

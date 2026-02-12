@@ -13,8 +13,8 @@
 
 #include "lib/base/env.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/api-compat.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/api-compat.h"
 
 #include "Prefs.h"
 #include "Session.h"

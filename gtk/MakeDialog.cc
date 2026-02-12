@@ -11,8 +11,8 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/makemeta.h>
+#include <lib/transmission/transmission.h>
+#include <lib/transmission/makemeta.h>
 
 #include "lib/base/error.h"
 #include "lib/base/values.h"

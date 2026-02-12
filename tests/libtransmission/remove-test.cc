@@ -15,8 +15,8 @@
 #include "lib/base/file.h"
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/torrent-files.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/torrent-files.h"
 
 #include "test-fixtures.h"
 

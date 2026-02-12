@@ -4,7 +4,7 @@
 
 #include <lib/base/log.h>
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
 #import "MessageWindowController.h"
 #import "Controller.h"

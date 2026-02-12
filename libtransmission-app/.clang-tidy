@@ -1,5 +1,5 @@
 ---
-HeaderFilterRegex: .*/libtransmission-app/.*
+HeaderFilterRegex: .*/lib/transmission/.*
 
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
 Checks:

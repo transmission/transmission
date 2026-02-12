@@ -18,10 +18,10 @@
 #include <QNetworkRequest>
 #include <QVersionNumber>
 
-#include <libtransmission/api-compat.h>
-#include <libtransmission/rpcimpl.h>
-#include <libtransmission/transmission.h>
-#include <libtransmission/version.h> // LONG_VERSION_STRING
+#include <lib/transmission/api-compat.h>
+#include <lib/transmission/rpcimpl.h>
+#include <lib/transmission/transmission.h>
+#include <lib/transmission/version.h> // LONG_VERSION_STRING
 
 #include "VariantHelpers.h"
 

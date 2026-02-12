@@ -36,12 +36,12 @@
 #include "lib/base/values.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/api-compat.h"
-#include "libtransmission/crypto-utils.h"
-#include "libtransmission/rpcimpl.h"
-#include "libtransmission/utils.h"
-#include "libtransmission/version.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/api-compat.h"
+#include "lib/transmission/crypto-utils.h"
+#include "lib/transmission/rpcimpl.h"
+#include "lib/transmission/utils.h"
+#include "lib/transmission/version.h"
 
 using namespace std::literals;
 

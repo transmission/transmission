@@ -10,11 +10,11 @@
 #include <numeric>
 #include <vector>
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
-#include <libtransmission/bitfield.h>
-#include <libtransmission/block-info.h>
-#include <libtransmission/file-piece-map.h>
+#include <lib/transmission/bitfield.h>
+#include <lib/transmission/block-info.h>
+#include <lib/transmission/file-piece-map.h>
 
 #include "test-fixtures.h"
 

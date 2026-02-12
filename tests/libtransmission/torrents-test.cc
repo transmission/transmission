@@ -15,10 +15,10 @@
 
 #include "lib/base/tr-strbuf.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/torrent.h"
-#include "libtransmission/torrents.h"
-#include "libtransmission/torrent-metainfo.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/torrent.h"
+#include "lib/transmission/torrents.h"
+#include "lib/transmission/torrent-metainfo.h"
 
 #include "test-fixtures.h"
 

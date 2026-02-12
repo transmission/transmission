@@ -9,8 +9,8 @@
 
 #include "lib/base/tr-macros.h"
 
-#include "libtransmission/crypto-utils.h" // tr_rand_buffer()
-#include "libtransmission/magnet-metainfo.h"
+#include "lib/transmission/crypto-utils.h" // tr_rand_buffer()
+#include "lib/transmission/magnet-metainfo.h"
 
 #include "test-fixtures.h"
 

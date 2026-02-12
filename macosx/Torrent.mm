@@ -11,7 +11,7 @@
 #include "lib/base/log.h"
 #include "lib/base/string-utils.h"
 
-#include "libtransmission/transmission.h"
+#include "lib/transmission/transmission.h"
 
 #import "Torrent.h"
 #import "GroupsController.h"

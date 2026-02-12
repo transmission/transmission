@@ -16,8 +16,8 @@
 
 #include "lib/base/serializer.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/api-compat.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/api-compat.h"
 
 #include "Filters.h"
 #include "Prefs.h"

@@ -20,7 +20,7 @@
 #include <QPixmapCache>
 #include <QStyle>
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
 #include "Utils.h"
 

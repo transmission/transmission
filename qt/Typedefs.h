@@ -3,7 +3,7 @@
 #include <set>
 #include <unordered_set>
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
 using torrent_ids_t = std::unordered_set<tr_torrent_id_t>;
 

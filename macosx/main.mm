@@ -8,9 +8,9 @@
 #import <AppKit/AppKit.h>
 #endif
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
-#include <libtransmission/utils.h>
+#include <lib/transmission/utils.h>
 
 int main(int argc, char** argv)
 {

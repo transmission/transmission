@@ -16,11 +16,11 @@
 #include "lib/base/tr-strbuf.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/block-info.h"
-#include "libtransmission/cache.h" // tr_cacheWriteBlock()
-#include "libtransmission/torrent.h"
-#include "libtransmission/torrent-files.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/block-info.h"
+#include "lib/transmission/cache.h" // tr_cacheWriteBlock()
+#include "lib/transmission/torrent.h"
+#include "lib/transmission/torrent-files.h"
 
 #include "test-fixtures.h"
 

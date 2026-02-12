@@ -13,10 +13,10 @@
 #include <string_view>
 #include <utility>
 
-#include <libtransmission/ip-cache.h>
-#include <libtransmission/net.h>
-#include <libtransmission/timer.h>
-#include <libtransmission/web.h>
+#include <lib/transmission/ip-cache.h>
+#include <lib/transmission/net.h>
+#include <lib/transmission/timer.h>
+#include <lib/transmission/web.h>
 
 #include "test-fixtures.h"
 

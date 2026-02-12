@@ -10,10 +10,10 @@
 #include <tuple>
 #include <utility>
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
-#include <libtransmission/net.h>
-#include <libtransmission/peer-mgr.h>
+#include <lib/transmission/net.h>
+#include <lib/transmission/peer-mgr.h>
 
 #include "test-fixtures.h"
 

@@ -14,8 +14,8 @@
 #include "lib/base/quark.h"
 #include "lib/base/variant.h"
 
-#include "libtransmission/transmission.h"
-#include "libtransmission/utils.h"
+#include "lib/transmission/transmission.h"
+#include "lib/transmission/utils.h"
 
 #include "Application.h"
 #include "IconCache.h"

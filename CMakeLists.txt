@@ -915,7 +915,7 @@ function(tr_install_web DST_DIR)
 endfunction()
 
 add_subdirectory(lib/base)
-add_subdirectory(libtransmission)
+add_subdirectory(lib/transmission)
 add_subdirectory(libtransmission-app)
 
 set(MAC_PROJECT_DIR macosx)

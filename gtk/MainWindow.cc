@@ -18,9 +18,9 @@
 #include "TorrentCellRenderer.h"
 #endif
 
-#include <libtransmission-app/display-modes.h>
+#include <lib/transmission/transmission.h>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission-app/display-modes.h>
 
 #include <lib/base/values.h>
 

@@ -9,7 +9,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
+#include <lib/transmission/transmission.h>
 
 #include <glibmm/i18n.h>
 #include <glibmm/ustring.h>
