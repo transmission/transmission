@@ -25,6 +25,7 @@ class SortListModel : public IF_GTKMM4(Gtk::SortListModel, Gtk::TreeModelSort)
 public:
     using SorterType = SorterBase<ItemT>;
 
+public:
     SortListModel(Glib::RefPtr<Gio::ListModel> const& model, Glib::RefPtr<SorterType> const& sorter);
 
 #if !GTKMM_CHECK_VERSION(4, 0, 0)

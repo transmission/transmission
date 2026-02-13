@@ -25,6 +25,7 @@ class FilterListModel : public IF_GTKMM4(Gtk::FilterListModel, Gtk::TreeModelFil
 public:
     using FilterType = FilterBase<ItemT>;
 
+public:
     FilterListModel(Glib::RefPtr<Gio::ListModel> const& model, Glib::RefPtr<FilterType> const& filter);
 
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
