@@ -312,7 +312,7 @@ The 'source' column here corresponds to the data structure there.
 | `upload_limited`| boolean| tr_torrent
 | `upload_ratio`| double| tr_stat
 | `wanted`| array (see below)| n/a
-| `webseeds`| array of strings | tr_tracker_view
+| `webseeds`| array of strings | **DEPRECATED** tr_tracker_view
 | `webseeds_ex`| array (see below)| n/a
 | `webseeds_sending_to_us`| number| tr_stat
 
@@ -1119,3 +1119,4 @@ Transmission 4.2.0 (`rpc_version_semver` 6.1.0, `rpc_version`: ?)
 | Method | Description
 |:---|:---
 | `torrent_get` | new arg `webseeds_ex`
+| `torrent_get` | **DEPRECATED** `webseeds`. Use `webseeds_ex` instead.
