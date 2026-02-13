@@ -5,7 +5,7 @@
 
 #include <array>
 
-#include "lib/base/tr-getopt.h"
+#include "tr/base/tr-getopt.h"
 
 #include "test-fixtures.h"
 

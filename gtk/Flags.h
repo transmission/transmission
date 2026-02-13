@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "lib/base/tr-macros.h"
+#include "tr/base/tr-macros.h"
 
 #include <bitset>
 #include <initializer_list>

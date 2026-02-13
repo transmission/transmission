@@ -13,10 +13,10 @@
 
 #include <small/map.hpp>
 
-#include <lib/transmission/transmission.h> // priorities
-
 #include <QAbstractItemModel>
 #include <QMutableListIterator>
+
+#include "tr/torrent/types.h" // priorities
 
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"

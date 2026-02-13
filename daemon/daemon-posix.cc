@@ -19,8 +19,8 @@
 
 #include <fmt/format.h>
 
-#include "lib/base/error.h"
-#include "lib/base/string-utils.h"
+#include "tr/base/error.h"
+#include "tr/base/string-utils.h"
 
 #include "daemon.h"
 

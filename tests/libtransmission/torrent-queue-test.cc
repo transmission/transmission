@@ -11,8 +11,8 @@
 
 #include <gtest/gtest.h>
 
-#include <lib/transmission/torrent-queue.h>
-#include <lib/transmission/torrent.h>
+#include "tr/torrent/torrent-queue.h"
+#include "tr/torrent/torrent.h"
 
 #include "test-fixtures.h"
 

@@ -11,12 +11,12 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/error.h"
-#include "lib/base/file-utils.h"
-#include "lib/base/file.h"
-#include "lib/base/tr-strbuf.h"
+#include "tr/base/error.h"
+#include "tr/base/file-utils.h"
+#include "tr/base/file.h"
+#include "tr/base/tr-strbuf.h"
 
-#include "lib/transmission/crypto-utils.h"
+#include "tr/torrent/crypto-utils.h"
 
 #include "test-fixtures.h"
 

@@ -17,7 +17,7 @@
 #include <QPixmapCache>
 #include <QStyleOptionProgressBar>
 
-#include <lib/transmission/utils.h>
+#include "tr/torrent/utils.h"
 
 #include "StyleHelper.h"
 #include "Torrent.h"

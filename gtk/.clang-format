@@ -3,15 +3,15 @@ BasedOnStyle: InheritParentConfig
 
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '^[<"]lib/app/'
+  - Regex: '^[<"]tr/app/'
     Priority: 3
-  - Regex: '^[<"]lib/transmission/transmission.h[">]'
+  - Regex: '^[<"]tr/torrent/transmission.h[">]'
     Priority: 4
     SortPriority: 3
-  - Regex: '^[<"]lib/transmission/'
+  - Regex: '^[<"]tr/torrent/'
     Priority: 4
     SortPriority: 4
-  - Regex: '^[<"]lib/base/'
+  - Regex: '^[<"]tr/base/'
     Priority: 5
   - Regex: '^<(cairo|gdk|gio|glib|gtk|pango)mm([-./]|config)'
     Priority: 6

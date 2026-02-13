@@ -19,8 +19,8 @@
 #include <QProxyStyle>
 #include <QtGui>
 
-#include <lib/transmission/transmission.h>
-#include <lib/transmission/version.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/version.h"
 
 #include "AboutDialog.h"
 #include "AddData.h"

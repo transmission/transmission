@@ -14,15 +14,15 @@
 #include "TorrentSorter.h"
 #include "Utils.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/rpcimpl.h"
-#include "lib/transmission/torrent-metainfo.h"
-#include "lib/transmission/utils.h" // tr_time()
-#include "lib/transmission/web-utils.h" // tr_urlIsValid()
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/rpcimpl.h"
+#include "tr/torrent/torrent-metainfo.h"
+#include "tr/torrent/utils.h" // tr_time()
+#include "tr/torrent/web-utils.h" // tr_urlIsValid()
 
-#include "lib/base/env.h"
-#include "lib/base/log.h"
-#include "lib/base/variant.h"
+#include "tr/base/env.h"
+#include "tr/base/log.h"
+#include "tr/base/variant.h"
 
 #include <giomm/asyncresult.h>
 #include <giomm/dbusconnection.h>

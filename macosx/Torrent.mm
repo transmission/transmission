@@ -7,11 +7,11 @@
 
 #include <fmt/format.h>
 
-#include "lib/base/error.h"
-#include "lib/base/log.h"
-#include "lib/base/string-utils.h"
+#include "tr/base/error.h"
+#include "tr/base/log.h"
+#include "tr/base/string-utils.h"
 
-#include "lib/transmission/transmission.h"
+#include "tr/torrent/transmission.h"
 
 #import "Torrent.h"
 #import "GroupsController.h"

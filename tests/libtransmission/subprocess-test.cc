@@ -14,12 +14,12 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/error.h"
-#include "lib/base/file.h"
-#include "lib/base/string-utils.h"
-#include "lib/base/tr-macros.h"
+#include "tr/base/error.h"
+#include "tr/base/file.h"
+#include "tr/base/string-utils.h"
+#include "tr/base/tr-macros.h"
 
-#include "lib/transmission/subprocess.h"
+#include "tr/torrent/subprocess.h"
 
 #include "test-fixtures.h"
 

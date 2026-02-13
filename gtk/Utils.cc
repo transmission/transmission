@@ -9,16 +9,16 @@
 #include "PrefsDialog.h"
 #include "Session.h"
 
-#include <lib/transmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
-#include <lib/transmission/torrent-metainfo.h>
-#include <lib/transmission/utils.h> /* tr_strratio() */
-#include <lib/transmission/version.h> /* SHORT_VERSION_STRING */
-#include <lib/transmission/web-utils.h>
+#include "tr/torrent/transmission.h" /* TR_RATIO_NA, TR_RATIO_INF */
+#include "tr/torrent/torrent-metainfo.h"
+#include "tr/torrent/utils.h" /* tr_strratio() */
+#include "tr/torrent/version.h" /* SHORT_VERSION_STRING */
+#include "tr/torrent/web-utils.h"
 
-#include "lib/base/error.h"
-#include "lib/base/string-utils.h"
-#include "lib/base/tr-strbuf.h"
-#include "lib/base/values.h"
+#include "tr/base/error.h"
+#include "tr/base/string-utils.h"
+#include "tr/base/tr-strbuf.h"
+#include "tr/base/values.h"
 
 #include <gdkmm/display.h>
 #include <giomm/appinfo.h>

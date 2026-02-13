@@ -2,7 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <lib/transmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
 #import "FileNameCellView.h"
 #import "FileListNode.h"

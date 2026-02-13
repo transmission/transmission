@@ -10,9 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include <lib/transmission/timer.h>
-#include <lib/transmission/timer-ev.h>
-#include <lib/transmission/utils-ev.h>
+#include "tr/torrent/timer.h"
+#include "tr/torrent/timer-ev.h"
+#include "tr/torrent/utils-ev.h"
 
 #include "test-fixtures.h"
 

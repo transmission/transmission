@@ -7,10 +7,10 @@
 #include <cstddef> // size_t, std::byte
 #include <string_view>
 
-#include "lib/base/tr-macros.h"
+#include "tr/base/tr-macros.h"
 
-#include "lib/transmission/crypto-utils.h" // tr_rand_buffer()
-#include "lib/transmission/magnet-metainfo.h"
+#include "tr/torrent/crypto-utils.h" // tr_rand_buffer()
+#include "tr/torrent/magnet-metainfo.h"
 
 #include "test-fixtures.h"
 

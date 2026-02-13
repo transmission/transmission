@@ -15,11 +15,11 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/quark.h"
-#include "lib/base/variant.h"
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/rpcimpl.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/rpcimpl.h"
 
 #include "test-fixtures.h"
 

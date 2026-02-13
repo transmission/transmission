@@ -26,22 +26,22 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
-#include "lib/base/env.h"
-#include "lib/base/file-utils.h"
-#include "lib/base/file.h"
-#include "lib/base/quark.h"
-#include "lib/base/string-utils.h"
-#include "lib/base/tr-assert.h"
-#include "lib/base/tr-getopt.h"
-#include "lib/base/values.h"
-#include "lib/base/variant.h"
+#include "tr/base/env.h"
+#include "tr/base/file-utils.h"
+#include "tr/base/file.h"
+#include "tr/base/quark.h"
+#include "tr/base/string-utils.h"
+#include "tr/base/tr-assert.h"
+#include "tr/base/tr-getopt.h"
+#include "tr/base/values.h"
+#include "tr/base/variant.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/api-compat.h"
-#include "lib/transmission/crypto-utils.h"
-#include "lib/transmission/rpcimpl.h"
-#include "lib/transmission/utils.h"
-#include "lib/transmission/version.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/api-compat.h"
+#include "tr/torrent/crypto-utils.h"
+#include "tr/torrent/rpcimpl.h"
+#include "tr/torrent/utils.h"
+#include "tr/torrent/version.h"
 
 using namespace std::literals;
 

@@ -9,7 +9,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <lib/transmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
 #include <glibmm/i18n.h>
 #include <glibmm/ustring.h>
@@ -30,7 +30,7 @@
 #ifdef APPINDICATOR_IS_AYATANA
 #include <libayatana-appindicator/app-indicator.h>
 #else
-#include <libappindicator/app-indicator.h>
+#include <libappindicator/app-indicator.h"
 #endif
 #endif
 

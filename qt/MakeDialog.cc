@@ -19,10 +19,10 @@
 #include <QString>
 #include <QTimer>
 
-#include "lib/base/error.h"
+#include "tr/base/error.h"
 
-#include "lib/transmission/makemeta.h"
-#include "lib/transmission/transmission.h"
+#include "tr/torrent/makemeta.h"
+#include "tr/torrent/transmission.h"
 
 #include "ColumnResizer.h"
 #include "Formatter.h"

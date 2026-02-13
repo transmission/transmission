@@ -11,11 +11,11 @@
 #include <QString>
 #include <QUrl>
 
-#include "lib/base/quark.h"
-#include "lib/base/variant.h"
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/utils.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/utils.h"
 
 #include "Application.h"
 #include "IconCache.h"

@@ -7,7 +7,7 @@
 
 #import <Sparkle/SUUpdaterDelegate.h>
 
-#include <lib/transmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
 #import "VDKQueue.h"
 

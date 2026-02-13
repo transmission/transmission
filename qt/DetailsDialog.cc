@@ -30,9 +30,9 @@
 #include <QStyle>
 #include <QTreeWidgetItem>
 
-#include <lib/transmission/transmission.h>
-#include <lib/transmission/announce-list.h>
-#include <lib/transmission/utils.h> // tr_getRatio()
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/announce-list.h"
+#include "tr/torrent/utils.h" // tr_getRatio()
 
 #include "BaseDialog.h"
 #include "ColumnResizer.h"

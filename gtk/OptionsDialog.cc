@@ -14,9 +14,9 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include "lib/transmission/transmission.h"
+#include "tr/torrent/transmission.h"
 
-#include "lib/base/file.h" // tr_sys_path_is_same()
+#include "tr/base/file.h" // tr_sys_path_is_same()
 
 #include <giomm/file.h>
 #include <glibmm/i18n.h>

@@ -12,8 +12,8 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include <lib/transmission/announcer-common.h>
-#include <lib/transmission/net.h>
+#include "tr/torrent/announcer-common.h"
+#include "tr/torrent/net.h"
 
 #include "test-fixtures.h"
 

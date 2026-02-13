@@ -16,13 +16,13 @@
 
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
 
-#include "lib/base/log.h"
-#include "lib/base/string-utils.h"
-#include "lib/base/values.h"
-#include "lib/base/variant.h"
+#include "tr/base/log.h"
+#include "tr/base/string-utils.h"
+#include "tr/base/values.h"
+#include "tr/base/variant.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/torrent-metainfo.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/torrent-metainfo.h"
 
 #import "VDKQueue.h"
 

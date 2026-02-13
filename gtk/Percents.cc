@@ -1,6 +1,6 @@
 #include "Percents.h"
 
-#include <lib/transmission/utils.h>
+#include "tr/torrent/utils.h"
 
 std::string Percents::to_string() const
 {

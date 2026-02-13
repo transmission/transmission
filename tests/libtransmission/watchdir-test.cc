@@ -22,14 +22,14 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/file.h"
-#include "lib/base/tr-strbuf.h"
+#include "tr/base/file.h"
+#include "tr/base/tr-strbuf.h"
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
-#include "lib/transmission/timer.h"
-#include "lib/transmission/timer-ev.h"
-#include "lib/transmission/watchdir.h"
-#include "lib/transmission/watchdir-base.h"
+#include "tr/torrent/timer.h"
+#include "tr/torrent/timer-ev.h"
+#include "tr/torrent/watchdir.h"
+#include "tr/torrent/watchdir-base.h"
 
 #include "test-fixtures.h"
 

@@ -12,8 +12,8 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include "lib/base/file-utils.h"
-#include "lib/base/string-utils.h"
+#include "tr/base/file-utils.h"
+#include "tr/base/string-utils.h"
 
 #include <giomm/icon.h>
 #include <glibmm/fileutils.h>

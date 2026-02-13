@@ -18,11 +18,11 @@
 #include <QString>
 #include <QStringList>
 
-#include "lib/base/quark.h"
-#include "lib/base/tr-macros.h"
+#include "tr/base/quark.h"
+#include "tr/base/tr-macros.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/crypto-utils.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/crypto-utils.h"
 
 #include "IconCache.h"
 #include "Speed.h"

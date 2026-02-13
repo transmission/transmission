@@ -2,7 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <lib/transmission/version.h>
+#include "tr/torrent/version.h"
 
 #import "AboutWindowController.h"
 

@@ -5,9 +5,9 @@
 
 #include <cstdint>
 
-#include <lib/transmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
-#include <lib/transmission/block-info.h>
+#include "tr/torrent/block-info.h"
 
 #include "test-fixtures.h"
 

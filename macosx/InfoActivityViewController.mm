@@ -2,8 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <lib/transmission/transmission.h>
-#include <lib/transmission/utils.h> //tr_getRatio()
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/utils.h" //tr_getRatio()
 
 #import "InfoActivityViewController.h"
 #import "NSStringAdditions.h"

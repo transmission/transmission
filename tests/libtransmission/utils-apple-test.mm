@@ -10,7 +10,7 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/string-utils.h"
+#include "tr/base/string-utils.h"
 
 #include "test-fixtures.h"
 

@@ -4,7 +4,7 @@
 
 #import <AppKit/AppKit.h>
 
-#include <lib/transmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
 @interface GlobalOptionsPopoverViewController : NSViewController
 

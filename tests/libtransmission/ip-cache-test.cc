@@ -13,10 +13,10 @@
 #include <string_view>
 #include <utility>
 
-#include <lib/transmission/ip-cache.h>
-#include <lib/transmission/net.h>
-#include <lib/transmission/timer.h>
-#include <lib/transmission/web.h>
+#include "tr/torrent/ip-cache.h"
+#include "tr/torrent/net.h"
+#include "tr/torrent/timer.h"
+#include "tr/torrent/web.h"
 
 #include "test-fixtures.h"
 

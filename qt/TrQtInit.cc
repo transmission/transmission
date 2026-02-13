@@ -5,7 +5,7 @@
 
 #include "TrQtInit.h"
 
-#include <lib/app/app.h>
+#include "tr/app/app.h"
 
 #include "VariantHelpers.h"
 

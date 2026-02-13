@@ -11,11 +11,11 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/variant.h"
+#include "tr/base/variant.h"
 
-#include "lib/base/serializer.h"
+#include "tr/base/serializer.h"
 
-#include "lib/app/display-modes.h"
+#include "tr/app/display-modes.h"
 
 #include "test-fixtures.h"
 

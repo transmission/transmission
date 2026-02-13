@@ -8,8 +8,8 @@
 #include <memory>
 #include <string_view>
 
-#include <lib/transmission/crypto-utils.h>
-#include <lib/transmission/tr-buffer.h>
+#include "tr/torrent/crypto-utils.h"
+#include "tr/torrent/tr-buffer.h"
 
 #include "test-fixtures.h"
 

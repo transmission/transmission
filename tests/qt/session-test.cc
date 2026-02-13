@@ -11,10 +11,10 @@
 #include <QRegularExpression>
 #include <QTest>
 
-#include "lib/base/env.h"
+#include "tr/base/env.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/api-compat.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/api-compat.h"
 
 #include "Prefs.h"
 #include "Session.h"

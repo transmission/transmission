@@ -21,16 +21,16 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/error.h"
-#include "lib/base/file.h" // tr_sys_file_*()
-#include "lib/base/quark.h"
-#include "lib/base/variant.h"
+#include "tr/base/error.h"
+#include "tr/base/file.h" // tr_sys_file_*()
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/crypto-utils.h" // tr_base64_decode()
-#include "lib/transmission/torrent-ctor.h"
-#include "lib/transmission/torrent.h"
-#include "lib/transmission/utils.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/crypto-utils.h" // tr_base64_decode()
+#include "tr/torrent/torrent-ctor.h"
+#include "tr/torrent/torrent.h"
+#include "tr/torrent/utils.h"
 
 using namespace std::literals;
 

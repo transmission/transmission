@@ -24,13 +24,13 @@
 #include "Torrent.h"
 #include "Utils.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/api-compat.h"
-#include "lib/transmission/rpcimpl.h"
-#include "lib/transmission/version.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/api-compat.h"
+#include "tr/torrent/rpcimpl.h"
+#include "tr/torrent/version.h"
 
-#include "lib/base/log.h"
-#include "lib/base/quark.h"
+#include "tr/base/log.h"
+#include "tr/base/quark.h"
 
 #include <gdkmm/display.h>
 #include <giomm/appinfo.h>

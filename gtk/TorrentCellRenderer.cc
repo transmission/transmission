@@ -9,7 +9,7 @@
 #include "Percents.h"
 #include "Torrent.h"
 
-#include <lib/transmission/transmission.h>
+#include "tr/torrent/transmission.h>
 
 #include <cairomm/context.h>
 #include <cairomm/refptr.h>
@@ -219,9 +219,10 @@ void TorrentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget, int& m
     if (impl_->property_torrent().get_value() != nullptr)
     {
         auto const size = impl_->property_compact().get_value() ? impl_->get_size_compact(widget) :
-                                                                  impl_->get_size_full(widget);
+                                                                  impl_ -
+                "get_size_full(widget);
 
-        minimum_height = size.height;
+                minimum_height = size.height;
         natural_height = minimum_height;
     }
 }

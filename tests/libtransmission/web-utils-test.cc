@@ -15,8 +15,8 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include <lib/transmission/crypto-utils.h>
-#include <lib/transmission/web-utils.h>
+#include "tr/torrent/crypto-utils.h"
+#include "tr/torrent/web-utils.h"
 
 #include "test-fixtures.h"
 

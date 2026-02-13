@@ -8,7 +8,7 @@
 
 #include <event2/event.h>
 
-#include <lib/transmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
 #include "dns-ev.h"
 #include "dns.h"

@@ -8,12 +8,12 @@
 #include "Prefs.h"
 #include "Torrent.h"
 
-#include "lib/app/favicon-cache.h"
+#include "tr/app/favicon-cache.h"
 
-#include "lib/transmission/transmission.h"
+#include "tr/torrent/transmission.h"
 
-#include "lib/base/serializer.h"
-#include "lib/base/variant.h"
+#include "tr/base/serializer.h"
+#include "tr/base/variant.h"
 
 #include <gdkmm/pixbuf.h>
 #include <giomm/file.h>

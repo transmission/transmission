@@ -14,13 +14,13 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include "lib/transmission/utils.h"
-#include "lib/transmission/web-utils.h"
+#include "tr/torrent/utils.h"
+#include "tr/torrent/web-utils.h"
 
-#include "lib/base/file-utils.h"
-#include "lib/base/string-utils.h"
-#include "lib/base/tr-macros.h"
-#include "lib/base/values.h"
+#include "tr/base/file-utils.h"
+#include "tr/base/string-utils.h"
+#include "tr/base/tr-macros.h"
+#include "tr/base/values.h"
 
 #include <gdkmm/pixbuf.h>
 #include <glibmm/i18n.h>

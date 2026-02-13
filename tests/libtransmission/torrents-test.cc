@@ -13,12 +13,12 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/tr-strbuf.h"
+#include "tr/base/tr-strbuf.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/torrent.h"
-#include "lib/transmission/torrents.h"
-#include "lib/transmission/torrent-metainfo.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/torrent.h"
+#include "tr/torrent/torrents.h"
+#include "tr/torrent/torrent-metainfo.h"
 
 #include "test-fixtures.h"
 

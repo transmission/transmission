@@ -10,7 +10,7 @@
 
 #include <small/set.hpp>
 
-#include <lib/transmission/transmission.h> // priorities
+#include "tr/torrent/transmission.h" // priorities
 
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"

@@ -29,22 +29,22 @@
 
 #include <fmt/format.h>
 
-#include "lib/base/error.h"
-#include "lib/base/file-utils.h"
-#include "lib/base/file.h"
-#include "lib/base/i18n.h"
-#include "lib/base/log.h"
-#include "lib/base/quark.h"
-#include "lib/base/string-utils.h"
-#include "lib/base/tr-getopt.h"
-#include "lib/base/tr-strbuf.h"
-#include "lib/base/variant.h"
+#include "tr/base/error.h"
+#include "tr/base/file-utils.h"
+#include "tr/base/file.h"
+#include "tr/base/i18n.h"
+#include "tr/base/log.h"
+#include "tr/base/quark.h"
+#include "tr/base/string-utils.h"
+#include "tr/base/tr-getopt.h"
+#include "tr/base/tr-strbuf.h"
+#include "tr/base/variant.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/timer-ev.h"
-#include "lib/transmission/utils.h"
-#include "lib/transmission/version.h"
-#include "lib/transmission/watchdir.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/timer-ev.h"
+#include "tr/torrent/utils.h"
+#include "tr/torrent/version.h"
+#include "tr/torrent/watchdir.h"
 
 #include "daemon.h"
 

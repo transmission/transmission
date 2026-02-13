@@ -9,9 +9,9 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/string-utils.h"
+#include "tr/base/string-utils.h"
 
-#include "lib/transmission/crypto-utils.h" // tr_rand_int()
+#include "tr/torrent/crypto-utils.h" // tr_rand_int()
 
 #include "test-fixtures.h"
 

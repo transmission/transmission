@@ -10,12 +10,12 @@
 #include "Percents.h"
 #include "Utils.h"
 
-#include <lib/transmission/transmission.h>
-#include <lib/transmission/utils.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/utils.h"
 
-#include "lib/base/file-utils.h"
-#include "lib/base/tr-macros.h"
-#include "lib/base/values.h"
+#include "tr/base/file-utils.h"
+#include "tr/base/tr-macros.h"
+#include "tr/base/values.h"
 
 #include <glibmm/i18n.h>
 #include <glibmm/value.h>

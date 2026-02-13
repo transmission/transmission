@@ -18,9 +18,9 @@
 #include <QNetworkReply>
 #include <QTimer>
 
-#include "lib/base/quark.h"
+#include "tr/base/quark.h"
 
-#include "lib/transmission/transmission.h"
+#include "tr/torrent/transmission.h"
 
 #include "RpcClient.h"
 #include "RpcQueue.h"

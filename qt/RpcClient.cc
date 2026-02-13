@@ -18,10 +18,10 @@
 #include <QNetworkRequest>
 #include <QVersionNumber>
 
-#include <lib/transmission/api-compat.h>
-#include <lib/transmission/rpcimpl.h>
-#include <lib/transmission/transmission.h>
-#include <lib/transmission/version.h> // LONG_VERSION_STRING
+#include "tr/torrent/api-compat.h"
+#include "tr/torrent/rpcimpl.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/version.h" // LONG_VERSION_STRING
 
 #include "VariantHelpers.h"
 

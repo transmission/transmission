@@ -8,9 +8,9 @@
 #include "FilterBase.hh"
 #include "Utils.h"
 
-#include "lib/transmission/transmission.h"
+#include "tr/torrent/transmission.h"
 
-#include "lib/base/tr-macros.h"
+#include "tr/base/tr-macros.h"
 
 #include <algorithm>
 #include <array>

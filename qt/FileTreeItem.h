@@ -17,7 +17,7 @@
 #include "Utils.h" // for std::hash<QString>
 #include "Typedefs.h"
 
-#include "lib/base/tr-macros.h"
+#include "tr/base/tr-macros.h"
 
 class FileTreeItem
 {

@@ -17,19 +17,19 @@
 
 #include <fmt/format.h>
 
-#include "lib/base/error.h"
-#include "lib/base/file.h"
-#include "lib/base/i18n.h"
-#include "lib/base/log.h"
-#include "lib/base/tr-getopt.h"
-#include "lib/base/values.h"
+#include "tr/base/error.h"
+#include "tr/base/file.h"
+#include "tr/base/i18n.h"
+#include "tr/base/log.h"
+#include "tr/base/tr-getopt.h"
+#include "tr/base/values.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/announce-list.h"
-#include "lib/transmission/makemeta.h"
-#include "lib/transmission/torrent-files.h"
-#include "lib/transmission/utils.h"
-#include "lib/transmission/version.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/announce-list.h"
+#include "tr/torrent/makemeta.h"
+#include "tr/torrent/torrent-files.h"
+#include "tr/torrent/utils.h"
+#include "tr/torrent/version.h"
 
 using namespace std::literals;
 

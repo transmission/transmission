@@ -7,11 +7,11 @@
 #include <QFile>
 #include <QFileInfo>
 
-#include "lib/base/error.h"
+#include "tr/base/error.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/torrent-metainfo.h"
-#include "lib/transmission/web-utils.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/torrent-metainfo.h"
+#include "tr/torrent/web-utils.h"
 
 #include "AddData.h"
 #include "Utils.h"

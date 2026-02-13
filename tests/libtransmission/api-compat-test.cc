@@ -7,10 +7,10 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/quark.h"
-#include "lib/base/variant.h"
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
-#include "lib/transmission/api-compat.h"
+#include "tr/torrent/api-compat.h"
 
 #include "test-fixtures.h"
 

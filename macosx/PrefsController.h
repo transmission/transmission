@@ -5,7 +5,7 @@
 #import "PortChecker.h"
 #import <AppKit/AppKit.h>
 
-#include <lib/transmission/transmission.h>
+#include "tr/torrent/transmission.h>
 
 @interface PrefsController : NSWindowController<NSToolbarDelegate, PortCheckerDelegate>
 

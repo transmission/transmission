@@ -11,16 +11,16 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/error.h"
-#include "lib/base/file-utils.h"
-#include "lib/base/file.h"
-#include "lib/base/log.h"
-#include "lib/base/tr-strbuf.h"
+#include "tr/base/error.h"
+#include "tr/base/file-utils.h"
+#include "tr/base/file.h"
+#include "tr/base/log.h"
+#include "tr/base/tr-strbuf.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/crypto-utils.h"
-#include "lib/transmission/torrent-metainfo.h"
-#include "lib/transmission/torrent.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/crypto-utils.h"
+#include "tr/torrent/torrent-metainfo.h"
+#include "tr/torrent/torrent.h"
 
 #include "test-fixtures.h"
 

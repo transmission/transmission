@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <lib/transmission/transmission.h>
+#include "tr/torrent/types.h"
 
 #include <glibmm/refptr.h>
 #include <gtkmm/window.h>

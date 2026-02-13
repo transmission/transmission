@@ -10,10 +10,10 @@
 #include <QString>
 #include <QWidget>
 
-#include "lib/base/quark.h"
-#include "lib/base/variant.h"
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
-#include "lib/transmission/transmission.h"
+#include "tr/torrent/transmission.h"
 
 #include "Formatter.h"
 #include "FreeSpaceLabel.h"

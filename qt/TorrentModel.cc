@@ -12,10 +12,10 @@
 #include <string_view>
 #include <vector>
 
-#include "lib/transmission/transmission.h"
+#include "tr/torrent/transmission.h"
 
-#include "lib/base/quark.h"
-#include "lib/base/variant.h"
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
 #include "Torrent.h"
 #include "TorrentDelegate.h"

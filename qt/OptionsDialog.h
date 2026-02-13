@@ -19,9 +19,9 @@
 #include "Typedefs.h" // file_indices_t
 #include "ui_OptionsDialog.h"
 
-#include <lib/transmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
-#include <lib/transmission/torrent-metainfo.h>
+#include "tr/torrent/torrent-metainfo.h"
 
 class Prefs;
 class Session;

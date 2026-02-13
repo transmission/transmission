@@ -34,21 +34,21 @@
 
 #include <gtest/gtest.h>
 
-#include "lib/base/file.h"
-#include "lib/base/log.h"
-#include "lib/base/quark.h"
-#include "lib/base/tr-macros.h"
-#include "lib/base/tr-strbuf.h"
-#include "lib/base/variant.h"
+#include "tr/base/file.h"
+#include "tr/base/log.h"
+#include "tr/base/quark.h"
+#include "tr/base/tr-macros.h"
+#include "tr/base/tr-strbuf.h"
+#include "tr/base/variant.h"
 
-#include "lib/transmission/transmission.h"
-#include "lib/transmission/crypto-utils.h" // tr_rand_obj
-#include "lib/transmission/net.h"
-#include "lib/transmission/session-thread.h" // for tr_evthread_init();
-#include "lib/transmission/timer.h"
-#include "lib/transmission/timer-ev.h"
-#include "lib/transmission/tr-dht.h"
-#include "lib/transmission/utils.h"
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/crypto-utils.h" // tr_rand_obj
+#include "tr/torrent/net.h"
+#include "tr/torrent/session-thread.h" // for tr_evthread_init();
+#include "tr/torrent/timer.h"
+#include "tr/torrent/timer-ev.h"
+#include "tr/torrent/tr-dht.h"
+#include "tr/torrent/utils.h"
 
 #include "test-fixtures.h"
 
