@@ -10,7 +10,6 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
-#include <netinet/in.h> // IPV6_V6ONLY, IPPROTO_IPV6
 #include <sys/socket.h> // setsockopt, SOL_SOCKET, bind
 #endif
 
