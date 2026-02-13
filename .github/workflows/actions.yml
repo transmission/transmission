@@ -339,8 +339,13 @@ jobs:
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
 
-  macos-xcodebuild-universal:
-    runs-on: macos-26
+  macos-xcodebuild:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26]
+        arch: [arm64, x86_64]
+    runs-on: ${{ matrix.os }}
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
             needs.what-to-make.outputs.make-daemon == 'true' ||
@@ -360,11 +365,11 @@ jobs:
           path: src
           submodules: recursive
       - name: Build
-        run: set -o pipefail && xcodebuild -project src/Transmission.xcodeproj -scheme Transmission -configuration 'Release - Debug' -derivedDataPath pfx ONLY_ACTIVE_ARCH=NO build | xcbeautify --renderer github-actions
+        run: set -o pipefail && xcodebuild -project src/Transmission.xcodeproj -scheme Transmission -configuration 'Release - Debug' -derivedDataPath pfx-${{ matrix.arch }} -destination "platform=macOS,arch=${{ matrix.arch }}" ARCHS=${{ matrix.arch }} ONLY_ACTIVE_ARCH=YES build | xcbeautify --renderer github-actions
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}
-          path: pfx/Build/Products/**/Transmission.app*
+          name: binaries-${{ matrix.os }}-${{ matrix.arch }}-xcodebuild
+          path: pfx-${{ matrix.arch }}/Build/Products/**/Transmission.app*
 
   macos-cmake-universal:
     strategy:
