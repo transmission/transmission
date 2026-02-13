@@ -9,7 +9,7 @@
 #include "Percents.h"
 #include "Torrent.h"
 
-#include "tr/torrent/transmission.h>
+#include "tr/torrent/transmission.h"
 
 #include <cairomm/context.h>
 #include <cairomm/refptr.h>
