@@ -19,10 +19,7 @@ import { LabelsDialog } from './labels-dialog.js';
 import { ShortcutsDialog } from './shortcuts-dialog.js';
 import { StatisticsDialog } from './statistics-dialog.js';
 import { Torrent } from './torrent.js';
-import {
-  TorrentRendererCompact,
-  TorrentRendererFull,
-} from './torrent-row.js';
+import { TorrentRendererCompact, TorrentRendererFull } from './torrent-row.js';
 import {
   newOpts,
   icon,
@@ -346,7 +343,10 @@ export class Transmission extends EventTarget {
 
     // Set up click handlers
     this.pointer_event(this.elements.torrent_list, right_click);
-    this.elements.torrent_list.addEventListener('click', this._onRowClicked.bind(this));
+    this.elements.torrent_list.addEventListener(
+      'click',
+      this._onRowClicked.bind(this),
+    );
 
     // Get preferences & torrents from the daemon
     this.loadDaemonPrefs();
@@ -372,7 +372,7 @@ export class Transmission extends EventTarget {
         clusterChanged: () => {
           // Update selections on newly rendered rows
           this._updateVisibleSelections();
-        }
+        },
       },
       contentId: 'torrent-list',
       no_data_class: '',
@@ -388,7 +388,9 @@ export class Transmission extends EventTarget {
   _generateTorrentRowHTML(torrent) {
     // Use existing renderers to create a temporary DOM element, then extract HTML
     const isCompact = this.prefs.display_mode === Prefs.DisplayCompact;
-    const renderer = isCompact ? new TorrentRendererCompact() : new TorrentRendererFull();
+    const renderer = isCompact
+      ? new TorrentRendererCompact()
+      : new TorrentRendererFull();
 
     // Create temporary row using existing renderer
     const tempRow = renderer.createRow(torrent);
@@ -606,7 +608,7 @@ export class Transmission extends EventTarget {
 
   getSelectedTorrents() {
     return [...this._selectedTorrentIds]
-      .map(id => this._torrents[id])
+      .map((id) => this._torrents[id])
       .filter(Boolean);
   }
 
@@ -656,7 +658,10 @@ export class Transmission extends EventTarget {
       for (const element of this.elements.torrent_list.children) {
         const torrentId = Number.parseInt(element.dataset.torrentId, 10);
         if (torrentId) {
-          element.classList.toggle('selected', this._selectedTorrentIds.has(torrentId));
+          element.classList.toggle(
+            'selected',
+            this._selectedTorrentIds.has(torrentId),
+          );
         }
       }
     }
@@ -687,8 +692,12 @@ export class Transmission extends EventTarget {
     }
 
     // Find indices in the current torrent order
-    const currentIndex = this._torrentOrder.findIndex(t => t.getId() === torrentId);
-    const lastIndex = this._torrentOrder.findIndex(t => t.getId() === this._last_torrent_clicked);
+    const currentIndex = this._torrentOrder.findIndex(
+      (t) => t.getId() === torrentId,
+    );
+    const lastIndex = this._torrentOrder.findIndex(
+      (t) => t.getId() === this._last_torrent_clicked,
+    );
 
     if (currentIndex === -1 || lastIndex === -1) {
       this._selectTorrent(torrentId);
@@ -817,13 +826,15 @@ export class Transmission extends EventTarget {
         if (torrent) {
           event_.preventDefault();
           this._last_torrent_clicked = torrent.getId();
-          const rowElem = Array.from(this.elements.torrent_list.children).find(
-            (element) => Number.parseInt(element.dataset.torrentId, 10) === torrent.getId()
+          const rowElem = [...this.elements.torrent_list.children].find(
+            (element) =>
+              Number.parseInt(element.dataset.torrentId, 10) ===
+              torrent.getId(),
           );
           if (rowElem) {
             rowElem.scrollIntoView({
               block: 'nearest',
-              inline: 'nearest'
+              inline: 'nearest',
             });
           }
         }
@@ -928,7 +939,7 @@ export class Transmission extends EventTarget {
     );
   }
 
-  _onTorrentChanged(event_) {
+  _onTorrentChanged() {
     if (this.changeStatus) {
       this._dispatchSelectionChanged();
       this.changeStatus = false;
@@ -1184,7 +1195,11 @@ TODO: fix this when notifications get fixed
       (accumulator, tor) => accumulator + tor.getDownloadSpeed(),
       0,
     );
-    const string = fmt.countString('Transfer', 'Transfers', this._torrentOrder.length);
+    const string = fmt.countString(
+      'Transfer',
+      'Transfers',
+      this._torrentOrder.length,
+    );
 
     setTextContent(this.speed.down, fmt.speedBps(d));
     setTextContent(this.speed.up, fmt.speedBps(u));
@@ -1275,15 +1290,15 @@ TODO: fix this when notifications get fixed
 
     // Sort the torrents
     filteredTorrents.sort((a, b) =>
-      Torrent.compareTorrents(a, b, sort_mode, sort_direction)
+      Torrent.compareTorrents(a, b, sort_mode, sort_direction),
     );
 
     // Update torrent order for range selection
     this._torrentOrder = filteredTorrents;
 
     // Generate HTML for each torrent
-    const rowsHTML = filteredTorrents.map(torrent =>
-      this._generateTorrentRowHTML(torrent)
+    const rowsHTML = filteredTorrents.map((torrent) =>
+      this._generateTorrentRowHTML(torrent),
     );
 
     // Update clusterize with new data
@@ -1294,7 +1309,8 @@ TODO: fix this when notifications get fixed
     }
 
     // Refresh clusterize if virtual scrolling is being performed
-    if (rowsHTML.length > 100) { // 25 blocks * 4 clusters
+    // Clusterize kicks in above 25 blocks * 4 clusters
+    if (rowsHTML.length > 100) {
       setTimeout(() => {
         this._clusterize.refresh(true);
       }, 50);

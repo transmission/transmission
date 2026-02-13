@@ -30,7 +30,8 @@ export class Inspector extends EventTarget {
     this.current_page = this.elements.info.root;
     this.interval = setInterval(this._refreshTorrents.bind(this), 3000);
     this.name = 'inspector';
-    this.selection_listener = (event_) => this._setTorrents(event_.selected, true);
+    this.selection_listener = (event_) =>
+      this._setTorrents(event_.selected, true);
     this.torrent_listener = () => this._updateCurrentPage();
     this.torrents = [];
     this.file_torrent = null;

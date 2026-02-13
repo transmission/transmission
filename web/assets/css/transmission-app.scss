@@ -1767,21 +1767,21 @@ dialog {
 
 /// CLUSTERIZE
 
-.clusterize-scroll{
+.clusterize-scroll {
   max-height: 200px;
   overflow: auto;
 }
 
-.clusterize-extra-row{
+.clusterize-extra-row {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
 
-.clusterize-extra-row.clusterize-keep-parity{
+.clusterize-extra-row.clusterize-keep-parity {
   display: none;
 }
 
-.clusterize-content{
+.clusterize-content {
   outline: 0;
   counter-reset: clusterize-counter;
 }
