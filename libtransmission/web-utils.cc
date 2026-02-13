@@ -652,10 +652,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
             remain.remove_prefix(std::size(parsed.host));
         }
 
-        // just encode to punycode (RFC 3492), if not needed then this will do nothing
-        // for now this allows us to check whether to host *would be* valid if used later
-        auto host_idn = punycode::to_ascii(parsed.host);
-        if (!hostIsValid(*host_idn))
+        if (!hostIsValid(parsed.host))
         {
             return std::nullopt;
         }
@@ -785,4 +782,89 @@ std::string tr_urlPercentDecode(std::string_view in)
     }
 
     return out;
+}
+
+[[nodiscard]] std::string tr_normalize_url(std::string_view url)
+{
+    auto const scheme_end = url.find("://"sv);
+
+    if (scheme_end == std::string_view::npos)
+    {
+        // no authority (e.g. magnet:) — percent-encode after scheme:
+        auto const colon = url.find(':');
+        if (colon == std::string_view::npos)
+        {
+            return std::string{ url };
+        }
+        auto result = tr_urlbuf{};
+        result += url.substr(0, colon + 1);
+        tr_urlPercentEncode(std::back_inserter(result), url.substr(colon + 1), false);
+        return std::string{ result.sv() };
+    }
+
+    auto const authority_start = scheme_end + 3;
+    auto const prefix = url.substr(0, authority_start); // "http://"
+    auto const rest = url.substr(authority_start);
+
+    // find end of host
+    size_t host_end;
+    if (!rest.empty() && rest[0] == '[')
+    {
+        // bracketed IPv6
+        auto const bracket = rest.find(']');
+        host_end = (bracket == std::string_view::npos) ? rest.size() : bracket + 1;
+    }
+    else
+    {
+        auto const path_start = rest.find_first_of("/?#"sv);
+        auto const authority = rest.substr(0, path_start);
+
+        if (std::ranges::count(authority, ':') > 1)
+        {
+            // bare IPv6, no port — entire authority is the host
+            host_end = (path_start == std::string_view::npos) ? rest.size() : path_start;
+        }
+        else
+        {
+            host_end = rest.find_first_of(":/?#"sv);
+            if (host_end == std::string_view::npos)
+            {
+                host_end = rest.size();
+            }
+        }
+    }
+
+    auto const host = rest.substr(0, host_end);
+    auto const after_host = rest.substr(host_end);
+
+    // skip past port
+    size_t encode_start = 0;
+    if (!after_host.empty() && after_host[0] == ':')
+    {
+        encode_start = 1;
+        while (encode_start < after_host.size() && after_host[encode_start] >= '0' && after_host[encode_start] <= '9')
+        {
+            ++encode_start;
+        }
+    }
+    auto const port_str = after_host.substr(0, encode_start);
+    auto const to_encode = after_host.substr(encode_start);
+
+    // build result
+    auto result = tr_urlbuf{};
+    result += prefix;
+
+    if (punycode::needs_encoding(host))
+    {
+        result += punycode::to_ascii(host).value_or(std::string{ host });
+    }
+    else
+    {
+        result += host;
+    }
+
+    result += port_str;
+    tr_urlPercentEncode(std::back_inserter(result), to_encode, false);
+
+    return std::string{ result.sv() };
 }
