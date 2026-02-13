@@ -214,8 +214,8 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_
         {
             gtr_warning(
                 fmt::format(
-                    fmt::runtime(_("Couldn't spawn async process '{command}': {error} ({error_code})")),
-                    fmt::arg("command", fmt::join(argv, " ")),
+                    fmt::runtime(_("Couldn't spawn async process \"'{command}'\": {error} ({error_code})")),
+                    fmt::arg("command", fmt::join(argv, "' '")),
                     fmt::arg("error", e.what()),
                     fmt::arg("error_code", static_cast<int>(e.code()))));
         }
