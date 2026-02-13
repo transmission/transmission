@@ -18,10 +18,7 @@ const peer_column_classes = [
   'peer-app-name',
 ];
 
-const webseed_column_classes = [
-  'url',
-  'speed-down'
-];
+const webseed_column_classes = ['url', 'speed-down'];
 
 export class Inspector extends EventTarget {
   constructor(controller) {
