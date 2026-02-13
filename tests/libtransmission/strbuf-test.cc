@@ -7,7 +7,7 @@
 #include <iterator>
 #include <string_view>
 
-#include <lib/base/tr-strbuf.h>
+#include "lib/base/tr-strbuf.h"
 
 #include "test-fixtures.h"
 

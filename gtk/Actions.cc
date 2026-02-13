@@ -10,7 +10,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <lib/base/quark.h>
+#include "lib/base/quark.h"
 
 #include <giomm/simpleaction.h>
 #include <glibmm/i18n.h>

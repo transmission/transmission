@@ -25,9 +25,9 @@
 #include <QAccessible>
 #endif
 
-#include <lib/transmission/transmission.h>
+#include "lib/transmission/transmission.h"
 
-#include <lib/base/values.h>
+#include "lib/base/values.h"
 
 #include "AccessibleSqueezeLabel.h"
 #include "AddData.h"

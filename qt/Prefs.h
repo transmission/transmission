@@ -12,10 +12,10 @@
 #include <QString>
 #include <QVariant>
 
-#include <lib/base/quark.h>
-#include <lib/base/variant.h>
+#include "lib/base/quark.h"
+#include "lib/base/variant.h"
 
-#include <lib/app/display-modes.h>
+#include "lib/app/display-modes.h"
 
 #include "UserMetaType.h"
 

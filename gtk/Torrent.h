@@ -7,9 +7,9 @@
 
 #include "Flags.h"
 
-#include <lib/transmission/transmission.h>
+#include "lib/transmission/transmission.h"
 
-#include <lib/base/values.h>
+#include "lib/base/values.h"
 
 #include <giomm/icon.h>
 #include <glibmm/extraclassinit.h>
