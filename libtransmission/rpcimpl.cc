@@ -31,6 +31,7 @@
 #include "libtransmission/announcer.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
@@ -39,10 +40,12 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/values.h"
 #include "libtransmission/variant.h"
@@ -182,7 +185,7 @@ namespace
 namespace
 {
 auto constexpr RecentlyActiveSeconds = time_t{ 60 };
-auto constexpr RpcVersion = int64_t{ 18 };
+auto constexpr RpcVersion = int64_t{ 18 }; // TODO: 18 == 6.0.0, bump after all 6.0.x releases and before releasing 6.1.0
 auto constexpr RpcVersionMin = int64_t{ 14 };
 
 enum class TrFormat : uint8_t
@@ -551,6 +554,23 @@ namespace make_torrent_field_helpers
     return tr_variant{ std::move(vec) };
 }
 
+[[nodiscard]] auto make_webseed_ex_vec(tr_torrent const& tor)
+{
+    auto const n_webseeds = tor.webseed_count();
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_webseeds);
+    for (size_t idx = 0U; idx != n_webseeds; ++idx)
+    {
+        auto const webseed = tr_torrentWebseed(&tor, idx);
+        auto webseed_map = tr_variant::Map{ 3U };
+        webseed_map.try_emplace(TR_KEY_url, webseed.url);
+        webseed_map.try_emplace(TR_KEY_is_downloading, webseed.is_downloading);
+        webseed_map.try_emplace(TR_KEY_download_bytes_per_second, webseed.download_bytes_per_second);
+        vec.emplace_back(std::move(webseed_map));
+    }
+    return tr_variant{ std::move(vec) };
+}
+
 [[nodiscard]] auto make_tracker_vec(tr_torrent const& tor)
 {
     auto const& trackers = tor.announce_list();
@@ -765,6 +785,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_uploaded_ever:
     case TR_KEY_wanted:
     case TR_KEY_webseeds:
+    case TR_KEY_webseeds_ex:
     case TR_KEY_webseeds_sending_to_us:
         return true;
 
@@ -939,6 +960,8 @@ namespace make_torrent_field_helpers
         return make_file_wanted_vec(tor);
     case TR_KEY_webseeds:
         return make_webseed_vec(tor);
+    case TR_KEY_webseeds_ex:
+        return make_webseed_ex_vec(tor);
     case TR_KEY_webseeds_sending_to_us:
         return st.webseeds_sending_to_us;
     default:

@@ -19,7 +19,9 @@ target_sources(libtransmission-test
         crypto-test.cc
         dht-test.cc
         error-test.cc
+        env-test.cc
         file-piece-map-test.cc
+        file-utils-test.cc
         file-test.cc
         getopt-test.cc
         handshake-test.cc
@@ -40,10 +42,11 @@ target_sources(libtransmission-test
         rename-test.cc
         rpc-test.cc
         serializer-tests.cc
-        session-test.cc
         session-alt-speeds-test.cc
+        session-test.cc
         settings-test.cc
         strbuf-test.cc
+        string-utils-test.cc
         subprocess-test-script.cmd
         subprocess-test.cc
         test-fixtures.h

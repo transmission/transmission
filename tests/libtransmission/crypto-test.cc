@@ -18,7 +18,7 @@
 #include <libtransmission/peer-mse.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/tr-macros.h>
-#include <libtransmission/utils.h>
+#include <libtransmission/string-utils.h>
 
 using namespace std::literals;
 

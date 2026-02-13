@@ -34,10 +34,10 @@
 #include <libtransmission/peer-mse.h>
 #include <libtransmission/peer-socket.h>
 #include <libtransmission/session.h> // tr_peerIdInit()
+#include <libtransmission/string-utils.h>
 #include <libtransmission/timer.h>
 #include <libtransmission/tr-assert.h>
 #include <libtransmission/tr-macros.h>
-#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 

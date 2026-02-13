@@ -11,10 +11,9 @@
 #include <string_view>
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/interned-string.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR_VEC
+#include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 

@@ -18,13 +18,11 @@
 #include <string_view>
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announcer.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // tr_pex
-#include "libtransmission/tr-macros.h" // tr_peer_id_t
+#include "libtransmission/types.h" // tr_peer_id_t
 #include "libtransmission/utils.h"
 
 struct tr_url_parsed_t;

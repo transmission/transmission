@@ -16,12 +16,12 @@
 
 #define LIBTRANSMISSION_PEER_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bitfield.h"
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/peer-mgr-wishlist.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR_VEC
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
 namespace

@@ -1185,6 +1185,7 @@ a {
   table-layout: fixed;
   text-align: left;
   width: 100%;
+  margin-bottom: 1rem;
 
   td,
   th {
@@ -1251,6 +1252,12 @@ a {
   .status {
     cursor: pointer;
     width: 10%;
+  }
+
+  .webseed-url {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 

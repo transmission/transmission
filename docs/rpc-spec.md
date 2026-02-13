@@ -314,6 +314,7 @@ The 'source' column here corresponds to the data structure there.
 | `upload_ratio`| double| tr_stat
 | `wanted`| array (see below)| n/a
 | `webseeds`| array of strings | tr_tracker_view
+| `webseeds_ex`| array (see below)| n/a
 | `webseeds_sending_to_us`| number| tr_stat
 
 `availability`: An array of `piece_count` numbers representing the number of connected peers that have each piece, or -1 if we already have the piece ourselves.
@@ -437,6 +438,14 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `sitename`                 | string     | tr_tracker_view
 | `tier`                     | number     | tr_tracker_view
 
+
+`webseeds_ex`: array of objects, each containing:
+
+| Key | Value Type | transmission.h source
+|:--|:--|:--
+| `url` | string | tr_webseed_view
+| `is_downloading` | boolean | tr_webseed_view
+| `download_bytes_per_second` | number | tr_webseed_view
 
 `wanted`: An array of `tr_torrentFileCount()` booleans, true if the corresponding file is to be downloaded. (Source: `tr_file_view`)
 
@@ -1096,3 +1105,18 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | `session_set` | :bomb: renamed `cache_size_mb` to `cache_size_mib`
 | `session_get` | :bomb: renamed `tolerated` to `allowed` in `encryption`
 | `session_set` | :bomb: renamed `tolerated` to `allowed` in `encryption`
+
+Transmission 4.1.1 (`rpc_version_semver` 6.0.1, `rpc_version`: 19)
+
+| Method | Description
+|:---|:---
+| `session_get` | `speed_limit_down` reverted to return an integer
+| `session_get` | `speed_limit_up` reverted to return an integer
+| `group_get` | `speed_limit_down` reverted to return an integer
+| `group_get` | `speed_limit_up` reverted to return an integer
+
+Transmission 4.2.0 (`rpc_version_semver` 6.1.0, `rpc_version`: ?)
+
+| Method | Description
+|:---|:---
+| `torrent_get` | new arg `webseeds_ex`

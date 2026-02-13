@@ -473,7 +473,7 @@ Glib::RefPtr<Gtk::ListStore> FilterBar::Impl::show_mode_filter_model_new()
 
     static auto constexpr types = std::array<FilterTypeInfo, 9>({ {
         { ShowMode::ShowAll, nullptr, N_("All"), nullptr },
-        { ShowMode{ -1 }, nullptr, nullptr, nullptr },
+        { ShowModeSeparator, nullptr, nullptr, nullptr },
         { ShowMode::ShowActive, nullptr, N_("Active"), "system-run" },
         { ShowMode::ShowDownloading, "Verb", NC_("Verb", "Downloading"), "network-receive" },
         { ShowMode::ShowSeeding, "Verb", NC_("Verb", "Seeding"), "network-transmit" },

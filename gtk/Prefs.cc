@@ -11,7 +11,6 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/serializer.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include <glibmm/miscutils.h>
