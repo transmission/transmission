@@ -1806,15 +1806,19 @@ void tr_announcer_impl::resetTorrent(tr_torrent* tor)
         }
     }
 
-    // kickstart any tiers that didn't get started
-    if (tor->is_running())
+    // kickstart any tiers that didn't get started:
+    // 1. ensure every tier has a current tracker
+    // 2. if we weren't already talking to the current tracker, then say hello
+    auto const is_running = tor->is_running();
+    auto const now = tr_time();
+    for (auto& tier : newer->tiers)
     {
-        auto const now = tr_time();
-        for (auto& tier : newer->tiers)
+        if (!tier.current_tracker_index_)
         {
-            if (!tier.current_tracker_index_)
+            tier.useNextTracker();
+
+            if (is_running)
             {
-                tier.useNextTracker();
                 tier_announce_event_push(&tier, TR_ANNOUNCE_EVENT_STARTED, now);
             }
         }
