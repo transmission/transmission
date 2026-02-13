@@ -593,10 +593,8 @@ void Application::Impl::on_startup()
         css_provider,
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    // NOLINTBEGIN(bugprone-unused-raii)
-    FilterBar();
-    PathButton();
-    // NOLINTEND(bugprone-unused-raii)
+    std::ignore = FilterBar();
+    std::ignore = PathButton();
 
     tr_session* session = nullptr;
 
