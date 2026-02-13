@@ -1091,7 +1091,6 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | `torrent_get` | new arg `files.end_piece`
 | `port_test` | new arg `ip_protocol`
 | `torrent_get` | new arg `tracker_stats.downloader_count`
-| `torrent_get` | new arg `webseeds_ex`
 | `torrent_get` | :warning: **DEPRECATED** `manual_announce_time`, it never worked
 | `session_get` | new arg `preferred_transports`
 | `session_set` | new arg `preferred_transports`
@@ -1119,3 +1118,4 @@ Transmission 4.2.0 (`rpc_version_semver` 6.1.0, `rpc_version`: ?)
 
 | Method | Description
 |:---|:---
+| `torrent_get` | new arg `webseeds_ex`
