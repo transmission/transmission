@@ -75,6 +75,7 @@ target_link_libraries(trbase
         FastFloat::fast_float
         RapidJSON
     PUBLIC
+        $<$<BOOL:${Intl_FOUND}>:Intl::Intl>
         transmission::fmt-header-only
         transmission::small
         utf8::cpp

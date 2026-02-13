@@ -197,8 +197,7 @@ target_compile_definitions(${TR_NAME}
 target_include_directories(${TR_NAME}
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/../..
-        ${CMAKE_CURRENT_BINARY_DIR}/../..
-        ${Intl_INCLUDE_DIRS})
+        ${CMAKE_CURRENT_BINARY_DIR}/../..)
 
 if(ANDROID)
     find_library(log-lib log)
@@ -215,7 +214,6 @@ target_link_libraries(${TR_NAME}
         dht::dht
         $<$<BOOL:${ENABLE_UTP}>:libutp::libutp>
         libb64::libb64
-        ${Intl_LIBRARIES}
         ${LIBM_LIBRARY}
         ${LIBQUOTA_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
