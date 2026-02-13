@@ -10,11 +10,6 @@ add_compile_options(
 
 add_library(${TR_NAME} STATIC)
 
-set(IS_APPLE_CLANG FALSE)
-if(APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(IS_APPLE_CLANG TRUE)
-endif()
-
 target_sources(${TR_NAME}
     PRIVATE
         announce-list.cc

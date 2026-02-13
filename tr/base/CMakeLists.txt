@@ -28,7 +28,7 @@ target_sources(trbase
         serializer.h
         string-utils.cc
         string-utils.h
-        $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
+        $<$<AND:$<BOOL:${APPLE}>,$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>>:string-utils.mm>
         tr-assert.cc
         tr-assert.h
         tr-getopt.cc
