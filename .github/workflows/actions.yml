@@ -910,7 +910,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ 41, 42, 43 ]
+        version: [ 42, 43, 44 ]
     container:
       image: fedora:${{ matrix.version }}
     steps:
