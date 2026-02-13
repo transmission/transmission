@@ -69,7 +69,7 @@ jobs:
           get_changes tests      CMakeLists.txt cmake third-party libtransmission utils tests
           get_changes utils      CMakeLists.txt cmake third-party libtransmission utils
           get_changes web        CMakeLists.txt cmake web
-          get_changes ci-actions .github/workflows/actions.yml
+          get_changes ci-actions .github/workflows/actions.yml .github/actions
           cat "$GITHUB_OUTPUT"
 
   code-style:
