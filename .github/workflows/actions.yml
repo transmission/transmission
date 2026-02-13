@@ -1168,3 +1168,417 @@ jobs:
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
       - name: Make
         run: cmake --build obj --config RelWithDebInfo -- "-k 0"
+
+  freebsd-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: |
+      needs.what-to-make.outputs.make-cli == 'true' ||
+      needs.what-to-make.outputs.make-daemon == 'true' ||
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-qt == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true' ||
+      needs.what-to-make.outputs.make-utils == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        release:
+          - '15.0'
+          - '14.3'
+        arch:
+          - x86_64
+          - aarch64
+        crypto:
+          - cmake: openssl
+            port: ''
+          - cmake: wolfssl
+            port: wolfssl
+          - cmake: mbedtls
+            port: mbedtls3
+        is-pull-request:
+          - ${{ github.event_name == 'pull_request' }}
+        exclude:
+          - arch: aarch64
+            is-pull-request: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+      - name: Get Source
+        uses: actions/download-artifact@v7
+        with:
+          name: source-tarball
+      - name: Extract, Build, Test and Install
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          release: ${{ matrix.release }}
+          arch: ${{ matrix.arch }}
+          prepare: |
+            set -ex
+            uname -a
+            pkg update
+            pkg upgrade -y
+            pkg install -y \
+              curl \
+              cmake \
+              crc32c \
+              dht \
+              fast_float \
+              gettext \
+              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm30` \
+              libb64 \
+              libdeflate \
+              libevent \
+              libfmt \
+              libnatpmp \
+              libpsl \
+              miniupnpc \
+              ninja \
+              `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo npm` \
+              pkgconf \
+              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
+              rapidjson \
+              utf8cpp \
+              `echo ${{ matrix.crypto.port }}`
+          run: |
+            set -ex
+            mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+            cmake \
+              -S src \
+              -B obj \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_INSTALL_PREFIX=pfx \
+              -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+              -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DEPRECATED=ON \
+              -DENABLE_WERROR=ON \
+              -DRUN_CLANG_TIDY=OFF \
+              -DUSE_SYSTEM_DEFAULT=ON \
+              -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in FreeBSD` \
+              -DUSE_SYSTEM_SMALL=OFF `# Not packaged in FreeBSD` \
+              -DUSE_SYSTEM_UTP=OFF `# Not packaged in FreeBSD` \
+              -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in FreeBSD` \
+              -DWITH_CRYPTO=${{ matrix.crypto.cmake }}
+            cmake --build obj --config RelWithDebInfo
+            if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
+              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
+            fi
+            cmake --install obj --config RelWithDebInfo --strip
+            rm -rf obj src
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.crypto.cmake }}
+          path: pfx/**/*
+
+  openbsd-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: |
+      needs.what-to-make.outputs.make-cli == 'true' ||
+      needs.what-to-make.outputs.make-daemon == 'true' ||
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-qt == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true' ||
+      needs.what-to-make.outputs.make-utils == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        release:
+          - '7.8'
+        arch:
+          - x86_64
+          - aarch64
+        is-pull-request:
+          - ${{ github.event_name == 'pull_request' }}
+        exclude:
+          - arch: aarch64
+            is-pull-request: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+      - name: Get Source
+        uses: actions/download-artifact@v7
+        with:
+          name: source-tarball
+      - name: Extract, Build, Test and Install
+        uses: vmactions/openbsd-vm@v1
+        with:
+          usesh: true
+          release: ${{ matrix.release }}
+          arch: ${{ matrix.arch }}
+          prepare: |
+            set -ex
+            uname -a
+            pkg_add -u
+            pkg_add -I -v \
+              curl \
+              cmake \
+              crc32c \
+              fast-float \
+              fmt \
+              gettext-tools \
+              gtar-- \
+              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm40` \
+              libdeflate \
+              libevent \
+              libnatpmp \
+              libpsl \
+              miniupnpc \
+              ninja \
+              `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo node` \
+              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
+              rapidjson \
+              utfcpp
+          run: |
+            set -ex
+            mkdir src && gtar xf transmission*.tar.* -C src --strip-components 1
+            cmake \
+              -S src \
+              -B obj \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_INSTALL_PREFIX=pfx \
+              -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+              -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DEPRECATED=ON \
+              -DENABLE_WERROR=ON \
+              -DRUN_CLANG_TIDY=OFF \
+              -DUSE_SYSTEM_DEFAULT=ON \
+              -DUSE_SYSTEM_B64=OFF `# Not packaged in OpenBSD` \
+              -DUSE_SYSTEM_DHT=OFF `# Not packaged in OpenBSD` \
+              -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in OpenBSD` \
+              -DUSE_SYSTEM_SMALL=OFF `# Not packaged in OpenBSD` \
+              -DUSE_SYSTEM_UTP=OFF `# Not packaged in OpenBSD` \
+              -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in OpenBSD`
+            cmake --build obj --config RelWithDebInfo
+            if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
+              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
+            fi
+            cmake --install obj --config RelWithDebInfo --strip
+            rm -rf obj src
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
+          path: pfx/**/*
+
+  netbsd-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: |
+      needs.what-to-make.outputs.make-cli == 'true' ||
+      needs.what-to-make.outputs.make-daemon == 'true' ||
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-qt == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true' ||
+      needs.what-to-make.outputs.make-utils == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        release:
+          - '10.1'
+        arch:
+          - vmactions: x86_64
+            binary-set: amd64
+          - vmactions: aarch64
+            binary-set: evbarm-aarch64
+        is-pull-request:
+          - ${{ github.event_name == 'pull_request' }}
+        exclude:
+          - arch:
+              vmactions: aarch64
+            is-pull-request: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+      - name: Get Source
+        uses: actions/download-artifact@v7
+        with:
+          name: source-tarball
+      - name: Extract, Build, Test and Install
+        uses: vmactions/netbsd-vm@v1
+        with:
+          usesh: true
+          release: ${{ matrix.release }}
+          arch: ${{ matrix.arch.vmactions }}
+          prepare: |
+            set -ex
+            uname -a
+            export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
+            export PKG_PATH="https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/`uname -p`/`uname -r`/All"
+            /usr/sbin/pkg_add -u \
+              curl \
+              cmake \
+              fast_float \
+              fmtlib \
+              gettext-tools \
+              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm4` \
+              libdeflate \
+              libevent \
+              libpsl \
+              miniupnpc \
+              ninja-build \
+              `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo nodejs` \
+              pkgconf \
+              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
+              rapidjson \
+              utf8-cpp
+            if [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
+              for set in xbase xcomp; do
+                curl -sL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-`uname -r`/${{ matrix.arch.binary-set }}/binary/sets/$set.tar.xz" | tar xJpf - -C /
+              done
+            fi
+          run: |
+            set -ex
+            export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
+            mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+            cmake \
+              -S src \
+              -B obj \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_INSTALL_PREFIX=pfx \
+              -DCMAKE_PREFIX_PATH=/usr/pkg/qt6 \
+              -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+              -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DEPRECATED=ON \
+              -DENABLE_WERROR=ON \
+              -DRUN_CLANG_TIDY=OFF \
+              -DUSE_SYSTEM_DEFAULT=ON \
+              -DUSE_SYSTEM_B64=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_DHT=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_NATPMP=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_SMALL=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_UTP=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in NetBSD`
+            cmake --build obj --config RelWithDebInfo
+            if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
+              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
+            fi
+            cmake --install obj --config RelWithDebInfo --strip
+            rm -rf obj src
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch.vmactions }}
+          path: pfx/**/*
+
+  dragonflybsd-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: |
+      needs.what-to-make.outputs.make-cli == 'true' ||
+      needs.what-to-make.outputs.make-daemon == 'true' ||
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-qt == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true' ||
+      needs.what-to-make.outputs.make-utils == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        release:
+          - '6.4.2'
+        arch:
+          - x86_64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+      - name: Get Source
+        uses: actions/download-artifact@v7
+        with:
+          name: source-tarball
+      - name: Extract, Build, Test and Install
+        uses: vmactions/dragonflybsd-vm@v1
+        with:
+          usesh: true
+          release: ${{ matrix.release }}
+          arch: ${{ matrix.arch }}
+          prepare: |
+            set -ex
+            uname -a
+            pkg update
+            pkg upgrade -y
+            pkg install -y \
+              curl \
+              cmake \
+              crc32c \
+              `# dht (somehow installing dht causes the build to fail with a bunch of "/usr/local/lib/libdht.so: error: undefined reference to 'dht_*'" messages` \
+              fast_float \
+              gcc12 \
+              gettext \
+              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm30` \
+              libb64 \
+              libdeflate \
+              libevent \
+              libfmt \
+              libnatpmp \
+              libpsl \
+              miniupnpc \
+              ninja \
+              pkgconf \
+              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
+              rapidjson \
+              utf8cpp
+          run: |
+            set -ex
+            export LANG=en_US.UTF-8 # Qt requires UTF-8 locales
+            mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+            cmake \
+              -S src \
+              -B obj \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_CXX_COMPILER='/usr/local/bin/g++12' \
+              -DCMAKE_C_COMPILER='/usr/local/bin/gcc12' \
+              -DCMAKE_BUILD_RPATH='/usr/local/lib/gcc12' \
+              -DCMAKE_INSTALL_PREFIX=pfx \
+              -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+              -DREBUILD_WEB=OFF `# Installing esbuild via npm is not supported on DragonFlyBSD, the full list of supported platforms can be found at https://esbuild.github.io/getting-started/#download-a-build` \
+              -DENABLE_DEPRECATED=ON \
+              -DENABLE_WERROR=ON \
+              -DRUN_CLANG_TIDY=OFF \
+              -DUSE_SYSTEM_DEFAULT=ON \
+              -DUSE_SYSTEM_DHT=OFF `# DragonflyBSD port does not work` \
+              -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in DragonflyBSD` \
+              -DUSE_SYSTEM_SMALL=OFF `# Not packaged in DragonflyBSD` \
+              -DUSE_SYSTEM_UTP=OFF `# Not packaged in DragonflyBSD` \
+              -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in DragonflyBSD`
+            cmake --build obj --config RelWithDebInfo
+            if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
+              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
+            fi
+            cmake --install obj --config RelWithDebInfo --strip
+            rm -rf obj src
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
+          path: pfx/**/*
