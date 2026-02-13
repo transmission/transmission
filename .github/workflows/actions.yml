@@ -371,7 +371,7 @@ jobs:
           name: binaries-${{ matrix.os }}-${{ matrix.arch }}-xcodebuild
           path: pfx-${{ matrix.arch }}/Build/Products/**/Transmission.app*
 
-  macos-cmake-universal:
+  macos-cmake:
     strategy:
       fail-fast: false
       matrix:
@@ -450,7 +450,7 @@ jobs:
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ matrix.os }}-cmake-universal
+          name: binaries-${{ matrix.os }}-cmake
           path: pfx/**/*
 
   alpine-musl:
