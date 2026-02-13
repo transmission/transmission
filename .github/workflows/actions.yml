@@ -1194,6 +1194,11 @@ jobs:
             port: wolfssl
           - cmake: mbedtls
             port: mbedtls3
+        is-pull-request:
+          - ${{ github.event_name == 'pull_request' }}
+        exclude:
+          - arch: aarch64
+            is-pull-request: true
     runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
@@ -1290,6 +1295,11 @@ jobs:
         arch:
           - x86_64
           - aarch64
+        is-pull-request:
+          - ${{ github.event_name == 'pull_request' }}
+        exclude:
+          - arch: aarch64
+            is-pull-request: true
     runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
@@ -1385,6 +1395,12 @@ jobs:
             binary-set: amd64
           - vmactions: aarch64
             binary-set: evbarm-aarch64
+        is-pull-request:
+          - ${{ github.event_name == 'pull_request' }}
+        exclude:
+          - arch:
+              vmactions: aarch64
+            is-pull-request: true
     runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
