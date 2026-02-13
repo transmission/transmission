@@ -278,7 +278,6 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
 
 - (void)outlineViewSelectionDidChange:(NSNotification*)notification
 {
-    [self reloadVisibleRows];
     if ([QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible)
     {
         [[QLPreviewPanel sharedPreviewPanel] reloadData];
