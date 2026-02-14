@@ -233,11 +233,25 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
 
     if ([identifier isEqualToString:@"Name"])
     {
-        FileNameCellView* cellView = [outlineView makeViewWithIdentifier:@"NameCell" owner:self];
-        if (!cellView)
+        FileNameCellView* cellView;
+
+        if (node.isFolder)
         {
-            cellView = [[FileNameCellView alloc] initWithFrame:NSZeroRect];
-            cellView.identifier = @"NameCell";
+            cellView = [outlineView makeViewWithIdentifier:@"OnlyFolderCell" owner:self];
+            if (!cellView)
+            {
+                cellView = [[OnlyFolderNameCellView alloc] initWithFrame:NSZeroRect];
+                cellView.identifier = @"OnlyFolderCell";
+            }
+        }
+        else
+        {
+            cellView = [outlineView makeViewWithIdentifier:@"OnlyFileCell" owner:self];
+            if (!cellView)
+            {
+                cellView = [[OnlyFileNameCellView alloc] initWithFrame:NSZeroRect];
+                cellView.identifier = @"OnlyFileCell";
+            }
         }
         cellView.node = node;
 
