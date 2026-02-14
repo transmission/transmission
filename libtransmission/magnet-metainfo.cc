@@ -195,8 +195,7 @@ std::string tr_magnet_metainfo::magnet() const
 
 void tr_magnet_metainfo::set_name(std::string_view name)
 {
-    // for values that are part of pathnames, strip ctrl characters as well as validate utf8
-    name_ = tr_strv_replace_ctrl(tr_strv_to_utf8_string(name));
+    name_ = tr_strv_to_utf8_string(name);
 }
 
 void tr_magnet_metainfo::add_webseed(std::string_view webseed)
