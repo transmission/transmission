@@ -466,7 +466,7 @@
 		ED8A16412735A8AA000D61F9 /* peer-mgr-wishlist.h in Headers */ = {isa = PBXBuildFile; fileRef = ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */; };
 		ED8A16422735A8AA000D61F9 /* peer-mgr-wishlist.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED8A163E2735A8AA000D61F9 /* peer-mgr-wishlist.cc */; };
 		ED91F28B2CBDA72C008388AA /* crc32iscsi.c in Sources */ = {isa = PBXBuildFile; fileRef = ED91F01E2CBDA72C008388AA /* crc32iscsi.c */; };
-		ED91F35A2CBDA72C008388AA /* crc32iscsi.h in Headers */ = {isa = PBXBuildFile; fileRef = ED91F01B2CBDA72C008388AA /* crc32iscsi.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ED91F35A2CBDA72C008388AA /* crc32iscsi.h in Headers */ = {isa = PBXBuildFile; fileRef = ED91F01B2CBDA72C008388AA /* crc32iscsi.h */; };
 		ED91F3962CBDAAED008388AA /* libmadler-crcany.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED91F00C2CBDA5D3008388AA /* libmadler-crcany.a */; };
 		ED9862972B979AA2002F3035 /* Utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED9862962B979AA2002F3035 /* Utils.mm */; };
 		EDBA61FF2D4180D5001470F8 /* torrent-queue.h in Headers */ = {isa = PBXBuildFile; fileRef = EDBA61FD2D4180D5001470F8 /* torrent-queue.h */; };
@@ -3099,8 +3099,6 @@
 			dependencies = (
 			);
 			name = "madler-crcany";
-			packageProductDependencies = (
-			);
 			productName = "madler-crcany";
 			productReference = ED91F00C2CBDA5D3008388AA /* libmadler-crcany.a */;
 			productType = "com.apple.product-type.library.static";
@@ -4298,6 +4296,7 @@
 					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
+					"third-party/madler-crcany",
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4549,6 +4548,7 @@
 					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
+					"third-party/madler-crcany",
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4880,6 +4880,7 @@
 					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
+					"third-party/madler-crcany",
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5551,7 +5552,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GENERATE_MASTER_OBJECT_FILE = YES;
-				HEADER_SEARCH_PATHS = "third-party/madler-crcany";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -5560,7 +5560,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GENERATE_MASTER_OBJECT_FILE = YES;
-				HEADER_SEARCH_PATHS = "third-party/madler-crcany";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = "Release - Debug";
@@ -5569,7 +5568,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GENERATE_MASTER_OBJECT_FILE = YES;
-				HEADER_SEARCH_PATHS = "third-party/madler-crcany";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
