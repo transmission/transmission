@@ -1365,7 +1365,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else
     {
-        [torrent closeRemoveTorrent:NO];
+        [self removeTorrents:@[ torrent ] trashFiles:NO];
     }
 
     [self.fAddWindows removeObject:addController];
@@ -1459,7 +1459,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else
     {
-        [torrent closeRemoveTorrent:NO];
+        [self removeTorrents:@[ torrent ] trashFiles:NO];
     }
 
     [self.fAddWindows removeObject:addController];
@@ -1936,6 +1936,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self confirmRemoveTorrents:torrents deleteData:deleteData];
 }
 
+- (void)removeTorrents:(NSArray<Torrent*>*)torrents trashFiles:(BOOL)trashFiles
+{
+    [self.fInfoController removeTorrentsFromInfo:torrents];
+
+    for (Torrent* torrent in torrents)
+    {
+        [torrent closeRemoveTorrent:trashFiles];
+    }
+}
+
 - (void)confirmRemoveTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData
 {
     //miscellaneous
@@ -1993,10 +2003,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
                 //we can't closeRemoveTorrent: until it's no longer in the GUI at all
                 NSAnimationContext.currentContext.completionHandler = ^{
-                    for (Torrent* torrent in torrents)
-                    {
-                        [torrent closeRemoveTorrent:deleteData];
-                    }
+                    [self removeTorrents:torrents trashFiles:deleteData];
 
                     [self fullUpdateUI];
                 };
@@ -2036,10 +2043,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     if (!beganUpdate)
     {
         //do here if we're not doing it at the end of the animation
-        for (Torrent* torrent in torrents)
-        {
-            [torrent closeRemoveTorrent:deleteData];
-        }
+        [self removeTorrents:torrents trashFiles:deleteData];
     }
 }
 

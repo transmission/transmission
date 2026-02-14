@@ -65,6 +65,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (void)stopTorrents:(NSArray<Torrent*>*)torrents;
 
 - (void)removeTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
+- (void)removeTorrents:(NSArray<Torrent*>*)torrents trashFiles:(BOOL)trashFiles;
 - (void)confirmRemoveTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
 - (IBAction)removeNoDelete:(id)sender;
 - (IBAction)removeDeleteData:(id)sender;
