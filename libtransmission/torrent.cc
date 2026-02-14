@@ -211,11 +211,21 @@ bool tr_torrentIsSeedRatioDone(tr_torrent const* tor)
 
 void tr_torrentSetSpeedLimit_KBps(tr_torrent* const tor, tr_direction const dir, size_t const limit_kbyps)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     tor->set_speed_limit(dir, Speed{ limit_kbyps, Speed::Units::KByps });
 }
 
 size_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* const tor, tr_direction const dir)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
@@ -224,6 +234,11 @@ size_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* const tor, tr_direction co
 
 void tr_torrentUseSpeedLimit(tr_torrent* const tor, tr_direction const dir, bool const enabled)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
@@ -232,6 +247,11 @@ void tr_torrentUseSpeedLimit(tr_torrent* const tor, tr_direction const dir, bool
 
 bool tr_torrentUsesSpeedLimit(tr_torrent const* const tor, tr_direction const dir)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->uses_speed_limit(dir);
@@ -239,6 +259,11 @@ bool tr_torrentUsesSpeedLimit(tr_torrent const* const tor, tr_direction const di
 
 void tr_torrentUseSessionLimits(tr_torrent* const tor, bool const enabled)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     if (tor->bandwidth().honor_parent_limits(TR_UP, enabled) || tor->bandwidth().honor_parent_limits(TR_DOWN, enabled))
@@ -249,6 +274,11 @@ void tr_torrentUseSessionLimits(tr_torrent* const tor, bool const enabled)
 
 bool tr_torrentUsesSessionLimits(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->uses_session_limits();
@@ -258,6 +288,11 @@ bool tr_torrentUsesSessionLimits(tr_torrent const* tor)
 
 void tr_torrentSetRatioMode(tr_torrent* const tor, tr_ratiolimit mode)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->set_seed_ratio_mode(mode);
@@ -265,6 +300,11 @@ void tr_torrentSetRatioMode(tr_torrent* const tor, tr_ratiolimit mode)
 
 tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* const tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->seed_ratio_mode();
@@ -272,6 +312,11 @@ tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* const tor)
 
 void tr_torrentSetRatioLimit(tr_torrent* const tor, double desired_ratio)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->set_seed_ratio(desired_ratio);
@@ -279,6 +324,11 @@ void tr_torrentSetRatioLimit(tr_torrent* const tor, double desired_ratio)
 
 double tr_torrentGetRatioLimit(tr_torrent const* const tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->seed_ratio();
@@ -286,6 +336,11 @@ double tr_torrentGetRatioLimit(tr_torrent const* const tor)
 
 bool tr_torrentGetSeedRatio(tr_torrent const* const tor, double* ratio)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     auto const val = tor->effective_seed_ratio();
@@ -302,6 +357,11 @@ bool tr_torrentGetSeedRatio(tr_torrent const* const tor, double* ratio)
 
 void tr_torrentSetIdleMode(tr_torrent* const tor, tr_idlelimit mode)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->set_idle_limit_mode(mode);
@@ -309,6 +369,11 @@ void tr_torrentSetIdleMode(tr_torrent* const tor, tr_idlelimit mode)
 
 tr_idlelimit tr_torrentGetIdleMode(tr_torrent const* const tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->idle_limit_mode();
@@ -316,6 +381,11 @@ tr_idlelimit tr_torrentGetIdleMode(tr_torrent const* const tor)
 
 void tr_torrentSetIdleLimit(tr_torrent* const tor, uint16_t idle_minutes)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->set_idle_limit_minutes(idle_minutes);
@@ -323,6 +393,11 @@ void tr_torrentSetIdleLimit(tr_torrent* const tor, uint16_t idle_minutes)
 
 uint16_t tr_torrentGetIdleLimit(tr_torrent const* const tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->idle_limit_minutes();
@@ -471,6 +546,11 @@ size_t tr_torrentGetQueuePosition(tr_torrent const* tor)
 
 void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     tor->set_queue_position(queue_position);
 }
 
@@ -737,6 +817,11 @@ void tr_torrentStop(tr_torrent* tor)
 void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* delete_user_data)
 {
     using namespace start_stop_helpers;
+
+    if (tor == nullptr)
+    {
+        return;
+    }
 
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -1137,6 +1222,11 @@ void tr_torrent::set_location(std::string_view location, bool move_from_old_path
 
 void tr_torrentSetLocation(tr_torrent* tor, char const* location, bool move_from_old_path, int volatile* setme_state)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(location != nullptr);
     TR_ASSERT(*location != '\0');
@@ -1164,6 +1254,11 @@ bool tr_torrent::has_any_local_data() const
 
 void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     if (tor->download_dir_ != path)
@@ -1181,6 +1276,11 @@ char const* tr_torrentGetDownloadDir(tr_torrent const* tor)
 
 char const* tr_torrentGetCurrentDir(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->current_dir().c_str();
@@ -1217,6 +1317,11 @@ void torrentManualUpdateImpl(tr_torrent* const tor)
 void tr_torrentManualUpdate(tr_torrent* tor)
 {
     using namespace manual_update_helpers;
+
+    if (tor == nullptr)
+    {
+        return;
+    }
 
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -1361,6 +1466,11 @@ tr_stat tr_torrent::stats() const
 
 tr_stat const* tr_torrentStat(tr_torrent* const tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     tor->stats_ = tor->stats();
     return &tor->stats_;
 }
@@ -1369,6 +1479,11 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
 
 tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     auto const& subpath = tor->file_subpath(file);
@@ -1388,6 +1503,11 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
 
 size_t tr_torrentFileCount(tr_torrent const* torrent)
 {
+    if (torrent == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(torrent));
 
     return torrent->file_count();
@@ -1395,11 +1515,21 @@ size_t tr_torrentFileCount(tr_torrent const* torrent)
 
 tr_webseed_view tr_torrentWebseed(tr_torrent const* tor, size_t nth)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     return tr_peerMgrWebseed(tor, nth);
 }
 
 size_t tr_torrentWebseedCount(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->webseed_count();
@@ -1407,16 +1537,31 @@ size_t tr_torrentWebseedCount(tr_torrent const* tor)
 
 tr_tracker_view tr_torrentTracker(tr_torrent const* tor, size_t i)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     return tr_announcerTracker(tor, i);
 }
 
 size_t tr_torrentTrackerCount(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     return tr_announcerTrackerCount(tor);
 }
 
 tr_torrent_view tr_torrentView(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     auto ret = tr_torrent_view{};
@@ -1437,6 +1582,11 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
 
 std::string tr_torrentFilename(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     return std::string{ tor->torrent_file() };
 }
 
@@ -1449,6 +1599,11 @@ size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen)
 
 tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, size_t* peer_count)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tr_peerMgrPeerStats(tor, peer_count);
@@ -1461,6 +1616,11 @@ void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t /*peer_count*/)
 
 void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     if (tab != nullptr && size > 0)
@@ -1471,6 +1631,11 @@ void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
 
 void tr_torrentAmountFinished(tr_torrent const* tor, float* tabs, int n_tabs)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     tor->amount_done_bins(tabs, n_tabs);
 }
 
@@ -1498,6 +1663,11 @@ void tr_torrentStartNow(tr_torrent* tor)
 
 void tr_torrentVerify(tr_torrent* tor)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     tor->session->run_in_session_thread(
         [tor, session = tor->session, tor_id = tor->id()]()
         {
@@ -1812,6 +1982,11 @@ void tr_torrent::recheck_completeness()
 
 void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->set_files_wanted(files, n_files, wanted);
@@ -1862,6 +2037,11 @@ void tr_torrent::set_bandwidth_group(std::string_view group_name) noexcept
 
 tr_priority_t tr_torrentGetPriority(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->get_priority();
@@ -1869,6 +2049,11 @@ tr_priority_t tr_torrentGetPriority(tr_torrent const* tor)
 
 void tr_torrentSetPriority(tr_torrent* const tor, tr_priority_t const priority)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isPriority(priority));
 
@@ -1884,6 +2069,11 @@ void tr_torrentSetPriority(tr_torrent* const tor, tr_priority_t const priority)
 
 void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->set_peer_limit(max_connected_peers);
@@ -1891,6 +2081,11 @@ void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers)
 
 uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->peer_limit();
@@ -2048,11 +2243,21 @@ void tr_torrent::on_tracker_response(tr_tracker_event const* event)
 
 bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     return text != nullptr && tor->set_announce_list(text);
 }
 
 std::string tr_torrentGetTrackerList(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     return tor->announce_list().to_string();
 }
 
@@ -2065,6 +2270,11 @@ size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t bu
 
 uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     TR_ASSERT(tr_isTorrent(tor));
 
     uint64_t bytes_left = 0;
@@ -2188,6 +2398,11 @@ void tr_torrent::on_block_received(tr_block_index_t const block)
 
 std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     auto const found = tor->find_file(file_num);
     return std::string{ found ? found->filename().sv() : ""sv };
 }
@@ -2456,6 +2671,11 @@ void tr_torrentRenamePath(
     tr_torrent_rename_done_func callback,
     void* callback_user_data)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     oldpath = oldpath != nullptr ? oldpath : "";
     newname = newname != nullptr ? newname : "";
 
@@ -2470,11 +2690,21 @@ void tr_torrentSetFilePriorities(
     tr_file_index_t file_count,
     tr_priority_t priority)
 {
+    if (tor == nullptr)
+    {
+        return;
+    }
+
     tor->set_file_priorities(files, file_count, priority);
 }
 
 bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
+    if (tor == nullptr)
+    {
+        return {};
+    }
+
     return tor->has_metainfo();
 }
 
