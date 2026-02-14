@@ -789,7 +789,19 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 {
     BOOL displayGroupRowRatio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
     [self.fDefaults setBool:!displayGroupRowRatio forKey:@"DisplayGroupRowRatio"];
-    [self reloadVisibleRows];
+    if ([self.fDefaults boolForKey:@"SortByGroup"]) {
+        __auto_type count = [self.dataSource outlineView:self numberOfChildrenOfItem:nil];
+        __auto_type indexSet = [[NSMutableIndexSet alloc] init];
+        for (NSInteger i = 0; i < count; ++i) {
+            __auto_type item = (NSObject *)[self.dataSource outlineView:self child:i ofItem:nil];
+            if ([item isKindOfClass:[TorrentGroup class]]) {
+                __auto_type row = [self rowForItem:item];
+                [indexSet addIndex:row];
+            }
+        }
+        
+        [self reloadDataForRowIndexes:indexSet columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
 }
 
 - (IBAction)toggleControlForTorrent:(id)sender
