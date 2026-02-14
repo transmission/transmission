@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace tr::app
 {
 enum class ShowMode : uint8_t

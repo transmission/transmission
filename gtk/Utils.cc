@@ -129,24 +129,27 @@ Glib::ustring tr_strlsize(guint64 n_bytes)
 
 namespace
 {
+auto constexpr SecondsPerMinute = time_t{ 60 };
+auto constexpr SecondsPerHour = time_t{ 3600 };
+auto constexpr SecondsPerDay = time_t{ 86400 };
 
 std::string tr_format_future_time(time_t seconds)
 {
-    if (auto const days_from_now = seconds / 86400U; days_from_now > 0U)
+    if (auto const days_from_now = seconds / SecondsPerDay; days_from_now > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{days_from_now:L} day from now", "{days_from_now:L} days from now", days_from_now)),
             fmt::arg("days_from_now", days_from_now));
     }
 
-    if (auto const hours_from_now = (seconds % 86400U) / 3600U; hours_from_now > 0U)
+    if (auto const hours_from_now = (seconds % SecondsPerDay) / SecondsPerHour; hours_from_now > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{hours_from_now:L} hour from now", "{hours_from_now:L} hours from now", hours_from_now)),
             fmt::arg("hours_from_now", hours_from_now));
     }
 
-    if (auto const minutes_from_now = (seconds % 3600U) / 60U; minutes_from_now > 0U)
+    if (auto const minutes_from_now = (seconds % SecondsPerHour) / SecondsPerMinute; minutes_from_now > 0)
     {
         return fmt::format(
             fmt::runtime(
@@ -154,7 +157,7 @@ std::string tr_format_future_time(time_t seconds)
             fmt::arg("minutes_from_now", minutes_from_now));
     }
 
-    if (auto const seconds_from_now = seconds % 60U; seconds_from_now > 0U)
+    if (auto const seconds_from_now = seconds % SecondsPerMinute; seconds_from_now > 0)
     {
         return fmt::format(
             fmt::runtime(
@@ -167,28 +170,28 @@ std::string tr_format_future_time(time_t seconds)
 
 std::string tr_format_past_time(time_t seconds)
 {
-    if (auto const days_ago = seconds / 86400U; days_ago > 0U)
+    if (auto const days_ago = seconds / SecondsPerDay; days_ago > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{days_ago:L} day ago", "{days_ago:L} days ago", days_ago)),
             fmt::arg("days_ago", days_ago));
     }
 
-    if (auto const hours_ago = (seconds % 86400U) / 3600U; hours_ago > 0U)
+    if (auto const hours_ago = (seconds % SecondsPerDay) / SecondsPerHour; hours_ago > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{hours_ago:L} hour ago", "{hours_ago:L} hours ago", hours_ago)),
             fmt::arg("hours_ago", hours_ago));
     }
 
-    if (auto const minutes_ago = (seconds % 3600U) / 60U; minutes_ago > 0U)
+    if (auto const minutes_ago = (seconds % SecondsPerHour) / SecondsPerMinute; minutes_ago > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{minutes_ago:L} minute ago", "{minutes_ago:L} minutes ago", minutes_ago)),
             fmt::arg("minutes_ago", minutes_ago));
     }
 
-    if (auto const seconds_ago = seconds % 60U; seconds_ago > 0U)
+    if (auto const seconds_ago = seconds % SecondsPerMinute; seconds_ago > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{seconds_ago:L} second ago", "{seconds_ago:L} seconds ago", seconds_ago)),
@@ -202,24 +205,24 @@ std::string tr_format_past_time(time_t seconds)
 
 std::string tr_format_time(time_t timestamp)
 {
-    if (auto const days = timestamp / 86400U; days > 0U)
+    if (auto const days = timestamp / SecondsPerDay; days > 0)
     {
         return fmt::format(fmt::runtime(ngettext("{days:L} day", "{days:L} days", days)), fmt::arg("days", days));
     }
 
-    if (auto const hours = (timestamp % 86400U) / 3600U; hours > 0U)
+    if (auto const hours = (timestamp % SecondsPerDay) / SecondsPerHour; hours > 0)
     {
         return fmt::format(fmt::runtime(ngettext("{hours:L} hour", "{hours:L} hours", hours)), fmt::arg("hours", hours));
     }
 
-    if (auto const minutes = (timestamp % 3600U) / 60U; minutes > 0U)
+    if (auto const minutes = (timestamp % SecondsPerHour) / SecondsPerMinute; minutes > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{minutes:L} minute", "{minutes:L} minutes", minutes)),
             fmt::arg("minutes", minutes));
     }
 
-    if (auto const seconds = timestamp % 60U; seconds > 0U)
+    if (auto const seconds = timestamp % SecondsPerMinute; seconds > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{seconds:L} second", "{seconds:L} seconds", seconds)),
@@ -231,28 +234,28 @@ std::string tr_format_time(time_t timestamp)
 
 std::string tr_format_time_left(time_t timestamp)
 {
-    if (auto const days_left = timestamp / 86400U; days_left > 0U)
+    if (auto const days_left = timestamp / SecondsPerDay; days_left > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{days_left:L} day left", "{days_left:L} days left", days_left)),
             fmt::arg("days_left", days_left));
     }
 
-    if (auto const hours_left = (timestamp % 86400U) / 3600U; hours_left > 0U)
+    if (auto const hours_left = (timestamp % SecondsPerDay) / SecondsPerHour; hours_left > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{hours_left:L} hour left", "{hours_left:L} hours left", hours_left)),
             fmt::arg("hours_left", hours_left));
     }
 
-    if (auto const minutes_left = (timestamp % 3600U) / 60U; minutes_left > 0U)
+    if (auto const minutes_left = (timestamp % SecondsPerHour) / SecondsPerMinute; minutes_left > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{minutes_left:L} minute left", "{minutes_left:L} minutes left", minutes_left)),
             fmt::arg("minutes_left", minutes_left));
     }
 
-    if (auto const seconds_left = timestamp % 60U; seconds_left > 0U)
+    if (auto const seconds_left = timestamp % SecondsPerMinute; seconds_left > 0)
     {
         return fmt::format(
             fmt::runtime(ngettext("{seconds_left:L} second left", "{seconds_left:L} seconds left", seconds_left)),
@@ -645,8 +648,14 @@ void gtr_open_uri(std::string_view const uri)
             return;
         }
     }
-    catch (Glib::Error const&)
+    catch (Glib::Error const& e)
     {
+        gtr_warning(
+            fmt::format(
+                fmt::runtime(_("Couldn't launch default application for URI '{uri}': {error} ({error_code})")),
+                fmt::arg("uri", uri),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", e.code())));
     }
 
     try
@@ -654,8 +663,14 @@ void gtr_open_uri(std::string_view const uri)
         Glib::spawn_async({}, std::vector<std::string>{ "xdg-open", uri_str }, TR_GLIB_SPAWN_FLAGS(SEARCH_PATH));
         return;
     }
-    catch (Glib::SpawnError const&)
+    catch (Glib::SpawnError const& e)
     {
+        gtr_warning(
+            fmt::format(
+                fmt::runtime(_("Couldn't invoke xdg-open for URI '{uri}': {error} ({error_code})")),
+                fmt::arg("uri", uri),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", static_cast<int>(e.code()))));
     }
 
     gtr_message(fmt::format(fmt::runtime(_("Couldn't open '{url}'")), fmt::arg("url", uri)));

@@ -94,7 +94,7 @@ public:
 
     void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
-    void send_rpc_request(tr_quark method, tr_variant&& params, std::function<void(tr_variant&)> on_response);
+    void send_rpc_request(tr_quark method, tr_variant&& params, std::function<void(tr_variant&)>&& on_response);
 
     void commit_prefs_change(tr_quark key);
 
@@ -424,8 +424,14 @@ void Session::Impl::watchdir_scan()
             watchdir_monitor_file(Gio::File::create_for_path(Glib::build_filename(dirname, name)));
         }
     }
-    catch (Glib::FileError const&)
+    catch (Glib::FileError const& e)
     {
+        gtr_warning(
+            fmt::format(
+                fmt::runtime(_("Couldn't open watchdir '{dirname}': {error} ({error_code})")),
+                fmt::arg("dirname", dirname),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", static_cast<int>(e.code()))));
     }
 }
 
@@ -617,7 +623,7 @@ std::pair<Glib::RefPtr<Torrent>, guint> Session::Impl::find_torrent_by_id(tr_tor
 
     while (begin_position < end_position)
     {
-        auto const position = begin_position + (end_position - begin_position) / 2;
+        auto const position = begin_position + ((end_position - begin_position) / 2);
         auto const torrent = raw_model_->get_item(position);
         auto const current_torrent_id = torrent->get_id();
 
@@ -925,6 +931,7 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
     impl_->remove_torrent(id, delete_files);
 }
 
+// NOLINTNEXTLINE(readability-make-member-function-const)
 void Session::Impl::remove_torrent(tr_torrent_id_t const id, bool const delete_files)
 {
     if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
@@ -1168,7 +1175,7 @@ void core_read_rpc_response(tr_variant&& response)
 
 } // namespace
 
-void Session::Impl::send_rpc_request(tr_quark const method, tr_variant&& params, std::function<void(tr_variant&)> on_response)
+void Session::Impl::send_rpc_request(tr_quark const method, tr_variant&& params, std::function<void(tr_variant&)>&& on_response)
 {
     if (session_ == nullptr)
     {
