@@ -435,7 +435,7 @@ namespace
 // for potential support of different filesystems on the same OS
 [[nodiscard, maybe_unused]] auto constexpr is_unix_reserved_char(unsigned char ch) noexcept
 {
-    return ch == '/';
+    return ch == '/' || ch <= 31;
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
