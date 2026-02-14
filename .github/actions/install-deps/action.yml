@@ -14,7 +14,7 @@ inputs:
     required: false
     default: 'false'
   enable-gtk:
-    description: 'Install GTK dependencies'
+    description: 'Install GTK dependencies (gtk3 or gtk4)'
     required: false
     default: 'false'
   enable-qt:
@@ -164,17 +164,25 @@ runs:
         fi
 
     - name: Install Linux GTK dependencies
-      if: env.OS_FAMILY == 'linux' && env.PKG_FAMILY != 'unknown' && inputs.enable-gtk == 'true'
+      if: env.OS_FAMILY == 'linux' && env.PKG_FAMILY != 'unknown' && inputs.enable-gtk != 'false'
       shell: bash
       run: |
         if [[ "$PKG_FAMILY" == "dnf" ]]; then
-          dnf install -y 'pkgconfig(glibmm-2.4)' 'pkgconfig(gtkmm-3.0)'
+          if [ '${{ inputs.enable-gtk }}' = 'gtk3' ]; then
+            dnf install -y 'pkgconfig(glibmm-2.4)' 'pkgconfig(gtkmm-3.0)'
+          elif [ '${{ inputs.enable-gtk }}' = 'gtk4' ]; then
+            dnf install -y 'pkgconfig(glibmm-2.68)' 'pkgconfig(gtkmm-4.0)'
+          fi
         elif [[ "$PKG_FAMILY" == "apt" ]]; then
           SUDO_CMD=""
           if [[ "${{ inputs.use-sudo }}" == "true" ]]; then
             SUDO_CMD="sudo"
           fi
-          $SUDO_CMD apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
+          if [ '${{ inputs.enable-gtk }}' = 'gtk3' ]; then
+            $SUDO_CMD apt-get install -y --no-install-recommends libgtkmm-3.0-dev
+          elif [ '${{ inputs.enable-gtk }}' = 'gtk4' ]; then
+            $SUDO_CMD apt-get install -y --no-install-recommends libgtkmm-4.0-dev
+          fi
         else
           echo "Unsupported package family: $PKG_FAMILY"
           exit 1
@@ -229,16 +237,20 @@ runs:
         brew install --formulae "${BASE_PACKAGES[@]}"
 
     - name: Install macOS GTK dependencies
-      if: env.OS_FAMILY == 'macos' && inputs.enable-gtk == 'true'
+      if: env.OS_FAMILY == 'macos' && inputs.enable-gtk != 'false'
       shell: bash
       run: |
-        brew install --formula gtkmm3
+        if [ '${{ inputs.enable-gtk }}' = 'gtk3' ]; then
+          brew install --formula gtkmm3
+        elif [ '${{ inputs.enable-gtk }}' = 'gtk4' ]; then
+          brew install --formula gtkmm4
+        fi
 
     - name: Install macOS Qt dependencies
       if: env.OS_FAMILY == 'macos' && inputs.enable-qt != 'false'
       shell: bash
       run: |
-        brew install --formula qt
+        brew install --formula qtsvg qttools
 
     - name: Report Installed Versions
       shell: bash
@@ -295,7 +307,7 @@ runs:
         fi
 
         # GTK versions (if enabled)
-        if [[ "${{ inputs.enable-gtk }}" == "true" ]]; then
+        if [[ "${{ inputs.enable-gtk }}" != "false" ]]; then
           echo "GTK:"
           pkg-config --modversion gtk+-3.0 2>/dev/null && echo "GTK+3: $(pkg-config --modversion gtk+-3.0)" || echo "GTK+3: not found"
           pkg-config --modversion gtk4 2>/dev/null && echo "GTK4: $(pkg-config --modversion gtk4)" || echo "GTK4: not found"

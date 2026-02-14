@@ -26,8 +26,6 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announce-list.h"
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/announcer.h"
@@ -35,10 +33,11 @@
 #include "libtransmission/interned-string.h" // tr_interned_string
 #include "libtransmission/log.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, TR_C...
+#include "libtransmission/types.h" // tr_sha1_digest_t
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 
@@ -1803,15 +1802,19 @@ void tr_announcer_impl::resetTorrent(tr_torrent* tor)
         }
     }
 
-    // kickstart any tiers that didn't get started
-    if (tor->is_running())
+    // kickstart any tiers that didn't get started:
+    // 1. ensure every tier has a current tracker
+    // 2. if we weren't already talking to the current tracker, then say hello
+    auto const is_running = tor->is_running();
+    auto const now = tr_time();
+    for (auto& tier : newer->tiers)
     {
-        auto const now = tr_time();
-        for (auto& tier : newer->tiers)
+        if (!tier.current_tracker_index_)
         {
-            if (!tier.current_tracker_index_)
+            tier.useNextTracker();
+
+            if (is_running)
             {
-                tier.useNextTracker();
                 tier_announce_event_push(&tier, TR_ANNOUNCE_EVENT_STARTED, now);
             }
         }

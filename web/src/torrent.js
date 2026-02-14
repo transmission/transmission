@@ -189,6 +189,9 @@ export class Torrent extends EventTarget {
   getPeers() {
     return this.fields.peers || [];
   }
+  getWebseedsEx() {
+    return this.fields.webseeds_ex || [];
+  }
   getPeersConnected() {
     return this.fields.peers_connected;
   }
@@ -653,4 +656,5 @@ Torrent.Fields.StatsExtra = [
   'peers',
   'start_date',
   'tracker_stats',
+  'webseeds_ex',
 ];

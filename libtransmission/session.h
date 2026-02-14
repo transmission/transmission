@@ -37,8 +37,6 @@
 
 #include <small/vector.hpp>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announce-list.h"
 #include "libtransmission/announcer.h"
 #include "libtransmission/bandwidth.h"
@@ -50,6 +48,7 @@
 #include "libtransmission/net.h" // for tr_port, tr_tos_t
 #include "libtransmission/open-files.h"
 #include "libtransmission/peer-io.h" // tr_preferred_transport
+#include "libtransmission/platform.h"
 #include "libtransmission/port-forwarding.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpc-server.h"
@@ -65,6 +64,7 @@
 #include "libtransmission/tr-dht.h"
 #include "libtransmission/tr-lpd.h"
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils-ev.h"
 #include "libtransmission/verify.h"
 #include "libtransmission/web.h"
@@ -468,8 +468,8 @@ public:
         std::string bind_address_ipv6;
         std::string blocklist_url = "http://www.example.com/blocklist";
         std::string default_trackers_str;
-        std::string download_dir = tr_getDefaultDownloadDir();
-        std::string incomplete_dir = tr_getDefaultDownloadDir();
+        std::string download_dir = get_default_download_dir();
+        std::string incomplete_dir = get_default_download_dir();
         std::string peer_congestion_algorithm;
         std::string script_torrent_added_filename;
         std::string script_torrent_done_filename;
@@ -487,6 +487,8 @@ public:
     private:
         template<auto MemberPtr>
         using Field = tr::serializer::Field<MemberPtr>;
+
+        [[nodiscard]] static std::string get_default_download_dir();
 
         static constexpr auto Fields = std::tuple{
             Field<&Settings::announce_ip>{ TR_KEY_announce_ip },

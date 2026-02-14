@@ -28,8 +28,6 @@
 
 #include <small/vector.hpp>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/cache.h"
@@ -43,13 +41,13 @@
 #include "libtransmission/peer-msgs.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/tr-macros.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 

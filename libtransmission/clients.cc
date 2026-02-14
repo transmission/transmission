@@ -19,7 +19,7 @@
 #include <fmt/format.h>
 
 #include "libtransmission/clients.h"
-#include "libtransmission/tr-macros.h" // tr_peer_id_t
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

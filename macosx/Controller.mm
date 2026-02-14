@@ -19,8 +19,8 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/log.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 

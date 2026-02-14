@@ -34,10 +34,9 @@
 
 #include <libdeflate.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h" /* tr_ssha1_matches() */
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/platform.h" /* tr_getWebClientDir() */
@@ -45,9 +44,10 @@
 #include "libtransmission/rpc-server.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-strbuf.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 

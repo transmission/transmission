@@ -21,11 +21,10 @@
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-natpmp.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/utils.h"
 
 namespace

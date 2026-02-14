@@ -15,8 +15,8 @@
 #include <string>
 #include <string_view>
 
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha256_d...
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h" // tr_sha1_digest_t, tr_sha256_d...
 
 #if defined(WITH_CCRYPTO)
 #include <CommonCrypto/CommonDigest.h>

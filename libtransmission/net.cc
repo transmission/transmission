@@ -33,9 +33,10 @@
 #include "libtransmission/net.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

@@ -28,8 +28,6 @@
 #include <fmt/format.h>
 
 #define LIBTRANSMISSION_PEER_MODULE
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announcer.h"
 #include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/clients.h"
@@ -46,12 +44,13 @@
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrents.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/values.h"
 #include "libtransmission/webseed.h"

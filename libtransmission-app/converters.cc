@@ -16,11 +16,14 @@
 #include <fmt/format.h>
 
 #include "libtransmission/serializer.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 
 #include "libtransmission-app/display-modes.h"
 #include "libtransmission-app/converters.h"
+
+using namespace std::literals;
 
 namespace tr::app::detail
 {
@@ -87,10 +90,10 @@ struct TrYearMonthDay
         }
 
         auto const dim = days_in_month(y, m);
-        return d >= 1 && d <= static_cast<unsigned>(dim);
+        return d >= 1 && std::cmp_less_equal(d, dim);
     };
 
-    return TrYearMonthDay{ year, month, day, is_valid_ymd(year, month, day) };
+    return TrYearMonthDay{ .year = year, .month = month, .day = day, .valid = is_valid_ymd(year, month, day) };
 }
 
 // c++20 (P0355) replace with std::chrono::sys_days{} after Debian 11 is EOL
@@ -343,11 +346,12 @@ tr_variant from_stats_mode(StatsMode const& src)
     {
         if (auto const* local = std::localtime(&tt))
         {
-            return fmt::format(FMT_STRING("{:%FT%T%z}"), *local);
+            // fmt::runtime to workaround FTBFS in clang
+            return fmt::format(fmt::runtime("{:%FT%T%z}"), *local);
         }
     }
 
-    return fmt::format(FMT_STRING("{:%FT%TZ}"), src);
+    return fmt::format("{:%FT%TZ}", src);
 }
 
 bool to_sys_seconds(tr_variant const& src, std::chrono::sys_seconds* tgt)
