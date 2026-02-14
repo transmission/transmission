@@ -9,8 +9,7 @@
 #include "Percents.h"
 #include "Torrent.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_truncd() */
+#include "tr/torrent/transmission.h"
 
 #include <cairomm/context.h>
 #include <cairomm/refptr.h>

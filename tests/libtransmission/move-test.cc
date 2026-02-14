@@ -11,16 +11,16 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/file.h" // tr_sys_path_*()
+#include "tr/base/quark.h"
+#include "tr/base/tr-strbuf.h"
+#include "tr/base/variant.h"
 
-#include <libtransmission/block-info.h>
-#include <libtransmission/cache.h> // tr_cacheWriteBlock()
-#include <libtransmission/file.h> // tr_sys_path_*()
-#include <libtransmission/quark.h>
-#include <libtransmission/torrent.h>
-#include <libtransmission/torrent-files.h>
-#include <libtransmission/tr-strbuf.h>
-#include <libtransmission/variant.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/block-info.h"
+#include "tr/torrent/cache.h" // tr_cacheWriteBlock()
+#include "tr/torrent/torrent.h"
+#include "tr/torrent/torrent-files.h"
 
 #include "test-fixtures.h"
 

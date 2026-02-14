@@ -12,11 +12,12 @@
 #include <QDateTime>
 #include <QDir>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/variant.h"
 
-#include <libtransmission/api-compat.h>
-#include <libtransmission/serializer.h>
-#include <libtransmission/variant.h>
+#include "tr/base/serializer.h"
+
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/api-compat.h"
 
 #include "Filters.h"
 #include "Prefs.h"

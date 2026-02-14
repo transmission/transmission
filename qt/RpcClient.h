@@ -19,11 +19,11 @@
 #include <QString>
 #include <QUrl>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
-#include <libtransmission/api-compat.h>
-#include <libtransmission/quark.h>
-#include <libtransmission/variant.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/api-compat.h"
 
 class QNetworkAccessManager;
 

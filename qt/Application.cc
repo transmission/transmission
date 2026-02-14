@@ -25,9 +25,9 @@
 #include <QAccessible>
 #endif
 
-#include <libtransmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
-#include <libtransmission/values.h>
+#include "tr/base/values.h"
 
 #include "AccessibleSqueezeLabel.h"
 #include "AddData.h"

@@ -12,9 +12,8 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/file-utils.h>
-#include <libtransmission/string-utils.h>
-#include <libtransmission/utils.h>
+#include "tr/base/file-utils.h"
+#include "tr/base/string-utils.h"
 
 #include <giomm/icon.h>
 #include <glibmm/fileutils.h>

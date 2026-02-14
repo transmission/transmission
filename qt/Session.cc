@@ -25,13 +25,13 @@
 
 #include <small/vector.hpp>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/quark.h"
+#include "tr/base/serializer.h"
+#include "tr/base/variant.h"
 
-#include <libtransmission/quark.h>
-#include <libtransmission/serializer.h>
-#include <libtransmission/session-id.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/variant.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/session-id.h"
+#include "tr/torrent/utils.h"
 
 #include "Session.h"
 

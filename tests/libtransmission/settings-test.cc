@@ -10,15 +10,15 @@
 
 #include <small/vector.hpp>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/log.h"
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
-#include <libtransmission/log.h>
-#include <libtransmission/net.h>
-#include <libtransmission/open-files.h>
-#include <libtransmission/peer-io.h>
-#include <libtransmission/quark.h>
-#include <libtransmission/session.h>
-#include <libtransmission/variant.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/net.h"
+#include "tr/torrent/open-files.h"
+#include "tr/torrent/peer-io.h"
+#include "tr/torrent/session.h"
 
 #include "test-fixtures.h"
 

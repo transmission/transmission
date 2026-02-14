@@ -8,11 +8,11 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/tr-strbuf.h"
 
-#include <libtransmission/net.h>
-#include <libtransmission/session.h> // tr_session.addressIsBlocked()
-#include <libtransmission/tr-strbuf.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/net.h"
+#include "tr/torrent/session.h" // tr_session.addressIsBlocked()
 
 #include "test-fixtures.h"
 

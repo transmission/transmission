@@ -16,10 +16,11 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/env.h"
+#include "tr/base/file-utils.h"
 
-#include <libtransmission/env.h>
-#include <libtransmission/utils.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/utils.h"
 
 #include "test-fixtures.h"
 

@@ -8,12 +8,12 @@
 #include "Prefs.h"
 #include "Utils.h"
 
-#include <libtransmission-app/app.h>
+#include "tr/app/app.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/serializer.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/version.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/version.h"
+
+#include "tr/base/serializer.h"
 
 #include <giomm/file.h>
 #include <giomm/init.h>

@@ -7,11 +7,12 @@
 #include "GtkCompat.h"
 #include "PrefsDialog.h"
 
-#include <libtransmission-app/display-modes.h>
+#include "tr/app/display-modes.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/serializer.h>
-#include <libtransmission/variant.h>
+#include "tr/torrent/transmission.h"
+
+#include "tr/base/serializer.h"
+#include "tr/base/variant.h"
 
 #include <glibmm/miscutils.h>
 

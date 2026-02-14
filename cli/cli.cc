@@ -13,18 +13,19 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/env.h"
+#include "tr/base/error.h"
+#include "tr/base/file.h"
+#include "tr/base/i18n.h"
+#include "tr/base/tr-getopt.h"
+#include "tr/base/values.h"
+#include "tr/base/variant.h"
 
-#include <libtransmission/env.h>
-#include <libtransmission/error.h>
-#include <libtransmission/file.h>
-#include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h> // _()
-#include <libtransmission/values.h>
-#include <libtransmission/variant.h>
-#include <libtransmission/version.h>
-#include <libtransmission/web-utils.h>
-#include <libtransmission/web.h> // tr_sessionFetch()
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/utils.h"
+#include "tr/torrent/version.h"
+#include "tr/torrent/web-utils.h"
+#include "tr/torrent/web.h" // tr_sessionFetch()
 
 using namespace std::literals;
 using namespace tr::Values;

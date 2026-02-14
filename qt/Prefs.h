@@ -12,10 +12,10 @@
 #include <QString>
 #include <QVariant>
 
-#include <libtransmission/quark.h>
-#include <libtransmission/variant.h>
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
-#include <libtransmission-app/display-modes.h>
+#include "tr/app/display-modes.h"
 
 #include "UserMetaType.h"
 

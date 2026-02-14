@@ -8,7 +8,7 @@
 #include <QCoreApplication> // Q_DECLARE_TR_FUNCTIONS
 #include <QString>
 
-#include "libtransmission/values.h"
+#include "tr/base/values.h"
 
 class Speed : public tr::Values::Speed
 {

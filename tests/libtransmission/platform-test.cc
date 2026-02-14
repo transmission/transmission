@@ -10,12 +10,12 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/file-utils.h"
+#include "tr/base/file.h"
+#include "tr/base/tr-strbuf.h"
 
-#include <libtransmission/file-utils.h>
-#include <libtransmission/file.h>
-#include <libtransmission/platform.h>
-#include <libtransmission/tr-strbuf.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/platform.h"
 
 #include "test-fixtures.h"
 

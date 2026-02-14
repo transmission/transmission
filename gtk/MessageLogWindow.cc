@@ -12,7 +12,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/log.h>
+#include "tr/base/log.h"
 
 #include <giomm/simpleaction.h>
 #include <glibmm/convert.h>

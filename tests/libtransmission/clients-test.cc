@@ -10,9 +10,10 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/crypto-utils.h> // tr_rand_obj()
-#include <libtransmission/clients.h>
-#include <libtransmission/tr-macros.h>
+#include "tr/base/tr-macros.h"
+
+#include "tr/torrent/crypto-utils.h" // tr_rand_obj()
+#include "tr/torrent/clients.h"
 
 using namespace std::literals;
 

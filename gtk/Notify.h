@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <libtransmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
 #include <glibmm/refptr.h>
 

@@ -7,8 +7,9 @@
 
 #include "GtkCompat.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/values.h>
+#include "tr/torrent/transmission.h"
+
+#include "tr/base/values.h"
 
 #include <glibmm/objectbase.h>
 #include <glibmm/refptr.h>

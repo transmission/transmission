@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include <libtransmission/transmission.h> /* tr_variant, tr_session */
-#include <libtransmission/quark.h>
-#include <libtransmission/serializer.h>
-#include <libtransmission/variant.h>
+#include "tr/torrent/transmission.h" // tr_variant, tr_session
+
+#include "tr/base/quark.h"
+#include "tr/base/serializer.h"
+#include "tr/base/variant.h"
 
 #include <cstdint> // int64_t
 #include <string>

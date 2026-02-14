@@ -11,10 +11,11 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/error.h>
-#include <libtransmission/makemeta.h>
-#include <libtransmission/values.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/makemeta.h"
+
+#include "tr/base/error.h"
+#include "tr/base/values.h"
 
 #include <giomm/file.h>
 #include <glibmm/convert.h>

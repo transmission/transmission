@@ -15,10 +15,11 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/peer-mse.h>
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/tr-macros.h>
-#include <libtransmission/string-utils.h>
+#include "tr/base/tr-macros.h"
+#include "tr/base/string-utils.h"
+
+#include "tr/torrent/peer-mse.h"
+#include "tr/torrent/crypto-utils.h"
 
 using namespace std::literals;
 

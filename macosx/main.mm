@@ -8,9 +8,9 @@
 #import <AppKit/AppKit.h>
 #endif
 
-#include <libtransmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
-#include <libtransmission/utils.h>
+#include "tr/torrent/utils.h"
 
 int main(int argc, char** argv)
 {

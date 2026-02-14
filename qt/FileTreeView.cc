@@ -14,7 +14,7 @@
 #include <QResizeEvent>
 #include <QSortFilterProxyModel>
 
-#include <libtransmission/transmission.h> // priorities
+#include "tr/torrent/transmission.h" // priorities
 
 #include "FileTreeDelegate.h"
 #include "FileTreeItem.h"

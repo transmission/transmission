@@ -5,7 +5,7 @@
 #import <Foundation/Foundation.h>
 #import <Quartz/Quartz.h>
 
-#include <libtransmission/transmission.h>
+#include "tr/torrent/transmission.h>
 
 @class FileListNode;
 
@@ -192,8 +192,9 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 - (void)checkGroupValueForRemoval:(NSNotification*)notification;
 
 @property(nonatomic, readonly) NSArray<FileListNode*>* fileList;
-@property(nonatomic, readonly) NSArray<FileListNode*>* flatFileList;
-@property(nonatomic, readonly) NSUInteger fileCount;
+@property(nonatomic, readonly) NSArray < FileListNode *
+        "* flatFileList;
+        @property(nonatomic, readonly) NSUInteger fileCount;
 
 //methods require fileStats to have been updated recently to be accurate
 - (CGFloat)fileProgress:(FileListNode*)node;

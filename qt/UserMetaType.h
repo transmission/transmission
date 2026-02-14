@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <libtransmission/transmission.h>
-
-#include <libtransmission-app/display-modes.h>
-
 #include <QMetaType>
+
+#include "tr/torrent/types.h" // tr_encryption_mode
+
+#include "tr/app/display-modes.h"
 
 class UserMetaType
 {

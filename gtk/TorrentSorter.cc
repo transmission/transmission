@@ -9,11 +9,12 @@
 #include "SorterBase.hh"
 #include "Utils.h"
 
-#include <libtransmission-app/display-modes.h>
+#include "tr/app/display-modes.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
-#include <libtransmission/utils.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/utils.h"
+
+#include "tr/base/tr-macros.h"
 
 #include <small/map.hpp>
 

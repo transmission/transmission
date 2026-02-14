@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-#include <libtransmission/quark.h>
+#include "tr/base/quark.h"
 
 #include "test-fixtures.h"
 

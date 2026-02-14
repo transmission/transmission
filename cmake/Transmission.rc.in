@@ -1,5 +1,5 @@
 #include "winresrc.h"
-#include <libtransmission/version.h>
+#include "tr/torrent/version.h"
 
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 

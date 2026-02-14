@@ -17,8 +17,8 @@
 #include <sys/socket.h>
 #endif
 
-#include <libtransmission/net.h>
-#include <libtransmission/peer-mgr.h>
+#include "tr/torrent/net.h"
+#include "tr/torrent/peer-mgr.h"
 
 #include "test-fixtures.h"
 

@@ -30,17 +30,18 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include <libtransmission/announcer.h>
-#include <libtransmission/announcer-common.h>
-#include <libtransmission/crypto-utils.h> // for tr_rand_obj()
-#include <libtransmission/net.h>
-#include <libtransmission/peer-mgr.h> // for tr_pex
-#include <libtransmission/session.h> // tr_peerIdInit
-#include "libtransmission/timer.h"
-#include <libtransmission/timer-ev.h>
-#include <libtransmission/tr-buffer.h>
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_p...
-#include "libtransmission/utils.h"
+#include "tr/base/tr-macros.h" // tr_sha1_digest_t, tr_p...
+
+#include "tr/torrent/announcer.h"
+#include "tr/torrent/announcer-common.h"
+#include "tr/torrent/crypto-utils.h" // for tr_rand_obj()
+#include "tr/torrent/net.h"
+#include "tr/torrent/peer-mgr.h" // for tr_pex
+#include "tr/torrent/session.h" // tr_peerIdInit
+#include "tr/torrent/timer.h"
+#include "tr/torrent/timer-ev.h"
+#include "tr/torrent/tr-buffer.h"
+#include "tr/torrent/utils.h"
 
 #include "test-fixtures.h"
 

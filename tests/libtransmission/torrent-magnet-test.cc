@@ -9,9 +9,10 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/error.h>
-#include <libtransmission/torrent-magnet.h>
-#include <libtransmission/torrent-metainfo.h>
+#include "tr/base/error.h"
+
+#include "tr/torrent/torrent-magnet.h"
+#include "tr/torrent/torrent-metainfo.h"
 
 #include "test-fixtures.h"
 

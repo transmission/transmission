@@ -16,13 +16,13 @@
 
 #include <gtest/gtest.h>
 
-#define LIBTRANSMISSION_VARIANT_MODULE
+#include "tr/base/benc.h"
+#include "tr/base/error.h"
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
-#include <libtransmission/benc.h>
-#include <libtransmission/crypto-utils.h> // tr_rand_buffer(), tr_rand_int()
-#include <libtransmission/error.h>
-#include <libtransmission/quark.h>
-#include <libtransmission/variant.h>
+#define LIBTRANSMISSION_VARIANT_MODULE
+#include "tr/torrent/crypto-utils.h" // tr_rand_buffer(), tr_rand_int()
 
 #include "test-fixtures.h"
 

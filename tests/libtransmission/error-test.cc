@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/error.h>
+#include "tr/base/error.h"
 
 #include "test-fixtures.h"
 

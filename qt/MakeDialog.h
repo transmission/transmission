@@ -7,7 +7,7 @@
 
 #include <optional>
 
-#include <libtransmission/makemeta.h>
+#include "tr/torrent/makemeta.h"
 
 #include "BaseDialog.h"
 #include "ui_MakeDialog.h"

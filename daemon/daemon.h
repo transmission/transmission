@@ -12,8 +12,8 @@
 #include <unistd.h>
 #endif
 
-#include <libtransmission/variant.h>
-#include <libtransmission/quark.h>
+#include "tr/base/variant.h"
+#include "tr/base/quark.h"
 
 struct event_base;
 struct tr_error;

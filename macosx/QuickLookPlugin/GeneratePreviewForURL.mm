@@ -12,8 +12,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include <libtransmission/string-utils.h>
-#include <libtransmission/torrent-metainfo.h>
+#include "tr/base/string-utils.h"
+
+#include "tr/torrent/torrent-metainfo.h"
 
 #import "NSStringAdditions.h"
 

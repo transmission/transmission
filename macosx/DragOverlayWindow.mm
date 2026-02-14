@@ -6,7 +6,7 @@
 #import "DragOverlayView.h"
 #import "NSStringAdditions.h"
 
-#include <libtransmission/torrent-metainfo.h>
+#include "tr/torrent/torrent-metainfo.h>
 
 @interface DragOverlayWindow ()
 
@@ -50,7 +50,7 @@
     return self;
 }
 
-- (void)setTorrents:(NSArray<NSString*>*)files
+- (void)setTorrents:(NSArray<NSString*"*)files
 {
     uint64_t size = 0;
     NSUInteger count = 0;

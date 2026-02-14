@@ -2,8 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/utils.h"
 
 #import "NSStringAdditions.h"
 #import "NSDataAdditions.h"

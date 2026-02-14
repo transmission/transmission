@@ -18,10 +18,11 @@
 #include "TorrentCellRenderer.h"
 #endif
 
-#include <libtransmission-app/display-modes.h>
+#include "tr/app/display-modes.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/values.h>
+#include "tr/torrent/transmission.h"
+
+#include "tr/base/values.h"
 
 #include <gdkmm/cursor.h>
 #include <gdkmm/rectangle.h>

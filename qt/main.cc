@@ -12,13 +12,13 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/tr-getopt.h"
 
-#include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/version.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/utils.h"
+#include "tr/torrent/version.h"
 
-#include <libtransmission-app/app.h>
+#include "tr/app/app.h"
 
 #include "Application.h"
 #include "InteropHelper.h"

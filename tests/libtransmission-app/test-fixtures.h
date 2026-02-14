@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include "libtransmission-app/app.h"
+#include "tr/app/app.h"
 
 class TransmissionTest : public ::testing::Test
 {

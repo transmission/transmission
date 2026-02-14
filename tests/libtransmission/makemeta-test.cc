@@ -14,16 +14,17 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/announce-list.h>
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/file.h>
-#include <libtransmission/makemeta.h>
-#include <libtransmission/quark.h>
-#include <libtransmission/session.h> // TR_NAME
-#include <libtransmission/string-utils.h>
-#include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/tr-strbuf.h>
-#include <libtransmission/variant.h>
+#include "tr/base/file.h"
+#include "tr/base/quark.h"
+#include "tr/base/string-utils.h"
+#include "tr/base/tr-strbuf.h"
+#include "tr/base/variant.h"
+
+#include "tr/torrent/announce-list.h"
+#include "tr/torrent/crypto-utils.h"
+#include "tr/torrent/makemeta.h"
+#include "tr/torrent/session.h" // TR_NAME
+#include "tr/torrent/torrent-metainfo.h"
 
 #include "test-fixtures.h"
 

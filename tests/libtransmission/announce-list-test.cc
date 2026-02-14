@@ -15,13 +15,13 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/error.h"
+#include "tr/base/file-utils.h"
+#include "tr/base/tr-strbuf.h"
 
-#include <libtransmission/announce-list.h>
-#include <libtransmission/error.h>
-#include <libtransmission/file-utils.h>
-#include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/tr-strbuf.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/announce-list.h"
+#include "tr/torrent/torrent-metainfo.h"
 
 #include "test-fixtures.h"
 

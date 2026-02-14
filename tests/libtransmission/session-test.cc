@@ -14,14 +14,14 @@
 
 #include <gtest/gtest.h>
 
-#include <libtransmission/transmission.h>
+#include "tr/base/quark.h"
+#include "tr/base/variant.h"
 
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/quark.h>
-#include <libtransmission/session-id.h>
-#include <libtransmission/session.h>
-#include <libtransmission/variant.h>
-#include <libtransmission/version.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/crypto-utils.h"
+#include "tr/torrent/session-id.h"
+#include "tr/torrent/session.h"
+#include "tr/torrent/version.h"
 
 #include "test-fixtures.h"
 

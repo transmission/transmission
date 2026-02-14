@@ -13,9 +13,9 @@
 #include "TorrentFilter.h"
 #include "Utils.h"
 
-#include <libtransmission-app/display-modes.h>
+#include "tr/app/display-modes.h"
 
-#include <libtransmission/tr-macros.h>
+#include "tr/base/tr-macros.h"
 
 #include <gdkmm/pixbuf.h>
 #include <glibmm/i18n.h>

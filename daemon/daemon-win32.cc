@@ -10,9 +10,9 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/error.h>
-#include <libtransmission/log.h>
-#include <libtransmission/string-utils.h>
+#include "tr/base/error.h"
+#include "tr/base/log.h"
+#include "tr/base/string-utils.h"
 
 #include "daemon.h"
 

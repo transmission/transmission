@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <libtransmission/transmission.h>
+#include "tr/torrent/types.h" // tr_torrent_id_t
 
 #include <glibmm/refptr.h>
 #include <gtkmm/builder.h>

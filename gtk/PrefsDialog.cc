@@ -13,8 +13,8 @@
 #include "SystemTrayIcon.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/web-utils.h>
+#include "tr/torrent/transmission.h"
+#include "tr/torrent/web-utils.h"
 
 #include <glibmm/date.h>
 #include <glibmm/i18n.h>

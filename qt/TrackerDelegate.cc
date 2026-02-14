@@ -9,9 +9,9 @@
 #include <QPixmap>
 #include <QTextDocument>
 
-#include <libtransmission/web-utils.h>
+#include "tr/torrent/web-utils.h"
 
-#include <libtransmission-app/favicon-cache.h>
+#include "tr/app/favicon-cache.h"
 
 #include "Formatter.h"
 #include "Torrent.h"

@@ -24,7 +24,7 @@
 #include <QTime>
 #include <QTimeEdit>
 
-#include <libtransmission/transmission.h>
+#include "tr/torrent/transmission.h"
 
 #include "ColumnResizer.h"
 #include "Formatter.h"
