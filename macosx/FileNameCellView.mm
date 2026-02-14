@@ -69,7 +69,9 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
     return self;
 }
 
-- (void)setupConstraints {}
+- (void)setupConstraints
+{
+}
 
 - (void)setNode:(FileListNode*)node
 {
@@ -164,7 +166,8 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 
 @implementation OnlyFileNameCellView
 
-- (void)setupConstraints {
+- (void)setupConstraints
+{
     NSImageView* iconView = self.iconView;
     NSTextField* nameField = self.nameField;
     NSTextField* statusField = self.statusField;
@@ -194,7 +197,8 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 
 @implementation OnlyFolderNameCellView
 
-- (void)setupConstraints {
+- (void)setupConstraints
+{
     NSImageView* iconView = self.iconView;
     NSTextField* nameField = self.nameField;
     NSTextField* statusField = self.statusField;
@@ -212,8 +216,7 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 
         // For folders, status appears next to name, both centered
         [nameField.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
-        [nameField.trailingAnchor constraintLessThanOrEqualToAnchor:statusField.leadingAnchor
-                                                           constant:-kPaddingBetweenNameAndFolderStatus],
+        [nameField.trailingAnchor constraintLessThanOrEqualToAnchor:statusField.leadingAnchor constant:-kPaddingBetweenNameAndFolderStatus],
 
         [statusField.leadingAnchor constraintEqualToAnchor:nameField.trailingAnchor constant:kPaddingBetweenNameAndFolderStatus],
         [statusField.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
