@@ -50,6 +50,7 @@ static dispatch_queue_t timeMachineExcludeQueue;
 
 @property(nonatomic) BOOL fResumeOnWake;
 @property(nonatomic, strong, readonly) NSString* hashString;
+@property(nonatomic, readonly) tr_torrent_id_t id;
 
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
@@ -1888,6 +1889,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
     _fResumeOnWake = NO;
     _hashString = @(tr_torrentView(self.fHandle).hash_string);
+    _id = tr_torrentId(self.fHandle);
 
     //don't do after this point - it messes with auto-group functionality
     if (!self.magnet)
