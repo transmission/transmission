@@ -18,6 +18,8 @@ const peer_column_classes = [
   'peer-app-name',
 ];
 
+const webseed_column_classes = ['url', 'speed-down'];
+
 export class Inspector extends EventTarget {
   constructor(controller) {
     super();
@@ -138,6 +140,26 @@ export class Inspector extends EventTarget {
   }
 
   static _createPeersPage() {
+    const container = document.createElement('div');
+
+    // Webseeds table
+    const webseedsTable = document.createElement('table');
+    webseedsTable.classList.add('peer-list');
+    const webseedsThead = document.createElement('thead');
+    const webseedsTr = document.createElement('tr');
+    const webseedsHeaders = ['Web Seeds', 'Down'];
+    for (const [index, name] of webseedsHeaders.entries()) {
+      const th = document.createElement('th');
+      th.classList.add(webseed_column_classes[index]);
+      setTextContent(th, name);
+      webseedsTr.append(th);
+    }
+    const webseedsTbody = document.createElement('tbody');
+    webseedsThead.append(webseedsTr);
+    webseedsTable.append(webseedsThead);
+    webseedsTable.append(webseedsTbody);
+
+    // Peers table
     const table = document.createElement('table');
     table.classList.add('peer-list');
     const thead = document.createElement('thead');
@@ -157,9 +179,16 @@ export class Inspector extends EventTarget {
     thead.append(tr);
     table.append(thead);
     table.append(tbody);
+
+    container.append(webseedsTable);
+    container.append(table);
+
     return {
-      root: table,
+      peersTable: table,
+      root: container,
       tbody,
+      webseedsTable,
+      webseedsTbody,
     };
   }
 
@@ -601,7 +630,7 @@ export class Inspector extends EventTarget {
   _updatePeers() {
     const fmt = Formatter;
     const { elements, torrents } = this;
-    const { tbody } = elements.peers;
+    const { tbody, webseedsTbody, webseedsTable } = elements.peers;
 
     const cell_setters = [
       (peer, td) => {
@@ -632,36 +661,86 @@ export class Inspector extends EventTarget {
       },
     ];
 
-    const rows = [];
+    const webseed_cell_setters = [
+      (webseed, td) => {
+        setTextContent(td, webseed.url);
+        td.setAttribute('title', webseed.url);
+      },
+      (webseed, td) => {
+        setTextContent(
+          td,
+          webseed.download_bytes_per_second
+            ? fmt.speedBps(webseed.download_bytes_per_second)
+            : '',
+        );
+      },
+    ];
+
+    const webseedsRows = [];
+    const peersRows = [];
+    let hasWebseeds = false;
+
     for (const tor of torrents) {
-      // torrent name
-      const tortr = document.createElement('tr');
-      tortr.classList.add('torrent-row');
-      const tortd = document.createElement('td');
-      tortd.setAttribute('colspan', cell_setters.length);
-      setTextContent(tortd, tor.getName());
-      tortr.append(tortd);
-      rows.push(tortr);
+      // create base torrent row
+      const baseTortr = document.createElement('tr');
+      baseTortr.classList.add('torrent-row');
+      const baseTortd = document.createElement('td');
+      setTextContent(baseTortd, tor.getName());
+      baseTortr.append(baseTortd);
+
+      // webseeds
+      const webseeds = tor.getWebseedsEx();
+      if (webseeds.length > 0) {
+        hasWebseeds = true;
+        const tortr = baseTortr.cloneNode(true);
+        tortr.firstChild.setAttribute('colspan', webseed_cell_setters.length);
+        webseedsRows.push(tortr);
+
+        // webseed rows
+        for (const webseed of webseeds) {
+          const tr = document.createElement('tr');
+          tr.classList.add('webseed-row');
+          for (const [index, setter] of webseed_cell_setters.entries()) {
+            const td = document.createElement('td');
+            td.classList.add(webseed_column_classes[index]);
+            setter(webseed, td);
+            tr.append(td);
+          }
+          webseedsRows.push(tr);
+        }
+      }
+
+      // peers
+      const tortr = baseTortr.cloneNode(true);
+      tortr.firstChild.setAttribute('colspan', cell_setters.length);
+      peersRows.push(tortr);
 
       // peers
       for (const peer of tor.getPeers()) {
         const tr = document.createElement('tr');
-        tr.classList.add('peer-row');
         for (const [index, setter] of cell_setters.entries()) {
           const td = document.createElement('td');
           td.classList.add(peer_column_classes[index]);
           setter(peer, td);
           tr.append(td);
         }
-        rows.push(tr);
+        peersRows.push(tr);
       }
-
-      // TODO: modify instead of rebuilding wholesale?
-      while (tbody.firstChild) {
-        tbody.firstChild.remove();
-      }
-      tbody.append(...rows);
     }
+
+    // TODO: modify instead of rebuilding wholesale?
+    webseedsTable.style.display = hasWebseeds ? '' : 'none';
+    while (webseedsTbody.firstChild) {
+      webseedsTbody.firstChild.remove();
+    }
+    if (hasWebseeds) {
+      webseedsTbody.append(...webseedsRows);
+    }
+
+    while (tbody.firstChild) {
+      tbody.firstChild.remove();
+    }
+    tbody.append(...peersRows);
   }
 
   /// TRACKERS PAGE

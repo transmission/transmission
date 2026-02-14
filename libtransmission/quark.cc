@@ -142,6 +142,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "downloadLimit"sv, // rpc
     "downloadLimited"sv, // rpc
     "downloadSpeed"sv, // rpc
+    "download_bytes_per_second"sv, // rpc
     "download_count"sv, // rpc
     "download_dir"sv, // daemon, gtk app, rpc, tr_session::Settings
     "download_dir_free_space"sv, // rpc
@@ -263,6 +264,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "isUTP"sv, // rpc
     "isUploadingTo"sv, // rpc
     "is_backup"sv, // rpc
+    "is_downloading"sv, // rpc
     "is_downloading_from"sv, // rpc
     "is_encrypted"sv, // rpc
     "is_finished"sv, // rpc
@@ -708,6 +710,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "uploadedEver"sv, // rpc
     "uploaded_bytes"sv, // rpc, stats.json
     "uploaded_ever"sv, // rpc
+    "url"sv, // rpc
     "url-list"sv, // .torrent
     "use-global-speed-limit"sv, // .resume
     "use-speed-limit"sv, // .resume
@@ -729,6 +732,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "watch_dir_force_generic"sv, // daemon
     "webseeds"sv, // rpc
     "webseedsSendingToUs"sv, // rpc
+    "webseeds_ex"sv, // rpc
     "webseeds_sending_to_us"sv, // rpc
     "yourip"sv, // BEP0010; BT protocol
 };
