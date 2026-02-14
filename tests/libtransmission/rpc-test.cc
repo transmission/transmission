@@ -303,6 +303,7 @@ TEST_F(RpcTest, idAsync)
 
         // cleanup
         tr_torrentRemove(tor, false);
+        EXPECT_TRUE(waitFor([this] { return std::empty(session_->torrents()); }, 5s));
     }
 }
 
