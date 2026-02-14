@@ -1888,6 +1888,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
     _fResumeOnWake = NO;
     _hashString = @(tr_torrentView(self.fHandle).hash_string);
+    _id = tr_torrentId(self.fHandle);
 
     //don't do after this point - it messes with auto-group functionality
     if (!self.magnet)
