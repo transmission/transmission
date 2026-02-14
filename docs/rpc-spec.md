@@ -248,8 +248,8 @@ The 'source' column here corresponds to the data structure there.
 | `desired_available`| number| tr_stat
 | `done_date`| number | tr_stat
 | `download_dir` | string  | tr_torrent
-| `downloaded_ever` | number  | tr_stat
-| `download_limit` | number  | tr_torrent
+| `integer` | number  | tr_stat
+| `download_limit` | integer  | tr_torrent
 | `download_limited` | boolean | tr_torrent
 | `edit_date` | number | tr_stat
 | `error` | number | tr_stat
@@ -264,7 +264,7 @@ The 'source' column here corresponds to the data structure there.
 | `have_unchecked`| number| tr_stat
 | `have_valid`| number| tr_stat
 | `honors_session_limits`| boolean| tr_torrent
-| `id` | number | tr_torrent
+| `id` | integer | tr_torrent
 | `is_finished` | boolean| tr_stat
 | `is_private` | boolean| tr_torrent
 | `is_stalled` | boolean| tr_stat
@@ -308,8 +308,8 @@ The 'source' column here corresponds to the data structure there.
 | `trackers`| array (see below)| n/a
 | `tracker_list` | string | string of announce URLs, one per line, with a blank line between tiers
 | `tracker_stats`| array (see below)| n/a
-| `uploaded_ever`| number| tr_stat
-| `upload_limit`| number| tr_torrent
+| `uploaded_ever`| integer| tr_stat
+| `upload_limit`| integer| tr_torrent
 | `upload_limited`| boolean| tr_torrent
 | `upload_ratio`| double| tr_stat
 | `wanted`| array (see below)| n/a
@@ -400,7 +400,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `announce` | string | tr_tracker_view
-| `id` | number | tr_tracker_view
+| `id` | integer | tr_tracker_view
 | `scrape` | string | tr_tracker_view
 | `sitename` | string | tr_tracker_view
 | `tier` | number | tr_tracker_view
@@ -416,7 +416,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `has_announced`            | boolean    | tr_tracker_view
 | `has_scraped`              | boolean    | tr_tracker_view
 | `host`                     | string     | tr_tracker_view
-| `id`                       | number     | tr_tracker_view
+| `id`                       | integer    | tr_tracker_view
 | `is_backup`                | boolean    | tr_tracker_view
 | `last_announce_peer_count` | number     | tr_tracker_view
 | `last_announce_result`     | string     | tr_tracker_view
@@ -621,9 +621,9 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `seed_ratio_limited` | boolean | true if `seed_ratio_limit` is honored by default
 | `sequential_download` | boolean | true means sequential download is enabled by default for added torrents
 | `session_id` | string | the current `X-Transmission-Session-Id` value
-| `speed_limit_down` | number | max global download speed (kB/s)
+| `speed_limit_down` | integer | max global download speed (kB/s)
 | `speed_limit_down_enabled` | boolean | true means enabled
-| `speed_limit_up` | number | max global upload speed (kB/s)
+| `speed_limit_up` | integer | max global upload speed (kB/s)
 | `speed_limit_up_enabled` | boolean | true means enabled
 | `start_added_torrents` | boolean | true means added torrents will be started right away
 | `tcp_enabled` | boolean | **DEPRECATED** Use `preferred_transports` instead
@@ -779,9 +779,9 @@ Request parameters:
 |:--|:--|:--
 | `honors_session_limits` | boolean  | true if session upload limits are honored
 | `name` | string | Bandwidth group name
-| `speed_limit_down` | number | max global download speed (kB/s)
+| `speed_limit_down` | integer | max global download speed (kB/s)
 | `speed_limit_down_enabled` | boolean | true means enabled
-| `speed_limit_up` | number | max global upload speed (kB/s)
+| `speed_limit_up` | integer | max global upload speed (kB/s)
 | `speed_limit_up_enabled` | boolean | true means enabled
 
 Response parameters: none
@@ -806,9 +806,9 @@ A bandwidth group description object has:
 |:--|:--|:--
 | `honors_session_limits` | boolean  | true if session upload limits are honored
 | `name` | string | Bandwidth group name
-| `speed_limit_down` | number | max global download speed (kB/s)
+| `speed_limit_down` | integer | max global download speed (kB/s)
 | `speed_limit_down_enabled` | boolean | true means enabled
-| `speed_limit_up` | number | max global upload speed (kB/s)
+| `speed_limit_up` | integer | max global upload speed (kB/s)
 | `speed_limit_up_enabled` | boolean | true means enabled
 
 ## 5 Protocol versions
