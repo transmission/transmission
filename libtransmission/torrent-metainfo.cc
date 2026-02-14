@@ -104,7 +104,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             {
                 file_subpath_ += '/';
             }
-            tr_torrent_files::sanitize_subpath(*path_element, file_subpath_);
+            tr_torrent_files::sanitize_subpath(tr_strv_replace_ctrl(tr_strv_to_utf8_string(*path_element)), file_subpath_);
         }
         else if (pathIs(InfoKey))
         {
@@ -306,7 +306,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
                     file_subpath_ += '/';
                 }
                 // BEP-3 says strings are UTF-8, so mask non-conformant path strings
-                tr_torrent_files::sanitize_subpath(tr_strv_to_utf8_string(value), file_subpath_);
+                tr_torrent_files::sanitize_subpath(tr_strv_replace_ctrl(tr_strv_to_utf8_string(value)), file_subpath_);
             }
             else if (current_key == AttrKey)
             {
@@ -535,6 +535,7 @@ private:
         // In the single file case, 'length' maps to the length of the file in bytes."
         if (tm_.file_count() == 0 && length_ != 0 && !std::empty(tm_.name_))
         {
+            // 'name' came via set_name() so it's already utf8 and ctrl clean
             tm_.files_.add(tr_torrent_files::sanitize_subpath(tm_.name_), length_);
         }
 
