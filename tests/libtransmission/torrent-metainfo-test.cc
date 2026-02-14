@@ -289,4 +289,18 @@ TEST_F(TorrentMetainfoTest, utf8Test)
     EXPECT_EQ("bad-utf8-path/file\uFFFD.foo", tm.file_subpath(1));
 }
 
+TEST_F(TorrentMetainfoTest, ctrlCharTest)
+{
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR "/ctrl-char.torrent"sv };
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
+
+    // don't replace CTRL char from 'comment', 'source' etc
+    EXPECT_EQ("Hello, World\nThis is a multiline comment\nAnd another line.", tm.comment());
+    // do replace for 'name' and 'path'
+    EXPECT_EQ("Test \uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD \uFFFD\uFFFD wxyz", tm.name());
+    EXPECT_EQ("Test \uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD \uFFFD\uFFFD wxyz/file1\uFFFD.txt", tm.file_subpath(0));
+    EXPECT_EQ("Test \uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD \uFFFD\uFFFD wxyz/file2\uFFFD\uFFFD.txt", tm.file_subpath(1));
+}
+
 } // namespace tr::test
