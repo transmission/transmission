@@ -1439,7 +1439,7 @@ jobs:
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
               rapidjson \
               utf8-cpp
-            if [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
+            if [ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] || [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
               for set in xbase xcomp; do
                 curl -sL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-`uname -r`/${{ matrix.arch.binary-set }}/binary/sets/$set.tar.xz" | tar xJpf - -C /
               done
