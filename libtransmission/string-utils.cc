@@ -71,21 +71,7 @@ std::string tr_strv_to_utf8_string(std::string_view sv)
 
 #endif
 
-// following functions use '\uFFFD' "�" {REPLACEMENT CHARACTER}
-std::string tr_strv_replace_ctrl(std::string_view sv)
-{
-    // also replace control characters
-    auto out = std::string{};
-    out.reserve(std::size(sv));
-    for (auto c : sv)
-        if (auto b = static_cast<unsigned char>(c); b >= 0x01 && b <= 0x1F)
-            out.append("\uFFFD");
-        else
-            out += c;
-    return out;
-}
-
-std::string tr_strv_replace_invalid(std::string_view sv)
+std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
     // stripping characters after first \0
     if (auto first_null = sv.find('\0'); first_null != std::string::npos)
@@ -94,7 +80,7 @@ std::string tr_strv_replace_invalid(std::string_view sv)
     }
     auto out = std::string{};
     out.reserve(std::size(sv));
-    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), 0xFFFD);
+    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
     return out;
 }
 
