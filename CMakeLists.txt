@@ -43,7 +43,6 @@ include(TrMacros)
 
 set(CURL_MINIMUM 7.28.0)
 set(WOLFSSL_MINIMUM 3.4)
-set(CRC32C_MINIMUM 1.1.0)
 set(DEFLATE_MINIMUM 1.7)
 set(EVENT2_MINIMUM 2.1.0)
 # fast_float's version file is configured with `COMPATIBILITY SameMajorVersion`
@@ -96,7 +95,6 @@ tr_auto_option(USE_SYSTEM_UTP "Use system utp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_WIDE_INTEGER "Use system WideInteger library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" ${USE_SYSTEM_DEFAULT})
-tr_auto_option(USE_SYSTEM_CRC32C "Use system crc32c library" ${USE_SYSTEM_DEFAULT})
 tr_list_option(USE_GTK_VERSION "Use specific GTK version" AUTO 3 4)
 tr_list_option(USE_QT_VERSION "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO "Use specified crypto library" AUTO ccrypto mbedtls openssl wolfssl)
@@ -566,6 +564,7 @@ if(NOT USE_SYSTEM_MINIUPNPC)
 endif()
 unset(TR_MINIUPNPC_LIBNAME)
 
+add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/madler-crcany)
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
 tr_add_external_auto_library(DHT dht
@@ -587,18 +586,6 @@ tr_add_external_auto_library(B64 libb64
     SUBPROJECT
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
-
-# Don't build crc32c as subdirectory as its CMakeLists.txt
-# messes with global CMAKE_* variables and global compiler options
-tr_add_external_auto_library(CRC32C Crc32c
-    TARGET Crc32c::crc32c
-    LIBNAME crc32c
-    SOURCE_DIR crc32c
-    CMAKE_ARGS
-        -DCRC32C_BUILD_TESTS=OFF
-        -DCRC32C_BUILD_BENCHMARKS=OFF
-        -DCRC32C_USE_GLOG=OFF
-        -DCRC32C_INSTALL=ON)
 
 tr_add_external_auto_library(FAST_FLOAT FastFloat
     SUBPROJECT

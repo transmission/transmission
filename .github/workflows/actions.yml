@@ -164,7 +164,6 @@ jobs:
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
@@ -266,7 +265,6 @@ jobs:
             -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }} \
             -DRUN_CLANG_TIDY=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
@@ -469,7 +467,6 @@ jobs:
             bash \
             clang \
             cmake \
-            crc32c-dev \
             curl-dev \
             fast_float \
             fmt-dev \
@@ -798,7 +795,6 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_GTEST=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_FAST_FLOAT=OFF `# Not packaged in Debian 11` \
             -DUSE_SYSTEM_FMT=OFF `# Debian 11 package too old` \
@@ -882,7 +878,6 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_GTEST=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Debian` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian` \
@@ -1044,7 +1039,6 @@ jobs:
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
@@ -1160,7 +1154,6 @@ jobs:
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
@@ -1223,7 +1216,6 @@ jobs:
             pkg install -y \
               curl \
               cmake \
-              crc32c \
               dht \
               fast_float \
               gettext \
@@ -1323,7 +1315,6 @@ jobs:
             pkg_add -I -v \
               curl \
               cmake \
-              crc32c \
               fast-float \
               fmt \
               gettext-tools \
@@ -1467,7 +1458,6 @@ jobs:
               -DRUN_CLANG_TIDY=OFF \
               -DUSE_SYSTEM_DEFAULT=ON \
               -DUSE_SYSTEM_B64=OFF `# Not packaged in NetBSD` \
-              -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_DHT=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_NATPMP=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in NetBSD` \
@@ -1525,7 +1515,6 @@ jobs:
             pkg install -y \
               curl \
               cmake \
-              crc32c \
               `# dht (somehow installing dht causes the build to fail with a bunch of "/usr/local/lib/libdht.so: error: undefined reference to 'dht_*'" messages` \
               fast_float \
               gcc12 \

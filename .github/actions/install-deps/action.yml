@@ -51,7 +51,6 @@ runs:
           dnf install -y \
             fast_float-devel \
             fmt-devel \
-            google-crc32c-devel \
             libb64-devel \
             libcurl-devel \
             libdeflate-devel \
@@ -222,7 +221,6 @@ runs:
 
         # Transmission-specific libraries
         BASE_PACKAGES+=(
-          crc32c
           fast_float
           fmt
           libb64
