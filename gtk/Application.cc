@@ -166,7 +166,7 @@ private:
         guint time_);
 #endif
 
-    bool on_rpc_changed_idle(tr_rpc_callback_type type, tr_torrent_id_t torrent_id);
+    bool on_rpc_changed_idle(tr_rpc_callback_type type, std::optional<tr_torrent_id_t> tor_id);
 
     void placeWindowFromPrefs();
     void presentMainWindow();
@@ -202,12 +202,6 @@ private:
     void copy_magnet_link_to_clipboard(Glib::RefPtr<Torrent> const& torrent) const;
     bool call_rpc_for_selected_torrents(tr_quark method);
     void remove_selected(bool delete_files);
-
-    static tr_rpc_callback_status on_rpc_changed(
-        tr_session* session,
-        tr_rpc_callback_type type,
-        tr_torrent* tor,
-        gpointer gdata);
 
 private:
     Application& app_;
@@ -454,7 +448,7 @@ void Application::Impl::on_main_window_size_allocated()
 **** listen to changes that come from RPC
 ***/
 
-bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torrent_id_t torrent_id)
+bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, std::optional<tr_torrent_id_t> tor_id)
 {
     switch (type)
     {
@@ -463,19 +457,27 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
         break;
 
     case TR_RPC_TORRENT_ADDED:
-        if (auto* tor = core_->find_torrent(torrent_id); tor != nullptr)
+        if (tor_id)
         {
-            core_->add_torrent(Torrent::create(tor), true);
+            if (auto* tor = core_->find_torrent(*tor_id); tor != nullptr)
+            {
+                core_->add_torrent(Torrent::create(tor), true);
+            }
         }
-
         break;
 
     case TR_RPC_TORRENT_REMOVING:
-        core_->remove_torrent(torrent_id, false);
+        if (tor_id)
+        {
+            core_->remove_torrent(*tor_id, false);
+        }
         break;
 
     case TR_RPC_TORRENT_TRASHING:
-        core_->remove_torrent(torrent_id, true);
+        if (tor_id)
+        {
+            core_->remove_torrent(*tor_id, true);
+        }
         break;
 
     case TR_RPC_SESSION_CHANGED:
@@ -523,7 +525,7 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
     case TR_RPC_TORRENT_STARTED:
     case TR_RPC_TORRENT_STOPPED:
     case TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED:
-        /* nothing interesting to do here */
+        // nothing interesting to do here
         break;
 
     default:
@@ -531,20 +533,6 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
     }
 
     return false;
-}
-
-tr_rpc_callback_status Application::Impl::on_rpc_changed(
-    tr_session* /*session*/,
-    tr_rpc_callback_type type,
-    tr_torrent* tor,
-    gpointer gdata)
-{
-    auto* impl = static_cast<Impl*>(gdata);
-    auto const torrent_id = tr_torrentId(tor);
-
-    Glib::signal_idle().connect([impl, type, torrent_id]() { return impl->on_rpc_changed_idle(type, torrent_id); });
-
-    return TR_RPC_NOREMOVE;
 }
 
 /***
@@ -647,7 +635,13 @@ void Application::Impl::on_startup()
 
     app_.hold();
     app_setup();
-    tr_sessionSetRPCCallback(session, &Impl::on_rpc_changed, this);
+    tr_sessionSetRPCCallback(
+        session,
+        [this](tr_rpc_callback_type const type, std::optional<tr_torrent_id_t> const tor_id)
+        {
+            Glib::signal_idle().connect([this, type, tor_id]() { return on_rpc_changed_idle(type, tor_id); });
+            return TR_RPC_NOREMOVE;
+        });
 
     /* check & see if it's time to update the blocklist */
     if (gtr_pref_flag_get(TR_KEY_blocklist_enabled) && gtr_pref_flag_get(TR_KEY_blocklist_updates_enabled))

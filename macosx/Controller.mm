@@ -170,12 +170,6 @@ static void initUnits()
                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 }
 
-static tr_rpc_callback_status rpcCallback([[maybe_unused]] tr_session* handle, tr_rpc_callback_type type, struct tr_torrent* torrentStruct, void* controller)
-{
-    [(__bridge Controller*)controller rpcCallback:type forTorrentStruct:torrentStruct];
-    return TR_RPC_NOREMOVE; //we'll do the remove manually
-}
-
 // 2.90 was infected with ransomware which we now check for and attempt to remove
 static void removeKeRangerRansomware()
 {
@@ -603,7 +597,13 @@ static void removeKeRangerRansomware()
             [_fDefaults setBool:tr_sessionUsesAltSpeed(_fLib) forKey:@"SpeedLimit"];
         }
 
-        tr_sessionSetRPCCallback(_fLib, rpcCallback, (__bridge void*)(self));
+        tr_sessionSetRPCCallback(
+            _fLib,
+            [controller = self](tr_rpc_callback_type const type, std::optional<tr_torrent_id_t> const tor_id)
+            {
+                [controller rpcCallback:type forTorrentId:tor_id];
+                return TR_RPC_NOREMOVE; // we'll do the remove manually
+            });
 
         [SUUpdater sharedUpdater].delegate = self;
         _fQuitRequested = NO;
@@ -5399,35 +5399,34 @@ static void removeKeRangerRansomware()
     [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:kDonateURL]];
 }
 
-- (void)rpcCallback:(tr_rpc_callback_type)type forTorrentStruct:(struct tr_torrent*)torrentStruct
+- (void)rpcCallback:(tr_rpc_callback_type)type forTorrentId:(std::optional<tr_torrent_id_t>)torrentId
 {
     @autoreleasepool
     {
-        //get the torrent
-        __block Torrent* torrent = nil;
-        if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
-        {
-            [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                             usingBlock:^(Torrent* checkTorrent, NSUInteger /*idx*/, BOOL* stop) {
-                                                 if (torrentStruct == checkTorrent.torrentStruct)
-                                                 {
-                                                     torrent = checkTorrent;
-                                                     *stop = YES;
-                                                 }
-                                             }];
-
-            if (!torrent)
-            {
-                NSLog(@"No torrent found matching the given torrent struct from the RPC callback!");
-                return;
-            }
-        }
-
         dispatch_async(dispatch_get_main_queue(), ^{
+            //get the torrent
+            Torrent* torrent = nil;
+            if (torrentId.has_value() && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
+            {
+                torrent = [self torrentForId:*torrentId];
+
+                if (!torrent)
+                {
+                    NSLog(@"No torrent found matching the given torrent id from the RPC callback!");
+                    return;
+                }
+            }
+
             switch (type)
             {
             case TR_RPC_TORRENT_ADDED:
-                [self rpcAddTorrentStruct:torrentStruct];
+                if (torrentId.has_value())
+                {
+                    if (auto* const torrentStruct = tr_torrentFindFromId(self.fLib, *torrentId); torrentStruct != nullptr)
+                    {
+                        [self rpcAddTorrentStruct:torrentStruct];
+                    }
+                }
                 break;
 
             case TR_RPC_TORRENT_STARTED:

@@ -183,7 +183,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (IBAction)linkGitHub:(id)sender;
 - (IBAction)linkDonate:(id)sender;
 
-- (void)rpcCallback:(tr_rpc_callback_type)type forTorrentStruct:(struct tr_torrent*)torrentStruct;
+- (void)rpcCallback:(tr_rpc_callback_type)type forTorrentId:(std::optional<tr_torrent_id_t>)torrentId;
 - (void)rpcAddTorrentStruct:(struct tr_torrent*)torrentStruct;
 - (void)rpcRemoveTorrent:(Torrent*)torrent deleteData:(BOOL)deleteData;
 - (void)rpcStartedStoppedTorrent:(Torrent*)torrent;

@@ -292,7 +292,7 @@ void tr_sessionSetDefaultTrackers(tr_session* session, std::string_view trackers
  * shouldn't call libtransmission functions (to avoid deadlock),
  * and shouldn't modify client-level memory without using a mutex!
  */
-void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func);
 
 // ---
 
