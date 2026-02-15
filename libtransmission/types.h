@@ -595,7 +595,7 @@ struct tr_webseed_view
     uint64_t download_bytes_per_second; // current download speed
 };
 
-using tr_altSpeedFunc = void (*)(tr_session* session, bool active, bool user_driven, void*);
+using tr_altSpeedFunc = std::function<void(bool active, bool user_driven)>;
 
 using tr_session_idle_limit_hit_func = std::function<void(tr_torrent_id_t)>;
 

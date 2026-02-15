@@ -1174,13 +1174,9 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
         session->update_bandwidth(tr_direction::Up);
         session->update_bandwidth(tr_direction::Down);
 
-        if (session->alt_speed_active_changed_func_ != nullptr)
+        if (session->alt_speed_active_changed_func_)
         {
-            session->alt_speed_active_changed_func_(
-                session,
-                is_active,
-                reason == tr_session_alt_speeds::ChangeReason::User,
-                session->alt_speed_active_changed_func_user_data_);
+            session->alt_speed_active_changed_func_(is_active, reason == tr_session_alt_speeds::ChangeReason::User);
         }
     };
 
@@ -1305,12 +1301,11 @@ bool tr_sessionUsesAltSpeed(tr_session const* session)
     return session->alt_speeds_.is_active();
 }
 
-void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data)
+void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func)
 {
     TR_ASSERT(session != nullptr);
 
-    session->alt_speed_active_changed_func_ = func;
-    session->alt_speed_active_changed_func_user_data_ = user_data;
+    session->alt_speed_active_changed_func_ = std::move(func);
 }
 
 // ---

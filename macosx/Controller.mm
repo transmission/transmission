@@ -170,13 +170,6 @@ static void initUnits()
                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 }
 
-static void altSpeedToggledCallback([[maybe_unused]] tr_session* handle, bool active, bool byUser, void* controller)
-{
-    NSDictionary* dict = @{@"Active" : @(active), @"ByUser" : @(byUser)};
-    [(__bridge Controller*)controller performSelectorOnMainThread:@selector(altSpeedToggledCallbackIsLimited:) withObject:dict
-                                                    waitUntilDone:NO];
-}
-
 static tr_rpc_callback_status rpcCallback([[maybe_unused]] tr_session* handle, tr_rpc_callback_type type, struct tr_torrent* torrentStruct, void* controller)
 {
     [(__bridge Controller*)controller rpcCallback:type forTorrentStruct:torrentStruct];
@@ -594,7 +587,14 @@ void onStartQueue(tr_session* /*session*/, tr_torrent* /*tor*/, void* /*vself*/)
         _fGlobalPopoverShown = NO;
         _fSoundPlaying = NO;
 
-        tr_sessionSetAltSpeedFunc(_fLib, altSpeedToggledCallback, (__bridge void*)(self));
+        tr_sessionSetAltSpeedFunc(
+            _fLib,
+            [controller = self](bool const active, bool const by_user)
+            {
+                NSDictionary* const dict = @{ @"Active" : @(active), @"ByUser" : @(by_user) };
+                [controller performSelectorOnMainThread:@selector(altSpeedToggledCallbackIsLimited:) withObject:dict
+                                          waitUntilDone:NO];
+            });
         if (usesSpeedLimitSched)
         {
             [_fDefaults setBool:tr_sessionUsesAltSpeed(_fLib) forKey:@"SpeedLimit"];

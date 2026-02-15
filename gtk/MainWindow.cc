@@ -740,9 +740,8 @@ MainWindow::Impl::Impl(
 
     tr_sessionSetAltSpeedFunc(
         core_->get_session(),
-        [](tr_session* /*s*/, bool /*isEnabled*/, bool /*byUser*/, gpointer p)
-        { Glib::signal_idle().connect_once([p]() { static_cast<Impl*>(p)->onAltSpeedToggledIdle(); }); },
-        this);
+        [this](bool const /*is_enabled*/, bool const /*by_user*/)
+        { Glib::signal_idle().connect_once([this]() { onAltSpeedToggledIdle(); }); });
 
     refresh();
 
