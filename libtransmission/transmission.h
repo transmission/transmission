@@ -371,7 +371,7 @@ void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight
 tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
 void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day day);
 
-void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data);
+void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func);
 
 // ---
 

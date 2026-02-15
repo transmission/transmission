@@ -1277,7 +1277,7 @@ private:
     friend void tr_sessionSetAltSpeedBegin(tr_session* session, size_t minutes_since_midnight);
     friend void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day days);
     friend void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight);
-    friend void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data);
+    friend void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func);
     friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, size_t limit_kbyps);
     friend void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes);
     friend void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
@@ -1371,7 +1371,6 @@ private:
     void* rpc_func_user_data_ = nullptr;
 
     tr_altSpeedFunc alt_speed_active_changed_func_ = nullptr;
-    void* alt_speed_active_changed_func_user_data_ = nullptr;
 
     // The local peer port that we bind a socket to for listening
     // to incoming peer connections. Usually the same as
