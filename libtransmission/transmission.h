@@ -887,7 +887,7 @@ void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func
  *
  * Has the same restrictions as `tr_sessionSetCompletenessCallback`
  */
-void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func callback, void* user_data);
+void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func callback);
 
 /**
  * Register to be notified whenever a torrent's idle limit
