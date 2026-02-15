@@ -19,10 +19,15 @@
 
 #include <utf8.h>
 
+// TRR
+#include "iconv_wrap.h"
+#include "uchardet_wrap.h"
+
 #include <wildmat.h>
 
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/log.h"
 
 /* User-level routine. returns whether or not 'text' and 'pattern' matched */
 bool tr_wildmat(char const* text, char const* pattern)
@@ -71,7 +76,7 @@ std::string tr_strv_to_utf8_string(std::string_view sv)
 
 #endif
 
-std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
+std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32_t replacement)
 {
     // stripping characters after first \0
     if (auto first_null = sv.find('\0'); first_null != std::string::npos)
@@ -79,8 +84,46 @@ std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
         sv = { std::data(sv), first_null };
     }
     auto out = std::string{};
+#ifdef _WIN32
     out.reserve(std::size(sv));
     utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
+#else
+    if (utf8::is_valid(sv))
+    {
+        out = sv;
+    }
+    else
+    {
+        CharsetDetector detector;
+        if (detector.detectFromString(sv) == CharsetDetector::OK)
+        {
+            tr_logAddDebug(fmt::format("CharsetDetector {}", detector.getEncoding()));
+        }
+        else
+        {
+            tr_logAddError("CharsetDetector failed");
+            return "";
+        }
+
+        IconvWrapper conv("UTF-8", detector.getEncoding());
+        if (!conv.is_valid())
+        {
+            tr_logAddError("Failed to open iconv");
+            return "";
+        }
+
+        out = conv.convert(sv);
+        if (out.empty())
+        {
+            tr_logAddError("Failed to convert to UTF-8");
+        }
+        else
+        {
+            tr_logAddDebug(fmt::format("Converted '{}' to UTF-8 '{}'", sv, out));
+        }
+    }
+#endif
+
     return out;
 }
 

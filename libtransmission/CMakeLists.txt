@@ -294,7 +294,8 @@ target_link_libraries(${TR_NAME}
         Pal::Sigslot
         transmission::small
         libevent::core
-        libevent::extra)
+        libevent::extra
+	uchardet)
 
 if(INSTALL_LIB)
     install(
