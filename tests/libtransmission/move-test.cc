@@ -71,12 +71,10 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor).left_until_done);
 
     auto completeness = TR_LEECH;
-    auto const zeroes_completeness_func =
-        [](tr_torrent* /*torrent*/, tr_completeness c, bool /*was_running*/, void* vc) noexcept
-    {
-        *static_cast<tr_completeness*>(vc) = c;
-    };
-    tr_sessionSetCompletenessCallback(session_, zeroes_completeness_func, &completeness);
+    tr_sessionSetCompletenessCallback(
+        session_,
+        [&completeness](tr_torrent_id_t const /*tor_id*/, tr_completeness const c, bool const /*was_running*/) noexcept
+        { completeness = c; });
 
     struct TestIncompleteDirData
     {

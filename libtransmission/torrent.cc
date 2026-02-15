@@ -1849,7 +1849,7 @@ void tr_torrent::recheck_completeness()
             done_(this, recent_change);
         }
 
-        session->onTorrentCompletenessChanged(this, completeness_, was_running);
+        session->onTorrentCompletenessChanged(id(), completeness_, was_running);
 
         set_dirty();
         mark_changed();
