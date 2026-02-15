@@ -599,7 +599,7 @@ using tr_altSpeedFunc = void (*)(tr_session* session, bool active, bool user_dri
 
 using tr_session_idle_limit_hit_func = std::function<void(tr_torrent_id_t)>;
 
-using tr_session_metadata_func = void (*)(tr_session* session, tr_torrent* torrent, void* user_data);
+using tr_session_metadata_func = std::function<void(tr_torrent_id_t)>;
 
 using tr_session_ratio_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
 

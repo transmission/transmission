@@ -878,7 +878,7 @@ void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completen
  * This happens when a magnet link finishes downloading
  * metadata from its peers.
  */
-void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func callback, void* user_data);
+void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func callback);
 
 /**
  * Register to be notified whenever a torrent's ratio limit
