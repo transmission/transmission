@@ -2108,9 +2108,9 @@ void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_li
     session->setRatioLimitHitCallback(callback, user_data);
 }
 
-void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func callback, void* user_data)
+void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func callback)
 {
-    session->setIdleLimitHitCallback(callback, user_data);
+    session->setIdleLimitHitCallback(std::move(callback));
 }
 
 void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func callback, void* user_data)

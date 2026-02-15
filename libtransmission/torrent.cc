@@ -453,7 +453,7 @@ void tr_torrent::stop_if_seed_limit_reached()
 
         stop_soon();
         finished_seeding_by_idle_ = true;
-        session->onIdleLimitHit(this);
+        session->onIdleLimitHit(id());
     }
 
     if (is_stopping_)

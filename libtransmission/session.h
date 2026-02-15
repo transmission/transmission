@@ -825,17 +825,16 @@ public:
         queue_start_user_data_ = user_data;
     }
 
-    constexpr void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
+    void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb)
     {
-        idle_limit_hit_callback_ = cb;
-        idle_limit_hit_user_data_ = user_data;
+        idle_limit_hit_callback_ = std::move(cb);
     }
 
-    void onIdleLimitHit(tr_torrent* tor)
+    void onIdleLimitHit(tr_torrent_id_t const tor_id)
     {
-        if (idle_limit_hit_callback_ != nullptr)
+        if (idle_limit_hit_callback_)
         {
-            idle_limit_hit_callback_(this, tor, idle_limit_hit_user_data_);
+            idle_limit_hit_callback_(tor_id);
         }
     }
 
@@ -1364,7 +1363,6 @@ private:
     void* queue_start_user_data_ = nullptr;
 
     tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
-    void* idle_limit_hit_user_data_ = nullptr;
 
     tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
     void* ratio_limit_hit_user_data_ = nullptr;
