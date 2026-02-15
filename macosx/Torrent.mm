@@ -199,6 +199,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     [self setTimeMachineExclude:NO];
 
     tr_torrentRemove(self.fHandle, trashFiles, trashDataFile);
+    _fHandle = nullptr;
 }
 
 - (void)changeDownloadFolderBeforeUsing:(NSString*)folder determinationType:(TorrentDeterminationType)determinationType
@@ -862,6 +863,15 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString:@""]);
 
+    if (self.fHandle == nullptr)
+    {
+        if (completionHandler != nullptr)
+        {
+            completionHandler(NO);
+        }
+        return;
+    }
+
     NSDictionary* contextInfo = @{ @"Torrent" : self, @"CompletionHandler" : [completionHandler copy] };
 
     tr_torrentRenamePath(self.fHandle, tr_torrentName(self.fHandle), newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
@@ -874,6 +884,15 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     NSParameterAssert(node.torrent == self);
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString:@""]);
+
+    if (self.fHandle == nullptr)
+    {
+        if (completionHandler != nullptr)
+        {
+            completionHandler(NO);
+        }
+        return;
+    }
 
     NSDictionary* contextInfo = @{ @"Torrent" : self, @"Nodes" : @[ node ], @"CompletionHandler" : [completionHandler copy] };
 
