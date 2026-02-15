@@ -896,7 +896,7 @@ void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_li
  *
  * Has the same restrictions as `tr_sessionSetCompletenessCallback`
  */
-void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func callback, void* user_data);
+void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func callback);
 
 /**
  * MANUAL ANNOUNCE
