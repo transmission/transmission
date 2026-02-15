@@ -385,15 +385,6 @@ void periodic_update(evutil_socket_t /*fd*/, short /*what*/, void* arg)
     static_cast<tr_daemon*>(arg)->periodic_update();
 }
 
-tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_type type, tr_torrent* /*tor*/, void* arg)
-{
-    if (type == TR_RPC_SESSION_CLOSE)
-    {
-        static_cast<tr_daemon*>(arg)->stop();
-    }
-    return TR_RPC_OK;
-}
-
 tr_variant load_settings(std::string_view const config_dir)
 {
     auto app_defaults_map = tr_variant::Map{ 6U };
@@ -854,7 +845,17 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
 
     /* start the session */
     auto* session = tr_sessionInit(config_dir_, true, settings_);
-    tr_sessionSetRPCCallback(session, on_rpc_callback, this);
+    tr_sessionSetRPCCallback(
+        session,
+        [this](tr_rpc_callback_type const type, std::optional<tr_torrent_id_t> const /*tor_id*/)
+        {
+            if (type == TR_RPC_SESSION_CLOSE)
+            {
+                stop();
+            }
+
+            return TR_RPC_OK;
+        });
     tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", config_dir_)));
     tr_sessionSaveSettings(session, config_dir_, settings_);
 

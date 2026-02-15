@@ -1060,9 +1060,10 @@ public:
 
     auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
     {
-        if (rpc_func_ != nullptr)
+        if (rpc_func_)
         {
-            return (*rpc_func_)(this, type, tor, rpc_func_user_data_);
+            auto const tor_id = tor == nullptr ? std::optional<tr_torrent_id_t>{} : std::optional{ tor->id() };
+            return rpc_func_(type, tor_id);
         }
 
         return TR_RPC_OK;
@@ -1296,7 +1297,7 @@ private:
     friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
-    friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+    friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func);
     friend void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
     friend void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled);
@@ -1364,7 +1365,6 @@ private:
     tr_torrent_completeness_func completeness_func_ = nullptr;
 
     tr_rpc_func rpc_func_ = nullptr;
-    void* rpc_func_user_data_ = nullptr;
 
     tr_altSpeedFunc alt_speed_active_changed_func_ = nullptr;
 

@@ -170,12 +170,6 @@ static void initUnits()
                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 }
 
-static tr_rpc_callback_status rpcCallback([[maybe_unused]] tr_session* handle, tr_rpc_callback_type type, struct tr_torrent* torrentStruct, void* controller)
-{
-    [(__bridge Controller*)controller rpcCallback:type forTorrentStruct:torrentStruct];
-    return TR_RPC_NOREMOVE; //we'll do the remove manually
-}
-
 // 2.90 was infected with ransomware which we now check for and attempt to remove
 static void removeKeRangerRansomware()
 {
@@ -601,7 +595,14 @@ static void removeKeRangerRansomware()
             [_fDefaults setBool:tr_sessionUsesAltSpeed(_fLib) forKey:@"SpeedLimit"];
         }
 
-        tr_sessionSetRPCCallback(_fLib, rpcCallback, (__bridge void*)(self));
+        tr_sessionSetRPCCallback(
+            _fLib,
+            [controller = self](tr_rpc_callback_type const type, std::optional<tr_torrent_id_t> const tor_id)
+            {
+                auto* const torrent_struct = tor_id ? tr_torrentFindFromId(controller.fLib, *tor_id) : nullptr;
+                [controller rpcCallback:type forTorrentStruct:torrent_struct];
+                return TR_RPC_NOREMOVE; // we'll do the remove manually
+            });
 
         [SUUpdater sharedUpdater].delegate = self;
         _fQuitRequested = NO;

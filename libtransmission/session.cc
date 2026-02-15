@@ -1871,12 +1871,11 @@ uint16_t tr_sessionGetRPCPort(tr_session const* session)
     return session->rpc_server_ ? session->rpc_server_->port().host() : uint16_t{};
 }
 
-void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data)
+void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_func_ = func;
-    session->rpc_func_user_data_ = user_data;
+    session->rpc_func_ = std::move(func);
 }
 
 void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view const whitelist)
