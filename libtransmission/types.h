@@ -607,11 +607,10 @@ using tr_session_ratio_limit_hit_func = std::function<void(tr_torrent_id_t)>;
  * @param was_running whether or not the torrent was running when
  *                    it changed its completeness state
  */
-using tr_torrent_completeness_func = void (*)( //
-    tr_torrent* torrent,
+using tr_torrent_completeness_func = std::function<void( //
+    tr_torrent_id_t,
     tr_completeness completeness,
-    bool was_running,
-    void* user_data);
+    bool was_running)>;
 
 using tr_torrent_remove_func = std::function<bool(std::string_view filename, tr_error* error)>;
 

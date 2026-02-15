@@ -392,17 +392,6 @@ void onStartQueue(tr_session* /*session*/, tr_torrent* /*tor*/, void* /*vself*/)
     });
 }
 
-void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool wasRunning, void* vself)
-{
-    auto* const controller = (__bridge Controller*)(vself);
-    auto const hashstr = @(tr_torrentView(tor).hash_string);
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        auto* const torrent = [controller torrentForHash:hashstr];
-        [torrent completenessChange:status wasRunning:wasRunning];
-    });
-}
-
 - (instancetype)init
 {
     if ((self = [super init]))
@@ -567,7 +556,15 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                     [torrent metadataRetrieved];
                 });
             });
-        tr_sessionSetCompletenessCallback(_fLib, onTorrentCompletenessChanged, (__bridge void*)(self));
+        tr_sessionSetCompletenessCallback(
+            _fLib,
+            [controller = self](tr_torrent_id_t const tor_id, tr_completeness const status, bool const was_running)
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    auto* const torrent = [controller torrentForId:tor_id];
+                    [torrent completenessChange:status wasRunning:was_running];
+                });
+            });
 
         NSApp.delegate = self;
 

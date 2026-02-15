@@ -864,17 +864,16 @@ public:
         }
     }
 
-    constexpr void setTorrentCompletenessCallback(tr_torrent_completeness_func cb, void* user_data)
+    void setTorrentCompletenessCallback(tr_torrent_completeness_func cb)
     {
-        completeness_func_ = cb;
-        completeness_func_user_data_ = user_data;
+        completeness_func_ = std::move(cb);
     }
 
-    void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness completeness, bool was_running)
+    void onTorrentCompletenessChanged(tr_torrent_id_t const tor_id, tr_completeness const completeness, bool const was_running)
     {
-        if (completeness_func_ != nullptr)
+        if (completeness_func_)
         {
-            completeness_func_(tor, completeness, was_running, completeness_func_user_data_);
+            completeness_func_(tor_id, completeness, was_running);
         }
     }
 
@@ -1367,7 +1366,6 @@ private:
     tr_session_metadata_func got_metadata_cb_ = nullptr;
 
     tr_torrent_completeness_func completeness_func_ = nullptr;
-    void* completeness_func_user_data_ = nullptr;
 
     tr_rpc_func rpc_func_ = nullptr;
     void* rpc_func_user_data_ = nullptr;

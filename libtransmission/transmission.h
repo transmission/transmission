@@ -870,7 +870,7 @@ bool tr_torrentSetTrackerList(tr_torrent* tor, std::string_view txt);
  *
  * @see `tr_completeness`
  */
-void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func callback, void* user_data);
+void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func callback);
 
 /**
  * Register to be notified whenever a torrent changes from

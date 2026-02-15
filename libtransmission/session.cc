@@ -2118,9 +2118,9 @@ void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func
     session->setMetadataCallback(std::move(callback));
 }
 
-void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func callback, void* user_data)
+void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func callback)
 {
-    session->setTorrentCompletenessCallback(callback, user_data);
+    session->setTorrentCompletenessCallback(std::move(callback));
 }
 
 tr_session_stats tr_sessionGetStats(tr_session const* session)

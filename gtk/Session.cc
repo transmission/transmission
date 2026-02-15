@@ -171,7 +171,7 @@ private:
 
     void on_pref_changed(tr_quark key);
 
-    void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running);
+    void on_torrent_completeness_changed(tr_torrent_id_t tor_id, tr_completeness completeness, bool was_running);
     void on_torrent_metadata_changed(tr_torrent_id_t tor_id);
 
 private:
@@ -546,9 +546,8 @@ Session::Impl::Impl(Session& core, tr_session* session)
 
     tr_sessionSetCompletenessCallback(
         session,
-        [](auto* tor, auto completeness, bool was_running, gpointer impl)
-        { static_cast<Impl*>(impl)->on_torrent_completeness_changed(tor, completeness, was_running); },
-        this);
+        [this](tr_torrent_id_t const tor_id, tr_completeness const completeness, bool const was_running)
+        { on_torrent_completeness_changed(tor_id, completeness, was_running); });
 }
 
 Session::Impl::~Impl()
@@ -580,14 +579,18 @@ tr_session* Session::Impl::close()
 
 /* this is called in the libtransmission thread, *NOT* the GTK+ thread,
    so delegate to the GTK+ thread before calling notify's dbus code... */
-void Session::Impl::on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running)
+void Session::Impl::on_torrent_completeness_changed(
+    tr_torrent_id_t const tor_id,
+    tr_completeness const completeness,
+    bool const was_running)
 {
-    if (was_running && completeness != TR_LEECH && tr_torrentStat(tor).size_when_done != 0U)
+    if (auto* const tor = tr_torrentFindFromId(session_, tor_id);
+        was_running && completeness != TR_LEECH && tor != nullptr && tr_torrentStat(tor).size_when_done != 0U)
     {
         Glib::signal_idle().connect(
-            [core = get_core_ptr(), torrent_id = tr_torrentId(tor)]()
+            [core = get_core_ptr(), tor_id]()
             {
-                gtr_notify_torrent_completed(core, torrent_id);
+                gtr_notify_torrent_completed(core, tor_id);
                 return false;
             });
     }
