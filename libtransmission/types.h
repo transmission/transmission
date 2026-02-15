@@ -601,7 +601,7 @@ using tr_session_idle_limit_hit_func = std::function<void(tr_torrent_id_t)>;
 
 using tr_session_metadata_func = std::function<void(tr_torrent_id_t)>;
 
-using tr_session_ratio_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
+using tr_session_ratio_limit_hit_func = std::function<void(tr_torrent_id_t)>;
 
 /**
  * @param was_running whether or not the torrent was running when

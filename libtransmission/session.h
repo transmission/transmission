@@ -838,17 +838,16 @@ public:
         }
     }
 
-    constexpr void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb, void* user_data)
+    void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb)
     {
-        ratio_limit_hit_cb_ = cb;
-        ratio_limit_hit_user_data_ = user_data;
+        ratio_limit_hit_cb_ = std::move(cb);
     }
 
-    void onRatioLimitHit(tr_torrent* tor)
+    void onRatioLimitHit(tr_torrent_id_t const tor_id)
     {
-        if (ratio_limit_hit_cb_ != nullptr)
+        if (ratio_limit_hit_cb_)
         {
-            ratio_limit_hit_cb_(this, tor, ratio_limit_hit_user_data_);
+            ratio_limit_hit_cb_(tor_id);
         }
     }
 
@@ -1364,7 +1363,6 @@ private:
     tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
 
     tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
-    void* ratio_limit_hit_user_data_ = nullptr;
 
     tr_session_metadata_func got_metadata_cb_ = nullptr;
 

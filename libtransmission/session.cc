@@ -2103,9 +2103,9 @@ void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_se
     session->setQueueStartCallback(callback, user_data);
 }
 
-void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func callback, void* user_data)
+void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func callback)
 {
-    session->setRatioLimitHitCallback(callback, user_data);
+    session->setRatioLimitHitCallback(std::move(callback));
 }
 
 void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func callback)

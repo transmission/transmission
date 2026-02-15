@@ -392,17 +392,6 @@ void onStartQueue(tr_session* /*session*/, tr_torrent* /*tor*/, void* /*vself*/)
     });
 }
 
-void onRatioLimitHit(tr_session* /*session*/, tr_torrent* tor, void* vself)
-{
-    auto* const controller = (__bridge Controller*)(vself);
-    auto const hashstr = @(tr_torrentView(tor).hash_string);
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        auto* const torrent = [controller torrentForHash:hashstr];
-        [torrent ratioLimitHit];
-    });
-}
-
 void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool wasRunning, void* vself)
 {
     auto* const controller = (__bridge Controller*)(vself);
@@ -560,7 +549,15 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                 });
             });
         tr_sessionSetQueueStartCallback(_fLib, onStartQueue, (__bridge void*)(self));
-        tr_sessionSetRatioLimitHitCallback(_fLib, onRatioLimitHit, (__bridge void*)(self));
+        tr_sessionSetRatioLimitHitCallback(
+            _fLib,
+            [controller = self](tr_torrent_id_t const tor_id)
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    auto* const torrent = [controller torrentForId:tor_id];
+                    [torrent ratioLimitHit];
+                });
+            });
         tr_sessionSetMetadataCallback(
             _fLib,
             [controller = self](tr_torrent_id_t const tor_id)
