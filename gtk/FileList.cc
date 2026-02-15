@@ -815,13 +815,6 @@ bool FileList::Impl::onViewButtonPressed(guint button, TrGdkModifierType state, 
     return handled;
 }
 
-struct rename_data
-{
-    Glib::ustring newname;
-    Glib::ustring path_string;
-    gpointer impl = nullptr;
-};
-
 void FileList::Impl::on_rename_done(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
 {
     rename_done_tags_.push(
@@ -905,21 +898,15 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
     }
 
     /* do the renaming */
-    auto rename_data = std::make_unique<struct rename_data>();
-    rename_data->newname = newname;
-    rename_data->impl = this;
-    rename_data->path_string = path_string;
     tr_torrentRenamePath(
         tor,
         oldpath.raw(),
         newname.raw(),
-        static_cast<tr_torrent_rename_done_func>(
-            [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, gpointer data)
-            {
-                auto const data_grave = std::unique_ptr<struct rename_data>(static_cast<struct rename_data*>(data));
-                static_cast<Impl*>(data_grave->impl)->on_rename_done(data_grave->path_string, data_grave->newname, error);
-            }),
-        rename_data.release());
+        [this, path_string, newname](
+            tr_torrent_id_t const /*tor_id*/,
+            std::string_view const /*oldpath*/,
+            std::string_view const /*newname*/,
+            tr_error const& error) { on_rename_done(path_string, newname, error ? error.code() : 0); });
 }
 
 FileList::FileList(

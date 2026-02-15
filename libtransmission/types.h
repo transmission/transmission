@@ -619,4 +619,4 @@ using tr_torrent_remove_func = std::function<bool(std::string_view filename, tr_
 using tr_rpc_func = std::function<tr_rpc_callback_status(tr_rpc_callback_type type, std::optional<tr_torrent_id_t>)>;
 
 using tr_torrent_rename_done_func = std::function<
-    void(tr_torrent* torrent, char const* oldpath, char const* newname, int error, void* user_data)>;
+    void(tr_torrent_id_t, std::string_view oldpath, std::string_view newname, tr_error const&)>;

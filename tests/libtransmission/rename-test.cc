@@ -112,14 +112,16 @@ protected:
 
     static int torrentRenameAndWait(tr_torrent* tor, std::string_view const oldpath, std::string_view const newname)
     {
-        auto const on_rename_done =
-            [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, void* user_data) noexcept
-        {
-            *static_cast<int*>(user_data) = error;
-        };
-
         int error = -1;
-        tr_torrentRenamePath(tor, oldpath, newname, on_rename_done, &error);
+        tr_torrentRenamePath(
+            tor,
+            oldpath,
+            newname,
+            [&error](
+                tr_torrent_id_t const /*tor_id*/,
+                std::string_view const /*oldpath*/,
+                std::string_view const /*newname*/,
+                tr_error const& rename_error) noexcept { error = rename_error ? rename_error.code() : 0; });
         auto test = [&error]()
         {
             return error != -1;

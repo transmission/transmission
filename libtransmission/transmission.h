@@ -670,7 +670,6 @@ void tr_torrentStop(tr_torrent* torrent);
  * @param oldpath       the path to the file or folder that will be renamed
  * @param newname       the file or folder's new name
  * @param callback      the callback invoked when the renaming finishes, or nullptr
- * @param callback_user_data the pointer to pass in the callback's user_data arg
  *
  * As a special case, renaming the root file in a torrent will also
  * update tr_torrentName().
@@ -709,8 +708,7 @@ void tr_torrentRenamePath(
     tr_torrent* tor,
     std::string_view oldpath,
     std::string_view newname,
-    tr_torrent_rename_done_func callback,
-    void* callback_user_data);
+    tr_torrent_rename_done_func callback);
 
 /**
  * @brief Tell transmission where to find this torrent's local data.
