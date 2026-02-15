@@ -171,7 +171,7 @@ TEST_F(TorrentsTest, invalidArgsAreLogged)
     EXPECT_EQ(""s, tr_torrentFindFile(nullptr, 0));
     ++expected_log_size;
 
-    tr_torrentRenamePath(nullptr, ""sv, ""sv, {}, nullptr);
+    tr_torrentRenamePath(nullptr, ""sv, ""sv, {});
     ++expected_log_size;
 
     tr_torrentSetFilePriorities(nullptr, nullptr, 0, TR_PRI_NORMAL);

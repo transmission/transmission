@@ -2437,8 +2437,7 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
 void tr_torrent::rename_path_in_session_thread(
     std::string_view const oldpath,
     std::string_view const newname,
-    tr_torrent_rename_done_func const& callback,
-    void* const callback_user_data)
+    tr_torrent_rename_done_func const& callback)
 {
     using namespace rename_helpers;
 
@@ -2479,33 +2478,32 @@ void tr_torrent::rename_path_in_session_thread(
 
     if (callback != nullptr)
     {
-        auto const szold = tr_pathbuf{ oldpath };
-        auto const sznew = tr_pathbuf{ newname };
-        callback(this, szold.c_str(), sznew.c_str(), error, callback_user_data);
+        auto rename_error = tr_error{};
+        if (error != 0)
+        {
+            rename_error.set_from_errno(error);
+        }
+
+        callback(id(), oldpath, newname, rename_error);
     }
 }
 
-void tr_torrent::rename_path(
-    std::string_view oldpath,
-    std::string_view newname,
-    tr_torrent_rename_done_func&& callback,
-    void* callback_user_data)
+void tr_torrent::rename_path(std::string_view oldpath, std::string_view newname, tr_torrent_rename_done_func&& callback)
 {
     this->session->run_in_session_thread(
-        [this, oldpath = std::string(oldpath), newname = std::string(newname), cb = std::move(callback), callback_user_data]()
-        { rename_path_in_session_thread(oldpath, newname, std::move(cb), callback_user_data); });
+        [this, oldpath = std::string(oldpath), newname = std::string(newname), cb = std::move(callback)]()
+        { rename_path_in_session_thread(oldpath, newname, std::move(cb)); });
 }
 
 void tr_torrentRenamePath(
     tr_torrent* tor,
     std::string_view const oldpath,
     std::string_view const newname,
-    tr_torrent_rename_done_func callback,
-    void* callback_user_data)
+    tr_torrent_rename_done_func callback)
 {
     tr_return_if_fail(tr_isTorrent(tor));
 
-    tor->rename_path(oldpath, newname, std::move(callback), callback_user_data);
+    tor->rename_path(oldpath, newname, std::move(callback));
 }
 
 // ---

@@ -670,7 +670,6 @@ void tr_torrentStop(tr_torrent* torrent);
  * @param oldpath       the path to the file or folder that will be renamed
  * @param newname       the file or folder's new name
  * @param callback      the callback invoked when the renaming finishes, or nullptr
- * @param callback_user_data the pointer to pass in the callback's user_data arg
  *
  * As a special case, renaming the root file in a torrent will also
  * update tr_torrentName().
@@ -702,15 +701,14 @@ void tr_torrentStop(tr_torrent* torrent);
  *   in files[*].name, or contains a directory separator, or is nullptr, "",
  *   ".", or "..", the error argument will be EINVAL.
  *
- *   If the path exists on disk but can't be renamed, the error argument
- *   will be the errno set by rename().
+ *   If the path exists on disk but can't be renamed, the callback's `error`
+ *   argument will be set via `set_with_errno()` with `rename()`'s errno.
  */
 void tr_torrentRenamePath(
     tr_torrent* tor,
     std::string_view oldpath,
     std::string_view newname,
-    tr_torrent_rename_done_func callback,
-    void* callback_user_data);
+    tr_torrent_rename_done_func callback);
 
 /**
  * @brief Tell transmission where to find this torrent's local data.
