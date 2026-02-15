@@ -852,17 +852,16 @@ public:
         }
     }
 
-    constexpr void setMetadataCallback(tr_session_metadata_func cb, void* user_data)
+    void setMetadataCallback(tr_session_metadata_func cb)
     {
-        got_metadata_cb_ = cb;
-        got_metadata_user_data_ = user_data;
+        got_metadata_cb_ = std::move(cb);
     }
 
-    void onMetadataCompleted(tr_torrent* tor)
+    void onMetadataCompleted(tr_torrent_id_t const tor_id)
     {
-        if (got_metadata_cb_ != nullptr)
+        if (got_metadata_cb_)
         {
-            got_metadata_cb_(this, tor, got_metadata_user_data_);
+            got_metadata_cb_(tor_id);
         }
     }
 
@@ -1368,7 +1367,6 @@ private:
     void* ratio_limit_hit_user_data_ = nullptr;
 
     tr_session_metadata_func got_metadata_cb_ = nullptr;
-    void* got_metadata_user_data_ = nullptr;
 
     tr_torrent_completeness_func completeness_func_ = nullptr;
     void* completeness_func_user_data_ = nullptr;

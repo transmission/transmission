@@ -2113,9 +2113,9 @@ void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limi
     session->setIdleLimitHitCallback(std::move(callback));
 }
 
-void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func callback, void* user_data)
+void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func callback)
 {
-    session->setMetadataCallback(callback, user_data);
+    session->setMetadataCallback(std::move(callback));
 }
 
 void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func callback, void* user_data)

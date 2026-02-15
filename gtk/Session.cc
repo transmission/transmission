@@ -172,7 +172,7 @@ private:
     void on_pref_changed(tr_quark key);
 
     void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running);
-    void on_torrent_metadata_changed(tr_torrent* raw_torrent);
+    void on_torrent_metadata_changed(tr_torrent_id_t tor_id);
 
 private:
     Session& core_;
@@ -542,10 +542,7 @@ Session::Impl::Impl(Session& core, tr_session* session)
     on_pref_changed(TR_KEY_inhibit_desktop_hibernation);
     signal_prefs_changed_.connect([this](auto key) { on_pref_changed(key); });
 
-    tr_sessionSetMetadataCallback(
-        session,
-        [](auto* /*session*/, auto* tor, gpointer impl) { static_cast<Impl*>(impl)->on_torrent_metadata_changed(tor); },
-        this);
+    tr_sessionSetMetadataCallback(session, [this](tr_torrent_id_t const tor_id) { on_torrent_metadata_changed(tor_id); });
 
     tr_sessionSetCompletenessCallback(
         session,
@@ -642,13 +639,13 @@ std::pair<Glib::RefPtr<Torrent>, guint> Session::Impl::find_torrent_by_id(tr_tor
 
 /* this is called in the libtransmission thread, *NOT* the GTK+ thread,
    so delegate to the GTK+ thread before changing our list store... */
-void Session::Impl::on_torrent_metadata_changed(tr_torrent* raw_torrent)
+void Session::Impl::on_torrent_metadata_changed(tr_torrent_id_t const tor_id)
 {
     Glib::signal_idle().connect(
-        [this, core = get_core_ptr(), torrent_id = tr_torrentId(raw_torrent)]()
+        [this, core = get_core_ptr(), tor_id]()
         {
             /* update the torrent's collated name */
-            if (auto const& [torrent, position] = find_torrent_by_id(torrent_id); torrent)
+            if (auto const& [torrent, position] = find_torrent_by_id(tor_id); torrent)
             {
                 torrent->update();
             }

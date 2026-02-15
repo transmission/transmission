@@ -1001,7 +1001,7 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
     on_metainfo_updated();
 
     got_metainfo_(this);
-    session->onMetadataCompleted(this);
+    session->onMetadataCompleted(id());
     set_dirty();
     mark_edited();
 
