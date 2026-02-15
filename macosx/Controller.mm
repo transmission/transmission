@@ -374,17 +374,6 @@ static void removeKeRangerRansomware()
     [NSValueTransformer setValueTransformer:iconTransformer forName:@"ExpandedPathToIconTransformer"];
 }
 
-void onStartQueue(tr_session* /*session*/, tr_torrent* /*tor*/, void* /*vself*/)
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
-        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
-                                                 postingStyle:NSPostASAP
-                                                 coalesceMask:NSNotificationCoalescingOnName
-                                                     forModes:nil];
-    });
-}
-
 - (instancetype)init
 {
     if ((self = [super init]))
@@ -530,7 +519,19 @@ void onStartQueue(tr_session* /*session*/, tr_torrent* /*tor*/, void* /*vself*/)
                     [torrent idleLimitHit];
                 });
             });
-        tr_sessionSetQueueStartCallback(_fLib, onStartQueue, (__bridge void*)(self));
+        tr_sessionSetQueueStartCallback(
+            _fLib,
+            [](tr_torrent_id_t const /*tor_id*/)
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
+                    [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState"
+                                                                                                        object:nil]
+                                                             postingStyle:NSPostASAP
+                                                             coalesceMask:NSNotificationCoalescingOnName
+                                                                 forModes:nil];
+                });
+            });
         tr_sessionSetRatioLimitHitCallback(
             _fLib,
             [controller = self](tr_torrent_id_t const tor_id)

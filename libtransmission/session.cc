@@ -698,9 +698,9 @@ void tr_session::on_queue_timer()
         {
             tr_torrentStartNow(tor);
 
-            if (queue_start_callback_ != nullptr)
+            if (queue_start_callback_)
             {
-                queue_start_callback_(this, tor, queue_start_user_data_);
+                queue_start_callback_(tor->id());
             }
         }
     }
@@ -2093,9 +2093,9 @@ void tr_session::close_torrent_file(tr_torrent const& tor, tr_file_index_t file_
 
 // ---
 
-void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data)
+void tr_sessionSetQueueStartCallback(tr_session* session, tr_session_queue_start_func callback)
 {
-    session->setQueueStartCallback(callback, user_data);
+    session->setQueueStartCallback(std::move(callback));
 }
 
 void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func callback)

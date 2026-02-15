@@ -817,12 +817,9 @@ public:
 
     // callbacks
 
-    using queue_start_callback_t = void (*)(tr_session*, tr_torrent*, void* user_data);
-
-    constexpr void setQueueStartCallback(queue_start_callback_t cb, void* user_data)
+    void setQueueStartCallback(tr_session_queue_start_func cb)
     {
-        queue_start_callback_ = cb;
-        queue_start_user_data_ = user_data;
+        queue_start_callback_ = std::move(cb);
     }
 
     void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb)
@@ -1356,8 +1353,7 @@ private:
 
     Settings settings_;
 
-    queue_start_callback_t queue_start_callback_ = nullptr;
-    void* queue_start_user_data_ = nullptr;
+    tr_session_queue_start_func queue_start_callback_ = nullptr;
 
     tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
 

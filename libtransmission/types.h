@@ -597,6 +597,8 @@ struct tr_webseed_view
 
 using tr_altSpeedFunc = std::function<void(bool active, bool user_driven)>;
 
+using tr_session_queue_start_func = std::function<void(tr_torrent_id_t)>;
+
 using tr_session_idle_limit_hit_func = std::function<void(tr_torrent_id_t)>;
 
 using tr_session_metadata_func = std::function<void(tr_torrent_id_t)>;

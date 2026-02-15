@@ -476,7 +476,7 @@ bool tr_sessionGetQueueStalledEnabled(tr_session const* session);
 void tr_sessionSetQueueStalledEnabled(tr_session* session, bool enabled);
 
 /** @brief Set a callback that is invoked when the queue starts a torrent */
-void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data);
+void tr_sessionSetQueueStartCallback(tr_session* session, tr_session_queue_start_func callback);
 
 // ---
 
