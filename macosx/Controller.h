@@ -109,6 +109,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (void)setBottomCountText:(BOOL)filtering;
 
 - (Torrent*)torrentForHash:(NSString*)hash;
+- (Torrent*)torrentForId:(tr_torrent_id_t)id;
 
 - (void)torrentFinishedDownloading:(NSNotification*)notification;
 - (void)torrentRestartedDownloading:(NSNotification*)notification;

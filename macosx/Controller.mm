@@ -2573,6 +2573,19 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     return torrent;
 }
 
+- (Torrent*)torrentForId:(tr_torrent_id_t)id
+{
+    __block Torrent* torrent = nil;
+    [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(Torrent* obj, NSUInteger /*idx*/, BOOL* stop) {
+        if (obj.id == id)
+        {
+            torrent = obj;
+            *stop = YES;
+        }
+    }];
+    return torrent;
+}
+
 - (void)torrentFinishedDownloading:(NSNotification*)notification
 {
     Torrent* torrent = notification.object;
