@@ -6,9 +6,10 @@
 
 @implementation GroupCell
 
-- (void)setBackgroundStyle:(NSBackgroundStyle)backgroundStyle {
+- (void)setBackgroundStyle:(NSBackgroundStyle)backgroundStyle
+{
     [super setBackgroundStyle:backgroundStyle];
-    
+
     __auto_type isEmphasized = backgroundStyle == NSBackgroundStyleEmphasized;
     self.fGroupTitleField.textColor = isEmphasized ? NSColor.labelColor : NSColor.secondaryLabelColor;
 }
