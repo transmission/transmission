@@ -46,6 +46,7 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @property(nonatomic) TorrentDeterminationType fDownloadFolderDetermination;
 
 @property(nonatomic) BOOL fResumeOnWake;
+@property(nonatomic, copy, readonly) NSString* hashString;
 
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
@@ -739,7 +740,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (NSString*)hashString
 {
-    return @(tr_torrentView(self.fHandle).hash_string);
+    return _hashString;
 }
 
 - (BOOL)privateTorrent
@@ -1849,6 +1850,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     }
 
     _fResumeOnWake = NO;
+    _hashString = @(tr_torrentView(self.fHandle).hash_string);
 
     //don't do after this point - it messes with auto-group functionality
     if (!self.magnet)
