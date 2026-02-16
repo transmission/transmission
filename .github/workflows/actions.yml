@@ -230,6 +230,71 @@ jobs:
           build-config: Debug
           enable-sanitizers: true
 
+  big-endian-qemu-tests:
+    runs-on: ubuntu-24.04
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Source
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Set up QEMU (s390x)
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: s390x
+      - name: Configure, Build, and Test (big-endian emulation)
+        run: |
+          docker run --rm --platform linux/s390x \
+            -v "$PWD":/src \
+            -w /src \
+            debian:bookworm-slim \
+            bash -lc '
+              set -eux
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update
+              apt-get install -y --no-install-recommends \
+                ca-certificates \
+                cmake \
+                g++ \
+                gettext \
+                libcurl4-openssl-dev \
+                libdeflate-dev \
+                libevent-dev \
+                libssl-dev \
+                ninja-build \
+                python3 \
+                pkg-config
+              test "$(dpkg --print-architecture)" = "s390x"
+              python3 -c "import sys; assert sys.byteorder == \"big\""
+              cmake \
+                -S . \
+                -B obj \
+                -G Ninja \
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                -DCMAKE_INSTALL_PREFIX=pfx \
+                -DENABLE_CLI=OFF \
+                -DENABLE_DAEMON=OFF \
+                -DENABLE_GTK=OFF \
+                -DENABLE_MAC=OFF \
+                -DENABLE_QT=OFF \
+                -DENABLE_TESTS=ON \
+                -DENABLE_UTILS=ON \
+                -DREBUILD_WEB=OFF \
+                -DENABLE_WERROR=OFF \
+                -DRUN_CLANG_TIDY=OFF \
+                -DHAVE_COPY_FILE_RANGE:BOOL=OFF \
+                -DHAVE_SENDFILE64:BOOL=OFF \
+                -DUSE_SYSTEM_DEFAULT=OFF
+              cmake --build obj --config RelWithDebInfo --target all-tests
+              cmake -E chdir obj ctest -j "$(nproc)" --build-config RelWithDebInfo --output-on-failure
+            '
+
   clang-tidy-libtransmission:
     runs-on: ubuntu-24.04
     needs: [ what-to-make ]
