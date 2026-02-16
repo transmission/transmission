@@ -443,7 +443,6 @@ jobs:
             ca-certificates \
             clang \
             cmake \
-            crc32c-dev \
             curl-dev \
             fmt-dev \
             gettext-dev \
@@ -954,7 +953,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    
+
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v3
       with:
