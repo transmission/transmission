@@ -1271,13 +1271,6 @@ jobs:
         arch:
           - x86_64
           - aarch64
-        crypto:
-          - cmake: openssl
-            port: ''
-          - cmake: wolfssl
-            port: wolfssl
-          - cmake: mbedtls
-            port: mbedtls3
         is-pull-request:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
@@ -1323,8 +1316,7 @@ jobs:
               pkgconf \
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
               rapidjson \
-              utf8cpp \
-              `echo ${{ matrix.crypto.port }}`
+              utf8cpp
           run: |
             set -ex
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
@@ -1348,7 +1340,7 @@ jobs:
               -DUSE_SYSTEM_SMALL=OFF `# Not packaged in FreeBSD` \
               -DUSE_SYSTEM_UTP=OFF `# Not packaged in FreeBSD` \
               -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in FreeBSD` \
-              -DWITH_CRYPTO=${{ matrix.crypto.cmake }}
+              -DWITH_CRYPTO=openssl
             cmake --build obj --config RelWithDebInfo
             if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
               QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
@@ -1357,7 +1349,94 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.crypto.cmake }}
+          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
+          path: pfx/**/*
+
+  crypto-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-core == 'true' && needs.what-to-make.outputs.make-tests == 'true' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crypto:
+          - cmake: openssl
+            apt: libssl-dev
+          - cmake: wolfssl
+            apt: libwolfssl-dev
+          - cmake: mbedtls
+            apt: libmbedtls-dev
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Composite Actions
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .github/actions
+          sparse-checkout-cone-mode: false
+      - name: Get Dependencies
+        uses: ./.github/actions/install-deps
+        with:
+          compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
+          enable-gtk: false
+          enable-qt: false
+          use-sudo: true
+      - name: Install Crypto Library
+        run: sudo apt-get install -y --no-install-recommends ${{ matrix.crypto.apt }}
+      - name: Get NPM
+        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+      - name: Get Source
+        uses: actions/download-artifact@v7
+        with:
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=OFF \
+            -DENABLE_DAEMON=OFF \
+            -DENABLE_GTK=OFF \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=OFF \
+            -DENABLE_TESTS=ON \
+            -DENABLE_UTILS=ON \
+            -DENABLE_WERROR=ON \
+            -DREBUILD_WEB=OFF \
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu` \
+            -DWITH_CRYPTO=${{ matrix.crypto.cmake }}
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        uses: ./.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: RelWithDebInfo
+      - name: Install
+        run: cmake --install obj --config RelWithDebInfo --strip
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.crypto.cmake }}
           path: pfx/**/*
 
   openbsd-from-tarball:
