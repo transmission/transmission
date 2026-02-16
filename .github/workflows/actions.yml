@@ -748,7 +748,7 @@ jobs:
           name: source-tarball
           path: obj/transmission*.tar.*
 
-  macos-from-tarball:
+  macos:
     strategy:
       fail-fast: false
       matrix:
@@ -832,10 +832,10 @@ jobs:
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ matrix.os }}-from-tarball
+          name: binaries-${{ matrix.os }}
           path: pfx/**/*
 
-  debian-11-from-tarball:
+  debian-11:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-latest
@@ -914,7 +914,7 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  debian-from-tarball:
+  debian:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-latest
@@ -994,7 +994,7 @@ jobs:
           name: binaries-${{ github.job }}-${{ matrix.version }}
           path: pfx/**/*
 
-  fedora-from-tarball:
+  fedora:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-latest
@@ -1254,7 +1254,7 @@ jobs:
       - name: Make
         run: cmake --build obj --config RelWithDebInfo -- "-k 0"
 
-  freebsd-from-tarball:
+  freebsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
@@ -1353,7 +1353,7 @@ jobs:
           name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
           path: pfx/**/*
 
-  crypto-from-tarball:
+  crypto:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-core == 'true' && needs.what-to-make.outputs.make-tests == 'true' }}
     runs-on: ubuntu-latest
@@ -1440,7 +1440,7 @@ jobs:
           name: binaries-${{ github.job }}-${{ matrix.crypto.cmake }}
           path: pfx/**/*
 
-  openbsd-from-tarball:
+  openbsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
@@ -1536,7 +1536,7 @@ jobs:
           name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
           path: pfx/**/*
 
-  netbsd-from-tarball:
+  netbsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
@@ -1643,7 +1643,7 @@ jobs:
           name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch.vmactions }}
           path: pfx/**/*
 
-  dragonflybsd-from-tarball:
+  dragonflybsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
