@@ -231,7 +231,7 @@ jobs:
           enable-sanitizers: true
 
   big-endian-qemu-tests:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
@@ -253,7 +253,7 @@ jobs:
           docker run --rm --platform linux/s390x \
             -v "$PWD":/src \
             -w /src \
-            debian:bookworm-slim \
+            debian:stable-slim \
             bash -lc '
               set -eux
               export DEBIAN_FRONTEND=noninteractive
