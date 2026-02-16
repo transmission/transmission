@@ -371,9 +371,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSString* groupName = groupIndex != -1 ? [GroupsController.groups nameForIndex:groupIndex] :
                                                  NSLocalizedString(@"No Group", "Group table row");
 
-        NSInteger row = [self rowForItem:item];
         groupCell.fGroupTitleField.stringValue = groupName;
-        groupCell.fGroupTitleField.textColor = NSColor.labelColor;
 
         groupCell.fGroupDownloadField.stringValue = [NSString stringForSpeed:group.downloadRate];
         groupCell.fGroupDownloadView.image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
