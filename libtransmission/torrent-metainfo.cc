@@ -93,6 +93,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
     bool StartDict(Context const& context) override
     {
+        // TODO Bittorrent v2. For now just parse and throw away.
         if (state_ == State::FileTree)
         {
             auto const path_element = currentKey();
@@ -105,7 +106,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             {
                 file_subpath_ += '/';
             }
-            tr_torrent_files::sanitize_subpath(*path_element, file_subpath_);
+            tr_torrent_files::sanitize_subpath(tr_strv_convert_utf8(*path_element), file_subpath_);
         }
         else if (pathIs(InfoKey))
         {
@@ -304,7 +305,8 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 {
                     file_subpath_ += '/';
                 }
-                tr_torrent_files::sanitize_subpath(value, file_subpath_);
+                // BEP-3 says strings are UTF-8, so mask non-conformant path strings
+                tr_torrent_files::sanitize_subpath(tr_strv_convert_utf8(value), file_subpath_);
             }
             else if (current_key == AttrKey)
             {
