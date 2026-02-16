@@ -1477,10 +1477,10 @@ jobs:
             binary-set: evbarm-aarch64
         is-pull-request:
           - ${{ github.event_name == 'pull_request' }}
-        exclude:
-          - arch:
-              vmactions: aarch64
-            is-pull-request: true
+#        exclude:
+#          - arch:
+#              vmactions: aarch64
+#            is-pull-request: true
     runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
