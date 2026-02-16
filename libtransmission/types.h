@@ -268,7 +268,7 @@ struct tr_byte_span_t
  */
 struct tr_file_view
 {
-    char const* name; // This file's name. Includes the full subpath in the torrent.
+    char const* name = ""; // This file's name. Includes the full subpath in the torrent.
     uint64_t have; // the current size of the file, i.e. how much we've downloaded
     uint64_t length; // the total size of the file
     double progress; // have / length
@@ -516,12 +516,12 @@ struct tr_stat
  */
 struct tr_torrent_view
 {
-    char const* name;
-    char const* hash_string;
+    char const* name = "";
+    char const* hash_string = "";
 
-    char const* comment; // optional; may be nullptr
-    char const* creator; // optional; may be nullptr
-    char const* source; // optional; may be nullptr
+    char const* comment = ""; // optional; may be nullptr
+    char const* creator = ""; // optional; may be nullptr
+    char const* source = ""; // optional; may be nullptr
 
     uint64_t total_size; // total size of the torrent, in bytes
 
@@ -541,8 +541,8 @@ struct tr_torrent_view
  */
 struct tr_tracker_view
 {
-    char const* announce; // full announce URL
-    char const* scrape; // full scrape URL
+    char const* announce = ""; // full announce URL
+    char const* scrape = ""; // full scrape URL
     char host_and_port[72]; // uniquely-identifying tracker name (`${host}:${port}`)
 
     // The tracker site's name. Uses the first label before the public suffix
@@ -590,7 +590,7 @@ struct tr_tracker_view
  */
 struct tr_webseed_view
 {
-    char const* url; // the url to download from
+    char const* url = ""; // the url to download from
     bool is_downloading; // can be true even if speed is 0, e.g. slow download
     uint64_t download_bytes_per_second; // current download speed
 };
