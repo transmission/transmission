@@ -292,7 +292,7 @@ jobs:
                 -DHAVE_SENDFILE64:BOOL=OFF \
                 -DUSE_SYSTEM_DEFAULT=OFF
               cmake --build obj --config RelWithDebInfo --target all-tests
-              cmake -E chdir obj ctest -j "$(nproc)" --build-config RelWithDebInfo --output-on-failure
+              cmake -E chdir obj ctest -j 2 --build-config RelWithDebInfo --output-on-failure
             '
 
   clang-tidy-libtransmission:
