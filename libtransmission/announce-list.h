@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <compare>
 #include <cstddef> // size_t
 #include <optional>
 #include <string>
@@ -31,29 +32,24 @@ public:
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 
-        [[nodiscard]] constexpr int compare(tracker_info const& that) const noexcept // <=>
+        [[nodiscard]] constexpr auto operator<=>(tracker_info const& that) const noexcept
         {
-            if (this->tier != that.tier)
+            if (auto const res = this->tier <=> that.tier; res != 0)
             {
-                return this->tier < that.tier ? -1 : 1;
+                return res;
             }
 
-            if (int const i{ this->announce.compare(that.announce) }; i != 0)
+            if (auto const res = this->announce <=> that.announce; res != 0)
             {
-                return i;
+                return res;
             }
 
-            return 0;
-        }
-
-        [[nodiscard]] constexpr bool operator<(tracker_info const& that) const noexcept
-        {
-            return compare(that) < 0;
+            return std::strong_ordering::equivalent;
         }
 
         [[nodiscard]] constexpr bool operator==(tracker_info const& that) const noexcept
         {
-            return compare(that) == 0;
+            return (*this <=> that) == 0;
         }
     };
 
@@ -91,11 +87,6 @@ public:
     [[nodiscard]] TR_CONSTEXPR_VEC bool operator==(tr_announce_list const& that) const
     {
         return trackers_ == that.trackers_;
-    }
-
-    [[nodiscard]] TR_CONSTEXPR_VEC bool operator!=(tr_announce_list const& that) const
-    {
-        return trackers_ != that.trackers_;
     }
 
     void add_to_map(tr_variant::Map& setme) const;
