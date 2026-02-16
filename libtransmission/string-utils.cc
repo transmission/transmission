@@ -84,9 +84,10 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
         sv = { std::data(sv), first_null };
     }
     auto out = std::string{};
-#ifdef _WIN32
     out.reserve(std::size(sv));
-    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
+    bool do_replacement = false;
+#ifdef _WIN32
+    do_replacement = true;
 #else
     if (utf8::is_valid(sv))
     {
@@ -98,31 +99,35 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
         if (detector.detectFromString(sv) == CharsetDetector::OK)
         {
             tr_logAddDebug(fmt::format("CharsetDetector {}", detector.getEncoding()));
+            IconvWrapper conv("UTF-8", detector.getEncoding());
+            if (!conv.is_valid())
+            {
+                tr_logAddError("Failed to open iconv");
+                return "";
+            }
+
+            out = conv.convert(sv);
+            if (out.empty())
+            {
+                tr_logAddError("Failed to convert to UTF-8");
+                do_replacement = true;
+            }
+            else
+            {
+                tr_logAddDebug(fmt::format("Converted '{}' to UTF-8 '{}'", sv, out));
+            }
         }
         else
         {
             tr_logAddError("CharsetDetector failed");
-            return "";
-        }
-
-        IconvWrapper conv("UTF-8", detector.getEncoding());
-        if (!conv.is_valid())
-        {
-            tr_logAddError("Failed to open iconv");
-            return "";
-        }
-
-        out = conv.convert(sv);
-        if (out.empty())
-        {
-            tr_logAddError("Failed to convert to UTF-8");
-        }
-        else
-        {
-            tr_logAddDebug(fmt::format("Converted '{}' to UTF-8 '{}'", sv, out));
+            do_replacement = true;
         }
     }
 #endif
+    if (do_replacement)
+    {
+        utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
+    }
 
     return out;
 }
