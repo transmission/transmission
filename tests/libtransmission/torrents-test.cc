@@ -23,6 +23,180 @@
 using TorrentsTest = ::libtransmission::test::TransmissionTest;
 using namespace std::literals;
 
+TEST_F(TorrentsTest, invalidArgsAreLogged)
+{
+    tr_logFreeQueue(tr_logGetQueue());
+    tr_logSetLevel(TR_LOG_WARN);
+    tr_logSetQueueEnabled(true);
+
+    auto expected_log_size = size_t{};
+
+    tr_torrentSetSpeedLimit_KBps(nullptr, TR_UP, 0);
+    ++expected_log_size;
+
+    EXPECT_EQ(0, tr_torrentGetSpeedLimit_KBps(nullptr, TR_UP));
+    ++expected_log_size;
+
+    tr_torrentUseSpeedLimit(nullptr, TR_UP, true);
+    ++expected_log_size;
+
+    EXPECT_FALSE(tr_torrentUsesSpeedLimit(nullptr, TR_UP));
+    ++expected_log_size;
+
+    tr_torrentUseSessionLimits(nullptr, false);
+    ++expected_log_size;
+
+    EXPECT_FALSE(tr_torrentUsesSessionLimits(nullptr));
+    ++expected_log_size;
+
+    tr_torrentSetRatioMode(nullptr, TR_RATIOLIMIT_UNLIMITED);
+    ++expected_log_size;
+
+    tr_torrentSetRatioLimit(nullptr, 0.0);
+    ++expected_log_size;
+
+    EXPECT_DOUBLE_EQ(0.0, tr_torrentGetRatioLimit(nullptr));
+    ++expected_log_size;
+
+    EXPECT_FALSE(tr_torrentGetSeedRatio(nullptr, nullptr));
+    ++expected_log_size;
+
+    tr_torrentSetIdleMode(nullptr, TR_IDLELIMIT_GLOBAL);
+    ++expected_log_size;
+
+    EXPECT_EQ(TR_IDLELIMIT_GLOBAL, tr_torrentGetIdleMode(nullptr));
+    ++expected_log_size;
+
+    tr_torrentSetIdleLimit(nullptr, 0);
+    ++expected_log_size;
+
+    EXPECT_EQ(0, tr_torrentGetIdleLimit(nullptr));
+    ++expected_log_size;
+
+    tr_torrentSetQueuePosition(nullptr, 0);
+    ++expected_log_size;
+
+    tr_torrentRemove(nullptr, false, {}, nullptr);
+    ++expected_log_size;
+
+    tr_torrentSetLocation(nullptr, nullptr, false, nullptr);
+    ++expected_log_size;
+
+    tr_torrentSetDownloadDir(nullptr, nullptr);
+    ++expected_log_size;
+
+    EXPECT_STREQ("", tr_torrentGetDownloadDir(nullptr));
+    ++expected_log_size;
+
+    EXPECT_STREQ("", tr_torrentGetCurrentDir(nullptr));
+    ++expected_log_size;
+
+    tr_torrentChangeMyPort(nullptr);
+    ++expected_log_size;
+
+    tr_torrentManualUpdate(nullptr);
+    ++expected_log_size;
+
+    EXPECT_EQ(nullptr, tr_torrentStat(nullptr));
+    ++expected_log_size;
+
+    tr_torrentFile(nullptr, 0);
+    ++expected_log_size;
+
+    EXPECT_EQ(0, tr_torrentFileCount(nullptr));
+    ++expected_log_size;
+
+    tr_torrentWebseed(nullptr, 0);
+    ++expected_log_size;
+
+    EXPECT_EQ(0, tr_torrentWebseedCount(nullptr));
+    ++expected_log_size;
+
+    tr_torrentTracker(nullptr, 0);
+    ++expected_log_size;
+
+    EXPECT_EQ(0, tr_torrentTrackerCount(nullptr));
+    ++expected_log_size;
+
+    tr_torrentView(nullptr);
+    ++expected_log_size;
+
+    EXPECT_EQ(""s, tr_torrentFilename(nullptr));
+    ++expected_log_size;
+
+    EXPECT_EQ(0, tr_torrentFilenameToBuf(nullptr, nullptr, 0));
+    ++expected_log_size;
+
+    EXPECT_EQ(nullptr, tr_torrentPeers(nullptr, nullptr));
+    ++expected_log_size;
+
+    tr_torrentAvailability(nullptr, nullptr, 0);
+    ++expected_log_size;
+
+    tr_torrentAmountFinished(nullptr, nullptr, 0);
+    ++expected_log_size;
+
+    tr_torrentStart(nullptr);
+    ++expected_log_size;
+
+    tr_torrentStartNow(nullptr);
+    ++expected_log_size;
+
+    tr_torrentVerify(nullptr);
+    ++expected_log_size;
+
+    tr_torrentSetFileDLs(nullptr, nullptr, 0, false);
+    ++expected_log_size;
+
+    EXPECT_EQ(TR_PRI_NORMAL, tr_torrentGetPriority(nullptr));
+    ++expected_log_size;
+
+    tr_torrentSetPriority(nullptr, TR_PRI_NORMAL);
+    ++expected_log_size;
+
+    tr_torrentSetPeerLimit(nullptr, 0);
+    ++expected_log_size;
+
+    EXPECT_EQ(0, tr_torrentGetPeerLimit(nullptr));
+    ++expected_log_size;
+
+    EXPECT_FALSE(tr_torrentSetTrackerList(nullptr, nullptr));
+    ++expected_log_size;
+
+    EXPECT_EQ(""s, tr_torrentGetTrackerList(nullptr));
+    ++expected_log_size;
+
+    EXPECT_EQ(0, tr_torrentGetTrackerListToBuf(nullptr, nullptr, 0));
+    ++expected_log_size;
+
+    EXPECT_EQ(0, tr_torrentGetBytesLeftToAllocate(nullptr));
+    ++expected_log_size;
+
+    EXPECT_EQ(""s, tr_torrentFindFile(nullptr, 0));
+    ++expected_log_size;
+
+    tr_torrentRenamePath(nullptr, nullptr, nullptr, {}, nullptr);
+    ++expected_log_size;
+
+    tr_torrentSetFilePriorities(nullptr, nullptr, 0, TR_PRI_NORMAL);
+    ++expected_log_size;
+
+    EXPECT_FALSE(tr_torrentHasMetadata(nullptr));
+    ++expected_log_size;
+
+    auto actual_log_size = size_t{};
+    tr_log_message* const msgs = tr_logGetQueue();
+    for (auto* walk = msgs; walk != nullptr; walk = walk->next)
+    {
+        ++actual_log_size;
+    }
+    EXPECT_EQ(actual_log_size, expected_log_size);
+
+    // cleanup
+    tr_logFreeQueue(msgs);
+    tr_logSetQueueEnabled(false);
+}
+
 TEST_F(TorrentsTest, simpleTests)
 {
     auto constexpr* const TorrentFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
