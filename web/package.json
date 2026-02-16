@@ -30,8 +30,8 @@
     "prettier": "^3.6.2",
     "sass": "^1.89.2",
     "style-loader": "^4.0.0",
-    "stylelint": "^16.25.0",
-    "stylelint-config-sass-guidelines": "^12.1.0"
+    "stylelint": "^17.3.0",
+    "stylelint-config-sass-guidelines": "^13.0.0"
   },
   "dependencies": {
     "clusterize.js": "^1.0.0",
