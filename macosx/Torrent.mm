@@ -46,7 +46,7 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @property(nonatomic) TorrentDeterminationType fDownloadFolderDetermination;
 
 @property(nonatomic) BOOL fResumeOnWake;
-@property(nonatomic, copy, readonly) NSString* hashString;
+@property(nonatomic, copy, readwrite) NSString* hashString;
 
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes

@@ -369,7 +369,7 @@ if(GTK_FOUND)
         INTERFACE
             ${GTK${GTK_VERSION}_CFLAGS_OTHER})
 
-    target_include_directories(transmission::gtk_impl
+    target_include_directories(transmission::gtk_impl SYSTEM
         INTERFACE
             ${GTK${GTK_VERSION}_INCLUDE_DIRS})
 
