@@ -4,5 +4,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class TorrentCell;
 @interface TorrentCellRevealButton : NSButton
+@property(nonatomic) IBOutlet TorrentCell* torrentCell;
 @end

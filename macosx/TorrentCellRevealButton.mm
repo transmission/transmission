@@ -9,7 +9,6 @@
 @interface TorrentCellRevealButton ()
 @property(nonatomic) NSTrackingArea* fTrackingArea;
 @property(nonatomic, copy) NSString* revealImageString;
-@property(nonatomic) IBOutlet TorrentCell* torrentCell;
 @property(nonatomic, readonly) TorrentTableView* torrentTableView;
 @end
 
@@ -26,6 +25,14 @@
 
     self.revealImageString = @"RevealOff";
     [self updateImage];
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect {
+    if (self = [super initWithFrame:frameRect]) {
+        self.revealImageString = @"RevealOff";
+        [self updateImage];
+    }
+    return self;
 }
 
 - (void)mouseEntered:(NSEvent*)event

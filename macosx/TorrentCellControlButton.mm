@@ -10,7 +10,6 @@
 @interface TorrentCellControlButton ()
 @property(nonatomic) NSTrackingArea* fTrackingArea;
 @property(nonatomic, copy) NSString* controlImageSuffix;
-@property(nonatomic) IBOutlet TorrentCell* torrentCell;
 @property(nonatomic, readonly) TorrentTableView* torrentTableView;
 @end
 
@@ -27,6 +26,14 @@
 
     self.controlImageSuffix = @"Off";
     [self updateImage];
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect {
+    if (self = [super initWithFrame:frameRect]) {
+        self.controlImageSuffix = @"Off";
+        [self updateImage];
+    }
+    return self;
 }
 
 - (void)resetImage

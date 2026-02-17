@@ -11,7 +11,6 @@
 @property(nonatomic) NSTrackingArea* fTrackingArea;
 @property(nonatomic) NSImage* fImage;
 @property(nonatomic) NSImage* fAlternativeImage;
-@property(nonatomic) IBOutlet TorrentCell* torrentCell;
 @property(nonatomic, readonly) TorrentTableView* torrentTableView;
 @property(nonatomic) NSUserDefaults* fDefaults;
 @end
@@ -35,6 +34,21 @@
 
     // disable button click highlighting
     [self.cell setHighlightsBy:NSNoCellMask];
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect {
+    if (self = [super initWithFrame:frameRect]) {
+        self.fDefaults = NSUserDefaults.standardUserDefaults;
+        self.fImage = [NSImage imageNamed:@"ActionHover"];
+        
+        // hide image by default and show only on hover
+        self.fAlternativeImage = [[NSImage alloc] init];
+        self.image = self.fAlternativeImage;
+        
+        // disable button click highlighting
+        [self.cell setHighlightsBy:NSNoCellMask];
+    }
+    return self;
 }
 
 - (void)mouseEntered:(NSEvent*)event
