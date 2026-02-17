@@ -896,40 +896,38 @@ jobs:
         run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Configure
         run: |
-          cmake_args=(
-            -S src
-            -B obj
-            -G Ninja
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo
-            -DCMAKE_INSTALL_PREFIX=pfx
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }}
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }}
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }}
-            -DENABLE_MAC=OFF
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }}
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }}
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }}
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }}
-            -DENABLE_WERROR=ON
-            -DRUN_CLANG_TIDY=OFF
-            -DUSE_SYSTEM_GTEST=ON
-            -DUSE_SYSTEM_DEFAULT=ON
-            -DUSE_SYSTEM_DHT=OFF
-            -DUSE_SYSTEM_SIGSLOT=OFF
-            -DUSE_SYSTEM_SMALL=OFF
-            -DUSE_SYSTEM_UTP=OFF
+          set -- \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_GTEST=ON \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_DHT=OFF \
+            -DUSE_SYSTEM_SIGSLOT=OFF \
+            -DUSE_SYSTEM_SMALL=OFF \
+            -DUSE_SYSTEM_UTP=OFF \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF
-          )
 
           if [ '${{ matrix.use-legacy-packages }}' = 'true' ]; then
-            cmake_args+=(
-              -DUSE_SYSTEM_FAST_FLOAT=OFF
-              -DUSE_SYSTEM_FMT=OFF
+            set -- "$@" \
+              -DUSE_SYSTEM_FAST_FLOAT=OFF \
+              -DUSE_SYSTEM_FMT=OFF \
               -DUSE_SYSTEM_UTF8CPP=OFF
-            )
           fi
 
-          cmake "${cmake_args[@]}"
+          cmake "$@"
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
