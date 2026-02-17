@@ -153,6 +153,8 @@ bool tr_spawn_async(
     if (child_pid == -1)
     {
         set_system_error(error, errno, "Call to fork()");
+        close(pipe_fds[0]);
+        close(pipe_fds[1]);
         return false;
     }
 
