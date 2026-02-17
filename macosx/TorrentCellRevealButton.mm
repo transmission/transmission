@@ -27,8 +27,10 @@
     [self updateImage];
 }
 
-- (instancetype)initWithFrame:(NSRect)frameRect {
-    if (self = [super initWithFrame:frameRect]) {
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    if (self = [super initWithFrame:frameRect])
+    {
         self.revealImageString = @"RevealOff";
         [self updateImage];
     }

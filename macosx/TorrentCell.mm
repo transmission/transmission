@@ -13,15 +13,18 @@
 
 @implementation TorrentCell
 
-- (instancetype)initWithFrame:(NSRect)frameRect {
-    if (self = [super initWithFrame:frameRect]) {
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    if (self = [super initWithFrame:frameRect])
+    {
         [self configureViews];
         [self setupConstraints];
     }
     return self;
 }
 
-- (void)configureViews {
+- (void)configureViews
+{
     __auto_type groupIndicatorView = [[NSImageView alloc] init];
 
     __auto_type iconView = [[NSImageView alloc] init];
@@ -30,12 +33,12 @@
     __auto_type stackView = [[NSStackView alloc] init];
     stackView.distribution = NSStackViewDistributionFill;
     stackView.spacing = 4;
-    
+
     __auto_type torrentTitleField = [[NSTextField alloc] init];
     torrentTitleField.textColor = NSColor.labelColor;
     torrentTitleField.backgroundColor = NSColor.textBackgroundColor;
     torrentTitleField.font = [NSFont systemFontOfSize:12.0 weight:NSFontWeightRegular];
-    
+
     __auto_type torrentPriorityView = [[NSImageView alloc] init];
 
     [stackView addArrangedSubview:torrentTitleField];
@@ -55,31 +58,22 @@
 
     __auto_type controlButton = [[TorrentCellControlButton alloc] init];
     __auto_type revealButton = [[TorrentCellRevealButton alloc] init];
-    
-    for (NSImageView *imageView in @[
-        groupIndicatorView,
-        iconView,
-        torrentPriorityView
-    ]) {
+
+    for (NSImageView* imageView in @[ groupIndicatorView, iconView, torrentPriorityView ])
+    {
         imageView.imageScaling = NSImageScaleProportionallyDown;
     }
-    
-    for (NSTextField *textField in @[
-        torrentTitleField,
-        torrentProgressField,
-        torrentStatusField
-    ]) {
+
+    for (NSTextField* textField in @[ torrentTitleField, torrentProgressField, torrentStatusField ])
+    {
         textField.editable = NO;
         textField.selectable = NO;
         textField.bordered = NO;
         textField.drawsBackground = NO;
     }
-    
-    for (NSButton *button in @[
-        actionButton,
-        controlButton,
-        revealButton
-    ]) {
+
+    for (NSButton* button in @[ actionButton, controlButton, revealButton ])
+    {
         button.imagePosition = NSImageOnly;
         button.imageScaling = NSImageScaleProportionallyDown;
         [button setButtonType:NSButtonTypeMomentaryPushIn];
@@ -87,19 +81,18 @@
         button.bordered = NO;
     }
 
-    for (
-        NSView *view in @[
-            groupIndicatorView,
-            iconView,
-            actionButton,
-            stackView,
-            torrentProgressField,
-            torrentStatusField,
-            torrentProgressBarView,
-            controlButton,
-            revealButton,
-        ]
-    ) {
+    for (NSView* view in @[
+             groupIndicatorView,
+             iconView,
+             actionButton,
+             stackView,
+             torrentProgressField,
+             torrentStatusField,
+             torrentProgressBarView,
+             controlButton,
+             revealButton,
+         ])
+    {
         view.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:view];
     }
@@ -117,7 +110,8 @@
     self.fRevealButton = revealButton;
 }
 
-- (void)setupConstraints {
+- (void)setupConstraints
+{
     __auto_type groupIndicatorView = self.fGroupIndicatorView;
     __auto_type iconView = self.fIconView;
     __auto_type actionButton = self.fActionButton;
@@ -128,7 +122,7 @@
     __auto_type controlButton = self.fControlButton;
     __auto_type revealButton = self.fRevealButton;
 
-    [NSLayoutConstraint activateConstraints: @[
+    [NSLayoutConstraint activateConstraints:@[
         // groupIndicatorView
         [groupIndicatorView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
         [groupIndicatorView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],

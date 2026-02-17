@@ -282,15 +282,16 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         else
         {
             torrentCell = [outlineView makeViewWithIdentifier:@"NewTorrentCell" owner:self];
-            if (!torrentCell) {
+            if (!torrentCell)
+            {
                 torrentCell = [[TorrentCell alloc] initWithFrame:NSZeroRect];
                 torrentCell.identifier = @"NewTorrentCell";
             }
-            
-            ((TorrentCellControlButton *)torrentCell.fControlButton).torrentCell = torrentCell;
-            ((TorrentCellRevealButton *)torrentCell.fRevealButton).torrentCell = torrentCell;
-            ((TorrentCellActionButton *)torrentCell.fActionButton).torrentCell = torrentCell;
-            
+
+            ((TorrentCellControlButton*)torrentCell.fControlButton).torrentCell = torrentCell;
+            ((TorrentCellRevealButton*)torrentCell.fRevealButton).torrentCell = torrentCell;
+            ((TorrentCellActionButton*)torrentCell.fActionButton).torrentCell = torrentCell;
+
             torrentCell.fTorrentProgressField.stringValue = torrent.progressString;
 
             // set torrent icon and error badge
