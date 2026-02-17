@@ -68,7 +68,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     std::string_view info_dict_begin_;
     tr_tracker_tier_t tier_ = 0;
     tr_pathbuf file_subpath_;
-    std::string_view pieces_root_;
     int64_t file_length_ = 0;
 
     enum class State : uint8_t
@@ -364,6 +363,12 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(InfoKey, PiecesKey))
         {
+            if (tm_.has_v1_metadata())
+            {
+                context.error.set(EINVAL, "invalid duplicate 'pieces'");
+                return false;
+            }
+
             static auto constexpr Sha1Len = std::tuple_size_v<tr_sha1_digest_t>;
             auto const len = std::size(value);
             if (len % Sha1Len != 0U)
@@ -450,8 +455,6 @@ private:
     {
         bool ok = true;
 
-        // FIXME: Check to see if we already added this file. This is a safeguard
-        // for hybrid torrents with duplicate info between "file tree" and "files"
         if (std::empty(file_subpath_))
         {
             context.error.set(EINVAL, fmt::format("invalid path [{:s}]", file_subpath_));
@@ -463,7 +466,6 @@ private:
         }
 
         file_length_ = 0;
-        pieces_root_ = {};
         // NB: let caller decide how to clear file_tree_.
         // if we're in "files" mode we clear it; if in "file tree" we pop it
         return ok;
@@ -474,6 +476,25 @@ private:
         if (std::empty(info_dict_begin_))
         {
             context.error.set(EINVAL, "no info_dict found");
+            return false;
+        }
+
+        if (!tm_.has_v1_metadata())
+        {
+            context.error.set(EINVAL, "missing v1 metadata");
+            return false;
+        }
+
+        // FIXME: update for hybrid torrents with duplicate info between "file tree" and "files"
+        // when "file tree" (bittorrent v2) supported
+        auto sorted_paths = tm_.files_.sorted_by_path();
+        if (auto dupe = std::adjacent_find(
+                sorted_paths.begin(),
+                sorted_paths.end(),
+                [](auto const& p1, auto const& p2) { return p1.first == p2.first; });
+            dupe != sorted_paths.end())
+        {
+            context.error.set(EINVAL, fmt::format("duplicate path [{:s}]", dupe->first));
             return false;
         }
 
@@ -505,11 +526,10 @@ private:
         // bittorrent 1.0 spec
         // https://www.bittorrent.org/beps/bep_0003.html
         //
-        // "There is also a key length or a key files, but not both or neither.
-        //
-        // "If length is present then the download represents a single file,
+        // "There is also a key 'length' or a key 'files', but not both or neither.
+        // If 'length' is present then the download represents a single file,
         // otherwise it represents a set of files which go in a directory structure.
-        // In the single file case, length maps to the length of the file in bytes.
+        // In the single file case, 'length' maps to the length of the file in bytes."
         if (tm_.file_count() == 0 && length_ != 0 && !std::empty(tm_.name_))
         {
             tm_.files_.add(tr_torrent_files::sanitize_subpath(tm_.name_), length_);
@@ -531,12 +551,26 @@ private:
             {
                 if (!context.error)
                 {
-                    context.error.set(EINVAL, fmt::format("invalid piece size: {}", piece_size_));
+                    context.error.set(EINVAL, fmt::format("invalid 'piece length': {}", piece_size_));
                 }
                 return false;
             }
 
             tm_.block_info_ = tr_block_info{ tm_.files_.total_size(), piece_size_ };
+            if (tm_.block_info_.piece_count() != std::size(tm_.pieces_))
+            {
+                if (!context.error)
+                {
+                    context.error.set(
+                        EINVAL,
+                        fmt::format(
+                            "'pieces' and torrent size mismatch: {}, {}",
+                            tm_.block_info_.piece_count(),
+                            std::size(tm_.pieces_)));
+                }
+                return false;
+            }
+
             return true;
         }
 
