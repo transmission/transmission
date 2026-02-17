@@ -1215,9 +1215,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release:
-          - '15.0'
-          - '14.3'
         arch:
           - x86_64
           - aarch64
@@ -1240,7 +1237,6 @@ jobs:
         uses: vmactions/freebsd-vm@v1
         with:
           usesh: true
-          release: ${{ matrix.release }}
           arch: ${{ matrix.arch }}
           prepare: |
             set -ex
@@ -1299,7 +1295,7 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
+          name: binaries-${{ github.job }}-${{ matrix.arch }}
           path: pfx/**/*
 
   crypto:
@@ -1401,8 +1397,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release:
-          - '7.8'
         arch:
           - x86_64
           - aarch64
@@ -1425,7 +1419,6 @@ jobs:
         uses: vmactions/openbsd-vm@v1
         with:
           usesh: true
-          release: ${{ matrix.release }}
           arch: ${{ matrix.arch }}
           prepare: |
             set -ex
@@ -1482,7 +1475,7 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
+          name: binaries-${{ github.job }}-${{ matrix.arch }}
           path: pfx/**/*
 
   netbsd:
