@@ -439,6 +439,9 @@ public:
     static auto constexpr BandwidthPauseMsec = long{ 500 };
     static auto constexpr DnsCacheTimeoutSecs = long{ 60 * 60 };
     static auto constexpr MaxRedirects = long{ 10 };
+    static auto constexpr MaxHostConnections = long{ 16 };
+    static auto constexpr MaxTotalConnections = long{ 96 };
+    static auto constexpr MaxCachedConnections = MaxTotalConnections;
 
     bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
@@ -726,6 +729,13 @@ public:
     void curlThreadFunc()
     {
         auto const multi = curl_helpers::multi_unique_ptr{ curl_multi_init() };
+#if LIBCURL_VERSION_NUM >= 0x071003 /* 7.16.3 */
+        (void)curl_multi_setopt(multi.get(), CURLMOPT_MAXCONNECTS, MaxCachedConnections);
+#endif
+#if LIBCURL_VERSION_NUM >= 0x071E00 /* 7.30.0 */
+        (void)curl_multi_setopt(multi.get(), CURLMOPT_MAX_TOTAL_CONNECTIONS, MaxTotalConnections);
+        (void)curl_multi_setopt(multi.get(), CURLMOPT_MAX_HOST_CONNECTIONS, MaxHostConnections);
+#endif
         auto const start_time = mediator.now();
 
         auto repeats = unsigned{};

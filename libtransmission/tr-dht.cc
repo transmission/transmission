@@ -153,7 +153,7 @@ public:
         init_state(state_filename_);
 
         get_nodes_from_bootstrap_file(tr_pathbuf{ mediator_.config_dir(), "/dht.bootstrap"sv }, bootstrap_queue_);
-        for (auto const [host, port] : DefaultBootstraps)
+        for (auto const& [host, port] : DefaultBootstraps)
         {
             get_nodes_from_name(host, tr_port::from_host(port), bootstrap_queue_);
         }
