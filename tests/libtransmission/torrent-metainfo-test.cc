@@ -247,4 +247,32 @@ TEST_F(TorrentMetainfoTest, pathKeyTest)
     }
 }
 
+TEST_F(TorrentMetainfoTest, pathKeyTest)
+{
+    static auto constexpr BadTorrents = std::array{ "dup-files.torrent"sv };
+
+    for (auto const& name : BadTorrents)
+    {
+        auto tm = tr_torrent_metainfo{};
+        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
+        EXPECT_FALSE(tm.parse_torrent_file(path));
+    }
+}
+
+TEST_F(TorrentMetainfoTest, utf8Test)
+{
+// MacOS implementation uses non-deterministic conversion for illegal UTF-8
+#if (defined(__APPLE__) && defined(__clang__))
+    GTEST_SKIP();
+#endif
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR "/bad-utf8-path.torrent"sv };
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
+
+    // good name: bad-utf8-path/πfile.😀😀😀
+    EXPECT_EQ("bad-utf8-path/\u03C0file.\U0001F600\U0001F600\U0001F600", tm.file_subpath(0));
+    // bad name, gets masked to: bad-utf8-path/file�.foo
+    EXPECT_EQ("bad-utf8-path/file\uFFFD.foo", tm.file_subpath(1));
+}
+
 } // namespace libtransmission::test
