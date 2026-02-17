@@ -488,8 +488,9 @@ private:
         // FIXME: update for hybrid torrents with duplicate info between "file tree" and "files"
         // when "file tree" (bittorrent v2) supported
         auto sorted_paths = tm_.files_.sorted_by_path();
-        if (auto dupe = std::ranges::adjacent_find(
-                sorted_paths,
+        if (auto dupe = std::adjacent_find(
+                sorted_paths.begin(),
+                sorted_paths.end(),
                 [](auto const& p1, auto const& p2) { return p1.first == p2.first; });
             dupe != sorted_paths.end())
         {
