@@ -579,26 +579,11 @@ tr_add_external_auto_library(PSL libpsl
 
 if(ENABLE_UCHARDET)
     tr_add_external_auto_library(UCHARDET uchardet
-        SUBPROJECT
+        LIBNAME uchardet
+        TARGET uchardet::uchardet
         CMAKE_ARGS
             -DBUILD_BINARY:BOOL=OFF
             -DBUILD_SHARED_LIBS:BOOL=OFF)
-    if(NOT USE_SYSTEM_UCHARDET)
-        # Bundled build: create the namespaced alias and fix the include path.
-        # The subproject exposes src/ as its include path, so #include <uchardet.h> works.
-        # Mirror the system-installed layout so #include <uchardet/uchardet.h> also works.
-        if(NOT TARGET uchardet::uchardet)
-            add_library(uchardet::uchardet ALIAS libuchardet)
-        endif()
-        file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/uchardet-include/uchardet")
-        configure_file(
-            "third-party/uchardet/src/uchardet.h"
-            "${CMAKE_CURRENT_BINARY_DIR}/uchardet-include/uchardet/uchardet.h"
-            COPYONLY)
-        target_include_directories(libuchardet
-            PUBLIC
-                "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/uchardet-include>")
-    endif()
 endif()
 
 if(ENABLE_UTP)
