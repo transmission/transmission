@@ -367,7 +367,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             groupCell.identifier = @"NewGroupCell";
         }
 
-
         NSInteger groupIndex = group.groupIndex;
 
         NSColor* groupColor = groupIndex != -1 ? [GroupsController.groups colorForIndex:groupIndex] :
