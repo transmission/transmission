@@ -1608,6 +1608,10 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 - (NSControlStateValue)checkForFiles:(NSIndexSet*)indexSet
 {
     BOOL onState = NO, offState = NO;
+    if (!self.fHandle)
+    {
+        return NSControlStateValueOff;
+    }
     for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
     {
         auto const file = tr_torrentFile(self.fHandle, index);
