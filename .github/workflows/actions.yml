@@ -232,17 +232,22 @@ jobs:
 
   clang-tidy-libtransmission:
     runs-on: ubuntu-24.04
-    needs: [ what-to-make ]
-    if: |
-      needs.what-to-make.outputs.make-core == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true'
+    needs: what-to-make
+    if: needs.what-to-make.outputs.make-core == 'true'
     steps:
       - name: Show Configuration
         run: |
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
+      - name: Cache project files
+        id: cache-project-files
+        uses: actions/cache@v5
+        with:
+          key: clang-tidy-${{ github.sha }}
+          path: .
       - name: Get Source
+        if: steps.cache-project-files.outputs.cache-hit != 'true'
         uses: actions/checkout@v6
         with:
           submodules: recursive
@@ -262,7 +267,6 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }} \
             -DRUN_CLANG_TIDY=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
@@ -278,11 +282,98 @@ jobs:
         run: |
           set -euo pipefail
           cmake --build obj --config Debug --target transmission-app 2>&1 | tee -a makelog
-      - name: Make (Tests)
-        if: needs.what-to-make.outputs.make-tests == 'true'
+      - name: Test for warnings
+        run: |
+          if grep 'warning:' makelog; then exit 1; fi
+
+  what-to-clang-tidy:
+    runs-on: ubuntu-latest
+    needs: [ what-to-make, clang-tidy-libtransmission ]
+    if: |
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true'
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.matrix }}
+    steps:
+      - name: Generate clang-tidy matrix
+        id: generate-matrix
+        run: |
+          set -exuo pipefail
+
+          # Generate elements in the include array
+          jobs=()
+          if [ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ]; then
+            jobs+=("$(
+              jq -nc '$ARGS.named' \
+                --arg target transmission-gtk \
+                --arg enable-gtk gtk3 \
+                --argjson enable-qt false \
+                --argjson enable-tests false
+            )")
+          fi
+          if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
+            jobs+=("$(
+              jq -nc '$ARGS.named' \
+                --arg target libtransmission-test \
+                --argjson enable-gtk false \
+                --argjson enable-qt '${{ needs.what-to-make.outputs.make-qt == 'true' && '"qt6"' || 'false' }}' \
+                --argjson enable-tests true
+            )")
+          fi
+
+          # Combine the include array elements into a JSON string and output
+          echo "matrix=$(printf "%s\n" "${jobs[@]}" | jq -sc '{include: .}')" >> "$GITHUB_OUTPUT"
+
+  clang-tidy:
+    runs-on: ubuntu-24.04
+    needs: what-to-clang-tidy
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.what-to-clang-tidy.outputs.matrix) }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get cached project files
+        uses: actions/cache/restore@v5
+        with:
+          key: clang-tidy-${{ github.sha }}
+          path: .
+          fail-on-cache-miss: true
+      - name: Get Dependencies
+        uses: ./.github/actions/install-deps
+        with:
+          compiler: clang
+          enable-clang-tidy: true
+          use-sudo: true
+          enable-gtk: ${{ matrix.enable-gtk }}
+          enable-qt: ${{ matrix.enable-qt }}
+      - name: Configure
+        run: |
+          cmake \
+            -S . \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_GTK=${{ matrix.enable-gtk && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ matrix.enable-qt && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ matrix.enable-tests && 'ON' || 'OFF' }} \
+            -DRUN_CLANG_TIDY=ON \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
+      - name: Make
         run: |
           set -euo pipefail
-          cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
+          cmake --build obj --config Debug --target ${{ matrix.target }} 2>&1 | tee makelog
       - name: Test for warnings
         run: |
           if grep 'warning:' makelog; then exit 1; fi

@@ -85,6 +85,7 @@ int main(int argc, char** argv)
     Gio::File::create_for_path(".");
     Glib::wrap_register(
         g_type_from_name("GLocalFile"),
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         [](GObject* object) -> Glib::ObjectBase* { return new Gio::File(G_FILE(object)); });
     g_type_ensure(Gio::File::get_type());
 

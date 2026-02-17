@@ -21,6 +21,7 @@
 #include <glibmm/variant.h>
 
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 
 #include <map>
 #include <utility>
@@ -209,8 +210,14 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_
         {
             Glib::spawn_async({}, argv, TR_GLIB_SPAWN_FLAGS(SEARCH_PATH));
         }
-        catch (Glib::SpawnError const&)
+        catch (Glib::SpawnError const& e)
         {
+            gtr_warning(
+                fmt::format(
+                    fmt::runtime(_("Couldn't spawn async process \"'{command}'\": {error} ({error_code})")),
+                    fmt::arg("command", fmt::join(argv, "' '")),
+                    fmt::arg("error", e.what()),
+                    fmt::arg("error_code", static_cast<int>(e.code()))));
         }
     }
 

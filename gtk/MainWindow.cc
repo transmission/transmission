@@ -619,7 +619,7 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createStatsMenu()
     {
         auto item = Gio::MenuItem::create(_(display_name), full_action_name);
         item->set_action_and_target(full_action_name, to_var(mode));
-        top->append_item(std::move(item));
+        top->append_item(item);
     }
 
     window_.insert_action_group(std::string(StatsMenuActionGroupName), actions);
@@ -763,7 +763,7 @@ namespace
 
 void MainWindow::Impl::updateStats()
 {
-    static_assert(StatsModeCount == 4U && "StatsMode changed: update this code");
+    static_assert(StatsModeCount == 4U, "StatsMode changed: update this code");
     auto const mode = gtr_pref_get<StatsMode>(TR_KEY_statusbar_stats).value_or(DefaultStatsMode);
     auto const use_session_stats = mode == StatsMode::SessionRatio || mode == StatsMode::SessionTransfer;
     auto const* const ses = core_->get_session();
