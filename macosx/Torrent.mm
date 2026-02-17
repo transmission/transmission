@@ -49,6 +49,7 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @property(nonatomic) TorrentDeterminationType fDownloadFolderDetermination;
 
 @property(nonatomic) BOOL fResumeOnWake;
+@property(nonatomic, copy, readwrite) NSString* hashString;
 
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
@@ -199,6 +200,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     [self setTimeMachineExclude:NO];
 
     tr_torrentRemove(self.fHandle, trashFiles, trashDataFile);
+    _fHandle = nullptr;
 }
 
 - (void)changeDownloadFolderBeforeUsing:(NSString*)folder determinationType:(TorrentDeterminationType)determinationType
@@ -779,7 +781,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
 - (NSString*)hashString
 {
-    return @(tr_torrentView(self.fHandle).hash_string);
+    return _hashString;
 }
 
 - (BOOL)privateTorrent
@@ -862,6 +864,15 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString:@""]);
 
+    if (self.fHandle == nullptr)
+    {
+        if (completionHandler != nullptr)
+        {
+            completionHandler(NO);
+        }
+        return;
+    }
+
     NSDictionary* contextInfo = @{ @"Torrent" : self, @"CompletionHandler" : [completionHandler copy] };
 
     tr_torrentRenamePath(self.fHandle, tr_torrentName(self.fHandle), newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
@@ -874,6 +885,15 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     NSParameterAssert(node.torrent == self);
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString:@""]);
+
+    if (self.fHandle == nullptr)
+    {
+        if (completionHandler != nullptr)
+        {
+            completionHandler(NO);
+        }
+        return;
+    }
 
     NSDictionary* contextInfo = @{ @"Torrent" : self, @"Nodes" : @[ node ], @"CompletionHandler" : [completionHandler copy] };
 
@@ -1867,6 +1887,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     }
 
     _fResumeOnWake = NO;
+    _hashString = @(tr_torrentView(self.fHandle).hash_string);
 
     //don't do after this point - it messes with auto-group functionality
     if (!self.magnet)

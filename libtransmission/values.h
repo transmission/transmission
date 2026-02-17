@@ -8,6 +8,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cmath> // for std::fabs(), std::floor()
+#include <compare>
 #include <cstdint> // for uint64_t
 #include <string>
 #include <string_view>
@@ -174,35 +175,9 @@ public:
         return ret /= mult;
     }
 
-    [[nodiscard]] constexpr auto operator<(Value const& that) const noexcept
-    {
-        return compare(that) < 0;
-    }
+    [[nodiscard]] constexpr auto operator<=>(Value const& that) const noexcept = default;
 
-    [[nodiscard]] constexpr auto operator<=(Value const& that) const noexcept
-    {
-        return compare(that) <= 0;
-    }
-
-    [[nodiscard]] constexpr auto operator==(Value const& that) const noexcept
-    {
-        return compare(that) == 0;
-    }
-
-    [[nodiscard]] constexpr auto operator!=(Value const& that) const noexcept
-    {
-        return compare(that) != 0;
-    }
-
-    [[nodiscard]] constexpr auto operator>(Value const& that) const noexcept
-    {
-        return compare(that) > 0;
-    }
-
-    [[nodiscard]] constexpr auto operator>=(Value const& that) const noexcept
-    {
-        return compare(that) >= 0;
-    }
+    [[nodiscard]] constexpr bool operator==(Value const& that) const noexcept = default;
 
     std::string_view to_string(char* buf, size_t buflen) const
     {
@@ -246,21 +221,6 @@ public:
 
 private:
     uint64_t base_quantity_ = {};
-
-    [[nodiscard]] constexpr int compare(Value const& that) const noexcept // <=>
-    {
-        if (base_quantity_ < that.base_quantity_)
-        {
-            return -1;
-        }
-
-        if (base_quantity_ > that.base_quantity_)
-        {
-            return 1;
-        }
-
-        return 0;
-    }
 };
 
 using Memory = Value<MemoryUnits, Config::memory>;

@@ -30,7 +30,8 @@ export class Inspector extends EventTarget {
     this.current_page = this.elements.info.root;
     this.interval = setInterval(this._refreshTorrents.bind(this), 3000);
     this.name = 'inspector';
-    this.selection_listener = (event_) => this._setTorrents(event_.selected);
+    this.selection_listener = (event_) =>
+      this._setTorrents(event_.selected, true);
     this.torrent_listener = () => this._updateCurrentPage();
     this.torrents = [];
     this.file_torrent = null;
@@ -43,7 +44,7 @@ export class Inspector extends EventTarget {
       'torrent-selection-changed',
       this.selection_listener,
     );
-    this._setTorrents(this.controller.getSelectedTorrents());
+    this._setTorrents(this.controller.getSelectedTorrents(), true); // Initial load
 
     document.querySelector('#mainwin-workarea').append(this.elements.root);
   }
@@ -219,7 +220,7 @@ export class Inspector extends EventTarget {
     return { ...elements, ...pages };
   }
 
-  _setTorrents(torrents) {
+  _setTorrents(torrents, isInitialLoad = false) {
     // update the inspector when a selected torrent's data changes.
     const key = 'dataChanged';
     const callback = this.torrent_listener;
@@ -231,7 +232,11 @@ export class Inspector extends EventTarget {
       t.addEventListener(key, callback);
     }
 
-    this._refreshTorrents();
+    // Fetch detailed data immediately when requested
+    // (initial load or selection changes)
+    if (isInitialLoad) {
+      this._refreshTorrents();
+    }
     this._updateCurrentPage();
   }
 
