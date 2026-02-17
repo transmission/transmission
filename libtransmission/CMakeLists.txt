@@ -231,6 +231,7 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
+        $<$<BOOL:${ENABLE_UCHARDET}>:WITH_UCHARDET>
         $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
@@ -273,6 +274,7 @@ target_link_libraries(${TR_NAME}
         miniupnpc::miniupnpc
         dht::dht
         $<$<BOOL:${ENABLE_UTP}>:libutp::libutp>
+        $<$<BOOL:${ENABLE_UCHARDET}>:uchardet::uchardet>
         libb64::libb64
         ${Intl_LIBRARIES}
         ${LIBM_LIBRARY}
@@ -294,8 +296,7 @@ target_link_libraries(${TR_NAME}
         Pal::Sigslot
         transmission::small
         libevent::core
-        libevent::extra
-	uchardet)
+        libevent::extra)
 
 if(INSTALL_LIB)
     install(

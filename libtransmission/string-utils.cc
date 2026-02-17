@@ -20,8 +20,10 @@
 #include <utf8.h>
 
 // TRR
+#ifdef WITH_UCHARDET
 #include "iconv_wrap.h"
 #include "uchardet_wrap.h"
+#endif
 
 #include <wildmat.h>
 
@@ -85,42 +87,41 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
     }
     auto out = std::string{};
     out.reserve(std::size(sv));
-    bool do_replacement = false;
-#ifdef _WIN32
-    do_replacement = true;
-#else
+    bool do_replacement = true;
+#ifdef WITH_UCHARDET
     if (utf8::is_valid(sv))
     {
         out = sv;
+        do_replacement = false;
     }
     else
     {
         CharsetDetector detector;
         if (detector.detectFromString(sv) == CharsetDetector::OK)
         {
-            tr_logAddDebug(fmt::format("CharsetDetector {}", detector.getEncoding()));
+            tr_logAddDebug(fmt::format("CharsetDetector found {}", detector.getEncoding()));
             IconvWrapper conv("UTF-8", detector.getEncoding());
             if (!conv.is_valid())
             {
                 tr_logAddError("Failed to open iconv");
-                return "";
-            }
-
-            out = conv.convert(sv);
-            if (out.empty())
-            {
-                tr_logAddError("Failed to convert to UTF-8");
-                do_replacement = true;
             }
             else
             {
-                tr_logAddDebug(fmt::format("Converted '{}' to UTF-8 '{}'", sv, out));
+                out = conv.convert(sv);
+                if (out.empty())
+                {
+                    tr_logAddError("Failed to convert to UTF-8");
+                }
+                else
+                {
+                    tr_logAddDebug(fmt::format("Converted '{}' to UTF-8 '{}'", sv, out));
+                    do_replacement = false;
+                }
             }
         }
         else
         {
             tr_logAddError("CharsetDetector failed");
-            do_replacement = true;
         }
     }
 #endif
