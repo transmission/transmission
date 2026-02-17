@@ -764,6 +764,7 @@ enum // NOLINT(performance-enum-size)
  * Note: this view is guaranteed to be zero-terminated at view[std::size(view)]
  */
 [[nodiscard]] std::string_view tr_quark_get_string_view(tr_quark quark);
+[[nodiscard]] std::u8string_view tr_quark_get_u8string_view(tr_quark quark);
 
 /**
  * Create a new quark for the specified string. If a quark already
