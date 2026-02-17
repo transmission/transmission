@@ -360,7 +360,13 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     else
     {
         TorrentGroup* group = (TorrentGroup*)item;
-        GroupCell* groupCell = [outlineView makeViewWithIdentifier:@"GroupCell" owner:self];
+        GroupCell* groupCell = [outlineView makeViewWithIdentifier:@"NewGroupCell" owner:self];
+        if (!groupCell)
+        {
+            groupCell = [[GroupCell alloc] initWithFrame:NSZeroRect];
+            groupCell.identifier = @"NewGroupCell";
+        }
+
 
         NSInteger groupIndex = group.groupIndex;
 
