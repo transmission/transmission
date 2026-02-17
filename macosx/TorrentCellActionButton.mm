@@ -36,15 +36,17 @@
     [self.cell setHighlightsBy:NSNoCellMask];
 }
 
-- (instancetype)initWithFrame:(NSRect)frameRect {
-    if (self = [super initWithFrame:frameRect]) {
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    if (self = [super initWithFrame:frameRect])
+    {
         self.fDefaults = NSUserDefaults.standardUserDefaults;
         self.fImage = [NSImage imageNamed:@"ActionHover"];
-        
+
         // hide image by default and show only on hover
         self.fAlternativeImage = [[NSImage alloc] init];
         self.image = self.fAlternativeImage;
-        
+
         // disable button click highlighting
         [self.cell setHighlightsBy:NSNoCellMask];
     }

@@ -28,8 +28,10 @@
     [self updateImage];
 }
 
-- (instancetype)initWithFrame:(NSRect)frameRect {
-    if (self = [super initWithFrame:frameRect]) {
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    if (self = [super initWithFrame:frameRect])
+    {
         self.controlImageSuffix = @"Off";
         [self updateImage];
     }
