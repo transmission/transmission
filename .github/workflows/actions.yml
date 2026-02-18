@@ -251,6 +251,7 @@ jobs:
           build-config: Debug
           enable-sanitizers: true
 
+  # todo(ckerr): add gtk4 once 26.04 is released
   clang-tidy-posix:
     name: clang-tidy-posix (${{ matrix.label }})
     strategy:
@@ -264,10 +265,6 @@ jobs:
           - label: gtk3
             kind: gtk
             gtk: 'gtk3'
-            qt: 'false'
-          - label: gtk4
-            kind: gtk
-            gtk: 'gtk4'
             qt: 'false'
           - label: qt5
             kind: qt
