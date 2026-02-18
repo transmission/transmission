@@ -236,10 +236,9 @@ Glib::RefPtr<Gio::ListModel> gtr_shortcuts_get_from_menu(Glib::RefPtr<Gio::MenuM
 
             if (!action_name.empty() && !action_accel.empty())
             {
-                result->append(
-                    Gtk::Shortcut::create(
-                        Gtk::ShortcutTrigger::parse_string(action_accel),
-                        Gtk::NamedAction::create(action_name)));
+                result->append(Gtk::Shortcut::create(
+                    Gtk::ShortcutTrigger::parse_string(action_accel),
+                    Gtk::NamedAction::create(action_name)));
             }
 
             for (auto it = link->iterate_item_links(i); it->next();)

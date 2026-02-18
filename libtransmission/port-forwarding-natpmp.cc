@@ -42,14 +42,13 @@ void log_val(char const* func, int ret)
     }
     else
     {
-        tr_logAddDebug(
-            fmt::format(
-                "{} failed. Natpmp returned {} ({}); errno is {} ({})",
-                func,
-                ret,
-                strnatpmperr(ret),
-                errno,
-                tr_strerror(errno)));
+        tr_logAddDebug(fmt::format(
+            "{} failed. Natpmp returned {} ({}); errno is {} ({})",
+            func,
+            ret,
+            strnatpmperr(ret),
+            errno,
+            tr_strerror(errno)));
     }
 }
 } // namespace

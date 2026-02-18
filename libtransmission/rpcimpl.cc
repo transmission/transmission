@@ -1643,12 +1643,11 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 
 void blocklistUpdate(tr_session* session, tr_variant::Map const& /*args_in*/, struct tr_rpc_idle_data* idle_data)
 {
-    session->fetch(
-        {
-            session->blocklistUrl(),
-            [](tr_web::FetchResponse const& r) { onBlocklistFetched(r); },
-            idle_data,
-        });
+    session->fetch({
+        session->blocklistUrl(),
+        [](tr_web::FetchResponse const& r) { onBlocklistFetched(r); },
+        idle_data,
+    });
 }
 
 // ---
@@ -1704,12 +1703,11 @@ void onMetadataFetched(tr_web::FetchResponse const& web_response)
     auto const& [status, body, primary_ip, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
 
-    tr_logAddTrace(
-        fmt::format(
-            "torrentAdd: HTTP response code was {} ({}); response length was {} bytes",
-            status,
-            tr_webGetResponseStr(status),
-            std::size(body)));
+    tr_logAddTrace(fmt::format(
+        "torrentAdd: HTTP response code was {} ({}); response length was {} bytes",
+        status,
+        tr_webGetResponseStr(status),
+        std::size(body)));
 
     if (status == 200 || status == 221) /* http or ftp success.. */
     {

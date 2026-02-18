@@ -162,12 +162,11 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     {
         if (auto const dir = tr_sys_path_dirname(filename); !tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
-            tr_logAddError(
-                fmt::format(
-                    fmt::runtime(_("Couldn't create '{path}': {error} ({error_code})")),
-                    fmt::arg("path", dir),
-                    fmt::arg("error", error.message()),
-                    fmt::arg("error_code", error.code())));
+            tr_logAddError(fmt::format(
+                fmt::runtime(_("Couldn't create '{path}': {error} ({error_code})")),
+                fmt::arg("path", dir),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
             return {};
         }
     }
@@ -185,12 +184,11 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     auto const fd = tr_sys_file_open(filename, flags, 0666, &error);
     if (!is_open(fd))
     {
-        tr_logAddError(
-            fmt::format(
-                fmt::runtime(_("Couldn't open '{path}': {error} ({error_code})")),
-                fmt::arg("path", filename),
-                fmt::arg("error", error.message()),
-                fmt::arg("error_code", error.code())));
+        tr_logAddError(fmt::format(
+            fmt::runtime(_("Couldn't open '{path}': {error} ({error_code})")),
+            fmt::arg("path", filename),
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
         return {};
     }
 
@@ -214,12 +212,11 @@ std::optional<tr_sys_file_t> tr_open_files::get(
 
         if (!success)
         {
-            tr_logAddError(
-                fmt::format(
-                    fmt::runtime(_("Couldn't preallocate '{path}': {error} ({error_code})")),
-                    fmt::arg("path", filename),
-                    fmt::arg("error", error.message()),
-                    fmt::arg("error_code", error.code())));
+            tr_logAddError(fmt::format(
+                fmt::runtime(_("Couldn't preallocate '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
             tr_sys_file_close(fd);
             return {};
         }
@@ -234,12 +231,11 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     // https://bugs.launchpad.net/ubuntu/+source/transmission/+bug/318249
     if (resize_needed && !tr_sys_file_truncate(fd, file_size, &error))
     {
-        tr_logAddWarn(
-            fmt::format(
-                fmt::runtime(_("Couldn't truncate '{path}': {error} ({error_code})")),
-                fmt::arg("path", filename),
-                fmt::arg("error", error.message()),
-                fmt::arg("error_code", error.code())));
+        tr_logAddWarn(fmt::format(
+            fmt::runtime(_("Couldn't truncate '{path}': {error} ({error_code})")),
+            fmt::arg("path", filename),
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
         tr_sys_file_close(fd);
         return {};
     }

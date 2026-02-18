@@ -894,12 +894,11 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const downloaded_str = tr_strlsize(
-            std::accumulate(
-                std::begin(stats),
-                std::end(stats),
-                uint64_t{ 0 },
-                [](auto sum, auto const& st) { return sum + st.downloaded_ever; }));
+        auto const downloaded_str = tr_strlsize(std::accumulate(
+            std::begin(stats),
+            std::end(stats),
+            uint64_t{ 0 },
+            [](auto sum, auto const& st) { return sum + st.downloaded_ever; }));
 
         auto const failed = std::accumulate(
             std::begin(stats),

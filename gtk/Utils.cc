@@ -547,12 +547,11 @@ bool gtr_file_trash_or_remove(std::string_view const filename, tr_error* error)
         catch (Glib::Error const& e)
         {
             error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
-            gtr_message(
-                fmt::format(
-                    fmt::runtime(_("Couldn't move '{path}' to trash: {error} ({error_code})")),
-                    fmt::arg("path", filename),
-                    fmt::arg("error", error->message()),
-                    fmt::arg("error_code", error->code())));
+            gtr_message(fmt::format(
+                fmt::runtime(_("Couldn't move '{path}' to trash: {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
         }
     }
 
@@ -566,12 +565,11 @@ bool gtr_file_trash_or_remove(std::string_view const filename, tr_error* error)
         catch (Glib::Error const& e)
         {
             error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
-            gtr_message(
-                fmt::format(
-                    fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
-                    fmt::arg("path", filename),
-                    fmt::arg("error", error->message()),
-                    fmt::arg("error_code", error->code())));
+            gtr_message(fmt::format(
+                fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
             result = false;
         }
     }
@@ -650,12 +648,11 @@ void gtr_open_uri(std::string_view const uri)
     }
     catch (Glib::Error const& e)
     {
-        gtr_warning(
-            fmt::format(
-                fmt::runtime(_("Couldn't launch default application for URI '{uri}': {error} ({error_code})")),
-                fmt::arg("uri", uri),
-                fmt::arg("error", e.what()),
-                fmt::arg("error_code", e.code())));
+        gtr_warning(fmt::format(
+            fmt::runtime(_("Couldn't launch default application for URI '{uri}': {error} ({error_code})")),
+            fmt::arg("uri", uri),
+            fmt::arg("error", e.what()),
+            fmt::arg("error_code", e.code())));
     }
 
     try
@@ -665,12 +662,11 @@ void gtr_open_uri(std::string_view const uri)
     }
     catch (Glib::SpawnError const& e)
     {
-        gtr_warning(
-            fmt::format(
-                fmt::runtime(_("Couldn't invoke xdg-open for URI '{uri}': {error} ({error_code})")),
-                fmt::arg("uri", uri),
-                fmt::arg("error", e.what()),
-                fmt::arg("error_code", static_cast<int>(e.code()))));
+        gtr_warning(fmt::format(
+            fmt::runtime(_("Couldn't invoke xdg-open for URI '{uri}': {error} ({error_code})")),
+            fmt::arg("uri", uri),
+            fmt::arg("error", e.what()),
+            fmt::arg("error_code", static_cast<int>(e.code()))));
     }
 
     gtr_message(fmt::format(fmt::runtime(_("Couldn't open '{url}'")), fmt::arg("url", uri)));

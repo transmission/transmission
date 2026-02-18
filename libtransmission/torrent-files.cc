@@ -247,12 +247,11 @@ bool tr_torrent_files::move(
                 // Log them instead.
                 if (auto log_error = tr_error{}; !tr_sys_path_remove(path, &log_error))
                 {
-                    tr_logAddWarn(
-                        fmt::format(
-                            fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
-                            fmt::arg("path", path),
-                            fmt::arg("error", log_error.message()),
-                            fmt::arg("error_code", log_error.code())));
+                    tr_logAddWarn(fmt::format(
+                        fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
+                        fmt::arg("path", path),
+                        fmt::arg("error", log_error.message()),
+                        fmt::arg("error_code", log_error.code())));
                 }
             }
 

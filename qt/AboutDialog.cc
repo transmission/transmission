@@ -54,10 +54,9 @@ void AboutDialog::showCredits()
     QMessageBox::about(
         this,
         tr("Credits"),
-        QString::fromUtf8(
-            "Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
-            "Mitchell Livingston (macOS)\n"
-            "Mike Gelfand\n"));
+        QString::fromUtf8("Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
+                          "Mitchell Livingston (macOS)\n"
+                          "Mike Gelfand\n"));
 }
 
 void AboutDialog::showLicense()

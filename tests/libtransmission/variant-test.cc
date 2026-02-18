@@ -693,17 +693,16 @@ TEST_F(VariantTest, visitConstVariant)
     ASSERT_NE(vec, nullptr);
     vec->emplace_back(int64_t{ 99 });
 
-    auto const result = std::as_const(var).visit(
-        Overloaded{ [](tr_variant::Vector const& values) -> int64_t
-                    {
-                        EXPECT_EQ(1U, std::size(values));
-                        return values[0].value_if<int64_t>().value_or(-1);
-                    },
-                    [](auto&&) -> int64_t
-                    {
-                        ADD_FAILURE() << "unexpected alternative";
-                        return -1;
-                    } });
+    auto const result = std::as_const(var).visit(Overloaded{ [](tr_variant::Vector const& values) -> int64_t
+                                                             {
+                                                                 EXPECT_EQ(1U, std::size(values));
+                                                                 return values[0].value_if<int64_t>().value_or(-1);
+                                                             },
+                                                             [](auto&&) -> int64_t
+                                                             {
+                                                                 ADD_FAILURE() << "unexpected alternative";
+                                                                 return -1;
+                                                             } });
 
     EXPECT_EQ(99, result);
 }
