@@ -252,15 +252,48 @@ jobs:
           enable-sanitizers: true
 
   clang-tidy-posix:
-    runs-on: ubuntu-latest
+    name: clang-tidy-posix (${{ matrix.label }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: core
+            kind: core
+            gtk: 'false'
+            qt: 'false'
+          - label: gtk3
+            kind: gtk
+            gtk: 'gtk3'
+            qt: 'false'
+          - label: gtk4
+            kind: gtk
+            gtk: 'gtk4'
+            qt: 'false'
+          - label: qt5
+            kind: qt
+            gtk: 'false'
+            qt: 'qt5'
+          - label: qt6
+            kind: qt
+            gtk: 'false'
+            qt: 'qt6'
+    runs-on: ubuntu-24.04
     needs: what-to-make
-    if: needs.what-to-make.outputs.make-core == 'true' ||
-        needs.what-to-make.outputs.make-gtk == 'true' ||
-        needs.what-to-make.outputs.make-qt == 'true' ||
-        needs.what-to-make.outputs.make-tests == 'true'
+    if: ${{ (needs.what-to-make.outputs.make-core == 'true' ||
+         needs.what-to-make.outputs.make-gtk == 'true' ||
+         needs.what-to-make.outputs.make-qt == 'true' ||
+          needs.what-to-make.outputs.make-tests == 'true') }}
+    env:
+      MAKE_GTK: ${{ needs.what-to-make.outputs.make-gtk }}
+      MAKE_QT: ${{ needs.what-to-make.outputs.make-qt }}
+      MAKE_TESTS: ${{ needs.what-to-make.outputs.make-tests }}
+      CHANGED_CPP_FILES: ${{ needs.what-to-make.outputs.changed-cpp-files }}
+      CLANG_CONFIG_CHANGED: ${{ needs.what-to-make.outputs.clang-config-changed }}
+      CLANG_TIDY_FULL_RUN: ${{ ((github.event_name == 'push' && github.ref_name == 'main') || needs.what-to-make.outputs.clang-config-changed == '1') && '1' || '0' }}
     steps:
       - name: Show Configuration
         run: |
+          set -euo pipefail
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           echo "RUNNER_OS=${RUNNER_OS}"
@@ -271,15 +304,44 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Determine variant enablement
+        id: variant
+        env:
+          VARIANT_KIND: ${{ matrix.kind }}
+          MAKE_GTK: ${{ needs.what-to-make.outputs.make-gtk }}
+          MAKE_QT: ${{ needs.what-to-make.outputs.make-qt }}
+        run: |
+          set -euo pipefail
+          enabled=0
+          case "${VARIANT_KIND}" in
+            core)
+              if [ "${MAKE_GTK}" != 'true' ] && [ "${MAKE_QT}" != 'true' ]; then
+                enabled=1
+              fi
+              ;;
+            gtk)
+              if [ "${MAKE_GTK}" = 'true' ]; then
+                enabled=1
+              fi
+              ;;
+            qt)
+              if [ "${MAKE_QT}" = 'true' ]; then
+                enabled=1
+              fi
+              ;;
+          esac
+          echo "enabled=${enabled}" >> "$GITHUB_OUTPUT"
       - name: Get Dependencies
+        if: steps.variant.outputs.enabled == '1'
         uses: ./.github/actions/install-deps
         with:
           compiler: clang
           enable-clang-tidy: true
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk3' || 'false' }}
-          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
+          enable-gtk: ${{ matrix.gtk }}
+          enable-qt: ${{ matrix.qt }}
           use-sudo: true
       - name: Configure
+        if: steps.variant.outputs.enabled == '1'
         run: |
           cmake \
             -S . \
@@ -289,9 +351,9 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_GTK=${{ needs.what-to-make.outputs.make-gtk == 'true' && 'ON' || 'OFF' }} \
-            -DENABLE_QT=${{ needs.what-to-make.outputs.make-qt == 'true' && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ matrix.gtk != 'false' && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ matrix.qt != 'false' && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ env.MAKE_TESTS == 'true' && 'ON' || 'OFF' }} \
             -DRUN_CLANG_TIDY=OFF \
             -DCMAKE_CXX_CLANG_TIDY="bash;$PWD/.github/scripts/clang-tidy-gate.sh;clang-tidy-20" \
             -DUSE_SYSTEM_DEFAULT=ON \
@@ -300,54 +362,53 @@ jobs:
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
-      - name: Determine clang-tidy scope
+      - name: Determine clang-tidy mode
+        if: steps.variant.outputs.enabled == '1'
         run: |
-          # Run clang-tidy on everything when pushing to main or when .clang-tidy config changes.
-          # Otherwise, run clang-tidy only on changed C/C++ files.
-          if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then
-            full_run=1
-          elif [ '${{ needs.what-to-make.outputs.clang-config-changed }}' = '1' ]; then
-            full_run=1
-          else
-            full_run=0
-          fi
-          echo "CLANG_TIDY_FULL_RUN=${full_run}" >> "$GITHUB_ENV"
-
           set -euo pipefail
+          echo "CLANG_TIDY_FULL_RUN=${CLANG_TIDY_FULL_RUN}"
+
+      - name: Determine clang-tidy targets
+        id: compute-targets
+        if: steps.variant.outputs.enabled == '1'
+        run: |
+          set -euo pipefail
+
           jobs="$(nproc)"
           if [ "$jobs" -gt 8 ]; then jobs=8; fi
 
           # Prime objects quickly before incremental clang-tidy pass.
           targets=(transmission transmission-app)
-          if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
+          if [ "${MAKE_TESTS}" = 'true' ]; then
             targets+=(libtransmission-test)
           fi
-          if [ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ]; then
+          if [ '${{ matrix.gtk }}' != 'false' ]; then
             targets+=(transmission-gtk)
           fi
-          if [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
+          if [ '${{ matrix.qt }}' != 'false' ]; then
             targets+=(transmission-qt qt-tests)
           fi
 
-          build_args=(--build obj --config Debug --parallel "$jobs" --target "${targets[@]}")
           {
-            echo 'CLANG_TIDY_BUILD_ARGS<<EOF'
-            printf '%s\n' "${build_args[@]}"
+            echo "jobs=${jobs}"
+            echo 'targets<<EOF'
+            printf '%s\n' "${targets[@]}"
             echo 'EOF'
-          } >> "$GITHUB_ENV"
+          } >> "$GITHUB_OUTPUT"
       - name: Make (No clang-tidy)
-        if: env.CLANG_TIDY_FULL_RUN != '1'
+        if: steps.variant.outputs.enabled == '1' && env.CLANG_TIDY_FULL_RUN != '1'
         run: |
           set -euo pipefail
           : > makelog
-          mapfile -t build_args < <(printf '%s\n' "$CLANG_TIDY_BUILD_ARGS" | sed '/^$/d')
-          TR_CLANG_TIDY_ENABLE=0 cmake "${build_args[@]}" 2>&1 | tee -a makelog
+          jobs='${{ steps.compute-targets.outputs.jobs }}'
+          mapfile -t targets < <(printf '%s\n' '${{ steps.compute-targets.outputs.targets }}' | sed '/^$/d')
+          TR_CLANG_TIDY_ENABLE=0 cmake --build obj --config Debug --parallel "$jobs" --target "${targets[@]}" 2>&1 | tee -a makelog
       - name: Touch changed files for incremental clang-tidy
-        if: env.CLANG_TIDY_FULL_RUN != '1'
+        if: steps.variant.outputs.enabled == '1' && env.CLANG_TIDY_FULL_RUN != '1'
         run: |
           set -euo pipefail
           # Touch changed files so only affected code is rebuilt/tidied.
-          changed_cpp_files='${{ needs.what-to-make.outputs.changed-cpp-files }}'
+          changed_cpp_files="${CHANGED_CPP_FILES}"
           mapfile -t changed_cpp_array < <(printf '%s\n' "$changed_cpp_files" | sed '/^$/d')
 
           if [ "${#changed_cpp_array[@]}" -gt 0 ]; then
@@ -358,12 +419,16 @@ jobs:
           printf '%s\n' "${#changed_cpp_array[@]}"
           printf '%s\n' "${changed_cpp_array[@]}"
       - name: Make (clang-tidy)
+        if: steps.variant.outputs.enabled == '1'
         run: |
           set -euo pipefail
-          mapfile -t build_args < <(printf '%s\n' "$CLANG_TIDY_BUILD_ARGS" | sed '/^$/d')
-          TR_CLANG_TIDY_ENABLE=1 cmake "${build_args[@]}" 2>&1 | tee -a makelog
+          jobs='${{ steps.compute-targets.outputs.jobs }}'
+          mapfile -t targets < <(printf '%s\n' '${{ steps.compute-targets.outputs.targets }}' | sed '/^$/d')
+          TR_CLANG_TIDY_ENABLE=1 cmake --build obj --config Debug --parallel "$jobs" --target "${targets[@]}" 2>&1 | tee -a makelog
       - name: Test for warnings
+        if: steps.variant.outputs.enabled == '1'
         run: |
+          set -euo pipefail
           if grep 'warning:' makelog; then exit 1; fi
 
   clang-tidy-libtransmission-win32:
