@@ -806,6 +806,7 @@ bool FileList::Impl::onViewButtonPressed(guint button, TrGdkModifierType state, 
     bool handled = false;
 
     if (button == GDK_BUTTON_PRIMARY &&
+        // NOLINTNEXTLINE(hicpp-signed-bitwise)
         (state & (TR_GDK_MODIFIED_TYPE(SHIFT_MASK) | TR_GDK_MODIFIED_TYPE(CONTROL_MASK))) == TrGdkModifierType{} &&
         getAndSelectEventPath(view_x, view_y, col, path))
     {

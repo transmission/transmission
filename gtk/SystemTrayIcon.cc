@@ -73,7 +73,7 @@ public:
     void refresh();
 
 private:
-    void activated();
+    static void activated();
     void popup(guint button, guint when);
 
     [[nodiscard]] std::string make_tooltip_text() const;
@@ -190,7 +190,7 @@ SystemTrayIcon::Impl::Impl([[maybe_unused]] Gtk::Window& main_window, Glib::RefP
     app_indicator_set_title(indicator_, Glib::get_application_name().c_str());
 #elif defined(TR_SYS_TRAY_IMPL_STATUS_ICON)
     icon_ = Gtk::StatusIcon::create(icon_name);
-    icon_->signal_activate().connect(sigc::mem_fun(*this, &Impl::activated));
+    icon_->signal_activate().connect(&Impl::activated);
     icon_->signal_popup_menu().connect(sigc::mem_fun(*this, &Impl::popup));
 #endif
 }
