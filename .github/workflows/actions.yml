@@ -6,6 +6,11 @@ on:
   pull_request:
     branches:
       - 'main'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 env:
   GTEST_OUTPUT: xml:./
 jobs:
@@ -743,7 +748,7 @@ jobs:
           name: source-tarball
           path: obj/transmission*.tar.*
 
-  macos-from-tarball:
+  macos:
     strategy:
       fail-fast: false
       matrix:
@@ -827,96 +832,29 @@ jobs:
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ matrix.os }}-from-tarball
+          name: binaries-${{ matrix.os }}
           path: pfx/**/*
 
-  debian-11-from-tarball:
-    needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-latest
-    container:
-      image: debian:11-slim
-    steps:
-      - name: Show Configuration
-        run: |
-          echo '${{ toJSON(needs) }}'
-          echo '${{ toJSON(runner) }}'
-          cat /etc/os-release
-      - name: Get Composite Actions
-        uses: actions/checkout@v6
-        with:
-          sparse-checkout: |
-            .github/actions
-          sparse-checkout-cone-mode: false
-      - name: Get Dependencies
-        uses: ./.github/actions/install-deps
-        with:
-          compiler: gcc
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk3' || 'false' }}
-          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
-          use-sudo: false
-      - name: Get NPM
-        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
-      - name: Get Source
-        uses: actions/download-artifact@v7
-        with:
-          name: source-tarball
-      - name: Extract Source
-        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
-      - name: Configure
-        run: |
-          cmake \
-            -S src \
-            -B obj \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_GTEST=ON \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian 11` \
-            -DUSE_SYSTEM_FAST_FLOAT=OFF `# Not packaged in Debian 11` \
-            -DUSE_SYSTEM_FMT=OFF `# Debian 11 package too old` \
-            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Debian 11` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian 11` \
-            -DUSE_SYSTEM_UTF8CPP=OFF `# Debian 11 package too old` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian 11` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Debian 11`
-      - name: Build
-        run: cmake --build obj --config RelWithDebInfo
-      - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        uses: ./.github/actions/run-tests
-        with:
-          build-dir: obj
-          build-config: RelWithDebInfo
-      - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
-      - uses: actions/upload-artifact@v6
-        with:
-          name: binaries-${{ github.job }}
-          path: pfx/**/*
-
-  debian-from-tarball:
+  debian:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        version: [stable, unstable]
+        include:
+          - version: oldoldstable
+            gtk: gtk3
+            qt: qt5
+            use-legacy-packages: true
+          - version: stable
+            gtk: gtk4
+            qt: qt6
+            use-legacy-packages: false
+          - version: unstable
+            gtk: gtk4
+            qt: qt6
+            use-legacy-packages: false
     container:
       image: debian:${{ matrix.version }}-slim
     steps:
@@ -925,6 +863,13 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
+      - name: Warn if oldoldstable moved past Debian 11
+        if: ${{ matrix.version == 'oldoldstable' }}
+        run: |
+          . /etc/os-release
+          if [ "$VERSION_ID" != '11' ]; then
+            echo "::warning title=Debian oldoldstable changed::debian:oldoldstable currently resolves to Debian $VERSION_ID. Consider removing matrix.use-legacy-packages if legacy package workarounds are no longer needed."
+          fi
       - name: Get Composite Actions
         uses: actions/checkout@v6
         with:
@@ -935,8 +880,8 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: gcc
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk4' || 'false' }}
-          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && matrix.gtk || 'false' }}
+          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && matrix.qt || 'false' }}
           use-sudo: false
       - name: Get NPM
         if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
@@ -951,7 +896,7 @@ jobs:
         run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Configure
         run: |
-          cmake \
+          set -- \
             -S src \
             -B obj \
             -G Ninja \
@@ -969,11 +914,20 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_GTEST=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Debian` \
-            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Debian` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Debian` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Debian` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Debian`
+            -DUSE_SYSTEM_DHT=OFF \
+            -DUSE_SYSTEM_SIGSLOT=OFF \
+            -DUSE_SYSTEM_SMALL=OFF \
+            -DUSE_SYSTEM_UTP=OFF \
+            -DUSE_SYSTEM_WIDE_INTEGER=OFF
+
+          if [ '${{ matrix.use-legacy-packages }}' = 'true' ]; then
+            set -- "$@" \
+              -DUSE_SYSTEM_FAST_FLOAT=OFF \
+              -DUSE_SYSTEM_FMT=OFF \
+              -DUSE_SYSTEM_UTF8CPP=OFF
+          fi
+
+          cmake "$@"
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -989,14 +943,14 @@ jobs:
           name: binaries-${{ github.job }}-${{ matrix.version }}
           path: pfx/**/*
 
-  fedora-from-tarball:
+  fedora:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        version: [ 42, 43, 44 ]
+        version: [ latest, rawhide ]
     container:
       image: fedora:${{ matrix.version }}
     steps:
@@ -1068,14 +1022,10 @@ jobs:
           name: binaries-${{ github.job }}-${{ matrix.version }}
           path: pfx/**/*
 
-  ubuntu-24-04-from-tarball:
+  utp-disabled:
     needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        enable-utp: [true, false]
+    if: ${{ needs.what-to-make.outputs.make-core == 'true' }}
+    runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
         run: |
@@ -1094,8 +1044,6 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk3' || 'false' }}
-          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt5' || 'false' }}
           use-sudo: true
       - name: Get NPM
         if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
@@ -1118,15 +1066,15 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=OFF \
+            -DENABLE_DAEMON=OFF \
+            -DENABLE_GTK=OFF \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=OFF \
             -DENABLE_TESTS=OFF \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTP=${{ matrix.enable-utp && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=ON \
+            -DENABLE_UTP=OFF \
+            -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
@@ -1253,7 +1201,7 @@ jobs:
       - name: Make
         run: cmake --build obj --config RelWithDebInfo -- "-k 0"
 
-  freebsd-from-tarball:
+  freebsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
@@ -1265,19 +1213,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release:
-          - '15.0'
-          - '14.3'
         arch:
           - x86_64
           - aarch64
-        crypto:
-          - cmake: openssl
-            port: ''
-          - cmake: wolfssl
-            port: wolfssl
-          - cmake: mbedtls
-            port: mbedtls3
         is-pull-request:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
@@ -1297,7 +1235,6 @@ jobs:
         uses: vmactions/freebsd-vm@v1
         with:
           usesh: true
-          release: ${{ matrix.release }}
           arch: ${{ matrix.arch }}
           prepare: |
             set -ex
@@ -1323,8 +1260,7 @@ jobs:
               pkgconf \
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
               rapidjson \
-              utf8cpp \
-              `echo ${{ matrix.crypto.port }}`
+              utf8cpp
           run: |
             set -ex
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
@@ -1348,7 +1284,7 @@ jobs:
               -DUSE_SYSTEM_SMALL=OFF `# Not packaged in FreeBSD` \
               -DUSE_SYSTEM_UTP=OFF `# Not packaged in FreeBSD` \
               -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in FreeBSD` \
-              -DWITH_CRYPTO=${{ matrix.crypto.cmake }}
+              -DWITH_CRYPTO=openssl
             cmake --build obj --config RelWithDebInfo
             if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
               QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
@@ -1357,10 +1293,97 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.crypto.cmake }}
+          name: binaries-${{ github.job }}-${{ matrix.arch }}
           path: pfx/**/*
 
-  openbsd-from-tarball:
+  crypto:
+    needs: [ make-source-tarball, what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-core == 'true' && needs.what-to-make.outputs.make-tests == 'true' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crypto:
+          - cmake: openssl
+            apt: libssl-dev
+          - cmake: wolfssl
+            apt: libwolfssl-dev
+          - cmake: mbedtls
+            apt: libmbedtls-dev
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Composite Actions
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .github/actions
+          sparse-checkout-cone-mode: false
+      - name: Get Dependencies
+        uses: ./.github/actions/install-deps
+        with:
+          compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
+          enable-gtk: false
+          enable-qt: false
+          use-sudo: true
+      - name: Install Crypto Library
+        run: sudo apt-get install -y --no-install-recommends ${{ matrix.crypto.apt }}
+      - name: Get NPM
+        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+      - name: Get Source
+        uses: actions/download-artifact@v7
+        with:
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=OFF \
+            -DENABLE_DAEMON=OFF \
+            -DENABLE_GTK=OFF \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=OFF \
+            -DENABLE_TESTS=ON \
+            -DENABLE_UTILS=ON \
+            -DENABLE_WERROR=ON \
+            -DREBUILD_WEB=OFF \
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu` \
+            -DWITH_CRYPTO=${{ matrix.crypto.cmake }}
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        uses: ./.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: RelWithDebInfo
+      - name: Install
+        run: cmake --install obj --config RelWithDebInfo --strip
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.crypto.cmake }}
+          path: pfx/**/*
+
+  openbsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
@@ -1372,8 +1395,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release:
-          - '7.8'
         arch:
           - x86_64
           - aarch64
@@ -1396,7 +1417,6 @@ jobs:
         uses: vmactions/openbsd-vm@v1
         with:
           usesh: true
-          release: ${{ matrix.release }}
           arch: ${{ matrix.arch }}
           prepare: |
             set -ex
@@ -1453,10 +1473,10 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
+          name: binaries-${{ github.job }}-${{ matrix.arch }}
           path: pfx/**/*
 
-  netbsd-from-tarball:
+  netbsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
@@ -1468,8 +1488,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release:
-          - '10.1'
         arch:
           - vmactions: x86_64
             binary-set: amd64
@@ -1495,7 +1513,6 @@ jobs:
         uses: vmactions/netbsd-vm@v1
         with:
           usesh: true
-          release: ${{ matrix.release }}
           arch: ${{ matrix.arch.vmactions }}
           prepare: |
             set -ex
@@ -1560,10 +1577,10 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch.vmactions }}
+          name: binaries-${{ github.job }}-${{ matrix.arch.vmactions }}
           path: pfx/**/*
 
-  dragonflybsd-from-tarball:
+  dragonflybsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
@@ -1575,8 +1592,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release:
-          - '6.4.2'
         arch:
           - x86_64
     runs-on: ubuntu-latest
@@ -1593,7 +1608,6 @@ jobs:
         uses: vmactions/dragonflybsd-vm@v1
         with:
           usesh: true
-          release: ${{ matrix.release }}
           arch: ${{ matrix.arch }}
           prepare: |
             set -ex
@@ -1656,5 +1670,5 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
+          name: binaries-${{ github.job }}-${{ matrix.arch }}
           path: pfx/**/*
