@@ -583,7 +583,8 @@ if(ENABLE_UCHARDET)
         TARGET uchardet::uchardet
         CMAKE_ARGS
             -DBUILD_BINARY:BOOL=OFF
-            -DBUILD_SHARED_LIBS:BOOL=OFF)
+            -DBUILD_SHARED_LIBS:BOOL=OFF
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5)
     if(NOT WIN32)
         find_package(Iconv REQUIRED)
         if(Iconv_IS_BUILT_IN)
