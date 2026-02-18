@@ -4,7 +4,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-// This file defines the C++ wrapper for the GNU libc iconv library.
+// This file defines the C++ wrapper for the POSIX iconv interface.
 
 #pragma once
 
@@ -12,6 +12,17 @@
 #include <string_view>
 #include <vector>
 
+// On FreeBSD (and other BSDs), iconv is built into libc. However, GNU libiconv
+// may also be installed as a dependency of other ports (e.g. gettext, glib).
+// If the GNU libiconv header gets picked up, it redefines iconv_open() etc.
+// to libiconv_open() etc., causing link failures against libc. LIBICONV_PLUG
+// disables that renaming so the standard POSIX symbols are always used.
+// On Linux/glibc this define is a harmless no-op.
+// See: https://github.com/transmission/transmission/issues/4547
+//      FreeBSD ports Mk/Uses/iconv.mk
+#ifndef LIBICONV_PLUG
+#define LIBICONV_PLUG 1
+#endif
 #include <iconv.h>
 
 class IconvWrapper
