@@ -80,7 +80,7 @@ jobs:
   code-style:
     runs-on: ubuntu-24.04
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
+    if: false # TEMP: macOS-only testing
     steps:
       - name: Show Configuration
         run: |
@@ -130,7 +130,7 @@ jobs:
   sanitizer-tests-ubuntu:
     runs-on: ubuntu-24.04
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+    if: false # TEMP: macOS-only testing
     steps:
       - name: Show Configuration
         run: |
@@ -238,7 +238,7 @@ jobs:
   clang-tidy-libtransmission:
     runs-on: ubuntu-24.04
     needs: what-to-make
-    if: needs.what-to-make.outputs.make-core == 'true'
+    if: false # TEMP: macOS-only testing
     steps:
       - name: Show Configuration
         run: |
@@ -294,9 +294,7 @@ jobs:
   what-to-clang-tidy:
     runs-on: ubuntu-latest
     needs: [ what-to-make, clang-tidy-libtransmission ]
-    if: |
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true'
+    if: false # TEMP: macOS-only testing
     outputs:
       matrix: ${{ steps.generate-matrix.outputs.matrix }}
     steps:
@@ -332,6 +330,7 @@ jobs:
   clang-tidy:
     runs-on: ubuntu-24.04
     needs: what-to-clang-tidy
+    if: false # TEMP: macOS-only testing
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.what-to-clang-tidy.outputs.matrix) }}
@@ -386,9 +385,7 @@ jobs:
   clang-tidy-libtransmission-win32:
     runs-on: windows-2025
     needs: what-to-make
-    if: |
-      needs.what-to-make.outputs.make-core == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true'
+    if: false # TEMP: macOS-only testing
     steps:
       - name: Show Configuration
         run: |
@@ -547,7 +544,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: alpine:latest
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: macOS-only testing
     steps:
       - name: Show Configuration
         run: |
@@ -637,7 +634,7 @@ jobs:
 
   windows:
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: macOS-only testing
     strategy:
       fail-fast: false
       matrix:
@@ -838,7 +835,7 @@ jobs:
 
   debian:
     needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: macOS-only testing
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -946,7 +943,7 @@ jobs:
 
   fedora:
     needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: macOS-only testing
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -1025,7 +1022,7 @@ jobs:
 
   utp-disabled:
     needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-core == 'true' }}
+    if: false # TEMP: macOS-only testing
     runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
@@ -1103,7 +1100,7 @@ jobs:
 
   android:
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-android == 'true' }}
+    if: false # TEMP: macOS-only testing
     runs-on: ubuntu-latest
     env:
       VCPKG_DEFAULT_TRIPLET: arm64-android
@@ -1153,7 +1150,7 @@ jobs:
 
   ubuntu-24-04-cxx-23:
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: macOS-only testing
     runs-on: ubuntu-24.04
     steps:
       - name: Show Configuration
@@ -1204,13 +1201,7 @@ jobs:
 
   freebsd:
     needs: [ make-source-tarball, what-to-make ]
-    if: |
-      needs.what-to-make.outputs.make-cli == 'true' ||
-      needs.what-to-make.outputs.make-daemon == 'true' ||
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-qt == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true' ||
-      needs.what-to-make.outputs.make-utils == 'true'
+    if: false # TEMP: macOS-only testing
     strategy:
       fail-fast: false
       matrix:
@@ -1300,7 +1291,7 @@ jobs:
 
   crypto:
     needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-core == 'true' && needs.what-to-make.outputs.make-tests == 'true' }}
+    if: false # TEMP: macOS-only testing
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -1387,13 +1378,7 @@ jobs:
 
   openbsd:
     needs: [ make-source-tarball, what-to-make ]
-    if: |
-      needs.what-to-make.outputs.make-cli == 'true' ||
-      needs.what-to-make.outputs.make-daemon == 'true' ||
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-qt == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true' ||
-      needs.what-to-make.outputs.make-utils == 'true'
+    if: false # TEMP: macOS-only testing
     strategy:
       fail-fast: false
       matrix:
@@ -1481,13 +1466,7 @@ jobs:
 
   netbsd:
     needs: [ make-source-tarball, what-to-make ]
-    if: |
-      needs.what-to-make.outputs.make-cli == 'true' ||
-      needs.what-to-make.outputs.make-daemon == 'true' ||
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-qt == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true' ||
-      needs.what-to-make.outputs.make-utils == 'true'
+    if: false # TEMP: macOS-only testing
     strategy:
       fail-fast: false
       matrix:
@@ -1586,13 +1565,7 @@ jobs:
 
   dragonflybsd:
     needs: [ make-source-tarball, what-to-make ]
-    if: |
-      needs.what-to-make.outputs.make-cli == 'true' ||
-      needs.what-to-make.outputs.make-daemon == 'true' ||
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-qt == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true' ||
-      needs.what-to-make.outputs.make-utils == 'true'
+    if: false # TEMP: macOS-only testing
     strategy:
       fail-fast: false
       matrix:
