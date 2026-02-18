@@ -399,4 +399,4 @@
 "pgY-W3-HdI.title" = "Ustaw domyślną aplikację";
 
 /* Class = "NSButtonCell"; title = "Verify data when download completes"; ObjectID = "wM8-cD-WAB"; */
-"wM8-cD-WAB.title" = "Zweryfikuj dane po zakończeniu pobierania";
+"wM8-cD-WAB.title" = "Sprawdzanie poprawności danych po ukończeniu pobierania";

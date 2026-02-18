@@ -156,7 +156,7 @@
 "1276.title" = "Karşıya yükleme hızı:";
 
 /* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
-"1277.title" = "İndirme oranı:";
+"1277.title" = "İndirme hızı:";
 
 /* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
 "1278.title" = "Hız Sınırı, Genel Bant Genişliğini etkisiz kılar";
@@ -399,4 +399,4 @@
 "pgY-W3-HdI.title" = "Saptanmış Uygulamayı Belirle";
 
 /* Class = "NSButtonCell"; title = "Verify data when download completes"; ObjectID = "wM8-cD-WAB"; */
-/* "wM8-cD-WAB.title" = ""; */
+"wM8-cD-WAB.title" = "İndirme tamamlandığında veriyi doğrula";

@@ -13,8 +13,8 @@
 # 普鲁文 <pluwen@gmail.com>, 2024
 # YFdyh000 <yfdyh000@gmail.com>, 2024
 # watchout, 2025
-# Mike Gelfand <mikedld@mikedld.com>, 2025
 # Phonebook3599, 2026
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -23,7 +23,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Phonebook3599, 2026\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -1251,7 +1251,7 @@ msgstr "启动 Transmission 时最小化"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "文件(_F)"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1307,7 +1307,7 @@ msgstr "首选项(_P)"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "种子(_T)"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1343,7 +1343,7 @@ msgstr "向 Tracker 请求更多节点(_M)"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "队列(_Q)"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1391,7 +1391,7 @@ msgstr "移除并删除文件(_D)"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "查看(_V)"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1475,7 +1475,7 @@ msgstr "关于(_A)"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "排列种子(_S)"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

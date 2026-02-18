@@ -8,9 +8,9 @@
 # Lock Ring <reject5514@naver.com>, 2017
 # Hugo Blackwood, 2022
 # Apparatus_Zero <aLOVEforMEDnCSnSYD@protonmail.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # VenusGirl❤ <venusgirl@outlook.com>, 2023
 # Tony Kim, 2024
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Tony Kim, 2024\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Korean (https://app.transifex.com/transmissionbt/teams/33778/ko/)\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -1217,7 +1217,7 @@ msgstr "트랜스미션을 창이 최소화된 상태로 시작하기"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "파일(_F)"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1273,7 +1273,7 @@ msgstr ""
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "토렌트(_T)"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1309,7 +1309,7 @@ msgstr "더 많은 피어를 트래커에 요청(_M)"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "대기열(_Q)"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1357,7 +1357,7 @@ msgstr "파일을 삭제하고 목록에서 제거(_D)"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "보기(_V)"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1441,7 +1441,7 @@ msgstr "정보(_A)"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "다음 기준으로 토렌트 정렬(_S)"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

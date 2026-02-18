@@ -319,6 +319,7 @@ set_source_files_properties(
         MACOSX_PACKAGE_LOCATION Resources)
 
 set(LINGUAS
+    bg
     da
     de
     en

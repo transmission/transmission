@@ -5,10 +5,10 @@
 #
 # Translators:
 # 553bfca145c93e26efcabc21d311cd2f, 2020
-# Josef Andersson <janderssonse@proton.me>, 2022
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2025
-# Daniel, 2026
+# Karl Jonatan Nyberg, 2026
+# Josef Andersson <janderssonse@proton.me>, 2026
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Daniel, 2026\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Swedish (https://app.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -146,7 +146,7 @@ msgstr "Copyright © The Transmission Project"
 #. dialog
 #: ../gtk/Application.cc:1403
 msgid "translator-credits"
-msgstr "Transifex-bidragsgivare https://app.transifex.com/transmissionbt/transmissionbt"
+msgstr "Transifex-bidragsgivare https://explore.transifex.com/transmissionbt/transmissionbt/"
 
 #: ../gtk/DetailsDialog.cc:476 ../gtk/DetailsDialog.cc:494
 msgid "Use global settings"
@@ -1238,7 +1238,7 @@ msgstr "Starta Transmission minimerad"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Arkiv"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1294,7 +1294,7 @@ msgstr "_Inställningar"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1330,7 +1330,7 @@ msgstr "Fråga spårare efter f_ler jämlikar"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_Kö"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1378,7 +1378,7 @@ msgstr "_Ta bort torrent och dess filer"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Visa"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1462,7 +1462,7 @@ msgstr "_Om"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Sortera torrenter efter"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

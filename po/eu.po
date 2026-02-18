@@ -7,10 +7,10 @@
 # Xabier Martin <Iparra@iparra.eus>, 2020
 # Gorka Azkarate Zubiaur <gorkaazkarate@gmail.com>, 2022
 # Sendoa Sojo <sendoasojo@gmail.com>, 2022
-# Xabier Aramendi <azpidatziak@gmail.com>, 2022
-# Alexander Gabilondo <alexgabi@disroot.org>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2023
-# Iñigo Zendegi Urzelai, 2023
+# Iñigo Zendegi Urzelai, 2026
+# Mike Gelfand <mikedld@mikedld.com>, 2026
+# Xabier Aramendi <azpidatziak@gmail.com>, 2026
+# Alexander Gabilondo <alexgabi@disroot.org>, 2026
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Iñigo Zendegi Urzelai, 2023\n"
+"Last-Translator: Alexander Gabilondo <alexgabi@disroot.org>, 2026\n"
 "Language-Team: Basque (https://app.transifex.com/transmissionbt/teams/33778/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -61,7 +61,7 @@ msgstr "Berriz kargatzea atzeratzen saioa guztiz hasi bitartean."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "Ezin izan da birkargatu: ezin izan da uneko ordu monotonikoa lortu: {errmsg}({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
@@ -847,35 +847,35 @@ msgstr "Blokeo-zerrenda berria jasotzen…"
 #: ../gtk/PrefsDialog.cc:955
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "ezezaguna"
 
 #: ../gtk/PrefsDialog.cc:957
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "egiaztatzen..."
 
 #: ../gtk/PrefsDialog.cc:959
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "ireki"
 
 #: ../gtk/PrefsDialog.cc:961
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "itxita"
 
 #: ../gtk/PrefsDialog.cc:963
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "errore"
 
 #: ../gtk/PrefsDialog.cc:976
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "Egoera: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:978
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "Egoera: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -909,7 +909,7 @@ msgstr "Mahaigainaren hibernatzea onartzen"
 
 #: ../gtk/Session.cc:1220
 msgid "Couldn't find pending RPC request for id {id}"
-msgstr ""
+msgstr "Ezin izan da aurkitu zain dagoen {id} IDaren RPC eskaera"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -1173,7 +1173,7 @@ msgstr "Exekutatu '{program} --help' eskuragarri dagoen komando-lerro bidezko au
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1193,7 +1193,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1250,7 +1250,7 @@ msgstr "Abiarazi Transmission minimizatua"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Agiria"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1306,7 +1306,7 @@ msgstr "_Hobespenak"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrenta"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1342,7 +1342,7 @@ msgstr "Galdetu Aztarnariari _Pare Gehiagorako"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_Lerroa"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1390,7 +1390,7 @@ msgstr "_Ezabatu fitxategiak eta kendu"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Ikusi"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1474,7 +1474,7 @@ msgstr "_Honi buruz"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Antolatu torrentak honela:"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -1582,7 +1582,7 @@ msgstr "Kideak"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:773 ../gtk/ui/gtk4/DetailsDialog.ui:587
 msgid "Show _backup trackers"
-msgstr "Erakutsi _babeskopiako aztarnariak"
+msgstr "Erakutsi _segurtasun-kopiako aztarnariak"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:834 ../gtk/ui/gtk4/DetailsDialog.ui:627
 msgid "File listing not available for combined torrent properties"
@@ -2126,7 +2126,7 @@ msgstr "Errore ezezaguna"
 
 #: ../libtransmission/announcer-udp.cc:423
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "{ip_protocol} konexioak huts egin du"
 
 #: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
@@ -2134,7 +2134,7 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:898
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Iragarpen errorea: {error}({url})"
 
 #: ../libtransmission/announcer.cc:910
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
@@ -2183,11 +2183,11 @@ msgstr ""
 
 #: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
-msgstr ""
+msgstr "Ezin izan da iturburu helbidea lortu IP protokolo batean, ezin da sareko konexiorik lortu"
 
 #: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Zure gailuak ez du {protocol} protokoloa onartzen"
 
 #: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"

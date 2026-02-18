@@ -8,9 +8,9 @@
 # Kristóf Korcsog <kristofkorcsog@gmail.com>, 2020
 # c2e331a438add123670fbf39846b5de3_8c31b08 <d7888a78469511cd116b0058dd23f760_811520>, 2022
 # Béla Bajza, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2023
-# Anon, 2024
 # Balázs Meskó <meskobalazs@mailbox.org>, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2026
+# Anon, 2026
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2025\n"
+"Last-Translator: Anon, 2026\n"
 "Language-Team: Hungarian (https://app.transifex.com/transmissionbt/teams/33778/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -1273,7 +1273,7 @@ msgstr "A Transmission indítása minimalizálva"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Fájl"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1329,7 +1329,7 @@ msgstr "_Beállítások"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1365,7 +1365,7 @@ msgstr "Több partner kérése a tr_ackertől"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_Sorrend"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1413,7 +1413,7 @@ msgstr "Fájlok törlése és eltáv_olítás"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Nézet"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1497,7 +1497,7 @@ msgstr "_Névjegy"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "T_orrentek rendezése:"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

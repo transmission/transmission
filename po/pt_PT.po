@@ -5,10 +5,10 @@
 #
 # Translators:
 # Gonçalo Matos, 2022
-# 7c6417e89b22a8ff879ae1c785868b50_dffeeef <c09a75da091a7c844bae1ff96a7d87ea_606937>, 2022
-# Rui <xymarior@yandex.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
-# Hugo Carvalho <hugokarvalho@hotmail.com>, 2025
+# 7c6417e89b22a8ff879ae1c785868b50_dffeeef <c09a75da091a7c844bae1ff96a7d87ea_606937>, 2026
+# Hugo Carvalho <hugokarvalho@hotmail.com>, 2026
+# Rui <xymarior@yandex.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>, 2025\n"
+"Last-Translator: Rui <xymarior@yandex.com>, 2026\n"
 "Language-Team: Portuguese (Portugal) (https://app.transifex.com/transmissionbt/teams/33778/pt_PT/)\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
@@ -1276,7 +1276,7 @@ msgstr "Iniciar o Transmission minimizado"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Ficheiro"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1332,7 +1332,7 @@ msgstr "_Preferências"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1368,7 +1368,7 @@ msgstr "Pedir ao rastreador _mais pares"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "F_ila"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1416,7 +1416,7 @@ msgstr "_Eliminar Ficheiros e Remover"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Vista"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1500,7 +1500,7 @@ msgstr "_Acerca"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Ordenar Torrents por"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

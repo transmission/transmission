@@ -1,0 +1,27 @@
+/* quicklook file header */
+"%lu Files" = "%lu Файла";
+
+/* quicklook file count */
+"%lu files" = "%lu файла";
+
+/* quicklook tracker header */
+"%lu Trackers" = "%lu Тракери";
+
+/* quicklook web seed header */
+"%lu Web Seeds" = "%lu Уеб сийдъри";
+
+/* quicklook tracker header */
+"1 Tracker" = "1 Тракер";
+
+/* quicklook web seed header */
+"1 Web Seed" = "1 Уеб сийдър";
+
+/* quicklook creation info */
+"Created on %@" = "Създаден на %@";
+
+/* quicklook creation info */
+"Created on %@ with %@" = "Създаден на %1$@ с %2$@";
+
+/* quicklook creation info */
+"Created with %@" = "Създаден с %@";
+

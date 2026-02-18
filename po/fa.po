@@ -5,7 +5,7 @@
 #
 # Translators:
 # Danial Behzadi <dani.behzi@ubuntu.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Persian (https://app.transifex.com/transmissionbt/teams/33778/fa/)\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
@@ -1238,7 +1238,7 @@ msgstr ""
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "پرونده"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1294,7 +1294,7 @@ msgstr "_ترجیحات"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "تورنت"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1330,7 +1330,7 @@ msgstr "درخواست جفت‌ها بیش‌تر از ردیاب"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "صف"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1378,7 +1378,7 @@ msgstr "حذف پرونده‌ها و برداشتن"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "نما"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1462,7 +1462,7 @@ msgstr "_درباره"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "چینش تورنت‌ها بر پایهٔ"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

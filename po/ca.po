@@ -5,9 +5,9 @@
 #
 # Translators:
 # Joan Montané, 2020
-# Robert Antoni Buj i Gelonch <rbuj@fedoraproject.org>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2023
 # Carlos Sánchez López <erielkhan@gmail.com>, 2024
+# Mike Gelfand <mikedld@mikedld.com>, 2026
+# Robert Antoni Buj i Gelonch <rbuj@fedoraproject.org>, 2026
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Carlos Sánchez López <erielkhan@gmail.com>, 2024\n"
+"Last-Translator: Robert Antoni Buj i Gelonch <rbuj@fedoraproject.org>, 2026\n"
 "Language-Team: Catalan (https://app.transifex.com/transmissionbt/teams/33778/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -1249,7 +1249,7 @@ msgstr "Inicia Transmission minimitzat"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Fitxer"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1305,7 +1305,7 @@ msgstr "_Preferències"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1341,7 +1341,7 @@ msgstr "Demana _més clients al rastrejador"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_Cua"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1389,7 +1389,7 @@ msgstr "Suprimeix i _elimina els fitxers"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Visualitza"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1473,7 +1473,7 @@ msgstr "_Quant a"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Ordena els torrents per"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

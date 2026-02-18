@@ -5,10 +5,10 @@
 #
 # Translators:
 # Ala Bala, 2018
-# Kiril Kirilov <cybercop_montana@abv.bg>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2023
 # Avel Pavlov, 2024
 # Miroslav Dragoev <miroslav.dragoev@icloud.com>, 2025
+# Kiril Kirilov <cybercop_montana@abv.bg>, 2026
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Miroslav Dragoev <miroslav.dragoev@icloud.com>, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Bulgarian (https://app.transifex.com/transmissionbt/teams/33778/bg/)\n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
@@ -1264,7 +1264,7 @@ msgstr "Стартирай Transmission минимизиран"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Файл"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1320,7 +1320,7 @@ msgstr "_Предпочитания"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Торент"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1356,7 +1356,7 @@ msgstr "Питай тракера за _повече участници"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_На опашката"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1404,7 +1404,7 @@ msgstr "_Изтрий и премахни файловете"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Изглед"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1488,7 +1488,7 @@ msgstr "_Относно"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Сортирай торентите по"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

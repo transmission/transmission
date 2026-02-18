@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Marathi (https://app.transifex.com/transmissionbt/teams/33778/mr/)\n"
 "Language: mr\n"
 "MIME-Version: 1.0\n"
@@ -1236,7 +1236,7 @@ msgstr ""
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "फाईल"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1292,7 +1292,7 @@ msgstr ""
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "टोरंट"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1328,7 +1328,7 @@ msgstr "ट्रॅकर्सला अधिक पिअर्ससाठ�
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "रांग"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1376,7 +1376,7 @@ msgstr "फाईल नष्ट करा  व काढून टाका"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "दृश्य"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1460,7 +1460,7 @@ msgstr ""
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "टोरंट क्रमवारीनुसार लावा"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

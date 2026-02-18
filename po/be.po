@@ -6,7 +6,7 @@
 # Translators:
 # Źmicier Turok <nashtlumach@gmail.com>, 2022
 # Alexander Vlasov, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Belarusian (https://app.transifex.com/transmissionbt/teams/33778/be/)\n"
 "Language: be\n"
 "MIME-Version: 1.0\n"
@@ -1324,7 +1324,7 @@ msgstr "Запусціць Transmission у згорнутым выглядзе"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Файл"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1380,7 +1380,7 @@ msgstr "_Налады"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Торэнт"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1416,7 +1416,7 @@ msgstr "За_пытаць у трэкера болей вузлоў"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_Чарга"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1464,7 +1464,7 @@ msgstr "Выдаліць _файлы і торэнт"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Выгляд"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1548,7 +1548,7 @@ msgstr "_Звесткі"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Парадкаваць торэнты паводле"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

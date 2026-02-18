@@ -6,7 +6,7 @@
 # Translators:
 # Lim Karsen, 2023
 # scootergrisen, 2025
-# Mike Gelfand <mikedld@mikedld.com>, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Danish (https://app.transifex.com/transmissionbt/teams/33778/da/)\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -1263,7 +1263,7 @@ msgstr "Start Transmission minimeret"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Fil"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1319,7 +1319,7 @@ msgstr "_Præferencer"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1355,7 +1355,7 @@ msgstr "Spørg om flere modparter fra _tracker"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_Kø"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1403,7 +1403,7 @@ msgstr "_Slet filer og fjern"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Vis"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1487,7 +1487,7 @@ msgstr "_Om"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Sortér torrents efter"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

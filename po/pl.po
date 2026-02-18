@@ -4,9 +4,9 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Piotr Drąg <piotrdrag@gmail.com>, 2024
-# Mike Gelfand <mikedld@mikedld.com>, 2025
 # Marek Adamski, 2026
+# Piotr Drąg <piotrdrag@gmail.com>, 2026
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Marek Adamski, 2026\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Polish (https://app.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +57,7 @@ msgstr "Odraczanie ponownego wczytania do czasu pełnego uruchomienia sesji."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr "Nie udało się załadować ponownie: nie udało się pobrać bieżącego czasu monotonicznego: {errmsg} ({errno})"
+msgstr "Ponowne wczytanie się nie powiodło: uzyskanie bieżącego czasu monotonicznego się nie powiodło: {errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
@@ -151,7 +151,7 @@ msgid "translator-credits"
 msgstr ""
 "Tomasz Dominikowski <dominikowski@gmail.com>, 2006, 2007\n"
 "Marek Adamski, 2022\n"
-"Piotr Drąg <piotrdrag@gmail.com>, 2008, 2017-2024\n"
+"Piotr Drąg <piotrdrag@gmail.com>, 2008, 2017-2024, 2026\n"
 "\n"
 "Launchpad Contributions:\n"
 "  Account Deactivated https://launchpad.net/~accountdeactivated\n"
@@ -971,7 +971,7 @@ msgstr "Zezwolenie na hibernację"
 
 #: ../gtk/Session.cc:1220
 msgid "Couldn't find pending RPC request for id {id}"
-msgstr "Nie można znaleźć oczekującego żądania RPC dla identyfikatora {id}"
+msgstr "Nie można odnaleźć oczekującego żądania RPC dla identyfikatora {id}"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -1356,7 +1356,7 @@ msgstr "Uruchom zminimalizowany"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Plik"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1412,7 +1412,7 @@ msgstr "_Preferencje"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1448,7 +1448,7 @@ msgstr "Wyślij zapyta_nie o więcej partnerów"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_Kolejka"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1496,7 +1496,7 @@ msgstr "_Usuń wraz z plikami"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Widok"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1580,7 +1580,7 @@ msgstr "_O programie"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Porządkowanie torrentów"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -2236,7 +2236,7 @@ msgstr "Połączenie {ip_protocol} się nie powiodło"
 
 #: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr "Nie można wyszukać „{address}:{port}” w {ip_protocol}: {error} ({error_code})"
+msgstr "Nie można wyszukać „{address}:{port}” w {ip_protocol}: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:898
 msgid "Announce error: {error} ({url})"
@@ -2293,7 +2293,7 @@ msgstr "Pomyślnie zaktualizowano adres źródłowy {protocol} na {ip}"
 
 #: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
-msgstr "Nie udało się uzyskać adresu źródłowego w żadnym protokole IP, nie ma możliwości nawiązania połączenia sieciowego"
+msgstr "Nie można uzyskać adresu źródłowego w żadnym protokole IP, nie ma możliwości nawiązania połączenia sieciowego"
 
 #: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
@@ -2417,27 +2417,27 @@ msgstr "Ścieżka do gniazda systemu UNIX nie może mieć więcej niż {count} z
 
 #: ../libtransmission/rpc-server.cc:348
 msgid "Rejected request from {host} (possible directory traversal attack)"
-msgstr "Odrzucono żądanie z {host} (możliwy atak typu directory traversal)"
+msgstr "Odrzucono żądanie z {host} (możliwy atak typu „directory traversal”)"
 
 #: ../libtransmission/rpc-server.cc:536
 msgid "Rejected request from {host} (brute force protection active)"
-msgstr "Odrzucono żądanie z {host} (aktywna ochrona przed techniką brute force)"
+msgstr "Odrzucono żądanie z {host} (aktywna ochrona przed techniką „brute force”)"
 
 #: ../libtransmission/rpc-server.cc:545
 msgid "Rejected request from {host} (IP not whitelisted)"
-msgstr "Odrzucono żądanie z {host} (adres IP nie jest na białej liście)"
+msgstr "Odrzucono żądanie z {host} (adres IP nie jest na białej liście)"
 
 #: ../libtransmission/rpc-server.cc:569
 msgid "Rejected request from {host} (failed authentication)"
-msgstr "Odrzucono żądanie z {host} (nieudana autoryzacja)"
+msgstr "Odrzucono żądanie z {host} (uwierzytelnienie się nie powiodło)"
 
 #: ../libtransmission/rpc-server.cc:611
 msgid "Rejected request from {host} (Host not whitelisted)"
-msgstr "Odrzucono żądanie z {host} (hosta nie ma na białej liście)"
+msgstr "Odrzucono żądanie z {host} (komputera nie ma na białej liście)"
 
 #: ../libtransmission/rpc-server.cc:649
 msgid "Unknown URI from {host}: '{uri}'"
-msgstr "Nieznany identyfikator URI z {host}: „{uri}”"
+msgstr "Nieznany adres URI z {host}: „{uri}”"
 
 #: ../libtransmission/rpc-server.cc:669
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
@@ -2541,7 +2541,7 @@ msgstr "Nie można użyć metainformacji z „{path}” dla „{magnet}”: {er
 
 #: ../libtransmission/torrent.cc:185
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr "Nie odnaleziono żadnych danych. Proszę się upewnić, że dyski są podłączone lub użyć opcji „Ustaw położenie”. Aby ponownie pobrać, należy użyć opcji „Sprawdź pobrane dane”, a następnie uruchomić torrent."
+msgstr "Nie odnaleziono żadnych danych. Proszę się upewnić, że dyski są podłączone lub użyć opcji „Ustaw położenie”. Aby ponownie pobrać, należy użyć opcji „Sprawdź pobrane dane”, a następnie rozpocząć torrent."
 
 #: ../libtransmission/torrent.cc:424
 msgid "Calling script '{path}'"
@@ -2581,7 +2581,7 @@ msgstr "Nie można przenieść „{old_path}” do „{path}”: {error} ({error
 
 #: ../libtransmission/torrent.cc:1563
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr "Wstrzymano torrent, ponieważ nie odnaleziono żadnych danych. Proszę się upewnić, że dyski są podłączone lub użyć opcji „Ustaw położenie”, a następnie ponownie użyć opcji „Sprawdź pobrane dane”. Aby ponownie pobrać, rozpocznij torrent."
+msgstr "Wstrzymano torrent, ponieważ nie odnaleziono żadnych danych. Proszę się upewnić, że dyski są podłączone lub użyć opcji „Ustaw położenie”, a następnie ponownie użyć opcji „Sprawdź pobrane dane”. Aby ponownie pobrać, należy rozpocząć torrent."
 
 #: ../libtransmission/torrent.cc:2069
 msgid "Tracker warning: '{warning}' ({url})"
@@ -2597,7 +2597,7 @@ msgstr "Nie można wyszukać „{address}:{port}”: {error} ({error_code})"
 
 #: ../libtransmission/tr-lpd.cc:271 ../libtransmission/tr-lpd.cc:285
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
-msgstr "Nie można zainicjować {ip_protocol} LPD: {error} ({error_code})"
+msgstr "Nie można zainicjować LPD {ip_protocol}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:186
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
@@ -2673,7 +2673,7 @@ msgstr "Nie można doczekać się zmian w katalogu"
 
 #: ../libtransmission/web.cc:170 ../libtransmission/web.cc:180
 msgid "Consider upgrading your curl installation."
-msgstr "Rozważ aktualizację instalacji curl."
+msgstr "Proszę zaktualizować program curl."
 
 #: ../libtransmission/web.cc:173
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
@@ -2681,7 +2681,7 @@ msgstr "curl {curl_version} jest podatny na awarie SIGPIPE. {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr "curl {curl_version} jest podatny na lukę w zabezpieczeniach związaną z podwójnym zamknięciem eventfd, która może powodować awarie SIGABRT usługi systemd transmission-daemon. {details_url}"
+msgstr "curl {curl_version} jest podatny na lukę w zabezpieczeniach związaną z podwójnym zamknięciem eventfd, która może powodować awarie SIGABRT usługi systemd transmission-daemon. {details_url}"
 
 #: ../libtransmission/web.cc:202
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"

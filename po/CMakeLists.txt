@@ -1,5 +1,7 @@
 set(LINGUAS
     da
+    de
+    el
     es
     eu
     fi

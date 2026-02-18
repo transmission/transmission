@@ -8,14 +8,14 @@
 # f6d3887df5c5bcb13fc1d4fb04e37f17, 2018
 # Vlad Anisimov <uniss@ua.fm>, 2022
 # Olexander Movchan, 2022
-# Yevhenii Shatalov <zhenya.shot@gmail.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Petro Bilyi <whitipet@gmail.com>, 2023
 # Oleksii Lysenko, 2023
 # Sirius961, 2024
 # Gordon Freeman, 2024
 # zubr139, 2025
 # Виталий Саенко <mail.saenkovitalik@gmail.com>, 2025
+# Yevhenii Shatalov <zhenya.shot@gmail.com>, 2026
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -24,7 +24,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Виталий Саенко <mail.saenkovitalik@gmail.com>, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Ukrainian (https://app.transifex.com/transmissionbt/teams/33778/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -1345,7 +1345,7 @@ msgstr "Запустити Transmission згорнутим"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Файл"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1401,7 +1401,7 @@ msgstr "_Налаштування"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Торент"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1437,7 +1437,7 @@ msgstr "Запросити у трекера _більше вузлів"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "Додати до _черги"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1485,7 +1485,7 @@ msgstr "_Вилучити файли і торент-файл"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Перегляд"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1569,7 +1569,7 @@ msgstr "_Про"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Впорядкувати торенти за"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

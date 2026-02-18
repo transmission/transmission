@@ -8,9 +8,9 @@
 # Savvas Adamtziloglou <savvas-gr@greeklug.gr>, 2022
 # Michalis Zisis <mixasgr@greeklug.gr>, 2022
 # 49b67765f7beecf7587147363d590d62, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2023
 # 3594141e28bdaa52cc9a5bd6ed314e0a_76a7721 <b9d2e0e012c5758f696048d590b6c558_1102917>, 2023
 # Giorgos Mousa, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Giorgos Mousa, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Greek (https://app.transifex.com/transmissionbt/teams/33778/el/)\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -1273,7 +1273,7 @@ msgstr "Εκκίνηση του Transmission Ελαχιστοποιημένο"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Αρχείο"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1329,7 +1329,7 @@ msgstr "_Προτιμήσεις"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1365,7 +1365,7 @@ msgstr "Αίτηση στον ιχνηλάτη για ε_πιπλέον ομότ
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_Σειρά"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1413,7 +1413,7 @@ msgstr "_Διαγραφή αρχείων και αφαίρεση από την �
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Προβολή"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1497,7 +1497,7 @@ msgstr "_Σχετικά"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Ταξινόμηση torrents κατά"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

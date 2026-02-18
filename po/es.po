@@ -8,9 +8,9 @@
 # Adolfo Jayme Barrientos, 2021
 # Julvenzor <adrlopgal@disroot.org>, 2022
 # Rodrigo Lledó <rodhos92@gmail.com>, 2023
-# Mike Gelfand <mikedld@mikedld.com>, 2023
 # Héctor Cortés, 2024
 # picodotdev <pico.dev@gmail.com>, 2024
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: picodotdev <pico.dev@gmail.com>, 2024\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Spanish (https://app.transifex.com/transmissionbt/teams/33778/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -1362,7 +1362,7 @@ msgstr "Iniciar Transmission minimizado"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Archivo"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1418,7 +1418,7 @@ msgstr "_Preferencias"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1454,7 +1454,7 @@ msgstr "Solicitar _más pares al rastreador"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_Cola"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1502,7 +1502,7 @@ msgstr "_Eliminar archivos y quitar torrent"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Ver"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1586,7 +1586,7 @@ msgstr "_Acerca de"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Ordenar torrents por"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

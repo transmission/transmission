@@ -5,9 +5,9 @@
 #
 # Translators:
 # 63f334ffc0709ba0fc2361b80bf3c0f0_00ffd1e <ab96c93ca0ac55ba7fa06385427e60dd_878890>, 2022
-# Avi Markovitz <avi.markovitz@gmail.com>, 2023
-# Mike Gelfand <mikedld@mikedld.com>, 2025
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2026
+# Avi Markovitz <avi.markovitz@gmail.com>, 2026
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2026\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Hebrew (https://app.transifex.com/transmissionbt/teams/33778/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -1334,7 +1334,7 @@ msgstr "הפעלת ‏Transmission במצב ממוזער"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_קובץ"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1390,7 +1390,7 @@ msgstr "ה_עדפות"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_טורנט"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1426,7 +1426,7 @@ msgstr "בקשת עמיתים _נוספים מהעוקב"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "ה_עברה לתור"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1474,7 +1474,7 @@ msgstr "_מחיקת הקבצים והסרה"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_תצוגה"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1558,7 +1558,7 @@ msgstr " על _אודות"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_סידור טורנטים לפי"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"

@@ -31,73 +31,73 @@
 "%lu cache" = "%lu w pamięci podręcznej";
 
 /* Inspector -> Peers tab -> peers */
-"%lu Connected" = "%lu połączone(-ych)";
+"%lu Connected" = "Połączone: %lu";
 
 /* Inspector -> Peers tab -> peers */
 "%lu DHT" = "%lu przez DHT";
 
 /* Dock item - Downloading */
-"%lu Downloading" = "%lu pobierane(-ych)";
+"%lu Downloading" = "Pobierane: %lu";
 
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
    Inspector -> selected torrents
    quicklook file count */
-"%lu files" = "%lu pliki(-ów)";
+"%lu files" = "Pliki: %lu";
 
 /* quicklook file header */
-"%lu Files" = "%lu pliki(-ów)";
+"%lu Files" = "Pliki: %lu";
 
 /* Inspector -> Peers tab -> peers */
-"%lu incoming" = "%lu przychodzące(-ych)";
+"%lu incoming" = "Przychodzące: %lu";
 
 /* Prefs -> blocklist -> message */
-"%lu IP address rules in list" = "%lu reguł(y) adresów IP na liście";
+"%lu IP address rules in list" = "Reguły adresów IP na liście: %lu";
 
 /* Inspector -> Peers tab -> peers */
-"%lu Known:" = "%lu znanych:";
+"%lu Known:" = "Znane: %lu";
 
 /* Inspector -> Peers tab -> peers */
-"%lu local discovery" = "%lu wykrywanie lokalnych";
+"%lu local discovery" = "Wykrywanie lokalnych: %lu";
 
 /* Inspector -> Peers tab -> peers */
 "%lu LTEP" = " %lu przez LTEP";
 
 /* Inspector -> selected torrents */
-"%lu magnetized transfers" = "%lu przesyłania magnet";
+"%lu magnetized transfers" = "Przesyłania magnet: %lu";
 
 /* Inspector -> Peers tab -> peers */
 "%lu PEX" = " %lu przez PEX";
 
 /* Dock item - Seeding */
-"%lu Seeding" = "%lu wysyłanie";
+"%lu Seeding" = "Wysyłane: %lu";
 
 /* Drag overlay -> torrents */
-"%lu Torrent Files" = "%lu pliki(-ów) torrent";
+"%lu Torrent Files" = "Pliki torrent: %lu";
 
 /* Inspector -> selected torrents */
-"%lu Torrents Selected" = "%lu wybrane(-ych) torrenty(-ów)";
+"%lu Torrents Selected" = "Wybrane pliki torrent: %lu";
 
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu. serwer śledzący";
 
 /* quicklook tracker header */
-"%lu Trackers" = "%lu serwery(-ów) śledzące(-ych)";
+"%lu Trackers" = "Serwery śledzące: %lu";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
-"%lu transfers" = "%lu transfery(-ów)";
+"%lu transfers" = "Przesyłania: %lu";
 
 /* Torrent -> status string */
-"%lu web seeds" = "%lu wysyłające(-ych) w sieci";
+"%lu web seeds" = "Wysyłający w sieci: %lu";
 
 /* quicklook web seed header */
-"%lu Web Seeds" = "%lu wysyłające(-ych) w sieci";
+"%lu Web Seeds" = "Wysyłający w sieci: %lu";
 
 /* Create torrent -> info */
-"%u pieces, %@ each" = "%1$u fragmenty(-ów), %2$@ każdy";
+"%u pieces, %@ each" = "Fragmenty: %1$u, %2$@ każdy";
 
 /* Inspector -> Peers tab -> peers */
 "1 Connected" = "1 połączony";
@@ -205,16 +205,16 @@
 "Are you sure you want to quit?" = "Na pewno zakończyć działanie?";
 
 /* Remove completed confirm panel -> title */
-"Are you sure you want to remove %lu completed transfers from the transfer list?" = "Czy na pewno chcesz usunąć %lu ukończone(-ych) transfery(-ów) z listy transferów?";
+"Are you sure you want to remove %lu completed transfers from the transfer list?" = "Na pewno usunąć ukończone przesyłania (%lu) z listy przesyłań?";
 
 /* Remove trackers alert -> title */
-"Are you sure you want to remove %lu trackers?" = "Czy na pewno chcesz usunąć %lu serwery(-ów) śledzące(-ych)?";
+"Are you sure you want to remove %lu trackers?" = "Na pewno usunąć serwery śledzące (%lu)?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Czy na pewno chcesz usunąć %lu transfery(-ów) z listy transferów i skasować pliki danych?";
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Na pewno usunąć przesyłania (%lu) z listy przesyłań i przenieść pliki z danymi do kosza?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %lu transfers from the transfer list?" = "Czy na pewno chcesz usunąć %lu transfery(-ów) z listy transferów?";
+"Are you sure you want to remove %lu transfers from the transfer list?" = "Na pewno usunąć przesyłania (%lu) z listy przesyłań?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Na pewno usunąć „%@” z listy przesyłania i przenieść plik danych do kosza?";
@@ -986,13 +986,13 @@
 "The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Przesyłanie nie skontaktuje się z serwerami śledzącymi po partnerów i będzie musiało opierać się wyłącznie o metody wykrywania partnerów nieużywające serwerów śledzących, takie jak PEX i DHT, aby pobierać i wysyłać.";
 
 /* Removal confirm panel -> message part 1 */
-"There are %1$lu transfers (%2$lu active)." = "Są transfery: %1$lu (aktywne: %2$lu)";
+"There are %1$lu transfers (%2$lu active)." = "Przesyłania: %1$lu (aktywne: %2$lu).";
 
 /* Confirm Quit panel -> message */
-"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "Są aktywne transfery (%lu), które zostaną wstrzymane po zamknięciu. Transfery zostaną automatycznie wznowione przy następnym uruchomieniu.";
+"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "Są aktywne przesyłania (%lu), które zostaną wstrzymane po wyłączeniu. Zostaną one automatycznie wznowione po następnym uruchomieniu.";
 
 /* Removal confirm panel -> message part 1 */
-"There are %lu active transfers." = "Są aktywne transfery: %lu.";
+"There are %lu active transfers." = "Aktywne przesyłania: %lu.";
 
 /* Create torrent -> blank address -> title */
 "There are no tracker addresses." = "Nie ma żadnych adresów serwerów śledzących.";
