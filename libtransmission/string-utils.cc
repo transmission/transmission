@@ -22,7 +22,7 @@
 #ifdef WITH_UCHARDET
 #include "libtransmission/charset-detect.h"
 #ifndef _WIN32
-#include "iconv_wrap.h"
+#include "libtransmission/charset-convert.h"
 #endif
 #endif
 
@@ -129,7 +129,7 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
                 }
             }
 #else
-            IconvWrapper conv("UTF-8", detector.encoding());
+            tr_charset_converter conv("UTF-8", detector.encoding());
             if (!conv.is_valid())
             {
                 tr_logAddError("Failed to open iconv");
