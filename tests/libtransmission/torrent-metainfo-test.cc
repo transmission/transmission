@@ -52,7 +52,7 @@ TEST_F(TorrentMetainfoTest, magnetLink)
 #define BEFORE_PATH \
     "d10:created by25:Transmission/2.82 (14160)13:creation datei1402280218e8:encoding5:UTF-84:infod5:filesld6:lengthi2e4:pathl"
 #define AFTER_PATH \
-    "eed6:lengthi2e4:pathl5:b.txteee4:name3:foo12:piece lengthi32768e6:pieces20:ÞÉ`âMs¡Å;Ëº¬.åÂà7:privatei0eee"
+    "eed6:lengthi2e4:pathl5:b.txteee4:name3:foo12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaa7:privatei0eee"
 
 // FIXME: split these into parameterized tests?
 TEST_F(TorrentMetainfoTest, bucket)
