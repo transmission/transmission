@@ -238,7 +238,7 @@ jobs:
   clang-tidy-libtransmission:
     runs-on: ubuntu-24.04
     needs: what-to-make
-    if: false # TEMP: minimal testing
+    if: needs.what-to-make.outputs.make-core == 'true'
     steps:
       - name: Show Configuration
         run: |
@@ -294,7 +294,9 @@ jobs:
   what-to-clang-tidy:
     runs-on: ubuntu-latest
     needs: [ what-to-make, clang-tidy-libtransmission ]
-    if: false # TEMP: minimal testing
+    if: |
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true'
     outputs:
       matrix: ${{ steps.generate-matrix.outputs.matrix }}
     steps:
@@ -330,7 +332,6 @@ jobs:
   clang-tidy:
     runs-on: ubuntu-24.04
     needs: what-to-clang-tidy
-    if: false # TEMP: minimal testing
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.what-to-clang-tidy.outputs.matrix) }}
