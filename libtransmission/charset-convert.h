@@ -14,17 +14,11 @@
 #include <string_view>
 #include <vector>
 
-// On FreeBSD (and other BSDs), iconv is built into libc. However, GNU libiconv
-// may also be installed as a dependency of other ports (e.g. gettext, glib).
-// If the GNU libiconv header gets picked up, it redefines iconv_open() etc.
-// to libiconv_open() etc., causing link failures against libc. LIBICONV_PLUG
-// disables that renaming so the standard POSIX symbols are always used.
-// On Linux/glibc this define is a harmless no-op.
+// LIBICONV_PLUG is set by CMake (via Iconv_IS_BUILT_IN) on platforms where
+// iconv is built into libc (FreeBSD, Linux). It prevents GNU libiconv's
+// header from renaming iconv_open() -> libiconv_open() etc.
+// On platforms that need GNU libiconv (OpenBSD), it is intentionally not set.
 // See: https://github.com/transmission/transmission/issues/4547
-//      FreeBSD ports Mk/Uses/iconv.mk
-#ifndef LIBICONV_PLUG
-#define LIBICONV_PLUG 1
-#endif
 #include <iconv.h>
 
 class tr_charset_converter
