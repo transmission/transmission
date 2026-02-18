@@ -577,6 +577,10 @@ tr_add_external_auto_library(PSL libpsl
     LIBNAME psl
     TARGET psl::psl)
 
+if(APPLE)
+    set(ENABLE_UCHARDET OFF)
+endif()
+
 if(ENABLE_UCHARDET)
     tr_add_external_auto_library(UCHARDET uchardet
         LIBNAME uchardet
