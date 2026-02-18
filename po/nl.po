@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-26 16:00+0000\n"
+"POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Gideon van Melle <translations@gvmelle.com>, 2025\n"
 "Language-Team: Dutch (https://app.transifex.com/transmissionbt/teams/33778/nl/)\n"
@@ -33,11 +33,11 @@ msgstr "Geen"
 msgid "Inf"
 msgstr "Inf"
 
-#: ../daemon/daemon.cc:218 ../gtk/Session.cc:817 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
+#: ../daemon/daemon.cc:218 ../gtk/Session.cc:815 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "Kon '{path}' niet lezen: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:243 ../gtk/Session.cc:869 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
+#: ../daemon/daemon.cc:243 ../gtk/Session.cc:879 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
 msgstr "Kan torrent-bestand '{path}' niet toevoegen"
 
@@ -77,7 +77,7 @@ msgstr "Instellingen laden vanaf '{path}'"
 msgid "Saved pidfile '{path}'"
 msgstr "Opgeslagen pid-bestand '{path}'"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1011 ../libtransmission/torrent.cc:2013 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "Kon  '{path}' niet opslaan: {error} ({error_code})"
 
@@ -579,7 +579,7 @@ msgstr "Normaal"
 msgid "Low"
 msgstr "Laag"
 
-#: ../gtk/FileList.cc:858 ../gtk/Session.cc:324
+#: ../gtk/FileList.cc:858 ../gtk/Session.cc:322
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "'{old_path}' niet hernoemen als '{path}': {error} ({error_code})"
 
@@ -835,66 +835,66 @@ msgstr "Voorkeur geven aan versleuteling"
 msgid "Require encryption"
 msgstr "Versleuteling vereisen"
 
-#: ../gtk/PrefsDialog.cc:382
+#: ../gtk/PrefsDialog.cc:383
 msgid "Every Day"
 msgstr "Elke dag"
 
-#: ../gtk/PrefsDialog.cc:383
+#: ../gtk/PrefsDialog.cc:384
 msgid "Weekdays"
 msgstr "Weekdagen"
 
-#: ../gtk/PrefsDialog.cc:384
+#: ../gtk/PrefsDialog.cc:385
 msgid "Weekends"
 msgstr "Weekends"
 
-#: ../gtk/PrefsDialog.cc:567
+#: ../gtk/PrefsDialog.cc:568
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] "zwarte lijst heeft {count:L} regels"
 msgstr[1] "Zwarte lijst heeft {count:L} regel"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Blocklist updated!"
 msgstr "Zwarte lijst bijgewerkt!"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Couldn't update blocklist"
 msgstr "Kon zwarte lijst niet bijwerken"
 
-#: ../gtk/PrefsDialog.cc:595
+#: ../gtk/PrefsDialog.cc:596
 msgid "Getting new blocklist…"
 msgstr "Nieuwe blokkadelijst wordt opgehaald…"
 
-#: ../gtk/PrefsDialog.cc:954
+#: ../gtk/PrefsDialog.cc:955
 msgctxt "Port test status"
 msgid "unknown"
 msgstr "onbekend"
 
-#: ../gtk/PrefsDialog.cc:956
+#: ../gtk/PrefsDialog.cc:957
 msgctxt "Port test status"
 msgid "checking…"
 msgstr "controleren..."
 
-#: ../gtk/PrefsDialog.cc:958
+#: ../gtk/PrefsDialog.cc:959
 msgctxt "Port test status"
 msgid "open"
 msgstr "open"
 
-#: ../gtk/PrefsDialog.cc:960
+#: ../gtk/PrefsDialog.cc:961
 msgctxt "Port test status"
 msgid "closed"
 msgstr "gesloten"
 
-#: ../gtk/PrefsDialog.cc:962
+#: ../gtk/PrefsDialog.cc:963
 msgctxt "Port test status"
 msgid "error"
 msgstr "fout"
 
-#: ../gtk/PrefsDialog.cc:975
+#: ../gtk/PrefsDialog.cc:976
 msgid "Status: <b>{status}</b>"
 msgstr "Status: <b>{status}</b>"
 
-#: ../gtk/PrefsDialog.cc:977
+#: ../gtk/PrefsDialog.cc:978
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 msgstr "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
@@ -910,25 +910,25 @@ msgstr "Kon de torrent niet verplaatsen"
 msgid "This may take a moment…"
 msgstr "Dit kan even duren…"
 
-#: ../gtk/Session.cc:802 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
+#: ../gtk/Session.cc:800 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
 msgstr "Kon '{path}' niet lezen"
 
 #. logging
-#: ../gtk/Session.cc:1087
+#: ../gtk/Session.cc:1071
 msgid "Inhibiting desktop hibernation"
 msgstr "Verhinderen dat de computer in slaapstand wordt gezet"
 
-#: ../gtk/Session.cc:1094 ../gtk/Session.cc:1120
+#: ../gtk/Session.cc:1078 ../gtk/Session.cc:1104
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "Kan de slaapstand van het bureaublad niet belemmeren: {error}"
 
 #. logging
-#: ../gtk/Session.cc:1115
+#: ../gtk/Session.cc:1099
 msgid "Allowing desktop hibernation"
 msgstr "Slaapstand computer toestaan"
 
-#: ../gtk/Session.cc:1236
+#: ../gtk/Session.cc:1220
 msgid "Couldn't find pending RPC request for id {id}"
 msgstr ""
 
@@ -1269,6 +1269,10 @@ msgstr "Transmission starten met alle torrents gepauzeerd"
 msgid "Start Transmission Minimized"
 msgstr "Transmission geminimaliseerd starten"
 
+#: ../gtk/transmission.ui:7
+msgid "_File"
+msgstr ""
+
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
 msgstr "Torrent openen"
@@ -1305,6 +1309,10 @@ msgstr "Alle torrents pauzeren"
 msgid "_Quit"
 msgstr "A_fsluiten"
 
+#: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
+msgid "_Edit"
+msgstr "Be_werken"
+
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
 msgstr "_Alles selecteren"
@@ -1316,6 +1324,10 @@ msgstr "_Niets selecteren"
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
 msgstr "_Voorkeuren"
+
+#: ../gtk/transmission.ui:77
+msgid "_Torrent"
+msgstr ""
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1348,6 +1360,10 @@ msgstr "Torrent nu starten"
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
 msgstr "_Tracker om meer peers vragen"
+
+#: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
+msgid "_Queue"
+msgstr ""
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1392,6 +1408,10 @@ msgstr "Torrent verwijderen"
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
 msgstr "Bestanden wissen en verwijderen"
+
+#: ../gtk/transmission.ui:178
+msgid "_View"
+msgstr ""
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1449,6 +1469,10 @@ msgstr "Sorteren op resterende _tijd"
 msgid "Re_verse Sort Order"
 msgstr "Omge_keerd sorteren"
 
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
+msgid "_Help"
+msgstr "_Hulp"
+
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
 msgstr "_Berichtenlogboek"
@@ -1468,6 +1492,10 @@ msgstr "In_houd"
 #: ../gtk/transmission.ui:282
 msgid "_About"
 msgstr "_Over"
+
+#: ../gtk/transmission.ui:306
+msgid "_Sort Torrents By"
+msgstr ""
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -1572,10 +1600,6 @@ msgstr "_Meer details tonen"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:652 ../gtk/ui/gtk4/DetailsDialog.ui:512
 msgid "Peers"
 msgstr "Peers"
-
-#: ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
-msgid "_Edit"
-msgstr "Be_werken"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:773 ../gtk/ui/gtk4/DetailsDialog.ui:587
 msgid "Show _backup trackers"
@@ -1756,10 +1780,6 @@ msgstr "_Verplaats torrent bestand naar de prullenbak"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
 msgstr "Voorkeuren van Transmission"
-
-#: ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
-msgid "_Help"
-msgstr "_Hulp"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:76 ../gtk/ui/gtk4/PrefsDialog.ui:29
 msgid "Speed Limits"
@@ -2129,7 +2149,7 @@ msgstr "Onbekende fout"
 msgid "{ip_protocol} connection failed"
 msgstr "{ip_protocol} verbinding mislukt"
 
-#: ../libtransmission/announcer-udp.cc:542
+#: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 msgstr "Kon niet nakijken '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 
@@ -2194,7 +2214,7 @@ msgstr "Uw machine ondersteunt  {protocol} niet"
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "Globaal {type} met succes geüpdate naar adres {ip} met gebruik van {url}"
 
-#: ../libtransmission/log.cc:292
+#: ../libtransmission/log.cc:294
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "Te veel van dit soort berichten! Ik zal dit bericht in deze sessie niet meer loggen."
 
@@ -2234,7 +2254,7 @@ msgstr "Kon '{path}' niet vooraf toewijzen: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Kon '{path}' niet afkorten: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:676
+#: ../libtransmission/peer-io.cc:686
 msgid "Unknown state: {state}"
 msgstr "Onbekende staat: {state}"
 
@@ -2404,73 +2424,73 @@ msgstr "Kan sessievergrendelingsbestand niet openen '{path}': {error} ({error_co
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "Luisteren naar inkomende peer-verbindingen op {hostport}"
 
-#: ../libtransmission/session.cc:748
+#: ../libtransmission/session.cc:749
 msgid "Transmission version {version} starting"
 msgstr "Transmission versie {version} starten"
 
-#: ../libtransmission/session.cc:1488
+#: ../libtransmission/session.cc:1489
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission versie {version} sluit af"
 
-#: ../libtransmission/session.cc:1570
+#: ../libtransmission/session.cc:1571
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "{count} torrent geladen"
 msgstr[1] "{count} torrents geladen"
 
-#: ../libtransmission/torrent-metainfo.cc:704
+#: ../libtransmission/torrent-metainfo.cc:739
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Torrent-bestand gemigreerd van '{old_path}' naar '{path}'"
 
-#: ../libtransmission/torrent.cc:139
+#: ../libtransmission/torrent.cc:156
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "Kon metainfo van '{path}' niet gebruiken voor '{magnet}': {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:168
+#: ../libtransmission/torrent.cc:185
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr "Geen gegevens gevonden! Zorg ervoor dat uw schijven zijn aangesloten of gebruik \"Locatie instellen\". Om opnieuw te downloaden, gebruik je \"Lokale gegevens verifiëren\" en start daarna de torrent."
 
-#: ../libtransmission/torrent.cc:405
+#: ../libtransmission/torrent.cc:424
 msgid "Calling script '{path}'"
 msgstr "aanroepen van script '{path}'"
 
-#: ../libtransmission/torrent.cc:413
+#: ../libtransmission/torrent.cc:432
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "Kon script '{path}'niet aanroepen: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:447
+#: ../libtransmission/torrent.cc:466
 msgid "Seed ratio reached; pausing torrent"
 msgstr "Seed ratio bereikt; torrent pauzeren"
 
-#: ../libtransmission/torrent.cc:454
+#: ../libtransmission/torrent.cc:473
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "Seeding inactief limiet bereikt; torrent pauzeren"
 
-#: ../libtransmission/torrent.cc:615
+#: ../libtransmission/torrent.cc:636
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Handmatig herstart -- seedverhouding wordt uitgeschakeld"
 
-#: ../libtransmission/torrent.cc:671
+#: ../libtransmission/torrent.cc:692
 msgid "Pausing torrent"
 msgstr "Torrent pauzeren"
 
-#: ../libtransmission/torrent.cc:725
+#: ../libtransmission/torrent.cc:737
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr "Kan niet alle torrent-bestanden verwijderen: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:791
+#: ../libtransmission/torrent.cc:780
 msgid "Removing torrent"
 msgstr "Bezig met verwijderen van torrent"
 
-#: ../libtransmission/torrent.cc:1110 ../libtransmission/torrent.cc:1618
+#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "Kon '{old_path}' niet verplaatsen naar '{path}': {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1560
+#: ../libtransmission/torrent.cc:1563
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr "Torrent gepauzeerd omdat er geen gegevens zijn gevonden! Zorg ervoor dat uw schijven zijn aangesloten of gebruik \"Locatie instellen\" en gebruik vervolgens opnieuw \"Lokale gegevens verifiëren\". Start de torrent om opnieuw te downloaden."
 
-#: ../libtransmission/torrent.cc:2066
+#: ../libtransmission/torrent.cc:2069
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr "Tracker waarschuwing: '{warning}' ({url})"
 

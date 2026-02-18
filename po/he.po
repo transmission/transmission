@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-26 16:00+0000\n"
+"POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2026\n"
 "Language-Team: Hebrew (https://app.transifex.com/transmissionbt/teams/33778/he/)\n"
@@ -32,11 +32,11 @@ msgstr "ללא"
 msgid "Inf"
 msgstr "אינסוף"
 
-#: ../daemon/daemon.cc:218 ../gtk/Session.cc:817 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
+#: ../daemon/daemon.cc:218 ../gtk/Session.cc:815 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "לא ניתן לקרוא את ‚{path}’:‏ {error} ‏({error_code})"
 
-#: ../daemon/daemon.cc:243 ../gtk/Session.cc:869 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
+#: ../daemon/daemon.cc:243 ../gtk/Session.cc:879 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
 msgstr "לא ניתן להוסיף את קובץ הטורנט ‚{path}’"
 
@@ -76,7 +76,7 @@ msgstr "נטענות הגדרות מתוך ‚{path}’"
 msgid "Saved pidfile '{path}'"
 msgstr "קובץ מזהה התהליך ‚{path}’ נשמר"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1011 ../libtransmission/torrent.cc:2013 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "לא ניתן לשמור את ‚{path}’: {error} ({error_code})"
 
@@ -596,7 +596,7 @@ msgstr "רגילה"
 msgid "Low"
 msgstr "נמוכה"
 
-#: ../gtk/FileList.cc:858 ../gtk/Session.cc:324
+#: ../gtk/FileList.cc:858 ../gtk/Session.cc:322
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "לא ניתן לשנות את השם ‚{old_path}’ לשם ‚{path}’: {error} ({error_code})"
 
@@ -852,19 +852,19 @@ msgstr "להעדיף הצפנה"
 msgid "Require encryption"
 msgstr "דרישת הצפנה"
 
-#: ../gtk/PrefsDialog.cc:382
+#: ../gtk/PrefsDialog.cc:383
 msgid "Every Day"
 msgstr "כל יום"
 
-#: ../gtk/PrefsDialog.cc:383
+#: ../gtk/PrefsDialog.cc:384
 msgid "Weekdays"
 msgstr "ימי השבוע"
 
-#: ../gtk/PrefsDialog.cc:384
+#: ../gtk/PrefsDialog.cc:385
 msgid "Weekends"
 msgstr "סופי שבוע"
 
-#: ../gtk/PrefsDialog.cc:567
+#: ../gtk/PrefsDialog.cc:568
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] "יש רשומה אחת ברשימת החסימה"
@@ -872,48 +872,48 @@ msgstr[1] "יש {count:L} רשומות ברשימת החסימה"
 msgstr[2] "יש {count:L} רשומות ברשימת החסימה"
 msgstr[3] "יש {count:L} רשומות ברשימת החסימה"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Blocklist updated!"
 msgstr "רשימת החסימה עודכנה!"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Couldn't update blocklist"
 msgstr "לא ניתן לעדכן את רשימת החסימה"
 
-#: ../gtk/PrefsDialog.cc:595
+#: ../gtk/PrefsDialog.cc:596
 msgid "Getting new blocklist…"
 msgstr "מתקבלת רשימה חדשה…"
 
-#: ../gtk/PrefsDialog.cc:954
+#: ../gtk/PrefsDialog.cc:955
 msgctxt "Port test status"
 msgid "unknown"
 msgstr "לא ידוע"
 
-#: ../gtk/PrefsDialog.cc:956
+#: ../gtk/PrefsDialog.cc:957
 msgctxt "Port test status"
 msgid "checking…"
 msgstr "בבדיקה…"
 
-#: ../gtk/PrefsDialog.cc:958
+#: ../gtk/PrefsDialog.cc:959
 msgctxt "Port test status"
 msgid "open"
 msgstr "פתוח"
 
-#: ../gtk/PrefsDialog.cc:960
+#: ../gtk/PrefsDialog.cc:961
 msgctxt "Port test status"
 msgid "closed"
 msgstr "סגור"
 
-#: ../gtk/PrefsDialog.cc:962
+#: ../gtk/PrefsDialog.cc:963
 msgctxt "Port test status"
 msgid "error"
 msgstr "שגיאה"
 
-#: ../gtk/PrefsDialog.cc:975
+#: ../gtk/PrefsDialog.cc:976
 msgid "Status: <b>{status}</b>"
 msgstr "מצב: <b>{status}</b>"
 
-#: ../gtk/PrefsDialog.cc:977
+#: ../gtk/PrefsDialog.cc:978
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 msgstr "מצב: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
@@ -929,25 +929,25 @@ msgstr "לא ניתן להעביר טורנט"
 msgid "This may take a moment…"
 msgstr "פעולה זו עשויה לארוך זמן מה…"
 
-#: ../gtk/Session.cc:802 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
+#: ../gtk/Session.cc:800 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
 msgstr "לא ניתן לקרוא את ‚{path}’"
 
 #. logging
-#: ../gtk/Session.cc:1087
+#: ../gtk/Session.cc:1071
 msgid "Inhibiting desktop hibernation"
 msgstr "תרדמת שולחן העבודה נמנעת"
 
-#: ../gtk/Session.cc:1094 ../gtk/Session.cc:1120
+#: ../gtk/Session.cc:1078 ../gtk/Session.cc:1104
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "לא ניתן למנוע את תרדמת שולחן העבודה: {error}"
 
 #. logging
-#: ../gtk/Session.cc:1115
+#: ../gtk/Session.cc:1099
 msgid "Allowing desktop hibernation"
 msgstr "תרדמת שולחן העבודה מותרת"
 
-#: ../gtk/Session.cc:1236
+#: ../gtk/Session.cc:1220
 msgid "Couldn't find pending RPC request for id {id}"
 msgstr "לא ניתן למצוא בקשת RPC ממתינה למזהה {id}"
 
@@ -1332,6 +1332,10 @@ msgstr "הפעלת ‏Transmission כשכל הטורנטים מופסקים"
 msgid "Start Transmission Minimized"
 msgstr "הפעלת ‏Transmission במצב ממוזער"
 
+#: ../gtk/transmission.ui:7
+msgid "_File"
+msgstr ""
+
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
 msgstr "פתיחת טורנט"
@@ -1368,6 +1372,10 @@ msgstr "השהיית כל הטורנטים"
 msgid "_Quit"
 msgstr "_יציאה"
 
+#: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
+msgid "_Edit"
+msgstr "_עריכה"
+
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
 msgstr "לבחור ה_כול"
@@ -1379,6 +1387,10 @@ msgstr "ביטול הבחי_רה"
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
 msgstr "ה_עדפות"
+
+#: ../gtk/transmission.ui:77
+msgid "_Torrent"
+msgstr ""
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1411,6 +1423,10 @@ msgstr "התחלת הטורנט כעת"
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
 msgstr "בקשת עמיתים _נוספים מהעוקב"
+
+#: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
+msgid "_Queue"
+msgstr ""
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1455,6 +1471,10 @@ msgstr "הסרת טורנט"
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
 msgstr "_מחיקת הקבצים והסרה"
+
+#: ../gtk/transmission.ui:178
+msgid "_View"
+msgstr ""
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1512,6 +1532,10 @@ msgstr "מיון לפי זמן ש_נותר"
 msgid "Re_verse Sort Order"
 msgstr "מיון בסדר ה_פוך"
 
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
+msgid "_Help"
+msgstr "_עזרה"
+
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
 msgstr "יו_מן הודעות"
@@ -1531,6 +1555,10 @@ msgstr "ת_כנים"
 #: ../gtk/transmission.ui:282
 msgid "_About"
 msgstr " על _אודות"
+
+#: ../gtk/transmission.ui:306
+msgid "_Sort Torrents By"
+msgstr ""
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -1635,10 +1663,6 @@ msgstr "הצגת פרטים _נוספים"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:652 ../gtk/ui/gtk4/DetailsDialog.ui:512
 msgid "Peers"
 msgstr "עמיתים"
-
-#: ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
-msgid "_Edit"
-msgstr "_עריכה"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:773 ../gtk/ui/gtk4/DetailsDialog.ui:587
 msgid "Show _backup trackers"
@@ -1819,10 +1843,6 @@ msgstr "הע_ברת קובץ טורנט לאשפה"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
 msgstr "העדפות ‏Transmission"
-
-#: ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
-msgid "_Help"
-msgstr "_עזרה"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:76 ../gtk/ui/gtk4/PrefsDialog.ui:29
 msgid "Speed Limits"
@@ -2192,7 +2212,7 @@ msgstr "שגיאה לא ידועה"
 msgid "{ip_protocol} connection failed"
 msgstr "חיבור {ip_protocol} נכשל"
 
-#: ../libtransmission/announcer-udp.cc:542
+#: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 msgstr "לא ניתן לאתר את ‚{address}:{port}’ תחת {ip_protocol}: {error} ({error_code})"
 
@@ -2261,7 +2281,7 @@ msgstr "המכונה שלך לא תומכת ב־{protocol}"
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "הכתובת הגלובלית {type} עודכנה בהצלחה ל־{ip} באמצעות {url}"
 
-#: ../libtransmission/log.cc:292
+#: ../libtransmission/log.cc:294
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "יותר מדי הודעות כאלו! לא יתעודו יותר הודעות כאלו בהפעלה הזאת."
 
@@ -2301,7 +2321,7 @@ msgstr "לא ניתן להקצות מראש את ‚{path}’:‏ {error} ({erro
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "לא ניתן לקצץ את ‚{path}’:‏ {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:676
+#: ../libtransmission/peer-io.cc:686
 msgid "Unknown state: {state}"
 msgstr "מצב לא ידוע: {state}"
 
@@ -2473,15 +2493,15 @@ msgstr "לא ניתן לפתוח את קובץ נעילת ההפעלה ‚{path}
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "בהאזנה לחיבורי עמיתים נכנסים דרך {hostport}"
 
-#: ../libtransmission/session.cc:748
+#: ../libtransmission/session.cc:749
 msgid "Transmission version {version} starting"
 msgstr "גרסה {version} של ‏Transmission מופעלת"
 
-#: ../libtransmission/session.cc:1488
+#: ../libtransmission/session.cc:1489
 msgid "Transmission version {version} shutting down"
 msgstr "גרסה {version} של ‏Transmission נכבית"
 
-#: ../libtransmission/session.cc:1570
+#: ../libtransmission/session.cc:1571
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "נטען טורנט"
@@ -2489,59 +2509,59 @@ msgstr[1] "נטענו {count} טורנטים"
 msgstr[2] "נטענו {count} טורנטים"
 msgstr[3] "נטענו {count} טורנטים"
 
-#: ../libtransmission/torrent-metainfo.cc:704
+#: ../libtransmission/torrent-metainfo.cc:739
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "קובץ הטורנט הועבר מ־‚{old_path}’ ל־‚{path}’"
 
-#: ../libtransmission/torrent.cc:139
+#: ../libtransmission/torrent.cc:156
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "לא ניתן להשתמש בנתוני העל מתוך ‚{path}’ עבור ‚{magnet}’: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:168
+#: ../libtransmission/torrent.cc:185
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr "לא נמצאו נתונים! נא לוודא שהכוננים שלך מחוברים או להשתמש ב„הגדרות מקום”. כדי להוריד מחדש יש להשתמש ב„אימות נתונים מקומיים” ולאחר מכן להפעיל את הטורנט."
 
-#: ../libtransmission/torrent.cc:405
+#: ../libtransmission/torrent.cc:424
 msgid "Calling script '{path}'"
 msgstr "הסקריפט ‚{path}’ נקרא"
 
-#: ../libtransmission/torrent.cc:413
+#: ../libtransmission/torrent.cc:432
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "לא ניתן לקרוא לסקריפט ‚{path}’: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:447
+#: ../libtransmission/torrent.cc:466
 msgid "Seed ratio reached; pausing torrent"
 msgstr "יחס הזריעה הושג, הטורנט מושהה"
 
-#: ../libtransmission/torrent.cc:454
+#: ../libtransmission/torrent.cc:473
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "מגבלת זמן ההמתנה לזריעה הושגה, הטורנט מושהה"
 
-#: ../libtransmission/torrent.cc:615
+#: ../libtransmission/torrent.cc:636
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "הופעל מחדש ידנית -- יחס הזריעה שלו יושבת"
 
-#: ../libtransmission/torrent.cc:671
+#: ../libtransmission/torrent.cc:692
 msgid "Pausing torrent"
 msgstr "טורנט מושהה"
 
-#: ../libtransmission/torrent.cc:725
+#: ../libtransmission/torrent.cc:737
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr "לא ניתן להסיר את כל קובצי הטורנט: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:791
+#: ../libtransmission/torrent.cc:780
 msgid "Removing torrent"
 msgstr "הטורנט נמחק כעת"
 
-#: ../libtransmission/torrent.cc:1110 ../libtransmission/torrent.cc:1618
+#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "לא ניתן להעביר את ‚{old_path}’ אל ‚{path}’: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1560
+#: ../libtransmission/torrent.cc:1563
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr "הטורנטים מושהים כי לא נמצא נתונים! נא לוודא שהכוננים שלך מחוברים או להשתמש ב„הגדרות מקום”, לאחר מכן להשתמש ב„אימות נתונים מקומיים” שוב. כדי להוריד מחדש, יש להפעיל את הטורנט."
 
-#: ../libtransmission/torrent.cc:2066
+#: ../libtransmission/torrent.cc:2069
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr "אזהרת עוקב: ‚{warning}’ ({url})"
 
