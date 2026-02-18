@@ -482,6 +482,7 @@ jobs:
             ninja \
             npm \
             pkgconfig \
+            uchardet-dev \
             utfcpp \
             xz
       - name: Get Dependencies (GTK)
@@ -1232,6 +1233,7 @@ jobs:
               pkgconf \
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
               rapidjson \
+              uchardet \
               utf8cpp \
               `echo ${{ matrix.crypto.port }}`
           run: |
@@ -1329,6 +1331,7 @@ jobs:
               `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo node` \
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
               rapidjson \
+              uchardet \
               utfcpp
           run: |
             set -ex
@@ -1429,6 +1432,7 @@ jobs:
               pkgconf \
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
               rapidjson \
+              uchardet \
               utf8-cpp
             if [ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] || [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
               for set in xbase xcomp; do
@@ -1531,6 +1535,7 @@ jobs:
               pkgconf \
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
               rapidjson \
+              uchardet \
               utf8cpp
           run: |
             set -ex
