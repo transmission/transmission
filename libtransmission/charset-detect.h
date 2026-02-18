@@ -31,9 +31,8 @@ public:
 
     tr_charset_detector() noexcept
         : ud_(uchardet_new())
-        , last_status_(Status::OK)
     {
-        if (!ud_)
+        if (ud_ == nullptr)
         {
             last_status_ = Status::InitFailed;
         }
@@ -41,7 +40,7 @@ public:
 
     ~tr_charset_detector()
     {
-        if (ud_)
+        if (ud_ != nullptr)
         {
             uchardet_delete(ud_);
         }
@@ -62,7 +61,7 @@ public:
     {
         if (this != &other)
         {
-            if (ud_)
+            if (ud_ != nullptr)
             {
                 uchardet_delete(ud_);
             }
@@ -76,11 +75,11 @@ public:
 
     [[nodiscard]] Status detect_from_buffer(char const* data, size_t length) noexcept
     {
-        if (!ud_)
+        if (ud_ == nullptr)
         {
             return Status::InitFailed;
         }
-        if (!data || length == 0)
+        if (data == nullptr || length == 0)
         {
             return Status::InvalidInput;
         }
@@ -94,7 +93,7 @@ public:
 
         uchardet_data_end(ud_);
         char const* charset = uchardet_get_charset(ud_);
-        if (!charset || charset[0] == '\0')
+        if (charset == nullptr || charset[0] == '\0')
         {
             last_encoding_ = {};
             last_status_ = Status::UnknownEncoding;
@@ -168,6 +167,6 @@ public:
 
 private:
     uchardet_t ud_;
-    Status last_status_;
+    Status last_status_ = Status::OK;
     std::string_view last_encoding_;
 };

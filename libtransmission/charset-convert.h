@@ -31,6 +31,7 @@ class tr_charset_converter
 {
 public:
     tr_charset_converter(std::string_view to_encoding, std::string_view from_encoding)
+        // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage) -- iconv_open requires null-terminated strings; callers ensure this
         : cd_(iconv_open(to_encoding.data(), from_encoding.data()))
     {
     }
@@ -68,7 +69,7 @@ public:
         }
 
         size_t in_bytes_left = input.size();
-        size_t out_bytes_left = input.size() * 4 + 4; // heuristic for expansion
+        size_t out_bytes_left = (input.size() * 4) + 4; // heuristic for expansion
         std::vector<char> output(out_bytes_left);
 
         // iconv() requires char*, but string_view::data() returns const char*
@@ -87,7 +88,7 @@ public:
             return {};
         }
 
-        return std::string(output.data(), output.size() - out_bytes_left);
+        return { output.data(), output.size() - out_bytes_left };
     }
 
     [[nodiscard]] bool is_valid() const noexcept
@@ -96,6 +97,7 @@ public:
     }
 
 private:
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,performance-no-int-to-ptr) -- POSIX iconv sentinel value
     static inline iconv_t const InvalidCd = (iconv_t)-1;
 
     iconv_t cd_ = InvalidCd;
