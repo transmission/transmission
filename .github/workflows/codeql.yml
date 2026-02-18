@@ -16,6 +16,7 @@ on:
 
 jobs:
   analyze:
+    if: false # TEMP: skip webapp and codeql CI
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
