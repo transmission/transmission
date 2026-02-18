@@ -41,7 +41,7 @@ public:
     tr_charset_converter(tr_charset_converter&& other) noexcept
         : cd_(other.cd_)
     {
-        other.cd_ = InvalidCd;
+        other.cd_ = (iconv_t)-1;
     }
 
     tr_charset_converter& operator=(tr_charset_converter&& other) noexcept
@@ -50,14 +50,14 @@ public:
         {
             close();
             cd_ = other.cd_;
-            other.cd_ = InvalidCd;
+            other.cd_ = (iconv_t)-1;
         }
         return *this;
     }
 
     [[nodiscard]] std::string convert(std::string_view input)
     {
-        if (cd_ == InvalidCd)
+        if (cd_ == (iconv_t)-1)
         {
             return {};
         }
@@ -87,21 +87,18 @@ public:
 
     [[nodiscard]] bool is_valid() const noexcept
     {
-        return cd_ != InvalidCd;
+        return cd_ != (iconv_t)-1;
     }
 
 private:
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,performance-no-int-to-ptr) -- POSIX iconv sentinel value
-    static inline iconv_t const InvalidCd = (iconv_t)-1;
-
-    iconv_t cd_ = InvalidCd;
+    iconv_t cd_ = (iconv_t)-1;
 
     void close() noexcept
     {
-        if (cd_ != InvalidCd)
+        if (cd_ != (iconv_t)-1)
         {
             iconv_close(cd_);
-            cd_ = InvalidCd;
+            cd_ = (iconv_t)-1;
         }
     }
 };

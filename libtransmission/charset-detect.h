@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t
 #include <string>
@@ -130,7 +131,7 @@ public:
     struct encoding_info
     {
         unsigned int codepage = 0; // Windows codepage number, or 0 if unknown
-        std::string_view iconv_name = {}; // portable iconv name (LCD across glibc, FreeBSD Citrus, etc.)
+        std::string_view iconv_name; // portable iconv name (LCD across glibc, FreeBSD Citrus, etc.)
     };
 
     // Looks up an encoding name (as returned by uchardet v0.0.8) and returns
@@ -139,8 +140,14 @@ public:
     // by both glibc and FreeBSD's Citrus iconv.
     [[nodiscard]] static encoding_info lookup_encoding(std::string_view encoding) noexcept
     {
+        struct encoding_entry
+        {
+            std::string_view uchardet;
+            unsigned int codepage;
+            std::string_view iconv;
+        };
         // clang-format off
-        static constexpr struct { std::string_view uchardet; unsigned int codepage; std::string_view iconv; } table[] = {
+        auto constexpr Table = std::array<encoding_entry, 44>{{
             { "ASCII",            20127, "ASCII" },
             { "BIG5",               950, "BIG5" },
             { "EUC-JP",           20932, "EUC-JP" },
@@ -185,14 +192,14 @@ public:
             { "WINDOWS-1256",      1256, "CP1256" },
             { "WINDOWS-1257",      1257, "CP1257" },
             { "WINDOWS-1258",      1258, "CP1258" },
-        };
+        }};
         // clang-format on
 
-        for (auto const& entry : table)
+        for (auto const& entry : Table)
         {
             if (entry.uchardet == encoding)
             {
-                return { entry.codepage, entry.iconv };
+                return { .codepage = entry.codepage, .iconv_name = entry.iconv };
             }
         }
         return {};
