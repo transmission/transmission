@@ -293,4 +293,28 @@ TEST_F(TorrentMetainfoTest, utf8Test)
 #endif
 }
 
+TEST_F(TorrentMetainfoTest, preservesInfoDictOrder)
+{
+    // These torrents' info dict are ordered differently, but they are identical otherwise.
+    //
+    // BEP-3 requires any dict to be sorted, but there are torrents where this is not
+    // obeyed in the wild.
+    //
+    // These v1 hashes are calculated by hand with this command:
+    // dd if=${TORRENT_FILE} skip=225 count=343 bs=1 status=none | sha1sum -b
+    static auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 2U>{ {
+        { "unordered-info-dict.torrent"sv, "e44a814ac5ed962f9181638d1136a6aface3f734"sv },
+        { "perfect-pieces.torrent"sv, "efa7eb3dec5661698f353fde079418543a63e872"sv },
+    } };
+
+    for (auto const& [name, v1hash] : Tests)
+    {
+        auto tm = tr_torrent_metainfo{};
+        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
+        EXPECT_TRUE(tm.parse_torrent_file(path)) << name;
+
+        EXPECT_EQ(tm.info_hash_string(), v1hash);
+    }
+}
+
 } // namespace tr::test
