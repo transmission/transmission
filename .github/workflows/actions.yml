@@ -434,6 +434,9 @@ jobs:
   clang-tidy-libtransmission-win32:
     runs-on: windows-2025
     needs: what-to-make
+    defaults:
+      run:
+        shell: pwsh
     if: |
       needs.what-to-make.outputs.make-core == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true'
@@ -685,6 +688,9 @@ jobs:
   windows:
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    defaults:
+      run:
+        shell: pwsh
     strategy:
       fail-fast: false
       matrix:
