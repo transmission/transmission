@@ -247,18 +247,6 @@ TEST_F(TorrentMetainfoTest, pathKeyTest)
     }
 }
 
-TEST_F(TorrentMetainfoTest, pathKeyTest)
-{
-    static auto constexpr BadTorrents = std::array{ "dup-files.torrent"sv };
-
-    for (auto const& name : BadTorrents)
-    {
-        auto tm = tr_torrent_metainfo{};
-        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
-        EXPECT_FALSE(tm.parse_torrent_file(path));
-    }
-}
-
 TEST_F(TorrentMetainfoTest, utf8Test)
 {
 // MacOS implementation uses non-deterministic conversion for illegal UTF-8
