@@ -26,7 +26,7 @@ jobs:
       make-gtk: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.gtk-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-mac: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.mac-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-qt: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.qt-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-source-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make-source-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' || steps.check-diffs.outputs.android-changed == '1' || steps.check-diffs.outputs.dist-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-web: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.web-changed == '1' }}
@@ -129,7 +129,7 @@ jobs:
 
   sanitizer-tests-ubuntu:
     runs-on: ubuntu-24.04
-    needs: [ what-to-make ]
+    needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
       - name: Show Configuration
@@ -138,11 +138,13 @@ jobs:
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
       - name: Get Source
-        uses: actions/checkout@v6
+        uses: actions/download-artifact@v7
         with:
-          submodules: recursive
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Get Dependencies
-        uses: ./.github/actions/install-deps
+        uses: ./src/.github/actions/install-deps
         with:
           compiler: clang
           enable-debugging: true
@@ -150,7 +152,7 @@ jobs:
       - name: Configure
         run: |
           cmake \
-            -S . \
+            -S src \
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Debug \
@@ -177,7 +179,7 @@ jobs:
       - name: Make
         run: cmake --build obj --config Debug --target all-tests
       - name: Test with sanitizers
-        uses: ./.github/actions/run-tests
+        uses: ./src/.github/actions/run-tests
         with:
           build-dir: obj
           build-config: Debug
@@ -185,7 +187,7 @@ jobs:
 
   sanitizer-tests-macos:
     runs-on: macos-26
-    needs: [ what-to-make ]
+    needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
       - name: Show Configuration
@@ -194,17 +196,19 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Source
-        uses: actions/checkout@v6
+        uses: actions/download-artifact@v7
         with:
-          submodules: recursive
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Get Dependencies
-        uses: ./.github/actions/install-deps
+        uses: ./src/.github/actions/install-deps
         with:
           compiler: clang
       - name: Configure
         run: |
           cmake \
-            -S . \
+            -S src \
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Debug \
@@ -229,7 +233,7 @@ jobs:
       - name: Make
         run: cmake --build obj --config Debug --target all-tests
       - name: Test with sanitizers
-        uses: ./.github/actions/run-tests
+        uses: ./src/.github/actions/run-tests
         with:
           build-dir: obj
           build-config: Debug
@@ -237,7 +241,7 @@ jobs:
 
   clang-tidy-libtransmission:
     runs-on: ubuntu-24.04
-    needs: what-to-make
+    needs: [ make-source-tarball, what-to-make ]
     if: needs.what-to-make.outputs.make-core == 'true'
     steps:
       - name: Show Configuration
@@ -253,9 +257,12 @@ jobs:
           path: .
       - name: Get Source
         if: steps.cache-project-files.outputs.cache-hit != 'true'
-        uses: actions/checkout@v6
+        uses: actions/download-artifact@v7
         with:
-          submodules: recursive
+          name: source-tarball
+      - name: Extract Source
+        if: steps.cache-project-files.outputs.cache-hit != 'true'
+        run: tar xf transmission*.tar.* --strip-components 1
       - name: Get Dependencies
         uses: ./.github/actions/install-deps
         with:
@@ -385,7 +392,7 @@ jobs:
 
   clang-tidy-libtransmission-win32:
     runs-on: windows-2025
-    needs: what-to-make
+    needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-core == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true'
@@ -395,10 +402,11 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
       - name: Get Source
-        uses: actions/checkout@v6
+        uses: actions/download-artifact@v7
         with:
-          submodules: recursive
-          path: src
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Prepare Build Deps
         uses: ./src/.github/actions/prepare-deps-win32
         with:
@@ -435,7 +443,7 @@ jobs:
 
   macos-xcodebuild-universal:
     runs-on: macos-26
-    needs: [ what-to-make ]
+    needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
             needs.what-to-make.outputs.make-daemon == 'true' ||
             needs.what-to-make.outputs.make-mac == 'true' ||
@@ -449,10 +457,11 @@ jobs:
       - name: Get Dependencies
         run: brew install --formulae xcbeautify
       - name: Get Source
-        uses: actions/checkout@v6
+        uses: actions/download-artifact@v7
         with:
-          path: src
-          submodules: recursive
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Build
         run: set -o pipefail && xcodebuild -project src/Transmission.xcodeproj -scheme Transmission -configuration 'Release - Debug' -derivedDataPath pfx ONLY_ACTIVE_ARCH=NO build | xcbeautify --renderer github-actions
       - uses: actions/upload-artifact@v6
@@ -473,7 +482,7 @@ jobs:
           # Xref https://github.com/actions/runner-images/pull/13007
           macos-26
         ]
-    needs: [what-to-make]
+    needs: [make-source-tarball, what-to-make]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
             needs.what-to-make.outputs.make-daemon == 'true' ||
             needs.what-to-make.outputs.make-gtk == 'true' ||
@@ -489,11 +498,13 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Source
-        uses: actions/checkout@v6
+        uses: actions/download-artifact@v7
         with:
-          submodules: recursive
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Get Dependencies
-        uses: ./.github/actions/install-deps
+        uses: ./src/.github/actions/install-deps
         with:
           compiler: clang
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk4' || 'false' }}
@@ -501,7 +512,7 @@ jobs:
       - name: Configure
         run: |
           cmake \
-            -S . \
+            -S src \
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -531,7 +542,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        uses: ./.github/actions/run-tests
+        uses: ./src/.github/actions/run-tests
         with:
           build-dir: obj
           build-config: RelWithDebInfo
@@ -543,7 +554,7 @@ jobs:
           path: pfx/**/*
 
   alpine-musl:
-    needs: [ what-to-make ]
+    needs: [ make-source-tarball, what-to-make ]
     runs-on: ubuntu-latest
     container:
       image: alpine:latest
@@ -587,13 +598,15 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: apk add --upgrade qt6-qtbase-dev qt6-qttools-dev qt6-qtsvg-dev xcb-util-cursor
       - name: Get Source
-        uses: actions/checkout@v6
+        uses: actions/download-artifact@v7
         with:
-          submodules: recursive
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Configure
         run: |
           cmake \
-            -S . \
+            -S src \
             -B obj \
             -G Ninja \
             -DCMAKE_C_COMPILER='clang' \
@@ -623,7 +636,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        uses: ./.github/actions/run-tests
+        uses: ./src/.github/actions/run-tests
         with:
           build-dir: obj
           build-config: RelWithDebInfo
@@ -635,7 +648,7 @@ jobs:
           path: pfx/**/*
 
   windows:
-    needs: [ what-to-make ]
+    needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     strategy:
       fail-fast: false
@@ -654,11 +667,13 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
       - name: Get Source
-        uses: actions/checkout@v6
+        uses: actions/download-artifact@v7
         with:
-          submodules: recursive
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Prepare Build Deps
-        uses: ./.github/actions/prepare-deps-win32
+        uses: ./src/.github/actions/prepare-deps-win32
         with:
           arch: ${{ matrix.arch }}
           type: Deps
@@ -666,7 +681,7 @@ jobs:
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
           cmake `
-            -S . `
+            -S src `
             -B obj `
             -G Ninja `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
@@ -689,7 +704,7 @@ jobs:
           cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        uses: ./.github/actions/run-tests
+        uses: ./src/.github/actions/run-tests
         with:
           build-dir: obj
           build-config: RelWithDebInfo
@@ -784,12 +799,6 @@ jobs:
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: brew install --formula qt
-      - name: Get Composite Actions
-        uses: actions/checkout@v6
-        with:
-          sparse-checkout: |
-            .github/actions
-          sparse-checkout-cone-mode: false
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
@@ -824,7 +833,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        uses: ./.github/actions/run-tests
+        uses: ./src/.github/actions/run-tests
         with:
           build-dir: obj
           build-config: RelWithDebInfo
@@ -870,14 +879,14 @@ jobs:
           if [ "$VERSION_ID" != '11' ]; then
             echo "::warning title=Debian oldoldstable changed::debian:oldoldstable currently resolves to Debian $VERSION_ID. Consider removing matrix.use-legacy-packages if legacy package workarounds are no longer needed."
           fi
-      - name: Get Composite Actions
-        uses: actions/checkout@v6
+      - name: Get Source
+        uses: actions/download-artifact@v7
         with:
-          sparse-checkout: |
-            .github/actions
-          sparse-checkout-cone-mode: false
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Get Dependencies
-        uses: ./.github/actions/install-deps
+        uses: ./src/.github/actions/install-deps
         with:
           compiler: gcc
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && matrix.gtk || 'false' }}
@@ -888,12 +897,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-      - name: Get Source
-        uses: actions/download-artifact@v7
-        with:
-          name: source-tarball
-      - name: Extract Source
-        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Configure
         run: |
           set -- \
@@ -932,7 +935,7 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        uses: ./.github/actions/run-tests
+        uses: ./src/.github/actions/run-tests
         with:
           build-dir: obj
           build-config: RelWithDebInfo
@@ -959,14 +962,14 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
-      - name: Get Composite Actions
-        uses: actions/checkout@v6
+      - name: Get Source
+        uses: actions/download-artifact@v7
         with:
-          sparse-checkout: |
-            .github/actions
-          sparse-checkout-cone-mode: false
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Get Dependencies
-        uses: ./.github/actions/install-deps
+        uses: ./src/.github/actions/install-deps
         with:
           compiler: gcc
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk4' || 'false' }}
@@ -977,12 +980,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-      - name: Get Source
-        uses: actions/download-artifact@v7
-        with:
-          name: source-tarball
-      - name: Extract Source
-        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Configure
         run: |
           cmake \
@@ -1011,7 +1008,7 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        uses: ./.github/actions/run-tests
+        uses: ./src/.github/actions/run-tests
         with:
           build-dir: obj
           build-config: RelWithDebInfo
@@ -1033,15 +1030,15 @@ jobs:
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
 
-      - name: Get Composite Actions
-        uses: actions/checkout@v6
+      - name: Get Source
+        uses: actions/download-artifact@v7
         with:
-          sparse-checkout: |
-            .github/actions
-          sparse-checkout-cone-mode: false
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
 
       - name: Get Dependencies
-        uses: ./.github/actions/install-deps
+        uses: ./src/.github/actions/install-deps
         with:
           compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
           use-sudo: true
@@ -1050,12 +1047,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-      - name: Get Source
-        uses: actions/download-artifact@v7
-        with:
-          name: source-tarball
-      - name: Extract Source
-        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Configure
         run: |
           cmake \
@@ -1089,7 +1080,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        uses: ./.github/actions/run-tests
+        uses: ./src/.github/actions/run-tests
         with:
           build-dir: obj
           build-config: RelWithDebInfo
@@ -1101,7 +1092,7 @@ jobs:
           path: pfx/**/*
 
   android:
-    needs: [ what-to-make ]
+    needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-android == 'true' }}
     runs-on: ubuntu-latest
     env:
@@ -1115,9 +1106,12 @@ jobs:
           ninja-build
 
     - name: Get Source
-      uses: actions/checkout@v6
+      uses: actions/download-artifact@v7
       with:
-        submodules: recursive
+        name: source-tarball
+
+    - name: Extract Source
+      run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
 
     - name: Set up JDK 17
       uses: actions/setup-java@v5
@@ -1146,12 +1140,12 @@ jobs:
         vcpkg install openssl curl
 
     - name: Build Transmission
-      working-directory: ./android
+      working-directory: ./src/android
       run: |
         gradle build
 
   ubuntu-24-04-cxx-23:
-    needs: [ what-to-make ]
+    needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-24.04
     steps:
@@ -1161,11 +1155,13 @@ jobs:
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
       - name: Get Source
-        uses: actions/checkout@v6
+        uses: actions/download-artifact@v7
         with:
-          submodules: recursive
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Get Dependencies
-        uses: ./.github/actions/install-deps
+        uses: ./src/.github/actions/install-deps
         with:
           compiler: clang
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk3' || 'false' }}
@@ -1174,7 +1170,7 @@ jobs:
       - name: Configure
         run: |
           cmake \
-            -S . \
+            -S src \
             -B obj \
             -G Ninja \
             -DCMAKE_CXX_STANDARD=23 \
@@ -1316,14 +1312,14 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
-      - name: Get Composite Actions
-        uses: actions/checkout@v6
+      - name: Get Source
+        uses: actions/download-artifact@v7
         with:
-          sparse-checkout: |
-            .github/actions
-          sparse-checkout-cone-mode: false
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Get Dependencies
-        uses: ./.github/actions/install-deps
+        uses: ./src/.github/actions/install-deps
         with:
           compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
           enable-gtk: false
@@ -1336,12 +1332,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-      - name: Get Source
-        uses: actions/download-artifact@v7
-        with:
-          name: source-tarball
-      - name: Extract Source
-        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Configure
         run: |
           cmake \
@@ -1372,7 +1362,7 @@ jobs:
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
-        uses: ./.github/actions/run-tests
+        uses: ./src/.github/actions/run-tests
         with:
           build-dir: obj
           build-config: RelWithDebInfo
