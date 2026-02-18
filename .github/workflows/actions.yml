@@ -1594,8 +1594,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release:
-          - '6.4.2'
         arch:
           - x86_64
     runs-on: ubuntu-latest
@@ -1612,7 +1610,6 @@ jobs:
         uses: vmactions/dragonflybsd-vm@v1
         with:
           usesh: true
-          release: ${{ matrix.release }}
           arch: ${{ matrix.arch }}
           prepare: |
             set -ex
@@ -1675,5 +1672,5 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
+          name: binaries-${{ github.job }}-${{ matrix.arch }}
           path: pfx/**/*
