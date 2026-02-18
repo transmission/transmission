@@ -19,10 +19,11 @@
 
 #include <utf8.h>
 
-// TRR
 #ifdef WITH_UCHARDET
-#include "iconv_wrap.h"
 #include "uchardet_wrap.h"
+#ifndef _WIN32
+#include "iconv_wrap.h"
+#endif
 #endif
 
 #include <wildmat.h>
@@ -100,6 +101,34 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
         if (detector.detectFromString(sv) == CharsetDetector::OK)
         {
             tr_logAddDebug(fmt::format("CharsetDetector found {}", detector.getEncoding()));
+#ifdef _WIN32
+            auto const cp = CharsetDetector::encodingToCodepage(detector.getEncoding());
+            if (cp == 0)
+            {
+                tr_logAddError(fmt::format("No codepage for encoding '{}'", detector.getEncoding()));
+            }
+            else
+            {
+                auto const len_wide = MultiByteToWideChar(cp, 0, std::data(sv), static_cast<int>(std::size(sv)), nullptr, 0);
+                if (len_wide > 0)
+                {
+                    auto wide = std::wstring(len_wide, L'\0');
+                    MultiByteToWideChar(cp, 0, std::data(sv), static_cast<int>(std::size(sv)), std::data(wide), len_wide);
+                    auto const
+                        len_utf8 = WideCharToMultiByte(CP_UTF8, 0, std::data(wide), len_wide, nullptr, 0, nullptr, nullptr);
+                    if (len_utf8 > 0)
+                    {
+                        out.resize(len_utf8);
+                        WideCharToMultiByte(CP_UTF8, 0, std::data(wide), len_wide, std::data(out), len_utf8, nullptr, nullptr);
+                        do_replacement = false;
+                    }
+                }
+                if (do_replacement)
+                {
+                    tr_logAddError(fmt::format("Windows conversion failed for codepage {}", cp));
+                }
+            }
+#else
             IconvWrapper conv("UTF-8", detector.getEncoding());
             if (!conv.is_valid())
             {
@@ -118,6 +147,7 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
                     do_replacement = false;
                 }
             }
+#endif
         }
         else
         {

@@ -120,6 +120,45 @@ public:
         return lastStatus_;
     }
 
+    // Returns the Windows codepage number for the detected encoding,
+    // or 0 if unknown. Covers all encodings that uchardet v0.0.8 can return.
+    [[nodiscard]] static unsigned int encodingToCodepage(std::string_view encoding) noexcept
+    {
+        static constexpr std::pair<std::string_view, unsigned int> table[] = {
+            { "ASCII", 20127 },        { "BIG5", 950 },
+            { "EUC-JP", 20932 },       { "EUC-KR", 51949 },
+            { "EUC-TW", 51950 },       { "GB18030", 54936 },
+            { "HZ-GB-2312", 52936 },   { "IBM852", 852 },
+            { "IBM855", 855 },         { "IBM865", 865 },
+            { "IBM866", 866 },         { "ISO-2022-CN", 50227 },
+            { "ISO-2022-JP", 50220 },  { "ISO-2022-KR", 50225 },
+            { "ISO-8859-1", 28591 },   { "ISO-8859-10", 28600 },
+            { "ISO-8859-11", 28601 },  { "ISO-8859-13", 28603 },
+            { "ISO-8859-15", 28605 },  { "ISO-8859-16", 28606 },
+            { "ISO-8859-2", 28592 },   { "ISO-8859-3", 28593 },
+            { "ISO-8859-4", 28594 },   { "ISO-8859-5", 28595 },
+            { "ISO-8859-6", 28596 },   { "ISO-8859-7", 28597 },
+            { "ISO-8859-8", 28598 },   { "ISO-8859-9", 28599 },
+            { "KOI8-R", 20866 },       { "MAC-CENTRALEUROPE", 10029 },
+            { "MAC-CYRILLIC", 10007 }, { "SHIFT_JIS", 932 },
+            { "TIS-620", 874 },        { "UHC", 949 },
+            { "UTF-8", 65001 },        { "VISCII", 1258 }, // no native Windows VISCII; CP1258 is closest
+            { "WINDOWS-1250", 1250 },  { "WINDOWS-1251", 1251 },
+            { "WINDOWS-1252", 1252 },  { "WINDOWS-1253", 1253 },
+            { "WINDOWS-1255", 1255 },  { "WINDOWS-1256", 1256 },
+            { "WINDOWS-1257", 1257 },  { "WINDOWS-1258", 1258 },
+        };
+
+        for (auto const& [name, cp] : table)
+        {
+            if (name == encoding)
+            {
+                return cp;
+            }
+        }
+        return 0;
+    }
+
 private:
     uchardet_t ud_;
     Status lastStatus_;
