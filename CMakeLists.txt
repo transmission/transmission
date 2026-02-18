@@ -577,7 +577,7 @@ tr_add_external_auto_library(PSL libpsl
     LIBNAME psl
     TARGET psl::psl)
 
-if(APPLE)
+if(APPLE OR ANDROID)
     set(ENABLE_UCHARDET OFF)
 endif()
 
