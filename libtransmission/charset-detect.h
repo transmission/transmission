@@ -4,39 +4,42 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-// This file defines the C++ wrapper for the Mozilla uchardet library.
+// C++ RAII wrapper for the Mozilla uchardet library.
 
 #pragma once
 
+#include <cstddef> // size_t
+#include <cstdint> // uint8_t
 #include <string>
 #include <string_view>
+#include <utility> // std::pair
 
 #include <uchardet/uchardet.h>
 
-class CharsetDetector
+class tr_charset_detector
 {
 public:
-    enum Status
+    enum class Status : uint8_t
     {
         OK = 0,
-        INIT_FAILED,
-        INVALID_INPUT,
-        PROCESS_ERROR,
-        FILE_ERROR,
-        UNKNOWN_ENCODING
+        InitFailed,
+        InvalidInput,
+        ProcessError,
+        FileError,
+        UnknownEncoding
     };
 
-    CharsetDetector() noexcept
+    tr_charset_detector() noexcept
         : ud_(uchardet_new())
-        , lastStatus_(OK)
+        , last_status_(Status::OK)
     {
         if (!ud_)
         {
-            lastStatus_ = INIT_FAILED;
+            last_status_ = Status::InitFailed;
         }
     }
 
-    ~CharsetDetector()
+    ~tr_charset_detector()
     {
         if (ud_)
         {
@@ -44,18 +47,18 @@ public:
         }
     }
 
-    CharsetDetector(CharsetDetector const&) = delete;
-    CharsetDetector& operator=(CharsetDetector const&) = delete;
+    tr_charset_detector(tr_charset_detector const&) = delete;
+    tr_charset_detector& operator=(tr_charset_detector const&) = delete;
 
-    CharsetDetector(CharsetDetector&& other) noexcept
+    tr_charset_detector(tr_charset_detector&& other) noexcept
         : ud_(other.ud_)
-        , lastStatus_(other.lastStatus_)
-        , lastEncoding_(std::move(other.lastEncoding_))
+        , last_status_(other.last_status_)
+        , last_encoding_(std::move(other.last_encoding_))
     {
         other.ud_ = nullptr;
     }
 
-    CharsetDetector& operator=(CharsetDetector&& other) noexcept
+    tr_charset_detector& operator=(tr_charset_detector&& other) noexcept
     {
         if (this != &other)
         {
@@ -64,65 +67,69 @@ public:
                 uchardet_delete(ud_);
             }
             ud_ = other.ud_;
-            lastStatus_ = other.lastStatus_;
-            lastEncoding_ = std::move(other.lastEncoding_);
+            last_status_ = other.last_status_;
+            last_encoding_ = std::move(other.last_encoding_);
             other.ud_ = nullptr;
         }
         return *this;
     }
 
-    Status detectFromBuffer(char const* data, size_t length) noexcept
+    [[nodiscard]] Status detect_from_buffer(char const* data, size_t length) noexcept
     {
         if (!ud_)
-            return INIT_FAILED;
+        {
+            return Status::InitFailed;
+        }
         if (!data || length == 0)
-            return INVALID_INPUT;
+        {
+            return Status::InvalidInput;
+        }
 
         uchardet_reset(ud_);
         if (uchardet_handle_data(ud_, data, length) != 0)
         {
-            lastStatus_ = PROCESS_ERROR;
-            return lastStatus_;
+            last_status_ = Status::ProcessError;
+            return last_status_;
         }
 
         uchardet_data_end(ud_);
         char const* charset = uchardet_get_charset(ud_);
         if (!charset || charset[0] == '\0')
         {
-            lastEncoding_ = {};
-            lastStatus_ = UNKNOWN_ENCODING;
+            last_encoding_ = {};
+            last_status_ = Status::UnknownEncoding;
         }
         else
         {
-            lastEncoding_ = charset;
-            lastStatus_ = OK;
+            last_encoding_ = charset;
+            last_status_ = Status::OK;
         }
-        return lastStatus_;
+        return last_status_;
     }
 
-    Status detectFromString(std::string_view const text) noexcept
+    [[nodiscard]] Status detect_from_string(std::string_view const text) noexcept
     {
-        return detectFromBuffer(text.data(), text.size());
+        return detect_from_buffer(text.data(), text.size());
     }
 
-    Status detectFromString(std::string const& text) noexcept
+    [[nodiscard]] Status detect_from_string(std::string const& text) noexcept
     {
-        return detectFromBuffer(text.data(), text.size());
+        return detect_from_buffer(text.data(), text.size());
     }
 
-    std::string_view const getEncoding() const noexcept
+    [[nodiscard]] std::string_view encoding() const noexcept
     {
-        return lastEncoding_;
+        return last_encoding_;
     }
 
-    Status getLastStatus() const noexcept
+    [[nodiscard]] Status last_status() const noexcept
     {
-        return lastStatus_;
+        return last_status_;
     }
 
     // Returns the Windows codepage number for the detected encoding,
     // or 0 if unknown. Covers all encodings that uchardet v0.0.8 can return.
-    [[nodiscard]] static unsigned int encodingToCodepage(std::string_view encoding) noexcept
+    [[nodiscard]] static unsigned int encoding_to_codepage(std::string_view encoding) noexcept
     {
         static constexpr std::pair<std::string_view, unsigned int> table[] = {
             { "ASCII", 20127 },        { "BIG5", 950 },
@@ -161,6 +168,6 @@ public:
 
 private:
     uchardet_t ud_;
-    Status lastStatus_;
-    std::string_view lastEncoding_;
+    Status last_status_;
+    std::string_view last_encoding_;
 };

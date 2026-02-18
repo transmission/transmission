@@ -20,7 +20,7 @@
 #include <utf8.h>
 
 #ifdef WITH_UCHARDET
-#include "uchardet_wrap.h"
+#include "libtransmission/charset-detect.h"
 #ifndef _WIN32
 #include "iconv_wrap.h"
 #endif
@@ -97,15 +97,15 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
     }
     else
     {
-        CharsetDetector detector;
-        if (detector.detectFromString(sv) == CharsetDetector::OK)
+        tr_charset_detector detector;
+        if (detector.detect_from_string(sv) == tr_charset_detector::Status::OK)
         {
-            tr_logAddDebug(fmt::format("CharsetDetector found {}", detector.getEncoding()));
+            tr_logAddDebug(fmt::format("tr_charset_detector found {}", detector.encoding()));
 #ifdef _WIN32
-            auto const cp = CharsetDetector::encodingToCodepage(detector.getEncoding());
+            auto const cp = tr_charset_detector::encoding_to_codepage(detector.encoding());
             if (cp == 0)
             {
-                tr_logAddError(fmt::format("No codepage for encoding '{}'", detector.getEncoding()));
+                tr_logAddError(fmt::format("No codepage for encoding '{}'", detector.encoding()));
             }
             else
             {
@@ -129,7 +129,7 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
                 }
             }
 #else
-            IconvWrapper conv("UTF-8", detector.getEncoding());
+            IconvWrapper conv("UTF-8", detector.encoding());
             if (!conv.is_valid())
             {
                 tr_logAddError("Failed to open iconv");
@@ -151,7 +151,7 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
         }
         else
         {
-            tr_logAddError("CharsetDetector failed");
+            tr_logAddError("tr_charset_detector failed");
         }
     }
 #endif
