@@ -15,13 +15,14 @@ performance logs reported by users. Thanks, and keep them coming!
 * Fixed a `4.1.0` bug that failed to report some filesystem errors to RPC clients who were querying the system's free space available. ([#8258](https://github.com/transmission/transmission/pull/8258))
 * Fixed a `4.1.0` bug that kept a a torrent's updated queue position from being shown. ([#8298](https://github.com/transmission/transmission/pull/8298))
 * Fixed a `4.1.0` bug that caused torrents' queuing order to sometimes be lost between sessions. ([#8306](https://github.com/transmission/transmission/pull/8306))
+* Fixed "assertion failed: no timezone" error on OpenSolaris. ([#8358](https://github.com/transmission/transmission/pull/8358))
 * Fixed a `4.0.0` bug that displayed the wrong mime-type icon for mp4 video files. ([#8411](https://github.com/transmission/transmission/pull/8411))
 * Hardened .torrent parsing by exiting sooner if  `pieces` has an invalid size. ([#8412](https://github.com/transmission/transmission/pull/8412))
-* Reverted a `4.1.0` RPC change that turned some speed limit fields from integers to floating-point numbers. ([#8416](https://github.com/transmission/transmission/pull/8416))
+* Reverted a `4.1.0` RPC change that broke some 3rd party code by returning floating-point numbers, rather than integers, for speed limit fields. ([#8416](https://github.com/transmission/transmission/pull/8416))
 * Fixed crash that could happen if a user paused a torrent and edited its tracker list at the same time. ([#8478](https://github.com/transmission/transmission/pull/8478))
 * Fixed `4.1.0` crash on arm32 by switching crc32 libraries to Mark Madler's [crcany](https://github.com/madler/crcany). ([#8529](https://github.com/transmission/transmission/pull/8529))
-* Allow only UTF-8 characters in torrent paths. ([#8541](https://github.com/transmission/transmission/pull/8541))
-* Reject .torrent files with bad 'pieces' key, fixes segfault. ([#8542](https://github.com/transmission/transmission/pull/8542))
+* Require UTF-8 filenames in .torrent files, as required by the [BitTorrent spec](https://www.bittorrent.org/beps/bep_0003.html). ([#8541](https://github.com/transmission/transmission/pull/8541))
+* Fixed crash that could occur when parsing a .torrent file with a bad `pieces` key. ([#8542](https://github.com/transmission/transmission/pull/8542))
 * Fixed potential file descriptor leak when launching scripts on POSIX systems. ([#8549](https://github.com/transmission/transmission/pull/8549))
 * Changed the network traffic algorithm to spread bandwidth more evenly amongst peers. ([#8259](https://github.com/transmission/transmission/pull/8259))
 * Improved laggy user interface when bandwidth usage is high. ([#8454](https://github.com/transmission/transmission/pull/8454))
@@ -58,5 +59,4 @@ performance logs reported by users. Thanks, and keep them coming!
 
 ### Everything Else
 
-* Updated documentation. ([#8245](https://github.com/transmission/transmission/pull/8245), [#8358](https://github.com/transmission/transmission/pull/8358), [#8526](https://github.com/transmission/transmission/pull/8526))
-
+* Updated documentation. ([#8245](https://github.com/transmission/transmission/pull/8245), [#8526](https://github.com/transmission/transmission/pull/8526))
