@@ -63,7 +63,7 @@ TEST_F(TorrentMetainfoTest, bucket)
         bool expected_parse_result;
     };
 
-    auto const tests = std::array<LocalTest, 9>{ {
+    static auto constexpr Tests = std::array<LocalTest, 12U>{ {
         { .benc = BEFORE_PATH "5:a.txt" AFTER_PATH, .expected_parse_result = true },
         // allow empty components, but not =all= empty components, see bug #5517
         { .benc = BEFORE_PATH "0:5:a.txt" AFTER_PATH, .expected_parse_result = true },
@@ -76,16 +76,21 @@ TEST_F(TorrentMetainfoTest, bucket)
         // allow ".." components (replaced with "__")
         { .benc = BEFORE_PATH "2:..5:a.txt" AFTER_PATH, .expected_parse_result = true },
         { .benc = BEFORE_PATH "5:a.txt2:.." AFTER_PATH, .expected_parse_result = true },
+        // fail when coming across an invalid character
+        { .benc = "dhe", .expected_parse_result = false },
+        { .benc = "d10:longer than 10 characterse", .expected_parse_result = false },
+        // fail when string is too short
+        { .benc = "d10:short", .expected_parse_result = false },
         // fail on empty string
         { .benc = "", .expected_parse_result = false },
     } };
 
     tr_logSetLevel(TR_LOG_OFF);
 
-    for (auto const& test : tests)
+    for (auto const& [benc, expected_parse_result] : Tests)
     {
         auto metainfo = tr_torrent_metainfo{};
-        EXPECT_EQ(test.expected_parse_result, metainfo.parse_benc(test.benc));
+        EXPECT_EQ(expected_parse_result, metainfo.parse_benc(benc));
     }
 }
 
