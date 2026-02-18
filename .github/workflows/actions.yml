@@ -244,12 +244,6 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
-      - name: Cache project files
-        id: cache-project-files
-        uses: actions/cache@v5
-        with:
-          key: clang-tidy-${{ github.sha }}
-          path: .
       - name: Get Source
         if: steps.cache-project-files.outputs.cache-hit != 'true'
         uses: actions/checkout@v6
@@ -286,6 +280,13 @@ jobs:
         run: |
           set -euo pipefail
           cmake --build obj --config Debug --target transmission-app 2>&1 | tee -a makelog
+      - name: Upload project files
+        uses: actions/upload-artifact@v6
+        with:
+          name: clang-tidy-project
+          path: .
+          include-hidden-files: true
+          retention-days: 1
       - name: Test for warnings
         run: |
           if grep 'warning:' makelog; then exit 1; fi
@@ -341,11 +342,9 @@ jobs:
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
       - name: Get cached project files
-        uses: actions/cache/restore@v5
+        uses: actions/download-artifact@v7
         with:
-          key: clang-tidy-${{ github.sha }}
-          path: .
-          fail-on-cache-miss: true
+          name: clang-tidy-project
       - name: Get Dependencies
         uses: ./.github/actions/install-deps
         with:
