@@ -14,7 +14,6 @@ on:
       - '.github/**'
 jobs:
   decide-what-jobs-to-run:
-    if: false # TEMP: skip webapp and codeql CI
     runs-on: ubuntu-latest
     outputs:
       test-style: ${{ steps.check-diffs.outputs.web-changed == '1' }}
