@@ -233,7 +233,11 @@ jobs:
   clang-tidy-libtransmission:
     runs-on: ubuntu-24.04
     needs: what-to-make
-    if: needs.what-to-make.outputs.make-core == 'true'
+    if: |
+      needs.what-to-make.outputs.make-core == 'true' ||
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-qt == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true'
     steps:
       - name: Show Configuration
         run: |
