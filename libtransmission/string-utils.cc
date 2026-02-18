@@ -100,9 +100,10 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
         tr_charset_detector detector;
         if (detector.detect_from_string(sv) == tr_charset_detector::Status::OK)
         {
+            auto const info = tr_charset_detector::lookup_encoding(detector.encoding());
             tr_logAddDebug(fmt::format("tr_charset_detector found {}", detector.encoding()));
 #ifdef _WIN32
-            auto const cp = tr_charset_detector::encoding_to_codepage(detector.encoding());
+            auto const cp = info.codepage;
             if (cp == 0)
             {
                 tr_logAddError(fmt::format("No codepage for encoding '{}'", detector.encoding()));
@@ -129,7 +130,7 @@ std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32
                 }
             }
 #else
-            tr_charset_converter conv("UTF-8", detector.encoding());
+            tr_charset_converter conv("UTF-8", info.iconv_name);
             if (!conv.is_valid())
             {
                 tr_logAddError("Failed to open iconv");
