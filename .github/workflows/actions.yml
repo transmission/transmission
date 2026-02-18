@@ -1490,8 +1490,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release:
-          - '10.1'
         arch:
           - vmactions: x86_64
             binary-set: amd64
@@ -1517,7 +1515,6 @@ jobs:
         uses: vmactions/netbsd-vm@v1
         with:
           usesh: true
-          release: ${{ matrix.release }}
           arch: ${{ matrix.arch.vmactions }}
           prepare: |
             set -ex
@@ -1582,7 +1579,7 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch.vmactions }}
+          name: binaries-${{ github.job }}-${{ matrix.arch.vmactions }}
           path: pfx/**/*
 
   dragonflybsd:
