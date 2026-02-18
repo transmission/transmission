@@ -584,6 +584,7 @@ if(ENABLE_UCHARDET)
         CMAKE_ARGS
             -DBUILD_BINARY:BOOL=OFF
             -DBUILD_SHARED_LIBS:BOOL=OFF)
+    find_package(Iconv REQUIRED)
 endif()
 
 if(ENABLE_UTP)

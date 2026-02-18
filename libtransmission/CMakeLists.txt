@@ -275,6 +275,7 @@ target_link_libraries(${TR_NAME}
         dht::dht
         $<$<BOOL:${ENABLE_UTP}>:libutp::libutp>
         $<$<BOOL:${ENABLE_UCHARDET}>:uchardet::uchardet>
+        $<$<BOOL:${ENABLE_UCHARDET}>:Iconv::Iconv>
         libb64::libb64
         ${Intl_LIBRARIES}
         ${LIBM_LIBRARY}
