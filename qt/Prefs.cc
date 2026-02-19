@@ -163,7 +163,7 @@ Prefs::Prefs()
     load(defaults());
 }
 
-void Prefs::loadFromConfigDir(QString const dir)
+void Prefs::loadFromConfigDir(QString const& dir)
 {
     auto settings = tr_sessionLoadSettings(dir.toStdString());
     if (auto* const map = settings.get_if<tr_variant::Map>())

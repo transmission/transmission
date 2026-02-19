@@ -24,12 +24,12 @@ class FileTreeItem
     Q_DECLARE_TR_FUNCTIONS(FileTreeItem)
 
 public:
-    static auto constexpr Low = int{ 1 << 0 };
-    static auto constexpr Normal = int{ 1 << 1 };
-    static auto constexpr High = int{ 1 << 2 };
+    static int constexpr Low = 1 << 0;
+    static int constexpr Normal = 1 << 1;
+    static int constexpr High = 1 << 2;
 
-    FileTreeItem(QString const& name = QString{}, int file_index = -1, uint64_t size = 0)
-        : name_{ name }
+    explicit FileTreeItem(QString name = QString{}, int file_index = -1, uint64_t size = 0)
+        : name_{ std::move(name) }
         , total_size_{ size }
         , file_index_{ file_index }
     {

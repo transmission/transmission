@@ -26,6 +26,7 @@
 #include "TorrentModel.h"
 #include "Utils.h"
 
+// NOLINTNEXTLINE(performance-enum-size)
 enum
 {
     ACTIVITY_ROLE = FilterBarComboBox::UserRole,
@@ -51,7 +52,7 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(new QStandardItem{}); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
-    auto add_row = [model](auto const show_mode, QString label, std::optional<icons::Type> const type)
+    auto add_row = [model](auto const show_mode, QString const& label, std::optional<icons::Type> const type)
     {
         auto* new_row = type ? new QStandardItem{ icons::icon(*type), label } : new QStandardItem{ label };
         new_row->setData(QVariant::fromValue(show_mode), ACTIVITY_ROLE);
@@ -101,6 +102,7 @@ Torrent::fields_t constexpr TrackerFields = {
 
 void FilterBar::refreshTrackers()
 {
+    // NOLINTNEXTLINE(performance-enum-size)
     enum
     {
         ROW_TOTALS = 0,

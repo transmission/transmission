@@ -296,6 +296,7 @@ jobs:
     needs: [ what-to-make, clang-tidy-libtransmission ]
     if: |
       needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-qt == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true'
     outputs:
       matrix: ${{ steps.generate-matrix.outputs.matrix }}
@@ -313,6 +314,22 @@ jobs:
                 --arg target transmission-gtk \
                 --arg enable-gtk gtk3 \
                 --argjson enable-qt false \
+                --argjson enable-tests false
+            )")
+          fi
+          if [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
+            jobs+=("$(
+              jq -nc '$ARGS.named' \
+                --arg target transmission-qt \
+                --argjson enable-gtk false \
+                --arg enable-qt qt6 \
+                --argjson enable-tests false
+            )"
+            "$(
+              jq -nc '$ARGS.named' \
+                --arg target transmission-qt \
+                --argjson enable-gtk false \
+                --arg enable-qt qt5 \
                 --argjson enable-tests false
             )")
           fi
@@ -370,7 +387,6 @@ jobs:
             -DENABLE_TESTS=${{ matrix.enable-tests && 'ON' || 'OFF' }} \
             -DRUN_CLANG_TIDY=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \

@@ -12,4 +12,4 @@
 // When one of these changes, it's time to refilter.
 extern Torrent::fields_t const ShowModeFields;
 
-bool should_show_torrent(Torrent const& torrent, ShowMode);
+bool should_show_torrent(Torrent const& torrent, ShowMode mode);

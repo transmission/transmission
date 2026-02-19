@@ -74,7 +74,7 @@ void ensureFontsLoaded()
 #endif
 }
 
-QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int const pixel_size)
+QPixmap makeIconFromCodepoint(QString const& family, QChar const codepoint, int const pixel_size)
 {
     auto font = QFont{ family };
     if (!QFontMetrics{ font }.inFont(codepoint))

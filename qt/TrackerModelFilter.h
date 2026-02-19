@@ -13,12 +13,13 @@ class TrackerModelFilter : public QSortFilterProxyModel
 
 public:
     explicit TrackerModelFilter(QObject* parent = nullptr);
+    ~TrackerModelFilter() override = default;
     TrackerModelFilter(TrackerModelFilter&&) = delete;
     TrackerModelFilter(TrackerModelFilter const&) = delete;
     TrackerModelFilter& operator=(TrackerModelFilter&&) = delete;
     TrackerModelFilter& operator=(TrackerModelFilter const&) = delete;
 
-    void setShowBackupTrackers(bool);
+    void setShowBackupTrackers(bool b);
 
     [[nodiscard]] constexpr auto showBackupTrackers() const noexcept
     {

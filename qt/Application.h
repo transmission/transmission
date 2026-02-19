@@ -85,7 +85,7 @@ signals:
     void faviconsChanged();
 
 public slots:
-    void addTorrent(AddData) const;
+    void addTorrent(AddData addme) const;
     void addWatchdirTorrent(QString const& filename) const;
 
 private slots:
@@ -105,7 +105,7 @@ private:
     void maybeUpdateBlocklist() const;
     void loadTranslations();
     QStringList getNames(torrent_ids_t const& ids) const;
-    void notifyTorrentAdded(Torrent const*) const;
+    void notifyTorrentAdded(Torrent const* tor) const;
 
     std::unordered_set<QString> interned_strings_;
 
@@ -124,4 +124,4 @@ private:
     tr::app::FaviconCache<QPixmap> favicon_cache_;
 };
 
-#define trApp dynamic_cast<Application*>(Application::instance())
+#define trApp (dynamic_cast<Application*>(Application::instance()))

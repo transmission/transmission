@@ -507,6 +507,7 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
 }
 
 #ifdef QT_DBUS_LIB
+// NOLINTNEXTLINE(performance-unnecessary-value-param)
 void Application::onNotificationActionInvoked(quint32 /* notification_id */, QString action_key)
 {
     static QRegularExpression const StartNowRegex{ QStringLiteral(R"rgx(start-now\((\d+)\))rgx") };
