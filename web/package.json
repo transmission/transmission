@@ -20,18 +20,18 @@
   "devDependencies": {
     "@eslint/js": "^9.7.0",
     "@primer/stylelint-config": "^13.4.0",
-    "esbuild": "^0.25.11",
+    "esbuild": "^0.27.3",
     "esbuild-sass-plugin": "^3.3.1",
     "eslint": "^9.38.0",
-    "eslint-plugin-sonarjs": "^3.0.5",
-    "eslint-plugin-unicorn": "^61.0.2",
-    "globals": "^16.4.0",
+    "eslint-plugin-sonarjs": "3.0.5",
+    "eslint-plugin-unicorn": "^63.0.0",
+    "globals": "^17.3.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.6.2",
     "sass": "^1.89.2",
     "style-loader": "^4.0.0",
-    "stylelint": "^16.25.0",
-    "stylelint-config-sass-guidelines": "^12.1.0"
+    "stylelint": "^17.3.0",
+    "stylelint-config-sass-guidelines": "^13.0.0"
   },
   "dependencies": {
     "clusterize.js": "^1.0.0",

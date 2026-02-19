@@ -37,7 +37,7 @@ Glib::Value<T>& column_value_cast(Glib::ValueBase& value, Gtk::TreeModelColumn<T
     return static_cast<Glib::Value<T>&>(value);
 }
 
-template<typename T, typename U, typename = std::enable_if_t<!std::is_floating_point_v<T>>>
+template<typename T, typename U>
 void update_cache_value(T& value, U&& new_value, Torrent::ChangeFlags& changes, Torrent::ChangeFlag flag)
 {
     if (value != new_value)
@@ -47,7 +47,7 @@ void update_cache_value(T& value, U&& new_value, Torrent::ChangeFlags& changes, 
     }
 }
 
-template<typename T, typename U, typename = std::enable_if_t<std::is_floating_point_v<T>>>
+template<std::floating_point T, typename U>
 void update_cache_value(T& value, U new_value, T epsilon, Torrent::ChangeFlags& changes, Torrent::ChangeFlag flag)
 {
     if (std::fabs(value - new_value) >= epsilon)
@@ -115,6 +115,7 @@ Torrent::Columns::Columns()
 class Torrent::Impl
 {
 public:
+    // NOLINTNEXTLINE(performance-enum-size): must be guint to match glib API
     enum class Property : guint
     {
         ICON = 1,
@@ -246,7 +247,7 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
     auto const has_seed_ratio = tr_torrentGetSeedRatio(raw_torrent_, &seed_ratio);
     auto const view = tr_torrentView(raw_torrent_);
 
-    update_cache_value(cache_.name, view.name, result, ChangeFlag::NAME);
+    update_cache_value(cache_.name, Glib::ustring{ view.name }, result, ChangeFlag::NAME);
     update_cache_value(cache_.speed_up, stats.piece_upload_speed, result, ChangeFlag::SPEED_UP);
     update_cache_value(cache_.speed_down, stats.piece_download_speed, result, ChangeFlag::SPEED_DOWN);
     update_cache_value(cache_.active_peers_up, stats.peers_getting_from_us, result, ChangeFlag::ACTIVE_PEERS_UP);
@@ -276,7 +277,7 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
     update_cache_value(cache_.queue_position, stats.queue_position, result, ChangeFlag::QUEUE_POSITION);
     update_cache_value(cache_.trackers, build_torrent_trackers_hash(*raw_torrent_), result, ChangeFlag::TRACKERS);
     update_cache_value(cache_.error_code, stats.error, result, ChangeFlag::ERROR_CODE);
-    update_cache_value(cache_.error_message, stats.error_string, result, ChangeFlag::ERROR_MESSAGE);
+    update_cache_value(cache_.error_message, Glib::ustring{ stats.error_string }, result, ChangeFlag::ERROR_MESSAGE);
     update_cache_value(
         cache_.active_peer_count,
         stats.peers_sending_to_us + stats.peers_getting_from_us + stats.webseeds_sending_to_us,

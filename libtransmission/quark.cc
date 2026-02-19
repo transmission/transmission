@@ -13,6 +13,7 @@
 
 #include "libtransmission/quark.h"
 #include "libtransmission/string-utils.h"
+#include "libtransmission/tr-assert.h"
 
 using namespace std::literals;
 
@@ -754,18 +755,17 @@ bool constexpr quarks_are_sorted()
 static_assert(quarks_are_sorted(), "Predefined quarks must be sorted by their string value");
 static_assert(std::size(MyStatic) == TR_N_KEYS);
 
-auto& my_runtime{ *new std::vector<std::string_view>{} };
+auto& my_runtime{ *new std::vector<std::u8string_view>{} };
 
 } // namespace
 
-std::optional<tr_quark> tr_quark_lookup(std::string_view key)
+std::optional<tr_quark> tr_quark_lookup(std::u8string_view key)
 {
     // is it in our static array?
     auto constexpr Sbegin = std::begin(MyStatic);
     auto constexpr Send = std::end(MyStatic);
 
-    auto const u8key = tr_strv_to_u8string(key);
-    if (auto const sit = std::lower_bound(Sbegin, Send, u8key); sit != Send && *sit == u8key)
+    if (auto const sit = std::lower_bound(Sbegin, Send, key); sit != Send && *sit == key)
     {
         return std::distance(Sbegin, sit);
     }
@@ -781,8 +781,15 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key)
     return {};
 }
 
-tr_quark tr_quark_new(std::string_view str)
+std::optional<tr_quark> tr_quark_lookup(std::string_view key)
 {
+    auto const u8key = tr_strv_to_u8string(key);
+    return tr_quark_lookup(u8key);
+}
+
+tr_quark tr_quark_new(std::u8string_view str)
+{
+    TR_ASSERT(tr_strv_find_invalid_utf8(str) == std::u8string_view::npos);
     if (auto const prior = tr_quark_lookup(str); prior)
     {
         return *prior;
@@ -790,20 +797,27 @@ tr_quark tr_quark_new(std::string_view str)
 
     auto const ret = TR_N_KEYS + std::size(my_runtime);
     auto const len = std::size(str);
-    auto* perma = new char[len + 1];
+    auto* perma = new char8_t[len + 1];
     std::copy_n(std::begin(str), len, perma);
     perma[len] = '\0';
     my_runtime.emplace_back(perma);
     return ret;
 }
 
+tr_quark tr_quark_new(std::string_view str)
+{
+    auto const u8str = tr_strv_to_u8string(str);
+    return tr_quark_new(u8str);
+}
+
 std::string_view tr_quark_get_string_view(tr_quark q)
 {
-    return q < TR_N_KEYS ? std::string_view{ reinterpret_cast<char const*>(std::data(MyStatic[q])), std::size(MyStatic[q]) } :
-                           my_runtime[q - TR_N_KEYS];
+    auto const u8str = tr_quark_get_u8string_view(q);
+    return { reinterpret_cast<char const*>(std::data(u8str)), std::size(u8str) };
 }
 
 std::u8string_view tr_quark_get_u8string_view(tr_quark q)
 {
-    return MyStatic[q];
+    TR_ASSERT(q < TR_N_KEYS + std::size(my_runtime));
+    return q < TR_N_KEYS ? MyStatic[q] : my_runtime[q - TR_N_KEYS];
 }

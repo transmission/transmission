@@ -970,10 +970,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = Glib::ustring(stats.front().error_string);
+        auto const& baseline = stats.front().error_string;
         bool const is_uniform = std::ranges::all_of(stats, [&baseline](auto const& st) { return baseline == st.error_string; });
 
-        str = is_uniform ? baseline : mixed;
+        str = is_uniform ? Glib::ustring{ baseline } : mixed;
     }
 
     if (str.empty())

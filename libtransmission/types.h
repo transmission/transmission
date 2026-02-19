@@ -268,14 +268,14 @@ struct tr_byte_span_t
  */
 struct tr_file_view
 {
-    char const* name; // This file's name. Includes the full subpath in the torrent.
-    uint64_t have; // the current size of the file, i.e. how much we've downloaded
-    uint64_t length; // the total size of the file
-    double progress; // have / length
-    tr_piece_index_t beginPiece; // piece index where this file starts
-    tr_piece_index_t endPiece; // piece index where this file ends (exclusive)
-    tr_priority_t priority; // the file's priority
-    bool wanted; // do we want to download this file?
+    char const* name = ""; // This file's name. Includes the full subpath in the torrent.
+    uint64_t have = {}; // the current size of the file, i.e. how much we've downloaded
+    uint64_t length = {}; // the total size of the file
+    double progress = {}; // have / length
+    tr_piece_index_t beginPiece = {}; // piece index where this file starts
+    tr_piece_index_t endPiece = {}; // piece index where this file ends (exclusive)
+    tr_priority_t priority = {}; // the file's priority
+    bool wanted = {}; // do we want to download this file?
 };
 
 struct tr_peer_stat
@@ -516,22 +516,22 @@ struct tr_stat
  */
 struct tr_torrent_view
 {
-    char const* name;
-    char const* hash_string;
+    char const* name = "";
+    char const* hash_string = "";
 
-    char const* comment; // optional; may be nullptr
-    char const* creator; // optional; may be nullptr
-    char const* source; // optional; may be nullptr
+    char const* comment = ""; // optional; may be nullptr
+    char const* creator = ""; // optional; may be nullptr
+    char const* source = ""; // optional; may be nullptr
 
-    uint64_t total_size; // total size of the torrent, in bytes
+    uint64_t total_size = {}; // total size of the torrent, in bytes
 
-    time_t date_created;
+    time_t date_created = {};
 
-    uint32_t piece_size;
-    tr_piece_index_t n_pieces;
+    uint32_t piece_size = {};
+    tr_piece_index_t n_pieces = {};
 
-    bool is_private;
-    bool is_folder;
+    bool is_private = {};
+    bool is_folder = {};
 };
 
 // NOLINTBEGIN(modernize-avoid-c-arrays)
@@ -541,46 +541,46 @@ struct tr_torrent_view
  */
 struct tr_tracker_view
 {
-    char const* announce; // full announce URL
-    char const* scrape; // full scrape URL
-    char host_and_port[72]; // uniquely-identifying tracker name (`${host}:${port}`)
+    char const* announce = ""; // full announce URL
+    char const* scrape = ""; // full scrape URL
+    char host_and_port[72] = {}; // uniquely-identifying tracker name (`${host}:${port}`)
 
     // The tracker site's name. Uses the first label before the public suffix
     // (https://publicsuffix.org/) in the announce URL's host.
     // e.g. "https://www.example.co.uk/announce/"'s sitename is "example"
     // RFC 1034 says labels must be less than 64 chars
-    char sitename[64];
+    char sitename[64] = {};
 
-    char lastAnnounceResult[128]; // if hasAnnounced, the human-readable result of latest announce
-    char lastScrapeResult[128]; // if hasScraped, the human-readable result of the latest scrape
+    char lastAnnounceResult[128] = {}; // if hasAnnounced, the human-readable result of latest announce
+    char lastScrapeResult[128] = {}; // if hasScraped, the human-readable result of the latest scrape
 
-    time_t lastAnnounceStartTime; // if hasAnnounced, when the latest announce request was sent
-    time_t lastAnnounceTime; // if hasAnnounced, when the latest announce reply was received
-    time_t nextAnnounceTime; // if announceState == TR_TRACKER_WAITING, time of next announce
+    time_t lastAnnounceStartTime = {}; // if hasAnnounced, when the latest announce request was sent
+    time_t lastAnnounceTime = {}; // if hasAnnounced, when the latest announce reply was received
+    time_t nextAnnounceTime = {}; // if announceState == TR_TRACKER_WAITING, time of next announce
 
-    time_t lastScrapeStartTime; // if hasScraped, when the latest scrape request was sent
-    time_t lastScrapeTime; // if hasScraped, when the latest scrape reply was received
-    time_t nextScrapeTime; // if scrapeState == TR_TRACKER_WAITING, time of next scrape
+    time_t lastScrapeStartTime = {}; // if hasScraped, when the latest scrape request was sent
+    time_t lastScrapeTime = {}; // if hasScraped, when the latest scrape reply was received
+    time_t nextScrapeTime = {}; // if scrapeState == TR_TRACKER_WAITING, time of next scrape
 
-    int downloadCount; // number of times this torrent's been downloaded, or -1 if unknown
-    int lastAnnouncePeerCount; // if hasAnnounced, the number of peers the tracker gave us
-    int leecherCount; // number of leechers the tracker knows of, or -1 if unknown
-    int seederCount; // number of seeders the tracker knows of, or -1 if unknown
-    int downloader_count; // number of downloaders (BEP-21) the tracker knows of, or -1 if unknown
+    int downloadCount = {}; // number of times this torrent's been downloaded, or -1 if unknown
+    int lastAnnouncePeerCount = {}; // if hasAnnounced, the number of peers the tracker gave us
+    int leecherCount = {}; // number of leechers the tracker knows of, or -1 if unknown
+    int seederCount = {}; // number of seeders the tracker knows of, or -1 if unknown
+    int downloader_count = {}; // number of downloaders (BEP-21) the tracker knows of, or -1 if unknown
 
-    size_t tier; // which tier this tracker is in
-    tr_tracker_id_t id; // unique transmission-generated ID for use in libtransmission API
+    size_t tier = {}; // which tier this tracker is in
+    tr_tracker_id_t id = {}; // unique transmission-generated ID for use in libtransmission API
 
-    tr_tracker_state announceState; // whether we're announcing, waiting to announce, etc.
-    tr_tracker_state scrapeState; // whether we're scraping, waiting to scrape, etc.
+    tr_tracker_state announceState = {}; // whether we're announcing, waiting to announce, etc.
+    tr_tracker_state scrapeState = {}; // whether we're scraping, waiting to scrape, etc.
 
-    bool hasAnnounced; // true iff we've announced to this tracker during this session
-    bool hasScraped; // true iff we've scraped this tracker during this session
-    bool isBackup; // only one tracker per tier is used; the others are kept as backups
-    bool lastAnnounceSucceeded; // if hasAnnounced, whether or not the latest announce succeeded
-    bool lastAnnounceTimedOut; // true iff the latest announce request timed out
-    bool lastScrapeSucceeded; // if hasScraped, whether or not the latest scrape succeeded
-    bool lastScrapeTimedOut; // true iff the latest scrape request timed out
+    bool hasAnnounced = {}; // true iff we've announced to this tracker during this session
+    bool hasScraped = {}; // true iff we've scraped this tracker during this session
+    bool isBackup = {}; // only one tracker per tier is used; the others are kept as backups
+    bool lastAnnounceSucceeded = {}; // if hasAnnounced, whether or not the latest announce succeeded
+    bool lastAnnounceTimedOut = {}; // true iff the latest announce request timed out
+    bool lastScrapeSucceeded = {}; // if hasScraped, whether or not the latest scrape succeeded
+    bool lastScrapeTimedOut = {}; // true iff the latest scrape request timed out
 };
 // NOLINTEND(modernize-avoid-c-arrays)
 
@@ -590,9 +590,9 @@ struct tr_tracker_view
  */
 struct tr_webseed_view
 {
-    char const* url; // the url to download from
-    bool is_downloading; // can be true even if speed is 0, e.g. slow download
-    uint64_t download_bytes_per_second; // current download speed
+    char const* url = ""; // the url to download from
+    bool is_downloading = {}; // can be true even if speed is 0, e.g. slow download
+    uint64_t download_bytes_per_second = {}; // current download speed
 };
 
 using tr_altSpeedFunc = void (*)(tr_session* session, bool active, bool user_driven, void*);

@@ -102,6 +102,7 @@ private:
     bool isPaused_ = false;
     sigc::connection refresh_tag_;
 
+    // NOLINTNEXTLINE(cert-err58-cpp)
     static auto inline const level_names_ = std::array<std::pair<tr_log_level, char const*>, 5U>{ {
         { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
         { TR_LOG_ERROR, C_("Logging level", "Error") },

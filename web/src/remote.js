@@ -187,9 +187,9 @@ export class Remote {
 
   changeFileCommand(torrentId, fileIndices, command) {
     const params = {
+      [command]: fileIndices,
       ids: [torrentId],
     };
-    params[command] = fileIndices;
     this.sendRequest(
       {
         jsonrpc: RPC._JsonRpcVersion,
