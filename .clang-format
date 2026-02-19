@@ -26,19 +26,20 @@ ExperimentalAutoDetectBinPacking: false
 IndentCaseBlocks: true
 IndentPPDirectives: None
 IndentWidth: 4
+KeepEmptyLines:
+  AtStartOfBlock: false
 MaxEmptyLinesToKeep: 1
 PenaltyBreakAssignment: 1000
 PenaltyBreakBeforeFirstCallParameter: 0
 PenaltyReturnTypeOnItsOwnLine: 1000
 PointerAlignment: Left
-ReflowComments: false
-SortIncludes: Never
+ReflowComments: Never
+SortIncludes:
+  Enabled: false
 SpaceAfterCStyleCast: false
 SpacesBeforeTrailingComments: 1
 SpacesInAngles: Never
-SpacesInCStyleCastParentheses: false
-SpacesInParentheses: false
-SpacesInSquareBrackets: false
+SpacesInParens: Never
 TabWidth: 4
 UseTab: Never
 ---
@@ -47,21 +48,19 @@ Standard: c++20
 
 AccessModifierOffset: -4
 PackConstructorInitializers: Never
-AlwaysBreakAfterReturnType: None
-AlwaysBreakTemplateDeclarations: Yes
+BreakAfterReturnType: Automatic
 BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeComma
+BreakTemplateDeclarations: Yes
 ConstructorInitializerIndentWidth: 4
 FixNamespaceComments: true
 IndentGotoLabels: false
-KeepEmptyLinesAtTheStartOfBlocks: false
 QualifierAlignment: Right
 SortUsingDeclarations: true # Since clang-format 16, the equivalent value is LexicographicNumeric
 SpaceAfterTemplateKeyword: false
 ---
 Language: ObjC
 
-KeepEmptyLinesAtTheStartOfBlocks: false
 ObjCBlockIndentWidth: 4
 ObjCBreakBeforeNestedBlockParam: false
 ObjCSpaceBeforeProtocolList: false
