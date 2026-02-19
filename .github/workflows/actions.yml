@@ -285,7 +285,6 @@ jobs:
       MAKE_QT: ${{ needs.what-to-make.outputs.make-qt }}
       MAKE_TESTS: ${{ needs.what-to-make.outputs.make-tests }}
       CHANGED_CPP_FILES: ${{ needs.what-to-make.outputs.changed-cpp-files }}
-      CLANG_CONFIG_CHANGED: ${{ needs.what-to-make.outputs.clang-config-changed }}
       CLANG_TIDY_FULL_RUN: ${{ ((github.event_name == 'push' && github.ref_name == 'main') || needs.what-to-make.outputs.clang-config-changed == '1') && '1' || '0' }}
     steps:
       - name: Show Configuration
@@ -434,7 +433,6 @@ jobs:
     env:
       MAKE_TESTS: ${{ needs.what-to-make.outputs.make-tests }}
       CHANGED_CPP_FILES: ${{ needs.what-to-make.outputs.changed-cpp-files }}
-      CLANG_CONFIG_CHANGED: ${{ needs.what-to-make.outputs.clang-config-changed }}
       CLANG_TIDY_FULL_RUN: ${{ ((github.event_name == 'push' && github.ref_name == 'main') || needs.what-to-make.outputs.clang-config-changed == '1') && '1' || '0' }}
     defaults:
       run:
