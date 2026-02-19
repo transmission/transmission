@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>21.title</key>
+	<string>Парчета:</string>
+	<key>22.placeholderString</key>
+	<string>N/A</string>
+	<key>24.title</key>
+	<string>Сигурен:</string>
+	<key>25.placeholderString</key>
+	<string>N/A</string>
+	<key>26.title</key>
+	<string>Файл с данни:</string>
+	<key>27.placeholderString</key>
+	<string>N/A</string>
+	<key>28.title</key>
+	<string>Къде</string>
+	<key>30.title</key>
+	<string>Създател:</string>
+	<key>31.placeholderString</key>
+	<string>N/A</string>
+	<key>32.title</key>
+	<string>Създаден на:</string>
+	<key>33.placeholderString</key>
+	<string>N/A</string>
+	<key>35.title</key>
+	<string>Коментар:</string>
+	<key>36.title</key>
+	<string>Хеш:</string>
+	<key>37.placeholderString</key>
+	<string>N/A</string>
+	<key>41.title</key>
+	<string>Информация за торент</string>
+	<key>7YU-bS-UkI.placeholderString</key>
+	<string>N/A</string>
+	<key>uaW-NM-PTU.title</key>
+	<string>Преди:</string>
+</dict>
+</plist>

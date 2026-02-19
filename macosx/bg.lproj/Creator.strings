@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>108.title</key>
+	<string>Тракерът ще бъде поставен в собствено ниво</string>
+	<key>5.title</key>
+	<string>Създател на торент</string>
+	<key>70.title</key>
+	<string>Коментар:</string>
+	<key>71.title</key>
+	<string>Тракери:</string>
+	<key>73.title</key>
+	<string>Промени...</string>
+	<key>74.title</key>
+	<string>Торент файл:</string>
+	<key>77.title</key>
+	<string>Частно</string>
+	<key>78.title</key>
+	<string>Създай</string>
+	<key>79.title</key>
+	<string>Отказ</string>
+	<key>81.title</key>
+	<string>Отваряне при създаване</string>
+	<key>82.title</key>
+	<string>Отказ</string>
+	<key>83.title</key>
+	<string>Създава се торент файл...</string>
+	<key>f1g-Kk-weU.title</key>
+	<string>Източник:</string>
+</dict>
+</plist>

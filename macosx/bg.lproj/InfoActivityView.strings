@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>30.title</key>
+	<string>Изтеглено:</string>
+	<key>31.placeholderString</key>
+	<string>N/A</string>
+	<key>32.title</key>
+	<string>Качен:</string>
+	<key>33.placeholderString</key>
+	<string>N/A</string>
+	<key>34.title</key>
+	<string>Съотношение:</string>
+	<key>35.placeholderString</key>
+	<string>N/A</string>
+	<key>36.title</key>
+	<string>Имам:</string>
+	<key>37.placeholderString</key>
+	<string>N/A</string>
+	<key>38.title</key>
+	<string>Състояние:</string>
+	<key>39.placeholderString</key>
+	<string>N/A</string>
+	<key>41.title</key>
+	<string>Грешка:</string>
+	<key>42.title</key>
+	<string>Дати</string>
+	<key>43.title</key>
+	<string>Добавено:</string>
+	<key>44.placeholderString</key>
+	<string>N/A</string>
+	<key>46.title</key>
+	<string>Завършено:</string>
+	<key>47.placeholderString</key>
+	<string>N/A</string>
+	<key>50.title</key>
+	<string>Трансфер</string>
+	<key>51.title</key>
+	<string>Последна активност:</string>
+	<key>52.placeholderString</key>
+	<string>N/A</string>
+	<key>54.ibShadowedLabels[0]</key>
+	<string>Напредък</string>
+	<key>54.ibShadowedLabels[1]</key>
+	<string>Наличен</string>
+	<key>55.title</key>
+	<string>Напредък:</string>
+	<key>56.placeholderString</key>
+	<string>N/A</string>
+	<key>57.title</key>
+	<string>Неуспешно изтегляне:</string>
+	<key>58.placeholderString</key>
+	<string>N/A</string>
+	<key>85.title</key>
+	<string>Изминало време</string>
+	<key>86.title</key>
+	<string>Изтегляне:</string>
+	<key>87.placeholderString</key>
+	<string>N/A</string>
+	<key>89.title</key>
+	<string>Качване:</string>
+	<key>90.placeholderString</key>
+	<string>N/A</string>
+</dict>
+</plist>

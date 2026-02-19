@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>100.title</key>
+	<string>Името</string>
+	<key>102.title</key>
+	<string>Коментарът</string>
+	<key>11.title</key>
+	<string>ОК</string>
+	<key>118.title</key>
+	<string>съвпада с</string>
+	<key>12.title</key>
+	<string>Отказ</string>
+	<key>153.title</key>
+	<string>съдържа</string>
+	<key>154.title</key>
+	<string>започва с</string>
+	<key>155.title</key>
+	<string>завършва с</string>
+	<key>156.title</key>
+	<string>е</string>
+	<key>161.title</key>
+	<string>Файлът</string>
+	<key>162.title</key>
+	<string>Тракерът</string>
+	<key>163.title</key>
+	<string>завършва с</string>
+	<key>164.title</key>
+	<string>не е</string>
+	<key>165.title</key>
+	<string>съдържа</string>
+	<key>166.title</key>
+	<string>Няма</string>
+	<key>167.title</key>
+	<string>съвпада с</string>
+	<key>40.title</key>
+	<string>започва с</string>
+	<key>42.title</key>
+	<string>е</string>
+	<key>49.title</key>
+	<string>от следните са верни</string>
+	<key>50.title</key>
+	<string>Всякакви</string>
+	<key>51.title</key>
+	<string>Всички</string>
+</dict>
+</plist>
