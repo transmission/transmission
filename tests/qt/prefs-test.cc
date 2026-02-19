@@ -5,6 +5,7 @@
 
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 #include <QApplication>
 #include <QDateTime>
@@ -33,6 +34,32 @@ class PrefsTest : public QObject
 {
     Q_OBJECT
 
+    template<typename T>
+    static void compare_eq(T const& actual, T const& expected)
+    {
+        if constexpr (std::is_floating_point_v<T>)
+        {
+            QVERIFY(qFuzzyCompare(actual, expected));
+        }
+        else
+        {
+            QCOMPARE_EQ(actual, expected);
+        }
+    }
+
+    template<typename T>
+    static void compare_ne(T const& actual, T const& expected)
+    {
+        if constexpr (std::is_floating_point_v<T>)
+        {
+            QVERIFY(!qFuzzyCompare(actual, expected));
+        }
+        else
+        {
+            QCOMPARE_NE(actual, expected);
+        }
+    }
+
     [[nodiscard]] static std::string get_json_member_str(tr_quark const key, std::string_view const valstr)
     {
         auto const json_key = tr_quark_get_string_view(key);
@@ -59,22 +86,22 @@ class PrefsTest : public QObject
     template<typename T>
     void verify_get_set_by_property(Prefs& prefs, int const idx, T const& val1, T const& val2)
     {
-        QCOMPARE_NE(val1, val2);
+        compare_ne(val1, val2);
 
         prefs.set(idx, val1);
-        QCOMPARE_EQ(prefs.get<T>(idx), val1);
-        QCOMPARE_NE(prefs.get<T>(idx), val2);
+        compare_eq(prefs.get<T>(idx), val1);
+        compare_ne(prefs.get<T>(idx), val2);
 
         prefs.set(idx, val2);
-        QCOMPARE_NE(prefs.get<T>(idx), val1);
-        QCOMPARE_EQ(prefs.get<T>(idx), val2);
+        compare_ne(prefs.get<T>(idx), val1);
+        compare_eq(prefs.get<T>(idx), val2);
     }
 
     template<typename T>
     void verify_get_by_json(Prefs& prefs, int const idx, T const& val, std::string_view const valstr)
     {
         prefs.set(idx, val);
-        QCOMPARE_EQ(prefs.get<T>(idx), val);
+        compare_eq(prefs.get<T>(idx), val);
         verify_json_contains(prefs.current_settings(), prefs.keyval(idx).first, valstr);
     }
 
@@ -90,7 +117,7 @@ class PrefsTest : public QObject
         auto const* const map = var->get_if<tr_variant::Map>();
         QVERIFY(map != nullptr);
         prefs.load(*map);
-        QCOMPARE_EQ(prefs.get<T>(idx), val);
+        compare_eq(prefs.get<T>(idx), val);
     }
 
     static void verify_variant_json(tr_variant const& var, std::string_view const expected)
