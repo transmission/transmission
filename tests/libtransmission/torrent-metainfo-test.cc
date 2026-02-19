@@ -52,7 +52,7 @@ TEST_F(TorrentMetainfoTest, magnetLink)
 #define BEFORE_PATH \
     "d10:created by25:Transmission/2.82 (14160)13:creation datei1402280218e8:encoding5:UTF-84:infod5:filesld6:lengthi2e4:pathl"
 #define AFTER_PATH \
-    "eed6:lengthi2e4:pathl5:b.txteee4:name3:foo12:piece lengthi32768e6:pieces20:ÞÉ`âMs¡Å;Ëº¬.åÂà7:privatei0eee"
+    "eed6:lengthi2e4:pathl5:b.txteee4:name3:foo12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaa7:privatei0eee"
 
 // FIXME: split these into parameterized tests?
 TEST_F(TorrentMetainfoTest, bucket)
@@ -63,7 +63,7 @@ TEST_F(TorrentMetainfoTest, bucket)
         bool expected_parse_result;
     };
 
-    auto const tests = std::array<LocalTest, 9>{ {
+    static auto constexpr Tests = std::array<LocalTest, 12U>{ {
         { .benc = BEFORE_PATH "5:a.txt" AFTER_PATH, .expected_parse_result = true },
         // allow empty components, but not =all= empty components, see bug #5517
         { .benc = BEFORE_PATH "0:5:a.txt" AFTER_PATH, .expected_parse_result = true },
@@ -76,16 +76,21 @@ TEST_F(TorrentMetainfoTest, bucket)
         // allow ".." components (replaced with "__")
         { .benc = BEFORE_PATH "2:..5:a.txt" AFTER_PATH, .expected_parse_result = true },
         { .benc = BEFORE_PATH "5:a.txt2:.." AFTER_PATH, .expected_parse_result = true },
+        // fail when coming across an invalid character
+        { .benc = "dhe", .expected_parse_result = false },
+        { .benc = "d10:longer than 10 characterse", .expected_parse_result = false },
+        // fail when string is too short
+        { .benc = "d10:short", .expected_parse_result = false },
         // fail on empty string
         { .benc = "", .expected_parse_result = false },
     } };
 
     tr_logSetLevel(TR_LOG_OFF);
 
-    for (auto const& test : tests)
+    for (auto const& [benc, expected_parse_result] : Tests)
     {
         auto metainfo = tr_torrent_metainfo{};
-        EXPECT_EQ(test.expected_parse_result, metainfo.parse_benc(test.benc));
+        EXPECT_EQ(expected_parse_result, metainfo.parse_benc(benc));
     }
 }
 
