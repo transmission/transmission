@@ -21,13 +21,17 @@
 // See: https://github.com/transmission/transmission/issues/4547
 #include <iconv.h>
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr, readability-identifier-naming)
+static inline auto InvalidCd = (iconv_t)-1; // general idiom used by iconv
+
 class tr_charset_converter
 {
 public:
     tr_charset_converter(std::string_view to_encoding, std::string_view from_encoding)
-        // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage) -- iconv_open requires null-terminated strings; callers ensure this
-        : cd_(iconv_open(to_encoding.data(), from_encoding.data()))
     {
+        auto const to = std::string(to_encoding);
+        auto const from = std::string(from_encoding);
+        cd_ = iconv_open(to.c_str(), from.c_str());
     }
 
     ~tr_charset_converter()
@@ -41,7 +45,7 @@ public:
     tr_charset_converter(tr_charset_converter&& other) noexcept
         : cd_(other.cd_)
     {
-        other.cd_ = (iconv_t)-1;
+        other.cd_ = InvalidCd;
     }
 
     tr_charset_converter& operator=(tr_charset_converter&& other) noexcept
@@ -50,14 +54,14 @@ public:
         {
             close();
             cd_ = other.cd_;
-            other.cd_ = (iconv_t)-1;
+            other.cd_ = InvalidCd;
         }
         return *this;
     }
 
     [[nodiscard]] std::string convert(std::string_view input)
     {
-        if (cd_ == (iconv_t)-1)
+        if (cd_ == InvalidCd)
         {
             return {};
         }
@@ -87,18 +91,18 @@ public:
 
     [[nodiscard]] bool is_valid() const noexcept
     {
-        return cd_ != (iconv_t)-1;
+        return cd_ != InvalidCd;
     }
 
 private:
-    iconv_t cd_ = (iconv_t)-1;
+    iconv_t cd_ = InvalidCd;
 
     void close() noexcept
     {
-        if (cd_ != (iconv_t)-1)
+        if (cd_ != InvalidCd)
         {
             iconv_close(cd_);
-            cd_ = (iconv_t)-1;
+            cd_ = InvalidCd;
         }
     }
 };

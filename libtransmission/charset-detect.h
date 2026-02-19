@@ -147,6 +147,7 @@ public:
             std::string_view iconv;
         };
         // clang-format off
+        // NOLINTBEGIN(modernize-use-designated-initializers)
         auto constexpr Table = std::array<encoding_entry, 44>{{
             { "ASCII",            20127, "ASCII" },
             { "BIG5",               950, "BIG5" },
@@ -193,6 +194,7 @@ public:
             { "WINDOWS-1257",      1257, "CP1257" },
             { "WINDOWS-1258",      1258, "CP1258" },
         }};
+        // NOLINTEND(modernize-use-designated-initializers)
         // clang-format on
 
         for (auto const& entry : Table)
