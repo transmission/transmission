@@ -428,9 +428,14 @@ jobs:
           set -euo pipefail
           if grep 'warning:' makelog; then exit 1; fi
 
-  clang-tidy-libtransmission-win32:
+  clang-tidy-win32:
     runs-on: windows-2025
     needs: what-to-make
+    env:
+      MAKE_TESTS: ${{ needs.what-to-make.outputs.make-tests }}
+      CHANGED_CPP_FILES: ${{ needs.what-to-make.outputs.changed-cpp-files }}
+      CLANG_CONFIG_CHANGED: ${{ needs.what-to-make.outputs.clang-config-changed }}
+      CLANG_TIDY_FULL_RUN: ${{ ((github.event_name == 'push' && github.ref_name == 'main') || needs.what-to-make.outputs.clang-config-changed == '1') && '1' || '0' }}
     defaults:
       run:
         shell: pwsh
@@ -447,7 +452,7 @@ jobs:
         with:
           submodules: recursive
           path: src
-      - name: Prepare Build Deps
+      - name: Get Dependencies
         uses: ./src/.github/actions/prepare-deps-win32
         with:
           arch: x64
@@ -461,22 +466,73 @@ jobs:
             -G Ninja `
             -DCMAKE_BUILD_TYPE=Debug `
             -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
-            -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }} `
-            -DRUN_CLANG_TIDY=ON `
+            -DCMAKE_INSTALL_PREFIX='C:/transmission' `
+            -DENABLE_TESTS=${{ env.MAKE_TESTS == 'true' && 'ON' || 'OFF' }} `
+            -DRUN_CLANG_TIDY=OFF `
+            -DCMAKE_CXX_CLANG_TIDY="pwsh;-File;${{ github.workspace }}\src\.github\scripts\clang-tidy-gate.ps1;clang-tidy" `
             -DUSE_SYSTEM_DEFAULT=OFF
-      - name: Make (Core)
+      - name: Determine clang-tidy mode
+        run: |
+          echo "CLANG_TIDY_FULL_RUN=${Env:CLANG_TIDY_FULL_RUN}"
+      - name: Determine clang-tidy targets
+        id: compute-targets
+        run: |
+          $jobs = [Environment]::ProcessorCount
+          if ($jobs -gt 8) { $jobs = 8 }
+
+          # Prime objects quickly before incremental clang-tidy pass.
+          $targets = @('transmission', 'transmission-app')
+          if ($Env:MAKE_TESTS -eq 'true') {
+            $targets += 'libtransmission-test'
+          }
+
+          "jobs=$jobs" | Out-File $Env:GITHUB_OUTPUT -Append
+          'targets<<EOF' | Out-File $Env:GITHUB_OUTPUT -Append
+          $targets | Out-File $Env:GITHUB_OUTPUT -Append
+          'EOF' | Out-File $Env:GITHUB_OUTPUT -Append
+      - name: Make (No clang-tidy)
+        if: ${{ env.CLANG_TIDY_FULL_RUN != '1' }}
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
-          cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
-      - name: Make (App)
+          $Env:TR_CLANG_TIDY_ENABLE = '0'
+          '' | Set-Content makelog
+
+          $jobs = '${{ steps.compute-targets.outputs.jobs }}'
+          $targets = '${{ steps.compute-targets.outputs.targets }}' -split "`r?`n" | Where-Object { $_ -ne '' }
+
+          cmake --build obj --config Debug --parallel $jobs --target $targets 2>&1 | tee -a makelog
+      - name: Touch changed files for incremental clang-tidy
+        if: ${{ env.CLANG_TIDY_FULL_RUN != '1' }}
+        run: |
+          # Touch changed files so only affected code is rebuilt/tidied.
+          $changedFiles = @()
+          if (-not [string]::IsNullOrWhiteSpace($Env:CHANGED_CPP_FILES)) {
+            $changedFiles = $Env:CHANGED_CPP_FILES -split "`r?`n" |
+              Where-Object { $_ -ne '' } |
+              ForEach-Object { Join-Path 'src' $_ } |
+              Where-Object { Test-Path $_ }
+          }
+
+          if ($changedFiles.Count -gt 0) {
+            cmake -E touch_nocreate @changedFiles
+          }
+
+          echo 'Touched files for clang-tidy:'
+          $changedFiles.Count | ForEach-Object { echo $_ }
+          $changedFiles | ForEach-Object { echo $_ }
+      - name: Make (clang-tidy)
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
-          cmake --build obj --config Debug --target transmission-app 2>&1 | tee -a makelog
-      - name: Make (Tests)
-        if: needs.what-to-make.outputs.make-tests == 'true'
-        run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
-          cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
+          $Env:TR_CLANG_TIDY_ENABLE = '1'
+
+          if (-not (Test-Path makelog)) {
+            '' | Set-Content makelog
+          }
+
+          $jobs = '${{ steps.compute-targets.outputs.jobs }}'
+          $targets = '${{ steps.compute-targets.outputs.targets }}' -split "`r?`n" | Where-Object { $_ -ne '' }
+
+          cmake --build obj --config Debug --parallel $jobs --target $targets 2>&1 | tee -a makelog
       - name: Test for warnings
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
