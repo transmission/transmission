@@ -1210,17 +1210,6 @@ jobs:
       needs.what-to-make.outputs.make-qt == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true' ||
       needs.what-to-make.outputs.make-utils == 'true'
-    strategy:
-      fail-fast: false
-      matrix:
-        arch:
-          - x86_64
-          - aarch64
-        is-pull-request:
-          - ${{ github.event_name == 'pull_request' }}
-        exclude:
-          - arch: aarch64
-            is-pull-request: true
     runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
@@ -1235,7 +1224,6 @@ jobs:
         uses: vmactions/freebsd-vm@v1
         with:
           usesh: true
-          arch: ${{ matrix.arch }}
           prepare: |
             set -ex
             uname -a
@@ -1293,7 +1281,7 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.arch }}
+          name: binaries-${{ github.job }}
           path: pfx/**/*
 
   crypto:
@@ -1392,17 +1380,6 @@ jobs:
       needs.what-to-make.outputs.make-qt == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true' ||
       needs.what-to-make.outputs.make-utils == 'true'
-    strategy:
-      fail-fast: false
-      matrix:
-        arch:
-          - x86_64
-          - aarch64
-        is-pull-request:
-          - ${{ github.event_name == 'pull_request' }}
-        exclude:
-          - arch: aarch64
-            is-pull-request: true
     runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
@@ -1417,7 +1394,6 @@ jobs:
         uses: vmactions/openbsd-vm@v1
         with:
           usesh: true
-          arch: ${{ matrix.arch }}
           prepare: |
             set -ex
             uname -a
@@ -1473,7 +1449,7 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.arch }}
+          name: binaries-${{ github.job }}
           path: pfx/**/*
 
   netbsd:
@@ -1485,20 +1461,6 @@ jobs:
       needs.what-to-make.outputs.make-qt == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true' ||
       needs.what-to-make.outputs.make-utils == 'true'
-    strategy:
-      fail-fast: false
-      matrix:
-        arch:
-          - vmactions: x86_64
-            binary-set: amd64
-          - vmactions: aarch64
-            binary-set: evbarm-aarch64
-        is-pull-request:
-          - ${{ github.event_name == 'pull_request' }}
-        exclude:
-          - arch:
-              vmactions: aarch64
-            is-pull-request: true
     runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
@@ -1513,7 +1475,6 @@ jobs:
         uses: vmactions/netbsd-vm@v1
         with:
           usesh: true
-          arch: ${{ matrix.arch.vmactions }}
           prepare: |
             set -ex
             uname -a
@@ -1538,7 +1499,7 @@ jobs:
               utf8-cpp
             if [ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] || [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
               for set in xbase xcomp; do
-                curl -sL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-`uname -r`/${{ matrix.arch.binary-set }}/binary/sets/$set.tar.xz" | tar xJpf - -C /
+                curl -sL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-`uname -r`/amd64/binary/sets/$set.tar.xz" | tar xJpf - -C /
               done
             fi
           run: |
@@ -1577,7 +1538,7 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.arch.vmactions }}
+          name: binaries-${{ github.job }}
           path: pfx/**/*
 
   dragonflybsd:
@@ -1589,11 +1550,6 @@ jobs:
       needs.what-to-make.outputs.make-qt == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true' ||
       needs.what-to-make.outputs.make-utils == 'true'
-    strategy:
-      fail-fast: false
-      matrix:
-        arch:
-          - x86_64
     runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
@@ -1608,7 +1564,6 @@ jobs:
         uses: vmactions/dragonflybsd-vm@v1
         with:
           usesh: true
-          arch: ${{ matrix.arch }}
           prepare: |
             set -ex
             uname -a
@@ -1670,5 +1625,5 @@ jobs:
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.arch }}
+          name: binaries-${{ github.job }}
           path: pfx/**/*
