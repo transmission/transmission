@@ -1201,6 +1201,87 @@ jobs:
       - name: Make
         run: cmake --build obj --config RelWithDebInfo -- "-k 0"
 
+  ubuntu-24-04-arm64:
+    needs: [ make-source-tarball, what-to-make ]
+    if: |
+      needs.what-to-make.outputs.make-cli == 'true' ||
+      needs.what-to-make.outputs.make-daemon == 'true' ||
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-qt == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true' ||
+      needs.what-to-make.outputs.make-utils == 'true'
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Composite Actions
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .github/actions
+          sparse-checkout-cone-mode: false
+      - name: Get Dependencies
+        uses: ./.github/actions/install-deps
+        with:
+          compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk3' || 'false' }}
+          enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
+          use-sudo: true
+      - name: Get NPM
+        if: needs.what-to-make.outputs.make-web == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+      - name: Get Source
+        uses: actions/download-artifact@v7
+        with:
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
+      - name: Build
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        if: needs.what-to-make.outputs.make-tests == 'true'
+        uses: ./.github/actions/run-tests
+        with:
+          build-dir: obj
+          build-config: RelWithDebInfo
+      - name: Install
+        run: cmake --install obj --config RelWithDebInfo --strip
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+
   freebsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
