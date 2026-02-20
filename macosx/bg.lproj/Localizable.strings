@@ -1,0 +1,1170 @@
+/* file size string
+   Inspector -> Files tab -> file status string
+   Status bar transfer count */
+"%@ of %@" = "%1$@ от %2$@";
+
+/* Torrent -> progress string */
+"%@ of torrent metadata retrieved" = "%@ от метаданните на торента са получени";
+
+/* Add torrent -> info
+   Inspector -> Activity tab -> progress
+   Torrent -> progress string */
+"%@ selected" = "%@ избрани";
+
+/* Inspector -> selected torrents
+   stats total */
+"%@ total" = "%@ общо";
+
+/* Inspector -> Activity tab -> have */
+"%@ verified" = "%@ проверени";
+
+/* Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld КБ/с";
+
+/* Info options -> global setting */
+"%ld minutes" = "%ld минути";
+
+/* stats window -> times opened */
+"%llu times" = "%llu пъти";
+
+/* Inspector -> Peers tab -> peers */
+"%lu cache" = "%lu кеш";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Connected" = "%lu свързани";
+
+/* Inspector -> Peers tab -> peers */
+"%lu DHT" = "%lu DHT";
+
+/* Dock item - Downloading */
+"%lu Downloading" = "%lu изтегляне";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents
+   quicklook file count */
+"%lu files" = "%lu файла";
+
+/* quicklook file header */
+"%lu Files" = "%lu Файла";
+
+/* Inspector -> Peers tab -> peers */
+"%lu incoming" = "%lu входящи";
+
+/* Prefs -> blocklist -> message */
+"%lu IP address rules in list" = "%lu правила за IP адреси в списъка";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Known:" = "%lu известни:";
+
+/* Inspector -> Peers tab -> peers */
+"%lu local discovery" = "%lu открити локално";
+
+/* Inspector -> Peers tab -> peers */
+"%lu LTEP" = "%lu LTEP";
+
+/* Inspector -> selected torrents */
+"%lu magnetized transfers" = "%lu магнетизирани трансфери";
+
+/* Inspector -> Peers tab -> peers */
+"%lu PEX" = "%lu PEX";
+
+/* Dock item - Seeding */
+"%lu Seeding" = "%lu сийдване";
+
+/* Drag overlay -> torrents */
+"%lu Torrent Files" = "%lu торент файлове";
+
+/* Inspector -> selected torrents */
+"%lu Torrents Selected" = "%lu избрани торенти";
+
+/* Inspector -> Peers tab -> peers */
+"%lu tracker" = "%lu тракер";
+
+/* quicklook tracker header */
+"%lu Trackers" = "%lu Тракери";
+
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"%lu transfers" = "%lu трансфери";
+
+/* Torrent -> status string */
+"%lu web seeds" = "%lu уеб сийдъри";
+
+/* quicklook web seed header */
+"%lu Web Seeds" = "%lu Уеб сийдъри";
+
+/* Create torrent -> info */
+"%u pieces, %@ each" = "%1$u части, по %2$@ всяка";
+
+/* Inspector -> Peers tab -> peers */
+"1 Connected" = "1 свързан";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"1 file" = "1 файл";
+
+/* Inspector -> selected torrents */
+"1 magnetized transfer" = "1 магнетизиран трансфер";
+
+/* Info options -> global setting */
+"1 minute" = "1 минута";
+
+/* Create torrent -> info */
+"1 piece, %@" = "1 част, %@";
+
+/* stats window -> times opened */
+"1 time" = "1 път";
+
+/* quicklook tracker header */
+"1 Tracker" = "1 Тракер";
+
+/* Filter Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"1 transfer" = "1 трансфер";
+
+/* quicklook web seed header */
+"1 Web Seed" = "1 Уеб сийдър";
+
+/* Open invalid alert -> title */
+"\"%@\" is not a valid torrent file." = "\"%@\" не е валиден торент файл.";
+
+/* Prefs -> blocklist -> message */
+"A blocklist must first be downloaded" = "Първо трябва да се изтегли списък за блокиране";
+
+/* Create torrent -> file already exists warning -> warning */
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "Файл с име \"%1$@\" вече съществува в директорията \"%2$@\". Изберете ново име или директория, за да създадете торент файла.";
+
+/* Move inside itself alert -> title */
+"A folder cannot be moved to inside itself." = "Папка не може да бъде преместена в самата себе си.";
+
+/* Create torrent -> zero size -> warning */
+"A torrent file cannot be created for files with no size." = "Не може да се създаде торент файл за файлове с нулев размер.";
+
+/* Create torrent -> file already exists warning -> title */
+"A torrent file with this name and directory cannot be created." = "Не може да бъде създаден торент файл с това име и в тази директория.";
+
+/* Create torrent -> blank address -> message */
+"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Трансфер, маркиран като частен, без адреси на тракери, няма да може да се свърже с участници. Торент файлът ще бъде полезен само ако планирате да го качите на уебсайт на тракер, който ще добави адресите вместо вас.";
+
+/* Open duplicate alert -> title
+   Open duplicate magnet alert -> title */
+"A transfer of \"%@\" already exists." = "Трансфер на \"%@\" вече съществува.";
+
+/* Filter Bar -> filter button */
+"Active" = "Активни";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Activity" = "Активност";
+
+/* Add torrent -> same name -> button */
+"Add" = "Добавяне";
+
+/* Inspector view -> tracker buttons */
+"Add a tracker" = "Добавяне на тракер";
+
+/* Magnet link failed -> title */
+"Adding magnetized transfer failed." = "Добавянето на магнетен трансфер е неуспешно.";
+
+/* Filter Bar -> filter button
+   inspector -> check all */
+"All" = "Всички";
+
+/* Filter Bar -> group filter menu
+   Groups -> Button */
+"All Groups" = "Всички групи";
+
+/* Tracker last announce */
+"Announce error" = "Грешка при анонсиране";
+
+/* Tracker next announce */
+"Announce in progress" = "Анонсиране в ход";
+
+/* Tracker next announce */
+"Announce is queued" = "Анонсирането е на опашка";
+
+/* Tracker next announce */
+"Announce not scheduled" = "Анонсирането не е насрочено";
+
+/* Tracker last announce */
+"Announce timed out" = "Времето за анонсиране изтече";
+
+/* All toolbar item -> label */
+"Apply All" = "Приложи на всички";
+
+/* Selected toolbar item -> label */
+"Apply Selected" = "Приложи на избраните";
+
+/* Confirm Quit panel -> title */
+"Are you sure you want to quit?" = "Сигурни ли сте, че искате да излезете?";
+
+/* Remove completed confirm panel -> title */
+"Are you sure you want to remove %lu completed transfers from the transfer list?" = "Сигурни ли сте, че искате да премахнете %lu завършени трансфера от списъка?";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove %lu trackers?" = "Сигурни ли сте, че искате да премахнете %lu тракера?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Сигурни ли сте, че искате да премахнете %lu трансфера от списъка и да изтриете файловете с данни?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list?" = "Сигурни ли сте, че искате да премахнете %lu трансфера от списъка?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Сигурни ли сте, че искате да премахнете \"%@\" от списъка с трансфери и да изтриете файла с данни?";
+
+/* Removal confirm panel -> title
+   Remove completed confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list?" = "Сигурни ли сте, че искате да премахнете \"%@\" от списъка с трансфери?";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove this tracker?" = "Сигурни ли сте, че искате да премахнете този тракер?";
+
+/* Stats reset -> title */
+"Are you sure you want to reset usage statistics?" = "Сигурни ли сте, че искате да нулирате статистиката за използване?";
+
+/* inspector -> peer table -> header tool tip */
+"Available" = "Налично";
+
+/* Transfer speed (bytes per second) */
+"B/s" = "Б/с";
+
+/* Preferences -> toolbar item title */
+"Bandwidth" = "Трафик";
+
+/* notification description */
+"Bandwidth settings changed" = "Настройките на трафика са променени";
+
+/* Groups -> Name */
+"Blue" = "Син";
+
+/* Add torrent -> same name -> button
+   Blocklist -> cancel button
+   Confirm Quit panel -> button
+   Create torrent -> blank address -> button
+   Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove trackers alert -> button
+   rename sheet button
+   Stats reset -> button
+   URL sheet button */
+"Cancel" = "Отказ";
+
+/* Torrent Table -> tooltip */
+"Change transfer settings" = "Промяна на настройките за трансфер";
+
+/* File Outline -> Menu */
+"Check Selected" = "Провери избраните";
+
+/* Torrent -> status string */
+"Checking existing data" = "Проверка на съществуващи данни";
+
+/* Message window -> save button */
+"Clear" = "Изчистване";
+
+/* inspector -> peer table -> header */
+"Client" = "Клиент";
+
+/* View menu -> Quick Look */
+"Close Quick Look" = "Затваряне на Quick Look";
+
+/* Blocklist -> message */
+"Connecting to site" = "Свързване със сайта";
+
+/* Torrent file copy alert -> title */
+"Copy of \"%@\" Cannot Be Created" = "Копие на \"%@\" не може да бъде създадено";
+
+/* Create toolbar item -> label
+   Create torrent -> blank address -> button */
+"Create" = "Създаване";
+
+/* Drag overlay -> file */
+"Create a Torrent File" = "Създаване на торент файл";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Създаване на торент файл";
+
+/* Create toolbar item -> palette label
+   Create torrent -> select file */
+"Create Torrent File" = "Създаване на торент файл";
+
+/* quicklook creation info */
+"Created on %@" = "Създаден на %@";
+
+/* quicklook creation info */
+"Created on %@ with %@" = "Създаден на %1$@ с %2$@";
+
+/* quicklook creation info */
+"Created with %@" = "Създаден с %@";
+
+/* Create torrent -> failed -> title */
+"Creation of \"%@\" failed." = "Създаването на \"%@\" е неуспешно.";
+
+/* Inspector -> peer -> status */
+"Currently downloading (interested and not choked)" = "В момента се изтегля (заинтересован и не е блокиран)";
+
+/* Inspector -> peer -> status */
+"Currently uploading (interested and not choked)" = "В момента се качва (заинтересован и не е блокиран)";
+
+/* Message window -> table column */
+"Date" = "Дата";
+
+/* Message window -> level
+   Message window -> level string */
+"Debug" = "Отстраняване на грешки";
+
+/* Info options -> global setting */
+"disabled" = "изключено";
+
+/* inspector -> peer table -> header
+   inspector -> web seed table -> header
+   status bar -> status label
+   Torrent -> status string */
+"DL" = "Сваляне";
+
+/* Inspector -> Peers tab -> peers */
+"DL from %lu" = "Сваляне от %lu";
+
+/* Torrent disk space alert -> button */
+"Do not check disk space again" = "Не проверявай дисковото пространство отново";
+
+/* Donation beg -> button */
+"Don't bug me about this ever again." = "Не ме безпокойте повече за това.";
+
+/* files tab -> tooltip */
+"Don't Download" = "Не изтегляй";
+
+/* Donation beg -> button */
+"Donate" = "Дарение";
+
+/* Donation beg -> message */
+"Donate or not, there will be no difference to your torrenting experience." = "Дарявате или не, няма да има разлика в изживяването ви с торенти.";
+
+/* file table -> header tool tip
+   files tab -> tooltip */
+"Download" = "Изтегляне";
+
+/* Torrent disk space alert -> button */
+"Download Anyway" = "Изтегли въпреки всичко";
+
+/* notification title */
+"Download Complete" = "Изтеглянето завърши";
+
+/* Blocklist -> message */
+"Download of the blocklist failed." = "Изтеглянето на списъка за блокиране е неуспешно.";
+
+/* files tab -> tooltip */
+"Download Some" = "Изтегли някои";
+
+/* Torrent table -> group row -> tooltip */
+"Download speed" = "Скорост на изтегляне";
+
+/* Stats window -> label
+   tracker peer stat */
+"Downloaded" = "Изтеглено";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Downloading" = "Изтегляне";
+
+/* Blocklist -> message */
+"Downloading blocklist" = "Изтегляне на списък за блокиране";
+
+/* Torrent -> status string */
+"Downloading from %lu of %lu peers" = "Изтегляне от %1$lu от %2$lu участници";
+
+/* Torrent -> status string */
+"Downloading from %lu of 1 peer" = "Изтегляне от %lu от 1 участник";
+
+/* inspector -> peer table -> header tool tip */
+"Downloading From Peer" = "Изтегляне от участник";
+
+/* inspector -> web seed table -> header tool tip */
+"Downloading From Web Seed" = "Изтегляне от уеб сийдър";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"encrypted" = "шифровано";
+
+/* inspector -> peer table -> header tool tip */
+"Encrypted Connection" = "Шифрована връзка";
+
+/* Filter Bar -> filter button
+   Message window -> level
+   Message window -> level string
+   Torrent -> status string */
+"Error" = "Грешка";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Files" = "Файлове";
+
+/* Filter toolbar item -> label
+   inspector -> file filter
+   Message window -> filter field */
+"Filter" = "Филтър";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: cache" = "От: кеш";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: distributed hash table" = "От: разпределена хеш таблица";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: incoming connection" = "От: входяща връзка";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: libtorrent extension protocol handshake" = "От: libtorrent extension protocol handshake";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: local peer discovery" = "От: локално откриване на участници";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: peer exchange" = "От: обмен на участници";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: tracker" = "От: тракер";
+
+/* Transfer speed (gigabytes per second) */
+"GB/s" = "ГБ/с";
+
+/* Preferences -> toolbar item title */
+"General" = "Основни";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"General Info" = "Основна информация";
+
+/* Status Bar -> speed tooltip */
+"Global download limit" = "Общо ограничение за изтегляне";
+
+/* Status Bar -> speed tooltip */
+"Global upload limit" = "Общо ограничение за качване";
+
+/* Tracker last announce */
+"got %lu peers" = "получени %lu участници";
+
+/* Tracker last announce */
+"got 1 peer" = "получен 1 участник";
+
+/* Groups -> Name */
+"Gray" = "Сив";
+
+/* Groups -> Name */
+"Green" = "Зелен";
+
+/* Groups -> Button */
+"Group" = "Група";
+
+/* Preferences -> toolbar item title */
+"Groups" = "Групи";
+
+/* View menu -> Filter Bar */
+"Hide Filter Bar" = "Скриване на лентата с филтри";
+
+/* View menu -> Inspector */
+"Hide Inspector" = "Скриване на инспектора";
+
+/* View menu -> Status Bar */
+"Hide Status Bar" = "Скриване на лентата на състоянието";
+
+/* View menu -> Toolbar */
+"Hide Toolbar" = "Скриване на лентата с инструменти";
+
+/* File Outline -> Priority Menu */
+"High" = "Висок";
+
+/* files tab -> tooltip */
+"High Priority" = "Висок приоритет";
+
+/* Legal alert -> button */
+"I Accept" = "Приемам";
+
+/* Add torrent -> same name -> message */
+"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "Ако се опитвате да използвате вече съществуващи данни, основната директория с данни трябва да бъде вътре в целевата директория.";
+
+/* Torrent -> eta string */
+"inactive" = "неактивен";
+
+/* Message window -> level
+   Message window -> level string */
+"Info" = "Информация";
+
+/* Inspector toolbar item -> label */
+"Inspector" = "Инспектор";
+
+/* URL sheet label */
+"Internet address of torrent file:" = "Интернет адрес на торент файла:";
+
+/* inspector -> peer table -> header */
+"IP Address" = "IP адрес";
+
+/* Download not a torrent -> message */
+"It appears that the file \"%@\" from %@ is not a torrent file." = "Изглежда, че файлът \"%1$@\" от %2$@ не е торент файл.";
+
+/* Transfer speed (kilobytes per second) */
+"KB/s" = "КБ/с";
+
+/* Inspector -> Peers tab -> peers */
+"Known:" = "Известни:";
+
+/* Tracker last announce */
+"Last Announce" = "Последно анонсиране";
+
+/* Tracker last scrape */
+"Last Scrape" = "Последно извличане";
+
+/* Prefs -> blocklist -> message */
+"Last updated" = "Последно актуализиран";
+
+/* tracker peer stat */
+"Leechers" = "Лийчъри";
+
+/* About window -> license button */
+"License" = "Лиценз";
+
+/* Save log alert panel -> title */
+"Log Could Not Be Saved" = "Дневникът не можа да бъде запазен";
+
+/* File Outline -> Priority Menu */
+"Low" = "Нисък";
+
+/* files tab -> tooltip */
+"Low Priority" = "Нисък приоритет";
+
+/* Open duplicate magnet alert -> title */
+"Magnet link is a duplicate of an existing transfer." = "Магнетният линк е дубликат на съществуващ трансфер.";
+
+/* Inspector -> selected torrents
+   Torrent -> progress string */
+"Magnetized transfer" = "Магнетизиран трансфер";
+
+/* Transfer speed (megabytes per second) */
+"MB/s" = "МБ/с";
+
+/* Message window -> table column */
+"Message" = "Съобщение";
+
+/* Message window -> title */
+"Message Log" = "Дневник на съобщенията";
+
+/* files tab -> tooltip */
+"Multiple Priorities" = "Множество приоритети";
+
+/* Inspector -> Peers tab -> table row tooltip
+   No Ratio
+   Prefs -> blocklist -> message
+   Tracker last announce
+   Tracker last scrape
+   tracker peer stat */
+"N/A" = "Няма данни";
+
+/* Filter Bar -> filter menu */
+"Name" = "Име";
+
+/* Preferences -> toolbar item title */
+"Network" = "Мрежа";
+
+/* Prefs -> blocklist -> message */
+"Never" = "Никога";
+
+/* Inspector -> tracker table */
+"New Tier" = "Ново ниво";
+
+/* Tracker next announce */
+"Next announce in %@" = "Следващо анонсиране след %@";
+
+/* Group table row */
+"No Group" = "Без група";
+
+/* Inspector -> selected torrents */
+"No Torrents Selected" = "Няма избрани торенти";
+
+/* Groups -> Button
+   Groups -> Menu
+   inspector -> check all */
+"None" = "Няма";
+
+/* Donation beg -> button */
+"Nope" = "Не";
+
+/* File Outline -> Priority Menu */
+"Normal" = "Нормален";
+
+/* files tab -> tooltip */
+"Normal Priority" = "Нормален приоритет";
+
+/* Torrent disk space alert -> title */
+"Not enough remaining disk space to download \"%@\" completely." = "Няма достатъчно оставащо дисково пространство, за да се изтегли напълно \"%@\".";
+
+/* About window -> license close button
+   Blocklist -> button
+   Create torrent -> directory doesn't exist warning -> button
+   Create torrent -> failed -> button
+   Create torrent -> file already exists warning -> button
+   Create torrent -> no files -> button
+   Create torrent -> zero size -> button
+   Download not a torrent -> button
+   Magnet link failed -> button
+   Move error alert -> button
+   Move inside itself alert -> button
+   Open duplicate alert -> button
+   Open duplicate magnet alert -> button
+   Open invalid alert -> button
+   Save log alert panel -> button
+   Torrent disk space alert -> button
+   Torrent download failed -> button
+   Torrent file copy alert -> button
+   Transmission already running alert -> button */
+"OK" = "OK";
+
+/* Remove completed confirm panel -> message */
+"Once removed, continuing the transfer will require the torrent file or magnet link." = "След като бъде премахнат, за продължаване на трансфера ще е необходим торент файлът или магнетният линк.";
+
+/* Removal confirm panel -> message part 2
+   Remove completed confirm panel -> message */
+"Once removed, continuing the transfers will require the torrent files or magnet links." = "След премахване, продължаването на трансферите ще изисква торент файловете или магнетните линкове.";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "След като бъде премахнат, Transmission повече няма да се опитва да се свърже с него. Това действие не може да бъде отменено.";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "След като бъдат премахнати, Transmission повече няма да се опитва да се свърже с тях. Това действие не може да бъде отменено.";
+
+/* File Outline -> Menu */
+"Only Check Selected" = "Провери само избраните";
+
+/* Open toolbar item -> label
+   URL sheet button */
+"Open" = "Отваряне";
+
+/* Open address toolbar item -> label */
+"Open Address" = "Отваряне на адрес";
+
+/* Open address toolbar item -> palette label */
+"Open Torrent Address" = "Отваряне на адрес на торент";
+
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "Отваряне на торент файлове";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "Отваряне на торент файлове";
+
+/* Open address toolbar item -> tooltip */
+"Open torrent web address" = "Отваряне на уеб адрес на торент";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Options" = "Настройки";
+
+/* Groups -> Name */
+"Orange" = "Оранжев";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Partial Seed" = "Частичен сийдър";
+
+/* All toolbar item -> palette label */
+"Pause / Resume All" = "Пауза / Продължаване на всички";
+
+/* Selected toolbar item -> palette label */
+"Pause / Resume Selected" = "Пауза / Продължаване на избраните";
+
+/* All toolbar item -> label
+   Dock item */
+"Pause All" = "Пауза на всички";
+
+/* All toolbar item -> tooltip */
+"Pause all transfers" = "Пауза на всички трансфери";
+
+/* Selected toolbar item -> label */
+"Pause Selected" = "Пауза на избраните";
+
+/* Selected toolbar item -> tooltip */
+"Pause selected transfers" = "Пауза на избраните трансфери";
+
+/* Torrent Table -> tooltip */
+"Pause the transfer" = "Пауза на трансфера";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Paused" = "На пауза";
+
+/* Inspector -> peer -> status */
+"Peer is unchoking you, but you are not interested" = "Участникът ви е отблокирал, но вие не сте заинтересовани";
+
+/* Inspector -> peer -> status */
+"Peer wants you to upload, but you do not want to (interested and choked)" = "Участникът иска да качвате, но вие не искате (заинтересован и блокиран)";
+
+/* Inspector -> tab
+   Inspector view -> title
+   Preferences -> toolbar item title */
+"Peers" = "Участници";
+
+/* Preferences -> Network -> port status */
+"Port check site is down" = "Сайтът за проверка на порта не работи";
+
+/* Preferences -> Network -> port status */
+"Port is closed" = "Портът е затворен";
+
+/* Preferences -> Network -> port status */
+"Port is open" = "Портът е отворен";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Port: %@" = "Порт: %@";
+
+/* No comment provided by engineer. */
+"PrefWindowSize" = "PrefWindowSize";
+
+/* File Outline -> Menu
+   file table -> header tool tip */
+"Priority" = "Приоритет";
+
+/* files tab -> tooltip */
+"Priority Not Available" = "Приоритет не е наличен";
+
+/* Inspector -> private torrent */
+"Private Torrent, non-tracker peer discovery disabled" = "Частен торент, откриването на участници извън тракера е изключено";
+
+/* Message window -> table column */
+"Process" = "Процес";
+
+/* Blocklist -> message */
+"Processing blocklist" = "Обработка на списък за блокиране";
+
+/* Stats window -> label */
+"Program Started" = "Програмата е стартирана";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Progress: %@" = "Напредък: %@";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Protocol: %@" = "Протокол: %@";
+
+/* Inspector -> private torrent */
+"Public Torrent" = "Публичен торент";
+
+/* Groups -> Name */
+"Purple" = "Лилав";
+
+/* QuickLook toolbar item -> label
+   QuickLook toolbar item -> palette label
+   QuickLook toolbar item -> tooltip
+   View menu -> Quick Look */
+"Quick Look" = "Бърз преглед";
+
+/* Confirm Quit panel -> button
+   Legal alert -> button */
+"Quit" = "Изход";
+
+/* Stats window -> label
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string
+   Torrent table -> group row -> tooltip */
+"Ratio" = "Коефициент";
+
+/* Groups -> Name */
+"Red" = "Червен";
+
+/* Torrent -> eta string */
+"remaining time unknown" = "оставащото време е неизвестно";
+
+/* Preferences -> toolbar item title */
+"Remote" = "Отдалечен достъп";
+
+/* Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove toolbar item -> label
+   Remove trackers alert -> button */
+"Remove" = "Премахване";
+
+/* Main window -> 3rd bottom left button (remove all) tooltip */
+"Remove all transfers that have completed seeding." = "Премахване на всички трансфери, които са завършили сийдването.";
+
+/* Remove toolbar item -> palette label */
+"Remove Selected" = "Премахване на избраните";
+
+/* Inspector view -> tracker buttons */
+"Remove selected trackers" = "Премахване на избраните тракери";
+
+/* Remove toolbar item -> tooltip */
+"Remove selected transfers" = "Премахване на избраните трансфери";
+
+/* rename sheet button */
+"Rename" = "Преименуване";
+
+/* File Outline -> Menu */
+"Rename File" = "Преименуване на файл";
+
+/* rename sheet label */
+"Rename the file \"%@\":" = "Преименуване на файла \"%@\":";
+
+/* Stats reset -> button
+   Stats window -> reset button */
+"Reset" = "Нулиране";
+
+/* All toolbar item -> label
+   Dock item */
+"Resume All" = "Продължаване на всички";
+
+/* All toolbar item -> tooltip */
+"Resume all transfers" = "Продължаване на всички трансфери";
+
+/* Selected toolbar item -> label */
+"Resume Selected" = "Продължаване на избраните";
+
+/* Selected toolbar item -> tooltip */
+"Resume selected transfers" = "Продължаване на избраните трансфери";
+
+/* Torrent cell -> button info */
+"Resume the transfer" = "Продължаване на трансфера";
+
+/* Torrent cell -> button info */
+"Resume the transfer right away" = "Продължаване на трансфера веднага";
+
+/* Stats window -> label */
+"Running Time" = "Време на работа";
+
+/* Message window -> save button */
+"Save" = "Запазване";
+
+/* Tracker last scrape */
+"Scrape error" = "Грешка при извличане";
+
+/* Tracker last scrape */
+"Scrape timed out" = "Времето за извличане изтече";
+
+/* tracker peer stat */
+"Seeders" = "Сийдъри";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Seeding" = "Сийдване";
+
+/* Torrent -> status string */
+"Seeding complete" = "Сийдването е завършено";
+
+/* notification title */
+"Seeding Complete" = "Сийдването завърши";
+
+/* Torrent -> status string */
+"Seeding to %1$lu of %2$lu peers" = "Сийдване към %1$lu от %2$lu участници";
+
+/* Torrent -> status string */
+"Seeding to %u of 1 peer" = "Сийдване към %u от 1 участник";
+
+/* Create torrent -> location sheet -> button
+   Create torrent -> select file
+   Move torrent -> prompt
+   Open torrent -> prompt
+   Preferences -> Open panel prompt */
+"Select" = "Избор";
+
+/* Create torrent -> select file */
+"Select a file or folder for the torrent file." = "Изберете файл или папка за торент файла.";
+
+/* Add -> select destination folder */
+"Select the download folder for \"%@\"" = "Изберете папката за изтегляне за \"%@\"";
+
+/* Create torrent -> location sheet -> message */
+"Select the name and location for the torrent file." = "Изберете името и местоположението на торент файла.";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for %lu data files." = "Изберете новата папка за %lu файла с данни.";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for \"%@\"." = "Изберете новата папка за \"%@\".";
+
+/* Status Bar -> status menu */
+"Session Ratio" = "Коефициент на сесията";
+
+/* Status Bar -> status menu */
+"Session Transfer" = "Трансфер в сесията";
+
+/* Share toolbar item -> label
+   Share toolbar item -> palette label */
+"Share" = "Споделяне";
+
+/* Share toolbar item -> tooltip */
+"Share torrent file" = "Споделяне на торент файл";
+
+/* Main window -> 1st bottom left button (action) tooltip */
+"Shortcuts for changing global settings." = "Преки пътища за промяна на глобалните настройки.";
+
+/* notification button */
+"Show" = "Показване";
+
+/* View menu -> Filter Bar */
+"Show Filter Bar" = "Показване на лентата с филтри";
+
+/* File Outline -> Menu */
+"Show in Finder" = "Показване във Finder";
+
+/* View menu -> Inspector */
+"Show Inspector" = "Показване на инспектора";
+
+/* View menu -> Status Bar */
+"Show Status Bar" = "Показване на лентата на състоянието";
+
+/* Torrent cell -> button info */
+"Show the data file in Finder" = "Показване на файла с данни във Finder";
+
+/* View menu -> Toolbar */
+"Show Toolbar" = "Показване на лентата с инструменти";
+
+/* Dock item
+   Status Bar -> speed tooltip */
+"Speed Limit" = "Ограничение на скоростта";
+
+/* notification title */
+"Speed Limit Auto Disabled" = "Автоматичното ограничение на скоростта е изключено";
+
+/* notification title */
+"Speed Limit Auto Enabled" = "Автоматичното ограничение на скоростта е включено";
+
+/* Main window -> 2nd bottom left button (turtle) tooltip */
+"Speed Limit overrides the total bandwidth limits with its own limits." = "Ограничението на скоростта заменя общите ограничения на трафика със собствени.";
+
+/* Torrent -> status string */
+"Stalled" = "В застой";
+
+/* Stats window -> title */
+"Statistics" = "Статистика";
+
+/* Torrent cell -> button info */
+"Stop waiting to start" = "Спиране на изчакването за стартиране";
+
+/* Donation beg -> title */
+"Support open-source indie software" = "Подкрепете независим софтуер с отворен код";
+
+/* Transfer speed (terabytes per second) */
+"TB/s" = "ТБ/с";
+
+/* Create torrent -> directory doesn't exist warning -> title */
+"The chosen torrent file location does not exist." = "Избраното местоположение на торент файла не съществува.";
+
+/* Add torrent -> same name -> title */
+"The destination directory and root data directory have the same name." = "Целевата директория и основната директория с данни имат едно и също име.";
+
+/* Create torrent -> directory doesn't exist warning -> warning */
+"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "Директорията \"%@\" в момента не съществува. Създайте тази директория или изберете друга, за да създадете торент файла.";
+
+/* Open duplicate magnet alert -> message */
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "Магнетният линк \"%@\" не може да бъде добавен, защото е дубликат на вече съществуващ трансфер.";
+
+/* Move error alert -> message
+   Move inside itself alert -> message */
+"The move operation of \"%@\" cannot be done." = "Операцията по преместване на \"%@\" не може да бъде извършена.";
+
+/* blocklist fail message */
+"The specified blocklist file did not contain any valid rules." = "Посоченият файл със списък за блокиране не съдържа валидни правила.";
+
+/* Torrent download failed -> message */
+"The torrent could not be downloaded from %@: %@." = "Торентът не може да бъде изтеглен от %1$@: %2$@.";
+
+/* Torrent file copy alert -> message */
+"The torrent file (%@) cannot be found." = "Торент файлът (%@) не може да бъде намерен.";
+
+/* Open invalid alert -> message */
+"The torrent file cannot be opened because it contains invalid data." = "Торент файлът не може да бъде отворен, защото съдържа невалидни данни.";
+
+/* Create torrent -> zero size -> title */
+"The total file size is zero bytes." = "Общият размер на файла е нула байта.";
+
+/* Open duplicate alert -> message */
+"The transfer cannot be added because it is a duplicate of an already existing transfer." = "Трансферът не може да бъде добавен, защото е дубликат на вече съществуващ трансфер.";
+
+/* Torrent disk space alert -> message */
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Трансферът ще бъде поставен на пауза. Освободете място на %@ или премахнете избора на файлове в инспектора на торента, за да продължите.";
+
+/* Create torrent -> blank address -> message */
+"The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Трансферът няма да се свързва с тракери за участници и ще трябва да разчита единствено на методи за откриване на участници извън тракера като PEX и DHT за изтегляне и сийдване.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %1$lu transfers (%2$lu active)." = "Има %1$lu трансфера (%2$lu активни).";
+
+/* Confirm Quit panel -> message */
+"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "Има %lu активни трансфера, които ще бъдат поставени на пауза при изход. Трансферите ще се възобновят автоматично при следващото стартиране.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %lu active transfers." = "Има %lu активни трансфера.";
+
+/* Create torrent -> blank address -> title */
+"There are no tracker addresses." = "Няма адреси на тракери.";
+
+/* Transmission already running alert -> message */
+"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Вече има работещо копие на Transmission. Това копие не може да бъде отворено, докато работещото не бъде затворено.";
+
+/* Confirm Quit panel -> message */
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Има активен трансфер, който ще бъде поставен на пауза при изход. Трансферът ще се възобнови автоматично при следващото стартиране.";
+
+/* Create torrent -> no files -> warning */
+"There must be at least one file in a folder to create a torrent file." = "Трябва да има поне един файл в папката, за да се създаде торент файл.";
+
+/* Save log alert panel -> message */
+"There was a problem creating the file \"%@\"." = "Възникна проблем при създаването на файла \"%@\".";
+
+/* Move error alert -> title */
+"There was an error moving the data file." = "Възникна грешка при преместването на файла с данни.";
+
+/* Magnet link failed -> message */
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Възникна грешка при добавянето на магнетния линк \"%@\". Трансферът няма да се осъществи.";
+
+/* Create torrent -> no files -> title */
+"This folder contains no files." = "Тази папка не съдържа файлове.";
+
+/* Preferences -> Transfers -> Adding -> Magnet tooltip */
+"This option is not available if Default location is set to Same as torrent file." = "Тази опция не е налична, ако местоположението по подразбиране е зададено на „Същото като на торент файла“.";
+
+/* Removal confirm panel -> message */
+"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Този трансфер е активен. След като бъде премахнат, за продължаване на трансфера ще е необходим торент файлът или магнетният линк.";
+
+/* Stats reset -> message */
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Това ще изчисти глобалната статистика, показвана от Transmission. Статистиката на отделните трансфери няма да бъде засегната.";
+
+/* Inspector -> tracker table */
+"Tier %ld" = "Ниво %ld";
+
+/* Filter toolbar item -> palette label */
+"Toggle Filter" = "Превключване на филтъра";
+
+/* Inspector toolbar item -> palette label */
+"Toggle Inspector" = "Превключване на инспектора";
+
+/* Filter toolbar item -> tooltip */
+"Toggle the filter bar" = "Превключване на лентата с филтри";
+
+/* Inspector toolbar item -> tooltip */
+"Toggle the torrent inspector" = "Превключване на инспектора на торенти";
+
+/* Download not a torrent -> title
+   Torrent download error -> title */
+"Torrent download failed" = "Изтеглянето на торента е неуспешно";
+
+/* notification title */
+"Torrent File Auto Added" = "Торент файлът е добавен автоматично";
+
+/* Inspector -> title */
+"Torrent Inspector" = "Инспектор на торенти";
+
+/* Torrent -> progress string */
+"torrent metadata needed" = "необходими са метаданни на торента";
+
+/* stats total */
+"Total N/A" = "Общо няма данни";
+
+/* Status Bar -> status menu */
+"Total Ratio" = "Общ коефициент";
+
+/* Status Bar -> status menu */
+"Total Transfer" = "Общ трансфер";
+
+/* Message window -> level */
+"Trace" = "Проследяване";
+
+/* Filter Bar -> filter menu */
+"Tracker" = "Тракер";
+
+/* Torrent -> status string */
+"Tracker returned error" = "Тракерът върна грешка";
+
+/* Torrent -> status string */
+"Tracker returned warning" = "Тракерът върна предупреждение";
+
+/* Tracker next announce */
+"Tracker will be used as a backup" = "Тракерът ще се използва като резервен";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Trackers" = "Тракери";
+
+/* Inspector -> Peers tab -> peers */
+"Transfer Not Active" = "Трансферът не е активен";
+
+/* Preferences -> toolbar item title */
+"Transfers" = "Трансфери";
+
+/* Inspector -> Peers tab -> peers */
+"Transfers Not Active" = "Трансферите не са активни";
+
+/* Legal alert -> message */
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission е програма за споделяне на файлове. Когато стартирате торент, данните му ще бъдат достъпни за други чрез качване. Вие и само вие носите пълна отговорност за правилната преценка и спазването на местните закони.";
+
+/* Donation beg -> message */
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission е пълнофункционално торент приложение. Много време и усилия са вложени в разработка, кодиране и усъвършенстване. Ако ви харесва да го използвате, моля, обмислете да покажете подкрепата си с дарение.";
+
+/* Transmission already running alert -> title */
+"Transmission is already running." = "Transmission вече работи.";
+
+/* inspector -> peer table -> header
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string */
+"UL" = "Качване";
+
+/* Inspector -> Peers tab -> peers */
+"UL to %lu" = "Качване към %lu";
+
+/* File Outline -> Menu */
+"Uncheck Selected" = "Премахване на отметката на избраните";
+
+/* Status Bar -> speed tooltip */
+"unlimited" = "неограничено";
+
+/* Torrent -> error string unreadable */
+"unreadable error" = "нечетима грешка";
+
+/* Save log panel -> default file name */
+"untitled" = "неозаглавен";
+
+/* Torrent table -> group row -> tooltip */
+"Upload speed" = "Скорост на качване";
+
+/* Stats window -> label */
+"Uploaded" = "Качено";
+
+/* Torrent -> progress string */
+"uploaded %@ (Ratio: %@)" = "качено %1$@ (Коефициент: %2$@)";
+
+/* inspector -> peer table -> header tool tip */
+"Uploading To Peer" = "Качване към участник";
+
+/* Torrent -> status string */
+"Waiting to check existing data" = "Изчакване за проверка на съществуващи данни";
+
+/* Torrent -> status string */
+"Waiting to download" = "Изчакване за изтегляне";
+
+/* Torrent -> status string */
+"Waiting to seed" = "Изчакване за сийдване";
+
+/* Message window -> level
+   Message window -> level string */
+"Warning" = "Предупреждение";
+
+/* Drag overlay -> url */
+"Web Address" = "Уеб адрес";
+
+/* Torrent -> status string */
+"web seed" = "уеб сийдър";
+
+/* inspector -> web seed table -> header */
+"Web Seeds" = "Уеб сийдъри";
+
+/* Legal alert -> title */
+"Welcome to Transmission" = "Добре дошли в Transmission";
+
+/* Groups -> Name */
+"Yellow" = "Жълт";
+
+/* Inspector -> peer -> status */
+"You unchoked the peer, but the peer is not interested" = "Вие отблокирахте участника, но той не е заинтересован";
+
+/* Inspector -> peer -> status */
+"You want to download, but peer does not want to send (interested and choked)" = "Искате да изтегляте, но участникът не иска да изпраща (заинтересован и блокиран)";
+

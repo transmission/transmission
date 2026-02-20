@@ -5,17 +5,17 @@
 #
 # Translators:
 # MMP 0 <mmmmpp0@yahoo.co.jp>, 2022
-# maboroshin, 2025
-# Mike Gelfand <mikedld@mikedld.com>, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2026
+# maboroshin, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-26 16:00+0000\n"
+"POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
+"Last-Translator: maboroshin, 2026\n"
 "Language-Team: Japanese (https://app.transifex.com/transmissionbt/teams/33778/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -31,11 +31,11 @@ msgstr "なし"
 msgid "Inf"
 msgstr ""
 
-#: ../daemon/daemon.cc:218 ../gtk/Session.cc:817 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
+#: ../daemon/daemon.cc:218 ../gtk/Session.cc:815 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "読み取れません「{path}」: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:243 ../gtk/Session.cc:869 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
+#: ../daemon/daemon.cc:243 ../gtk/Session.cc:879 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
 msgstr "トレントファイルを追加できません「{path}」"
 
@@ -75,7 +75,7 @@ msgstr "以下から設定を読み込み中「{path}」"
 msgid "Saved pidfile '{path}'"
 msgstr "PidFile を保存しました「{path}」"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1011 ../libtransmission/torrent.cc:2013 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "保存できませんでした「{path}」: {error} ({error_code})"
 
@@ -533,7 +533,7 @@ msgstr "通常"
 msgid "Low"
 msgstr "低"
 
-#: ../gtk/FileList.cc:858 ../gtk/Session.cc:324
+#: ../gtk/FileList.cc:858 ../gtk/Session.cc:322
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "改名できません。「{old_path}」から「{path}」へ: {error} ({error_code})"
 
@@ -789,65 +789,65 @@ msgstr "暗号化を優先"
 msgid "Require encryption"
 msgstr "暗号化は必須"
 
-#: ../gtk/PrefsDialog.cc:382
+#: ../gtk/PrefsDialog.cc:383
 msgid "Every Day"
 msgstr "毎日"
 
-#: ../gtk/PrefsDialog.cc:383
+#: ../gtk/PrefsDialog.cc:384
 msgid "Weekdays"
 msgstr "平日"
 
-#: ../gtk/PrefsDialog.cc:384
+#: ../gtk/PrefsDialog.cc:385
 msgid "Weekends"
 msgstr "週末"
 
-#: ../gtk/PrefsDialog.cc:567
+#: ../gtk/PrefsDialog.cc:568
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] "ブロックリスト内に {count:L} 項目あります"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Blocklist updated!"
 msgstr "ブロックリストを更新しました !"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Couldn't update blocklist"
 msgstr "ブロックリストを更新できません"
 
-#: ../gtk/PrefsDialog.cc:595
+#: ../gtk/PrefsDialog.cc:596
 msgid "Getting new blocklist…"
 msgstr "新しいブロックリストを取得中…"
 
-#: ../gtk/PrefsDialog.cc:954
+#: ../gtk/PrefsDialog.cc:955
 msgctxt "Port test status"
 msgid "unknown"
 msgstr "不明"
 
-#: ../gtk/PrefsDialog.cc:956
+#: ../gtk/PrefsDialog.cc:957
 msgctxt "Port test status"
 msgid "checking…"
 msgstr "確認中…"
 
-#: ../gtk/PrefsDialog.cc:958
+#: ../gtk/PrefsDialog.cc:959
 msgctxt "Port test status"
 msgid "open"
 msgstr "開く"
 
-#: ../gtk/PrefsDialog.cc:960
+#: ../gtk/PrefsDialog.cc:961
 msgctxt "Port test status"
 msgid "closed"
 msgstr "閉鎖"
 
-#: ../gtk/PrefsDialog.cc:962
+#: ../gtk/PrefsDialog.cc:963
 msgctxt "Port test status"
 msgid "error"
 msgstr "エラー"
 
-#: ../gtk/PrefsDialog.cc:975
+#: ../gtk/PrefsDialog.cc:976
 msgid "Status: <b>{status}</b>"
 msgstr "状態: <b>{status}</b>"
 
-#: ../gtk/PrefsDialog.cc:977
+#: ../gtk/PrefsDialog.cc:978
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 msgstr "状態: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
@@ -863,25 +863,25 @@ msgstr "トレントを移動できません"
 msgid "This may take a moment…"
 msgstr "作業には数分かかる場合があります…"
 
-#: ../gtk/Session.cc:802 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
+#: ../gtk/Session.cc:800 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
 msgstr "読み込めません「{path}」"
 
 #. logging
-#: ../gtk/Session.cc:1087
+#: ../gtk/Session.cc:1071
 msgid "Inhibiting desktop hibernation"
 msgstr "デスクトップの休止状態を抑制中"
 
-#: ../gtk/Session.cc:1094 ../gtk/Session.cc:1120
+#: ../gtk/Session.cc:1078 ../gtk/Session.cc:1104
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "デスクトップの休止状態を抑制できませんでした: {error}"
 
 #. logging
-#: ../gtk/Session.cc:1115
+#: ../gtk/Session.cc:1099
 msgid "Allowing desktop hibernation"
 msgstr "デスクトップの休止状態を許可中"
 
-#: ../gtk/Session.cc:1236
+#: ../gtk/Session.cc:1220
 msgid "Couldn't find pending RPC request for id {id}"
 msgstr ""
 
@@ -1200,6 +1200,10 @@ msgstr "全トレントを停止状態で Transmission を起動"
 msgid "Start Transmission Minimized"
 msgstr "最小化して Transmission を起動"
 
+#: ../gtk/transmission.ui:7
+msgid "_File"
+msgstr "ファイル(_F)"
+
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
 msgstr "トレントを開く"
@@ -1236,6 +1240,10 @@ msgstr "すべてのトレントを停止"
 msgid "_Quit"
 msgstr "終了(_Q)"
 
+#: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
+msgid "_Edit"
+msgstr "編集(_E)"
+
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
 msgstr "すべて選択(_A)"
@@ -1247,6 +1255,10 @@ msgstr "すべて選択解除(_L)"
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
 msgstr "環境設定(_P)"
+
+#: ../gtk/transmission.ui:77
+msgid "_Torrent"
+msgstr "トレント(_T)"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1279,6 +1291,10 @@ msgstr "トレントをすぐに開始する"
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
 msgstr "トラッカーにピア増加を要求(_M)"
+
+#: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
+msgid "_Queue"
+msgstr "待ち行列(_Q)"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1323,6 +1339,10 @@ msgstr "トレントを削除"
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
 msgstr "ファイルの削除(_D)"
+
+#: ../gtk/transmission.ui:178
+msgid "_View"
+msgstr "表示(_V)"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1380,6 +1400,10 @@ msgstr "残り時間順に並び替え(_L)"
 msgid "Re_verse Sort Order"
 msgstr "逆順に並び替え(_V)"
 
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
+msgid "_Help"
+msgstr "ヘルプ(_H)"
+
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
 msgstr "メッセージログ(_L)"
@@ -1399,6 +1423,10 @@ msgstr "コンテンツ(_C)"
 #: ../gtk/transmission.ui:282
 msgid "_About"
 msgstr "バージョン情報(_A)"
+
+#: ../gtk/transmission.ui:306
+msgid "_Sort Torrents By"
+msgstr "トレントの並べ替え(_S)"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -1503,10 +1531,6 @@ msgstr "詳細を表示(_M)"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:652 ../gtk/ui/gtk4/DetailsDialog.ui:512
 msgid "Peers"
 msgstr "ピア"
-
-#: ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
-msgid "_Edit"
-msgstr "編集(_E)"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:773 ../gtk/ui/gtk4/DetailsDialog.ui:587
 msgid "Show _backup trackers"
@@ -1687,10 +1711,6 @@ msgstr ".torrent ファイルをごみ箱へ(_V)"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
 msgstr "Transmission 設定"
-
-#: ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
-msgid "_Help"
-msgstr "ヘルプ(_H)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:76 ../gtk/ui/gtk4/PrefsDialog.ui:29
 msgid "Speed Limits"
@@ -2060,7 +2080,7 @@ msgstr "不明のエラー"
 msgid "{ip_protocol} connection failed"
 msgstr "{ip_protocol} 接続失敗"
 
-#: ../libtransmission/announcer-udp.cc:542
+#: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 msgstr "参照できません '{address}:{port}'  /{ip_protocol}: {error} ({error_code})"
 
@@ -2123,7 +2143,7 @@ msgstr " この端末は{protocol}に未対応"
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "更新成功: グローバル {type} アドレスを {ip} の {url}を利用したものへ"
 
-#: ../libtransmission/log.cc:292
+#: ../libtransmission/log.cc:294
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "以下のようなメッセージがたくさん ! このセッションではこのメッセージは記録しません。"
 
@@ -2163,7 +2183,7 @@ msgstr "事前割り当てできません「{path}」: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "切り詰めできません「{path}」: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:676
+#: ../libtransmission/peer-io.cc:686
 msgid "Unknown state: {state}"
 msgstr "不明の状態: {state}"
 
@@ -2332,72 +2352,72 @@ msgstr "セッションのロックファイルを開けません「{path}」: {
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "以下で接続してくるピア接続を待ち受け{hostport}"
 
-#: ../libtransmission/session.cc:748
+#: ../libtransmission/session.cc:749
 msgid "Transmission version {version} starting"
 msgstr "Transmission バージョン{version} 開始"
 
-#: ../libtransmission/session.cc:1488
+#: ../libtransmission/session.cc:1489
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission バージョン {version} シャットダウン"
 
-#: ../libtransmission/session.cc:1570
+#: ../libtransmission/session.cc:1571
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "{count} トレントを読み込みました"
 
-#: ../libtransmission/torrent-metainfo.cc:704
+#: ../libtransmission/torrent-metainfo.cc:739
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "トレントファイルを移行「{old_path}」から「{path}」へ"
 
-#: ../libtransmission/torrent.cc:139
+#: ../libtransmission/torrent.cc:156
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "「{path}」からのメタ情報が使用できません。 「{magnet}」用のものです: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:168
+#: ../libtransmission/torrent.cc:185
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr "データなし。ドライブの接続を確認したり「場所の設定」をお使いください。再ダウンロードには「取得データの検証」の後、トレントを開始します。"
 
-#: ../libtransmission/torrent.cc:405
+#: ../libtransmission/torrent.cc:424
 msgid "Calling script '{path}'"
 msgstr "スクリプト実行「{path}」"
 
-#: ../libtransmission/torrent.cc:413
+#: ../libtransmission/torrent.cc:432
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "スクリプトを実行できません「{path}」: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:447
+#: ../libtransmission/torrent.cc:466
 msgid "Seed ratio reached; pausing torrent"
 msgstr "シード比に達しました; トレントを停止"
 
-#: ../libtransmission/torrent.cc:454
+#: ../libtransmission/torrent.cc:473
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "シードアイドルの制限に達しました。トレントを停止"
 
-#: ../libtransmission/torrent.cc:615
+#: ../libtransmission/torrent.cc:636
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "手動で再起動 -- シード比を無効化"
 
-#: ../libtransmission/torrent.cc:671
+#: ../libtransmission/torrent.cc:692
 msgid "Pausing torrent"
 msgstr "トレントの停止"
 
-#: ../libtransmission/torrent.cc:725
+#: ../libtransmission/torrent.cc:737
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr "すべてのトレントファイルを除去できませんでした: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:791
+#: ../libtransmission/torrent.cc:780
 msgid "Removing torrent"
 msgstr "トレントの削除"
 
-#: ../libtransmission/torrent.cc:1110 ../libtransmission/torrent.cc:1618
+#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "移動できません。「{old_path}」から「{path}」へ: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1560
+#: ../libtransmission/torrent.cc:1563
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr "データがないためトレントを停止しました。ドライブの接続を確認したり「場所の設定」の後、「取得データの検証」を行います。再ダウンロードするにはトレントを開始します。"
 
-#: ../libtransmission/torrent.cc:2066
+#: ../libtransmission/torrent.cc:2069
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr "トラッカーの警告: '{warning}' ({url})"
 

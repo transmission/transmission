@@ -7,17 +7,17 @@
 # jrthsr700tmax <jrthsr700tmax@gmail.com>, 2020
 # abc0922001 <abc0922001@hotmail.com>, 2024
 # Mike Gelfand <mikedld@mikedld.com>, 2025
-# MP Wang, 2025
 # taijuin lee, 2025
+# MP Wang, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-26 16:00+0000\n"
+"POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: taijuin lee, 2025\n"
+"Last-Translator: MP Wang, 2026\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/transmissionbt/teams/33778/zh_TW/)\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
@@ -33,11 +33,11 @@ msgstr "無"
 msgid "Inf"
 msgstr "Inf"
 
-#: ../daemon/daemon.cc:218 ../gtk/Session.cc:817 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
+#: ../daemon/daemon.cc:218 ../gtk/Session.cc:815 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "無法讀取 '{path}': {error} ({error_code})"
 
-#: ../daemon/daemon.cc:243 ../gtk/Session.cc:869 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
+#: ../daemon/daemon.cc:243 ../gtk/Session.cc:879 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
 msgstr "無法加入 torrent 檔案 '{path}'"
 
@@ -77,7 +77,7 @@ msgstr "正在從 '{path}' 讀取設定"
 msgid "Saved pidfile '{path}'"
 msgstr "已儲存 pidfile 於 '{path}'"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1011 ../libtransmission/torrent.cc:2013 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "無法儲存 '{path}'：{error} ({error_code})"
 
@@ -556,7 +556,7 @@ msgstr "中"
 msgid "Low"
 msgstr "低"
 
-#: ../gtk/FileList.cc:858 ../gtk/Session.cc:324
+#: ../gtk/FileList.cc:858 ../gtk/Session.cc:322
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "無法重新命名 '{old_path}' 為 '{path}'：{error} ({error_code})"
 
@@ -812,65 +812,65 @@ msgstr "偏好加密"
 msgid "Require encryption"
 msgstr "要求加密"
 
-#: ../gtk/PrefsDialog.cc:382
+#: ../gtk/PrefsDialog.cc:383
 msgid "Every Day"
 msgstr "每天"
 
-#: ../gtk/PrefsDialog.cc:383
+#: ../gtk/PrefsDialog.cc:384
 msgid "Weekdays"
 msgstr "週一到週五"
 
-#: ../gtk/PrefsDialog.cc:384
+#: ../gtk/PrefsDialog.cc:385
 msgid "Weekends"
 msgstr "週末"
 
-#: ../gtk/PrefsDialog.cc:567
+#: ../gtk/PrefsDialog.cc:568
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] "黑名單上有 {count:L} 個項目"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Blocklist updated!"
 msgstr "已更新黑名單！"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Couldn't update blocklist"
 msgstr "無法更新黑名單"
 
-#: ../gtk/PrefsDialog.cc:595
+#: ../gtk/PrefsDialog.cc:596
 msgid "Getting new blocklist…"
 msgstr "正在取得新的黑名單…"
 
-#: ../gtk/PrefsDialog.cc:954
+#: ../gtk/PrefsDialog.cc:955
 msgctxt "Port test status"
 msgid "unknown"
 msgstr "未知"
 
-#: ../gtk/PrefsDialog.cc:956
+#: ../gtk/PrefsDialog.cc:957
 msgctxt "Port test status"
 msgid "checking…"
 msgstr "正在檢查…"
 
-#: ../gtk/PrefsDialog.cc:958
+#: ../gtk/PrefsDialog.cc:959
 msgctxt "Port test status"
 msgid "open"
 msgstr "開啟"
 
-#: ../gtk/PrefsDialog.cc:960
+#: ../gtk/PrefsDialog.cc:961
 msgctxt "Port test status"
 msgid "closed"
 msgstr "關閉"
 
-#: ../gtk/PrefsDialog.cc:962
+#: ../gtk/PrefsDialog.cc:963
 msgctxt "Port test status"
 msgid "error"
 msgstr "錯誤"
 
-#: ../gtk/PrefsDialog.cc:975
+#: ../gtk/PrefsDialog.cc:976
 msgid "Status: <b>{status}</b>"
 msgstr "狀態：<b>{status}</b>"
 
-#: ../gtk/PrefsDialog.cc:977
+#: ../gtk/PrefsDialog.cc:978
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 msgstr "狀態：<b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
@@ -886,25 +886,25 @@ msgstr "無法移動 Torrent"
 msgid "This may take a moment…"
 msgstr "這可能會花上一段時間…"
 
-#: ../gtk/Session.cc:802 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
+#: ../gtk/Session.cc:800 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
 msgstr "無法讀取 '{path}'"
 
 #. logging
-#: ../gtk/Session.cc:1087
+#: ../gtk/Session.cc:1071
 msgid "Inhibiting desktop hibernation"
 msgstr "禁止桌面休眠"
 
-#: ../gtk/Session.cc:1094 ../gtk/Session.cc:1120
+#: ../gtk/Session.cc:1078 ../gtk/Session.cc:1104
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "無法禁止桌面休眠：{error}"
 
 #. logging
-#: ../gtk/Session.cc:1115
+#: ../gtk/Session.cc:1099
 msgid "Allowing desktop hibernation"
 msgstr "允許桌面休眠"
 
-#: ../gtk/Session.cc:1236
+#: ../gtk/Session.cc:1220
 msgid "Couldn't find pending RPC request for id {id}"
 msgstr ""
 
@@ -1223,6 +1223,10 @@ msgstr "啟動 Transmission 時暫停所有 Torrents"
 msgid "Start Transmission Minimized"
 msgstr "啟動 Transmission 時最小化"
 
+#: ../gtk/transmission.ui:7
+msgid "_File"
+msgstr "檔案 (_F)"
+
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
 msgstr "開啟 torrent"
@@ -1259,6 +1263,10 @@ msgstr "暫停所有 torrents"
 msgid "_Quit"
 msgstr "結束 (_Q)"
 
+#: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
+msgid "_Edit"
+msgstr "編輯 (_E)"
+
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
 msgstr "全選 (_A)"
@@ -1270,6 +1278,10 @@ msgstr "取消全選 (_L)"
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
 msgstr "偏好設定 (_P)"
+
+#: ../gtk/transmission.ui:77
+msgid "_Torrent"
+msgstr "Torrent (_T)"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1302,6 +1314,10 @@ msgstr "立即開始執行 torrent"
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
 msgstr "向追蹤器請求更多節點 (_M)"
+
+#: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
+msgid "_Queue"
+msgstr "排程 (_Q)"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1346,6 +1362,10 @@ msgstr "移除 Torrent"
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
 msgstr "刪除檔案並移除 (_D)"
+
+#: ../gtk/transmission.ui:178
+msgid "_View"
+msgstr "檢視 (_V)"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1403,6 +1423,10 @@ msgstr "依剩餘時間排序 (_L)"
 msgid "Re_verse Sort Order"
 msgstr "反轉排列順序 (_V)"
 
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
+msgid "_Help"
+msgstr "說明 (_H)"
+
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
 msgstr "訊息日誌 (_L)"
@@ -1422,6 +1446,10 @@ msgstr "內容 (_C)"
 #: ../gtk/transmission.ui:282
 msgid "_About"
 msgstr "關於 (_A)"
+
+#: ../gtk/transmission.ui:306
+msgid "_Sort Torrents By"
+msgstr "依以下方式排序 Torrents (_S)"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -1526,10 +1554,6 @@ msgstr "顯示更多詳細資料 (_M)"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:652 ../gtk/ui/gtk4/DetailsDialog.ui:512
 msgid "Peers"
 msgstr "節點"
-
-#: ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
-msgid "_Edit"
-msgstr "編輯 (_E)"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:773 ../gtk/ui/gtk4/DetailsDialog.ui:587
 msgid "Show _backup trackers"
@@ -1710,10 +1734,6 @@ msgstr "移動 torrent 檔案到垃圾桶 (_V)"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
 msgstr "Transmission 偏好設定"
-
-#: ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
-msgid "_Help"
-msgstr "說明 (_H)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:76 ../gtk/ui/gtk4/PrefsDialog.ui:29
 msgid "Speed Limits"
@@ -2083,7 +2103,7 @@ msgstr "未知的錯誤"
 msgid "{ip_protocol} connection failed"
 msgstr "{ip_protocol} 連線失敗"
 
-#: ../libtransmission/announcer-udp.cc:542
+#: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 msgstr "無法找到 '{address}:{port}' 在 {ip_protocol}: {error} ({error_code})"
 
@@ -2146,7 +2166,7 @@ msgstr "您的裝置不支援 {protocol}"
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "成功使用 {url} 更新全域 {type} 位址為 {ip}"
 
-#: ../libtransmission/log.cc:292
+#: ../libtransmission/log.cc:294
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "出現太多類似的訊息！將於本工作階段停止紀錄此類訊息。"
 
@@ -2186,7 +2206,7 @@ msgstr "無法預先配置 '{path}'：{error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "無法截斷 '{path}'：{error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:676
+#: ../libtransmission/peer-io.cc:686
 msgid "Unknown state: {state}"
 msgstr "未知狀態：{state}"
 
@@ -2355,72 +2375,72 @@ msgstr "無法開啟工作階段鎖定檔案 '{path}'：{error} ({error_code})"
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "正在監聽通訊埠 {hostport} 傳入的節點連線"
 
-#: ../libtransmission/session.cc:748
+#: ../libtransmission/session.cc:749
 msgid "Transmission version {version} starting"
 msgstr "Transmission 版本 {version} 正在啟動"
 
-#: ../libtransmission/session.cc:1488
+#: ../libtransmission/session.cc:1489
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission 版本 {version} 正在結束"
 
-#: ../libtransmission/session.cc:1570
+#: ../libtransmission/session.cc:1571
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "已載入 {count} 個 torrents"
 
-#: ../libtransmission/torrent-metainfo.cc:704
+#: ../libtransmission/torrent-metainfo.cc:739
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "已將 torrent 檔案從 '{old_path}' 移轉到 '{path}'"
 
-#: ../libtransmission/torrent.cc:139
+#: ../libtransmission/torrent.cc:156
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "無法將 '{path}' 的後設資料使用於 '{magnet}'：{error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:168
+#: ../libtransmission/torrent.cc:185
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr "找不到資料！請確保您的硬碟已連接或使用「設定位置」。若要重新下載，請使用「驗證本機資料」後開始下載 torrent。"
 
-#: ../libtransmission/torrent.cc:405
+#: ../libtransmission/torrent.cc:424
 msgid "Calling script '{path}'"
 msgstr "正在呼叫腳本 '{path}'"
 
-#: ../libtransmission/torrent.cc:413
+#: ../libtransmission/torrent.cc:432
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "無法呼叫腳本 '{path}'：{error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:447
+#: ../libtransmission/torrent.cc:466
 msgid "Seed ratio reached; pausing torrent"
 msgstr "已達到做種分享率，正在暫停 torrent"
 
-#: ../libtransmission/torrent.cc:454
+#: ../libtransmission/torrent.cc:473
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "已達到做種閒置時間，正在暫停 torrent"
 
-#: ../libtransmission/torrent.cc:615
+#: ../libtransmission/torrent.cc:636
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "已手動重新啟動 -- 正在停用做種分享率限制"
 
-#: ../libtransmission/torrent.cc:671
+#: ../libtransmission/torrent.cc:692
 msgid "Pausing torrent"
 msgstr "正在暫停 torrent"
 
-#: ../libtransmission/torrent.cc:725
+#: ../libtransmission/torrent.cc:737
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr "無法移除所有 torrent 檔案：{error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:791
+#: ../libtransmission/torrent.cc:780
 msgid "Removing torrent"
 msgstr "正在移除 torrent"
 
-#: ../libtransmission/torrent.cc:1110 ../libtransmission/torrent.cc:1618
+#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "無法移動 '{old_path}' 到 '{path}'：{error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1560
+#: ../libtransmission/torrent.cc:1563
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr "因為找不到資料，已暫停 torrent！請確保您的硬碟已連接或使用「設定位置」，然後再次使用「驗證本機資料」。若要重新下載，開始下載 torrent。"
 
-#: ../libtransmission/torrent.cc:2066
+#: ../libtransmission/torrent.cc:2069
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr "追蹤器警告：'{warning}'（{url}）"
 

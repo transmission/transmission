@@ -1,14 +1,14 @@
 /* quicklook file header */
-"%lu Files" = "%lu pliki(-ów)";
+"%lu Files" = "Pliki: %lu";
 
 /* quicklook file count */
-"%lu files" = "%lu pliki(-ów)";
+"%lu files" = "Pliki: %lu";
 
 /* quicklook tracker header */
-"%lu Trackers" = "%lu serwery(-ów) śledzące(-ych)";
+"%lu Trackers" = "Serwery śledzące: %lu";
 
 /* quicklook web seed header */
-"%lu Web Seeds" = "%lu wysyłające(-ych) w sieci";
+"%lu Web Seeds" = "Wysyłający w sieci: %lu";
 
 /* quicklook tracker header */
 "1 Tracker" = "1 serwer śledzący";

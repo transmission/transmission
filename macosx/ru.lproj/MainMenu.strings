@@ -225,7 +225,7 @@
 "1860.title" = "Обновить трекер";
 
 /* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "1877"; */
-"1877.title" = "Перепроверить существующие данные";
+"1877.title" = "Перепроверить локальные данные";
 
 /* Class = "NSMenuItem"; title = "Move Data File To…"; ObjectID = "1891"; */
 "1891.title" = "Переместить данные в…";
@@ -321,7 +321,7 @@
 "3218.title" = "Копировать магнит-ссылку в буфер";
 
 /* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "3221"; */
-"3221.title" = "Перепроверить существующие данные";
+"3221.title" = "Перепроверить локальные данные";
 
 /* Class = "NSMenuItem"; title = "Undo"; ObjectID = "3321"; */
 "3321.title" = "Отменить";

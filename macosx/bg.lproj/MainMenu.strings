@@ -1,0 +1,384 @@
+
+/* Class = "NSWindow"; title = "Transmission"; ObjectID = "21"; */
+"21.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "56"; */
+"56.title" = "Transmission";
+
+/* Class = "NSMenu"; title = "Transmission"; ObjectID = "57"; */
+"57.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "About Transmission"; ObjectID = "58"; */
+"58.title" = "Относно Transmission";
+
+/* Class = "NSMenuItem"; title = "Open Torrent File…"; ObjectID = "72"; */
+"72.title" = "Отваряне на торент файл…";
+
+/* Class = "NSMenuItem"; title = "Close Window"; ObjectID = "73"; */
+"73.title" = "Затваряне на прозореца";
+
+/* Class = "NSMenu"; title = "File"; ObjectID = "81"; */
+"81.title" = "Файл";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
+"83.title" = "Файл";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "103"; */
+"103.title" = "Помощ";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "106"; */
+"106.title" = "Помощ";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "129"; */
+"129.title" = "Предпочитания…";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "130"; */
+"130.title" = "Услуги";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "131"; */
+"131.title" = "Услуги";
+
+/* Class = "NSMenuItem"; title = "Hide Transmission"; ObjectID = "134"; */
+"134.title" = "Скриване на Transmission";
+
+/* Class = "NSMenuItem"; title = "Quit Transmission"; ObjectID = "136"; */
+"136.title" = "Изход от Transmission";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
+"145.title" = "Скриване на другите";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
+"150.title" = "Показване на всички";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "157"; */
+"157.title" = "Копирай";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "160"; */
+"160.title" = "Изрежи";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "163"; */
+"163.title" = "Редактиране";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "169"; */
+"169.title" = "Редактиране";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "171"; */
+"171.title" = "Постави";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "172"; */
+"172.title" = "Избери всички";
+
+/* Class = "NSMenuItem"; title = "View"; ObjectID = "301"; */
+"301.title" = "Изглед";
+
+/* Class = "NSMenu"; title = "View"; ObjectID = "302"; */
+"302.title" = "Изглед";
+
+/* Class = "NSMenuItem"; title = "Forums"; ObjectID = "418"; */
+"418.title" = "Форуми";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "456"; */
+"456.title" = "Меню";
+
+/* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "457"; */
+"457.title" = "Пауза на избраните";
+
+/* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "459"; */
+"459.title" = "Показване на инспектора";
+
+/* Class = "NSMenuItem"; title = "Show in Finder"; ObjectID = "516"; */
+"516.title" = "Показване във Finder";
+
+/* Class = "NSMenuItem"; title = "Customize Toolbar…"; ObjectID = "545"; */
+"545.title" = "Персонализиране на лентата с инструменти…";
+
+/* Class = "NSMenuItem"; title = "Hide Status Bar"; ObjectID = "547"; */
+"547.title" = "Скриване на лентата на състоянието";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "589"; */
+"589.title" = "Меню";
+
+/* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "598"; */
+"598.title" = "Показване на инспектора";
+
+/* Class = "NSMenuItem"; title = "Open Torrent File…"; ObjectID = "611"; */
+"611.title" = "Отваряне на торент файл…";
+
+/* Class = "NSMenuItem"; title = "Check for Update…"; ObjectID = "975"; */
+"975.title" = "Проверка за актуализации…";
+
+/* Class = "NSMenuItem"; title = "Resume Selected"; ObjectID = "1028"; */
+"1028.title" = "Продължаване на избраните";
+
+/* Class = "NSMenuItem"; title = "Hide Toolbar"; ObjectID = "1222"; */
+"1222.title" = "Скриване на лентата с инструменти";
+
+/* Class = "NSMenuItem"; title = "Transfers"; ObjectID = "1399"; */
+"1399.title" = "Трансфери";
+
+/* Class = "NSMenu"; title = "Transfers"; ObjectID = "1400"; */
+"1400.title" = "Трансфери";
+
+/* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "1403"; */
+"1403.title" = "Пауза на избраните";
+
+/* Class = "NSMenuItem"; title = "Resume Selected"; ObjectID = "1404"; */
+"1404.title" = "Продължаване на избраните";
+
+/* Class = "NSMenuItem"; title = "Pause All"; ObjectID = "1413"; */
+"1413.title" = "Пауза на всички";
+
+/* Class = "NSMenuItem"; title = "Resume All"; ObjectID = "1414"; */
+"1414.title" = "Продължаване на всички";
+
+/* Class = "NSMenuItem"; title = "Remove and Trash Data File"; ObjectID = "1514"; */
+"1514.title" = "Премахни и изхвърли файла с данни";
+
+/* Class = "NSMenuItem"; title = "Remove From List"; ObjectID = "1516"; */
+"1516.title" = "Премахни от списъка";
+
+/* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "1533"; */
+"1533.title" = "Запази торент файла като…";
+
+/* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "1536"; */
+"1536.title" = "Показване на инспектора";
+
+/* Class = "NSMenuItem"; title = "Show in Finder"; ObjectID = "1539"; */
+"1539.title" = "Показване във Finder";
+
+/* Class = "NSMenuItem"; title = "Remove From List"; ObjectID = "1550"; */
+"1550.title" = "Премахни от списъка";
+
+/* Class = "NSMenuItem"; title = "Remove and Trash Data File"; ObjectID = "1551"; */
+"1551.title" = "Премахни и изхвърли файла с данни";
+
+/* Class = "NSMenuItem"; title = "Transmission Homepage"; ObjectID = "1558"; */
+"1558.title" = "Начална страница на Transmission";
+
+/* Class = "NSMenuItem"; title = "Transmission Help"; ObjectID = "1561"; */
+"1561.title" = "Помощ за Transmission";
+
+/* Class = "NSMenuItem"; title = "Speed Limit"; ObjectID = "1566"; */
+"1566.title" = "Ограничение на скоростта";
+
+/* Class = "NSMenuItem"; title = "Compact View"; ObjectID = "1578"; */
+"1578.title" = "Компактен изглед";
+
+/* Class = "NSMenuItem"; title = "Hide Filter Bar"; ObjectID = "1620"; */
+"1620.title" = "Скриване на лентата с филтри";
+
+/* Class = "NSMenuItem"; title = "Resume Selected Right Away"; ObjectID = "1678"; */
+"1678.title" = "Продължи избраните веднага";
+
+/* Class = "NSMenuItem"; title = "Open With Options Window…"; ObjectID = "1680"; */
+"1680.title" = "Отвори с прозорец с опции…";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "1683"; */
+"1683.title" = "Прозорец";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "1684"; */
+"1684.title" = "Прозорец";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "1685"; */
+"1685.title" = "Минимизиране";
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "1687"; */
+"1687.title" = "Премести всички най-отпред";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "1688"; */
+"1688.title" = "Мащабиране";
+
+/* Class = "NSMenuItem"; title = "Next Inspector Tab"; ObjectID = "1693"; */
+"1693.title" = "Следващ раздел на инспектора";
+
+/* Class = "NSMenuItem"; title = "Previous Inspector Tab"; ObjectID = "1694"; */
+"1694.title" = "Предишен раздел на инспектора";
+
+/* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "1696"; */
+"1696.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "1766"; */
+"1766.title" = "Изтриване";
+
+/* Class = "NSMenuItem"; title = "Message Log"; ObjectID = "1795"; */
+"1795.title" = "Дневник със съобщения";
+
+/* Class = "NSMenuItem"; title = "Next Filter Button"; ObjectID = "1797"; */
+"1797.title" = "Следващ бутон на филтъра";
+
+/* Class = "NSMenuItem"; title = "Previous Filter Button"; ObjectID = "1798"; */
+"1798.title" = "Предишен бутон на филтъра";
+
+/* Class = "NSMenuItem"; title = "Resume All Waiting"; ObjectID = "1804"; */
+"1804.title" = "Продължи всички чакащи";
+
+/* Class = "NSMenuItem"; title = "Resume Selected Right Away"; ObjectID = "1808"; */
+"1808.title" = "Продължи избраните веднага";
+
+/* Class = "NSMenuItem"; title = "Open Torrent Address…"; ObjectID = "1846"; */
+"1846.title" = "Отваряне на адрес на торент…";
+
+/* Class = "NSMenuItem"; title = "Open Torrent Address…"; ObjectID = "1858"; */
+"1858.title" = "Отваряне на адрес на торент…";
+
+/* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "1860"; */
+"1860.title" = "Актуализиране на тракера";
+
+/* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "1877"; */
+"1877.title" = "Проверка на локалните данни";
+
+/* Class = "NSMenuItem"; title = "Move Data File To…"; ObjectID = "1891"; */
+"1891.title" = "Премести файла с данни в…";
+
+/* Class = "NSMenuItem"; title = "Sort Transfers By"; ObjectID = "1894"; */
+"1894.title" = "Сортирай трансферите по";
+
+/* Class = "NSMenu"; title = "Sort Transfers By"; ObjectID = "1895"; */
+"1895.title" = "Сортирай трансферите по";
+
+/* Class = "NSMenuItem"; title = "Progress"; ObjectID = "1896"; */
+"1896.title" = "Напредък";
+
+/* Class = "NSMenuItem"; title = "State"; ObjectID = "1897"; */
+"1897.title" = "Състояние";
+
+/* Class = "NSMenuItem"; title = "Ascending"; ObjectID = "1899"; */
+"1899.title" = "Възходящ ред";
+
+/* Class = "NSMenuItem"; title = "Date Added"; ObjectID = "1900"; */
+"1900.title" = "Дата на добавяне";
+
+/* Class = "NSMenuItem"; title = "Queue Order"; ObjectID = "1901"; */
+"1901.title" = "Ред на опашката";
+
+/* Class = "NSMenuItem"; title = "Name"; ObjectID = "1902"; */
+"1902.title" = "Име";
+
+/* Class = "NSMenuItem"; title = "Create Torrent File…"; ObjectID = "1921"; */
+"1921.title" = "Създаване на торент файл…";
+
+/* Class = "NSMenuItem"; title = "Create Torrent File…"; ObjectID = "1923"; */
+"1923.title" = "Създаване на торент файл…";
+
+/* Class = "NSMenuItem"; title = "Tracker"; ObjectID = "1933"; */
+"1933.title" = "Тракер";
+
+/* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "2122"; */
+"2122.title" = "Актуализиране на тракера";
+
+/* Class = "NSMenuItem"; title = "Pieces Bar"; ObjectID = "2185"; */
+"2185.title" = "Лента за частите";
+
+/* Class = "NSMenuItem"; title = "Availability"; ObjectID = "2279"; */
+"2279.title" = "Наличност";
+
+/* Class = "NSMenuItem"; title = "Statistics"; ObjectID = "2301"; */
+"2301.title" = "Статистика";
+
+/* Class = "NSMenuItem"; title = "Activity"; ObjectID = "2324"; */
+"2324.title" = "Активност";
+
+/* Class = "NSMenuItem"; title = "Group"; ObjectID = "2839"; */
+"2839.title" = "Група";
+
+/* Class = "NSMenu"; title = "Group"; ObjectID = "2840"; */
+"2840.title" = "Група";
+
+/* Class = "NSMenuItem"; title = "Group"; ObjectID = "2849"; */
+"2849.title" = "Група";
+
+/* Class = "NSMenu"; title = "Group"; ObjectID = "2850"; */
+"2850.title" = "Група";
+
+/* Class = "NSTextFieldCell"; title = "Transfers"; ObjectID = "3049"; */
+"3049.title" = "Трансфери";
+
+/* Class = "NSMenuItem"; title = "Use Groups"; ObjectID = "3078"; */
+"3078.title" = "Използвай групи";
+
+/* Class = "NSTableColumn"; headerCell.title = "Torrent"; ObjectID = "3093"; */
+"3093.headerCell.title" = "Торент";
+
+/* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
+"3166.title" = "Бърз преглед";
+
+/* Class = "NSMenuItem"; title = "Support & Development"; ObjectID = "3170"; */
+"3170.title" = "Поддръжка и разработка";
+
+/* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "3207"; */
+"3207.title" = "Запази торент файла като…";
+
+/* Class = "NSMenuItem"; title = "Move Data File To…"; ObjectID = "3209"; */
+"3209.title" = "Премести файла с данни в…";
+
+/* Class = "NSMenuItem"; title = "Donate…"; ObjectID = "3212"; */
+"3212.title" = "Дарение…";
+
+/* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3216"; */
+"3216.title" = "Копирай Magnet линк в клипборда";
+
+/* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3218"; */
+"3218.title" = "Копирай Magnet линк в клипборда";
+
+/* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "3221"; */
+"3221.title" = "Проверка на локалните данни";
+
+/* Class = "NSMenuItem"; title = "Undo"; ObjectID = "3321"; */
+"3321.title" = "Отмяна";
+
+/* Class = "NSMenuItem"; title = "Redo"; ObjectID = "3400"; */
+"3400.title" = "Връщане";
+
+/* Class = "NSMenuItem"; title = "Descending"; ObjectID = "3405"; */
+"3405.title" = "Низходящ ред";
+
+/* Class = "NSMenuItem"; title = "Remove All Completed From List"; ObjectID = "3407"; */
+"3407.title" = "Премахни всички завършени от списъка";
+
+/* Class = "NSMenuItem"; title = "Size"; ObjectID = "3430"; */
+"3430.title" = "Размер";
+
+/* Class = "NSMenuItem"; title = "Rename File…"; ObjectID = "3445"; */
+"3445.title" = "Преименуване на файл…";
+
+/* Class = "NSMenuItem"; title = "Rename File…"; ObjectID = "3448"; */
+"3448.title" = "Преименуване на файл…";
+
+/* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "8t6-wh-5UW"; */
+"8t6-wh-5UW.title" = "Споделяне на торент файл";
+
+/* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "Cay-iU-bH4"; */
+"Cay-iU-bH4.title" = "Споделяне на торент файл";
+
+/* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "HmT-FI-amY"; */
+"HmT-FI-amY.title" = "0.0КБ/с";
+
+/* Class = "NSTextFieldCell"; title = "Status String"; ObjectID = "Zmj-A9-NPf"; */
+"Zmj-A9-NPf.title" = "Низ на състоянието";
+
+/* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "kbX-Av-eP4"; */
+"kbX-Av-eP4.title" = "Заглавие";
+
+/* Class = "NSTextFieldCell"; title = "Status"; ObjectID = "lmp-Y3-ZQO"; */
+"lmp-Y3-ZQO.title" = "Състояние";
+
+/* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "lvU-Va-GzM"; */
+"lvU-Va-GzM.title" = "Споделяне на торент файл";
+
+/* Class = "NSTextFieldCell"; title = "Progress"; ObjectID = "oSz-TE-8jj"; */
+"oSz-TE-8jj.title" = "Напредък";
+
+/* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "s5v-VO-G2y"; */
+"s5v-VO-G2y.title" = "Споделяне на торент файл";
+
+/* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "x8g-Nv-jcD"; */
+"x8g-Nv-jcD.title" = "0.0КБ/с";
+
+/* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "y9O-gd-sXA"; */
+"y9O-gd-sXA.title" = "Заглавие";
+
+/* Class = "NSTextFieldCell"; title = "Group Title"; ObjectID = "zIM-6D-jsa"; */
+"zIM-6D-jsa.title" = "Заглавие на група";
+
+/* Class = "NSMenuItem"; title = "ETA"; ObjectID = "zLF-YR-Oq6"; */
+"zLF-YR-Oq6.title" = "Очаквано време";

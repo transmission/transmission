@@ -492,17 +492,17 @@
     <message>
         <location line="-100"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Gehitu</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Editatu</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Kendu</translation>
     </message>
     <message>
         <location line="+126"/>
@@ -1999,7 +1999,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+2"/>
         <source>checking…</source>
-        <translation>ikuskatzen, txekeatzen...</translation>
+        <translation>egiaztatzen...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2307,7 +2307,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+17"/>
         <source>Remote root pa&amp;th:</source>
-        <translation type="unfinished"></translation>
+        <translation>Urruneko erro-bidea:</translation>
     </message>
 </context>
 <context>
@@ -2664,7 +2664,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+6"/>
         <source>To add a backup URL, add it on the next line after a primary URL.</source>
-        <translation>URLaren babeskopia gehitzekotan, gehitu hurrengo lerroan, oinarrizko URLaren ostean.</translation>
+        <translation>URLaren segurtasun-kopia gehitzekotan, gehitu hurrengo lerroan, oinarrizko URLaren ostean.</translation>
     </message>
     <message>
         <location line="+7"/>

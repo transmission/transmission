@@ -233,7 +233,7 @@
 "Available" = "Erabilgarria";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "B/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Transferentzien abiadura";
@@ -301,7 +301,7 @@
 "Created on %@ with %@" = "Honekin %2$@ %1$@ Sortua  ";
 
 /* quicklook creation info */
-"Created with %@" = "%@ Honekin sortua";
+"Created with %@" = "Honekin sortua: %@ ";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "\"%@\"(r)en sorrerak huts egin du.";

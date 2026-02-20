@@ -5,19 +5,19 @@
 #
 # Translators:
 # 553bfca145c93e26efcabc21d311cd2f, 2020
-# Josef Andersson <janderssonse@proton.me>, 2022
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2025
-# Daniel, 2026
+# Karl Jonatan Nyberg, 2026
+# Josef Andersson <janderssonse@proton.me>, 2026
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-26 16:00+0000\n"
+"POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Daniel, 2026\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Swedish (https://app.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -33,11 +33,11 @@ msgstr "Inget"
 msgid "Inf"
 msgstr "Inf"
 
-#: ../daemon/daemon.cc:218 ../gtk/Session.cc:817 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
+#: ../daemon/daemon.cc:218 ../gtk/Session.cc:815 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "Det gick inte att läsa '{path}': {error} ({error_code})"
 
-#: ../daemon/daemon.cc:243 ../gtk/Session.cc:869 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
+#: ../daemon/daemon.cc:243 ../gtk/Session.cc:879 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
 msgstr "Det gick inte att lägga till torrentfilen '{path}'"
 
@@ -77,7 +77,7 @@ msgstr "Läser in inställningar från '{path}'"
 msgid "Saved pidfile '{path}'"
 msgstr "Sparade pidfilen '{path}'"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1011 ../libtransmission/torrent.cc:2013 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "Det gick inte att spara '{path}': {error} ({error_code})"
 
@@ -146,7 +146,7 @@ msgstr "Copyright © The Transmission Project"
 #. dialog
 #: ../gtk/Application.cc:1403
 msgid "translator-credits"
-msgstr "Transifex-bidragsgivare https://app.transifex.com/transmissionbt/transmissionbt"
+msgstr "Transifex-bidragsgivare https://explore.transifex.com/transmissionbt/transmissionbt/"
 
 #: ../gtk/DetailsDialog.cc:476 ../gtk/DetailsDialog.cc:494
 msgid "Use global settings"
@@ -546,7 +546,7 @@ msgstr "Normal"
 msgid "Low"
 msgstr "Låg"
 
-#: ../gtk/FileList.cc:858 ../gtk/Session.cc:324
+#: ../gtk/FileList.cc:858 ../gtk/Session.cc:322
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "Det gick inte att byta namn på '{old_path}' till '{path}': {error} ({error_code})"
 
@@ -802,66 +802,66 @@ msgstr "Föredra kryptering"
 msgid "Require encryption"
 msgstr "Kräv kryptering"
 
-#: ../gtk/PrefsDialog.cc:382
+#: ../gtk/PrefsDialog.cc:383
 msgid "Every Day"
 msgstr "Varje dag"
 
-#: ../gtk/PrefsDialog.cc:383
+#: ../gtk/PrefsDialog.cc:384
 msgid "Weekdays"
 msgstr "Veckodagar"
 
-#: ../gtk/PrefsDialog.cc:384
+#: ../gtk/PrefsDialog.cc:385
 msgid "Weekends"
 msgstr "Helger"
 
-#: ../gtk/PrefsDialog.cc:567
+#: ../gtk/PrefsDialog.cc:568
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] "Blockeringslistan har {count:L} post"
 msgstr[1] "Blockeringslistan har {count:L} poster"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Blocklist updated!"
 msgstr "Blockeringslistan uppdaterad!"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Couldn't update blocklist"
 msgstr "Det gick inte att uppdatera blockeringslista"
 
-#: ../gtk/PrefsDialog.cc:595
+#: ../gtk/PrefsDialog.cc:596
 msgid "Getting new blocklist…"
 msgstr "Hämtar ny blockeringslista…"
 
-#: ../gtk/PrefsDialog.cc:954
+#: ../gtk/PrefsDialog.cc:955
 msgctxt "Port test status"
 msgid "unknown"
 msgstr "okänd"
 
-#: ../gtk/PrefsDialog.cc:956
+#: ../gtk/PrefsDialog.cc:957
 msgctxt "Port test status"
 msgid "checking…"
 msgstr "kontrollerar…"
 
-#: ../gtk/PrefsDialog.cc:958
+#: ../gtk/PrefsDialog.cc:959
 msgctxt "Port test status"
 msgid "open"
 msgstr "öppen"
 
-#: ../gtk/PrefsDialog.cc:960
+#: ../gtk/PrefsDialog.cc:961
 msgctxt "Port test status"
 msgid "closed"
 msgstr "stängd"
 
-#: ../gtk/PrefsDialog.cc:962
+#: ../gtk/PrefsDialog.cc:963
 msgctxt "Port test status"
 msgid "error"
 msgstr "fel"
 
-#: ../gtk/PrefsDialog.cc:975
+#: ../gtk/PrefsDialog.cc:976
 msgid "Status: <b>{status}</b>"
 msgstr "Status: <b>{status}</b>"
 
-#: ../gtk/PrefsDialog.cc:977
+#: ../gtk/PrefsDialog.cc:978
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 msgstr "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
@@ -877,25 +877,25 @@ msgstr "Det gick inte att flytta torrent"
 msgid "This may take a moment…"
 msgstr "Detta kan ta en stund…"
 
-#: ../gtk/Session.cc:802 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
+#: ../gtk/Session.cc:800 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
 msgstr "Det gick inte att läsa '{path}'"
 
 #. logging
-#: ../gtk/Session.cc:1087
+#: ../gtk/Session.cc:1071
 msgid "Inhibiting desktop hibernation"
 msgstr "Förhindra viloläge för datorn"
 
-#: ../gtk/Session.cc:1094 ../gtk/Session.cc:1120
+#: ../gtk/Session.cc:1078 ../gtk/Session.cc:1104
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "Det gick inte att förhindra viloläget: {error}"
 
 #. logging
-#: ../gtk/Session.cc:1115
+#: ../gtk/Session.cc:1099
 msgid "Allowing desktop hibernation"
 msgstr "Tillåter skrivbordsviloläge"
 
-#: ../gtk/Session.cc:1236
+#: ../gtk/Session.cc:1220
 msgid "Couldn't find pending RPC request for id {id}"
 msgstr "Det gick inte att hitta väntande RPC-begäran för {id}"
 
@@ -1236,6 +1236,10 @@ msgstr "Starta Transmission med alla torrenter pausade"
 msgid "Start Transmission Minimized"
 msgstr "Starta Transmission minimerad"
 
+#: ../gtk/transmission.ui:7
+msgid "_File"
+msgstr "_Arkiv"
+
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
 msgstr "Öppna en torrent"
@@ -1272,6 +1276,10 @@ msgstr "Pausa alla torrenter"
 msgid "_Quit"
 msgstr "A_vsluta"
 
+#: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
+msgid "_Edit"
+msgstr "R_edigera"
+
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
 msgstr "Markera _alla"
@@ -1283,6 +1291,10 @@ msgstr "Avma_rkera alla"
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
 msgstr "_Inställningar"
+
+#: ../gtk/transmission.ui:77
+msgid "_Torrent"
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1315,6 +1327,10 @@ msgstr "Starta torrent nu"
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
 msgstr "Fråga spårare efter f_ler jämlikar"
+
+#: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
+msgid "_Queue"
+msgstr "_Kö"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1359,6 +1375,10 @@ msgstr "Ta bort torrent"
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
 msgstr "_Ta bort torrent och dess filer"
+
+#: ../gtk/transmission.ui:178
+msgid "_View"
+msgstr "_Visa"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1416,6 +1436,10 @@ msgstr "Sortera efter återstående _tid"
 msgid "Re_verse Sort Order"
 msgstr "O_mvänd sorteringsordning"
 
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
+msgid "_Help"
+msgstr "_Hjälp"
+
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
 msgstr "Meddelande_logg"
@@ -1435,6 +1459,10 @@ msgstr "_Innehåll"
 #: ../gtk/transmission.ui:282
 msgid "_About"
 msgstr "_Om"
+
+#: ../gtk/transmission.ui:306
+msgid "_Sort Torrents By"
+msgstr "_Sortera torrenter efter"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -1539,10 +1567,6 @@ msgstr "Visa _mer detaljer"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:652 ../gtk/ui/gtk4/DetailsDialog.ui:512
 msgid "Peers"
 msgstr "Jämlikar"
-
-#: ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
-msgid "_Edit"
-msgstr "R_edigera"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:773 ../gtk/ui/gtk4/DetailsDialog.ui:587
 msgid "Show _backup trackers"
@@ -1723,10 +1747,6 @@ msgstr "Fl_ytta torrentfil till papperskorgen"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
 msgstr "Inställningar för Transmission"
-
-#: ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
-msgid "_Help"
-msgstr "_Hjälp"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:76 ../gtk/ui/gtk4/PrefsDialog.ui:29
 msgid "Speed Limits"
@@ -2096,7 +2116,7 @@ msgstr "Okänt fel"
 msgid "{ip_protocol} connection failed"
 msgstr "{ip_protocol} anslutning misslyckades"
 
-#: ../libtransmission/announcer-udp.cc:542
+#: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 msgstr "Kunde inte slå upp '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 
@@ -2161,7 +2181,7 @@ msgstr "Din maskin stöder inte {protocol}"
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "Den globala {type}-adressen har uppdaterats till {ip} med {url}"
 
-#: ../libtransmission/log.cc:292
+#: ../libtransmission/log.cc:294
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "För många meddelanden som detta! Jag kommer inte att logga detta meddelande längre denna session."
 
@@ -2201,7 +2221,7 @@ msgstr "Det gick inte att förallokera '{path}': {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Det gick inte att trunkera '{path}': {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:676
+#: ../libtransmission/peer-io.cc:686
 msgid "Unknown state: {state}"
 msgstr "Okänt tillstånd: {state}"
 
@@ -2371,73 +2391,73 @@ msgstr "Det gick inte att öppna sessionslåsfilen '{path}': {error} ({error_cod
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "Lyssnar på inkommande jämlikeanslutningar på {hostport}"
 
-#: ../libtransmission/session.cc:748
+#: ../libtransmission/session.cc:749
 msgid "Transmission version {version} starting"
 msgstr "Transmission version {version} startar"
 
-#: ../libtransmission/session.cc:1488
+#: ../libtransmission/session.cc:1489
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission version {version} stängs av"
 
-#: ../libtransmission/session.cc:1570
+#: ../libtransmission/session.cc:1571
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "Läste in {count} torrent"
 msgstr[1] "Läste in {count} torrenter"
 
-#: ../libtransmission/torrent-metainfo.cc:704
+#: ../libtransmission/torrent-metainfo.cc:739
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Migrerade torrentfil från '{old_path}' till '{path}'"
 
-#: ../libtransmission/torrent.cc:139
+#: ../libtransmission/torrent.cc:156
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "Det gick inte att använda metainfo från '{path}' for '{magnet}': {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:168
+#: ../libtransmission/torrent.cc:185
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr "Inga data hittades! Se till att dina enheter är anslutna eller använd \"Ange plats\". För att hämta igen, använd \"Verifiera lokala data\" och starta torrenten efteråt."
 
-#: ../libtransmission/torrent.cc:405
+#: ../libtransmission/torrent.cc:424
 msgid "Calling script '{path}'"
 msgstr "Anropar skriptet '{path}'"
 
-#: ../libtransmission/torrent.cc:413
+#: ../libtransmission/torrent.cc:432
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "Det gick inte att anropa skriptet '{path}': {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:447
+#: ../libtransmission/torrent.cc:466
 msgid "Seed ratio reached; pausing torrent"
 msgstr "Distributionskvot nådd; pausar torrent"
 
-#: ../libtransmission/torrent.cc:454
+#: ../libtransmission/torrent.cc:473
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "Distributionsinaktivitetsgräns nådd; pausar torrent"
 
-#: ../libtransmission/torrent.cc:615
+#: ../libtransmission/torrent.cc:636
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Startades om manuellt -- inaktiverar dess distributionskvot"
 
-#: ../libtransmission/torrent.cc:671
+#: ../libtransmission/torrent.cc:692
 msgid "Pausing torrent"
 msgstr "Pausar torrent"
 
-#: ../libtransmission/torrent.cc:725
+#: ../libtransmission/torrent.cc:737
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr "Det gick inte att ta bort alla torrentfiler: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:791
+#: ../libtransmission/torrent.cc:780
 msgid "Removing torrent"
 msgstr "Tar bort torrent"
 
-#: ../libtransmission/torrent.cc:1110 ../libtransmission/torrent.cc:1618
+#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "Det gick inte att flytta '{old_path}' till '{path}': {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1560
+#: ../libtransmission/torrent.cc:1563
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr "Pausade torrent eftersom inga data hittades! Se till att dina enheter är anslutna eller använd \"Ange plats\" och använd sedan \"Verifiera lokala data\" igen. För att hämta igen, starta torrent."
 
-#: ../libtransmission/torrent.cc:2066
+#: ../libtransmission/torrent.cc:2069
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr "Spårarvarning: '{warning}' ({url})"
 

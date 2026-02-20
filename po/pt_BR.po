@@ -6,25 +6,25 @@
 # Translators:
 # Gustavo Costa <xfgusta@gmail.com>, 2022
 # Gabriel P Machado <machado.gp@gmail.com>, 2022
-# Carlos Henrique De Freitas Ferreira <Neocazen@vivaldi.net>, 2022
-# 380125ae2590f93d3e1eff2258abdf75_6979c31, 2022
 # Eduardo Lamblet <edlamblet@netscape.net>, 2023
 # LUIS PEDRO NUNES LESSA, 2023
 # Leonardo Colman Lopes <leonardo.dev@colman.com.br>, 2023
 # Alex W., 2023
-# Mike Gelfand <mikedld@mikedld.com>, 2023
 # luquita39, 2023
 # Fúlvio Alves <fga.fulvio@gmail.com>, 2024
 # Emilio Demeterco, 2025
+# 380125ae2590f93d3e1eff2258abdf75_6979c31, 2026
+# Carlos Henrique De Freitas Ferreira <Neocazen@vivaldi.net>, 2026
+# Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-26 16:00+0000\n"
+"POT-Creation-Date: 2026-02-18 19:12+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Emilio Demeterco, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/transmissionbt/teams/33778/pt_BR/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -40,11 +40,11 @@ msgstr "Nenhum"
 msgid "Inf"
 msgstr "Inf"
 
-#: ../daemon/daemon.cc:218 ../gtk/Session.cc:817 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
+#: ../daemon/daemon.cc:218 ../gtk/Session.cc:815 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "Não foi possível ler '{path}': {error} ({error_code})"
 
-#: ../daemon/daemon.cc:243 ../gtk/Session.cc:869 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
+#: ../daemon/daemon.cc:243 ../gtk/Session.cc:879 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
 msgstr "Não foi possível adicionar o arquivo de torrent '{path}'"
 
@@ -84,7 +84,7 @@ msgstr "Carregando ajustes de '{path}'"
 msgid "Saved pidfile '{path}'"
 msgstr "Salvo pidfile '{path}'"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1011 ../libtransmission/torrent.cc:2013 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "Não foi possível salvar '{path}';{error}({error_code})"
 
@@ -628,7 +628,7 @@ msgstr "Normal"
 msgid "Low"
 msgstr "Baixa"
 
-#: ../gtk/FileList.cc:858 ../gtk/Session.cc:324
+#: ../gtk/FileList.cc:858 ../gtk/Session.cc:322
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "Não foi possível renomear '{old_path}' para '{path}': {error} ({error_code})"
 
@@ -884,67 +884,67 @@ msgstr "Preferir"
 msgid "Require encryption"
 msgstr "Exigir"
 
-#: ../gtk/PrefsDialog.cc:382
+#: ../gtk/PrefsDialog.cc:383
 msgid "Every Day"
 msgstr "Diariamente"
 
-#: ../gtk/PrefsDialog.cc:383
+#: ../gtk/PrefsDialog.cc:384
 msgid "Weekdays"
 msgstr "Dias da semana"
 
-#: ../gtk/PrefsDialog.cc:384
+#: ../gtk/PrefsDialog.cc:385
 msgid "Weekends"
 msgstr "Finais de semana"
 
-#: ../gtk/PrefsDialog.cc:567
+#: ../gtk/PrefsDialog.cc:568
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] "A Lista de Bloqueios possui {count:L}entrada"
 msgstr[1] "A Lista de Bloqueio possui {count:L}entradas"
 msgstr[2] "A Lista de Bloqueio possui {count:L}entradas"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Blocklist updated!"
 msgstr "Lista de Bloqueio atualizada!"
 
-#: ../gtk/PrefsDialog.cc:583
+#: ../gtk/PrefsDialog.cc:584
 msgid "Couldn't update blocklist"
 msgstr "Não foi possível atualizar a lista de bloqueio"
 
-#: ../gtk/PrefsDialog.cc:595
+#: ../gtk/PrefsDialog.cc:596
 msgid "Getting new blocklist…"
 msgstr "Obtendo nova lista de bloqueio…"
 
-#: ../gtk/PrefsDialog.cc:954
+#: ../gtk/PrefsDialog.cc:955
 msgctxt "Port test status"
 msgid "unknown"
 msgstr "desconhecido"
 
-#: ../gtk/PrefsDialog.cc:956
+#: ../gtk/PrefsDialog.cc:957
 msgctxt "Port test status"
 msgid "checking…"
 msgstr "checando..."
 
-#: ../gtk/PrefsDialog.cc:958
+#: ../gtk/PrefsDialog.cc:959
 msgctxt "Port test status"
 msgid "open"
 msgstr "aberto"
 
-#: ../gtk/PrefsDialog.cc:960
+#: ../gtk/PrefsDialog.cc:961
 msgctxt "Port test status"
 msgid "closed"
 msgstr "fechado"
 
-#: ../gtk/PrefsDialog.cc:962
+#: ../gtk/PrefsDialog.cc:963
 msgctxt "Port test status"
 msgid "error"
 msgstr "erro"
 
-#: ../gtk/PrefsDialog.cc:975
+#: ../gtk/PrefsDialog.cc:976
 msgid "Status: <b>{status}</b>"
 msgstr "Estado: <b>{status}</b>"
 
-#: ../gtk/PrefsDialog.cc:977
+#: ../gtk/PrefsDialog.cc:978
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 msgstr "Estado: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
@@ -960,25 +960,25 @@ msgstr "Não pôde mover o torrent"
 msgid "This may take a moment…"
 msgstr "Isso pode levar um tempo…"
 
-#: ../gtk/Session.cc:802 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
+#: ../gtk/Session.cc:800 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
 msgstr "Não foi possível ler '{path}'"
 
 #. logging
-#: ../gtk/Session.cc:1087
+#: ../gtk/Session.cc:1071
 msgid "Inhibiting desktop hibernation"
 msgstr "Impedindo hibernação da área de trabalho"
 
-#: ../gtk/Session.cc:1094 ../gtk/Session.cc:1120
+#: ../gtk/Session.cc:1078 ../gtk/Session.cc:1104
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "Não foi possível impedir a hibernação do computador: {error}"
 
 #. logging
-#: ../gtk/Session.cc:1115
+#: ../gtk/Session.cc:1099
 msgid "Allowing desktop hibernation"
 msgstr "Permitir hibernação do computador"
 
-#: ../gtk/Session.cc:1236
+#: ../gtk/Session.cc:1220
 msgid "Couldn't find pending RPC request for id {id}"
 msgstr ""
 
@@ -1341,6 +1341,10 @@ msgstr "Iniciar Transmission Com Todos Os Torrents Pausados"
 msgid "Start Transmission Minimized"
 msgstr "Iniciar Transmission Minimizado"
 
+#: ../gtk/transmission.ui:7
+msgid "_File"
+msgstr "_Arquivo"
+
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
 msgstr "Abrir um torrent"
@@ -1377,6 +1381,10 @@ msgstr "Pausar todos os torrents"
 msgid "_Quit"
 msgstr "_Sair"
 
+#: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
+msgid "_Edit"
+msgstr "_Editar"
+
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
 msgstr "Marcar _Todos"
@@ -1388,6 +1396,10 @@ msgstr "Des_marcar Todos"
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
 msgstr "_Preferências"
+
+#: ../gtk/transmission.ui:77
+msgid "_Torrent"
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
@@ -1420,6 +1432,10 @@ msgstr "Iniciar torrent agora"
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
 msgstr "Pedir _Mais Pares ao Rastreador"
+
+#: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
+msgid "_Queue"
+msgstr "_Fila"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1464,6 +1480,10 @@ msgstr "Remover torrent"
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
 msgstr "_Remover e Excluir Arquivos"
+
+#: ../gtk/transmission.ui:178
+msgid "_View"
+msgstr "_Visualizar"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1521,6 +1541,10 @@ msgstr "Por Tempo Re_stante"
 msgid "Re_verse Sort Order"
 msgstr "In_verter Ordem"
 
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
+msgid "_Help"
+msgstr "A_juda"
+
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
 msgstr "Registro de _Mensagens"
@@ -1540,6 +1564,10 @@ msgstr "S_umário"
 #: ../gtk/transmission.ui:282
 msgid "_About"
 msgstr "_Sobre"
+
+#: ../gtk/transmission.ui:306
+msgid "_Sort Torrents By"
+msgstr "Ordenar Torrent_s Por"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -1644,10 +1672,6 @@ msgstr "Exibir _mais detalhes"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:652 ../gtk/ui/gtk4/DetailsDialog.ui:512
 msgid "Peers"
 msgstr "Pares"
-
-#: ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
-msgid "_Edit"
-msgstr "_Editar"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:773 ../gtk/ui/gtk4/DetailsDialog.ui:587
 msgid "Show _backup trackers"
@@ -1828,10 +1852,6 @@ msgstr "Mover arquivo torrent para o lixo"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
 msgstr "Preferências do Transmission"
-
-#: ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
-msgid "_Help"
-msgstr "A_juda"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:76 ../gtk/ui/gtk4/PrefsDialog.ui:29
 msgid "Speed Limits"
@@ -2200,7 +2220,7 @@ msgstr "Erro desconhecido"
 msgid "{ip_protocol} connection failed"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:542
+#: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 msgstr ""
 
@@ -2267,7 +2287,7 @@ msgstr ""
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr ""
 
-#: ../libtransmission/log.cc:292
+#: ../libtransmission/log.cc:294
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "Muitas mensagens iguais! Não vou mais logar essa mensagem durante essa sessão."
 
@@ -2307,7 +2327,7 @@ msgstr ""
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/peer-io.cc:676
+#: ../libtransmission/peer-io.cc:686
 msgid "Unknown state: {state}"
 msgstr "Estado desconhecido: {state}"
 
@@ -2478,74 +2498,74 @@ msgstr ""
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr ""
 
-#: ../libtransmission/session.cc:748
+#: ../libtransmission/session.cc:749
 msgid "Transmission version {version} starting"
 msgstr ""
 
-#: ../libtransmission/session.cc:1488
+#: ../libtransmission/session.cc:1489
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission versão {version} desligando"
 
-#: ../libtransmission/session.cc:1570
+#: ../libtransmission/session.cc:1571
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../libtransmission/torrent-metainfo.cc:704
+#: ../libtransmission/torrent-metainfo.cc:739
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:139
+#: ../libtransmission/torrent.cc:156
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:168
+#: ../libtransmission/torrent.cc:185
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:405
+#: ../libtransmission/torrent.cc:424
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:413
+#: ../libtransmission/torrent.cc:432
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:447
+#: ../libtransmission/torrent.cc:466
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:454
+#: ../libtransmission/torrent.cc:473
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:615
+#: ../libtransmission/torrent.cc:636
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Reiniciado manualmente -- desativando a sua proporção de semeadura"
 
-#: ../libtransmission/torrent.cc:671
+#: ../libtransmission/torrent.cc:692
 msgid "Pausing torrent"
 msgstr "Pausando torrent"
 
-#: ../libtransmission/torrent.cc:725
+#: ../libtransmission/torrent.cc:737
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:791
+#: ../libtransmission/torrent.cc:780
 msgid "Removing torrent"
 msgstr "Removendo torrent"
 
-#: ../libtransmission/torrent.cc:1110 ../libtransmission/torrent.cc:1618
+#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1560
+#: ../libtransmission/torrent.cc:1563
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:2066
+#: ../libtransmission/torrent.cc:2069
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr ""
 
