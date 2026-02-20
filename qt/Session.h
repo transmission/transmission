@@ -200,5 +200,12 @@ private:
     std::map<QString, QString> duplicates_;
     QTimer duplicates_timer_;
 
-    static auto constexpr EmptyStats = tr_session_stats{ TR_RATIO_NA, 0, 0, 0, 0, 0 };
+    static auto constexpr EmptyStats = tr_session_stats{
+        .ratio = TR_RATIO_NA,
+        .uploadedBytes = 0,
+        .downloadedBytes = 0,
+        .filesAdded = 0,
+        .sessionCount = 0,
+        .secondsActive = 0,
+    };
 };
