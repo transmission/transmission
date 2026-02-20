@@ -51,6 +51,24 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 @end
 
+@interface TorrentTableViewHoveringData : NSObject<NSCopying>
+@property(nonatomic, nullable) NSNumber *hoveredRow;
+@property(nonatomic, nullable) NSString *statusText;
+@property(nonatomic, readonly) BOOL isHovered;
+@end
+@implementation TorrentTableViewHoveringData
+- (BOOL)isHovered {
+    return self.hoveredRow != nil && self.hoveredRow.integerValue != -1;
+}
+
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
+    __auto_type copy = (TorrentTableViewHoveringData *)[[self.class alloc] init];
+    copy.hoveredRow = self.hoveredRow;
+    copy.statusText = self.statusText;
+    return copy;
+}
+@end
+
 @interface TorrentTableView ()
 
 @property(nonatomic) IBOutlet Controller* fController;
@@ -70,7 +88,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 @property(nonatomic) BOOL fActionPopoverShown;
 @property(nonatomic) NSView* fPositioningView;
 
-@property(nonatomic) NSDictionary* fHoverEventDict;
+@property(nonatomic) TorrentTableViewHoveringData *hoveringData;
 
 @property(nonatomic) NSMutableIndexSet* fPendingSelectionReloadRows;
 
@@ -82,6 +100,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 {
     if ((self = [super initWithCoder:decoder]))
     {
+        self.hoveringData = [[TorrentTableViewHoveringData alloc] init];
         _fDefaults = NSUserDefaults.standardUserDefaults;
 
         NSData* groupData;
@@ -260,10 +279,10 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
                 torrent.shortStatusString :
                 torrent.remainingTimeString;
 
-            if (self.fHoverEventDict)
+            if (self.hoveringData.isHovered)
             {
                 NSInteger row = [self rowForItem:item];
-                NSInteger hoverRow = [self.fHoverEventDict[@"row"] integerValue];
+                NSInteger hoverRow = self.hoveringData.hoveredRow.integerValue;
 
                 if (row == hoverRow)
                 {
@@ -313,14 +332,14 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
             // set torrent status
             NSString* status;
-            if (self.fHoverEventDict)
+            if (self.hoveringData.isHovered)
             {
                 NSInteger row = [self rowForItem:item];
-                NSInteger hoverRow = [self.fHoverEventDict[@"row"] integerValue];
+                NSInteger hoverRow = self.hoveringData.hoveredRow.integerValue;
 
                 if (row == hoverRow)
                 {
-                    status = self.fHoverEventDict[@"string"];
+                    status = self.hoveringData.statusText;
                 }
             }
             torrentCell.fTorrentStatusField.stringValue = status ?: torrent.statusString;
@@ -705,12 +724,14 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     NSInteger row = [self rowForView:view];
     Torrent* torrent = [self itemAtRow:row];
 
+    __auto_type previouslyHovered = (TorrentTableViewHoveringData *)[self.hoveringData copy];
     BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
     if (minimal)
     {
         if ([view isKindOfClass:[SmallTorrentCell class]])
         {
-            self.fHoverEventDict = @{ @"row" : [NSNumber numberWithInteger:row] };
+            self.hoveringData.hoveredRow = @(row);
+            self.hoveringData.statusText = nil;
         }
         else if ([view isKindOfClass:[TorrentCellActionButton class]])
         {
@@ -752,11 +773,20 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
         if (statusString)
         {
-            self.fHoverEventDict = @{ @"string" : statusString, @"row" : [NSNumber numberWithInteger:row] };
+            self.hoveringData.hoveredRow = @(row);
+            self.hoveringData.statusText = statusString;
         }
     }
 
-    [self reloadVisibleRows];
+    if (previouslyHovered.isHovered) {
+        NSMutableIndexSet *indexSet = [[NSMutableIndexSet alloc] init];
+        [indexSet addIndex:previouslyHovered.hoveredRow.integerValue];
+        [indexSet addIndex:row];
+        [self reloadDataForRowIndexes:indexSet columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
+    else {
+        [self reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
 }
 
 - (void)hoverEventEndedForView:(id)view
@@ -780,8 +810,18 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     if (update)
     {
-        self.fHoverEventDict = nil;
-        [self reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+        __auto_type previouslyHovered = (TorrentTableViewHoveringData *)[self.hoveringData copy];
+        self.hoveringData.hoveredRow = nil;
+        self.hoveringData.statusText = nil;
+        if (previouslyHovered.isHovered) {
+            NSMutableIndexSet *indexSet = [[NSMutableIndexSet alloc] init];
+            [indexSet addIndex:previouslyHovered.hoveredRow.integerValue];
+            [indexSet addIndex:row];
+            [self reloadDataForRowIndexes:indexSet columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+        }
+        else {
+            [self reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+        }
     }
 }
 
