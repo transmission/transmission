@@ -853,22 +853,22 @@ msgstr "Выходные"
 #: ../gtk/PrefsDialog.cc:567
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
-msgstr[0] "В чёрном списке {count:L} запись"
-msgstr[1] "В чёрном списке {count:L} записи"
-msgstr[2] "В чёрном списке {count:L} записей"
-msgstr[3] "В чёрном списке {count:L} записей"
+msgstr[0] "В списке блокировок {count:L} запись"
+msgstr[1] "В списке блокировок {count:L} записи"
+msgstr[2] "В списке блокировок {count:L} записей"
+msgstr[3] "В списке блокировок {count:L} записей"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Blocklist updated!"
-msgstr "Чёрный список обновлён!"
+msgstr "Список блокировок обновлён!"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Couldn't update blocklist"
-msgstr "Не удалось обновить чёрный список"
+msgstr "Не удалось обновить список блокировок"
 
 #: ../gtk/PrefsDialog.cc:595
 msgid "Getting new blocklist…"
-msgstr "Получение нового чёрного списка…"
+msgstr "Получение нового списка блокировок…"
 
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
@@ -1940,11 +1940,11 @@ msgstr "_Режим шифрования:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:950 ../gtk/ui/gtk4/PrefsDialog.ui:687
 msgid "Blocklist"
-msgstr "Чёрный список"
+msgstr "Список блокировок"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:964 ../gtk/ui/gtk4/PrefsDialog.ui:699
 msgid "Enable _blocklist:"
-msgstr "Включить _чёрный список:"
+msgstr "Включить _список блокировок:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:979 ../gtk/ui/gtk4/PrefsDialog.ui:712
 msgid "Enable _automatic updates"
@@ -2209,10 +2209,10 @@ msgstr "Успешно"
 #: ../libtransmission/blocklist.cc:85 ../libtransmission/blocklist.cc:412
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
-msgstr[0] "В чёрном списке «{path}» {count} запись"
-msgstr[1] "В чёрном списке «{path}» {count} записи"
-msgstr[2] "В чёрном списке «{path}» {count} записей"
-msgstr[3] "В чёрном списке «{path}» {count} записей"
+msgstr[0] "В списке блокировок «{path}» {count} запись"
+msgstr[1] "В списке блокировок «{path}» {count} записи"
+msgstr[2] "В списке блокировок «{path}» {count} записей"
+msgstr[3] "В списке блокировок «{path}» {count} записей"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:264
@@ -2437,7 +2437,7 @@ msgstr "Не удалось проверить порт: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1566
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
-msgstr "Не удалось получить чёрный список: {error} ({error_code})"
+msgstr "Не удалось получить список блокировок: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1707
 msgid "Couldn't fetch torrent: {error} ({error_code})"
