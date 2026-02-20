@@ -11,10 +11,26 @@ if (-not $clangTidyBin) {
     Write-Error 'clang-tidy binary path was not provided'
 }
 
+# Normalize arguments:
+# - CMake passes: pwsh;-File;...;clang-tidy;--extra-arg-before=...;--source=...;--;cl.exe ...
+#   PowerShell may receive them already split, but in some cases they come as a single token with semicolons.
+function Normalize-Args {
+    param([string[]]$InputArgs)
+    if ($InputArgs.Count -eq 1 -and $InputArgs[0] -like '*;*') {
+        # Split on ';' but keep empty parts out.
+        return @($InputArgs[0].Split(';') | Where-Object { $_ -ne '' })
+    }
+    return $InputArgs
+}
+
 $clangTidyArgs = @()
 if ($args.Count -gt 1) {
-    $clangTidyArgs = @($args[1..($args.Count - 1)])
+    $clangTidyArgs = Normalize-Args -InputArgs @($args[1..($args.Count - 1)])
 }
+else {
+    $clangTidyArgs = Normalize-Args -InputArgs $args
+}
+
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path.Replace('\', '/')
 $workspaceRoot = ($repoRoot | Split-Path -Parent)
@@ -42,82 +58,82 @@ if (-not [string]::IsNullOrWhiteSpace($Env:DEPS_PREFIX)) {
     $depsIncludeDir = ([System.IO.Path]::GetFullPath((Join-Path $Env:DEPS_PREFIX 'include'))).Replace('\\', '/')
 }
 
-$normalizedArgs = @()
-$stdArg = '/std:c++20'
-$externalIncludeDirs = @()
-$skipNext = $false
-for ($i = 0; $i -lt $clangTidyArgs.Count; ++$i) {
-    if ($skipNext) {
-        $skipNext = $false
-        continue
-    }
-
-    $arg = $clangTidyArgs[$i]
-
-    if ($arg -eq '-std' -or $arg -eq '/std') {
-        if ($i + 1 -lt $clangTidyArgs.Count) {
-            $stdValue = $clangTidyArgs[$i + 1]
-            if (-not [string]::IsNullOrWhiteSpace($stdValue)) {
-                $stdArg = "/std:$stdValue"
+# Collect external include dirs (from either clang-tidy args or compiler args) so we can
+# re-inject them as -I /imsvc fallback; this covers things like -external:ID:<path>.
+function Collect-ExternalIncludeDirs {
+    param([string[]]$Args)
+    $dirs = @()
+    foreach ($arg in $Args) {
+        if ($arg -like '-external:*' -or $arg -like '/external:*') {
+            $externalValue = $arg.Substring(10)
+            if ($externalValue -match '^W\d+$') { continue }
+            if ($externalValue -like 'I*') {
+                $includePath = $externalValue.Substring(1).Replace('\\', '/')
+                if (-not [string]::IsNullOrWhiteSpace($includePath)) {
+                    $dirs += $includePath
+                }
             }
-        }
-        $skipNext = $true
-        continue
-    }
-
-    if ($arg -like '-std:*' -or $arg -like '/std:*' -or $arg -like '-std=*' -or $arg -like '/std=*') {
-        $separatorIndex = $arg.IndexOf(':')
-        if ($separatorIndex -lt 0) {
-            $separatorIndex = $arg.IndexOf('=')
-        }
-
-        if ($separatorIndex -ge 0 -and $separatorIndex + 1 -lt $arg.Length) {
-            $stdValue = $arg.Substring($separatorIndex + 1)
-            if (-not [string]::IsNullOrWhiteSpace($stdValue)) {
-                $stdArg = "/std:$stdValue"
-            }
-        }
-        continue
-    }
-
-    if ($arg -eq '-external') {
-        continue
-    }
-
-    if ($arg -eq '-I' -or $arg -eq '/I' -or $arg -eq '-isystem' -or $arg -eq '/imsvc') {
-        if ($i + 1 -lt $clangTidyArgs.Count) {
-            $normalizedArgs += $arg
-            $normalizedArgs += $clangTidyArgs[$i + 1]
-            $skipNext = $true
-        }
-        continue
-    }
-
-    if ($arg -like '-I*' -or $arg -like '/I*' -or $arg -like '-isystem*' -or $arg -like '/imsvc*') {
-        $normalizedArgs += $arg
-        continue
-    }
-
-    if ($arg -like '-external:*') {
-        $externalValue = $arg.Substring(10)
-        if ($externalValue -match '^W\d+$') {
             continue
         }
+    }
+    return @($dirs | Sort-Object -Unique)
+}
 
-        if ($externalValue -like 'I*') {
-            $includePath = $externalValue.Substring(1).Replace('\\', '/')
-            $externalIncludeDirs += $includePath
+# Extract the translation unit (source file) from various forms:
+# - --source=<path> (CMake passes this to tidy)
+# - --source <path>
+# - Compiler args containing *.c, *.cc, *.cpp, *.cxx, *.mm, *.ixx, *.m, *.hpp, etc.
+function Extract-TUSources {
+    param([string[]]$ClangArgs, [string[]]$CompilerArgs)
+    $sources = @()
+
+    # From --source flags
+    for ($i = 0; $i -lt $ClangArgs.Count; ++$i) {
+        $arg = $ClangArgs[$i]
+        if ($arg -like '--source=*') {
+            $val = $arg.Substring(9)
+            if (-not [string]::IsNullOrWhiteSpace($val)) { $sources += $val }
             continue
         }
-
-        continue
+        if ($arg -eq '--source' -and $i + 1 -lt $ClangArgs.Count -and -not ($ClangArgs[$i+1] -eq '--')) {
+            $sources += $ClangArgs[$i+1]; $i++; continue
+        }
     }
 
-    if ($arg -like '-DPACKAGE_DATA_DIR=*') {
-        continue
+    # Fallback: from compiler args (-c <path>, or bare *.cc)
+    if ($sources.Count -eq 0 -and $CompilerArgs.Count -gt 0) {
+        $tuPattern = '\\.(c|cc|cpp|cxx|c\+\+|mm|m|ixx|hpp|hh|hxx|ipp)$'
+        for ($j = 0; $j -lt $CompilerArgs.Count; ++$j) {
+            $carg = $CompilerArgs[$j]
+            if ($carg -eq '-c' -and $j + 1 -lt $CompilerArgs.Count) {
+                $sources += $CompilerArgs[$j+1]; $j++; continue
+            }
+            if ($carg -match $tuPattern) { $sources += $carg; continue }
+        }
     }
 
-    $normalizedArgs += $arg
+    return @($sources | Sort-Object -Unique)
+}
+
+# Derive std arg if provided via -std or /std forms in the compiler args; default to c++20.
+function Detect-StdArg {
+    param([string[]]$Args)
+    $stdArg = '/std:c++20'
+    for ($i = 0; $i -lt $Args.Count; ++$i) {
+        $arg = $Args[$i]
+        if (($arg -eq '-std' -or $arg -eq '/std') -and $i + 1 -lt $Args.Count) {
+            $stdValue = $Args[$i + 1]
+            if (-not [string]::IsNullOrWhiteSpace($stdValue)) { return "/std:$stdValue" }
+        }
+        if ($arg -like '-std:*' -or $arg -like '/std:*' -or $arg -like '-std=*' -or $arg -like '/std=*') {
+            $sep = $arg.IndexOf(':'); if ($sep -lt 0) { $sep = $arg.IndexOf('=') }
+            if ($sep -ge 0 -and $sep + 1 -lt $arg.Length) {
+                $stdValue = $arg.Substring($sep + 1)
+                if (-not [string]::IsNullOrWhiteSpace($stdValue)) { return "/std:$stdValue" }
+            }
+        }
+    }
+    return $stdArg
 }
 
 $fallbackIncludeDirs = @()
@@ -199,16 +215,21 @@ function Extract-Sources {
     param([string[]]$Args)
     $sources = @()
     $remaining = @()
-    foreach ($arg in $Args) {
+    for ($i = 0; $i -lt $Args.Count; ++$i) {
+        $arg = $Args[$i]
         if ($arg -like '--source=*') {
             $val = $arg.Substring(9)
-            if (-not [string]::IsNullOrWhiteSpace($val)) {
-                $sources += $val
-            }
+            if (-not [string]::IsNullOrWhiteSpace($val)) { $sources += $val }
             continue
         }
         # Some CMake versions may pass '--source' as a token followed by the path (rare)
         if ($arg -eq '--source') {
+            if ($i + 1 -lt $Args.Count -and -not ($Args[$i+1] -eq '--')) {
+                $sources += $Args[$i+1]
+                $i++
+                continue
+            }
+            # If nothing follows, keep the token to avoid losing info
             $remaining += $arg
             continue
         }
@@ -224,7 +245,19 @@ $sentinelIndex = $split[2]
 
 $extract = Extract-Sources -Args $clangArgs
 $clangArgs = $extract[0]
-$sources = $extract[1]
+$sourceFlags = $extract[1]
+
+# Derive std arg and external include dirs from the combined args (clang + compiler).
+$allArgs = @($clangArgs + $compilerArgs)
+$stdArg = Detect-StdArg -Args $allArgs
+$externalIncludeDirs = Collect-ExternalIncludeDirs -Args $allArgs
+
+# Get TU sources from both source flags and compiler args.
+$sources = Extract-TUSources -ClangArgs $clangTidyArgs -CompilerArgs $compilerArgs
+if ($sources.Count -eq 0 -and $sourceFlags.Count -gt 0) {
+    $sources = $sourceFlags
+}
+
 
 # Passthrough mode (parity with POSIX gate). Useful for debugging or when normalization is at fault.
 if ($Env:TR_CLANG_TIDY_PASSTHRU -eq '1') {
@@ -247,10 +280,25 @@ if ($Env:TR_CLANG_TIDY_PASSTHRU -eq '1') {
 
 $prefixArgs = @(
     "--extra-arg-before=-I$repoRoot"
-) + $buildIncludeArgs + $depsIncludeArgs + $fallbackIncludeArgs + $externalIncludeArgs + @(
+) + $buildIncludeArgs + $depsIncludeArgs + $fallbackIncludeArgs + @(
+    # external include dirs collected from compiler args. Add both /imsvc and -I variants.
+    $externalIncludeDirs | ForEach-Object { "--extra-arg-before=/imsvc$_" }
+    $externalIncludeDirs | ForEach-Object { "--extra-arg-before=-I$_" }
+) + @(
     "--extra-arg-before=$stdArg",
     '--extra-arg-before=--driver-mode=cl'
 )
+
+if ($sources.Count -eq 0) {
+    Write-Host "[clang-tidy-gate] ERROR: No sources found in args; refusing to call clang-tidy without input." -ForegroundColor Red
+    if ($Env:TR_CLANG_TIDY_DEBUG -eq '1') {
+        Write-Host "[clang-tidy-gate] rawArgs:`n$($args -join "`n")"
+        Write-Host "[clang-tidy-gate] clangArgs:`n$($clangArgs -join "`n")"
+        Write-Host "[clang-tidy-gate] compilerArgs:`n$($compilerArgs -join "`n")"
+        Write-Host "[clang-tidy-gate] externalIncludeDirs:`n$($externalIncludeDirs -join "`n")"
+    }
+    exit 2
+}
 
 # Assemble final arguments:
 #   clang-tidy [options + prefixArgs] [sources] -- [compilerArgs]
