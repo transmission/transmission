@@ -1332,7 +1332,7 @@ jobs:
               dht \
               fast_float \
               gettext \
-              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm30` \
+              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm40` \
               libb64 \
               libdeflate \
               libevent \
