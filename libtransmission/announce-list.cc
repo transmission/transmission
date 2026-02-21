@@ -86,8 +86,10 @@ bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier
     // according to the definition in RFC 3986 Section 6.1, while consisting of
     // only US-ASCII characters. This ensures the URLs be represented correctly
     // when transmitted via UTF-8 mediums, for example JSON.
+    // It now works in two parts: the hostname, if present, is first converted to IDN,
+    // then the rest is percent-encoded as needed
     auto normalized_url = tr_urlbuf{};
-    tr_urlPercentEncode(std::back_inserter(normalized_url), announce_url, false);
+    normalized_url = tr_normalize_url(announce_url);
 
     // Make sure the announce URL is usable before we intern it.
     if (auto const announce = tr_urlParseTracker(normalized_url); !announce || !can_add(*announce))
