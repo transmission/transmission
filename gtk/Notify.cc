@@ -230,7 +230,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_
 
     auto const* const tor = core->find_torrent(tor_id);
 
-    auto const n = TrNotification{ core, tor_id };
+    auto const n = TrNotification{ .core = core, .torrent_id = tor_id };
 
     std::vector<Glib::ustring> actions;
     if (server_supports_actions)
@@ -282,7 +282,7 @@ void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, tr_torrent_id_t
         actions.emplace_back(_("Start Now"));
     }
 
-    auto const n = TrNotification{ core, tor_id };
+    auto const n = TrNotification{ .core = core, .torrent_id = tor_id };
 
     proxy->call(
         "Notify",

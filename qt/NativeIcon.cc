@@ -424,7 +424,13 @@ struct Info
         break;
     }
 
-    return { sf_symbol_name, segoe_codepoint, xdg_icon_name, fallback, ok_in_gnome_menus };
+    return {
+        .sf_symbol_name = sf_symbol_name,
+        .segoe_codepoint = segoe_codepoint,
+        .xdg_icon_name = xdg_icon_name,
+        .fallback = fallback,
+        .ok_in_gnome_menus = ok_in_gnome_menus,
+    };
 }
 } // namespace
 
