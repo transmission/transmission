@@ -472,15 +472,24 @@ Glib::RefPtr<Gtk::ListStore> FilterBar::Impl::show_mode_filter_model_new()
     };
 
     static auto constexpr types = std::array<FilterTypeInfo, 9>({ {
-        { ShowMode::ShowAll, nullptr, N_("All"), nullptr },
-        { ShowModeSeparator, nullptr, nullptr, nullptr },
-        { ShowMode::ShowActive, nullptr, N_("Active"), "system-run" },
-        { ShowMode::ShowDownloading, "Verb", NC_("Verb", "Downloading"), "network-receive" },
-        { ShowMode::ShowSeeding, "Verb", NC_("Verb", "Seeding"), "network-transmit" },
-        { ShowMode::ShowPaused, nullptr, N_("Paused"), "media-playback-pause" },
-        { ShowMode::ShowFinished, nullptr, N_("Finished"), "media-playback-stop" },
-        { ShowMode::ShowVerifying, "Verb", NC_("Verb", "Verifying"), "view-refresh" },
-        { ShowMode::ShowError, nullptr, N_("Error"), "dialog-error" },
+        { .show_mode = ShowMode::ShowAll, .context = nullptr, .name = N_("All"), .icon_name = nullptr },
+        { .show_mode = ShowModeSeparator, .context = nullptr, .name = nullptr, .icon_name = nullptr },
+        { .show_mode = ShowMode::ShowActive, .context = nullptr, .name = N_("Active"), .icon_name = "system-run" },
+        { .show_mode = ShowMode::ShowDownloading,
+          .context = "Verb",
+          .name = NC_("Verb", "Downloading"),
+          .icon_name = "network-receive" },
+        { .show_mode = ShowMode::ShowSeeding,
+          .context = "Verb",
+          .name = NC_("Verb", "Seeding"),
+          .icon_name = "network-transmit" },
+        { .show_mode = ShowMode::ShowPaused, .context = nullptr, .name = N_("Paused"), .icon_name = "media-playback-pause" },
+        { .show_mode = ShowMode::ShowFinished, .context = nullptr, .name = N_("Finished"), .icon_name = "media-playback-stop" },
+        { .show_mode = ShowMode::ShowVerifying,
+          .context = "Verb",
+          .name = NC_("Verb", "Verifying"),
+          .icon_name = "view-refresh" },
+        { .show_mode = ShowMode::ShowError, .context = nullptr, .name = N_("Error"), .icon_name = "dialog-error" },
     } });
 
     auto store = Gtk::ListStore::create(show_mode_filter_cols);

@@ -22,7 +22,6 @@ Checks:
   - misc-*
   - -misc-include-cleaner
   - modernize-*
-  - -modernize-use-designated-initializers
   - -modernize-use-ranges
   - -modernize-use-trailing-return-type
   - performance-*
