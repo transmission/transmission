@@ -1,4 +1,5 @@
 name: Prepare Win32 build dependencies
+description: Prepare and cache Windows build dependencies for configured architecture and dependency set.
 inputs:
   arch:
     description: Architecture (x86, x64)

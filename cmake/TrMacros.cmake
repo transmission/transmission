@@ -21,7 +21,8 @@ macro(tr_setup_gtest_target TARGET_NAME TEST_PREFIX)
 
     if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
         gtest_discover_tests(${TARGET_NAME}
-            TEST_PREFIX "${TEST_PREFIX}")
+            TEST_PREFIX "${TEST_PREFIX}"
+            DISCOVERY_MODE PRE_TEST)
     else()
         add_test(
             NAME ${TARGET_NAME}
