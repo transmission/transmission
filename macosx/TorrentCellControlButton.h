@@ -4,8 +4,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class TorrentCell;
 @interface TorrentCellControlButton : NSButton
 
+@property(nonatomic) IBOutlet TorrentCell* torrentCell;
 - (void)resetImage;
 
 @end
