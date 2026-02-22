@@ -258,7 +258,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
             if (*val == tr_quark_get_string_view(TR_KEY_recently_active))
             {
                 auto const cutoff = tr_time() - RecentlyActiveSeconds;
-                auto const recent = torrents.get_matching([cutoff](auto* walk) { return walk->has_changed_since(cutoff); });
+                auto recent = torrents.get_matching([cutoff](auto* walk) { return walk->has_changed_since(cutoff); });
                 std::ranges::copy(recent, std::back_inserter(torrents_vec));
             }
             else
@@ -288,7 +288,8 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
     }
     else // all of them
     {
-        torrents_vec = torrents.get_all();
+        auto view = torrents.get_all();
+        torrents_vec.assign(view.begin(), view.end()); // TODO(c++23): use ranges::to instead
     }
 
     return torrents_vec;

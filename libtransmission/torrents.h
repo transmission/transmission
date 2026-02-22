@@ -14,6 +14,7 @@
 #include <ctime>
 #include <functional>
 #include <iterator>
+#include <ranges>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -100,17 +101,11 @@ public:
         return std::empty(by_hash_);
     }
 
-    [[nodiscard]] auto get_matching(std::function<bool(tr_torrent const*)> pred_in) const
+    [[nodiscard]] auto get_matching(std::function<bool(tr_torrent const*)>&& pred_in) const
     {
-        auto const pred = [&pred_in](tr_torrent const* const tor)
-        {
-            return tor != nullptr && pred_in(tor);
-        };
-
-        auto vec = std::vector<tr_torrent*>{};
-        vec.reserve(size());
-        std::copy_if(std::begin(by_id_), std::end(by_id_), std::back_inserter(vec), pred);
-        return vec;
+        return std::views::filter(
+            by_id_,
+            [pred = std::move(pred_in)](tr_torrent const* const tor) { return tor != nullptr && pred(tor); });
     }
 
     [[nodiscard]] auto get_all() const
