@@ -36,7 +36,6 @@ Checks:
   - -misc-no-recursion
   - -misc-non-private-member-variables-in-classes
   - modernize-*
-  - -modernize-use-ranges
   - -modernize-use-trailing-return-type # keep
   - performance-*
   - readability-*

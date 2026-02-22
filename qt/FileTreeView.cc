@@ -257,6 +257,7 @@ void FileTreeView::onlyCheckSelectedItems()
     QModelIndexList wanted_indices = selectedSourceRows();
     model_->setWanted(wanted_indices, true);
 
+    // NOLINTNEXTLINE(modernize-use-ranges)
     std::sort(wanted_indices.begin(), wanted_indices.end());
 
     auto wanted_indices_parents = std::set<QModelIndex>{};
@@ -278,6 +279,7 @@ void FileTreeView::onlyCheckSelectedItems()
         auto const parent_index = parents_queue.front();
         parents_queue.pop();
 
+        // NOLINTNEXTLINE(modernize-use-ranges)
         if (std::binary_search(wanted_indices.begin(), wanted_indices.end(), parent_index))
         {
             continue;
@@ -291,6 +293,7 @@ void FileTreeView::onlyCheckSelectedItems()
             int const child_check_state = child_index.data(FileTreeModel::WantedRole).toInt();
 
             if (child_check_state == Qt::Unchecked ||
+                // NOLINTNEXTLINE(modernize-use-ranges)
                 std::binary_search(wanted_indices.begin(), wanted_indices.end(), child_index))
             {
                 continue;

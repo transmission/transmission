@@ -31,23 +31,28 @@ using ::trqt::variant_helpers::getValue;
 namespace
 {
 
-struct TorrentIdLessThan
+constexpr struct
 {
-    bool operator()(Torrent const* left, Torrent const* right) const
+    constexpr bool operator()(Torrent const* left, Torrent const* right) const noexcept
     {
         return left->id() < right->id();
     }
 
-    bool operator()(int left_id, Torrent const* right) const
+    constexpr bool operator()(int left_id, Torrent const* right) const noexcept
     {
         return left_id < right->id();
     }
 
-    bool operator()(Torrent const* left, int right_id) const
+    constexpr bool operator()(Torrent const* left, int right_id) const noexcept
     {
         return left->id() < right_id;
     }
-};
+
+    constexpr bool operator()(int left_id, int right_id) const noexcept
+    {
+        return left_id < right_id;
+    }
+} TorrentIdLessThan;
 
 template<typename Iter>
 auto getIds(Iter it, Iter end)
@@ -326,10 +331,10 @@ void TorrentModel::updateTorrents(tr_variant* torrent_list, bool is_complete_lis
 
     if (is_complete_list)
     {
-        std::ranges::sort(processed, TorrentIdLessThan());
+        std::ranges::sort(processed, TorrentIdLessThan);
         torrents_t removed;
         removed.reserve(old.size());
-        std::ranges::set_difference(old, processed, std::back_inserter(removed), TorrentIdLessThan());
+        std::ranges::set_difference(old, processed, std::back_inserter(removed), TorrentIdLessThan);
         rowsRemove(removed);
     }
 }
@@ -342,8 +347,7 @@ std::optional<int> TorrentModel::getRow(int id) const
 {
     std::optional<int> row;
 
-    auto const [begin, end] = std::equal_range(torrents_.begin(), torrents_.end(), id, TorrentIdLessThan());
-    if (begin != end)
+    if (auto const [begin, end] = std::ranges::equal_range(torrents_, id, TorrentIdLessThan); begin != end)
     {
         row = std::distance(torrents_.begin(), begin);
         assert(torrents_[*row]->id() == id);
@@ -433,20 +437,18 @@ void TorrentModel::rowsEmitChanged(torrent_ids_t const& ids)
 
 void TorrentModel::rowsAdd(torrents_t const& torrents)
 {
-    auto const compare = TorrentIdLessThan();
-
     if (torrents_.empty())
     {
         beginInsertRows(QModelIndex{}, 0, torrents.size() - 1);
         torrents_ = torrents;
-        std::ranges::sort(torrents_, TorrentIdLessThan{});
+        std::ranges::sort(torrents_, TorrentIdLessThan);
         endInsertRows();
     }
     else
     {
         for (auto const& tor : torrents)
         {
-            auto const it = std::ranges::lower_bound(torrents_, tor, compare);
+            auto const it = std::ranges::lower_bound(torrents_, tor, TorrentIdLessThan);
             auto const row = static_cast<int>(std::distance(torrents_.begin(), it));
 
             beginInsertRows(QModelIndex{}, row, row);
