@@ -434,7 +434,7 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
 
     ensureLoaded();
 
-    struct Compare
+    static constexpr struct
     {
         [[nodiscard]] static auto compare(tr_address const& a, address_range_t const& b) noexcept // <=>
         {
@@ -463,9 +463,10 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
         {
             return compare(a, b) < 0;
         }
-    };
+    } Compare;
 
-    return std::binary_search(std::begin(rules_), std::end(rules_), addr, Compare{});
+    // NOLINTNEXTLINE(modernize-use-ranges)
+    return std::binary_search(std::begin(rules_), std::end(rules_), addr, Compare);
 }
 
 std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(

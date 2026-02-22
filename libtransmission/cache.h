@@ -53,8 +53,6 @@ private:
     using Blocks = std::vector<CacheBlock>;
     using CIter = Blocks::const_iterator;
 
-    [[nodiscard]] static Key make_key(tr_torrent const& tor, tr_block_info::Location loc) noexcept;
-
     [[nodiscard]] static std::pair<CIter, CIter> find_biggest_span(CIter const& begin, CIter const& end) noexcept;
 
     [[nodiscard]] static CIter find_span_end(CIter const& span_begin, CIter const& end) noexcept;
@@ -78,6 +76,11 @@ private:
 
     [[nodiscard]] CIter get_block(tr_torrent const& tor, tr_block_info::Location const& loc) noexcept;
 
+    static auto constexpr project_to_key(CacheBlock const& block) noexcept
+    {
+        return block.key;
+    }
+
     tr_torrents const& torrents_;
 
     Blocks blocks_;
@@ -87,16 +90,4 @@ private:
     mutable size_t disk_write_bytes_ = 0;
     mutable size_t cache_writes_ = 0;
     mutable size_t cache_write_bytes_ = 0;
-
-    static constexpr struct
-    {
-        [[nodiscard]] constexpr bool operator()(Key const& key, CacheBlock const& block) const
-        {
-            return key < block.key;
-        }
-        [[nodiscard]] constexpr bool operator()(CacheBlock const& block, Key const& key) const
-        {
-            return block.key < key;
-        }
-    } CompareCacheBlockByKey{};
 };

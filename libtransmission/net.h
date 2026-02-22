@@ -387,7 +387,7 @@ struct tr_address
     } addr = {};
 
     static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
-    static auto constexpr CompactAddrMaxBytes = *std::max_element(std::begin(CompactAddrBytes), std::end(CompactAddrBytes));
+    static auto constexpr CompactAddrMaxBytes = *std::ranges::max_element(CompactAddrBytes);
     static_assert(std::size(CompactAddrBytes) == NUM_TR_AF_INET_TYPES);
 
     [[nodiscard]] static auto any(tr_address_type type) noexcept

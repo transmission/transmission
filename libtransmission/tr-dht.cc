@@ -398,8 +398,7 @@ private:
             return candidate.socket_address.port_ == tr_port::from_host(1);
         };
 
-        auto const remove_it = std::remove_if(std::begin(pex), std::end(pex), IsBadPex);
-        pex.erase(remove_it, std::end(pex));
+        std::erase_if(pex, IsBadPex);
         return std::move(pex);
     }
 
