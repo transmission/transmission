@@ -669,27 +669,17 @@ TEST_F(RpcTest, sessionGet)
 
     // what we got
     std::set<tr_quark> actual_keys;
-    for (auto const& [key, val] : *args_map)
+    for (auto const& key : std::views::keys(*args_map))
     {
         actual_keys.insert(key);
     }
 
     auto missing_keys = std::vector<tr_quark>{};
-    std::set_difference(
-        std::begin(expected_keys),
-        std::end(expected_keys),
-        std::begin(actual_keys),
-        std::end(actual_keys),
-        std::inserter(missing_keys, std::begin(missing_keys)));
+    std::ranges::set_difference(expected_keys, actual_keys, std::inserter(missing_keys, std::begin(missing_keys)));
     EXPECT_EQ(decltype(missing_keys){}, missing_keys);
 
     auto unexpected_keys = std::vector<tr_quark>{};
-    std::set_difference(
-        std::begin(actual_keys),
-        std::end(actual_keys),
-        std::begin(expected_keys),
-        std::end(expected_keys),
-        std::inserter(unexpected_keys, std::begin(unexpected_keys)));
+    std::ranges::set_difference(actual_keys, expected_keys, std::inserter(unexpected_keys, std::begin(unexpected_keys)));
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 
     // cleanup

@@ -202,7 +202,7 @@ TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
         results[i] = static_cast<bool>(session_->openFiles().get(TorId, i, false));
     }
     sorted = results;
-    std::sort(std::begin(sorted), std::end(sorted));
+    std::ranges::sort(sorted);
     EXPECT_EQ(sorted, results);
-    EXPECT_GT(std::count(std::begin(results), std::end(results), true), 0);
+    EXPECT_GT(std::ranges::count(results, true), 0);
 }
