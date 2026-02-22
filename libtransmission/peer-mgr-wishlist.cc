@@ -5,6 +5,7 @@
 
 #include <algorithm> // std::adjacent_find, std::sort
 #include <array>
+#include <compare>
 #include <cstddef>
 #include <functional>
 #include <ranges>
@@ -74,11 +75,32 @@ class Wishlist::Impl
             }
         }
 
-        [[nodiscard]] int compare(Candidate const& that) const noexcept; // <=>
-
-        [[nodiscard]] auto operator<(Candidate const& that) const // less than
+        [[nodiscard]] constexpr auto operator<=>(Candidate const& that) const noexcept
         {
-            return compare(that) < 0;
+            // prefer pieces closer to completion
+            if (auto const val = std::size(unrequested) <=> std::size(that.unrequested); val != 0)
+            {
+                return val;
+            }
+
+            // prefer higher priority
+            if (auto const val = that.priority <=> priority; val != 0)
+            {
+                return val;
+            }
+
+            // prefer rarer pieces
+            if (auto const val = replication <=> that.replication; val != 0)
+            {
+                return val;
+            }
+
+            return salt <=> that.salt;
+        }
+
+        [[nodiscard]] constexpr auto operator==(Candidate const& that) const noexcept
+        {
+            return (*this <=> that) == 0;
         }
 
         [[nodiscard]] constexpr auto block_belongs(tr_block_index_t const block) const
@@ -217,7 +239,7 @@ private:
             }
         }
 
-        std::sort(std::begin(candidates_), std::end(candidates_));
+        std::ranges::sort(candidates_);
     }
 
     constexpr void inc_replication() noexcept
@@ -246,7 +268,7 @@ private:
             }
         }
 
-        std::sort(std::begin(candidates_), std::end(candidates_));
+        std::ranges::sort(candidates_);
     }
 
     constexpr void inc_replication_piece(tr_piece_index_t const piece)
@@ -315,7 +337,7 @@ private:
             }
         }
 
-        std::sort(std::begin(candidates_), std::end(candidates_));
+        std::ranges::sort(candidates_);
     }
 
     // ---
@@ -379,7 +401,7 @@ private:
             iter->unrequested.insert(i - 1U);
         }
 
-        std::sort(std::begin(candidates_), std::end(candidates_));
+        std::ranges::sort(candidates_);
     }
 
     // ---
@@ -443,10 +465,7 @@ private:
         auto const n_pieces = mediator_.piece_count();
         candidates_.reserve(n_pieces);
 
-        std::sort(
-            std::begin(candidates_),
-            std::end(candidates_),
-            [](auto const& lhs, auto const& rhs) { return lhs.piece < rhs.piece; });
+        std::ranges::sort(candidates_, [](auto const& lhs, auto const& rhs) { return lhs.piece < rhs.piece; });
 
         Candidate* prev = nullptr;
         for (tr_piece_index_t piece = 0U, idx_c = 0U; piece < n_pieces; ++piece)
@@ -537,7 +556,7 @@ private:
             }
         }
 
-        std::sort(std::begin(candidates_), std::end(candidates_));
+        std::ranges::sort(candidates_);
     }
 
     // ---
@@ -563,7 +582,7 @@ private:
             candidate.salt = get_salt(candidate.piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
         }
 
-        std::sort(std::begin(candidates_), std::end(candidates_));
+        std::ranges::sort(candidates_);
     }
 
     // ---
@@ -575,7 +594,7 @@ private:
             candidate.priority = mediator_.priority(candidate.piece);
         }
 
-        std::sort(std::begin(candidates_), std::end(candidates_));
+        std::ranges::sort(candidates_);
     }
 
     // ---
@@ -644,31 +663,8 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
 
     // Ensure the list of blocks are sorted
     // The list needs to be unique as well, but that should come naturally
-    std::sort(std::begin(blocks), std::end(blocks));
+    std::ranges::sort(blocks);
     return make_spans(blocks);
-}
-
-int Wishlist::Impl::Candidate::compare(Candidate const& that) const noexcept
-{
-    // prefer pieces closer to completion
-    if (auto const val = tr_compare_3way(std::size(unrequested), std::size(that.unrequested)); val != 0)
-    {
-        return val;
-    }
-
-    // prefer higher priority
-    if (auto const val = tr_compare_3way(priority, that.priority); val != 0)
-    {
-        return -val;
-    }
-
-    // prefer rarer pieces
-    if (auto const val = tr_compare_3way(replication, that.replication); val != 0)
-    {
-        return val;
-    }
-
-    return tr_compare_3way(salt, that.salt);
 }
 
 // ---
