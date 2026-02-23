@@ -340,7 +340,7 @@ void FileList::Impl::refresh()
         int sort_column_id = 0;
         store_->get_sort_column_id(sort_column_id, order);
 
-        RefreshData refresh_data{ sort_column_id, false, tor };
+        RefreshData refresh_data{ .sort_column_id = sort_column_id, .resort_needed = false, .tor = tor };
         gtr_tree_model_foreach_postorder(
             store_,
             [this, &refresh_data](Gtk::TreeModel::iterator const& iter)

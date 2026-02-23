@@ -278,6 +278,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     }
 }
 
+// NOLINTNEXTLINE(performance-unnecessary-value-param): DO NOT make the parameter a reference as this method is called from another thread
 void RpcClient::localRequestFinished(TrVariantPtr response)
 {
     if (auto node = local_requests_.extract(parseResponseId(*response)))

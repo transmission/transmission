@@ -44,7 +44,7 @@ template <typename T> [[nodiscard]] std::string tr_strupper(T in)
 [[nodiscard]] bool tr_wildmat(char const* text, char const* pattern);
 
 // c++23 (P1679R3), GCC 11.1, clang 12
-template <typename T> [[nodiscard]] constexpr bool tr_strv_contains(std::string_view sv, T key) noexcept
+template <typename T> [[nodiscard]] constexpr bool tr_strv_contains(std::string_view sv, T const& key) noexcept
 {
     return sv.find(key) != std::string_view::npos;
 }

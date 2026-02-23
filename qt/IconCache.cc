@@ -84,8 +84,8 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
 
     if (!multifile)
     {
-        static auto const mime_db = QMimeDatabase{};
-        auto const type = mime_db.mimeTypeForName(mime_type_name);
+        static auto const MimeDb = QMimeDatabase{};
+        auto const type = MimeDb.mimeTypeForName(mime_type_name);
         auto const filename = QStringLiteral("filename.%1").arg(type.preferredSuffix());
         return guessMimeIcon(filename, file_icon_);
     }

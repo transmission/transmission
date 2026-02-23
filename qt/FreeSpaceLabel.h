@@ -22,6 +22,7 @@ class FreeSpaceLabel : public QLabel
 
 public:
     explicit FreeSpaceLabel(QWidget* parent = nullptr);
+    ~FreeSpaceLabel() override = default;
     FreeSpaceLabel(FreeSpaceLabel&&) = delete;
     FreeSpaceLabel(FreeSpaceLabel const&) = delete;
     FreeSpaceLabel& operator=(FreeSpaceLabel&&) = delete;

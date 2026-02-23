@@ -54,6 +54,7 @@ class RpcClient : public QObject
 
 public:
     explicit RpcClient(QNetworkAccessManager& nam, QObject* parent = nullptr);
+    ~RpcClient() override = default;
     RpcClient(RpcClient&&) = delete;
     RpcClient(RpcClient const&) = delete;
     RpcClient& operator=(RpcClient&&) = delete;
@@ -86,10 +87,10 @@ private slots:
     void localRequestFinished(TrVariantPtr response);
 
 private:
-    QByteArray const SessionIdHeaderName = QByteArray{ TrRpcSessionIdHeader.data(),
-                                                       static_cast<qsizetype>(TrRpcSessionIdHeader.size()) };
-    QByteArray const VersionHeaderName = QByteArray{ TrRpcVersionHeader.data(),
-                                                     static_cast<qsizetype>(TrRpcVersionHeader.size()) };
+    static inline QByteArray const SessionIdHeaderName = { TrRpcSessionIdHeader.data(),
+                                                           static_cast<qsizetype>(TrRpcSessionIdHeader.size()) };
+    static inline QByteArray const VersionHeaderName = { TrRpcVersionHeader.data(),
+                                                         static_cast<qsizetype>(TrRpcVersionHeader.size()) };
 
     void connectNetworkAccessManager();
 
