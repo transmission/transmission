@@ -1042,20 +1042,10 @@ void tr_peerMsgsImpl::send_ut_pex()
         auto new_pex = tr_peerMgrGetPeers(&tor_, ip_type, TR_PEERS_CONNECTED, MaxPexPeerCount);
         auto added = std::vector<tr_pex>{};
         added.reserve(std::size(new_pex));
-        std::set_difference(
-            std::begin(new_pex),
-            std::end(new_pex),
-            std::begin(old_pex),
-            std::end(old_pex),
-            std::back_inserter(added));
+        std::ranges::set_difference(new_pex, old_pex, std::back_inserter(added));
         auto dropped = std::vector<tr_pex>{};
         dropped.reserve(std::size(old_pex));
-        std::set_difference(
-            std::begin(old_pex),
-            std::end(old_pex),
-            std::begin(new_pex),
-            std::end(new_pex),
-            std::back_inserter(dropped));
+        std::ranges::set_difference(old_pex, new_pex, std::back_inserter(dropped));
 
         // Some peers give us error messages if we send
         // more than this many peers in a single pex message.
