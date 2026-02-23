@@ -34,7 +34,7 @@ class DetailsDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
+    DetailsDialog(Session& session, Prefs& prefs, TorrentModel const& model, QWidget* parent = nullptr);
     DetailsDialog(DetailsDialog&&) = delete;
     DetailsDialog(DetailsDialog const&) = delete;
     DetailsDialog& operator=(DetailsDialog&&) = delete;
@@ -56,7 +56,7 @@ private:
     void initFilesTab() const;
     void initOptionsTab();
 
-    void setEnabled(bool);
+    void setEnabled(bool enabled);
 
 private slots:
     void refreshModel();
@@ -75,24 +75,24 @@ private slots:
     void onAddTrackerClicked();
     void onEditTrackersClicked();
     void onRemoveTrackerClicked();
-    void onShowTrackerScrapesToggled(bool);
-    void onShowBackupTrackersToggled(bool);
-    void onTrackerListEdited(QString);
+    void onShowTrackerScrapesToggled(bool val);
+    void onShowBackupTrackersToggled(bool val);
+    void onTrackerListEdited(QString const& tracker_list);
 
     // Files tab
-    void onFilePriorityChanged(file_indices_t const& file_indices, int);
-    void onFileWantedChanged(file_indices_t const& file_indices, bool);
+    void onFilePriorityChanged(file_indices_t const& file_indices, int priority);
+    void onFileWantedChanged(file_indices_t const& file_indices, bool wanted);
     void onPathEdited(QString const& old_path, QString const& new_name);
     void onOpenRequested(QString const& path) const;
 
     // Options tab
-    void onBandwidthPriorityChanged(int);
-    void onHonorsSessionLimitsToggled(bool);
-    void onDownloadLimitedToggled(bool);
+    void onBandwidthPriorityChanged(int index);
+    void onHonorsSessionLimitsToggled(bool val);
+    void onDownloadLimitedToggled(bool val);
     void onSpinBoxEditingFinished();
-    void onUploadLimitedToggled(bool);
-    void onRatioModeChanged(int);
-    void onIdleModeChanged(int);
+    void onUploadLimitedToggled(bool val);
+    void onRatioModeChanged(int index);
+    void onIdleModeChanged(int index);
     void onIdleLimitChanged();
 
 private:
@@ -109,7 +109,7 @@ private:
     QMetaObject::Connection pending_changes_connection_;
 
     template<typename T>
-    void torrentSet(torrent_ids_t const& ids, tr_quark key, T val)
+    void torrentSet(torrent_ids_t const& ids, tr_quark key, T const& val)
     {
         auto const tag = session_.torrentSet(ids, key, val);
         pending_changes_tags_.insert(tag);
@@ -120,7 +120,7 @@ private:
     }
 
     template<typename T>
-    void torrentSet(tr_quark key, T val)
+    void torrentSet(tr_quark key, T const& val)
     {
         torrentSet(ids_, key, val);
     }
@@ -145,7 +145,7 @@ private:
     std::map<QString, QTreeWidgetItem*> peers_;
 
     QIcon const icon_encrypted_ = QIcon{ QStringLiteral(":/icons/encrypted.svg") };
-    QIcon const icon_unencrypted_ = {};
+    QIcon const icon_unencrypted_;
 
-    static int prev_tab_index_;
+    static int prev_tab_index;
 };

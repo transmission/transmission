@@ -21,6 +21,7 @@ public:
         : QItemDelegate{ parent }
     {
     }
+    ~TrackerDelegate() override = default;
     TrackerDelegate(TrackerDelegate&&) = delete;
     TrackerDelegate(TrackerDelegate const&) = delete;
     TrackerDelegate& operator=(TrackerDelegate&&) = delete;
@@ -33,10 +34,10 @@ public:
     void paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const override;
 
 protected:
-    [[nodiscard]] QString getText(TrackerInfo const&) const;
+    [[nodiscard]] QString getText(TrackerInfo const& inf) const;
 
-    [[nodiscard]] QSize sizeHint(QStyleOptionViewItem const&, TrackerInfo const&) const;
-    void drawTracker(QPainter*, QStyleOptionViewItem const&, TrackerInfo const&) const;
+    [[nodiscard]] QSize sizeHint(QStyleOptionViewItem const& option, TrackerInfo const& info) const;
+    void drawTracker(QPainter* painter, QStyleOptionViewItem const& option, TrackerInfo const& info) const;
 
 private:
     bool show_more_ = false;

@@ -56,7 +56,7 @@ set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 2.7)
 set(MINIUPNPC_MINIMUM 2.2.1)
-set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
+set(NPM_MINIMUM 10.8.2) # Node.js 20.19 (stylelint@17)
 set(PSL_MINIMUM 0.21.0)
 set(QT_MINIMUM 5.15)
 set(SIGSLOT_MINIMUM 1.2.3)
@@ -110,10 +110,10 @@ set(TR_NAME ${PROJECT_NAME})
 
 # these should be the only five lines you need to change
 set(TR_VERSION_MAJOR "4")
-set(TR_VERSION_MINOR "1")
+set(TR_VERSION_MINOR "2")
 set(TR_VERSION_PATCH "0")
-set(TR_VERSION_BETA_NUMBER "5") # empty string for not beta
-set(TR_VERSION_DEV FALSE)
+set(TR_VERSION_BETA_NUMBER "") # empty string for not beta
+set(TR_VERSION_DEV TRUE)
 
 # derived from above: release type
 if(TR_VERSION_DEV)

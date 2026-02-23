@@ -17,13 +17,13 @@ class Speed : public tr::Values::Speed
 public:
     Speed() = default;
 
-    template<typename Number, typename std::enable_if_t<std::is_integral_v<Number>>* = nullptr>
+    template<std::integral Number>
     constexpr Speed(Number value, Units multiple)
         : tr::Values::Speed{ value, multiple }
     {
     }
 
-    template<typename Number, typename std::enable_if_t<std::is_floating_point_v<Number>>* = nullptr>
+    template<std::floating_point Number>
     Speed(Number value, Units multiple)
         : tr::Values::Speed{ value, multiple }
     {

@@ -138,7 +138,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     auto refresh_action_sensitivity_soon = [this]()
     {
-        refreshSoon(REFRESH_ACTION_SENSITIVITY);
+        refreshSoon(RefreshActionSensitivity);
     };
     connect(&filter_model_, &TorrentFilter::rowsInserted, this, refresh_action_sensitivity_soon);
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_action_sensitivity_soon);
@@ -148,7 +148,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     filter_model_.setSourceModel(&model_);
     auto refresh_soon_adapter = [this]()
     {
-        refreshSoon(~REFRESH_ICONS);
+        refreshSoon(~RefreshIcon);
     };
     connect(&model_, &TorrentModel::modelReset, this, refresh_soon_adapter);
     connect(&model_, &TorrentModel::rowsRemoved, this, refresh_soon_adapter);
@@ -216,7 +216,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     auto refresh_header_soon = [this]()
     {
-        refreshSoon(REFRESH_TORRENT_VIEW_HEADER);
+        refreshSoon(RefreshTorrentViewHeader);
     };
     connect(&model_, &TorrentModel::rowsInserted, this, refresh_header_soon);
     connect(&model_, &TorrentModel::rowsRemoved, this, refresh_header_soon);
@@ -250,7 +250,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     auto refresh_status_soon = [this]()
     {
-        refreshSoon(REFRESH_STATUS_BAR);
+        refreshSoon(RefreshStatusBar);
     };
     connect(&session_, &Session::sourceChanged, this, &MainWindow::onSessionSourceChanged);
     connect(&session_, &Session::statsUpdated, this, refresh_status_soon);
@@ -672,37 +672,37 @@ void MainWindow::onRefreshTimer()
     int fields = 0;
     std::swap(fields, refresh_fields_);
 
-    if (fields & REFRESH_TITLE)
+    if (fields & RefreshTitle)
     {
         refreshTitle();
     }
 
-    if (fields & REFRESH_ICONS)
+    if (fields & RefreshIcon)
     {
         refreshIcons();
     }
 
-    if (fields & (REFRESH_TRAY_ICON | REFRESH_STATUS_BAR))
+    if (fields & (RefreshTrayIcon | RefreshStatusBar))
     {
         auto const stats = getTransferStats();
 
-        if (fields & REFRESH_TRAY_ICON)
+        if (fields & RefreshTrayIcon)
         {
             refreshTrayIcon(stats);
         }
 
-        if (fields & REFRESH_STATUS_BAR)
+        if (fields & RefreshStatusBar)
         {
             refreshStatusBar(stats);
         }
     }
 
-    if (fields & REFRESH_TORRENT_VIEW_HEADER)
+    if (fields & RefreshTorrentViewHeader)
     {
         refreshTorrentViewHeader();
     }
 
-    if (fields & REFRESH_ACTION_SENSITIVITY)
+    if (fields & RefreshActionSensitivity)
     {
         refreshActionSensitivity();
     }
@@ -1107,7 +1107,7 @@ void MainWindow::refreshPref(int const idx)
                 action->setChecked(needle == action->property(StatsModeKey));
             }
 
-            refreshSoon(REFRESH_STATUS_BAR);
+            refreshSoon(RefreshStatusBar);
         }
         break;
 
@@ -1175,7 +1175,7 @@ void MainWindow::refreshPref(int const idx)
         ui_.action_TrayIcon->setChecked(b);
         tray_icon_.setVisible(b);
         QApplication::setQuitOnLastWindowClosed(!b);
-        refreshSoon(REFRESH_TRAY_ICON);
+        refreshSoon(RefreshTrayIcon);
         break;
 
     case Prefs::COMPACT_VIEW:
@@ -1266,7 +1266,7 @@ void MainWindow::openURL()
         add = AddData{};
     }
 
-    addTorrent(std::move(*add), true);
+    addTorrent(*add, true);
 }
 
 void MainWindow::addTorrentFromClipboard()
@@ -1314,17 +1314,17 @@ void MainWindow::addTorrents(QStringList const& filenames)
     }
 }
 
-void MainWindow::addTorrent(AddData add_me, bool show_options)
+void MainWindow::addTorrent(AddData const& add_me, bool show_options)
 {
     if (show_options)
     {
-        auto* o = new OptionsDialog{ session_, prefs_, std::move(add_me), this };
+        auto* o = new OptionsDialog{ session_, prefs_, add_me, this };
         o->show();
         QApplication::alert(o);
     }
     else
     {
-        session_.addTorrent(std::move(add_me));
+        session_.addTorrent(add_me);
         QApplication::alert(this);
     }
 }
@@ -1514,7 +1514,7 @@ void MainWindow::onNetworkResponse(QNetworkReply::NetworkError code, QString con
 
     network_error_ = have_error;
     error_message_ = message;
-    refreshSoon(REFRESH_TRAY_ICON);
+    refreshSoon(RefreshTrayIcon);
     updateNetworkLabel();
 
     // Refresh our model if we've just gotten a clean connection to the session.
@@ -1598,7 +1598,7 @@ bool MainWindow::event(QEvent* e)
         [[fallthrough]];
 
     case QEvent::ApplicationPaletteChange:
-        refreshSoon(REFRESH_ICONS);
+        refreshSoon(RefreshIcon);
         break;
 
     default:

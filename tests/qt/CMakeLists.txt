@@ -14,6 +14,13 @@ function(add_trqt_test source)
     set_property(TARGET ${target} PROPERTY AUTOMOC ON)
     set_property(TARGET ${target} PROPERTY AUTORCC ON)
     add_test(NAME QT.${test_name} COMMAND ${target})
+
+    if(UNIX AND NOT APPLE)
+        set_tests_properties(
+            QT.${test_name}
+            PROPERTIES
+                ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+    endif()
 endfunction()
 
 add_trqt_test(prefs-test.cc)

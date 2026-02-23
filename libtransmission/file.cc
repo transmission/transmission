@@ -10,6 +10,10 @@
 #include <string_view>
 #include <vector>
 
+#ifndef _WIN32
+#include <sys/stat.h>
+#endif
+
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 
@@ -157,8 +161,12 @@ bool tr_sys_dir_create(std::string_view path, int flags, [[maybe_unused]] int pe
     auto const parents = (flags & TR_SYS_DIR_CREATE_PARENTS) != 0;
 
 #ifndef _WIN32
+    auto const umask = ::umask(0);
+    ::umask(umask);
+    auto const final_perms = static_cast<std::filesystem::perms>(permissions & ~umask);
+
     auto missing = std::vector<std::filesystem::path>{};
-    if (parents && permissions != 0)
+    if (parents && final_perms != std::filesystem::perms::none)
     {
         auto current = std::filesystem::path{};
         for (auto const& part : filesystem_path)
@@ -210,16 +218,12 @@ bool tr_sys_dir_create(std::string_view path, int flags, [[maybe_unused]] int pe
     }
 
 #ifndef _WIN32
-    if (permissions != 0)
+    if (final_perms != std::filesystem::perms::none)
     {
         auto const apply_permissions = [&](std::filesystem::path const& target)
         {
             auto perm_ec = std::error_code{};
-            std::filesystem::permissions(
-                target,
-                static_cast<std::filesystem::perms>(permissions),
-                std::filesystem::perm_options::replace,
-                perm_ec);
+            std::filesystem::permissions(target, final_perms, std::filesystem::perm_options::replace, perm_ec);
             if (perm_ec)
             {
                 maybe_set_error(error, perm_ec);

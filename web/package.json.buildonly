@@ -8,7 +8,7 @@
     "build": "node esbuild.mjs"
   },
   "devDependencies": {
-    "esbuild": "^0.25.11",
+    "esbuild": "^0.27.3",
     "esbuild-sass-plugin": "^3.3.1"
   },
   "dependencies": {

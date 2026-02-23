@@ -460,10 +460,8 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
 {
     // must walk in reverse to avoid invalidating row numbers
     auto const& spans = getSpans(getIds(torrents.begin(), torrents.end()));
-    for (auto it = spans.rbegin(), end = spans.rend(); it != end; ++it)
+    for (auto const& [first, last] : std::views::reverse(spans))
     {
-        auto const& [first, last] = *it;
-
         beginRemoveRows(QModelIndex{}, first, last);
         torrents_.erase(torrents_.begin() + first, torrents_.begin() + last + 1);
         endRemoveRows();

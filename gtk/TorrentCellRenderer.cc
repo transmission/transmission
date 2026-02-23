@@ -156,8 +156,8 @@ Gtk::Requisition TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget
     *** LAYOUT
     **/
 
-    return { xpad * 2 + icon_size.width + GUI_PAD + CompactBarWidth + GUI_PAD + stat_size.width,
-             ypad * 2 + std::max(name_size.height, property_bar_height_.get_value()) };
+    return { (xpad * 2) + icon_size.width + GUI_PAD + CompactBarWidth + GUI_PAD + stat_size.width,
+             (ypad * 2) + std::max(name_size.height, property_bar_height_.get_value()) };
 }
 
 Gtk::Requisition TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget) const
@@ -198,9 +198,9 @@ Gtk::Requisition TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget) c
     *** LAYOUT
     **/
 
-    return { xpad * 2 + icon_size.width + GUI_PAD + std::max(prog_size.width, stat_size.width),
-             ypad * 2 + name_size.height + prog_size.height + GUI_PAD_SMALL + property_bar_height_.get_value() + GUI_PAD_SMALL +
-                 stat_size.height };
+    return { (xpad * 2) + icon_size.width + GUI_PAD + std::max(prog_size.width, stat_size.width),
+             (ypad * 2) + name_size.height + prog_size.height + GUI_PAD_SMALL + property_bar_height_.get_value() +
+                 GUI_PAD_SMALL + stat_size.height };
 }
 
 void TorrentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget, int& minimum_width, int& natural_width) const
@@ -369,8 +369,8 @@ void TorrentCellRenderer::Impl::render_compact(
     auto fill_area = background_area;
     fill_area.set_x(fill_area.get_x() + xpad);
     fill_area.set_y(fill_area.get_y() + ypad);
-    fill_area.set_width(fill_area.get_width() - xpad * 2);
-    fill_area.set_height(fill_area.get_height() - ypad * 2);
+    fill_area.set_width(fill_area.get_width() - (xpad * 2));
+    fill_area.set_height(fill_area.get_height() - (ypad * 2));
 
     auto icon_area = fill_area;
     icon_renderer_->property_gicon() = icon;
@@ -390,7 +390,7 @@ void TorrentCellRenderer::Impl::render_compact(
 
     auto name_area = fill_area;
     name_area.set_width(
-        fill_area.get_width() - icon_area.get_width() - stat_area.get_width() - prog_area.get_width() - GUI_PAD * 3);
+        fill_area.get_width() - icon_area.get_width() - stat_area.get_width() - prog_area.get_width() - (GUI_PAD * 3));
 
     if ((renderer_.get_state(widget, flags) & TR_GTK_STATE_FLAGS(DIR_RTL)) == Gtk::StateFlags{})
     {
@@ -493,11 +493,11 @@ void TorrentCellRenderer::Impl::render_full(
     auto fill_area = background_area;
     fill_area.set_x(fill_area.get_x() + xpad);
     fill_area.set_y(fill_area.get_y() + ypad);
-    fill_area.set_width(fill_area.get_width() - xpad * 2);
-    fill_area.set_height(fill_area.get_height() - ypad * 2);
+    fill_area.set_width(fill_area.get_width() - (xpad * 2));
+    fill_area.set_height(fill_area.get_height() - (ypad * 2));
 
     /* icon */
-    icon_area.set_y(fill_area.get_y() + (fill_area.get_height() - icon_area.get_height()) / 2);
+    icon_area.set_y(fill_area.get_y() + ((fill_area.get_height() - icon_area.get_height()) / 2));
 
     /* name */
     name_area.set_y(fill_area.get_y());

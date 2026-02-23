@@ -19,6 +19,7 @@ class SessionDialog : public BaseDialog
 
 public:
     SessionDialog(Session& session, Prefs& prefs, QWidget* parent = nullptr);
+    ~SessionDialog() override = default;
     SessionDialog(SessionDialog&&) = delete;
     SessionDialog(SessionDialog const&) = delete;
     SessionDialog& operator=(SessionDialog&&) = delete;

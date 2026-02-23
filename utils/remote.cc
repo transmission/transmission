@@ -25,6 +25,7 @@
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 
 #include <libtransmission/transmission.h>
 
@@ -1855,9 +1856,11 @@ void print_session(tr_variant::Map const& result)
         fmt::print("  Port forwarding enabled: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = result.value_if<bool>(TR_KEY_utp_enabled))
+    if (auto const* const l = result.find_if<tr_variant::Vector>(TR_KEY_preferred_transports); l != nullptr &&
+        std::ranges::all_of(*l, [](tr_variant const& var) { return var.holds_alternative<std::string_view>(); }))
     {
-        fmt::print("  µTP enabled: {:s}\n", *b ? "Yes" : "No");
+        auto const view = std::views::transform(*l, [](tr_variant const& var) { return *var.value_if<std::string_view>(); });
+        fmt::print("  Transport protocol preference: {}\n", fmt::join(view, ", "));
     }
 
     if (auto b = result.value_if<bool>(TR_KEY_dht_enabled))
