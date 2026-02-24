@@ -1,3 +1,4 @@
+
 // This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
@@ -349,10 +350,6 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
 
             tm_.source_ = tr_strv_to_utf8_string(value);
         }
-        else if (pathIs(AnnounceKey))
-        {
-            tm_.announce_list().add(value, tier_);
-        }
         else if (pathIs(EncodingKey))
         {
             encoding_ = tr_strv_strip(value);
@@ -389,9 +386,12 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             // currently unused. TODO support for bittorrent v2
             // TODO https://github.com/transmission/transmission/issues/458
         }
-        else if (pathStartsWith(AnnounceListKey))
+        else if (pathIs(AnnounceKey) || pathStartsWith(AnnounceListKey))
         {
-            tm_.announce_list().add(value, tier_);
+            if (!tm_.announce_list().add(value, tier_))
+            {
+                tr_logAddWarn(fmt::format("invalid announce url '{}'", value));
+            }
         }
         else if (curdepth == 2 && (pathStartsWith(HttpSeedsKey) || pathStartsWith(UrlListKey)))
         {

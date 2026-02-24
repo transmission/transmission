@@ -24,6 +24,7 @@
 
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/punycode.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
@@ -177,6 +178,292 @@ char const* tr_webGetResponseStr(long code)
 
 namespace
 {
+
+// --- Character classification helpers ---
+[[nodiscard]] constexpr bool is_digit(char ch) noexcept
+{
+    return ch >= '0' && ch <= '9';
+}
+
+[[nodiscard]] constexpr bool is_hex_digit(char ch) noexcept
+{
+    return is_digit(ch) || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
+}
+
+[[nodiscard]] constexpr bool is_alpha(char ch) noexcept
+{
+    return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+}
+
+[[nodiscard]] constexpr bool is_ldh(char ch) noexcept
+{
+    return is_alpha(ch) || is_digit(ch) || ch == '-';
+}
+
+// --- IPv4 validation ---
+// Expects "D.D.D.D" where D is 0-255 with no leading zeros.
+[[nodiscard]] constexpr bool is_valid_ipv4(std::string_view str) noexcept
+{
+    if (str.empty()) [[unlikely]]
+    {
+        return false;
+    }
+
+    int octets = 0;
+
+    while (!str.empty())
+    {
+        if (octets == 4)
+        {
+            return false; // too many octets
+        }
+
+        // find the end of this octet
+        auto const dot_pos = str.find('.');
+        auto const octet_str = str.substr(0, dot_pos);
+
+        if (octet_str.empty() || octet_str.size() > 3)
+        {
+            return false;
+        }
+
+        // no leading zeros (except "0" itself)
+        if (octet_str.size() > 1 && octet_str.starts_with('0'))
+        {
+            return false;
+        }
+
+        // all digits?
+        if (!std::ranges::all_of(octet_str, is_digit))
+        {
+            return false;
+        }
+
+        // parse and range-check
+        int value = 0;
+        for (char const ch : octet_str)
+        {
+            value = value * 10 + (ch - '0');
+        }
+        if (value > 255)
+        {
+            return false;
+        }
+
+        ++octets;
+
+        if (dot_pos == std::string_view::npos)
+        {
+            str = {};
+        }
+        else
+        {
+            str = str.substr(dot_pos + 1);
+            // trailing dot with nothing after it is invalid for IPv4
+            if (str.empty())
+            {
+                return false;
+            }
+        }
+    }
+
+    return octets == 4;
+}
+
+// --- IPv6 validation ---
+// Expects up to 8 groups of 1-4 hex digits separated by ':'.
+// Exactly one "::" abbreviation is allowed.
+// Does NOT expect surrounding brackets (caller strips them).
+[[nodiscard]] constexpr bool is_valid_ipv6(std::string_view str) noexcept
+{
+    if (str.empty()) [[unlikely]]
+    {
+        return false;
+    }
+
+    int groups = 0;
+    bool seen_double_colon = false;
+
+    // handle leading "::"
+    if (str.starts_with("::"))
+    {
+        seen_double_colon = true;
+        str.remove_prefix(2);
+        if (str.empty())
+        {
+            return true; // "::" alone is valid (all zeros)
+        }
+    }
+    else if (str.starts_with(':'))
+    {
+        return false; // single leading colon is invalid
+    }
+
+    while (!str.empty())
+    {
+        // find the end of this group
+        auto const colon_pos = str.find(':');
+        auto const group_str = str.substr(0, colon_pos);
+
+        // check for "::" at this position
+        if (group_str.empty())
+        {
+            if (seen_double_colon)
+            {
+                return false; // only one "::" allowed
+            }
+            seen_double_colon = true;
+            str.remove_prefix(1); // skip the second ':'
+            if (str.empty())
+            {
+                break; // trailing "::" is valid
+            }
+            continue;
+        }
+
+        // validate group: 1-4 hex digits
+        if (group_str.size() > 4)
+        {
+            return false;
+        }
+        if (!std::ranges::all_of(group_str, is_hex_digit))
+        {
+            return false;
+        }
+
+        ++groups;
+
+        if (colon_pos == std::string_view::npos)
+        {
+            str = {};
+        }
+        else
+        {
+            str = str.substr(colon_pos + 1);
+            // trailing single colon with nothing after it is invalid
+            if (str.empty())
+            {
+                return false;
+            }
+        }
+    }
+
+    if (seen_double_colon)
+    {
+        // "::" expands to fill the gap; total groups must be < 8
+        return groups < 8;
+    }
+
+    return groups == 8;
+}
+
+// --- Domain name validation (RFC 1035 / RFC 1123) ---
+// - total length <= 253
+// - each label <= 63 characters
+// - labels contain only [a-zA-Z0-9-]
+// - labels do not start or end with hyphen
+// - no empty labels (no leading, trailing, or consecutive dots)
+// - at least one label must contain a letter
+[[nodiscard]] constexpr bool is_valid_domain_name(std::string_view str) noexcept
+{
+    if (str.empty() || str.size() > 253) [[unlikely]]
+    {
+        return false;
+    }
+
+    // optional trailing dot (FQDN notation) — strip it for validation
+    if (str.ends_with('.'))
+    {
+        str.remove_suffix(1);
+        if (str.empty())
+        {
+            return false;
+        }
+    }
+
+    bool has_non_digit_label = false;
+
+    while (!str.empty())
+    {
+        auto const dot_pos = str.find('.');
+        auto const label = str.substr(0, dot_pos);
+
+        if (label.empty() || label.size() > 63)
+        {
+            return false;
+        }
+
+        // must not start or end with hyphen
+        if (label.starts_with('-') || label.ends_with('-'))
+        {
+            return false;
+        }
+
+        // all characters must be LDH
+        if (!std::ranges::all_of(label, is_ldh))
+        {
+            return false;
+        }
+
+        if (!has_non_digit_label && std::ranges::any_of(label, is_alpha))
+        {
+            has_non_digit_label = true;
+        }
+
+        if (dot_pos == std::string_view::npos)
+        {
+            str = {};
+        }
+        else
+        {
+            str = str.substr(dot_pos + 1);
+        }
+    }
+
+    // at least one label must contain a letter, otherwise it looks
+    // like an IPv4 address and should be validated as one.
+    return has_non_digit_label;
+}
+
+// Returns true if 'host' is a syntactically valid:
+//   - Domain name per RFC 1035/1123 (LDH rule)
+//   - IPv4 dotted-decimal address
+//   - IPv6 address (with or without square brackets)
+[[nodiscard]] constexpr bool hostIsValid(std::string_view host) noexcept
+{
+    if (host.empty()) [[unlikely]]
+    {
+        return false;
+    }
+
+    // bracketed IPv6: "[::1]", "[2001:db8::1]"
+    if (host.starts_with('[')) [[unlikely]]
+    {
+        if (host.size() < 4 || !host.ends_with(']'))
+        {
+            return false;
+        }
+        return is_valid_ipv6(host.substr(1, host.size() - 2));
+    }
+
+    // try IPv4 first if it looks numeric
+    if (is_digit(host.front())) [[likely]]
+    {
+        if (is_valid_ipv4(host))
+        {
+            return true;
+        }
+        // fall through: could be a domain starting with a digit like "3com.com"
+    }
+
+    // try bare IPv6 (no brackets) — heuristic: contains ':'
+    if (host.find(':') != std::string_view::npos)
+    {
+        return is_valid_ipv6(host);
+    }
+
+    return is_valid_domain_name(host);
+}
 
 constexpr std::optional<uint16_t> getPortForScheme(std::string_view scheme)
 {
@@ -365,6 +652,11 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
             remain.remove_prefix(std::size(parsed.host));
         }
 
+        if (!hostIsValid(parsed.host))
+        {
+            return std::nullopt;
+        }
+
         if (std::empty(remain))
         {
             auto const port = getPortForScheme(parsed.scheme);
@@ -490,4 +782,89 @@ std::string tr_urlPercentDecode(std::string_view in)
     }
 
     return out;
+}
+
+[[nodiscard]] std::string tr_normalize_url(std::string_view url)
+{
+    auto const scheme_end = url.find("://"sv);
+
+    if (scheme_end == std::string_view::npos)
+    {
+        // no authority (e.g. magnet:) — percent-encode after scheme:
+        auto const colon = url.find(':');
+        if (colon == std::string_view::npos)
+        {
+            return std::string{ url };
+        }
+        auto result = tr_urlbuf{};
+        result += url.substr(0, colon + 1);
+        tr_urlPercentEncode(std::back_inserter(result), url.substr(colon + 1), false);
+        return std::string{ result.sv() };
+    }
+
+    auto const authority_start = scheme_end + 3;
+    auto const prefix = url.substr(0, authority_start); // "http://"
+    auto const rest = url.substr(authority_start);
+
+    // find end of host
+    size_t host_end;
+    if (!rest.empty() && rest[0] == '[')
+    {
+        // bracketed IPv6
+        auto const bracket = rest.find(']');
+        host_end = (bracket == std::string_view::npos) ? rest.size() : bracket + 1;
+    }
+    else
+    {
+        auto const path_start = rest.find_first_of("/?#"sv);
+        auto const authority = rest.substr(0, path_start);
+
+        if (std::ranges::count(authority, ':') > 1)
+        {
+            // bare IPv6, no port — entire authority is the host
+            host_end = (path_start == std::string_view::npos) ? rest.size() : path_start;
+        }
+        else
+        {
+            host_end = rest.find_first_of(":/?#"sv);
+            if (host_end == std::string_view::npos)
+            {
+                host_end = rest.size();
+            }
+        }
+    }
+
+    auto const host = rest.substr(0, host_end);
+    auto const after_host = rest.substr(host_end);
+
+    // skip past port
+    size_t encode_start = 0;
+    if (!after_host.empty() && after_host[0] == ':')
+    {
+        encode_start = 1;
+        while (encode_start < after_host.size() && after_host[encode_start] >= '0' && after_host[encode_start] <= '9')
+        {
+            ++encode_start;
+        }
+    }
+    auto const port_str = after_host.substr(0, encode_start);
+    auto const to_encode = after_host.substr(encode_start);
+
+    // build result
+    auto result = tr_urlbuf{};
+    result += prefix;
+
+    if (punycode::needs_encoding(host))
+    {
+        result += punycode::to_ascii(host).value_or(std::string{ host });
+    }
+    else
+    {
+        result += host;
+    }
+
+    result += port_str;
+    tr_urlPercentEncode(std::back_inserter(result), to_encode, false);
+
+    return std::string{ result.sv() };
 }

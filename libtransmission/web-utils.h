@@ -93,3 +93,5 @@ constexpr void tr_urlPercentEncode(BackInsertIter out, tr_sha1_digest_t const& d
 [[nodiscard]] char const* tr_webGetResponseStr(long response_code);
 
 [[nodiscard]] std::string tr_urlPercentDecode(std::string_view /*url*/);
+
+[[nodiscard]] std::string tr_normalize_url(std::string_view /*url*/);

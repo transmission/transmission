@@ -27,10 +27,14 @@ TEST_F(WebUtilsTest, urlParse)
 {
     auto url = "http://1"sv;
     auto parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
+
+    url = "http://a"sv;
+    parsed = tr_urlParse(url);
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
-    EXPECT_EQ("1"sv, parsed->host);
-    EXPECT_EQ("1"sv, parsed->sitename);
+    EXPECT_EQ("a"sv, parsed->host);
+    EXPECT_EQ("a"sv, parsed->sitename);
     EXPECT_EQ(""sv, parsed->path);
     EXPECT_EQ(""sv, parsed->query);
     EXPECT_EQ(""sv, parsed->fragment);
@@ -231,6 +235,7 @@ TEST_F(WebUtilsTest, urlIsValid)
 {
     EXPECT_FALSE(tr_urlIsValid("hello world"sv));
     EXPECT_FALSE(tr_urlIsValid("http://www.💩.com/announce/"sv));
+    EXPECT_TRUE(tr_urlIsValid(tr_normalize_url("http://www.💩.com/announce/"sv)));
     EXPECT_TRUE(tr_urlIsValid("http://www.example.com/announce/"sv));
     EXPECT_FALSE(tr_urlIsValid(""sv));
     EXPECT_FALSE(tr_urlIsValid("com"sv));
@@ -241,6 +246,16 @@ TEST_F(WebUtilsTest, urlIsValid)
 
     EXPECT_TRUE(tr_urlIsValid("sftp://www.example.com"sv));
     EXPECT_FALSE(tr_urlIsValidTracker("sftp://www.example.com"sv)); // unsupported tracker scheme
+
+    EXPECT_FALSE(tr_urlIsValid("x:/www.example.com"sv));
+    EXPECT_FALSE(tr_urlIsValid("x://www.example.com"sv));
+    EXPECT_TRUE(tr_urlIsValid("http://www.example.com?announce"sv)); // less common but legal
+    EXPECT_FALSE(tr_urlIsValid("http://www.example.com/announce/\u00E8"sv));
+    EXPECT_TRUE(tr_urlIsValid(tr_normalize_url("http://www.example.com/announce/\u00E8"sv)));
+    EXPECT_FALSE(tr_urlIsValid("http://www.example.com/announce/\x80"sv));
+    EXPECT_TRUE(tr_urlIsValid(tr_normalize_url("http://www.example.com/announce/\x80"sv)));
+    EXPECT_TRUE(tr_urlIsValid("http://[dead:beef::0]:12345/announce"sv));
+    EXPECT_FALSE(tr_urlIsValid("http://dead:beef::0:12345/announce"sv)); // without [], cannot specify port
 }
 
 TEST_F(WebUtilsTest, urlPercentDecode)
