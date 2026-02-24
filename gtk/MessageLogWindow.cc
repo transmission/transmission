@@ -42,6 +42,8 @@
 #include <memory>
 #include <utility>
 
+#define LOGGING_LEVEL_CONTEXT "Logging level"
+
 class MessageLogColumnsModel : public Gtk::TreeModelColumnRecord
 {
 public:
@@ -100,12 +102,12 @@ private:
     bool isPaused_ = false;
     sigc::connection refresh_tag_;
 
-    static auto inline const level_names_ = std::array<std::pair<tr_log_level, char const*>, 5U>{ {
-        { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
-        { TR_LOG_ERROR, C_("Logging level", "Error") },
-        { TR_LOG_WARN, C_("Logging level", "Warning") },
-        { TR_LOG_INFO, C_("Logging level", "Information") },
-        { TR_LOG_DEBUG, C_("Logging level", "Debug") },
+    static auto constexpr level_names_ = std::array<std::pair<tr_log_level, char const*>, 5U>{ {
+        { TR_LOG_CRITICAL, NC_(LOGGING_LEVEL_CONTEXT, "Critical") },
+        { TR_LOG_ERROR, NC_(LOGGING_LEVEL_CONTEXT, "Error") },
+        { TR_LOG_WARN, NC_(LOGGING_LEVEL_CONTEXT, "Warning") },
+        { TR_LOG_INFO, NC_(LOGGING_LEVEL_CONTEXT, "Information") },
+        { TR_LOG_DEBUG, NC_(LOGGING_LEVEL_CONTEXT, "Debug") },
     } };
 };
 
@@ -178,7 +180,7 @@ void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo)
     items.reserve(std::size(level_names_));
     for (auto const& [level, name] : level_names_)
     {
-        items.emplace_back(name, level);
+        items.emplace_back(g_dpgettext2(nullptr, LOGGING_LEVEL_CONTEXT, name), level);
         has_pref_level |= level == pref_level;
     }
 
@@ -231,7 +233,9 @@ void MessageLogWindow::Impl::doSave(std::string const& filename)
                 std::begin(level_names_),
                 std::end(level_names_),
                 [key = node->level](auto const& item) { return item.first == key; });
-            auto const* const level_str = iter != std::end(level_names_) ? iter->second : "???";
+            auto const level_str = iter != std::end(level_names_) ?
+                Glib::ustring(g_dpgettext2(nullptr, LOGGING_LEVEL_CONTEXT, iter->second)) :
+                Glib::ustring("???");
 
             fmt::print(stream, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
         }
