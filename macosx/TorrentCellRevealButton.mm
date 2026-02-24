@@ -9,7 +9,7 @@
 @interface TorrentCellRevealButton ()
 @property(nonatomic) NSTrackingArea* fTrackingArea;
 @property(nonatomic, copy) NSString* revealImageString;
-@property(nonatomic) IBOutlet TorrentCell* torrentCell;
+@property(nonatomic, weak) IBOutlet TorrentCell* torrentCell;
 @property(nonatomic, readonly) TorrentTableView* torrentTableView;
 @end
 
