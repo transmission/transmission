@@ -104,7 +104,7 @@ public:
     [[nodiscard]] auto get_matching(std::function<bool(tr_torrent const*)>&& pred_in) const
     {
         return std::views::filter(
-            by_id_,
+            std::as_const(by_id_),
             [pred = std::move(pred_in)](tr_torrent const* const tor) { return tor != nullptr && pred(tor); });
     }
 
