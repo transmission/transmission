@@ -25,6 +25,7 @@
                 <outlet property="fRatioLimitGlobalLabel" destination="109" id="112"/>
                 <outlet property="fRatioPopUp" destination="9" id="74"/>
                 <outlet property="fRemoveSeedingCompleteCheck" destination="113" id="118"/>
+                <outlet property="fSequentialDownloadCheck" destination="f9T-h9-E4n" id="K7I-hV-AuW"/>
                 <outlet property="fSeedingView" destination="wfz-WZ-zVG" id="zLN-y6-kI2"/>
                 <outlet property="fUploadLimitCheck" destination="8" id="67"/>
                 <outlet property="fUploadLimitField" destination="19" id="71"/>
@@ -35,10 +36,10 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView clipsToBounds="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2" userLabel="Options">
-            <rect key="frame" x="0.0" y="0.0" width="375" height="298"/>
+            <rect key="frame" x="0.0" y="0.0" width="375" height="320"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="250" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KYq-Jm-g2s">
-                    <rect key="frame" x="12" y="12" width="318" height="274"/>
+                    <rect key="frame" x="12" y="12" width="318" height="296"/>
                     <subviews>
                         <customView horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="2Ow-Hq-XLB">
                             <rect key="frame" x="0.0" y="142" width="234" height="132"/>
@@ -211,7 +212,7 @@
                             </constraints>
                         </customView>
                         <customView horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="wfz-WZ-zVG">
-                            <rect key="frame" x="0.0" y="0.0" width="318" height="134"/>
+                            <rect key="frame" x="0.0" y="0.0" width="318" height="156"/>
                             <subviews>
                                 <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="21">
                                     <rect key="frame" x="-2" y="120" width="87" height="14"/>
@@ -246,6 +247,16 @@
                                     </buttonCell>
                                     <connections>
                                         <action selector="setRemoveWhenSeedingCompletes:" target="-2" id="119"/>
+                                    </connections>
+                                </button>
+                                <button horizontalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="f9T-h9-E4n">
+                                    <rect key="frame" x="-1" y="31" width="224" height="16"/>
+                                    <buttonCell key="cell" type="check" title="Sequential download (first and last pieces first)" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" allowsMixedState="YES" inset="2" id="c4n-W3-Vye">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="setSequentialDownload:" target="-2" id="7Fx-uK-mP4"/>
                                     </connections>
                                 </button>
                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="13">
@@ -399,7 +410,7 @@
                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="97" secondAttribute="trailing" constant="12" id="7eh-EI-gCP"/>
                                 <constraint firstItem="21" firstAttribute="leading" secondItem="wfz-WZ-zVG" secondAttribute="leading" id="7tt-pl-FzN"/>
                                 <constraint firstItem="80" firstAttribute="top" relation="greaterThanOrEqual" secondItem="9" secondAttribute="bottom" constant="3" id="8hV-tH-PNW"/>
-                                <constraint firstAttribute="height" constant="134" id="9TO-VB-aNs"/>
+                                <constraint firstAttribute="height" constant="156" id="9TO-VB-aNs"/>
                                 <constraint firstItem="10" firstAttribute="baseline" secondItem="9" secondAttribute="baseline" id="9kM-ee-Q2F"/>
                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="21" secondAttribute="trailing" constant="12" id="CJv-g8-noI"/>
                                 <constraint firstItem="9" firstAttribute="baseline" secondItem="15" secondAttribute="baseline" id="CPh-qS-N0b"/>
@@ -410,7 +421,10 @@
                                 <constraint firstItem="109" firstAttribute="baseline" secondItem="9" secondAttribute="baseline" id="EIU-JL-LAH"/>
                                 <constraint firstItem="80" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="79" secondAttribute="trailing" constant="8" symbolic="YES" id="EeJ-Ue-0Y2"/>
                                 <constraint firstItem="80" firstAttribute="leading" secondItem="9" secondAttribute="leading" id="Kte-5k-GZU"/>
-                                <constraint firstItem="14" firstAttribute="top" secondItem="113" secondAttribute="bottom" constant="20" id="LDQ-Yk-YmU"/>
+                                <constraint firstItem="f9T-h9-E4n" firstAttribute="leading" secondItem="21" secondAttribute="leading" id="3Ek-Jd-BCW"/>
+                                <constraint firstItem="f9T-h9-E4n" firstAttribute="top" secondItem="113" secondAttribute="bottom" constant="6" symbolic="YES" id="iaC-UN-jwg"/>
+                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="f9T-h9-E4n" secondAttribute="trailing" constant="12" id="j5r-hN-VDo"/>
+                                <constraint firstItem="14" firstAttribute="top" secondItem="f9T-h9-E4n" secondAttribute="bottom" constant="6" symbolic="YES" id="LDQ-Yk-YmU"/>
                                 <constraint firstItem="107" firstAttribute="baseline" secondItem="80" secondAttribute="baseline" id="NXV-bz-9mf"/>
                                 <constraint firstItem="107" firstAttribute="leading" secondItem="80" secondAttribute="trailing" constant="8" symbolic="YES" id="O6x-mk-aYL"/>
                                 <constraint firstItem="14" firstAttribute="leading" secondItem="21" secondAttribute="leading" id="ObU-aT-0wx"/>
