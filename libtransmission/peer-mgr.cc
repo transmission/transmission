@@ -283,7 +283,7 @@ void tr_peer_info::update_canonical_priority()
     // smaller IP addresses go first.
     auto const address_size = tr_address::CompactAddrBytes[type];
     auto addresses = std::array{ client_external_address_, listen_address() };
-    std::sort(std::begin(addresses), std::end(addresses));
+    std::ranges::sort(addresses);
 
     auto buf = std::array<std::byte, tr_address::CompactAddrMaxBytes * 2U>{};
     auto const first = std::begin(buf);
@@ -1582,7 +1582,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     auto pex = std::vector<tr_pex>{};
     pex.reserve(n);
 
-    std::partial_sort(std::begin(infos), std::begin(infos) + n, std::end(infos), CompareAtomsByUsefulness);
+    std::ranges::partial_sort(infos, infos.begin() + n, CompareAtomsByUsefulness);
     infos.resize(n);
 
     for (auto const* const info : infos)
@@ -1595,7 +1595,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
         pex.emplace_back(socket_address, info->pex_flags());
     }
 
-    std::sort(std::begin(pex), std::end(pex));
+    std::ranges::sort(pex);
     return pex;
 }
 
@@ -1936,25 +1936,26 @@ struct ChokeData
     bool was_choked_;
     bool is_choked_;
 
-    [[nodiscard]] constexpr auto compare(ChokeData const& that) const noexcept // <=>
+    [[nodiscard]] constexpr auto operator<=>(ChokeData const& that) const noexcept
     {
         // prefer higher overall speeds
-        if (auto const val = tr_compare_3way(rate_, that.rate_); val != 0)
+        if (auto const val = that.rate_ <=> rate_; val != 0)
         {
-            return -val;
+            return val;
         }
 
-        if (was_choked_ != that.was_choked_) // prefer unchoked
+        // prefer unchoked
+        if (auto const val = static_cast<int>(was_choked_) <=> static_cast<int>(that.was_choked_); val != 0)
         {
-            return was_choked_ ? 1 : -1;
+            return val;
         }
 
-        return tr_compare_3way(salt_, that.salt_);
+        return salt_ <=> that.salt_;
     }
 
-    [[nodiscard]] constexpr auto operator<(ChokeData const& that) const noexcept
+    [[nodiscard]] constexpr auto operator==(ChokeData const& that) const noexcept
     {
-        return compare(that) < 0;
+        return (*this <=> that) == 0;
     }
 };
 
@@ -2030,7 +2031,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
         }
     }
 
-    std::sort(std::begin(choked), std::end(choked));
+    std::ranges::sort(choked);
 
     /**
      * Reciprocation and number of uploads capping is managed by unchoking
@@ -2380,14 +2381,11 @@ void tr_peerMgr::peer_info_pulse()
 
         auto infos = std::vector<std::shared_ptr<tr_peer_info>>{};
         infos.reserve(pool_size);
-        std::ranges::transform(pool, std::back_inserter(infos), [](auto const& keyval) { return keyval.second; });
+        std::ranges::copy(std::views::values(pool), std::back_inserter(infos));
         pool.clear();
 
         // Keep all peer info objects before test_begin unconditionally
-        auto const test_begin = std::partition(
-            std::begin(infos),
-            std::end(infos),
-            [](auto const& info) { return info->is_in_use(); });
+        auto const test_begin = std::ranges::partition(infos, [](auto const& info) { return info->is_in_use(); }).begin();
 
         auto const iter_max = std::begin(infos) + max;
         if (iter_max > test_begin)

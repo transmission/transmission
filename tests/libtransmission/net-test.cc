@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <compare>
 #include <cstddef> // std::byte, size_t
 #include <string_view>
 #include <tuple>
@@ -921,14 +922,14 @@ TEST_F(NetTest, isIPv6Multicast)
 TEST_F(NetTest, ipCompare)
 {
     static constexpr auto IpPairs = std::array{
-        std::tuple{ "223.18.245.229"sv, "8.8.8.8"sv, 1 },
-        std::tuple{ "0.0.0.0"sv, "255.255.255.255"sv, -1 },
-        std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, 0 },
-        std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, -1 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:0:0eab:dead::a0:abcd:4e]"sv, 1 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, 0 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:1890:1112:1::20]"sv, 0 },
+        std::tuple{ "223.18.245.229"sv, "8.8.8.8"sv, std::strong_ordering::greater },
+        std::tuple{ "0.0.0.0"sv, "255.255.255.255"sv, std::strong_ordering::less },
+        std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, std::strong_ordering::equal },
+        std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, std::strong_ordering::less },
+        std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, std::strong_ordering::greater },
+        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:0:0eab:dead::a0:abcd:4e]"sv, std::strong_ordering::greater },
+        std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, std::strong_ordering::equal },
+        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:1890:1112:1::20]"sv, std::strong_ordering::equal },
     };
 
     for (auto const& [sv1, sv2, res] : IpPairs)
@@ -936,12 +937,13 @@ TEST_F(NetTest, ipCompare)
         auto const ip1 = *tr_address::from_string(sv1);
         auto const ip2 = *tr_address::from_string(sv2);
 
-        EXPECT_EQ(ip1.compare(ip2) < 0, res < 0) << sv1 << ' ' << sv2;
-        EXPECT_EQ(ip1.compare(ip2) > 0, res > 0) << sv1 << ' ' << sv2;
-        EXPECT_EQ(ip1.compare(ip2) == 0, res == 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 <=> ip2, res) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 < ip2, res < 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 <= ip2, res <= 0) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 > ip2, res > 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 >= ip2, res >= 0) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 == ip2, res == 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 != ip2, res != 0) << sv1 << ' ' << sv2;
     }
 }
 

@@ -10,6 +10,7 @@
 
 #include <algorithm> // for std::copy_n
 #include <array>
+#include <compare>
 #include <cstddef> // size_t
 #include <cstdint> // uint16_t, uint32_t, uint8_t
 #include <optional>
@@ -102,20 +103,14 @@ public:
 
     [[nodiscard]] static std::pair<tr_port, std::byte const*> from_compact(std::byte const* compact) noexcept;
 
-    [[nodiscard]] constexpr auto operator<(tr_port const& that) const noexcept
+    [[nodiscard]] constexpr auto operator<=>(tr_port const& that) const noexcept
     {
-        return hport_ < that.hport_;
+        return hport_ <=> that.hport_;
     }
 
     [[nodiscard]] constexpr auto operator==(tr_port const& that) const noexcept
     {
-        return hport_ == that.hport_;
-    }
-
-    // Can be removed once we use C++20
-    [[nodiscard]] constexpr auto operator!=(tr_port const& that) const noexcept
-    {
-        return hport_ != that.hport_;
+        return (*this <=> that) == 0;
     }
 
     [[nodiscard]] constexpr auto empty() const noexcept
@@ -209,31 +204,11 @@ struct tr_address
 
     // --- comparisons
 
-    [[nodiscard]] int compare(tr_address const& that) const noexcept;
+    [[nodiscard]] std::strong_ordering operator<=>(tr_address const& that) const noexcept;
 
     [[nodiscard]] bool operator==(tr_address const& that) const noexcept
     {
-        return this->compare(that) == 0;
-    }
-
-    [[nodiscard]] bool operator!=(tr_address const& that) const noexcept
-    {
-        return !(*this == that);
-    }
-
-    [[nodiscard]] bool operator<(tr_address const& that) const noexcept
-    {
-        return this->compare(that) < 0;
-    }
-
-    [[nodiscard]] bool operator<=(tr_address const& that) const noexcept
-    {
-        return this->compare(that) <= 0;
-    }
-
-    [[nodiscard]] bool operator>(tr_address const& that) const noexcept
-    {
-        return this->compare(that) > 0;
+        return (*this <=> that) == 0;
     }
 
     // ---
@@ -478,16 +453,6 @@ struct tr_socket_address
 
     [[nodiscard]] bool is_valid_for_peers(tr_peer_from from) const noexcept;
 
-    [[nodiscard]] int compare(tr_socket_address const& that) const noexcept
-    {
-        if (auto const val = tr_compare_3way(address_, that.address_); val != 0)
-        {
-            return val;
-        }
-
-        return tr_compare_3way(port_, that.port_);
-    }
-
     // --- compact addr + port -- very common format used for peer exchange, dht, tracker announce responses
 
     [[nodiscard]] static std::pair<tr_socket_address, std::byte const*> from_compact_ipv4(std::byte const* compact) noexcept
@@ -553,14 +518,19 @@ struct tr_socket_address
 
     // --- Comparisons
 
-    [[nodiscard]] auto operator<(tr_socket_address const& that) const noexcept
+    [[nodiscard]] auto operator<=>(tr_socket_address const& that) const noexcept
     {
-        return compare(that) < 0;
+        if (auto const val = address_ <=> that.address_; val != 0)
+        {
+            return val;
+        }
+
+        return port_ <=> that.port_;
     }
 
     [[nodiscard]] auto operator==(tr_socket_address const& that) const noexcept
     {
-        return compare(that) == 0;
+        return (*this <=> that) == 0;
     }
 
     tr_address address_;
