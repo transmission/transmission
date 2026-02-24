@@ -649,6 +649,10 @@ private:
 
 bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error* error)
 {
+    // Reset the object to avoid accidentally failing checks
+    // because of the old data
+    *this = tr_torrent_metainfo{};
+
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = MetainfoHandler{ *this };
 
