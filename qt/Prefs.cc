@@ -362,8 +362,9 @@ Prefs::~Prefs()
     auto const file = QFile{ QDir{ config_dir_ }.absoluteFilePath(QStringLiteral("settings.json")) };
     auto const filename = file.fileName().toStdString();
     auto settings = tr_variant::make_map(PREFS_COUNT);
-    if (auto const file_settings = serde.parse_file(filename); file_settings)
+    if (auto file_settings = serde.parse_file(filename))
     {
+        api_compat::convert_incoming_data(*file_settings);
         settings.merge(*file_settings);
     }
 
