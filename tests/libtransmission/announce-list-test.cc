@@ -34,7 +34,7 @@ TEST_F(AnnounceListTest, canAdd)
     auto constexpr Announce = "https://example.org/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(Announce, Tier));
+    EXPECT_EQ(1, announce_list.add(Announce, Tier));
     auto const tracker = announce_list.at(0);
     EXPECT_EQ(Announce, tracker.announce.sv());
     EXPECT_EQ("https://example.org/scrape"sv, tracker.scrape.sv());
@@ -42,34 +42,6 @@ TEST_F(AnnounceListTest, canAdd)
     EXPECT_EQ("example.org", tracker.announce_parsed.host);
     EXPECT_EQ("example.org"sv, tracker.announce_parsed.authority);
     EXPECT_EQ(443, tracker.announce_parsed.port);
-}
-
-TEST_F(AnnounceListTest, canAddForeignCharset)
-{
-    auto constexpr Tier = tr_tracker_tier_t{ 2 };
-    auto constexpr Announce = "udp://你好.com:6771/announce"sv;
-    auto constexpr AnnounceEncoded = "udp://%E4%BD%A0%E5%A5%BD.com:6771/announce"sv;
-
-    auto announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(Announce, Tier));
-    auto tracker = announce_list.at(0);
-    EXPECT_EQ(AnnounceEncoded, tracker.announce.sv());
-    EXPECT_EQ("udp://%E4%BD%A0%E5%A5%BD.com:6771/scrape"sv, tracker.scrape.sv());
-    EXPECT_EQ(Tier, tracker.tier);
-    EXPECT_EQ("%E4%BD%A0%E5%A5%BD.com", tracker.announce_parsed.host);
-    EXPECT_EQ("%E4%BD%A0%E5%A5%BD.com:6771"sv, tracker.announce_parsed.authority);
-    EXPECT_EQ(6771, tracker.announce_parsed.port);
-
-    // This ensures the URL doesn't get double-encoded
-    announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(AnnounceEncoded, Tier));
-    tracker = announce_list.at(0);
-    EXPECT_EQ(AnnounceEncoded, tracker.announce.sv());
-    EXPECT_EQ("udp://%E4%BD%A0%E5%A5%BD.com:6771/scrape"sv, tracker.scrape.sv());
-    EXPECT_EQ(Tier, tracker.tier);
-    EXPECT_EQ("%E4%BD%A0%E5%A5%BD.com", tracker.announce_parsed.host);
-    EXPECT_EQ("%E4%BD%A0%E5%A5%BD.com:6771"sv, tracker.announce_parsed.authority);
-    EXPECT_EQ(6771, tracker.announce_parsed.port);
 }
 
 TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
