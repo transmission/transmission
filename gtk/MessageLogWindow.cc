@@ -46,7 +46,7 @@
 
 namespace
 {
-static auto LoggingLevelContext = "Logging level";
+auto constexpr LoggingLevelContext = "Logging level";
 
 class MessageLogColumnsModel : public Gtk::TreeModelColumnRecord
 {
