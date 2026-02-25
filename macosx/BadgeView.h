@@ -4,6 +4,12 @@
 
 #import <AppKit/AppKit.h>
 
+@interface BadgeView2 : NSView
+
+- (BOOL)setRatesWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate;
+
+@end
+
 @interface BadgeView : NSView
 
 - (BOOL)setRatesWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate;
