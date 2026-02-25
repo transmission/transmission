@@ -250,6 +250,14 @@
                                         <action selector="setRemoveWhenSeedingCompletes:" target="-2" id="119"/>
                                     </connections>
                                 </button>
+                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="QzM-Do-0rL">
+                                    <rect key="frame" x="-2" y="35" width="100" height="14"/>
+                                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Download Order" id="oGR-V5-H1e">
+                                        <font key="font" metaFont="smallSystemBold"/>
+                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
                                 <button horizontalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="f9T-h9-E4n">
                                     <rect key="frame" x="-1" y="31" width="224" height="16"/>
                                     <buttonCell key="cell" type="check" title="Sequential download" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" allowsMixedState="YES" inset="2" id="c4n-W3-Vye">
@@ -421,7 +429,7 @@
                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="97" secondAttribute="trailing" constant="12" id="7eh-EI-gCP"/>
                                 <constraint firstItem="21" firstAttribute="leading" secondItem="wfz-WZ-zVG" secondAttribute="leading" id="7tt-pl-FzN"/>
                                 <constraint firstItem="80" firstAttribute="top" relation="greaterThanOrEqual" secondItem="9" secondAttribute="bottom" constant="3" id="8hV-tH-PNW"/>
-                                <constraint firstAttribute="height" constant="178" id="9TO-VB-aNs"/>
+                                <constraint firstAttribute="height" constant="194" id="9TO-VB-aNs"/>
                                 <constraint firstItem="10" firstAttribute="baseline" secondItem="9" secondAttribute="baseline" id="9kM-ee-Q2F"/>
                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="21" secondAttribute="trailing" constant="12" id="CJv-g8-noI"/>
                                 <constraint firstItem="9" firstAttribute="baseline" secondItem="15" secondAttribute="baseline" id="CPh-qS-N0b"/>
@@ -433,7 +441,10 @@
                                 <constraint firstItem="80" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="79" secondAttribute="trailing" constant="8" symbolic="YES" id="EeJ-Ue-0Y2"/>
                                 <constraint firstItem="80" firstAttribute="leading" secondItem="9" secondAttribute="leading" id="Kte-5k-GZU"/>
                                 <constraint firstItem="f9T-h9-E4n" firstAttribute="leading" secondItem="21" secondAttribute="leading" id="3Ek-Jd-BCW"/>
-                                <constraint firstItem="f9T-h9-E4n" firstAttribute="top" secondItem="113" secondAttribute="bottom" constant="6" symbolic="YES" id="iaC-UN-jwg"/>
+                                <constraint firstItem="QzM-Do-0rL" firstAttribute="leading" secondItem="21" secondAttribute="leading" id="F23-kh-YQv"/>
+                                <constraint firstItem="QzM-Do-0rL" firstAttribute="top" secondItem="113" secondAttribute="bottom" constant="6" symbolic="YES" id="D6F-Rw-XkY"/>
+                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="QzM-Do-0rL" secondAttribute="trailing" constant="12" id="I8x-TS-f4K"/>
+                                <constraint firstItem="f9T-h9-E4n" firstAttribute="top" secondItem="QzM-Do-0rL" secondAttribute="bottom" constant="2" id="iaC-UN-jwg"/>
                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="f9T-h9-E4n" secondAttribute="trailing" constant="12" id="j5r-hN-VDo"/>
                                 <constraint firstItem="A4d-Rw-m2T" firstAttribute="leading" secondItem="21" secondAttribute="leading" id="AaS-1H-Ayi"/>
                                 <constraint firstItem="A4d-Rw-m2T" firstAttribute="top" secondItem="f9T-h9-E4n" secondAttribute="bottom" constant="6" symbolic="YES" id="NJs-qB-vfu"/>
