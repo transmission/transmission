@@ -771,6 +771,8 @@ void tr_torrentUseSessionLimits(tr_torrent* tor, bool enabled);
 
 bool tr_torrentUsesSequentialDownload(tr_torrent const* tor);
 void tr_torrentUseSequentialDownload(tr_torrent* tor, bool enabled);
+bool tr_torrentUsesFirstLastPiecePriority(tr_torrent const* tor);
+void tr_torrentUseFirstLastPiecePriority(tr_torrent* tor, bool enabled);
 
 // --- Ratio Limits
 

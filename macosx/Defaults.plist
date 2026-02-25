@@ -98,6 +98,10 @@
 	<string>Constant</string>
 	<key>NatTraversal</key>
 	<true/>
+	<key>NewTorrentDownloadFirstLastPiecesFirst</key>
+	<true/>
+	<key>NewTorrentSequentialDownload</key>
+	<false/>
 	<key>PeersTorrent</key>
 	<integer>60</integer>
 	<key>PeersTotal</key>

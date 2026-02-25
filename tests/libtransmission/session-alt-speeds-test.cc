@@ -54,22 +54,6 @@ protected:
     };
 
     static auto constexpr ArbitraryTimestamp1 = time_t{ 666 };
-
-    static auto midnightSundayMorning()
-    {
-        // new year's, Sun Jan 1 2023
-        auto tmdate = tm{};
-        tmdate.tm_sec = 0;
-        tmdate.tm_min = 0;
-        tmdate.tm_hour = 0;
-        tmdate.tm_mday = 1;
-        tmdate.tm_mon = 0;
-        tmdate.tm_year = 2023 - 1900;
-        tmdate.tm_wday = 0; // Sunday
-        tmdate.tm_yday = 0;
-        tmdate.tm_isdst = 0;
-        return mktime(&tmdate);
-    }
 };
 
 namespace tr::test
@@ -105,47 +89,52 @@ TEST_F(SessionAltSpeedsTest, canSchedule)
 {
     auto mediator = MockMediator{};
 
-    auto now = midnightSundayMorning(); // midnight
-    mediator.current_time_ = now;
+    auto current_timestamp = ArbitraryTimestamp1;
+    mediator.current_time_ = current_timestamp;
+
+    auto const current_local_time = *std::localtime(&current_timestamp);
+    auto const current_minute_of_day = static_cast<size_t>(current_local_time.tm_hour * 60 + current_local_time.tm_min);
+    auto const schedule_start_minute = current_minute_of_day + 60U;
+    auto const schedule_end_minute = schedule_start_minute + 60U;
 
     auto alt_speeds = tr_session_alt_speeds{ mediator };
-    alt_speeds.set_start_minute(60); // start at 1AM
-    alt_speeds.set_end_minute(120); // end at 2AM
-    alt_speeds.set_weekdays(TR_SCHED_ALL); // every day
+    alt_speeds.set_start_minute(schedule_start_minute);
+    alt_speeds.set_end_minute(schedule_end_minute);
+    alt_speeds.set_weekdays(TR_SCHED_ALL);
     alt_speeds.set_scheduler_enabled(true);
     auto n_changes = std::size(mediator.changelog_);
     EXPECT_EQ(0U, n_changes);
 
     // Confirm that walking up to the threshold, but not crossing it, does not enable
-    now += std::chrono::duration_cast<std::chrono::seconds>(59min).count();
-    mediator.current_time_ = now;
+    current_timestamp += std::chrono::duration_cast<std::chrono::seconds>(59min).count();
+    mediator.current_time_ = current_timestamp;
     alt_speeds.check_scheduler();
     EXPECT_EQ(n_changes, std::size(mediator.changelog_));
 
     // Confirm that crossing the threshold does enable
-    now += std::chrono::duration_cast<std::chrono::seconds>(1min).count();
-    mediator.current_time_ = now;
+    current_timestamp += std::chrono::duration_cast<std::chrono::seconds>(1min).count();
+    mediator.current_time_ = current_timestamp;
     alt_speeds.check_scheduler();
     ASSERT_EQ(n_changes + 1, std::size(mediator.changelog_));
     EXPECT_EQ(true, mediator.changelog_[n_changes].is_active);
     EXPECT_EQ(ChangeReason::Scheduler, mediator.changelog_[n_changes].reason);
-    EXPECT_EQ(now, mediator.changelog_[n_changes].timestamp);
+    EXPECT_EQ(current_timestamp, mediator.changelog_[n_changes].timestamp);
     ++n_changes;
 
     // Confirm that walking up to the threshold, but not crossing it, does not disable
-    now += std::chrono::duration_cast<std::chrono::seconds>(59min).count();
-    mediator.current_time_ = now;
+    current_timestamp += std::chrono::duration_cast<std::chrono::seconds>(59min).count();
+    mediator.current_time_ = current_timestamp;
     alt_speeds.check_scheduler();
     EXPECT_EQ(n_changes, std::size(mediator.changelog_));
 
     // Confirm that crossing the threshold does disable
-    now += std::chrono::duration_cast<std::chrono::seconds>(1min).count();
-    mediator.current_time_ = now;
+    current_timestamp += std::chrono::duration_cast<std::chrono::seconds>(1min).count();
+    mediator.current_time_ = current_timestamp;
     alt_speeds.check_scheduler();
     ASSERT_EQ(n_changes + 1, std::size(mediator.changelog_));
     EXPECT_EQ(false, mediator.changelog_[n_changes].is_active);
     EXPECT_EQ(ChangeReason::Scheduler, mediator.changelog_[n_changes].reason);
-    EXPECT_EQ(now, mediator.changelog_[n_changes].timestamp);
+    EXPECT_EQ(current_timestamp, mediator.changelog_[n_changes].timestamp);
 }
 
 } // namespace tr::test

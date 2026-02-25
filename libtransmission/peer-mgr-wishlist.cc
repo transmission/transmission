@@ -198,6 +198,11 @@ public:
         requested_block_span(block_span);
     }
 
+    void on_download_first_last_pieces_first_changed()
+    {
+        recalculate_salt();
+    }
+
     void on_sequential_download_changed()
     {
         recalculate_salt();
@@ -421,37 +426,57 @@ private:
         tr_piece_index_t const n_pieces,
         tr_piece_index_t const random_salt,
         bool const is_sequential,
+        bool const download_first_last_pieces_first,
         tr_piece_index_t const sequential_download_from_piece)
     {
+        if (download_first_last_pieces_first)
+        {
+            if (piece == 0U)
+            {
+                return 0U;
+            }
+
+            if (piece == n_pieces - 1U)
+            {
+                return 1U;
+            }
+
+            if (!is_sequential)
+            {
+                return random_salt + 2U;
+            }
+
+            if (sequential_download_from_piece <= 1)
+            {
+                return piece + 1U;
+            }
+
+            // Rotate remaining pieces
+            // 1 2 3 4 5 -> 3 4 5 1 2 if sequential_download_from_piece is 3
+            if (piece < sequential_download_from_piece)
+            {
+                return n_pieces - (sequential_download_from_piece - piece);
+            }
+
+            return piece - sequential_download_from_piece + 2U;
+        }
+
         if (!is_sequential)
         {
             return random_salt;
         }
 
-        // Download first and last piece first
-        if (piece == 0U)
-        {
-            return 0U;
-        }
-
-        if (piece == n_pieces - 1U)
-        {
-            return 1U;
-        }
-
         if (sequential_download_from_piece <= 1)
         {
-            return piece + 1U;
+            return piece;
         }
 
-        // Rotate remaining pieces
-        // 1 2 3 4 5 -> 3 4 5 1 2 if sequential_download_from_piece is 3
         if (piece < sequential_download_from_piece)
         {
             return n_pieces - (sequential_download_from_piece - piece);
         }
 
-        return piece - sequential_download_from_piece + 2U;
+        return piece - sequential_download_from_piece;
     }
 
     // ---
@@ -461,6 +486,7 @@ private:
         auto n_old_c = std::size(candidates_);
         auto salter = tr_salt_shaker<tr_piece_index_t>{};
         auto const is_sequential = mediator_.is_sequential_download();
+        auto const download_first_last_pieces_first = mediator_.download_first_last_pieces_first();
         auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
         auto const n_pieces = mediator_.piece_count();
         candidates_.reserve(n_pieces);
@@ -496,7 +522,13 @@ private:
                 }
                 else
                 {
-                    auto const salt = get_salt(piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
+                    auto const salt = get_salt(
+                        piece,
+                        n_pieces,
+                        salter(),
+                        is_sequential,
+                        download_first_last_pieces_first,
+                        sequential_download_from_piece);
                     auto& candidate = candidates_.emplace_back(piece, salt, &mediator_);
 
                     if (auto& begin = candidate.block_span.begin; prev != nullptr)
@@ -575,11 +607,18 @@ private:
     {
         auto salter = tr_salt_shaker<tr_piece_index_t>{};
         auto const is_sequential = mediator_.is_sequential_download();
+        auto const download_first_last_pieces_first = mediator_.download_first_last_pieces_first();
         auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
         auto const n_pieces = mediator_.piece_count();
         for (auto& candidate : candidates_)
         {
-            candidate.salt = get_salt(candidate.piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
+            candidate.salt = get_salt(
+                candidate.piece,
+                n_pieces,
+                salter(),
+                is_sequential,
+                download_first_last_pieces_first,
+                sequential_download_from_piece);
         }
 
         std::ranges::sort(candidates_);
@@ -739,6 +778,11 @@ void Wishlist::on_sent_cancel(tr_block_index_t const block)
 void Wishlist::on_sent_request(tr_block_span_t const block_span)
 {
     impl_->on_sent_request(block_span);
+}
+
+void Wishlist::on_download_first_last_pieces_first_changed()
+{
+    impl_->on_download_first_last_pieces_first_changed();
 }
 
 void Wishlist::on_sequential_download_changed()

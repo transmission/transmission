@@ -402,6 +402,8 @@ public:
                                                      { wishlist_.on_sent_request(block_span); }),
                   tor_.sequential_download_changed_.connect_scoped([this](tr_torrent*, bool)
                                                                    { wishlist_.on_sequential_download_changed(); }),
+                  tor_.download_first_last_pieces_first_changed_.connect_scoped(
+                      [this](tr_torrent*, bool) { wishlist_.on_download_first_last_pieces_first_changed(); }),
                   tor_.sequential_download_from_piece_changed_.connect_scoped(
                       [this](tr_torrent*, tr_piece_index_t) { wishlist_.on_sequential_download_from_piece_changed(); }),
               } }
@@ -431,6 +433,11 @@ public:
         [[nodiscard]] bool is_sequential_download() const override
         {
             return tor_.is_sequential_download();
+        }
+
+        [[nodiscard]] bool download_first_last_pieces_first() const override
+        {
+            return tor_.download_first_last_pieces_first();
         }
 
         [[nodiscard]] tr_piece_index_t sequential_download_from_piece() const override
@@ -467,7 +474,7 @@ public:
         tr_torrent& tor_;
         tr_swarm& swarm_;
         Wishlist wishlist_;
-        std::array<sigslot::scoped_connection, 15U> signal_tags_; // depends-on: wishlist_
+        std::array<sigslot::scoped_connection, 16U> signal_tags_; // depends-on: wishlist_
     };
 
     [[nodiscard]] auto unique_lock() const

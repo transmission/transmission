@@ -1166,6 +1166,19 @@ CA
                 <menuItem isSeparatorItem="YES" id="3450">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
+                <menuItem title="Sequential Download" id="NyU-jF-Dxg">
+                    <connections>
+                        <action selector="toggleSequentialDownloadForSelectedTorrents:" target="206" id="7Nh-z3-cj8"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Download First and Last Pieces First" id="cO5-u9-cBF">
+                    <connections>
+                        <action selector="toggleDownloadFirstLastPiecesFirstForSelectedTorrents:" target="206" id="qee-2i-dv4"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="pQ1-Rt-9xZ">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
                 <menuItem title="Show Inspector" secondaryImage="info.circle" catalog="system" tag="6" id="459">
                     <connections>
                         <action selector="showInfo:" target="206" id="477"/>

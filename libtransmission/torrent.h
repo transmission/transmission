@@ -778,6 +778,21 @@ struct tr_torrent
         return sequential_download_;
     }
 
+    void set_download_first_last_pieces_first(bool is_enabled) noexcept
+    {
+        if (is_enabled != download_first_last_pieces_first_)
+        {
+            download_first_last_pieces_first_ = is_enabled;
+            download_first_last_pieces_first_changed_(this, is_enabled);
+            set_dirty();
+        }
+    }
+
+    [[nodiscard]] constexpr auto download_first_last_pieces_first() const noexcept
+    {
+        return download_first_last_pieces_first_;
+    }
+
     bool set_sequential_download_from_piece(tr_piece_index_t piece) noexcept
     {
         auto const is_valid = piece < piece_count();
@@ -1023,6 +1038,7 @@ struct tr_torrent
     sigslot::signal<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
     sigslot::signal<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
     sigslot::signal<tr_torrent*, bool> sequential_download_changed_;
+    sigslot::signal<tr_torrent*, bool> download_first_last_pieces_first_changed_;
     sigslot::signal<tr_torrent*, tr_piece_index_t> sequential_download_from_piece_changed_;
 
     CumulativeCount bytes_corrupt_;
@@ -1443,6 +1459,7 @@ private:
     bool needs_completeness_check_ = true;
 
     bool sequential_download_ = false;
+    bool download_first_last_pieces_first_ = true;
 
     tr_piece_index_t sequential_download_from_piece_ = 0;
 

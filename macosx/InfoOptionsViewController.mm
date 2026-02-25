@@ -38,6 +38,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 @property(nonatomic) IBOutlet NSButton* fGlobalLimitCheck;
 @property(nonatomic) IBOutlet NSButton* fRemoveSeedingCompleteCheck;
 @property(nonatomic) IBOutlet NSButton* fSequentialDownloadCheck;
+@property(nonatomic) IBOutlet NSButton* fDownloadFirstLastPiecesFirstCheck;
 @property(nonatomic) IBOutlet NSTextField* fUploadLimitField;
 @property(nonatomic) IBOutlet NSTextField* fDownloadLimitField;
 @property(nonatomic) IBOutlet NSTextField* fRatioLimitField;
@@ -285,6 +286,7 @@ static CGFloat const kStackViewSpacing = 8.0;
     NSInteger checkIdle = torrent.idleSetting;
     NSInteger removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSControlStateValueOn : NSControlStateValueOff;
     NSInteger sequentialDownload = torrent.sequentialDownload ? NSControlStateValueOn : NSControlStateValueOff;
+    NSInteger downloadFirstLastPiecesFirst = torrent.downloadFirstLastPiecesFirst ? NSControlStateValueOn : NSControlStateValueOff;
     CGFloat ratioLimit = torrent.ratioLimit;
     BOOL multipleRatioLimits = NO;
     NSUInteger idleLimit = torrent.idleLimitMinutes;
@@ -323,6 +325,12 @@ static CGFloat const kStackViewSpacing = 8.0;
             sequentialDownload != (torrent.sequentialDownload ? NSControlStateValueOn : NSControlStateValueOff))
         {
             sequentialDownload = NSControlStateValueMixed;
+        }
+
+        if (downloadFirstLastPiecesFirst != NSControlStateValueMixed &&
+            downloadFirstLastPiecesFirst != (torrent.downloadFirstLastPiecesFirst ? NSControlStateValueOn : NSControlStateValueOff))
+        {
+            downloadFirstLastPiecesFirst = NSControlStateValueMixed;
         }
     }
 
@@ -398,6 +406,9 @@ static CGFloat const kStackViewSpacing = 8.0;
 
     self.fSequentialDownloadCheck.state = sequentialDownload;
     self.fSequentialDownloadCheck.enabled = YES;
+
+    self.fDownloadFirstLastPiecesFirstCheck.state = downloadFirstLastPiecesFirst;
+    self.fDownloadFirstLastPiecesFirstCheck.enabled = YES;
 
     //get priority info
     enumerator = [self.fTorrents objectEnumerator];
@@ -652,6 +663,22 @@ static CGFloat const kStackViewSpacing = 8.0;
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptionsNotification" object:self];
 }
 
+- (IBAction)setDownloadFirstLastPiecesFirst:(id)sender
+{
+    if (((NSButton*)sender).state == NSControlStateValueMixed)
+    {
+        [sender setState:NSControlStateValueOn];
+    }
+    BOOL const enable = ((NSButton*)sender).state == NSControlStateValueOn;
+
+    for (Torrent* torrent in self.fTorrents)
+    {
+        torrent.downloadFirstLastPiecesFirst = enable;
+    }
+
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptionsNotification" object:self];
+}
+
 - (void)setPriority:(id)sender
 {
     tr_priority_t priority;
@@ -753,6 +780,9 @@ static CGFloat const kStackViewSpacing = 8.0;
 
         self.fSequentialDownloadCheck.enabled = NO;
         self.fSequentialDownloadCheck.state = NSControlStateValueOff;
+
+        self.fDownloadFirstLastPiecesFirstCheck.enabled = NO;
+        self.fDownloadFirstLastPiecesFirstCheck.state = NSControlStateValueOff;
 
         self.fPeersConnectField.enabled = NO;
         self.fPeersConnectField.stringValue = @"";
