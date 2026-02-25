@@ -227,8 +227,9 @@ void Prefs::save(QString const& filename) const
     auto serde = tr_variant_serde::json();
 
     auto settings = tr_variant::make_map(PREFS_COUNT);
-    if (auto const var = serde.parse_file(filename_str))
+    if (auto var = serde.parse_file(filename_str))
     {
+        api_compat::convert_incoming_data(*var);
         settings.merge(*var);
     }
     settings.merge(tr_variant{ current_settings() });
