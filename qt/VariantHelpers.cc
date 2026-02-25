@@ -14,6 +14,7 @@
 #include <QUrl>
 
 #include <libtransmission/serializer.h>
+#include <libtransmission/web-utils.h>
 
 #include "Application.h" // qApp
 #include "Speed.h"
@@ -183,8 +184,12 @@ bool change(TrackerStat& setme, tr_variant const* value)
     {
         if (setme.sitename.isEmpty())
         {
-            QStringList const separated_host = QUrl{ setme.announce }.host().split(QStringLiteral("."));
-            setme.sitename = separated_host.at(separated_host.size() - 2);
+            auto const announce_str = setme.announce.toStdString();
+            if (auto const parsed = tr_urlParse(announce_str))
+            {
+                auto const sitename = parsed->sitename;
+                setme.sitename = QString::fromUtf8(std::data(sitename), std::size(sitename));
+            }
         }
 
         setme.announce = trApp->intern(setme.announce);
