@@ -602,16 +602,26 @@ std::optional<unsigned> tr_address::to_interface_index() const noexcept
     return {};
 }
 
-int tr_address::compare(tr_address const& that) const noexcept // <=>
+std::strong_ordering tr_address::operator<=>(tr_address const& that) const noexcept
 {
     // IPv6 addresses are always "greater than" IPv4
-    if (auto const val = tr_compare_3way(this->type, that.type); val != 0)
+    if (auto const val = this->type <=> that.type; val != 0)
     {
         return val;
     }
 
-    return this->is_ipv4() ? memcmp(&this->addr.addr4, &that.addr.addr4, sizeof(this->addr.addr4)) :
-                             memcmp(&this->addr.addr6.s6_addr, &that.addr.addr6.s6_addr, sizeof(this->addr.addr6.s6_addr));
+    auto const val = this->is_ipv4() ?
+        memcmp(&this->addr.addr4, &that.addr.addr4, sizeof(this->addr.addr4)) :
+        memcmp(&this->addr.addr6.s6_addr, &that.addr.addr6.s6_addr, sizeof(this->addr.addr6.s6_addr));
+    if (val < 0)
+    {
+        return std::strong_ordering::less;
+    }
+    if (val > 0)
+    {
+        return std::strong_ordering::greater;
+    }
+    return std::strong_ordering::equal;
 }
 
 // https://en.wikipedia.org/wiki/Reserved_IP_addresses
