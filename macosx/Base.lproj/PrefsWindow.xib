@@ -594,6 +594,16 @@
                                                     </binding>
                                                 </connections>
                                             </button>
+                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="UE5-XW-5uK">
+                                                <rect key="frame" x="84" y="210" width="250" height="18"/>
+                                                <buttonCell key="cell" type="check" title="Enable sequential download by default" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="DPp-hM-3ig">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <connections>
+                                                    <binding destination="365" name="value" keyPath="values.NewTorrentSequentialDownload" id="wui-kc-jZu"/>
+                                                </connections>
+                                            </button>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="1476">
                                                 <rect key="frame" x="104" y="114" width="193" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Only when adding manually" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1477">
@@ -628,7 +638,7 @@
                                         <constraints>
                                             <constraint firstItem="1947" firstAttribute="leading" secondItem="59" secondAttribute="leading" id="04r-iS-yVo"/>
                                             <constraint firstItem="209" firstAttribute="leading" secondItem="59" secondAttribute="leading" id="1WY-0B-oPc"/>
-                                            <constraint firstItem="115" firstAttribute="top" secondItem="1334" secondAttribute="bottom" constant="4" id="1lv-0a-UmS"/>
+                                            <constraint firstItem="115" firstAttribute="top" secondItem="UE5-XW-5uK" secondAttribute="bottom" constant="4" id="1lv-0a-UmS"/>
                                             <constraint firstItem="352" firstAttribute="trailing" secondItem="61" secondAttribute="trailing" id="46r-zf-9Dz"/>
                                             <constraint firstAttribute="width" priority="750" constant="456" id="5MD-kx-1og"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1339" secondAttribute="trailing" constant="20" symbolic="YES" id="7mT-PQ-YW1"/>
@@ -659,13 +669,16 @@
                                             <constraint firstItem="216" firstAttribute="top" secondItem="1947" secondAttribute="bottom" constant="20" symbolic="YES" id="gUI-I8-Ert"/>
                                             <constraint firstItem="538" firstAttribute="leading" secondItem="537" secondAttribute="trailing" constant="5" id="hoK-DB-sCM"/>
                                             <constraint firstItem="1334" firstAttribute="leading" secondItem="59" secondAttribute="leading" id="iPl-4T-QCM"/>
+                                            <constraint firstItem="UE5-XW-5uK" firstAttribute="leading" secondItem="59" secondAttribute="leading" id="jZf-jR-RLJ"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1947" secondAttribute="trailing" id="jF1-WU-h6u"/>
                                             <constraint firstItem="1939" firstAttribute="leading" secondItem="59" secondAttribute="leading" id="ods-1D-5PF"/>
                                             <constraint firstItem="1337" firstAttribute="width" secondItem="61" secondAttribute="width" id="pUr-gl-HWr"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="51" secondAttribute="trailing" constant="20" symbolic="YES" id="pdr-Mz-OEr"/>
                                             <constraint firstItem="115" firstAttribute="leading" secondItem="59" secondAttribute="leading" id="r9n-Jd-yn7"/>
+                                            <constraint firstItem="UE5-XW-5uK" firstAttribute="top" secondItem="1334" secondAttribute="bottom" constant="4" id="Uus-G6-aQk"/>
                                             <constraint firstItem="1293" firstAttribute="top" secondItem="1939" secondAttribute="bottom" constant="20" id="sc7-xe-pwG"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1334" secondAttribute="trailing" constant="20" symbolic="YES" id="uBl-jP-kgp"/>
+                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="UE5-XW-5uK" secondAttribute="trailing" constant="20" symbolic="YES" id="06m-EG-yjU"/>
                                             <constraint firstItem="59" firstAttribute="leading" secondItem="61" secondAttribute="trailing" constant="8" symbolic="YES" id="udm-xI-Bf1"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="216" secondAttribute="trailing" constant="20" symbolic="YES" id="ulA-rw-Yfo"/>
                                             <constraint firstItem="1947" firstAttribute="top" secondItem="1476" secondAttribute="bottom" constant="4" id="wl6-dK-YZ4"/>

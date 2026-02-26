@@ -3494,6 +3494,32 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self updateTorrentHistory];
 }
 
+- (IBAction)toggleSequentialDownloadForSelectedTorrents:(id)sender
+{
+    BOOL hasEnabledSequentialDownload = NO;
+    BOOL hasDisabledSequentialDownload = NO;
+
+    for (Torrent* torrent in self.fTableView.selectedTorrents)
+    {
+        if (torrent.sequentialDownload)
+        {
+            hasEnabledSequentialDownload = YES;
+        }
+        else
+        {
+            hasDisabledSequentialDownload = YES;
+        }
+    }
+
+    BOOL const enableSequentialDownload = hasDisabledSequentialDownload || !hasEnabledSequentialDownload;
+    for (Torrent* torrent in self.fTableView.selectedTorrents)
+    {
+        torrent.sequentialDownload = enableSequentialDownload;
+    }
+
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptionsNotification" object:self];
+}
+
 - (void)toggleSpeedLimit:(id)sender
 {
     [self.fDefaults setBool:![self.fDefaults boolForKey:@"SpeedLimit"] forKey:@"SpeedLimit"];
@@ -4661,6 +4687,37 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         menuItem.state = checked ? NSControlStateValueOn : NSControlStateValueOff;
+        return canUseTable && self.fTableView.numberOfSelectedRows > 0;
+    }
+
+    if (action == @selector(toggleSequentialDownloadForSelectedTorrents:))
+    {
+        BOOL hasEnabledValue = NO;
+        BOOL hasDisabledValue = NO;
+
+        for (Torrent* torrent in self.fTableView.selectedTorrents)
+        {
+            BOOL const value = torrent.sequentialDownload;
+
+            if (value)
+            {
+                hasEnabledValue = YES;
+            }
+            else
+            {
+                hasDisabledValue = YES;
+            }
+        }
+
+        if (hasEnabledValue && hasDisabledValue)
+        {
+            menuItem.state = NSControlStateValueMixed;
+        }
+        else
+        {
+            menuItem.state = hasEnabledValue ? NSControlStateValueOn : NSControlStateValueOff;
+        }
+
         return canUseTable && self.fTableView.numberOfSelectedRows > 0;
     }
 

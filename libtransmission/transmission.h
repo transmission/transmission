@@ -769,6 +769,9 @@ void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool enabled);
 bool tr_torrentUsesSessionLimits(tr_torrent const* tor);
 void tr_torrentUseSessionLimits(tr_torrent* tor, bool enabled);
 
+bool tr_torrentUsesSequentialDownload(tr_torrent const* tor);
+void tr_torrentUseSequentialDownload(tr_torrent* tor, bool enabled);
+
 // --- Ratio Limits
 
 tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* tor);
