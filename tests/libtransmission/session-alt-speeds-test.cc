@@ -67,7 +67,7 @@ protected:
         tmdate.tm_year = 2023 - 1900;
         tmdate.tm_wday = 0; // Sunday
         tmdate.tm_yday = 0;
-        tmdate.tm_isdst = -1; // let mktime auto-detect DST
+        tmdate.tm_isdst = 0;
         return mktime(&tmdate);
     }
 };
