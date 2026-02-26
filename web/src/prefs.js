@@ -125,6 +125,7 @@ Prefs.SortByQueue = 'queue';
 Prefs.SortByRatio = 'ratio';
 Prefs.SortBySize = 'size';
 Prefs.SortByState = 'state';
+Prefs.SortByUploaded = 'uploaded';
 Prefs.SortDescending = 'descending';
 Prefs.SortDirection = 'sort-direction';
 Prefs.SortMode = 'sort-mode';
