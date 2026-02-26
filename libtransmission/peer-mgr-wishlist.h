@@ -30,7 +30,6 @@ public:
         [[nodiscard]] virtual bool client_has_piece(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual bool client_wants_piece(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual bool is_sequential_download() const = 0;
-        [[nodiscard]] virtual bool download_first_last_pieces_first() const = 0;
         [[nodiscard]] virtual tr_piece_index_t sequential_download_from_piece() const = 0;
         [[nodiscard]] virtual size_t count_piece_replication(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual tr_block_span_t block_span(tr_piece_index_t piece) const = 0;
@@ -55,7 +54,6 @@ public:
     void on_priority_changed();
     void on_sent_cancel(tr_block_index_t block);
     void on_sent_request(tr_block_span_t block_span);
-    void on_download_first_last_pieces_first_changed();
     void on_sequential_download_changed();
     void on_sequential_download_from_piece_changed();
 

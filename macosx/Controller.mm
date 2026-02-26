@@ -3520,32 +3520,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptionsNotification" object:self];
 }
 
-- (IBAction)toggleDownloadFirstLastPiecesFirstForSelectedTorrents:(id)sender
-{
-    BOOL hasEnabledDownloadFirstLastPiecesFirst = NO;
-    BOOL hasDisabledDownloadFirstLastPiecesFirst = NO;
-
-    for (Torrent* torrent in self.fTableView.selectedTorrents)
-    {
-        if (torrent.downloadFirstLastPiecesFirst)
-        {
-            hasEnabledDownloadFirstLastPiecesFirst = YES;
-        }
-        else
-        {
-            hasDisabledDownloadFirstLastPiecesFirst = YES;
-        }
-    }
-
-    BOOL const enableDownloadFirstLastPiecesFirst = hasDisabledDownloadFirstLastPiecesFirst || !hasEnabledDownloadFirstLastPiecesFirst;
-    for (Torrent* torrent in self.fTableView.selectedTorrents)
-    {
-        torrent.downloadFirstLastPiecesFirst = enableDownloadFirstLastPiecesFirst;
-    }
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptionsNotification" object:self];
-}
-
 - (void)toggleSpeedLimit:(id)sender
 {
     [self.fDefaults setBool:![self.fDefaults boolForKey:@"SpeedLimit"] forKey:@"SpeedLimit"];
@@ -4716,16 +4690,14 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         return canUseTable && self.fTableView.numberOfSelectedRows > 0;
     }
 
-    if (action == @selector(toggleSequentialDownloadForSelectedTorrents:) ||
-        action == @selector(toggleDownloadFirstLastPiecesFirstForSelectedTorrents:))
+    if (action == @selector(toggleSequentialDownloadForSelectedTorrents:))
     {
         BOOL hasEnabledValue = NO;
         BOOL hasDisabledValue = NO;
 
         for (Torrent* torrent in self.fTableView.selectedTorrents)
         {
-            BOOL const value = action == @selector(toggleSequentialDownloadForSelectedTorrents:) ? torrent.sequentialDownload :
-                                                                                                   torrent.downloadFirstLastPiecesFirst;
+            BOOL const value = torrent.sequentialDownload;
 
             if (value)
             {

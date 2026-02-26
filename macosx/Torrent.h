@@ -77,7 +77,6 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 - (void)setSpeedLimit:(NSUInteger)limit upload:(BOOL)upload;
 @property(nonatomic) BOOL usesGlobalSpeedLimit;
 @property(nonatomic) BOOL sequentialDownload;
-@property(nonatomic) BOOL downloadFirstLastPiecesFirst;
 
 @property(nonatomic) uint16_t maxPeerConnect;
 

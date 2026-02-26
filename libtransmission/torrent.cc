@@ -291,20 +291,6 @@ void tr_torrentUseSequentialDownload(tr_torrent* tor, bool enabled)
     tor->set_sequential_download(enabled);
 }
 
-bool tr_torrentUsesFirstLastPiecePriority(tr_torrent const* tor)
-{
-    tr_return_val_if_fail(tr_isTorrent(tor), {});
-
-    return tor->download_first_last_pieces_first();
-}
-
-void tr_torrentUseFirstLastPiecePriority(tr_torrent* tor, bool enabled)
-{
-    tr_return_if_fail(tr_isTorrent(tor));
-
-    tor->set_download_first_last_pieces_first(enabled);
-}
-
 // --- Download Ratio
 
 void tr_torrentSetRatioMode(tr_torrent* const tor, tr_ratiolimit mode)
@@ -943,7 +929,6 @@ void tr_torrent::init(tr_ctor const& ctor)
     // these are defaults that will be overwritten by the resume file
     date_added_ = now_sec;
     set_sequential_download(session->sequential_download());
-    set_download_first_last_pieces_first(true);
 
     tr_resume::fields_t loaded = {};
 

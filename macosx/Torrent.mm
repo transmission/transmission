@@ -177,12 +177,6 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     {
         torrent.sequentialDownload = sequentialDownload.boolValue;
     }
-
-    NSNumber* downloadFirstLastPiecesFirst;
-    if ((downloadFirstLastPiecesFirst = history[@"DownloadFirstLastPiecesFirst"]))
-    {
-        torrent.downloadFirstLastPiecesFirst = downloadFirstLastPiecesFirst.boolValue;
-    }
 }
 
 - (NSDictionary*)history
@@ -193,8 +187,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
         @"WaitToStart" : @(self.waitingToStart),
         @"GroupValue" : @(self.groupValue),
         @"RemoveWhenFinishSeeding" : @(_removeWhenFinishSeeding),
-        @"SequentialDownload" : @(self.sequentialDownload),
-        @"DownloadFirstLastPiecesFirst" : @(self.downloadFirstLastPiecesFirst)
+        @"SequentialDownload" : @(self.sequentialDownload)
     };
 }
 
@@ -503,16 +496,6 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 - (void)setSequentialDownload:(BOOL)use
 {
     tr_torrentUseSequentialDownload(self.fHandle, use);
-}
-
-- (BOOL)downloadFirstLastPiecesFirst
-{
-    return tr_torrentUsesFirstLastPiecePriority(self.fHandle);
-}
-
-- (void)setDownloadFirstLastPiecesFirst:(BOOL)use
-{
-    tr_torrentUseFirstLastPiecePriority(self.fHandle, use);
 }
 
 - (void)setMaxPeerConnect:(uint16_t)count
@@ -1920,7 +1903,6 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
         }
 
         tr_torrentUseSequentialDownload(self.fHandle, [_fDefaults boolForKey:@"NewTorrentSequentialDownload"]);
-        tr_torrentUseFirstLastPiecePriority(self.fHandle, [_fDefaults boolForKey:@"NewTorrentDownloadFirstLastPiecesFirst"]);
     }
 
     _fResumeOnWake = NO;

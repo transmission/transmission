@@ -31,7 +31,6 @@ protected:
         mutable std::set<tr_piece_index_t> client_has_piece_;
         mutable std::set<tr_piece_index_t> client_wants_piece_;
         bool is_sequential_download_ = false;
-        bool download_first_last_pieces_first_ = true;
         tr_piece_index_t sequential_download_from_piece_ = 0;
 
         MockMediator() = default;
@@ -54,11 +53,6 @@ protected:
         [[nodiscard]] bool is_sequential_download() const override
         {
             return is_sequential_download_;
-        }
-
-        [[nodiscard]] bool download_first_last_pieces_first() const override
-        {
-            return download_first_last_pieces_first_;
         }
 
         [[nodiscard]] tr_piece_index_t sequential_download_from_piece() const override
@@ -341,101 +335,6 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
         EXPECT_EQ(0U, requested.count(100, 200));
         // piece 2 should be downloaded before piece 1
         EXPECT_EQ(100U, requested.count(200, 300));
-        EXPECT_EQ(100U, requested.count(300, 400));
-    }
-}
-
-TEST_F(PeerMgrWishlistTest, sequentialDownloadWithoutFirstLastPiecesPriority)
-{
-    auto const get_spans = [](size_t n_wanted)
-    {
-        auto mediator = MockMediator{};
-
-        // setup: four pieces, all missing
-        mediator.block_span_[0] = { .begin = 0, .end = 100 };
-        mediator.block_span_[1] = { .begin = 100, .end = 200 };
-        mediator.block_span_[2] = { .begin = 200, .end = 300 };
-        mediator.block_span_[3] = { .begin = 300, .end = 400 };
-
-        // peer has all pieces
-        mediator.piece_replication_[0] = 1;
-        mediator.piece_replication_[1] = 1;
-        mediator.piece_replication_[2] = 1;
-        mediator.piece_replication_[3] = 1;
-
-        for (tr_piece_index_t piece = 0; piece < mediator.piece_count(); ++piece)
-        {
-            mediator.client_wants_piece_.insert(piece);
-        }
-
-        mediator.is_sequential_download_ = true;
-        mediator.download_first_last_pieces_first_ = false;
-        mediator.sequential_download_from_piece_ = 2;
-
-        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces);
-    };
-
-    static auto constexpr NumRuns = 1000;
-    for (int run = 0; run < NumRuns; ++run)
-    {
-        auto requested = tr_bitfield{ 400 };
-        auto const spans = get_spans(200);
-        for (auto const& [begin, end] : spans)
-        {
-            requested.set_span(begin, end);
-        }
-
-        EXPECT_EQ(200U, requested.count());
-        EXPECT_EQ(0U, requested.count(0, 200));
-        EXPECT_EQ(100U, requested.count(200, 300));
-        EXPECT_EQ(100U, requested.count(300, 400));
-    }
-}
-
-TEST_F(PeerMgrWishlistTest, firstLastPiecesPriorityWithoutSequentialDownload)
-{
-    auto const get_spans = [](size_t n_wanted)
-    {
-        auto mediator = MockMediator{};
-
-        // setup: four pieces, all missing
-        mediator.block_span_[0] = { .begin = 0, .end = 100 };
-        mediator.block_span_[1] = { .begin = 100, .end = 200 };
-        mediator.block_span_[2] = { .begin = 200, .end = 300 };
-        mediator.block_span_[3] = { .begin = 300, .end = 400 };
-
-        // peer has all pieces
-        mediator.piece_replication_[0] = 1;
-        mediator.piece_replication_[1] = 1;
-        mediator.piece_replication_[2] = 1;
-        mediator.piece_replication_[3] = 1;
-
-        for (tr_piece_index_t piece = 0; piece < mediator.piece_count(); ++piece)
-        {
-            mediator.client_wants_piece_.insert(piece);
-        }
-
-        mediator.is_sequential_download_ = false;
-        mediator.download_first_last_pieces_first_ = true;
-
-        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces);
-    };
-
-    // Without sequential ordering, first and last piece should still be preferred.
-    // Run multiple times to verify this does not depend on random tie-breaking.
-    static auto constexpr NumRuns = 1000;
-    for (int run = 0; run < NumRuns; ++run)
-    {
-        auto requested = tr_bitfield{ 400 };
-        auto const spans = get_spans(200);
-        for (auto const& [begin, end] : spans)
-        {
-            requested.set_span(begin, end);
-        }
-
-        EXPECT_EQ(200U, requested.count());
-        EXPECT_EQ(100U, requested.count(0, 100));
-        EXPECT_EQ(0U, requested.count(100, 300));
         EXPECT_EQ(100U, requested.count(300, 400));
     }
 }

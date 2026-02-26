@@ -31,8 +31,6 @@
 
 - (IBAction)setSequentialDownload:(id)sender;
 
-- (IBAction)setDownloadFirstLastPiecesFirst:(id)sender;
-
 - (IBAction)setPriority:(id)sender;
 
 - (IBAction)setPeersConnectLimit:(id)sender;
