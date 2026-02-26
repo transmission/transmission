@@ -217,8 +217,8 @@ TEST_F(FilePieceMapTest, priorities)
     {
         file_priorities.set(i, pri);
     }
-    std::fill(std::begin(expected_file_priorities), std::end(expected_file_priorities), pri);
-    std::fill(std::begin(expected_piece_priorities), std::end(expected_piece_priorities), pri);
+    std::ranges::fill(expected_file_priorities, pri);
+    std::ranges::fill(expected_piece_priorities, pri);
     mark_file_endpoints_as_high_priority();
     compare_to_expected();
 
@@ -247,8 +247,8 @@ TEST_F(FilePieceMapTest, priorities)
     {
         file_priorities.set(i, pri);
     }
-    std::fill(std::begin(expected_file_priorities), std::end(expected_file_priorities), pri);
-    std::fill(std::begin(expected_piece_priorities), std::end(expected_piece_priorities), pri);
+    std::ranges::fill(expected_file_priorities, pri);
+    std::ranges::fill(expected_piece_priorities, pri);
     mark_file_endpoints_as_high_priority();
     compare_to_expected();
 
@@ -279,14 +279,14 @@ TEST_F(FilePieceMapTest, priorities)
     std::iota(std::begin(file_indices), std::end(file_indices), 0U);
     pri = TR_PRI_HIGH;
     file_priorities.set(std::data(file_indices), std::size(file_indices), pri);
-    std::fill(std::begin(expected_file_priorities), std::end(expected_file_priorities), pri);
-    std::fill(std::begin(expected_piece_priorities), std::end(expected_piece_priorities), pri);
+    std::ranges::fill(expected_file_priorities, pri);
+    std::ranges::fill(expected_piece_priorities, pri);
     mark_file_endpoints_as_high_priority();
     compare_to_expected();
     pri = TR_PRI_LOW;
     file_priorities.set(std::data(file_indices), std::size(file_indices), pri);
-    std::fill(std::begin(expected_file_priorities), std::end(expected_file_priorities), pri);
-    std::fill(std::begin(expected_piece_priorities), std::end(expected_piece_priorities), pri);
+    std::ranges::fill(expected_file_priorities, pri);
+    std::ranges::fill(expected_piece_priorities, pri);
     mark_file_endpoints_as_high_priority();
     compare_to_expected();
 }

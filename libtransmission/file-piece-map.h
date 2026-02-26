@@ -66,7 +66,7 @@ public:
 
     [[nodiscard]] constexpr bool is_edge_piece(tr_piece_index_t const piece) const
     {
-        return std::binary_search(std::begin(edge_pieces_), std::end(edge_pieces_), piece);
+        return std::ranges::binary_search(edge_pieces_, piece);
     }
 
 private:
