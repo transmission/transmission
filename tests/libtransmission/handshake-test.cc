@@ -32,7 +32,7 @@
 #include <libtransmission/net.h>
 #include <libtransmission/peer-io.h>
 #include <libtransmission/peer-mse.h>
-#include <libtransmission/peer-socket.h>
+#include <libtransmission/peer-socket-tcp.h>
 #include <libtransmission/session.h> // tr_peerIdInit()
 #include <libtransmission/string-utils.h>
 #include <libtransmission/timer.h>
@@ -169,11 +169,13 @@ public:
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
         EXPECT_EQ(0, evutil_make_socket_nonblocking(sockpair[0]));
         EXPECT_EQ(0, evutil_make_socket_nonblocking(sockpair[1]));
-        return std::pair{ tr_peerIo::new_incoming(
-                              session,
-                              &session->top_bandwidth_,
-                              tr_peer_socket(session, DefaultPeerSockAddr, sockpair[0])),
-                          sockpair[1] };
+        return std::pair{
+            tr_peerIo::new_incoming(
+                session,
+                &session->top_bandwidth_,
+                tr_peer_socket_tcp::create(*session, DefaultPeerSockAddr, static_cast<tr_socket_t>(sockpair[0]))),
+            sockpair[1],
+        };
     }
 
     auto createOutgoingIo(tr_session* session, tr_sha1_digest_t const& info_hash)
@@ -184,7 +186,7 @@ public:
         EXPECT_EQ(0, evutil_make_socket_nonblocking(sockpair[1]));
         auto peer_io = tr_peerIo::create(
             session,
-            { session, DefaultPeerSockAddr, static_cast<tr_socket_t>(sockpair[0]) },
+            tr_peer_socket_tcp::create(*session, DefaultPeerSockAddr, static_cast<tr_socket_t>(sockpair[0])),
             &session->top_bandwidth_,
             &info_hash,
             false /*incoming*/,

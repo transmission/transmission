@@ -14,8 +14,7 @@
 
 #include <small/vector.hpp>
 
-#include "libtransmission/error.h"
-#include "libtransmission/net.h" // tr_socket_t
+#include "libtransmission/net.h" // tr_port
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" // for tr_htonll(), tr_ntohll()
 
@@ -98,31 +97,6 @@ public:
         auto tmp = uint64_t{};
         to_buf(&tmp, sizeof(tmp));
         return tr_ntohll(tmp);
-    }
-
-    // Returns the number of bytes written. Check `error` for error.
-    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error* error = nullptr)
-    {
-        n_bytes = std::min(n_bytes, size());
-
-        if (n_bytes == 0U)
-        {
-            return {};
-        }
-
-        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), n_bytes, 0); n_sent >= 0)
-        {
-            drain(n_sent);
-            return n_sent;
-        }
-
-        if (error != nullptr)
-        {
-            auto const err = sockerrno;
-            error->set(err, tr_net_strerror(err));
-        }
-
-        return {};
     }
 
     void clear()
@@ -213,37 +187,6 @@ public:
             TR_ASSERT_MSG(false, "invalid type");
             break;
         }
-    }
-
-    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error* error = nullptr)
-    {
-        auto const [buf, buflen] = reserve_space(n_bytes);
-        n_bytes = std::min(n_bytes, buflen);
-        TR_ASSERT(n_bytes > 0U);
-        auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), n_bytes, 0);
-        auto const err = sockerrno;
-
-        if (n_read > 0)
-        {
-            commit_space(n_read);
-            return static_cast<size_t>(n_read);
-        }
-
-        // When a stream socket peer has performed an orderly shutdown,
-        // the return value will be 0 (the traditional "end-of-file" return).
-        if (error != nullptr)
-        {
-            if (n_read == 0)
-            {
-                error->set_from_errno(ENOTCONN);
-            }
-            else
-            {
-                error->set(err, tr_net_strerror(err));
-            }
-        }
-
-        return {};
     }
 };
 

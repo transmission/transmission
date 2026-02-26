@@ -43,6 +43,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h"
+#include "libtransmission/peer-socket-tcp.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/port-forwarding.h"
 #include "libtransmission/quark.h"
@@ -401,7 +402,7 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
     {
         auto const& [socket_address, sock] = *incoming_info;
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, socket_address.display_name()));
-        session->addIncoming({ session, socket_address, sock });
+        session->addIncoming(tr_peer_socket_tcp::create(*session, socket_address, sock));
     }
 }
 
@@ -2189,7 +2190,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
     save_timer_->start_repeating(SaveInterval);
 }
 
-void tr_session::addIncoming(tr_peer_socket&& socket)
+void tr_session::addIncoming(std::shared_ptr<tr_peer_socket> socket)
 {
     tr_peerMgrAddIncoming(peer_mgr_.get(), std::move(socket));
 }
