@@ -423,6 +423,8 @@ public:
             return tor_.has_blocks(block_span(piece));
         }
 
+        [[nodiscard]] std::vector<uint8_t> active_request_count(tr_piece_index_t piece) const override;
+
         [[nodiscard]] bool client_wants_piece(tr_piece_index_t const piece) const override
         {
             return tor_.piece_is_wanted(piece);
@@ -530,6 +532,18 @@ public:
 
         peer_disconnect(tor, peer->has(), peer->active_requests);
 
+        auto const now = std::chrono::system_clock::now();
+        for (size_t block = 0U; block < std::size(peer->active_requests); ++block)
+        {
+            if (peer->active_requests.test(block))
+            {
+                block_history.try_emplace(block).first->second.emplace_back(
+                    now,
+                    fmt::format("disconnected with active request {} [{}]", peer->display_name(), peer->user_agent()));
+                log_block_history(block);
+            }
+        }
+
         auto const& peer_info = peer->peer_info;
         TR_ASSERT(peer_info);
 
@@ -617,6 +631,7 @@ public:
         auto* s = static_cast<tr_swarm*>(vs);
         TR_ASSERT(msgs->swarm == s);
         auto const lock = s->unique_lock();
+        auto const now = std::chrono::system_clock::now();
 
         switch (event.type)
         {
@@ -625,6 +640,10 @@ public:
                 auto* const tor = s->tor;
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->sent_cancel(tor, msgs, loc.block);
+                s->block_history.try_emplace(loc.block).first->second.emplace_back(
+                    now,
+                    fmt::format("cancelled to {} [{}]", msgs->display_name(), msgs->user_agent()));
+                s->log_block_history(loc.block);
             }
             break;
 
@@ -665,6 +684,16 @@ public:
 
         case tr_peer_event::Type::ClientGotChoke:
             s->got_choke(s->tor, msgs->active_requests);
+            for (tr_block_index_t block = 0U; block < std::size(msgs->active_requests); ++block)
+            {
+                if (msgs->active_requests.test(block))
+                {
+                    s->block_history.try_emplace(block).first->second.emplace_back(
+                        now,
+                        fmt::format("choked by {} [{}]", msgs->display_name(), msgs->user_agent()));
+                    s->log_block_history(block);
+                }
+            }
             break;
 
         case tr_peer_event::Type::ClientGotPort:
@@ -681,7 +710,12 @@ public:
 
         case tr_peer_event::Type::ClientGotSuggest:
         case tr_peer_event::Type::ClientGotAllowedFast:
-            // not currently supported
+            for (auto [block, end] = s->tor->block_span_for_piece(event.pieceIndex); block < end; ++block)
+            {
+                s->block_history.try_emplace(block).first->second.emplace_back(
+                    now,
+                    fmt::format("got suggest or allowed fast from {} [{}]", msgs->display_name(), msgs->user_agent()));
+            }
             break;
 
         case tr_peer_event::Type::Error:
@@ -746,7 +780,23 @@ public:
         return tor->session->advertisedPeerPort();
     };
 
+    std::map<tr_block_index_t, std::vector<std::pair<std::chrono::system_clock::time_point, std::string>>> block_history;
+
 private:
+    void log_block_history(tr_block_index_t block) const
+    {
+        if (auto const it = block_history.find(block); it != std::end(block_history))
+        {
+            tr_logAddInfoTor(tor, fmt::format("block {} history:", block));
+            for (auto const& [time, str] : it->second)
+            {
+                auto buf = std::array<char, 64U>{};
+                auto const timestr = tr_logGetTimeStr(time, std::data(buf), std::size(buf));
+                tr_logAddInfoTor(tor, fmt::format("  [{}] {}", timestr, str));
+            }
+        }
+    }
+
     void rebuild_webseeds()
     {
         auto const n = tor->webseed_count();
@@ -850,6 +900,13 @@ private:
             }
         }
 
+        auto const now = std::chrono::system_clock::now();
+        for (auto [block, end] = tor->block_span_for_piece(piece); block < end; ++block)
+        {
+            block_history.try_emplace(block).first->second.emplace_back(now, fmt::format("piece {} completed", piece));
+            log_block_history(block);
+        }
+
         if (piece_came_from_peers) /* webseed downloads don't belong in announce totals */
         {
             tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->piece_size(piece));
@@ -870,6 +927,19 @@ private:
                         piece,
                         peer->strikes + 1));
                 add_strike(peer);
+                auto const* const msgs = dynamic_cast<tr_peerMsgs*>(peer);
+                auto const now = std::chrono::system_clock::now();
+                for (auto [block, end] = tor->block_span_for_piece(piece); block < end; ++block)
+                {
+                    block_history.try_emplace(block).first->second.emplace_back(
+                        now,
+                        fmt::format(
+                            "got bad piece {} {} [{}]",
+                            piece,
+                            peer->display_name(),
+                            msgs != nullptr ? msgs->user_agent() : "webseed"sv));
+                    log_block_history(block);
+                }
             }
         };
 
@@ -924,6 +994,7 @@ private:
 
     static void peer_callback_common(tr_peer* const peer, tr_peer_event const& event, tr_swarm* const s)
     {
+        auto const now = std::chrono::system_clock::now();
         switch (event.type)
         {
         case tr_peer_event::Type::ClientSentRequest:
@@ -933,6 +1004,16 @@ private:
                 auto const loc_end = tor->piece_loc(event.pieceIndex, event.offset, event.length);
                 auto const span = tr_block_span_t{ .begin = loc_begin.block, .end = loc_end.block };
                 s->sent_request(tor, peer, span);
+                auto const* const msgs = dynamic_cast<tr_peerMsgs*>(peer);
+                for (auto block = loc_begin.block; block < loc_end.block; ++block)
+                {
+                    s->block_history.try_emplace(block).first->second.emplace_back(
+                        now,
+                        fmt::format(
+                            "requested to {} [{}]",
+                            peer->display_name(),
+                            msgs != nullptr ? msgs->user_agent() : "webseed"sv));
+                }
             }
             break;
 
@@ -941,6 +1022,14 @@ private:
                 auto* const tor = s->tor;
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->got_reject(tor, peer, loc.block);
+                auto const* const msgs = dynamic_cast<tr_peerMsgs*>(peer);
+                s->block_history.try_emplace(loc.block).first->second.emplace_back(
+                    now,
+                    fmt::format(
+                        "rejected by {} [{}]",
+                        peer->display_name(),
+                        msgs != nullptr ? msgs->user_agent() : "webseed"sv));
+                s->log_block_history(loc.block);
             }
             break;
 
@@ -952,6 +1041,13 @@ private:
                 peer->blocks_sent_to_client.add(tr_time(), 1);
                 peer->blame.set(loc.piece);
                 s->got_block(tor, loc.block); // put this line before calling tr_torrent callback
+                auto const* const msgs = dynamic_cast<tr_peerMsgs*>(peer);
+                s->block_history.try_emplace(loc.block).first->second.emplace_back(
+                    now,
+                    fmt::format(
+                        "received from {} [{}]",
+                        peer->display_name(),
+                        msgs != nullptr ? msgs->user_agent() : "webseed"sv));
                 tor->on_block_received(loc.block);
             }
             break;
@@ -1044,6 +1140,27 @@ EXIT:
 
     mutable std::optional<bool> pool_is_all_upload_only_;
 };
+
+std::vector<uint8_t> tr_swarm::WishlistController::active_request_count(tr_piece_index_t piece) const
+{
+    auto const [begin, end] = block_span(piece);
+    auto ret = std::vector<uint8_t>(end - begin);
+    for (auto const& peer : swarm_.peers)
+    {
+        for (auto block = begin; block < end; ++block)
+        {
+            ret[block - begin] += static_cast<uint8_t>(peer->active_requests.test(block));
+        }
+    }
+    for (auto const& webseed : swarm_.webseeds)
+    {
+        for (auto block = begin; block < end; ++block)
+        {
+            ret[block - begin] += static_cast<uint8_t>(webseed->active_requests.test(block));
+        }
+    }
+    return ret;
+}
 
 // ---
 

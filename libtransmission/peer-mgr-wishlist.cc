@@ -25,6 +25,9 @@
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
+#include <fmt/core.h>
+#include "libtransmission/log.h"
+
 namespace
 {
 [[nodiscard]] TR_CONSTEXPR_VEC std::vector<tr_block_span_t> make_spans(small::vector<tr_block_index_t> const& blocks)
@@ -639,6 +642,61 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
 
     auto blocks = small::vector<tr_block_index_t>{};
     blocks.reserve(n_wanted_blocks);
+    tr_logAddInfo(fmt::format("candidate list size: {}", std::size(candidates_)));
+    tr_logAddInfo("candidate list:");
+    for (auto const& candidate : candidates_)
+    {
+        auto const [begin, end] = candidate.block_span;
+        auto const [raw_begin, raw_end] = candidate.raw_block_span;
+        tr_logAddInfo(
+            fmt::format(
+                "  piece {}: unrequested size = {}, block_span = [{}, {}), raw_block_span = [{}, {}), shrunken = {}",
+                candidate.piece,
+                std::size(candidate.unrequested),
+                begin,
+                end,
+                raw_begin,
+                raw_end,
+                begin != raw_begin || end != raw_end));
+        auto const active_req = mediator_.active_request_count(candidate.piece);
+        for (auto block = raw_begin; block < raw_end; ++block)
+        {
+            auto const n_req = active_req[block - raw_begin];
+            auto const requested = n_req != 0U;
+            auto const contains = candidate.unrequested.contains(block);
+            auto const has = mediator_.client_has_block(block);
+
+            if (n_req > 1U)
+            {
+                tr_logAddInfo(
+                    fmt::format(
+                        "    block {}: active request larger than 1, n_req = {}, contained = {}",
+                        block,
+                        n_req,
+                        contains));
+            }
+
+            if (has && contains)
+            {
+                tr_logAddInfo(fmt::format("    block {}: has but still in 'unrequested' set", block));
+            }
+
+            if (requested && contains)
+            {
+                tr_logAddInfo(fmt::format("    block {}: requested but still in 'unrequested' set", block));
+            }
+
+            if (!has && !requested && !contains && begin <= block && block < end)
+            {
+                tr_logAddInfo(fmt::format("    block {}: missing from 'unrequested' set", block));
+            }
+
+            if ((begin > block || block >= end) && contains)
+            {
+                tr_logAddInfo(fmt::format("    block {}: out of range but still in 'unrequested' set", block));
+            }
+        }
+    }
     for (auto const& candidate : candidates_)
     {
         auto const n_added = std::size(blocks);
