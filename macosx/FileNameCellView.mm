@@ -71,22 +71,6 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 
 - (void)setupConstraints
 {
-    NSImageView* iconView = self.iconView;
-    NSTextField* nameField = self.nameField;
-
-    // Fixed constraints that don't change
-    [NSLayoutConstraint activateConstraints:@[
-        // Icon view constraints
-        [iconView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:kPaddingHorizontal],
-        [iconView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
-        [iconView.widthAnchor constraintEqualToConstant:kImageIconSize],
-        [iconView.heightAnchor constraintEqualToConstant:kImageIconSize],
-
-        // Name field leading constraint
-        [nameField.leadingAnchor constraintEqualToAnchor:iconView.trailingAnchor constant:kPaddingBetweenImageAndTitle],
-    ]];
-
-    self.dynamicConstraints = @[];
 }
 
 - (void)setNode:(FileListNode*)node
@@ -107,16 +91,6 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
     // Update icon
     self.iconView.image = node.icon;
 
-    // Update icon size constraints based on folder/file
-    CGFloat const imageSize = node.isFolder ? kImageFolderSize : kImageIconSize;
-    for (NSLayoutConstraint* constraint in self.iconView.constraints)
-    {
-        if (constraint.firstAttribute == NSLayoutAttributeWidth || constraint.firstAttribute == NSLayoutAttributeHeight)
-        {
-            constraint.constant = imageSize;
-        }
-    }
-
     // Update name
     self.nameField.stringValue = node.name;
 
@@ -129,42 +103,6 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
                                                   percentString,
                                                   [NSString stringForFileSize:node.size]];
     self.statusField.stringValue = status;
-
-    // Update layout constraints based on folder vs file
-    [NSLayoutConstraint deactivateConstraints:self.dynamicConstraints];
-
-    NSTextField* nameField = self.nameField;
-    NSTextField* statusField = self.statusField;
-
-    if (node.isFolder)
-    {
-        // For folders, status appears next to name, both centered
-        self.statusField.hidden = NO;
-        self.dynamicConstraints = @[
-            [nameField.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
-            [nameField.trailingAnchor constraintLessThanOrEqualToAnchor:statusField.leadingAnchor
-                                                               constant:-kPaddingBetweenNameAndFolderStatus],
-
-            [statusField.leadingAnchor constraintEqualToAnchor:nameField.trailingAnchor constant:kPaddingBetweenNameAndFolderStatus],
-            [statusField.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
-            [statusField.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor],
-        ];
-    }
-    else
-    {
-        // For files, status appears below name
-        self.statusField.hidden = NO;
-        self.dynamicConstraints = @[
-            [nameField.topAnchor constraintEqualToAnchor:self.topAnchor constant:kPaddingAboveTitleFile],
-            [nameField.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor],
-
-            [statusField.leadingAnchor constraintEqualToAnchor:nameField.leadingAnchor],
-            [statusField.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
-            [statusField.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-kPaddingBelowStatusFile],
-        ];
-    }
-
-    [NSLayoutConstraint activateConstraints:self.dynamicConstraints];
 
     // Update colors based on background style and check state
     [self updateColors];
@@ -222,6 +160,68 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
         self.nameField.textColor = NSColor.controlTextColor;
         self.statusField.textColor = NSColor.secondaryLabelColor;
     }
+}
+
+@end
+
+@implementation OnlyFileNameCellView
+
+- (void)setupConstraints
+{
+    NSImageView* iconView = self.iconView;
+    NSTextField* nameField = self.nameField;
+    NSTextField* statusField = self.statusField;
+
+    // Fixed constraints that don't change
+    [NSLayoutConstraint activateConstraints:@[
+        // Icon view constraints
+        [iconView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:kPaddingHorizontal],
+        [iconView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+        [iconView.widthAnchor constraintEqualToConstant:kImageIconSize],
+        [iconView.heightAnchor constraintEqualToConstant:kImageIconSize],
+
+        // Name field leading constraint
+        [nameField.leadingAnchor constraintEqualToAnchor:iconView.trailingAnchor constant:kPaddingBetweenImageAndTitle],
+
+        // For files, status appears below name
+        [nameField.topAnchor constraintEqualToAnchor:self.topAnchor constant:kPaddingAboveTitleFile],
+        [nameField.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor],
+
+        [statusField.leadingAnchor constraintEqualToAnchor:nameField.leadingAnchor],
+        [statusField.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [statusField.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-kPaddingBelowStatusFile],
+    ]];
+}
+
+@end
+
+@implementation OnlyFolderNameCellView
+
+- (void)setupConstraints
+{
+    NSImageView* iconView = self.iconView;
+    NSTextField* nameField = self.nameField;
+    NSTextField* statusField = self.statusField;
+
+    // Fixed constraints that don't change
+    [NSLayoutConstraint activateConstraints:@[
+        // Icon view constraints
+        [iconView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:kPaddingHorizontal],
+        [iconView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+        [iconView.widthAnchor constraintEqualToConstant:kImageFolderSize],
+        [iconView.heightAnchor constraintEqualToConstant:kImageFolderSize],
+
+        // Name field leading constraint
+        [nameField.leadingAnchor constraintEqualToAnchor:iconView.trailingAnchor constant:kPaddingBetweenImageAndTitle],
+
+        // For folders, status appears next to name, both centered
+        [nameField.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+        [nameField.trailingAnchor constraintLessThanOrEqualToAnchor:statusField.leadingAnchor constant:-kPaddingBetweenNameAndFolderStatus],
+
+        [statusField.leadingAnchor constraintEqualToAnchor:nameField.trailingAnchor constant:kPaddingBetweenNameAndFolderStatus],
+        [statusField.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+        [statusField.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor],
+    ]];
 }
 
 @end

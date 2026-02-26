@@ -11,3 +11,9 @@
 @property(nonatomic, weak) FileListNode* node;
 
 @end
+
+@interface OnlyFileNameCellView : FileNameCellView
+@end
+
+@interface OnlyFolderNameCellView : FileNameCellView
+@end
