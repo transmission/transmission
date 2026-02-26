@@ -35,6 +35,15 @@ using namespace std::literals;
 
 namespace
 {
+void merge_maps(tr_variant::Map& dest, tr_variant::Map const& src)
+{
+    dest.reserve(std::size(dest) + std::size(src));
+    for (auto const& [key, child] : src)
+    {
+        dest[key].merge(child);
+    }
+}
+
 template<typename T>
 [[nodiscard]] bool value_if(tr_variant const* const var, T* const setme)
 {
@@ -188,6 +197,12 @@ tr_variant tr_variant::clone() const
     return ret;
 }
 
+tr_variant::Map& tr_variant::Map::merge(tr_variant::Map const& that)
+{
+    merge_maps(*this, that);
+    return *this;
+}
+
 tr_variant& tr_variant::merge(tr_variant const& that)
 {
     that.visit(
@@ -213,21 +228,24 @@ tr_variant& tr_variant::merge(tr_variant const& that)
             }
             else if constexpr (std::is_same_v<ValueType, Map>)
             {
-                if (index() != MapIndex)
-                {
-                    val_.emplace<Map>();
-                }
-
-                if (auto* dest = this->template get_if<MapIndex>(); dest != nullptr)
-                {
-                    dest->reserve(std::size(*dest) + std::size(value));
-                    for (auto const& [key, child] : value)
-                    {
-                        (*dest)[key].merge(child);
-                    }
-                }
+                this->merge(value);
             }
         });
+
+    return *this;
+}
+
+tr_variant& tr_variant::merge(Map const& that)
+{
+    if (index() != MapIndex)
+    {
+        val_.emplace<Map>();
+    }
+
+    if (auto* const dest = this->template get_if<MapIndex>(); dest != nullptr)
+    {
+        merge_maps(*dest, that);
+    }
 
     return *this;
 }
