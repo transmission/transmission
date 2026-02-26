@@ -11,6 +11,7 @@ target_sources(${TR_NAME}-mac-ql
         main.cc)
 
 set(LINGUAS
+    bg
     da
     de
     en

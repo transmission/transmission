@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>114.title</key>
+	<string>Премахване от списъка за трансфери, когато качването завърши</string>
+	<key>22.title</key>
+	<string>Ограничения за качване</string>
+	<key>23.title</key>
+	<string>Пропускателна способност</string>
+	<key>26.title</key>
+	<string>КБ/с</string>
+	<key>29.title</key>
+	<string>КБ/с</string>
+	<key>30.title</key>
+	<string>Съотношение:</string>
+	<key>31.title</key>
+	<string>Разширени</string>
+	<key>32.title</key>
+	<string>Максимален брой връзки:</string>
+	<key>35.title</key>
+	<string>пиъри</string>
+	<key>40.title</key>
+	<string>Неограничен</string>
+	<key>41.title</key>
+	<string>Глобална настройка</string>
+	<key>42.title</key>
+	<string>Спри при съотношение</string>
+	<key>43.title</key>
+	<string>Ограничи качването:</string>
+	<key>44.title</key>
+	<string>Ограничи изтеглянето:</string>
+	<key>45.title</key>
+	<string>Остани в рамките на глобалните ограничения на пропускателната способност</string>
+	<key>46.title</key>
+	<string>Приоритет</string>
+	<key>47.title</key>
+	<string>Приоритет на трансфер:</string>
+	<key>50.title</key>
+	<string>ниско</string>
+	<key>51.title</key>
+	<string>нормално</string>
+	<key>52.title</key>
+	<string>високо</string>
+	<key>86.title</key>
+	<string>Спиране при неактивност</string>
+	<key>87.title</key>
+	<string>Глобална настройка</string>
+	<key>88.title</key>
+	<string>Неограничен</string>
+	<key>89.title</key>
+	<string>Неактивност:</string>
+	<key>98.title</key>
+	<string>минути</string>
+</dict>
+</plist>

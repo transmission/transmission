@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>"%@" is not a valid torrent file.</key>
+	<string>„%@“ не е валиден торент файл.</string>
+	<key>%@ of %@</key>
+	<string>%1$@ от %2$@</string>
+	<key>%@ of torrent metadata retrieved</key>
+	<string>%@ от торент извлечени метаданни</string>
+	<key>%@ selected</key>
+	<string>%@ избрано</string>
+	<key>%@ total</key>
+	<string>Общо %@</string>
+	<key>%@ verified</key>
+	<string>%@ потвърдено</string>
+	<key>%ld KB/s</key>
+	<string>%ld КБ/с</string>
+	<key>%ld minutes</key>
+	<string>%ld минути</string>
+	<key>%llu times</key>
+	<string>%llu пъти</string>
+	<key>%lu Connected</key>
+	<string>%lu свързани</string>
+	<key>%lu DHT</key>
+	<string>%lu DHT</string>
+	<key>%lu Downloading</key>
+	<string>%lu изтеглящи</string>
+	<key>%lu Files</key>
+	<string>%lu файлове</string>
+	<key>%lu IP address rules in list</key>
+	<string>%lu правила за IP адреси в списъка</string>
+	<key>%lu Known:</key>
+	<string>%lu известни:</string>
+	<key>%lu LTEP</key>
+	<string>%lu LTEP</string>
+	<key>%lu PEX</key>
+	<string>%lu PEX</string>
+	<key>%lu Seeding</key>
+	<string>%lu качващи</string>
+	<key>%lu Torrent Files</key>
+	<string>%lu торент файлове</string>
+	<key>%lu Torrents Selected</key>
+	<string>Избрани торенти: %lu</string>
+	<key>%lu Trackers</key>
+	<string>Тракери: %lu</string>
+	<key>%lu Web Seeds</key>
+	<string>%lu уеб сийдъри</string>
+	<key>%lu cache</key>
+	<string>%lu кеш</string>
+	<key>%lu files</key>
+	<string>%lu файла</string>
+	<key>%lu incoming</key>
+	<string>%lu входящи</string>
+	<key>%lu local discovery</key>
+	<string>%lu локално откритие</string>
+	<key>%lu magnetized transfers</key>
+	<string>%lu трансфера по магнитна връзка</string>
+	<key>%lu tracker</key>
+	<string>%lu тракер</string>
+	<key>%lu transfers</key>
+	<string>%lu трансфери</string>
+	<key>%lu web seeds</key>
+	<string>%lu уеб сийдъри</string>
+	<key>%u pieces, %@ each</key>
+	<string>%1$u парчета, %2$@ всяка</string>
+	<key>1 Connected</key>
+	<string>1 свързан</string>
+	<key>1 Tracker</key>
+	<string>1 тракер</string>
+	<key>1 Web Seed</key>
+	<string>1 уеб сийдър</string>
+	<key>1 file</key>
+	<string>1 файл</string>
+	<key>1 magnetized transfer</key>
+	<string>1 трансфер по магнитна връзка</string>
+	<key>1 minute</key>
+	<string>1 минута</string>
+	<key>1 piece, %@</key>
+	<string>1 брой, %@</string>
+	<key>1 time</key>
+	<string>1 път</string>
+	<key>1 transfer</key>
+	<string>1 трансфер</string>
+	<key>A blocklist must first be downloaded</key>
+	<string>Първо трябва да се изтегли списък за блокиране</string>
+	<key>A file with the name "%@" already exists in the directory "%@". Choose a new name or directory to create the torrent file.</key>
+	<string>Файл с име „%1$@“ вече съществува в директорията „%2$@“. Избери ново име или директория, за да създадеш торент файла.</string>
+	<key>A folder cannot be moved to inside itself.</key>
+	<string>Папка не може да бъде преместена вътре в себе си.</string>
+	<key>A torrent file cannot be created for files with no size.</key>
+	<string>Торент файл не може да бъде създаден за файлове без размер.</string>
+	<key>A torrent file with this name and directory cannot be created.</key>
+	<string>Торент файл с това име и директория не може да бъде създаден.</string>
+	<key>A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you.</key>
+	<string>Трансфер, маркиран като частен и без адреси на тракери, няма да може да се свърже с пиъри. Торент файлът ще е полезен само ако планираш да качиш файла в тракер сайт, който ще добави адресите вместо теб.</string>
+	<key>A transfer of "%@" already exists.</key>
+	<string>Вече съществува трансфер на „%@“.</string>
+	<key>Active</key>
+	<string>Активни</string>
+	<key>Activity</key>
+	<string>Активност</string>
+	<key>Add</key>
+	<string>Добави</string>
+	<key>Add a tracker</key>
+	<string>Добави тракер</string>
+	<key>Adding magnetized transfer failed.</key>
+	<string>Добавянето на трансфер по магнитна връзка не беше успешно.</string>
+	<key>All</key>
+	<string>Всички</string>
+	<key>All Groups</key>
+	<string>Всички групи</string>
+	<key>Announce error</key>
+	<string>Грешка при обявяване</string>
+	<key>Announce in progress</key>
+	<string>Обявяване в ход</string>
+	<key>Announce is queued</key>
+	<string>Обявяването е на опашка</string>
+	<key>Announce not scheduled</key>
+	<string>Обявяването не е планирано</string>
+	<key>Announce timed out</key>
+	<string>Времето за изчакване при обявяване изтече</string>
+	<key>Apply All</key>
+	<string>Приложи всички</string>
+	<key>Apply Selected</key>
+	<string>Прилагане на избраното</string>
+	<key>Are you sure you want to quit?</key>
+	<string>Наистина ли искаш да се откажеш?</string>
+	<key>Are you sure you want to remove "%@" from the transfer list and trash the data file?</key>
+	<string>Наистина ли искаш да премахнеш „%@“ от списъка за трансфери и да изтриеш файла с данни в кошчето?</string>
+	<key>Are you sure you want to remove "%@" from the transfer list?</key>
+	<string>Наистина ли искаш да премахнеш „%@“ от списъка за трансфери?</string>
+	<key>Are you sure you want to remove %lu completed transfers from the transfer list?</key>
+	<string>Наистина ли искаш да премахнеш %lu завършени трансфера от списъка за трансфери?</string>
+	<key>Are you sure you want to remove %lu trackers?</key>
+	<string>Наистина ли искаш да премахнеш %lu тракери?</string>
+	<key>Are you sure you want to remove %lu transfers from the transfer list and trash the data files?</key>
+	<string>Наистина ли искаш да премахнеш %lu трансфера от списъка за трансфери и да изтриеш файловете с данни?</string>
+	<key>Are you sure you want to remove %lu transfers from the transfer list?</key>
+	<string>Наистина ли искаш да премахнеш %lu трансфера от списъка за трансфери?</string>
+	<key>Are you sure you want to remove this tracker?</key>
+	<string>Наистина ли искаш да премахнеш този тракер?</string>
+	<key>Are you sure you want to reset usage statistics?</key>
+	<string>Наистина ли искаш да нулираш статистиката за употреба?</string>
+	<key>Available</key>
+	<string>Наличен</string>
+	<key>B/s</key>
+	<string>Б/с</string>
+	<key>Bandwidth</key>
+	<string>Пропускателна способност</string>
+	<key>Bandwidth settings changed</key>
+	<string>Настройките за пропускателна способност са променени</string>
+	<key>Blue</key>
+	<string>Синьо</string>
+	<key>Cancel</key>
+	<string>Отказ</string>
+	<key>Change transfer settings</key>
+	<string>Промени настройките за трансфер</string>
+	<key>Check Selected</key>
+	<string>Провери избраното</string>
+	<key>Checking existing data</key>
+	<string>Проверка на съществуващите данни</string>
+	<key>Clear</key>
+	<string>Изчисти</string>
+	<key>Client</key>
+	<string>Клиент</string>
+	<key>Close Quick Look</key>
+	<string>Затвори Бърз преглед</string>
+	<key>Connecting to site</key>
+	<string>Свързване към сайта</string>
+	<key>Copy of "%@" Cannot Be Created</key>
+	<string>Копие на „%@“ не може да бъде създадено</string>
+	<key>Create</key>
+	<string>Създай</string>
+	<key>Create Torrent File</key>
+	<string>Създаване на торент файл</string>
+	<key>Create a Torrent File</key>
+	<string>Създаване на торент файл</string>
+	<key>Create torrent file</key>
+	<string>Създаване на торент файл</string>
+	<key>Created on %@</key>
+	<string>Създаден на %@</string>
+	<key>Created on %@ with %@</key>
+	<string>Създаден на %1$@ с %2$@</string>
+	<key>Created with %@</key>
+	<string>Създаден с %@</string>
+	<key>Creation of "%@" failed.</key>
+	<string>Създаването на „%@“ е неуспешно.</string>
+	<key>Currently downloading (interested and not choked)</key>
+	<string>В момента се изтегля (заинтересован и не е задушен)</string>
+	<key>Currently uploading (interested and not choked)</key>
+	<string>В момента се качва (заинтересован и не е задушен)</string>
+	<key>DL</key>
+	<string>Изт.</string>
+	<key>DL from %lu</key>
+	<string>Изт. от %lu</string>
+	<key>Date</key>
+	<string>Дата</string>
+	<key>Debug</key>
+	<string>Отстраняване на грешки</string>
+	<key>Do not check disk space again</key>
+	<string>Не проверявай дисковото пространство отново</string>
+	<key>Don't Download</key>
+	<string>Не изтегляй</string>
+	<key>Don't bug me about this ever again.</key>
+	<string>Никога повече не ме занимавай с това.</string>
+	<key>Donate</key>
+	<string>Дари</string>
+	<key>Donate or not, there will be no difference to your torrenting experience.</key>
+	<string>Дари или не — няма да има разлика в изживяването ти с торенти.</string>
+	<key>Download</key>
+	<string>Изтегляне</string>
+	<key>Download Anyway</key>
+	<string>Изтегли въпреки това</string>
+	<key>Download Complete</key>
+	<string>Изтеглянето завърши</string>
+	<key>Download Some</key>
+	<string>Изтегли някои</string>
+	<key>Download of the blocklist failed.</key>
+	<string>Неуспешно изтегляне на списъка за блокиране.</string>
+	<key>Download speed</key>
+	<string>Скорост на изтегляне</string>
+	<key>Downloaded</key>
+	<string>Изтеглено</string>
+	<key>Downloading</key>
+	<string>Изтегля се</string>
+	<key>Downloading From Peer</key>
+	<string>Изтегляне от пиър</string>
+	<key>Downloading From Web Seed</key>
+	<string>Изтегляне от уеб сийдър</string>
+	<key>Downloading blocklist</key>
+	<string>Списъкът за блокиране се изтегля</string>
+	<key>Downloading from %lu of %lu peers</key>
+	<string>Изтегляне от %1$lu от общо %2$lu пиъри</string>
+	<key>Downloading from %lu of 1 peer</key>
+	<string>Изтегляне от %lu от 1 пиър</string>
+	<key>Encrypted Connection</key>
+	<string>Криптирана връзка</string>
+	<key>Error</key>
+	<string>Грешка</string>
+	<key>Files</key>
+	<string>Файлове</string>
+	<key>Filter</key>
+	<string>Филтър</string>
+	<key>From: cache</key>
+	<string>От: кеш</string>
+	<key>From: distributed hash table</key>
+	<string>От: разпределена хеш-таблица</string>
+	<key>From: incoming connection</key>
+	<string>От: входяща връзка</string>
+	<key>From: libtorrent extension protocol handshake</key>
+	<string>От: ръкостискане на протокола за разширение на libtorrent</string>
+	<key>From: local peer discovery</key>
+	<string>От: локално откриване на пиъри</string>
+	<key>From: peer exchange</key>
+	<string>От: обмен на пиъри</string>
+	<key>From: tracker</key>
+	<string>От: тракер</string>
+	<key>GB/s</key>
+	<string>ГБ/с</string>
+	<key>General</key>
+	<string>Основни</string>
+	<key>General Info</key>
+	<string>Обща информация</string>
+	<key>Global download limit</key>
+	<string>Глобален лимит за изтегляне</string>
+	<key>Global upload limit</key>
+	<string>Глобален лимит за качване</string>
+	<key>Gray</key>
+	<string>Сиво</string>
+	<key>Green</key>
+	<string>Зелено</string>
+	<key>Group</key>
+	<string>Група</string>
+	<key>Groups</key>
+	<string>Групи</string>
+	<key>Hide Filter Bar</key>
+	<string>Скрий филтърната лента</string>
+	<key>Hide Inspector</key>
+	<string>Скрий инспектора</string>
+	<key>Hide Status Bar</key>
+	<string>Скрий лентата на състоянието</string>
+	<key>Hide Toolbar</key>
+	<string>Скрий лентата с инструменти</string>
+	<key>High</key>
+	<string>Висок</string>
+	<key>High Priority</key>
+	<string>Висок приоритет</string>
+	<key>I Accept</key>
+	<string>Приемам</string>
+	<key>IP Address</key>
+	<string>IP адрес</string>
+	<key>If you are attempting to use already existing data, the root data directory should be inside the destination directory.</key>
+	<string>Ако се опитвате да използвате вече съществуващи данни, основната директория с данни трябва да е в целевата директория.</string>
+	<key>Info</key>
+	<string>Информация</string>
+	<key>Inspector</key>
+	<string>Инспектор</string>
+	<key>Internet address of torrent file:</key>
+	<string>Интернет адрес на торент файл:</string>
+	<key>It appears that the file "%@" from %@ is not a torrent file.</key>
+	<string>Изглежда, че файлът „%1$@“ от %2$@ не е торент файл.</string>
+	<key>KB/s</key>
+	<string>КБ/с</string>
+	<key>Known:</key>
+	<string>Известен:</string>
+	<key>Last Announce</key>
+	<string>Последно обявяване</string>
+	<key>Last Scrape</key>
+	<string>Последно остъргване</string>
+	<key>Last updated</key>
+	<string>Последна актуализация</string>
+	<key>Leechers</key>
+	<string>Свалящи</string>
+	<key>License</key>
+	<string>Лиценз</string>
+	<key>Log Could Not Be Saved</key>
+	<string>Дневникът не може да бъде запазен</string>
+	<key>Low</key>
+	<string>Нисък</string>
+	<key>Low Priority</key>
+	<string>Нисък приоритет</string>
+	<key>MB/s</key>
+	<string>МБ/с</string>
+	<key>Magnet link is a duplicate of an existing transfer.</key>
+	<string>Магнитната връзка е дубликат на съществуващ трансфер.</string>
+	<key>Magnetized transfer</key>
+	<string>Трансфер по магнитна връзка</string>
+	<key>Message</key>
+	<string>Съобщение</string>
+	<key>Message Log</key>
+	<string>Регистър на съобщенията</string>
+	<key>Multiple Priorities</key>
+	<string>Множество приоритети</string>
+	<key>N/A</key>
+	<string>Н/П</string>
+	<key>Name</key>
+	<string>Името</string>
+	<key>Network</key>
+	<string>Мрежа</string>
+	<key>Never</key>
+	<string>Никога</string>
+	<key>New Tier</key>
+	<string>Ново ниво</string>
+	<key>Next announce in %@</key>
+	<string>Следващото обявяване след %@</string>
+	<key>No Group</key>
+	<string>Няма група</string>
+	<key>No Torrents Selected</key>
+	<string>Няма избрани торенти</string>
+	<key>None</key>
+	<string>Няма</string>
+	<key>Nope</key>
+	<string>Не</string>
+	<key>Normal</key>
+	<string>Нормален</string>
+	<key>Normal Priority</key>
+	<string>Нормален приоритет</string>
+	<key>Not enough remaining disk space to download "%@" completely.</key>
+	<string>Няма достатъчно оставащо дисково пространство за пълно изтегляне на „%@“.</string>
+	<key>OK</key>
+	<string>ОК</string>
+	<key>Once removed, Transmission will no longer attempt to contact it. This cannot be undone.</key>
+	<string>След като бъде премахнато, Transmission повече няма да се опитва да се свърже с него.</string>
+	<key>Once removed, Transmission will no longer attempt to contact them. This cannot be undone.</key>
+	<string>След като бъде премахнато, Transmission повече няма да се опитва да се свърже с тях.</string>
+	<key>Once removed, continuing the transfer will require the torrent file or magnet link.</key>
+	<string>След като бъде премахнат, за да продължиш трансфера ще са нужни торент файл или магнитна връзка.</string>
+	<key>Once removed, continuing the transfers will require the torrent files or magnet links.</key>
+	<string>Веднъж премахнати, продължаването на трансферите ще изисква торент файловете или магнитните връзки.</string>
+	<key>Only Check Selected</key>
+	<string>Провери само избраното</string>
+	<key>Open</key>
+	<string>Отвори</string>
+	<key>Open Address</key>
+	<string>Отворен адрес</string>
+	<key>Open Torrent Address</key>
+	<string>Отвори адреса на торент</string>
+	<key>Open Torrent Files</key>
+	<string>Отвори торент файлове</string>
+	<key>Open torrent files</key>
+	<string>Отвори торент файла</string>
+	<key>Open torrent web address</key>
+	<string>Отвори торент уеб адрес</string>
+	<key>Options</key>
+	<string>Опции</string>
+	<key>Orange</key>
+	<string>Оранжево</string>
+	<key>Partial Seed</key>
+	<string>Частично качване</string>
+	<key>Pause / Resume All</key>
+	<string>Пауза / Възобновяване на всички</string>
+	<key>Pause / Resume Selected</key>
+	<string>Избрано е пауза/възобновяване</string>
+	<key>Pause All</key>
+	<string>Пауза на всички</string>
+	<key>Pause Selected</key>
+	<string>Избрана пауза</string>
+	<key>Pause all transfers</key>
+	<string>Пауза на всички трансфери</string>
+	<key>Pause selected transfers</key>
+	<string>Постави на пауза избраните трансфери</string>
+	<key>Pause the transfer</key>
+	<string>Постави трансфера на пауза</string>
+	<key>Paused</key>
+	<string>На пауза</string>
+	<key>Peer is unchoking you, but you are not interested</key>
+	<string>Пиърът те отблокира, но ти не си заинтересован</string>
+	<key>Peer wants you to upload, but you do not want to (interested and choked)</key>
+	<string>Пиърът иска да качваш, но ти не искаш (заинтересован и ограничен)</string>
+	<key>Peers</key>
+	<string>Пиъри</string>
+	<key>Port check site is down</key>
+	<string>Сайтът за проверка на портове не работи</string>
+	<key>Port is closed</key>
+	<string>Портът е затворен</string>
+	<key>Port is open</key>
+	<string>Портът е отворен</string>
+	<key>Port: %@</key>
+	<string>Порт: %@</string>
+	<key>PrefWindowSize</key>
+	<string>Размер на прозореца с настройки</string>
+	<key>Priority</key>
+	<string>Приоритет</string>
+	<key>Priority Not Available</key>
+	<string>Приоритетът не е наличен</string>
+	<key>Private Torrent, non-tracker peer discovery disabled</key>
+	<string>Частен торент, откриването на пиъри без тракер е изключено</string>
+	<key>Process</key>
+	<string>Процес</string>
+	<key>Processing blocklist</key>
+	<string>Списъкът за блокиране се обработва</string>
+	<key>Program Started</key>
+	<string>Програмата стартира</string>
+	<key>Progress: %@</key>
+	<string>Напредък: %@</string>
+	<key>Protocol: %@</key>
+	<string>Протокол: %@</string>
+	<key>Public Torrent</key>
+	<string>Обществен торент</string>
+	<key>Purple</key>
+	<string>Лилаво</string>
+	<key>Quick Look</key>
+	<string>Бърз поглед</string>
+	<key>Quit</key>
+	<string>Изход</string>
+	<key>Ratio</key>
+	<string>Съотношение</string>
+	<key>Red</key>
+	<string>Червено</string>
+	<key>Remote</key>
+	<string>Отдалечен достъп</string>
+	<key>Remove</key>
+	<string>Премахни</string>
+	<key>Remove Selected</key>
+	<string>Премахване на избраното</string>
+	<key>Remove all transfers that have completed seeding.</key>
+	<string>Премахни всички трансфери, които са завършили качването.</string>
+	<key>Remove selected trackers</key>
+	<string>Премахване на избраните тракери</string>
+	<key>Remove selected transfers</key>
+	<string>Премахни избраните трансфери</string>
+	<key>Rename</key>
+	<string>Преименувай</string>
+	<key>Rename File</key>
+	<string>Преименуване на файл</string>
+	<key>Rename the file "%@":</key>
+	<string>Преименувай файла "%@":</string>
+	<key>Reset</key>
+	<string>Нулирай</string>
+	<key>Resume All</key>
+	<string>Възобнови всички</string>
+	<key>Resume Selected</key>
+	<string>Избрано е резюме</string>
+	<key>Resume all transfers</key>
+	<string>Възобнови всички трансфери</string>
+	<key>Resume selected transfers</key>
+	<string>Възобнови избраните трансфери</string>
+	<key>Resume the transfer</key>
+	<string>Възобнови трансфера</string>
+	<key>Resume the transfer right away</key>
+	<string>Възобнови трансфера веднага</string>
+	<key>Running Time</key>
+	<string>Работно време</string>
+	<key>Save</key>
+	<string>Запази</string>
+	<key>Scrape error</key>
+	<string>Грешка при изстъргване</string>
+	<key>Scrape timed out</key>
+	<string>Времето за изчерпване изтече</string>
+	<key>Seeders</key>
+	<string>Качващи</string>
+	<key>Seeding</key>
+	<string>Качване</string>
+	<key>Seeding Complete</key>
+	<string>Качването завърши</string>
+	<key>Seeding complete</key>
+	<string>Качването завърши</string>
+	<key>Seeding to %1$lu of %2$lu peers</key>
+	<string>Качване към %1$lu от общо %2$lu пиъри</string>
+	<key>Seeding to %u of 1 peer</key>
+	<string>Качване към %u от 1 пиър</string>
+	<key>Select</key>
+	<string>Избери</string>
+	<key>Select a file or folder for the torrent file.</key>
+	<string>Избери файл или папка за файла торент.</string>
+	<key>Select the download folder for "%@"</key>
+	<string>Избери папката за изтегляне за „%@“</string>
+	<key>Select the name and location for the torrent file.</key>
+	<string>Избери името и местоположението на файла торент.</string>
+	<key>Select the new folder for "%@".</key>
+	<string>Избери новата папка за "%@".</string>
+	<key>Select the new folder for %lu data files.</key>
+	<string>Избери новата папка за %lu файла с данни.</string>
+	<key>Session Ratio</key>
+	<string>Сесия Съотношение</string>
+	<key>Session Transfer</key>
+	<string>Трансфер за сесия</string>
+	<key>Share</key>
+	<string>Сподели</string>
+	<key>Share torrent file</key>
+	<string>Сподели торент файл</string>
+	<key>Shortcuts for changing global settings.</key>
+	<string>Преки пътища за промяна на глобалните настройки.</string>
+	<key>Show</key>
+	<string>Покажи</string>
+	<key>Show Filter Bar</key>
+	<string>Покажи филтърната лента</string>
+	<key>Show Inspector</key>
+	<string>Покажи инспектора</string>
+	<key>Show Status Bar</key>
+	<string>Покажи лентата на състоянието</string>
+	<key>Show Toolbar</key>
+	<string>Покажи лентата с инструменти</string>
+	<key>Show in Finder</key>
+	<string>Покажи във Finder</string>
+	<key>Show the data file in Finder</key>
+	<string>Покажи файла с данни във Finder</string>
+	<key>Speed Limit</key>
+	<string>Ограничение на скоростта</string>
+	<key>Speed Limit Auto Disabled</key>
+	<string>Автоматичното ограничение на скоростта е деактивирано</string>
+	<key>Speed Limit Auto Enabled</key>
+	<string>Автоматичното ограничение на скоростта е активирано</string>
+	<key>Speed Limit overrides the total bandwidth limits with its own limits.</key>
+	<string>Ограничението на скоростта заменя общите ограничения на пропускателната способност със свои собствени ограничения.</string>
+	<key>Stalled</key>
+	<string>В застой</string>
+	<key>Statistics</key>
+	<string>Статистика</string>
+	<key>Stop waiting to start</key>
+	<string>Спри да чакаш да започнеш</string>
+	<key>Support open-source indie software</key>
+	<string>Поддържа независим софтуер с отворен код</string>
+	<key>TB/s</key>
+	<string>ТБ/с</string>
+	<key>The chosen torrent file location does not exist.</key>
+	<string>Избраното местоположение на файла торент не съществува.</string>
+	<key>The destination directory and root data directory have the same name.</key>
+	<string>Целевата директория и основната директория с данни имат едно и също име.</string>
+	<key>The directory "%@" does not currently exist. Create this directory or choose a different one to create the torrent file.</key>
+	<string>Директорията "%@" в момента не съществува. Създай тази директория или избери друга, за да създадеш торент файла.</string>
+	<key>The magnet link  "%@" cannot be added because it is a duplicate of an already existing transfer.</key>
+	<string>Магнитна връзката "%@" не може да бъде добавена, защото дублира вече съществуващ трансфер.</string>
+	<key>The move operation of "%@" cannot be done.</key>
+	<string>Операцията по преместване на "%@" не може да бъде изпълнена.</string>
+	<key>The specified blocklist file did not contain any valid rules.</key>
+	<string>Посоченият файл със списък за блокиране не съдържа никакви валидни правила.</string>
+	<key>The torrent could not be downloaded from %@: %@.</key>
+	<string>Торентът не можа да бъде изтеглен от %1$@: %2$@.</string>
+	<key>The torrent file (%@) cannot be found.</key>
+	<string>Торент файлът (%@) не може да бъде намерен.</string>
+	<key>The torrent file cannot be opened because it contains invalid data.</key>
+	<string>Файлът торент не може да бъде отворен, защото съдържа невалидни данни.</string>
+	<key>The total file size is zero bytes.</key>
+	<string>Общият размер на файла е нула байта.</string>
+	<key>The transfer cannot be added because it is a duplicate of an already existing transfer.</key>
+	<string>Трансферът не може да бъде добавен, защото е дубликат на вече съществуващ трансфер.</string>
+	<key>The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue.</key>
+	<string>Трансферът ще бъде поставен на пауза. Освободи място на %@ или премахни избора на файлове в инспектора на торента, за да продължиш.</string>
+	<key>The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed.</key>
+	<string>Трансферът няма да се свързва с тракери и ще разчита само на методи за откриване на пиъри без тракер, като обмен на пиъри (PEX) и DHT, за изтегляне и качване.</string>
+	<key>There are %1$lu transfers (%2$lu active).</key>
+	<string>Има %1$lu трансфера (%2$lu активни).</string>
+	<key>There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch.</key>
+	<string>Има %lu активни трансфера, които ще бъдат поставени на пауза при изход. Трансферите ще се възобновят автоматично при следващото стартиране.</string>
+	<key>There are %lu active transfers.</key>
+	<string>Има %lu активни трансфера.</string>
+	<key>There are no tracker addresses.</key>
+	<string>Няма тракер адреси.</string>
+	<key>There is already a copy of Transmission running. This copy cannot be opened until that instance is quit.</key>
+	<string>Вече има работещо копие на Transmission. Това копие не може да се отвори, докато онова не бъде затворено.</string>
+	<key>There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch.</key>
+	<string>Има активен трансфер, който ще бъде поставен на пауза при изход. Трансферът ще се възобнови автоматично при следващото стартиране.</string>
+	<key>There must be at least one file in a folder to create a torrent file.</key>
+	<string>Трябва да има поне един файл в папка, за да създадеш торент файл.</string>
+	<key>There was a problem creating the file "%@".</key>
+	<string>Възникна проблем при създаването на файла "%@".</string>
+	<key>There was an error moving the data file.</key>
+	<string>Възникна грешка при преместването на файла с данни.</string>
+	<key>There was an error when adding the magnet link "%@". The transfer will not occur.</key>
+	<string>Възникна грешка при добавяне на магнитната връзка "%@". Трансферът няма да започне.</string>
+	<key>This folder contains no files.</key>
+	<string>Тази папка не съдържа файлове.</string>
+	<key>This option is not available if Default location is set to Same as torrent file.</key>
+	<string>Тази опция не е налична, ако местоположението по подразбиране е същото като файла торент.</string>
+	<key>This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link.</key>
+	<string>Този трансфер е активен. След като го премахнеш, за да го продължиш ще са нужни торент файл или магнитна връзка.</string>
+	<key>This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected.</key>
+	<string>Това ще изчисти глобалната статистика, показвана от Transmission. Статистиката за отделните трансфери няма да бъде засегната.</string>
+	<key>Tier %ld</key>
+	<string>Ниво %ld</string>
+	<key>Toggle Filter</key>
+	<string>Превключване на филтъра</string>
+	<key>Toggle Inspector</key>
+	<string>Превключване на инспектора</string>
+	<key>Toggle the filter bar</key>
+	<string>Превключи филтърната лента</string>
+	<key>Toggle the torrent inspector</key>
+	<string>Превключи инспектора на торент</string>
+	<key>Torrent File Auto Added</key>
+	<string>Торент файлът е добавен автоматично</string>
+	<key>Torrent Inspector</key>
+	<string>Инспектор на торент</string>
+	<key>Torrent download failed</key>
+	<string>Изтеглянето на торент не беше успешно</string>
+	<key>Total N/A</key>
+	<string>Общо Н/П</string>
+	<key>Total Ratio</key>
+	<string>Общо Съотношение</string>
+	<key>Total Transfer</key>
+	<string>Пълен трансфер</string>
+	<key>Trace</key>
+	<string>Проследяване</string>
+	<key>Tracker</key>
+	<string>Тракер</string>
+	<key>Tracker returned error</key>
+	<string>Тракерът върна грешка</string>
+	<key>Tracker returned warning</key>
+	<string>Тракерът върна предупреждение</string>
+	<key>Tracker will be used as a backup</key>
+	<string>Тракерът ще се използва като резервен</string>
+	<key>Trackers</key>
+	<string>Тракери</string>
+	<key>Transfer Not Active</key>
+	<string>Трансферът не е активен</string>
+	<key>Transfers</key>
+	<string>Трансфери</string>
+	<key>Transfers Not Active</key>
+	<string>Трансферите не са активни</string>
+	<key>Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</key>
+	<string>Transmission е програма за споделяне на файлове. Когато пуснеш торент, данните му стават достъпни за други чрез качване. Само ти носиш пълна отговорност да прецениш правилно и да спазваш местните си закони.</string>
+	<key>Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation.</key>
+	<string>Transmission е пълнофункционално торент приложение. В разработката, кодирането и усъвършенстването му са вложени много време и усилия. Ако ти харесва да го използваш, помисли дали да не го подкрепиш с дарение.</string>
+	<key>Transmission is already running.</key>
+	<string>Transmission вече работи.</string>
+	<key>UL</key>
+	<string>Кач.</string>
+	<key>UL to %lu</key>
+	<string>Кач. до %lu</string>
+	<key>Uncheck Selected</key>
+	<string>Премахни отметката от избраното</string>
+	<key>Upload speed</key>
+	<string>Скорост на качване</string>
+	<key>Uploaded</key>
+	<string>Качено</string>
+	<key>Uploading To Peer</key>
+	<string>Качване към пиър</string>
+	<key>Waiting to check existing data</key>
+	<string>Изчаква се проверка на съществуващите данни</string>
+	<key>Waiting to download</key>
+	<string>Чака изтегляне</string>
+	<key>Waiting to seed</key>
+	<string>В очакване на сийд</string>
+	<key>Warning</key>
+	<string>Предупреждение</string>
+	<key>Web Address</key>
+	<string>Уеб адрес</string>
+	<key>Web Seeds</key>
+	<string>Уеб сийдъри</string>
+	<key>Welcome to Transmission</key>
+	<string>Добре дошъл в Transmission</string>
+	<key>Yellow</key>
+	<string>Жълто</string>
+	<key>You unchoked the peer, but the peer is not interested</key>
+	<string>Ти отблокира пиъра, но пиърът не е заинтересован</string>
+	<key>You want to download, but peer does not want to send (interested and choked)</key>
+	<string>Искаш да изтегляш, но пиърът не иска да изпраща (заинтересован и задушен)</string>
+	<key>disabled</key>
+	<string>забранено</string>
+	<key>encrypted</key>
+	<string>криптиран</string>
+	<key>got %lu peers</key>
+	<string>получени %lu пиъри</string>
+	<key>got 1 peer</key>
+	<string>получен 1 пиър</string>
+	<key>inactive</key>
+	<string>неактивен</string>
+	<key>remaining time unknown</key>
+	<string>оставащото време неизвестно</string>
+	<key>torrent metadata needed</key>
+	<string>Необходими са метаданни за торент</string>
+	<key>unlimited</key>
+	<string>неограничен</string>
+	<key>unreadable error</key>
+	<string>нечетлива грешка</string>
+	<key>untitled</key>
+	<string>без заглавие</string>
+	<key>uploaded %@ (Ratio: %@)</key>
+	<string>качено %1$@ (Съотношение: %2$@)</string>
+	<key>web seed</key>
+	<string>уеб сийдър</string>
+</dict>
+</plist>
