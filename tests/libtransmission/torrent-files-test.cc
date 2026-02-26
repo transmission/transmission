@@ -187,7 +187,7 @@ TEST_F(TorrentFilesTest, isSubpathPortable)
 
         // reserved characters
         { "hell:o.txt", NotWin32 },
-        { "hell\to.txt", NotWin32 },
+        { "hell\to.txt", false },
 
         // everything else
         { ".foo", true },
