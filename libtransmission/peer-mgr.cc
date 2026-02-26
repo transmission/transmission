@@ -687,6 +687,12 @@ public:
         case tr_peer_event::Type::Error:
             if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
             {
+                // TODO: fix this elsewhere, i/o closure should not be generating error 3x
+                // only do disconnect & log if this the first time we see it here
+                if (msgs->is_disconnecting())
+                {
+                    break;
+                }
                 // some protocol error from the peer
                 msgs->disconnect_soon();
                 tr_logAddDebugSwarm(
