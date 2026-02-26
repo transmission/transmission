@@ -10,6 +10,7 @@ Terminal=false
 TryExec=transmission-gtk
 Type=Application
 StartupNotify=true
+StartupWMClass=com.transmissionbt.transmission
 MimeType=application/x-bittorrent;x-scheme-handler/magnet;
 Categories=Network;FileTransfer;P2P;GTK;
 X-Ubuntu-Gettext-Domain=transmission
