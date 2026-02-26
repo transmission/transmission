@@ -446,15 +446,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
 template<size_t M>
 [[nodiscard]] consteval bool has_no_none_entries(std::array<ApiKey, M> const& keys)
 {
-    for (auto const [current, legacy] : keys)
-    {
-        if (current == TR_KEY_NONE || legacy == TR_KEY_NONE)
-        {
-            return false;
-        }
-    }
-
-    return true;
+    return std::ranges::all_of(keys, [](auto const& key) { return key.current != TR_KEY_NONE && key.legacy != TR_KEY_NONE; });
 }
 
 static_assert(has_no_none_entries(RpcKeys));
