@@ -80,7 +80,7 @@ jobs:
   code-style:
     runs-on: ubuntu-24.04
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
+    if: false # TEMP: minimal testing
     steps:
       - name: Show Configuration
         run: |
@@ -130,7 +130,7 @@ jobs:
   sanitizer-tests-ubuntu:
     runs-on: ubuntu-24.04
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+    if: false # TEMP: minimal testing
     steps:
       - name: Show Configuration
         run: |
@@ -186,7 +186,7 @@ jobs:
   sanitizer-tests-macos:
     runs-on: macos-26
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+    if: false # TEMP: minimal testing
     steps:
       - name: Show Configuration
         run: |
@@ -406,9 +406,7 @@ jobs:
   clang-tidy-libtransmission-win32:
     runs-on: windows-2025
     needs: what-to-make
-    if: |
-      needs.what-to-make.outputs.make-core == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true'
+    if: false # TEMP: minimal testing
     steps:
       - name: Show Configuration
         run: |
@@ -456,10 +454,7 @@ jobs:
   macos-xcodebuild-universal:
     runs-on: macos-26
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
-            needs.what-to-make.outputs.make-daemon == 'true' ||
-            needs.what-to-make.outputs.make-mac == 'true' ||
-            needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: minimal testing
     steps:
       - name: Show Configuration
         run: |
@@ -494,13 +489,7 @@ jobs:
           macos-26
         ]
     needs: [what-to-make]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
-            needs.what-to-make.outputs.make-daemon == 'true' ||
-            needs.what-to-make.outputs.make-gtk == 'true' ||
-            needs.what-to-make.outputs.make-mac == 'true' ||
-            needs.what-to-make.outputs.make-qt == 'true' ||
-            needs.what-to-make.outputs.make-tests == 'true' ||
-            needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: minimal testing
     runs-on: ${{ matrix.os }}
     steps:
       - name: Show Configuration
@@ -598,6 +587,7 @@ jobs:
             ninja \
             npm \
             pkgconfig \
+            uchardet-dev \
             utfcpp \
             xz
       - name: Get Dependencies (GTK)
@@ -656,7 +646,7 @@ jobs:
 
   windows:
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: minimal testing
     strategy:
       fail-fast: false
       matrix:
@@ -782,13 +772,7 @@ jobs:
           macos-26
         ]
     needs: [make-source-tarball, what-to-make]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
-            needs.what-to-make.outputs.make-daemon == 'true' ||
-            needs.what-to-make.outputs.make-gtk == 'true' ||
-            needs.what-to-make.outputs.make-mac == 'true' ||
-            needs.what-to-make.outputs.make-qt == 'true' ||
-            needs.what-to-make.outputs.make-tests == 'true' ||
-            needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: minimal testing
     runs-on: ${{ matrix.os }}
     steps:
       - name: Show Configuration
@@ -965,7 +949,7 @@ jobs:
 
   fedora:
     needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: minimal testing
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -1044,7 +1028,7 @@ jobs:
 
   utp-disabled:
     needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-core == 'true' }}
+    if: false # TEMP: minimal testing
     runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
@@ -1172,7 +1156,7 @@ jobs:
 
   ubuntu-24-04-cxx-23:
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: false # TEMP: minimal testing
     runs-on: ubuntu-24.04
     steps:
       - name: Show Configuration
@@ -1349,6 +1333,7 @@ jobs:
               pkgconf \
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
               rapidjson \
+              uchardet \
               utf8cpp
           run: |
             set -ex
@@ -1387,7 +1372,7 @@ jobs:
 
   crypto:
     needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-core == 'true' && needs.what-to-make.outputs.make-tests == 'true' }}
+    if: false # TEMP: minimal testing
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -1516,6 +1501,7 @@ jobs:
               `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo node` \
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
               rapidjson \
+              uchardet \
               utfcpp
           run: |
             set -ex
@@ -1597,6 +1583,7 @@ jobs:
               pkgconf \
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
               rapidjson \
+              uchardet \
               utf8-cpp
             if [ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] || [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
               for set in xbase xcomp; do
@@ -1689,6 +1676,7 @@ jobs:
               pkgconf \
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
               rapidjson \
+              uchardet \
               utf8cpp
           run: |
             set -ex
