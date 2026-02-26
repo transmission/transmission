@@ -546,8 +546,7 @@ private:
             return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
                 info.announce_after < now;
         };
-        auto const remove_it = std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(needs_announce));
-        torrents.erase(remove_it, std::end(torrents));
+        std::erase_if(torrents, std::not_fn(needs_announce));
 
         if (std::empty(torrents))
         {
@@ -568,7 +567,7 @@ private:
             }
             return false;
         };
-        std::sort(std::begin(torrents), std::end(torrents), TorrentComparator);
+        std::ranges::sort(torrents, TorrentComparator);
 
         auto const next_announce_after = now + TorrentAnnounceIntervalSec;
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)

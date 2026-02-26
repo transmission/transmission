@@ -23,11 +23,6 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/types.h"
 
-Cache::Key Cache::make_key(tr_torrent const& tor, tr_block_info::Location const loc) noexcept
-{
-    return std::make_pair(tor.id(), loc.block);
-}
-
 Cache::CIter Cache::find_span_end(CIter const& span_begin, CIter const& end) noexcept
 {
     static constexpr auto NotAdjacent = [](CacheBlock const& block1, CacheBlock const& block2)
@@ -141,7 +136,7 @@ int Cache::write_block(tr_torrent_id_t const tor_id, tr_block_index_t const bloc
     }
 
     auto const key = Key{ tor_id, block };
-    auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey);
+    auto iter = std::ranges::lower_bound(blocks_, key, {}, project_to_key);
     if (iter == std::end(blocks_) || iter->key != key)
     {
         iter = blocks_.emplace(iter);
@@ -158,11 +153,7 @@ int Cache::write_block(tr_torrent_id_t const tor_id, tr_block_index_t const bloc
 
 Cache::CIter Cache::get_block(tr_torrent const& tor, tr_block_info::Location const& loc) noexcept
 {
-    if (auto const [begin, end] = std::equal_range(
-            std::begin(blocks_),
-            std::end(blocks_),
-            make_key(tor, loc),
-            CompareCacheBlockByKey);
+    if (auto const [begin, end] = std::ranges::equal_range(blocks_, Key{ tor.id(), loc.block }, {}, project_to_key);
         begin < end)
     {
         return begin;
@@ -208,15 +199,15 @@ int Cache::flush_file(tr_torrent const& tor, tr_file_index_t const file)
     auto const [block_begin, block_end] = tor.block_span_for_file(file);
 
     return flush_span(
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), CompareCacheBlockByKey),
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), CompareCacheBlockByKey));
+        std::ranges::lower_bound(blocks_, Key{ tor_id, block_begin }, {}, project_to_key),
+        std::ranges::lower_bound(blocks_, Key{ tor_id, block_end }, {}, project_to_key));
 }
 
 int Cache::flush_torrent(tr_torrent_id_t const tor_id)
 {
     return flush_span(
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), CompareCacheBlockByKey),
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), CompareCacheBlockByKey));
+        std::ranges::lower_bound(blocks_, Key{ tor_id, 0 }, {}, project_to_key),
+        std::ranges::lower_bound(blocks_, Key{ tor_id + 1, 0 }, {}, project_to_key));
 }
 
 int Cache::flush_biggest()
