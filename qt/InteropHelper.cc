@@ -7,15 +7,15 @@
 
 #include "InteropHelper.h"
 
-bool InteropHelper::isConnected() const
+bool InteropHelper::is_connected() const
 {
 #if defined(ENABLE_DBUS_INTEROP) && defined(ENABLE_COM_INTEROP)
 
-    return dbus_client_.isConnected() || com_client_.isConnected();
+    return dbus_client_.is_connected() || com_client_.isConnected();
 
 #elif defined(ENABLE_DBUS_INTEROP)
 
-    return dbus_client_.isConnected();
+    return dbus_client_.is_connected();
 
 #elif defined(ENABLE_COM_INTEROP)
 
@@ -28,19 +28,19 @@ bool InteropHelper::isConnected() const
 #endif
 }
 
-bool InteropHelper::addMetainfo(QString const& metainfo) const
+bool InteropHelper::add_metainfo(QString const& metainfo) const
 {
 #if defined(ENABLE_DBUS_INTEROP) && defined(ENABLE_COM_INTEROP)
 
-    return dbus_client_.addMetainfo(metainfo).toBool() || com_client_.addMetainfo(metainfo).toBool();
+    return dbus_client_.add_metainfo(metainfo).toBool() || com_client_.add_metainfo(metainfo).toBool();
 
 #elif defined(ENABLE_DBUS_INTEROP)
 
-    return dbus_client_.addMetainfo(metainfo).toBool();
+    return dbus_client_.add_metainfo(metainfo).toBool();
 
 #elif defined(ENABLE_COM_INTEROP)
 
-    return com_client_.addMetainfo(metainfo).toBool();
+    return com_client_.add_metainfo(metainfo).toBool();
 
 #else
 
@@ -56,13 +56,13 @@ void InteropHelper::initialize()
 #endif
 }
 
-void InteropHelper::registerObject(QObject* parent)
+void InteropHelper::register_object(QObject* parent)
 {
 #ifdef ENABLE_DBUS_INTEROP
-    DBusInteropHelper::registerObject(parent);
+    DBusInteropHelper::register_object(parent);
 #endif
 
 #ifdef ENABLE_COM_INTEROP
-    ComInteropHelper::registerObject(parent);
+    ComInteropHelper::register_object(parent);
 #endif
 }

@@ -40,13 +40,13 @@ bool change(double& setme, double const& value)
 
 bool change(Speed& setme, tr_variant const* value)
 {
-    auto const byps = getValue<int>(value);
+    auto const byps = get_value<int>(value);
     return byps && change(setme, Speed{ *byps, Speed::Units::Byps });
 }
 
 bool change(TorrentHash& setme, tr_variant const* value)
 {
-    auto const hash_string = getValue<std::string_view>(value);
+    auto const hash_string = get_value<std::string_view>(value);
     return hash_string && change(setme, TorrentHash{ *hash_string });
 }
 
@@ -204,44 +204,44 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
 ///
 
-void variantInit(tr_variant* init_me, bool value)
+void variant_init(tr_variant* init_me, bool value)
 {
     *init_me = value;
 }
 
-void variantInit(tr_variant* init_me, int64_t value)
+void variant_init(tr_variant* init_me, int64_t value)
 {
     *init_me = value;
 }
 
-void variantInit(tr_variant* init_me, int value)
+void variant_init(tr_variant* init_me, int value)
 {
     *init_me = value;
 }
 
-void variantInit(tr_variant* init_me, double value)
+void variant_init(tr_variant* init_me, double value)
 {
     *init_me = value;
 }
 
-void variantInit(tr_variant* init_me, QByteArray const& value)
+void variant_init(tr_variant* init_me, QByteArray const& value)
 {
     *init_me = std::string_view{ value.constData(), static_cast<size_t>(value.size()) };
 }
 
-void variantInit(tr_variant* init_me, QString const& value)
+void variant_init(tr_variant* init_me, QString const& value)
 {
     *init_me = value.toStdString();
 }
 
-void variantInit(tr_variant* init_me, std::string_view value)
+void variant_init(tr_variant* init_me, std::string_view value)
 {
     *init_me = value;
 }
 
 namespace
 {
-bool toInt(tr_variant const& src, int* tgt)
+bool to_int(tr_variant const& src, int* tgt)
 {
     if (auto const val = src.value_if<int64_t>())
     {
@@ -257,14 +257,15 @@ bool toInt(tr_variant const& src, int* tgt)
     return false;
 }
 
-tr_variant fromInt(int const& val)
+tr_variant from_int(int const& val)
 {
     return static_cast<int64_t>(val);
 }
 
 // ---
 
-bool toQDateTime(tr_variant const& src, QDateTime* tgt)
+// NOLINTNEXTLINE(readability-identifier-naming)
+bool to_QDateTime(tr_variant const& src, QDateTime* tgt)
 {
     if (auto const val = ser::to_value<int64_t>(src))
     {
@@ -275,14 +276,16 @@ bool toQDateTime(tr_variant const& src, QDateTime* tgt)
     return false;
 }
 
-tr_variant fromQDateTime(QDateTime const& src)
+// NOLINTNEXTLINE(readability-identifier-naming)
+tr_variant from_QDateTime(QDateTime const& src)
 {
     return ser::to_variant(int64_t{ src.toSecsSinceEpoch() });
 }
 
 // ---
 
-bool toQString(tr_variant const& src, QString* tgt)
+// NOLINTNEXTLINE(readability-identifier-naming)
+bool to_QString(tr_variant const& src, QString* tgt)
 {
     if (auto const val = src.value_if<std::string_view>())
     {
@@ -293,7 +296,8 @@ bool toQString(tr_variant const& src, QString* tgt)
     return false;
 }
 
-tr_variant fromQString(QString const& val)
+// NOLINTNEXTLINE(readability-identifier-naming)
+tr_variant from_QString(QString const& val)
 {
     return val.toStdString();
 }
@@ -307,9 +311,9 @@ void register_qt_converters()
         []
         {
             using namespace tr::serializer;
-            Converters::add(toInt, fromInt);
-            Converters::add(toQDateTime, fromQDateTime);
-            Converters::add(toQString, fromQString);
+            Converters::add(to_int, from_int);
+            Converters::add(to_QDateTime, from_QDateTime);
+            Converters::add(to_QString, from_QString);
         });
 }
 

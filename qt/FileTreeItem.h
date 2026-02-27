@@ -41,7 +41,7 @@ public:
     FileTreeItem(FileTreeItem const&) = delete;
     ~FileTreeItem();
 
-    void appendChild(FileTreeItem* child);
+    void append_child(FileTreeItem* child);
     FileTreeItem* child(QString const& filename);
 
     FileTreeItem* child(int row)
@@ -49,7 +49,7 @@ public:
         return children_.at(row);
     }
 
-    [[nodiscard]] constexpr int childCount() const noexcept
+    [[nodiscard]] constexpr int child_count() const noexcept
     {
         return std::size(children_);
     }
@@ -73,35 +73,35 @@ public:
 
     QVariant data(int column, int role) const;
     std::pair<int, int> update(QString const& name, bool want, int priority, uint64_t have, bool update_fields);
-    void setSubtreeWanted(bool wanted, file_indices_t& setme_changed_ids);
-    void setSubtreePriority(int priority, file_indices_t& setme_changed_ids);
+    void set_subtree_wanted(bool wanted, file_indices_t& setme_changed_ids);
+    void set_subtree_priority(int priority, file_indices_t& setme_changed_ids);
 
-    [[nodiscard]] constexpr auto fileIndex() const noexcept
+    [[nodiscard]] constexpr auto file_index() const noexcept
     {
         return file_index_;
     }
 
-    [[nodiscard]] constexpr auto totalSize() const noexcept
+    [[nodiscard]] constexpr auto total_size() const noexcept
     {
         return total_size_;
     }
 
-    [[nodiscard]] constexpr auto isComplete() const noexcept
+    [[nodiscard]] constexpr auto is_complete() const noexcept
     {
-        return have_size_ == totalSize();
+        return have_size_ == total_size();
     }
 
     QString path() const;
     int priority() const;
-    int isSubtreeWanted() const;
+    int is_subtree_wanted() const;
 
 private:
-    QString priorityString() const;
-    QString sizeString() const;
+    QString priority_string() const;
+    QString size_string() const;
     std::pair<uint64_t, uint64_t> get_subtree_wanted_size() const;
     double progress() const;
     uint64_t size() const;
-    std::unordered_map<QString, int> const& getMyChildRows() const;
+    std::unordered_map<QString, int> const& get_my_child_rows() const;
 
     FileTreeItem* parent_ = {};
     mutable std::unordered_map<QString, int> child_rows_;

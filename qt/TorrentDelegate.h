@@ -34,20 +34,20 @@ public:
 
 protected:
     QSize margin(QStyle const& style) const;
-    void setProgressBarPercentDone(QStyleOptionViewItem const& option, Torrent const& tor) const;
-    QIcon warningEmblem() const
+    void set_progress_bar_percent_done(QStyleOptionViewItem const& option, Torrent const& tor) const;
+    QIcon warning_emblem() const
     {
         return warning_emblem_;
     }
 
     // Our own overridables
-    virtual QSize sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const;
-    virtual void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const& tor) const;
+    virtual QSize size_hint(QStyleOptionViewItem const& option, Torrent const& tor) const;
+    virtual void draw_torrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const& tor) const;
 
-    static QString statusString(Torrent const& tor);
-    static QString progressString(Torrent const& tor);
-    static QString shortStatusString(Torrent const& tor);
-    static QString shortTransferString(Torrent const& tor);
+    static QString status_string(Torrent const& tor);
+    static QString progress_string(Torrent const& tor);
+    static QString short_status_string(Torrent const& tor);
+    static QString short_transfer_string(Torrent const& tor);
 
     static inline QColor const BlueBack{ "lightgrey" };
     static inline QColor const BlueBrush{ "steelblue" };

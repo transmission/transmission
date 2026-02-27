@@ -20,10 +20,10 @@ public:
     TorrentView& operator=(TorrentView const&) = delete;
 
 public slots:
-    void setHeaderText(QString const& text);
+    void set_header_text(QString const& text);
 
 signals:
-    void headerDoubleClicked();
+    void header_double_clicked();
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
@@ -31,7 +31,7 @@ protected:
 private:
     class HeaderWidget;
 
-    void adjustHeaderPosition();
+    void adjust_header_position();
 
     HeaderWidget* const header_widget_ = {};
 };

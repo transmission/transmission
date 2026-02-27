@@ -11,7 +11,7 @@ TrackerModelFilter::TrackerModelFilter(QObject* parent)
 {
 }
 
-void TrackerModelFilter::setShowBackupTrackers(bool b)
+void TrackerModelFilter::set_show_backup_trackers(bool b)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 10, 0)
 

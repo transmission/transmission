@@ -39,11 +39,7 @@ class StatsDialog;
 class TorrentDelegate;
 class TorrentDelegateMin;
 class TorrentModel;
-
-extern "C"
-{
-    struct tr_variant;
-}
+struct tr_variant;
 
 class MainWindow : public QMainWindow
 {
@@ -57,33 +53,33 @@ public:
     MainWindow& operator=(MainWindow&&) = delete;
     MainWindow& operator=(MainWindow const&) = delete;
 
-    [[nodiscard]] constexpr QSystemTrayIcon& trayIcon() noexcept
+    [[nodiscard]] constexpr QSystemTrayIcon& tray_icon() noexcept
     {
         return tray_icon_;
     }
 
 public slots:
-    void startAll();
-    void startSelected();
-    void startSelectedNow();
-    void pauseAll();
-    void pauseSelected();
-    void removeSelected();
-    void deleteSelected();
-    void verifySelected();
-    void queueMoveTop();
-    void queueMoveUp();
-    void queueMoveDown();
-    void queueMoveBottom();
-    void reannounceSelected();
+    void start_all();
+    void start_selected();
+    void start_selected_now();
+    void pause_all();
+    void pause_selected();
+    void remove_selected();
+    void delete_selected();
+    void verify_selected();
+    void queue_move_top();
+    void queue_move_up();
+    void queue_move_down();
+    void queue_move_bottom();
+    void reannounce_selected();
 
-    void setToolbarVisible(bool visible);
-    void setFilterbarVisible(bool visible);
-    void setStatusbarVisible(bool visible);
-    void setCompactView(bool visible);
-    void wrongAuthentication();
+    void set_toolbar_visible(bool visible);
+    void set_filterbar_visible(bool visible);
+    void set_statusbar_visible(bool visible);
+    void set_compact_view(bool visible);
+    void wrong_authentication();
 
-    void openSession();
+    void open_session();
 
 protected:
     // QWidget
@@ -93,47 +89,47 @@ protected:
     bool event(QEvent* e) override;
 
 private slots:
-    void addTorrents(QStringList const& filenames);
-    void copyMagnetLinkToClipboard();
-    void dataReadProgress();
-    void dataSendProgress();
-    void newTorrent();
-    void onNetworkResponse(QNetworkReply::NetworkError code, QString const& message);
-    void onRefreshTimer();
-    void onSessionSourceChanged();
-    void onSetPrefs();
-    void onSetPrefs(bool is_checked);
-    void onSortModeChanged(QAction const* action);
-    void onStatsModeChanged(QAction const* action);
-    void openAbout();
-    void openDonate() const;
-    void openFolder();
-    void openHelp() const;
-    void openPreferences();
-    void openProperties();
-    void openStats();
-    void openTorrent();
-    void openURL();
-    void refreshPref(int idx);
-    void removeTorrents(bool delete_files);
-    void setLocation();
-    void setSortAscendingPref(bool b);
-    void toggleSpeedMode();
-    void toggleWindows(bool do_show);
-    void trayActivated(QSystemTrayIcon::ActivationReason reason);
+    void add_torrents(QStringList const& filenames);
+    void copy_magnet_link_to_clipboard();
+    void data_read_progress();
+    void data_send_progress();
+    void new_torrent();
+    void on_network_response(QNetworkReply::NetworkError code, QString const& message);
+    void on_refresh_timer();
+    void on_session_source_changed();
+    void on_set_prefs();
+    void on_set_prefs(bool is_checked);
+    void on_sort_mode_changed(QAction const* action);
+    void on_stats_mode_changed(QAction const* action);
+    void open_about();
+    void open_donate() const;
+    void open_folder();
+    void open_help() const;
+    void open_preferences();
+    void open_properties();
+    void open_stats();
+    void open_torrent();
+    void open_url();
+    void refresh_pref(int idx);
+    void remove_torrents(bool delete_files);
+    void set_location();
+    void set_sort_ascending_pref(bool b);
+    void toggle_speed_mode();
+    void toggle_windows(bool do_show);
+    void tray_activated(QSystemTrayIcon::ActivationReason reason);
 
 private:
-    [[nodiscard]] torrent_ids_t getSelectedTorrents(bool with_metadata_only = false) const;
-    void updateNetworkLabel();
-    void refreshSoon(int fields);
+    [[nodiscard]] torrent_ids_t get_selected_torrents(bool with_metadata_only = false) const;
+    void update_network_label();
+    void refresh_soon(int fields);
 
-    QMenu* createOptionsMenu();
-    QMenu* createStatsModeMenu();
-    void initStatusBar();
+    QMenu* create_options_menu();
+    QMenu* create_stats_mode_menu();
+    void init_status_bar();
 
-    void clearSelection();
-    void addTorrentFromClipboard();
-    void addTorrent(AddData const& add_me, bool show_options);
+    void clear_selection();
+    void add_torrent_from_clipboard();
+    void add_torrent(AddData const& add_me, bool show_options);
 
     // QWidget
     void hideEvent(QHideEvent* event) override;
@@ -189,7 +185,7 @@ private:
         size_t peers_sending = 0;
         size_t peers_receiving = 0;
     };
-    [[nodiscard]] TransferStats getTransferStats() const;
+    [[nodiscard]] TransferStats get_transfer_stats() const;
 
     static constexpr auto RefreshTitle = 1 << 0;
     static constexpr auto RefreshStatusBar = 1 << 1;
@@ -200,10 +196,10 @@ private:
     int refresh_fields_ = {};
     QTimer refresh_timer_;
 
-    void refreshActionSensitivity();
-    void refreshIcons();
-    void refreshStatusBar(TransferStats const& stats);
-    void refreshTitle();
-    void refreshTorrentViewHeader();
-    void refreshTrayIcon(TransferStats const& stats);
+    void refresh_action_sensitivity();
+    void refresh_icons();
+    void refresh_status_bar(TransferStats const& stats);
+    void refresh_title();
+    void refresh_torrent_view_header();
+    void refresh_tray_icon(TransferStats const& stats);
 };

@@ -62,7 +62,7 @@ protected:
 
 private:
 #if QT_CONFIG(accessibility)
-    void updateAccessibilityIfNeeded();
+    void update_accessibility_if_needed();
 #endif
 
 private:

@@ -19,9 +19,9 @@ public:
     TrackerModelFilter& operator=(TrackerModelFilter&&) = delete;
     TrackerModelFilter& operator=(TrackerModelFilter const&) = delete;
 
-    void setShowBackupTrackers(bool b);
+    void set_show_backup_trackers(bool b);
 
-    [[nodiscard]] constexpr auto showBackupTrackers() const noexcept
+    [[nodiscard]] constexpr auto show_backup_trackers() const noexcept
     {
         return show_backups_;
     }

@@ -10,11 +10,7 @@
 #include <QTimer>
 
 class Session;
-
-extern "C"
-{
-    struct tr_variant;
-}
+struct tr_variant;
 
 class FreeSpaceLabel : public QLabel
 {
@@ -28,11 +24,11 @@ public:
     FreeSpaceLabel& operator=(FreeSpaceLabel&&) = delete;
     FreeSpaceLabel& operator=(FreeSpaceLabel const&) = delete;
 
-    void setSession(Session& session);
-    void setPath(QString const& path);
+    void set_session(Session& session);
+    void set_path(QString const& path);
 
 private slots:
-    void onTimer();
+    void on_timer();
 
 private:
     Session* session_ = {};

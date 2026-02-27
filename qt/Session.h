@@ -28,11 +28,7 @@
 
 class AddData;
 class Prefs;
-
-extern "C"
-{
-    struct tr_variant;
-}
+struct tr_variant;
 
 class Session : public QObject
 {
@@ -49,27 +45,27 @@ public:
     void stop();
     void restart();
 
-    [[nodiscard]] constexpr auto const& getRemoteUrl() const noexcept
+    [[nodiscard]] constexpr auto const& get_remote_url() const noexcept
     {
         return rpc_.url();
     }
 
-    [[nodiscard]] constexpr auto const& getStats() const noexcept
+    [[nodiscard]] constexpr auto const& get_stats() const noexcept
     {
         return stats_;
     }
 
-    [[nodiscard]] constexpr auto const& getCumulativeStats() const noexcept
+    [[nodiscard]] constexpr auto const& get_cumulative_stats() const noexcept
     {
         return cumulative_stats_;
     }
 
-    [[nodiscard]] constexpr auto const& sessionVersion() const noexcept
+    [[nodiscard]] constexpr auto const& session_version() const noexcept
     {
         return session_version_;
     }
 
-    [[nodiscard]] constexpr auto blocklistSize() const noexcept
+    [[nodiscard]] constexpr auto blocklist_size() const noexcept
     {
         return blocklist_size_;
     }
@@ -81,49 +77,49 @@ public:
         NUM_PORT_TEST_IP_PROTOCOL
     };
 
-    void setBlocklistSize(int64_t i);
-    void updateBlocklist();
-    void portTest(PortTestIpProtocol ip_protocol);
-    void copyMagnetLinkToClipboard(int torrent_id);
+    void set_blocklist_size(int64_t i);
+    void update_blocklist();
+    void port_test(PortTestIpProtocol ip_protocol);
+    void copy_magnet_link_to_clipboard(int torrent_id);
 
-    [[nodiscard]] bool portTestPending(PortTestIpProtocol ip_protocol) const noexcept;
+    [[nodiscard]] bool port_test_pending(PortTestIpProtocol ip_protocol) const noexcept;
 
     /** returns true if the transmission session is being run inside this client */
-    [[nodiscard]] constexpr auto isServer() const noexcept
+    [[nodiscard]] constexpr auto is_server() const noexcept
     {
         return session_ != nullptr;
     }
 
-    /** returns true if isServer() is true or if the remote address is the localhost */
-    [[nodiscard]] auto isLocal() const noexcept
+    /** returns true if is_local() is true or if the remote address is the localhost */
+    [[nodiscard]] auto is_local() const noexcept
     {
-        return !session_id_.isEmpty() ? is_definitely_local_session_ : rpc_.isLocal();
+        return !session_id_.isEmpty() ? is_definitely_local_session_ : rpc_.is_local();
     }
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
 
     using Tag = RpcQueue::Tag;
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, bool val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, int val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, double val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, QString const& val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, std::vector<int> const& val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, QStringList const& val);
+    Tag torrent_set(torrent_ids_t const& torrent_ids, tr_quark key, bool val);
+    Tag torrent_set(torrent_ids_t const& torrent_ids, tr_quark key, int val);
+    Tag torrent_set(torrent_ids_t const& torrent_ids, tr_quark key, double val);
+    Tag torrent_set(torrent_ids_t const& torrent_ids, tr_quark key, QString const& val);
+    Tag torrent_set(torrent_ids_t const& torrent_ids, tr_quark key, std::vector<int> const& val);
+    Tag torrent_set(torrent_ids_t const& torrent_ids, tr_quark key, QStringList const& val);
 
-    void torrentSetLocation(torrent_ids_t const& torrent_ids, QString const& path, bool do_move);
-    void torrentRenamePath(torrent_ids_t const& torrent_ids, QString const& oldpath, QString const& newname);
-    void addTorrent(AddData const& add_me, tr_variant* args_dict);
-    void initTorrents(torrent_ids_t const& ids = {});
-    void pauseTorrents(torrent_ids_t const& torrent_ids = {});
-    void startTorrents(torrent_ids_t const& torrent_ids = {});
-    void startTorrentsNow(torrent_ids_t const& torrent_ids = {});
-    void refreshDetailInfo(torrent_ids_t const& torrent_ids);
-    void refreshActiveTorrents();
-    void refreshAllTorrents();
-    void addNewlyCreatedTorrent(QString const& filename, QString const& local_path);
-    void verifyTorrents(torrent_ids_t const& torrent_ids);
-    void reannounceTorrents(torrent_ids_t const& torrent_ids);
-    void refreshExtraStats(torrent_ids_t const& torrent_ids);
+    void torrent_set_location(torrent_ids_t const& torrent_ids, QString const& path, bool do_move);
+    void torrent_rename_path(torrent_ids_t const& torrent_ids, QString const& oldpath, QString const& newname);
+    void add_torrent(AddData const& add_me, tr_variant* args_dict);
+    void init_torrents(torrent_ids_t const& ids = {});
+    void pause_torrents(torrent_ids_t const& torrent_ids = {});
+    void start_torrents(torrent_ids_t const& torrent_ids = {});
+    void start_torrents_now(torrent_ids_t const& torrent_ids = {});
+    void refresh_detail_info(torrent_ids_t const& torrent_ids);
+    void refresh_active_torrents();
+    void refresh_all_torrents();
+    void add_newly_created_torrent(QString const& filename, QString const& local_path);
+    void verify_torrents(torrent_ids_t const& torrent_ids);
+    void reannounce_torrents(torrent_ids_t const& torrent_ids);
+    void refresh_extra_stats(torrent_ids_t const& torrent_ids);
 
     enum class TorrentProperties : uint8_t
     {
@@ -136,50 +132,50 @@ public:
     };
 
 public slots:
-    void addTorrent(AddData const& add_me);
-    void launchWebInterface() const;
-    void queueMoveBottom(torrent_ids_t const& torrentIds = {});
-    void queueMoveDown(torrent_ids_t const& torrentIds = {});
-    void queueMoveTop(torrent_ids_t const& torrentIds = {});
-    void queueMoveUp(torrent_ids_t const& torrentIds = {});
-    void refreshSessionInfo();
-    void refreshSessionStats();
-    void removeTorrents(torrent_ids_t const& torrent_ids, bool delete_files = false);
-    void updatePref(int key);
+    void add_torrent(AddData const& add_me);
+    void launch_web_interface() const;
+    void queue_move_bottom(torrent_ids_t const& torrentIds = {});
+    void queue_move_down(torrent_ids_t const& torrentIds = {});
+    void queue_move_top(torrent_ids_t const& torrentIds = {});
+    void queue_move_up(torrent_ids_t const& torrentIds = {});
+    void refresh_session_info();
+    void refresh_session_stats();
+    void remove_torrents(torrent_ids_t const& torrent_ids, bool delete_files = false);
+    void update_pref(int key);
 
 signals:
-    void sourceChanged();
-    void portTested(std::optional<bool> status, PortTestIpProtocol ip_protocol);
-    void statsUpdated();
-    void sessionUpdated();
-    void blocklistUpdated(int);
-    void torrentsUpdated(tr_variant* torrent_list, bool complete_list);
-    void torrentsRemoved(tr_variant* torrent_list);
-    void sessionCalled(Tag);
-    void dataReadProgress();
-    void dataSendProgress();
-    void networkResponse(QNetworkReply::NetworkError code, QString const& message);
-    void httpAuthenticationRequired();
+    void source_changed();
+    void port_tested(std::optional<bool> status, PortTestIpProtocol ip_protocol);
+    void stats_updated();
+    void session_updated();
+    void blocklist_updated(int);
+    void torrents_updated(tr_variant* torrent_list, bool complete_list);
+    void torrents_removed(tr_variant* torrent_list);
+    void session_called(Tag);
+    void data_read_progress();
+    void data_send_progress();
+    void network_response(QNetworkReply::NetworkError code, QString const& message);
+    void http_authentication_required();
 
 private slots:
-    void onDuplicatesTimer();
+    void on_duplicates_timer();
 
 private:
     void start();
 
-    void updateStats(tr_variant* args_dict);
-    void updateInfo(tr_variant* args_dict);
+    void update_stats(tr_variant* args_dict);
+    void update_info(tr_variant* args_dict);
 
-    Tag torrentSetImpl(tr_variant* args);
-    void sessionSet(tr_quark key, tr_variant val);
-    void pumpRequests();
-    void sendTorrentRequest(tr_quark method, torrent_ids_t const& torrent_ids);
-    void refreshTorrents(torrent_ids_t const& ids, TorrentProperties props);
+    Tag torrent_set_impl(tr_variant* args);
+    void session_set(tr_quark key, tr_variant val);
+    void pump_requests();
+    void send_torrent_request(tr_quark method, torrent_ids_t const& torrent_ids);
+    void refresh_torrents(torrent_ids_t const& ids, TorrentProperties props);
 
-    static void updateStats(tr_variant* args_dict, tr_session_stats* stats);
+    static void update_stats(tr_variant* args_dict, tr_session_stats* stats);
 
-    void addOptionalIds(tr_variant::Map& params, torrent_ids_t const& torrent_ids) const;
-    void addOptionalIds(tr_variant* args_dict, torrent_ids_t const& torrent_ids) const;
+    void add_optional_ids(tr_variant::Map& params, torrent_ids_t const& torrent_ids) const;
+    void add_optional_ids(tr_variant* args_dict, torrent_ids_t const& torrent_ids) const;
 
     QString const config_dir_;
     Prefs& prefs_;

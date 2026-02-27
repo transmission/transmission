@@ -49,7 +49,7 @@ class RpcClientTest : public QObject
 
     static void invoke_network_finished(RpcClient& client, QNetworkReply* reply)
     {
-        QMetaObject::invokeMethod(&client, "networkRequestFinished", Qt::DirectConnection, Q_ARG(QNetworkReply*, reply));
+        QMetaObject::invokeMethod(&client, "network_request_finished", Qt::DirectConnection, Q_ARG(QNetworkReply*, reply));
     }
 
     static void add_style_data()

@@ -25,11 +25,11 @@ public:
     PathButton& operator=(PathButton&&) = delete;
     PathButton& operator=(PathButton const&) = delete;
 
-    void setMode(Mode mode);
-    void setTitle(QString const& title);
-    void setNameFilter(QString const& name_filter);
+    void set_mode(Mode mode);
+    void set_title(QString const& title);
+    void set_name_filter(QString const& name_filter);
 
-    void setPath(QString const& path);
+    void set_path(QString const& path);
 
     [[nodiscard]] constexpr auto const& path() const noexcept
     {
@@ -40,21 +40,21 @@ public:
     [[nodiscard]] QSize sizeHint() const override;
 
 signals:
-    void pathChanged(QString const& path);
+    void path_changed(QString const& path);
 
 protected:
     // QWidget
     void paintEvent(QPaintEvent* event) override;
 
 private slots:
-    void onClicked() const;
-    void onFileSelected(QString const& path);
+    void on_clicked() const;
+    void on_file_selected(QString const& path);
 
 private:
-    void updateAppearance();
+    void update_appearance();
 
-    [[nodiscard]] bool isDirMode() const;
-    [[nodiscard]] QString effectiveTitle() const;
+    [[nodiscard]] bool is_dir_mode() const;
+    [[nodiscard]] QString effective_title() const;
 
     QString name_filter_;
     QString path_;

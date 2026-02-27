@@ -29,14 +29,14 @@
 namespace
 {
 
-bool isSlashChar(QChar const& c)
+bool is_slash_char(QChar const& c)
 {
     return c == QLatin1Char('/') || c == QLatin1Char('\\');
 }
 
 } // namespace
 
-QIcon Utils::getIconFromIndex(QModelIndex const& index)
+QIcon Utils::get_icon_from_index(QModelIndex const& index)
 {
     QVariant const variant = index.data(Qt::DecorationRole);
 
@@ -57,11 +57,11 @@ QIcon Utils::getIconFromIndex(QModelIndex const& index)
     }
 }
 
-QString Utils::removeTrailingDirSeparator(QString const& path)
+QString Utils::remove_trailing_dir_separator(QString const& path)
 {
     int i = path.size();
 
-    while (i > 1 && isSlashChar(path[i - 1]))
+    while (i > 1 && is_slash_char(path[i - 1]))
     {
         --i;
     }
@@ -69,7 +69,7 @@ QString Utils::removeTrailingDirSeparator(QString const& path)
     return path.left(i);
 }
 
-int Utils::measureViewItem(QAbstractItemView const* view, QString const& text)
+int Utils::measure_view_item(QAbstractItemView const* view, QString const& text)
 {
     QStyleOptionViewItem option;
     option.initFrom(view);
@@ -83,7 +83,7 @@ int Utils::measureViewItem(QAbstractItemView const* view, QString const& text)
         .width();
 }
 
-int Utils::measureHeaderItem(QHeaderView const* view, QString const& text)
+int Utils::measure_header_item(QHeaderView const* view, QString const& text)
 {
     QStyleOptionHeader option;
     option.initFrom(view);
@@ -93,14 +93,14 @@ int Utils::measureHeaderItem(QHeaderView const* view, QString const& text)
     return view->style()->sizeFromContents(QStyle::CT_HeaderSection, &option, QSize{}, view).width();
 }
 
-QColor Utils::getFadedColor(QColor const& color)
+QColor Utils::get_faded_color(QColor const& color)
 {
     QColor faded_color(color);
     faded_color.setAlpha(128);
     return faded_color;
 }
 
-void Utils::updateSpinBoxFormat(QSpinBox* spinBox, char const* context, char const* format, QString const& placeholder)
+void Utils::update_spin_box_format(QSpinBox* spinBox, char const* context, char const* format, QString const& placeholder)
 {
     QString const units_format = QCoreApplication::translate(context, format, nullptr, spinBox->value());
     auto const placeholder_pos = units_format.indexOf(placeholder);

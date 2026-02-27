@@ -40,18 +40,18 @@ public:
 
     Type set(QString const& key);
 
-    [[nodiscard]] QByteArray toBase64() const;
-    [[nodiscard]] QString readableName() const;
-    [[nodiscard]] QString readableShortName() const;
+    [[nodiscard]] QByteArray to_base64() const;
+    [[nodiscard]] QString readable_name() const;
+    [[nodiscard]] QString readable_short_name() const;
 
-    void disposeSourceFile() const;
+    void dispose_source_file() const;
 
-    constexpr void setFileDisposal(FilenameDisposal disposal)
+    constexpr void set_file_disposal(FilenameDisposal disposal)
     {
         disposal_ = disposal;
     }
 
-    [[nodiscard]] constexpr auto& fileDisposal() const noexcept
+    [[nodiscard]] constexpr auto& file_disposal() const noexcept
     {
         return disposal_;
     }

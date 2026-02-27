@@ -135,14 +135,14 @@ public:
     Prefs& operator=(Prefs const&) = delete;
     ~Prefs() override = default;
 
-    [[nodiscard]] static auto constexpr isCore(int const idx)
+    [[nodiscard]] static auto constexpr is_core(int const idx)
     {
         return FIRST_CORE_PREF <= idx && idx <= LAST_CORE_PREF;
     }
 
     [[nodiscard]] std::pair<tr_quark, tr_variant> keyval(int idx) const;
 
-    void loadFromConfigDir(QString const& dir);
+    void load_from_config_dir(QString const& dir);
 
     void load(tr_variant::Map const& settings);
 

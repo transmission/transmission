@@ -35,13 +35,13 @@ Torrent::Torrent(Prefs const& prefs, int id)
 ****
 ***/
 
-std::optional<double> Torrent::getSeedRatioLimit() const
+std::optional<double> Torrent::get_seed_ratio_limit() const
 {
-    auto const mode = seedRatioMode();
+    auto const mode = seed_ratio_mode();
 
     if (mode == TR_RATIOLIMIT_SINGLE)
     {
-        return seedRatioLimit();
+        return seed_ratio_limit();
     }
 
     if (mode == TR_RATIOLIMIT_GLOBAL && prefs_.get<bool>(Prefs::RATIO_ENABLED))
@@ -52,19 +52,19 @@ std::optional<double> Torrent::getSeedRatioLimit() const
     return {};
 }
 
-bool Torrent::includesTracker(QString const& sitename) const
+bool Torrent::includes_tracker(QString const& sitename) const
 {
     return std::ranges::binary_search(sitenames_, sitename);
 }
 
-int Torrent::compareSeedProgress(Torrent const& that) const
+int Torrent::compare_seed_progress(Torrent const& that) const
 {
-    auto const a_ratio_limit = getSeedRatioLimit();
-    auto const b_ratio_limit = that.getSeedRatioLimit();
+    auto const a_ratio_limit = get_seed_ratio_limit();
+    auto const b_ratio_limit = that.get_seed_ratio_limit();
 
     if (!a_ratio_limit && !b_ratio_limit)
     {
-        return compareRatio(that);
+        return compare_ratio(that);
     }
 
     auto const a_ratio = ratio();
@@ -82,7 +82,7 @@ int Torrent::compareSeedProgress(Torrent const& that) const
 
     if (!(*a_ratio_limit > 0) && !(*b_ratio_limit > 0))
     {
-        return compareRatio(that);
+        return compare_ratio(that);
     }
 
     if (!(*a_ratio_limit > 0))
@@ -100,7 +100,7 @@ int Torrent::compareSeedProgress(Torrent const& that) const
     return tr_compare_3way(a_progress, b_progress);
 }
 
-int Torrent::compareRatio(Torrent const& that) const
+int Torrent::compare_ratio(Torrent const& that) const
 {
     double const a = ratio();
     double const b = that.ratio();
@@ -123,14 +123,14 @@ int Torrent::compareRatio(Torrent const& that) const
     return tr_compare_3way(a, b);
 }
 
-int Torrent::compareETA(Torrent const& that) const
+int Torrent::compare_eta(Torrent const& that) const
 {
-    bool const have_a(hasETA());
-    bool const have_b(that.hasETA());
+    bool const have_a(has_eta());
+    bool const have_b(that.has_eta());
 
     if (have_a && have_b)
     {
-        return getETA() - that.getETA();
+        return get_eta() - that.get_eta();
     }
 
     if (have_a)
@@ -150,11 +150,11 @@ int Torrent::compareETA(Torrent const& that) const
 ****
 ***/
 
-QIcon Torrent::getMimeTypeIcon() const
+QIcon Torrent::get_mime_type_icon() const
 {
     if (icon_.isNull())
     {
-        icon_ = IconCache::get().getMimeTypeIcon(primary_mime_type_, file_count_ > 1);
+        icon_ = IconCache::get().get_mime_type_icon(primary_mime_type_, file_count_ > 1);
     }
 
     return icon_;
@@ -295,12 +295,12 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
     return changed;
 }
 
-QString Torrent::activityString() const
+QString Torrent::activity_string() const
 {
-    switch (getActivity())
+    switch (get_activity())
     {
     case TR_STATUS_STOPPED:
-        return isFinished() ? tr("Finished") : tr("Paused");
+        return is_finished() ? tr("Finished") : tr("Paused");
 
     case TR_STATUS_CHECK_WAIT:
         return tr("Queued for verification");
@@ -325,7 +325,7 @@ QString Torrent::activityString() const
     }
 }
 
-QString Torrent::getError() const
+QString Torrent::get_error() const
 {
     switch (error_)
     {
@@ -343,7 +343,7 @@ QString Torrent::getError() const
     }
 }
 
-QPixmap TrackerStat::getFavicon() const
+QPixmap TrackerStat::get_favicon() const
 {
     return trApp->find_favicon(sitename);
 }

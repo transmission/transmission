@@ -22,15 +22,15 @@ StatsDialog::StatsDialog(Session& session, QWidget* parent)
     ui_.setupUi(this);
 
     auto* cr = new ColumnResizer{ this };
-    cr->addLayout(ui_.currentSessionSectionLayout);
-    cr->addLayout(ui_.totalSectionLayout);
+    cr->add_layout(ui_.currentSessionSectionLayout);
+    cr->add_layout(ui_.totalSectionLayout);
     cr->update();
 
     timer_.setSingleShot(false);
-    connect(&timer_, &QTimer::timeout, &session_, &Session::refreshSessionStats);
-    connect(&session_, &Session::statsUpdated, this, &StatsDialog::updateStats);
-    updateStats();
-    session_.refreshSessionStats();
+    connect(&timer_, &QTimer::timeout, &session_, &Session::refresh_session_stats);
+    connect(&session_, &Session::stats_updated, this, &StatsDialog::update_stats);
+    update_stats();
+    session_.refresh_session_stats();
 }
 
 void StatsDialog::setVisible(bool visible)
@@ -45,10 +45,10 @@ void StatsDialog::setVisible(bool visible)
     BaseDialog::setVisible(visible);
 }
 
-void StatsDialog::updateStats()
+void StatsDialog::update_stats()
 {
-    tr_session_stats const& current(session_.getStats());
-    tr_session_stats const& total(session_.getCumulativeStats());
+    tr_session_stats const& current(session_.get_stats());
+    tr_session_stats const& total(session_.get_cumulative_stats());
 
     ui_.currentUploadedValueLabel->setText(Formatter::storage_to_string(current.uploadedBytes));
     ui_.currentDownloadedValueLabel->setText(Formatter::storage_to_string(current.downloadedBytes));

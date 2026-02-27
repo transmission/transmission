@@ -44,7 +44,7 @@ IconCache& IconCache::get()
     return singleton;
 }
 
-QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
+QIcon IconCache::guess_mime_icon(QString const& filename, QIcon fallback) const
 {
     QIcon icon;
 
@@ -54,14 +54,14 @@ QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
     {
         QFileInfo const file_info(filename);
 
-        addAssociatedFileIcon(file_info, SHGFI_SMALLICON, icon);
-        addAssociatedFileIcon(file_info, 0, icon);
-        addAssociatedFileIcon(file_info, SHGFI_LARGEICON, icon);
+        add_associated_file_icon(file_info, SHGFI_SMALLICON, icon);
+        add_associated_file_icon(file_info, 0, icon);
+        add_associated_file_icon(file_info, SHGFI_LARGEICON, icon);
     }
 
 #else
 
-    icon = getMimeIcon(filename);
+    icon = get_mime_icon(filename);
 
 #endif
 
@@ -73,7 +73,7 @@ QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
     return icon;
 }
 
-QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) const
+QIcon IconCache::get_mime_type_icon(QString const& mime_type_name, bool multifile) const
 {
     auto& icon = (multifile ? name_to_emblem_icon_ : name_to_icon_)[mime_type_name];
 
@@ -87,10 +87,10 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
         static auto const MimeDb = QMimeDatabase{};
         auto const type = MimeDb.mimeTypeForName(mime_type_name);
         auto const filename = QStringLiteral("filename.%1").arg(type.preferredSuffix());
-        return guessMimeIcon(filename, file_icon_);
+        return guess_mime_icon(filename, file_icon_);
     }
 
-    auto const mime_icon = getMimeTypeIcon(mime_type_name, false);
+    auto const mime_icon = get_mime_type_icon(mime_type_name, false);
     for (auto const& size : { QSize{ 24, 24 }, QSize{ 32, 32 }, QSize{ 48, 48 } })
     {
         // upper left corner
@@ -114,9 +114,9 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
     return icon;
 }
 
-QIcon IconCache::getThemeIcon(QString const& name, std::optional<QStyle::StandardPixmap> const& fallback) const
+QIcon IconCache::get_theme_icon(QString const& name, std::optional<QStyle::StandardPixmap> const& fallback) const
 {
-    return getThemeIcon(name, name + QStringLiteral("-symbolic"), fallback);
+    return get_theme_icon(name, name + QStringLiteral("-symbolic"), fallback);
 }
 
 /***
@@ -125,7 +125,7 @@ QIcon IconCache::getThemeIcon(QString const& name, std::optional<QStyle::Standar
 
 #ifdef _WIN32
 
-void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, unsigned int icon_size, QIcon& icon) const
+void IconCache::add_associated_file_icon(QFileInfo const& file_info, unsigned int icon_size, QIcon& icon) const
 {
     QString const pixmap_cache_key = QStringLiteral("tr_file_ext_") + QString::number(icon_size) + QLatin1Char('_') +
         file_info.suffix();
@@ -167,7 +167,7 @@ void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, unsigned int i
 
 #else
 
-QIcon IconCache::getMimeIcon(QString const& filename) const
+QIcon IconCache::get_mime_icon(QString const& filename) const
 {
     if (suffixes_.empty())
     {
@@ -191,12 +191,12 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
         auto const type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
         if (icon.isNull())
         {
-            icon = getThemeIcon(type.iconName());
+            icon = get_theme_icon(type.iconName());
         }
 
         if (icon.isNull())
         {
-            icon = getThemeIcon(type.genericIconName());
+            icon = get_theme_icon(type.genericIconName());
         }
 
         if (icon.isNull())
@@ -210,7 +210,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
 
 #endif
 
-QIcon IconCache::getThemeIcon(
+QIcon IconCache::get_theme_icon(
     QString const& name,
     QString const& fallbackName,
     std::optional<QStyle::StandardPixmap> const& fallbackPixmap) const

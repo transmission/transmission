@@ -25,11 +25,7 @@
 
 class Prefs;
 class Session;
-
-extern "C"
-{
-    struct tr_variant;
-}
+struct tr_variant;
 
 class OptionsDialog : public BaseDialog
 {
@@ -44,19 +40,19 @@ public:
     ~OptionsDialog() override;
 
 private slots:
-    void onAccepted();
-    void onPriorityChanged(file_indices_t const& file_indices, int priority);
-    void onWantedChanged(file_indices_t const& file_indices, bool is_wanted);
+    void on_accepted();
+    void on_priority_changed(file_indices_t const& file_indices, int priority);
+    void on_wanted_changed(file_indices_t const& file_indices, bool is_wanted);
 
-    void onSourceChanged();
-    void onDestinationChanged();
+    void on_source_changed();
+    void on_destination_changed();
 
-    void onSessionUpdated();
+    void on_session_updated();
 
 private:
     void reload();
-    void updateWidgetsLocality();
-    void clearInfo();
+    void update_widgets_locality();
+    void clear_info();
 
     AddData add_;
     FileList files_;

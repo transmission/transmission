@@ -30,10 +30,7 @@ class QNetworkAccessManager;
 using TrVariantPtr = std::shared_ptr<tr_variant>;
 Q_DECLARE_METATYPE(TrVariantPtr)
 
-extern "C"
-{
-    struct tr_session;
-}
+struct tr_session;
 
 struct RpcResponse
 {
@@ -65,7 +62,7 @@ public:
         return url_;
     }
 
-    [[nodiscard]] constexpr auto isLocal() const noexcept
+    [[nodiscard]] constexpr auto is_local() const noexcept
     {
         return session_ != nullptr || url_is_loopback_;
     }
@@ -77,14 +74,14 @@ public:
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
 
 signals:
-    void httpAuthenticationRequired();
-    void dataReadProgress();
-    void dataSendProgress();
-    void networkResponse(QNetworkReply::NetworkError code, QString const& message);
+    void http_authentication_required();
+    void data_read_progress();
+    void data_send_progress();
+    void network_response(QNetworkReply::NetworkError code, QString const& message);
 
 private slots:
-    void networkRequestFinished(QNetworkReply* reply);
-    void localRequestFinished(TrVariantPtr response);
+    void network_request_finished(QNetworkReply* reply);
+    void local_request_finished(TrVariantPtr response);
 
 private:
     static inline QByteArray const SessionIdHeaderName = { TrRpcSessionIdHeader.data(),
@@ -92,12 +89,12 @@ private:
     static inline QByteArray const VersionHeaderName = { TrRpcVersionHeader.data(),
                                                          static_cast<qsizetype>(TrRpcVersionHeader.size()) };
 
-    void connectNetworkAccessManager();
+    void connect_network_access_manager();
 
-    void sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise);
-    void sendLocalRequest(tr_variant& req, QFutureInterface<RpcResponse> const& promise, int64_t id);
-    [[nodiscard]] int64_t parseResponseId(tr_variant& response) const;
-    [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
+    void send_network_request(QByteArray const& body, QFutureInterface<RpcResponse> const& promise);
+    void send_local_request(tr_variant& req, QFutureInterface<RpcResponse> const& promise, int64_t id);
+    [[nodiscard]] int64_t parse_response_id(tr_variant& response) const;
+    [[nodiscard]] RpcResponse parse_response_data(tr_variant& response) const;
 
     tr::api_compat::Style network_style_ = tr::api_compat::default_style();
     tr_session* session_ = {};

@@ -15,13 +15,13 @@
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 bool RelocateDialog::move_flag = true;
 
-void RelocateDialog::onSetLocation()
+void RelocateDialog::on_set_location()
 {
-    session_.torrentSetLocation(ids_, newLocation(), move_flag);
+    session_.torrent_set_location(ids_, new_location(), move_flag);
     close();
 }
 
-void RelocateDialog::onMoveToggled(bool b) const
+void RelocateDialog::on_move_toggled(bool b) const
 {
     move_flag = b;
 }
@@ -37,15 +37,15 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
 
     for (int const id : ids_)
     {
-        Torrent const* tor = model.getTorrentFromId(id);
+        Torrent const* tor = model.get_torrent_from_id(id);
 
         if (path.isEmpty())
         {
-            path = tor->getPath();
+            path = tor->get_path();
         }
-        else if (path != tor->getPath())
+        else if (path != tor->get_path())
         {
-            if (session_.isLocal())
+            if (session_.is_local())
             {
                 path = QDir::homePath();
             }
@@ -58,12 +58,12 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         }
     }
 
-    if (session_.isLocal())
+    if (session_.is_local())
     {
         ui_.newLocationStack->setCurrentWidget(ui_.newLocationButton);
-        ui_.newLocationButton->setMode(PathButton::DirectoryMode);
-        ui_.newLocationButton->setTitle(tr("Select Location"));
-        ui_.newLocationButton->setPath(path);
+        ui_.newLocationButton->set_mode(PathButton::DirectoryMode);
+        ui_.newLocationButton->set_title(tr("Select Location"));
+        ui_.newLocationButton->set_path(path);
     }
     else
     {
@@ -84,12 +84,12 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         ui_.findDataRadio->setChecked(true);
     }
 
-    connect(ui_.moveDataRadio, &QAbstractButton::toggled, this, &RelocateDialog::onMoveToggled);
+    connect(ui_.moveDataRadio, &QAbstractButton::toggled, this, &RelocateDialog::on_move_toggled);
     connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &RelocateDialog::close);
-    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &RelocateDialog::onSetLocation);
+    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &RelocateDialog::on_set_location);
 }
 
-QString RelocateDialog::newLocation() const
+QString RelocateDialog::new_location() const
 {
     return ui_.newLocationStack->currentWidget() == ui_.newLocationButton ? ui_.newLocationButton->path() :
                                                                             ui_.newLocationEdit->text();

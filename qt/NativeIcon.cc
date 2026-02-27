@@ -22,7 +22,7 @@
 #include <small/set.hpp>
 
 #if defined(Q_OS_MAC)
-extern QPixmap loadSFSymbol(QString symbol_name, int pixel_size);
+extern QPixmap load_sf_symbol(QString symbol_name, int pixel_size);
 #endif
 
 namespace icons
@@ -48,7 +48,7 @@ auto const Win11IconFamily = QStringLiteral("Segoe Fluent Icons");
 // #define DEV_FORCE_FONT_FAMILY Win11IconFamily
 // #define DEV_FORCE_FONT_RESOURCE QStringLiteral(":devonly/segoe_fluent_icons.ttf")
 
-QString getWindowsFontFamily()
+QString get_windows_font_family()
 {
 #ifdef DEV_FORCE_FONT_FAMILY
     return DEV_FORCE_FONT_FAMILY;
@@ -67,14 +67,14 @@ QString getWindowsFontFamily()
 #endif
 }
 
-void ensureFontsLoaded()
+void ensure_fonts_loaded()
 {
 #ifdef DEV_FORCE_FONT_RESOURCE
     [[maybe_unused]] static auto const font_id = QFontDatabase::addApplicationFont(DEV_FORCE_FONT_RESOURCE);
 #endif
 }
 
-QPixmap makeIconFromCodepoint(QString const& family, QChar const codepoint, int const pixel_size)
+QPixmap make_icon_from_codepoint(QString const& family, QChar const codepoint, int const pixel_size)
 {
     auto font = QFont{ family };
     if (!QFontMetrics{ font }.inFont(codepoint))
@@ -161,7 +161,7 @@ struct Info
  * This is used as a fallback to ensure all toolbar acitions have icons,
  * even on very old Windows / macOS systems lacking Segoe / SF Symbols.
  */
-[[nodiscard]] constexpr Info getInfo(Type const type)
+[[nodiscard]] constexpr Info get_info(Type const type)
 {
     auto sf_symbol_name = std::string_view{};
     auto xdg_icon_name = std::string_view{};
@@ -436,7 +436,7 @@ struct Info
 
 QIcon icon(Type const type, QStyle const* const style)
 {
-    ensureFontsLoaded();
+    ensure_fonts_loaded();
 
     auto const pixel_sizes = small::max_size_set<int, 7U>{
         style->pixelMetric(QStyle::PM_ButtonIconSize),   style->pixelMetric(QStyle::PM_LargeIconSize),
@@ -445,7 +445,7 @@ QIcon icon(Type const type, QStyle const* const style)
         style->pixelMetric(QStyle::PM_ToolBarIconSize)
     };
 
-    auto const info = getInfo(type);
+    auto const info = get_info(type);
 
 #if defined(Q_OS_MAC)
     if (auto const key = info.sf_symbol_name; !std::empty(key))
@@ -454,7 +454,7 @@ QIcon icon(Type const type, QStyle const* const style)
         auto const name = QString::fromUtf8(std::data(key), std::size(key));
         for (int const pixel_size : pixel_sizes)
         {
-            if (auto const pixmap = loadSFSymbol(name, pixel_size); !pixmap.isNull())
+            if (auto const pixmap = load_sf_symbol(name, pixel_size); !pixmap.isNull())
             {
                 icon.addPixmap(pixmap);
             }
@@ -468,13 +468,13 @@ QIcon icon(Type const type, QStyle const* const style)
 
     if (auto const key = info.segoe_codepoint)
     {
-        if (auto const family = getWindowsFontFamily(); !family.isEmpty())
+        if (auto const family = get_windows_font_family(); !family.isEmpty())
         {
             auto icon = QIcon{};
             auto const ch = QChar{ key };
             for (int const pixel_size : pixel_sizes)
             {
-                if (auto pixmap = makeIconFromCodepoint(family, ch, pixel_size); !pixmap.isNull())
+                if (auto pixmap = make_icon_from_codepoint(family, ch, pixel_size); !pixmap.isNull())
                 {
                     icon.addPixmap(pixmap);
                 }
@@ -508,11 +508,11 @@ QIcon icon(Type const type, QStyle const* const style)
     return {};
 }
 
-[[nodiscard]] bool shouldBeShownInMenu(Type type)
+[[nodiscard]] bool should_be_shown_in_menu(Type type)
 {
     static bool const ForceIcons = !qgetenv("TR_SHOW_MENU_ICONS").isEmpty();
     static bool const IsGnome = qgetenv("XDG_CURRENT_DESKTOP").contains("GNOME");
-    return ForceIcons || !IsGnome || getInfo(type).ok_in_gnome_menus;
+    return ForceIcons || !IsGnome || get_info(type).ok_in_gnome_menus;
 }
 
 } // namespace icons

@@ -20,10 +20,10 @@ public:
 
     bool isConnected() const;
 
-    QVariant addMetainfo(QString const& metainfo) const;
+    QVariant add_metainfo(QString const& metainfo) const;
 
     static void initialize();
-    static void registerObject(QObject* parent);
+    static void register_object(QObject* parent);
 
 private:
     std::unique_ptr<QAxObject> client_;

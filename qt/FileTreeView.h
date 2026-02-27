@@ -32,13 +32,13 @@ public:
     void clear();
     void update(FileList const& files, bool update_fields = true);
 
-    void setEditable(bool editable);
+    void set_editable(bool editable);
 
 signals:
-    void priorityChanged(file_indices_t const& file_indices, int priority);
-    void wantedChanged(file_indices_t const& file_indices, bool wanted);
-    void pathEdited(QString const& old_path, QString const& new_name);
-    void openRequested(QString const& path);
+    void priority_changed(file_indices_t const& file_indices, int priority);
+    void wanted_changed(file_indices_t const& file_indices, bool wanted);
+    void path_edited(QString const& old_path, QString const& new_name);
+    void open_requested(QString const& path);
 
 protected:
     // QWidget
@@ -51,22 +51,22 @@ protected:
     bool edit(QModelIndex const& index, EditTrigger trigger, QEvent* event) override;
 
 private slots:
-    void onClicked(QModelIndex const& index);
+    void on_clicked(QModelIndex const& index);
 
-    void checkSelectedItems();
-    void uncheckSelectedItems();
-    void onlyCheckSelectedItems();
-    void setSelectedItemsPriority();
-    bool openSelectedItem();
-    void renameSelectedItem();
+    void check_selected_items();
+    void uncheck_selected_items();
+    void only_check_selected_items();
+    void set_selected_items_priority();
+    bool open_selected_item();
+    void rename_selected_item();
 
-    void refreshContextMenuActionsSensitivity();
+    void refresh_context_menu_actions_sensitivity();
 
 private:
-    void initContextMenu();
-    [[nodiscard]] QModelIndexList selectedSourceRows(int column = 0) const;
+    void init_context_menu();
+    [[nodiscard]] QModelIndexList selected_source_rows(int column = 0) const;
 
-    static Qt::CheckState getCumulativeCheckState(QModelIndexList const& indices);
+    static Qt::CheckState get_cumulative_check_state(QModelIndexList const& indices);
 
     FileTreeModel* model_ = {};
     QSortFilterProxyModel* proxy_ = {};

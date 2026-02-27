@@ -13,12 +13,12 @@
 #include "DBusInteropHelper.h"
 #include "InteropObject.h"
 
-bool DBusInteropHelper::isConnected() const
+bool DBusInteropHelper::is_connected() const
 {
     return QDBusConnection::sessionBus().isConnected();
 }
 
-QVariant DBusInteropHelper::addMetainfo(QString const& metainfo) const
+QVariant DBusInteropHelper::add_metainfo(QString const& metainfo) const
 {
     auto request = QDBusMessage::createMethodCall(
         QStringLiteral("com.transmissionbt.Transmission"),
@@ -31,7 +31,7 @@ QVariant DBusInteropHelper::addMetainfo(QString const& metainfo) const
     return response.isValid() ? QVariant{ response.value() } : QVariant{};
 }
 
-void DBusInteropHelper::registerObject(QObject* parent)
+void DBusInteropHelper::register_object(QObject* parent)
 {
     auto bus = QDBusConnection::sessionBus();
     if (!bus.isConnected())

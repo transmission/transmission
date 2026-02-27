@@ -13,25 +13,25 @@ bool should_show_torrent(Torrent const& tor, ShowMode const mode)
     switch (mode)
     {
     case ShowMode::ShowActive:
-        return tor.peersWeAreUploadingTo() > 0 || tor.peersWeAreDownloadingFrom() > 0 || tor.isVerifying();
+        return tor.peers_we_are_uploading_to() > 0 || tor.peers_we_are_downloading_from() > 0 || tor.is_verifying();
 
     case ShowMode::ShowDownloading:
-        return tor.isDownloading() || tor.isWaitingToDownload();
+        return tor.is_downloading() || tor.is_waiting_to_download();
 
     case ShowMode::ShowError:
-        return tor.hasError();
+        return tor.has_error();
 
     case ShowMode::ShowFinished:
-        return tor.isFinished();
+        return tor.is_finished();
 
     case ShowMode::ShowPaused:
-        return tor.isPaused();
+        return tor.is_paused();
 
     case ShowMode::ShowSeeding:
-        return tor.isSeeding() || tor.isWaitingToSeed();
+        return tor.is_seeding() || tor.is_waiting_to_seed();
 
     case ShowMode::ShowVerifying:
-        return tor.isVerifying() || tor.isWaitingToVerify();
+        return tor.is_verifying() || tor.is_waiting_to_verify();
 
     default: // SHOW_ALL
         return true;

@@ -35,7 +35,7 @@ public:
     RpcQueue& operator=(RpcQueue&&) = delete;
     RpcQueue& operator=(RpcQueue const&) = delete;
 
-    constexpr void setTolerateErrors(bool tolerate_errors = true)
+    constexpr void set_tolerate_errors(bool tolerate_errors = true)
     {
         tolerate_errors_ = tolerate_errors;
     }
@@ -43,13 +43,13 @@ public:
     template<typename Func>
     void add(Func const& func)
     {
-        queue_.emplace(normalizeFunc(func), ErrorHandlerFunction());
+        queue_.emplace(normalize_func(func), ErrorHandlerFunction());
     }
 
     template<typename Func, typename ErrorHandler>
     void add(Func const& func, ErrorHandler const& error_handler)
     {
-        queue_.emplace(normalizeFunc(func), normalizeErrorHandler(error_handler));
+        queue_.emplace(normalize_func(func), normalize_error_handler(error_handler));
     }
 
     // The first function in queue is ran synchronously
@@ -71,13 +71,13 @@ private:
     // Internally stored error handler function. Takes the last response future and returns nothing.
     using ErrorHandlerFunction = std::function<void(RpcResponseFuture const&)>;
 
-    void runNext(RpcResponseFuture const& response);
+    void run_next(RpcResponseFuture const& response);
 
     // These overloads convert various forms of input closures to what we store internally.
 
     // normal closure, takes response and returns new future
     template<detail::invoke_result_is<RpcResponseFuture, RpcResponse const&> Func>
-    static QueuedFunction normalizeFunc(Func const& func)
+    static QueuedFunction normalize_func(Func const& func)
     {
         return [func](RpcResponseFuture const& r)
         {
@@ -87,7 +87,7 @@ private:
 
     // closure without argument (first step), takes nothing and returns new future
     template<detail::invoke_result_is<RpcResponseFuture> Func>
-    static QueuedFunction normalizeFunc(Func const& func)
+    static QueuedFunction normalize_func(Func const& func)
     {
         return [func](RpcResponseFuture const&)
         {
@@ -97,29 +97,29 @@ private:
 
     // closure without return value ("auxiliary"), takes response and returns nothing
     template<detail::invoke_result_is<void, RpcResponse const&> Func>
-    static QueuedFunction normalizeFunc(Func const& func)
+    static QueuedFunction normalize_func(Func const& func)
     {
         return [func](RpcResponseFuture const& r)
         {
             func(r.result());
-            return createFinishedFuture();
+            return create_finished_future();
         };
     }
 
     // closure without argument and return value, takes nothing and returns nothing -- next function will also get nothing
     template<detail::invoke_result_is<void> Func>
-    static QueuedFunction normalizeFunc(Func const& func)
+    static QueuedFunction normalize_func(Func const& func)
     {
         return [func](RpcResponseFuture const&)
         {
             func();
-            return createFinishedFuture();
+            return create_finished_future();
         };
     }
 
     // normal error handler, takes last response
     template<detail::invoke_result_is<void, RpcResponse const&> Func>
-    static ErrorHandlerFunction normalizeErrorHandler(Func const& func)
+    static ErrorHandlerFunction normalize_error_handler(Func const& func)
     {
         return [func](RpcResponseFuture const& r)
         {
@@ -129,7 +129,7 @@ private:
 
     // error handler without an argument, takes nothing
     template<detail::invoke_result_is<void> Func>
-    static ErrorHandlerFunction normalizeErrorHandler(Func const& func)
+    static ErrorHandlerFunction normalize_error_handler(Func const& func)
     {
         return [func](RpcResponseFuture const&)
         {
@@ -137,7 +137,7 @@ private:
         };
     }
 
-    static RpcResponseFuture createFinishedFuture()
+    static RpcResponseFuture create_finished_future()
     {
         QFutureInterface<RpcResponse> promise;
         promise.reportStarted();
@@ -155,5 +155,5 @@ private:
     QFutureWatcher<RpcResponse> future_watcher_;
 
 private slots:
-    void stepFinished();
+    void step_finished();
 };

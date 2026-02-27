@@ -27,17 +27,17 @@ public:
     TrackerDelegate& operator=(TrackerDelegate&&) = delete;
     TrackerDelegate& operator=(TrackerDelegate const&) = delete;
 
-    void setShowMore(bool b);
+    void set_show_more(bool b);
 
     // QAbstractItemDelegate
     [[nodiscard]] QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const override;
     void paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const override;
 
 protected:
-    [[nodiscard]] QString getText(TrackerInfo const& inf) const;
+    [[nodiscard]] QString get_text(TrackerInfo const& inf) const;
 
-    [[nodiscard]] QSize sizeHint(QStyleOptionViewItem const& option, TrackerInfo const& info) const;
-    void drawTracker(QPainter* painter, QStyleOptionViewItem const& option, TrackerInfo const& info) const;
+    [[nodiscard]] QSize size_hint(QStyleOptionViewItem const& option, TrackerInfo const& info) const;
+    void draw_tracker(QPainter* painter, QStyleOptionViewItem const& option, TrackerInfo const& info) const;
 
 private:
     bool show_more_ = false;

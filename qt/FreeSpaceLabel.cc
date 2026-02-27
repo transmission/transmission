@@ -20,8 +20,8 @@
 #include "Session.h"
 #include "VariantHelpers.h"
 
-using ::trqt::variant_helpers::dictAdd;
-using ::trqt::variant_helpers::dictFind;
+using ::trqt::variant_helpers::dict_add;
+using ::trqt::variant_helpers::dict_find;
 
 namespace
 {
@@ -37,10 +37,10 @@ FreeSpaceLabel::FreeSpaceLabel(QWidget* parent)
     timer_.setSingleShot(true);
     timer_.setInterval(IntervalMSec);
 
-    connect(&timer_, &QTimer::timeout, this, &FreeSpaceLabel::onTimer);
+    connect(&timer_, &QTimer::timeout, this, &FreeSpaceLabel::on_timer);
 }
 
-void FreeSpaceLabel::setSession(Session& session)
+void FreeSpaceLabel::set_session(Session& session)
 {
     if (session_ == &session)
     {
@@ -48,20 +48,20 @@ void FreeSpaceLabel::setSession(Session& session)
     }
 
     session_ = &session;
-    onTimer();
+    on_timer();
 }
 
-void FreeSpaceLabel::setPath(QString const& path)
+void FreeSpaceLabel::set_path(QString const& path)
 {
     if (path_ != path)
     {
         setText(tr("<i>Calculating Free Space…</i>"));
         path_ = path;
-        onTimer();
+        on_timer();
     }
 }
 
-void FreeSpaceLabel::onTimer()
+void FreeSpaceLabel::on_timer()
 {
     timer_.stop();
 
@@ -72,7 +72,7 @@ void FreeSpaceLabel::onTimer()
 
     tr_variant args;
     tr_variantInitDict(&args, 1);
-    dictAdd(&args, TR_KEY_path, path_);
+    dict_add(&args, TR_KEY_path, path_);
 
     auto* q = new RpcQueue{ this };
 
@@ -82,7 +82,7 @@ void FreeSpaceLabel::onTimer()
         [this](RpcResponse const& r)
         {
             // update the label
-            if (auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes); bytes && *bytes > 1)
+            if (auto const bytes = dict_find<int64_t>(r.args.get(), TR_KEY_size_bytes); bytes && *bytes > 1)
             {
                 setText(tr("%1 free").arg(Formatter::storage_to_string(*bytes)));
             }
@@ -92,7 +92,7 @@ void FreeSpaceLabel::onTimer()
             }
 
             // update the tooltip
-            auto const path = dictFind<QString>(r.args.get(), TR_KEY_path);
+            auto const path = dict_find<QString>(r.args.get(), TR_KEY_path);
             setToolTip(QDir::toNativeSeparators(path.value_or(QString{})));
 
             timer_.start();

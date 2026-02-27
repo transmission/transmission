@@ -11,7 +11,7 @@
 
 #include "StyleHelper.h"
 
-QIcon::Mode StyleHelper::getIconMode(QStyle::State const& state)
+QIcon::Mode StyleHelper::get_icon_mode(QStyle::State const& state)
 {
     if (!state.testFlag(QStyle::State_Enabled))
     {
@@ -26,7 +26,7 @@ QIcon::Mode StyleHelper::getIconMode(QStyle::State const& state)
     return QIcon::Normal;
 }
 
-void StyleHelper::drawProgressBar(QPainter& painter, QStyleOptionProgressBar const& option)
+void StyleHelper::draw_progress_bar(QPainter& painter, QStyleOptionProgressBar const& option)
 {
     painter.save();
 

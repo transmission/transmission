@@ -25,8 +25,8 @@
 #include "Utils.h"
 #include "VariantHelpers.h"
 
-using ::trqt::variant_helpers::dictAdd;
-using ::trqt::variant_helpers::listAdd;
+using ::trqt::variant_helpers::dict_add;
+using ::trqt::variant_helpers::list_add;
 
 /***
 ****
@@ -36,7 +36,7 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     : BaseDialog{ parent }
     , add_{ std::move(addme) }
     , session_{ session }
-    , is_local_{ session_.isLocal() }
+    , is_local_{ session_.is_local() }
 {
     ui_.setupUi(this);
 
@@ -44,23 +44,23 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
 
     edit_timer_.setInterval(2000);
     edit_timer_.setSingleShot(true);
-    connect(&edit_timer_, &QTimer::timeout, this, &OptionsDialog::onDestinationChanged);
+    connect(&edit_timer_, &QTimer::timeout, this, &OptionsDialog::on_destination_changed);
 
     if (add_.type == AddData::FILENAME)
     {
         ui_.sourceStack->setCurrentWidget(ui_.sourceButton);
-        ui_.sourceButton->setMode(PathButton::FileMode);
-        ui_.sourceButton->setTitle(tr("Open Torrent"));
-        ui_.sourceButton->setNameFilter(tr("Torrent Files (*.torrent);;All Files (*.*)"));
-        ui_.sourceButton->setPath(add_.filename);
-        connect(ui_.sourceButton, &PathButton::pathChanged, this, &OptionsDialog::onSourceChanged);
+        ui_.sourceButton->set_mode(PathButton::FileMode);
+        ui_.sourceButton->set_title(tr("Open Torrent"));
+        ui_.sourceButton->set_name_filter(tr("Torrent Files (*.torrent);;All Files (*.*)"));
+        ui_.sourceButton->set_path(add_.filename);
+        connect(ui_.sourceButton, &PathButton::path_changed, this, &OptionsDialog::on_source_changed);
     }
     else
     {
         ui_.sourceStack->setCurrentWidget(ui_.sourceEdit);
-        ui_.sourceEdit->setText(add_.readableName());
+        ui_.sourceEdit->setText(add_.readable_name());
         ui_.sourceEdit->selectAll();
-        connect(ui_.sourceEdit, &QLineEdit::editingFinished, this, &OptionsDialog::onSourceChanged);
+        connect(ui_.sourceEdit, &QLineEdit::editingFinished, this, &OptionsDialog::on_source_changed);
     }
 
     ui_.sourceStack->setFixedHeight(ui_.sourceStack->currentWidget()->sizeHint().height());
@@ -70,13 +70,13 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     int const width = font_metrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
     ui_.sourceStack->setMinimumWidth(width);
 
-    auto const download_dir = Utils::removeTrailingDirSeparator(prefs.get<QString>(Prefs::DOWNLOAD_DIR));
-    ui_.freeSpaceLabel->setSession(session_);
-    ui_.freeSpaceLabel->setPath(download_dir);
+    auto const download_dir = Utils::remove_trailing_dir_separator(prefs.get<QString>(Prefs::DOWNLOAD_DIR));
+    ui_.freeSpaceLabel->set_session(session_);
+    ui_.freeSpaceLabel->set_path(download_dir);
 
-    ui_.destinationButton->setMode(PathButton::DirectoryMode);
-    ui_.destinationButton->setTitle(tr("Select Destination"));
-    ui_.destinationButton->setPath(download_dir);
+    ui_.destinationButton->set_mode(PathButton::DirectoryMode);
+    ui_.destinationButton->set_title(tr("Select Destination"));
+    ui_.destinationButton->set_path(download_dir);
     ui_.destinationEdit->setText(download_dir);
 
     if (is_local_)
@@ -84,11 +84,11 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
         local_destination_.setPath(download_dir);
     }
 
-    connect(ui_.destinationButton, &PathButton::pathChanged, this, &OptionsDialog::onDestinationChanged);
+    connect(ui_.destinationButton, &PathButton::path_changed, this, &OptionsDialog::on_destination_changed);
     connect(ui_.destinationEdit, &QLineEdit::textEdited, &edit_timer_, qOverload<>(&QTimer::start));
-    connect(ui_.destinationEdit, &QLineEdit::editingFinished, this, &OptionsDialog::onDestinationChanged);
+    connect(ui_.destinationEdit, &QLineEdit::editingFinished, this, &OptionsDialog::on_destination_changed);
 
-    ui_.filesView->setEditable(false);
+    ui_.filesView->set_editable(false);
     ui_.priorityCombo->addItem(tr("High"), TR_PRI_HIGH);
     ui_.priorityCombo->addItem(tr("Normal"), TR_PRI_NORMAL);
     ui_.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
@@ -98,27 +98,27 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.trashCheck->setChecked(prefs.get<bool>(Prefs::TRASH_ORIGINAL));
 
     connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &QObject::deleteLater);
-    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &OptionsDialog::onAccepted);
+    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &OptionsDialog::on_accepted);
 
-    connect(ui_.filesView, &FileTreeView::priorityChanged, this, &OptionsDialog::onPriorityChanged);
-    connect(ui_.filesView, &FileTreeView::wantedChanged, this, &OptionsDialog::onWantedChanged);
+    connect(ui_.filesView, &FileTreeView::priority_changed, this, &OptionsDialog::on_priority_changed);
+    connect(ui_.filesView, &FileTreeView::wanted_changed, this, &OptionsDialog::on_wanted_changed);
 
-    connect(&session_, &Session::sessionUpdated, this, &OptionsDialog::onSessionUpdated);
+    connect(&session_, &Session::session_updated, this, &OptionsDialog::on_session_updated);
 
-    updateWidgetsLocality();
+    update_widgets_locality();
     reload();
 }
 
 OptionsDialog::~OptionsDialog()
 {
-    clearInfo();
+    clear_info();
 }
 
 /***
 ****
 ***/
 
-void OptionsDialog::clearInfo()
+void OptionsDialog::clear_info()
 {
     metainfo_.reset();
     files_.clear();
@@ -126,7 +126,7 @@ void OptionsDialog::clearInfo()
 
 void OptionsDialog::reload()
 {
-    clearInfo();
+    clear_info();
 
     auto metainfo = tr_torrent_metainfo{};
     auto ok = bool{};
@@ -188,25 +188,25 @@ void OptionsDialog::reload()
     ui_.filesView->hideColumn(FileTreeModel::COL_PROGRESS);
 }
 
-void OptionsDialog::updateWidgetsLocality()
+void OptionsDialog::update_widgets_locality()
 {
     ui_.destinationStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.destinationButton) : ui_.destinationEdit);
     ui_.destinationStack->setFixedHeight(ui_.destinationStack->currentWidget()->sizeHint().height());
     ui_.destinationLabel->setBuddy(ui_.destinationStack->currentWidget());
 }
 
-void OptionsDialog::onSessionUpdated()
+void OptionsDialog::on_session_updated()
 {
-    bool const is_local = session_.isLocal();
+    bool const is_local = session_.is_local();
 
     if (is_local_ != is_local)
     {
         is_local_ = is_local;
-        updateWidgetsLocality();
+        update_widgets_locality();
     }
 }
 
-void OptionsDialog::onPriorityChanged(file_indices_t const& file_indices, int priority)
+void OptionsDialog::on_priority_changed(file_indices_t const& file_indices, int priority)
 {
     for (int const i : file_indices)
     {
@@ -214,7 +214,7 @@ void OptionsDialog::onPriorityChanged(file_indices_t const& file_indices, int pr
     }
 }
 
-void OptionsDialog::onWantedChanged(file_indices_t const& file_indices, bool is_wanted)
+void OptionsDialog::on_wanted_changed(file_indices_t const& file_indices, bool is_wanted)
 {
     for (int const i : file_indices)
     {
@@ -222,7 +222,7 @@ void OptionsDialog::onWantedChanged(file_indices_t const& file_indices, bool is_
     }
 }
 
-void OptionsDialog::onAccepted()
+void OptionsDialog::on_accepted()
 {
     // rpc spec section 3.4 "adding a torrent"
 
@@ -240,15 +240,15 @@ void OptionsDialog::onAccepted()
         download_dir = ui_.destinationEdit->text();
     }
 
-    dictAdd(&args, TR_KEY_download_dir, download_dir);
+    dict_add(&args, TR_KEY_download_dir, download_dir);
 
     // paused
-    dictAdd(&args, TR_KEY_paused, !ui_.startCheck->isChecked());
+    dict_add(&args, TR_KEY_paused, !ui_.startCheck->isChecked());
 
     // priority
     int const index = ui_.priorityCombo->currentIndex();
     int const priority = ui_.priorityCombo->itemData(index).toInt();
-    dictAdd(&args, TR_KEY_bandwidth_priority, priority);
+    dict_add(&args, TR_KEY_bandwidth_priority, priority);
 
     // files_unwanted
     auto count = std::count(wanted_.begin(), wanted_.end(), false);
@@ -261,7 +261,7 @@ void OptionsDialog::onAccepted()
         {
             if (!wanted_.at(i))
             {
-                listAdd(l, i);
+                list_add(l, i);
             }
         }
     }
@@ -277,7 +277,7 @@ void OptionsDialog::onAccepted()
         {
             if (priorities_.at(i) == TR_PRI_LOW)
             {
-                listAdd(l, i);
+                list_add(l, i);
             }
         }
     }
@@ -293,26 +293,26 @@ void OptionsDialog::onAccepted()
         {
             if (priorities_.at(i) == TR_PRI_HIGH)
             {
-                listAdd(l, i);
+                list_add(l, i);
             }
         }
     }
 
     auto const disposal = ui_.trashCheck->isChecked() ? AddData::FilenameDisposal::Delete : AddData::FilenameDisposal::NoAction;
-    add_.setFileDisposal(disposal);
+    add_.set_file_disposal(disposal);
 
-    session_.addTorrent(add_, &args);
+    session_.add_torrent(add_, &args);
 
     deleteLater();
 }
 
-void OptionsDialog::onSourceChanged()
+void OptionsDialog::on_source_changed()
 {
     if (ui_.sourceStack->currentWidget() == ui_.sourceButton)
     {
         add_.set(ui_.sourceButton->path());
     }
-    else if (auto const text = ui_.sourceEdit->text(); text != add_.readableName())
+    else if (auto const text = ui_.sourceEdit->text(); text != add_.readable_name())
     {
         add_.set(text);
     }
@@ -320,15 +320,15 @@ void OptionsDialog::onSourceChanged()
     reload();
 }
 
-void OptionsDialog::onDestinationChanged()
+void OptionsDialog::on_destination_changed()
 {
     if (ui_.destinationStack->currentWidget() == ui_.destinationButton)
     {
         local_destination_.setPath(ui_.destinationButton->path());
-        ui_.freeSpaceLabel->setPath(local_destination_.absolutePath());
+        ui_.freeSpaceLabel->set_path(local_destination_.absolutePath());
     }
     else
     {
-        ui_.freeSpaceLabel->setPath(ui_.destinationEdit->text());
+        ui_.freeSpaceLabel->set_path(ui_.destinationEdit->text());
     }
 }

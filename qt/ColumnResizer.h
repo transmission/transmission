@@ -24,7 +24,7 @@ public:
     ColumnResizer& operator=(ColumnResizer&&) = delete;
     ColumnResizer& operator=(ColumnResizer const&) = delete;
 
-    void addLayout(QGridLayout* layout);
+    void add_layout(QGridLayout* layout);
 
     // QObject
     bool eventFilter(QObject* object, QEvent* event) override;
@@ -33,7 +33,7 @@ public slots:
     void update() const;
 
 private:
-    void scheduleUpdate();
+    void schedule_update();
 
     QTimer timer_;
     std::set<QGridLayout*> layouts_;
