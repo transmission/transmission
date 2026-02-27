@@ -1467,6 +1467,8 @@ void tr_sessionClose(tr_session* session, double const timeout_secs)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(!session->am_in_session_thread());
 
+    using namespace std::chrono_literals;
+
     tr_logAddInfo(
         fmt::format(fmt::runtime(_("Transmission version {version} shutting down")), fmt::arg("version", LONG_VERSION_STRING)));
 
@@ -1476,7 +1478,16 @@ void tr_sessionClose(tr_session* session, double const timeout_secs)
         std::chrono::milliseconds{ static_cast<int64_t>(timeout_secs * 1000.0) };
     session->run_in_session_thread([&closed_promise, deadline, session]()
                                    { session->closeImplPart1(&closed_promise, deadline); });
-    closed_future.wait();
+
+    // Use wait_for() instead of wait() to prevent the main thread from
+    // blocking indefinitely when the session thread is stuck in a kernel
+    // call (e.g., connect() on macOS with ECN-incompatible peers or
+    // uninterruptible I/O on external drives).
+    auto const wait_limit = std::chrono::milliseconds{ static_cast<int64_t>(timeout_secs * 1000.0) } + 5s;
+    if (closed_future.wait_for(wait_limit) == std::future_status::timeout)
+    {
+        tr_logAddWarn(fmt::format("Session shutdown timed out after {:.0f}s; forcing cleanup", timeout_secs + 5.0));
+    }
 
     delete session;
 }
