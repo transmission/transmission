@@ -26,12 +26,14 @@ endfunction()
 add_trqt_test(prefs-test.cc)
 add_trqt_test(rpcclient-test.cc)
 add_trqt_test(session-test.cc)
+add_trqt_test(torrent-memory-test.cc)
 
 add_custom_target(qt-tests
     DEPENDS
         qt-test-prefs
         qt-test-rpcclient
-        qt-test-session)
+        qt-test-session
+        qt-test-torrent-memory)
 
 set_property(
     TARGET qt-tests

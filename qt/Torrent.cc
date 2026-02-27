@@ -241,11 +241,9 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
 #define HANDLE_KEY(key, bit) \
     case TR_KEY_##key: \
+        /* These fields are mutable/high-cardinality at runtime; interning \
+           them grows a process-lifetime pool and inflates RSS over time. */ \
         field_changed = change(key##_, child); \
-        if (field_changed) \
-        { \
-            key##_ = trApp->intern(key##_); \
-        } \
         changed.set(bit, field_changed); \
         break;
 

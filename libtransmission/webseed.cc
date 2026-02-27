@@ -384,15 +384,18 @@ void tr_webseed_task::use_fetched_blocks()
         }
         else
         {
-            auto block_buf = new Cache::BlockData(block_size);
+            // Keep temporary block data under RAII ownership across thread handoff.
+            // `run_in_session_thread()` stores copyable callbacks, so we capture a
+            // shared_ptr here and move into unique ownership right before write.
+            auto block_buf = std::make_shared<Cache::BlockData>(block_size);
             content_.to_buf(std::data(*block_buf), std::size(*block_buf));
             session_->run_in_session_thread(
                 [session = session_, tor_id = tor.id(), block = loc_.block, block_buf, webseed = webseed_]()
                 {
-                    auto data = std::unique_ptr<Cache::BlockData>{ block_buf };
                     if (auto const* const torrent = session->torrents().get(tor_id); torrent != nullptr)
                     {
                         webseed->active_requests.unset(block);
+                        auto data = std::make_unique<Cache::BlockData>(std::move(*block_buf));
                         session->cache->write_block(tor_id, block, std::move(data));
                         webseed->publish(tr_peer_event::GotBlock(torrent->block_info(), block));
                     }
