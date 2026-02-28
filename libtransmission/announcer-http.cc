@@ -101,6 +101,7 @@ struct http_announce_data
 
     uint8_t requests_sent_count = {};
     uint8_t requests_answered_count = {};
+    bool succeeded = false;
 
     std::string log_name;
 };
@@ -145,7 +146,7 @@ bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announ
 void onAnnounceDone(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, primary_ip, did_connect, did_timeout, vdata] = web_response;
-    auto* data = static_cast<http_announce_data*>(vdata);
+    auto* const data = static_cast<http_announce_data*>(vdata);
 
     auto const got_all_responses = ++data->requests_answered_count == data->requests_sent_count;
 
@@ -158,8 +159,9 @@ void onAnnounceDone(tr_web::FetchResponse const& web_response)
         if (handleAnnounceResponse(web_response, response))
         {
             data->on_response(response);
+            data->succeeded = true;
         }
-        else
+        else if (!data->succeeded)
         {
             if (!data->failed_response || tr_announce_response::compare_failed(*data->failed_response, response) < 0)
             {
