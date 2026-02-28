@@ -178,8 +178,6 @@ private:
 
     // What software the peer is running.
     // Derived from the `v` string in LTEP's handshake dictionary, when available.
-    // Keep this as an owning string. `v` is peer-controlled/high-cardinality,
-    // and interning it would retain unique values for process lifetime.
     std::string user_agent_;
 
     tr_peer_id_t peer_id_;

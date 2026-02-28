@@ -185,8 +185,6 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
     if (site_changed && !setme.announce.isEmpty() && trApp != nullptr)
     {
-        // announce values can churn with tracker updates; keep them as normal
-        // QStrings instead of interning into a process-lifetime set.
         if (setme.sitename.isEmpty())
         {
             auto const announce_str = setme.announce.toStdString();

@@ -384,9 +384,6 @@ void tr_webseed_task::use_fetched_blocks()
         }
         else
         {
-            // Keep temporary block data under RAII ownership across thread handoff.
-            // `run_in_session_thread()` stores copyable callbacks, so we capture a
-            // shared_ptr here and move into unique ownership right before write.
             auto block_buf = std::make_shared<Cache::BlockData>(block_size);
             content_.to_buf(std::data(*block_buf), std::size(*block_buf));
             session_->run_in_session_thread(

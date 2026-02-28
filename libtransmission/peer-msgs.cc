@@ -1307,7 +1307,6 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // peer id encoding.
     if (auto const sv = map->value_if<std::string_view>(TR_KEY_v))
     {
-        // Remote input: avoid global interning/quark growth from unique peers.
         set_user_agent(tr_strv_to_utf8_string(*sv));
     }
 
@@ -2187,7 +2186,6 @@ tr_peerMsgs::tr_peerMsgs(
     {
         auto buf = std::array<char, 128>{};
         tr_clientForId(std::data(buf), sizeof(buf), peer_id);
-        // This value is per-peer and can be highly variable in large swarms.
         client = std::data(buf);
     }
     set_user_agent(client);

@@ -56,8 +56,6 @@ public:
 
     QString const& intern(QString const& in)
     {
-        // Process-lifetime pool: only use for low-cardinality stable strings.
-        // Interning unbounded runtime values will grow memory monotonically.
         return *interned_strings_.insert(in).first;
     }
 
