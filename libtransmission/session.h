@@ -817,67 +817,60 @@ public:
 
     // callbacks
 
-    using queue_start_callback_t = void (*)(tr_session*, tr_torrent*, void* user_data);
-
-    constexpr void setQueueStartCallback(queue_start_callback_t cb, void* user_data)
+    void setQueueStartCallback(tr_session_queue_start_func cb)
     {
-        queue_start_callback_ = cb;
-        queue_start_user_data_ = user_data;
+        queue_start_callback_ = std::move(cb);
     }
 
-    constexpr void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
+    void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb)
     {
-        idle_limit_hit_callback_ = cb;
-        idle_limit_hit_user_data_ = user_data;
+        idle_limit_hit_callback_ = std::move(cb);
     }
 
-    void onIdleLimitHit(tr_torrent* tor)
+    void onIdleLimitHit(tr_torrent_id_t const tor_id)
     {
-        if (idle_limit_hit_callback_ != nullptr)
+        if (idle_limit_hit_callback_)
         {
-            idle_limit_hit_callback_(this, tor, idle_limit_hit_user_data_);
+            idle_limit_hit_callback_(tor_id);
         }
     }
 
-    constexpr void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb, void* user_data)
+    void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb)
     {
-        ratio_limit_hit_cb_ = cb;
-        ratio_limit_hit_user_data_ = user_data;
+        ratio_limit_hit_cb_ = std::move(cb);
     }
 
-    void onRatioLimitHit(tr_torrent* tor)
+    void onRatioLimitHit(tr_torrent_id_t const tor_id)
     {
-        if (ratio_limit_hit_cb_ != nullptr)
+        if (ratio_limit_hit_cb_)
         {
-            ratio_limit_hit_cb_(this, tor, ratio_limit_hit_user_data_);
+            ratio_limit_hit_cb_(tor_id);
         }
     }
 
-    constexpr void setMetadataCallback(tr_session_metadata_func cb, void* user_data)
+    void setMetadataCallback(tr_session_metadata_func cb)
     {
-        got_metadata_cb_ = cb;
-        got_metadata_user_data_ = user_data;
+        got_metadata_cb_ = std::move(cb);
     }
 
-    void onMetadataCompleted(tr_torrent* tor)
+    void onMetadataCompleted(tr_torrent_id_t const tor_id)
     {
-        if (got_metadata_cb_ != nullptr)
+        if (got_metadata_cb_)
         {
-            got_metadata_cb_(this, tor, got_metadata_user_data_);
+            got_metadata_cb_(tor_id);
         }
     }
 
-    constexpr void setTorrentCompletenessCallback(tr_torrent_completeness_func cb, void* user_data)
+    void setTorrentCompletenessCallback(tr_torrent_completeness_func cb)
     {
-        completeness_func_ = cb;
-        completeness_func_user_data_ = user_data;
+        completeness_func_ = std::move(cb);
     }
 
-    void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness completeness, bool was_running)
+    void onTorrentCompletenessChanged(tr_torrent_id_t const tor_id, tr_completeness const completeness, bool const was_running)
     {
-        if (completeness_func_ != nullptr)
+        if (completeness_func_)
         {
-            completeness_func_(tor, completeness, was_running, completeness_func_user_data_);
+            completeness_func_(tor_id, completeness, was_running);
         }
     }
 
@@ -1065,11 +1058,11 @@ public:
 
     /*module_visible*/
 
-    auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
+    auto rpcNotify(tr_rpc_callback_type type, std::optional<tr_torrent_id_t> tor_id = {})
     {
-        if (rpc_func_ != nullptr)
+        if (rpc_func_)
         {
-            return (*rpc_func_)(this, type, tor, rpc_func_user_data_);
+            return rpc_func_(type, tor_id);
         }
 
         return TR_RPC_OK;
@@ -1281,7 +1274,7 @@ private:
     friend void tr_sessionSetAltSpeedBegin(tr_session* session, size_t minutes_since_midnight);
     friend void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day days);
     friend void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight);
-    friend void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data);
+    friend void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func);
     friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, size_t limit_kbyps);
     friend void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes);
     friend void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
@@ -1303,7 +1296,7 @@ private:
     friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
-    friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+    friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func);
     friend void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
     friend void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled);
@@ -1360,26 +1353,19 @@ private:
 
     Settings settings_;
 
-    queue_start_callback_t queue_start_callback_ = nullptr;
-    void* queue_start_user_data_ = nullptr;
+    tr_session_queue_start_func queue_start_callback_ = nullptr;
 
     tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
-    void* idle_limit_hit_user_data_ = nullptr;
 
     tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
-    void* ratio_limit_hit_user_data_ = nullptr;
 
     tr_session_metadata_func got_metadata_cb_ = nullptr;
-    void* got_metadata_user_data_ = nullptr;
 
     tr_torrent_completeness_func completeness_func_ = nullptr;
-    void* completeness_func_user_data_ = nullptr;
 
     tr_rpc_func rpc_func_ = nullptr;
-    void* rpc_func_user_data_ = nullptr;
 
     tr_altSpeedFunc alt_speed_active_changed_func_ = nullptr;
-    void* alt_speed_active_changed_func_user_data_ = nullptr;
 
     // The local peer port that we bind a socket to for listening
     // to incoming peer connections. Usually the same as

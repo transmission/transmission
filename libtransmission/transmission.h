@@ -292,7 +292,7 @@ void tr_sessionSetDefaultTrackers(tr_session* session, std::string_view trackers
  * shouldn't call libtransmission functions (to avoid deadlock),
  * and shouldn't modify client-level memory without using a mutex!
  */
-void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func);
 
 // ---
 
@@ -371,7 +371,7 @@ void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight
 tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
 void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day day);
 
-void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data);
+void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func);
 
 // ---
 
@@ -476,7 +476,7 @@ bool tr_sessionGetQueueStalledEnabled(tr_session const* session);
 void tr_sessionSetQueueStalledEnabled(tr_session* session, bool enabled);
 
 /** @brief Set a callback that is invoked when the queue starts a torrent */
-void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data);
+void tr_sessionSetQueueStartCallback(tr_session* session, tr_session_queue_start_func callback);
 
 // ---
 
@@ -670,7 +670,6 @@ void tr_torrentStop(tr_torrent* torrent);
  * @param oldpath       the path to the file or folder that will be renamed
  * @param newname       the file or folder's new name
  * @param callback      the callback invoked when the renaming finishes, or nullptr
- * @param callback_user_data the pointer to pass in the callback's user_data arg
  *
  * As a special case, renaming the root file in a torrent will also
  * update tr_torrentName().
@@ -702,15 +701,14 @@ void tr_torrentStop(tr_torrent* torrent);
  *   in files[*].name, or contains a directory separator, or is nullptr, "",
  *   ".", or "..", the error argument will be EINVAL.
  *
- *   If the path exists on disk but can't be renamed, the error argument
- *   will be the errno set by rename().
+ *   If the path exists on disk but can't be renamed, the callback's `error`
+ *   argument will be set via `set_with_errno()` with `rename()`'s errno.
  */
 void tr_torrentRenamePath(
     tr_torrent* tor,
     std::string_view oldpath,
     std::string_view newname,
-    tr_torrent_rename_done_func callback,
-    void* callback_user_data);
+    tr_torrent_rename_done_func callback);
 
 /**
  * @brief Tell transmission where to find this torrent's local data.
@@ -870,7 +868,7 @@ bool tr_torrentSetTrackerList(tr_torrent* tor, std::string_view txt);
  *
  * @see `tr_completeness`
  */
-void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func callback, void* user_data);
+void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func callback);
 
 /**
  * Register to be notified whenever a torrent changes from
@@ -878,7 +876,7 @@ void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completen
  * This happens when a magnet link finishes downloading
  * metadata from its peers.
  */
-void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func callback, void* user_data);
+void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func callback);
 
 /**
  * Register to be notified whenever a torrent's ratio limit
@@ -887,7 +885,7 @@ void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func
  *
  * Has the same restrictions as `tr_sessionSetCompletenessCallback`
  */
-void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func callback, void* user_data);
+void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func callback);
 
 /**
  * Register to be notified whenever a torrent's idle limit
@@ -896,7 +894,7 @@ void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_li
  *
  * Has the same restrictions as `tr_sessionSetCompletenessCallback`
  */
-void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func callback, void* user_data);
+void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func callback);
 
 /**
  * MANUAL ANNOUNCE

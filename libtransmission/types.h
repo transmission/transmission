@@ -10,8 +10,9 @@
 #include <cstdint> // uint16_t, uint32_t, uint64_t
 #include <ctime> // time_t
 #include <functional>
-#include <string_view>
+#include <optional>
 #include <string>
+#include <string_view>
 
 #include "libtransmission/values.h"
 
@@ -595,31 +596,25 @@ struct tr_webseed_view
     uint64_t download_bytes_per_second = {}; // current download speed
 };
 
-using tr_altSpeedFunc = void (*)(tr_session* session, bool active, bool user_driven, void*);
+using tr_altSpeedFunc = std::function<void(bool active, bool user_driven)>;
 
-using tr_session_idle_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
+using tr_session_queue_start_func = std::function<void(tr_torrent_id_t)>;
 
-using tr_session_metadata_func = void (*)(tr_session* session, tr_torrent* torrent, void* user_data);
+using tr_session_idle_limit_hit_func = std::function<void(tr_torrent_id_t)>;
 
-using tr_session_ratio_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
+using tr_session_metadata_func = std::function<void(tr_torrent_id_t)>;
+
+using tr_session_ratio_limit_hit_func = std::function<void(tr_torrent_id_t)>;
 
 /**
  * @param was_running whether or not the torrent was running when
  *                    it changed its completeness state
  */
-using tr_torrent_completeness_func = void (*)( //
-    tr_torrent* torrent,
-    tr_completeness completeness,
-    bool was_running,
-    void* user_data);
+using tr_torrent_completeness_func = std::function<void(tr_torrent_id_t, tr_completeness completeness, bool was_running)>;
 
 using tr_torrent_remove_func = std::function<bool(std::string_view filename, tr_error* error)>;
 
-using tr_rpc_func = tr_rpc_callback_status (*)( //
-    tr_session* session,
-    tr_rpc_callback_type type,
-    struct tr_torrent* tor_or_null,
-    void* user_data);
+using tr_rpc_func = std::function<tr_rpc_callback_status(tr_rpc_callback_type type, std::optional<tr_torrent_id_t>)>;
 
 using tr_torrent_rename_done_func = std::function<
-    void(tr_torrent* torrent, char const* oldpath, char const* newname, int error, void* user_data)>;
+    void(tr_torrent_id_t, std::string_view oldpath, std::string_view newname, tr_error const&)>;

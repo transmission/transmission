@@ -125,7 +125,7 @@ tr_torrent_id_t tr_torrentId(tr_torrent const* tor)
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, tr_torrent_id_t id)
 {
-    return session->torrents().get(id);
+    return session != nullptr ? session->torrents().get(id) : nullptr;
 }
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo)
@@ -467,7 +467,7 @@ void tr_torrent::stop_if_seed_limit_reached()
     {
         tr_logAddInfoTor(this, _("Seed ratio reached; pausing torrent"));
         stop_soon();
-        session->onRatioLimitHit(this);
+        session->onRatioLimitHit(id());
     }
     /* if we're seeding and reach our inactivity limit, stop the torrent */
     else if (auto const secs_left = idle_seconds_left(tr_time()); secs_left && *secs_left <= 0U)
@@ -476,7 +476,7 @@ void tr_torrent::stop_if_seed_limit_reached()
 
         stop_soon();
         finished_seeding_by_idle_ = true;
-        session->onIdleLimitHit(this);
+        session->onIdleLimitHit(id());
     }
 
     if (is_stopping_)
@@ -1027,7 +1027,7 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
     on_metainfo_updated();
 
     got_metainfo_(this);
-    session->onMetadataCompleted(this);
+    session->onMetadataCompleted(id());
     set_dirty();
     mark_edited();
 
@@ -1849,7 +1849,7 @@ void tr_torrent::recheck_completeness()
             done_(this, recent_change);
         }
 
-        session->onTorrentCompletenessChanged(this, completeness_, was_running);
+        session->onTorrentCompletenessChanged(id(), completeness_, was_running);
 
         set_dirty();
         mark_changed();
@@ -2437,8 +2437,7 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
 void tr_torrent::rename_path_in_session_thread(
     std::string_view const oldpath,
     std::string_view const newname,
-    tr_torrent_rename_done_func const& callback,
-    void* const callback_user_data)
+    tr_torrent_rename_done_func const& callback)
 {
     using namespace rename_helpers;
 
@@ -2479,33 +2478,32 @@ void tr_torrent::rename_path_in_session_thread(
 
     if (callback != nullptr)
     {
-        auto const szold = tr_pathbuf{ oldpath };
-        auto const sznew = tr_pathbuf{ newname };
-        callback(this, szold.c_str(), sznew.c_str(), error, callback_user_data);
+        auto rename_error = tr_error{};
+        if (error != 0)
+        {
+            rename_error.set_from_errno(error);
+        }
+
+        callback(id(), oldpath, newname, rename_error);
     }
 }
 
-void tr_torrent::rename_path(
-    std::string_view oldpath,
-    std::string_view newname,
-    tr_torrent_rename_done_func&& callback,
-    void* callback_user_data)
+void tr_torrent::rename_path(std::string_view oldpath, std::string_view newname, tr_torrent_rename_done_func&& callback)
 {
     this->session->run_in_session_thread(
-        [this, oldpath = std::string(oldpath), newname = std::string(newname), cb = std::move(callback), callback_user_data]()
-        { rename_path_in_session_thread(oldpath, newname, std::move(cb), callback_user_data); });
+        [this, oldpath = std::string(oldpath), newname = std::string(newname), cb = std::move(callback)]()
+        { rename_path_in_session_thread(oldpath, newname, std::move(cb)); });
 }
 
 void tr_torrentRenamePath(
     tr_torrent* tor,
     std::string_view const oldpath,
     std::string_view const newname,
-    tr_torrent_rename_done_func callback,
-    void* callback_user_data)
+    tr_torrent_rename_done_func callback)
 {
     tr_return_if_fail(tr_isTorrent(tor));
 
-    tor->rename_path(oldpath, newname, std::move(callback), callback_user_data);
+    tor->rename_path(oldpath, newname, std::move(callback));
 }
 
 // ---
