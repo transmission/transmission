@@ -459,7 +459,6 @@ private:
     void candidate_list_upkeep()
     {
         auto n_old_c = std::size(candidates_);
-        auto salter = tr_salt_shaker<tr_piece_index_t>{};
         auto const is_sequential = mediator_.is_sequential_download();
         auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
         auto const n_pieces = mediator_.piece_count();
@@ -496,7 +495,7 @@ private:
                 }
                 else
                 {
-                    auto const salt = get_salt(piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
+                    auto const salt = get_salt(piece, n_pieces, salter_(), is_sequential, sequential_download_from_piece);
                     auto& candidate = candidates_.emplace_back(piece, salt, &mediator_);
 
                     if (auto& begin = candidate.block_span.begin; prev != nullptr)
@@ -573,13 +572,12 @@ private:
 
     void recalculate_salt()
     {
-        auto salter = tr_salt_shaker<tr_piece_index_t>{};
         auto const is_sequential = mediator_.is_sequential_download();
         auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
         auto const n_pieces = mediator_.piece_count();
         for (auto& candidate : candidates_)
         {
-            candidate.salt = get_salt(candidate.piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
+            candidate.salt = get_salt(candidate.piece, n_pieces, salter_(), is_sequential, sequential_download_from_piece);
         }
 
         std::ranges::sort(candidates_);
@@ -617,7 +615,11 @@ private:
         }
     }
 
+    // ---
+
     CandidateVec candidates_;
+
+    tr_salt_shaker<tr_piece_index_t> salter_ = {};
 
     Mediator& mediator_;
 };
