@@ -1,0 +1,687 @@
+// This file Copyright © Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <algorithm>
+#include <cerrno>
+#include <condition_variable>
+#include <cstddef>
+#include <cstdint>
+#include <deque>
+#include <future>
+#include <memory>
+#include <mutex>
+#include <ranges>
+#include <stop_token>
+#include <string_view>
+#include <thread>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
+
+#include "libtransmission/local-data.h"
+
+#include "libtransmission/inout.h"
+#include "libtransmission/session.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/torrents.h"
+#include "libtransmission/transmission.h"
+
+namespace tr
+{
+namespace
+{
+[[nodiscard]] tr_error make_error(int err)
+{
+    auto error = tr_error{};
+    if (err != 0)
+    {
+        error.set_from_errno(err);
+    }
+
+    return error;
+}
+
+class DefaultBackend final : public LocalData::Backend
+{
+public:
+    explicit DefaultBackend(tr_torrents const& torrents)
+        : torrents_{ torrents }
+    {
+    }
+
+    [[nodiscard]] int read(
+        tr_torrent_id_t const id,
+        tr_block_info::Location const loc,
+        size_t const len,
+        LocalData::BlockData& setme) override
+    {
+        if (len > tr_block_info::BlockSize)
+        {
+            return EINVAL;
+        }
+
+        auto const* const tor = torrents_.get(id);
+        if (tor == nullptr)
+        {
+            return EINVAL;
+        }
+
+        setme.resize(len);
+        return tr_ioRead(*tor, loc, len, std::data(setme));
+    }
+
+    [[nodiscard]] int write(
+        tr_torrent_id_t const id,
+        tr_block_info::Location const loc,
+        size_t const len,
+        LocalData::BlockData const& data) override
+    {
+        if (len > std::size(data))
+        {
+            return EINVAL;
+        }
+
+        auto* const tor = torrents_.get(id);
+        if (tor == nullptr)
+        {
+            return EINVAL;
+        }
+
+        return tr_ioWrite(*tor, loc, len, std::data(data));
+    }
+
+    [[nodiscard]] int close(tr_torrent_id_t const id) override
+    {
+        auto* const tor = torrents_.get(id);
+        if (tor == nullptr || tor->session == nullptr)
+        {
+            return EINVAL;
+        }
+
+        tor->session->close_torrent_files(id);
+        return 0;
+    }
+
+    [[nodiscard]] int move(
+        tr_torrent_id_t const id,
+        std::string_view const old_parent,
+        std::string_view const parent,
+        std::string_view const parent_name) override
+    {
+        auto* const tor = torrents_.get(id);
+        if (tor == nullptr)
+        {
+            return EINVAL;
+        }
+
+        auto error = tr_error{};
+        if (tor->files().move(old_parent, parent, parent_name, &error))
+        {
+            return 0;
+        }
+
+        return error ? error.code() : EIO;
+    }
+
+    [[nodiscard]] int remove(tr_torrent_id_t const id, tr_torrent_remove_func remove_func) override
+    {
+        auto* const tor = torrents_.get(id);
+        if (tor == nullptr)
+        {
+            return EINVAL;
+        }
+
+        if (!remove_func)
+        {
+            remove_func = tr_sys_path_remove;
+        }
+
+        auto error = tr_error{};
+        tor->files().remove(tor->current_dir(), tor->name(), remove_func, &error);
+        return error ? error.code() : 0;
+    }
+
+    [[nodiscard]] int rename(tr_torrent_id_t const id, std::string_view const oldpath, std::string_view const newname) override
+    {
+        auto* const tor = torrents_.get(id);
+        if (tor == nullptr)
+        {
+            return EINVAL;
+        }
+
+        auto promise = std::promise<int>{};
+        auto future = promise.get_future();
+
+        tr_torrentRenamePath(
+            tor,
+            oldpath,
+            newname,
+            [&promise](
+                tr_torrent_id_t /*tor_id*/,
+                std::string_view /*old_path*/,
+                std::string_view /*new_path*/,
+                tr_error const& error) { promise.set_value(error.code()); });
+
+        return future.get();
+    }
+
+private:
+    tr_torrents const& torrents_;
+};
+} // namespace
+
+class LocalData::Impl
+{
+private:
+    enum class Op
+    {
+        Read,
+        Write,
+        Close,
+        Move,
+        Remove,
+        Rename
+    };
+
+    struct Task
+    {
+        tr_torrent_id_t id = -1;
+        Op op = Op::Read;
+        uint64_t write_bytes = 0;
+        std::function<void()> run;
+        std::function<void()> cancel;
+    };
+
+public:
+    explicit Impl(std::unique_ptr<Backend> backend, size_t worker_count)
+        : backend_{ std::move(backend) }
+    {
+        if (worker_count == 0U)
+        {
+            worker_count = std::max(1U, std::thread::hardware_concurrency());
+        }
+
+        workers_.reserve(worker_count);
+        for (size_t i = 0; i < worker_count; ++i)
+        {
+            workers_.emplace_back([this](std::stop_token const& /*stop_token*/) { worker_thread(); });
+        }
+    }
+
+    ~Impl()
+    {
+        shutdown();
+    }
+
+    void read(tr_torrent_id_t id, tr_block_info::Location loc, size_t len, OnRead on_read)
+    {
+        auto callback = std::make_shared<OnRead>(std::move(on_read));
+
+        auto task = Task{};
+        task.id = id;
+        task.op = Op::Read;
+        task.run = [this, id, loc, len, callback = callback]() mutable
+        {
+            auto data = std::make_unique<BlockData>();
+            auto const err = backend_->read(id, loc, len, *data);
+            if (err != 0)
+            {
+                data.reset();
+            }
+            (*callback)(id, loc, len, make_error(err), std::move(data));
+        };
+        task.cancel = [id, loc, len, callback = std::move(callback)]() mutable
+        {
+            (*callback)(id, loc, len, make_error(ECANCELED), nullptr);
+        };
+
+        enqueue(std::move(task));
+    }
+
+    void write(tr_torrent_id_t id, tr_block_info::Location loc, size_t len, std::unique_ptr<BlockData> data, OnWrite on_write)
+    {
+        auto callback = std::make_shared<OnWrite>(std::move(on_write));
+
+        auto task = Task{};
+        task.id = id;
+        task.op = Op::Write;
+        task.write_bytes = len;
+
+        if (data == nullptr || len > std::size(*data))
+        {
+            (*callback)(id, loc, len, make_error(EINVAL));
+            return;
+        }
+
+        auto write_data = std::make_shared<BlockData>(std::move(*data));
+
+        task.run = [this, id, loc, len, write_data = std::move(write_data), callback = callback]() mutable
+        {
+            auto const err = backend_->write(id, loc, len, *write_data);
+            (*callback)(id, loc, len, make_error(err));
+        };
+        task.cancel = [id, loc, len, callback = std::move(callback)]() mutable
+        {
+            (*callback)(id, loc, len, make_error(ECANCELED));
+        };
+
+        enqueue(std::move(task));
+    }
+
+    void close(tr_torrent_id_t id)
+    {
+        auto task = Task{};
+        task.id = id;
+        task.op = Op::Close;
+        task.run = [this, id]()
+        {
+            static_cast<void>(backend_->close(id));
+        };
+
+        enqueue(std::move(task));
+    }
+
+    void rename(tr_torrent_id_t id, std::string_view oldpath, std::string_view newname, tr_torrent_rename_done_func callback)
+    {
+        auto oldpath_buf = std::string{ oldpath };
+        auto newname_buf = std::string{ newname };
+        auto callback_ptr = std::make_shared<tr_torrent_rename_done_func>(std::move(callback));
+
+        auto task = Task{};
+        task.id = id;
+        task.op = Op::Rename;
+        task.run = [this, id, oldpath = oldpath_buf, newname = newname_buf, callback = callback_ptr]() mutable
+        {
+            static_cast<void>(backend_->close(id));
+            auto const err = backend_->rename(id, oldpath, newname);
+            if (*callback != nullptr)
+            {
+                (*callback)(id, oldpath, newname, make_error(err));
+            }
+        };
+        task.cancel = [id,
+                       oldpath = std::move(oldpath_buf),
+                       newname = std::move(newname_buf),
+                       callback = std::move(callback_ptr)]() mutable
+        {
+            if (*callback != nullptr)
+            {
+                (*callback)(id, oldpath, newname, make_error(ECANCELED));
+            }
+        };
+
+        enqueue(std::move(task));
+    }
+
+    void move(tr_torrent_id_t id, std::string_view old_parent, std::string_view parent, std::string_view parent_name)
+    {
+        auto task = Task{};
+        task.id = id;
+        task.op = Op::Move;
+        task.run = [this,
+                    id,
+                    old_parent = std::string{ old_parent },
+                    parent = std::string{ parent },
+                    parent_name = std::string{ parent_name }]()
+        {
+            static_cast<void>(backend_->close(id));
+            static_cast<void>(backend_->move(id, old_parent, parent, parent_name));
+        };
+
+        enqueue(std::move(task));
+    }
+
+    void remove(tr_torrent_id_t id, tr_torrent_remove_func remove_func)
+    {
+        auto canceled_callbacks = std::vector<std::function<void()>>{};
+
+        auto task = Task{};
+        task.id = id;
+        task.op = Op::Remove;
+        task.run = [this, id, remove_func = std::move(remove_func)]() mutable
+        {
+            static_cast<void>(backend_->close(id));
+            static_cast<void>(backend_->remove(id, std::move(remove_func)));
+        };
+
+        {
+            auto const lock = std::lock_guard(mutex_);
+
+            auto& queue = queues_[id];
+            auto it = std::begin(queue);
+            while (it != std::end(queue))
+            {
+                auto const should_discard = it->op == Op::Read || it->op == Op::Write || it->op == Op::Rename ||
+                    it->op == Op::Move;
+                if (!should_discard)
+                {
+                    ++it;
+                    continue;
+                }
+
+                if (it->op == Op::Write)
+                {
+                    enqueued_write_bytes_ -= it->write_bytes;
+                }
+
+                if (it->op != Op::Read)
+                {
+                    --pending_non_read_;
+                }
+
+                if (it->cancel)
+                {
+                    canceled_callbacks.emplace_back(std::move(it->cancel));
+                }
+
+                it = queue.erase(it);
+            }
+
+            auto const was_empty = std::empty(queue);
+            queue.emplace_back(std::move(task));
+            if (was_empty)
+            {
+                runnable_ids_.push_back(id);
+            }
+        }
+
+        for (auto& canceled_callback : canceled_callbacks)
+        {
+            canceled_callback();
+        }
+
+        cv_.notify_one();
+    }
+
+    void shutdown()
+    {
+        auto canceled_callbacks = std::vector<std::function<void()>>{};
+
+        {
+            auto lock = std::unique_lock(mutex_);
+            if (stopping_workers_)
+            {
+                return;
+            }
+
+            shutting_down_ = true;
+
+            for (auto& [id, queue] : queues_)
+            {
+                static_cast<void>(id);
+
+                auto it = std::begin(queue);
+                while (it != std::end(queue))
+                {
+                    if (it->op == Op::Read)
+                    {
+                        if (it->cancel)
+                        {
+                            canceled_callbacks.emplace_back(std::move(it->cancel));
+                        }
+
+                        it = queue.erase(it);
+                    }
+                    else
+                    {
+                        ++it;
+                    }
+                }
+            }
+
+            shutdown_cv_.wait(lock, [this]() { return pending_non_read_ == 0U && active_non_read_ == 0U; });
+            stopping_workers_ = true;
+        }
+
+        for (auto& callback : canceled_callbacks)
+        {
+            callback();
+        }
+
+        cv_.notify_all();
+
+        for (auto& worker : workers_)
+        {
+            worker.request_stop();
+        }
+        workers_.clear();
+    }
+
+    [[nodiscard]] uint64_t enqueued_write_bytes() const
+    {
+        auto const lock = std::lock_guard(mutex_);
+        return enqueued_write_bytes_;
+    }
+
+private:
+    void enqueue(Task task)
+    {
+        auto cancel = std::function<void()>{};
+
+        {
+            auto const lock = std::lock_guard(mutex_);
+
+            if (shutting_down_ && task.op == Op::Read)
+            {
+                cancel = std::move(task.cancel);
+            }
+            else
+            {
+                if (task.op == Op::Write)
+                {
+                    enqueued_write_bytes_ += task.write_bytes;
+                }
+
+                if (task.op != Op::Read)
+                {
+                    ++pending_non_read_;
+                }
+
+                auto& queue = queues_[task.id];
+                queue.emplace_back(std::move(task));
+                if (std::size(queue) == 1U)
+                {
+                    runnable_ids_.push_back(queue.front().id);
+                }
+            }
+        }
+
+        if (cancel)
+        {
+            cancel();
+            return;
+        }
+
+        cv_.notify_one();
+    }
+
+    [[nodiscard]] bool has_runnable_task_unlocked() const
+    {
+        return std::ranges::any_of(
+            runnable_ids_,
+            [this](tr_torrent_id_t const id)
+            { return !active_ids_.contains(id) && queues_.contains(id) && !std::empty(queues_.at(id)); });
+    }
+
+    [[nodiscard]] bool dequeue_next_task_unlocked(Task& setme)
+    {
+        while (!std::empty(runnable_ids_))
+        {
+            auto const id = runnable_ids_.front();
+            runnable_ids_.pop_front();
+
+            if (active_ids_.contains(id))
+            {
+                continue;
+            }
+
+            auto it = queues_.find(id);
+            if (it == std::end(queues_) || std::empty(it->second))
+            {
+                continue;
+            }
+
+            setme = std::move(it->second.front());
+            it->second.pop_front();
+            active_ids_.insert(id);
+
+            if (setme.op != Op::Read)
+            {
+                --pending_non_read_;
+                ++active_non_read_;
+            }
+
+            if (std::empty(it->second))
+            {
+                queues_.erase(it);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    void worker_thread()
+    {
+        while (true)
+        {
+            auto task = Task{};
+
+            {
+                auto lock = std::unique_lock(mutex_);
+                cv_.wait(lock, [this]() { return stopping_workers_ || has_runnable_task_unlocked(); });
+
+                if (stopping_workers_)
+                {
+                    return;
+                }
+
+                if (!dequeue_next_task_unlocked(task))
+                {
+                    continue;
+                }
+            }
+
+            if (task.run)
+            {
+                task.run();
+            }
+
+            {
+                auto const lock = std::lock_guard(mutex_);
+                active_ids_.erase(task.id);
+
+                if (task.op == Op::Write)
+                {
+                    enqueued_write_bytes_ -= task.write_bytes;
+                }
+
+                if (task.op != Op::Read)
+                {
+                    --active_non_read_;
+                    if (shutting_down_ && pending_non_read_ == 0U && active_non_read_ == 0U)
+                    {
+                        shutdown_cv_.notify_all();
+                    }
+                }
+
+                if (auto it = queues_.find(task.id); it != std::end(queues_) && !std::empty(it->second))
+                {
+                    runnable_ids_.push_back(task.id);
+                }
+            }
+
+            cv_.notify_one();
+        }
+    }
+
+private:
+    std::unique_ptr<Backend> backend_;
+
+    mutable std::mutex mutex_;
+    std::condition_variable cv_;
+    std::condition_variable shutdown_cv_;
+
+    std::unordered_map<tr_torrent_id_t, std::deque<Task>> queues_;
+    std::deque<tr_torrent_id_t> runnable_ids_;
+    std::unordered_set<tr_torrent_id_t> active_ids_;
+    std::vector<std::jthread> workers_;
+
+    uint64_t enqueued_write_bytes_ = 0;
+    size_t pending_non_read_ = 0;
+    size_t active_non_read_ = 0;
+
+    bool shutting_down_ = false;
+    bool stopping_workers_ = false;
+};
+
+LocalData::LocalData(tr_torrents const& torrents, size_t worker_count)
+    : impl_{ std::make_unique<Impl>(std::make_unique<DefaultBackend>(torrents), worker_count) }
+{
+}
+
+LocalData::LocalData(std::unique_ptr<Backend> backend, size_t worker_count)
+    : impl_{ std::make_unique<Impl>(std::move(backend), worker_count) }
+{
+}
+
+LocalData::~LocalData() = default;
+
+void LocalData::read(tr_torrent_id_t const id, tr_block_info::Location const loc, size_t const len, OnRead on_read)
+{
+    impl_->read(id, loc, len, std::move(on_read));
+}
+
+void LocalData::write(
+    tr_torrent_id_t const id,
+    tr_block_info::Location const loc,
+    size_t const len,
+    std::unique_ptr<BlockData> data,
+    OnWrite on_write)
+{
+    impl_->write(id, loc, len, std::move(data), std::move(on_write));
+}
+
+void LocalData::close(tr_torrent_id_t const id)
+{
+    impl_->close(id);
+}
+
+void LocalData::rename(
+    tr_torrent_id_t const id,
+    std::string_view const oldpath,
+    std::string_view const newname,
+    tr_torrent_rename_done_func callback)
+{
+    impl_->rename(id, oldpath, newname, std::move(callback));
+}
+
+void LocalData::move(
+    tr_torrent_id_t const id,
+    std::string_view const old_parent,
+    std::string_view const parent,
+    std::string_view const parent_name)
+{
+    impl_->move(id, old_parent, parent, parent_name);
+}
+
+void LocalData::remove(tr_torrent_id_t const id, tr_torrent_remove_func remove_func)
+{
+    impl_->remove(id, std::move(remove_func));
+}
+
+void LocalData::shutdown()
+{
+    impl_->shutdown();
+}
+
+uint64_t LocalData::enqueued_write_bytes() const
+{
+    return impl_->enqueued_write_bytes();
+}
+
+} // namespace tr

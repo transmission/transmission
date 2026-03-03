@@ -28,6 +28,8 @@ target_sources(${TR_NAME}
         announcer-udp.cc
         announcer.cc
         announcer.h
+        local-data.cc
+        local-data.h
         api-compat.cc
         api-compat.h
         bandwidth.cc
