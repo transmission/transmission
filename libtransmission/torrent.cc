@@ -125,7 +125,7 @@ tr_torrent_id_t tr_torrentId(tr_torrent const* tor)
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, tr_torrent_id_t id)
 {
-    return session->torrents().get(id);
+    return session != nullptr ? session->torrents().get(id) : nullptr;
 }
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo)
