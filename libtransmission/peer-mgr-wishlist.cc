@@ -364,13 +364,15 @@ private:
     void got_bad_piece(tr_piece_index_t const piece)
     {
         auto iter = find_by_piece(piece);
-        if (auto const end = std::end(candidates_); iter == end)
+        if (auto const salt = get_salt(piece); iter != std::end(candidates_))
         {
-            auto const salt = get_salt(piece);
-            iter = candidates_.emplace(end, piece, salt, &mediator_);
+            *iter = { piece, salt, &mediator_ };
+        }
+        else
+        {
+            iter = candidates_.emplace(iter, piece, salt, &mediator_);
         }
 
-        iter->block_span = iter->raw_block_span;
         if (piece > 0U)
         {
             if (auto const prev = find_by_piece(piece - 1U); prev != std::end(candidates_))
@@ -398,11 +400,6 @@ private:
                     iter->unrequested.erase(block);
                 }
             }
-        }
-
-        for (auto [begin, i] = iter->block_span; i > begin; --i)
-        {
-            iter->unrequested.insert(i - 1U);
         }
 
         std::ranges::sort(candidates_);
