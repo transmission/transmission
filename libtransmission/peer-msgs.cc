@@ -21,6 +21,7 @@
 #include <string_view>
 #include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -336,6 +337,8 @@ public:
 
     ~tr_peerMsgsImpl() override
     {
+        cancel_pending_peer_reads();
+
         set_active(tr_direction::Up, false);
         set_active(tr_direction::Down, false);
 
@@ -545,15 +548,119 @@ private:
 
     [[nodiscard]] bool is_valid_request(peer_request const& req) const;
 
+    struct queued_peer_request
+    {
+        peer_request req;
+        uint64_t token = 0;
+        std::shared_ptr<tr::LocalData::BlockData> data;
+
+        [[nodiscard]] bool is_read_pending() const noexcept
+        {
+            return token != 0;
+        }
+    };
+
+    [[nodiscard]] uint64_t next_peer_request_token() noexcept
+    {
+        return next_peer_request_token_++;
+    }
+
+    void cancel_pending_peer_reads()
+    {
+        for (auto const& req : peer_requested_)
+        {
+            if (req.token != 0)
+            {
+                pending_peer_read_tokens_.erase(req.token);
+            }
+        }
+    }
+
+    void on_local_data_read_done(uint64_t const token, tr_error const& error, std::shared_ptr<tr::LocalData::BlockData> data)
+    {
+        TR_ASSERT(session->am_in_session_thread());
+
+        if (pending_peer_read_tokens_.erase(token) == 0U)
+        {
+            return;
+        }
+
+        auto const it = std::ranges::find(peer_requested_, token, &queued_peer_request::token);
+        if (it == std::end(peer_requested_))
+        {
+            return;
+        }
+
+        it->token = 0;
+        if (!error && data != nullptr)
+        {
+            it->data = std::move(data);
+        }
+
+        fill_output_buffer(tr_time(), tr_time_msec());
+    }
+
+    void schedule_peer_request_read(peer_request const& req)
+    {
+        auto token = uint64_t{ 0 };
+        auto data = std::shared_ptr<tr::LocalData::BlockData>{};
+        auto ok = tor_.ensure_piece_is_checked(req.index);
+
+        if (!ok)
+        {
+            tor_.error().set_local_error(fmt::format("Please Verify Local Data! Piece #{:d} is corrupt.", req.index));
+        }
+        else
+        {
+            token = next_peer_request_token();
+            pending_peer_read_tokens_.insert(token);
+        }
+
+        peer_requested_.emplace_back(req, token, std::move(data));
+
+        if (!ok)
+        {
+            fill_output_buffer(tr_time(), tr_time_msec());
+            return;
+        }
+
+        auto const weak = weak_from_this();
+        session->local_data.read(
+            tor_.id(),
+            tor_.piece_loc(req.index, req.offset, req.length),
+            req.length,
+            [weak, token](
+                tr_torrent_id_t /*id*/,
+                tr_block_info::Location /*loc*/,
+                size_t /*len*/,
+                tr_error const& error,
+                std::unique_ptr<tr::LocalData::BlockData> data) mutable
+            {
+                if (auto self = weak.lock(); self != nullptr)
+                {
+                    auto shared_data = std::shared_ptr<tr::LocalData::BlockData>{ std::move(data) };
+                    self->session->run_in_session_thread(
+                        [weak, token, error, data = std::move(shared_data)]() mutable
+                        {
+                            if (auto self_again = weak.lock(); self_again != nullptr)
+                            {
+                                self_again->on_local_data_read_done(token, error, std::move(data));
+                            }
+                        });
+                }
+            });
+    }
+
     void reject_all_requests()
     {
         auto& queue = peer_requested_;
 
         if (auto const must_send_rej = io_->supports_fext(); must_send_rej)
         {
-            std::ranges::for_each(queue, [this](peer_request const& req) { protocol_send_reject(req); });
+            std::ranges::for_each(queue, [this](queued_peer_request const& req) { protocol_send_reject(req.req); });
         }
 
+        cancel_pending_peer_reads();
         queue.clear();
     }
 
@@ -563,9 +670,7 @@ private:
     {
         if (can_add_request_from_peer(req))
         {
-            peer_requested_.emplace_back(req);
-
-            fill_output_buffer(tr_time(), tr_time_msec());
+            schedule_peer_request_read(req);
         }
         else if (io_->supports_fext())
         {
@@ -721,7 +826,9 @@ private:
 
     std::shared_ptr<tr_peerIo> const io_;
 
-    std::deque<peer_request> peer_requested_;
+    std::deque<queued_peer_request> peer_requested_;
+    std::unordered_set<uint64_t> pending_peer_read_tokens_;
+    uint64_t next_peer_request_token_ = 1;
 
     std::array<std::vector<tr_pex>, NUM_TR_AF_INET_TYPES> pex_;
 
@@ -1543,8 +1650,13 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
             logtrace(this, fmt::format("got a Cancel {:d}:{:d}->{:d}", r.index, r.offset, r.length));
 
             auto& requests = peer_requested_;
-            if (auto iter = std::ranges::find(requests, r); iter != std::ranges::end(requests))
+            if (auto iter = std::ranges::find(requests, r, &queued_peer_request::req); iter != std::ranges::end(requests))
             {
+                if (iter->token != 0)
+                {
+                    pending_peer_read_tokens_.erase(iter->token);
+                }
+
                 requests.erase(iter);
 
                 // bep6: "Even when a request is cancelled, the peer
@@ -2033,31 +2145,21 @@ void tr_peerMsgsImpl::check_request_timeout(time_t const now)
         return {};
     }
 
-    auto const req = peer_requested_.front();
+    auto const& queued_req = peer_requested_.front();
+    if (queued_req.is_read_pending())
+    {
+        return {};
+    }
+
+    auto const req = queued_req.req;
+    auto data = std::move(peer_requested_.front().data);
     peer_requested_.pop_front();
 
-    auto buf = std::array<uint8_t, tr_block_info::BlockSize>{};
-    auto ok = is_valid_request(req) && tor_.has_piece(req.index);
-
-    if (ok)
-    {
-        ok = tor_.ensure_piece_is_checked(req.index);
-
-        if (!ok)
-        {
-            tor_.error().set_local_error(fmt::format("Please Verify Local Data! Piece #{:d} is corrupt.", req.index));
-        }
-    }
-
-    if (ok)
-    {
-        ok = tr_ioRead(tor_, tor_.piece_loc(req.index, req.offset), std::span{ std::data(buf), req.length }) == 0;
-    }
-
-    if (ok)
+    if (data != nullptr && std::size(*data) >= req.length)
     {
         blocks_sent_to_peer.add(now_sec, 1);
-        auto const piece_data = std::string_view{ reinterpret_cast<char const*>(std::data(buf)), req.length };
+        auto const piece_data = std::string_view{ reinterpret_cast<char const*>(std::data(*data)),
+                                                  static_cast<size_t>(req.length) };
         return protocol_send_message(BtPeerMsgs::Piece, req.index, req.offset, piece_data);
     }
 
