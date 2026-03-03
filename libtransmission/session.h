@@ -44,6 +44,7 @@
 #include "libtransmission/blocklist.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/ip-cache.h"
+#include "libtransmission/local-data.h"
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port, tr_tos_t
 #include "libtransmission/open-files.h"
@@ -1468,6 +1469,11 @@ private:
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
+public:
+    // depends-on: torrents_, open_files_ (indirectly via inout calls to tr_session::openFiles())
+    tr::LocalData local_data{ torrents_ };
+
+private:
     // depends-on: timer_maker_, blocklists_, top_bandwidth_, utp_context, torrents_, web_
     std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
 
