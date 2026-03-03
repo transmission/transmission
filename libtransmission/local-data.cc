@@ -23,6 +23,7 @@
 
 #include "libtransmission/local-data.h"
 
+#include "libtransmission/crypto-utils.h"
 #include "libtransmission/inout.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
@@ -42,6 +43,51 @@ namespace
     }
 
     return error;
+}
+
+[[nodiscard]] std::optional<tr_sha1_digest_t> recalculate_hash(
+    LocalData::Backend& backend,
+    tr_torrent_id_t const id,
+    tr_block_info const block_info,
+    tr_piece_index_t const piece)
+{
+    TR_ASSERT(piece < block_info.piece_count());
+
+    auto sha = tr_sha1{};
+    auto buffer = LocalData::BlockData{};
+
+    auto const [begin_byte, end_byte] = block_info.byte_span_for_piece(piece);
+    auto const [begin_block, end_block] = block_info.block_span_for_piece(piece);
+    [[maybe_unused]] auto n_bytes_checked = size_t{};
+    for (auto block = begin_block; block < end_block; ++block)
+    {
+        auto const block_loc = block_info.block_loc(block);
+        auto const block_len = block_info.block_size(block);
+
+        buffer.clear();
+        if (auto const err = backend.read(id, block_loc, block_len, buffer); err != 0)
+        {
+            return {};
+        }
+
+        auto begin = std::data(buffer);
+        auto end = begin + block_len;
+
+        if (block == begin_block)
+        {
+            begin += (begin_byte - block_loc.byte);
+        }
+        if (block + 1U == end_block)
+        {
+            end -= (block_loc.byte + block_len - end_byte);
+        }
+
+        sha.add(begin, end - begin);
+        n_bytes_checked += (end - begin);
+    }
+
+    TR_ASSERT(block_info.piece_size(piece) == n_bytes_checked);
+    return sha.finish();
 }
 
 class DefaultBackend final : public LocalData::Backend
@@ -71,6 +117,24 @@ public:
 
         setme.resize(len);
         return tr_ioRead(*tor, loc, len, std::data(setme));
+    }
+
+    [[nodiscard]] int testPiece(tr_torrent_id_t const id, tr_piece_index_t const piece, tr_sha1_digest_t& setme_hash) override
+    {
+        auto const* const tor = torrents_.get(id);
+        if (tor == nullptr || piece >= tor->piece_count())
+        {
+            return EINVAL;
+        }
+
+        auto const hash = recalculate_hash(*this, id, tor->block_info(), piece);
+        if (!hash)
+        {
+            return EIO;
+        }
+
+        setme_hash = *hash;
+        return 0;
     }
 
     [[nodiscard]] int write(
@@ -179,6 +243,7 @@ private:
     enum class Op
     {
         Read,
+        Test,
         Write,
         Close,
         Move,
@@ -236,6 +301,27 @@ public:
         task.cancel = [id, loc, len, callback = std::move(callback)]() mutable
         {
             (*callback)(id, loc, len, make_error(ECANCELED), nullptr);
+        };
+
+        enqueue(std::move(task));
+    }
+
+    void testPiece(tr_torrent_id_t id, tr_piece_index_t piece, OnTest on_test)
+    {
+        auto callback = std::make_shared<OnTest>(std::move(on_test));
+
+        auto task = Task{};
+        task.id = id;
+        task.op = Op::Test;
+        task.run = [this, id, piece, callback = callback]() mutable
+        {
+            auto hash = tr_sha1_digest_t{};
+            auto const err = backend_->testPiece(id, piece, hash);
+            (*callback)(id, piece, make_error(err), err == 0 ? std::optional<tr_sha1_digest_t>{ hash } : std::nullopt);
+        };
+        task.cancel = [id, piece, callback = std::move(callback)]() mutable
+        {
+            (*callback)(id, piece, make_error(ECANCELED), std::nullopt);
         };
 
         enqueue(std::move(task));
@@ -355,7 +441,7 @@ public:
             while (it != std::end(queue))
             {
                 auto const should_discard = it->op == Op::Read || it->op == Op::Write || it->op == Op::Rename ||
-                    it->op == Op::Move;
+                    it->op == Op::Move || it->op == Op::Test;
                 if (!should_discard)
                 {
                     ++it;
@@ -367,7 +453,7 @@ public:
                     enqueued_write_bytes_ -= it->write_bytes;
                 }
 
-                if (it->op != Op::Read)
+                if (!is_read_like(it->op))
                 {
                     --pending_non_read_;
                 }
@@ -416,7 +502,7 @@ public:
                 auto it = std::begin(queue);
                 while (it != std::end(queue))
                 {
-                    if (it->op == Op::Read)
+                    if (is_read_like(it->op))
                     {
                         if (it->cancel)
                         {
@@ -464,7 +550,7 @@ private:
         {
             auto const lock = std::lock_guard(mutex_);
 
-            if (shutting_down_ && task.op == Op::Read)
+            if (shutting_down_ && is_read_like(task.op))
             {
                 cancel = std::move(task.cancel);
             }
@@ -475,7 +561,7 @@ private:
                     enqueued_write_bytes_ += task.write_bytes;
                 }
 
-                if (task.op != Op::Read)
+                if (!is_read_like(task.op))
                 {
                     ++pending_non_read_;
                 }
@@ -528,7 +614,7 @@ private:
             it->second.pop_front();
             active_ids_.insert(id);
 
-            if (setme.op != Op::Read)
+            if (!is_read_like(setme.op))
             {
                 --pending_non_read_;
                 ++active_non_read_;
@@ -580,7 +666,7 @@ private:
                     enqueued_write_bytes_ -= task.write_bytes;
                 }
 
-                if (task.op != Op::Read)
+                if (!is_read_like(task.op))
                 {
                     --active_non_read_;
                     if (shutting_down_ && pending_non_read_ == 0U && active_non_read_ == 0U)
@@ -597,6 +683,11 @@ private:
 
             cv_.notify_one();
         }
+    }
+
+    [[nodiscard]] static bool is_read_like(Op const op)
+    {
+        return op == Op::Read || op == Op::Test;
     }
 
 private:
@@ -634,6 +725,11 @@ LocalData::~LocalData() = default;
 void LocalData::read(tr_torrent_id_t const id, tr_block_info::Location const loc, size_t const len, OnRead on_read)
 {
     impl_->read(id, loc, len, std::move(on_read));
+}
+
+void LocalData::testPiece(tr_torrent_id_t const id, tr_piece_index_t const piece, OnTest on_test)
+{
+    impl_->testPiece(id, piece, std::move(on_test));
 }
 
 void LocalData::write(

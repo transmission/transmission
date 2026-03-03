@@ -13,6 +13,7 @@
 #include <cstdint> // for intX_t, uintX_t
 #include <functional>
 #include <memory> // for std::unique_ptr
+#include <optional>
 #include <string_view>
 #include <utility> // for std::pair
 #include <vector>
@@ -35,6 +36,9 @@ public:
     using OnRead = std::function<
         void(tr_torrent_id_t, tr_block_info::Location loc, size_t len, tr_error const& error, std::unique_ptr<BlockData> data)>;
 
+    using OnTest = std::function<
+        void(tr_torrent_id_t, tr_piece_index_t piece, tr_error const& error, std::optional<tr_sha1_digest_t> hash)>;
+
     using OnWrite = std::function<void(tr_torrent_id_t, tr_block_info::Location loc, size_t len, tr_error const& error)>;
 
     class Backend
@@ -43,6 +47,7 @@ public:
         virtual ~Backend() = default;
 
         [[nodiscard]] virtual int read(tr_torrent_id_t id, tr_block_info::Location loc, size_t len, BlockData& setme) = 0;
+        [[nodiscard]] virtual int testPiece(tr_torrent_id_t id, tr_piece_index_t piece, tr_sha1_digest_t& setme_hash) = 0;
         [[nodiscard]] virtual int write(tr_torrent_id_t id, tr_block_info::Location loc, size_t len, BlockData const& data) = 0;
         [[nodiscard]] virtual int close(tr_torrent_id_t id) = 0;
         [[nodiscard]] virtual int move(
@@ -66,6 +71,9 @@ public:
 
     // Read a block
     void read(tr_torrent_id_t, tr_block_info::Location loc, size_t len, OnRead on_read);
+
+    // Read a piece and return its SHA1 checksum.
+    void testPiece(tr_torrent_id_t, tr_piece_index_t piece, OnTest on_test);
 
     // Write a block
     void write(tr_torrent_id_t, tr_block_info::Location loc, size_t len, std::unique_ptr<BlockData> data, OnWrite on_write);
