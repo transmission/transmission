@@ -2349,11 +2349,9 @@ auto renameFindAffectedFiles(tr_torrent_files const& files, std::string_view old
     return indices;
 }
 
-int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
+int renamePath(std::string_view const base, std::string_view const oldpath, std::string_view const newname)
 {
     int err = 0;
-
-    auto const base = tor->is_done() || std::empty(tor->incomplete_dir()) ? tor->download_dir() : tor->incomplete_dir();
 
     auto src = tr_pathbuf{ base, '/', oldpath };
 
@@ -2457,7 +2455,8 @@ void tr_torrent::rename_path_in_session_thread(
     }
     else
     {
-        error = renamePath(this, oldpath, newname);
+        auto const base = is_done() || std::empty(incomplete_dir()) ? download_dir() : incomplete_dir();
+        error = renamePath(base, oldpath, newname);
 
         if (error == 0)
         {
