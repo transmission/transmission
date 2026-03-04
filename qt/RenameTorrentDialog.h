@@ -34,7 +34,7 @@ private:
     void selectBaseName() const;
 
     Session& session_;
-    int torrent_id_ = -1;
+    tr_torrent_id_t torrent_id_ = {};
     QString old_name_;
     QLineEdit* line_edit_ = {};
     QDialogButtonBox* button_box_ = {};

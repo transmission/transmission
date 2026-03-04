@@ -31,11 +31,7 @@ RenameTorrentDialog::RenameTorrentDialog(Session& session, TorrentModel const& m
 
     setWindowTitle(tr("Rename Torrent"));
 
-    if (torrent_id_ < 0)
-    {
-        QTimer::singleShot(0, this, &QDialog::reject);
-    }
-    else
+    if (torrent_id_ > 0)
     {
         auto* const layout = new QVBoxLayout{ this };
         auto* const label = new QLabel{ tr("Rename \"%1\":").arg(old_name_), this };
@@ -68,6 +64,10 @@ RenameTorrentDialog::RenameTorrentDialog(Session& session, TorrentModel const& m
 
         updateButtons();
     }
+    else
+    {
+        QTimer::singleShot(0, this, &QDialog::reject);
+    }
 }
 
 QString RenameTorrentDialog::newName() const
@@ -78,7 +78,7 @@ QString RenameTorrentDialog::newName() const
 void RenameTorrentDialog::onAccepted()
 {
     auto const new_name = newName();
-    if (torrent_id_ >= 0 && !new_name.isEmpty() && new_name != old_name_)
+    if (torrent_id_ > 0 && !new_name.isEmpty() && new_name != old_name_)
     {
         session_.torrentRenamePath({ torrent_id_ }, old_name_, new_name);
     }
@@ -95,7 +95,7 @@ void RenameTorrentDialog::updateButtons() const
     }
 
     auto const name = newName();
-    ok_button->setEnabled(torrent_id_ >= 0 && !name.isEmpty() && name != old_name_);
+    ok_button->setEnabled(torrent_id_ > 0 && !name.isEmpty() && name != old_name_);
 }
 
 void RenameTorrentDialog::selectBaseName() const
