@@ -37,9 +37,6 @@ using namespace std::literals;
 static_assert(TR_AF_INET == 0);
 static_assert(TR_AF_INET6 == 1);
 
-auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissionbt.com/"sv },
-                                             std::array{ "https://ip6.transmissionbt.com/"sv } };
-
 auto constexpr UpkeepInterval = 30min;
 auto constexpr RetryUpkeepInterval = 30s;
 
@@ -231,17 +228,23 @@ void tr_ip_cache::update_addr(tr_address_type type) noexcept
     }
 }
 
-void tr_ip_cache::update_global_addr(tr_address_type type) noexcept
+void tr_ip_cache::update_global_addr(tr_address_type const type) noexcept
 {
-    auto const ix_service = ix_service_[type];
     TR_ASSERT(type < NUM_TR_AF_INET_TYPES);
     TR_ASSERT(has_ip_protocol_[type]);
-    TR_ASSERT(ix_service < std::size(IPQueryServices[type]));
 
-    if (ix_service == 0U && !set_is_updating(type))
+    auto const ip_endpoints = mediator_.settings_ip_endpoint(type);
+    if (std::empty(ip_endpoints))
     {
         return;
     }
+
+    auto const ix_service = ix_service_[type];
+    if (ix_service == 0U && !set_is_updating(type, ip_endpoints))
+    {
+        return;
+    }
+    TR_ASSERT(ix_service < std::size(current_ip_endpoints_[type]));
     TR_ASSERT(is_updating_[type] == is_updating_t::Yes);
 
     // Update global address
@@ -250,7 +253,7 @@ void tr_ip_cache::update_global_addr(tr_address_type type) noexcept
         tr_web::FetchOptions::IPProtocol::V6,
     };
     auto options = tr_web::FetchOptions{
-        IPQueryServices[type][ix_service],
+        current_ip_endpoints_[type][ix_service],
         [weak = weak_from_this(), type](tr_web::FetchResponse const& response)
         {
             if (auto const ptr = weak.lock())
@@ -315,11 +318,12 @@ void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
     unset_is_updating(type);
 }
 
-void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept
+void tr_ip_cache::on_response_ip_query(tr_address_type const type, tr_web::FetchResponse const& response) noexcept
 {
     auto& ix_service = ix_service_[type];
+    auto const& ip_endpoints = current_ip_endpoints_[type];
     TR_ASSERT(is_updating_[type] == is_updating_t::Yes);
-    TR_ASSERT(ix_service < std::size(IPQueryServices[type]));
+    TR_ASSERT(ix_service < std::size(ip_endpoints));
 
     auto const protocol = tr_ip_protocol_to_sv(type);
     auto success = false;
@@ -338,14 +342,14 @@ void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchRespon
                     fmt::runtime(_("Successfully updated global {type} address to {ip} using {url}")),
                     fmt::arg("type", protocol),
                     fmt::arg("ip", addr->display_name()),
-                    fmt::arg("url", IPQueryServices[type][ix_service])));
+                    fmt::arg("url", ip_endpoints[ix_service])));
         }
     }
 
     // Try next IP query URL
     if (!success)
     {
-        if (++ix_service < std::size(IPQueryServices[type]))
+        if (++ix_service < std::size(ip_endpoints))
         {
             update_global_addr(type);
             return;
@@ -393,13 +397,14 @@ void tr_ip_cache::unset_addr(tr_address_type type) noexcept
     unset_global_addr(type);
 }
 
-bool tr_ip_cache::set_is_updating(tr_address_type type) noexcept
+bool tr_ip_cache::set_is_updating(tr_address_type type, std::span<std::string const> ip_endpoints) noexcept
 {
     if (is_updating_[type] != is_updating_t::No)
     {
         return false;
     }
     is_updating_[type] = is_updating_t::Yes;
+    current_ip_endpoints_[type].assign(ip_endpoints.begin(), ip_endpoints.end());
     return true;
 }
 
