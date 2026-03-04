@@ -32,9 +32,8 @@ public:
 
     [[nodiscard]] bool contains(tr_address const& addr) const noexcept
     {
-        return std::any_of(
-            std::begin(blocklists_),
-            std::end(blocklists_),
+        return std::ranges::any_of(
+            blocklists_,
             [&addr](auto const& blocklist) { return blocklist.enabled() && blocklist.contains(addr); });
     }
 

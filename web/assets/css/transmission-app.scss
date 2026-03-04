@@ -490,6 +490,12 @@ a {
   overflow: auto;
   padding: 0;
   right: 0;
+
+  // Override clusterize default max-height
+  &.clusterize-scroll {
+    max-height: none;
+    height: 100%;
+  }
 }
 
 #torrent-list {
@@ -501,6 +507,7 @@ a {
   width: 100%;
   user-select: none;
   -webkit-user-select: none;
+  outline: none;
 
   .torrent {
     align-items: center;
@@ -1185,6 +1192,7 @@ a {
   table-layout: fixed;
   text-align: left;
   width: 100%;
+  margin-bottom: 1rem;
 
   td,
   th {
@@ -1251,6 +1259,12 @@ a {
   .status {
     cursor: pointer;
     width: 10%;
+  }
+
+  .webseed-url {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -1749,4 +1763,25 @@ dialog {
 
 .upload-div {
   display: none;
+}
+
+/// CLUSTERIZE
+
+.clusterize-scroll {
+  max-height: 200px;
+  overflow: auto;
+}
+
+.clusterize-extra-row {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.clusterize-extra-row.clusterize-keep-parity {
+  display: none;
+}
+
+.clusterize-content {
+  outline: 0;
+  counter-reset: clusterize-counter;
 }

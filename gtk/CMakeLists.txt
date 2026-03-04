@@ -166,22 +166,6 @@ target_compile_definitions(${TR_NAME}-gtk
         GETTEXT_PACKAGE="${TR_NAME}-gtk"
         $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>)
 
-if(NOT ENABLE_DEPRECATED)
-    target_compile_definitions(${TR_NAME}-gtk
-        PRIVATE
-            G_DISABLE_DEPRECATED
-            GDK_PIXBUF_DISABLE_DEPRECATED
-            GDK_DISABLE_DEPRECATED
-            GTK_DISABLE_DEPRECATED
-            PANGO_DISABLE_DEPRECATED
-            GDKMM_DISABLE_DEPRECATED
-            GIOMM_DISABLE_DEPRECATED
-            GLIBMM_DISABLE_DEPRECATED
-            GTKMM_DISABLE_DEPRECATED
-            PANGOMM_DISABLE_DEPRECATED
-            SIGCXX_DISABLE_DEPRECATED)
-endif()
-
 target_compile_options(${TR_NAME}-gtk
     PRIVATE
         $<$<BOOL:${ENABLE_WERROR}>:$<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>>

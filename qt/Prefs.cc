@@ -163,7 +163,7 @@ Prefs::Prefs()
     load(defaults());
 }
 
-void Prefs::loadFromConfigDir(QString const dir)
+void Prefs::loadFromConfigDir(QString const& dir)
 {
     auto settings = tr_sessionLoadSettings(dir.toStdString());
     if (auto* const map = settings.get_if<tr_variant::Map>())
@@ -227,8 +227,9 @@ void Prefs::save(QString const& filename) const
     auto serde = tr_variant_serde::json();
 
     auto settings = tr_variant::make_map(PREFS_COUNT);
-    if (auto const var = serde.parse_file(filename_str))
+    if (auto var = serde.parse_file(filename_str))
     {
+        api_compat::convert_incoming_data(*var);
         settings.merge(*var);
     }
     settings.merge(tr_variant{ current_settings() });

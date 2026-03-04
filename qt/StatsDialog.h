@@ -17,7 +17,8 @@ class StatsDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    explicit StatsDialog(Session&, QWidget* parent = nullptr);
+    explicit StatsDialog(Session& session, QWidget* parent = nullptr);
+    ~StatsDialog() override = default;
     StatsDialog(StatsDialog&&) = delete;
     StatsDialog(StatsDialog const&) = delete;
     StatsDialog& operator=(StatsDialog&&) = delete;

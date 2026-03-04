@@ -43,7 +43,6 @@ include(TrMacros)
 
 set(CURL_MINIMUM 7.28.0)
 set(WOLFSSL_MINIMUM 3.4)
-set(CRC32C_MINIMUM 1.1.0)
 set(DEFLATE_MINIMUM 1.7)
 set(EVENT2_MINIMUM 2.1.0)
 # fast_float's version file is configured with `COMPATIBILITY SameMajorVersion`
@@ -57,7 +56,7 @@ set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 2.7)
 set(MINIUPNPC_MINIMUM 2.2.1)
-set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
+set(NPM_MINIMUM 10.8.2) # Node.js 20.19 (stylelint@17)
 set(PSL_MINIMUM 0.21.0)
 set(QT_MINIMUM 5.15)
 set(SIGSLOT_MINIMUM 1.2.3)
@@ -80,7 +79,6 @@ option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
 option(INSTALL_LIB "Install the library" OFF)
-tr_auto_option(ENABLE_DEPRECATED "Allow deprecated API use of upstream packages, e.g. GTK" AUTO)
 tr_auto_option(USE_SYSTEM_DEFAULT "Default value for USE_SYSTEM_* options" AUTO)
 tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" ${USE_SYSTEM_DEFAULT})
@@ -97,7 +95,6 @@ tr_auto_option(USE_SYSTEM_UTP "Use system utp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_WIDE_INTEGER "Use system WideInteger library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" ${USE_SYSTEM_DEFAULT})
-tr_auto_option(USE_SYSTEM_CRC32C "Use system crc32c library" ${USE_SYSTEM_DEFAULT})
 tr_list_option(USE_GTK_VERSION "Use specific GTK version" AUTO 3 4)
 tr_list_option(USE_QT_VERSION "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO "Use specified crypto library" AUTO ccrypto mbedtls openssl wolfssl)
@@ -113,10 +110,10 @@ set(TR_NAME ${PROJECT_NAME})
 
 # these should be the only five lines you need to change
 set(TR_VERSION_MAJOR "4")
-set(TR_VERSION_MINOR "1")
+set(TR_VERSION_MINOR "2")
 set(TR_VERSION_PATCH "0")
-set(TR_VERSION_BETA_NUMBER "5") # empty string for not beta
-set(TR_VERSION_DEV FALSE)
+set(TR_VERSION_BETA_NUMBER "") # empty string for not beta
+set(TR_VERSION_DEV TRUE)
 
 # derived from above: release type
 if(TR_VERSION_DEV)
@@ -266,14 +263,6 @@ find_package(Threads)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
-
-if(ENABLE_DEPRECATED STREQUAL "AUTO")
-    if(DEFINED ENV{CI})
-        set(ENABLE_DEPRECATED OFF)
-    else()
-        set(ENABLE_DEPRECATED ON)
-    endif()
-endif()
 
 set(CRYPTO_PKG "")
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "ccrypto")
@@ -575,6 +564,7 @@ if(NOT USE_SYSTEM_MINIUPNPC)
 endif()
 unset(TR_MINIUPNPC_LIBNAME)
 
+add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/madler-crcany)
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
 tr_add_external_auto_library(DHT dht
@@ -596,18 +586,6 @@ tr_add_external_auto_library(B64 libb64
     SUBPROJECT
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
-
-# Don't build crc32c as subdirectory as its CMakeLists.txt
-# messes with global CMAKE_* variables and global compiler options
-tr_add_external_auto_library(CRC32C Crc32c
-    TARGET Crc32c::crc32c
-    LIBNAME crc32c
-    SOURCE_DIR crc32c
-    CMAKE_ARGS
-        -DCRC32C_BUILD_TESTS=OFF
-        -DCRC32C_BUILD_BENCHMARKS=OFF
-        -DCRC32C_USE_GLOG=OFF
-        -DCRC32C_INSTALL=ON)
 
 tr_add_external_auto_library(FAST_FLOAT FastFloat
     SUBPROJECT

@@ -22,10 +22,8 @@
 
 #include <dht/dht.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/net.h" // tr_port
-#include "libtransmission/tr-macros.h"
+#include "libtransmission/types.h"
 
 struct tr_pex;
 

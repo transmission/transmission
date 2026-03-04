@@ -593,8 +593,8 @@ void Application::Impl::on_startup()
         css_provider,
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    FilterBar();
-    PathButton();
+    std::ignore = FilterBar();
+    std::ignore = PathButton();
 
     tr_session* session = nullptr;
 
@@ -896,7 +896,7 @@ void Application::Impl::on_drag_data_received(
     {
         auto files = std::vector<Glib::RefPtr<Gio::File>>();
         files.reserve(uris.size());
-        std::transform(uris.begin(), uris.end(), std::back_inserter(files), &Gio::File::create_for_uri);
+        std::ranges::transform(uris, std::back_inserter(files), &Gio::File::create_for_uri);
 
         open_files(files);
     }

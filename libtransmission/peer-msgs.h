@@ -14,11 +14,10 @@
 #include <cstddef> // for size_t
 #include <memory>
 
-#include "libtransmission/transmission.h" // for tr_direction, tr_block_ind...
-
 #include "libtransmission/interned-string.h"
 #include "libtransmission/net.h" // tr_socket_address
 #include "libtransmission/peer-common.h" // for tr_peer
+#include "libtransmission/types.h"
 
 class tr_peerIo;
 class tr_peerMsgs;

@@ -16,13 +16,12 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/peer-io.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h" // tr_time_msec()
 #include "libtransmission/values.h"
 

@@ -3,7 +3,8 @@
 // License text can be found in the licenses/ folder.
 
 #import <Sparkle/Sparkle.h>
-#include <libtransmission/utils.h>
+
+#include <libtransmission/string-utils.h>
 
 #import "VDKQueue.h"
 

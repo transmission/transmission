@@ -10,9 +10,6 @@
 #include <fmt/format.h>
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
-
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/log.h"
 #include "libtransmission/port-forwarding-natpmp.h"
 #include "libtransmission/port-forwarding-upnp.h"

@@ -16,7 +16,7 @@
 #include <fmt/format.h>
 
 #include <libtransmission/quark.h>
-#include <libtransmission/utils.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/variant.h>
 
 #include "Prefs.h"

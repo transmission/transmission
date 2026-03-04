@@ -25,7 +25,8 @@ class PrefsDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
+    PrefsDialog(Session& session, Prefs& prefs, QWidget* parent = nullptr);
+    ~PrefsDialog() override = default;
     PrefsDialog& operator=(PrefsDialog&&) = delete;
     PrefsDialog& operator=(PrefsDialog const&) = delete;
     PrefsDialog(PrefsDialog&&) = delete;
@@ -34,14 +35,14 @@ public:
 private slots:
     void refreshPref(int key);
     void sessionUpdated();
-    void onPortTested(std::optional<bool>, Session::PortTestIpProtocol);
+    void onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol);
     void onPortTest();
     void onIdleLimitChanged();
     void onQueueStalledMinutesChanged();
 
     void onUpdateBlocklistClicked();
     void onUpdateBlocklistCancelled();
-    void onBlocklistDialogDestroyed(QObject*);
+    void onBlocklistDialogDestroyed(QObject* o);
     void onBlocklistUpdated(int n);
 
 private:
@@ -55,9 +56,9 @@ private:
     };
 
     template<typename T>
-    void set(int const key, T val)
+    void set(int const key, T const& val)
     {
-        prefs_.set(key, std::move(val));
+        prefs_.set(key, val);
         refreshPref(key);
     }
 
@@ -78,7 +79,7 @@ private:
     void initWidget(QCheckBox* w, int key);
     void initWidget(QDoubleSpinBox* w, int key);
     void initWidget(QLineEdit* w, int key);
-    void initWidget(QPlainTextEdit*, int);
+    void initWidget(QPlainTextEdit* w, int key);
     void initWidget(QSpinBox* w, int key);
     void initWidget(QTimeEdit* w, int key);
 

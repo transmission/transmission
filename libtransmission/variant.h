@@ -91,7 +91,7 @@ public:
             {
                 return item.first == key;
             };
-            return std::find_if(std::begin(vec_), std::end(vec_), predicate);
+            return std::ranges::find_if(vec_, predicate);
         }
 
         [[nodiscard]] constexpr auto find(tr_quark const key) const noexcept
@@ -101,7 +101,7 @@ public:
 
         [[nodiscard]] constexpr auto contains(tr_quark const key) const noexcept
         {
-            return find(key) != end();
+            return find(key) != end(); // NOLINT(readability-container-contains)
         }
 
         [[nodiscard]] constexpr auto size() const noexcept

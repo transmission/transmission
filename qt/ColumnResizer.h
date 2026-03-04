@@ -18,6 +18,7 @@ class ColumnResizer : public QObject
 
 public:
     explicit ColumnResizer(QObject* parent = nullptr);
+    ~ColumnResizer() override = default;
     ColumnResizer(ColumnResizer&&) = delete;
     ColumnResizer(ColumnResizer const&) = delete;
     ColumnResizer& operator=(ColumnResizer&&) = delete;

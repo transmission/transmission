@@ -22,14 +22,8 @@ class TorrentFilter : public QSortFilterProxyModel
     Q_OBJECT
 
 public:
-    enum TextMode
-    {
-        FILTER_BY_NAME,
-        FILTER_BY_FILES,
-        FILTER_BY_TRACKER
-    };
-
     explicit TorrentFilter(Prefs const& prefs);
+    ~TorrentFilter() override = default;
     TorrentFilter(TorrentFilter&&) = delete;
     TorrentFilter(TorrentFilter const&) = delete;
     TorrentFilter& operator=(TorrentFilter&&) = delete;
@@ -39,8 +33,8 @@ public:
 
 protected:
     // QSortFilterProxyModel
-    [[nodiscard]] bool filterAcceptsRow(int, QModelIndex const&) const override;
-    [[nodiscard]] bool lessThan(QModelIndex const&, QModelIndex const&) const override;
+    [[nodiscard]] bool filterAcceptsRow(int source_row, QModelIndex const& source_parent) const override;
+    [[nodiscard]] bool lessThan(QModelIndex const& source_left, QModelIndex const& source_right) const override;
 
 private slots:
     void onPrefChanged(int key);

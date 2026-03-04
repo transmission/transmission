@@ -21,6 +21,8 @@
 
 #include <gtest/gtest.h>
 
+#include <libtransmission/transmission.h>
+
 #include <libtransmission/crypto-utils.h> // tr_base64_decode()
 #include <libtransmission/error.h>
 #include <libtransmission/file.h> // tr_sys_file_*()

@@ -27,6 +27,7 @@ class TorrentModel : public QAbstractListModel
     Q_OBJECT
 
 public:
+    // NOLINTNEXTLINE(performance-enum-size)
     enum Role
     {
         TorrentRole = Qt::UserRole

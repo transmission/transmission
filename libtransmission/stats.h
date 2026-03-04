@@ -14,7 +14,7 @@
 #include <string>
 #include <string_view>
 
-#include "libtransmission/transmission.h" // for tr_session_stats
+#include "libtransmission/types.h" // for tr_session_stats
 
 // per-session data structure for bandwidth use statistics
 class tr_stats

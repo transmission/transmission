@@ -36,6 +36,7 @@
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
 #include "libtransmission/crypto-utils.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/ip-cache.h"
 #include "libtransmission/interned-string.h"
@@ -46,8 +47,9 @@
 #include "libtransmission/port-forwarding.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpc-server.h"
-#include "libtransmission/session.h"
 #include "libtransmission/session-alt-speeds.h"
+#include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrent-ctor.h"
@@ -56,7 +58,7 @@
 #include "libtransmission/tr-lpd.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/tr-utp.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web.h"
@@ -621,11 +623,7 @@ std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_dire
     num_wanted = std::min(num_wanted, std::size(candidates));
     if (num_wanted < candidates.size())
     {
-        std::partial_sort(
-            std::begin(candidates),
-            std::begin(candidates) + num_wanted,
-            std::end(candidates),
-            tr_torrent::CompareQueuePosition);
+        std::ranges::partial_sort(candidates, std::begin(candidates) + num_wanted, tr_torrent::CompareQueuePosition);
         candidates.resize(num_wanted);
     }
 
@@ -905,6 +903,11 @@ void tr_sessionSet(tr_session* session, tr_variant const& settings)
 
 // ---
 
+std::string tr_session::Settings::get_default_download_dir()
+{
+    return tr_getDefaultDownloadDir();
+}
+
 void tr_session::Settings::fixup_from_preferred_transports()
 {
     utp_enabled = false;
@@ -929,8 +932,8 @@ void tr_session::Settings::fixup_to_preferred_transports()
 {
     if (!utp_enabled)
     {
-        auto const remove_it = std::remove(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_UTP);
-        preferred_transports.erase(remove_it, std::end(preferred_transports));
+        auto const [first, last] = std::ranges::remove(preferred_transports, TR_PREFER_UTP);
+        preferred_transports.erase(first, last);
     }
     else if (std::ranges::find(preferred_transports, TR_PREFER_UTP) == std::ranges::end(preferred_transports))
     {
@@ -940,8 +943,8 @@ void tr_session::Settings::fixup_to_preferred_transports()
 
     if (!tcp_enabled)
     {
-        auto const remove_it = std::remove(std::begin(preferred_transports), std::end(preferred_transports), TR_PREFER_TCP);
-        preferred_transports.erase(remove_it, std::end(preferred_transports));
+        auto const [first, last] = std::ranges::remove(preferred_transports, TR_PREFER_TCP);
+        preferred_transports.erase(first, last);
     }
     else if (std::ranges::find(preferred_transports, TR_PREFER_TCP) == std::ranges::end(preferred_transports))
     {
@@ -1494,10 +1497,7 @@ auto get_remaining_files(std::string_view folder, std::vector<std::string>& queu
 
     // Read .torrent first if somehow a .magnet of the same hash exists
     // Example of possible cause: https://github.com/transmission/transmission/issues/5007
-    std::stable_partition(
-        std::begin(ret),
-        std::end(ret),
-        [](std::string_view name) { return tr_strv_ends_with(name, ".torrent"sv); });
+    std::ranges::stable_partition(ret, [](std::string_view name) { return tr_strv_ends_with(name, ".torrent"sv); });
 
     return ret;
 }

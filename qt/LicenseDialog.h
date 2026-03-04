@@ -14,6 +14,7 @@ class LicenseDialog : public BaseDialog
 
 public:
     explicit LicenseDialog(QWidget* parent = nullptr);
+    ~LicenseDialog() override = default;
     LicenseDialog(LicenseDialog&&) = delete;
     LicenseDialog(LicenseDialog const&) = delete;
     LicenseDialog& operator=(LicenseDialog&&) = delete;

@@ -32,9 +32,11 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
+#include <libtransmission/file-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-strbuf.h>

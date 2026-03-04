@@ -401,18 +401,18 @@ TEST_F(CompletionTest, amountDone)
         completion.remove_piece(piece);
     }
     completion.amount_done(std::data(bins), std::size(bins));
-    std::for_each(std::begin(bins), std::end(bins), [](float bin) { EXPECT_DOUBLE_EQ(0.0, bin); });
+    std::ranges::for_each(bins, [](float bin) { EXPECT_FLOAT_EQ(0.0, bin); });
 
     // one block
     completion.add_block(0);
     completion.amount_done(std::data(bins), std::size(bins));
-    EXPECT_DOUBLE_EQ(0.0, bins[1]);
+    EXPECT_FLOAT_EQ(0.0, bins[1]);
 
     // one piece
     completion.add_piece(0);
     completion.amount_done(std::data(bins), std::size(bins));
-    EXPECT_DOUBLE_EQ(1.0, bins[0]);
-    EXPECT_DOUBLE_EQ(0.0, bins[1]);
+    EXPECT_FLOAT_EQ(1.0, bins[0]);
+    EXPECT_FLOAT_EQ(0.0, bins[1]);
 
     // all pieces
     for (tr_piece_index_t piece = 0; piece < block_info.piece_count(); ++piece)
@@ -420,7 +420,7 @@ TEST_F(CompletionTest, amountDone)
         completion.add_piece(piece);
     }
     completion.amount_done(std::data(bins), std::size(bins));
-    std::for_each(std::begin(bins), std::end(bins), [](float bin) { EXPECT_DOUBLE_EQ(1.0, bin); });
+    std::ranges::for_each(bins, [](float bin) { EXPECT_FLOAT_EQ(1.0, bin); });
 
     // don't do anything if fed bad input
     auto const backup = bins;

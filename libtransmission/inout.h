@@ -12,9 +12,8 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint32_t
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/block-info.h"
+#include "libtransmission/types.h"
 
 struct tr_torrent;
 

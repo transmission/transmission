@@ -11,7 +11,7 @@
 @property(nonatomic) NSTrackingArea* fTrackingArea;
 @property(nonatomic) NSImage* fImage;
 @property(nonatomic) NSImage* fAlternativeImage;
-@property(nonatomic) IBOutlet TorrentCell* torrentCell;
+@property(nonatomic, weak) IBOutlet TorrentCell* torrentCell;
 @property(nonatomic, readonly) TorrentTableView* torrentTableView;
 @property(nonatomic) NSUserDefaults* fDefaults;
 @end

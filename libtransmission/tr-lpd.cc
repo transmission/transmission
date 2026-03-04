@@ -27,14 +27,14 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-lpd.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for tr_net_init()
 #include "libtransmission/utils-ev.h" // for tr_net_init()
 
@@ -546,8 +546,7 @@ private:
             return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
                 info.announce_after < now;
         };
-        auto const remove_it = std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(needs_announce));
-        torrents.erase(remove_it, std::end(torrents));
+        std::erase_if(torrents, std::not_fn(needs_announce));
 
         if (std::empty(torrents))
         {
@@ -568,7 +567,7 @@ private:
             }
             return false;
         };
-        std::sort(std::begin(torrents), std::end(torrents), TorrentComparator);
+        std::ranges::sort(torrents, TorrentComparator);
 
         auto const next_announce_after = now + TorrentAnnounceIntervalSec;
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)

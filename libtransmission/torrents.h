@@ -18,10 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/torrent-metainfo.h"
-#include "libtransmission/tr-macros.h"
 
 struct tr_torrent;
 
@@ -112,7 +109,7 @@ public:
 
         auto vec = std::vector<tr_torrent*>{};
         vec.reserve(size());
-        std::copy_if(std::begin(by_id_), std::end(by_id_), std::back_inserter(vec), pred);
+        std::ranges::copy_if(by_id_, std::back_inserter(vec), pred);
         return vec;
     }
 

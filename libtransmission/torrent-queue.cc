@@ -40,8 +40,7 @@ void tr_torrent_queue::remove(tr_torrent_id_t const id)
     }
     else
     {
-        auto const remove_it = std::remove(std::begin(queue_), std::end(queue_), id);
-        queue_.erase(remove_it, std::end(queue_));
+        std::erase(queue_, id);
     }
     set_dirty();
 }

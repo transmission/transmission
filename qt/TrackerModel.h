@@ -27,18 +27,20 @@ class TrackerModel : public QAbstractListModel
     Q_OBJECT
 
 public:
+    // NOLINTNEXTLINE(performance-enum-size)
     enum Role
     {
         TrackerRole = Qt::UserRole
     };
 
     TrackerModel() = default;
+    ~TrackerModel() override = default;
     TrackerModel(TrackerModel&&) = delete;
     TrackerModel(TrackerModel const&) = delete;
     TrackerModel& operator=(TrackerModel&&) = delete;
     TrackerModel& operator=(TrackerModel const&) = delete;
 
-    void refresh(TorrentModel const&, torrent_ids_t const& ids);
+    void refresh(TorrentModel const& torrent_model, torrent_ids_t const& ids);
     [[nodiscard]] int find(int torrent_id, QString const& url) const;
 
     // QAbstractItemModel

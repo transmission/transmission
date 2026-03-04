@@ -155,6 +155,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_download_limit_camel_APICOMPAT,
     TR_KEY_download_limited_camel_APICOMPAT,
     TR_KEY_download_speed_camel_APICOMPAT,
+    TR_KEY_download_bytes_per_second,
     TR_KEY_download_count,
     TR_KEY_download_dir,
     TR_KEY_download_dir_free_space,
@@ -276,6 +277,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_is_utp_camel_APICOMPAT,
     TR_KEY_is_uploading_to_camel_APICOMPAT,
     TR_KEY_is_backup,
+    TR_KEY_is_downloading,
     TR_KEY_is_downloading_from,
     TR_KEY_is_encrypted,
     TR_KEY_is_finished,
@@ -721,6 +723,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_uploaded_ever_camel_APICOMPAT,
     TR_KEY_uploaded_bytes,
     TR_KEY_uploaded_ever,
+    TR_KEY_url,
     TR_KEY_url_list,
     TR_KEY_use_global_speed_limit_kebab_APICOMPAT,
     TR_KEY_use_speed_limit_kebab_APICOMPAT,
@@ -742,6 +745,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_watch_dir_force_generic,
     TR_KEY_webseeds,
     TR_KEY_webseeds_sending_to_us_camel_APICOMPAT,
+    TR_KEY_webseeds_ex,
     TR_KEY_webseeds_sending_to_us,
     TR_KEY_yourip,
     TR_N_KEYS
@@ -752,6 +756,7 @@ enum // NOLINT(performance-enum-size)
  *
  * @return true if the specified string exists as a quark
  */
+[[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::u8string_view key);
 [[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::string_view key);
 
 /**
@@ -760,10 +765,12 @@ enum // NOLINT(performance-enum-size)
  * Note: this view is guaranteed to be zero-terminated at view[std::size(view)]
  */
 [[nodiscard]] std::string_view tr_quark_get_string_view(tr_quark quark);
+[[nodiscard]] std::u8string_view tr_quark_get_u8string_view(tr_quark quark);
 
 /**
  * Create a new quark for the specified string. If a quark already
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
+[[nodiscard]] tr_quark tr_quark_new(std::u8string_view str);
 [[nodiscard]] tr_quark tr_quark_new(std::string_view str);

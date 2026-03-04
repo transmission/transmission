@@ -16,7 +16,7 @@
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/tr-arc4.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
+#include "libtransmission/types.h" // tr_sha1_digest_t
 
 // workaround bug in GCC < 10.4
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99859

@@ -386,8 +386,9 @@ bool parse(
             }
             break;
 
-        default: // invalid bencoded text... march past it
-            benc.remove_prefix(1);
+        default:
+            err = EILSEQ;
+            error->set(err, "Malformed benc? invalid bencoded text");
             break;
         }
 

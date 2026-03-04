@@ -17,12 +17,11 @@
 #include <string>
 #include <vector>
 
-#include "libtransmission/transmission.h" // tr_block_span_t (ptr only)
-
 #include "libtransmission/blocklist.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/net.h" /* tr_address */
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h" /* tr_compare_3way */
 #include "libtransmission/variant.h"
 
@@ -650,19 +649,14 @@ struct tr_pex
         return socket_address.display_name();
     }
 
-    [[nodiscard]] int compare(tr_pex const& that) const noexcept // <=>
+    [[nodiscard]] auto operator<=>(tr_pex const& that) const noexcept
     {
-        return socket_address.compare(that.socket_address);
+        return socket_address <=> that.socket_address;
     }
 
     [[nodiscard]] bool operator==(tr_pex const& that) const noexcept
     {
-        return compare(that) == 0;
-    }
-
-    [[nodiscard]] bool operator<(tr_pex const& that) const noexcept
-    {
-        return compare(that) < 0;
+        return (*this <=> that) == 0;
     }
 
     [[nodiscard]] bool is_valid() const noexcept

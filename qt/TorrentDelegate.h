@@ -22,6 +22,7 @@ class TorrentDelegate : public QStyledItemDelegate
 
 public:
     explicit TorrentDelegate(QObject* parent = nullptr);
+    ~TorrentDelegate() override = default;
     TorrentDelegate& operator=(TorrentDelegate&&) = delete;
     TorrentDelegate& operator=(TorrentDelegate const&) = delete;
     TorrentDelegate(TorrentDelegate&&) = delete;
@@ -33,29 +34,29 @@ public:
 
 protected:
     QSize margin(QStyle const& style) const;
-    void setProgressBarPercentDone(QStyleOptionViewItem const& option, Torrent const&) const;
+    void setProgressBarPercentDone(QStyleOptionViewItem const& option, Torrent const& tor) const;
     QIcon warningEmblem() const
     {
         return warning_emblem_;
     }
 
     // Our own overridables
-    virtual QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const;
-    virtual void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const&) const;
+    virtual QSize sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const;
+    virtual void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const& tor) const;
 
     static QString statusString(Torrent const& tor);
     static QString progressString(Torrent const& tor);
     static QString shortStatusString(Torrent const& tor);
     static QString shortTransferString(Torrent const& tor);
 
-    QColor const BlueBack{ "lightgrey" };
-    QColor const BlueBrush{ "steelblue" };
-    QColor const GreenBack{ "darkseagreen" };
-    QColor const GreenBrush{ "forestgreen" };
-    QColor const SilverBack{ "grey" };
-    QColor const SilverBrush{ "silver" };
+    static inline QColor const BlueBack{ "lightgrey" };
+    static inline QColor const BlueBrush{ "steelblue" };
+    static inline QColor const GreenBack{ "darkseagreen" };
+    static inline QColor const GreenBrush{ "forestgreen" };
+    static inline QColor const SilverBack{ "grey" };
+    static inline QColor const SilverBrush{ "silver" };
 
-    mutable QStyleOptionProgressBar progress_bar_style_ = {};
+    mutable QStyleOptionProgressBar progress_bar_style_;
 
 private:
     QIcon const warning_emblem_ = icons::icon(icons::Type::TorrentErrorEmblem);

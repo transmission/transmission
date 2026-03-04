@@ -10,7 +10,6 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
-#include <netinet/in.h> // IPV6_V6ONLY, IPPROTO_IPV6
 #include <sys/socket.h> // setsockopt, SOL_SOCKET, bind
 #endif
 
@@ -21,6 +20,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"

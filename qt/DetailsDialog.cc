@@ -65,7 +65,7 @@ class TrackersDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    explicit TrackersDialog(QString tracker_list, QWidget* parent = nullptr)
+    explicit TrackersDialog(QString const& tracker_list, QWidget* parent = nullptr)
         : BaseDialog{ parent }
     {
         ui_.setupUi(this);
@@ -112,6 +112,7 @@ int constexpr RefreshIntervalMSec = 4000;
 
 char constexpr const* const PrefKey = "pref_key";
 
+// NOLINTNEXTLINE(performance-enum-size)
 enum // peer columns
 {
     COL_LOCK,
@@ -128,8 +129,8 @@ int measureViewItem(QTreeWidget const* view, int column, QString const& text)
 {
     QTreeWidgetItem const* header_item = view->headerItem();
 
-    int const item_width = Utils::measureViewItem(view, text);
-    int const header_width = Utils::measureHeaderItem(view->header(), header_item->text(column));
+    auto const item_width = Utils::measureViewItem(view, text);
+    auto const header_width = Utils::measureHeaderItem(view->header(), header_item->text(column));
 
     return std::max(item_width, header_width);
 }
@@ -247,7 +248,7 @@ private:
 // ---
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
-int DetailsDialog::prev_tab_index_ = 0;
+int DetailsDialog::prev_tab_index = 0;
 
 DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const& model, QWidget* parent)
     : BaseDialog{ parent }
@@ -265,7 +266,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
 
     adjustSize();
     ui_.commentTextEdit->setMaximumHeight(QWIDGETSIZE_MAX);
-    ui_.tabs->setCurrentIndex(prev_tab_index_);
+    ui_.tabs->setCurrentIndex(prev_tab_index);
 
     static std::array<int, 2> constexpr InitKeys = {
         Prefs::SHOW_TRACKER_SCRAPES,
@@ -297,7 +298,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
 
 DetailsDialog::~DetailsDialog()
 {
-    prev_tab_index_ = ui_.tabs->currentIndex();
+    prev_tab_index = ui_.tabs->currentIndex();
 }
 
 void DetailsDialog::setIds(torrent_ids_t const& ids)
@@ -1462,7 +1463,7 @@ void DetailsDialog::onAddTrackerClicked()
     }
 }
 
-void DetailsDialog::onTrackerListEdited(QString tracker_list)
+void DetailsDialog::onTrackerListEdited(QString const& tracker_list)
 {
     torrentSet(TR_KEY_tracker_list, tracker_list);
 }

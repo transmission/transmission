@@ -25,12 +25,7 @@ export default {
     'selector-attribute-quotes': null,
     'selector-max-compound-selectors': null,
     'selector-max-id': null,
-    'selector-no-qualifying-type': [
-      true,
-      {
-        ignore: ['attribute'],
-      },
-    ],
+    'selector-no-qualifying-type': null, // "This rule is only appropriate for CSS. You should not turn it on for CSS-like languages, such as SCSS or Less."
     'selector-pseudo-class-no-unknown': true,
     'selector-pseudo-element-no-unknown': true,
     'selector-type-no-unknown': true,

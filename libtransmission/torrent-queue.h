@@ -14,7 +14,7 @@
 #include <string_view>
 #include <vector>
 
-#include "libtransmission/transmission.h"
+#include "libtransmission/types.h"
 
 class tr_torrent_queue
 {

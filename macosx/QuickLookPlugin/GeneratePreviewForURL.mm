@@ -12,8 +12,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <libtransmission/string-utils.h>
 #include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/utils.h>
 
 #import "NSStringAdditions.h"
 

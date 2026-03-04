@@ -371,22 +371,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSString* groupName = groupIndex != -1 ? [GroupsController.groups nameForIndex:groupIndex] :
                                                  NSLocalizedString(@"No Group", "Group table row");
 
-        NSInteger row = [self rowForItem:item];
-        if ([self isRowSelected:row])
-        {
-            NSMutableAttributedString* string = [[NSMutableAttributedString alloc] initWithString:groupName];
-            NSDictionary* attributes = @{
-                NSFontAttributeName : [NSFont boldSystemFontOfSize:11.0],
-                NSForegroundColorAttributeName : [NSColor labelColor]
-            };
-
-            [string addAttributes:attributes range:NSMakeRange(0, string.length)];
-            groupCell.fGroupTitleField.attributedStringValue = string;
-        }
-        else
-        {
-            groupCell.fGroupTitleField.stringValue = groupName;
-        }
+        groupCell.fGroupTitleField.stringValue = groupName;
 
         groupCell.fGroupDownloadField.stringValue = [NSString stringForSpeed:group.downloadRate];
         groupCell.fGroupDownloadView.image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
@@ -477,6 +462,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     NSMutableIndexSet* rows = self.fPendingSelectionReloadRows;
     self.fPendingSelectionReloadRows = nil;
 
+    NSInteger const numberOfRows = self.numberOfRows;
+    [rows removeIndexesInRange:NSMakeRange(numberOfRows, NSIntegerMax - numberOfRows)];
     if (rows.count > 0)
     {
         [self reloadDataForRowIndexes:rows columnIndexes:[NSIndexSet indexSetWithIndex:0]];

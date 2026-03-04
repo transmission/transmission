@@ -13,14 +13,13 @@
 #include <utility> // std::pair
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announce-list.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR_VEC
+#include "libtransmission/types.h"
 
 class tr_metainfo_builder
 {

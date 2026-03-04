@@ -19,8 +19,8 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/log.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 
@@ -339,6 +339,8 @@ static void removeKeRangerRansomware()
 @property(nonatomic) BOOL fGlobalPopoverShown;
 @property(nonatomic) NSView* fPositioningView;
 @property(nonatomic) BOOL fSoundPlaying;
+
+- (void)removeTorrentsImpl:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
 
 @end
 
@@ -1369,7 +1371,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else
     {
-        [torrent closeRemoveTorrent:NO];
+        [self removeTorrentsImpl:@[ torrent ] deleteData:NO];
     }
 
     [self.fAddWindows removeObject:addController];
@@ -1463,7 +1465,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else
     {
-        [torrent closeRemoveTorrent:NO];
+        [self removeTorrentsImpl:@[ torrent ] deleteData:NO];
     }
 
     [self.fAddWindows removeObject:addController];
@@ -1940,6 +1942,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self confirmRemoveTorrents:torrents deleteData:deleteData];
 }
 
+- (void)removeTorrentsImpl:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData
+{
+    [self.fInfoController removeTorrentsFromInfo:torrents];
+
+    for (Torrent* torrent in torrents)
+    {
+        [torrent closeRemoveTorrent:deleteData];
+    }
+}
+
 - (void)confirmRemoveTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData
 {
     //miscellaneous
@@ -1997,10 +2009,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
                 //we can't closeRemoveTorrent: until it's no longer in the GUI at all
                 NSAnimationContext.currentContext.completionHandler = ^{
-                    for (Torrent* torrent in torrents)
-                    {
-                        [torrent closeRemoveTorrent:deleteData];
-                    }
+                    [self removeTorrentsImpl:torrents deleteData:deleteData];
 
                     [self fullUpdateUI];
                 };
@@ -2040,10 +2049,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     if (!beganUpdate)
     {
         //do here if we're not doing it at the end of the animation
-        for (Torrent* torrent in torrents)
-        {
-            [torrent closeRemoveTorrent:deleteData];
-        }
+        [self removeTorrentsImpl:torrents deleteData:deleteData];
     }
 }
 

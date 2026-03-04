@@ -20,9 +20,9 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/session.h> // TR_NAME
+#include <libtransmission/string-utils.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include "test-fixtures.h"

@@ -23,12 +23,10 @@
 
 #include <small/vector.hpp>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
 #include "libtransmission/peer-io.h"
 #include "libtransmission/timer.h"
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_peer_id_t
+#include "libtransmission/types.h" // tr_sha1_digest_t, tr_peer_id_t
 
 struct tr_error;
 struct tr_socket_address;

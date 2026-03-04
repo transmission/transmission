@@ -14,12 +14,11 @@
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <string>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/history.h"
 #include "libtransmission/net.h" // tr_port
+#include "libtransmission/types.h"
 
 /**
  * @addtogroup peers Peers

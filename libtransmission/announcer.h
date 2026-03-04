@@ -24,8 +24,6 @@
 #include <sys/socket.h> // socklen_t
 #endif
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/interned-string.h"
 #include "libtransmission/peer-mgr.h"
 

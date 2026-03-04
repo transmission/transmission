@@ -129,6 +129,7 @@ QModelIndexList FileTreeModel::getOrphanIndices(QModelIndexList const& indices) 
 {
     QModelIndexList orphan_indices = indices;
 
+    // NOLINTNEXTLINE(modernize-use-ranges)
     std::sort(orphan_indices.begin(), orphan_indices.end());
 
     for (QMutableListIterator<QModelIndex> it(orphan_indices); it.hasNext();)
@@ -144,6 +145,7 @@ QModelIndexList FileTreeModel::getOrphanIndices(QModelIndexList const& indices) 
                 break;
             }
 
+            // NOLINTNEXTLINE(modernize-use-ranges)
             if (std::binary_search(orphan_indices.begin(), orphan_indices.end(), walk))
             {
                 it.remove();

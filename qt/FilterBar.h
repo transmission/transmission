@@ -31,6 +31,7 @@ class FilterBar : public QWidget
 
 public:
     FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent = nullptr);
+    ~FilterBar() override = default;
     FilterBar(FilterBar&&) = delete;
     FilterBar(FilterBar const&) = delete;
     FilterBar& operator=(FilterBar&&) = delete;
@@ -40,11 +41,11 @@ public slots:
     void clear();
 
 private:
-    FilterBarComboBox* createTrackerCombo(QStandardItemModel*);
+    FilterBarComboBox* createTrackerCombo(QStandardItemModel* model);
     FilterBarComboBox* createActivityCombo();
     void refreshTrackers();
 
-    enum
+    enum : uint8_t
     {
         ACTIVITY,
         TRACKERS,
@@ -67,7 +68,7 @@ private:
 
     small::map<QString, int> sitename_counts_;
     QTimer recount_timer_;
-    Pending pending_ = {};
+    Pending pending_;
     bool is_bootstrapping_ = {};
 
 private slots:
@@ -91,7 +92,7 @@ private slots:
 
     void refreshPref(int key);
     void onActivityIndexChanged(int index);
-    void onTextChanged(QString const&);
-    void onTorrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
+    void onTextChanged(QString const& str);
+    void onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields);
     void onTrackerIndexChanged(int index);
 };

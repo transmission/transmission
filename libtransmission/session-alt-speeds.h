@@ -15,10 +15,9 @@
 #include <ctime> // for time_t
 #include <optional>
 
-#include "libtransmission/transmission.h" // for TR_SCHED_ALL
-
 #include "libtransmission/quark.h"
 #include "libtransmission/serializer.h"
+#include "libtransmission/types.h" // for TR_SCHED_ALL
 #include "libtransmission/values.h"
 
 struct tr_variant;

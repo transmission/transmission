@@ -14,8 +14,6 @@
 #include <string_view>
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/net.h" // for tr_address, tr_port
 
 struct event_base;
