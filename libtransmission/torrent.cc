@@ -2389,10 +2389,14 @@ int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view
     return err;
 }
 
-void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::string_view newname, tr_file_index_t file_index)
+void renameTorrentFileString(
+    tr_torrent_metainfo& metainfo,
+    std::string_view const oldpath,
+    std::string_view const newname,
+    tr_file_index_t const file_index)
 {
     auto name = std::string{};
-    auto const subpath = std::string_view{ tor->file_subpath(file_index) };
+    auto const subpath = std::string_view{ metainfo.file_subpath(file_index) };
     auto const oldpath_len = std::size(oldpath);
 
     if (!tr_strv_contains(oldpath, '/'))
@@ -2427,7 +2431,7 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
 
     if (subpath != name)
     {
-        tor->set_file_subpath(file_index, name);
+        metainfo.set_file_subpath(file_index, name);
     }
 }
 
@@ -2460,7 +2464,7 @@ void tr_torrent::rename_path_in_session_thread(
             /* update tr_info.files */
             for (auto const& file_index : file_indices)
             {
-                renameTorrentFileString(this, oldpath, newname, file_index);
+                renameTorrentFileString(metainfo_, oldpath, newname, file_index);
             }
 
             /* update tr_info.name if user changed the toplevel */
