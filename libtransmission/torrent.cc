@@ -2331,15 +2331,15 @@ bool renameArgsAreValid(tr_torrent_files const& files, std::string_view oldpath,
     return true;
 }
 
-auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
+auto renameFindAffectedFiles(tr_torrent_files const& files, std::string_view oldpath)
 {
     auto indices = std::vector<tr_file_index_t>{};
     auto const oldpath_as_dir = tr_pathbuf{ oldpath, '/' };
-    auto const n_files = tor->file_count();
+    auto const n_files = files.file_count();
 
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
-        auto const& name = tor->file_subpath(i);
+        auto const& name = files.path(i);
         if (name == oldpath || tr_strv_starts_with(name, oldpath_as_dir))
         {
             indices.push_back(i);
@@ -2447,7 +2447,7 @@ void tr_torrent::rename_path_in_session_thread(
     {
         error = EINVAL;
     }
-    else if (auto const file_indices = renameFindAffectedFiles(this, oldpath); std::empty(file_indices))
+    else if (auto const file_indices = renameFindAffectedFiles(files(), oldpath); std::empty(file_indices))
     {
         error = EINVAL;
     }
