@@ -363,14 +363,16 @@ private:
 
     void got_bad_piece(tr_piece_index_t const piece)
     {
-        auto const iter = find_by_piece(piece);
-        if (iter == std::end(candidates_))
+        auto iter = find_by_piece(piece);
+        if (auto const salt = get_salt(piece); iter != std::end(candidates_))
         {
-            return;
+            *iter = { piece, salt, &mediator_ };
         }
-        TR_ASSERT(std::empty(iter->unrequested));
+        else
+        {
+            iter = candidates_.emplace(iter, piece, salt, &mediator_);
+        }
 
-        iter->block_span = iter->raw_block_span;
         if (piece > 0U)
         {
             if (auto const prev = find_by_piece(piece - 1U); prev != std::end(candidates_))
@@ -379,7 +381,9 @@ private:
                 TR_ASSERT(iter->block_span.begin == prev->block_span.end);
                 for (tr_block_index_t i = iter->block_span.begin; i > iter->raw_block_span.begin; --i)
                 {
-                    prev->unrequested.insert(i - 1U);
+                    auto const block = i - 1U;
+                    prev->unrequested.insert(block);
+                    iter->unrequested.erase(block);
                 }
             }
         }
@@ -391,14 +395,11 @@ private:
                 TR_ASSERT(iter->block_span.end == next->block_span.begin);
                 for (tr_block_index_t i = iter->raw_block_span.end; i > iter->block_span.end; --i)
                 {
-                    next->unrequested.insert(i - 1U);
+                    auto const block = i - 1U;
+                    next->unrequested.insert(block);
+                    iter->unrequested.erase(block);
                 }
             }
-        }
-
-        for (auto [begin, i] = iter->block_span; i > begin; --i)
-        {
-            iter->unrequested.insert(i - 1U);
         }
 
         std::ranges::sort(candidates_);
@@ -416,16 +417,15 @@ private:
         return std::ranges::find_if(candidates_, [block](auto const& c) { return c.block_belongs(block); });
     }
 
-    static constexpr tr_piece_index_t get_salt(
-        tr_piece_index_t const piece,
-        tr_piece_index_t const n_pieces,
-        tr_piece_index_t const random_salt,
-        bool const is_sequential,
-        tr_piece_index_t const sequential_download_from_piece)
+    tr_piece_index_t get_salt(tr_piece_index_t const piece)
     {
+        auto const is_sequential = mediator_.is_sequential_download();
+        auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
+        auto const n_pieces = mediator_.piece_count();
+
         if (!is_sequential)
         {
-            return random_salt;
+            return salter_();
         }
 
         // Download first and last piece first
@@ -459,9 +459,6 @@ private:
     void candidate_list_upkeep()
     {
         auto n_old_c = std::size(candidates_);
-        auto salter = tr_salt_shaker<tr_piece_index_t>{};
-        auto const is_sequential = mediator_.is_sequential_download();
-        auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
         auto const n_pieces = mediator_.piece_count();
         candidates_.reserve(n_pieces);
 
@@ -496,7 +493,7 @@ private:
                 }
                 else
                 {
-                    auto const salt = get_salt(piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
+                    auto const salt = get_salt(piece);
                     auto& candidate = candidates_.emplace_back(piece, salt, &mediator_);
 
                     if (auto& begin = candidate.block_span.begin; prev != nullptr)
@@ -573,13 +570,9 @@ private:
 
     void recalculate_salt()
     {
-        auto salter = tr_salt_shaker<tr_piece_index_t>{};
-        auto const is_sequential = mediator_.is_sequential_download();
-        auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
-        auto const n_pieces = mediator_.piece_count();
         for (auto& candidate : candidates_)
         {
-            candidate.salt = get_salt(candidate.piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
+            candidate.salt = get_salt(candidate.piece);
         }
 
         std::ranges::sort(candidates_);
@@ -617,7 +610,11 @@ private:
         }
     }
 
+    // ---
+
     CandidateVec candidates_;
+
+    tr_salt_shaker<tr_piece_index_t> salter_ = {};
 
     Mediator& mediator_;
 };
