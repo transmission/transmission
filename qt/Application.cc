@@ -239,6 +239,22 @@ Application::Application(
 
 Application::~Application() = default;
 
+QString const& Application::intern(QString const& in)
+{
+    static auto constexpr MaxSize = 512U; // it's an arbitrary number for now, up for tuning
+    auto const [ret, is_inserted] = interned_strings_set_.insert(in);
+    if (is_inserted)
+    {
+        if (interned_strings_set_.size() >= MaxSize)
+        {
+            interned_strings_set_.erase(interned_strings_queue_.front());
+            interned_strings_queue_.pop();
+        }
+        interned_strings_queue_.push(*ret);
+    }
+    return *ret;
+}
+
 void Application::loadTranslations()
 {
     auto const qt_qm_dirs = QStringList{} <<

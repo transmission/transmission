@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <ctime>
 #include <memory>
+#include <queue>
 #include <unordered_set>
 
 #include <QApplication>
@@ -54,10 +54,7 @@ public:
     void raise() const;
     bool notifyApp(QString const& title, QString const& body, QStringList const& actions = {}) const;
 
-    QString const& intern(QString const& in)
-    {
-        return *interned_strings_.insert(in).first;
-    }
+    QString const& intern(QString const& in);
 
     [[nodiscard]] QPixmap find_favicon(QString const& sitename) const
     {
@@ -107,7 +104,8 @@ private:
     QStringList getNames(torrent_ids_t const& ids) const;
     void notifyTorrentAdded(Torrent const* tor) const;
 
-    std::unordered_set<QString> interned_strings_;
+    std::unordered_set<QString> interned_strings_set_;
+    std::queue<QString> interned_strings_queue_;
 
     Prefs& prefs_;
     std::unique_ptr<Session> session_;
