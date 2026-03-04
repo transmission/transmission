@@ -2194,8 +2194,8 @@ void tr_torrent::on_piece_failed(tr_piece_index_t const piece)
     auto const n = piece_size(piece);
     bytes_corrupt_ += n;
     bytes_downloaded_.reduce(n);
-    got_bad_piece_(this, piece);
     set_has_piece(piece, false);
+    got_bad_piece_(this, piece);
 }
 
 void tr_torrent::on_block_received(tr_block_index_t const block)
