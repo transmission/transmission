@@ -267,6 +267,11 @@ void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view whitelist);
 bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session);
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);
 
+[[nodiscard]] std::string tr_sessionGetRPCHostWhitelist(tr_session const* session);
+void tr_sessionSetRPCHostWhitelist(tr_session* session, std::string_view whitelist);
+bool tr_sessionGetRPCHostWhitelistEnabled(tr_session const* session);
+void tr_sessionSetRPCHostWhitelistEnabled(tr_session* session, bool enabled);
+
 // TODO(ckerr): rename function to indicate it returns the salted value
 /** @brief get the salted version of the password used to restrict RPC requests.
     @return the password string.
@@ -704,11 +709,10 @@ void tr_torrentStop(tr_torrent* torrent);
  *   If the path exists on disk but can't be renamed, the callback's `error`
  *   argument will be set via `set_with_errno()` with `rename()`'s errno.
  */
-void tr_torrentRenamePath(
-    tr_torrent* tor,
-    std::string_view oldpath,
-    std::string_view newname,
-    tr_torrent_rename_done_func callback);
+void tr_torrentRenamePath(tr_torrent* tor,
+                          std::string_view oldpath,
+                          std::string_view newname,
+                          tr_torrent_rename_done_func callback);
 
 /**
  * @brief Tell transmission where to find this torrent's local data.
@@ -797,11 +801,10 @@ void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
  *
  * @param priority must be one of TR_PRI_NORMAL, _HIGH, or _LOW
  */
-void tr_torrentSetFilePriorities(
-    tr_torrent* torrent,
-    tr_file_index_t const* files,
-    tr_file_index_t file_count,
-    tr_priority_t priority);
+void tr_torrentSetFilePriorities(tr_torrent* torrent,
+                                 tr_file_index_t const* files,
+                                 tr_file_index_t file_count,
+                                 tr_priority_t priority);
 
 /** @brief Set a batch of files to be downloaded or not. */
 void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);

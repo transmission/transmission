@@ -741,6 +741,12 @@ public:
 
     [[nodiscard]] bool useRpcWhitelist() const;
 
+    void setRpcHostWhitelist(std::string_view whitelist) const;
+
+    void useRpcHostWhitelist(bool enabled) const;
+
+    [[nodiscard]] bool useRpcHostWhitelist() const;
+
     // peer networking
 
     [[nodiscard]] constexpr auto const& peerCongestionAlgorithm() const noexcept
@@ -1251,6 +1257,7 @@ private:
     friend std::string tr_sessionGetRPCPassword(tr_session const* session);
     friend std::string tr_sessionGetRPCUsername(tr_session const* session);
     friend std::string tr_sessionGetRPCWhitelist(tr_session const* session);
+    friend std::string tr_sessionGetRPCHostWhitelist(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, std::string_view content_filename);
     friend size_t tr_sessionGetAltSpeedBegin(tr_session const* session);
@@ -1259,10 +1266,9 @@ private:
     friend size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
-    friend tr_session* tr_sessionInit(
-        std::string_view config_dir,
-        bool message_queueing_enabled,
-        tr_variant const& client_settings);
+    friend tr_session* tr_sessionInit(std::string_view config_dir,
+                                      bool message_queueing_enabled,
+                                      tr_variant const& client_settings);
     friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);

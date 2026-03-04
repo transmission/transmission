@@ -403,8 +403,12 @@ static void removeKeRangerRansomware()
         tr_variantDictAddInt(&settings, TR_KEY_alt_speed_down, [_fDefaults integerForKey:@"SpeedLimitDownloadLimit"]);
 
         tr_variantDictAddBool(&settings, TR_KEY_alt_speed_time_enabled, [_fDefaults boolForKey:@"SpeedLimitAuto"]);
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_time_begin, [PrefsController dateToTimeSum:[_fDefaults objectForKey:@"SpeedLimitAutoOnDate"]]);
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_time_end, [PrefsController dateToTimeSum:[_fDefaults objectForKey:@"SpeedLimitAutoOffDate"]]);
+        tr_variantDictAddInt(&settings,
+                             TR_KEY_alt_speed_time_begin,
+                             [PrefsController dateToTimeSum:[_fDefaults objectForKey:@"SpeedLimitAutoOnDate"]]);
+        tr_variantDictAddInt(&settings,
+                             TR_KEY_alt_speed_time_end,
+                             [PrefsController dateToTimeSum:[_fDefaults objectForKey:@"SpeedLimitAutoOffDate"]]);
         tr_variantDictAddInt(&settings, TR_KEY_alt_speed_time_day, [_fDefaults integerForKey:@"SpeedLimitAutoDay"]);
 
         tr_variantDictAddInt(&settings, TR_KEY_speed_limit_down, [_fDefaults integerForKey:@"DownloadLimit"]);
@@ -426,18 +430,16 @@ static void removeKeRangerRansomware()
         if ([_fDefaults objectForKey:@"BlocklistURL"])
             tr_variantDictAddStr(&settings, TR_KEY_blocklist_url, [_fDefaults stringForKey:@"BlocklistURL"].UTF8String);
         tr_variantDictAddBool(&settings, TR_KEY_dht_enabled, [_fDefaults boolForKey:@"DHTGlobal"]);
-        tr_variantDictAddStr(
-            &settings,
-            TR_KEY_download_dir,
-            [_fDefaults stringForKey:@"DownloadFolder"].stringByExpandingTildeInPath.UTF8String);
+        tr_variantDictAddStr(&settings,
+                             TR_KEY_download_dir,
+                             [_fDefaults stringForKey:@"DownloadFolder"].stringByExpandingTildeInPath.UTF8String);
         tr_variantDictAddBool(&settings, TR_KEY_download_queue_enabled, [_fDefaults boolForKey:@"Queue"]);
         tr_variantDictAddInt(&settings, TR_KEY_download_queue_size, [_fDefaults integerForKey:@"QueueDownloadNumber"]);
         tr_variantDictAddInt(&settings, TR_KEY_idle_seeding_limit, [_fDefaults integerForKey:@"IdleLimitMinutes"]);
         tr_variantDictAddBool(&settings, TR_KEY_idle_seeding_limit_enabled, [_fDefaults boolForKey:@"IdleLimitCheck"]);
-        tr_variantDictAddStr(
-            &settings,
-            TR_KEY_incomplete_dir,
-            [_fDefaults stringForKey:@"IncompleteDownloadFolder"].stringByExpandingTildeInPath.UTF8String);
+        tr_variantDictAddStr(&settings,
+                             TR_KEY_incomplete_dir,
+                             [_fDefaults stringForKey:@"IncompleteDownloadFolder"].stringByExpandingTildeInPath.UTF8String);
         tr_variantDictAddBool(&settings, TR_KEY_incomplete_dir_enabled, [_fDefaults boolForKey:@"UseIncompleteDownloadFolder"]);
         tr_variantDictAddBool(&settings, TR_KEY_torrent_complete_verify_enabled, [_fDefaults boolForKey:@"VerifyDataOnCompletion"]);
         tr_variantDictAddBool(&settings, TR_KEY_lpd_enabled, [_fDefaults boolForKey:@"LocalPeerDiscoveryGlobal"]);
@@ -494,10 +496,14 @@ static void removeKeRangerRansomware()
             tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, prefs_string.UTF8String);
         }
 
-        // TODO: Add to GUI
-        if ([_fDefaults objectForKey:@"RPCHostWhitelist"])
+        if (NSArray* hostWhitelist = [_fDefaults arrayForKey:@"RPCHostWhitelist"])
         {
-            tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [_fDefaults stringForKey:@"RPCHostWhitelist"].UTF8String);
+            NSString* hostWhitelistStr = [hostWhitelist componentsJoinedByString:@","];
+            tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, hostWhitelistStr.UTF8String);
+        }
+        else if (NSString* hostWhitelistStr = [_fDefaults stringForKey:@"RPCHostWhitelist"])
+        {
+            tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, hostWhitelistStr.UTF8String);
         }
 
         initUnits();
@@ -506,55 +512,51 @@ static void removeKeRangerRansomware()
         _fLib = tr_sessionInit(default_config_dir, YES, settings);
         _fConfigDirectory = @(default_config_dir.c_str());
 
-        tr_sessionSetIdleLimitHitCallback(
-            _fLib,
-            [controller = self](tr_torrent_id_t const tor_id)
-            {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    auto* const torrent = [controller torrentForId:tor_id];
-                    [torrent idleLimitHit];
-                });
-            });
-        tr_sessionSetQueueStartCallback(
-            _fLib,
-            [](tr_torrent_id_t const /*tor_id*/)
-            {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
-                    [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState"
-                                                                                                        object:nil]
-                                                             postingStyle:NSPostASAP
-                                                             coalesceMask:NSNotificationCoalescingOnName
-                                                                 forModes:nil];
-                });
-            });
-        tr_sessionSetRatioLimitHitCallback(
-            _fLib,
-            [controller = self](tr_torrent_id_t const tor_id)
-            {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    auto* const torrent = [controller torrentForId:tor_id];
-                    [torrent ratioLimitHit];
-                });
-            });
-        tr_sessionSetMetadataCallback(
-            _fLib,
-            [controller = self](tr_torrent_id_t const tor_id)
-            {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    auto* const torrent = [controller torrentForId:tor_id];
-                    [torrent metadataRetrieved];
-                });
-            });
-        tr_sessionSetCompletenessCallback(
-            _fLib,
-            [controller = self](tr_torrent_id_t const tor_id, tr_completeness const status, bool const was_running)
-            {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    auto* const torrent = [controller torrentForId:tor_id];
-                    [torrent completenessChange:status wasRunning:was_running];
-                });
-            });
+        tr_sessionSetIdleLimitHitCallback(_fLib,
+                                          [controller = self](tr_torrent_id_t const tor_id)
+                                          {
+                                              dispatch_async(dispatch_get_main_queue(), ^{
+                                                  auto* const torrent = [controller torrentForId:tor_id];
+                                                  [torrent idleLimitHit];
+                                              });
+                                          });
+        tr_sessionSetQueueStartCallback(_fLib,
+                                        [](tr_torrent_id_t const /*tor_id*/)
+                                        {
+                                            dispatch_async(dispatch_get_main_queue(), ^{
+                                                //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
+                                                [NSNotificationQueue.defaultQueue
+                                                    enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState"
+                                                                                                      object:nil]
+                                                           postingStyle:NSPostASAP
+                                                           coalesceMask:NSNotificationCoalescingOnName
+                                                               forModes:nil];
+                                            });
+                                        });
+        tr_sessionSetRatioLimitHitCallback(_fLib,
+                                           [controller = self](tr_torrent_id_t const tor_id)
+                                           {
+                                               dispatch_async(dispatch_get_main_queue(), ^{
+                                                   auto* const torrent = [controller torrentForId:tor_id];
+                                                   [torrent ratioLimitHit];
+                                               });
+                                           });
+        tr_sessionSetMetadataCallback(_fLib,
+                                      [controller = self](tr_torrent_id_t const tor_id)
+                                      {
+                                          dispatch_async(dispatch_get_main_queue(), ^{
+                                              auto* const torrent = [controller torrentForId:tor_id];
+                                              [torrent metadataRetrieved];
+                                          });
+                                      });
+        tr_sessionSetCompletenessCallback(_fLib,
+                                          [controller = self](tr_torrent_id_t const tor_id, tr_completeness const status, bool const was_running)
+                                          {
+                                              dispatch_async(dispatch_get_main_queue(), ^{
+                                                  auto* const torrent = [controller torrentForId:tor_id];
+                                                  [torrent completenessChange:status wasRunning:was_running];
+                                              });
+                                          });
 
         NSApp.delegate = self;
 
@@ -584,26 +586,25 @@ static void removeKeRangerRansomware()
         _fGlobalPopoverShown = NO;
         _fSoundPlaying = NO;
 
-        tr_sessionSetAltSpeedFunc(
-            _fLib,
-            [controller = self](bool const active, bool const by_user)
-            {
-                NSDictionary* const dict = @{ @"Active" : @(active), @"ByUser" : @(by_user) };
-                [controller performSelectorOnMainThread:@selector(altSpeedToggledCallbackIsLimited:) withObject:dict
-                                          waitUntilDone:NO];
-            });
+        tr_sessionSetAltSpeedFunc(_fLib,
+                                  [controller = self](bool const active, bool const by_user)
+                                  {
+                                      NSDictionary* const dict = @{ @"Active" : @(active), @"ByUser" : @(by_user) };
+                                      [controller performSelectorOnMainThread:@selector(altSpeedToggledCallbackIsLimited:)
+                                                                   withObject:dict
+                                                                waitUntilDone:NO];
+                                  });
         if (usesSpeedLimitSched)
         {
             [_fDefaults setBool:tr_sessionUsesAltSpeed(_fLib) forKey:@"SpeedLimit"];
         }
 
-        tr_sessionSetRPCCallback(
-            _fLib,
-            [controller = self](tr_rpc_callback_type const type, std::optional<tr_torrent_id_t> const tor_id)
-            {
-                [controller rpcCallback:type forTorrentId:tor_id];
-                return TR_RPC_NOREMOVE; // we'll do the remove manually
-            });
+        tr_sessionSetRPCCallback(_fLib,
+                                 [controller = self](tr_rpc_callback_type const type, std::optional<tr_torrent_id_t> const tor_id)
+                                 {
+                                     [controller rpcCallback:type forTorrentId:tor_id];
+                                     return TR_RPC_NOREMOVE; // we'll do the remove manually
+                                 });
 
         [SUUpdater sharedUpdater].delegate = self;
         _fQuitRequested = NO;
@@ -646,7 +647,8 @@ static void removeKeRangerRansomware()
 
     self.fTotalTorrentsField.cell.backgroundStyle = NSBackgroundStyleRaised;
 
-    self.fActionButton.toolTip = NSLocalizedString(@"Shortcuts for changing global settings.", "Main window -> 1st bottom left button (action) tooltip");
+    self.fActionButton.toolTip = NSLocalizedString(@"Shortcuts for changing global settings.",
+                                                   "Main window -> 1st bottom left button (action) tooltip");
     if (@available(macOS 26.0, *))
     {
         NSLayoutConstraint* constraint = [self.fActionButton.leadingAnchor constraintEqualToAnchor:self.fActionButton.superview.leadingAnchor
@@ -655,13 +657,11 @@ static void removeKeRangerRansomware()
         constraint.active = YES;
     }
 
-    self.fSpeedLimitButton.toolTip = NSLocalizedString(
-        @"Speed Limit overrides the total bandwidth limits with its own limits.",
-        "Main window -> 2nd bottom left button (turtle) tooltip");
+    self.fSpeedLimitButton.toolTip = NSLocalizedString(@"Speed Limit overrides the total bandwidth limits with its own limits.",
+                                                       "Main window -> 2nd bottom left button (turtle) tooltip");
 
-    self.fClearCompletedButton.toolTip = NSLocalizedString(
-        @"Remove all transfers that have completed seeding.",
-        "Main window -> 3rd bottom left button (remove all) tooltip");
+    self.fClearCompletedButton.toolTip = NSLocalizedString(@"Remove all transfers that have completed seeding.",
+                                                           "Main window -> 3rd bottom left button (remove all) tooltip");
 
     [self.fTableView registerForDraggedTypes:@[ kTorrentTableViewDataType ]];
     [self.fWindow registerForDraggedTypes:@[ NSPasteboardTypeFileURL, NSPasteboardTypeURL ]];
@@ -914,12 +914,12 @@ static void removeKeRangerRansomware()
 
             NSString* donateMessage = [NSString
                 stringWithFormat:@"%@\n\n%@",
-                                 NSLocalizedString(
-                                     @"Transmission is a full-featured torrent application."
-                                      " A lot of time and effort have gone into development, coding, and refinement."
-                                      " If you enjoy using it, please consider showing your love with a donation.",
-                                     "Donation beg -> message"),
-                                 NSLocalizedString(@"Donate or not, there will be no difference to your torrenting experience.", "Donation beg -> message")];
+                                 NSLocalizedString(@"Transmission is a full-featured torrent application."
+                                                    " A lot of time and effort have gone into development, coding, and refinement."
+                                                    " If you enjoy using it, please consider showing your love with a donation.",
+                                                   "Donation beg -> message"),
+                                 NSLocalizedString(@"Donate or not, there will be no difference to your torrenting experience.",
+                                                   "Donation beg -> message")];
 
             alert.informativeText = donateMessage;
             alert.alertStyle = NSAlertStyleInformational;
@@ -996,10 +996,9 @@ static void removeKeRangerRansomware()
             @"There is an active transfer that will be paused on quit."
              " The transfer will automatically resume on the next launch.",
             "Confirm Quit panel -> message") :
-        [NSString localizedStringWithFormat:NSLocalizedString(
-                                                @"There are %lu active transfers that will be paused on quit."
-                                                 " The transfers will automatically resume on the next launch.",
-                                                "Confirm Quit panel -> message"),
+        [NSString localizedStringWithFormat:NSLocalizedString(@"There are %lu active transfers that will be paused on quit."
+                                                               " The transfers will automatically resume on the next launch.",
+                                                              "Confirm Quit panel -> message"),
                                             active];
     [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Confirm Quit panel -> button")];
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Confirm Quit panel -> button")];
@@ -1130,10 +1129,10 @@ static void removeKeRangerRansomware()
     }
     completionHandler(NSURLSessionResponseCancel);
 
-    NSString* message = [NSString
-        stringWithFormat:NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.", "Download not a torrent -> message"),
-                         suggestedName,
-                         dataTask.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding];
+    NSString* message = [NSString stringWithFormat:NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.",
+                                                                     "Download not a torrent -> message"),
+                                                   suggestedName,
+                                                   dataTask.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding];
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Download not a torrent -> button")];
@@ -1520,7 +1519,8 @@ static void removeKeRangerRansomware()
     NSAlert* alert = [[NSAlert alloc] init];
     alert.messageText = [NSString
         stringWithFormat:NSLocalizedString(@"\"%@\" is not a valid torrent file.", "Open invalid alert -> title"), filename];
-    alert.informativeText = NSLocalizedString(@"The torrent file cannot be opened because it contains invalid data.", "Open invalid alert -> message");
+    alert.informativeText = NSLocalizedString(@"The torrent file cannot be opened because it contains invalid data.",
+                                              "Open invalid alert -> message");
 
     alert.alertStyle = NSAlertStyleWarning;
     [alert addButtonWithTitle:NSLocalizedString(@"OK", "Open invalid alert -> button")];
@@ -1541,10 +1541,9 @@ static void removeKeRangerRansomware()
 
     NSAlert* alert = [[NSAlert alloc] init];
     alert.messageText = NSLocalizedString(@"Adding magnetized transfer failed.", "Magnet link failed -> title");
-    alert.informativeText = [NSString stringWithFormat:NSLocalizedString(
-                                                           @"There was an error when adding the magnet link \"%@\"."
-                                                            " The transfer will not occur.",
-                                                           "Magnet link failed -> message"),
+    alert.informativeText = [NSString stringWithFormat:NSLocalizedString(@"There was an error when adding the magnet link \"%@\"."
+                                                                          " The transfer will not occur.",
+                                                                         "Magnet link failed -> message"),
                                                        address];
     alert.alertStyle = NSAlertStyleWarning;
     [alert addButtonWithTitle:NSLocalizedString(@"OK", "Magnet link failed -> button")];
@@ -1566,9 +1565,8 @@ static void removeKeRangerRansomware()
     NSAlert* alert = [[NSAlert alloc] init];
     alert.messageText = [NSString
         stringWithFormat:NSLocalizedString(@"A transfer of \"%@\" already exists.", "Open duplicate alert -> title"), name];
-    alert.informativeText = NSLocalizedString(
-        @"The transfer cannot be added because it is a duplicate of an already existing transfer.",
-        "Open duplicate alert -> message");
+    alert.informativeText = NSLocalizedString(@"The transfer cannot be added because it is a duplicate of an already existing transfer.",
+                                              "Open duplicate alert -> message");
 
     alert.alertStyle = NSAlertStyleWarning;
     [alert addButtonWithTitle:NSLocalizedString(@"OK", "Open duplicate alert -> button")];
@@ -1599,9 +1597,8 @@ static void removeKeRangerRansomware()
         alert.messageText = NSLocalizedString(@"Magnet link is a duplicate of an existing transfer.", "Open duplicate magnet alert -> title");
     }
     alert.informativeText = [NSString
-        stringWithFormat:NSLocalizedString(
-                             @"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer.",
-                             "Open duplicate magnet alert -> message"),
+        stringWithFormat:NSLocalizedString(@"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer.",
+                                           "Open duplicate magnet alert -> message"),
                          address];
     alert.alertStyle = NSAlertStyleWarning;
     [alert addButtonWithTitle:NSLocalizedString(@"OK", "Open duplicate magnet alert -> button")];
@@ -1858,17 +1855,16 @@ static void removeKeRangerRansomware()
 
                 if (deleteData)
                 {
-                    title = [NSString stringWithFormat:NSLocalizedString(
-                                                           @"Are you sure you want to remove \"%@\" from the transfer list"
-                                                            " and trash the data file?",
-                                                           "Removal confirm panel -> title"),
+                    title = [NSString stringWithFormat:NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list"
+                                                                          " and trash the data file?",
+                                                                         "Removal confirm panel -> title"),
                                                        torrentName];
                 }
                 else
                 {
-                    title = [NSString
-                        stringWithFormat:NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list?", "Removal confirm panel -> title"),
-                                         torrentName];
+                    title = [NSString stringWithFormat:NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list?",
+                                                                         "Removal confirm panel -> title"),
+                                                       torrentName];
                 }
 
                 message = NSLocalizedString(
@@ -1880,35 +1876,34 @@ static void removeKeRangerRansomware()
             {
                 if (deleteData)
                 {
-                    title = [NSString localizedStringWithFormat:NSLocalizedString(
-                                                                    @"Are you sure you want to remove %lu transfers from the transfer list"
-                                                                     " and trash the data files?",
-                                                                    "Removal confirm panel -> title"),
+                    title = [NSString localizedStringWithFormat:NSLocalizedString(@"Are you sure you want to remove %lu transfers from the transfer list"
+                                                                                   " and trash the data files?",
+                                                                                  "Removal confirm panel -> title"),
                                                                 selected];
                 }
                 else
                 {
-                    title = [NSString localizedStringWithFormat:NSLocalizedString(
-                                                                    @"Are you sure you want to remove %lu transfers from the transfer list?",
-                                                                    "Removal confirm panel -> title"),
+                    title = [NSString localizedStringWithFormat:NSLocalizedString(@"Are you sure you want to remove %lu transfers from the transfer list?",
+                                                                                  "Removal confirm panel -> title"),
                                                                 selected];
                 }
 
                 if (selected == active)
                 {
-                    message = [NSString localizedStringWithFormat:NSLocalizedString(@"There are %lu active transfers.", "Removal confirm panel -> message part 1"),
+                    message = [NSString localizedStringWithFormat:NSLocalizedString(@"There are %lu active transfers.",
+                                                                                    "Removal confirm panel -> message part 1"),
                                                                   active];
                 }
                 else
                 {
-                    message = [NSString localizedStringWithFormat:NSLocalizedString(@"There are %1$lu transfers (%2$lu active).", "Removal confirm panel -> message part 1"),
+                    message = [NSString localizedStringWithFormat:NSLocalizedString(@"There are %1$lu transfers (%2$lu active).",
+                                                                                    "Removal confirm panel -> message part 1"),
                                                                   selected,
                                                                   active];
                 }
                 message = [message stringByAppendingFormat:@" %@",
-                                                           NSLocalizedString(
-                                                               @"Once removed, continuing the transfers will require the torrent files or magnet links.",
-                                                               "Removal confirm panel -> message part 2")];
+                                                           NSLocalizedString(@"Once removed, continuing the transfers will require the torrent files or magnet links.",
+                                                                             "Removal confirm panel -> message part 2")];
             }
 
             NSAlert* alert = [[NSAlert alloc] init];
@@ -1966,10 +1961,9 @@ static void removeKeRangerRansomware()
                                                             }];
     if (torrents.count != indexesToRemove.count)
     {
-        NSLog(
-            @"trying to remove %ld transfers, but %ld have already been removed",
-            torrents.count,
-            torrents.count - indexesToRemove.count);
+        NSLog(@"trying to remove %ld transfers, but %ld have already been removed",
+              torrents.count,
+              torrents.count - indexesToRemove.count);
         torrents = [torrents objectsAtIndexes:indexesToRemove];
 
         if (indexesToRemove.count == 0)
@@ -2070,24 +2064,21 @@ static void removeKeRangerRansomware()
         if (torrents.count == 1)
         {
             NSString* torrentName = torrents[0].name;
-            message = [NSString
-                stringWithFormat:NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list?", "Remove completed confirm panel -> title"),
-                                 torrentName];
+            message = [NSString stringWithFormat:NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list?",
+                                                                   "Remove completed confirm panel -> title"),
+                                                 torrentName];
 
-            info = NSLocalizedString(
-                @"Once removed, continuing the transfer will require the torrent file or magnet link.",
-                "Remove completed confirm panel -> message");
+            info = NSLocalizedString(@"Once removed, continuing the transfer will require the torrent file or magnet link.",
+                                     "Remove completed confirm panel -> message");
         }
         else
         {
-            message = [NSString localizedStringWithFormat:NSLocalizedString(
-                                                              @"Are you sure you want to remove %lu completed transfers from the transfer list?",
-                                                              "Remove completed confirm panel -> title"),
+            message = [NSString localizedStringWithFormat:NSLocalizedString(@"Are you sure you want to remove %lu completed transfers from the transfer list?",
+                                                                            "Remove completed confirm panel -> title"),
                                                           torrents.count];
 
-            info = NSLocalizedString(
-                @"Once removed, continuing the transfers will require the torrent files or magnet links.",
-                "Remove completed confirm panel -> message");
+            info = NSLocalizedString(@"Once removed, continuing the transfers will require the torrent files or magnet links.",
+                                     "Remove completed confirm panel -> message");
         }
 
         NSAlert* alert = [[NSAlert alloc] init];
@@ -2136,9 +2127,9 @@ static void removeKeRangerRansomware()
     }
     else
     {
-        panel.message = [NSString
-            localizedStringWithFormat:NSLocalizedString(@"Select the new folder for %lu data files.", "Move torrent -> select destination folder"),
-                                      count];
+        panel.message = [NSString localizedStringWithFormat:NSLocalizedString(@"Select the new folder for %lu data files.",
+                                                                              "Move torrent -> select destination folder"),
+                                                            count];
     }
 
     [panel beginSheetModalForWindow:self.fWindow completionHandler:^(NSInteger result) {
@@ -2915,11 +2906,10 @@ static void removeKeRangerRansomware()
         }
     }
 
-    NSAssert2(
-        [rearrangeArray isEqualToArray:[rearrangeArray sortedArrayUsingDescriptors:descriptors]],
-        @"Torrent rearranging didn't work! %@ %@",
-        rearrangeArray,
-        [rearrangeArray sortedArrayUsingDescriptors:descriptors]);
+    NSAssert2([rearrangeArray isEqualToArray:[rearrangeArray sortedArrayUsingDescriptors:descriptors]],
+              @"Torrent rearranging didn't work! %@ %@",
+              rearrangeArray,
+              [rearrangeArray sortedArrayUsingDescriptors:descriptors]);
 }
 
 - (void)applyFilter
@@ -3030,25 +3020,26 @@ static void removeKeRangerRansomware()
                     NSArray<NSString*>* trackers = torrent.allTrackersFlat;
 
                     //to count, we need each string in at least 1 tracker
-                    [searchStrings
-                        enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString* searchString, NSUInteger /*idx*/, BOOL* stop) {
-                            __block BOOL found = NO;
-                            [trackers enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                                       usingBlock:^(NSString* tracker, NSUInteger /*trackerIdx*/, BOOL* stopEnumerateTrackers) {
-                                                           if ([tracker rangeOfString:searchString
-                                                                              options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)]
-                                                                   .location != NSNotFound)
-                                                           {
-                                                               found = YES;
-                                                               *stopEnumerateTrackers = YES;
-                                                           }
-                                                       }];
-                            if (!found)
-                            {
-                                removeTextField = YES;
-                                *stop = YES;
-                            }
-                        }];
+                    [searchStrings enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString* searchString,
+                                                                                                    NSUInteger /*idx*/,
+                                                                                                    BOOL* stop) {
+                        __block BOOL found = NO;
+                        [trackers enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                                   usingBlock:^(NSString* tracker, NSUInteger /*trackerIdx*/, BOOL* stopEnumerateTrackers) {
+                                                       if ([tracker rangeOfString:searchString
+                                                                          options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)]
+                                                               .location != NSNotFound)
+                                                       {
+                                                           found = YES;
+                                                           *stopEnumerateTrackers = YES;
+                                                       }
+                                                   }];
+                        if (!found)
+                        {
+                            removeTextField = YES;
+                            *stop = YES;
+                        }
+                    }];
                 }
                 else
                 {
@@ -3179,21 +3170,20 @@ static void removeKeRangerRansomware()
                     [addIndexes removeIndexes:newAddIndexes];
 
                     [self.fDisplayedTorrents addObjectsFromArray:[allTorrents objectsAtIndexes:newAddIndexes]];
-                    [self.fTableView insertItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(
-                                                                                                     self.fDisplayedTorrents.count -
-                                                                                                         newAddIndexes.count,
-                                                                                                     newAddIndexes.count)]
-                                                 inParent:nil
-                                            withAnimation:NSTableViewAnimationSlideLeft];
+                    [self.fTableView
+                        insertItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.fDisplayedTorrents.count -
+                                                                                                    newAddIndexes.count,
+                                                                                                newAddIndexes.count)]
+                                    inParent:nil
+                               withAnimation:NSTableViewAnimationSlideLeft];
                 }
 
                 [self.fDisplayedTorrents addObjectsFromArray:[allTorrents objectsAtIndexes:addIndexes]];
-                [self.fTableView
-                    insertItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(
-                                                                                    self.fDisplayedTorrents.count - addIndexes.count,
-                                                                                    addIndexes.count)]
-                                inParent:nil
-                           withAnimation:NSTableViewAnimationSlideDown];
+                [self.fTableView insertItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.fDisplayedTorrents.count -
+                                                                                                             addIndexes.count,
+                                                                                                         addIndexes.count)]
+                                             inParent:nil
+                                        withAnimation:NSTableViewAnimationSlideDown];
             }
         }
     }
