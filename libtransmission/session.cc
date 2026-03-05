@@ -405,11 +405,12 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
     }
 }
 
-tr_session::BoundSocket::BoundSocket(struct event_base* evbase,
-                                     tr_address const& addr,
-                                     tr_port port,
-                                     IncomingCallback cb,
-                                     void* cb_data)
+tr_session::BoundSocket::BoundSocket(
+    struct event_base* evbase,
+    tr_address const& addr,
+    tr_port port,
+    IncomingCallback cb,
+    void* cb_data)
     : cb_{ cb }
     , cb_data_{ cb_data }
     , socket_{ tr_netBindTCP(addr, port, false) }
@@ -420,8 +421,10 @@ tr_session::BoundSocket::BoundSocket(struct event_base* evbase,
         return;
     }
 
-    tr_logAddInfo(fmt::format(fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
-                              fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
+    tr_logAddInfo(
+        fmt::format(
+            fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
+            fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
     event_add(ev_.get(), nullptr);
 }
 
@@ -1390,13 +1393,14 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // so that the most important announce=stopped events are
     // fired out first...
     auto torrents = torrents_.get_all();
-    std::ranges::sort(torrents,
-                      [](auto const* a, auto const* b)
-                      {
-                          auto const a_cur = a->bytes_downloaded_.ever();
-                          auto const b_cur = b->bytes_downloaded_.ever();
-                          return a_cur > b_cur; // larger xfers go first
-                      });
+    std::ranges::sort(
+        torrents,
+        [](auto const* a, auto const* b)
+        {
+            auto const a_cur = a->bytes_downloaded_.ever();
+            auto const b_cur = b->bytes_downloaded_.ever();
+            return a_cur > b_cur; // larger xfers go first
+        });
     for (auto* tor : torrents)
     {
         tr_torrentFreeInSessionThread(tor);
@@ -1532,8 +1536,10 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
 
     if (n_torrents != 0U)
     {
-        tr_logAddInfo(fmt::format(fmt::runtime(tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents)),
-                                  fmt::arg("count", n_torrents)));
+        tr_logAddInfo(
+            fmt::format(
+                fmt::runtime(tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents)),
+                fmt::arg("count", n_torrents)));
     }
 
     loaded_promise->set_value(n_torrents);

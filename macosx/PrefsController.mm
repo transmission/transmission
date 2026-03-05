@@ -509,9 +509,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 {
     NSMutableArray* sounds = [NSMutableArray array];
 
-    NSArray* directories = NSSearchPathForDirectoriesInDomains(NSAllLibrariesDirectory,
-                                                               NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask,
-                                                               YES);
+    NSArray* directories = NSSearchPathForDirectoriesInDomains(NSAllLibrariesDirectory, NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES);
 
     for (__strong NSString* directory in directories)
     {
@@ -1042,8 +1040,9 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         //always show the add window for magnet links when the download location is the same as the torrent file
         self.fShowMagnetAddWindowCheck.state = NSControlStateValueOn;
         self.fShowMagnetAddWindowCheck.enabled = NO;
-        self.fShowMagnetAddWindowCheck.toolTip = NSLocalizedString(@"This option is not available if Default location is set to Same as torrent file.",
-                                                                   "Preferences -> Transfers -> Adding -> Magnet tooltip");
+        self.fShowMagnetAddWindowCheck.toolTip = NSLocalizedString(
+            @"This option is not available if Default location is set to Same as torrent file.",
+            "Preferences -> Transfers -> Adding -> Magnet tooltip");
     }
     else
     {
@@ -1717,13 +1716,14 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
 - (void)updateRPCPassword
 {
     CFTypeRef data;
-    OSStatus result = SecItemCopyMatching((CFDictionaryRef) @{
-        (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
-        (NSString*)kSecAttrAccount : @(kRPCKeychainName),
-        (NSString*)kSecAttrService : @(kRPCKeychainService),
-        (NSString*)kSecReturnData : @YES,
-    },
-                                          &data);
+    OSStatus result = SecItemCopyMatching(
+        (CFDictionaryRef) @{
+            (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
+            (NSString*)kSecAttrAccount : @(kRPCKeychainName),
+            (NSString*)kSecAttrService : @(kRPCKeychainService),
+            (NSString*)kSecReturnData : @YES,
+        },
+        &data);
     if (result != noErr && result != errSecItemNotFound)
     {
         NSLog(@"Problem accessing Keychain: %@", getOSStatusDescription(result));
@@ -1739,12 +1739,13 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
 - (void)setKeychainPassword:(char const*)password
 {
     CFTypeRef item;
-    OSStatus result = SecItemCopyMatching((CFDictionaryRef) @{
-        (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
-        (NSString*)kSecAttrAccount : @(kRPCKeychainName),
-        (NSString*)kSecAttrService : @(kRPCKeychainService),
-    },
-                                          &item);
+    OSStatus result = SecItemCopyMatching(
+        (CFDictionaryRef) @{
+            (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
+            (NSString*)kSecAttrAccount : @(kRPCKeychainName),
+            (NSString*)kSecAttrService : @(kRPCKeychainService),
+        },
+        &item);
     if (result != noErr && result != errSecItemNotFound)
     {
         NSLog(@"Problem accessing Keychain: %@", getOSStatusDescription(result));
@@ -1756,14 +1757,15 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
     {
         if (passwordLength > 0) // found and needed, so update it
         {
-            result = SecItemUpdate((CFDictionaryRef) @{
-                (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
-                (NSString*)kSecAttrAccount : @(kRPCKeychainName),
-                (NSString*)kSecAttrService : @(kRPCKeychainService),
-            },
-                                   (CFDictionaryRef) @{
-                                       (NSString*)kSecValueData : [NSData dataWithBytes:password length:passwordLength],
-                                   });
+            result = SecItemUpdate(
+                (CFDictionaryRef) @{
+                    (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
+                    (NSString*)kSecAttrAccount : @(kRPCKeychainName),
+                    (NSString*)kSecAttrService : @(kRPCKeychainService),
+                },
+                (CFDictionaryRef) @{
+                    (NSString*)kSecValueData : [NSData dataWithBytes:password length:passwordLength],
+                });
             if (result != noErr)
             {
                 NSLog(@"Problem updating Keychain item: %@", getOSStatusDescription(result));
@@ -1787,13 +1789,14 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
     {
         if (passwordLength > 0) // not found and needed, so add it
         {
-            result = SecItemAdd((CFDictionaryRef) @{
-                (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
-                (NSString*)kSecAttrAccount : @(kRPCKeychainName),
-                (NSString*)kSecAttrService : @(kRPCKeychainService),
-                (NSString*)kSecValueData : [NSData dataWithBytes:password length:passwordLength],
-            },
-                                nil);
+            result = SecItemAdd(
+                (CFDictionaryRef) @{
+                    (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
+                    (NSString*)kSecAttrAccount : @(kRPCKeychainName),
+                    (NSString*)kSecAttrService : @(kRPCKeychainService),
+                    (NSString*)kSecValueData : [NSData dataWithBytes:password length:passwordLength],
+                },
+                nil);
             if (result != noErr)
             {
                 NSLog(@"Problem adding Keychain item: %@", getOSStatusDescription(result));

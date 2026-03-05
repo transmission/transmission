@@ -709,10 +709,11 @@ void tr_torrentStop(tr_torrent* torrent);
  *   If the path exists on disk but can't be renamed, the callback's `error`
  *   argument will be set via `set_with_errno()` with `rename()`'s errno.
  */
-void tr_torrentRenamePath(tr_torrent* tor,
-                          std::string_view oldpath,
-                          std::string_view newname,
-                          tr_torrent_rename_done_func callback);
+void tr_torrentRenamePath(
+    tr_torrent* tor,
+    std::string_view oldpath,
+    std::string_view newname,
+    tr_torrent_rename_done_func callback);
 
 /**
  * @brief Tell transmission where to find this torrent's local data.
@@ -801,10 +802,11 @@ void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
  *
  * @param priority must be one of TR_PRI_NORMAL, _HIGH, or _LOW
  */
-void tr_torrentSetFilePriorities(tr_torrent* torrent,
-                                 tr_file_index_t const* files,
-                                 tr_file_index_t file_count,
-                                 tr_priority_t priority);
+void tr_torrentSetFilePriorities(
+    tr_torrent* torrent,
+    tr_file_index_t const* files,
+    tr_file_index_t file_count,
+    tr_priority_t priority);
 
 /** @brief Set a batch of files to be downloaded or not. */
 void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);
