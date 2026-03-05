@@ -470,6 +470,21 @@ tr_variant tr_sessionGetDefaultSettings()
     ret.merge(tr_rpc_server::Settings{}.save());
     ret.merge(tr_session_alt_speeds::Settings{}.save());
     ret.merge(tr_session::Settings{}.save());
+
+    // TODO(5.0.0): remove this if block
+    if (auto* const map = ret.get_if<tr_variant::Map>())
+    {
+        // N.B. Because `tr_session::Settings::load()` calls
+        // `tr_session::Settings::fixup_to_preferred_transports()`,
+        // the defaults of `preferred_transports` essentially
+        // just repeats `utp_enabled` + `tcp_enabled`.
+        //
+        // Erase `preferred_transports` from the defaults to avoid
+        // overwriting `utp_enabled` and `tcp_enabled` that is set
+        // by the user.
+        map->erase(TR_KEY_preferred_transports);
+    }
+
     return ret;
 }
 
