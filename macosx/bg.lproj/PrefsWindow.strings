@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>1201.title</key>
+	<string>Затваряне при активни трансфери</string>
+	<key>1202.title</key>
+	<string>Премахване на активни трансфери</string>
+	<key>1203.title</key>
+	<string>Подкана към потребителя за:</string>
+	<key>1204.title</key>
+	<string>Значка на Dock с:</string>
+	<key>1205.title</key>
+	<string>Обща скорост на изтегляне</string>
+	<key>1206.title</key>
+	<string>Общ процент на качване</string>
+	<key>1207.title</key>
+	<string>Само когато се изтеглят трансфери</string>
+	<key>1208.title</key>
+	<string>Само когато се изтеглят трансфери</string>
+	<key>1209.title</key>
+	<string>Автоматично преоразмеряване:</string>
+	<key>1210.title</key>
+	<string>Автоматично оразмеряване на прозореца, за да пасне на всички трансфери</string>
+	<key>1211.title</key>
+	<string>Нулирай</string>
+	<key>1212.title</key>
+	<string>Нулиране на всички сигнали:</string>
+	<key>1213.title</key>
+	<string>Проверявай автоматично всеки ден</string>
+	<key>1214.title</key>
+	<string>Провери за актуализации:</string>
+	<key>1216.title</key>
+	<string>Местоположение по подразбиране:</string>
+	<key>1217.title</key>
+	<string>Настройки:</string>
+	<key>1218.title</key>
+	<string>Изхвърли оригиналните торент файлове</string>
+	<key>1219.title</key>
+	<string>Следи за торент файла в:</string>
+	<key>1226.title</key>
+	<string>Автоматично добавяне:</string>
+	<key>1227.title</key>
+	<string>Съхранявай непълните файлове в:</string>
+	<key>1230.title</key>
+	<string>Опашки:</string>
+	<key>1231.title</key>
+	<string>активни трансфери</string>
+	<key>1232.title</key>
+	<string>Спри качването при съотношение:</string>
+	<key>1234.title</key>
+	<string>Ограничения:</string>
+	<key>1235.title</key>
+	<string>Съотношението е отношението на каченото към изтегленото количество</string>
+	<key>1236.title</key>
+	<string>Скорост на изтегляне:</string>
+	<key>1239.title</key>
+	<string>активни трансфери</string>
+	<key>1240.title</key>
+	<string>Качване с максимум:</string>
+	<key>1242.title</key>
+	<string>минути</string>
+	<key>1243.title</key>
+	<string>Трансферът е спрян, когато е неактивен за:</string>
+	<key>1247.title</key>
+	<string>Автоматично картографиране на порт</string>
+	<key>1248.title</key>
+	<string>Преодоляването на NAT използва NAT-PMP или UPnP</string>
+	<key>1250.title</key>
+	<string>Портът е отворен</string>
+	<key>1253.title</key>
+	<string>Комуникация с пиър:</string>
+	<key>1254.title</key>
+	<string>Предотврати заспиването на компютъра при активни трансфери</string>
+	<key>1255.title</key>
+	<string>Сън на системата:</string>
+	<key>1265.title</key>
+	<string>Скорост на качване:</string>
+	<key>1267.title</key>
+	<string>Скорост на изтегляне:</string>
+	<key>1268.title</key>
+	<string>КБ/с</string>
+	<key>1269.title</key>
+	<string>КБ/с</string>
+	<key>1270.title</key>
+	<string>Глобални ограничения за пропускателна способност:</string>
+	<key>1273.title</key>
+	<string>КБ/с</string>
+	<key>1274.title</key>
+	<string>КБ/с</string>
+	<key>1275.title</key>
+	<string>Режим на ограничение на скоростта:</string>
+	<key>1276.title</key>
+	<string>Скорост на качване:</string>
+	<key>1277.title</key>
+	<string>Скорост на изтегляне:</string>
+	<key>1278.title</key>
+	<string>Когато е активирано, ограничението на скоростта отменя глобалните ограничения на пропускателна способност</string>
+	<key>1280.title</key>
+	<string>Ограничение на скоростта по график:</string>
+	<key>1281.title</key>
+	<string>към</string>
+	<key>1294.title</key>
+	<string>Показвай прозорец при отваряне на торент файл</string>
+	<key>1302.title</key>
+	<string>Когато изтеглянето завърши:</string>
+	<key>1306.title</key>
+	<string>Когато качването завърши:</string>
+	<key>1310.title</key>
+	<string>Възпроизвеждане на звук:</string>
+	<key>1335.title</key>
+	<string>Стартирай трансферите при добавяне</string>
+	<key>1338.title</key>
+	<string>Добавяне на прозорец:</string>
+	<key>1340.title</key>
+	<string>Само когато има няколко файла</string>
+	<key>1437.title</key>
+	<string>Актуализация</string>
+	<key>1438.title</key>
+	<string>блокиращ списък зареден/незареден</string>
+	<key>1439.title</key>
+	<string>Блокиран списък:</string>
+	<key>1440.title</key>
+	<string>Предотврати свързването на пиъри в списъка за блокиране</string>
+	<key>1441.title</key>
+	<string>Високите ограничения на връзката могат значително да повлияят на производителността на системата</string>
+	<key>1442.title</key>
+	<string>Използвай обмен на пиъри (PEX) за публични торенти</string>
+	<key>1443.title</key>
+	<string>Максимален брой връзки за нови трансфери:</string>
+	<key>1446.title</key>
+	<string>пиъри</string>
+	<key>1447.title</key>
+	<string>пиъри</string>
+	<key>1450.title</key>
+	<string>Глобални максимални връзки:</string>
+	<key>1451.title</key>
+	<string>Връзки:</string>
+	<key>1452.title</key>
+	<string>Предпочитам шифровани пиъри</string>
+	<key>1453.title</key>
+	<string>Шифроване:</string>
+	<key>1454.title</key>
+	<string>Игнориране на некриптирани пиъри</string>
+	<key>1477.title</key>
+	<string>Само при ръчно добавяне</string>
+	<key>1493.title</key>
+	<string>Порт за слушане:</string>
+	<key>1502.title</key>
+	<string>Активиране на отдалечен достъп</string>
+	<key>1505.title</key>
+	<string>Изискване на удостоверяване</string>
+	<key>1523.headerCell.title</key>
+	<string>IP адрес</string>
+	<key>1542.title</key>
+	<string>IP адресите могат да включват * като заместващ знак</string>
+	<key>1555.title</key>
+	<string>Парола:</string>
+	<key>1557.title</key>
+	<string>Потребителско име:</string>
+	<key>1645.title</key>
+	<string>Това активира уеб интерфейса и позволява отдалечени заявки</string>
+	<key>1718.title</key>
+	<string>Стартирай уеб интерфейс</string>
+	<key>1739.title</key>
+	<string>Последна актуализация: N/A</string>
+	<key>1742.title</key>
+	<string>Автоматично актуализиране всяка седмица</string>
+	<key>1748.title</key>
+	<string>Разреши само следните IP адреси за свързване:</string>
+	<key>1777.headerCell.title</key>
+	<string>Цвят</string>
+	<key>1779.headerCell.title</key>
+	<string>Името</string>
+	<key>1796.title</key>
+	<string>Името на групата:</string>
+	<key>1813.title</key>
+	<string>Друго…</string>
+	<key>1815.title</key>
+	<string>Персонализирано местоположение:</string>
+	<key>1824.title</key>
+	<string>Местоположението ще бъде зададено само при добавяне на трансфера</string>
+	<key>1826.title</key>
+	<string>Показвай уеб интерфейса с Bonjour</string>
+	<key>1831.title</key>
+	<string>Присвояване на група за нови трансфери въз основа на критерии</string>
+	<key>1833.title</key>
+	<string>Редактирай…</string>
+	<key>1835.title</key>
+	<string>Трансферите ще бъдат причислени към първата група, която отговаря на всички критерии</string>
+	<key>1890.title</key>
+	<string>Случаен порт при стартиране</string>
+	<key>1892.title</key>
+	<string>Нов случаен порт</string>
+	<key>1896.title</key>
+	<string>Включи бета версии</string>
+	<key>1910.title</key>
+	<string>Всеки ден</string>
+	<key>1911.title</key>
+	<string>Делнични дни</string>
+	<key>1912.title</key>
+	<string>Почивните дни</string>
+	<key>1914.title</key>
+	<string>понеделник</string>
+	<key>1915.title</key>
+	<string>вторник</string>
+	<key>1916.title</key>
+	<string>сряда</string>
+	<key>1917.title</key>
+	<string>четвъртък</string>
+	<key>1918.title</key>
+	<string>петък</string>
+	<key>1919.title</key>
+	<string>Събота</string>
+	<key>1920.title</key>
+	<string>неделя</string>
+	<key>1926.title</key>
+	<string>Използвай разпределена хеш-таблица (DHT) за публични торенти</string>
+	<key>1931.title</key>
+	<string>Приемай магнитни връзки:</string>
+	<key>1933.title</key>
+	<string>Задай приложение по подразбиране</string>
+	<key>1940.title</key>
+	<string>Добави .part към непълните файлове</string>
+	<key>1948.title</key>
+	<string>Показвай прозорец при отваряне на магнитна връзка</string>
+	<key>1952.title</key>
+	<string>Използвай локално откриване на пиъри за обществени торенти</string>
+	<key>1962.title</key>
+	<string>Спри качването, когато е неактивно за:</string>
+	<key>1970.title</key>
+	<string>минути</string>
+	<key>1988.title</key>
+	<string>URL:</string>
+	<key>2044.title</key>
+	<string>Когато изтеглянето завърши:</string>
+	<key>2047.title</key>
+	<string>Скрипт за повикване:</string>
+	<key>2053.title</key>
+	<string>Друго…</string>
+	<key>2078.title</key>
+	<string>Активиране на микротранспортен протокол (µTP)</string>
+	<key>2082.title</key>
+	<string>Порт за слушане:</string>
+	<key>2087.title</key>
+	<string>Известия:</string>
+	<key>2114.title</key>
+	<string>Конфигурирай в системните предпочитания</string>
+	<key>2119.title</key>
+	<string>Премахване от списъка за трансфери, когато качването завърши</string>
+	<key>2123.title</key>
+	<string>Прилага се за новодобавени трансфери</string>
+	<key>219.title</key>
+	<string>Друго…</string>
+	<key>23.title</key>
+	<string>Настройки</string>
+	<key>253.label</key>
+	<string>Добавяне</string>
+	<key>254.label</key>
+	<string>Управление</string>
+	<key>53.title</key>
+	<string>Друго…</string>
+	<key>542.title</key>
+	<string>Друго…</string>
+	<key>55.title</key>
+	<string>Същото като торент файл</string>
+	<key>A9E-F4-a3c.title</key>
+	<string>Отвори торент файла:</string>
+	<key>pgY-W3-HdI.title</key>
+	<string>Задай приложение по подразбиране</string>
+	<key>wM8-cD-WAB.title</key>
+	<string>Провери данните, когато изтеглянето завърши</string>
+</dict>
+</plist>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>101.title</key>
+	<string>Магнитна връзка</string>
+	<key>15.title</key>
+	<string>Изтегляне на:</string>
+	<key>16.title</key>
+	<string>Промени...</string>
+	<key>18.title</key>
+	<string>Старт при добавяне</string>
+	<key>20.title</key>
+	<string>Добави</string>
+	<key>22.title</key>
+	<string>Отказ</string>
+	<key>2zq-5y-smI.title</key>
+	<string>Няма</string>
+	<key>41.title</key>
+	<string>Група:</string>
+	<key>88.title</key>
+	<string>ниско</string>
+	<key>89.title</key>
+	<string>нормално</string>
+	<key>90.title</key>
+	<string>високо</string>
+	<key>91.title</key>
+	<string>Приоритет:</string>
+</dict>
+</plist>
