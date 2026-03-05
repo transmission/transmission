@@ -25,6 +25,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/resume.h"
 #include "libtransmission/session.h"
+#include "libtransmission/serializer.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent-metainfo.h"
@@ -49,19 +50,27 @@ void save_peers(tr_variant::Map& map, tr_torrent const* tor)
 {
     if (auto const pex = tr_peerMgrGetPeers(tor, TR_AF_INET, TR_PEERS_INTERESTING, MaxRememberedPeers); !std::empty(pex))
     {
-        map.insert_or_assign(TR_KEY_peers2, tr_pex::to_variant(std::data(pex), std::size(pex)));
+        map.insert_or_assign(TR_KEY_peers2, tr::serializer::to_variant(pex));
     }
 
     if (auto const pex = tr_peerMgrGetPeers(tor, TR_AF_INET6, TR_PEERS_INTERESTING, MaxRememberedPeers); !std::empty(pex))
     {
-        map.insert_or_assign(TR_KEY_peers2_6, tr_pex::to_variant(std::data(pex), std::size(pex)));
+        map.insert_or_assign(TR_KEY_peers2_6, tr::serializer::to_variant(pex));
     }
 }
 
 size_t add_peers(tr_torrent* tor, tr_variant::Vector const& l)
 {
     auto const n_pex = std::min(std::size(l), size_t{ MaxRememberedPeers });
-    auto const pex = tr_pex::from_variant(std::data(l), n_pex);
+    auto pex = std::vector<tr_pex>{};
+    pex.reserve(n_pex);
+    for (size_t i = 0; i < n_pex; ++i)
+    {
+        if (auto p = tr::serializer::to_value<tr_pex>(l[i]))
+        {
+            pex.emplace_back(std::move(*p));
+        }
+    }
     return tr_peerMgrAddPex(tor, TR_PEER_FROM_RESUME, std::data(pex), std::size(pex));
 }
 
