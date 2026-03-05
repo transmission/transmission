@@ -446,7 +446,7 @@ struct tr_socket_address
         return display_name(address_, port_);
     }
 
-    [[nodiscard]] auto is_valid() const noexcept
+    [[nodiscard]] constexpr auto is_valid() const noexcept
     {
         return address_.is_valid();
     }
@@ -587,13 +587,6 @@ tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_ms
 [[nodiscard]] std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(
     tr_session* session,
     tr_socket_t listening_sockfd);
-
-void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
-
-[[nodiscard]] tr_socket_t tr_net_open_peer_socket(
-    tr_session* session,
-    tr_socket_address const& socket_address,
-    bool client_is_seed);
 
 void tr_net_close_socket(tr_socket_t fd);
 
