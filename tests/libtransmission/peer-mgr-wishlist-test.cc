@@ -2227,8 +2227,97 @@ TEST_F(PeerMgrWishlistTest, unalignedTorrentGot2ConsectutiveBadPieces)
         auto requested = tr_bitfield{ 134 };
         auto const spans = get_spans(67);
 
-        // We should get 1 pan [33, 100),
+        // We should get 1 span [33, 100),
         // not [33, 67), [66, 100)
+        EXPECT_EQ(std::size(spans), 1);
+
+        // Since the spans might overlap if we didn't handle unaligned
+        // torrents correctly, we might not get all 67 blocks if there
+        // is a bug
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(67U, requested.count());
+        EXPECT_EQ(67U, requested.count(33, 100));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, unalignedTorrentPreviouslyCompletedPieceCorrupted)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: 4 pieces, (100 / 3 * 16) KiB each
+        // N.B. only the boundary of piece 2 and 3 is aligned
+        mediator.block_span_[0] = { 0, 34 };
+        mediator.block_span_[1] = { 33, 67 };
+        mediator.block_span_[2] = { 66, 100 };
+        mediator.block_span_[3] = { 100, 134 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we want all 4 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // pieces 0, 2, 3 completed normally
+        sent_request_.emit(nullptr, nullptr, { 0, 134 });
+        for (tr_block_index_t block = 0; block < 134; ++block)
+        {
+            mediator.client_has_block_.insert(block);
+            got_block_.emit(nullptr, block);
+        }
+        mediator.client_has_piece_.insert(0);
+        piece_completed_.emit(nullptr, 0);
+        mediator.client_has_piece_.insert(3);
+        piece_completed_.emit(nullptr, 3);
+        mediator.client_has_piece_.insert(2);
+        piece_completed_.emit(nullptr, 2);
+
+        // piece 1 turned out to be corrupt, needs to be re-downloaded
+        for (auto [block, end] = mediator.block_span_[1]; block < end; ++block)
+        {
+            mediator.client_has_block_.erase(block);
+        }
+        got_bad_piece_.emit(nullptr, 1);
+
+        // receive the boundary block 66
+        mediator.client_has_block_.insert(66);
+        got_block_.emit(nullptr, 66);
+
+        // piece 2 fails the re-check and needs to be re-downloaded
+        for (auto [block, end] = mediator.block_span_[2]; block < end; ++block)
+        {
+            mediator.client_has_block_.erase(block);
+        }
+        mediator.client_has_piece_.erase(2);
+        got_bad_piece_.emit(nullptr, 2);
+
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 134 };
+        auto const spans = get_spans(67);
+
+        // We should get 1 span [33, 100),
+        // not [33, 67), [66, 100), or any one of them
         EXPECT_EQ(std::size(spans), 1);
 
         // Since the spans might overlap if we didn't handle unaligned
