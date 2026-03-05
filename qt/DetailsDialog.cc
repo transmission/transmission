@@ -1281,7 +1281,7 @@ void DetailsDialog::refreshUI()
 
     for (auto const& [key, item] : peers_)
     {
-        if (peers2.count(key) == 0U) // old peer has disconnected
+        if (!peers2.contains(key)) // old peer has disconnected
         {
             ui_.peersView->takeTopLevelItem(ui_.peersView->indexOfTopLevelItem(item));
             delete item;
