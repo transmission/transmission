@@ -6,10 +6,6 @@ HeaderFilterRegex: .*/libtransmission/.*
 # TODO: Enable `modernize-use-integer-sign-comparison` (P0586R2) after GCC >= 10.1, clang >= 13
 #
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
-#
-# -readability-container-contains (P0458R2): GCC 9.1, clang 13
-# Ref: https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html
-# Ref: https://libcxx.llvm.org/Status/Cxx20.html
 Checks:
   - bugprone-*
   - -bugprone-branch-clone
@@ -53,7 +49,6 @@ Checks:
   - portability-*
   - -portability-template-virtual-member-function
   - readability-*
-  - -readability-container-contains
   - -readability-enum-initial-value
   - -readability-function-cognitive-complexity
   - -readability-identifier-length

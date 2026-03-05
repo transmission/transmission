@@ -37,17 +37,17 @@ protected:
 
         [[nodiscard]] bool client_has_block(tr_block_index_t block) const override
         {
-            return client_has_block_.count(block) != 0;
+            return client_has_block_.contains(block);
         }
 
         [[nodiscard]] bool client_has_piece(tr_piece_index_t piece) const override
         {
-            return client_has_piece_.count(piece) != 0;
+            return client_has_piece_.contains(piece);
         }
 
         [[nodiscard]] bool client_wants_piece(tr_piece_index_t piece) const override
         {
-            return client_wants_piece_.count(piece) != 0;
+            return client_wants_piece_.contains(piece);
         }
 
         [[nodiscard]] bool is_sequential_download() const override

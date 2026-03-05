@@ -439,7 +439,7 @@ void FileTreeModel::emitParentsChanged(
 
         if (visited_parent_indices != nullptr)
         {
-            if (visited_parent_indices->count(walk) != 0U)
+            if (visited_parent_indices->contains(walk))
             {
                 break;
             }

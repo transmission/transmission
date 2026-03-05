@@ -1918,7 +1918,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     auto groups_vec = tr_variant::Vector{};
     for (auto const& [name, group] : session->bandwidthGroups())
     {
-        if (names.empty() || names.count(name.sv()) > 0U)
+        if (names.empty() || names.contains(name.sv()))
         {
             auto const limits = group->get_limits();
             auto group_map = tr_variant::Map{ 6U };

@@ -179,7 +179,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
     }
 
     auto const ext = QFileInfo{ filename }.suffix();
-    if (suffixes_.count(ext) == 0)
+    if (!suffixes_.contains(ext))
     {
         return {};
     }

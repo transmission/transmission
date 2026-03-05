@@ -1355,7 +1355,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", socket.display_name()));
         socket.close();
     }
-    else if (manager->incoming_handshakes.count(socket.socket_address()) != 0U)
+    else if (manager->incoming_handshakes.contains(socket.socket_address()))
     {
         socket.close();
     }

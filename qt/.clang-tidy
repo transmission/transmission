@@ -39,7 +39,6 @@ Checks:
   - -modernize-use-trailing-return-type # keep
   - performance-*
   - readability-*
-  - -readability-container-contains
   - -readability-convert-member-functions-to-static
   - -readability-enum-initial-value
   - -readability-function-cognitive-complexity

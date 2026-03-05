@@ -303,7 +303,7 @@ void FileTreeView::onlyCheckSelectedItems()
             {
                 unwanted_indices << child_index;
             }
-            else if (wanted_indices_parents.count(child_index) == 0U)
+            else if (!wanted_indices_parents.contains(child_index))
             {
                 unwanted_indices << child_index;
             }

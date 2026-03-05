@@ -274,7 +274,7 @@ void TorrentModel::updateTorrents(tr_variant* torrent_list, bool is_complete_lis
             needinfo.insert(*id);
         }
 
-        if (recently_added(tor) && tor->hasName() && !already_added_.count(*id))
+        if (recently_added(tor) && tor->hasName() && !already_added_.contains(*id))
         {
             added.insert(*id);
             already_added_.insert(*id);

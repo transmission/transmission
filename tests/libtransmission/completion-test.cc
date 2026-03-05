@@ -29,7 +29,7 @@ struct TestTorrent
 
     [[nodiscard]] tr_completion makeCompletion(tr_block_info const& block_info) const
     {
-        return { [this](tr_piece_index_t const piece) { return dnd_pieces.count(piece) == 0; }, &block_info };
+        return { [this](tr_piece_index_t const piece) { return !dnd_pieces.contains(piece); }, &block_info };
     }
 };
 
