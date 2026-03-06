@@ -165,11 +165,11 @@ public:
     {
         if (dir == tr_direction::Down)
         {
-            settings_.speed_down_kbyps = limit.count(Speed::Units::KByps);
+            settings_.speed_down_kbyps = static_cast<decltype(settings_.speed_down_kbyps)>(limit.count(Speed::Units::KByps));
         }
         else
         {
-            settings_.speed_up_kbyps = limit.count(Speed::Units::KByps);
+            settings_.speed_up_kbyps = static_cast<decltype(settings_.speed_up_kbyps)>(limit.count(Speed::Units::KByps));
         }
     }
 

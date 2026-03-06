@@ -26,14 +26,14 @@
 template <typename T> [[nodiscard]] std::string tr_strlower(T in)
 {
     auto out = std::string{ std::move(in) };
-    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::tolower(ch); });
+    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = static_cast<char>(std::tolower(ch)); });
     return out;
 }
 
 template <typename T> [[nodiscard]] std::string tr_strupper(T in)
 {
     auto out = std::string{ std::move(in) };
-    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::toupper(ch); });
+    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = static_cast<char>(std::toupper(ch)); });
     return out;
 }
 

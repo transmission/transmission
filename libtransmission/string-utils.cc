@@ -89,9 +89,16 @@ std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 std::string tr_win32_native_to_utf8(std::wstring_view in)
 {
     auto out = std::string{};
-    out.resize(WideCharToMultiByte(CP_UTF8, 0, std::data(in), std::size(in), nullptr, 0, nullptr, nullptr));
-    [[maybe_unused]] auto
-        len = WideCharToMultiByte(CP_UTF8, 0, std::data(in), std::size(in), std::data(out), std::size(out), nullptr, nullptr);
+    out.resize(WideCharToMultiByte(CP_UTF8, 0, std::data(in), static_cast<int>(std::size(in)), nullptr, 0, nullptr, nullptr));
+    [[maybe_unused]] auto len = WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        std::data(in),
+        static_cast<int>(std::size(in)),
+        std::data(out),
+        static_cast<int>(std::size(out)),
+        nullptr,
+        nullptr);
     TR_ASSERT(len == std::size(out));
     return out;
 }
@@ -99,8 +106,14 @@ std::string tr_win32_native_to_utf8(std::wstring_view in)
 std::wstring tr_win32_utf8_to_native(std::string_view in)
 {
     auto out = std::wstring{};
-    out.resize(MultiByteToWideChar(CP_UTF8, 0, std::data(in), std::size(in), nullptr, 0));
-    [[maybe_unused]] auto len = MultiByteToWideChar(CP_UTF8, 0, std::data(in), std::size(in), std::data(out), std::size(out));
+    out.resize(MultiByteToWideChar(CP_UTF8, 0, std::data(in), static_cast<int>(std::size(in)), nullptr, 0));
+    [[maybe_unused]] auto len = MultiByteToWideChar(
+        CP_UTF8,
+        0,
+        std::data(in),
+        static_cast<int>(std::size(in)),
+        std::data(out),
+        static_cast<int>(std::size(out)));
     TR_ASSERT(len == std::size(out));
     return out;
 }

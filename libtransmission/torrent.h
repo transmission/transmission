@@ -1206,7 +1206,7 @@ private:
         return {};
     }
 
-    [[nodiscard]] constexpr std::optional<size_t> idle_seconds_left(time_t now) const noexcept
+    [[nodiscard]] constexpr std::optional<time_t> idle_seconds_left(time_t now) const noexcept
     {
         auto const idle_limit_minutes = effective_idle_limit_minutes();
         if (!idle_limit_minutes)

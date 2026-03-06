@@ -774,7 +774,7 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
     FILE_END_OF_FILE_INFO info;
-    info.EndOfFile.QuadPart = size;
+    info.EndOfFile.QuadPart = static_cast<LONGLONG>(size);
 
     bool const ret = to_bool(SetFileInformationByHandle(handle, FileEndOfFileInfo, &info, sizeof(info)));
 
