@@ -35,6 +35,12 @@ public:
         [[nodiscard]] virtual tr_block_span_t block_span(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual tr_piece_index_t piece_count() const = 0;
         [[nodiscard]] virtual tr_priority_t priority(tr_piece_index_t piece) const = 0;
+
+        [[nodiscard]] virtual std::vector<uint8_t> active_request_count(tr_piece_index_t /*piece*/) const
+        {
+            return {};
+        }
+
         virtual ~Mediator() = default;
     };
 

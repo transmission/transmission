@@ -272,6 +272,7 @@ struct tr_incoming
     } while (0)
 
 #define logdbg(msgs, text) myLogMacro(msgs, TR_LOG_DEBUG, text)
+#define loginfo(msgs, text) myLogMacro(msgs, TR_LOG_INFO, text)
 #define logtrace(msgs, text) myLogMacro(msgs, TR_LOG_TRACE, text)
 #define logwarn(msgs, text) myLogMacro(msgs, TR_LOG_WARN, text)
 
