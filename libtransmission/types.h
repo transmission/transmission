@@ -333,7 +333,7 @@ struct tr_peer_stat
 /** @brief Used by `tr_sessionGetStats()` and `tr_sessionGetCumulativeStats()` */
 struct tr_session_stats
 {
-    float ratio; /* TR_RATIO_INF, TR_RATIO_NA, or total up/down */
+    double ratio; /* TR_RATIO_INF, TR_RATIO_NA, or total up/down */
     uint64_t uploadedBytes; /* total up */
     uint64_t downloadedBytes; /* total down */
     uint64_t filesAdded; /* number of files added */
@@ -563,11 +563,11 @@ struct tr_tracker_view
     time_t lastScrapeTime = {}; // if hasScraped, when the latest scrape reply was received
     time_t nextScrapeTime = {}; // if scrapeState == TR_TRACKER_WAITING, time of next scrape
 
-    int downloadCount = {}; // number of times this torrent's been downloaded, or -1 if unknown
-    int lastAnnouncePeerCount = {}; // if hasAnnounced, the number of peers the tracker gave us
-    int leecherCount = {}; // number of leechers the tracker knows of, or -1 if unknown
-    int seederCount = {}; // number of seeders the tracker knows of, or -1 if unknown
-    int downloader_count = {}; // number of downloaders (BEP-21) the tracker knows of, or -1 if unknown
+    int64_t downloadCount = {}; // number of times this torrent's been downloaded, or -1 if unknown
+    size_t lastAnnouncePeerCount = {}; // if hasAnnounced, the number of peers the tracker gave us
+    int64_t leecherCount = {}; // number of leechers the tracker knows of, or -1 if unknown
+    int64_t seederCount = {}; // number of seeders the tracker knows of, or -1 if unknown
+    int64_t downloader_count = {}; // number of downloaders (BEP-21) the tracker knows of, or -1 if unknown
 
     size_t tier = {}; // which tier this tracker is in
     tr_tracker_id_t id = {}; // unique transmission-generated ID for use in libtransmission API

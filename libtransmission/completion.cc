@@ -98,7 +98,7 @@ void tr_completion::amount_done(float* tab, size_t n_tabs) const
         auto const begin = i * blocks_per_tab;
         auto const end = std::min(begin + blocks_per_tab, std::size(blocks_));
         auto const numerator = blocks_.count(begin, end);
-        tab[i] = float(numerator) / (end - begin);
+        tab[i] = static_cast<float>(numerator) / static_cast<float>(end - begin);
     }
 }
 

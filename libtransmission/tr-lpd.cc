@@ -11,6 +11,7 @@
 #include <ctime> // time_t
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -34,6 +35,7 @@
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-lpd.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for tr_net_init()
 #include "libtransmission/utils-ev.h" // for tr_net_init()
@@ -575,6 +577,7 @@ private:
             auto const ip_protocol = static_cast<tr_address_type>(ipp);
 
             // cram in as many as will fit in a message
+            using diff_type = std::ranges::range_difference_t<decltype(torrents)>;
             auto const baseline_size = std::size(makeAnnounceMsg(ip_protocol, cookie_, mediator_.port(), {}));
             auto const size_with_one = std::size(
                 makeAnnounceMsg(ip_protocol, cookie_, mediator_.port(), { torrents.front().info_hash_str }));
@@ -583,9 +586,8 @@ private:
             auto const torrents_this_announce = std::min(std::size(torrents), max_torrents_per_announce);
             auto info_hash_strings = std::vector<std::string_view>{};
             info_hash_strings.reserve(torrents_this_announce);
-            std::transform(
-                std::begin(torrents),
-                std::begin(torrents) + torrents_this_announce,
+            std::ranges::transform(
+                std::views::take(torrents, static_cast<diff_type>(torrents_this_announce)),
                 std::back_inserter(info_hash_strings),
                 [](auto const& tor) { return tor.info_hash_str; });
 
@@ -642,12 +644,12 @@ private:
         auto const res = sendto(
             mcast_sockets_[ip_protocol],
             std::data(announce),
-            std::size(announce),
+            static_cast<TR_IF_WIN32(int, size_t)>(std::size(announce)),
             0,
             ip_protocol == TR_AF_INET ? reinterpret_cast<sockaddr const*>(&mcast_addr_) :
                                         reinterpret_cast<sockaddr const*>(&mcast6_addr_),
             ip_protocol == TR_AF_INET ? sizeof(mcast_addr_) : sizeof(mcast6_addr_));
-        return res == static_cast<int>(std::size(announce));
+        return std::cmp_equal(res, std::size(announce));
     }
 
     std::string const cookie_ = makeCookie();

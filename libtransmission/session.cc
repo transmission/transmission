@@ -196,15 +196,15 @@ tr_peer_id_t tr_peerIdInit()
 
     // remainder is randomly-generated characters
     auto constexpr Pool = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyz" };
-    auto total = 0;
+    auto total = size_t{};
     tr_rand_buffer(it, end - it);
     while (it + 1 < end)
     {
-        int const val = *it % std::size(Pool);
+        auto const val = *it % std::size(Pool);
         total += val;
         *it++ = Pool[val];
     }
-    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - (total % std::size(Pool)) : 0;
+    auto const val = total % std::size(Pool) != 0 ? std::size(Pool) - (total % std::size(Pool)) : 0;
     *it = Pool[val];
 
     return peer_id;
@@ -413,7 +413,12 @@ tr_session::BoundSocket::BoundSocket(
     : cb_{ cb }
     , cb_data_{ cb_data }
     , socket_{ tr_netBindTCP(addr, port, false) }
-    , ev_{ tr::evhelpers::event_new_pri2(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocket::onCanRead, this) }
+    , ev_{ tr::evhelpers::event_new_pri2(
+          evbase,
+          static_cast<evutil_socket_t>(socket_),
+          EV_READ | EV_PERSIST,
+          &BoundSocket::onCanRead,
+          this) }
 {
     if (socket_ == TR_BAD_SOCKET)
     {
@@ -629,7 +634,7 @@ namespace
 {
 namespace queue_helpers
 {
-std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_direction dir, size_t num_wanted)
+std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents const& torrents, tr_direction dir, size_t num_wanted)
 {
     auto candidates = torrents.get_matching([dir](auto const* const tor) { return tor->is_queued(dir); });
 
@@ -637,7 +642,10 @@ std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_dire
     num_wanted = std::min(num_wanted, std::size(candidates));
     if (num_wanted < candidates.size())
     {
-        std::ranges::partial_sort(candidates, std::begin(candidates) + num_wanted, tr_torrent::CompareQueuePosition);
+        std::ranges::partial_sort(
+            candidates,
+            std::begin(candidates) + static_cast<decltype(candidates)::difference_type>(num_wanted),
+            tr_torrent::CompareQueuePosition);
         candidates.resize(num_wanted);
     }
 
@@ -1199,7 +1207,7 @@ void tr_sessionSetSpeedLimit_KBps(tr_session* const session, tr_direction const 
 size_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    return session->speed_limit(dir).count(Speed::Units::KByps);
+    return static_cast<size_t>(session->speed_limit(dir).count(Speed::Units::KByps));
 }
 
 void tr_sessionLimitSpeed(tr_session* session, tr_direction const dir, bool limited)
@@ -1236,7 +1244,7 @@ void tr_sessionSetAltSpeed_KBps(tr_session* const session, tr_direction const di
 size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
-    return session->alt_speeds_.speed_limit(dir).count(Speed::Units::KByps);
+    return static_cast<size_t>(session->alt_speeds_.speed_limit(dir).count(Speed::Units::KByps));
 }
 
 void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled)

@@ -82,13 +82,13 @@ struct tr_completion
     [[nodiscard]] constexpr double percent_complete() const
     {
         auto const denom = block_info_->total_size();
-        return denom != 0U ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
+        return denom != 0U ? std::clamp(static_cast<double>(size_now_) / static_cast<double>(denom), 0.0, 1.0) : 0.0;
     }
 
     [[nodiscard]] double percent_done() const
     {
         auto const denom = size_when_done();
-        return denom != 0U ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
+        return denom != 0U ? std::clamp(static_cast<double>(size_now_) / static_cast<double>(denom), 0.0, 1.0) : 0.0;
     }
 
     [[nodiscard]] uint64_t size_when_done() const;
