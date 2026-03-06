@@ -72,6 +72,8 @@ target_sources(${TR_NAME}-qt-lib
         PrefsDialog.h
         RelocateDialog.cc
         RelocateDialog.h
+        RenameTorrentDialog.cc
+        RenameTorrentDialog.h
         RpcClient.cc
         RpcClient.h
         RpcQueue.cc
