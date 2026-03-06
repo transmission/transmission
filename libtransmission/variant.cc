@@ -84,25 +84,6 @@ template<typename T>
 
 // ---
 
-// Specialisations for int64_t and bool could have been inline and constexpr,
-// but aren't because https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282
-
-template<>
-[[nodiscard]] std::optional<int64_t> tr_variant::value_if() const noexcept
-{
-    switch (index())
-    {
-    case IntIndex:
-        return *get_if<IntIndex>();
-
-    case BoolIndex:
-        return *get_if<BoolIndex>() ? 1 : 0;
-
-    default:
-        return {};
-    }
-}
-
 template<>
 [[nodiscard]] std::optional<bool> tr_variant::value_if() const noexcept
 {
