@@ -37,6 +37,8 @@
                 <outlet property="fQueueDownloadField" destination="257" id="616"/>
                 <outlet property="fQueueSeedField" destination="604" id="615"/>
                 <outlet property="fRPCAddRemoveControl" destination="1534" id="1536"/>
+                <outlet property="fRPCHostAddRemoveControl" destination="HWL-seg-ctl" id="HWL-out-seg"/>
+                <outlet property="fRPCHostWhitelistTable" destination="HWL-tbl-vw1" id="HWL-out-tbl"/>
                 <outlet property="fRPCPasswordField" destination="1509" id="1674"/>
                 <outlet property="fRPCPortField" destination="1491" id="1514"/>
                 <outlet property="fRPCWhitelistTable" destination="1521" id="1746"/>
@@ -2320,11 +2322,11 @@
             <point key="canvasLocation" x="-1149" y="500"/>
         </customView>
         <customView id="1481" userLabel="Remote">
-            <rect key="frame" x="0.0" y="0.0" width="508" height="440"/>
+            <rect key="frame" x="0.0" y="0.0" width="508" height="610"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="g2p-4Y-QU9">
-                    <rect key="frame" x="60" y="40" width="388" height="380"/>
+                    <rect key="frame" x="60" y="40" width="388" height="550"/>
                     <subviews>
                         <textField focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1552">
                             <rect key="frame" x="133" y="244" width="184" height="21"/>
@@ -2491,6 +2493,103 @@
                                 <binding destination="365" name="value" keyPath="values.RPCAuthorize" id="1567"/>
                             </connections>
                         </button>
+                        <button horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="HWL-chk-box">
+                            <rect key="frame" x="38" y="139" width="323" height="18"/>
+                            <buttonCell key="cell" type="check" title="Only allow the following hostnames to connect:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="HWL-chk-cel">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="setRPCUseHostWhitelist:" target="-2" id="HWL-act-chk"/>
+                                <binding destination="365" name="enabled" keyPath="values.RPC" id="HWL-bnd-en1"/>
+                                <binding destination="365" name="value" keyPath="values.RPCUseHostWhitelist" id="HWL-bnd-val"/>
+                            </connections>
+                        </button>
+                        <scrollView horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HWL-scr-vw1">
+                            <rect key="frame" x="60" y="47" width="308" height="88"/>
+                            <clipView key="contentView" id="HWL-clp-vw1">
+                                <rect key="frame" x="1" y="1" width="306" height="86"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <subviews>
+                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="HWL-tbl-vw1">
+                                        <rect key="frame" x="0.0" y="0.0" width="306" height="86"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <size key="intercellSpacing" width="3" height="2"/>
+                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                        <tableColumns>
+                                            <tableColumn identifier="Hostname" width="250" minWidth="40" maxWidth="1000" id="HWL-col-001">
+                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Hostname">
+                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                                </tableHeaderCell>
+                                                <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" id="HWL-cel-001">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            </tableColumn>
+                                        </tableColumns>
+                                        <connections>
+                                            <binding destination="365" name="enabled" keyPath="values.RPC" id="HWL-bnd-en2"/>
+                                            <binding destination="365" name="enabled2" keyPath="values.RPCUseHostWhitelist" previousBinding="HWL-bnd-en2" id="HWL-bnd-en3">
+                                                <dictionary key="options">
+                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                    <integer key="NSNullPlaceholder" value="-1"/>
+                                                </dictionary>
+                                            </binding>
+                                            <outlet property="dataSource" destination="-2" id="HWL-out-ds1"/>
+                                            <outlet property="delegate" destination="-2" id="HWL-out-dl1"/>
+                                        </connections>
+                                    </tableView>
+                                </subviews>
+                            </clipView>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="308" placeholder="YES" id="HWL-cns-wid"/>
+                                <constraint firstAttribute="height" constant="88" id="HWL-cns-hgt"/>
+                            </constraints>
+                            <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="HWL-hsc-001">
+                                <rect key="frame" x="-100" y="-100" width="327" height="15"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                            </scroller>
+                            <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="HWL-vsc-001">
+                                <rect key="frame" x="291" y="1" width="16" height="86"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                            </scroller>
+                        </scrollView>
+                        <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HWL-seg-ctl">
+                            <rect key="frame" x="59" y="23" width="71" height="20"/>
+                            <segmentedCell key="cell" state="on" borderStyle="border" alignment="left" style="roundRect" trackingMode="momentary" id="HWL-seg-cel">
+                                <font key="font" metaFont="cellTitle"/>
+                                <segments>
+                                    <segment image="NSAddTemplate" width="32"/>
+                                    <segment image="NSRemoveTemplate" width="32" enabled="NO" tag="1"/>
+                                </segments>
+                            </segmentedCell>
+                            <connections>
+                                <action selector="addRemoveRPCHost:" target="-2" id="HWL-act-seg"/>
+                                <binding destination="365" name="enabled" keyPath="values.RPC" id="HWL-bnd-en4"/>
+                                <binding destination="365" name="enabled2" keyPath="values.RPCUseHostWhitelist" previousBinding="HWL-bnd-en4" id="HWL-bnd-en5">
+                                    <dictionary key="options">
+                                        <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                        <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                        <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                        <integer key="NSNullPlaceholder" value="-1"/>
+                                    </dictionary>
+                                </binding>
+                            </connections>
+                        </segmentedControl>
+                        <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HWL-hnt-txt">
+                            <rect key="frame" x="132" y="26" width="193" height="14"/>
+                            <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="e.g. download.internal" id="HWL-hnt-cel">
+                                <font key="font" metaFont="smallSystem"/>
+                                <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
                         <button horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1825">
                             <rect key="frame" x="38" y="-1" width="259" height="18"/>
                             <buttonCell key="cell" type="check" title="Display the web interface with Bonjour" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1826">
@@ -2619,7 +2718,18 @@
                         <constraint firstItem="1552" firstAttribute="leading" secondItem="1556" secondAttribute="trailing" constant="8" symbolic="YES" id="IyC-sD-IYd"/>
                         <constraint firstAttribute="width" priority="750" constant="366" id="Jmg-mL-ah5"/>
                         <constraint firstItem="1717" firstAttribute="top" secondItem="1644" secondAttribute="bottom" constant="20" symbolic="YES" id="LMj-EI-y8s"/>
-                        <constraint firstItem="1825" firstAttribute="top" secondItem="1534" secondAttribute="bottom" constant="8" symbolic="YES" id="MtV-dQ-wju"/>
+                        <constraint firstItem="HWL-chk-box" firstAttribute="top" secondItem="1534" secondAttribute="bottom" constant="22" id="MtV-dQ-wju"/>
+                        <constraint firstItem="HWL-scr-vw1" firstAttribute="top" secondItem="HWL-chk-box" secondAttribute="bottom" constant="5" id="HWL-cns-001"/>
+                        <constraint firstItem="HWL-scr-vw1" firstAttribute="leading" secondItem="HWL-chk-box" secondAttribute="leading" constant="20" id="HWL-cns-002"/>
+                        <constraint firstAttribute="trailing" secondItem="HWL-scr-vw1" secondAttribute="trailing" constant="20" symbolic="YES" id="HWL-cns-003"/>
+                        <constraint firstItem="HWL-seg-ctl" firstAttribute="top" secondItem="HWL-scr-vw1" secondAttribute="bottom" constant="5" id="HWL-cns-004"/>
+                        <constraint firstItem="HWL-seg-ctl" firstAttribute="leading" secondItem="HWL-scr-vw1" secondAttribute="leading" id="HWL-cns-005"/>
+                        <constraint firstItem="HWL-hnt-txt" firstAttribute="leading" secondItem="HWL-seg-ctl" secondAttribute="trailing" constant="5" id="HWL-cns-006"/>
+                        <constraint firstItem="HWL-hnt-txt" firstAttribute="centerY" secondItem="HWL-seg-ctl" secondAttribute="centerY" id="HWL-cns-007"/>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="HWL-hnt-txt" secondAttribute="trailing" constant="20" symbolic="YES" id="HWL-cns-008"/>
+                        <constraint firstItem="HWL-chk-box" firstAttribute="leading" secondItem="1644" secondAttribute="leading" id="HWL-cns-009"/>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="HWL-chk-box" secondAttribute="trailing" constant="20" id="HWL-cns-010"/>
+                        <constraint firstItem="1825" firstAttribute="top" secondItem="HWL-seg-ctl" secondAttribute="bottom" constant="8" symbolic="YES" id="HWL-cns-011"/>
                         <constraint firstItem="1552" firstAttribute="centerY" secondItem="1556" secondAttribute="centerY" id="Mvm-TY-lm2"/>
                         <constraint firstItem="1554" firstAttribute="width" secondItem="1556" secondAttribute="width" id="NXT-pa-uAs"/>
                         <constraint firstItem="1554" firstAttribute="trailing" secondItem="1556" secondAttribute="trailing" id="PN7-nl-5ba"/>

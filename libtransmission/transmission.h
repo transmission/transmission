@@ -267,6 +267,11 @@ void tr_sessionSetRPCWhitelist(tr_session* session, std::string_view whitelist);
 bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session);
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool is_enabled);
 
+[[nodiscard]] std::string tr_sessionGetRPCHostWhitelist(tr_session const* session);
+void tr_sessionSetRPCHostWhitelist(tr_session* session, std::string_view whitelist);
+bool tr_sessionGetRPCHostWhitelistEnabled(tr_session const* session);
+void tr_sessionSetRPCHostWhitelistEnabled(tr_session* session, bool enabled);
+
 // TODO(ckerr): rename function to indicate it returns the salted value
 /** @brief get the salted version of the password used to restrict RPC requests.
     @return the password string.
