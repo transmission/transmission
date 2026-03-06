@@ -35,6 +35,8 @@ public:
     // load multiple files.
     bool parse_torrent_file(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error* error = nullptr);
 
+    void rename_path(std::string_view base, std::string_view oldpath, std::string_view newname, tr_error* error = nullptr);
+
     // FILES
 
     [[nodiscard]] constexpr auto const& files() const noexcept
