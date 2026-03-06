@@ -174,14 +174,11 @@ TEST_F(RpcTest, idSync)
         case tr_variant::DoubleIndex:
             EXPECT_EQ(request_id.value_if<double>(), response_map->value_if<double>(TR_KEY_id));
             break;
-        case tr_variant::StringIndex:
-        case tr_variant::StringViewIndex:
-            EXPECT_EQ(request_id.value_if<std::string_view>(), response_map->value_if<std::string_view>(TR_KEY_id));
-            break;
         case tr_variant::NullIndex:
             EXPECT_EQ(request_id.value_if<std::nullptr_t>(), response_map->value_if<std::nullptr_t>(TR_KEY_id));
             break;
         default:
+            EXPECT_EQ(request_id.value_if<std::string_view>(), response_map->value_if<std::string_view>(TR_KEY_id));
             break;
         }
     }
@@ -290,14 +287,11 @@ TEST_F(RpcTest, idAsync)
         case tr_variant::DoubleIndex:
             EXPECT_EQ(request_id.value_if<double>(), response_map->value_if<double>(TR_KEY_id));
             break;
-        case tr_variant::StringIndex:
-        case tr_variant::StringViewIndex:
-            EXPECT_EQ(request_id.value_if<std::string_view>(), response_map->value_if<std::string_view>(TR_KEY_id));
-            break;
         case tr_variant::NullIndex:
             EXPECT_EQ(request_id.value_if<std::nullptr_t>(), response_map->value_if<std::nullptr_t>(TR_KEY_id));
             break;
         default:
+            EXPECT_EQ(request_id.value_if<std::string_view>(), response_map->value_if<std::string_view>(TR_KEY_id));
             break;
         }
 

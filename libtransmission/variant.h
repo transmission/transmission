@@ -446,8 +446,7 @@ template<>
         }
         break;
 
-    case StringIndex:
-    case StringViewIndex:
+    default:
         if (auto const val = value_if<std::string_view>(); val == "true")
         {
             return true;
@@ -456,9 +455,6 @@ template<>
         {
             return false;
         }
-        break;
-
-    default:
         break;
     }
 

@@ -95,15 +95,11 @@ template<>
     case IntIndex:
         return static_cast<double>(*get_if<IntIndex>());
 
-    case StringIndex:
-    case StringViewIndex:
+    default:
         if (auto const sv = value_if<std::string_view>())
         {
             return tr_num_parse<double>(*sv);
         }
-        break;
-
-    default:
         break;
     }
 
