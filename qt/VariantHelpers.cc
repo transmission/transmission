@@ -195,7 +195,6 @@ bool change(TrackerStat& setme, tr_variant const* value)
             }
         }
 
-        setme.announce = trApp->intern(setme.announce);
         trApp->load_favicon(setme.announce);
     }
 
