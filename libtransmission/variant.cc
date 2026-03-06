@@ -88,7 +88,7 @@ template<typename T>
 // but aren't because https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282
 
 template<>
-[[nodiscard]] std::optional<int64_t> tr_variant::value_if() noexcept
+[[nodiscard]] std::optional<int64_t> tr_variant::value_if() const noexcept
 {
     switch (index())
     {
@@ -104,7 +104,7 @@ template<>
 }
 
 template<>
-[[nodiscard]] std::optional<bool> tr_variant::value_if() noexcept
+[[nodiscard]] std::optional<bool> tr_variant::value_if() const noexcept
 {
     switch (index())
     {
@@ -138,7 +138,7 @@ template<>
 }
 
 template<>
-[[nodiscard]] std::optional<double> tr_variant::value_if() noexcept
+[[nodiscard]] std::optional<double> tr_variant::value_if() const noexcept
 {
     switch (index())
     {
@@ -164,7 +164,7 @@ template<>
 }
 
 template<>
-[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() noexcept
+[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() const noexcept
 {
     switch (index())
     {
