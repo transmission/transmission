@@ -7,6 +7,7 @@
 #include <cerrno>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <limits>
 #include <map>
 #include <string>
 #include <string_view>
@@ -97,6 +98,53 @@ TEST_F(VariantTest, getType)
     sv = v.value_if<std::string_view>();
     ASSERT_TRUE(sv);
     EXPECT_EQ(strkey, *sv);
+}
+
+template<typename T>
+using VariantIntTest = ::testing::Test;
+using TestTypes = ::testing::Types<int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t>;
+TYPED_TEST_SUITE(VariantIntTest, TestTypes);
+
+TYPED_TEST(VariantIntTest, getIntTypes)
+{
+    auto v = tr_variant{};
+    auto const test = [&v](auto const expected)
+    {
+        v = expected;
+        if (std::cmp_greater_equal(expected, std::numeric_limits<TypeParam>::lowest()) &&
+            std::cmp_less_equal(expected, std::numeric_limits<TypeParam>::max()))
+        {
+            EXPECT_EQ(expected, v.value_if<TypeParam>());
+        }
+        else
+        {
+            EXPECT_EQ(std::nullopt, v.value_if<TypeParam>());
+        }
+    };
+
+    test(0);
+    test(-1);
+    test(30);
+    test(std::numeric_limits<int8_t>::lowest());
+    test(std::numeric_limits<int8_t>::lowest() - int16_t{ 1 });
+    test(std::numeric_limits<int8_t>::max());
+    test(std::numeric_limits<int8_t>::max() + int16_t{ 1 });
+    test(std::numeric_limits<int16_t>::lowest());
+    test(std::numeric_limits<int16_t>::lowest() - int32_t{ 1 });
+    test(std::numeric_limits<int16_t>::max());
+    test(std::numeric_limits<int16_t>::max() + int32_t{ 1 });
+    test(std::numeric_limits<int32_t>::lowest());
+    test(std::numeric_limits<int32_t>::lowest() - int64_t{ 1 });
+    test(std::numeric_limits<int32_t>::max());
+    test(std::numeric_limits<int32_t>::max() + int64_t{ 1 });
+    test(std::numeric_limits<int64_t>::lowest());
+    test(std::numeric_limits<int64_t>::max());
+    test(std::numeric_limits<uint8_t>::max());
+    test(std::numeric_limits<uint8_t>::max() + uint16_t{ 1 });
+    test(std::numeric_limits<uint16_t>::max());
+    test(std::numeric_limits<uint16_t>::max() + uint32_t{ 1 });
+    test(std::numeric_limits<uint32_t>::max());
+    test(std::numeric_limits<uint32_t>::max() + uint64_t{ 1 });
 }
 
 TEST_F(VariantTest, mergeStringsTakesOwnership)
