@@ -400,6 +400,22 @@ private:
 // but aren't because https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282
 
 template<>
+[[nodiscard]] constexpr std::optional<std::string_view> tr_variant::value_if() const noexcept
+{
+    switch (index())
+    {
+    case StringIndex:
+        return *std::get_if<std::string>(&val_);
+
+    case StringViewIndex:
+        return *std::get_if<std::string_view>(&val_);
+
+    default:
+        return {};
+    }
+}
+
+template<>
 [[nodiscard]] constexpr std::optional<int64_t> tr_variant::value_if() const noexcept
 {
     switch (index())
@@ -451,8 +467,6 @@ template<>
 
 template<>
 [[nodiscard]] std::optional<double> tr_variant::value_if() const noexcept;
-template<>
-[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() const noexcept;
 
 template<std::integral Val>
 [[nodiscard]] constexpr std::optional<Val> tr_variant::value_if() const noexcept

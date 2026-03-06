@@ -110,22 +110,6 @@ template<>
     return {};
 }
 
-template<>
-[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() const noexcept
-{
-    switch (index())
-    {
-    case StringIndex:
-        return *std::get_if<std::string>(&val_);
-
-    case StringViewIndex:
-        return *std::get_if<std::string_view>(&val_);
-
-    default:
-        return {};
-    }
-}
-
 // ---
 
 tr_variant tr_variant::clone() const
