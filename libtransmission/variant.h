@@ -416,7 +416,39 @@ template<>
 }
 
 template<>
-[[nodiscard]] std::optional<bool> tr_variant::value_if() const noexcept;
+[[nodiscard]] constexpr std::optional<bool> tr_variant::value_if() const noexcept
+{
+    switch (index())
+    {
+    case BoolIndex:
+        return *get_if<BoolIndex>();
+
+    case IntIndex:
+        if (auto const val = *get_if<IntIndex>(); val == 0 || val == 1)
+        {
+            return val != 0;
+        }
+        break;
+
+    case StringIndex:
+    case StringViewIndex:
+        if (auto const val = value_if<std::string_view>(); val == "true")
+        {
+            return true;
+        }
+        else if (val == "false")
+        {
+            return false;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return {};
+}
+
 template<>
 [[nodiscard]] std::optional<double> tr_variant::value_if() const noexcept;
 template<>
