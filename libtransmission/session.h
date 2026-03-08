@@ -813,9 +813,6 @@ public:
         return open_files_;
     }
 
-    void close_torrent_files(tr_torrent_id_t tor_id) noexcept;
-    void close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept;
-
     // announce ip
 
     [[nodiscard]] constexpr std::string const& announceIP() const noexcept
@@ -1470,8 +1467,8 @@ private:
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
 public:
-    // depends-on: torrents_, open_files_ (indirectly via inout calls to tr_session::openFiles())
-    tr::LocalData local_data{ torrents_ };
+    // depends-on: open_files_, torrents_
+    tr::LocalData local_data{ open_files_, torrents_ };
 
 private:
     // depends-on: timer_maker_, blocklists_, top_bandwidth_, utp_context, torrents_, web_

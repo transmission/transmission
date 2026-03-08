@@ -697,7 +697,7 @@ void tr_torrent::stop_now()
     stopped_(this);
     session->announcer_->stopTorrent(this);
 
-    session->close_torrent_files(id());
+    session->local_data.close_torrent(id());
 
     if (!is_deleting_)
     {
@@ -707,6 +707,7 @@ void tr_torrent::stop_now()
     set_is_queued(false);
 }
 
+// FIXME: this needs to be moved into session->local_data()
 // By-value: arguments are moved into the session-thread work item.
 void tr_torrentRemoveInSessionThread(
     tr_torrent* tor,
@@ -718,7 +719,7 @@ void tr_torrentRemoveInSessionThread(
     if (delete_flag && tor->has_metainfo())
     {
         // ensure the files are all closed and idle before moving
-        tor->session->close_torrent_files(tor->id());
+        tor->session->local_data.close_torrent(tor->id());
         tor->session->verify_remove(tor);
 
         if (!remove_func)
@@ -1070,6 +1071,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 
 // --- Location
 
+// FIXME: this needs to be moved into session->local_data()
 void tr_torrent::set_location_in_session_thread(std::string_view const path, bool move_from_old_path, int volatile* setme_state)
 {
     TR_ASSERT(session->am_in_session_thread());
@@ -1083,7 +1085,7 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
         }
 
         // ensure the files are all closed and idle before moving
-        session->close_torrent_files(id());
+        session->local_data.close_torrent(id());
         session->verify_remove(this);
 
         auto error = tr_error{};
@@ -1833,7 +1835,7 @@ void tr_torrent::recheck_completeness()
 
         if (is_done())
         {
-            session->close_torrent_files(id());
+            session->local_data.close_torrent(id());
 
             if (recent_change)
             {
@@ -1991,15 +1993,6 @@ void tr_torrent::set_file_priorities(tr_file_index_t const* files, tr_file_index
 
 // ---
 
-bool tr_torrent::check_piece(tr_piece_index_t const piece) const
-{
-    auto const pass = tr_ioTestPiece(*this, piece);
-    tr_logAddTraceTor(this, fmt::format("[LAZY] tr_torrent.checkPiece tested piece {}, pass=={}", piece, pass));
-    return pass;
-}
-
-// ---
-
 bool tr_torrent::set_announce_list(std::string_view announce_list_str)
 {
     auto ann = tr_announce_list{};
@@ -2151,19 +2144,19 @@ std::string_view tr_torrent::primary_mime_type() const
 
 // ---
 
-void tr_torrent::on_file_completed(tr_file_index_t const file)
+void tr_torrent::on_file_completed(tr_file_index_t const file_num)
 {
     /* close the file so that we can reopen in read-only mode as needed */
-    session->close_torrent_file(*this, file);
+    session->local_data.close_file(id(), file_num);
 
     /* now that the file is complete and closed, we can start watching its
      * mtime timestamp for changes to know if we need to reverify pieces */
-    file_mtimes_[file] = tr_time();
+    file_mtimes_[file_num] = tr_time();
 
     /* if the torrent's current filename isn't the same as the one in the
      * metadata -- for example, if it had the ".part" suffix appended to
      * it until now -- then rename it to match the one in the metadata */
-    update_file_path(file, true);
+    update_file_path(file_num, true);
 }
 
 void tr_torrent::on_piece_completed(tr_piece_index_t const piece)

@@ -92,8 +92,9 @@ namespace
 class DefaultBackend final : public LocalData::Backend
 {
 public:
-    explicit DefaultBackend(tr_torrents const& torrents)
-        : torrents_{ torrents }
+    DefaultBackend(tr_open_files& open_files, tr_torrents const& torrents)
+        : open_files_{ open_files }
+        , torrents_{ torrents }
     {
     }
 
@@ -162,16 +163,14 @@ public:
         return tr_ioWrite(*tor, loc, len, std::data(data));
     }
 
-    [[nodiscard]] int close(tr_torrent_id_t const id) override
+    void close_torrent(tr_torrent_id_t const tor_id) override
     {
-        auto* const tor = torrents_.get(id);
-        if (tor == nullptr || tor->session == nullptr)
-        {
-            return EINVAL;
-        }
+        open_files_.close_torrent(tor_id);
+    }
 
-        tor->session->close_torrent_files(id);
-        return 0;
+    void close_file(tr_torrent_id_t const tor_id, tr_file_index_t const file_num) override
+    {
+        open_files_.close_file(tor_id, file_num);
     }
 
     [[nodiscard]] int move(
@@ -238,6 +237,7 @@ public:
     }
 
 private:
+    tr_open_files& open_files_;
     tr_torrents const& torrents_;
 };
 } // namespace
@@ -250,7 +250,8 @@ private:
         Read,
         Test,
         Write,
-        Close,
+        CloseFile,
+        CloseTorrent,
         Move,
         Remove,
         Rename
@@ -375,86 +376,104 @@ public:
         enqueue(std::move(task));
     }
 
-    void close(tr_torrent_id_t id)
+    void close_torrent(tr_torrent_id_t const tor_id)
     {
         auto task = Task{};
-        task.id = id;
-        task.op = Op::Close;
-        task.run = [this, id]()
+        task.id = tor_id;
+        task.op = Op::CloseTorrent;
+        task.run = [this, tor_id]()
         {
-            static_cast<void>(backend_->close(id));
+            backend_->close_torrent(tor_id);
         };
 
         enqueue(std::move(task));
     }
 
-    void rename(tr_torrent_id_t id, std::string_view oldpath, std::string_view newname, tr_torrent_rename_done_func callback)
+    void close_file(tr_torrent_id_t const tor_id, tr_file_index_t const file_num)
+    {
+        auto task = Task{};
+        task.id = tor_id;
+        task.op = Op::CloseFile;
+        task.run = [this, tor_id, file_num]()
+        {
+            backend_->close_file(tor_id, file_num);
+        };
+
+        enqueue(std::move(task));
+    }
+
+    void rename(
+        tr_torrent_id_t const tor_id,
+        std::string_view oldpath,
+        std::string_view newname,
+        tr_torrent_rename_done_func callback)
     {
         auto oldpath_buf = std::string{ oldpath };
         auto newname_buf = std::string{ newname };
         auto callback_ptr = std::make_shared<tr_torrent_rename_done_func>(std::move(callback));
 
         auto task = Task{};
-        task.id = id;
+        task.id = tor_id;
         task.op = Op::Rename;
-        task.run = [this, id, oldpath = oldpath_buf, newname = newname_buf, callback = callback_ptr]() mutable
+        task.run = [this, tor_id, oldpath = oldpath_buf, newname = newname_buf, callback = callback_ptr]() mutable
         {
-            static_cast<void>(backend_->close(id));
-            auto const err = backend_->rename(id, oldpath, newname);
+            backend_->close_torrent(tor_id);
+
+            auto const err = backend_->rename(tor_id, oldpath, newname);
             if (*callback != nullptr)
             {
-                (*callback)(id, oldpath, newname, make_error(err));
+                (*callback)(tor_id, oldpath, newname, make_error(err));
             }
         };
-        task.cancel = [id,
+        task.cancel = [tor_id,
                        oldpath = std::move(oldpath_buf),
                        newname = std::move(newname_buf),
                        callback = std::move(callback_ptr)]() mutable
         {
             if (*callback != nullptr)
             {
-                (*callback)(id, oldpath, newname, make_error(ECANCELED));
+                (*callback)(tor_id, oldpath, newname, make_error(ECANCELED));
             }
         };
 
         enqueue(std::move(task));
     }
 
-    void move(tr_torrent_id_t id, std::string_view old_parent, std::string_view parent, std::string_view parent_name)
+    void move(tr_torrent_id_t const tor_id, std::string_view old_parent, std::string_view parent, std::string_view parent_name)
     {
         auto task = Task{};
-        task.id = id;
+        task.id = tor_id;
         task.op = Op::Move;
         task.run = [this,
-                    id,
+                    tor_id,
                     old_parent = std::string{ old_parent },
                     parent = std::string{ parent },
                     parent_name = std::string{ parent_name }]()
         {
-            static_cast<void>(backend_->close(id));
-            static_cast<void>(backend_->move(id, old_parent, parent, parent_name));
+            backend_->close_torrent(tor_id);
+            static_cast<void>(backend_->move(tor_id, old_parent, parent, parent_name));
         };
 
         enqueue(std::move(task));
     }
 
-    void remove(tr_torrent_id_t id, tr_torrent_remove_func remove_func)
+    void remove(tr_torrent_id_t const tor_id, tr_torrent_remove_func remove_func)
     {
         auto canceled_callbacks = std::vector<std::function<void()>>{};
 
         auto task = Task{};
-        task.id = id;
+        task.id = tor_id;
         task.op = Op::Remove;
-        task.run = [this, id, remove_func = std::move(remove_func)]() mutable
+        task.run = [this, tor_id, remove_func = std::move(remove_func)]() mutable
         {
-            static_cast<void>(backend_->close(id));
-            static_cast<void>(backend_->remove(id, std::move(remove_func)));
+            backend_->close_torrent(tor_id);
+            static_cast<void>(backend_->remove(tor_id, std::move(remove_func)));
         };
 
         {
             auto const lock = std::lock_guard(mutex_);
 
-            auto& queue = queues_[id];
+            auto& queue = queues_[tor_id];
             auto it = std::begin(queue);
             while (it != std::end(queue))
             {
@@ -488,7 +507,7 @@ public:
             queue.emplace_back(std::move(task));
             if (was_empty)
             {
-                runnable_ids_.push_back(id);
+                runnable_ids_.push_back(tor_id);
             }
         }
 
@@ -727,8 +746,8 @@ private:
     bool stopping_workers_ = false;
 };
 
-LocalData::LocalData(tr_torrents const& torrents, size_t worker_count)
-    : impl_{ std::make_unique<Impl>(std::make_unique<DefaultBackend>(torrents), worker_count) }
+LocalData::LocalData(tr_open_files& open_files, tr_torrents const& torrents, size_t worker_count)
+    : impl_{ std::make_unique<Impl>(std::make_unique<DefaultBackend>(open_files, torrents), worker_count) }
 {
 }
 
@@ -758,9 +777,14 @@ void LocalData::write(
     impl_->write(id, byte_span, std::move(data), std::move(on_write));
 }
 
-void LocalData::close(tr_torrent_id_t const id)
+void LocalData::close_torrent(tr_torrent_id_t const tor_id)
 {
-    impl_->close(id);
+    impl_->close_torrent(tor_id);
+}
+
+void LocalData::close_file(tr_torrent_id_t const tor_id, tr_file_index_t const file_num)
+{
+    impl_->close_file(tor_id, file_num);
 }
 
 void LocalData::rename(

@@ -20,7 +20,7 @@
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
-#include "libtransmission/inout.h"
+#include "libtransmission/local-data.h"
 #include "libtransmission/peer-common.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/session.h"
@@ -369,10 +369,13 @@ void tr_webseed_task::use_fetched_blocks()
     auto const lock = session_->unique_lock();
 
     auto const& tor = webseed_->tor;
+    auto const& block_info = tor.block_info();
 
     for (;;)
     {
-        auto const block_size = tor.block_size(loc_.block);
+        auto const block = loc_.block;
+        auto const byte_span = block_info.byte_span_for_block(block);
+        auto const block_size = byte_span.size();
         if (std::size(content_) < block_size)
         {
             break;
@@ -384,22 +387,22 @@ void tr_webseed_task::use_fetched_blocks()
         }
         else
         {
-            auto block_buf = std::vector<uint8_t>{};
-            block_buf.resize(block_size);
-            content_.to_buf(block_buf);
-
+            auto event = tr_peer_event::GotBlock(block_info, block);
+            auto block_data = std::make_shared<tr::LocalData::BlockData>(block_size);
+            content_.to_buf(std::data(*block_data), std::size(*block_data));
             session_->run_in_session_thread(
-                [buf = std::move(block_buf), loc = loc_, session = session_, tor_id = tor.id(), webseed = webseed_]()
+                [session = session_, tor_id = tor.id(), block, byte_span, block_data = std::move(block_data), event, webseed = webseed_]()
                 {
-                    if (auto* const torrent = session->torrents().get(tor_id))
+                    webseed->active_requests.unset(block);
+                    auto on_written = [event, webseed](tr_torrent_id_t, tr_byte_span_t, tr_error const&)
                     {
-                        webseed->active_requests.unset(loc.block);
-                        if (tr_ioWrite(*torrent, loc, buf) != 0)
-                        {
-                            return;
-                        }
-                        webseed->publish(tr_peer_event::GotBlock(torrent->block_info(), loc.block));
-                    }
+                        webseed->publish(event);
+                    };
+                    session->local_data.write(
+                        tor_id,
+                        byte_span,
+                        std::make_unique<tr::LocalData::BlockData>(std::move(*block_data)),
+                        std::move(on_written));
                 });
         }
 

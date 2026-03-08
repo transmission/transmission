@@ -30,7 +30,4 @@ struct tr_torrent;
  */
 [[nodiscard]] tr_error_code_t tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, std::span<uint8_t const> writeme);
 
-/**
- * @brief Test to see if the piece matches its metainfo's SHA1 checksum.
- */
-[[nodiscard]] bool tr_ioTestPiece(tr_torrent const& tor, tr_piece_index_t piece);
+/* @} */
