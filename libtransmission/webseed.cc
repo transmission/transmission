@@ -391,7 +391,13 @@ void tr_webseed_task::use_fetched_blocks()
             auto block_data = std::make_shared<tr::LocalData::BlockData>(block_size);
             content_.to_buf(std::data(*block_data), std::size(*block_data));
             session_->run_in_session_thread(
-                [session = session_, tor_id = tor.id(), block, byte_span, block_data = std::move(block_data), event, webseed = webseed_]()
+                [session = session_,
+                 tor_id = tor.id(),
+                 block,
+                 byte_span,
+                 block_data = std::move(block_data),
+                 event,
+                 webseed = webseed_]()
                 {
                     webseed->active_requests.unset(block);
                     auto on_written = [event, webseed](tr_torrent_id_t, tr_byte_span_t, tr_error const&)

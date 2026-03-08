@@ -15,6 +15,7 @@
 
 #include <libtransmission/block-info.h>
 #include <libtransmission/file.h> // tr_sys_path_*()
+#include <libtransmission/local-data.h>
 #include <libtransmission/inout.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/torrent-files.h>
@@ -82,14 +83,14 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_torrent* tor = {};
         tr_block_index_t block = {};
         tr_piece_index_t pieceIndex = {};
-        std::vector<uint8_t> buf;
+        std::unique_ptr<tr::LocalData::BlockData> buf;
         bool done = {};
     };
 
     auto const test_incomplete_dir_threadfunc = [](TestIncompleteDirData* data) noexcept
     {
         auto& tor = *data->tor;
-        if (tr_ioWrite(tor, tor.block_loc(data->block), data->buf) == 0)
+        if (tr_ioWrite(tor, tor.block_loc(data->block), *data->buf) == 0)
         {
             data->tor->on_block_received(data->block);
         }
@@ -107,8 +108,8 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
         for (tr_block_index_t block_index = begin; block_index < end; ++block_index)
         {
-            data.buf.resize(tr_block_info::BlockSize);
-            std::ranges::fill(data.buf, '\0');
+            data.buf = std::make_unique<tr::LocalData::BlockData>(tr_block_info::BlockSize);
+            std::fill_n(std::data(*data.buf), tr_block_info::BlockSize, '\0');
             data.block = block_index;
             data.done = false;
             session_->run_in_session_thread(test_incomplete_dir_threadfunc, &data);
