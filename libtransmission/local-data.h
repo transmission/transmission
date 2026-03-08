@@ -48,7 +48,7 @@ public:
         virtual ~Backend() = default;
 
         [[nodiscard]] virtual int read(tr_torrent_id_t tor_id, tr_byte_span_t byte_span, BlockData& setme) = 0;
-        [[nodiscard]] virtual int testPiece(tr_torrent_id_t tor_id, tr_piece_index_t piece, tr_sha1_digest_t& setme_hash) = 0;
+        [[nodiscard]] virtual int test_piece(tr_torrent_id_t tor_id, tr_piece_index_t piece, tr_sha1_digest_t& setme_hash) = 0;
         [[nodiscard]] virtual int write(tr_torrent_id_t tor_id, tr_byte_span_t byte_span, BlockData const& data) = 0;
         [[nodiscard]] virtual int move(
             tr_torrent_id_t id,
@@ -75,7 +75,7 @@ public:
     void read(tr_torrent_id_t, tr_byte_span_t byte_span, OnRead on_read);
 
     // Read a piece and return its SHA1 checksum.
-    void testPiece(tr_torrent_id_t, tr_piece_index_t piece, OnTest on_test);
+    void test_piece(tr_torrent_id_t, tr_piece_index_t piece, OnTest on_test);
 
     // Write a block
     void write(tr_torrent_id_t, tr_byte_span_t byte_span, std::unique_ptr<BlockData> data, OnWrite on_write);

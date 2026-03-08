@@ -122,7 +122,7 @@ public:
         return tr_ioRead(*tor, loc, len, std::data(setme));
     }
 
-    [[nodiscard]] int testPiece(tr_torrent_id_t const id, tr_piece_index_t const piece, tr_sha1_digest_t& setme_hash) override
+    [[nodiscard]] int test_piece(tr_torrent_id_t const id, tr_piece_index_t const piece, tr_sha1_digest_t& setme_hash) override
     {
         auto const* const tor = torrents_.get(id);
         if (tor == nullptr || piece >= tor->piece_count())
@@ -317,7 +317,7 @@ public:
         enqueue(std::move(task));
     }
 
-    void testPiece(tr_torrent_id_t id, tr_piece_index_t piece, OnTest on_test)
+    void test_piece(tr_torrent_id_t id, tr_piece_index_t piece, OnTest on_test)
     {
         auto callback = std::make_shared<OnTest>(std::move(on_test));
 
@@ -327,7 +327,7 @@ public:
         task.run = [this, id, piece, callback = callback]() mutable
         {
             auto hash = tr_sha1_digest_t{};
-            auto const err = backend_->testPiece(id, piece, hash);
+            auto const err = backend_->test_piece(id, piece, hash);
             (*callback)(id, piece, make_error(err), err == 0 ? std::optional<tr_sha1_digest_t>{ hash } : std::nullopt);
         };
         task.cancel = [id, piece, callback = std::move(callback)]() mutable
@@ -763,9 +763,9 @@ void LocalData::read(tr_torrent_id_t const id, tr_byte_span_t const byte_span, O
     impl_->read(id, byte_span, std::move(on_read));
 }
 
-void LocalData::testPiece(tr_torrent_id_t const id, tr_piece_index_t const piece, OnTest on_test)
+void LocalData::test_piece(tr_torrent_id_t const id, tr_piece_index_t const piece, OnTest on_test)
 {
-    impl_->testPiece(id, piece, std::move(on_test));
+    impl_->test_piece(id, piece, std::move(on_test));
 }
 
 void LocalData::write(
