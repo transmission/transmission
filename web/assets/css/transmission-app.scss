@@ -97,7 +97,7 @@
     --color-border-default: var(--default-border-dark);
     --color-border-stark: var(--dark-mode-white);
     --color-border-starkest: var(--grey-500);
-    --color-fg-disabled: var(--grey);
+    --color-fg-disabled: var(--nice-grey);
     --color-fg-on-popup: var(--nice-grey);
     --color-fg-primary: var(--dark-mode-white);
     --color-fg-secondary: var(--nice-grey);
@@ -160,7 +160,7 @@
     --color-border-stark: var(--grey-500);
     --color-border-starkest: #d0d7de;
     --color-dialog-border: var(--nice-grey);
-    --color-fg-disabled: var(--grey);
+    --color-fg-disabled: var(--grey-500);
     --color-fg-error: var(--red-500);
     --color-fg-on-popup: var(--grey-900);
     --color-fg-port-closed: var(--red-500);
@@ -796,8 +796,8 @@ a {
     &::before {
       clip-path: polygon(
         0 0,
-        var(--progress, 30%) 0,
-        var(--progress, 30%) 100%,
+          var(--progress, 30%) 0,
+          var(--progress, 30%) 100%,
         0 100%
       );
     }
@@ -805,8 +805,8 @@ a {
     &::after {
       clip-path: polygon(
         var(--progress, 30%) 0,
-        100% 0,
-        100% 100%,
+          100% 0,
+          100% 100%,
         var(--progress, 30%) 100%
       );
     }
@@ -1785,3 +1785,4 @@ dialog {
   outline: 0;
   counter-reset: clusterize-counter;
 }
+
