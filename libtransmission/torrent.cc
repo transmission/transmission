@@ -831,8 +831,7 @@ bool tr_torrent::is_new_torrent_a_seed()
         }
     }
 
-    // check the first piece
-    return ensure_piece_is_checked(0);
+    return true;
 }
 
 void tr_torrent::on_metainfo_updated()
@@ -2189,7 +2188,7 @@ void tr_torrent::on_piece_failed(tr_piece_index_t const piece)
 
 void tr_torrent::on_block_received(tr_block_index_t const block)
 {
-    TR_ASSERT(session->am_in_session_thread());
+    TR_ASSERT(this->session->am_in_session_thread());
 
     if (has_block(block))
     {
@@ -2202,23 +2201,37 @@ void tr_torrent::on_block_received(tr_block_index_t const block)
 
     completion_.add_block(block);
 
+    auto const on_tested = [session = this->session](
+                               tr_torrent_id_t tor_id,
+                               tr_piece_index_t piece,
+                               tr_error const& error,
+                               std::optional<tr_sha1_digest_t> hash)
+    {
+        session->run_in_session_thread(
+            [session, tor_id, piece, error, hash = std::move(hash)]()
+            {
+                if (auto* const tor = session->torrents().get(tor_id))
+                {
+                    if (hash == tor->piece_hash(piece))
+                    {
+                        tor->on_piece_completed(piece);
+                    }
+                    else
+                    {
+                        tor->on_piece_failed(piece);
+                    }
+                }
+            });
+    };
+
     auto const block_loc = this->block_loc(block);
     auto const first_piece = block_loc.piece;
     auto const last_piece = byte_loc(block_loc.byte + block_size(block) - 1).piece;
     for (auto piece = first_piece; piece <= last_piece; ++piece)
     {
-        if (!has_piece(piece))
+        if (has_piece(piece))
         {
-            continue;
-        }
-
-        if (check_piece(piece))
-        {
-            on_piece_completed(piece);
-        }
-        else
-        {
-            on_piece_failed(piece);
+            session->local_data.test_piece(id(), piece, on_tested);
         }
     }
 }
@@ -2527,21 +2540,11 @@ void tr_torrent::mark_changed()
     this->bump_date_changed(tr_time());
 }
 
-[[nodiscard]] bool tr_torrent::ensure_piece_is_checked(tr_piece_index_t piece)
+void tr_torrent::set_piece_is_checked(tr_piece_index_t const piece, bool const passed)
 {
-    TR_ASSERT(piece < this->piece_count());
-
-    if (is_piece_checked(piece))
-    {
-        return true;
-    }
-
-    bool const checked = check_piece(piece);
     mark_changed();
     set_dirty();
-
-    checked_pieces_.set(piece, checked);
-    return checked;
+    checked_pieces_.set(piece, passed);
 }
 
 // --- RESUME HELPER

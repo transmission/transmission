@@ -603,51 +603,93 @@ private:
 
     void schedule_peer_request_read(peer_request const& req)
     {
-        auto token = uint64_t{ 0 };
-        auto data = std::shared_ptr<tr::LocalData::BlockData>{};
-        auto ok = tor_.ensure_piece_is_checked(req.index);
+        auto const tor_id = tor_.id();
+        auto const byte_span = tor_.block_info().byte_span_for_req(req.index, req.offset, req.length);
+        auto const weak = weak_from_this();
+        auto* const session = this->session;
 
-        if (!ok)
+        auto const enqueue_local_data_read = [byte_span, session, tor_id, weak](uint64_t const token)
         {
-            tor_.error().set_local_error(fmt::format("Please Verify Local Data! Piece #{:d} is corrupt.", req.index));
-        }
-        else
+            session->local_data.read(
+                tor_id,
+                byte_span,
+                [weak, session, token](
+                    tr_torrent_id_t /*tor_id*/,
+                    tr_byte_span_t /*byte_span*/,
+                    tr_error const& error,
+                    std::unique_ptr<tr::LocalData::BlockData> data) mutable
+                {
+                    auto shared_data = std::shared_ptr<tr::LocalData::BlockData>{ std::move(data) };
+                    session->run_in_session_thread(
+                        [weak, token, error, data = std::move(shared_data)]() mutable
+                        {
+                            if (auto self = weak.lock())
+                            {
+                                self->on_local_data_read_done(token, error, std::move(data));
+                            }
+                        });
+                });
+        };
+
+        if (tor_.is_piece_checked(req.index))
         {
-            token = next_peer_request_token();
+            auto const token = next_peer_request_token();
             pending_peer_read_tokens_.insert(token);
-        }
-
-        peer_requested_.emplace_back(req, token, std::move(data));
-
-        if (!ok)
-        {
-            fill_output_buffer(tr_time(), tr_time_msec());
+            peer_requested_.emplace_back(req, token, std::make_shared<tr::LocalData::BlockData>());
+            enqueue_local_data_read(token);
             return;
         }
 
-        auto const weak = weak_from_this();
-        auto const span = tor_.block_info().byte_span_for_req(req.index, req.offset, req.length);
-        session->local_data.read(
-            tor_.id(),
-            span,
-            [weak, token](
-                tr_torrent_id_t /*id*/,
-                tr_byte_span_t /*span*/,
-                tr_error const& error,
-                std::unique_ptr<tr::LocalData::BlockData> data) mutable
+        peer_requested_.emplace_back(req, 0U, std::make_shared<tr::LocalData::BlockData>());
+
+        session->local_data.test_piece(
+            tor_id,
+            req.index,
+            [weak, session, req, enqueue_local_data_read](
+                tr_torrent_id_t tor_id,
+                tr_piece_index_t piece,
+                tr_error const& /*error*/,
+                std::optional<tr_sha1_digest_t> hash)
             {
-                if (auto self = weak.lock(); self != nullptr)
-                {
-                    auto shared_data = std::shared_ptr<tr::LocalData::BlockData>{ std::move(data) };
-                    self->session->run_in_session_thread(
-                        [weak, token, error, data = std::move(shared_data)]() mutable
+                session->run_in_session_thread(
+                    [weak, session, tor_id, req, piece, hash = std::move(hash), enqueue_local_data_read]()
+                    {
+                        auto* const tor = session->torrents().get(tor_id);
+                        if (tor == nullptr)
                         {
-                            if (auto self_again = weak.lock(); self_again != nullptr)
-                            {
-                                self_again->on_local_data_read_done(token, error, std::move(data));
-                            }
-                        });
-                }
+                            return;
+                        }
+
+                        auto const ok = hash == tor->piece_hash(piece);
+                        tor->set_piece_is_checked(piece, ok);
+
+                        auto self = weak.lock();
+                        if (self == nullptr)
+                        {
+                            return;
+                        }
+
+                        if (!ok)
+                        {
+                            tor->error().set_local_error(
+                                fmt::format("Please Verify Local Data! Piece #{:d} is corrupt.", piece));
+                            self->fill_output_buffer(tr_time(), tr_time_msec());
+                            return;
+                        }
+
+                        auto const it = std::ranges::find_if(
+                            self->peer_requested_,
+                            [req](queued_peer_request const& queued) { return queued.token == 0U && queued.req == req; });
+                        if (it == std::end(self->peer_requested_))
+                        {
+                            return;
+                        }
+
+                        auto const token = self->next_peer_request_token();
+                        self->pending_peer_read_tokens_.insert(token);
+                        it->token = token;
+                        enqueue_local_data_read(token);
+                    });
             });
     }
 
