@@ -806,13 +806,6 @@ public:
 
     [[nodiscard]] tr_bandwidth& getBandwidthGroup(std::string_view name);
 
-    //
-
-    [[nodiscard]] constexpr auto& openFiles() noexcept
-    {
-        return open_files_;
-    }
-
     // announce ip
 
     [[nodiscard]] constexpr std::string const& announceIP() const noexcept
@@ -1415,8 +1408,6 @@ private:
 
     tr_session_id session_id_;
 
-    tr_open_files open_files_;
-
     tr::Blocklists blocklists_;
 
     QueueMediator torrent_queue_mediator_{ *this };
@@ -1467,8 +1458,8 @@ private:
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
 public:
-    // depends-on: open_files_, torrents_
-    tr::LocalData local_data{ open_files_, torrents_ };
+    // depends-on: torrents_
+    tr::LocalData local_data{ torrents_ };
 
 private:
     // depends-on: timer_maker_, blocklists_, top_bandwidth_, utp_context, torrents_, web_

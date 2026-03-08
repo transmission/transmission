@@ -1886,7 +1886,7 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
 
     auto& blocks = incoming_.blocks;
     auto& incoming_block = blocks.try_emplace(block, block_size).first->second;
-        payload.to_buf(std::data(*incoming_block.buf) + loc.block_offset, len);
+    payload.to_buf(std::data(*incoming_block.buf) + loc.block_offset, len);
 
     if (!incoming_block.add_span(loc.block_offset, loc.block_offset + len))
     {

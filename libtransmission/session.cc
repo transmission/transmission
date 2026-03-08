@@ -1458,7 +1458,6 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
 
     stats().save();
     peer_mgr_.reset();
-    openFiles().close_all();
     tr_utp_close(this);
     this->udp_core_.reset();
 

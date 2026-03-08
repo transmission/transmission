@@ -25,6 +25,7 @@
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/inout.h"
+#include "libtransmission/open-files.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrents.h"
@@ -92,9 +93,8 @@ namespace
 class DefaultBackend final : public LocalData::Backend
 {
 public:
-    DefaultBackend(tr_open_files& open_files, tr_torrents const& torrents)
-        : open_files_{ open_files }
-        , torrents_{ torrents }
+    DefaultBackend(tr_torrents const& torrents)
+        : torrents_{ torrents }
     {
     }
 
@@ -119,7 +119,7 @@ public:
 
         auto const loc = tor->block_info().byte_loc(byte_span.begin);
         setme.resize(len);
-        return tr_ioRead(*tor, loc, len, std::data(setme));
+        return tr_ioRead(*tor, open_files_, loc, setme);
     }
 
     [[nodiscard]] int test_piece(tr_torrent_id_t const id, tr_piece_index_t const piece, tr_sha1_digest_t& setme_hash) override
@@ -160,7 +160,7 @@ public:
         }
 
         auto const loc = tor->block_info().byte_loc(byte_span.begin);
-        return tr_ioWrite(*tor, loc, len, std::data(data));
+        return tr_ioWrite(*tor, open_files_, loc, std::span{ std::data(data), len });
     }
 
     void close_torrent(tr_torrent_id_t const tor_id) override
@@ -237,7 +237,7 @@ public:
     }
 
 private:
-    tr_open_files& open_files_;
+    tr_open_files open_files_;
     tr_torrents const& torrents_;
 };
 } // namespace
@@ -746,8 +746,8 @@ private:
     bool stopping_workers_ = false;
 };
 
-LocalData::LocalData(tr_open_files& open_files, tr_torrents const& torrents, size_t worker_count)
-    : impl_{ std::make_unique<Impl>(std::make_unique<DefaultBackend>(open_files, torrents), worker_count) }
+LocalData::LocalData(tr_torrents const& torrents, size_t worker_count)
+    : impl_{ std::make_unique<Impl>(std::make_unique<DefaultBackend>(torrents), worker_count) }
 {
 }
 

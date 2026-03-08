@@ -23,7 +23,6 @@
 #include "libtransmission/block-info.h"
 #include "libtransmission/types.h"
 
-class tr_open_files;
 class tr_torrents;
 
 namespace tr
@@ -61,7 +60,7 @@ public:
         virtual void close_file(tr_torrent_id_t tor_id, tr_file_index_t file_num) = 0;
     };
 
-    explicit LocalData(tr_open_files& open_files, tr_torrents const& torrents, size_t worker_count = {});
+    explicit LocalData(tr_torrents const& torrents, size_t worker_count = {});
     explicit LocalData(std::unique_ptr<Backend> backend, size_t worker_count = {});
 
     LocalData(LocalData const&) = delete;
@@ -87,6 +86,8 @@ public:
 
     // Close an individual file in the torrent.
     void close_file(tr_torrent_id_t, tr_file_index_t);
+
+    void close_all();
 
     // See tr_torrent_files::move()
     void move(tr_torrent_id_t, std::string_view old_parent, std::string_view parent, std::string_view parent_name = "");
