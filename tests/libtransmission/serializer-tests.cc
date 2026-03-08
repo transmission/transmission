@@ -178,6 +178,31 @@ TEST_F(SerializerTest, usesFsPath)
     EXPECT_EQ(toString(actual.u8string()), toString(expected.u8string()));
 }
 
+TEST_F(SerializerTest, usesTrPex)
+{
+    static auto constexpr CompactIp = std::array{ '\x7F', '\0', '\0', '\1', '\x73', '\x1A' }; // 127.0.0.1:6771
+    static_assert(CompactIp.size() == tr_socket_address::CompactSockAddrBytes[TR_AF_INET]);
+
+    auto const expected_flags = static_cast<uint8_t>(tr_rand_int(0x100U));
+    auto const expected_sockaddr = tr_socket_address::from_compact_ipv4(reinterpret_cast<std::byte const*>(CompactIp.data()))
+                                       .first;
+    auto const var = Converters::serialize(tr_pex{ expected_sockaddr, expected_flags });
+
+    auto* const map = var.get_if<tr_variant::Map>();
+    ASSERT_NE(map, nullptr);
+    auto const compact_ip = map->value_if<std::string_view>(TR_KEY_socket_address);
+    ASSERT_TRUE(compact_ip);
+    EXPECT_EQ(
+        std::lexicographical_compare_three_way(compact_ip->begin(), compact_ip->end(), CompactIp.begin(), CompactIp.end()),
+        std::strong_ordering::equivalent);
+    EXPECT_EQ(map->value_if<int64_t>(TR_KEY_flags), expected_flags);
+
+    auto actual = tr_pex{};
+    EXPECT_TRUE(Converters::deserialize(var, &actual));
+    EXPECT_EQ(actual.socket_address, expected_sockaddr);
+    EXPECT_EQ(actual.flags, expected_flags);
+}
+
 TEST_F(SerializerTest, u8StringWarnsOnInvalidUtf8)
 {
     auto const bad = std::string{ static_cast<char>(0xC3), static_cast<char>(0x28) };
