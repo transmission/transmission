@@ -625,14 +625,13 @@ private:
         }
 
         auto const weak = weak_from_this();
+        auto const span = tor_.block_info().byte_span_for_req(req.index, req.offset, req.length);
         session->local_data.read(
             tor_.id(),
-            tor_.piece_loc(req.index, req.offset, req.length),
-            req.length,
+            span,
             [weak, token](
                 tr_torrent_id_t /*id*/,
-                tr_block_info::Location /*loc*/,
-                size_t /*len*/,
+                tr_byte_span_t /*span*/,
                 tr_error const& error,
                 std::unique_ptr<tr::LocalData::BlockData> data) mutable
             {

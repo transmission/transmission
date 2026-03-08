@@ -61,25 +61,24 @@ namespace
     [[maybe_unused]] auto n_bytes_checked = size_t{};
     for (auto block = begin_block; block < end_block; ++block)
     {
-        auto const block_loc = block_info.block_loc(block);
-        auto const block_len = block_info.block_size(block);
+        auto const byte_span = block_info.byte_span_for_block(block);
 
         buffer.clear();
-        if (auto const err = backend.read(id, block_loc, block_len, buffer); err != 0)
+        if (auto const err = backend.read(id, byte_span, buffer); err != 0)
         {
             return {};
         }
 
         auto begin = std::data(buffer);
-        auto end = begin + block_len;
+        auto end = begin + byte_span.size();
 
         if (block == begin_block)
         {
-            begin += (begin_byte - block_loc.byte);
+            begin += (begin_byte - byte_span.begin);
         }
         if (block + 1U == end_block)
         {
-            end -= (block_loc.byte + block_len - end_byte);
+            end -= (byte_span.end - end_byte);
         }
 
         sha.add(begin, end - begin);
@@ -98,12 +97,14 @@ public:
     {
     }
 
-    [[nodiscard]] int read(
-        tr_torrent_id_t const id,
-        tr_block_info::Location const loc,
-        size_t const len,
-        LocalData::BlockData& setme) override
+    [[nodiscard]] int read(tr_torrent_id_t const id, tr_byte_span_t const byte_span, LocalData::BlockData& setme) override
     {
+        if (!byte_span.is_valid())
+        {
+            return EINVAL;
+        }
+
+        auto const len = byte_span.size();
         if (len > tr_block_info::BlockSize)
         {
             return EINVAL;
@@ -115,6 +116,7 @@ public:
             return EINVAL;
         }
 
+        auto const loc = tor->block_info().byte_loc(byte_span.begin);
         setme.resize(len);
         return tr_ioRead(*tor, loc, len, std::data(setme));
     }
@@ -137,12 +139,14 @@ public:
         return 0;
     }
 
-    [[nodiscard]] int write(
-        tr_torrent_id_t const id,
-        tr_block_info::Location const loc,
-        size_t const len,
-        LocalData::BlockData const& data) override
+    [[nodiscard]] int write(tr_torrent_id_t const id, tr_byte_span_t const byte_span, LocalData::BlockData const& data) override
     {
+        if (!byte_span.is_valid())
+        {
+            return EINVAL;
+        }
+
+        auto const len = byte_span.size();
         if (len > std::size(data))
         {
             return EINVAL;
@@ -154,6 +158,7 @@ public:
             return EINVAL;
         }
 
+        auto const loc = tor->block_info().byte_loc(byte_span.begin);
         return tr_ioWrite(*tor, loc, len, std::data(data));
     }
 
@@ -286,26 +291,26 @@ public:
         shutdown();
     }
 
-    void read(tr_torrent_id_t id, tr_block_info::Location loc, size_t len, OnRead on_read)
+    void read(tr_torrent_id_t id, tr_byte_span_t byte_span, OnRead on_read)
     {
         auto callback = std::make_shared<OnRead>(std::move(on_read));
 
         auto task = Task{};
         task.id = id;
         task.op = Op::Read;
-        task.run = [this, id, loc, len, callback = callback]() mutable
+        task.run = [this, id, byte_span, callback = callback]() mutable
         {
             auto data = std::make_unique<BlockData>();
-            auto const err = backend_->read(id, loc, len, *data);
+            auto const err = backend_->read(id, byte_span, *data);
             if (err != 0)
             {
                 data.reset();
             }
-            (*callback)(id, loc, len, make_error(err), std::move(data));
+            (*callback)(id, byte_span, make_error(err), std::move(data));
         };
-        task.cancel = [id, loc, len, callback = std::move(callback)]() mutable
+        task.cancel = [id, byte_span, callback = std::move(callback)]() mutable
         {
-            (*callback)(id, loc, len, make_error(ECANCELED), nullptr);
+            (*callback)(id, byte_span, make_error(ECANCELED), nullptr);
         };
 
         enqueue(std::move(task));
@@ -332,9 +337,17 @@ public:
         enqueue(std::move(task));
     }
 
-    void write(tr_torrent_id_t id, tr_block_info::Location loc, size_t len, std::unique_ptr<BlockData> data, OnWrite on_write)
+    void write(tr_torrent_id_t id, tr_byte_span_t byte_span, std::unique_ptr<BlockData> data, OnWrite on_write)
     {
         auto callback = std::make_shared<OnWrite>(std::move(on_write));
+
+        if (!byte_span.is_valid())
+        {
+            (*callback)(id, byte_span, make_error(EINVAL));
+            return;
+        }
+
+        auto const len = byte_span.size();
 
         auto task = Task{};
         task.id = id;
@@ -343,20 +356,20 @@ public:
 
         if (data == nullptr || len > std::size(*data))
         {
-            (*callback)(id, loc, len, make_error(EINVAL));
+            (*callback)(id, byte_span, make_error(EINVAL));
             return;
         }
 
         auto write_data = std::make_shared<BlockData>(std::move(*data));
 
-        task.run = [this, id, loc, len, write_data = std::move(write_data), callback = callback]() mutable
+        task.run = [this, id, byte_span, write_data = std::move(write_data), callback = callback]() mutable
         {
-            auto const err = backend_->write(id, loc, len, *write_data);
-            (*callback)(id, loc, len, make_error(err));
+            auto const err = backend_->write(id, byte_span, *write_data);
+            (*callback)(id, byte_span, make_error(err));
         };
-        task.cancel = [id, loc, len, callback = std::move(callback)]() mutable
+        task.cancel = [id, byte_span, callback = std::move(callback)]() mutable
         {
-            (*callback)(id, loc, len, make_error(ECANCELED));
+            (*callback)(id, byte_span, make_error(ECANCELED));
         };
 
         enqueue(std::move(task));
@@ -726,9 +739,9 @@ LocalData::LocalData(std::unique_ptr<Backend> backend, size_t worker_count)
 
 LocalData::~LocalData() = default;
 
-void LocalData::read(tr_torrent_id_t const id, tr_block_info::Location const loc, size_t const len, OnRead on_read)
+void LocalData::read(tr_torrent_id_t const id, tr_byte_span_t const byte_span, OnRead on_read)
 {
-    impl_->read(id, loc, len, std::move(on_read));
+    impl_->read(id, byte_span, std::move(on_read));
 }
 
 void LocalData::testPiece(tr_torrent_id_t const id, tr_piece_index_t const piece, OnTest on_test)
@@ -738,12 +751,11 @@ void LocalData::testPiece(tr_torrent_id_t const id, tr_piece_index_t const piece
 
 void LocalData::write(
     tr_torrent_id_t const id,
-    tr_block_info::Location const loc,
-    size_t const len,
+    tr_byte_span_t const byte_span,
     std::unique_ptr<BlockData> data,
     OnWrite on_write)
 {
-    impl_->write(id, loc, len, std::move(data), std::move(on_write));
+    impl_->write(id, byte_span, std::move(data), std::move(on_write));
 }
 
 void LocalData::close(tr_torrent_id_t const id)
