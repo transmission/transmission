@@ -400,9 +400,9 @@ void tr_webseed_task::use_fetched_blocks()
                  webseed = webseed_]()
                 {
                     webseed->active_requests.unset(block);
-                    auto on_written = [event, webseed](tr_torrent_id_t, tr_byte_span_t, tr_error const&)
+                    auto on_written = [session, event, webseed](tr_torrent_id_t, tr_byte_span_t, tr_error const&)
                     {
-                        webseed->publish(event);
+                        session->run_in_session_thread([event, webseed]() { webseed->publish(event); });
                     };
                     session->local_data.write(
                         tor_id,

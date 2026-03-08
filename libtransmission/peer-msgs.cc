@@ -1885,7 +1885,8 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<tr::LocalData::BlockData> 
         tor_.id(),
         tor_.block_info().byte_span_for_block(block),
         std::move(block_data),
-        [this, event](tr_torrent_id_t, tr_byte_span_t, tr_error const&) { publish(event); });
+        [session = session, msgs = this, event](tr_torrent_id_t, tr_byte_span_t, tr_error const&)
+        { session->run_in_session_thread([msgs, event]() { msgs->publish(event); }); });
 
     return 0;
 }
