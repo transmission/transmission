@@ -240,7 +240,7 @@ private:
 class LocalData::Impl
 {
 private:
-    enum class Op
+    enum class Op : std::uint8_t
     {
         Read,
         Test,
@@ -275,6 +275,11 @@ public:
             workers_.emplace_back([this](std::stop_token const& /*stop_token*/) { worker_thread(); });
         }
     }
+
+    Impl(Impl const&) = delete;
+    Impl(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
 
     ~Impl()
     {
@@ -690,7 +695,6 @@ private:
         return op == Op::Read || op == Op::Test;
     }
 
-private:
     std::unique_ptr<Backend> backend_;
 
     mutable std::mutex mutex_;
