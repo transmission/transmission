@@ -272,7 +272,7 @@ protected:
 
         auto const response_size = std::size(buf);
         auto arr = std::array<uint8_t, 256>{};
-        buf.to_buf(std::data(arr), response_size);
+        buf.to_buf(std::span{ std::data(arr), response_size });
 
         return announcer.handle_message(std::data(arr), response_size, from, fromlen);
     }
@@ -291,7 +291,7 @@ protected:
 
         auto arr = std::array<uint8_t, 16>{};
         auto response_size = std::size(buf);
-        buf.to_buf(std::data(arr), response_size);
+        buf.to_buf(std::span{ std::data(arr), response_size });
         EXPECT_TRUE(announcer.handle_message(std::data(arr), response_size, from, fromlen));
 
         return connection_id;
@@ -436,7 +436,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     buf.add_uint32(expected_response.rows[0].leechers.value_or(-1));
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
-    buf.to_buf(std::data(arr), response_size);
+    buf.to_buf(std::span{ std::data(arr), response_size });
     EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
 
     // confirm that announcer processed the response
@@ -533,7 +533,7 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     }
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
-    buf.to_buf(std::data(arr), response_size);
+    buf.to_buf(std::span{ std::data(arr), response_size });
     EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
 
     // Confirm that announcer processed the response
@@ -669,7 +669,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     buf.add_uint64(tr_rand_obj<uint64_t>());
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
-    buf.to_buf(std::data(arr), response_size);
+    buf.to_buf(std::span{ std::data(arr), response_size });
     EXPECT_FALSE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
 
     // send a connection response but with an *invalid* action
@@ -678,7 +678,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     buf.add_uint32(transaction_id);
     buf.add_uint64(tr_rand_obj<uint64_t>());
     response_size = std::size(buf);
-    buf.to_buf(std::data(arr), response_size);
+    buf.to_buf(std::span{ std::data(arr), response_size });
     EXPECT_FALSE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
 
     // but after discarding invalid messages,

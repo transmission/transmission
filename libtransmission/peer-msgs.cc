@@ -1725,14 +1725,14 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
     if (loc.block_offset == 0U && len == block_size) // simple case: one message has entire block
     {
         auto buf = std::make_unique<Cache::BlockData>(block_size);
-        payload.to_buf(std::data(*buf), len);
+        payload.to_buf(std::span{ std::data(*buf), len });
         auto const ok = client_got_block(std::move(buf), block) == 0;
         return { ok ? ReadState::Now : ReadState::Err, len };
     }
 
     auto& blocks = incoming_.blocks;
     auto& incoming_block = blocks.try_emplace(block, block_size).first->second;
-    payload.to_buf(std::data(*incoming_block.buf) + loc.block_offset, len);
+    payload.to_buf(std::span{ std::data(*incoming_block.buf) + loc.block_offset, len });
 
     if (!incoming_block.add_span(loc.block_offset, loc.block_offset + len))
     {
