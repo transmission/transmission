@@ -147,8 +147,6 @@
 		A233BD330D8C6585007EE7B4 /* MessageWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A233BD320D8C6585007EE7B4 /* MessageWindow.xib */; };
 		A233BD690D8CF2C7007EE7B4 /* StatsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */; };
 		A234EA541453563B000F3E97 /* NSImageAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = A234EA531453563B000F3E97 /* NSImageAdditions.mm */; };
-		A23547E211CD0B090046EAE6 /* cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = A23547E011CD0B090046EAE6 /* cache.cc */; };
-		A23547E311CD0B090046EAE6 /* cache.h in Headers */ = {isa = PBXBuildFile; fileRef = A23547E111CD0B090046EAE6 /* cache.h */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.mm */; };
 		A23F29A1132A447400E9A83B /* announcer-common.h in Headers */ = {isa = PBXBuildFile; fileRef = A23F299F132A447400E9A83B /* announcer-common.h */; };
 		A23F29A2132A447400E9A83B /* announcer-http.cc in Sources */ = {isa = PBXBuildFile; fileRef = A23F29A0132A447400E9A83B /* announcer-http.cc */; };
@@ -932,8 +930,6 @@
 		A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StatsWindow.xib; sourceTree = "<group>"; };
 		A234EA521453563B000F3E97 /* NSImageAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSImageAdditions.h; sourceTree = "<group>"; };
 		A234EA531453563B000F3E97 /* NSImageAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSImageAdditions.mm; sourceTree = "<group>"; };
-		A23547E011CD0B090046EAE6 /* cache.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cache.cc; sourceTree = "<group>"; };
-		A23547E111CD0B090046EAE6 /* cache.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = cache.h; sourceTree = "<group>"; };
 		A236D19215F6BB54000C3DD4 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A236D19415F6BCB2000C3DD4 /* da */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A236D19615F6BD9C000C3DD4 /* it */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1934,8 +1930,6 @@
 				6A044CBD8C049AFCBD4DB411 /* block-info.h */,
 				A2D3078E0D9EC45F0051FD27 /* blocklist.cc */,
 				A2D307930D9EC4860051FD27 /* blocklist.h */,
-				A23547E011CD0B090046EAE6 /* cache.cc */,
-				A23547E111CD0B090046EAE6 /* cache.h */,
 				BEFC1E1F0C07861A00B0BB3C /* clients.cc */,
 				BEFC1E1E0C07861A00B0BB3C /* clients.h */,
 				BEFC1E1D0C07861A00B0BB3C /* completion.cc */,
@@ -2591,7 +2585,6 @@
 				0A89346B736DBCF81F3A4852 /* torrent-metainfo.h in Headers */,
 				A209EE5D1144B51E002B02D1 /* history.h in Headers */,
 				A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */,
-				A23547E311CD0B090046EAE6 /* cache.h in Headers */,
 				CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */,
 				2856E0656A49F2665D69E760 /* benc.h in Headers */,
 				E975121263DD973CAF4AEBA0 /* timer.h in Headers */,
@@ -3435,7 +3428,6 @@
 				0A89346B736DBCF81F3A4850 /* torrent-metainfo.cc in Sources */,
 				A220EC5B118C8A060022B4BE /* tr-lpd.cc in Sources */,
 				C1FEE57A1C3223CC00D62832 /* watchdir.cc in Sources */,
-				A23547E211CD0B090046EAE6 /* cache.cc in Sources */,
 				C843FC8429C51B9400491854 /* string-utils.mm in Sources */,
 				EDC37BCD2EE9C2AD001E2612 /* api-compat.cc in Sources */,
 				A284214412DA663E00FBDDBB /* tr-udp.cc in Sources */,

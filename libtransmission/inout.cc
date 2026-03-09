@@ -203,7 +203,6 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
     auto sha = tr_sha1{};
     auto buffer = std::array<uint8_t, tr_block_info::BlockSize>{};
 
-    auto& cache = tor.session->cache;
     auto const [begin_byte, end_byte] = tor.block_info().byte_span_for_piece(piece);
     auto const [begin_block, end_block] = tor.block_span_for_piece(piece);
     [[maybe_unused]] auto n_bytes_checked = size_t{};
@@ -211,12 +210,13 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
     {
         auto const block_loc = tor.block_loc(block);
         auto const block_len = tor.block_size(block);
-        if (auto const success = cache->read_block(tor, block_loc, block_len, std::data(buffer)) == 0; !success)
+        auto contents = std::span{ std::data(buffer), block_len };
+        if (auto const success = tr_ioRead(tor, block_loc, contents) == 0; !success)
         {
             return {};
         }
 
-        auto begin = std::data(buffer);
+        auto begin = std::data(contents);
         auto end = begin + block_len;
 
         // handle edge case where blocks aren't on piece boundaries:

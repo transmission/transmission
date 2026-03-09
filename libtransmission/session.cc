@@ -34,7 +34,6 @@
 #include "libtransmission/api-compat.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
-#include "libtransmission/cache.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/file.h"
@@ -1431,7 +1430,6 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     auto const now = std::chrono::steady_clock::now();
     auto const remaining_ms = now < deadline ? std::chrono::duration_cast<std::chrono::milliseconds>(deadline - now) : 0ms;
     this->web_->startShutdown(remaining_ms);
-    this->cache.reset();
 
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
     TR_ASSERT(!save_timer_);
@@ -2059,20 +2057,14 @@ void tr_session::verify_add(tr_torrent* const tor)
 }
 
 // ---
-void tr_session::flush_torrent_files(tr_torrent_id_t const tor_id) const noexcept
-{
-    this->cache->flush_torrent(tor_id);
-}
 
 void tr_session::close_torrent_files(tr_torrent_id_t const tor_id) noexcept
 {
-    this->cache->flush_torrent(tor_id);
     openFiles().close_torrent(tor_id);
 }
 
 void tr_session::close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept
 {
-    this->cache->flush_file(tor, file_num);
     openFiles().close_file(tor.id(), file_num);
 }
 

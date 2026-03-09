@@ -41,7 +41,6 @@
 #include "libtransmission/announcer.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
-#include "libtransmission/cache.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/ip-cache.h"
 #include "libtransmission/log.h" // for tr_log_level
@@ -446,7 +445,7 @@ public:
         bool torrent_complete_verify_enabled = false;
         bool utp_enabled = true;
         double ratio_limit = 2.0;
-        size_t unused_cache_size_mbytes = 4U;
+        size_t unused_cache_size_mbytes = 4U; // TODO(TR5): remove
         size_t download_queue_size = 5U;
         size_t idle_seeding_limit_minutes = 30U;
         size_t peer_limit_global = TrDefaultPeerLimitGlobal;
@@ -794,7 +793,6 @@ public:
         return open_files_;
     }
 
-    void flush_torrent_files(tr_torrent_id_t tor_id) const noexcept;
     void close_torrent_files(tr_torrent_id_t tor_id) noexcept;
     void close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept;
 
@@ -1451,11 +1449,6 @@ private:
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
-public:
-    // depends-on: settings_, open_files_, torrents_
-    std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, Memory{ 2U, Memory::Units::MBytes });
-
-private:
     // depends-on: timer_maker_, blocklists_, top_bandwidth_, utp_context, torrents_, web_
     std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
 

@@ -30,9 +30,9 @@
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
-#include "libtransmission/cache.h"
 #include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
+#include "libtransmission/inout.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
 #include "libtransmission/peer-common.h"
@@ -222,9 +222,9 @@ struct tr_incoming
     struct incoming_piece_data
     {
         explicit incoming_piece_data(uint32_t block_size)
-            : buf{ std::make_unique<Cache::BlockData>(block_size) }
-            , block_size_{ block_size }
+            : block_size_{ block_size }
         {
+            buf.resize(block_size);
         }
 
         [[nodiscard]] bool add_span(size_t begin, size_t end)
@@ -247,7 +247,7 @@ struct tr_incoming
             return have_.count() >= block_size_;
         }
 
-        std::unique_ptr<Cache::BlockData> buf;
+        std::vector<uint8_t> buf;
 
     private:
         std::bitset<tr_block_info::BlockSize> have_;
@@ -639,7 +639,7 @@ private:
 
     void send_ut_pex();
 
-    int client_got_block(std::unique_ptr<Cache::BlockData> block_data, tr_block_index_t block);
+    int client_got_block(std::span<uint8_t const> block_data, tr_block_index_t block);
     ReadResult read_piece_data(MessageReader& payload);
     ReadResult process_peer_message(uint8_t id, MessageReader& payload);
 
@@ -1724,15 +1724,16 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
 
     if (loc.block_offset == 0U && len == block_size) // simple case: one message has entire block
     {
-        auto buf = std::make_unique<Cache::BlockData>(block_size);
-        payload.to_buf(std::span{ std::data(*buf), len });
-        auto const ok = client_got_block(std::move(buf), block) == 0;
+        auto buf = std::array<uint8_t, tr_block_info::BlockSize>{};
+        auto content = std::span{ std::begin(buf), block_size };
+        payload.to_buf(content);
+        auto const ok = client_got_block(content, block) == 0;
         return { ok ? ReadState::Now : ReadState::Err, len };
     }
 
     auto& blocks = incoming_.blocks;
     auto& incoming_block = blocks.try_emplace(block, block_size).first->second;
-    payload.to_buf(std::span{ std::data(*incoming_block.buf) + loc.block_offset, len });
+    payload.to_buf(std::span{ std::data(incoming_block.buf) + loc.block_offset, len });
 
     if (!incoming_block.add_span(loc.block_offset, loc.block_offset + len))
     {
@@ -1746,25 +1747,26 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
 
     auto block_buf = std::move(incoming_block.buf);
     blocks.erase(block); // note: invalidates `incoming_block` local
-    auto const ok = client_got_block(std::move(block_buf), block) == 0;
+    auto const ok = client_got_block(block_buf, block) == 0;
     return { ok ? ReadState::Now : ReadState::Err, len };
 }
 
 // returns 0 on success, or an errno on failure
-int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_data, tr_block_index_t const block)
+int tr_peerMsgsImpl::client_got_block(std::span<uint8_t const> block_data, tr_block_index_t const block)
 {
-    if (auto const n_bytes = block_data ? std::size(*block_data) : 0U; n_bytes != tor_.block_size(block))
+    auto const n_expected = tor_.block_size(block);
+    auto const n_actual = std::size(block_data);
+    if (n_actual != n_expected)
     {
-        auto const n_expected = tor_.block_size(block);
-        logdbg(this, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, n_bytes));
+        logdbg(this, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, n_actual));
         return EMSGSIZE;
     }
 
     logtrace(this, fmt::format("got block {:d}", block));
 
     // NB: if writeBlock() fails the torrent may be paused.
-    // If this happens, this object will be destructed and must no longer be used.
-    if (auto const err = session->cache->write_block(tor_.id(), block, std::move(block_data)); err != 0)
+    // If this happens, `this` will be destructed and must no longer be used.
+    if (auto const err = tr_ioWrite(tor_, tor_.block_loc(block), block_data); err != 0)
     {
         return err;
     }
@@ -2049,7 +2051,7 @@ void tr_peerMsgsImpl::check_request_timeout(time_t const now)
 
     if (ok)
     {
-        ok = session->cache->read_block(tor_, tor_.piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
+        ok = tr_ioRead(tor_, tor_.piece_loc(req.index, req.offset), std::span{ std::data(buf), req.length }) == 0;
     }
 
     if (ok)

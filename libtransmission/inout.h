@@ -9,18 +9,13 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstdint> // uint8_t, uint32_t
+#include <cstdint> // uint8_t
 #include <span>
 
 #include "libtransmission/block-info.h"
 #include "libtransmission/types.h"
 
 struct tr_torrent;
-
-/**
- * @addtogroup file_io File IO
- * @{
- */
 
 /**
  * Reads the block specified by the piece index, offset, and length.
@@ -38,5 +33,3 @@ struct tr_torrent;
  * @brief Test to see if the piece matches its metainfo's SHA1 checksum.
  */
 [[nodiscard]] bool tr_ioTestPiece(tr_torrent const& tor, tr_piece_index_t piece);
-
-/* @} */
