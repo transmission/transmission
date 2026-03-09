@@ -3,7 +3,6 @@ HeaderFilterRegex: .*/libtransmission/.*
 
 # TODO: Enable `portability-template-virtual-member-function` after https://github.com/llvm/llvm-project/issues/139031 is fixed
 # TODO: Enable `cppcoreguidelines-pro-bounds-pointer-arithmetic` after converting all pointers to std::span
-# TODO: Enable `modernize-use-integer-sign-comparison` (P0586R2) after GCC >= 10.1, clang >= 13
 #
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
 Checks:
@@ -42,7 +41,6 @@ Checks:
   - -misc-no-recursion
   - -misc-non-private-member-variables-in-classes
   - modernize-*
-  - -modernize-use-integer-sign-comparison
   - -modernize-use-trailing-return-type
   - performance-*
   - -performance-move-const-arg
