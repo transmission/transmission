@@ -31,8 +31,12 @@ const TorrentRendererHelper = {
     let percent = 100;
     let ratio = null;
 
-    if (status === Torrent._StatusStopped) {
+    if (status === Torrent._StatusStopped && !t.isDone()) {
       classList.push('paused');
+    }
+
+    if (t.isDone()) {
+      classList.push('done');
     }
 
     if (t.needsMetaData()) {
@@ -216,7 +220,9 @@ export class TorrentRendererFull {
   // eslint-disable-next-line class-methods-use-this
   render(controller, torrent, root) {
     const is_stopped = torrent.isStopped();
+    const is_done = torrent.isDone();
     root.classList.toggle('paused', is_stopped);
+    root.classList.toggle('done', !is_stopped && is_done);
     const { labels, name, peer_details, progressbar, progress_details } = root;
 
     // name
@@ -316,7 +322,10 @@ export class TorrentRendererCompact {
 
   // eslint-disable-next-line class-methods-use-this
   render(controller, torrent, root) {
-    root.classList.toggle('paused', torrent.isStopped());
+    const is_stopped = torrent.isStopped();
+    const is_done = torrent.isDone();
+    root.classList.toggle('paused', is_stopped);
+    root.classList.toggle('done', !is_stopped && is_done);
     const { labels, name, peer_details, progressbar } = root;
 
     // name

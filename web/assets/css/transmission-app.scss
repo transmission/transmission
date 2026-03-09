@@ -7,13 +7,13 @@
 }
 
 @mixin viewport-medium {
-  @media (width >= 600px) {
+  @media (width >=600px) {
     @content;
   }
 }
 
 @mixin viewport-large {
-  @media (width >= 950px) {
+  @media (width >=950px) {
     @content;
   }
 }
@@ -45,6 +45,7 @@
   --grey: rgba(128, 128, 130, 0.66);
   --grey-200: #e1e4e8;
   --grey-40: #666;
+  --grey-400: #929292;
   --grey-500: #828282;
   --grey-900: #191919;
   --nice-grey: #f8f8f8;
@@ -97,7 +98,8 @@
     --color-border-default: var(--default-border-dark);
     --color-border-stark: var(--dark-mode-white);
     --color-border-starkest: var(--grey-500);
-    --color-fg-disabled: var(--nice-grey);
+    --color-fg-disabled: var(--grey);
+    --color-fg-done: var(--grey-400);
     --color-fg-on-popup: var(--nice-grey);
     --color-fg-primary: var(--dark-mode-white);
     --color-fg-secondary: var(--nice-grey);
@@ -124,6 +126,7 @@
       --color-border-stark: var(--white);
       --color-border-starkest: var(--white);
       --color-fg-disabled: var(--white);
+      --color-fg-done: var(--white);
       --color-fg-error: var(--red-500);
       --color-fg-on-popup: var(--white);
       --color-fg-port-closed: var(--red-500);
@@ -149,6 +152,7 @@
       --progress-bar-shadow-3: 0;
     }
   }
+
   @media (prefers-color-scheme: light) {
     --color-bg-hover: var(--nice-grey);
     --color-bg-odd: var(--white);
@@ -160,7 +164,8 @@
     --color-border-stark: var(--grey-500);
     --color-border-starkest: #d0d7de;
     --color-dialog-border: var(--nice-grey);
-    --color-fg-disabled: var(--grey-500);
+    --color-fg-disabled: var(--grey);
+    --color-fg-done: var(--grey-400);
     --color-fg-error: var(--red-500);
     --color-fg-on-popup: var(--grey-900);
     --color-fg-port-closed: var(--red-500);
@@ -195,6 +200,7 @@
       --color-border-stark: var(--black);
       --color-border-starkest: var(--black);
       --color-fg-disabled: var(--black);
+      --color-fg-done: var(--black);
       --color-fg-error: var(--red-500);
       --color-fg-on-popup: var(--black);
       --color-fg-port-closed: var(--red-500);
@@ -402,7 +408,8 @@ a {
     width: 100%;
     min-width: 140px;
     max-width: 226px;
-    padding-right: 24px; /* accommodate reset button */
+    padding-right: 24px;
+    /* accommodate reset button */
 
     &::-webkit-search-cancel-button {
       display: none;
@@ -693,6 +700,12 @@ a {
       }
     }
 
+    &.done {
+      &:not(.selected) .torrent-name {
+        color: var(--color-fg-done);
+      }
+    }
+
     &.selected {
       background-color: var(--color-bg-selected);
       color: var(--color-fg-selected);
@@ -796,8 +809,8 @@ a {
     &::before {
       clip-path: polygon(
         0 0,
-          var(--progress, 30%) 0,
-          var(--progress, 30%) 100%,
+        var(--progress, 30%) 0,
+        var(--progress, 30%) 100%,
         0 100%
       );
     }
@@ -805,8 +818,8 @@ a {
     &::after {
       clip-path: polygon(
         var(--progress, 30%) 0,
-          100% 0,
-          100% 100%,
+        100% 0,
+        100% 100%,
         var(--progress, 30%) 100%
       );
     }
@@ -937,6 +950,7 @@ a {
     top: 0;
     left: 0;
   }
+
   @include viewport-medium {
     border-left: 1px solid var(--color-border-default);
     min-width: 570px;
@@ -978,6 +992,7 @@ a {
   @include viewport-small {
     padding: 0 8px 20px;
   }
+
   @include viewport-medium {
     padding: 0 20px 20px;
   }
@@ -1785,4 +1800,3 @@ dialog {
   outline: 0;
   counter-reset: clusterize-counter;
 }
-
