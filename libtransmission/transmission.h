@@ -424,9 +424,6 @@ void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
 /** @brief Like `tr_torrentStart()`, but resumes right away regardless of the queues. */
 void tr_torrentStartNow(tr_torrent* tor);
 
-/** @brief Return the queued torrent's position in the queue it's in. [0...n) */
-size_t tr_torrentGetQueuePosition(tr_torrent const* tor);
-
 /** @brief Set the queued torrent's position in the queue it's in.
  * Edge cases: `pos <= 0` moves to the front; `pos >= queue's length` moves to the back */
 void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position);

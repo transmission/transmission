@@ -487,11 +487,6 @@ void tr_torrent::stop_if_seed_limit_reached()
 
 // --- Queue
 
-size_t tr_torrentGetQueuePosition(tr_torrent const* tor)
-{
-    return tor->queue_position();
-}
-
 void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position)
 {
     tr_return_if_fail(tr_isTorrent(tor));
