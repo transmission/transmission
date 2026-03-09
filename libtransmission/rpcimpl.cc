@@ -310,7 +310,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
-    tr_torrentsQueueMoveTop(std::data(torrents), std::size(torrents));
+    tr_torrent::queue_move_top(torrents);
     notifyBatchQueueChange(session, torrents);
     return { JsonRpc::Error::SUCCESS, {} };
 }
@@ -321,7 +321,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
-    tr_torrentsQueueMoveUp(std::data(torrents), std::size(torrents));
+    tr_torrent::queue_move_up(torrents);
     notifyBatchQueueChange(session, torrents);
     return { JsonRpc::Error::SUCCESS, {} };
 }
@@ -332,7 +332,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
-    tr_torrentsQueueMoveDown(std::data(torrents), std::size(torrents));
+    tr_torrent::queue_move_down(torrents);
     notifyBatchQueueChange(session, torrents);
     return { JsonRpc::Error::SUCCESS, {} };
 }
@@ -343,7 +343,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
-    tr_torrentsQueueMoveBottom(std::data(torrents), std::size(torrents));
+    tr_torrent::queue_move_bottom(torrents);
     notifyBatchQueueChange(session, torrents);
     return { JsonRpc::Error::SUCCESS, {} };
 }

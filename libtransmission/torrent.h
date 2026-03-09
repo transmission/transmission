@@ -15,6 +15,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -997,6 +998,14 @@ struct tr_torrent
             }
         }
     }
+
+    static void queue_move_top(std::span<tr_torrent* const> torrents);
+
+    static void queue_move_up(std::span<tr_torrent* const> torrents);
+
+    static void queue_move_down(std::span<tr_torrent* const> torrents);
+
+    static void queue_move_bottom(std::span<tr_torrent* const> torrents);
 
     static constexpr struct
     {
