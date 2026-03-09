@@ -216,21 +216,15 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
             return {};
         }
 
-        auto begin = std::data(contents);
-        auto end = begin + block_len;
+        // Handle edge cases where blocks aren't perfectly aligned on piece boundaries.
+        // `std::max` ensures we don't start hashing before the piece begins (for the first block).
+        // `std::min` ensures we don't hash past the end of the piece (for the last block).
+        auto const start = std::max(begin_byte, block_loc.byte);
+        auto const end = std::min(end_byte, block_loc.byte + block_len);
+        auto const piece_data = contents.subspan(start - block_loc.byte, static_cast<size_t>(end - start));
 
-        // handle edge case where blocks aren't on piece boundaries:
-        if (block == begin_block) // `block` may begin before `piece` does
-        {
-            begin += (begin_byte - block_loc.byte);
-        }
-        if (block + 1U == end_block) // `block` may end after `piece` does
-        {
-            end -= (block_loc.byte + block_len - end_byte);
-        }
-
-        sha.add(begin, end - begin);
-        n_bytes_checked += (end - begin);
+        sha.add(std::data(piece_data), std::size(piece_data));
+        n_bytes_checked += std::size(piece_data);
     }
 
     TR_ASSERT(tor.piece_size(piece) == n_bytes_checked);
