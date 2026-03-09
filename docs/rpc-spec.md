@@ -581,7 +581,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `blocklist_enabled` | boolean | true means enabled
 | `blocklist_size` | number | number of rules in the blocklist
 | `blocklist_url` | string | location of the blocklist to use for `blocklist_update`
-| `cache_size_mib` | number | maximum size of the disk cache (MiB). Pieces are guaranteed to be written to filesystem if sequential download is enabled. Otherwise, data might still be in cache only.
+| `cache_size_mib` | number |**DEPRECATED** This property will be removed in Transmission 5.0.0. Clients should stop using this property now.
 | `config_dir` | string | location of transmission's configuration directory
 | `default_trackers` | string | announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `dht_enabled` | boolean | true means allow DHT in public torrents
@@ -1121,3 +1121,4 @@ Transmission 4.2.0 (`rpc_version_semver` 6.1.0, `rpc_version`: ?)
 |:---|:---
 | `torrent_get` | new arg `webseeds_ex`
 | `torrent_get` | **DEPRECATED** `webseeds`. Use `webseeds_ex` instead.
+| `session_get` | **DEPRECATED** `cache_size_mib`. The memory cache is being replaced with async file IO, making this setting moot. The setting will still be gettable and settable via RPC `session_get` and `session_set` until Transmission 5.0.0, but it will be otherwise unused in libtransmission. Clients should stop using this key.
