@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <optional>
+#include <span>
 #include <string_view>
 
 #include <fmt/format.h>
@@ -31,38 +32,36 @@ using namespace std::literals;
 namespace
 {
 
-bool read_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t* buf, uint64_t buflen, tr_error& error)
+bool read_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, std::span<uint8_t> buf, tr_error& error)
 {
-    while (buflen > 0U)
+    while (!std::empty(buf))
     {
         auto n_read = uint64_t{};
 
-        if (!tr_sys_file_read_at(fd, buf, buflen, file_offset, &n_read, &error))
+        if (!tr_sys_file_read_at(fd, std::data(buf), std::size(buf), file_offset, &n_read, &error))
         {
             return false;
         }
 
-        buf += n_read;
-        buflen -= n_read;
+        buf = buf.subspan(n_read);
         file_offset += n_read;
     }
 
     return true;
 }
 
-bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t const* buf, uint64_t buflen, tr_error& error)
+bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, std::span<uint8_t const> buf, tr_error& error)
 {
-    while (buflen > 0U)
+    while (!std::empty(buf))
     {
         auto n_written = uint64_t{};
 
-        if (!tr_sys_file_write_at(fd, buf, buflen, file_offset, &n_written, &error))
+        if (!tr_sys_file_write_at(fd, std::data(buf), std::size(buf), file_offset, &n_written, &error))
         {
             return false;
         }
 
-        buf += n_written;
-        buflen -= n_written;
+        buf = buf.subspan(n_written);
         file_offset += n_written;
     }
 
@@ -121,84 +120,79 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t cons
     return {};
 }
 
-void read_or_write_bytes(
+void read_bytes(
     tr_session& session,
     tr_open_files& open_files,
     tr_torrent const& tor,
-    bool const writable,
     tr_file_index_t const file_index,
     uint64_t const file_offset,
-    uint8_t* const buf,
-    uint64_t const buflen,
+    std::span<uint8_t> buf,
     tr_error& error)
 {
     TR_ASSERT(file_index < tor.file_count());
     auto const file_size = tor.file_size(file_index);
     TR_ASSERT(file_size == 0U || file_offset < file_size);
-    TR_ASSERT(file_offset + buflen <= file_size);
+    TR_ASSERT(file_offset + std::size(buf) <= file_size);
     if (file_size == 0U)
     {
         return;
     }
 
-    auto const fd = get_fd(session, open_files, tor, writable, file_index, error);
+    auto const fd = get_fd(session, open_files, tor, false, file_index, error);
     if (!fd || error)
     {
         return;
     }
 
-    auto fmtstr = ""sv;
-    if (writable)
-    {
-        fmtstr = _("Couldn't save '{path}': {error} ({error_code})");
-        write_entire_buf(*fd, file_offset, buf, buflen, error);
-    }
-    else
-    {
-        fmtstr = _("Couldn't read '{path}': {error} ({error_code})");
-        read_entire_buf(*fd, file_offset, buf, buflen, error);
-    }
+    read_entire_buf(*fd, file_offset, buf, error);
 
     if (error)
     {
         tr_logAddErrorTor(
             &tor,
             fmt::format(
-                fmt::runtime(fmtstr),
+                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
                 fmt::arg("path", tor.file_subpath(file_index)),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())));
     }
 }
 
-void read_or_write_piece(
+void write_bytes(
+    tr_session& session,
+    tr_open_files& open_files,
     tr_torrent const& tor,
-    bool const writable,
-    tr_block_info::Location const loc,
-    uint8_t* buf,
-    uint64_t buflen,
+    tr_file_index_t const file_index,
+    uint64_t const file_offset,
+    std::span<uint8_t const> buf,
     tr_error& error)
 {
-    if (loc.piece >= tor.piece_count())
+    TR_ASSERT(file_index < tor.file_count());
+    auto const file_size = tor.file_size(file_index);
+    TR_ASSERT(file_size == 0U || file_offset < file_size);
+    TR_ASSERT(file_offset + std::size(buf) <= file_size);
+    if (file_size == 0U)
     {
-        error.set_from_errno(EINVAL);
         return;
     }
 
-    auto [file_index, file_offset] = tor.file_offset(loc);
-    auto& session = *tor.session;
-    auto& open_files = session.openFiles();
-    while (buflen != 0U && !error)
+    auto const fd = get_fd(session, open_files, tor, true, file_index, error);
+    if (!fd || error)
     {
-        auto const bytes_this_pass = std::min(buflen, tor.file_size(file_index) - file_offset);
-        read_or_write_bytes(session, open_files, tor, writable, file_index, file_offset, buf, bytes_this_pass, error);
-        if (buf != nullptr)
-        {
-            buf += bytes_this_pass;
-        }
-        buflen -= bytes_this_pass;
-        ++file_index;
-        file_offset = 0U;
+        return;
+    }
+
+    write_entire_buf(*fd, file_offset, buf, error);
+
+    if (error)
+    {
+        tr_logAddErrorTor(
+            &tor,
+            fmt::format(
+                fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
+                fmt::arg("path", tor.file_subpath(file_index)),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
     }
 }
 
@@ -245,17 +239,53 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
 
 } // namespace
 
-int tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& loc, size_t const len, uint8_t* const setme)
+int tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& loc, std::span<uint8_t> const setme)
 {
     auto error = tr_error{};
-    read_or_write_piece(tor, false /*writable*/, loc, setme, len, error);
+    if (loc.piece >= tor.piece_count())
+    {
+        error.set_from_errno(EINVAL);
+        return error.code();
+    }
+
+    auto [file_index, file_offset] = tor.file_offset(loc);
+    auto& session = *tor.session;
+    auto& open_files = session.openFiles();
+    auto buf = setme;
+    while (!std::empty(buf) && !error)
+    {
+        auto const bytes_this_pass = std::min<uint64_t>(std::size(buf), tor.file_size(file_index) - file_offset);
+        read_bytes(session, open_files, tor, file_index, file_offset, buf.first(bytes_this_pass), error);
+        buf = buf.subspan(bytes_this_pass);
+        ++file_index;
+        file_offset = 0U;
+    }
+
     return error.code();
 }
 
-int tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, size_t const len, uint8_t const* const writeme)
+int tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, std::span<uint8_t const> const writeme)
 {
     auto error = tr_error{};
-    read_or_write_piece(tor, true /*writable*/, loc, const_cast<uint8_t*>(writeme), len, error);
+    if (loc.piece >= tor.piece_count())
+    {
+        error.set_from_errno(EINVAL);
+    }
+    else
+    {
+        auto [file_index, file_offset] = tor.file_offset(loc);
+        auto& session = *tor.session;
+        auto& open_files = session.openFiles();
+        auto buf = writeme;
+        while (!std::empty(buf) && !error)
+        {
+            auto const bytes_this_pass = std::min<uint64_t>(std::size(buf), tor.file_size(file_index) - file_offset);
+            write_bytes(session, open_files, tor, file_index, file_offset, buf.first(bytes_this_pass), error);
+            buf = buf.subspan(bytes_this_pass);
+            ++file_index;
+            file_offset = 0U;
+        }
+    }
 
     // if IO failed, set torrent's error if not already set
     if (error && !tor.error().is_local_error())

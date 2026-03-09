@@ -96,7 +96,7 @@ int Cache::write_contiguous(CIter const& begin, CIter const& end) const
 
     auto const loc = tor->block_loc(block);
 
-    if (auto const err = tr_ioWrite(*tor, loc, outlen, out); err != 0)
+    if (auto const err = tr_ioWrite(*tor, loc, { out, outlen }); err != 0)
     {
         return err;
     }
@@ -132,7 +132,7 @@ int Cache::write_block(tr_torrent_id_t const tor_id, tr_block_index_t const bloc
         // already has a cache layer for the very purpose of this cache
         // https://github.com/transmission/transmission/pull/5668
         auto* const tor = torrents_.get(tor_id);
-        return tor == nullptr ? EINVAL : tr_ioWrite(*tor, tor->block_loc(block), std::size(*writeme), std::data(*writeme));
+        return tor == nullptr ? EINVAL : tr_ioWrite(*tor, tor->block_loc(block), { std::data(*writeme), std::size(*writeme) });
     }
 
     auto const key = Key{ tor_id, block };
@@ -170,7 +170,7 @@ int Cache::read_block(tr_torrent const& tor, tr_block_info::Location const& loc,
         return {};
     }
 
-    return tr_ioRead(tor, loc, len, setme);
+    return tr_ioRead(tor, loc, { setme, len });
 }
 
 // ---
