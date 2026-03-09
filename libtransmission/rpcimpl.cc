@@ -2193,12 +2193,12 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
 
     map.try_emplace(
         TR_KEY_cache_size_mib,
-        [](tr_session const& src) -> tr_variant { return tr_sessionGetCacheLimit_MB(&src); },
+        [](tr_session const& src) -> tr_variant { return src.unused_cache_size_mbytes(); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
             if (auto const val = src.value_if<int64_t>())
             {
-                tr_sessionSetCacheLimit_MB(&tgt, *val);
+                tgt.set_unused_cache_size_mbytes(*val);
             }
         });
 

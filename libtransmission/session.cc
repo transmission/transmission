@@ -796,11 +796,6 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
     }
 #endif
 
-    if (auto const& val = new_settings.cache_size_mbytes; force || val != old_settings.cache_size_mbytes)
-    {
-        tr_sessionSetCacheLimit_MB(this, val);
-    }
-
     if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
     {
         ip_cache_->update_addr(TR_AF_INET);
@@ -1686,23 +1681,6 @@ bool tr_sessionIsLPDEnabled(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->allowsLPD();
-}
-
-// ---
-
-void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes)
-{
-    TR_ASSERT(session != nullptr);
-
-    session->settings_.cache_size_mbytes = mbytes;
-    session->cache->set_limit(Memory{ mbytes, Memory::Units::MBytes });
-}
-
-size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    return session->settings_.cache_size_mbytes;
 }
 
 // ---
