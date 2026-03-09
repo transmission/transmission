@@ -1725,7 +1725,7 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
     if (loc.block_offset == 0U && len == block_size) // simple case: one message has entire block
     {
         auto buf = std::array<uint8_t, tr_block_info::BlockSize>{};
-        auto content = std::span{ std::begin(buf), block_size };
+        auto const content = std::span{ buf }.first(block_size);
         payload.to_buf(content);
         auto const ok = client_got_block(content, block) == 0;
         return { ok ? ReadState::Now : ReadState::Err, len };
