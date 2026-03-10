@@ -244,7 +244,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
 
     auto& torrents = session->torrents();
     torrents_vec.reserve(std::size(torrents));
-    auto const add_torrent_from_var = [&torrents, &torrents_vec](tr_variant const& var)
+    auto const add_torrent_from_var = [&torrents, &torrents_vec, session](tr_variant const& var)
     {
         tr_torrent* tor = nullptr;
 
@@ -257,7 +257,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
         {
             if (*val == tr_quark_get_string_view(TR_KEY_recently_active))
             {
-                auto const cutoff = tr_time() - RecentlyActiveSeconds;
+                auto const cutoff = std::max(tr_time() - RecentlyActiveSeconds, session->startTime());
                 auto const recent = torrents.get_matching([cutoff](auto* walk) { return walk->has_changed_since(cutoff); });
                 std::ranges::copy(recent, std::back_inserter(torrents_vec));
             }

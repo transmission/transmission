@@ -636,6 +636,11 @@ public:
         return resume_dir_;
     }
 
+    [[nodiscard]] constexpr auto startTime() const noexcept
+    {
+        return start_time_;
+    }
+
     [[nodiscard]] constexpr auto const& downloadDir() const noexcept
     {
         return settings().download_dir;
@@ -1269,6 +1274,7 @@ private:
     friend void tr_sessionClose(tr_session* session, double timeout_secs);
     friend tr_variant tr_sessionGetSettings(tr_session const* s);
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
+    friend size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor);
     friend void tr_sessionReloadBlocklists(tr_session* session);
     friend void tr_sessionSet(tr_session* session, tr_variant const& settings);
     friend void tr_sessionSetAltSpeedBegin(tr_session* session, size_t minutes_since_midnight);
@@ -1387,6 +1393,8 @@ private:
     mutable std::recursive_mutex session_mutex_;
 
     tr_stats session_stats_{ config_dir_, time(nullptr) };
+
+    time_t start_time_ = 0;
 
     tr_announce_list default_trackers_;
 

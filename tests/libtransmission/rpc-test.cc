@@ -726,6 +726,43 @@ TEST_F(RpcTest, torrentGet)
     tr_torrentRemove(tor, false);
 }
 
+TEST_F(RpcTest, recentlyActiveEmptyOnStartup)
+{
+    // Add a torrent but don't do anything with it
+    auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    EXPECT_NE(nullptr, tor);
+
+    auto request_map = tr_variant::Map{ 3U };
+    request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_get));
+    request_map.try_emplace(TR_KEY_id, 12345);
+
+    auto params = tr_variant::Map{ 2U };
+    auto fields = tr_variant::Vector{};
+    fields.emplace_back(tr_quark_get_string_view(TR_KEY_id));
+    params.try_emplace(TR_KEY_fields, std::move(fields));
+    params.try_emplace(TR_KEY_ids, tr_quark_get_string_view(TR_KEY_recently_active));
+    request_map.try_emplace(TR_KEY_params, std::move(params));
+
+    auto request = tr_variant{ std::move(request_map) };
+    auto response = tr_variant{};
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
+
+    auto* response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto* result = response_map->find_if<tr_variant::Map>(TR_KEY_result);
+    ASSERT_NE(result, nullptr);
+
+    auto* torrents = result->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    ASSERT_NE(torrents, nullptr);
+
+    // Should be empty since we haven't done anything with the torrent
+    EXPECT_EQ(0UL, std::size(*torrents));
+
+    // cleanup
+    tr_torrentRemove(tor, false);
+}
+
 TEST_F(RpcTest, torrentGetLegacy)
 {
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
