@@ -8,18 +8,45 @@
 #import "Torrent.h"
 #import "NSImageAdditions.h"
 
+@interface TorrentCell ()
+@property(nonatomic, strong) ProgressBarView2* secondProgress;
+@end
+
 @implementation TorrentCell
+
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
+
+    self.secondProgress = [[ProgressBarView2 alloc] init];
+    self.secondProgress.translatesAutoresizingMaskIntoConstraints = false;
+}
 
 - (void)drawRect:(NSRect)dirtyRect
 {
+    __auto_type was = CFAbsoluteTimeGetCurrent();
     if (self.fTorrentTableView)
     {
         Torrent* torrent = (Torrent*)self.objectValue;
 
+        if (self.secondProgress.superview == nil)
+        {
+            [self.fTorrentTableView addSubview:self.secondProgress];
+
+            __auto_type view = self.secondProgress;
+            [NSLayoutConstraint activateConstraints:@[
+                [view.leadingAnchor constraintEqualToAnchor:self.fTorrentProgressBarView.leadingAnchor],
+                [view.trailingAnchor constraintEqualToAnchor:self.fTorrentProgressBarView.trailingAnchor],
+                [view.topAnchor constraintEqualToAnchor:self.fTorrentProgressBarView.topAnchor],
+                [view.bottomAnchor constraintEqualToAnchor:self.fTorrentProgressBarView.bottomAnchor],
+            ]];
+        }
+
         // draw progress bar
-        NSRect barRect = self.fTorrentProgressBarView.frame;
-        ProgressBarView* progressBar = [[ProgressBarView alloc] init];
-        [progressBar drawBarInRect:barRect forTableView:self.fTorrentTableView withTorrent:torrent];
+        // NSRect barRect = self.fTorrentProgressBarView.frame;
+        // ProgressBarView* progressBar = [[ProgressBarView alloc] init];
+        [self.secondProgress drawBarInRect:CGRectZero forTableView:self.fTorrentTableView withTorrent:torrent];
+        // [self.secondProgress drawBarIn]
 
         // set priority icon
         if (torrent.priority != TR_PRI_NORMAL)
@@ -39,6 +66,9 @@
     }
 
     [super drawRect:dirtyRect];
+    
+    __auto_type spent = CFAbsoluteTimeGetCurrent() - was;
+    NSLog(@"Update happened in %.7f", spent);
 }
 
 // otherwise progress bar is inverted

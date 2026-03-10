@@ -146,7 +146,7 @@
 
 @end
 
-static NSArray<NSNumber*>* kLocations = @[@(0.0), @(0.5), @(0.5), @(1.0)];
+static NSArray<NSNumber*>* kLocations = @[ @(0.0), @(0.5), @(0.5), @(1.0) ];
 
 @implementation ModernProgressGradients
 
@@ -289,13 +289,14 @@ static NSArray<NSNumber*>* kLocations = @[@(0.0), @(0.5), @(0.5), @(1.0)];
     NSColor* color3 = [NSColor colorWithCalibratedRed:redComponent * 0.85 green:greenComponent * 0.85 blue:blueComponent * 0.85
                                                 alpha:alpha];
 
-    return @[baseColor, color2, color3, baseColor];
+    return @[ baseColor, color2, color3, baseColor ];
 }
 
 @end
 
 @implementation NSColor (KVC_CGColor)
-- (id)cgColorKVC {
+- (id)cgColorKVC
+{
     return (id)self.CGColor;
 }
 @end

@@ -19,7 +19,7 @@
 
 @end
 
-@interface ModernProgressGradients
+@interface ModernProgressGradients : NSObject
 
 @property(nonatomic, class, readonly) NSArray<NSNumber*>* locations;
 
@@ -37,5 +37,5 @@
 @end
 
 @interface NSColor (KVC_CGColor)
-@property (readonly) id cgColorKVC;
+@property(readonly) id cgColorKVC;
 @end
