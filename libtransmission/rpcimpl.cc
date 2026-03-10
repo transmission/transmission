@@ -248,7 +248,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
     {
         tr_torrent* tor = nullptr;
 
-        if (auto const val = var.value_if<int64_t>())
+        if (auto const val = var.value_if<tr_torrent_id_t>())
         {
             tor = torrents.get(*val);
         }

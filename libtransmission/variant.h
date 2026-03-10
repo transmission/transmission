@@ -9,6 +9,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <functional> // std::invoke
+#include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -338,7 +339,7 @@ public:
     }
 
     template<typename Val>
-    [[nodiscard]] constexpr std::optional<Val> value_if() noexcept
+    [[nodiscard]] constexpr std::optional<Val> value_if() const noexcept
     {
         if (auto const* const val = get_if<Val>())
         {
@@ -348,11 +349,8 @@ public:
         return {};
     }
 
-    template<typename Val>
-    [[nodiscard]] std::optional<Val> value_if() const noexcept
-    {
-        return const_cast<tr_variant*>(this)->value_if<Val>();
-    }
+    template<std::integral Val>
+    [[nodiscard]] std::optional<Val> value_if() const noexcept;
 
     template<typename Val>
     [[nodiscard]] constexpr bool holds_alternative() const noexcept
@@ -399,13 +397,27 @@ private:
 };
 
 template<>
-[[nodiscard]] std::optional<int64_t> tr_variant::value_if() noexcept;
+[[nodiscard]] std::optional<int64_t> tr_variant::value_if() const noexcept;
 template<>
-[[nodiscard]] std::optional<bool> tr_variant::value_if() noexcept;
+[[nodiscard]] std::optional<bool> tr_variant::value_if() const noexcept;
 template<>
-[[nodiscard]] std::optional<double> tr_variant::value_if() noexcept;
+[[nodiscard]] std::optional<double> tr_variant::value_if() const noexcept;
 template<>
-[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() noexcept;
+[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() const noexcept;
+
+template<std::integral Val>
+[[nodiscard]] std::optional<Val> tr_variant::value_if() const noexcept
+{
+    static_assert(!std::is_same_v<Val, bool>);
+    static_assert(!std::is_same_v<Val, int64_t>);
+    if (auto val = value_if<int64_t>(); val && std::cmp_greater_equal(*val, std::numeric_limits<Val>::lowest()) &&
+        std::cmp_less_equal(*val, std::numeric_limits<Val>::max()))
+    {
+        return val;
+    }
+
+    return {};
+}
 
 // --- Strings
 
