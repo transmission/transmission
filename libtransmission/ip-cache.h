@@ -3,24 +3,24 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
+#pragma once
+
 #include <array>
 #include <chrono> // std::chrono::milliseconds
-#include <condition_variable>
 #include <memory> // std::unique_ptr
-#include <mutex>
 #include <optional>
 #include <shared_mutex>
+#include <span>
 #include <string_view>
+#include <vector>
 
 #include "libtransmission/net.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/web.h"
-
-#pragma once
-
-#ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
-#endif
 
 /**
  * Cache IP addresses.
@@ -46,6 +46,11 @@ public:
         }
 
         [[nodiscard]] virtual std::string_view settings_bind_addr(tr_address_type /* type */)
+        {
+            return {};
+        }
+
+        [[nodiscard]] virtual std::span<std::string const> settings_ip_endpoint(tr_address_type /*type*/)
         {
             return {};
         }
@@ -112,7 +117,7 @@ private:
         upkeep_timers_[type]->stop();
     }
 
-    [[nodiscard]] bool set_is_updating(tr_address_type type) noexcept;
+    [[nodiscard]] bool set_is_updating(tr_address_type type, std::span<std::string const> ip_endpoints = {}) noexcept;
     void unset_is_updating(tr_address_type type) noexcept;
 
     Mediator& mediator_;
@@ -124,6 +129,7 @@ private:
         Abort
     };
     array_ip_t<is_updating_t> is_updating_ = {};
+    array_ip_t<std::vector<std::string>> current_ip_endpoints_ = {};
 
     // Never directly read/write IP addresses for the sake of being thread safe
     // Use global_*_addr() for read, and set_*_addr()/unset_*_addr() for write instead
