@@ -350,7 +350,7 @@ public:
     }
 
     template<std::integral Val>
-    [[nodiscard]] std::optional<Val> value_if() const noexcept;
+    [[nodiscard]] constexpr std::optional<Val> value_if() const noexcept;
 
     template<typename Val>
     [[nodiscard]] constexpr bool holds_alternative() const noexcept
@@ -396,17 +396,80 @@ private:
     std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, std::string, std::string_view, Vector, Map> val_;
 };
 
+// These specialisations could have been in the class body,
+// but aren't because https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282
+
 template<>
-[[nodiscard]] std::optional<int64_t> tr_variant::value_if() const noexcept;
+[[nodiscard]] constexpr std::optional<std::string_view> tr_variant::value_if() const noexcept
+{
+    switch (index())
+    {
+    case StringIndex:
+        return *std::get_if<std::string>(&val_);
+
+    case StringViewIndex:
+        return *std::get_if<std::string_view>(&val_);
+
+    default:
+        return {};
+    }
+}
+
 template<>
-[[nodiscard]] std::optional<bool> tr_variant::value_if() const noexcept;
+[[nodiscard]] constexpr std::optional<int64_t> tr_variant::value_if() const noexcept
+{
+    switch (index())
+    {
+    case IntIndex:
+        return *get_if<IntIndex>();
+
+    case BoolIndex:
+        return *get_if<BoolIndex>() ? 1 : 0;
+
+    default:
+        return {};
+    }
+}
+
+template<>
+[[nodiscard]] constexpr std::optional<bool> tr_variant::value_if() const noexcept
+{
+    switch (index())
+    {
+    case BoolIndex:
+        return *get_if<BoolIndex>();
+
+    case IntIndex:
+        if (auto const val = *get_if<IntIndex>(); val == 0 || val == 1)
+        {
+            return val != 0;
+        }
+        break;
+
+    case StringIndex:
+    case StringViewIndex:
+        if (auto const val = value_if<std::string_view>(); val == "true")
+        {
+            return true;
+        }
+        else if (val == "false")
+        {
+            return false;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return {};
+}
+
 template<>
 [[nodiscard]] std::optional<double> tr_variant::value_if() const noexcept;
-template<>
-[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() const noexcept;
 
 template<std::integral Val>
-[[nodiscard]] std::optional<Val> tr_variant::value_if() const noexcept
+[[nodiscard]] constexpr std::optional<Val> tr_variant::value_if() const noexcept
 {
     static_assert(!std::is_same_v<Val, bool>);
     static_assert(!std::is_same_v<Val, int64_t>);
