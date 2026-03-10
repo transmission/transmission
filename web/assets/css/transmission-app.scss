@@ -47,6 +47,8 @@
   --grey-40: #666;
   --grey-400: #929292;
   --grey-500: #828282;
+  --grey-600: #434343;
+  --grey-700: #2d2d2d;
   --grey-900: #191919;
   --nice-grey: #f8f8f8;
   --red-500: #d73a49;
@@ -84,6 +86,7 @@
   --color-progressbar-paused: var(--grey-200);
   --color-progressbar-queued: var(--blue-400);
   --color-progressbar-verify: var(--yellow-300);
+  --color-progressbar-finished: var(--grey-200);
   --color-toolbar-background: var(--default-tinted);
 
   color-scheme: light dark;
@@ -100,6 +103,7 @@
     --color-border-starkest: var(--grey-500);
     --color-fg-disabled: var(--grey);
     --color-fg-done: var(--grey-400);
+    --color-fg-finished: var(--grey-200);
     --color-fg-on-popup: var(--nice-grey);
     --color-fg-primary: var(--dark-mode-white);
     --color-fg-secondary: var(--nice-grey);
@@ -110,6 +114,7 @@
     --color-progressbar-fg-2: #edefff;
     --color-progressbar-fg-3: #edefff;
     --color-progressbar-paused: var(--grey-500);
+    --color-progressbar-finished: var(--grey-500);
     --color-progressbar-seed-1: var(--green-100);
     --color-progressbar-seed-2: var(--green-400);
     --color-progressbar-seed-paused: var(--grey-500);
@@ -127,6 +132,7 @@
       --color-border-starkest: var(--white);
       --color-fg-disabled: var(--white);
       --color-fg-done: var(--white);
+      --color-fg-finished: var(--white);
       --color-fg-error: var(--red-500);
       --color-fg-on-popup: var(--white);
       --color-fg-port-closed: var(--red-500);
@@ -144,6 +150,7 @@
       --color-progressbar-magnet: var(--yellow-300);
       --color-progressbar-paused: var(--grey-500);
       --color-progressbar-queued: var(--blue-400);
+      --color-progressbar-finished: var(--grey-500);
       --color-progressbar-seed-1: var(--black);
       --color-progressbar-seed-2: var(--white);
       --color-progressbar-seed-paused: var(--grey-500);
@@ -166,6 +173,7 @@
     --color-dialog-border: var(--nice-grey);
     --color-fg-disabled: var(--grey);
     --color-fg-done: var(--grey-400);
+    --color-fg-finished: var(--grey-700);
     --color-fg-error: var(--red-500);
     --color-fg-on-popup: var(--grey-900);
     --color-fg-port-closed: var(--red-500);
@@ -182,6 +190,7 @@
     --color-progressbar-magnet: var(--yellow-300);
     --color-progressbar-paused: var(--grey-200);
     --color-progressbar-queued: var(--blue-400);
+    --color-progressbar-finished: var(--grey-200);
     --color-progressbar-seed-1: var(--green-500);
     --color-progressbar-seed-2: var(--green-300);
     --color-progressbar-seed-paused: var(--grey-200);
@@ -201,6 +210,7 @@
       --color-border-starkest: var(--black);
       --color-fg-disabled: var(--black);
       --color-fg-done: var(--black);
+      --color-fg-finished: var(--black);
       --color-fg-error: var(--red-500);
       --color-fg-on-popup: var(--black);
       --color-fg-port-closed: var(--red-500);
@@ -219,6 +229,7 @@
       --color-progressbar-magnet: var(--yellow-300);
       --color-progressbar-paused: var(--grey-500);
       --color-progressbar-queued: var(--blue-400);
+      --color-progressbar-finished: var(--grey-500);
       --color-progressbar-seed-1: var(--black);
       --color-progressbar-seed-2: var(--white);
       --color-progressbar-seed-paused: var(--grey-500);
@@ -700,9 +711,11 @@ a {
       }
     }
 
-    &.done {
-      &:not(.selected) .torrent-name {
-        color: var(--color-fg-done);
+    &.finished {
+      color: var(--color-fg-finished);
+
+      .icon {
+        background-color: var(--color-fg-finished);
       }
     }
 
@@ -792,6 +805,12 @@ a {
 
     &.paused::before {
       background: var(--color-progressbar-paused);
+      color: var(--color-progressbar-fg-1);
+      text-shadow: var(--progress-bar-shadow-1);
+    }
+
+    &.finished::before {
+      background: var(--color-progressbar-finished);
       color: var(--color-progressbar-fg-1);
       text-shadow: var(--progress-bar-shadow-1);
     }
