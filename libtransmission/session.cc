@@ -726,7 +726,7 @@ void tr_session::on_save_timer()
         tor->save_resume_file();
     }
 
-    stats().save();
+    stats().save_if_dirty();
     torrent_queue().to_file();
 }
 
