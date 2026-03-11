@@ -322,9 +322,6 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool is_enabled);
 bool tr_sessionIsLPDEnabled(tr_session const* session);
 void tr_sessionSetLPDEnabled(tr_session* session, bool is_enabled);
 
-size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
-void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes);
-
 tr_encryption_mode tr_sessionGetEncryption(tr_session const* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
 

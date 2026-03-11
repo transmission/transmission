@@ -39,8 +39,6 @@ target_sources(${TR_NAME}
         block-info.h
         blocklist.cc
         blocklist.h
-        cache.cc
-        cache.h
         clients.cc
         clients.h
         completion.cc

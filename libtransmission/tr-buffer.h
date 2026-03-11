@@ -9,6 +9,7 @@
 #include <cstddef> // size_t
 #include <memory> // std::allocator
 #include <ratio>
+#include <span>
 #include <string>
 #include <string_view>
 
@@ -63,6 +64,11 @@ public:
     [[nodiscard]] auto to_string() const
     {
         return std::string{ to_string_view() };
+    }
+
+    void to_buf(std::span<uint8_t> tgt)
+    {
+        to_buf(tgt.data(), tgt.size());
     }
 
     void to_buf(void* tgt, size_t n_bytes)
