@@ -78,21 +78,27 @@ export class PrefsDialog extends EventTarget {
     e.value = b ? 'Update' : 'Updating...';
   }
 
-  static _getValue(e) {
-    if (e.tagName === 'TEXTAREA') {
-      return e.value;
+  static _getValueFromEvent(e) {
+    const element = e.target;
+
+    if (element.tagName === 'TEXTAREA') {
+      return element.value;
     }
 
-    switch (e.type) {
+    if (element.classList.contains('listboxeditor-wrapper')) {
+      return e.detail;
+    }
+
+    switch (element.type) {
       case 'checkbox':
       case 'radio':
-        return e.checked;
+        return element.checked;
 
       case 'number':
       case 'select-one':
       case 'text':
       case 'url': {
-        const string = e.value;
+        const string = element.value;
         if (Number.parseInt(string, 10).toString() === string) {
           return Number.parseInt(string, 10);
         }
@@ -116,9 +122,12 @@ export class PrefsDialog extends EventTarget {
   // this callback is for controls whose changes can be applied
   // immediately, like checkboxs, radioboxes, and selects
   _onControlChanged(event_) {
+    if (event_.target !== event_.currentTarget) {
+      return;
+    }
     const { key } = event_.target.dataset;
     this.remote.savePrefs({
-      [key]: PrefsDialog._getValue(event_.target),
+      [key]: PrefsDialog._getValueFromEvent(event_),
     });
     this._onMaybePortChanged(key);
   }
@@ -141,6 +150,8 @@ export class PrefsDialog extends EventTarget {
           const n = Formatter.number(value);
           element.innerHTML = `Blocklist has <span class="blocklist-size-number">${n}</span> rules`;
           setTextContent(this.elements.peers.blocklist_update_button, 'Update');
+        } else if (element.classList.contains('listboxeditor-wrapper')) {
+          PrefsDialog._updateListBoxEditor(element, value);
         } else {
           switch (element.type) {
             case 'checkbox':
@@ -192,6 +203,145 @@ export class PrefsDialog extends EventTarget {
     root.append(label);
 
     return { check, label, root };
+  }
+
+  static _createListBoxEditor(size, multiple, allOptions) {
+    const root = document.createElement('div');
+    root.classList.add('listboxeditor-wrapper');
+
+    const selectActiveLabel = document.createElement('label');
+    setTextContent(selectActiveLabel, 'Selected');
+
+    const selectActive = document.createElement('select');
+    selectActive.id = makeUUID();
+    selectActive.size = size;
+    selectActive.multiple = multiple;
+    root.dataset.selectActive = selectActive.id;
+
+    const selectStagingLabel = document.createElement('label');
+    setTextContent(selectStagingLabel, 'Available');
+
+    const selectStaging = document.createElement('select');
+    selectStaging.id = makeUUID();
+    selectStaging.size = size;
+    selectStaging.multiple = multiple;
+    root.dataset.selectStaging = selectStaging.id;
+    for (const o of allOptions) {
+      const option = document.createElement('option');
+      option.value = o.value;
+      setTextContent(option, o.label);
+      selectStaging.add(option);
+    }
+
+    const moveUpButton = document.createElement('button');
+    setTextContent(moveUpButton, '⌃');
+    moveUpButton.addEventListener('click', () => {
+      const values = [...selectActive.options].map((ele) => ele.value);
+      let lastConsecutiveIdx = 0;
+      for (const selected of selectActive.selectedOptions) {
+        const idx = selected.index;
+        if (idx === lastConsecutiveIdx) {
+          ++lastConsecutiveIdx;
+          continue;
+        }
+
+        [values[idx - 1], values[idx]] = [values[idx], values[idx - 1]];
+      }
+
+      if (values.some((ele, idx) => ele !== selectActive.options[idx].value)) {
+        root.dispatchEvent(new CustomEvent('change', { detail: values }));
+      }
+    });
+
+    const moveDownButton = document.createElement('button');
+    setTextContent(moveDownButton, '⌄');
+    moveDownButton.addEventListener('click', () => {
+      const values = [...selectActive.options].map((ele) => ele.value);
+      let lastConsecutiveIdx = values.length - 1;
+      for (const selected of [...selectActive.selectedOptions].toReversed()) {
+        const idx = selected.index;
+        if (idx === lastConsecutiveIdx) {
+          --lastConsecutiveIdx;
+          continue;
+        }
+
+        [values[idx + 1], values[idx]] = [values[idx], values[idx + 1]];
+      }
+
+      if (values.some((ele, idx) => ele !== selectActive.options[idx].value)) {
+        root.dispatchEvent(new CustomEvent('change', { detail: values }));
+      }
+    });
+
+    const moveLeftButton = document.createElement('button');
+    setTextContent(moveLeftButton, '«');
+    moveLeftButton.addEventListener('click', () => {
+      if (selectStaging.selectedOptions.length === 0) {
+        return;
+      }
+      const values = [
+        ...selectActive.options,
+        ...selectStaging.selectedOptions,
+      ].map((ele) => ele.value);
+      root.dispatchEvent(new CustomEvent('change', { detail: values }));
+    });
+
+    const moveRightButton = document.createElement('button');
+    setTextContent(moveRightButton, '»');
+    moveRightButton.addEventListener('click', () => {
+      if (selectActive.selectedOptions.length === 0) {
+        return;
+      }
+      const selectedIndices = new Set(
+        [...selectActive.selectedOptions].map((ele) => ele.index),
+      );
+      const values = [...selectActive.options]
+        .filter((ele) => !selectedIndices.has(ele.index))
+        .map((ele) => ele.value);
+      root.dispatchEvent(new CustomEvent('change', { detail: values }));
+    });
+
+    root.append(selectActiveLabel);
+    root.append(selectActive);
+    root.append(moveUpButton);
+    root.append(moveDownButton);
+    root.append(moveLeftButton);
+    root.append(moveRightButton);
+    root.append(selectStagingLabel);
+    root.append(selectStaging);
+
+    return root;
+  }
+
+  static _updateListBoxEditor(root, activeValues) {
+    const selectActive = root.querySelector(
+      `#${CSS.escape(root.dataset.selectActive)}`,
+    );
+    const selectStaging = root.querySelector(
+      `#${CSS.escape(root.dataset.selectStaging)}`,
+    );
+
+    const options = new Map(
+      [...selectActive.options, ...selectStaging.options].map((e) => [
+        e.value,
+        e,
+      ]),
+    );
+
+    for (const select of [selectActive, selectStaging]) {
+      while (select.options.length > 0) {
+        select.remove(0);
+      }
+    }
+
+    for (const activeValue of activeValues) {
+      selectActive.add(options.get(activeValue));
+      options.delete(activeValue);
+    }
+
+    for (const inactiveValue of options.values()) {
+      selectStaging.add(inactiveValue);
+    }
   }
 
   static _enableIfChecked(element, check) {
@@ -711,17 +861,22 @@ export class PrefsDialog extends EventTarget {
     const port_forwarding_check = cal.check;
 
     label = document.createElement('div');
-    label.textContent = 'Options';
+    label.textContent = 'Preferred Transport Protocols';
     label.classList.add('section-label');
     root.append(label);
 
-    cal = PrefsDialog._createCheckAndLabel(
-      'utp-enabled',
-      'Enable uTP for peer communication',
+    // tr_preferred_transports
+    const all_preferred_transports = Object.freeze([
+      { label: 'uTP', value: 'utp' },
+      { label: 'TCP', value: 'tcp' },
+    ]);
+    const preferred_transports_editor = PrefsDialog._createListBoxEditor(
+      all_preferred_transports.length,
+      true,
+      all_preferred_transports,
     );
-    cal.check.dataset.key = 'utp_enabled';
-    root.append(cal.root);
-    const utp_check = cal.check;
+    preferred_transports_editor.dataset.key = 'preferred_transports';
+    root.append(preferred_transports_editor);
 
     label = document.createElement('div');
     label.textContent = 'Default Public Trackers';
@@ -755,9 +910,9 @@ export class PrefsDialog extends EventTarget {
         ipv4: port_status_label_ipv4,
         ipv6: port_status_label_ipv6,
       },
+      preferred_transports_editor,
       random_port_check,
       root,
-      utp_check,
     };
   }
 
@@ -827,7 +982,8 @@ export class PrefsDialog extends EventTarget {
           }
         } else if (
           element.tagName === 'TEXTAREA' ||
-          element.tagName === 'SELECT'
+          element.tagName === 'SELECT' ||
+          element.classList?.contains('listboxeditor-wrapper')
         ) {
           element.addEventListener('change', on_change);
         }

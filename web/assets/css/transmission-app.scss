@@ -903,7 +903,8 @@ a {
   }
 
   #default-trackers,
-  .default-trackers-label {
+  .default-trackers-label,
+  .listboxeditor-wrapper {
     grid-column: 1 / 3;
   }
 
@@ -918,6 +919,27 @@ a {
   padding: 0;
   user-select: none;
   -webkit-user-select: none;
+}
+
+.listboxeditor-wrapper {
+  display: inline grid;
+  grid-auto-flow: column;
+  grid-template-columns: 1fr max-content 1fr;
+  grid-template-rows: max-content repeat(4, 1fr);
+  gap: 10px;
+
+  select {
+    grid-row: 2 / -1;
+  }
+
+  button:first-of-type {
+    grid-row: 2;
+  }
+
+  label {
+    text-align: center;
+    font-size: small;
+  }
 }
 
 /// TABS
