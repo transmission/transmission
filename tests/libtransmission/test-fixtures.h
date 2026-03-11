@@ -344,6 +344,10 @@ private:
         settings_map->try_emplace(TR_KEY_dht_enabled, false);
         settings_map->try_emplace(TR_KEY_message_level, verbose_ ? TR_LOG_DEBUG : TR_LOG_ERROR);
 
+        // disable ip query
+        settings_map->insert_or_assign(TR_KEY_ip_endpoints_ipv4, tr_variant::Vector{});
+        settings_map->insert_or_assign(TR_KEY_ip_endpoints_ipv6, tr_variant::Vector{});
+
         return tr_sessionInit(sandboxDir(), !verbose_, settings);
     }
 

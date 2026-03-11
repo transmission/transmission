@@ -264,6 +264,8 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_info,
     TR_KEY_inhibit_desktop_hibernation_kebab_APICOMPAT,
     TR_KEY_inhibit_desktop_hibernation,
+    TR_KEY_ip_endpoints_ipv4,
+    TR_KEY_ip_endpoints_ipv6,
     TR_KEY_ip_protocol,
     TR_KEY_ipv4,
     TR_KEY_ipv6,

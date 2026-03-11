@@ -21,6 +21,7 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -339,6 +340,20 @@ private:
             }
         }
 
+        [[nodiscard]] std::span<std::string const> settings_ip_endpoint(tr_address_type type) override
+        {
+            switch (type)
+            {
+            case TR_AF_INET:
+                return session_.settings_.ip_endpoint_ipv4;
+            case TR_AF_INET6:
+                return session_.settings_.ip_endpoint_ipv6;
+            default:
+                TR_ASSERT_MSG(false, "Invalid type");
+                return {};
+            }
+        }
+
         [[nodiscard]] tr::TimerMaker& timer_maker() override
         {
             return session_.timerMaker();
@@ -461,6 +476,8 @@ public:
             TR_PREFER_UTP,
             TR_PREFER_TCP,
         };
+        std::vector<std::string> ip_endpoint_ipv4 = { "https://ip4.transmissionbt.com/" };
+        std::vector<std::string> ip_endpoint_ipv6 = { "https://ip6.transmissionbt.com/" };
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
         std::optional<std::string> proxy_url;
         std::string announce_ip;
@@ -508,6 +525,8 @@ public:
             Field<&Settings::idle_seeding_limit_enabled>{ TR_KEY_idle_seeding_limit_enabled },
             Field<&Settings::incomplete_dir>{ TR_KEY_incomplete_dir },
             Field<&Settings::incomplete_dir_enabled>{ TR_KEY_incomplete_dir_enabled },
+            Field<&Settings::ip_endpoint_ipv4>{ TR_KEY_ip_endpoints_ipv4 },
+            Field<&Settings::ip_endpoint_ipv6>{ TR_KEY_ip_endpoints_ipv6 },
             Field<&Settings::lpd_enabled>{ TR_KEY_lpd_enabled },
             Field<&Settings::log_level>{ TR_KEY_message_level },
             Field<&Settings::peer_congestion_algorithm>{ TR_KEY_peer_congestion_algorithm },
