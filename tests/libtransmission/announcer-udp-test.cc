@@ -270,11 +270,10 @@ protected:
         buf.add_uint32(transaction_id);
         buf.add(errmsg);
 
-        auto const response_size = std::size(buf);
-        auto arr = std::array<uint8_t, 256>{};
-        buf.to_buf(std::data(arr), response_size);
-
-        return announcer.handle_message(std::data(arr), response_size, from, fromlen);
+        auto msg = std::vector<uint8_t>{};
+        msg.resize(std::size(buf));
+        buf.to_buf(msg);
+        return announcer.handle_message(std::data(msg), std::size(msg), from, fromlen);
     }
 
     [[nodiscard]] static auto sendConnectionResponse(
@@ -289,10 +288,10 @@ protected:
         buf.add_uint32(transaction_id);
         buf.add_uint64(connection_id);
 
-        auto arr = std::array<uint8_t, 16>{};
-        auto response_size = std::size(buf);
-        buf.to_buf(std::data(arr), response_size);
-        EXPECT_TRUE(announcer.handle_message(std::data(arr), response_size, from, fromlen));
+        auto msg = std::vector<uint8_t>{};
+        msg.resize(std::size(buf));
+        buf.to_buf(msg);
+        EXPECT_TRUE(announcer.handle_message(std::data(msg), std::size(msg), from, fromlen));
 
         return connection_id;
     }
@@ -434,10 +433,10 @@ TEST_F(AnnouncerUdpTest, canScrape)
     buf.add_uint32(expected_response.rows[0].seeders.value_or(-1));
     buf.add_uint32(expected_response.rows[0].downloads.value_or(-1));
     buf.add_uint32(expected_response.rows[0].leechers.value_or(-1));
-    auto response_size = std::size(buf);
-    auto arr = std::array<uint8_t, 256>{};
-    buf.to_buf(std::data(arr), response_size);
-    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
+    auto msg = std::vector<uint8_t>{};
+    msg.resize(std::size(buf));
+    buf.to_buf(msg);
+    EXPECT_TRUE(announcer->handle_message(std::data(msg), std::size(msg), from_ptr, fromlen));
 
     // confirm that announcer processed the response
     ASSERT_TRUE(response.has_value());
@@ -531,10 +530,10 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
         buf.add_uint32(expected_response.rows[i].downloads.value_or(-1));
         buf.add_uint32(expected_response.rows[i].leechers.value_or(-1));
     }
-    auto response_size = std::size(buf);
-    auto arr = std::array<uint8_t, 256>{};
-    buf.to_buf(std::data(arr), response_size);
-    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
+    auto msg = std::vector<uint8_t>{};
+    msg.resize(std::size(buf));
+    buf.to_buf(msg);
+    EXPECT_TRUE(announcer->handle_message(std::data(msg), std::size(msg), from_ptr, fromlen));
 
     // Confirm that announcer processed the response
     ASSERT_TRUE(response.has_value());
@@ -667,19 +666,19 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     buf.add_uint32(ConnectAction);
     buf.add_uint32(transaction_id + 1);
     buf.add_uint64(tr_rand_obj<uint64_t>());
-    auto response_size = std::size(buf);
-    auto arr = std::array<uint8_t, 256>{};
-    buf.to_buf(std::data(arr), response_size);
-    EXPECT_FALSE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
+    auto msg = std::vector<uint8_t>{};
+    msg.resize(std::size(buf));
+    buf.to_buf(msg);
+    EXPECT_FALSE(announcer->handle_message(std::data(msg), std::size(msg), from_ptr, fromlen));
 
     // send a connection response but with an *invalid* action
     buf.clear();
     buf.add_uint32(ScrapeAction);
     buf.add_uint32(transaction_id);
     buf.add_uint64(tr_rand_obj<uint64_t>());
-    response_size = std::size(buf);
-    buf.to_buf(std::data(arr), response_size);
-    EXPECT_FALSE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
+    msg.resize(std::size(buf));
+    buf.to_buf(msg);
+    EXPECT_FALSE(announcer->handle_message(std::data(msg), std::size(msg), from_ptr, fromlen));
 
     // but after discarding invalid messages,
     // a valid connection response should still work

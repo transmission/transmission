@@ -760,10 +760,6 @@ struct tr_torrent
     {
         if (is_sequential != sequential_download_)
         {
-            if (is_sequential)
-            {
-                session->flush_torrent_files(id());
-            }
             sequential_download_ = is_sequential;
             sequential_download_changed_(this, is_sequential);
             set_dirty();
