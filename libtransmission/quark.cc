@@ -135,6 +135,7 @@ auto constexpr MyStatic = std::array<std::u8string_view, TR_N_KEYS>{
     u8"done-date"sv, // .resume
     u8"doneDate"sv, // rpc
     u8"done_date"sv, // .resume, rpc
+    u8"done_script_called"sv, // .resume
     u8"download-dir"sv, // daemon, gtk app, tr_session::Settings
     u8"download-dir-free-space"sv, // rpc
     u8"download-queue-enabled"sv, // rpc, tr_session::Settings

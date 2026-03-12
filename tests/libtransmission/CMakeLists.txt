@@ -39,6 +39,7 @@ target_sources(libtransmission-test
         platform-test.cc
         quark-test.cc
         remove-test.cc
+        resume-test.cc
         rename-test.cc
         rpc-test.cc
         serializer-tests.cc
@@ -52,6 +53,7 @@ target_sources(libtransmission-test
         test-fixtures.h
         timer-test.cc
         torrent-files-test.cc
+        torrent-test.cc
         torrent-magnet-test.cc
         torrent-metainfo-test.cc
         torrent-queue-test.cc

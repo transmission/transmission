@@ -1860,7 +1860,14 @@ void tr_torrent::recheck_completeness()
         if (is_done())
         {
             save_resume_file();
-            callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
+
+            if (!done_script_called_ && tr_sessionIsScriptEnabled(session, TR_SCRIPT_ON_TORRENT_DONE))
+            {
+                done_script_called_ = true;
+                set_dirty();
+                callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
+                save_resume_file();
+            }
         }
     }
 }
