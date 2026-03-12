@@ -796,6 +796,12 @@ a {
         color: var(--color-progressbar-fg-2);
         text-shadow: var(--progress-bar-shadow-2);
       }
+
+      &.finished::before {
+        background: var(--color-progressbar-finished);
+        color: var(--color-progressbar-fg-1);
+        text-shadow: var(--progress-bar-shadow-1);
+      }
     }
 
     &.verify::before {
