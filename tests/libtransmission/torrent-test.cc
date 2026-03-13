@@ -3,6 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <cstddef>
+#include <ranges>
+
+#include <libtransmission/torrent.h>
+
 #include "test-fixtures.h"
 
 using TorrentTest = tr::test::SessionTest;
@@ -36,6 +42,32 @@ TEST_F(TorrentTest, queueMoveUp)
     }
 
     tr_torrent::queue_move_up(move_torrents);
+
+    for (size_t i = 0; i < ExpectedQueuePosition.size(); ++i)
+    {
+        EXPECT_EQ(ExpectedQueuePosition[i], torrents[i]->queue_position()) << i;
+    }
+}
+
+TEST_F(TorrentTest, queueMoveDown)
+{
+    static constexpr auto ExpectedQueuePosition = std::array{ 1, 0, 2, 3 };
+    auto ctor = tr_ctor{ session_ };
+    auto torrents = std::array<tr_torrent*, TorFilenames.size()>{};
+    std::ranges::transform(
+        TorFilenames,
+        torrents.begin(),
+        [this](auto const filename) { return torrentInitFromFile(filename); });
+    auto const move_torrents = std::array{ torrents[0], torrents[2], torrents[3] };
+
+    // Pre-test sanity checks
+    for (size_t i = 0; i < torrents.size(); ++i)
+    {
+        ASSERT_EQ(i, torrents[i]->queue_position());
+        ASSERT_EQ(i + 1U, torrents[i]->id());
+    }
+
+    tr_torrent::queue_move_down(move_torrents);
 
     for (size_t i = 0; i < ExpectedQueuePosition.size(); ++i)
     {
