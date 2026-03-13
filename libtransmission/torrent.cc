@@ -913,8 +913,6 @@ void tr_torrent::init(tr_ctor const& ctor)
     TR_ASSERT(bytes_downloaded_.during_this_session() == 0U);
     TR_ASSERT(bytes_uploaded_.during_this_session() == 0);
 
-    mark_changed();
-
     // these are defaults that will be overwritten by the resume file
     date_added_ = now_sec;
     set_sequential_download(session->sequential_download());
@@ -998,6 +996,8 @@ void tr_torrent::init(tr_ctor const& ctor)
                     fmt::arg("error", error.message()),
                     fmt::arg("error_code", error.code())));
         }
+
+        mark_changed();
     }
 
     torrent_announcer = session->announcer_->addTorrent(this, &tr_torrent::on_tracker_response);
