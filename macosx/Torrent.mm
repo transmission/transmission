@@ -1932,6 +1932,7 @@ tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextInfo)
     {
         NSUInteger const count = self.fileCount;
         NSMutableArray* flatFileList = [NSMutableArray arrayWithCapacity:count];
+        NSMutableDictionary* folderCache = [NSMutableDictionary dictionary];
 
         FileListNode* tempNode = nil;
 
@@ -1958,7 +1959,8 @@ tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextInfo)
                                 forParent:tempNode
                                  fileSize:file.length
                                     index:i
-                                 flatList:flatFileList];
+                                 flatList:flatFileList
+                              folderCache:folderCache];
         }
 
         [self sortFileList:tempNode.children];
@@ -1981,34 +1983,26 @@ tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextInfo)
                        fileSize:(uint64_t)size
                           index:(NSInteger)index
                        flatList:(NSMutableArray<FileListNode*>*)flatFileList
+                    folderCache:(NSMutableDictionary<NSString*, FileListNode*>*)folderCache
 {
     NSParameterAssert(components.count > 0);
     NSParameterAssert(componentIndex < components.count);
 
     NSString* name = components[componentIndex];
     BOOL const isFolder = componentIndex < (components.count - 1);
+    NSString* path = [parent.path stringByAppendingPathComponent:parent.name];
 
     //determine if folder node already exists
-    __block FileListNode* node = nil;
-    if (isFolder)
-    {
-        [parent.children enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                          usingBlock:^(FileListNode* searchNode, NSUInteger /*idx*/, BOOL* stop) {
-                                              if ([searchNode.name isEqualToString:name] && searchNode.isFolder)
-                                              {
-                                                  node = searchNode;
-                                                  *stop = YES;
-                                              }
-                                          }];
-    }
+    NSString* cacheKey = [path stringByAppendingPathComponent:name];
+    FileListNode* node = folderCache[cacheKey];
 
     //create new folder or file if it doesn't already exist
     if (!node)
     {
-        NSString* path = [parent.path stringByAppendingPathComponent:parent.name];
         if (isFolder)
         {
             node = [[FileListNode alloc] initWithFolderName:name path:path torrent:self];
+            folderCache[cacheKey] = node;
         }
         else
         {
@@ -2028,7 +2022,8 @@ tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextInfo)
                             forParent:node
                              fileSize:size
                                 index:index
-                             flatList:flatFileList];
+                             flatList:flatFileList
+                          folderCache:folderCache];
     }
 }
 
