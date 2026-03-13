@@ -405,9 +405,9 @@
 	<key>Paused</key>
 	<string>На пауза</string>
 	<key>Peer is unchoking you, but you are not interested</key>
-	<string>Пиърът разрешава прехвърляне, но няма заявен интерес</string>
+	<string>Пиърът е готов да изпраща данни, но няма заявка за изтегляне</string>
 	<key>Peer wants you to upload, but you do not want to (interested and choked)</key>
-	<string>Пиърът иска качване, но качването е ограничено (има интерес и е ограничен)</string>
+	<string>Пиърът иска да получава данни, но качването към него е ограничено</string>
 	<key>Peers</key>
 	<string>Пиъри</string>
 	<key>Port check site is down</key>
@@ -683,9 +683,9 @@
 	<key>Yellow</key>
 	<string>Жълто</string>
 	<key>You unchoked the peer, but the peer is not interested</key>
-	<string>Прехвърлянето към пиъра е разрешено, но пиърът няма интерес</string>
+	<string>Изпращането към пиъра е разрешено, но пиърът не заявява интерес</string>
 	<key>You want to download, but peer does not want to send (interested and choked)</key>
-	<string>Има заявен интерес за изтегляне, но пиърът не изпраща данни (има интерес и е ограничен)</string>
+	<string>Има заявка за изтегляне, но пиърът не изпраща данни</string>
 	<key>disabled</key>
 	<string>забранено</string>
 	<key>encrypted</key>
