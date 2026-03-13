@@ -207,7 +207,7 @@
 	<key>Donate</key>
 	<string>Дари</string>
 	<key>Donate or not, there will be no difference to your torrenting experience.</key>
-	<string>Дари или не — няма да има разлика в изживяването ти с торенти.</string>
+	<string>Дарението не променя работата с торенти.</string>
 	<key>Download</key>
 	<string>Изтегляне</string>
 	<key>Download Anyway</key>
@@ -405,9 +405,9 @@
 	<key>Paused</key>
 	<string>На пауза</string>
 	<key>Peer is unchoking you, but you are not interested</key>
-	<string>Пиърът те отблокира, но ти не си заинтересован</string>
+	<string>Пиърът разрешава прехвърляне, но няма заявен интерес</string>
 	<key>Peer wants you to upload, but you do not want to (interested and choked)</key>
-	<string>Пиърът иска да качваш, но ти не искаш (заинтересован и ограничен)</string>
+	<string>Пиърът иска качване, но качването е ограничено (има интерес и е ограничен)</string>
 	<key>Peers</key>
 	<string>Пиъри</string>
 	<key>Port check site is down</key>
@@ -649,9 +649,9 @@
 	<key>Transfers Not Active</key>
 	<string>Трансферите не са активни</string>
 	<key>Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</key>
-	<string>Transmission е програма за споделяне на файлове. Когато пуснеш торент, данните му стават достъпни за други чрез качване. Само ти носиш пълна отговорност да прецениш правилно и да спазваш местните си закони.</string>
+	<string>Transmission е програма за споделяне на файлове. При стартиране на торент данните му стават достъпни за други чрез качване. Отговорността за правилната преценка и спазването на местните закони е изцяло на потребителя.</string>
 	<key>Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation.</key>
-	<string>Transmission е пълнофункционално торент приложение. В разработката, кодирането и усъвършенстването му са вложени много време и усилия. Ако ти харесва да го използваш, помисли дали да не го подкрепиш с дарение.</string>
+	<string>Transmission е пълнофункционално торент приложение. В разработката, кодирането и усъвършенстването му са вложени много време и усилия. Ако приложението е полезно, помислете за дарение.</string>
 	<key>Transmission is already running.</key>
 	<string>Transmission вече работи.</string>
 	<key>UL</key>
@@ -683,9 +683,9 @@
 	<key>Yellow</key>
 	<string>Жълто</string>
 	<key>You unchoked the peer, but the peer is not interested</key>
-	<string>Ти отблокира пиъра, но пиърът не е заинтересован</string>
+	<string>Прехвърлянето към пиъра е разрешено, но пиърът няма интерес</string>
 	<key>You want to download, but peer does not want to send (interested and choked)</key>
-	<string>Искаш да изтегляш, но пиърът не иска да изпраща (заинтересован и задушен)</string>
+	<string>Има заявен интерес за изтегляне, но пиърът не изпраща данни (има интерес и е ограничен)</string>
 	<key>disabled</key>
 	<string>забранено</string>
 	<key>encrypted</key>
