@@ -74,3 +74,55 @@ TEST_F(TorrentTest, queueMoveDown)
         EXPECT_EQ(ExpectedQueuePosition[i], torrents[i]->queue_position()) << i;
     }
 }
+
+TEST_F(TorrentTest, queueMoveTop)
+{
+    static constexpr auto ExpectedQueuePosition = std::array{ 0, 3, 1, 2 };
+    auto ctor = tr_ctor{ session_ };
+    auto torrents = std::array<tr_torrent*, TorFilenames.size()>{};
+    std::ranges::transform(
+        TorFilenames,
+        torrents.begin(),
+        [this](auto const filename) { return torrentInitFromFile(filename); });
+    auto const move_torrents = std::array{ torrents[0], torrents[2], torrents[3] };
+
+    // Pre-test sanity checks
+    for (size_t i = 0; i < torrents.size(); ++i)
+    {
+        ASSERT_EQ(i, torrents[i]->queue_position());
+        ASSERT_EQ(i + 1U, torrents[i]->id());
+    }
+
+    tr_torrent::queue_move_top(move_torrents);
+
+    for (size_t i = 0; i < ExpectedQueuePosition.size(); ++i)
+    {
+        EXPECT_EQ(ExpectedQueuePosition[i], torrents[i]->queue_position()) << i;
+    }
+}
+
+TEST_F(TorrentTest, queueMoveBottom)
+{
+    static constexpr auto ExpectedQueuePosition = std::array{ 1, 2, 0, 3 };
+    auto ctor = tr_ctor{ session_ };
+    auto torrents = std::array<tr_torrent*, TorFilenames.size()>{};
+    std::ranges::transform(
+        TorFilenames,
+        torrents.begin(),
+        [this](auto const filename) { return torrentInitFromFile(filename); });
+    auto const move_torrents = std::array{ torrents[0], torrents[1], torrents[3] };
+
+    // Pre-test sanity checks
+    for (size_t i = 0; i < torrents.size(); ++i)
+    {
+        ASSERT_EQ(i, torrents[i]->queue_position());
+        ASSERT_EQ(i + 1U, torrents[i]->id());
+    }
+
+    tr_torrent::queue_move_bottom(move_torrents);
+
+    for (size_t i = 0; i < ExpectedQueuePosition.size(); ++i)
+    {
+        EXPECT_EQ(ExpectedQueuePosition[i], torrents[i]->queue_position()) << i;
+    }
+}
