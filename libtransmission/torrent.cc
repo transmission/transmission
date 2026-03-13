@@ -512,11 +512,15 @@ void tr_torrent::queue_move_up(std::span<tr_torrent* const> const torrents_in)
 
     auto torrents = std::vector<tr_torrent*>(std::begin(torrents_in), std::end(torrents_in));
     std::ranges::sort(torrents, tr_torrent::CompareQueuePosition);
-    for (auto* const tor : torrents)
+    for (auto last_consecutive_pos = tr_torrent_queue::MinQueuePosition; auto* const tor : torrents)
     {
-        if (auto const pos = tor->queue_position(); pos > tr_torrent_queue::MinQueuePosition)
+        if (auto const pos = tor->queue_position(); pos != last_consecutive_pos)
         {
             tor->set_queue_position(pos - 1U);
+        }
+        else
+        {
+            ++last_consecutive_pos;
         }
     }
 }
