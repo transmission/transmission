@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - 'main'
+      - 'master_m-dragoev'
   pull_request:
     branches:
       - 'main'
+      - 'master_m-dragoev'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
