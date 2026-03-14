@@ -2526,7 +2526,10 @@ void DetailsDialog::Impl::set_torrents(std::vector<tr_torrent_id_t> const& ids)
     Glib::ustring title;
     auto const len = ids.size();
 
-    ids_ = ids;
+    if (std::addressof(ids_) != std::addressof(ids))
+    {
+        ids_ = ids;
+    }
 
     if (len == 1)
     {
