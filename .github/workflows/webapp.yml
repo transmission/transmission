@@ -3,12 +3,14 @@ on:
   push:
     branches:
       - 'main'
+      - 'master_m-dragoev'
     paths-ignore:
       - 'docs/**'
       - '.github/**'
   pull_request:
     branches:
       - 'main'
+      - 'master_m-dragoev'
     paths-ignore:
       - 'docs/**'
       - '.github/**'
@@ -28,7 +30,7 @@ jobs:
         id: check-main-push
         run: |
           set -x # echo all executed commands to the terminal
-          if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then
+          if [ "$GITHUB_EVENT_NAME" = 'push' ] && { [ "$GITHUB_REF_NAME" = 'main' ] || [ "$GITHUB_REF_NAME" = 'master_m-dragoev' ]; }; then
             echo is-main-push=1 >> "$GITHUB_OUTPUT"
           else
             echo is-main-push=0 >> "$GITHUB_OUTPUT"
@@ -40,7 +42,7 @@ jobs:
           function get_changes() { # name, paths...
             local name="$1"
             shift
-            if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then
+            if [ "$GITHUB_EVENT_NAME" = 'push' ] && { [ "$GITHUB_REF_NAME" = 'main' ] || [ "$GITHUB_REF_NAME" = 'master_m-dragoev' ]; }; then
               DIFF_TARGET='--name-only HEAD^'
             else
               git fetch --depth=1 origin "$GITHUB_BASE_REF"
@@ -151,4 +153,3 @@ jobs:
           delete-branch: true
           title: 'chore: update generated transmission-web files'
           body: Generated from https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
