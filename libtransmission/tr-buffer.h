@@ -23,9 +23,17 @@
 namespace tr
 {
 
+namespace detail
+{
+template<typename T>
+concept object_representation = std::same_as<T, char> || std::same_as<T, unsigned char> || std::same_as<T, std::byte>;
+}
+
 template<typename value_type>
 class BufferReader
 {
+    static_assert(detail::object_representation<value_type>);
+
 public:
     virtual ~BufferReader() = default;
     virtual void drain(size_t n_bytes) = 0;
@@ -140,6 +148,8 @@ public:
 template<typename value_type>
 class BufferWriter
 {
+    static_assert(detail::object_representation<value_type>);
+
 public:
     virtual ~BufferWriter() = default;
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) = 0;
