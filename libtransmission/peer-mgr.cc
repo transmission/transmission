@@ -270,7 +270,7 @@ void tr_peer_info::update_canonical_priority()
         static_assert(std::is_same_v<std::remove_reference_t<decltype(buf[0])>, uint16_t>);
         std::ranges::sort(buf);
         std::ranges::for_each(buf, [](auto& p) { p = htons(p); });
-        canonical_priority_ = tr_crc32c(reinterpret_cast<uint8_t*>(std::data(buf)), std::size(buf) * sizeof(uint16_t));
+        canonical_priority_ = tr_crc32c(std::data(buf), std::size(buf) * sizeof(uint16_t));
         return;
     }
 
@@ -312,7 +312,7 @@ void tr_peer_info::update_canonical_priority()
         second[i] &= std::byte{ 0x55 };
     }
 
-    canonical_priority_ = tr_crc32c(reinterpret_cast<uint8_t*>(std::data(buf)), address_size * 2U);
+    canonical_priority_ = tr_crc32c(std::data(buf), address_size * 2U);
 }
 
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
