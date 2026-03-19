@@ -618,6 +618,15 @@ void handle_request(struct evhttp_request* req, void* arg)
             fmt::format(fmt::runtime(_("Rejected request from {host} (Host not whitelisted)")), fmt::arg("host", remote_host)));
         send_simple_response(req, 421, Body);
     }
+    else if (uri != rpc_base_path)
+    {
+        tr_logAddWarn(
+            fmt::format(
+                fmt::runtime(_("Unknown URI from {host}: '{uri}'")),
+                fmt::arg("host", remote_host),
+                fmt::arg("uri", uri)));
+        send_simple_response(req, HTTP_NOTFOUND, uri);
+    }
 #ifdef REQUIRE_SESSION_ID
     else if (!test_session_id(server, req))
     {
@@ -645,18 +654,9 @@ void handle_request(struct evhttp_request* req, void* arg)
         send_simple_response(req, 409, body.c_str());
     }
 #endif
-    else if (tr_strv_starts_with(uri, rpc_base_path))
-    {
-        handle_rpc(req, server);
-    }
     else
     {
-        tr_logAddWarn(
-            fmt::format(
-                fmt::runtime(_("Unknown URI from {host}: '{uri}'")),
-                fmt::arg("host", remote_host),
-                fmt::arg("uri", uri)));
-        send_simple_response(req, HTTP_NOTFOUND, uri);
+        handle_rpc(req, server);
     }
 }
 
