@@ -1675,7 +1675,7 @@ jobs:
               cmake \
               `# dht (somehow installing dht causes the build to fail with a bunch of "/usr/local/lib/libdht.so: error: undefined reference to 'dht_*'" messages` \
               fast_float \
-              gcc12 \
+              gcc13 \
               gettext \
               `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm30` \
               libb64 \
@@ -1699,9 +1699,9 @@ jobs:
               -B obj \
               -G Ninja \
               -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-              -DCMAKE_CXX_COMPILER='/usr/local/bin/g++12' \
-              -DCMAKE_C_COMPILER='/usr/local/bin/gcc12' \
-              -DCMAKE_BUILD_RPATH='/usr/local/lib/gcc12' \
+              -DCMAKE_CXX_COMPILER='/usr/local/bin/g++13' \
+              -DCMAKE_C_COMPILER='/usr/local/bin/gcc13' \
+              -DCMAKE_BUILD_RPATH='/usr/local/lib/gcc13' \
               -DCMAKE_INSTALL_PREFIX=pfx \
               -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
