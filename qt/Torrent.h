@@ -299,7 +299,7 @@ public:
 
     [[nodiscard]] constexpr double percentComplete() const noexcept
     {
-        return totalSize() != 0 ? haveTotal() / static_cast<double>(totalSize()) : 0;
+        return percent_complete_;
     }
 
     [[nodiscard]] constexpr double percentDone() const noexcept
@@ -593,6 +593,7 @@ public:
         PEERS_GETTING_FROM_US,
         PEERS_SENDING_TO_US,
         PEER_LIMIT,
+        PERCENT_COMPLETE,
         PERCENT_DONE,
         PIECE_COUNT,
         PIECE_SIZE,
@@ -669,6 +670,7 @@ private:
     uint64_t uploaded_ever_ = {};
 
     double metadata_percent_complete_ = {};
+    double percent_complete_ = {};
     double percent_done_ = {};
     double recheck_progress_ = {};
     double seed_ratio_limit_ = {};
