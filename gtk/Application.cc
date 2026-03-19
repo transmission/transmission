@@ -1270,7 +1270,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         {
             bool const b = gtr_pref_flag_get(key);
             tr_sessionUseAltSpeed(tr, b);
-            gtr_action_set_toggled(std::string(tr_quark_get_string_view(key)), b);
+            gtr_action_set_toggled("alt-speed-enabled", b);
             break;
         }
 
