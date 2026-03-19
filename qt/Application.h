@@ -7,7 +7,6 @@
 
 #include <ctime>
 #include <memory>
-#include <unordered_set>
 
 #include <QApplication>
 #include <QPixmap>
@@ -17,11 +16,12 @@
 #include <QTranslator>
 #include <QWeakPointer>
 
+#include <small/set.hpp>
+
 #include <libtransmission-app/favicon-cache.h>
 
 #include "AddData.h"
 #include "Typedefs.h"
-#include "Utils.h" // std::hash<QString>
 
 class AddData;
 class MainWindow;
@@ -103,7 +103,7 @@ private:
     QStringList getNames(torrent_ids_t const& ids) const;
     void notifyTorrentAdded(Torrent const*) const;
 
-    std::unordered_set<QString> interned_strings_;
+    small::unordered_set<QString> interned_strings_;
 
     std::unique_ptr<Prefs> prefs_;
     std::unique_ptr<Session> session_;
