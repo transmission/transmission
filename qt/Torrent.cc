@@ -9,12 +9,9 @@
 
 #include <QApplication>
 #include <QString>
-#include <QUrl>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/variant.h>
 
 #include "Application.h"
 #include "IconCache.h"
@@ -57,7 +54,7 @@ bool Torrent::includesTracker(QString const& sitename) const
     return std::ranges::binary_search(sitenames_, sitename);
 }
 
-int Torrent::compareSeedProgress(Torrent const& that) const
+std::partial_ordering Torrent::compareSeedProgress(Torrent const& that) const
 {
     auto const a_ratio_limit = getSeedRatioLimit();
     auto const b_ratio_limit = that.getSeedRatioLimit();
@@ -72,12 +69,12 @@ int Torrent::compareSeedProgress(Torrent const& that) const
 
     if (!a_ratio_limit)
     {
-        return b_ratio < *b_ratio_limit ? 1 : -1;
+        return b_ratio < *b_ratio_limit ? std::partial_ordering::greater : std::partial_ordering::less;
     }
 
     if (!b_ratio_limit)
     {
-        return a_ratio < *a_ratio_limit ? -1 : 1;
+        return a_ratio < *a_ratio_limit ? std::partial_ordering::less : std::partial_ordering::greater;
     }
 
     if (!(*a_ratio_limit > 0) && !(*b_ratio_limit > 0))
@@ -87,63 +84,63 @@ int Torrent::compareSeedProgress(Torrent const& that) const
 
     if (!(*a_ratio_limit > 0))
     {
-        return 1;
+        return std::partial_ordering::greater;
     }
 
     if (!(*b_ratio_limit > 0))
     {
-        return -1;
+        return std::partial_ordering::less;
     }
 
     double const a_progress = a_ratio / *a_ratio_limit;
     double const b_progress = b_ratio / *b_ratio_limit;
-    return tr_compare_3way(a_progress, b_progress);
+    return a_progress <=> b_progress;
 }
 
-int Torrent::compareRatio(Torrent const& that) const
+std::partial_ordering Torrent::compareRatio(Torrent const& that) const
 {
     double const a = ratio();
     double const b = that.ratio();
 
     if (static_cast<int>(a) == TR_RATIO_INF && static_cast<int>(b) == TR_RATIO_INF)
     {
-        return 0;
+        return std::partial_ordering::equivalent;
     }
 
     if (static_cast<int>(a) == TR_RATIO_INF)
     {
-        return 1;
+        return std::partial_ordering::greater;
     }
 
     if (static_cast<int>(b) == TR_RATIO_INF)
     {
-        return -1;
+        return std::partial_ordering::less;
     }
 
-    return tr_compare_3way(a, b);
+    return a <=> b;
 }
 
-int Torrent::compareETA(Torrent const& that) const
+std::strong_ordering Torrent::compareETA(Torrent const& that) const
 {
     bool const have_a(hasETA());
     bool const have_b(that.hasETA());
 
     if (have_a && have_b)
     {
-        return getETA() - that.getETA();
+        return getETA() <=> that.getETA();
     }
 
     if (have_a)
     {
-        return 1;
+        return std::strong_ordering::greater;
     }
 
     if (have_b)
     {
-        return -1;
+        return std::strong_ordering::less;
     }
 
-    return 0;
+    return std::strong_ordering::equal;
 }
 
 /***

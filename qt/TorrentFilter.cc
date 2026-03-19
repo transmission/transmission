@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <compare>
 #include <optional>
 
 #include "libtransmission/utils.h"
@@ -77,7 +78,7 @@ void TorrentFilter::refilter()
 
 bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) const
 {
-    int val = 0;
+    auto val = std::partial_ordering::equivalent;
     auto const* a = sourceModel()->data(left, TorrentModel::TorrentRole).value<Torrent const*>();
     auto const* b = sourceModel()->data(right, TorrentModel::TorrentRole).value<Torrent const*>();
 
@@ -86,7 +87,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     case SortMode::SortByQueue:
         if (val == 0)
         {
-            val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
+            val = b->queuePosition() <=> a->queuePosition();
         }
 
         break;
@@ -94,7 +95,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     case SortMode::SortBySize:
         if (val == 0)
         {
-            val = tr_compare_3way(a->sizeWhenDone(), b->sizeWhenDone());
+            val = a->sizeWhenDone() <=> b->sizeWhenDone();
         }
 
         break;
@@ -102,7 +103,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     case SortMode::SortByAge:
         if (val == 0)
         {
-            val = tr_compare_3way(a->dateAdded(), b->dateAdded());
+            val = a->dateAdded() <=> b->dateAdded();
         }
 
         break;
@@ -110,7 +111,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     case SortMode::SortById:
         if (val == 0)
         {
-            val = tr_compare_3way(a->id(), b->id());
+            val = a->id() <=> b->id();
         }
 
         break;
@@ -118,14 +119,13 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     case SortMode::SortByActivity:
         if (val == 0)
         {
-            val = tr_compare_3way(a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed());
+            val = a->downloadSpeed() + a->uploadSpeed() <=> b->downloadSpeed() + b->uploadSpeed();
         }
 
         if (val == 0)
         {
-            val = tr_compare_3way(
-                a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
-                b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom());
+            val = a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom() <=>
+                b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom();
         }
 
         [[fallthrough]];
@@ -133,22 +133,22 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     case SortMode::SortByState:
         if (val == 0)
         {
-            val = -tr_compare_3way(a->isPaused(), b->isPaused());
+            val = static_cast<int>(b->isPaused()) <=> static_cast<int>(a->isPaused());
         }
 
         if (val == 0)
         {
-            val = tr_compare_3way(a->getActivity(), b->getActivity());
+            val = a->getActivity() <=> b->getActivity();
         }
 
         if (val == 0)
         {
-            val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
+            val = b->queuePosition() <=> a->queuePosition();
         }
 
         if (val == 0)
         {
-            val = tr_compare_3way(a->hasError(), b->hasError());
+            val = static_cast<int>(a->hasError()) <=> static_cast<int>(b->hasError());
         }
 
         [[fallthrough]];
@@ -156,12 +156,12 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     case SortMode::SortByProgress:
         if (val == 0)
         {
-            val = tr_compare_3way(a->metadataPercentDone(), b->metadataPercentDone());
+            val = a->metadataPercentDone() <=> b->metadataPercentDone();
         }
 
         if (val == 0)
         {
-            val = tr_compare_3way(a->percentComplete(), b->percentComplete());
+            val = a->percentComplete() <=> b->percentComplete();
         }
 
         if (val == 0)
@@ -171,7 +171,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
         if (val == 0)
         {
-            val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
+            val = b->queuePosition() <=> a->queuePosition();
         }
 
         [[fallthrough]];
@@ -198,12 +198,23 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
     if (val == 0)
     {
-        val = -a->name().compare(b->name(), Qt::CaseInsensitive);
+        if (auto const tmp = a->name().compare(b->name(), Qt::CaseInsensitive); tmp < 0)
+        {
+            val = std::strong_ordering::greater;
+        }
+        else if (tmp > 0)
+        {
+            val = std::strong_ordering::less;
+        }
+        else
+        {
+            val = std::strong_ordering::equal;
+        }
     }
 
     if (val == 0)
     {
-        val = tr_compare_3way(a->hash(), b->hash());
+        val = a->hash() <=> b->hash();
     }
 
     return val < 0;
