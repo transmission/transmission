@@ -130,7 +130,7 @@ QAccessibleInterface* accessibleFactory(QString const& className, QObject* objec
 
 void Application::pruneInternedStrings()
 {
-    std::erase_if(interned_strings_, [](QString const& str) { return str.isDetached(); });
+    interned_strings_.erase_if([](QString const& str) { return str.isDetached(); });
 }
 
 QString Application::intern(QString const& in)
