@@ -28,11 +28,17 @@
  * This class caches 3 useful info:
  * 1. Whether your machine supports the IP protocol
  * 2. Source address used for global connections
- * 3. Global address (IPv4 public address/IPv6 global unicast address)
+ * 3. Global address (IPv4 public address/IPv6 global unicast address) retrieved
+ *    from HTTP IP query endpoints on the Internet.
  *
  * The idea is, if this class successfully cached a source address, that means
  * your system is capable in that IP protocol. And if the global address is
  * the same as the source address, then you are not behind a NAT.
+ *
+ * The global address cached in this class is not to be trusted 100%. Although
+ * uncommon, your BT packets might be routed differently than HTTP traffic such
+ * that your global address appears differently to other BT clients than the IP
+ * query services.
  */
 class tr_ip_cache : public std::enable_shared_from_this<tr_ip_cache>
 {
