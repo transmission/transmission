@@ -214,6 +214,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(peers_connected, peers_connected, PEERS_CONNECTED)
             HANDLE_KEY(peers_getting_from_us, peers_getting_from_us, PEERS_GETTING_FROM_US)
             HANDLE_KEY(peers_sending_to_us, peers_sending_to_us, PEERS_SENDING_TO_US)
+            HANDLE_KEY(percent_complete, percent_complete, PERCENT_COMPLETE)
             HANDLE_KEY(percent_done, percent_done, PERCENT_DONE)
             HANDLE_KEY(piece_count, piece_count, PIECE_COUNT)
             HANDLE_KEY(piece_size, piece_size, PIECE_SIZE)
