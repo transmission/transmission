@@ -95,7 +95,7 @@ int TorrentModel::rowCount(QModelIndex const& parent) const
 {
     Q_UNUSED(parent)
 
-    return torrents_.size();
+    return static_cast<int>(torrents_.size());
 }
 
 QVariant TorrentModel::data(QModelIndex const& index, int role) const
@@ -439,7 +439,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
 {
     if (torrents_.empty())
     {
-        beginInsertRows(QModelIndex{}, 0, torrents.size() - 1);
+        beginInsertRows(QModelIndex{}, 0, static_cast<int>(torrents.size() - 1));
         torrents_ = torrents;
         std::ranges::sort(torrents_, TorrentIdLessThan);
         endInsertRows();

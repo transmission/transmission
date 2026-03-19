@@ -270,7 +270,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             case TR_KEY_files:
                 for (size_t i = 0; i < files_.size(); ++i)
                 {
-                    files_[i].index = i;
+                    files_[i].index = static_cast<int>(i);
                 }
                 break;
 

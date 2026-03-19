@@ -152,7 +152,7 @@ signals:
     void portTested(std::optional<bool> status, PortTestIpProtocol ip_protocol);
     void statsUpdated();
     void sessionUpdated();
-    void blocklistUpdated(int);
+    void blocklistUpdated(int64_t);
     void torrentsUpdated(tr_variant* torrent_list, bool complete_list);
     void torrentsRemoved(tr_variant* torrent_list);
     void sessionCalled(Tag);

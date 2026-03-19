@@ -23,6 +23,7 @@
 #include <libtransmission/quark.h>
 
 #include "IconCache.h"
+#include "QtCompat.h"
 #include "Speed.h"
 
 class QPixmap;
@@ -113,7 +114,7 @@ public:
         : data_{ data }
     {
         auto const hashstr = tr_sha1_to_string(data_);
-        data_str_ = QString::fromUtf8(std::data(hashstr), std::size(hashstr));
+        data_str_ = QString::fromUtf8(std::data(hashstr), static_cast<IF_QT6(qsizetype, int)>(std::size(hashstr)));
     }
 
     explicit TorrentHash(std::string_view const str)

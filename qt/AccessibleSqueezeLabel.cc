@@ -62,7 +62,8 @@ void AccessibleSqueezeLabel::selection(int selectionIndex, int* startOffset, int
     }
 
     *startOffset = label()->selectionStart();
-    *endOffset = *startOffset + label()->selectedText().size();
+    // NOLINTNEXTLINE(readability-redundant-casting): Remove this comment when we drop Qt5
+    *endOffset = *startOffset + static_cast<int>(label()->selectedText().size());
 }
 
 int AccessibleSqueezeLabel::selectionCount() const
@@ -108,7 +109,8 @@ QString AccessibleSqueezeLabel::text(int startOffset, int endOffset) const
 
 int AccessibleSqueezeLabel::characterCount() const
 {
-    return label()->text().size();
+    // NOLINTNEXTLINE(readability-redundant-casting): Remove this comment when we drop Qt5
+    return static_cast<int>(label()->text().size());
 }
 
 QRect AccessibleSqueezeLabel::characterRect(int /*offset*/) const

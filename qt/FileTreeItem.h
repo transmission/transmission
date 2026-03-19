@@ -51,7 +51,7 @@ public:
 
     [[nodiscard]] constexpr int childCount() const noexcept
     {
-        return std::size(children_);
+        return static_cast<int>(std::size(children_));
     }
 
     [[nodiscard]] constexpr auto* parent() noexcept

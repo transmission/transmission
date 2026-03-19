@@ -16,7 +16,7 @@ int TrackerModel::rowCount(QModelIndex const& parent) const
 {
     Q_UNUSED(parent)
 
-    return parent.isValid() ? 0 : rows_.size();
+    return parent.isValid() ? 0 : static_cast<int>(rows_.size());
 }
 
 QVariant TrackerModel::data(QModelIndex const& index, int role) const
@@ -104,13 +104,13 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
     std::ranges::sort(trackers, Comp);
 
     // merge 'em with the existing list
-    unsigned int old_index = 0;
-    unsigned int new_index = 0;
+    int old_index = 0;
+    int new_index = 0;
 
-    while (old_index < rows_.size() || new_index < trackers.size())
+    while (std::cmp_less(old_index, rows_.size()) || std::cmp_less(new_index, trackers.size()))
     {
-        bool const is_end_of_old = old_index == rows_.size();
-        bool const is_end_of_new = new_index == trackers.size();
+        auto const is_end_of_old = std::cmp_equal(old_index, rows_.size());
+        auto const is_end_of_new = std::cmp_equal(new_index, trackers.size());
 
         if (is_end_of_old || (!is_end_of_new && Comp(trackers.at(new_index), rows_.at(old_index))))
         {
@@ -121,7 +121,7 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
             ++old_index;
             ++new_index;
         }
-        else if (is_end_of_new || (!is_end_of_old && Comp(rows_.at(old_index), trackers.at(new_index))))
+        else if (is_end_of_new || Comp(rows_.at(old_index), trackers.at(new_index)))
         {
             // remove this old row
             beginRemoveRows(QModelIndex{}, old_index, old_index);
@@ -140,13 +140,13 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
 
 int TrackerModel::find(int torrent_id, QString const& url) const
 {
-    for (int i = 0, n = rows_.size(); i < n; ++i)
+    for (size_t i = 0, n = rows_.size(); i < n; ++i)
     {
         TrackerInfo const& inf = rows_.at(i);
 
         if (inf.torrent_id == torrent_id && url == inf.st.announce)
         {
-            return i;
+            return static_cast<int>(i);
         }
     }
 

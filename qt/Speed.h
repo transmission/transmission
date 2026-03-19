@@ -8,7 +8,9 @@
 #include <QCoreApplication> // Q_DECLARE_TR_FUNCTIONS
 #include <QString>
 
-#include "libtransmission/values.h"
+#include <libtransmission/values.h>
+
+#include "QtCompat.h"
 
 class Speed : public tr::Values::Speed
 {
@@ -54,6 +56,6 @@ public:
     [[nodiscard]] static auto display_name(Speed::Units const units)
     {
         auto const speed_unit_sv = Speed::units().display_name(units);
-        return QString::fromUtf8(std::data(speed_unit_sv), std::size(speed_unit_sv));
+        return QString::fromUtf8(std::data(speed_unit_sv), static_cast<IF_QT6(qsizetype, int)>(std::size(speed_unit_sv)));
     }
 };

@@ -17,6 +17,8 @@
 
 #include <libtransmission/variant.h>
 
+#include "QtCompat.h"
+
 class QByteArray;
 
 class Speed;
@@ -79,7 +81,7 @@ auto getValue(tr_variant const* variant)
 
     if (auto sv = std::string_view{}; tr_variantGetStrView(variant, &sv))
     {
-        ret = QString::fromUtf8(std::data(sv), std::size(sv));
+        ret = QString::fromUtf8(std::data(sv), static_cast<IF_QT6(qsizetype, int)>(std::size(sv)));
     }
 
     return ret;
