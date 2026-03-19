@@ -292,9 +292,7 @@ public:
 
     [[nodiscard]] constexpr auto ratio() const noexcept
     {
-        auto const numerator = static_cast<double>(uploadedEver());
-        auto const denominator = sizeWhenDone();
-        return denominator > 0U ? numerator / denominator : double{};
+        return upload_ratio_;
     }
 
     [[nodiscard]] constexpr double percentComplete() const noexcept
@@ -612,6 +610,7 @@ public:
         UPLOADED_EVER,
         UPLOAD_LIMIT,
         UPLOAD_LIMITED,
+        UPLOAD_RATIO,
         UPLOAD_SPEED,
         WEBSEEDS_SENDING_TO_US,
 
@@ -672,6 +671,7 @@ private:
     double percent_done_ = {};
     double recheck_progress_ = {};
     double seed_ratio_limit_ = {};
+    double upload_ratio_ = {};
 
     QString comment_;
     QString creator_;

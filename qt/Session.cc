@@ -581,6 +581,7 @@ using TorrentProperties = Session::TorrentProperties;
                 TR_KEY_status,
                 TR_KEY_total_size,
                 TR_KEY_trackers,
+                TR_KEY_upload_ratio,
                 TR_KEY_uploaded_ever,
                 TR_KEY_webseeds_sending_to_us,
             };
@@ -627,6 +628,7 @@ using TorrentProperties = Session::TorrentProperties;
                 TR_KEY_seed_ratio_mode,
                 TR_KEY_size_when_done,
                 TR_KEY_status,
+                TR_KEY_upload_ratio,
                 TR_KEY_uploaded_ever,
                 TR_KEY_webseeds_sending_to_us,
             };
