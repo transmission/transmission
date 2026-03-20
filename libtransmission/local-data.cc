@@ -172,6 +172,11 @@ public:
         open_files_.close_file(tor_id, file_num);
     }
 
+    void close_all() override
+    {
+        open_files_.close_all();
+    }
+
     [[nodiscard]] int move(
         tr_torrent_id_t const id,
         std::string_view const old_parent,
@@ -399,6 +404,13 @@ public:
         };
 
         enqueue(std::move(task));
+    }
+
+    void close_all()
+    {
+        auto lock = std::unique_lock(mutex_);
+        cv_.wait(lock, [this]() { return std::empty(queues_) && std::empty(active_ids_); });
+        backend_->close_all();
     }
 
     void rename(
@@ -784,6 +796,11 @@ void LocalData::close_torrent(tr_torrent_id_t const tor_id)
 void LocalData::close_file(tr_torrent_id_t const tor_id, tr_file_index_t const file_num)
 {
     impl_->close_file(tor_id, file_num);
+}
+
+void LocalData::close_all()
+{
+    impl_->close_all();
 }
 
 void LocalData::rename(

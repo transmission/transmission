@@ -62,6 +62,7 @@ public:
             std::string_view parent_name) = 0;
         [[nodiscard]] virtual int remove(tr_torrent_id_t id, tr_torrent_remove_func remove_func) = 0;
         [[nodiscard]] virtual int rename(tr_torrent_id_t id, std::string_view oldpath, std::string_view newname) = 0;
+        virtual void close_all() = 0;
         virtual void close_torrent(tr_torrent_id_t tor_id) = 0;
         virtual void close_file(tr_torrent_id_t tor_id, tr_file_index_t file_num) = 0;
     };
@@ -93,6 +94,8 @@ public:
     // Close an individual file in the torrent.
     void close_file(tr_torrent_id_t, tr_file_index_t);
 
+    // Blocks until currently queued local-data work is idle,
+    // then closes all open files managed by this instance.
     void close_all();
 
     // See tr_torrent_files::move()
