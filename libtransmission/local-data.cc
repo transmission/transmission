@@ -26,7 +26,6 @@
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/inout.h"
 #include "libtransmission/open-files.h"
-#include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrents.h"
 #include "libtransmission/transmission.h"

@@ -15,8 +15,6 @@
 #include <memory> // for std::unique_ptr
 #include <optional>
 #include <string_view>
-#include <utility> // for std::pair
-#include <vector>
 
 #include <small/vector.hpp>
 
