@@ -648,15 +648,32 @@ private:
             [weak, session, req, enqueue_local_data_read](
                 tr_torrent_id_t tor_id,
                 tr_piece_index_t piece,
-                tr_error const& /*error*/,
+                tr_error const& error,
                 std::optional<tr_sha1_digest_t> hash)
             {
                 session->run_in_session_thread(
-                    [weak, session, tor_id, req, piece, hash = std::move(hash), enqueue_local_data_read]()
+                    [weak, session, tor_id, req, piece, error, hash = std::move(hash), enqueue_local_data_read]()
                     {
                         auto* const tor = session->torrents().get(tor_id);
                         if (tor == nullptr)
                         {
+                            return;
+                        }
+
+                        if (error)
+                        {
+                            tor->error().set_local_error(
+                                fmt::format(
+                                    fmt::runtime(_("Couldn't verify piece #{piece}: {error} ({error_code})")),
+                                    fmt::arg("piece", piece),
+                                    fmt::arg("error", error.message()),
+                                    fmt::arg("error_code", error.code())));
+
+                            if (auto self = weak.lock(); self != nullptr)
+                            {
+                                self->fill_output_buffer(tr_time(), tr_time_msec());
+                            }
+
                             return;
                         }
 

@@ -2212,6 +2212,17 @@ void tr_torrent::on_block_received(tr_block_index_t const block)
             {
                 if (auto* const tor = session->torrents().get(tor_id))
                 {
+                    if (error)
+                    {
+                        tor->error().set_local_error(
+                            fmt::format(
+                                fmt::runtime(_("Couldn't verify piece #{piece}: {error} ({error_code})")),
+                                fmt::arg("piece", piece),
+                                fmt::arg("error", error.message()),
+                                fmt::arg("error_code", error.code())));
+                        return;
+                    }
+
                     if (hash == tor->piece_hash(piece))
                     {
                         tor->on_piece_completed(piece);
