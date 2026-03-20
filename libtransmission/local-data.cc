@@ -300,22 +300,22 @@ public:
     {
         auto callback = std::make_shared<OnRead>(std::move(on_read));
 
-        auto task = Task{};
-        task.id = id;
-        task.op = Op::Read;
-        task.run = [this, id, byte_span, callback = callback]() mutable
-        {
-            auto data = std::make_unique<BlockData>();
-            auto const err = backend_->read(id, byte_span, *data);
-            if (err != 0)
+        auto task = Task{
+            .id = id,
+            .op = Op::Read,
+            .run =
+                [this, id, byte_span, callback = callback]() mutable
             {
-                data.reset();
-            }
-            (*callback)(id, byte_span, make_error(err), std::move(data));
-        };
-        task.cancel = [id, byte_span, callback = std::move(callback)]() mutable
-        {
-            (*callback)(id, byte_span, make_error(ECANCELED), nullptr);
+                auto data = std::make_unique<BlockData>();
+                auto const err = backend_->read(id, byte_span, *data);
+                if (err != 0)
+                {
+                    data.reset();
+                }
+                (*callback)(id, byte_span, make_error(err), std::move(data));
+            },
+            .cancel = [id, byte_span, callback = std::move(callback)]() mutable
+            { (*callback)(id, byte_span, make_error(ECANCELED), nullptr); },
         };
 
         enqueue(std::move(task));
@@ -325,18 +325,18 @@ public:
     {
         auto callback = std::make_shared<OnTest>(std::move(on_test));
 
-        auto task = Task{};
-        task.id = id;
-        task.op = Op::Test;
-        task.run = [this, id, piece, callback = callback]() mutable
-        {
-            auto hash = tr_sha1_digest_t{};
-            auto const err = backend_->test_piece(id, piece, hash);
-            (*callback)(id, piece, make_error(err), err == 0 ? std::optional<tr_sha1_digest_t>{ hash } : std::nullopt);
-        };
-        task.cancel = [id, piece, callback = std::move(callback)]() mutable
-        {
-            (*callback)(id, piece, make_error(ECANCELED), std::nullopt);
+        auto task = Task{
+            .id = id,
+            .op = Op::Test,
+            .run =
+                [this, id, piece, callback = callback]() mutable
+            {
+                auto hash = tr_sha1_digest_t{};
+                auto const err = backend_->test_piece(id, piece, hash);
+                (*callback)(id, piece, make_error(err), err == 0 ? std::optional<tr_sha1_digest_t>{ hash } : std::nullopt);
+            },
+            .cancel = [id, piece, callback = std::move(callback)]() mutable
+            { (*callback)(id, piece, make_error(ECANCELED), std::nullopt); },
         };
 
         enqueue(std::move(task));
@@ -354,10 +354,11 @@ public:
 
         auto const len = byte_span.size();
 
-        auto task = Task{};
-        task.id = id;
-        task.op = Op::Write;
-        task.write_bytes = len;
+        auto task = Task{
+            .id = id,
+            .op = Op::Write,
+            .write_bytes = len,
+        };
 
         if (data == nullptr || len > std::size(*data))
         {
@@ -382,12 +383,10 @@ public:
 
     void close_torrent(tr_torrent_id_t const tor_id)
     {
-        auto task = Task{};
-        task.id = tor_id;
-        task.op = Op::CloseTorrent;
-        task.run = [this, tor_id]()
-        {
-            backend_->close_torrent(tor_id);
+        auto task = Task{
+            .id = tor_id,
+            .op = Op::CloseTorrent,
+            .run = [this, tor_id]() { backend_->close_torrent(tor_id); },
         };
 
         enqueue(std::move(task));
@@ -395,12 +394,10 @@ public:
 
     void close_file(tr_torrent_id_t const tor_id, tr_file_index_t const file_num)
     {
-        auto task = Task{};
-        task.id = tor_id;
-        task.op = Op::CloseFile;
-        task.run = [this, tor_id, file_num]()
-        {
-            backend_->close_file(tor_id, file_num);
+        auto task = Task{
+            .id = tor_id,
+            .op = Op::CloseFile,
+            .run = [this, tor_id, file_num]() { backend_->close_file(tor_id, file_num); },
         };
 
         enqueue(std::move(task));
@@ -423,28 +420,31 @@ public:
         auto newname_buf = std::string{ newname };
         auto callback_ptr = std::make_shared<tr_torrent_rename_done_func>(std::move(callback));
 
-        auto task = Task{};
-        task.id = tor_id;
-        task.op = Op::Rename;
-        task.run = [this, tor_id, oldpath = oldpath_buf, newname = newname_buf, callback = callback_ptr]() mutable
-        {
-            backend_->close_torrent(tor_id);
+        auto task = Task{
+            .id = tor_id,
+            .op = Op::Rename,
+            .run =
+                [this, tor_id, oldpath = oldpath_buf, newname = newname_buf, callback = callback_ptr]() mutable
+            {
+                backend_->close_torrent(tor_id);
 
-            auto const err = backend_->rename(tor_id, oldpath, newname);
-            if (*callback != nullptr)
+                auto const err = backend_->rename(tor_id, oldpath, newname);
+                if (*callback != nullptr)
+                {
+                    (*callback)(tor_id, oldpath, newname, make_error(err));
+                }
+            },
+            .cancel =
+                [tor_id,
+                 oldpath = std::move(oldpath_buf),
+                 newname = std::move(newname_buf),
+                 callback = std::move(callback_ptr)]() mutable
             {
-                (*callback)(tor_id, oldpath, newname, make_error(err));
-            }
-        };
-        task.cancel = [tor_id,
-                       oldpath = std::move(oldpath_buf),
-                       newname = std::move(newname_buf),
-                       callback = std::move(callback_ptr)]() mutable
-        {
-            if (*callback != nullptr)
-            {
-                (*callback)(tor_id, oldpath, newname, make_error(ECANCELED));
-            }
+                if (*callback != nullptr)
+                {
+                    (*callback)(tor_id, oldpath, newname, make_error(ECANCELED));
+                }
+            },
         };
 
         enqueue(std::move(task));
@@ -452,17 +452,19 @@ public:
 
     void move(tr_torrent_id_t const tor_id, std::string_view old_parent, std::string_view parent, std::string_view parent_name)
     {
-        auto task = Task{};
-        task.id = tor_id;
-        task.op = Op::Move;
-        task.run = [this,
-                    tor_id,
-                    old_parent = std::string{ old_parent },
-                    parent = std::string{ parent },
-                    parent_name = std::string{ parent_name }]()
-        {
-            backend_->close_torrent(tor_id);
-            static_cast<void>(backend_->move(tor_id, old_parent, parent, parent_name));
+        auto task = Task{
+            .id = tor_id,
+            .op = Op::Move,
+            .run =
+                [this,
+                 tor_id,
+                 old_parent = std::string{ old_parent },
+                 parent = std::string{ parent },
+                 parent_name = std::string{ parent_name }]()
+            {
+                backend_->close_torrent(tor_id);
+                static_cast<void>(backend_->move(tor_id, old_parent, parent, parent_name));
+            },
         };
 
         enqueue(std::move(task));
@@ -472,13 +474,15 @@ public:
     {
         auto canceled_callbacks = std::vector<std::function<void()>>{};
 
-        auto task = Task{};
-        task.id = tor_id;
-        task.op = Op::Remove;
-        task.run = [this, tor_id, remove_func = std::move(remove_func)]() mutable
-        {
-            backend_->close_torrent(tor_id);
-            static_cast<void>(backend_->remove(tor_id, std::move(remove_func)));
+        auto task = Task{
+            .id = tor_id,
+            .op = Op::Remove,
+            .run =
+                [this, tor_id, remove_func = std::move(remove_func)]() mutable
+            {
+                backend_->close_torrent(tor_id);
+                static_cast<void>(backend_->remove(tor_id, std::move(remove_func)));
+            },
         };
 
         {
