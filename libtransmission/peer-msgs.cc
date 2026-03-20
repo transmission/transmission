@@ -639,7 +639,7 @@ private:
 
     void send_ut_pex();
 
-    int client_got_block(std::span<uint8_t const> block_data, tr_block_index_t block);
+    tr_error_code_t client_got_block(std::span<uint8_t const> block_data, tr_block_index_t block);
     ReadResult read_piece_data(MessageReader& payload);
     ReadResult process_peer_message(uint8_t id, MessageReader& payload);
 
@@ -1752,7 +1752,7 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
 }
 
 // returns 0 on success, or an errno on failure
-int tr_peerMsgsImpl::client_got_block(std::span<uint8_t const> block_data, tr_block_index_t const block)
+tr_error_code_t tr_peerMsgsImpl::client_got_block(std::span<uint8_t const> block_data, tr_block_index_t const block)
 {
     auto const n_expected = tor_.block_size(block);
     auto const n_actual = std::size(block_data);
