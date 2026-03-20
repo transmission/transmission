@@ -26,6 +26,14 @@ class tr_torrents;
 namespace tr
 {
 
+/**
+ * Interface class for async handling of local data files.
+ *
+ * Requests for multiple torrents can be handled in parallel.
+ *
+ * Requests for the same torrent are handled in the order they
+ * are received, and only one task per torrent runs at a time.
+ */
 class LocalData
 {
 public:
