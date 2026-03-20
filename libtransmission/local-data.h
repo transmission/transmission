@@ -47,6 +47,8 @@ public:
 
     using OnWrite = std::function<void(tr_torrent_id_t, tr_byte_span_t byte_span, tr_error const& error)>;
 
+    using OnMove = std::function<void(tr_torrent_id_t, tr_error const& error)>;
+
     class Backend
     {
     public:
@@ -99,7 +101,7 @@ public:
     void close_all();
 
     // See tr_torrent_files::move()
-    void move(tr_torrent_id_t, std::string_view old_parent, std::string_view parent, std::string_view parent_name = "");
+    void move(tr_torrent_id_t, std::string_view old_parent, std::string_view parent, std::string_view parent_name, OnMove);
 
     // See tr_torrent_files::remove()
     void remove(tr_torrent_id_t, tr_torrent_remove_func remove_func);

@@ -450,8 +450,15 @@ public:
         enqueue(std::move(task));
     }
 
-    void move(tr_torrent_id_t const tor_id, std::string_view old_parent, std::string_view parent, std::string_view parent_name)
+    void move(
+        tr_torrent_id_t const tor_id,
+        std::string_view old_parent,
+        std::string_view parent,
+        std::string_view parent_name,
+        OnMove on_move)
     {
+        auto callback = std::make_shared<OnMove>(std::move(on_move));
+
         auto task = Task{
             .id = tor_id,
             .op = Op::Move,
@@ -460,11 +467,14 @@ public:
                  tor_id,
                  old_parent = std::string{ old_parent },
                  parent = std::string{ parent },
-                 parent_name = std::string{ parent_name }]()
+                 parent_name = std::string{ parent_name },
+                 callback = callback]() mutable
             {
                 backend_->close_torrent(tor_id);
-                static_cast<void>(backend_->move(tor_id, old_parent, parent, parent_name));
+                auto const err = backend_->move(tor_id, old_parent, parent, parent_name);
+                (*callback)(tor_id, make_error(err));
             },
+            .cancel = [tor_id, callback = std::move(callback)]() mutable { (*callback)(tor_id, make_error(ECANCELED)); },
         };
 
         enqueue(std::move(task));
@@ -820,9 +830,10 @@ void LocalData::move(
     tr_torrent_id_t const id,
     std::string_view const old_parent,
     std::string_view const parent,
-    std::string_view const parent_name)
+    std::string_view const parent_name,
+    OnMove on_move)
 {
-    impl_->move(id, old_parent, parent, parent_name);
+    impl_->move(id, old_parent, parent, parent_name, std::move(on_move));
 }
 
 void LocalData::remove(tr_torrent_id_t const id, tr_torrent_remove_func remove_func)
