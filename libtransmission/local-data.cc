@@ -118,7 +118,7 @@ public:
 
         auto const loc = tor->block_info().byte_loc(byte_span.begin);
         setme.resize(len);
-        return tr_ioRead(*tor, open_files_, loc, setme);
+        return tr_ioRead(*tor, open_files_, loc, std::span{ std::data(setme), len });
     }
 
     [[nodiscard]] int test_piece(tr_torrent_id_t const id, tr_piece_index_t const piece, tr_sha1_digest_t& setme_hash) override
@@ -358,6 +358,8 @@ public:
             .id = id,
             .op = Op::Write,
             .write_bytes = len,
+            .run = {},
+            .cancel = {},
         };
 
         if (data == nullptr || len > std::size(*data))
@@ -387,6 +389,7 @@ public:
             .id = tor_id,
             .op = Op::CloseTorrent,
             .run = [this, tor_id]() { backend_->close_torrent(tor_id); },
+            .cancel = {},
         };
 
         enqueue(std::move(task));
@@ -398,6 +401,7 @@ public:
             .id = tor_id,
             .op = Op::CloseFile,
             .run = [this, tor_id, file_num]() { backend_->close_file(tor_id, file_num); },
+            .cancel = {},
         };
 
         enqueue(std::move(task));
@@ -493,6 +497,7 @@ public:
                 backend_->close_torrent(tor_id);
                 static_cast<void>(backend_->remove(tor_id, std::move(remove_func)));
             },
+            .cancel = {},
         };
 
         {
