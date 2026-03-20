@@ -57,7 +57,10 @@ using namespace tr::Values;
 #define tr_return_if_fail(expr) \
     do \
     { \
-        if (!(expr)) \
+        if (expr) [[likely]] \
+        { \
+        } \
+        else \
         { \
             tr_logAddWarn(#expr); \
             return; \
@@ -66,7 +69,10 @@ using namespace tr::Values;
 #define tr_return_val_if_fail(expr, val) \
     do \
     { \
-        if (!(expr)) \
+        if (expr) [[likely]] \
+        { \
+        } \
+        else \
         { \
             tr_logAddWarn(#expr); \
             return val; \
