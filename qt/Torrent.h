@@ -302,9 +302,7 @@ public:
 
     [[nodiscard]] constexpr double percentDone() const noexcept
     {
-        auto const l = leftUntilDone();
-        auto const s = sizeWhenDone();
-        return s ? static_cast<double>(s - l) / static_cast<double>(s) : 0.0;
+        return percent_done_;
     }
 
     [[nodiscard]] constexpr auto failedEver() const noexcept
