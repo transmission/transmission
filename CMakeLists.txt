@@ -889,7 +889,7 @@ if(RUN_CLANG_TIDY)
         endif()
     else()
         message(STATUS "Looking for clang-tidy - found: ${CLANG_TIDY}")
-        set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}")
+        set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}" --allow-no-checks)
     endif()
 endif()
 
