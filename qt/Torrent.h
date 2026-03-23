@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bitset>
+#include <compare>
 #include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
@@ -18,10 +19,7 @@
 #include <QString>
 #include <QStringList>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/crypto-utils.h>
-#include "libtransmission/tr-macros.h"
 #include <libtransmission/quark.h>
 
 #include "IconCache.h"
@@ -128,14 +126,9 @@ public:
         return data_ == that.data_;
     }
 
-    [[nodiscard]] constexpr auto operator!=(TorrentHash const& that) const
+    [[nodiscard]] constexpr auto operator<=>(TorrentHash const& that) const
     {
-        return !(*this == that);
-    }
-
-    [[nodiscard]] auto operator<(TorrentHash const& that) const
-    {
-        return data_ < that.data_;
+        return data_ <=> that.data_;
     }
 
     [[nodiscard]] constexpr auto& toString() const noexcept
@@ -310,9 +303,9 @@ public:
         return failed_ever_;
     }
 
-    int compareSeedProgress(Torrent const& that) const;
-    int compareRatio(Torrent const& that) const;
-    int compareETA(Torrent const& that) const;
+    std::partial_ordering compareSeedProgress(Torrent const& that) const;
+    std::partial_ordering compareRatio(Torrent const& that) const;
+    std::strong_ordering compareETA(Torrent const& that) const;
 
     [[nodiscard]] constexpr auto getETA() const noexcept
     {
