@@ -879,4 +879,18 @@ TEST_F(RpcTest, DISABLED_wellFormedLegacyFreeSpace)
 }
 } // namespace free_space_test
 
+TEST_F(RpcTest, rpcPathExactMatch)
+{
+    auto const is_rpc_path = [](std::string_view uri)
+    {
+        auto constexpr RpcBasePath = "/transmission/rpc"sv;
+        return uri == RpcBasePath;
+    };
+
+    EXPECT_TRUE(is_rpc_path("/transmission/rpc"));
+    EXPECT_FALSE(is_rpc_path("/transmission/rpc/xyz"));
+    EXPECT_FALSE(is_rpc_path("/transmission/rpc/"));
+    EXPECT_FALSE(is_rpc_path("/transmission/rpcx"));
+    EXPECT_FALSE(is_rpc_path("/transmission/rpc/anything"));
+}
 } // namespace tr::test
