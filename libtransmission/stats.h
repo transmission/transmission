@@ -23,6 +23,7 @@ public:
     tr_stats(std::string_view config_dir, time_t now)
         : config_dir_{ config_dir }
         , start_time_{ now }
+        , is_dirty_{ true }
     {
         single_.sessionCount = 1;
         old_ = load_old_stats(config_dir_);
@@ -50,19 +51,23 @@ public:
     constexpr void add_uploaded(uint32_t n_bytes) noexcept
     {
         single_.uploadedBytes += n_bytes;
+        is_dirty_ = true;
     }
 
     constexpr void add_downloaded(uint32_t n_bytes) noexcept
     {
         single_.downloadedBytes += n_bytes;
+        is_dirty_ = true;
     }
 
     constexpr void add_file_created() noexcept
     {
         ++single_.filesAdded;
+        is_dirty_ = true;
     }
 
     void save() const;
+    void save_if_dirty();
 
 private:
     static tr_session_stats add(tr_session_stats const& a, tr_session_stats const& b);
@@ -82,4 +87,5 @@ private:
     };
     tr_session_stats single_ = Zero;
     tr_session_stats old_ = Zero;
+    bool is_dirty_ = false;
 };
