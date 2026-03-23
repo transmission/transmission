@@ -233,7 +233,7 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
 
 } // namespace
 
-int tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& loc, std::span<uint8_t> const setme)
+tr_error_code_t tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& loc, std::span<uint8_t> const setme)
 {
     auto error = tr_error{};
     if (loc.piece >= tor.piece_count())
@@ -258,7 +258,7 @@ int tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& loc, std::sp
     return error.code();
 }
 
-int tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, std::span<uint8_t const> const writeme)
+tr_error_code_t tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, std::span<uint8_t const> const writeme)
 {
     auto error = tr_error{};
     if (loc.piece >= tor.piece_count())

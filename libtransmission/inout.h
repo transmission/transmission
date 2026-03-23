@@ -12,6 +12,7 @@
 #include <cstdint> // uint8_t
 #include <span>
 
+#include "libtransmission/error-types.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/types.h"
 
@@ -21,13 +22,13 @@ struct tr_torrent;
  * Reads the block specified by the piece index, offset, and length.
  * @return 0 on success, or an errno value on failure.
  */
-[[nodiscard]] int tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& loc, std::span<uint8_t> setme);
+[[nodiscard]] tr_error_code_t tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& loc, std::span<uint8_t> setme);
 
 /**
  * Writes the block specified by the piece index, offset, and length.
  * @return 0 on success, or an errno value on failure.
  */
-[[nodiscard]] int tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, std::span<uint8_t const> writeme);
+[[nodiscard]] tr_error_code_t tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, std::span<uint8_t const> writeme);
 
 /**
  * @brief Test to see if the piece matches its metainfo's SHA1 checksum.
