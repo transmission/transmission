@@ -815,46 +815,30 @@ RpcResponseFuture Session::exec(tr_quark method, tr_variant* args)
     return rpc_.exec(method, args);
 }
 
-void Session::updateStats(tr_variant* args_dict, tr_session_stats* stats)
+void Session::updateStats(tr_variant const& args_dict, tr_session_stats& stats)
 {
-    if (auto const value = dictFind<uint64_t>(args_dict, TR_KEY_uploaded_bytes))
-    {
-        stats->uploadedBytes = *value;
-    }
+    static constexpr auto Fields = std::tuple{
+        tr::serializer::Field<&tr_session_stats::downloadedBytes>{ TR_KEY_downloaded_bytes },
+        tr::serializer::Field<&tr_session_stats::filesAdded>{ TR_KEY_files_added },
+        tr::serializer::Field<&tr_session_stats::secondsActive>{ TR_KEY_seconds_active },
+        tr::serializer::Field<&tr_session_stats::sessionCount>{ TR_KEY_session_count },
+        tr::serializer::Field<&tr_session_stats::uploadedBytes>{ TR_KEY_uploaded_bytes },
+    };
+    tr::serializer::load(stats, Fields, args_dict);
 
-    if (auto const value = dictFind<uint64_t>(args_dict, TR_KEY_downloaded_bytes))
-    {
-        stats->downloadedBytes = *value;
-    }
-
-    if (auto const value = dictFind<uint64_t>(args_dict, TR_KEY_files_added))
-    {
-        stats->filesAdded = *value;
-    }
-
-    if (auto const value = dictFind<uint64_t>(args_dict, TR_KEY_session_count))
-    {
-        stats->sessionCount = *value;
-    }
-
-    if (auto const value = dictFind<uint64_t>(args_dict, TR_KEY_seconds_active))
-    {
-        stats->secondsActive = *value;
-    }
-
-    stats->ratio = static_cast<float>(tr_getRatio(stats->uploadedBytes, stats->downloadedBytes));
+    stats.ratio = static_cast<float>(tr_getRatio(stats.uploadedBytes, stats.downloadedBytes));
 }
 
 void Session::updateStats(tr_variant* dict)
 {
     if (tr_variant* var = nullptr; tr_variantDictFindDict(dict, TR_KEY_current_stats, &var))
     {
-        updateStats(var, &stats_);
+        updateStats(*var, stats_);
     }
 
     if (tr_variant* var = nullptr; tr_variantDictFindDict(dict, TR_KEY_cumulative_stats, &var))
     {
-        updateStats(var, &cumulative_stats_);
+        updateStats(*var, cumulative_stats_);
     }
 
     emit statsUpdated();
