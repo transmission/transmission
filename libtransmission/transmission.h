@@ -446,7 +446,7 @@ size_t tr_sessionGetQueueStalledMinutes(tr_session const* session);
 
 /** @brief Consider torrent as 'stalled' when it's been inactive for N minutes.
     Stalled torrents are left running but are not counted by `tr_sessionGetQueueSize()`. */
-void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
+void tr_sessionSetQueueStalledMinutes(tr_session* session, size_t minutes);
 
 /** @return true if torrents idle for over N minutes will be flagged as 'stalled' */
 bool tr_sessionGetQueueStalledEnabled(tr_session const* session);

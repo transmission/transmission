@@ -220,7 +220,7 @@ void PageBase::spun_cb(Gtk::SpinButton& w, tr_quark const key, bool isDouble)
 Gtk::SpinButton* PageBase::init_spin_button(Glib::ustring const& name, tr_quark const key, int low, int high, int step)
 {
     auto* button = get_widget<Gtk::SpinButton>(name);
-    button->set_adjustment(Gtk::Adjustment::create(gtr_pref_int_get(key), low, high, step));
+    button->set_adjustment(Gtk::Adjustment::create(gtr_pref_int_get<int>(key), low, high, step));
     button->set_digits(0);
     button->signal_value_changed().connect([this, button, key]() { spun_cb(*button, key, false); });
     return button;
@@ -354,7 +354,7 @@ Gtk::ComboBox* PageBase::init_time_combo(Glib::ustring const& name, tr_quark con
     auto* r = Gtk::make_managed<Gtk::CellRendererText>();
     combo->pack_start(*r, true);
     combo->add_attribute(r->property_text(), time_cols.title);
-    combo->set_active(gtr_pref_int_get(key) / 15);
+    combo->set_active(gtr_pref_int_get<int>(key) / 15);
     combo->signal_changed().connect(
         [this, combo, key]()
         {
@@ -391,7 +391,7 @@ Gtk::ComboBox* PageBase::init_week_combo(Glib::ustring const& name, tr_quark con
             { get_weekday_string(Glib::Date::Weekday::SATURDAY), TR_SCHED_SAT },
             { get_weekday_string(Glib::Date::Weekday::SUNDAY), TR_SCHED_SUN },
         });
-    gtr_combo_box_set_active_enum(*combo, gtr_pref_int_get(key));
+    gtr_combo_box_set_active_enum(*combo, gtr_pref_int_get<int>(key));
     combo->signal_changed().connect([this, combo, key]() { onIntComboChanged(*combo, key); });
     return combo;
 }
@@ -563,7 +563,7 @@ private:
 
 void PrivacyPage::updateBlocklistText()
 {
-    int const n = tr_blocklistGetRuleCount(core_->get_session());
+    auto const n = tr_blocklistGetRuleCount(core_->get_session());
     auto const msg = fmt::format(
         fmt::runtime(ngettext("Blocklist has {count:L} entry", "Blocklist has {count:L} entries", n)),
         fmt::arg("count", n));
@@ -780,7 +780,7 @@ void RemotePage::refreshRPCSensitivity()
 
 void RemotePage::onLaunchClutchCB()
 {
-    gtr_open_uri(fmt::format("http://localhost:{}/", gtr_pref_int_get(TR_KEY_rpc_port)));
+    gtr_open_uri(fmt::format("http://localhost:{}/", gtr_pref_int_get<uint16_t>(TR_KEY_rpc_port)));
 }
 
 RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)

@@ -646,7 +646,7 @@ void Application::Impl::on_startup()
     /* check & see if it's time to update the blocklist */
     if (gtr_pref_flag_get(TR_KEY_blocklist_enabled) && gtr_pref_flag_get(TR_KEY_blocklist_updates_enabled))
     {
-        int64_t const last_time = gtr_pref_int_get(TR_KEY_blocklist_date);
+        auto const last_time = gtr_pref_int_get<time_t>(TR_KEY_blocklist_date);
         int const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
         time_t const now = time(nullptr);
 
@@ -778,10 +778,10 @@ void Application::Impl::app_setup()
 void Application::Impl::placeWindowFromPrefs()
 {
 #if GTKMM_CHECK_VERSION(4, 0, 0)
-    wind_->set_default_size((int)gtr_pref_int_get(TR_KEY_main_window_width), (int)gtr_pref_int_get(TR_KEY_main_window_height));
+    wind_->set_default_size(gtr_pref_int_get<int>(TR_KEY_main_window_width), gtr_pref_int_get<int>(TR_KEY_main_window_height));
 #else
-    wind_->resize((int)gtr_pref_int_get(TR_KEY_main_window_width), (int)gtr_pref_int_get(TR_KEY_main_window_height));
-    wind_->move((int)gtr_pref_int_get(TR_KEY_main_window_x), (int)gtr_pref_int_get(TR_KEY_main_window_y));
+    wind_->resize(gtr_pref_int_get<int>(TR_KEY_main_window_width), gtr_pref_int_get<int>(TR_KEY_main_window_height));
+    wind_->move(gtr_pref_int_get<int>(TR_KEY_main_window_x), gtr_pref_int_get<int>(TR_KEY_main_window_y));
 #endif
 }
 
@@ -1128,7 +1128,10 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
     switch (key)
     {
     case TR_KEY_encryption:
-        tr_sessionSetEncryption(tr, static_cast<tr_encryption_mode>(gtr_pref_int_get(key)));
+        if (auto const val = gtr_pref_get<tr_encryption_mode>(key))
+        {
+            tr_sessionSetEncryption(tr, *val);
+        }
         break;
 
     case TR_KEY_default_trackers:
@@ -1140,11 +1143,14 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_message_level:
-        tr_logSetLevel(static_cast<tr_log_level>(gtr_pref_int_get(key)));
+        if (auto const val = gtr_pref_get<tr_log_level>(key))
+        {
+            tr_logSetLevel(*val);
+        }
         break;
 
     case TR_KEY_peer_port:
-        tr_sessionSetPeerPort(tr, gtr_pref_int_get(key));
+        tr_sessionSetPeerPort(tr, gtr_pref_int_get<uint16_t>(key));
         break;
 
     case TR_KEY_blocklist_enabled:
@@ -1171,7 +1177,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_speed_limit_down:
-        tr_sessionSetSpeedLimit_KBps(tr, tr_direction::Down, gtr_pref_int_get(key));
+        tr_sessionSetSpeedLimit_KBps(tr, tr_direction::Down, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_speed_limit_up_enabled:
@@ -1179,7 +1185,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_speed_limit_up:
-        tr_sessionSetSpeedLimit_KBps(tr, tr_direction::Up, gtr_pref_int_get(key));
+        tr_sessionSetSpeedLimit_KBps(tr, tr_direction::Up, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_ratio_limit_enabled:
@@ -1191,7 +1197,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_idle_seeding_limit:
-        tr_sessionSetIdleLimit(tr, gtr_pref_int_get(key));
+        tr_sessionSetIdleLimit(tr, gtr_pref_int_get<uint16_t>(key));
         break;
 
     case TR_KEY_idle_seeding_limit_enabled:
@@ -1211,11 +1217,11 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_download_queue_size:
-        tr_sessionSetQueueSize(tr, tr_direction::Down, gtr_pref_int_get(key));
+        tr_sessionSetQueueSize(tr, tr_direction::Down, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_queue_stalled_minutes:
-        tr_sessionSetQueueStalledMinutes(tr, gtr_pref_int_get(key));
+        tr_sessionSetQueueStalledMinutes(tr, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_dht_enabled:
@@ -1231,7 +1237,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_rpc_port:
-        tr_sessionSetRPCPort(tr, gtr_pref_int_get(key));
+        tr_sessionSetRPCPort(tr, gtr_pref_int_get<uint16_t>(key));
         break;
 
     case TR_KEY_rpc_enabled:
@@ -1259,11 +1265,11 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_alt_speed_up:
-        tr_sessionSetAltSpeed_KBps(tr, tr_direction::Up, gtr_pref_int_get(key));
+        tr_sessionSetAltSpeed_KBps(tr, tr_direction::Up, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_alt_speed_down:
-        tr_sessionSetAltSpeed_KBps(tr, tr_direction::Down, gtr_pref_int_get(key));
+        tr_sessionSetAltSpeed_KBps(tr, tr_direction::Down, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_alt_speed_enabled:
@@ -1275,11 +1281,11 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         }
 
     case TR_KEY_alt_speed_time_begin:
-        tr_sessionSetAltSpeedBegin(tr, gtr_pref_int_get(key));
+        tr_sessionSetAltSpeedBegin(tr, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_alt_speed_time_end:
-        tr_sessionSetAltSpeedEnd(tr, gtr_pref_int_get(key));
+        tr_sessionSetAltSpeedEnd(tr, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_alt_speed_time_enabled:

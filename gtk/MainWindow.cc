@@ -379,8 +379,10 @@ void MainWindow::Impl::syncAltSpeedButton()
             fmt::runtime(
                 b ? _("Click to disable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)") :
                     _("Click to enable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)")),
-            fmt::arg("download_speed", Speed{ gtr_pref_int_get(TR_KEY_alt_speed_down), Speed::Units::KByps }.to_string()),
-            fmt::arg("upload_speed", Speed{ gtr_pref_int_get(TR_KEY_alt_speed_up), Speed::Units::KByps }.to_string())));
+            fmt::arg(
+                "download_speed",
+                Speed{ gtr_pref_int_get<size_t>(TR_KEY_alt_speed_down), Speed::Units::KByps }.to_string()),
+            fmt::arg("upload_speed", Speed{ gtr_pref_int_get<size_t>(TR_KEY_alt_speed_up), Speed::Units::KByps }.to_string())));
 }
 
 void MainWindow::Impl::alt_speed_toggled_cb()
@@ -566,12 +568,12 @@ void MainWindow::Impl::onOptionsClicked()
 
     update_menu(
         speed_menu_info_[static_cast<uint8_t>(tr_direction::Down)],
-        Speed{ gtr_pref_int_get(TR_KEY_speed_limit_down), Speed::Units::KByps }.to_string(),
+        Speed{ gtr_pref_int_get<size_t>(TR_KEY_speed_limit_down), Speed::Units::KByps }.to_string(),
         TR_KEY_speed_limit_down_enabled);
 
     update_menu(
         speed_menu_info_[static_cast<uint8_t>(tr_direction::Up)],
-        Speed{ gtr_pref_int_get(TR_KEY_speed_limit_up), Speed::Units::KByps }.to_string(),
+        Speed{ gtr_pref_int_get<size_t>(TR_KEY_speed_limit_up), Speed::Units::KByps }.to_string(),
         TR_KEY_speed_limit_up_enabled);
 
     update_menu(
@@ -674,9 +676,9 @@ MainWindow::Impl::Impl(
 {
     /* make the window */
     window.set_title(Glib::get_application_name());
-    window.set_default_size(gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
+    window.set_default_size(gtr_pref_int_get<int>(TR_KEY_main_window_width), gtr_pref_int_get<int>(TR_KEY_main_window_height));
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-    window.move(gtr_pref_int_get(TR_KEY_main_window_x), gtr_pref_int_get(TR_KEY_main_window_y));
+    window.move(gtr_pref_int_get<int>(TR_KEY_main_window_x), gtr_pref_int_get<int>(TR_KEY_main_window_y));
 #endif
 
     if (gtr_pref_flag_get(TR_KEY_main_window_is_maximized))

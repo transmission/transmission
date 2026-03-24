@@ -2017,7 +2017,7 @@ bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir)
     return session->queueEnabled(dir);
 }
 
-void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes)
+void tr_sessionSetQueueStalledMinutes(tr_session* session, size_t minutes)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(minutes > 0);

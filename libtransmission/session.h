@@ -1321,7 +1321,7 @@ private:
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_torrents);
     friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
-    friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
+    friend void tr_sessionSetQueueStalledMinutes(tr_session* session, size_t minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func);
     friend void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
