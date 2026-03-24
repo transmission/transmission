@@ -166,21 +166,21 @@ export class OpenDialog extends EventTarget {
       return; // Allow default text paste behavior
     }
 
-    const files = [...event.clipboardData.files];
+    if (this._addFilesToInput(event.clipboardData.files)) {
+      event.preventDefault();
+    }
+  }
 
-    // Check for .torrent files
-    const torrentFiles = files.filter(
+  _addFilesToInput(files) {
+    const torrentFiles = [...files].filter(
       (f) =>
         f.name.endsWith('.torrent') || f.type === 'application/x-bittorrent',
     );
 
-    if (torrentFiles.length > 0) {
-      event.preventDefault();
-      this._addFilesToInput(torrentFiles);
+    if (torrentFiles.length === 0) {
+      return false;
     }
-  }
 
-  _addFilesToInput(filesArray) {
     const dt = new DataTransfer();
 
     // Add existing files first (preserve them)
@@ -189,11 +189,12 @@ export class OpenDialog extends EventTarget {
     }
 
     // Add new files
-    for (const file of filesArray) {
+    for (const file of torrentFiles) {
       dt.items.add(file);
     }
 
     this.elements.file_input.files = dt.files;
+    return true;
   }
 
   _onDragOver(event) {
@@ -215,16 +216,7 @@ export class OpenDialog extends EventTarget {
     event.preventDefault();
     event.stopPropagation();
     this.elements.root.classList.remove('drag-over');
-
-    const files = [...event.dataTransfer.files];
-    const torrentFiles = files.filter(
-      (f) =>
-        f.name.endsWith('.torrent') || f.type === 'application/x-bittorrent',
-    );
-
-    if (torrentFiles.length > 0) {
-      this._addFilesToInput(torrentFiles);
-    }
+    this._addFilesToInput(event.dataTransfer.files);
   }
 
   _create(url) {
