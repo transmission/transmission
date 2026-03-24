@@ -158,7 +158,7 @@ public:
     void add(void const* span_begin, size_t span_len)
     {
         auto [buf, buflen] = reserve_space(span_len);
-        std::copy_n(reinterpret_cast<value_type const*>(span_begin), span_len, buf);
+        std::copy_n(static_cast<value_type const*>(span_begin), span_len, buf);
         commit_space(span_len);
     }
 

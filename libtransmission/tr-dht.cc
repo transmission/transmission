@@ -71,7 +71,7 @@ extern "C"
         void const* v3,
         int len3)
     {
-        auto* setme = reinterpret_cast<std::byte*>(hash_return);
+        auto* setme = static_cast<std::byte*>(hash_return);
         std::fill_n(static_cast<char*>(hash_return), hash_size, '\0');
 
         auto const sv1 = std::string_view{ static_cast<char const*>(v1), size_t(len1) };
