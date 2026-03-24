@@ -161,12 +161,12 @@ export class OpenDialog extends EventTarget {
   }
 
   _onPaste(event) {
-    const files = [...event.clipboardData.files];
-
     // Allow text paste in url_input
-    if (event.target === this.elements.url_input && files.length === 0) {
+    if (event.target === this.elements.url_input && event.clipboardData.files.length === 0) {
       return; // Allow default text paste behavior
     }
+
+    const files = [...event.clipboardData.files];
 
     // Check for .torrent files
     const torrentFiles = files.filter(
