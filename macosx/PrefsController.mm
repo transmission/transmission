@@ -1018,6 +1018,11 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     tr_sessionSetIncompleteFileNamingEnabled(self.fHandle, [self.fDefaults boolForKey:@"RenamePartialFiles"]);
 }
 
+- (void)setWrapSingleFileTorrents:(id)sender
+{
+    tr_sessionSetWrapSingleFileTorrents(self.fHandle, [self.fDefaults boolForKey:@"WrapSingleFileTorrents"]);
+}
+
 - (void)setShowAddMagnetWindow:(id)sender
 {
     [self.fDefaults setBool:(self.fShowMagnetAddWindowCheck.state == NSControlStateValueOn) forKey:@"MagnetOpenAsk"];

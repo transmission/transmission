@@ -447,6 +447,17 @@
                                                     <binding destination="365" name="value" keyPath="values.RenamePartialFiles" id="1942"/>
                                                 </connections>
                                             </button>
+                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="2001">
+                                                <rect key="frame" x="84" y="168" width="280" height="18"/>
+                                                <buttonCell key="cell" type="check" title="Put single-file torrents into a subfolder" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2002">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <connections>
+                                                    <action selector="setWrapSingleFileTorrents:" target="-2" id="2003"/>
+                                                    <binding destination="365" name="value" keyPath="values.WrapSingleFileTorrents" id="2004"/>
+                                                </connections>
+                                            </button>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="209">
                                                 <rect key="frame" x="84" y="56" width="177" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Watch for torrent files in:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1219">
@@ -664,7 +675,10 @@
                                             <constraint firstItem="1337" firstAttribute="width" secondItem="61" secondAttribute="width" id="pUr-gl-HWr"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="51" secondAttribute="trailing" constant="20" symbolic="YES" id="pdr-Mz-OEr"/>
                                             <constraint firstItem="115" firstAttribute="leading" secondItem="59" secondAttribute="leading" id="r9n-Jd-yn7"/>
-                                            <constraint firstItem="1293" firstAttribute="top" secondItem="1939" secondAttribute="bottom" constant="20" id="sc7-xe-pwG"/>
+                                            <constraint firstItem="2001" firstAttribute="top" secondItem="1939" secondAttribute="bottom" constant="4" id="sc7-xe-pwG"/>
+                                            <constraint firstItem="2001" firstAttribute="leading" secondItem="59" secondAttribute="leading" id="tr1-WS-F01"/>
+                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2001" secondAttribute="trailing" constant="20" symbolic="YES" id="tr2-WS-F02"/>
+                                            <constraint firstItem="1293" firstAttribute="top" secondItem="2001" secondAttribute="bottom" constant="4" id="tr3-WS-F03"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1334" secondAttribute="trailing" constant="20" symbolic="YES" id="uBl-jP-kgp"/>
                                             <constraint firstItem="59" firstAttribute="leading" secondItem="61" secondAttribute="trailing" constant="8" symbolic="YES" id="udm-xI-Bf1"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="216" secondAttribute="trailing" constant="20" symbolic="YES" id="ulA-rw-Yfo"/>
