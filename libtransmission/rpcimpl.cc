@@ -2379,7 +2379,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         [](tr_session const& src) -> tr_variant { return src.advertisedPeerPort().host(); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
-            if (auto const val = src.value_if<int64_t>())
+            if (auto const val = src.value_if<uint16_t>())
             {
                 tr_sessionSetPeerPort(&tgt, *val);
             }
