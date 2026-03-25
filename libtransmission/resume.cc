@@ -792,6 +792,15 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         }
     }
 
+    if ((fields_to_load & tr_resume::DoneScriptCalled) != 0)
+    {
+        if (auto b = map.value_if<bool>(TR_KEY_done_script_called); b)
+        {
+            tor->set_done_script_called(*b);
+            fields_loaded |= tr_resume::DoneScriptCalled;
+        }
+    }
+
     if ((fields_to_load & tr_resume::Peers) != 0)
     {
         fields_loaded |= load_peers(map, tor);
@@ -976,6 +985,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     map.try_emplace(TR_KEY_paused, !helper.start_when_stable());
     map.try_emplace(TR_KEY_sequential_download, tor->is_sequential_download());
     map.try_emplace(TR_KEY_sequential_download_from_piece, tor->sequential_download_from_piece());
+    map.try_emplace(TR_KEY_done_script_called, tor->done_script_called());
     save_peers(map, tor);
 
     if (tor->has_metainfo())

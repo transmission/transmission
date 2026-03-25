@@ -58,6 +58,7 @@ void tr_torrentChangeMyPort(tr_torrent* tor);
 namespace tr::test
 {
 
+class TorrentTest_doneScriptNotTriggeredTwiceAfterRecheck_Test;
 class RenameTest_multifileTorrent_Test;
 class RenameTest_singleFilenameTorrent_Test;
 
@@ -92,6 +93,7 @@ struct tr_torrent
         [[nodiscard]] bool start_when_stable() const noexcept;
 
     private:
+        friend class ResumeTest_doneScriptCalledPersistsAcrossResume_Test;
         friend class tr::test::RenameTest_multifileTorrent_Test;
         friend class tr::test::RenameTest_singleFilenameTorrent_Test;
         friend struct tr_torrent;
@@ -771,6 +773,16 @@ struct tr_torrent
         return sequential_download_;
     }
 
+    constexpr void set_done_script_called(bool val) noexcept
+    {
+        done_script_called_ = val;
+    }
+
+    [[nodiscard]] constexpr bool done_script_called() const noexcept
+    {
+        return done_script_called_;
+    }
+
     bool set_sequential_download_from_piece(tr_piece_index_t piece) noexcept
     {
         auto const is_valid = piece < piece_count();
@@ -1039,6 +1051,7 @@ struct tr_torrent
     time_t lpdAnnounceAt = 0;
 
 private:
+    friend class tr::test::TorrentTest_doneScriptNotTriggeredTwiceAfterRecheck_Test;
     friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat tr_torrentStat(tr_torrent* tor);
@@ -1443,6 +1456,9 @@ private:
     bool needs_completeness_check_ = true;
 
     bool sequential_download_ = false;
+
+    // tracks whether the done script has already been called for this torrent
+    bool done_script_called_ = false;
 
     tr_piece_index_t sequential_download_from_piece_ = 0;
 
