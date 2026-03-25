@@ -459,6 +459,7 @@ public:
         bool tcp_enabled = true;
         bool torrent_complete_verify_enabled = false;
         bool utp_enabled = true;
+        bool wrap_single_file_torrents = false;
         double ratio_limit = 2.0;
         size_t unused_cache_size_mbytes = 4U; // TODO(TR5): remove
         size_t download_queue_size = 5U;
@@ -570,6 +571,7 @@ public:
             Field<&Settings::umask>{ TR_KEY_umask },
             Field<&Settings::upload_slots_per_torrent>{ TR_KEY_upload_slots_per_torrent },
             Field<&Settings::utp_enabled>{ TR_KEY_utp_enabled },
+            Field<&Settings::wrap_single_file_torrents>{ TR_KEY_wrap_single_file_torrents },
         };
     };
 
@@ -799,6 +801,16 @@ public:
     void set_sequential_download(bool seq) noexcept
     {
         settings_.sequential_download = seq;
+    }
+
+    [[nodiscard]] constexpr auto wrap_single_file_torrents() const noexcept
+    {
+        return settings().wrap_single_file_torrents;
+    }
+
+    void set_wrap_single_file_torrents(bool wrap) noexcept
+    {
+        settings_.wrap_single_file_torrents = wrap;
     }
 
     // bandwidth
@@ -1330,6 +1342,7 @@ private:
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetWrapSingleFileTorrents(tr_session* session, bool wrap);
     friend void tr_sessionUseAltSpeed(tr_session* session, bool enabled);
     friend void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled);
 

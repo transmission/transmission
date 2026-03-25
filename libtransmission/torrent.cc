@@ -1062,6 +1062,16 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
         return nullptr;
     }
 
+    if (session->wrap_single_file_torrents() && metainfo.file_count() == 1 &&
+        !tr_strv_contains(metainfo.file_subpath(0), '/'))
+    {
+        auto const folder = tr_torrent_files::sanitize_subpath(metainfo.name());
+        if (!std::empty(folder))
+        {
+            metainfo.set_file_subpath(0, tr_pathbuf{ folder, '/', metainfo.file_subpath(0) }.sv());
+        }
+    }
+
     auto* const tor = new tr_torrent{ std::move(metainfo) };
     tor->verify_done_callback_ = ctor->steal_verify_done_callback();
     tor->init(*ctor);

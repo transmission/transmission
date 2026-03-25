@@ -1001,6 +1001,20 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)
     return session->isIncompleteFileNamingEnabled();
 }
 
+bool tr_sessionGetWrapSingleFileTorrents(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->wrap_single_file_torrents();
+}
+
+void tr_sessionSetWrapSingleFileTorrents(tr_session* session, bool wrap)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->set_wrap_single_file_torrents(wrap);
+}
+
 // ---
 
 void tr_sessionSetIncompleteDir(tr_session* session, std::string_view const dir)

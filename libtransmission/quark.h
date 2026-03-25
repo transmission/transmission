@@ -749,6 +749,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_webseeds_sending_to_us_camel_APICOMPAT,
     TR_KEY_webseeds_ex,
     TR_KEY_webseeds_sending_to_us,
+    TR_KEY_wrap_single_file_torrents,
     TR_KEY_yourip,
     TR_N_KEYS
 };
