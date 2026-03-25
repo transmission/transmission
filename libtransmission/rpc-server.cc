@@ -1034,6 +1034,10 @@ void tr_rpc_server::load(Settings&& settings)
             tr_logAddInfo(_("Password required"));
         }
     }
+    else
+    {
+        session->run_in_session_thread(stop_server, this);
+    }
 
     if (!std::empty(web_client_dir_))
     {
