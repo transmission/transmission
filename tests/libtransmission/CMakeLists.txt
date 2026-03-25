@@ -55,6 +55,7 @@ target_sources(libtransmission-test
         torrent-magnet-test.cc
         torrent-metainfo-test.cc
         torrent-queue-test.cc
+        torrent-test.cc
         torrents-test.cc
         tr-peer-info-test.cc
         utils-test.cc
