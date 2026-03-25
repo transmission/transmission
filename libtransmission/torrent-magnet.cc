@@ -297,7 +297,7 @@ bool tr_metadata_download::set_metadata_piece(int64_t const piece, void const* c
     }
 
     auto const offset = piece * MetadataPieceSize;
-    std::copy_n(reinterpret_cast<char const*>(data), len, std::begin(metadata_) + offset);
+    std::copy_n(static_cast<char const*>(data), len, std::begin(metadata_) + offset);
 
     needed.erase(iter);
     tr_logAddDebugMagnet(this, fmt::format("saving metainfo piece {}... {} remain", piece, std::size(needed)));

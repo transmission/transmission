@@ -599,7 +599,7 @@ void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_dat
     outbuf_info_.emplace_back(n_bytes, is_piece_data);
 
     auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
-    filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
+    filter_.encrypt(static_cast<std::byte const*>(bytes), n_bytes, resbuf);
     outbuf_.commit_space(n_bytes);
 
     flush_outbuf_soon();
@@ -618,7 +618,7 @@ size_t tr_peerIo::get_write_buffer_space(uint64_t now) const noexcept
 
 void tr_peerIo::read_bytes(void* bytes, size_t n_bytes)
 {
-    auto walk = reinterpret_cast<std::byte*>(bytes);
+    auto walk = static_cast<std::byte*>(bytes);
     n_bytes = std::min(n_bytes, std::size(inbuf_));
     if (n_decrypt_remain_)
     {
