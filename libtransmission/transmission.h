@@ -222,6 +222,9 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
  */
 void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled);
 
+bool tr_sessionGetWrapSingleFileTorrents(tr_session const* session);
+void tr_sessionSetWrapSingleFileTorrents(tr_session* session, bool wrap);
+
 /** @brief Get whether or not RPC calls are allowed in this session.
     @see `tr_sessionInit()`
     @see `tr_sessionSetRPCEnabled()` */
