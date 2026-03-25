@@ -136,9 +136,11 @@ tr_variant from_double(double const& val)
 
 // ---
 
-bool to_int64(tr_variant const& src, int64_t* tgt)
+template<std::integral T>
+bool to_int(tr_variant const& src, T* tgt)
 {
-    if (auto const val = src.value_if<int64_t>())
+    static_assert(!std::is_same_v<T, bool>);
+    if (auto const val = src.value_if<T>())
     {
         *tgt = *val;
         return true;
@@ -147,8 +149,10 @@ bool to_int64(tr_variant const& src, int64_t* tgt)
     return false;
 }
 
-tr_variant from_int64(int64_t const& val)
+template<std::integral T>
+tr_variant from_int(T const& val)
 {
+    static_assert(!std::is_same_v<T, bool>);
     return val;
 }
 
@@ -337,42 +341,6 @@ tr_variant from_preferred_transport(small::max_size_vector<tr_preferred_transpor
     }
 
     return ret;
-}
-
-// ---
-
-bool to_size_t(tr_variant const& src, size_t* tgt)
-{
-    if (auto const val = src.value_if<int64_t>())
-    {
-        *tgt = static_cast<size_t>(*val);
-        return true;
-    }
-
-    return false;
-}
-
-tr_variant from_size_t(size_t const& val)
-{
-    return uint64_t{ val };
-}
-
-// ---
-
-bool to_uint64(tr_variant const& src, uint64_t* tgt)
-{
-    if (auto const val = src.value_if<int64_t>())
-    {
-        *tgt = static_cast<uint64_t>(*val);
-        return true;
-    }
-
-    return false;
-}
-
-tr_variant from_uint64(uint64_t const& val)
-{
-    return val;
 }
 
 // ---
@@ -573,7 +541,9 @@ void Converters::ensure_default_converters()
             Converters::add(to_double, from_double);
             Converters::add(to_encryption_mode, from_encryption_mode);
             Converters::add(to_fs_path, from_fs_path);
-            Converters::add(to_int64, from_int64);
+            Converters::add(to_int<int64_t>, from_int<int64_t>);
+            Converters::add(to_int<size_t>, from_int<size_t>);
+            Converters::add(to_int<uint64_t>, from_int<uint64_t>);
             Converters::add(to_log_level, from_log_level);
             Converters::add(to_mode_t, from_mode_t);
             Converters::add(to_msec, from_msec);
@@ -581,10 +551,8 @@ void Converters::ensure_default_converters()
             Converters::add(to_port, from_port);
             Converters::add(to_preallocation_mode, from_preallocation_mode);
             Converters::add(to_preferred_transport, from_preferred_transport);
-            Converters::add(to_size_t, from_size_t);
             Converters::add(to_string, from_string);
             Converters::add(to_u8string, from_u8string);
-            Converters::add(to_uint64, from_uint64);
             Converters::add(to_verify_added_mode, from_verify_added_mode);
         });
 }
