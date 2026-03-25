@@ -245,7 +245,7 @@ tr_variant from_msec(std::chrono::milliseconds const& src)
 
 bool to_port(tr_variant const& src, tr_port* tgt)
 {
-    if (auto const val = src.value_if<int64_t>())
+    if (auto const val = src.value_if<uint16_t>())
     {
         *tgt = tr_port::from_host(*val);
         return true;
@@ -256,7 +256,7 @@ bool to_port(tr_variant const& src, tr_port* tgt)
 
 tr_variant from_port(tr_port const& val)
 {
-    return int64_t{ val.host() };
+    return val.host();
 }
 
 // ---
