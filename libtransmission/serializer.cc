@@ -543,6 +543,7 @@ void Converters::ensure_default_converters()
             Converters::add(to_fs_path, from_fs_path);
             Converters::add(to_int<int64_t>, from_int<int64_t>);
             Converters::add(to_int<size_t>, from_int<size_t>);
+            Converters::add(to_int<time_t>, from_int<time_t>);
             Converters::add(to_int<uint64_t>, from_int<uint64_t>);
             Converters::add(to_log_level, from_log_level);
             Converters::add(to_mode_t, from_mode_t);

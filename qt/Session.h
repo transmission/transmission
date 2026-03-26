@@ -176,7 +176,7 @@ private:
     void sendTorrentRequest(tr_quark method, torrent_ids_t const& torrent_ids);
     void refreshTorrents(torrent_ids_t const& ids, TorrentProperties props);
 
-    static void updateStats(tr_variant* args_dict, tr_session_stats* stats);
+    static void updateStats(tr_variant const& args_dict, tr_session_stats& stats);
 
     void addOptionalIds(tr_variant::Map& params, torrent_ids_t const& torrent_ids) const;
     void addOptionalIds(tr_variant* args_dict, torrent_ids_t const& torrent_ids) const;
@@ -206,6 +206,6 @@ private:
         .downloadedBytes = 0,
         .filesAdded = 0,
         .sessionCount = 0,
-        .secondsActive = 0,
+        .secondsActive = time_t{},
     };
 };
