@@ -277,6 +277,20 @@ bool tr_torrentUsesSessionLimits(tr_torrent const* tor)
     return tor->uses_session_limits();
 }
 
+bool tr_torrentUsesSequentialDownload(tr_torrent const* tor)
+{
+    tr_return_val_if_fail(tr_isTorrent(tor), {});
+
+    return tor->is_sequential_download();
+}
+
+void tr_torrentUseSequentialDownload(tr_torrent* tor, bool enabled)
+{
+    tr_return_if_fail(tr_isTorrent(tor));
+
+    tor->set_sequential_download(enabled);
+}
+
 // --- Download Ratio
 
 void tr_torrentSetRatioMode(tr_torrent* const tor, tr_ratiolimit mode)
