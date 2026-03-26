@@ -951,6 +951,10 @@ export class Transmission extends EventTarget {
 
   updateTorrents(ids, fields) {
     this.remote.updateTorrents(ids, fields, (table, removed_ids) => {
+      if (!ids) {
+        this._torrents = {};
+      }
+
       const needinfo = [];
 
       const keys = table.shift();
