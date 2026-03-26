@@ -257,7 +257,7 @@ void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, 
         {
             if (*val == tr_quark_get_string_view(TR_KEY_recently_active))
             {
-                auto const cutoff = std::max(tr_time() - RecentlyActiveSeconds, session->startTime());
+                auto const cutoff = std::max(tr_time() - RecentlyActiveSeconds, session->torrentsLoadedTime());
                 auto const recent = torrents.get_matching([cutoff](auto* walk) { return walk->has_changed_since(cutoff); });
                 std::ranges::copy(recent, std::back_inserter(torrents_vec));
             }
