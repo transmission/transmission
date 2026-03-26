@@ -122,6 +122,7 @@ std::string tr_base64_encode(std::string_view input)
     auto buf = std::vector<char>(base64AllocSize(input));
     auto state = base64_encodestate{};
     base64_init_encodestate(&state);
+    // NOLINTNEXTLINE(bugprone-narrowing-conversions): libb64 < 2.0.0 takes `int` argument instead of `size_t`
     size_t len = base64_encode_block(std::data(input), std::size(input), std::data(buf), &state);
     len += base64_encode_blockend(std::data(buf) + len, &state);
     auto str = std::string{};
@@ -138,6 +139,7 @@ std::string tr_base64_decode(std::string_view input)
     auto buf = std::vector<char>(std::size(input) + 8);
     auto state = base64_decodestate{};
     base64_init_decodestate(&state);
+    // NOLINTNEXTLINE(bugprone-narrowing-conversions): libb64 < 2.0.0 takes `int` argument instead of `size_t`
     size_t const len = base64_decode_block(std::data(input), std::size(input), std::data(buf), &state);
     return std::string{ std::data(buf), len };
 }
@@ -170,8 +172,8 @@ constexpr void tr_hex_to_binary(char const* input, void* voutput, size_t byte_le
 
     for (size_t i = 0; i < byte_length; ++i)
     {
-        auto const upper_nibble = Hex.find(std::tolower(*input++));
-        auto const lower_nibble = Hex.find(std::tolower(*input++));
+        auto const upper_nibble = Hex.find(static_cast<char>(std::tolower(*input++)));
+        auto const lower_nibble = Hex.find(static_cast<char>(std::tolower(*input++)));
         *output++ = (uint8_t)((upper_nibble << 4) | lower_nibble);
     }
 }

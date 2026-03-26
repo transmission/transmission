@@ -65,12 +65,14 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Int(int const val)
     {
-        return Int64(val);
+        *get_leaf() = val;
+        return true;
     }
 
     bool Uint(unsigned const val)
     {
-        return Uint64(val);
+        *get_leaf() = val;
+        return true;
     }
 
     bool Int64(int64_t const val)
@@ -81,7 +83,8 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Uint64(uint64_t const val)
     {
-        return Int64(val);
+        *get_leaf() = val;
+        return true;
     }
 
     bool Double(double const val)

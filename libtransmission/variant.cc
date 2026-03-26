@@ -196,7 +196,7 @@ bool tr_variantListRemove(tr_variant* const var, size_t pos)
     if (auto* const vec = var != nullptr ? var->get_if<tr_variant::VectorIndex>() : nullptr;
         vec != nullptr && pos < std::size(*vec))
     {
-        vec->erase(std::begin(*vec) + pos);
+        vec->erase(std::begin(*vec) + static_cast<tr_variant::Vector::difference_type>(pos));
         return true;
     }
 

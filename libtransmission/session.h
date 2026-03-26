@@ -1141,7 +1141,7 @@ public:
     void set_speed_limit(tr_direction dir, Speed limit) noexcept
     {
         auto& tgt = dir == tr_direction::Down ? settings_.speed_limit_down : settings_.speed_limit_up;
-        tgt = limit.count(Speed::Units::KByps);
+        tgt = static_cast<size_t>(limit.count(Speed::Units::KByps));
         update_bandwidth(dir);
     }
 

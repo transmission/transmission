@@ -21,7 +21,7 @@ bool tr_x509_store_add(tr_x509_store_t /*handle*/, tr_x509_cert_t /*cert*/)
     return false;
 }
 
-tr_x509_cert_t tr_x509_cert_new(void const* /*der*/, size_t /*der_length*/)
+tr_x509_cert_t tr_x509_cert_new(void const* /*der*/, long /*der_length*/)
 {
     return nullptr;
 }

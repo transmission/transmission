@@ -63,7 +63,7 @@ public:
         using namespace std::chrono;
         auto const secs = duration_cast<seconds>(interval_);
         auto tv = timeval{};
-        tv.tv_sec = secs.count();
+        tv.tv_sec = static_cast<decltype(tv.tv_sec)>(secs.count());
         tv.tv_usec = static_cast<decltype(tv.tv_usec)>(duration_cast<microseconds>(interval_ - secs).count());
         evtimer_add(evtimer_.get(), &tv);
 

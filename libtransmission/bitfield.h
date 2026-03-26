@@ -107,7 +107,7 @@ public:
             return 0.0F;
         }
 
-        return static_cast<float>(count()) / size();
+        return static_cast<float>(count()) / static_cast<float>(size());
     }
 
     tr_bitfield& operator|=(tr_bitfield const& that) noexcept;

@@ -140,7 +140,7 @@ CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
                 break;
             }
 
-            auto* const cert = tr_x509_cert_new(sys_cert->pbCertEncoded, sys_cert->cbCertEncoded);
+            auto* const cert = tr_x509_cert_new(sys_cert->pbCertEncoded, static_cast<long>(sys_cert->cbCertEncoded));
             if (cert == nullptr)
             {
                 continue;

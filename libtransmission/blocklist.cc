@@ -71,7 +71,7 @@ void save(std::string_view filename, address_range_t const* ranges, size_t n_ran
     }
 
     if (!out.write(std::data(BinContentsPrefix), std::size(BinContentsPrefix)) ||
-        !out.write(reinterpret_cast<char const*>(ranges), n_ranges * sizeof(*ranges)))
+        !out.write(reinterpret_cast<char const*>(ranges), static_cast<std::streamsize>(n_ranges * sizeof(*ranges))))
     {
         tr_logAddWarn(
             fmt::format(

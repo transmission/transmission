@@ -32,11 +32,11 @@ size_t tr_torrent_queue::add(tr_torrent_id_t const id)
 
 void tr_torrent_queue::remove(tr_torrent_id_t const id)
 {
-    auto const uid = static_cast<size_t>(id);
-    auto const pos = uid < std::size(pos_cache_) ? pos_cache_[uid] : 0U;
+    auto const pos = std::cmp_less(id, std::size(pos_cache_)) ? pos_cache_[id] : 0U;
     if (pos < std::size(queue_) && queue_[pos] == id)
     {
-        queue_.erase(std::begin(queue_) + pos);
+        using diff_type = decltype(queue_)::difference_type;
+        queue_.erase(std::begin(queue_) + static_cast<diff_type>(pos));
     }
     else
     {
@@ -83,10 +83,11 @@ std::vector<tr_torrent_id_t> tr_torrent_queue::set_pos(tr_torrent_id_t const id,
 
     auto ret = std::vector<tr_torrent_id_t>{};
 
+    using diff_type = decltype(queue_)::difference_type;
     auto const begin = std::begin(queue_);
-    auto const old_it = std::next(begin, old_pos);
+    auto const old_it = std::next(begin, static_cast<diff_type>(old_pos));
     auto const old_next_it = std::next(old_it);
-    auto const new_it = std::next(begin, new_pos);
+    auto const new_it = std::next(begin, static_cast<diff_type>(new_pos));
     if (old_pos > new_pos)
     {
         ret.assign(new_it, old_next_it);

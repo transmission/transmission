@@ -118,7 +118,7 @@ bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert);
 /**
  * @brief Allocate and initialize new X509 certificate from DER-encoded buffer.
  */
-tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length);
+tr_x509_cert_t tr_x509_cert_new(void const* der, long der_length);
 
 /**
  * @brief Free X509 certificate returned by @ref tr_x509_cert_new.

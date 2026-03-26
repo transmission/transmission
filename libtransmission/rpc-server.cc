@@ -239,7 +239,7 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
         auto const max_compressed_len = libdeflate_deflate_compress_bound(server->compressor.get(), std::size(content));
 
         auto iov = evbuffer_iovec{};
-        evbuffer_reserve_space(out, std::max(std::size(content), max_compressed_len), &iov, 1);
+        evbuffer_reserve_space(out, static_cast<ev_ssize_t>(std::max(std::size(content), max_compressed_len)), &iov, 1);
 
         auto const compressed_len = libdeflate_gzip_compress(
             server->compressor.get(),
@@ -746,14 +746,14 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
         return evhttp_bind_socket(httpd, address, port);
     }
 
-    int const fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    auto const fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (fd == INVALID_SOCKET)
     {
         freeaddrinfo(result);
         return evhttp_bind_socket(httpd, address, port);
     }
-    evutil_make_socket_nonblocking(fd);
-    evutil_make_listen_socket_reuseable(fd);
+    evutil_make_socket_nonblocking(static_cast<evutil_socket_t>(fd));
+    evutil_make_listen_socket_reuseable(static_cast<evutil_socket_t>(fd));
 
     // Making dual stack
     if (result->ai_family == AF_INET6)
@@ -764,13 +764,13 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
     // Set keep alive
     int on = 1;
     setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&on), sizeof(on));
-    if (bind(fd, result->ai_addr, result->ai_addrlen) != 0 || listen(fd, 128) == -1)
+    if (bind(fd, result->ai_addr, static_cast<int>(result->ai_addrlen)) != 0 || listen(fd, 128) == -1)
     {
         closesocket(fd);
         freeaddrinfo(result);
         return evhttp_bind_socket(httpd, address, port);
     }
-    if (evhttp_accept_socket(httpd, fd) == 0)
+    if (evhttp_accept_socket(httpd, static_cast<evutil_socket_t>(fd)) == 0)
     {
         freeaddrinfo(result);
         return 0;

@@ -124,7 +124,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 {
     if (denominator > 0)
     {
-        return numerator / static_cast<double>(denominator);
+        return static_cast<double>(numerator) / static_cast<double>(denominator);
     }
 
     if (numerator > 0)
@@ -196,7 +196,7 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
             std::back_inserter(argv_cstrs),
             [](auto& str) { return std::data(str); });
         argv_cstrs.push_back(nullptr); // argv is nullptr-terminated
-        return (*real_main)(std::size(*argv_strs), std::data(argv_cstrs));
+        return (*real_main)(static_cast<int>(std::size(*argv_strs)), std::data(argv_cstrs));
     }
 
     return (*real_main)(argc, argv);
