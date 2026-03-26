@@ -649,6 +649,9 @@ export class Transmission extends EventTarget {
     this._selectedTorrentIds.clear();
     this._updateVisibleSelections();
     this._dispatchSelectionChanged();
+    if (this.popup[0] instanceof Inspector) {
+      this.popup[0].close();
+    }
     delete this._last_torrent_clicked;
   }
 
