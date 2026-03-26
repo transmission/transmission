@@ -1193,7 +1193,7 @@ public:
         return bandwidth_groups_;
     }
 
-    void addIncoming(tr_peer_socket&& socket);
+    void addIncoming(std::shared_ptr<tr_peer_socket> socket);
 
     void addTorrent(tr_torrent* tor);
 
