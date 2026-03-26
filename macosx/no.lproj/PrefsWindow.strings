@@ -1,0 +1,402 @@
+
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "23"; */
+"23.title" = "Instillinger";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "53"; */
+"53.title" = "Andre…";
+
+/* Class = "NSMenuItem"; title = "Same as torrent file"; ObjectID = "55"; */
+"55.title" = "Samma som torrentfil";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "219"; */
+"219.title" = "Andre…";
+
+/* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
+"253.label" = "Legge til";
+
+/* Class = "NSTabViewItem"; label = "Management"; ObjectID = "254"; */
+"254.label" = "Håndtering";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "542"; */
+"542.title" = "Andre…";
+
+/* Class = "NSButtonCell"; title = "Quit with active transfers"; ObjectID = "1201"; */
+"1201.title" = "Avslutt med aktive overføringer";
+
+/* Class = "NSButtonCell"; title = "Removal of active transfers"; ObjectID = "1202"; */
+"1202.title" = "Fjerning av aktive overføringer";
+
+/* Class = "NSTextFieldCell"; title = "Prompt user for:"; ObjectID = "1203"; */
+"1203.title" = "Spør brukeren om:";
+
+/* Class = "NSTextFieldCell"; title = "Badge Dock icon with:"; ObjectID = "1204"; */
+"1204.title" = "Skilt dock ikon med:";
+
+/* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
+"1205.title" = "Total nedlastingshastighet";
+
+/* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
+"1206.title" = "Total opplastingshastighet";
+
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
+"1207.title" = "Kun når overføringer lastes ned";
+
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1208"; */
+"1208.title" = "Kun når overføringer lastes ned";
+
+/* Class = "NSTextFieldCell"; title = "Auto resize:"; ObjectID = "1209"; */
+"1209.title" = "Endre størrelse automatisk";
+
+/* Class = "NSButtonCell"; title = "Automatically size window to fit all transfers"; ObjectID = "1210"; */
+"1210.title" = "Automatisk endre størrelsen på vindu for å passe alle overføringene";
+
+/* Class = "NSButtonCell"; title = "Reset"; ObjectID = "1211"; */
+"1211.title" = "Tilbakestill";
+
+/* Class = "NSTextFieldCell"; title = "Reset all alerts:"; ObjectID = "1212"; */
+"1212.title" = "Tilbakestill alle varsler";
+
+/* Class = "NSButtonCell"; title = "Automatically check daily"; ObjectID = "1213"; */
+"1213.title" = "Automatisk sjekk daglig";
+
+/* Class = "NSTextFieldCell"; title = "Check for update:"; ObjectID = "1214"; */
+"1214.title" = "Sjekk etter oppdatering";
+
+/* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
+"1216.title" = "Standard plass";
+
+/* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
+"1217.title" = "Instillinger:";
+
+/* Class = "NSButtonCell"; title = "Trash original torrent files"; ObjectID = "1218"; */
+"1218.title" = "Kast original torrentfil";
+
+/* Class = "NSButtonCell"; title = "Watch for torrent files in:"; ObjectID = "1219"; */
+"1219.title" = "Se etter torrentfil i:";
+
+/* Class = "NSTextFieldCell"; title = "Auto add:"; ObjectID = "1226"; */
+"1226.title" = "Legg til automatisk";
+
+/* Class = "NSButtonCell"; title = "Keep incomplete files in:"; ObjectID = "1227"; */
+"1227.title" = "Behold ufullstendige filer i:";
+
+/* Class = "NSTextFieldCell"; title = "Queues:"; ObjectID = "1230"; */
+"1230.title" = "Køer:";
+
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1231"; */
+"1231.title" = "aktive øverføringer";
+
+/* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "1232"; */
+"1232.title" = "Stopp seeding ved ratio:";
+
+/* Class = "NSTextFieldCell"; title = "Limits:"; ObjectID = "1234"; */
+"1234.title" = "Grenser:";
+
+/* Class = "NSTextFieldCell"; title = "Ratio is amount uploaded to amount downloaded"; ObjectID = "1235"; */
+"1235.title" = "Ratio er mengde lastet opp til mengde lasted ned";
+
+/* Class = "NSButtonCell"; title = "Download with maximum of:"; ObjectID = "1236"; */
+"1236.title" = "Last ned med maksimum av:";
+
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1239"; */
+"1239.title" = "aktive overføringer";
+
+/* Class = "NSButtonCell"; title = "Seeding with maximum of:"; ObjectID = "1240"; */
+"1240.title" = "Seeding med maksimum av:";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1242"; */
+"1242.title" = "minutter";
+
+/* Class = "NSButtonCell"; title = "Transfer is stalled when inactive for:"; ObjectID = "1243"; */
+"1243.title" = "Overføringer er steilet når inaktiv for:";
+
+/* Class = "NSButtonCell"; title = "Automatically map port"; ObjectID = "1247"; */
+"1247.title" = "Automatisk kartlegg port";
+
+/* Class = "NSTextFieldCell"; title = "NAT traversal uses either NAT-PMP or UPnP"; ObjectID = "1248"; */
+"1248.title" = "NAT traversering bruker enten NAT-MPM eller UPnP";
+
+/* Class = "NSTextFieldCell"; title = "Port is open"; ObjectID = "1250"; */
+"1250.title" = "Porten er åpen";
+
+/* Class = "NSTextFieldCell"; title = "Peer communication:"; ObjectID = "1253"; */
+"1253.title" = "Peer kommunikasjon";
+
+/* Class = "NSButtonCell"; title = "Prevent computer from sleeping with active transfers"; ObjectID = "1254"; */
+"1254.title" = "Forhindre datamaskin fra å sove med aktive overføringer";
+
+/* Class = "NSTextFieldCell"; title = "System sleep:"; ObjectID = "1255"; */
+"1255.title" = "System søvn";
+
+/* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
+"1265.title" = "Opplastningshastighet";
+
+/* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
+"1267.title" = "Nedlastingshastighet";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
+"1268.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1269"; */
+"1269.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
+"1270.title" = "Globale båndbreddegrenser:";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
+"1273.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1274"; */
+"1274.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
+"1275.title" = "Fartsgrensemodus";
+
+/* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
+"1276.title" = "Opplastingshastighet:";
+
+/* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
+"1277.title" = "Nedlastingshastighet:";
+
+/* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
+"1278.title" = "Når aktivert overstyrer fartsgrensen den globale båndbreddegrensen";
+
+/* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
+"1280.title" = "Planlegg hastighetgrense";
+
+/* Class = "NSTextFieldCell"; title = "to"; ObjectID = "1281"; */
+"1281.title" = "til";
+
+/* Class = "NSButtonCell"; title = "Display a window when opening a torrent file"; ObjectID = "1294"; */
+"1294.title" = "Vis et vindu når torrentfil åpnes";
+
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "1302"; */
+"1302.title" = "Når nedlastings fullføres:";
+
+/* Class = "NSButtonCell"; title = "When seeding completes:"; ObjectID = "1306"; */
+"1306.title" = "Når seeding fullføres:";
+
+/* Class = "NSTextFieldCell"; title = "Play sound:"; ObjectID = "1310"; */
+"1310.title" = "Spill lyd:";
+
+/* Class = "NSButtonCell"; title = "Start transfers when added"; ObjectID = "1335"; */
+"1335.title" = "Start overføring når lagt til";
+
+/* Class = "NSTextFieldCell"; title = "Add window:"; ObjectID = "1338"; */
+"1338.title" = "Legg til vindu";
+
+/* Class = "NSButtonCell"; title = "Only when there are multiple files"; ObjectID = "1340"; */
+"1340.title" = "Kun når det er flere filer";
+
+/* Class = "NSButtonCell"; title = "Update"; ObjectID = "1437"; */
+"1437.title" = "Oppdater";
+
+/* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
+"1438.title" = "blokkeringsliste lastet/ikke lastet";
+
+/* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
+"1439.title" = "Blokkeringsliste";
+
+/* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
+"1440.title" = "Forhindre peers i blokkeringsliste fra å koble til";
+
+/* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
+"1441.title" = "Høy tilkoblingsgrense kan dratisk påvirke systemytelse";
+
+/* Class = "NSButtonCell"; title = "Use peer exchange (PEX) for public torrents"; ObjectID = "1442"; */
+"1442.title" = "Bruk peer exchange (PEX) for offentlige torrenter";
+
+/* Class = "NSTextFieldCell"; title = "Maximum connections for new transfers:"; ObjectID = "1443"; */
+"1443.title" = "Maksimum tilkoblinger for nye overføringer:";
+
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1446"; */
+"1446.title" = "peers";
+
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1447"; */
+"1447.title" = "peers";
+
+/* Class = "NSTextFieldCell"; title = "Global maximum connections:"; ObjectID = "1450"; */
+"1450.title" = "Globala maksimum tilkoblinger:";
+
+/* Class = "NSTextFieldCell"; title = "Connections:"; ObjectID = "1451"; */
+"1451.title" = "Tilkoblinger:";
+
+/* Class = "NSButtonCell"; title = "Prefer encrypted peers"; ObjectID = "1452"; */
+"1452.title" = "Foretrekk kryperte peers";
+
+/* Class = "NSTextFieldCell"; title = "Encryption:"; ObjectID = "1453"; */
+"1453.title" = "Kryptering:";
+
+/* Class = "NSButtonCell"; title = "Ignore unencrypted peers"; ObjectID = "1454"; */
+"1454.title" = "Ignorer ukrypterte peers";
+
+/* Class = "NSButtonCell"; title = "Only when adding manually"; ObjectID = "1477"; */
+"1477.title" = "Kun når legges til manuelt";
+
+/* Class = "NSTextFieldCell"; title = "Listening port:"; ObjectID = "1493"; */
+"1493.title" = "Avlyttingsport";
+
+/* Class = "NSButtonCell"; title = "Enable remote access"; ObjectID = "1502"; */
+"1502.title" = "Aktiver fjerntilgang";
+
+/* Class = "NSButtonCell"; title = "Require authentication"; ObjectID = "1505"; */
+"1505.title" = "Krev autentisering";
+
+/* Class = "NSTableColumn"; headerCell.title = "IP Address"; ObjectID = "1523"; */
+"1523.headerCell.title" = "IP-addresse";
+
+/* Class = "NSTextFieldCell"; title = "IP addresses may include * wildcard"; ObjectID = "1542"; */
+"1542.title" = "IP-addresser kan inneholde * wildcard";
+
+/* Class = "NSTextFieldCell"; title = "Password:"; ObjectID = "1555"; */
+"1555.title" = "Passord:";
+
+/* Class = "NSTextFieldCell"; title = "Username:"; ObjectID = "1557"; */
+"1557.title" = "Brukernavn:";
+
+/* Class = "NSTextFieldCell"; title = "This enables the web interface and allows remote requests"; ObjectID = "1645"; */
+"1645.title" = "Dette aktiverer web brukergrensesnitt og tillater fjernforespørsler";
+
+/* Class = "NSButtonCell"; title = "Launch Web Interface"; ObjectID = "1718"; */
+"1718.title" = "Start web grensesnitt";
+
+/* Class = "NSTextFieldCell"; title = "Last updated: N/A"; ObjectID = "1739"; */
+"1739.title" = "Sist oppdatert: N/A";
+
+/* Class = "NSButtonCell"; title = "Automatically update weekly"; ObjectID = "1742"; */
+"1742.title" = "Automatisk oppdater ukentlig";
+
+/* Class = "NSButtonCell"; title = "Only allow the following IP addresses to connect:"; ObjectID = "1748"; */
+"1748.title" = "Kun tillat de følgene IP-addressene å koble til:";
+
+/* Class = "NSTableColumn"; headerCell.title = "Color"; ObjectID = "1777"; */
+"1777.headerCell.title" = "Farge";
+
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "1779"; */
+"1779.headerCell.title" = "Navn";
+
+/* Class = "NSTextFieldCell"; title = "Group Name:"; ObjectID = "1796"; */
+"1796.title" = "Gruppenavn:";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "1813"; */
+"1813.title" = "Andre…";
+
+/* Class = "NSButtonCell"; title = "Custom location:"; ObjectID = "1815"; */
+"1815.title" = "Tilpasset lokasjon";
+
+/* Class = "NSTextFieldCell"; title = "The location will only be set when adding the transfer"; ObjectID = "1824"; */
+"1824.title" = "Lokasjonen blir kun satt når overføringer legges til";
+
+/* Class = "NSButtonCell"; title = "Display the web interface with Bonjour"; ObjectID = "1826"; */
+"1826.title" = "Vis webgrensesnittet med Bonjour";
+
+/* Class = "NSButtonCell"; title = "Assign group to new transfers based on criteria"; ObjectID = "1831"; */
+"1831.title" = "Tildel gruppe til nye overføringer basert på kriterium";
+
+/* Class = "NSButtonCell"; title = "Edit…"; ObjectID = "1833"; */
+"1833.title" = "Rediger…";
+
+/* Class = "NSTextFieldCell"; title = "Transfers will be assigned to the first group where all criteria are met"; ObjectID = "1835"; */
+"1835.title" = "Overføringer blir tilfelt den første gruppe hvor alle kriterier er møtt";
+
+/* Class = "NSButtonCell"; title = "Randomize port on launch"; ObjectID = "1890"; */
+"1890.title" = "Randomiser port ved oppstart";
+
+/* Class = "NSButtonCell"; title = "Randomize"; ObjectID = "1892"; */
+"1892.title" = "Randomiser";
+
+/* Class = "NSButtonCell"; title = "Include beta releases"; ObjectID = "1896"; */
+"1896.title" = "Inkluder betaversioner";
+
+/* Class = "NSMenuItem"; title = "Every Day"; ObjectID = "1910"; */
+"1910.title" = "Hver dag";
+
+/* Class = "NSMenuItem"; title = "Weekdays"; ObjectID = "1911"; */
+"1911.title" = "Ukedager";
+
+/* Class = "NSMenuItem"; title = "Weekends"; ObjectID = "1912"; */
+"1912.title" = "Helger";
+
+/* Class = "NSMenuItem"; title = "Monday"; ObjectID = "1914"; */
+"1914.title" = "Mandag";
+
+/* Class = "NSMenuItem"; title = "Tuesday"; ObjectID = "1915"; */
+"1915.title" = "Tirsdag";
+
+/* Class = "NSMenuItem"; title = "Wednesday"; ObjectID = "1916"; */
+"1916.title" = "Onsdag";
+
+/* Class = "NSMenuItem"; title = "Thursday"; ObjectID = "1917"; */
+"1917.title" = "Torsdag";
+
+/* Class = "NSMenuItem"; title = "Friday"; ObjectID = "1918"; */
+"1918.title" = "Fredag";
+
+/* Class = "NSMenuItem"; title = "Saturday"; ObjectID = "1919"; */
+"1919.title" = "Lørdag";
+
+/* Class = "NSMenuItem"; title = "Sunday"; ObjectID = "1920"; */
+"1920.title" = "Søndag";
+
+/* Class = "NSButtonCell"; title = "Use distributed hash table (DHT) for public torrents"; ObjectID = "1926"; */
+"1926.title" = "Anvend distribuert hashtabell (DHT) for offentlige torrenter";
+
+/* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
+"1931.title" = "Aksepter magnetlenker";
+
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
+"1933.title" = "Sett standard applikasjon";
+
+/* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
+"1940.title" = "Legg til .part til ufullstendige filer";
+
+/* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
+"1948.title" = "Vis et vindu når en magnetlenke åpnes";
+
+/* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
+"1952.title" = "Anvend lokal peer oppdagelse for offentlige torrenter";
+
+/* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "1962"; */
+"1962.title" = "Stopp seeding når inaktiv for:";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
+"1970.title" = "minutter";
+
+/* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
+"1988.title" = "URL:";
+
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "2044"; */
+"2044.title" = "Når nedlasting fullføres:";
+
+/* Class = "NSTextFieldCell"; title = "Call script:"; ObjectID = "2047"; */
+"2047.title" = "Kall script";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "2053"; */
+"2053.title" = "Andre…";
+
+/* Class = "NSButtonCell"; title = "Enable Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
+"2078.title" = "Aktiver micro transport protokoll (µTP)";
+
+/* Class = "NSTextFieldCell"; title = "Peer listening port:"; ObjectID = "2082"; */
+"2082.title" = "Peer lytteport";
+
+/* Class = "NSTextFieldCell"; title = "Notifications:"; ObjectID = "2087"; */
+"2087.title" = "Notifikasjoner";
+
+/* Class = "NSButtonCell"; title = "Configure In System Preferences"; ObjectID = "2114"; */
+"2114.title" = "Konfiguer i systeminstillinger";
+
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "2119"; */
+"2119.title" = "Fjern fra overføringslisten når seed er ferdig";
+
+/* Class = "NSTextFieldCell"; title = "Applies to newly added transfers"; ObjectID = "2123"; */
+"2123.title" = "Gjelder nylige lagt til overføringer";
+
+/* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
+"A9E-F4-a3c.title" = "Åpne torrentfiler:";
+
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
+"pgY-W3-HdI.title" = "Velg standard applikasjon";
+
+/* Class = "NSButtonCell"; title = "Verify data when download completes"; ObjectID = "wM8-cD-WAB"; */
+/* "wM8-cD-WAB.title" = "Verifiser data når nedlasting fullføres"; */
