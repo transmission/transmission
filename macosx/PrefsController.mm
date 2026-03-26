@@ -105,6 +105,9 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic) IBOutlet NSTableView* fRPCWhitelistTable;
 @property(nonatomic, readonly) NSMutableArray<NSString*>* fRPCWhitelistArray;
 @property(nonatomic) IBOutlet NSSegmentedControl* fRPCAddRemoveControl;
+@property(nonatomic) IBOutlet NSTableView* fRPCHostWhitelistTable;
+@property(nonatomic, readonly) NSMutableArray<NSString*>* fRPCHostWhitelistArray;
+@property(nonatomic) IBOutlet NSSegmentedControl* fRPCHostAddRemoveControl;
 @property(nonatomic, copy) NSString* fRPCPassword;
 @property(nonatomic, readonly) DefaultAppHelper* fDefaultAppHelper;
 
@@ -173,6 +176,10 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         //update rpc whitelist
         _fRPCWhitelistArray = [NSMutableArray arrayWithArray:[self.fDefaults arrayForKey:@"RPCWhitelist"] ?: @[ @"127.0.0.1" ]];
         [self updateRPCWhitelist];
+
+        //update rpc host whitelist
+        _fRPCHostWhitelistArray = [NSMutableArray arrayWithArray:[self.fDefaults arrayForKey:@"RPCHostWhitelist"] ?: @[]];
+        [self updateRPCHostWhitelist];
 
         //reset old Sparkle settings from previous versions
         [_fDefaults removeObjectForKey:@"SUScheduledCheckInterval"];
@@ -297,6 +304,9 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
     //set fRPCWhitelistTable column width to table width
     [self.fRPCWhitelistTable sizeToFit];
+
+    //set fRPCHostWhitelistTable column width to table width
+    [self.fRPCHostWhitelistTable sizeToFit];
 }
 
 - (NSToolbarItem*)toolbar:(NSToolbar*)toolbar itemForItemIdentifier:(NSString*)ident willBeInsertedIntoToolbar:(BOOL)flag
@@ -1164,6 +1174,11 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     tr_sessionSetRPCWhitelistEnabled(self.fHandle, [self.fDefaults boolForKey:@"RPCUseWhitelist"]);
 }
 
+- (IBAction)setRPCUseHostWhitelist:(id)sender
+{
+    tr_sessionSetRPCHostWhitelistEnabled(self.fHandle, [self.fDefaults boolForKey:@"RPCUseHostWhitelist"]);
+}
+
 - (IBAction)setRPCWebUIDiscovery:(id)sender
 {
     if ([self.fDefaults boolForKey:@"RPC"] && [self.fDefaults boolForKey:@"RPCWebDiscovery"])
@@ -1207,13 +1222,51 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     }
 }
 
+- (IBAction)addRemoveRPCHost:(id)sender
+{
+    //don't allow add/remove when currently adding - it leads to weird results
+    if (self.fRPCHostWhitelistTable.editedRow != -1)
+    {
+        return;
+    }
+
+    if ([[sender cell] tagForSegment:[sender selectedSegment]] == RPCIPTagRemove)
+    {
+        [self.fRPCHostWhitelistArray removeObjectsAtIndexes:self.fRPCHostWhitelistTable.selectedRowIndexes];
+        [self.fRPCHostWhitelistTable deselectAll:self];
+        [self.fRPCHostWhitelistTable reloadData];
+
+        [self.fDefaults setObject:self.fRPCHostWhitelistArray forKey:@"RPCHostWhitelist"];
+        [self updateRPCHostWhitelist];
+    }
+    else
+    {
+        [self.fRPCHostWhitelistArray addObject:@""];
+        [self.fRPCHostWhitelistTable reloadData];
+
+        NSUInteger const row = self.fRPCHostWhitelistArray.count - 1;
+        [self.fRPCHostWhitelistTable selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+        [self.fRPCHostWhitelistTable editColumn:0 row:row withEvent:nil select:YES];
+    }
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView*)tableView
 {
+    if (tableView == self.fRPCHostWhitelistTable)
+    {
+        return self.fRPCHostWhitelistArray.count;
+    }
+
     return self.fRPCWhitelistArray.count;
 }
 
 - (id)tableView:(NSTableView*)tableView objectValueForTableColumn:(NSTableColumn*)tableColumn row:(NSInteger)row
 {
+    if (tableView == self.fRPCHostWhitelistTable)
+    {
+        return self.fRPCHostWhitelistArray[row];
+    }
+
     return self.fRPCWhitelistArray[row];
 }
 
@@ -1222,6 +1275,45 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     forTableColumn:(NSTableColumn*)tableColumn
                row:(NSInteger)row
 {
+    if (tableView == self.fRPCHostWhitelistTable)
+    {
+        NSString* hostname = [object stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+
+        BOOL valid = hostname.length > 0;
+
+        if (valid)
+        {
+            //don't allow the same hostname
+            if ([self.fRPCHostWhitelistArray containsObject:hostname] && ![self.fRPCHostWhitelistArray[row] isEqualToString:hostname])
+            {
+                valid = false;
+            }
+        }
+
+        if (valid)
+        {
+            self.fRPCHostWhitelistArray[row] = hostname;
+            [self.fRPCHostWhitelistArray sortUsingComparator:^NSComparisonResult(NSString* a, NSString* b) {
+                return [a caseInsensitiveCompare:b];
+            }];
+        }
+        else
+        {
+            NSBeep();
+            if ([self.fRPCHostWhitelistArray[row] isEqualToString:@""])
+            {
+                [self.fRPCHostWhitelistArray removeObjectAtIndex:row];
+            }
+        }
+
+        [self.fRPCHostWhitelistTable deselectAll:self];
+        [self.fRPCHostWhitelistTable reloadData];
+
+        [self.fDefaults setObject:self.fRPCHostWhitelistArray forKey:@"RPCHostWhitelist"];
+        [self updateRPCHostWhitelist];
+        return;
+    }
+
     NSArray* components = [object componentsSeparatedByString:@"."];
     NSMutableArray* newComponents = [NSMutableArray arrayWithCapacity:4];
 
@@ -1287,6 +1379,12 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)tableViewSelectionDidChange:(NSNotification*)notification
 {
+    if (notification.object == self.fRPCHostWhitelistTable)
+    {
+        [self.fRPCHostAddRemoveControl setEnabled:self.fRPCHostWhitelistTable.numberOfSelectedRows > 0 forSegment:RPCIPTagRemove];
+        return;
+    }
+
     [self.fRPCAddRemoveControl setEnabled:self.fRPCWhitelistTable.numberOfSelectedRows > 0 forSegment:RPCIPTagRemove];
 }
 
@@ -1711,6 +1809,12 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
 {
     NSString* string = [self.fRPCWhitelistArray componentsJoinedByString:@","];
     tr_sessionSetRPCWhitelist(self.fHandle, string.UTF8String);
+}
+
+- (void)updateRPCHostWhitelist
+{
+    NSString* string = [self.fRPCHostWhitelistArray componentsJoinedByString:@","];
+    tr_sessionSetRPCHostWhitelist(self.fHandle, string.UTF8String);
 }
 
 @end

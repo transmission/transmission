@@ -1890,6 +1890,49 @@ bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session)
     return session->useRpcWhitelist();
 }
 
+void tr_session::setRpcHostWhitelist(std::string_view whitelist) const
+{
+    this->rpc_server_->set_host_whitelist(whitelist);
+}
+
+void tr_session::useRpcHostWhitelist(bool enabled) const
+{
+    this->rpc_server_->set_host_whitelist_enabled(enabled);
+}
+
+bool tr_session::useRpcHostWhitelist() const
+{
+    return this->rpc_server_->is_host_whitelist_enabled();
+}
+
+std::string tr_sessionGetRPCHostWhitelist(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->rpc_server_->host_whitelist();
+}
+
+void tr_sessionSetRPCHostWhitelist(tr_session* session, std::string_view whitelist)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->setRpcHostWhitelist(whitelist);
+}
+
+void tr_sessionSetRPCHostWhitelistEnabled(tr_session* session, bool enabled)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->useRpcHostWhitelist(enabled);
+}
+
+bool tr_sessionGetRPCHostWhitelistEnabled(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->useRpcHostWhitelist();
+}
+
 void tr_sessionSetRPCPassword(tr_session* session, std::string_view const password)
 {
     TR_ASSERT(session != nullptr);
