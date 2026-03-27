@@ -654,6 +654,16 @@ public:
         return resume_dir_;
     }
 
+    [[nodiscard]] constexpr auto torrentsLoadedTime() const noexcept
+    {
+        return torrents_loaded_time_;
+    }
+
+    void setTorrentsLoadedTime() noexcept
+    {
+        torrents_loaded_time_ = tr_time();
+    }
+
     [[nodiscard]] constexpr auto const& downloadDir() const noexcept
     {
         return settings().download_dir;
@@ -1412,6 +1422,8 @@ private:
     mutable std::recursive_mutex session_mutex_;
 
     tr_stats session_stats_{ config_dir_, time(nullptr) };
+
+    time_t torrents_loaded_time_ = 0;
 
     tr_announce_list default_trackers_;
 
