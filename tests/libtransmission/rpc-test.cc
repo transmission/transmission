@@ -728,10 +728,36 @@ TEST_F(RpcTest, torrentGet)
 
 TEST_F(RpcTest, recentlyActiveEmptyOnStartup)
 {
-    // Add a torrent but don't do anything with it
-    auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
-    EXPECT_NE(nullptr, tor);
+    //Add a torrent from assets
+    auto* ctor = tr_ctorNew(session_);
+    auto const torrent_path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/archlinux-2025.05.01-x86_64.iso.torrent"sv };
+    ASSERT_TRUE(ctor->set_metainfo_from_file(torrent_path.sv()));
+    tr_ctorSetPaused(ctor, TR_FORCE, true);
+    auto* tor = tr_torrentNew(ctor, nullptr);
+    tr_ctorFree(ctor);
+    ASSERT_NE(nullptr, tor);
 
+    //Save .torrent and .resume files to sandboxDir()
+    auto const config_dir = sandboxDir();
+    tr_sessionClose(session_, 5.0);
+    tr_logFreeQueue(tr_logGetQueue());
+    session_ = nullptr;
+
+    //Reopen session
+    auto settings = tr_variant{ tr_variant::make_map(10U) };
+    auto* settings_map = settings.get_if<tr_variant::Map>();
+    settings_map->try_emplace(TR_KEY_port_forwarding_enabled, false);
+    settings_map->try_emplace(TR_KEY_dht_enabled, false);
+    settings_map->try_emplace(TR_KEY_message_level, TR_LOG_ERROR);
+    session_ = tr_sessionInit(config_dir, true, settings);
+
+    //Load torrents from disk
+    ctor = tr_ctorNew(session_);
+    tr_ctorSetPaused(ctor, TR_FORCE, true);
+    tr_sessionLoadTorrents(session_, ctor);
+    tr_ctorFree(ctor);
+
+    //Query recently_active. Should be empty
     auto request_map = tr_variant::Map{ 3U };
     request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
     request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_get));
@@ -755,12 +781,7 @@ TEST_F(RpcTest, recentlyActiveEmptyOnStartup)
 
     auto* torrents = result->find_if<tr_variant::Vector>(TR_KEY_torrents);
     ASSERT_NE(torrents, nullptr);
-
-    // Should be empty since we haven't done anything with the torrent
     EXPECT_EQ(0UL, std::size(*torrents));
-
-    // cleanup
-    tr_torrentRemove(tor, false);
 }
 
 TEST_F(RpcTest, torrentGetLegacy)
