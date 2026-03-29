@@ -338,7 +338,7 @@ struct tr_session_stats
     uint64_t downloadedBytes; /* total down */
     uint64_t filesAdded; /* number of files added */
     uint64_t sessionCount; /* program started N times */
-    uint64_t secondsActive; /* how long Transmission's been running */
+    time_t secondsActive; /* how long Transmission's been running */
 };
 
 struct tr_stat

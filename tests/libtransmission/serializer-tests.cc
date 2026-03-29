@@ -154,6 +154,18 @@ TEST_F(SerializerTest, usesBuiltins)
     }
 }
 
+TEST_F(SerializerTest, usesTimeT)
+{
+    static auto constexpr Expected = time_t{ 1774486600 };
+    auto const var = Converters::serialize(Expected);
+    EXPECT_TRUE(var.holds_alternative<int64_t>());
+    EXPECT_EQ(var.value_if<time_t>(), Expected);
+
+    auto actual = time_t{};
+    EXPECT_TRUE(Converters::deserialize(var, &actual));
+    EXPECT_EQ(actual, Expected);
+}
+
 TEST_F(SerializerTest, usesU8String)
 {
     auto const expected = std::u8string{ u8"hello" };

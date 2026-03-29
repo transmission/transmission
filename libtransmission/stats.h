@@ -83,7 +83,7 @@ private:
         .downloadedBytes = 0U,
         .filesAdded = 0U,
         .sessionCount = 0U,
-        .secondsActive = 0U,
+        .secondsActive = time_t{},
     };
     tr_session_stats single_ = Zero;
     tr_session_stats old_ = Zero;
