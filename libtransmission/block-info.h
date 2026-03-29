@@ -7,12 +7,13 @@
 
 #include <cstdint> // uint32_t, uint64_t
 
+#include "libtransmission/constants.h"
 #include "libtransmission/types.h"
 
 struct tr_block_info
 {
 public:
-    static auto constexpr BlockSize = uint32_t{ 1024U * 16U };
+    static auto constexpr BlockSize = TrBlockSize;
 
     tr_block_info() noexcept = default;
 
