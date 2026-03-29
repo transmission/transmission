@@ -1922,11 +1922,9 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
 }
 
 // returns 0 on success, or an errno on failure
-<<<<<<< HEAD
-tr_error_code_t tr_peerMsgsImpl::client_got_block(std::span<uint8_t const> block_data, tr_block_index_t const block)
-=======
-int tr_peerMsgsImpl::client_got_block(std::unique_ptr<tr::LocalData::BlockData> block_data, tr_block_index_t const block)
->>>>>>> bf66ae40a (chore: remove cache.h, cache.cc)
+tr_error_code_t tr_peerMsgsImpl::client_got_block(
+    std::unique_ptr<tr::LocalData::BlockData> block_data,
+    tr_block_index_t const block)
 {
     if (auto const n_bytes = block_data ? std::size(*block_data) : 0U; n_bytes != tor_.block_size(block))
     {
