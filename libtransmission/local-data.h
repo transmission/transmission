@@ -32,7 +32,7 @@ namespace tr
  * Requests for multiple torrents can be handled in parallel.
  *
  * Requests for the same torrent are handled in the order they
- * are received, and only one task per torrent runs at a time.
+ * are received, one request at a time.
  */
 class LocalData
 {
@@ -49,6 +49,11 @@ public:
 
     using OnMove = std::function<void(tr_torrent_id_t, tr_error const& error)>;
 
+    /**
+     * Interface class for working with local files.
+     * Production will use the default backend.
+     * Tests can use this to inject mocks.
+     */
     class Backend
     {
     public:
@@ -109,8 +114,8 @@ public:
     // See tr_torrentRenamePath()
     void rename(tr_torrent_id_t, std::string_view oldpath, std::string_view newname, tr_torrent_rename_done_func callback);
 
-    // Stops accepting new work and blocks until all already-enqueued
-    // non-read operations complete.
+    // Stops accepting new work.
+    // Blocks until all pending mutating operations finish.
     void shutdown();
 
     // Number of bytes pending to be written to disk
