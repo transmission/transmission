@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "libtransmission/types.h"
+#include <string_view>
 
 inline auto constexpr TrInet6AddrStrlen = 46U;
 
@@ -24,3 +24,5 @@ inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc" };
 inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/" };
 inline auto constexpr TrRpcSessionIdHeader = std::string_view{ "X-Transmission-Session-Id" };
 inline auto constexpr TrRpcVersionHeader = std::string_view{ "X-Transmission-Rpc-Version" };
+
+inline auto constexpr TrBlockSize = uint32_t{ 1024U * 16U };

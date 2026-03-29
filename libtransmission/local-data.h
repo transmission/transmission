@@ -18,7 +18,7 @@
 
 #include <small/vector.hpp>
 
-#include "libtransmission/block-info.h"
+#include "libtransmission/constants.h"
 #include "libtransmission/types.h"
 
 class tr_torrents;
@@ -37,7 +37,7 @@ namespace tr
 class LocalData
 {
 public:
-    using BlockData = small::max_size_vector<uint8_t, tr_block_info::BlockSize>;
+    using BlockData = small::max_size_vector<uint8_t, TrBlockSize>;
 
     using OnRead = std::function<
         void(tr_torrent_id_t, tr_byte_span_t byte_span, tr_error const& error, std::unique_ptr<BlockData> data)>;
