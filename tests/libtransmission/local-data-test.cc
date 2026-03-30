@@ -14,6 +14,8 @@
 #include <libtransmission/error.h>
 #include <libtransmission/local-data.h>
 
+using namespace std::literals;
+
 namespace
 {
 
