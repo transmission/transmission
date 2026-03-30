@@ -195,8 +195,9 @@ tr_priority_t tr_file_priorities::piece_priority(tr_piece_index_t const piece) c
     // check the priorities of the files that touch this piece
     if (auto const [begin_file, end_file] = fpm_->file_span_for_piece(piece); end_file <= std::size(priorities_))
     {
-        auto const begin = std::begin(priorities_) + begin_file;
-        auto const end = std::begin(priorities_) + end_file;
+        using diff_type = decltype(priorities_)::difference_type;
+        auto const begin = std::begin(priorities_) + static_cast<diff_type>(begin_file);
+        auto const end = std::begin(priorities_) + static_cast<diff_type>(end_file);
         if (auto const it = std::max_element(begin, end); it != end)
         {
             return *it;

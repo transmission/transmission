@@ -7,7 +7,6 @@ Checks:
   - -bugprone-branch-clone
   - -bugprone-easily-swappable-parameters
   - -bugprone-implicit-widening-of-multiplication-result
-  - -bugprone-narrowing-conversions
   - cert-*
   - -cert-err58-cpp
   - -cert-int09-c # alias of `readability-enum-initial-value`

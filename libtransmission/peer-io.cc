@@ -198,14 +198,14 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
         event_read_.reset(
             tr::evhelpers::event_new_pri2(
                 session_->event_base(),
-                socket_.handle.tcp,
+                static_cast<evutil_socket_t>(socket_.handle.tcp),
                 EV_READ,
                 &tr_peerIo::event_read_cb,
                 this));
         event_write_.reset(
             tr::evhelpers::event_new_pri2(
                 session_->event_base(),
-                socket_.handle.tcp,
+                static_cast<evutil_socket_t>(socket_.handle.tcp),
                 EV_WRITE,
                 &tr_peerIo::event_write_cb,
                 this));
