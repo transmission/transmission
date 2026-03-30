@@ -89,7 +89,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto const test_incomplete_dir_threadfunc = [](TestIncompleteDirData* data) noexcept
     {
         auto& tor = *data->tor;
-        if (tr_ioWrite(tor, tor.block_loc(data->block), data->buf) == 0)
+        if (tr_ioWrite(tor, data->session->openFiles(), tor.block_loc(data->block), data->buf) == 0)
         {
             data->tor->on_block_received(data->block);
         }

@@ -202,6 +202,7 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
 
     auto sha = tr_sha1{};
     auto buffer = std::array<uint8_t, tr_block_info::BlockSize>{};
+    auto& open_files = tor.session->openFiles();
 
     auto const [begin_byte, end_byte] = tor.block_info().byte_span_for_piece(piece);
     auto const [begin_block, end_block] = tor.block_span_for_piece(piece);
@@ -211,7 +212,7 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
         auto const block_loc = tor.block_loc(block);
         auto const block_len = tor.block_size(block);
         auto contents = std::span{ std::data(buffer), block_len };
-        if (auto const success = tr_ioRead(tor, block_loc, contents) == 0; !success)
+        if (auto const success = tr_ioRead(tor, open_files, block_loc, contents) == 0; !success)
         {
             return {};
         }
@@ -233,7 +234,11 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
 
 } // namespace
 
-tr_error_code_t tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& loc, std::span<uint8_t> const setme)
+tr_error_code_t tr_ioRead(
+    tr_torrent const& tor,
+    tr_open_files& open_files,
+    tr_block_info::Location const& loc,
+    std::span<uint8_t> const setme)
 {
     auto error = tr_error{};
     if (loc.piece >= tor.piece_count())
@@ -244,7 +249,6 @@ tr_error_code_t tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& 
 
     auto [file_index, file_offset] = tor.file_offset(loc);
     auto& session = *tor.session;
-    auto& open_files = session.openFiles();
     auto buf = setme;
     while (!std::empty(buf) && !error)
     {
@@ -258,7 +262,11 @@ tr_error_code_t tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& 
     return error.code();
 }
 
-tr_error_code_t tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, std::span<uint8_t const> const writeme)
+tr_error_code_t tr_ioWrite(
+    tr_torrent& tor,
+    tr_open_files& open_files,
+    tr_block_info::Location const& loc,
+    std::span<uint8_t const> const writeme)
 {
     auto error = tr_error{};
     if (loc.piece >= tor.piece_count())
@@ -269,7 +277,6 @@ tr_error_code_t tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, 
     {
         auto [file_index, file_offset] = tor.file_offset(loc);
         auto& session = *tor.session;
-        auto& open_files = session.openFiles();
         auto buf = writeme;
         while (!std::empty(buf) && !error)
         {

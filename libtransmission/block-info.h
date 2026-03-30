@@ -7,12 +7,13 @@
 
 #include <cstdint> // uint32_t, uint64_t
 
+#include "libtransmission/constants.h"
 #include "libtransmission/types.h"
 
 struct tr_block_info
 {
 public:
-    static auto constexpr BlockSize = uint32_t{ 1024U * 16U };
+    static auto constexpr BlockSize = TrBlockSize;
 
     tr_block_info() noexcept = default;
 
@@ -97,6 +98,12 @@ public:
         return byte_loc(uint64_t{ block } * BlockSize);
     }
 
+    [[nodiscard]] constexpr tr_byte_span_t byte_span_for_block(tr_block_index_t const block) const noexcept
+    {
+        auto const begin = block_loc(block).byte;
+        return { .begin = begin, .end = begin + block_size(block) };
+    }
+
     // Location of the last byte in `block`.
     [[nodiscard]] constexpr auto block_last_loc(tr_block_index_t const block) const noexcept
     {
@@ -107,6 +114,13 @@ public:
     [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = {}, uint32_t length = {}) const noexcept
     {
         return byte_loc((uint64_t{ piece } * piece_size()) + offset + length);
+    }
+
+    [[nodiscard]] constexpr tr_byte_span_t byte_span_for_req(tr_piece_index_t piece, uint32_t offset, uint32_t length)
+        const noexcept
+    {
+        auto const begin = piece_loc(piece, offset).byte;
+        return { .begin = begin, .end = begin + length };
     }
 
     [[nodiscard]] constexpr tr_block_span_t block_span_for_piece(tr_piece_index_t const piece) const noexcept
