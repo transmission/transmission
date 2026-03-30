@@ -99,6 +99,7 @@ public:
         {
             return EINVAL;
         }
+        auto const span_size = static_cast<size_t>(len);
 
         auto const* const tor = torrents_.get(id);
         if (tor == nullptr)
@@ -107,8 +108,8 @@ public:
         }
 
         auto const loc = tor->block_info().byte_loc(byte_span.begin);
-        setme.resize(len);
-        return tr_ioRead(*tor, open_files_, loc, std::span{ std::data(setme), len });
+        setme.resize(span_size);
+        return tr_ioRead(*tor, open_files_, loc, std::span{ std::data(setme), span_size });
     }
 
     [[nodiscard]] int test_piece(tr_torrent_id_t const id, tr_piece_index_t const piece, tr_sha1_digest_t& setme_hash) override
@@ -141,6 +142,7 @@ public:
         {
             return EINVAL;
         }
+        auto const span_size = static_cast<size_t>(len);
 
         auto* const tor = torrents_.get(id);
         if (tor == nullptr)
@@ -149,7 +151,7 @@ public:
         }
 
         auto const loc = tor->block_info().byte_loc(byte_span.begin);
-        return tr_ioWrite(*tor, open_files_, loc, std::span{ std::data(data), len });
+        return tr_ioWrite(*tor, open_files_, loc, std::span{ std::data(data), span_size });
     }
 
     [[nodiscard]] int move(
