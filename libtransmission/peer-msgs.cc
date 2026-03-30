@@ -1766,7 +1766,7 @@ tr_error_code_t tr_peerMsgsImpl::client_got_block(std::span<uint8_t const> block
 
     // NB: if writeBlock() fails the torrent may be paused.
     // If this happens, `this` will be destructed and must no longer be used.
-    if (auto const err = tr_ioWrite(tor_, tor_.block_loc(block), block_data); err != 0)
+    if (auto const err = tr_ioWrite(tor_, session->openFiles(), tor_.block_loc(block), block_data); err != 0)
     {
         return err;
     }
@@ -2051,7 +2051,11 @@ void tr_peerMsgsImpl::check_request_timeout(time_t const now)
 
     if (ok)
     {
-        ok = tr_ioRead(tor_, tor_.piece_loc(req.index, req.offset), std::span{ std::data(buf), req.length }) == 0;
+        ok = tr_ioRead(
+                 tor_,
+                 session->openFiles(),
+                 tor_.piece_loc(req.index, req.offset),
+                 std::span{ std::data(buf), req.length }) == 0;
     }
 
     if (ok)

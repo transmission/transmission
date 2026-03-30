@@ -394,7 +394,7 @@ void tr_webseed_task::use_fetched_blocks()
                     if (auto* const torrent = session->torrents().get(tor_id))
                     {
                         webseed->active_requests.unset(loc.block);
-                        if (tr_ioWrite(*torrent, loc, buf) != 0)
+                        if (tr_ioWrite(*torrent, session->openFiles(), loc, buf) != 0)
                         {
                             return;
                         }
