@@ -23,7 +23,13 @@ namespace tr
 {
 namespace
 {
-[[nodiscard]] tr_error make_error(int err)
+struct HashResult
+{
+    tr_error_code_t error = 0;
+    std::optional<tr_sha1_digest_t> hash;
+};
+
+[[nodiscard]] tr_error make_error(tr_error_code_t err)
 {
     auto error = tr_error{};
     if (err != 0)
@@ -34,7 +40,7 @@ namespace
     return error;
 }
 
-[[nodiscard]] std::optional<tr_sha1_digest_t> recalculate_hash(
+[[nodiscard]] HashResult recalculate_hash(
     LocalData::Backend& backend,
     tr_torrent_id_t const id,
     tr_block_info const block_info,
@@ -55,7 +61,7 @@ namespace
         buffer.clear();
         if (auto const err = backend.read(id, byte_span, buffer); err != 0)
         {
-            return {};
+            return { .error = err, .hash = {} };
         }
 
         auto* begin = std::data(buffer);
@@ -75,7 +81,7 @@ namespace
     }
 
     TR_ASSERT(block_info.piece_size(piece) == n_bytes_checked);
-    return sha.finish();
+    return { .error = 0, .hash = sha.finish() };
 }
 
 class DefaultBackend final : public LocalData::Backend
@@ -87,24 +93,25 @@ public:
     {
     }
 
-    [[nodiscard]] int read(tr_torrent_id_t const id, tr_byte_span_t const byte_span, LocalData::BlockData& setme) override
+    [[nodiscard]] tr_error_code_t read(tr_torrent_id_t const id, tr_byte_span_t const byte_span, LocalData::BlockData& setme)
+        override
     {
         if (!byte_span.is_valid())
         {
-            return EINVAL;
+            return TR_ERROR_EINVAL;
         }
 
         auto const len = byte_span.size();
         if (len > tr_block_info::BlockSize)
         {
-            return EINVAL;
+            return TR_ERROR_EINVAL;
         }
         auto const span_size = static_cast<size_t>(len);
 
         auto const* const tor = torrents_.get(id);
         if (tor == nullptr)
         {
-            return EINVAL;
+            return TR_ERROR_EINVAL;
         }
 
         auto const loc = tor->block_info().byte_loc(byte_span.begin);
@@ -112,49 +119,55 @@ public:
         return tr_ioRead(*tor, open_files_, loc, std::span{ std::data(setme), span_size });
     }
 
-    [[nodiscard]] int test_piece(tr_torrent_id_t const id, tr_piece_index_t const piece, tr_sha1_digest_t& setme_hash) override
+    [[nodiscard]] tr_error_code_t test_piece(
+        tr_torrent_id_t const id,
+        tr_piece_index_t const piece,
+        tr_sha1_digest_t& setme_hash) override
     {
         auto const* const tor = torrents_.get(id);
         if (tor == nullptr || piece >= tor->piece_count())
         {
-            return EINVAL;
+            return TR_ERROR_EINVAL;
         }
 
-        auto const hash = recalculate_hash(*this, id, tor->block_info(), piece);
-        if (!hash)
+        auto const result = recalculate_hash(*this, id, tor->block_info(), piece);
+        if (!result.hash)
         {
-            return EIO;
+            return result.error != 0 ? result.error : EIO;
         }
 
-        setme_hash = *hash;
+        setme_hash = *result.hash;
         return 0;
     }
 
-    [[nodiscard]] int write(tr_torrent_id_t const id, tr_byte_span_t const byte_span, LocalData::BlockData const& data) override
+    [[nodiscard]] tr_error_code_t write(
+        tr_torrent_id_t const id,
+        tr_byte_span_t const byte_span,
+        LocalData::BlockData const& data) override
     {
         if (!byte_span.is_valid())
         {
-            return EINVAL;
+            return TR_ERROR_EINVAL;
         }
 
         auto const len = byte_span.size();
         if (len > std::size(data))
         {
-            return EINVAL;
+            return TR_ERROR_EINVAL;
         }
         auto const span_size = static_cast<size_t>(len);
 
         auto* const tor = torrents_.get(id);
         if (tor == nullptr)
         {
-            return EINVAL;
+            return TR_ERROR_EINVAL;
         }
 
         auto const loc = tor->block_info().byte_loc(byte_span.begin);
         return tr_ioWrite(*tor, open_files_, loc, std::span{ std::data(data), span_size });
     }
 
-    [[nodiscard]] int move(
+    [[nodiscard]] tr_error_code_t move(
         tr_torrent_id_t const id,
         std::string_view const old_parent,
         std::string_view const parent,
@@ -163,7 +176,7 @@ public:
         auto* const tor = torrents_.get(id);
         if (tor == nullptr)
         {
-            return EINVAL;
+            return TR_ERROR_EINVAL;
         }
 
         auto error = tr_error{};
@@ -175,12 +188,12 @@ public:
         return error ? error.code() : EIO;
     }
 
-    [[nodiscard]] int remove(tr_torrent_id_t const id, tr_torrent_remove_func remove_func) override
+    [[nodiscard]] tr_error_code_t remove(tr_torrent_id_t const id, tr_torrent_remove_func remove_func) override
     {
         auto* const tor = torrents_.get(id);
         if (tor == nullptr)
         {
-            return EINVAL;
+            return TR_ERROR_EINVAL;
         }
 
         if (!remove_func)
@@ -204,7 +217,7 @@ public:
         {
             if (callback != nullptr)
             {
-                callback(id, oldpath, newname, make_error(EINVAL));
+                callback(id, oldpath, newname, make_error(TR_ERROR_EINVAL));
             }
             return;
         }
@@ -278,7 +291,7 @@ void LocalData::write(
     std::unique_ptr<BlockData> data,
     OnWrite on_write)
 {
-    auto err = int{ EINVAL };
+    auto err = tr_error_code_t{ TR_ERROR_EINVAL };
     if (data != nullptr)
     {
         err = backend_->write(id, byte_span, *data);

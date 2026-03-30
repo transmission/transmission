@@ -22,29 +22,33 @@ namespace
 class StubBackend final : public tr::LocalData::Backend
 {
 public:
-    [[nodiscard]] int read(tr_torrent_id_t, tr_byte_span_t byte_span, tr::LocalData::BlockData& setme) override
+    [[nodiscard]] tr_error_code_t read(tr_torrent_id_t, tr_byte_span_t byte_span, tr::LocalData::BlockData& setme) override
     {
         read_span = byte_span;
         setme.assign({ uint8_t{ 1U }, uint8_t{ 2U }, uint8_t{ 3U } });
         return read_err;
     }
 
-    [[nodiscard]] int test_piece(tr_torrent_id_t, tr_piece_index_t piece, tr_sha1_digest_t& setme_hash) override
+    [[nodiscard]] tr_error_code_t test_piece(tr_torrent_id_t, tr_piece_index_t piece, tr_sha1_digest_t& setme_hash) override
     {
         tested_piece = piece;
         setme_hash = hash;
         return test_err;
     }
 
-    [[nodiscard]] int write(tr_torrent_id_t, tr_byte_span_t byte_span, tr::LocalData::BlockData const& data) override
+    [[nodiscard]] tr_error_code_t write(tr_torrent_id_t, tr_byte_span_t byte_span, tr::LocalData::BlockData const& data)
+        override
     {
         write_span = byte_span;
         last_write.assign(std::begin(data), std::end(data));
         return write_err;
     }
 
-    [[nodiscard]] int move(tr_torrent_id_t, std::string_view old_parent, std::string_view parent, std::string_view parent_name)
-        override
+    [[nodiscard]] tr_error_code_t move(
+        tr_torrent_id_t,
+        std::string_view old_parent,
+        std::string_view parent,
+        std::string_view parent_name) override
     {
         moved_from = std::string{ old_parent };
         moved_to = std::string{ parent };
@@ -52,7 +56,7 @@ public:
         return move_err;
     }
 
-    [[nodiscard]] int remove(tr_torrent_id_t, tr_torrent_remove_func) override
+    [[nodiscard]] tr_error_code_t remove(tr_torrent_id_t, tr_torrent_remove_func) override
     {
         remove_called = true;
         return remove_err;
@@ -84,11 +88,11 @@ public:
         closed_file = std::pair{ tor_id, file_num };
     }
 
-    int read_err = 0;
-    int test_err = 0;
-    int write_err = 0;
-    int move_err = 0;
-    int remove_err = 0;
+    tr_error_code_t read_err = 0;
+    tr_error_code_t test_err = 0;
+    tr_error_code_t write_err = 0;
+    tr_error_code_t move_err = 0;
+    tr_error_code_t remove_err = 0;
     bool remove_called = false;
     bool close_all_called = false;
     tr_byte_span_t read_span{};

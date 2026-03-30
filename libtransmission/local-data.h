@@ -19,6 +19,7 @@
 #include <small/vector.hpp>
 
 #include "libtransmission/constants.h"
+#include "libtransmission/error-types.h"
 #include "libtransmission/types.h"
 
 class tr_open_files;
@@ -47,15 +48,21 @@ public:
     public:
         virtual ~Backend() = default;
 
-        [[nodiscard]] virtual int read(tr_torrent_id_t tor_id, tr_byte_span_t byte_span, BlockData& setme) = 0;
-        [[nodiscard]] virtual int test_piece(tr_torrent_id_t tor_id, tr_piece_index_t piece, tr_sha1_digest_t& setme_hash) = 0;
-        [[nodiscard]] virtual int write(tr_torrent_id_t tor_id, tr_byte_span_t byte_span, BlockData const& data) = 0;
-        [[nodiscard]] virtual int move(
+        [[nodiscard]] virtual tr_error_code_t read(tr_torrent_id_t tor_id, tr_byte_span_t byte_span, BlockData& setme) = 0;
+        [[nodiscard]] virtual tr_error_code_t test_piece(
+            tr_torrent_id_t tor_id,
+            tr_piece_index_t piece,
+            tr_sha1_digest_t& setme_hash) = 0;
+        [[nodiscard]] virtual tr_error_code_t write(
+            tr_torrent_id_t tor_id,
+            tr_byte_span_t byte_span,
+            BlockData const& data) = 0;
+        [[nodiscard]] virtual tr_error_code_t move(
             tr_torrent_id_t id,
             std::string_view old_parent,
             std::string_view parent,
             std::string_view parent_name) = 0;
-        [[nodiscard]] virtual int remove(tr_torrent_id_t id, tr_torrent_remove_func remove_func) = 0;
+        [[nodiscard]] virtual tr_error_code_t remove(tr_torrent_id_t id, tr_torrent_remove_func remove_func) = 0;
         virtual void rename(
             tr_torrent_id_t id,
             std::string_view oldpath,
