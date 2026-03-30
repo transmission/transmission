@@ -259,6 +259,16 @@ struct tr_block_span_t
 
 struct tr_byte_span_t
 {
+    [[nodiscard]] constexpr bool is_valid() const noexcept
+    {
+        return begin <= end;
+    }
+
+    [[nodiscard]] constexpr auto size() const noexcept
+    {
+        return end - begin;
+    }
+
     uint64_t begin;
     uint64_t end;
 };
