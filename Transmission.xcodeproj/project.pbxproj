@@ -305,6 +305,8 @@
 		BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E140C07861A00B0BB3C /* session.h */; };
 		BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E150C07861A00B0BB3C /* inout.h */; };
 		BEFC1E4F0C07861A00B0BB3C /* inout.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E160C07861A00B0BB3C /* inout.cc */; };
+		EDC0A1B12E5A100100A1B2C3 /* local-data.h in Headers */ = {isa = PBXBuildFile; fileRef = EDC0A1AF2E5A100100A1B2C3 /* local-data.h */; };
+		EDC0A1B22E5A100100A1B2C3 /* local-data.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDC0A1B02E5A100100A1B2C3 /* local-data.cc */; };
 		BEFC1E520C07861A00B0BB3C /* open-files.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E190C07861A00B0BB3C /* open-files.h */; };
 		BEFC1E530C07861A00B0BB3C /* open-files.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1A0C07861A00B0BB3C /* open-files.cc */; };
 		BEFC1E550C07861A00B0BB3C /* completion.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1C0C07861A00B0BB3C /* completion.h */; };
@@ -1151,6 +1153,8 @@
 		BEFC1E140C07861A00B0BB3C /* session.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = session.h; sourceTree = "<group>"; };
 		BEFC1E150C07861A00B0BB3C /* inout.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = inout.h; sourceTree = "<group>"; };
 		BEFC1E160C07861A00B0BB3C /* inout.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = inout.cc; sourceTree = "<group>"; };
+		EDC0A1AF2E5A100100A1B2C3 /* local-data.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = local-data.h; sourceTree = "<group>"; };
+		EDC0A1B02E5A100100A1B2C3 /* local-data.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = local-data.cc; sourceTree = "<group>"; };
 		BEFC1E190C07861A00B0BB3C /* open-files.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "open-files.h"; sourceTree = "<group>"; };
 		BEFC1E1A0C07861A00B0BB3C /* open-files.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "open-files.cc"; sourceTree = "<group>"; };
 		BEFC1E1C0C07861A00B0BB3C /* completion.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = completion.h; sourceTree = "<group>"; };
@@ -2001,6 +2005,8 @@
 				BEFC1E140C07861A00B0BB3C /* session.h */,
 				CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */,
 				CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */,
+				EDC0A1B02E5A100100A1B2C3 /* local-data.cc */,
+				EDC0A1AF2E5A100100A1B2C3 /* local-data.h */,
 				ED67FB402B70FCE400D8A037 /* serializer.cc */,
 				ED67FB412B70FCE400D8A037 /* serializer.h */,
 				A25D2CBB0CF4C7190096A262 /* stats.cc */,
@@ -2547,6 +2553,7 @@
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
 				CCEBA596277340F6DF9F4482 /* session-alt-speeds.h in Headers */,
 				BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */,
+				EDC0A1B12E5A100100A1B2C3 /* local-data.h in Headers */,
 				BEFC1E520C07861A00B0BB3C /* open-files.h in Headers */,
 				BEFC1E550C07861A00B0BB3C /* completion.h in Headers */,
 				BEFC1E570C07861A00B0BB3C /* clients.h in Headers */,
@@ -3388,6 +3395,7 @@
 				BEFC1E480C07861A00B0BB3C /* port-forwarding-natpmp.cc in Sources */,
 				C1077A4E183EB29600634C22 /* error.cc in Sources */,
 				BEFC1E4F0C07861A00B0BB3C /* inout.cc in Sources */,
+				EDC0A1B22E5A100100A1B2C3 /* local-data.cc in Sources */,
 				BEFC1E530C07861A00B0BB3C /* open-files.cc in Sources */,
 				C1FEE5781C3223CC00D62832 /* watchdir-generic.cc in Sources */,
 				BEFC1E560C07861A00B0BB3C /* completion.cc in Sources */,
