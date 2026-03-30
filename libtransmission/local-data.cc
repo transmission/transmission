@@ -270,7 +270,7 @@ void LocalData::read(tr_torrent_id_t const id, tr_byte_span_t const byte_span, O
 
     if (on_read)
     {
-        on_read(id, byte_span, make_error(err), std::move(data));
+        std::move(on_read)(id, byte_span, make_error(err), std::move(data));
     }
 }
 
@@ -281,7 +281,7 @@ void LocalData::test_piece(tr_torrent_id_t const id, tr_piece_index_t const piec
 
     if (on_test)
     {
-        on_test(id, piece, make_error(err), err == 0 ? std::optional<tr_sha1_digest_t>{ hash } : std::nullopt);
+        std::move(on_test)(id, piece, make_error(err), err == 0 ? std::optional<tr_sha1_digest_t>{ hash } : std::nullopt);
     }
 }
 
@@ -299,7 +299,7 @@ void LocalData::write(
 
     if (on_write)
     {
-        on_write(id, byte_span, make_error(err));
+        std::move(on_write)(id, byte_span, make_error(err));
     }
 }
 
@@ -329,7 +329,7 @@ void LocalData::move(
 
     if (on_move)
     {
-        on_move(id, make_error(err));
+        std::move(on_move)(id, make_error(err));
     }
 }
 
@@ -351,7 +351,7 @@ void LocalData::shutdown()
 {
 }
 
-uint64_t LocalData::enqueued_write_bytes() const
+uint64_t LocalData::enqueued_write_bytes()
 {
     return 0U;
 }

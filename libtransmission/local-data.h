@@ -83,17 +83,22 @@ public:
 
     ~LocalData();
 
-    void read(tr_torrent_id_t, tr_byte_span_t byte_span, OnRead on_read);
-    void test_piece(tr_torrent_id_t, tr_piece_index_t piece, OnTest on_test);
-    void write(tr_torrent_id_t, tr_byte_span_t byte_span, std::unique_ptr<BlockData> data, OnWrite on_write);
-    void close_torrent(tr_torrent_id_t);
-    void close_file(tr_torrent_id_t, tr_file_index_t);
+    void read(tr_torrent_id_t id, tr_byte_span_t byte_span, OnRead on_read);
+    void test_piece(tr_torrent_id_t id, tr_piece_index_t piece, OnTest on_test);
+    void write(tr_torrent_id_t id, tr_byte_span_t byte_span, std::unique_ptr<BlockData> data, OnWrite on_write);
+    void close_torrent(tr_torrent_id_t tor_id);
+    void close_file(tr_torrent_id_t tor_id, tr_file_index_t file_num);
     void close_all();
-    void move(tr_torrent_id_t, std::string_view old_parent, std::string_view parent, std::string_view parent_name, OnMove);
-    void remove(tr_torrent_id_t, tr_torrent_remove_func remove_func);
-    void rename(tr_torrent_id_t, std::string_view oldpath, std::string_view newname, tr_torrent_rename_done_func callback);
+    void move(
+        tr_torrent_id_t id,
+        std::string_view old_parent,
+        std::string_view parent,
+        std::string_view parent_name,
+        OnMove on_move);
+    void remove(tr_torrent_id_t id, tr_torrent_remove_func remove_func);
+    void rename(tr_torrent_id_t id, std::string_view oldpath, std::string_view newname, tr_torrent_rename_done_func callback);
     void shutdown();
-    [[nodiscard]] uint64_t enqueued_write_bytes() const;
+    [[nodiscard]] static uint64_t enqueued_write_bytes();
 
 private:
     std::unique_ptr<Backend> backend_;
