@@ -177,7 +177,15 @@ namespace
 {
 int constexpr DeflateLevel = 6; // medium / default
 
-// ---
+// Prevent clickjacking on the browser-facing WebUI and RPC responses.
+// https://github.com/transmission/transmission/issues/8726
+// https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html.
+void add_clickjacking_prevention_headers(struct evkeyvalq* headers)
+{
+    // Send X-Frame-Options for older browsers + CSP frame-ancestors for newer ones
+    evhttp_add_header(headers, "X-Frame-Options", "SAMEORIGIN");
+    evhttp_add_header(headers, "Content-Security-Policy", "frame-ancestors 'self'");
+}
 
 void send_simple_response(struct evhttp_request* req, int code, char const* text = nullptr)
 {
@@ -532,6 +540,7 @@ void handle_request(struct evhttp_request* req, void* arg)
 
     auto* const output_headers = evhttp_request_get_output_headers(req);
     evhttp_add_header(output_headers, "Server", MY_REALM);
+    add_clickjacking_prevention_headers(output_headers);
 
     if (server->is_anti_brute_force_enabled() && server->login_attempts_ >= server->settings().anti_brute_force_limit)
     {
