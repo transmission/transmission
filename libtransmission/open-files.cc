@@ -6,6 +6,7 @@
 #include <algorithm> // std::min
 #include <array>
 #include <cstdint> // uint8_t, uint64_t
+#include <span>
 #include <string_view>
 #include <utility>
 
@@ -97,7 +98,8 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error* error)
         {
             uint64_t const this_pass = std::min(length, uint64_t{ std::size(buf) });
             uint64_t bytes_written = 0;
-            success = tr_sys_file_write(fd, std::data(buf), this_pass, &bytes_written, &local_error);
+            auto const bytes = std::as_bytes(std::span{ buf }.first(static_cast<size_t>(this_pass)));
+            success = tr_sys_file_write(fd, bytes.data(), bytes.size_bytes(), &bytes_written, &local_error);
             length -= bytes_written;
         }
 
