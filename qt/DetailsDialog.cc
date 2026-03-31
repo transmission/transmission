@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <ctime>
 #include <map>
 #include <set>
@@ -41,6 +42,7 @@
 #include "IconCache.h"
 #include "NativeIcon.h"
 #include "Prefs.h"
+#include "QtCompat.h"
 #include "Session.h"
 #include "SqueezeLabel.h"
 #include "Torrent.h"
@@ -229,6 +231,7 @@ private:
 
                 for (int i = 0; i < 16; ++i)
                 {
+                    // NOLINTNEXTLINE(bugprone-narrowing-conversions): TODO(c++20): use std::bit_cast after gcc 11.1
                     tmp[i] = ipv6_address[i];
                 }
 
@@ -549,8 +552,8 @@ void DetailsDialog::refreshUI()
     else
     {
         uint64_t left_until_done = 0;
-        int64_t have_verified = 0;
-        int64_t have_unverified = 0;
+        uint64_t have_verified = 0;
+        uint64_t have_unverified = 0;
 
         for (Torrent const* const t : torrents)
         {
@@ -571,13 +574,13 @@ void DetailsDialog::refreshUI()
         auto const pct = Formatter::percent_to_string(d);
         auto const size_when_done_str = Formatter::storage_to_string(size_when_done);
 
-        if (have_unverified == 0 && left_until_done == 0)
+        if (have_unverified == 0U && left_until_done == 0U)
         {
             //: Text following the "Have:" label in torrent properties dialog;
             //: %1 is amount of downloaded and verified data
             string = tr("%1 (100%)").arg(Formatter::storage_to_string(have_verified));
         }
-        else if (have_unverified == 0)
+        else if (have_unverified == 0U)
         {
             //: Text following the "Have:" label in torrent properties dialog;
             //: %1 is amount of downloaded and verified data,
@@ -1398,7 +1401,7 @@ void DetailsDialog::onBandwidthPriorityChanged(int index)
 
 void DetailsDialog::onTrackerSelectionChanged()
 {
-    int const selection_count = ui_.trackersView->selectionModel()->selectedRows().size();
+    auto const selection_count = ui_.trackersView->selectionModel()->selectedRows().size();
     ui_.removeTrackerButton->setEnabled(selection_count > 0);
 }
 
@@ -1424,7 +1427,7 @@ void DetailsDialog::onAddTrackerClicked()
     {
         // for each selected torrent...
         auto sv = info.announce.sv();
-        auto const announce_url = QString::fromUtf8(std::data(sv), std::size(sv));
+        auto const announce_url = QString::fromUtf8(std::data(sv), static_cast<IF_QT6(qsizetype, int)>(std::size(sv)));
         for (auto const& id : ids_)
         {
             // make a note if the torrent doesn't already have the URL
@@ -1452,7 +1455,7 @@ void DetailsDialog::onAddTrackerClicked()
         for (auto const& [ids, urls] : ids_to_urls)
         {
             auto urls_list = QList<QString>{};
-            urls_list.reserve(std::size(urls));
+            urls_list.reserve(static_cast<IF_QT6(qsizetype, int)>(std::size(urls)));
             for (auto const& url : urls)
             {
                 urls_list << url;

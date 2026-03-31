@@ -38,6 +38,7 @@
 #include "AddData.h"
 #include "Filters.h"
 #include "Prefs.h"
+#include "QtCompat.h"
 #include "RpcQueue.h"
 #include "SessionDialog.h"
 #include "Torrent.h"
@@ -326,7 +327,8 @@ void Session::start()
 
         auto const root_path = prefs_.get<QString>(Prefs::SESSION_REMOTE_URL_BASE_PATH);
         auto const relative_path = TrHttpServerRpcRelativePath;
-        url.setPath(root_path + QString::fromUtf8(relative_path.data(), relative_path.size()));
+        url.setPath(
+            root_path + QString::fromUtf8(relative_path.data(), static_cast<IF_QT6(qsizetype, int)>(relative_path.size())));
 
         if (prefs_.get<bool>(Prefs::SESSION_REMOTE_AUTH))
         {
@@ -996,9 +998,11 @@ void Session::onDuplicatesTimer()
     if (!lines.empty())
     {
         lines.sort(Qt::CaseInsensitive);
-        auto const title = tr("Duplicate Torrent(s)", "", lines.size());
+        // NOLINTNEXTLINE(readability-redundant-casting): Remove this comment when we drop Qt5
+        auto const title = tr("Duplicate Torrent(s)", "", static_cast<int>(lines.size()));
         auto const detail = lines.join(QStringLiteral("\n"));
-        auto const detail_text = tr("Unable to add %n duplicate torrent(s)", "", lines.size());
+        // NOLINTNEXTLINE(readability-redundant-casting): Remove this comment when we drop Qt5
+        auto const detail_text = tr("Unable to add %n duplicate torrent(s)", "", static_cast<int>(lines.size()));
         auto const use_detail = lines.size() > 1;
         auto const text = use_detail ? detail_text : detail;
 
@@ -1084,7 +1088,8 @@ void Session::launchWebInterface() const
 
         auto const root_path = prefs_.get<QString>(Prefs::SESSION_REMOTE_URL_BASE_PATH);
         auto const relative_path = TrHttpServerWebRelativePath;
-        url.setPath(root_path + QString::fromUtf8(relative_path.data(), relative_path.size()));
+        url.setPath(
+            root_path + QString::fromUtf8(relative_path.data(), static_cast<IF_QT6(qsizetype, int)>(relative_path.size())));
     }
     else // local session
     {

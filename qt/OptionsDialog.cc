@@ -26,7 +26,6 @@
 #include "VariantHelpers.h"
 
 using ::trqt::variant_helpers::dictAdd;
-using ::trqt::variant_helpers::listAdd;
 
 /***
 ****
@@ -174,7 +173,7 @@ void OptionsDialog::reload()
         for (tr_file_index_t i = 0; i < n_files; ++i)
         {
             auto f = TorrentFile{};
-            f.index = i;
+            f.index = static_cast<int>(i);
             f.priority = priorities_[i];
             f.wanted = wanted_[i];
             f.size = metainfo_->file_size(i);
@@ -257,11 +256,11 @@ void OptionsDialog::onAccepted()
     {
         tr_variant* l = tr_variantDictAddList(&args, TR_KEY_files_unwanted, count);
 
-        for (int i = 0, n = wanted_.size(); i < n; ++i)
+        for (size_t i = 0, n = wanted_.size(); i < n; ++i)
         {
             if (!wanted_.at(i))
             {
-                listAdd(l, i);
+                *tr_variantListAdd(l) = i;
             }
         }
     }
@@ -273,11 +272,11 @@ void OptionsDialog::onAccepted()
     {
         tr_variant* l = tr_variantDictAddList(&args, TR_KEY_priority_low, count);
 
-        for (int i = 0, n = priorities_.size(); i < n; ++i)
+        for (size_t i = 0, n = priorities_.size(); i < n; ++i)
         {
             if (priorities_.at(i) == TR_PRI_LOW)
             {
-                listAdd(l, i);
+                *tr_variantListAdd(l) = i;
             }
         }
     }
@@ -289,11 +288,11 @@ void OptionsDialog::onAccepted()
     {
         tr_variant* l = tr_variantDictAddList(&args, TR_KEY_priority_high, count);
 
-        for (int i = 0, n = priorities_.size(); i < n; ++i)
+        for (size_t i = 0, n = priorities_.size(); i < n; ++i)
         {
             if (priorities_.at(i) == TR_PRI_HIGH)
             {
-                listAdd(l, i);
+                *tr_variantListAdd(l) = i;
             }
         }
     }

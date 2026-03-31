@@ -25,6 +25,7 @@
 
 #include "ColumnResizer.h"
 #include "Formatter.h"
+#include "QtCompat.h"
 #include "Session.h"
 #include "Utils.h"
 
@@ -145,7 +146,9 @@ void MakeProgressDialog::onProgress()
         }
         else
         {
-            auto err_msg = QString::fromUtf8(std::data(error.message()), std::size(error.message()));
+            auto err_msg = QString::fromUtf8(
+                std::data(error.message()),
+                static_cast<IF_QT6(qsizetype, int)>(std::size(error.message())));
             str = tr("Couldn't create \"%1\": %2 (%3)").arg(base).arg(err_msg).arg(error.code());
         }
     }
@@ -227,7 +230,7 @@ void MakeDialog::onSourceChanged()
 
     if (builder_)
     {
-        ui_.pieceSizeSlider->setValue(log2(builder_->piece_size()));
+        ui_.pieceSizeSlider->setValue(static_cast<int>(log2(builder_->piece_size())));
     }
 }
 
@@ -307,13 +310,13 @@ void MakeDialog::updatePiecesLabel()
     }
     else
     {
-        auto const files = tr("%Ln File(s)", nullptr, builder_->file_count());
-        auto const pieces = tr("%Ln Piece(s)", nullptr, builder_->piece_count());
+        auto const files = tr("%Ln File(s)", nullptr, static_cast<int>(builder_->file_count()));
+        auto const pieces = tr("%Ln Piece(s)", nullptr, static_cast<int>(builder_->piece_count()));
         text = tr("%1 in %2; %3 @ %4")
                    .arg(Formatter::storage_to_string(builder_->total_size()))
                    .arg(files)
                    .arg(pieces)
-                   .arg(Formatter::memory_to_string(static_cast<uint64_t>(builder_->piece_size())));
+                   .arg(Formatter::memory_to_string(builder_->piece_size()));
         ui_.pieceSizeSlider->setEnabled(true);
     }
 

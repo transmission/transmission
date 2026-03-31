@@ -20,6 +20,7 @@
 
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"
+#include "QtCompat.h"
 
 namespace
 {
@@ -27,7 +28,7 @@ namespace
 class PathIteratorBase
 {
 protected:
-    PathIteratorBase(QString const& path, int const slash_index)
+    PathIteratorBase(QString const& path, IF_QT6(qsizetype, int) const slash_index)
         : path_{ path }
         , slash_index_{ slash_index }
     {
@@ -36,7 +37,7 @@ protected:
 
     QString const& path_;
     QString token_;
-    int slash_index_;
+    IF_QT6(qsizetype, int) slash_index_;
 
     static QChar const SlashChar;
 };
@@ -58,7 +59,7 @@ public:
 
     QString const& next()
     {
-        int const new_slash_index = path_.lastIndexOf(SlashChar, slash_index_);
+        auto const new_slash_index = path_.lastIndexOf(SlashChar, slash_index_);
         token_.truncate(0);
         token_.append(&path_.data()[new_slash_index + 1], slash_index_ - new_slash_index);
         slash_index_ = new_slash_index - 1;
@@ -81,7 +82,7 @@ public:
 
     QString const& next()
     {
-        int new_slash_index = path_.indexOf(SlashChar, slash_index_);
+        auto new_slash_index = path_.indexOf(SlashChar, slash_index_);
 
         if (new_slash_index == -1)
         {
@@ -283,9 +284,7 @@ QModelIndex FileTreeModel::indexOf(FileTreeItem* item, int column) const
 
 void FileTreeModel::clearSubtree(QModelIndex const& top)
 {
-    size_t i = rowCount(top);
-
-    while (i > 0)
+    for (auto i = rowCount(top); i > 0;)
     {
         clearSubtree(index(--i, 0, top));
     }

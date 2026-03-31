@@ -35,6 +35,7 @@
 #include "MainWindow.h"
 #include "OptionsDialog.h"
 #include "Prefs.h"
+#include "QtCompat.h"
 #include "Session.h"
 #include "TorrentModel.h"
 #include "WatchDir.h"
@@ -258,12 +259,8 @@ Application::~Application() = default;
 
 void Application::loadTranslations()
 {
-    auto const qt_qm_dirs = QStringList{} <<
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        QLibraryInfo::path(QLibraryInfo::TranslationsPath) <<
-#else
-        QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
-#endif
+    auto const qt_qm_dirs = QStringList{} << //
+        IF_QT6(QLibraryInfo::path(QLibraryInfo::TranslationsPath), QLibraryInfo::location(QLibraryInfo::TranslationsPath)) <<
 #ifdef TRANSLATIONS_DIR
         QStringLiteral(TRANSLATIONS_DIR) <<
 #endif

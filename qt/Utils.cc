@@ -59,7 +59,7 @@ QIcon Utils::getIconFromIndex(QModelIndex const& index)
 
 QString Utils::removeTrailingDirSeparator(QString const& path)
 {
-    int i = path.size();
+    auto i = path.size();
 
     while (i > 1 && isSlashChar(path[i - 1]))
     {

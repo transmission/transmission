@@ -8,7 +8,6 @@ Checks:
   - bugprone-*
   - -bugprone-branch-clone
   - -bugprone-easily-swappable-parameters
-  - -bugprone-narrowing-conversions
   - cert-*
   - -cert-err58-cpp,
   - -cert-int09-c
