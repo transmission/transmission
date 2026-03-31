@@ -1558,6 +1558,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
                 fmt::arg("count", n_torrents)));
     }
 
+    session->setTorrentsLoadedTime();
     loaded_promise->set_value(n_torrents);
 }
 } // namespace load_torrents_helpers
@@ -1573,7 +1574,6 @@ size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
     session->run_in_session_thread(session_load_torrents, session, ctor, &loaded_promise);
     loaded_future.wait();
     auto const n_torrents = loaded_future.get();
-
     return n_torrents;
 }
 

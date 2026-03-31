@@ -726,6 +726,64 @@ TEST_F(RpcTest, torrentGet)
     tr_torrentRemove(tor, false);
 }
 
+TEST_F(RpcTest, recentlyActiveEmptyOnStartup)
+{
+    //Add a torrent from assets
+    auto* ctor = tr_ctorNew(session_);
+    auto const torrent_path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/archlinux-2025.05.01-x86_64.iso.torrent"sv };
+    ASSERT_TRUE(ctor->set_metainfo_from_file(torrent_path.sv()));
+    tr_ctorSetPaused(ctor, TR_FORCE, true);
+    auto* tor = tr_torrentNew(ctor, nullptr);
+    tr_ctorFree(ctor);
+    ASSERT_NE(nullptr, tor);
+
+    //Save .torrent and .resume files to sandboxDir()
+    auto const config_dir = sandboxDir();
+    tr_sessionClose(session_, 5.0);
+    tr_logFreeQueue(tr_logGetQueue());
+    session_ = nullptr;
+
+    //Reopen session
+    auto settings = tr_variant{ tr_variant::make_map(10U) };
+    auto* settings_map = settings.get_if<tr_variant::Map>();
+    settings_map->try_emplace(TR_KEY_port_forwarding_enabled, false);
+    settings_map->try_emplace(TR_KEY_dht_enabled, false);
+    settings_map->try_emplace(TR_KEY_message_level, TR_LOG_ERROR);
+    session_ = tr_sessionInit(config_dir, true, settings);
+
+    //Load torrents from disk
+    ctor = tr_ctorNew(session_);
+    tr_ctorSetPaused(ctor, TR_FORCE, true);
+    tr_sessionLoadTorrents(session_, ctor);
+    tr_ctorFree(ctor);
+
+    //Query recently_active. Should be empty
+    auto request_map = tr_variant::Map{ 3U };
+    request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_get));
+    request_map.try_emplace(TR_KEY_id, 12345);
+
+    auto params = tr_variant::Map{ 2U };
+    auto fields = tr_variant::Vector{};
+    fields.emplace_back(tr_quark_get_string_view(TR_KEY_id));
+    params.try_emplace(TR_KEY_fields, std::move(fields));
+    params.try_emplace(TR_KEY_ids, tr_quark_get_string_view(TR_KEY_recently_active));
+    request_map.try_emplace(TR_KEY_params, std::move(params));
+
+    auto request = tr_variant{ std::move(request_map) };
+    auto response = tr_variant{};
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
+
+    auto* response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto* result = response_map->find_if<tr_variant::Map>(TR_KEY_result);
+    ASSERT_NE(result, nullptr);
+
+    auto* torrents = result->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    ASSERT_NE(torrents, nullptr);
+    EXPECT_EQ(0UL, std::size(*torrents));
+}
+
 TEST_F(RpcTest, torrentGetLegacy)
 {
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
