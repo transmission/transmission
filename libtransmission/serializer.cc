@@ -541,6 +541,7 @@ void Converters::ensure_default_converters()
             Converters::add(to_double, from_double);
             Converters::add(to_encryption_mode, from_encryption_mode);
             Converters::add(to_fs_path, from_fs_path);
+            Converters::add(to_int<int>, from_int<int>);
             Converters::add(to_int<int64_t>, from_int<int64_t>);
             Converters::add(to_int<size_t>, from_int<size_t>);
             Converters::add(to_int<time_t>, from_int<time_t>);
