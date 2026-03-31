@@ -11,9 +11,9 @@
 
 #include <cstddef>
 #include <string>
-#include <string_view>
 #include <vector>
 
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/types.h"
 
 class tr_torrent_queue
@@ -42,6 +42,11 @@ public:
 
     [[nodiscard]] size_t get_pos(tr_torrent_id_t id);
     [[nodiscard]] std::vector<tr_torrent_id_t> set_pos(tr_torrent_id_t id, size_t new_pos);
+
+    [[nodiscard]] TR_CONSTEXPR_VEC auto size() const noexcept
+    {
+        return queue_.size();
+    }
 
     bool to_file(); // NOLINT(modernize-use-nodiscard)
     [[nodiscard]] std::vector<std::string> from_file();
