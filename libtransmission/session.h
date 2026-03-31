@@ -44,6 +44,7 @@
 #include "libtransmission/blocklist.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/ip-cache.h"
+#include "libtransmission/local-data.h"
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port, tr_tos_t
 #include "libtransmission/open-files.h"
@@ -1460,6 +1461,11 @@ private:
     // depends-on: open_files_
     tr_torrents torrents_;
 
+public:
+    // depends-on: open_files_, torrents_
+    tr::LocalData local_data{ torrents_, open_files_ };
+
+private:
     // depends-on: settings_, session_thread_, timer_maker_, web_
     IPCacheMediator ip_cache_mediator_{ *this };
     std::shared_ptr<tr_ip_cache> ip_cache_ = tr_ip_cache::create(ip_cache_mediator_);
