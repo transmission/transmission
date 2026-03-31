@@ -173,6 +173,12 @@ tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextInfo)
     {
         self.ratioLimit = ratioLimit.floatValue;
     }
+
+    NSNumber* sequentialDownload;
+    if ((sequentialDownload = history[@"SequentialDownload"]))
+    {
+        torrent.sequentialDownload = sequentialDownload.boolValue;
+    }
 }
 
 - (NSDictionary*)history
@@ -182,7 +188,8 @@ tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextInfo)
         @"Active" : @(self.active),
         @"WaitToStart" : @(self.waitingToStart),
         @"GroupValue" : @(self.groupValue),
-        @"RemoveWhenFinishSeeding" : @(_removeWhenFinishSeeding)
+        @"RemoveWhenFinishSeeding" : @(_removeWhenFinishSeeding),
+        @"SequentialDownload" : @(self.sequentialDownload)
     };
 }
 
@@ -481,6 +488,16 @@ tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextInfo)
 - (void)setUsesGlobalSpeedLimit:(BOOL)use
 {
     tr_torrentUseSessionLimits(self.fHandle, use);
+}
+
+- (BOOL)sequentialDownload
+{
+    return tr_torrentUsesSequentialDownload(self.fHandle);
+}
+
+- (void)setSequentialDownload:(BOOL)use
+{
+    tr_torrentUseSequentialDownload(self.fHandle, use);
 }
 
 - (void)setMaxPeerConnect:(uint16_t)count
@@ -1886,6 +1903,8 @@ tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextInfo)
         {
             return nil;
         }
+
+        tr_torrentUseSequentialDownload(self.fHandle, [_fDefaults boolForKey:@"NewTorrentSequentialDownload"]);
     }
 
     _fResumeOnWake = NO;
