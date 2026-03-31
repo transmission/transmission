@@ -259,6 +259,7 @@ LocalData::LocalData(std::unique_ptr<Backend> backend, [[maybe_unused]] size_t w
 
 LocalData::~LocalData() = default;
 
+// NOLINTNEXTLINE(performance-unnecessary-value-param): keep callback by value so a later async backend can take ownership.
 void LocalData::read(tr_torrent_id_t const id, tr_byte_span_t const byte_span, OnRead on_read)
 {
     auto data = std::make_unique<BlockData>();
@@ -274,6 +275,7 @@ void LocalData::read(tr_torrent_id_t const id, tr_byte_span_t const byte_span, O
     }
 }
 
+// NOLINTNEXTLINE(performance-unnecessary-value-param): keep callback by value so a later async backend can take ownership.
 void LocalData::test_piece(tr_torrent_id_t const id, tr_piece_index_t const piece, OnTest on_test)
 {
     auto hash = tr_sha1_digest_t{};
@@ -289,7 +291,7 @@ void LocalData::write(
     tr_torrent_id_t const id,
     tr_byte_span_t const byte_span,
     std::unique_ptr<BlockData> data,
-    OnWrite on_write)
+    OnWrite on_write) // NOLINT(performance-unnecessary-value-param)
 {
     auto err = tr_error_code_t{ TR_ERROR_EINVAL };
     if (data != nullptr)
@@ -323,7 +325,7 @@ void LocalData::move(
     std::string_view const old_parent,
     std::string_view const parent,
     std::string_view const parent_name,
-    OnMove on_move)
+    OnMove on_move) // NOLINT(performance-unnecessary-value-param)
 {
     auto const err = backend_->move(id, old_parent, parent, parent_name);
 
