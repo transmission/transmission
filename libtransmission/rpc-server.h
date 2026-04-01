@@ -141,6 +141,23 @@ public:
 
     void set_whitelist(std::string_view whitelist);
 
+    [[nodiscard]] constexpr auto is_host_whitelist_enabled() const noexcept
+    {
+        return settings_.is_host_whitelist_enabled;
+    }
+
+    constexpr void set_host_whitelist_enabled(bool is_enabled) noexcept
+    {
+        settings_.is_host_whitelist_enabled = is_enabled;
+    }
+
+    [[nodiscard]] constexpr auto const& host_whitelist() const noexcept
+    {
+        return settings_.host_whitelist_str;
+    }
+
+    void set_host_whitelist(std::string_view whitelist);
+
     [[nodiscard]] constexpr auto const& username() const noexcept
     {
         return settings_.username;

@@ -948,6 +948,12 @@ void tr_rpc_server::set_whitelist(std::string_view whitelist)
     whitelist_ = parse_whitelist(whitelist);
 }
 
+void tr_rpc_server::set_host_whitelist(std::string_view whitelist)
+{
+    settings_.host_whitelist_str = whitelist;
+    host_whitelist_ = parse_whitelist(whitelist);
+}
+
 // --- PASSWORD
 
 void tr_rpc_server::set_username(std::string_view username)
