@@ -7,13 +7,13 @@
 }
 
 @mixin viewport-medium {
-  @media (width >= 600px) {
+  @media (width >=600px) {
     @content;
   }
 }
 
 @mixin viewport-large {
-  @media (width >= 950px) {
+  @media (width >=950px) {
     @content;
   }
 }
@@ -45,7 +45,10 @@
   --grey: rgba(128, 128, 130, 0.66);
   --grey-200: #e1e4e8;
   --grey-40: #666;
+  --grey-400: #929292;
   --grey-500: #828282;
+  --grey-600: #434343;
+  --grey-700: #2d2d2d;
   --grey-900: #191919;
   --nice-grey: #f8f8f8;
   --red-500: #d73a49;
@@ -83,6 +86,7 @@
   --color-progressbar-paused: var(--grey-200);
   --color-progressbar-queued: var(--blue-400);
   --color-progressbar-verify: var(--yellow-300);
+  --color-progressbar-finished: var(--grey-200);
   --color-toolbar-background: var(--default-tinted);
 
   color-scheme: light dark;
@@ -98,6 +102,8 @@
     --color-border-stark: var(--dark-mode-white);
     --color-border-starkest: var(--grey-500);
     --color-fg-disabled: var(--grey);
+    --color-fg-done: var(--grey-400);
+    --color-fg-finished: var(--grey-200);
     --color-fg-on-popup: var(--nice-grey);
     --color-fg-primary: var(--dark-mode-white);
     --color-fg-secondary: var(--nice-grey);
@@ -108,6 +114,7 @@
     --color-progressbar-fg-2: #edefff;
     --color-progressbar-fg-3: #edefff;
     --color-progressbar-paused: var(--grey-500);
+    --color-progressbar-finished: var(--grey-500);
     --color-progressbar-seed-1: var(--green-100);
     --color-progressbar-seed-2: var(--green-400);
     --color-progressbar-seed-paused: var(--grey-500);
@@ -124,6 +131,8 @@
       --color-border-stark: var(--white);
       --color-border-starkest: var(--white);
       --color-fg-disabled: var(--white);
+      --color-fg-done: var(--white);
+      --color-fg-finished: var(--white);
       --color-fg-error: var(--red-500);
       --color-fg-on-popup: var(--white);
       --color-fg-port-closed: var(--red-500);
@@ -141,6 +150,7 @@
       --color-progressbar-magnet: var(--yellow-300);
       --color-progressbar-paused: var(--grey-500);
       --color-progressbar-queued: var(--blue-400);
+      --color-progressbar-finished: var(--grey-500);
       --color-progressbar-seed-1: var(--black);
       --color-progressbar-seed-2: var(--white);
       --color-progressbar-seed-paused: var(--grey-500);
@@ -149,6 +159,7 @@
       --progress-bar-shadow-3: 0;
     }
   }
+
   @media (prefers-color-scheme: light) {
     --color-bg-hover: var(--nice-grey);
     --color-bg-odd: var(--white);
@@ -161,6 +172,8 @@
     --color-border-starkest: #d0d7de;
     --color-dialog-border: var(--nice-grey);
     --color-fg-disabled: var(--grey);
+    --color-fg-done: var(--grey-400);
+    --color-fg-finished: var(--grey-700);
     --color-fg-error: var(--red-500);
     --color-fg-on-popup: var(--grey-900);
     --color-fg-port-closed: var(--red-500);
@@ -177,6 +190,7 @@
     --color-progressbar-magnet: var(--yellow-300);
     --color-progressbar-paused: var(--grey-200);
     --color-progressbar-queued: var(--blue-400);
+    --color-progressbar-finished: var(--grey-200);
     --color-progressbar-seed-1: var(--green-500);
     --color-progressbar-seed-2: var(--green-300);
     --color-progressbar-seed-paused: var(--grey-200);
@@ -195,6 +209,8 @@
       --color-border-stark: var(--black);
       --color-border-starkest: var(--black);
       --color-fg-disabled: var(--black);
+      --color-fg-done: var(--black);
+      --color-fg-finished: var(--black);
       --color-fg-error: var(--red-500);
       --color-fg-on-popup: var(--black);
       --color-fg-port-closed: var(--red-500);
@@ -213,6 +229,7 @@
       --color-progressbar-magnet: var(--yellow-300);
       --color-progressbar-paused: var(--grey-500);
       --color-progressbar-queued: var(--blue-400);
+      --color-progressbar-finished: var(--grey-500);
       --color-progressbar-seed-1: var(--black);
       --color-progressbar-seed-2: var(--white);
       --color-progressbar-seed-paused: var(--grey-500);
@@ -402,7 +419,8 @@ a {
     width: 100%;
     min-width: 140px;
     max-width: 226px;
-    padding-right: 24px; /* accommodate reset button */
+    padding-right: 24px;
+    /* accommodate reset button */
 
     &::-webkit-search-cancel-button {
       display: none;
@@ -693,6 +711,14 @@ a {
       }
     }
 
+    &.finished {
+      color: var(--color-fg-finished);
+
+      .icon {
+        background-color: var(--color-fg-finished);
+      }
+    }
+
     &.selected {
       background-color: var(--color-bg-selected);
       color: var(--color-fg-selected);
@@ -770,6 +796,12 @@ a {
         color: var(--color-progressbar-fg-2);
         text-shadow: var(--progress-bar-shadow-2);
       }
+
+      &.finished::before {
+        background: var(--color-progressbar-finished);
+        color: var(--color-progressbar-fg-1);
+        text-shadow: var(--progress-bar-shadow-1);
+      }
     }
 
     &.verify::before {
@@ -779,6 +811,12 @@ a {
 
     &.paused::before {
       background: var(--color-progressbar-paused);
+      color: var(--color-progressbar-fg-1);
+      text-shadow: var(--progress-bar-shadow-1);
+    }
+
+    &.finished::before {
+      background: var(--color-progressbar-finished);
       color: var(--color-progressbar-fg-1);
       text-shadow: var(--progress-bar-shadow-1);
     }
@@ -937,6 +975,7 @@ a {
     top: 0;
     left: 0;
   }
+
   @include viewport-medium {
     border-left: 1px solid var(--color-border-default);
     min-width: 570px;
@@ -978,6 +1017,7 @@ a {
   @include viewport-small {
     padding: 0 8px 20px;
   }
+
   @include viewport-medium {
     padding: 0 20px 20px;
   }
