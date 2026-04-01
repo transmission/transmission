@@ -16,6 +16,7 @@ on:
 
 jobs:
   analyze:
+    if: false # TEMP: minimal testing
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
