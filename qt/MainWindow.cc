@@ -37,6 +37,7 @@
 #include "PrefsDialog.h"
 #include "QtCompat.h"
 #include "RelocateDialog.h"
+#include "RenameTorrentDialog.h"
 #include "Session.h"
 #include "SessionDialog.h"
 #include "Speed.h"
@@ -129,6 +130,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui_.action_Contents, &QAction::triggered, this, &MainWindow::openHelp);
     connect(ui_.action_OpenFolder, &QAction::triggered, this, &MainWindow::openFolder);
     connect(ui_.action_CopyMagnetToClipboard, &QAction::triggered, this, &MainWindow::copyMagnetLinkToClipboard);
+    connect(ui_.action_Rename, &QAction::triggered, this, &MainWindow::renameTorrent);
     connect(ui_.action_SetLocation, &QAction::triggered, this, &MainWindow::setLocation);
     connect(ui_.action_Properties, &QAction::triggered, this, &MainWindow::openProperties);
     connect(ui_.action_SessionDialog, &QAction::triggered, this, &MainWindow::openSession);
@@ -493,6 +495,13 @@ void MainWindow::openProperties()
     details_dialog_->setIds(getSelectedTorrents());
 }
 
+void MainWindow::renameTorrent()
+{
+    auto* const dialog = new RenameTorrentDialog{ session_, model_, getSelectedTorrents(), this };
+    dialog->setAttribute(Qt::WA_DeleteOnClose, true);
+    dialog->show();
+}
+
 void MainWindow::setLocation()
 {
     auto* d = new RelocateDialog{ session_, model_, getSelectedTorrents(), this };
@@ -842,6 +851,7 @@ void MainWindow::refreshActionSensitivity()
     ui_.action_Delete->setEnabled(have_selection);
     ui_.action_Properties->setEnabled(have_selection);
     ui_.action_DeselectAll->setEnabled(have_selection);
+    ui_.action_Rename->setEnabled(one_selection && have_selection_with_metadata);
     ui_.action_SetLocation->setEnabled(have_selection);
 
     ui_.action_OpenFolder->setEnabled(one_selection && have_selection_with_metadata && session_.isLocal());
@@ -893,6 +903,7 @@ void MainWindow::refreshIcons()
     set_icon(ui_.action_Quit, icons::Type::QuitApp);
     set_icon(ui_.action_Remove, icons::Type::RemoveTorrent);
     set_icon(ui_.action_SelectAll, icons::Type::SelectAll);
+    set_icon(ui_.action_Rename, icons::Type::RenameTorrent);
     set_icon(ui_.action_SetLocation, icons::Type::SetTorrentLocation);
     set_icon(ui_.action_Start, icons::Type::StartTorrent);
     set_icon(ui_.action_StartNow, icons::Type::StartTorrentNow);
