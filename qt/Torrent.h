@@ -299,6 +299,13 @@ public:
         return percent_done_;
     }
 
+    double seedRatioPercentDone() const;
+
+    [[nodiscard]] constexpr double activityPercentDone() const noexcept
+    {
+        return isDone() ? seedRatioPercentDone() : percentDone();
+    }
+
     [[nodiscard]] constexpr auto failedEver() const noexcept
     {
         return failed_ever_;
