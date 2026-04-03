@@ -2676,16 +2676,7 @@ static void removeKeRangerRansomware()
 
         if ([self.fDefaults boolForKey:@"CloseWhenLastTransferRemoved"])
         {
-            BOOL hasActiveTransfer = NO;
-            for (Torrent* t in self.fTorrents)
-            {
-                if (t.active)
-                {
-                    hasActiveTransfer = YES;
-                    break;
-                }
-            }
-            if (!hasActiveTransfer)
+            if (self.fTorrents.count == 0)
             {
                 self.fQuitRequested = YES;
                 [NSApp terminate:self];
