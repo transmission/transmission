@@ -1076,6 +1076,17 @@
                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
+                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="QWz-Tn-r8K">
+                                                <rect key="frame" x="96" y="159" width="398" height="18"/>
+                                                <buttonCell key="cell" type="check" title="Close Transmission when last transfer removed" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="NHx-Vp-d3M">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <connections>
+                                                    <binding destination="365" name="enabled" keyPath="values.RemoveWhenFinishSeeding" id="tGw-Hz-J8q"/>
+                                                    <binding destination="365" name="value" keyPath="values.CloseWhenLastTransferRemoved" id="vMn-Xk-L9r"/>
+                                                </connections>
+                                            </button>
                                             <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Evu-rf-BPM">
                                                 <rect key="frame" x="76" y="99" width="257" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Verify data when download completes" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="wM8-cD-WAB">
@@ -1121,7 +1132,7 @@
                                             <constraint firstItem="1298" firstAttribute="leading" secondItem="1301" secondAttribute="trailing" constant="8" symbolic="YES" id="PMy-jP-rEj"/>
                                             <constraint firstItem="2043" firstAttribute="centerY" secondItem="2046" secondAttribute="centerY" id="PSZ-ae-Eqx"/>
                                             <constraint firstItem="2043" firstAttribute="top" secondItem="1299" secondAttribute="bottom" constant="20" id="Qf1-Gf-NrG"/>
-                                            <constraint firstItem="337" firstAttribute="top" secondItem="2122" secondAttribute="bottom" constant="20" id="RNI-7M-7QS"/>
+                                            <constraint firstItem="337" firstAttribute="top" secondItem="QWz-Tn-r8K" secondAttribute="bottom" constant="20" id="RNI-7M-7QS"/>
                                             <constraint firstItem="636" firstAttribute="centerY" secondItem="639" secondAttribute="centerY" id="RzR-et-pCg"/>
                                             <constraint firstItem="2046" firstAttribute="width" secondItem="267" secondAttribute="width" id="Ubm-6P-bEl"/>
                                             <constraint firstItem="1300" firstAttribute="leading" secondItem="1299" secondAttribute="trailing" constant="8" symbolic="YES" id="Vxv-Ha-Cat"/>
@@ -1142,6 +1153,9 @@
                                             <constraint firstItem="257" firstAttribute="centerY" secondItem="337" secondAttribute="centerY" id="f2o-bs-2xS"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2118" secondAttribute="trailing" constant="20" symbolic="YES" id="gWX-1m-B0d"/>
                                             <constraint firstItem="2122" firstAttribute="top" secondItem="2118" secondAttribute="bottom" constant="2" id="ifS-4u-lBe"/>
+                                            <constraint firstItem="QWz-Tn-r8K" firstAttribute="leading" secondItem="2118" secondAttribute="leading" constant="20" id="jRw-Kz-B4n"/>
+                                            <constraint firstItem="QWz-Tn-r8K" firstAttribute="top" secondItem="2122" secondAttribute="bottom" constant="4" id="pXk-Yf-T2v"/>
+                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="QWz-Tn-r8K" secondAttribute="trailing" constant="20" symbolic="YES" id="mDs-Ab-C7e"/>
                                             <constraint firstItem="267" firstAttribute="top" secondItem="4cS-54-dlc" secondAttribute="top" constant="3" id="jC8-Fg-aoK"/>
                                             <constraint firstItem="2048" firstAttribute="centerY" secondItem="2046" secondAttribute="centerY" id="kRG-P0-HOO"/>
                                             <constraint firstItem="268" firstAttribute="top" secondItem="264" secondAttribute="bottom" constant="2" id="lDA-6s-bJO"/>

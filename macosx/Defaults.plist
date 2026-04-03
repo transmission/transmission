@@ -32,6 +32,8 @@
 	<false/>
 	<key>CheckUpload</key>
 	<false/>
+	<key>CloseWhenLastTransferRemoved</key>
+	<false/>
 	<key>CreatorLocation</key>
 	<string>~/Desktop</string>
 	<key>DeleteOriginalTorrent</key>

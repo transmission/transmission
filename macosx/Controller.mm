@@ -2673,6 +2673,16 @@ static void removeKeRangerRansomware()
     if (torrent.removeWhenFinishSeeding)
     {
         [self confirmRemoveTorrents:@[ torrent ] deleteData:NO];
+
+        if ([self.fDefaults boolForKey:@"CloseWhenLastTransferRemoved"])
+        {
+            if (self.fTorrents.count == 0)
+            {
+                [torrent closeRemoveTorrent:NO];
+                self.fQuitRequested = YES;
+                [NSApp terminate:self];
+            }
+        }
     }
     else
     {
