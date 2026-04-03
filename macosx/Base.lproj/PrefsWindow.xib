@@ -1078,7 +1078,7 @@
                                             </textField>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="QWz-Tn-r8K">
                                                 <rect key="frame" x="96" y="159" width="398" height="18"/>
-                                                <buttonCell key="cell" type="check" title="Close Transmission when last active transfer is removed" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="NHx-Vp-d3M">
+                                                <buttonCell key="cell" type="check" title="Close Transmission when last transfer removed" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="NHx-Vp-d3M">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
