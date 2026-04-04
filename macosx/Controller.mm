@@ -486,6 +486,7 @@ static void removeKeRangerRansomware()
         tr_variantDictAddInt(&settings, TR_KEY_seed_queue_size, [_fDefaults integerForKey:@"QueueSeedNumber"]);
         tr_variantDictAddBool(&settings, TR_KEY_start_added_torrents, [_fDefaults boolForKey:@"AutoStartDownload"]);
         tr_variantDictAddBool(&settings, TR_KEY_utp_enabled, [_fDefaults boolForKey:@"UTPGlobal"]);
+        tr_variantDictAddBool(&settings, TR_KEY_wrap_single_file_torrents, [_fDefaults boolForKey:@"WrapSingleFileTorrents"]);
 
         tr_variantDictAddBool(&settings, TR_KEY_script_torrent_done_enabled, [_fDefaults boolForKey:@"DoneScriptEnabled"]);
         NSString* prefs_string = [_fDefaults stringForKey:@"DoneScriptPath"];

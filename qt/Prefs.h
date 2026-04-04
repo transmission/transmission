@@ -123,7 +123,8 @@ public:
         USPEED_ENABLED,
         USPEED,
         UPLOAD_SLOTS_PER_TORRENT,
-        LAST_CORE_PREF = UPLOAD_SLOTS_PER_TORRENT,
+        WRAP_SINGLE_FILE_TORRENTS,
+        LAST_CORE_PREF = WRAP_SINGLE_FILE_TORRENTS,
         //
         PREFS_COUNT
     };
@@ -286,6 +287,7 @@ private:
         { .id = USPEED_ENABLED, .key = TR_KEY_speed_limit_up_enabled, .type = QMetaType::Bool },
         { .id = USPEED, .key = TR_KEY_speed_limit_up, .type = QMetaType::Int },
         { .id = UPLOAD_SLOTS_PER_TORRENT, .key = TR_KEY_upload_slots_per_torrent, .type = QMetaType::Int },
+        { .id = WRAP_SINGLE_FILE_TORRENTS, .key = TR_KEY_wrap_single_file_torrents, .type = QMetaType::Bool },
     } };
 
     [[nodiscard]] static tr_variant::Map defaults();

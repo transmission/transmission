@@ -1026,6 +1026,17 @@ void tr_torrent::init(tr_ctor const& ctor)
 void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
 {
     TR_ASSERT(!has_metainfo());
+
+    if (session->wrap_single_file_torrents() && tm.file_count() == 1 &&
+        !tr_strv_contains(tm.file_subpath(0), '/'))
+    {
+        auto const folder = tr_torrent_files::sanitize_subpath(tm.name());
+        if (!std::empty(folder))
+        {
+            tm.set_file_subpath(0, tr_pathbuf{ folder, '/', tm.file_subpath(0) }.sv());
+        }
+    }
+
     metainfo_ = std::move(tm);
     on_metainfo_updated();
 
@@ -1060,6 +1071,16 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
         }
 
         return nullptr;
+    }
+
+    if (session->wrap_single_file_torrents() && metainfo.file_count() == 1 &&
+        !tr_strv_contains(metainfo.file_subpath(0), '/'))
+    {
+        auto const folder = tr_torrent_files::sanitize_subpath(metainfo.name());
+        if (!std::empty(folder))
+        {
+            metainfo.set_file_subpath(0, tr_pathbuf{ folder, '/', metainfo.file_subpath(0) }.sv());
+        }
     }
 
     auto* const tor = new tr_torrent{ std::move(metainfo) };

@@ -2627,6 +2627,17 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         [](tr_session const& /*src*/) -> tr_variant { return tr_variant::unmanaged_string(LONG_VERSION_STRING); },
         nullptr);
 
+    map.try_emplace(
+        TR_KEY_wrap_single_file_torrents,
+        [](tr_session const& src) -> tr_variant { return src.wrap_single_file_torrents(); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tr_sessionSetWrapSingleFileTorrents(&tgt, *val);
+            }
+        });
+
     // `row` could have been replaced by structured bindings,
     // but it's not available until clang 16
     // https://github.com/llvm/llvm-project/commit/44f2baa3804a62ca793f0ff3e43aa71cea91a795
