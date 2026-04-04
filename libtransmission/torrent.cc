@@ -1026,6 +1026,17 @@ void tr_torrent::init(tr_ctor const& ctor)
 void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
 {
     TR_ASSERT(!has_metainfo());
+
+    if (session->wrap_single_file_torrents() && tm.file_count() == 1 &&
+        !tr_strv_contains(tm.file_subpath(0), '/'))
+    {
+        auto const folder = tr_torrent_files::sanitize_subpath(tm.name());
+        if (!std::empty(folder))
+        {
+            tm.set_file_subpath(0, tr_pathbuf{ folder, '/', tm.file_subpath(0) }.sv());
+        }
+    }
+
     metainfo_ = std::move(tm);
     on_metainfo_updated();
 
