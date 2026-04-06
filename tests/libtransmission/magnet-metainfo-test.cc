@@ -7,15 +7,16 @@
 #include <cstddef> // size_t, std::byte
 #include <string_view>
 
-#include "gtest/gtest.h"
-
 #include <libtransmission/crypto-utils.h> // tr_rand_buffer()
 #include <libtransmission/magnet-metainfo.h>
 #include <libtransmission/tr-macros.h>
 
+#include "test-fixtures.h"
+
+using MagnetMetainfoTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
-TEST(MagnetMetainfo, magnetParse)
+TEST_F(MagnetMetainfoTest, magnetParse)
 {
     auto constexpr ExpectedHash = tr_sha1_digest_t{ std::byte{ 210 }, std::byte{ 53 },  std::byte{ 64 },  std::byte{ 16 },
                                                     std::byte{ 163 }, std::byte{ 202 }, std::byte{ 74 },  std::byte{ 222 },
@@ -91,7 +92,7 @@ TEST(MagnetMetainfo, magnetParse)
     }
 }
 
-TEST(WebUtilsTest, parseMagnetFuzzRegressions)
+TEST_F(MagnetMetainfoTest, parseMagnetFuzzRegressions)
 {
     static auto constexpr Tests = std::array<std::string_view, 1>{
         "UICOl7RLjChs/QZZwNH4sSQwuH890UMHuoxoWBmMkr0=",
@@ -104,7 +105,7 @@ TEST(WebUtilsTest, parseMagnetFuzzRegressions)
     }
 }
 
-TEST(WebUtilsTest, parseMagnetFuzz)
+TEST_F(MagnetMetainfoTest, parseMagnetFuzz)
 {
     auto buf = std::array<char, 1024>{};
 

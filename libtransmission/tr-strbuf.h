@@ -251,26 +251,6 @@ public:
 
     ///
 
-    template<typename... Args>
-    void join(Char delim, Args const&... args)
-    {
-        ((append(args), append(delim)), ...);
-        resize(size() - 1);
-    }
-
-    template<typename ContiguousRange, typename... Args>
-    void join(ContiguousRange const& delim, Args const&... args)
-    {
-        ((append(args), append(delim)), ...);
-        resize(size() - std::size(delim));
-    }
-
-    template<typename... Args>
-    void join(Char const* sz_delim, Args const&... args)
-    {
-        join(std::basic_string_view<Char>{ sz_delim }, args...);
-    }
-
     // NOLINTNEXTLINE(google-explicit-constructor)
     [[nodiscard]] constexpr operator std::basic_string_view<Char>() const noexcept
     {
@@ -281,28 +261,6 @@ public:
     [[nodiscard]] constexpr operator auto() const noexcept
     {
         return c_str();
-    }
-
-    bool popdir() noexcept
-    {
-        // NOLINTNEXTLINE(readability-redundant-declaration): P.S. This looks like some dark magic
-        std::string_view tr_sys_path_dirname(std::string_view path);
-        auto const parent = tr_sys_path_dirname(sv());
-        auto const changed = parent != sv();
-
-        if (changed)
-        {
-            if (std::data(parent) == std::data(*this))
-            {
-                resize(std::size(parent));
-            }
-            else
-            {
-                assign(parent);
-            }
-        }
-
-        return changed;
     }
 
 private:

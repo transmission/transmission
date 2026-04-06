@@ -17,6 +17,9 @@ struct event_base;
 
 class tr_session_thread
 {
+protected:
+    using callback_t = std::function<void()>;
+
 public:
     static void tr_evthread_init();
 
@@ -27,27 +30,19 @@ public:
 
     [[nodiscard]] virtual bool am_in_session_thread() const noexcept = 0;
 
-    virtual void queue(std::function<void(void)>&& func) = 0;
+    virtual void queue(callback_t&& func) = 0;
 
-    virtual void run(std::function<void(void)>&& func) = 0;
+    virtual void run(callback_t&& func) = 0;
 
     template<typename Func, typename... Args>
     void queue(Func&& func, Args&&... args)
     {
-        // TODO(tearfur): Use C++20 P0780R2, GCC 9, clang 9
-        queue(std::function<void(void)>{
-            [func = std::forward<Func>(func), args = std::make_tuple(std::forward<Args>(args)...)]()
-            { std::apply(std::move(func), std::move(args)); },
-        });
+        queue(callback_t{ std::bind_front(std::forward<Func>(func), std::forward<Args>(args)...) });
     }
 
     template<typename Func, typename... Args>
     void run(Func&& func, Args&&... args)
     {
-        // TODO(tearfur): Use C++20 P0780R2, GCC 9, clang 9
-        run(std::function<void(void)>{
-            [func = std::forward<Func>(func), args = std::make_tuple(std::forward<Args>(args)...)]()
-            { std::apply(std::move(func), std::move(args)); },
-        });
+        run(callback_t{ std::bind_front(std::forward<Func>(func), std::forward<Args>(args)...) });
     }
 };

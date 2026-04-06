@@ -10,11 +10,14 @@
 #include <ctime>
 #include <optional>
 #include <string_view>
+#include <type_traits>
 #include <vector>
 
 #include <QString>
 
 #include <libtransmission/variant.h>
+
+#include "QtCompat.h"
 
 class QByteArray;
 
@@ -26,9 +29,11 @@ struct TrackerStat;
 
 namespace trqt::variant_helpers
 {
+void register_qt_converters();
 
-template<typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
+template<typename T>
 auto getValue(tr_variant const* variant)
+    requires std::is_same_v<T, bool>
 {
     std::optional<T> ret;
 
@@ -40,12 +45,9 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template<
-    typename T,
-    typename std::enable_if_t<
-        std::is_same_v<T, int64_t> || std::is_same_v<T, uint64_t> || std::is_same_v<T, int> || std::is_same_v<T, time_t>>* =
-        nullptr>
+template<typename T>
 auto getValue(tr_variant const* variant)
+    requires std::is_same_v<T, int64_t> || std::is_same_v<T, uint64_t> || std::is_same_v<T, int> || std::is_same_v<T, time_t>
 {
     std::optional<T> ret;
 
@@ -57,8 +59,9 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template<typename T, typename std::enable_if_t<std::is_same_v<T, double>>* = nullptr>
+template<typename T>
 auto getValue(tr_variant const* variant)
+    requires std::is_same_v<T, double>
 {
     std::optional<T> ret;
 
@@ -70,21 +73,23 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template<typename T, typename std::enable_if_t<std::is_same_v<T, QString>>* = nullptr>
+template<typename T>
 auto getValue(tr_variant const* variant)
+    requires std::is_same_v<T, QString>
 {
     std::optional<T> ret;
 
     if (auto sv = std::string_view{}; tr_variantGetStrView(variant, &sv))
     {
-        ret = QString::fromUtf8(std::data(sv), std::size(sv));
+        ret = QString::fromUtf8(std::data(sv), static_cast<IF_QT6(qsizetype, int)>(std::size(sv)));
     }
 
     return ret;
 }
 
-template<typename T, typename std::enable_if_t<std::is_same_v<T, std::string_view>>* = nullptr>
+template<typename T>
 auto getValue(tr_variant const* variant)
+    requires std::is_same_v<T, std::string_view>
 {
     std::optional<T> ret;
 
@@ -96,12 +101,23 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template<
-    typename C,
-    typename T = typename C::value_type,
-    typename std::enable_if_t<
-        std::is_same_v<C, QStringList> || std::is_same_v<C, QList<T>> || std::is_same_v<C, std::vector<T>>>* = nullptr>
+template<typename T>
+auto getValue(tr_variant const* variant)
+    requires std::is_enum_v<T>
+{
+    std::optional<T> ret;
+
+    if (auto const value = getValue<int>(variant); value)
+    {
+        ret = static_cast<T>(*value);
+    }
+
+    return ret;
+}
+
+template<typename C, typename T = typename C::value_type>
 auto getValue(tr_variant const* var)
+    requires std::is_same_v<C, QStringList> || std::is_same_v<C, QList<T>> || std::is_same_v<C, std::vector<T>>
 {
     std::optional<C> ret;
 

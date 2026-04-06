@@ -20,7 +20,8 @@ class MakeDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    MakeDialog(Session&, QWidget* parent = nullptr);
+    explicit MakeDialog(Session& session, QWidget* parent = nullptr);
+    ~MakeDialog() override = default;
     MakeDialog(MakeDialog&&) = delete;
     MakeDialog(MakeDialog const&) = delete;
     MakeDialog& operator=(MakeDialog&&) = delete;
@@ -28,13 +29,13 @@ public:
 
 protected:
     // QWidget
-    void dragEnterEvent(QDragEnterEvent*) override;
-    void dropEvent(QDropEvent*) override;
+    void dragEnterEvent(QDragEnterEvent* event) override;
+    void dropEvent(QDropEvent* event) override;
 
 private slots:
     void onSourceChanged();
     void makeTorrent();
-    void onPieceSizeUpdated(int);
+    void onPieceSizeUpdated(int value);
 
 private:
     [[nodiscard]] QString getSource() const;

@@ -19,14 +19,12 @@
 
 #include <event2/util.h> // for evutil_socket_t
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, TR_CONSTEXPR20
+#include "libtransmission/types.h"
 #include "libtransmission/utils-ev.h"
 
 struct struct_utp_context;
@@ -34,10 +32,15 @@ struct tr_error;
 struct tr_session;
 struct tr_socket_address;
 
-namespace libtransmission::test
+namespace tr
+{
+class Timer;
+
+namespace test
 {
 class HandshakeTest;
-} // namespace libtransmission::test
+}
+} // namespace tr
 
 enum class ReadState : uint8_t
 {
@@ -63,14 +66,6 @@ class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
     using GotError = void (*)(tr_peerIo* io, tr_error const& error, void* user_data);
 
 public:
-    tr_peerIo(
-        tr_session* session,
-        tr_peer_socket&& socket,
-        tr_bandwidth* parent_bandwidth,
-        tr_sha1_digest_t const* info_hash,
-        bool is_incoming,
-        bool client_is_seed);
-
     ~tr_peerIo();
 
     tr_peerIo(tr_peerIo const&) = delete;
@@ -116,7 +111,7 @@ public:
 
     ///
 
-    [[nodiscard]] TR_CONSTEXPR20 auto read_buffer_size() const noexcept
+    [[nodiscard]] constexpr auto read_buffer_size() const noexcept
     {
         return std::size(inbuf_);
     }
@@ -152,7 +147,7 @@ public:
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
     template<typename T>
-    void write(libtransmission::BufferReader<T>& buf, bool is_piece_data)
+    void write(tr::BufferReader<T>& buf, bool is_piece_data)
     {
         auto const n_bytes = std::size(buf);
         write_bytes(std::data(buf), n_bytes, is_piece_data);
@@ -161,7 +156,10 @@ public:
 
     size_t flush_outgoing_protocol_msgs();
 
-    size_t flush(tr_direction dir, size_t byte_limit);
+    size_t flush(tr_direction dir, size_t byte_limit)
+    {
+        return dir == tr_direction::Down ? try_read(byte_limit) : try_write(byte_limit);
+    }
 
     ///
 
@@ -287,7 +285,7 @@ public:
         filter_.decrypt_init(is_incoming, dh, info_hash);
     }
 
-    TR_CONSTEXPR20 void decrypt_disable(size_t decrypt_len = 0U) noexcept
+    constexpr void decrypt_disable(size_t decrypt_len = 0U) noexcept
     {
         // optionally decrypt decrypt_len more bytes before disabling decryption
         n_decrypt_remain_ = decrypt_len;
@@ -318,9 +316,17 @@ private:
     // The buffer size for incoming & outgoing peer messages.
     // Starts off with enough capacity to read a single BT Piece message,
     // but has a 5x GrowthFactor so that it can quickly to high volume.
-    using PeerBuffer = libtransmission::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
+    using PeerBuffer = tr::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
 
-    friend class libtransmission::test::HandshakeTest;
+    friend class tr::test::HandshakeTest;
+
+    tr_peerIo(
+        tr_session* session,
+        tr_peer_socket&& socket,
+        tr_bandwidth* parent_bandwidth,
+        tr_sha1_digest_t const* info_hash,
+        bool is_incoming,
+        bool client_is_seed);
 
     [[nodiscard]] constexpr auto client_is_seed() const noexcept
     {
@@ -341,6 +347,8 @@ private:
 #endif
 
     void close();
+
+    void flush_outbuf_soon();
 
     static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
     static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio);
@@ -385,8 +393,10 @@ private:
     GotError got_error_ = nullptr;
     void* user_data_ = nullptr;
 
-    libtransmission::evhelpers::event_unique_ptr event_read_;
-    libtransmission::evhelpers::event_unique_ptr event_write_;
+    std::unique_ptr<tr::Timer> const flush_outbuf_trigger_;
+
+    tr::evhelpers::event_unique_ptr event_read_;
+    tr::evhelpers::event_unique_ptr event_write_;
 
     short int pending_events_ = 0;
 

@@ -10,13 +10,12 @@
 #include <utility>
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/completion.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/torrent.h"
+#include "libtransmission/types.h"
 
 tr_completion::tr_completion(tr_torrent const* tor, tr_block_info const* block_info)
     : tr_completion{ [tor](tr_piece_index_t const piece) { return tor->piece_is_wanted(piece); }, block_info }
@@ -99,7 +98,7 @@ void tr_completion::amount_done(float* tab, size_t n_tabs) const
         auto const begin = i * blocks_per_tab;
         auto const end = std::min(begin + blocks_per_tab, std::size(blocks_));
         auto const numerator = blocks_.count(begin, end);
-        tab[i] = float(numerator) / (end - begin);
+        tab[i] = static_cast<float>(numerator) / static_cast<float>(end - begin);
     }
 }
 
@@ -140,7 +139,7 @@ void tr_completion::set_blocks(tr_bitfield blocks)
     TR_ASSERT(std::size(blocks_) == std::size(blocks));
 
     blocks_ = std::move(blocks);
-    size_now_ = count_has_bytes_in_span({ 0, block_info_->total_size() });
+    size_now_ = count_has_bytes_in_span({ .begin = 0, .end = block_info_->total_size() });
     size_when_done_.reset();
     has_valid_.reset();
 }

@@ -16,6 +16,7 @@ public:
         : TorrentDelegate{ parent }
     {
     }
+    ~TorrentDelegateMin() override = default;
     TorrentDelegateMin(TorrentDelegateMin&&) = delete;
     TorrentDelegateMin(TorrentDelegateMin const&) = delete;
     TorrentDelegateMin& operator=(TorrentDelegateMin&&) = delete;
@@ -23,6 +24,6 @@ public:
 
 protected:
     // TorrentDelegate
-    QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const override;
-    void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const&) const override;
+    QSize sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const override;
+    void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const& tor) const override;
 };

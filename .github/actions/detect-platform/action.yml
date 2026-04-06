@@ -1,0 +1,23 @@
+name: 'Detect Platform'
+description: 'Detect OS/platform and export OS_FAMILY/DISTRO/DISTRO_VERSION/PKG_FAMILY'
+outputs:
+  os-family:
+    description: 'OS family (linux, macos, windows, unknown)'
+    value: ${{ steps.detect.outputs.os-family }}
+  distro:
+    description: 'Linux distribution (ubuntu, debian, fedora, unknown)'
+    value: ${{ steps.detect.outputs.distro }}
+  distro-version:
+    description: 'Linux distribution version (e.g., 22.04)'
+    value: ${{ steps.detect.outputs.distro-version }}
+  pkg-family:
+    description: 'Package manager family (apt, dnf, brew, unknown)'
+    value: ${{ steps.detect.outputs.pkg-family }}
+runs:
+  using: composite
+  steps:
+    - name: Detect platform
+      id: detect
+      shell: bash
+      run: |
+        bash "${GITHUB_ACTION_PATH}/detect-platform.sh"

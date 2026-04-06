@@ -18,6 +18,8 @@ const peer_column_classes = [
   'peer-app-name',
 ];
 
+const webseed_column_classes = ['url', 'speed-down'];
+
 export class Inspector extends EventTarget {
   constructor(controller) {
     super();
@@ -28,7 +30,8 @@ export class Inspector extends EventTarget {
     this.current_page = this.elements.info.root;
     this.interval = setInterval(this._refreshTorrents.bind(this), 3000);
     this.name = 'inspector';
-    this.selection_listener = (event_) => this._setTorrents(event_.selected);
+    this.selection_listener = (event_) =>
+      this._setTorrents(event_.selected, true);
     this.torrent_listener = () => this._updateCurrentPage();
     this.torrents = [];
     this.file_torrent = null;
@@ -41,7 +44,7 @@ export class Inspector extends EventTarget {
       'torrent-selection-changed',
       this.selection_listener,
     );
-    this._setTorrents(this.controller.getSelectedTorrents());
+    this._setTorrents(this.controller.getSelectedTorrents(), true); // Initial load
 
     document.querySelector('#mainwin-workarea').append(this.elements.root);
   }
@@ -109,8 +112,8 @@ export class Inspector extends EventTarget {
       ['hash', 'Hash:'],
       ['privacy', 'Privacy:'],
       ['origin', 'Origin:'],
-      ['dateAdded', 'Date added:'],
-      ['magnetLink', 'Magnet:'],
+      ['date_added', 'Date added:'],
+      ['magnet_link', 'Magnet:'],
       ['comment', 'Comment:'],
       ['labels', 'Labels:'],
     ];
@@ -138,6 +141,26 @@ export class Inspector extends EventTarget {
   }
 
   static _createPeersPage() {
+    const container = document.createElement('div');
+
+    // Webseeds table
+    const webseedsTable = document.createElement('table');
+    webseedsTable.classList.add('peer-list');
+    const webseedsThead = document.createElement('thead');
+    const webseedsTr = document.createElement('tr');
+    const webseedsHeaders = ['Web Seeds', 'Down'];
+    for (const [index, name] of webseedsHeaders.entries()) {
+      const th = document.createElement('th');
+      th.classList.add(webseed_column_classes[index]);
+      setTextContent(th, name);
+      webseedsTr.append(th);
+    }
+    const webseedsTbody = document.createElement('tbody');
+    webseedsThead.append(webseedsTr);
+    webseedsTable.append(webseedsThead);
+    webseedsTable.append(webseedsTbody);
+
+    // Peers table
     const table = document.createElement('table');
     table.classList.add('peer-list');
     const thead = document.createElement('thead');
@@ -157,9 +180,16 @@ export class Inspector extends EventTarget {
     thead.append(tr);
     table.append(thead);
     table.append(tbody);
+
+    container.append(webseedsTable);
+    container.append(table);
+
     return {
-      root: table,
+      peersTable: table,
+      root: container,
       tbody,
+      webseedsTable,
+      webseedsTbody,
     };
   }
 
@@ -190,7 +220,7 @@ export class Inspector extends EventTarget {
     return { ...elements, ...pages };
   }
 
-  _setTorrents(torrents) {
+  _setTorrents(torrents, isInitialLoad = false) {
     // update the inspector when a selected torrent's data changes.
     const key = 'dataChanged';
     const callback = this.torrent_listener;
@@ -202,7 +232,11 @@ export class Inspector extends EventTarget {
       t.addEventListener(key, callback);
     }
 
-    this._refreshTorrents();
+    // Fetch detailed data immediately when requested
+    // (initial load or selection changes)
+    if (isInitialLoad) {
+      this._refreshTorrents();
+    }
     this._updateCurrentPage();
   }
 
@@ -541,7 +575,7 @@ export class Inspector extends EventTarget {
     }
     setTextContent(e.info.location, string);
 
-    // dateAdded
+    // date_added
     if (torrents.length === 0) {
       string = none;
     } else {
@@ -561,16 +595,16 @@ export class Inspector extends EventTarget {
           })
         : mixed;
     }
-    setTextContent(e.info.dateAdded, string);
+    setTextContent(e.info.date_added, string);
 
-    // magnetLink
+    // magnet_link
     if (torrents.length === 0) {
-      setTextContent(e.info.magnetLink, none);
+      setTextContent(e.info.magnet_link, none);
     } else if (torrents.length > 1) {
-      setTextContent(e.info.magnetLink, mixed);
+      setTextContent(e.info.magnet_link, mixed);
     } else {
       const link = torrents[0].getMagnetLink();
-      e.info.magnetLink.innerHTML = `<a class="inspector-info-magnet" href="${link}"><button></button></a>`;
+      e.info.magnet_link.innerHTML = `<a class="inspector-info-magnet" href="${link}"><button></button></a>`;
     }
   }
 
@@ -601,90 +635,140 @@ export class Inspector extends EventTarget {
   _updatePeers() {
     const fmt = Formatter;
     const { elements, torrents } = this;
-    const { tbody } = elements.peers;
+    const { tbody, webseedsTbody, webseedsTable } = elements.peers;
 
     const cell_setters = [
       (peer, td) => {
-        td.dataset.encrypted = peer.isEncrypted;
+        td.dataset.encrypted = peer.is_encrypted;
       },
       (peer, td) =>
         setTextContent(
           td,
-          peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : '',
+          peer.rate_to_peer ? fmt.speedBps(peer.rate_to_peer) : '',
         ),
       (peer, td) =>
         setTextContent(
           td,
-          peer.rateToClient ? fmt.speedBps(peer.rateToClient) : '',
+          peer.rate_to_client ? fmt.speedBps(peer.rate_to_client) : '',
         ),
       (peer, td) => setTextContent(td, `${Math.floor(peer.progress * 100)}%`),
       (peer, td) => {
-        setTextContent(td, peer.flagStr);
-        td.setAttribute('title', Inspector._peerStatusTitle(peer.flagStr));
+        setTextContent(td, peer.flag_str);
+        td.setAttribute('title', Inspector._peerStatusTitle(peer.flag_str));
       },
       (peer, td) => {
         setTextContent(td, peer.address);
         td.setAttribute('title', peer.address);
       },
       (peer, td) => {
-        setTextContent(td, peer.clientName);
-        td.setAttribute('title', peer.clientName);
+        setTextContent(td, peer.client_name);
+        td.setAttribute('title', peer.client_name);
       },
     ];
 
-    const rows = [];
+    const webseed_cell_setters = [
+      (webseed, td) => {
+        setTextContent(td, webseed.url);
+        td.setAttribute('title', webseed.url);
+      },
+      (webseed, td) => {
+        setTextContent(
+          td,
+          webseed.download_bytes_per_second
+            ? fmt.speedBps(webseed.download_bytes_per_second)
+            : '',
+        );
+      },
+    ];
+
+    const webseedsRows = [];
+    const peersRows = [];
+    let hasWebseeds = false;
+
     for (const tor of torrents) {
-      // torrent name
-      const tortr = document.createElement('tr');
-      tortr.classList.add('torrent-row');
-      const tortd = document.createElement('td');
-      tortd.setAttribute('colspan', cell_setters.length);
-      setTextContent(tortd, tor.getName());
-      tortr.append(tortd);
-      rows.push(tortr);
+      // create base torrent row
+      const baseTortr = document.createElement('tr');
+      baseTortr.classList.add('torrent-row');
+      const baseTortd = document.createElement('td');
+      setTextContent(baseTortd, tor.getName());
+      baseTortr.append(baseTortd);
+
+      // webseeds
+      const webseeds = tor.getWebseedsEx();
+      if (webseeds.length > 0) {
+        hasWebseeds = true;
+        const tortr = baseTortr.cloneNode(true);
+        tortr.firstChild.setAttribute('colspan', webseed_cell_setters.length);
+        webseedsRows.push(tortr);
+
+        // webseed rows
+        for (const webseed of webseeds) {
+          const tr = document.createElement('tr');
+          tr.classList.add('webseed-row');
+          for (const [index, setter] of webseed_cell_setters.entries()) {
+            const td = document.createElement('td');
+            td.classList.add(webseed_column_classes[index]);
+            setter(webseed, td);
+            tr.append(td);
+          }
+          webseedsRows.push(tr);
+        }
+      }
+
+      // peers
+      const tortr = baseTortr.cloneNode(true);
+      tortr.firstChild.setAttribute('colspan', cell_setters.length);
+      peersRows.push(tortr);
 
       // peers
       for (const peer of tor.getPeers()) {
         const tr = document.createElement('tr');
-        tr.classList.add('peer-row');
         for (const [index, setter] of cell_setters.entries()) {
           const td = document.createElement('td');
           td.classList.add(peer_column_classes[index]);
           setter(peer, td);
           tr.append(td);
         }
-        rows.push(tr);
+        peersRows.push(tr);
       }
-
-      // TODO: modify instead of rebuilding wholesale?
-      while (tbody.firstChild) {
-        tbody.firstChild.remove();
-      }
-      tbody.append(...rows);
     }
+
+    // TODO: modify instead of rebuilding wholesale?
+    webseedsTable.style.display = hasWebseeds ? '' : 'none';
+    while (webseedsTbody.firstChild) {
+      webseedsTbody.firstChild.remove();
+    }
+    if (hasWebseeds) {
+      webseedsTbody.append(...webseedsRows);
+    }
+
+    while (tbody.firstChild) {
+      tbody.firstChild.remove();
+    }
+    tbody.append(...peersRows);
   }
 
   /// TRACKERS PAGE
 
   static getAnnounceState(tracker) {
-    switch (tracker.announceState) {
+    switch (tracker.announce_state) {
       case Torrent._TrackerActive:
         return 'Announce in progress';
       case Torrent._TrackerWaiting: {
         const timeUntilAnnounce = Math.max(
           0,
-          tracker.nextAnnounceTime - Date.now() / 1000,
+          tracker.next_announce_time - Date.now() / 1000,
         );
         return `Next announce in ${Formatter.timeInterval(timeUntilAnnounce)}`;
       }
       case Torrent._TrackerQueued:
         return 'Announce is queued';
       case Torrent._TrackerInactive:
-        return tracker.isBackup
+        return tracker.is_backup
           ? 'Tracker will be used as a backup'
           : 'Announce not scheduled';
       default:
-        return `unknown announce state: ${tracker.announceState}`;
+        return `unknown announce state: ${tracker.announce_state}`;
     }
   }
 
@@ -692,19 +776,25 @@ export class Inspector extends EventTarget {
     let lastAnnounceLabel = 'Last Announce';
     let lastAnnounce = ['N/A'];
 
-    if (tracker.hasAnnounced) {
-      const lastAnnounceTime = Formatter.timestamp(tracker.lastAnnounceTime);
-      if (tracker.lastAnnounceSucceeded) {
+    if (tracker.has_announced) {
+      const lastAnnounceTime = Formatter.timestamp(tracker.last_announce_time);
+      if (tracker.last_announce_succeeded) {
         lastAnnounce = [
           lastAnnounceTime,
           ' (got ',
-          Formatter.countString('peer', 'peers', tracker.lastAnnouncePeerCount),
+          Formatter.countString(
+            'peer',
+            'peers',
+            tracker.last_announce_peer_count,
+          ),
           ')',
         ];
       } else {
         lastAnnounceLabel = 'Announce error';
         lastAnnounce = [
-          tracker.lastAnnounceResult ? `${tracker.lastAnnounceResult} - ` : '',
+          tracker.last_announce_result
+            ? `${tracker.last_announce_result} - `
+            : '',
           lastAnnounceTime,
         ];
       }
@@ -719,15 +809,16 @@ export class Inspector extends EventTarget {
     let lastScrapeLabel = 'Last Scrape';
     let lastScrape = 'N/A';
 
-    if (tracker.hasScraped) {
-      const lastScrapeTime = Formatter.timestamp(tracker.lastScrapeTime);
-      if (tracker.lastScrapeSucceeded) {
+    if (tracker.has_scraped) {
+      const lastScrapeTime = Formatter.timestamp(tracker.last_scrape_time);
+      if (tracker.last_scrape_succeeded) {
         lastScrape = lastScrapeTime;
       } else {
         lastScrapeLabel = 'Scrape error';
         lastScrape =
-          (tracker.lastScrapeResult ? `${tracker.lastScrapeResult} - ` : '') +
-          lastScrapeTime;
+          (tracker.last_scrape_result
+            ? `${tracker.last_scrape_result} - `
+            : '') + lastScrapeTime;
       }
     }
     return {
@@ -795,7 +886,7 @@ export class Inspector extends EventTarget {
         element.classList.add('tier-seeders');
         setTextContent(
           element,
-          `Seeders: ${tracker.seederCount > -1 ? tracker.seederCount : na}`,
+          `Seeders: ${tracker.seeder_count > -1 ? tracker.seeder_count : na}`,
         );
         tier_div.append(element);
 
@@ -808,7 +899,9 @@ export class Inspector extends EventTarget {
         element.classList.add('tier-leechers');
         setTextContent(
           element,
-          `Leechers: ${tracker.leecherCount > -1 ? tracker.leecherCount : na}`,
+          `Leechers: ${
+            tracker.leecher_count > -1 ? tracker.leecher_count : na
+          }`,
         );
         tier_div.append(element);
 
@@ -825,7 +918,7 @@ export class Inspector extends EventTarget {
         setTextContent(
           element,
           `Downloads: ${
-            tracker.downloadCount > -1 ? tracker.downloadCount : na
+            tracker.download_count > -1 ? tracker.download_count : na
           }`,
         );
         tier_div.append(element);
@@ -853,7 +946,7 @@ export class Inspector extends EventTarget {
     const { indices, wanted } = event_;
     this._changeFileCommand(
       indices,
-      wanted ? 'files-wanted' : 'files-unwanted',
+      wanted ? 'files_wanted' : 'files_unwanted',
     );
   }
 
@@ -863,13 +956,13 @@ export class Inspector extends EventTarget {
     let command = null;
     switch (priority.toString()) {
       case '-1':
-        command = 'priority-low';
+        command = 'priority_low';
         break;
       case '1':
-        command = 'priority-high';
+        command = 'priority_high';
         break;
       default:
-        command = 'priority-normal';
+        command = 'priority_normal';
     }
 
     this._changeFileCommand(indices, command);

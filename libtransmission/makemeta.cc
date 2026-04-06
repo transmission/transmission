@@ -8,6 +8,7 @@
 #include <cmath>
 #include <ctime> // time()
 #include <iterator>
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -16,19 +17,20 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/makemeta.h"
 #include "libtransmission/quark.h" // TR_KEY_length, TR_KEY_a...
 #include "libtransmission/session.h" // TR_NAME
+#include "libtransmission/string-utils.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h" // tr_pathbuf
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for _()
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
@@ -76,11 +78,12 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
     auto const info = tr_sys_path_get_info(path, 0, &error);
     if (error)
     {
-        tr_logAddWarn(fmt::format(
-            fmt::runtime(_("Skipping '{path}': {error} ({error_code})")),
-            fmt::arg("path", path),
-            fmt::arg("error", error.message()),
-            fmt::arg("error_code", error.code())));
+        tr_logAddWarn(
+            fmt::format(
+                fmt::runtime(_("Skipping '{path}': {error} ({error_code})")),
+                fmt::arg("path", path),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
     }
     if (!info)
     {
@@ -231,7 +234,7 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
         TR_ASSERT(left_in_piece == 0);
         sha.add(std::data(buf), std::size(buf));
         auto const digest = sha.finish();
-        walk = std::copy(std::begin(digest), std::end(digest), walk);
+        walk = std::ranges::copy(digest, walk).out;
         sha.clear();
 
         total_remain -= piece_size;

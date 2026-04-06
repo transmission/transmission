@@ -25,7 +25,7 @@
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha25...
+#include "libtransmission/types.h"
 #include "libtransmission/utils.h"
 
 #if !defined(WITH_OPENSSL)
@@ -183,7 +183,7 @@ bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert)
     return check_result(X509_STORE_add_cert(static_cast<X509_STORE*>(handle), static_cast<X509*>(cert)));
 }
 
-tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
+tr_x509_cert_t tr_x509_cert_new(void const* der, long der_length)
 {
     TR_ASSERT(der != nullptr);
 

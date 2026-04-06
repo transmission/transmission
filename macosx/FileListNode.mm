@@ -2,7 +2,11 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#if __has_feature(modules)
 @import AppKit;
+#else
+#import <AppKit/AppKit.h>
+#endif
 
 #import "FileListNode.h"
 

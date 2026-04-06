@@ -47,7 +47,7 @@
 "%lu files" = "%lu ファイル";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%luファイル";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu 着信";
@@ -83,7 +83,7 @@
 "%lu tracker" = "%lu トラッカー";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%luトラッカー";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,7 +94,7 @@
 "%lu web seeds" = "%lu ウェブシード";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%luウェブシード";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u ピース, 各 %2$@";
@@ -121,7 +121,7 @@
 "1 time" = "1 回";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "1トラッカー";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "1 項目を転送";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "1ウェブシード";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "「%@」は正しいトレントファイルではありません。";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "トレントファイルの作成";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "作成日 %@";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "作成日 %1$@ / 作成 %2$@";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "作成 %@";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "「%@」の作成に失敗しました。";

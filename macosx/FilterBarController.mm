@@ -319,24 +319,16 @@ typedef NS_ENUM(NSInteger, FilterTypeTag) {
     [NSNotificationCenter.defaultCenter postNotificationName:@"ApplyFilter" object:nil];
 }
 
-- (void)reset:(BOOL)updateUI
+- (void)reset
 {
     [NSUserDefaults.standardUserDefaults setInteger:kGroupFilterAllTag forKey:@"FilterGroup"];
 
-    if (updateUI)
-    {
-        [self updateGroupsButton];
+    [self updateGroupsButton];
 
-        [self setFilter:self.fNoFilterButton];
+    [self setFilter:self.fNoFilterButton];
 
-        self.fSearchField.stringValue = @"";
-        [self setSearchText:self.fSearchField];
-    }
-    else
-    {
-        [NSUserDefaults.standardUserDefaults setObject:FilterTypeNone forKey:@"Filter"];
-        [NSUserDefaults.standardUserDefaults removeObjectForKey:@"FilterSearchString"];
-    }
+    self.fSearchField.stringValue = @"";
+    [self setSearchText:self.fSearchField];
 }
 
 - (NSArray<NSString*>*)searchStrings

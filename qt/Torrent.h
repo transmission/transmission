@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bitset>
+#include <compare>
 #include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
@@ -18,13 +19,11 @@
 #include <QString>
 #include <QStringList>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/crypto-utils.h>
-#include "libtransmission/tr-macros.h"
 #include <libtransmission/quark.h>
 
 #include "IconCache.h"
+#include "QtCompat.h"
 #include "Speed.h"
 
 class QPixmap;
@@ -38,21 +37,21 @@ extern "C"
 
 struct Peer
 {
-    bool client_is_choked;
-    bool client_is_interested;
-    bool is_downloading_from;
-    bool is_encrypted;
-    bool is_incoming;
-    bool is_uploading_to;
-    bool peer_is_choked;
-    bool peer_is_interested;
+    bool client_is_choked = {};
+    bool client_is_interested = {};
+    bool is_downloading_from = {};
+    bool is_encrypted = {};
+    bool is_incoming = {};
+    bool is_uploading_to = {};
+    bool peer_is_choked = {};
+    bool peer_is_interested = {};
     QString address;
     QString client_name;
     QString flags;
-    int port;
+    int port = {};
     Speed rate_to_client;
     Speed rate_to_peer;
-    double progress;
+    double progress = {};
 };
 
 using PeerList = std::vector<Peer>;
@@ -61,27 +60,27 @@ struct TrackerStat
 {
     [[nodiscard]] QPixmap getFavicon() const;
 
-    bool has_announced;
-    bool has_scraped;
-    bool is_backup;
-    bool last_announce_succeeded;
-    bool last_announce_timed_out;
-    bool last_scrape_succeeded;
-    bool last_scrape_timed_out;
-    int announce_state;
-    int download_count;
-    int id;
-    int last_announce_peer_count;
-    int last_announce_start_time;
-    int last_announce_time;
-    int last_scrape_start_time;
-    int last_scrape_time;
-    int leecher_count;
-    int next_announce_time;
-    int next_scrape_time;
-    int scrape_state;
-    int seeder_count;
-    int tier;
+    bool has_announced = {};
+    bool has_scraped = {};
+    bool is_backup = {};
+    bool last_announce_succeeded = {};
+    bool last_announce_timed_out = {};
+    bool last_scrape_succeeded = {};
+    bool last_scrape_timed_out = {};
+    int announce_state = {};
+    int download_count = {};
+    int id = {};
+    int last_announce_peer_count = {};
+    int last_announce_start_time = {};
+    int last_announce_time = {};
+    int last_scrape_start_time = {};
+    int last_scrape_time = {};
+    int leecher_count = {};
+    int next_announce_time = {};
+    int next_scrape_time = {};
+    int scrape_state = {};
+    int seeder_count = {};
+    int tier = {};
     QString announce;
     QString last_announce_result;
     QString last_scrape_result;
@@ -115,7 +114,7 @@ public:
         : data_{ data }
     {
         auto const hashstr = tr_sha1_to_string(data_);
-        data_str_ = QString::fromUtf8(std::data(hashstr), std::size(hashstr));
+        data_str_ = QString::fromUtf8(std::data(hashstr), static_cast<IF_QT6(qsizetype, int)>(std::size(hashstr)));
     }
 
     explicit TorrentHash(std::string_view const str)
@@ -123,19 +122,14 @@ public:
     {
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto operator==(TorrentHash const& that) const
+    [[nodiscard]] constexpr auto operator==(TorrentHash const& that) const
     {
         return data_ == that.data_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto operator!=(TorrentHash const& that) const
+    [[nodiscard]] constexpr auto operator<=>(TorrentHash const& that) const
     {
-        return !(*this == that);
-    }
-
-    [[nodiscard]] auto operator<(TorrentHash const& that) const
-    {
-        return data_ < that.data_;
+        return data_ <=> that.data_;
     }
 
     [[nodiscard]] constexpr auto& toString() const noexcept
@@ -149,7 +143,8 @@ class Torrent : public QObject
     Q_OBJECT
 
 public:
-    Torrent(Prefs const&, int id);
+    Torrent(Prefs const& prefs, int id);
+    ~Torrent() override = default;
     Torrent(Torrent&&) = delete;
     Torrent(Torrent const&) = delete;
     Torrent& operator=(Torrent&&) = delete;
@@ -204,7 +199,7 @@ public:
 
     [[nodiscard]] constexpr auto hasError() const noexcept
     {
-        return error_ != TR_STAT_OK;
+        return error_ != tr_stat::Error::Ok;
     }
 
     [[nodiscard]] constexpr auto leftUntilDone() const noexcept
@@ -291,21 +286,17 @@ public:
 
     [[nodiscard]] constexpr auto ratio() const noexcept
     {
-        auto const numerator = static_cast<double>(uploadedEver());
-        auto const denominator = sizeWhenDone();
-        return denominator > 0U ? numerator / denominator : double{};
+        return upload_ratio_;
     }
 
     [[nodiscard]] constexpr double percentComplete() const noexcept
     {
-        return totalSize() != 0 ? haveTotal() / static_cast<double>(totalSize()) : 0;
+        return percent_complete_;
     }
 
     [[nodiscard]] constexpr double percentDone() const noexcept
     {
-        auto const l = leftUntilDone();
-        auto const s = sizeWhenDone();
-        return s ? static_cast<double>(s - l) / static_cast<double>(s) : 0.0;
+        return percent_done_;
     }
 
     [[nodiscard]] constexpr auto failedEver() const noexcept
@@ -313,9 +304,9 @@ public:
         return failed_ever_;
     }
 
-    int compareSeedProgress(Torrent const&) const;
-    int compareRatio(Torrent const&) const;
-    int compareETA(Torrent const&) const;
+    std::partial_ordering compareSeedProgress(Torrent const& that) const;
+    std::partial_ordering compareRatio(Torrent const& that) const;
+    std::strong_ordering compareETA(Torrent const& that) const;
 
     [[nodiscard]] constexpr auto getETA() const noexcept
     {
@@ -553,7 +544,7 @@ public:
 
     QIcon getMimeTypeIcon() const;
 
-    enum Field
+    enum Field : uint8_t
     {
         ACTIVITY_DATE,
         ADDED_DATE,
@@ -592,6 +583,7 @@ public:
         PEERS_GETTING_FROM_US,
         PEERS_SENDING_TO_US,
         PEER_LIMIT,
+        PERCENT_COMPLETE,
         PERCENT_DONE,
         PIECE_COUNT,
         PIECE_SIZE,
@@ -611,6 +603,7 @@ public:
         UPLOADED_EVER,
         UPLOAD_LIMIT,
         UPLOAD_LIMITED,
+        UPLOAD_RATIO,
         UPLOAD_SPEED,
         WEBSEEDS_SENDING_TO_US,
 
@@ -630,6 +623,8 @@ private:
     bool is_stalled_ = {};
     bool upload_limited_ = {};
 
+    tr_stat::Error error_ = tr_stat::Error::Ok;
+
     time_t activity_date_ = {};
     time_t added_date_ = {};
     time_t date_created_ = {};
@@ -638,7 +633,6 @@ private:
     time_t start_date_ = {};
 
     int bandwidth_priority_ = {};
-    int error_ = {};
     int eta_ = {};
     int peer_limit_ = {};
     int peers_connected_ = {};
@@ -667,9 +661,11 @@ private:
     uint64_t uploaded_ever_ = {};
 
     double metadata_percent_complete_ = {};
+    double percent_complete_ = {};
     double percent_done_ = {};
     double recheck_progress_ = {};
     double seed_ratio_limit_ = {};
+    double upload_ratio_ = {};
 
     QString comment_;
     QString creator_;

@@ -47,7 +47,7 @@
 "%lu files" = "%lu 個檔案";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%lu 個檔案";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu 個傳入連線";
@@ -83,7 +83,7 @@
 "%lu tracker" = "%lu 個追蹤器";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%lu 個追蹤器";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,7 +94,7 @@
 "%lu web seeds" = "%lu 個網路種子";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%lu 個網路種子";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "總計 %1$u 個區塊，區塊大小為 %2$@";
@@ -121,7 +121,7 @@
 "1 time" = "1 次";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "1 個追蹤器";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "1 個傳輸";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "1 個網路種子";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" 是無效的 Torrent 檔案。";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "建立 Torrent 檔案";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "建立於 %@";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "由 %2$@ 建立於 %1$@";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "由 %@ 建立";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "無法建立 \"%@\"。";

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <algorithm>
+#include <compare>
 #include <string_view>
 
 #include <fmt/format.h>
@@ -21,7 +23,12 @@ public:
 
     explicit tr_interned_string(tr_quark quark)
         : quark_{ quark }
-        , sv_{ tr_quark_get_string_view(quark_) }
+        , sv_{ tr_quark_get_u8string_view(quark_) }
+    {
+    }
+
+    explicit tr_interned_string(std::u8string_view sv)
+        : tr_interned_string{ tr_quark_new(sv) }
     {
     }
 
@@ -38,8 +45,13 @@ public:
     tr_interned_string& operator=(tr_quark quark)
     {
         quark_ = quark;
-        sv_ = tr_quark_get_string_view(quark_);
+        sv_ = tr_quark_get_u8string_view(quark_);
         return *this;
+    }
+
+    tr_interned_string& operator=(std::u8string_view sv)
+    {
+        return *this = tr_quark_new(sv);
     }
 
     tr_interned_string& operator=(std::string_view sv)
@@ -57,19 +69,19 @@ public:
         return quark_;
     }
 
-    [[nodiscard]] constexpr auto sv() const noexcept
+    [[nodiscard]] constexpr auto u8sv() const noexcept
     {
         return sv_;
     }
 
-    [[nodiscard]] constexpr char const* c_str() const noexcept
-    {
-        return std::data(sv()); // tr_quark strs are always zero-terminated
-    }
-
     [[nodiscard]] constexpr auto data() const noexcept
     {
-        return std::data(sv());
+        return std::data(u8sv());
+    }
+
+    [[nodiscard]] char const* c_str() const noexcept
+    {
+        return reinterpret_cast<char const*>(data()); // tr_quark strs are always zero-terminated
     }
 
     [[nodiscard]] constexpr auto empty() const noexcept
@@ -79,7 +91,12 @@ public:
 
     [[nodiscard]] constexpr auto size() const noexcept
     {
-        return std::size(sv());
+        return std::size(u8sv());
+    }
+
+    [[nodiscard]] auto sv() const noexcept
+    {
+        return std::string_view{ reinterpret_cast<char const*>(data()), size() };
     }
 
     constexpr void clear()
@@ -89,83 +106,56 @@ public:
 
     [[nodiscard]] constexpr auto begin() const noexcept
     {
-        return std::begin(sv());
+        return std::begin(u8sv());
     }
 
     [[nodiscard]] constexpr auto end() const noexcept
     {
-        return std::end(sv());
+        return std::end(u8sv());
     }
 
     [[nodiscard]] constexpr auto rbegin() const noexcept
     {
-        return std::rbegin(sv());
+        return std::rbegin(u8sv());
     }
     [[nodiscard]] constexpr auto rend() const noexcept
     {
-        return std::rend(sv());
+        return std::rend(u8sv());
     }
 
-    [[nodiscard]] constexpr auto compare(tr_interned_string const& that) const noexcept // <=>
+    [[nodiscard]] constexpr auto operator<=>(tr_interned_string const& that) const noexcept
     {
-        if (this->quark() < that.quark())
-        {
-            return -1;
-        }
-
-        if (this->quark() > that.quark())
-        {
-            return 1;
-        }
-
-        return 0;
+        return this->quark() <=> that.quark();
     }
-
-    [[nodiscard]] constexpr bool operator<(tr_interned_string const& that) const noexcept
-    {
-        return this->compare(that) < 0;
-    }
-
-    [[nodiscard]] constexpr bool operator>(tr_interned_string const& that) const noexcept
-    {
-        return this->compare(that) > 0;
-    }
-
     [[nodiscard]] constexpr bool operator==(tr_interned_string const& that) const noexcept
     {
-        return this->compare(that) == 0;
-    }
-    [[nodiscard]] constexpr bool operator!=(tr_interned_string const& that) const noexcept
-    {
-        return this->compare(that) != 0;
+        return (*this <=> that) == 0;
     }
 
-    [[nodiscard]] constexpr auto operator==(std::string_view that) const noexcept
+    [[nodiscard]] constexpr auto operator<=>(std::string_view that) const noexcept
     {
-        return sv() == that;
+        return std::lexicographical_compare_three_way(begin(), end(), that.begin(), that.end());
     }
-    [[nodiscard]] constexpr auto operator!=(std::string_view that) const noexcept
+    [[nodiscard]] constexpr bool operator==(std::string_view that) const noexcept
     {
-        return sv() != that;
-    }
-    [[nodiscard]] constexpr bool operator==(char const* that) const noexcept
-    {
-        return *this == std::string_view{ that != nullptr ? that : "" };
-    }
-    [[nodiscard]] constexpr bool operator!=(char const* that) const noexcept
-    {
-        return *this != std::string_view{ that != nullptr ? that : "" };
+        return std::ranges::equal(*this, that);
     }
 
     // NOLINTNEXTLINE(google-explicit-constructor)
-    [[nodiscard]] constexpr operator std::string_view() const noexcept
+    [[nodiscard]] constexpr operator std::u8string_view() const noexcept
+    {
+        return u8sv();
+    }
+
+    // NOLINTNEXTLINE(google-explicit-constructor)
+    [[nodiscard]] operator std::string_view() const noexcept
     {
         return sv();
     }
 
 private:
     tr_quark quark_ = TR_KEY_NONE;
-    std::string_view sv_;
+    std::u8string_view sv_;
 };
 
 template<>

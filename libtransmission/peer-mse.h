@@ -16,8 +16,8 @@
 #include <cstddef> // size_t, std::byte
 #include <cstdint> // uint8_t
 
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 #include "libtransmission/tr-arc4.h"
+#include "libtransmission/types.h" // tr_sha1_digest_t
 
 // Spec: https://wiki.vuze.com/w/Message_Stream_Encryption
 namespace tr_message_stream_encryption

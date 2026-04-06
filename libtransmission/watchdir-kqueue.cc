@@ -22,22 +22,21 @@
 #include <fmt/format.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/log.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h" // for _()
 #include "libtransmission/utils-ev.h"
 #include "libtransmission/watchdir-base.h"
 
-namespace libtransmission
+namespace tr
 {
 namespace
 {
 class KQueueWatchdir final : public impl::BaseWatchdir
 {
 public:
-    KQueueWatchdir(std::string_view dirname, Callback callback, libtransmission::TimerMaker& timer_maker, event_base* evbase)
+    KQueueWatchdir(std::string_view dirname, Callback callback, tr::TimerMaker& timer_maker, event_base* evbase)
         : BaseWatchdir{ dirname, std::move(callback), timer_maker }
     {
         init(evbase);
@@ -71,10 +70,11 @@ private:
         if (kq_ == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -84,11 +84,12 @@ private:
         if (dirfd_ == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
-                fmt::arg("path", dirname()),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
+                    fmt::arg("path", dirname()),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -99,11 +100,12 @@ private:
         if (kevent(kq_, &ke, 1, nullptr, 0, nullptr) == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
-                fmt::arg("path", dirname()),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
+                    fmt::arg("path", dirname()),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -112,20 +114,22 @@ private:
         if (!event_)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't create event: {error} ({error_code})")),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't create event: {error} ({error_code})")),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
         if (event_add(event_.get(), nullptr) == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't add event: {error} ({error_code})")),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't add event: {error} ({error_code})")),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
     }
@@ -142,10 +146,11 @@ private:
         if (kevent(kq_, nullptr, 0, &ke, 1, &ts) == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't read event: {error} ({error_code})")),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't read event: {error} ({error_code})")),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             return;
         }
 
@@ -154,7 +159,7 @@ private:
 
     int kq_ = -1;
     int dirfd_ = -1;
-    libtransmission::evhelpers::event_unique_ptr event_;
+    tr::evhelpers::event_unique_ptr event_;
 };
 
 } // namespace
@@ -168,4 +173,4 @@ std::unique_ptr<Watchdir> Watchdir::create(
     return std::make_unique<KQueueWatchdir>(dirname, std::move(callback), timer_maker, evbase);
 }
 
-} // namespace libtransmission
+} // namespace tr

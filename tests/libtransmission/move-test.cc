@@ -9,23 +9,24 @@
 #include <string_view>
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/block-info.h>
-#include <libtransmission/cache.h> // tr_cacheWriteBlock()
 #include <libtransmission/file.h> // tr_sys_path_*()
+#include <libtransmission/inout.h>
 #include <libtransmission/quark.h>
-#include <libtransmission/torrent.h>
 #include <libtransmission/torrent-files.h>
+#include <libtransmission/torrent.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 auto constexpr MaxWaitMsec = 5000;
@@ -54,8 +55,8 @@ protected:
 
 TEST_P(IncompleteDirTest, incompleteDir)
 {
-    auto const* download_dir = tr_sessionGetDownloadDir(session_);
-    auto const* incomplete_dir = tr_sessionGetIncompleteDir(session_);
+    std::string const download_dir = tr_sessionGetDownloadDir(session_);
+    std::string const incomplete_dir = tr_sessionGetIncompleteDir(session_);
 
     // init an incomplete torrent.
     // the test zero_torrent will be missing its first piece.
@@ -67,15 +68,13 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(path, tr_torrentFindFile(tor, 0));
     path.assign(incomplete_dir, '/', tr_torrentFile(tor, 1).name);
     EXPECT_EQ(path, tr_torrentFindFile(tor, 1));
-    EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor).left_until_done);
 
     auto completeness = TR_LEECH;
-    auto const zeroes_completeness_func =
-        [](tr_torrent* /*torrent*/, tr_completeness c, bool /*was_running*/, void* vc) noexcept
-    {
-        *static_cast<tr_completeness*>(vc) = c;
-    };
-    tr_sessionSetCompletenessCallback(session_, zeroes_completeness_func, &completeness);
+    tr_sessionSetCompletenessCallback(
+        session_,
+        [&completeness](tr_torrent_id_t const /*tor_id*/, tr_completeness const c, bool const /*was_running*/) noexcept
+        { completeness = c; });
 
     struct TestIncompleteDirData
     {
@@ -83,14 +82,18 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_torrent* tor = {};
         tr_block_index_t block = {};
         tr_piece_index_t pieceIndex = {};
-        std::unique_ptr<Cache::BlockData> buf;
+        std::vector<uint8_t> buf;
         bool done = {};
     };
 
     auto const test_incomplete_dir_threadfunc = [](TestIncompleteDirData* data) noexcept
     {
-        data->session->cache->write_block(data->tor->id(), data->block, std::move(data->buf));
-        data->tor->on_block_received(data->block);
+        auto& tor = *data->tor;
+        if (tr_ioWrite(tor, data->session->openFiles(), tor.block_loc(data->block), data->buf) == 0)
+        {
+            data->tor->on_block_received(data->block);
+        }
+
         data->done = true;
     };
 
@@ -104,8 +107,8 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
         for (tr_block_index_t block_index = begin; block_index < end; ++block_index)
         {
-            data.buf = std::make_unique<Cache::BlockData>(tr_block_info::BlockSize);
-            std::fill_n(std::data(*data.buf), tr_block_info::BlockSize, '\0');
+            data.buf.resize(tr_block_info::BlockSize);
+            std::ranges::fill(data.buf, '\0');
             data.block = block_index;
             data.done = false;
             session_->run_in_session_thread(test_incomplete_dir_threadfunc, &data);
@@ -119,7 +122,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     }
 
     blockingTorrentVerify(tor);
-    EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
 
     auto test = [&completeness]()
     {
@@ -136,7 +139,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     }
 
     // cleanup
-    tr_torrentRemove(tor, true, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, true);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -159,12 +162,12 @@ using MoveTest = SessionTest;
 TEST_F(MoveTest, setLocation)
 {
     auto const target_dir = tr_pathbuf{ session_->configDir(), "/target"sv };
-    tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+    tr_sys_dir_create(target_dir, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
     // init a torrent.
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
     blockingTorrentVerify(tor);
-    EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
 
     // now move it
     auto state = -1;
@@ -178,7 +181,7 @@ TEST_F(MoveTest, setLocation)
 
     // confirm the torrent is still complete after being moved
     blockingTorrentVerify(tor);
-    EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
 
     // confirm the files really got moved
     sync();
@@ -190,7 +193,7 @@ TEST_F(MoveTest, setLocation)
     }
 
     // cleanup
-    tr_torrentRemove(tor, true, nullptr, nullptr, nullptr, nullptr);
+    tr_torrentRemove(tor, true);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

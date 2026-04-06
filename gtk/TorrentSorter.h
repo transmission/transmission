@@ -8,14 +8,18 @@
 #include "SorterBase.h"
 #include "Torrent.h"
 
+#include <libtransmission-app/display-modes.h>
+
 #include <glibmm/refptr.h>
+
+using SortMode = tr::app::SortMode;
 
 class TorrentSorter : public SorterBase<Torrent>
 {
     using CompareFunc = int (*)(Torrent const&, Torrent const&);
 
 public:
-    void set_mode(std::string_view mode);
+    void set_mode(SortMode mode);
     void set_reversed(bool is_reversed);
 
     // SorterBase<Torrent>

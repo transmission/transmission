@@ -166,22 +166,6 @@ target_compile_definitions(${TR_NAME}-gtk
         GETTEXT_PACKAGE="${TR_NAME}-gtk"
         $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>)
 
-if(NOT ENABLE_DEPRECATED)
-    target_compile_definitions(${TR_NAME}-gtk
-        PRIVATE
-            G_DISABLE_DEPRECATED
-            GDK_PIXBUF_DISABLE_DEPRECATED
-            GDK_DISABLE_DEPRECATED
-            GTK_DISABLE_DEPRECATED
-            PANGO_DISABLE_DEPRECATED
-            GDKMM_DISABLE_DEPRECATED
-            GIOMM_DISABLE_DEPRECATED
-            GLIBMM_DISABLE_DEPRECATED
-            GTKMM_DISABLE_DEPRECATED
-            PANGOMM_DISABLE_DEPRECATED
-            SIGCXX_DISABLE_DEPRECATED)
-endif()
-
 target_compile_options(${TR_NAME}-gtk
     PRIVATE
         $<$<BOOL:${ENABLE_WERROR}>:$<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>>
@@ -197,9 +181,10 @@ target_include_directories(${TR_NAME}-gtk SYSTEM
 
 target_link_libraries(${TR_NAME}-gtk
     PRIVATE
+        ${TR_NAME}-app
         ${TR_NAME}
         transmission::gtk_impl
-        fmt::fmt-header-only
+        transmission::fmt-header-only
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
 
 if(MSVC)
@@ -225,6 +210,7 @@ set(ICON_NAME_REGEX "^([^_]+)_([^_]+)_([^_]+)_(.+)$")
 foreach(ICON ${PUBLIC_ICONS})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\1/\\3/\\2" ICON_DIR ${ICON})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\4" ICON_NAME ${ICON})
+    string(REGEX REPLACE "^transmission" "transmission-gtk" ICON_NAME ${ICON_NAME})
     install(
         FILES ${SOURCE_ICONS_DIR}/${ICON}
         DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/${ICON_DIR}/

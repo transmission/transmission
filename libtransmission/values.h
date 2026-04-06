@@ -8,13 +8,14 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cmath> // for std::fabs(), std::floor()
+#include <compare>
 #include <cstdint> // for uint64_t
 #include <string>
 #include <string_view>
 
 #include <fmt/format.h>
 
-namespace libtransmission::Values
+namespace tr::Values
 {
 enum class MemoryUnits : uint8_t
 {
@@ -48,7 +49,7 @@ struct Config
     struct Units
     {
         template<typename... Names> // NOLINTNEXTLINE(google-explicit-constructor, cppcoreguidelines-pro-type-member-init)
-        Units(Base base, Names... names) noexcept
+        Units(Base base, Names... names)
         {
             set_base(base);
 
@@ -174,37 +175,11 @@ public:
         return ret /= mult;
     }
 
-    [[nodiscard]] constexpr auto operator<(Value const& that) const noexcept
-    {
-        return compare(that) < 0;
-    }
+    [[nodiscard]] constexpr auto operator<=>(Value const& that) const noexcept = default;
 
-    [[nodiscard]] constexpr auto operator<=(Value const& that) const noexcept
-    {
-        return compare(that) <= 0;
-    }
+    [[nodiscard]] constexpr bool operator==(Value const& that) const noexcept = default;
 
-    [[nodiscard]] constexpr auto operator==(Value const& that) const noexcept
-    {
-        return compare(that) == 0;
-    }
-
-    [[nodiscard]] constexpr auto operator!=(Value const& that) const noexcept
-    {
-        return compare(that) != 0;
-    }
-
-    [[nodiscard]] constexpr auto operator>(Value const& that) const noexcept
-    {
-        return compare(that) > 0;
-    }
-
-    [[nodiscard]] constexpr auto operator>=(Value const& that) const noexcept
-    {
-        return compare(that) >= 0;
-    }
-
-    std::string_view to_string(char* buf, size_t buflen) const noexcept
+    std::string_view to_string(char* buf, size_t buflen) const
     {
         auto idx = size_t{ 0 };
         auto val = 1.0 * base_quantity_;
@@ -246,25 +221,10 @@ public:
 
 private:
     uint64_t base_quantity_ = {};
-
-    [[nodiscard]] constexpr int compare(Value const& that) const noexcept // <=>
-    {
-        if (base_quantity_ < that.base_quantity_)
-        {
-            return -1;
-        }
-
-        if (base_quantity_ > that.base_quantity_)
-        {
-            return 1;
-        }
-
-        return 0;
-    }
 };
 
 using Memory = Value<MemoryUnits, Config::memory>;
 using Storage = Value<StorageUnits, Config::storage>;
 using Speed = Value<SpeedUnits, Config::speed>;
 
-} // namespace libtransmission::Values
+} // namespace tr::Values

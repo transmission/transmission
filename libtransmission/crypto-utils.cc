@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <iterator>
 #include <optional>
+#include <ranges>
 #include <random>
 #include <string>
 #include <string_view>
@@ -19,16 +20,15 @@ extern "C"
 {
 #include <b64/cdecode.h>
 #include <b64/cencode.h>
-}
 
-#include <crc32c/crc32c.h>
+#include <crc32iscsi.h>
+}
 
 #include <fmt/format.h>
 
 #include "libtransmission/crypto-utils.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
-#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
@@ -70,11 +70,7 @@ std::string tr_ssha1(std::string_view plaintext)
     static_assert(std::size(Salter) == 64);
     auto constexpr SaltSize = size_t{ 8 };
     auto salt = tr_rand_obj<std::array<char, SaltSize>>();
-    std::transform(
-        std::begin(salt),
-        std::end(salt),
-        std::begin(salt),
-        [&Salter](auto ch) { return Salter[ch % std::size(Salter)]; });
+    std::ranges::for_each(salt, [&Salter](auto& ch) { ch = Salter[ch % std::size(Salter)]; });
 
     return tr_salt(plaintext, std::string_view{ std::data(salt), std::size(salt) });
 }
@@ -126,6 +122,7 @@ std::string tr_base64_encode(std::string_view input)
     auto buf = std::vector<char>(base64AllocSize(input));
     auto state = base64_encodestate{};
     base64_init_encodestate(&state);
+    // NOLINTNEXTLINE(bugprone-narrowing-conversions): libb64 < 2.0.0 takes `int` argument instead of `size_t`
     size_t len = base64_encode_block(std::data(input), std::size(input), std::data(buf), &state);
     len += base64_encode_blockend(std::data(buf) + len, &state);
     auto str = std::string{};
@@ -142,6 +139,7 @@ std::string tr_base64_decode(std::string_view input)
     auto buf = std::vector<char>(std::size(input) + 8);
     auto state = base64_decodestate{};
     base64_init_decodestate(&state);
+    // NOLINTNEXTLINE(bugprone-narrowing-conversions): libb64 < 2.0.0 takes `int` argument instead of `size_t`
     size_t const len = base64_decode_block(std::data(input), std::size(input), std::data(buf), &state);
     return std::string{ std::data(buf), len };
 }
@@ -174,8 +172,8 @@ constexpr void tr_hex_to_binary(char const* input, void* voutput, size_t byte_le
 
     for (size_t i = 0; i < byte_length; ++i)
     {
-        auto const upper_nibble = Hex.find(std::tolower(*input++));
-        auto const lower_nibble = Hex.find(std::tolower(*input++));
+        auto const upper_nibble = Hex.find(static_cast<char>(std::tolower(*input++)));
+        auto const lower_nibble = Hex.find(static_cast<char>(std::tolower(*input++)));
         *output++ = (uint8_t)((upper_nibble << 4) | lower_nibble);
     }
 }
@@ -212,7 +210,7 @@ std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex)
         return {};
     }
 
-    if (!std::all_of(std::begin(hex), std::end(hex), [](unsigned char ch) { return isxdigit(ch); }))
+    if (!std::ranges::all_of(hex, [](unsigned char ch) { return isxdigit(ch); }))
     {
         return {};
     }
@@ -231,7 +229,7 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
         return {};
     }
 
-    if (!std::all_of(std::begin(hex), std::end(hex), [](unsigned char ch) { return isxdigit(ch); }))
+    if (!std::ranges::all_of(hex, [](unsigned char ch) { return isxdigit(ch); }))
     {
         return {};
     }
@@ -241,9 +239,9 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
     return digest;
 }
 
-uint32_t tr_crc32c(uint8_t const* data, size_t count)
+uint32_t tr_crc32c(void const* data, size_t count)
 {
-    return crc32c::Crc32c(data, count);
+    return crc32iscsi_byte(0U, data, count);
 }
 
 // fallback implementation in case the system crypto library's RNG fails

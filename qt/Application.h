@@ -17,7 +17,7 @@
 #include <QTranslator>
 #include <QWeakPointer>
 
-#include <libtransmission/favicon-cache.h>
+#include <libtransmission-app/favicon-cache.h>
 
 #include "AddData.h"
 #include "Typedefs.h"
@@ -26,6 +26,7 @@
 class AddData;
 class MainWindow;
 class Prefs;
+class RpcClient;
 class Session;
 class Torrent;
 class TorrentModel;
@@ -37,7 +38,8 @@ class Application : public QApplication
 
 public:
     Application(
-        std::unique_ptr<Prefs> prefs,
+        Prefs& prefs,
+        RpcClient& rpc,
         bool minimized,
         QString const& config_dir,
         QStringList const& filenames,
@@ -52,10 +54,7 @@ public:
     void raise() const;
     bool notifyApp(QString const& title, QString const& body, QStringList const& actions = {}) const;
 
-    QString const& intern(QString const& in)
-    {
-        return *interned_strings_.insert(in).first;
-    }
+    QString intern(QString const& in);
 
     [[nodiscard]] QPixmap find_favicon(QString const& sitename) const
     {
@@ -83,16 +82,16 @@ signals:
     void faviconsChanged();
 
 public slots:
-    void addTorrent(AddData) const;
+    void addTorrent(AddData addme) const;
     void addWatchdirTorrent(QString const& filename) const;
 
 private slots:
-    void consentGiven(int result) const;
     void onSessionSourceChanged() const;
     void onTorrentsAdded(torrent_ids_t const& torrent_ids) const;
     void onTorrentsCompleted(torrent_ids_t const& torrent_ids) const;
     void onTorrentsEdited(torrent_ids_t const& torrent_ids) const;
     void onTorrentsNeedInfo(torrent_ids_t const& torrent_ids) const;
+    void pruneInternedStrings();
     void refreshPref(int key) const;
     void refreshTorrents();
     void saveGeometry() const;
@@ -104,11 +103,11 @@ private:
     void maybeUpdateBlocklist() const;
     void loadTranslations();
     QStringList getNames(torrent_ids_t const& ids) const;
-    void notifyTorrentAdded(Torrent const*) const;
+    void notifyTorrentAdded(Torrent const* tor) const;
 
     std::unordered_set<QString> interned_strings_;
 
-    std::unique_ptr<Prefs> prefs_;
+    Prefs& prefs_;
     std::unique_ptr<Session> session_;
     std::unique_ptr<TorrentModel> model_;
     std::unique_ptr<MainWindow> window_;
@@ -116,11 +115,12 @@ private:
     QTimer model_timer_;
     QTimer stats_timer_;
     QTimer session_timer_;
+    QTimer intern_timer_;
     time_t last_full_update_time_ = {};
     QTranslator qt_translator_;
     QTranslator app_translator_;
 
-    FaviconCache<QPixmap> favicon_cache_;
+    tr::app::FaviconCache<QPixmap> favicon_cache_;
 };
 
-#define trApp dynamic_cast<Application*>(Application::instance())
+#define trApp (dynamic_cast<Application*>(Application::instance()))

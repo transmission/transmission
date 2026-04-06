@@ -2,7 +2,7 @@
 <interface domain="transmission-gtk">
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="RelocateDialog">
-    <property name="title" translatable="1">Set Torrent Location</property>
+    <property name="title" translatable="yes">Set Torrent Location</property>
     <child internal-child="content_area">
       <object class="GtkBox" id="dialog_layout">
         <property name="orientation">vertical</property>
@@ -17,7 +17,7 @@
               <object class="GtkFrame">
                 <child type="label">
                   <object class="GtkLabel" id="set_location_section_label">
-                    <property name="label" translatable="1">Location</property>
+                    <property name="label" translatable="yes">Location</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
                     </attributes>
@@ -30,7 +30,7 @@
                     <child>
                       <object class="GtkLabel" id="new_location_label">
                         <property name="halign">start</property>
-                        <property name="label" translatable="1">Torrent _location:</property>
+                        <property name="label" translatable="yes">Torrent _location:</property>
                         <property name="use-underline">1</property>
                         <property name="mnemonic-widget">new_location_button</property>
                         <property name="xalign">0</property>
@@ -52,7 +52,7 @@
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="move_data_radio">
-                        <property name="label" translatable="1">_Move from the current folder</property>
+                        <property name="label" translatable="yes">_Move from the current folder</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
                         <property name="active">1</property>
@@ -65,7 +65,7 @@
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="find_data_radio">
-                        <property name="label" translatable="1">Local data is _already there</property>
+                        <property name="label" translatable="yes">Local data is _already there</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
                         <property name="group">move_data_radio</property>
@@ -90,7 +90,7 @@
         <property name="spacing">6</property>
         <child>
           <object class="GtkButton" id="cancel_button">
-            <property name="label" translatable="1">_Cancel</property>
+            <property name="label" translatable="yes">_Cancel</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
@@ -98,7 +98,7 @@
         </child>
         <child>
           <object class="GtkButton" id="apply_button">
-            <property name="label" translatable="1">_Apply</property>
+            <property name="label" translatable="yes">_Apply</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>

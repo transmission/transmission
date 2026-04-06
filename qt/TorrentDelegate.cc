@@ -16,21 +16,16 @@
 #include <QStyleOptionProgressBar>
 
 #include "Formatter.h"
-#include "IconCache.h"
 #include "StyleHelper.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
 #include "Utils.h"
 
-enum
-{
-    GUI_PAD = 6,
-    BAR_HEIGHT = 12
-};
-
 namespace
 {
+constexpr auto GuiPad = 6;
+constexpr auto BarHeight = 12;
 
 class ItemLayout
 {
@@ -120,11 +115,11 @@ ItemLayout::ItemLayout(
     auto const progress_size = progress_fm.size(0, progress_text_);
 
     auto base_rect = QRect{ top_left, QSize{ width, 0 } };
-    Utils::narrowRect(base_rect, icon_size + GUI_PAD, 0, direction);
+    Utils::narrowRect(base_rect, icon_size + GuiPad, 0, direction);
 
     name_rect = base_rect.adjusted(0, 0, 0, name_size.height());
     status_rect = name_rect.adjusted(0, name_rect.height() + 1, 0, status_size.height() + 1);
-    bar_rect = status_rect.adjusted(0, status_rect.height() + 1, 0, BAR_HEIGHT + 1);
+    bar_rect = status_rect.adjusted(0, status_rect.height() + 1, 0, BarHeight + 1);
     progress_rect = bar_rect.adjusted(0, bar_rect.height() + 1, 0, progress_size.height() + 1);
     icon_rect = QStyle::alignedRect(
         direction,
@@ -444,18 +439,6 @@ QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex 
     return { option.rect.width(), *height_hint_ };
 }
 
-QIcon& TorrentDelegate::getWarningEmblem() const
-{
-    auto& icon = warning_emblem_;
-
-    if (icon.isNull())
-    {
-        icon = IconCache::get().getThemeIcon(QStringLiteral("emblem-important"), QStyle::SP_MessageBoxWarning);
-    }
-
-    return icon;
-}
-
 void TorrentDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
     auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
@@ -547,7 +530,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_state |= QStyle::State_Small | QStyle::State_Horizontal;
 
     auto const emblem_im = is_item_selected ? QIcon::Selected : QIcon::Normal;
-    auto const emblem_icon = tor.hasError() ? getWarningEmblem() : QIcon{};
+    auto const emblem_icon = tor.hasError() ? warningEmblem() : QIcon{};
 
     // layout
     auto const m = margin(*style);

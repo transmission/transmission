@@ -21,7 +21,7 @@ class FileTreeModel final : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    enum
+    enum : uint8_t
     {
         COL_NAME,
         COL_SIZE,
@@ -32,7 +32,7 @@ public:
         NUM_COLUMNS
     };
 
-    enum Role
+    enum Role : uint16_t
     {
         SortRole = Qt::UserRole,
         FileIndexRole,
@@ -40,7 +40,7 @@ public:
         CompleteRole
     };
 
-    FileTreeModel(QObject* parent = nullptr, bool is_editable = true);
+    explicit FileTreeModel(QObject* parent = nullptr, bool is_editable = true);
     FileTreeModel& operator=(FileTreeModel&&) = delete;
     FileTreeModel& operator=(FileTreeModel const&) = delete;
     FileTreeModel(FileTreeModel&&) = delete;
@@ -86,16 +86,16 @@ signals:
     void openRequested(QString const& path);
 
 private:
-    void clearSubtree(QModelIndex const&);
-    QModelIndex indexOf(FileTreeItem*, int column) const;
+    void clearSubtree(QModelIndex const& top);
+    QModelIndex indexOf(FileTreeItem* item, int column) const;
     void emitParentsChanged(
-        QModelIndex const&,
+        QModelIndex const& index,
         int first_column,
         int last_column,
         std::set<QModelIndex>* visited_parent_indices = nullptr);
-    void emitSubtreeChanged(QModelIndex const&, int first_column, int last_column);
+    void emitSubtreeChanged(QModelIndex const& idx, int first_column, int last_column);
     [[nodiscard]] FileTreeItem* findItemForFileIndex(int file_index) const;
-    [[nodiscard]] FileTreeItem* itemFromIndex(QModelIndex const&) const;
+    [[nodiscard]] FileTreeItem* itemFromIndex(QModelIndex const& index) const;
     [[nodiscard]] QModelIndexList getOrphanIndices(QModelIndexList const& indices) const;
 
     std::map<int, FileTreeItem*> index_cache_;

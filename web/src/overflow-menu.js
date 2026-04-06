@@ -244,24 +244,6 @@ export class OverflowMenu extends EventTarget {
 
     add_checkbox(this.action_manager.text('toggle-compact-rows'), listener);
 
-    // contrast
-
-    div = document.createElement('div');
-    div.classList.add('table-row');
-    options.append(div);
-
-    listener = (e) => {
-      e.checked = this.prefs.contrast_mode === Prefs.ContrastMore;
-      e.addEventListener('change', (event_) => {
-        const { checked } = event_.target;
-        this.prefs.contrast_mode = checked
-          ? Prefs.ContrastMore
-          : Prefs.ContrastLess;
-      });
-    };
-
-    add_checkbox(this.action_manager.text('toggle-contrast'), listener);
-
     // fullscreen
 
     div = document.createElement('div');
@@ -285,6 +267,19 @@ export class OverflowMenu extends EventTarget {
     };
 
     add_checkbox('Fullscreen', listener);
+
+    // appearance
+
+    const appearance_text = this.action_manager.text(
+      'open-appearance-settings',
+    );
+    div = make_button(
+      section,
+      appearance_text,
+      'open-appearance-settings',
+      on_click,
+    );
+    options.append(div);
 
     // SPEED LIMIT
 

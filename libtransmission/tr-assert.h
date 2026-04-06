@@ -9,8 +9,6 @@
 
 #include <string_view>
 
-#include "libtransmission/tr-macros.h"
-
 [[noreturn]] bool tr_assert_report(std::string_view file, long line, std::string_view message);
 
 #define TR_ASSERT(x) ((void)((x) || tr_assert_report(__FILE__, __LINE__, #x)))

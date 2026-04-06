@@ -20,6 +20,10 @@ export class ActionManager extends EventTarget {
       'move-down': { enabled: false, text: 'Down' },
       'move-top': { enabled: false, text: 'Top' },
       'move-up': { enabled: false, text: 'Up' },
+      'open-appearance-settings': {
+        enabled: true,
+        text: 'Appearance settings',
+      },
       'open-torrent': {
         enabled: true,
         shortcut: 'O',
@@ -35,10 +39,7 @@ export class ActionManager extends EventTarget {
         enabled: false,
         text: 'Ask tracker for more peers',
       },
-      'remove-selected-torrents': {
-        enabled: false,
-        text: 'Remove selected torrents',
-      },
+      'remove-selected-torrents': { enabled: false, text: 'Remove from list…' },
       'resume-selected-torrents': {
         enabled: false,
         shortcut: 'R',
@@ -86,6 +87,10 @@ export class ActionManager extends EventTarget {
       'start-all-torrents': { enabled: false, text: 'Start all' },
       'toggle-compact-rows': { enabled: true, text: 'Compact rows' },
       'toggle-contrast': { enabled: true, text: 'High contrast UI' },
+      'trash-selected-torrents': {
+        enabled: false,
+        text: 'Trash data and remove from list…',
+      },
       'verify-selected-torrents': {
         enabled: false,
         shortcut: 'V',
@@ -202,6 +207,7 @@ export class ActionManager extends EventTarget {
       'show-inspector',
       'show-labels-dialog',
       'show-move-dialog',
+      'trash-selected-torrents',
       'verify-selected-torrents',
     ]);
 

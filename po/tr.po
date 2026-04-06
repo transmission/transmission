@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-02 17:55+0000\n"
+"POT-Creation-Date: 2026-01-04 14:15+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Turkish (https://app.transifex.com/transmissionbt/teams/33778/tr/)\n"
@@ -30,7 +30,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../cli/cli.cc:94 ../gtk/Utils.cc:119 ../libtransmission/utils.cc:568
+#: ../cli/cli.cc:94 ../gtk/Utils.cc:114 ../gtk/Utils.cc:119
 msgid "None"
 msgstr "Yok"
 
@@ -38,462 +38,450 @@ msgstr "Yok"
 msgid "Inf"
 msgstr "Snsz"
 
-#: ../daemon/daemon.cc:211 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:241 ../libtransmission/blocklist.cc:339 ../libtransmission/blocklist.cc:354 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
+#: ../daemon/daemon.cc:218 ../gtk/Session.cc:817 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "'{path}' okunamadı: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:236 ../gtk/Session.cc:863 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:91
+#: ../daemon/daemon.cc:243 ../gtk/Session.cc:869 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
 msgstr "'{path}' torrent dosyası eklenemedi"
 
-#: ../daemon/daemon.cc:245
+#: ../daemon/daemon.cc:252
 msgid "Removing torrent file '{path}'"
 msgstr "'{path}' torrent dosyası kaldırılıyor"
 
-#: ../daemon/daemon.cc:250 ../gtk/Utils.cc:563 ../libtransmission/utils.cc:636
+#: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:642
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "'{path}' kaldırılamadı: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:659
+#: ../daemon/daemon.cc:741
 msgid "Couldn't parse log level '{level}'"
 msgstr "'{level}' günlük düzeyi ayrıştırılamadı"
 
-#: ../daemon/daemon.cc:707
+#: ../daemon/daemon.cc:793
 msgid "Deferring reload until session is fully started."
 msgstr "Oturum tümüyle başlayana dek yeniden yükleme erteleniyor."
 
-#: ../daemon/daemon.cc:719
+#: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
 msgstr ""
 
-#: ../daemon/daemon.cc:740
+#: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
 msgstr "Ayarlar '{path}' yolundan yeniden yükleniyor"
 
-#: ../daemon/daemon.cc:766
+#: ../daemon/daemon.cc:853
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr "Art alan başlatılamadı: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:778
+#: ../daemon/daemon.cc:865
 msgid "Loading settings from '{path}'"
 msgstr "Ayarlar '{path}' yolundan yükleniyor"
 
-#: ../daemon/daemon.cc:799
+#: ../daemon/daemon.cc:892
 msgid "Saved pidfile '{path}'"
 msgstr "'{path}' pidfile kaydedildi"
 
-#: ../daemon/daemon.cc:805 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:475 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1008 ../libtransmission/torrent.cc:1997 ../libtransmission/variant.cc:876
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1011 ../libtransmission/torrent.cc:2013 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "'{path}' kaydedilemedi: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:814
+#: ../daemon/daemon.cc:908
 msgid "Requiring authentication"
 msgstr "Kimlik doğrulama gerekli"
 
-#: ../daemon/daemon.cc:836
+#: ../daemon/daemon.cc:927
 msgid "Watching '{path}' for new torrent files"
 msgstr "Yeni torrent dosyaları için '{path}' izleniyor"
 
-#: ../daemon/daemon.cc:881 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
+#: ../daemon/daemon.cc:973 ../libtransmission/watchdir-kqueue.cc:120 ../libtransmission/watchdir-win32.cc:197
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr "Olay yaratılamadı: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:891 ../libtransmission/watchdir-kqueue.cc:126
+#: ../daemon/daemon.cc:984 ../libtransmission/watchdir-kqueue.cc:131
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr "Olay eklenemedi: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:905
+#: ../daemon/daemon.cc:999
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr "Art alan olay döngüsü başlatılamadı: {error} ({error_code})"
 
-#: ../gtk/Application.cc:400
+#: ../gtk/Application.cc:402
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr "Transmission, {content_type} işleyicisi olarak kaydedilemedi: {error} ({error_code})"
 
-#: ../gtk/Application.cc:558
+#: ../gtk/Application.cc:560
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr "Sonlanma sinyali alındı, temizce kapatmaya çalışılıyor. Takılırsa yeniden yapın."
 
-#: ../gtk/Application.cc:784
-msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr "Transmission, dosya paylaşım programıdır. Bir torrent çalıştırdığınızda, veriler karşıya yükleme yoluyla herkesin erişimine açılacaktır. Her türlü içerik paylaşımı sizin sorumluluğunuzdadır."
-
-#: ../gtk/Application.cc:790 ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
-msgid "_Cancel"
-msgstr "_İptal"
-
-#: ../gtk/Application.cc:791
-msgid "I _Agree"
-msgstr "_Onaylıyorum"
-
-#: ../gtk/Application.cc:1020
+#: ../gtk/Application.cc:992
 msgid "Closing Connections…"
 msgstr "Bağlantılar Kapatılıyor…"
 
-#: ../gtk/Application.cc:1025
+#: ../gtk/Application.cc:997
 msgid "Sending upload/download totals to tracker…"
 msgstr "Gönderme/indirme toplamları izleyiciye gönderiliyor…"
 
-#: ../gtk/Application.cc:1030
+#: ../gtk/Application.cc:1002
 msgid "_Quit Now"
 msgstr "Şimdi _Çık"
 
-#: ../gtk/Application.cc:1092
+#: ../gtk/Application.cc:1064
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Bozuk torrent eklenemedi"
 msgstr[1] "Bozuk torrentler eklenemedi"
 
-#: ../gtk/Application.cc:1099
+#: ../gtk/Application.cc:1071
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Yinelenen torrent eklenemedi"
 msgstr[1] "Yinelenen torrentler eklenemedi"
 
-#: ../gtk/Application.cc:1420
+#: ../gtk/Application.cc:1396
 msgid "A fast and easy BitTorrent client"
 msgstr "Hızlı ve kolay BitTorrent istemcisi"
 
-#: ../gtk/Application.cc:1421
+#: ../gtk/Application.cc:1397
 msgid "Copyright © The Transmission Project"
 msgstr "Telif Hakkı © Transmission Projesi"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1427
+#: ../gtk/Application.cc:1403
 msgid "translator-credits"
 msgstr ""
 "Ozancan Karataş <ozanc27@icloud.com>\n"
 "Emin Tufan Çetin <etcetin@gmail.com>"
 
-#: ../gtk/DetailsDialog.cc:525 ../gtk/DetailsDialog.cc:543
+#: ../gtk/DetailsDialog.cc:476 ../gtk/DetailsDialog.cc:494
 msgid "Use global settings"
 msgstr "Genel ayarları kullan"
 
-#: ../gtk/DetailsDialog.cc:526
+#: ../gtk/DetailsDialog.cc:477
 msgid "Seed regardless of ratio"
 msgstr "Orandan bağımsız gönderim"
 
-#: ../gtk/DetailsDialog.cc:527
+#: ../gtk/DetailsDialog.cc:478
 msgid "Stop seeding at ratio:"
 msgstr "Şu oranda gönderimi durdur:"
 
-#: ../gtk/DetailsDialog.cc:544
+#: ../gtk/DetailsDialog.cc:495
 msgid "Seed regardless of activity"
 msgstr "Etkinlikten bağımsız gönderim"
 
-#: ../gtk/DetailsDialog.cc:545
+#: ../gtk/DetailsDialog.cc:496
 msgid "Stop seeding if idle for N minutes:"
 msgstr "Şu dakika boyunca boşsa gönderimi durdur:"
 
-#: ../gtk/DetailsDialog.cc:576 ../gtk/Torrent.cc:430
+#: ../gtk/DetailsDialog.cc:527 ../gtk/Torrent.cc:431
 msgid "Queued for verification"
 msgstr "Doğrulama için sıralandı"
 
-#: ../gtk/DetailsDialog.cc:579
+#: ../gtk/DetailsDialog.cc:530
 msgid "Verifying local data"
 msgstr "Yerel veri doğrulanıyor"
 
-#: ../gtk/DetailsDialog.cc:582 ../gtk/Torrent.cc:433
+#: ../gtk/DetailsDialog.cc:533 ../gtk/Torrent.cc:434
 msgid "Queued for download"
 msgstr "İndirme için sıralandı"
 
-#: ../gtk/DetailsDialog.cc:585 ../gtk/FilterBar.cc:476
+#: ../gtk/DetailsDialog.cc:536 ../gtk/FilterBar.cc:477
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "İndiriliyor"
 
-#: ../gtk/DetailsDialog.cc:588 ../gtk/Torrent.cc:436
+#: ../gtk/DetailsDialog.cc:539 ../gtk/Torrent.cc:437
 msgid "Queued for seeding"
 msgstr "Gönderim için sıralandı"
 
-#: ../gtk/DetailsDialog.cc:591 ../gtk/FilterBar.cc:477
+#: ../gtk/DetailsDialog.cc:542 ../gtk/FilterBar.cc:478
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Gönderiliyor"
 
-#: ../gtk/DetailsDialog.cc:594 ../gtk/FilterBar.cc:479 ../gtk/Torrent.cc:427
+#: ../gtk/DetailsDialog.cc:545 ../gtk/FilterBar.cc:480 ../gtk/Torrent.cc:428
 msgid "Finished"
 msgstr "Bitti"
 
-#: ../gtk/DetailsDialog.cc:594 ../gtk/FilterBar.cc:478 ../gtk/Torrent.cc:427
+#: ../gtk/DetailsDialog.cc:545 ../gtk/FilterBar.cc:479 ../gtk/Torrent.cc:428
 msgid "Paused"
 msgstr "Duraklatıldı"
 
-#: ../gtk/DetailsDialog.cc:615 ../gtk/DetailsDialog.cc:620 ../gtk/DetailsDialog.cc:737
+#: ../gtk/DetailsDialog.cc:566 ../gtk/DetailsDialog.cc:571 ../gtk/DetailsDialog.cc:688
 msgid "N/A"
 msgstr "Yok"
 
-#: ../gtk/DetailsDialog.cc:629 ../gtk/FileList.cc:655
+#: ../gtk/DetailsDialog.cc:580 ../gtk/FileList.cc:655
 msgid "Mixed"
 msgstr "Karışık"
 
-#: ../gtk/DetailsDialog.cc:630
+#: ../gtk/DetailsDialog.cc:581
 msgid "No Torrents Selected"
 msgstr "Seçili Torrent Yok"
 
-#: ../gtk/DetailsDialog.cc:659
+#: ../gtk/DetailsDialog.cc:610
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr "Bu izleyiciye özel -- DHT ve PEX etkisizleştirildi"
 
-#: ../gtk/DetailsDialog.cc:659
+#: ../gtk/DetailsDialog.cc:610
 msgid "Public torrent"
 msgstr "Kamusal torrent"
 
-#: ../gtk/DetailsDialog.cc:723
+#: ../gtk/DetailsDialog.cc:674
 msgid "Created by {creator} on {date}"
 msgstr "{creator} tarafından {date} tarihinde yaratıldı"
 
-#: ../gtk/DetailsDialog.cc:729
+#: ../gtk/DetailsDialog.cc:680
 msgid "Created by {creator}"
 msgstr "{creator} tarafından yaratıldı"
 
-#: ../gtk/DetailsDialog.cc:733
+#: ../gtk/DetailsDialog.cc:684
 msgid "Created on {date}"
 msgstr "{date} tarihinde yaratıldı"
 
-#: ../gtk/DetailsDialog.cc:847
+#: ../gtk/DetailsDialog.cc:798
 msgid "Unknown"
 msgstr "Bilinmeyen"
 
-#: ../gtk/DetailsDialog.cc:885 ../gtk/MakeDialog.cc:393
+#: ../gtk/DetailsDialog.cc:836 ../gtk/MakeDialog.cc:393
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] "{file_count:L} dosyada {total_size}"
 msgstr[1] "{file_count:L} dosyada {total_size}"
 
-#: ../gtk/DetailsDialog.cc:900 ../gtk/MakeDialog.cc:401
+#: ../gtk/DetailsDialog.cc:851 ../gtk/MakeDialog.cc:401
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] "({piece_size} boyutlu {piece_count} BitTorrent parçası)"
 msgstr[1] "({piece_size} boyutlu {piece_count} BitTorrent parçası)"
 
-#: ../gtk/DetailsDialog.cc:944
+#: ../gtk/DetailsDialog.cc:895
 msgid "{current_size} ({percent_done}%)"
 msgstr "{current_size} (%{percent_done})"
 
-#: ../gtk/DetailsDialog.cc:952
+#: ../gtk/DetailsDialog.cc:903
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr "{current_size} ({percent_done} / %{percent_available} uygun)"
 
-#: ../gtk/DetailsDialog.cc:962
+#: ../gtk/DetailsDialog.cc:913
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr "{current_size} (%{percent_done} / %{percent_available} uygun; {unverified_size} doğrulanmamış)"
 
-#: ../gtk/DetailsDialog.cc:995
+#: ../gtk/DetailsDialog.cc:947
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
 msgstr "{downloaded_size} (+{discarded_size} özet denetimi sonrası atılan)"
 
-#: ../gtk/DetailsDialog.cc:1025
+#: ../gtk/DetailsDialog.cc:977
 msgid "{uploaded_size} (Ratio: {ratio})"
 msgstr "{uploaded_size} (Oran: {ratio})"
 
-#: ../gtk/DetailsDialog.cc:1066
+#: ../gtk/DetailsDialog.cc:1018
 msgid "No errors"
 msgstr "Hata yok"
 
-#: ../gtk/DetailsDialog.cc:1086
+#: ../gtk/DetailsDialog.cc:1038
 msgid "Never"
 msgstr "Asla"
 
-#: ../gtk/DetailsDialog.cc:1090
+#: ../gtk/DetailsDialog.cc:1042
 msgid "Active now"
 msgstr "Şimdi etkin"
 
-#: ../gtk/DetailsDialog.cc:1504
+#: ../gtk/DetailsDialog.cc:1456
 msgid "Optimistic unchoke"
 msgstr "İyimser kesinti giderme"
 
-#: ../gtk/DetailsDialog.cc:1508
+#: ../gtk/DetailsDialog.cc:1460
 msgid "Downloading from this peer"
 msgstr "Bu eşten indiriliyor"
 
-#: ../gtk/DetailsDialog.cc:1512
+#: ../gtk/DetailsDialog.cc:1464
 msgid "We would download from this peer if they would let us"
 msgstr "Bize izin verirlerse bu eşten indirebiliriz"
 
-#: ../gtk/DetailsDialog.cc:1516
+#: ../gtk/DetailsDialog.cc:1468
 msgid "Uploading to peer"
 msgstr "Eşe gönderiliyor"
 
-#: ../gtk/DetailsDialog.cc:1520
+#: ../gtk/DetailsDialog.cc:1472
 msgid "We would upload to this peer if they asked"
 msgstr "Sorarlarsa bu eşe gönderebiliriz"
 
-#: ../gtk/DetailsDialog.cc:1524
+#: ../gtk/DetailsDialog.cc:1476
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "Eş kesintimizi giderdi, ama ilgilenmiyoruz"
 
-#: ../gtk/DetailsDialog.cc:1528
+#: ../gtk/DetailsDialog.cc:1480
 msgid "We unchoked this peer, but they're not interested"
 msgstr "Bu eşin kesintisini giderdik, ama ilgilenmiyorlar"
 
-#: ../gtk/DetailsDialog.cc:1532
+#: ../gtk/DetailsDialog.cc:1484
 msgid "Encrypted connection"
 msgstr "Şifreli bağlantı"
 
-#: ../gtk/DetailsDialog.cc:1536
+#: ../gtk/DetailsDialog.cc:1488
 msgid "Peer was found through Peer Exchange (PEX)"
 msgstr "Eş Takası (PEX) aracılığıyla eş bulundu"
 
-#: ../gtk/DetailsDialog.cc:1540
+#: ../gtk/DetailsDialog.cc:1492
 msgid "Peer was found through DHT"
 msgstr "DHT aracılığıyla eş bulundu"
 
-#: ../gtk/DetailsDialog.cc:1544
+#: ../gtk/DetailsDialog.cc:1496
 msgid "Peer is an incoming connection"
 msgstr "Eş, bir gelen bağlantıdır"
 
-#: ../gtk/DetailsDialog.cc:1548
+#: ../gtk/DetailsDialog.cc:1500
 msgid "Peer is connected over µTP"
 msgstr "Eş, µTP üzerinden bağlandı"
 
-#: ../gtk/DetailsDialog.cc:1618
+#: ../gtk/DetailsDialog.cc:1570
 msgid "Address"
 msgstr "Adres"
 
 #. % is percent done
-#: ../gtk/DetailsDialog.cc:1626
+#: ../gtk/DetailsDialog.cc:1578
 msgid "%"
 msgstr "%"
 
-#: ../gtk/DetailsDialog.cc:1642
+#: ../gtk/DetailsDialog.cc:1594
 msgid "Dn Reqs"
 msgstr "İnd. İst."
 
-#: ../gtk/DetailsDialog.cc:1649
+#: ../gtk/DetailsDialog.cc:1601
 msgid "Up Reqs"
 msgstr "Yük. İst."
 
-#: ../gtk/DetailsDialog.cc:1656
+#: ../gtk/DetailsDialog.cc:1608
 msgid "Dn Blocks"
 msgstr "İnd. Blokları"
 
-#: ../gtk/DetailsDialog.cc:1663
+#: ../gtk/DetailsDialog.cc:1615
 msgid "Up Blocks"
 msgstr "Yük. Blokları"
 
-#: ../gtk/DetailsDialog.cc:1670
+#: ../gtk/DetailsDialog.cc:1622
 msgid "We Cancelled"
 msgstr "İptal Ettik"
 
-#: ../gtk/DetailsDialog.cc:1677
+#: ../gtk/DetailsDialog.cc:1629
 msgid "They Cancelled"
 msgstr "İptal Ettiler"
 
-#: ../gtk/DetailsDialog.cc:1685 ../gtk/DetailsDialog.cc:1763
+#: ../gtk/DetailsDialog.cc:1637 ../gtk/DetailsDialog.cc:1715
 msgid "Down"
 msgstr "İnd."
 
-#: ../gtk/DetailsDialog.cc:1693
+#: ../gtk/DetailsDialog.cc:1645
 msgid "Up"
 msgstr "Yük."
 
-#: ../gtk/DetailsDialog.cc:1700
+#: ../gtk/DetailsDialog.cc:1652
 msgid "Client"
 msgstr "İstemci"
 
-#: ../gtk/DetailsDialog.cc:1706
+#: ../gtk/DetailsDialog.cc:1658
 msgid "Flags"
 msgstr "Bayraklar"
 
-#: ../gtk/DetailsDialog.cc:1754
+#: ../gtk/DetailsDialog.cc:1706
 msgid "Web Seeds"
 msgstr "Web Gönderimleri"
 
-#: ../gtk/DetailsDialog.cc:1822
+#: ../gtk/DetailsDialog.cc:1774
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
 msgstr[0] "{time_span_ago} {markup_begin}{peer_count} eşin{markup_end} listesi alındı"
 msgstr[1] "{time_span_ago} {markup_begin}{peer_count} eşin{markup_end} listesi alındı"
 
 #. {markup_begin} and {markup_end} should surround the time_span
-#: ../gtk/DetailsDialog.cc:1834
+#: ../gtk/DetailsDialog.cc:1786
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
 msgstr "Eş listesi istemi {markup_begin}{time_span_ago} önce zaman aşımına uğradı{markup_end}; yeniden denenecek"
 
 #. {markup_begin} and {markup_end} should surround the error
-#: ../gtk/DetailsDialog.cc:1843
+#: ../gtk/DetailsDialog.cc:1795
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr "{time_span_ago} önce '{markup_begin}{error}{markup_end}' hatası alındı"
 
-#: ../gtk/DetailsDialog.cc:1856
+#: ../gtk/DetailsDialog.cc:1808
 msgid "No updates scheduled"
 msgstr "Belirlenmiş güncelleştirme yok"
 
-#: ../gtk/DetailsDialog.cc:1863
+#: ../gtk/DetailsDialog.cc:1815
 msgid "Asking for more peers {time_span_from_now}"
 msgstr "{time_span_from_now} içinde daha çok eş sorulacak"
 
-#: ../gtk/DetailsDialog.cc:1870
+#: ../gtk/DetailsDialog.cc:1822
 msgid "Queued to ask for more peers"
 msgstr "Daha çok eş sayısının sorulması için kuyruğa alındı"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
-#: ../gtk/DetailsDialog.cc:1878
+#: ../gtk/DetailsDialog.cc:1830
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
 msgstr "{markup_begin}{time_span_ago}{markup_end} önce daha çok eş soruldu"
 
-#: ../gtk/DetailsDialog.cc:1904
+#: ../gtk/DetailsDialog.cc:1856
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 msgstr "İzleyicide {time_span_ago} {markup_begin}{seeder_count} {seeder_or_seeders} ve {leecher_count} {leecher_or_leechers}{markup_end} vardı"
 
-#: ../gtk/DetailsDialog.cc:1906
+#: ../gtk/DetailsDialog.cc:1858
 msgid "seeder"
 msgid_plural "seeders"
 msgstr[0] "besleyici"
 msgstr[1] "besleyici"
 
-#: ../gtk/DetailsDialog.cc:1908
+#: ../gtk/DetailsDialog.cc:1860
 msgid "leecher"
 msgid_plural "leechers"
 msgstr[0] "indirici"
 msgstr[1] "indirici"
 
 #. {markup_begin} and {markup_end} should surround the error text
-#: ../gtk/DetailsDialog.cc:1917
+#: ../gtk/DetailsDialog.cc:1869
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr "{time_span_ago} önce '{markup_begin}{error}{markup_end}' istek hatası alındı"
 
-#: ../gtk/DetailsDialog.cc:1934
+#: ../gtk/DetailsDialog.cc:1886
 msgid "Asking for peer counts in {time_span_from_now}"
 msgstr "{time_span_from_now} içinde eş sayısı sorulacak"
 
-#: ../gtk/DetailsDialog.cc:1941
+#: ../gtk/DetailsDialog.cc:1893
 msgid "Queued to ask for peer counts"
 msgstr "Eş sayısının sorulması için kuyruğa alındı"
 
-#: ../gtk/DetailsDialog.cc:1948
+#: ../gtk/DetailsDialog.cc:1900
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
 msgstr "{markup_begin}{time_span_ago}{markup_end} önce eş sayısı soruldu"
 
-#: ../gtk/DetailsDialog.cc:2234
+#: ../gtk/DetailsDialog.cc:2186
 msgid "{torrent_name} - Edit Trackers"
 msgstr "{torrent_name} - İzleyicileri Düzenle"
 
-#: ../gtk/DetailsDialog.cc:2268
+#: ../gtk/DetailsDialog.cc:2220
 msgid "List contains invalid URLs"
 msgstr "Liste geçersiz URL'ler içeriyor"
 
-#: ../gtk/DetailsDialog.cc:2273 ../gtk/FileList.cc:866
+#: ../gtk/DetailsDialog.cc:2225 ../gtk/FileList.cc:867
 msgid "Please correct the errors and try again."
 msgstr "Lütfen hataları düzeltip yeniden deneyin."
 
-#: ../gtk/DetailsDialog.cc:2355
+#: ../gtk/DetailsDialog.cc:2307
 msgid "{torrent_name} - Add Tracker"
 msgstr "{torrent_name} - İzleyici Ekle"
 
-#: ../gtk/DetailsDialog.cc:2471 ../gtk/ui/gtk3/DetailsDialog.ui:796 ../gtk/ui/gtk4/DetailsDialog.ui:597
+#: ../gtk/DetailsDialog.cc:2414 ../gtk/ui/gtk3/DetailsDialog.ui:796 ../gtk/ui/gtk4/DetailsDialog.ui:597
 msgid "Trackers"
 msgstr "İzleyiciler"
 
-#: ../gtk/DetailsDialog.cc:2650
+#: ../gtk/DetailsDialog.cc:2593
 msgid "{torrent_name} Properties"
 msgstr "{torrent_name} Özellikleri"
 
-#: ../gtk/DetailsDialog.cc:2655
+#: ../gtk/DetailsDialog.cc:2598
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] "Özellikler - {torrent_count:L} Torrent"
@@ -541,6 +529,10 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Bu torrentlerin birinin indirilmesi bitmedi."
 msgstr[1] "Bu torrentlerin bazılarının indirilmesi bitmedi."
 
+#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+msgid "_Cancel"
+msgstr "_İptal"
+
 #: ../gtk/Dialogs.cc:121
 msgid "_Delete"
 msgstr "_Sil"
@@ -549,64 +541,64 @@ msgstr "_Sil"
 msgid "_Remove"
 msgstr "_Kaldır"
 
-#: ../gtk/FileList.cc:643 ../gtk/Utils.cc:739
+#: ../gtk/FileList.cc:643 ../gtk/Utils.cc:741
 msgid "High"
 msgstr "Yüksek"
 
-#: ../gtk/FileList.cc:647 ../gtk/Utils.cc:740
+#: ../gtk/FileList.cc:647 ../gtk/Utils.cc:742
 msgid "Normal"
 msgstr "Normal"
 
-#: ../gtk/FileList.cc:651 ../gtk/Utils.cc:741
+#: ../gtk/FileList.cc:651 ../gtk/Utils.cc:743
 msgid "Low"
 msgstr "Düşük"
 
-#: ../gtk/FileList.cc:857 ../gtk/Session.cc:322
+#: ../gtk/FileList.cc:858 ../gtk/Session.cc:324
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "'{old_path}', '{path}' olarak yeniden adlandırılamadı: {error} ({error_code})"
 
-#: ../gtk/FileList.cc:962 ../gtk/MessageLogWindow.cc:342
+#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:342
 msgid "Name"
 msgstr "Ad"
 
-#: ../gtk/FileList.cc:992
+#: ../gtk/FileList.cc:993
 msgid "Size"
 msgstr "Boyut"
 
-#: ../gtk/FileList.cc:1002
+#: ../gtk/FileList.cc:1003
 msgid "Have"
 msgstr "Eldeki"
 
-#: ../gtk/FileList.cc:1013
+#: ../gtk/FileList.cc:1014
 msgid "Download"
 msgstr "İndir"
 
-#: ../gtk/FileList.cc:1024
+#: ../gtk/FileList.cc:1025
 msgid "Priority"
 msgstr "Öncelik"
 
-#: ../gtk/FilterBar.cc:327 ../gtk/FilterBar.cc:473
+#: ../gtk/FilterBar.cc:332 ../gtk/FilterBar.cc:474
 msgid "All"
 msgstr "Tümü"
 
-#: ../gtk/FilterBar.cc:475
+#: ../gtk/FilterBar.cc:476
 msgid "Active"
 msgstr "Etkin"
 
-#: ../gtk/FilterBar.cc:480
+#: ../gtk/FilterBar.cc:481
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Doğrulanıyor"
 
-#: ../gtk/FilterBar.cc:481 ../gtk/FreeSpaceLabel.cc:58
+#: ../gtk/FilterBar.cc:482 ../gtk/FreeSpaceLabel.cc:58
 msgid "Error"
 msgstr "Hata"
 
-#: ../gtk/FilterBar.cc:589 ../gtk/ui/gtk3/FilterBar.ui:13 ../gtk/ui/gtk4/FilterBar.ui:8
+#: ../gtk/FilterBar.cc:590 ../gtk/ui/gtk3/FilterBar.ui:13 ../gtk/ui/gtk4/FilterBar.ui:8
 msgid "_Show:"
 msgstr "_Göster:"
 
-#: ../gtk/FilterBar.cc:590
+#: ../gtk/FilterBar.cc:591
 msgid "_Show {count:L} of:"
 msgstr "Şunun {count:L} tanesini göster:"
 
@@ -614,7 +606,7 @@ msgstr "Şunun {count:L} tanesini göster:"
 msgid "{disk_space} free"
 msgstr "{disk_space} boş"
 
-#: ../gtk/MainWindow.cc:384
+#: ../gtk/MainWindow.cc:385
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
@@ -622,7 +614,7 @@ msgstr ""
 "Tıklayarak Alternatif Hız Sınırlarını etkisizleştir\n"
 "({download_speed} indirme, {upload_speed} gönderme)"
 
-#: ../gtk/MainWindow.cc:385
+#: ../gtk/MainWindow.cc:386
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
@@ -630,65 +622,65 @@ msgstr ""
 "Tıklayarak Alternatif Hız Sınırlarını etkinleştir\n"
 "({download_speed} indirme, {upload_speed} gönderme)"
 
-#: ../gtk/MainWindow.cc:437
+#: ../gtk/MainWindow.cc:438
 msgid "Unlimited"
 msgstr "Sınırsız"
 
-#: ../gtk/MainWindow.cc:500
+#: ../gtk/MainWindow.cc:501
 msgid "Seed Forever"
 msgstr "Sürekli Dağıt"
 
-#: ../gtk/MainWindow.cc:539
+#: ../gtk/MainWindow.cc:540
 msgid "Limit Download Speed"
 msgstr "İndirme Hızını Sınırla"
 
-#: ../gtk/MainWindow.cc:540
+#: ../gtk/MainWindow.cc:541
 msgid "Limit Upload Speed"
 msgstr "Gönderme Hızını Sınırla"
 
-#: ../gtk/MainWindow.cc:544
+#: ../gtk/MainWindow.cc:545
 msgid "Stop Seeding at Ratio"
 msgstr "Belli Orana Ulaşıldığında Dağıtımı Durdur"
 
-#: ../gtk/MainWindow.cc:584
+#: ../gtk/MainWindow.cc:585
 msgid "Stop at Ratio ({ratio})"
 msgstr "Oranda Dur ({ratio})"
 
-#: ../gtk/MainWindow.cc:598
+#: ../gtk/MainWindow.cc:599
 msgid "Total Ratio"
 msgstr "Toplam Oran"
 
-#: ../gtk/MainWindow.cc:599
+#: ../gtk/MainWindow.cc:600
 msgid "Session Ratio"
 msgstr "Oturum Oranı"
 
-#: ../gtk/MainWindow.cc:600
+#: ../gtk/MainWindow.cc:601
 msgid "Total Transfer"
 msgstr "Toplam Aktarım"
 
-#: ../gtk/MainWindow.cc:601
+#: ../gtk/MainWindow.cc:602
 msgid "Session Transfer"
 msgstr "Oturum Aktarımı"
 
-#: ../gtk/MainWindow.cc:766 ../gtk/MainWindow.cc:787 ../gtk/Torrent.cc:449
+#: ../gtk/MainWindow.cc:767 ../gtk/MainWindow.cc:788 ../gtk/Torrent.cc:450
 msgid "Ratio: {ratio}"
 msgstr "Oran: {ratio}"
 
-#: ../gtk/MainWindow.cc:772
+#: ../gtk/MainWindow.cc:773
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr "İnen: {downloaded_size}, Gönderilen: {uploaded_size}"
 
-#: ../gtk/MainWindow.cc:780
+#: ../gtk/MainWindow.cc:781
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr "İnen: {downloaded_size}, Gönderilen: {uploaded_size}"
 
-#: ../gtk/MainWindow.cc:814
+#: ../gtk/MainWindow.cc:815
 msgid "{download_speed} ▼"
 msgstr "{download_speed} ▼"
 
-#: ../gtk/MainWindow.cc:817 ../gtk/Torrent.cc:628
+#: ../gtk/MainWindow.cc:818 ../gtk/Torrent.cc:629
 msgid "{upload_speed} ▲"
 msgstr "{upload_speed} ▲"
 
@@ -700,7 +692,7 @@ msgstr "'{path}' yaratılıyor"
 msgid "Created '{path}'"
 msgstr "'{path}' yaratıldı"
 
-#: ../gtk/MakeDialog.cc:213 ../libtransmission/open-files.cc:170 ../libtransmission/session-id.cc:68
+#: ../gtk/MakeDialog.cc:213 ../libtransmission/open-files.cc:171 ../libtransmission/session-id.cc:69
 msgid "Couldn't create '{path}': {error} ({error_code})"
 msgstr "'{path}' yaratılamadı: {error} ({error_code})"
 
@@ -753,27 +745,27 @@ msgstr "İleti"
 msgid "Time"
 msgstr "Süre"
 
-#: ../gtk/Notify.cc:148
+#: ../gtk/Notify.cc:149
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
 msgstr "'{bus}' için vekil yaratılamadı: {error} ({error_code})"
 
-#: ../gtk/Notify.cc:233
+#: ../gtk/Notify.cc:234
 msgid "Open File"
 msgstr "Dosya Aç"
 
-#: ../gtk/Notify.cc:238
+#: ../gtk/Notify.cc:239
 msgid "Open Folder"
 msgstr "Klasör Aç"
 
-#: ../gtk/Notify.cc:252
+#: ../gtk/Notify.cc:253
 msgid "Torrent Complete"
 msgstr "Torrent Tamamlandı"
 
-#: ../gtk/Notify.cc:274
+#: ../gtk/Notify.cc:275
 msgid "Start Now"
 msgstr "Şimdi Başlat"
 
-#: ../gtk/Notify.cc:286
+#: ../gtk/Notify.cc:287
 msgid "Torrent Added"
 msgstr "Torrent Eklendi"
 
@@ -892,27 +884,27 @@ msgstr "Torrent taşınamadı"
 msgid "This may take a moment…"
 msgstr "Bu biraz zaman alabilir…"
 
-#: ../gtk/Session.cc:797 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
+#: ../gtk/Session.cc:802 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
 msgstr "'{path}' okunamadı"
 
 #. logging
-#: ../gtk/Session.cc:1085
+#: ../gtk/Session.cc:1087
 msgid "Inhibiting desktop hibernation"
 msgstr "Masaüstünün hazırda bekletilmesi engelleniyor"
 
-#: ../gtk/Session.cc:1092 ../gtk/Session.cc:1118
+#: ../gtk/Session.cc:1094 ../gtk/Session.cc:1120
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "Masaüstünün hazırda bekletilmesi engellenemedi: {error}"
 
 #. logging
-#: ../gtk/Session.cc:1113
+#: ../gtk/Session.cc:1115
 msgid "Allowing desktop hibernation"
 msgstr "Masaüstünün hazırda bekletilmesine izin veriliyor"
 
-#: ../gtk/Session.cc:1232
-msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr "{tag} etiketi için bekleyen RPC istemi bulunamadı"
+#: ../gtk/Session.cc:1236
+msgid "Couldn't find pending RPC request for id {id}"
+msgstr ""
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -936,81 +928,81 @@ msgstr "Bu istatistikler yalnızca bilginiz içindir. Onları sıfırlamanız Bi
 msgid "{upload_speed} ▲ {download_speed} ▼"
 msgstr "{upload_speed} ▲ {download_speed} ▼"
 
-#: ../gtk/Torrent.cc:441
+#: ../gtk/Torrent.cc:442
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr "Yerel veri doğrulanıyor (%{percent_done} sınandı)"
 
-#: ../gtk/Torrent.cc:468
+#: ../gtk/Torrent.cc:469
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr "{current_size} / {complete_size} (%{percent_done})"
 
-#: ../gtk/Torrent.cc:479
+#: ../gtk/Torrent.cc:480
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr "{current_size} / {complete_size} (%{percent_complete}), gönderilen {uploaded_size} (Oran: {ratio}, Hedef: {seed_ratio})"
 
-#: ../gtk/Torrent.cc:492
+#: ../gtk/Torrent.cc:493
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr "{current_size} / {complete_size} (%{percent_complete}), gönderilen {uploaded_size} (Oran: {ratio})"
 
-#: ../gtk/Torrent.cc:502
+#: ../gtk/Torrent.cc:503
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr "{complete_size}, gönderilen {uploaded_size} (Oran: {ratio}, Hedef: {seed_ratio})"
 
-#: ../gtk/Torrent.cc:511
+#: ../gtk/Torrent.cc:512
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr "{complete_size}, gönderilen {uploaded_size} (Oran: {ratio})"
 
-#: ../gtk/Torrent.cc:524
+#: ../gtk/Torrent.cc:525
 msgid "Remaining time unknown"
 msgstr "Kalan süre bilinmiyor"
 
-#: ../gtk/Torrent.cc:621
+#: ../gtk/Torrent.cc:622
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr "{download_speed} ▼  {upload_speed} ▲"
 
-#: ../gtk/Torrent.cc:633
+#: ../gtk/Torrent.cc:634
 msgid "Stalled"
 msgstr "Kesinti"
 
-#: ../gtk/Torrent.cc:644
+#: ../gtk/Torrent.cc:645
 msgid "Tracker warning: '{warning}'"
 msgstr "İzleyici uyarısı: '{warning}'"
 
-#: ../gtk/Torrent.cc:647
+#: ../gtk/Torrent.cc:648
 msgid "Tracker Error: '{error}'"
 msgstr "İzleyici Hatası: '{error}'"
 
-#: ../gtk/Torrent.cc:650
+#: ../gtk/Torrent.cc:651
 msgid "Local error: '{error}'"
 msgstr "Yerel hata: '{error}'"
 
-#: ../gtk/Torrent.cc:674
+#: ../gtk/Torrent.cc:675
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
 msgstr[0] "{active_count} bağlı eşten üst veri indiriliyor (%{percent_done} bitti)"
 msgstr[1] "{active_count} bağlı eşten üst veri indiriliyor (%{percent_done} bitti)"
 
-#: ../gtk/Torrent.cc:685
+#: ../gtk/Torrent.cc:686
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] "{active_count} / {connected_count} bağlı eşten ve web besleyicisinden indiriliyor"
 msgstr[1] "{active_count} / {connected_count} bağlı eşten ve web besleyicisinden indiriliyor"
 
-#: ../gtk/Torrent.cc:696
+#: ../gtk/Torrent.cc:697
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] "{active_count} web besleyicisinden indiriliyor"
 msgstr[1] "{active_count} web besleyicisinden indiriliyor"
 
-#: ../gtk/Torrent.cc:704
+#: ../gtk/Torrent.cc:705
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] "{active_count} / {connected_count} bağlı eşten indiriliyor"
 msgstr[1] "{active_count} / {connected_count} bağlı eşten indiriliyor"
 
-#: ../gtk/Torrent.cc:713
+#: ../gtk/Torrent.cc:714
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] "{active_count} / {connected_count} bağlı eşe gönderiliyor"
@@ -1124,24 +1116,24 @@ msgstr "'{path}' torrent dosyası halihazırda '{torrent_name}' tarafından kull
 msgid "Couldn't open torrent"
 msgstr "Torrent açılamadı"
 
-#: ../gtk/Utils.cc:545
+#: ../gtk/Utils.cc:546
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
 msgstr "'{path}' çöpe taşınamadı: {error} ({error_code})"
 
-#: ../gtk/Utils.cc:652
+#: ../gtk/Utils.cc:654
 msgid "Couldn't open '{url}'"
 msgstr "'{url}' açılamadı"
 
-#: ../gtk/Utils.cc:863 ../libtransmission/announcer.cc:186 ../libtransmission/announcer.cc:205
+#: ../gtk/Utils.cc:865 ../libtransmission/announcer.cc:186 ../libtransmission/announcer.cc:205
 msgid "Unsupported URL: '{url}'"
 msgstr "Desteklenmeyen URL: '{url}'"
 
 #. modal
-#: ../gtk/Utils.cc:869
+#: ../gtk/Utils.cc:871
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr "Transmission şunun nasıl kullanılacağını bilmiyor: '{url}'"
 
-#: ../gtk/Utils.cc:874
+#: ../gtk/Utils.cc:876
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr "Bu mıknatıs bağlantısı BitTorrent'ten başka bir şey içinmiş gibi görünüyor."
 
@@ -2137,18 +2129,18 @@ msgstr "İzleyici yanıtlamıyor"
 msgid "Success"
 msgstr "Başarılı"
 
-#: ../libtransmission/blocklist.cc:82 ../libtransmission/blocklist.cc:405
+#: ../libtransmission/blocklist.cc:85 ../libtransmission/blocklist.cc:412
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
 msgstr[0] "'{path}' engel listesinin {count} girdisi var"
 msgstr[1] "'{path}' engel listesinin {count} girdisi var"
 
 #. don't try to display the actual lines - it causes issues
-#: ../libtransmission/blocklist.cc:260
+#: ../libtransmission/blocklist.cc:264
 msgid "Couldn't parse line: '{line}'"
 msgstr "Satır ayrıştırılamadı: '{line}'"
 
-#: ../libtransmission/blocklist.cc:388
+#: ../libtransmission/blocklist.cc:394
 msgid "Rewriting old blocklist file format to new format"
 msgstr "Eski engel listesi biçimi yeni biçimde yeniden yazılıyor"
 
@@ -2160,19 +2152,19 @@ msgstr "{crypto_library} hatası: {error} ({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "'{path}' alınamadı: {error} ({error_code})"
 
-#: ../libtransmission/ip-cache.cc:283
+#: ../libtransmission/ip-cache.cc:291
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "Kaynak {protocol} adresi başarıyla {ip} olarak güncellendi"
 
-#: ../libtransmission/ip-cache.cc:297
+#: ../libtransmission/ip-cache.cc:305
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
 msgstr ""
 
-#: ../libtransmission/ip-cache.cc:305
+#: ../libtransmission/ip-cache.cc:313
 msgid "Your machine does not support {protocol}"
 msgstr "Makineniz {protocol} iletişim kuralını desteklemiyor"
 
-#: ../libtransmission/ip-cache.cc:331
+#: ../libtransmission/ip-cache.cc:340
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "Küresel {type} adresi {url} kullanılarak {ip} olarak başarıyla güncellendi"
 
@@ -2180,83 +2172,83 @@ msgstr "Küresel {type} adresi {url} kullanılarak {ip} olarak başarıyla günc
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "Bunun gibi birçok ileti! Bu oturumda bu iletiyi artık yazmayacağım."
 
-#: ../libtransmission/makemeta.cc:80 ../libtransmission/watchdir.cc:52
+#: ../libtransmission/makemeta.cc:81 ../libtransmission/watchdir.cc:53
 msgid "Skipping '{path}': {error} ({error_code})"
 msgstr "'{path}' atlanıyor: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:192
+#: ../libtransmission/net.cc:203
 msgid "Couldn't create socket: {error} ({error_code})"
 msgstr "Yuva yaratılamadı: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:268
+#: ../libtransmission/net.cc:280
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
 msgstr "{socket} üstündeki {address} kaynak adresi belirlenemedi: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:287
+#: ../libtransmission/net.cc:300
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr "{socket} yuvası {address}:{port} adresine bağlanamadı: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:351
+#: ../libtransmission/net.cc:361
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
 msgstr "{address} üstündeki {port} bağlantı noktası sarılamadı: {error} ({error_code}) -- Başka bir Transmission kopyası mı çalışıyor?"
 
-#: ../libtransmission/net.cc:352
+#: ../libtransmission/net.cc:362
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
 msgstr "{address} üstündeki {port} bağlantı noktası sarılamadı: {error} ({error_code})"
 
-#: ../libtransmission/open-files.cc:192
+#: ../libtransmission/open-files.cc:194
 msgid "Couldn't open '{path}': {error} ({error_code})"
 msgstr "'{path}' açılamadı: {error} ({error_code})"
 
-#: ../libtransmission/open-files.cc:220
+#: ../libtransmission/open-files.cc:223
 msgid "Couldn't preallocate '{path}': {error} ({error_code})"
 msgstr "'{path}' önden pay edilemedi: {error} ({error_code})"
 
-#: ../libtransmission/open-files.cc:239
+#: ../libtransmission/open-files.cc:243
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "'{path}' kesilemedi: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:673
+#: ../libtransmission/peer-io.cc:676
 msgid "Unknown state: {state}"
 msgstr "Bilinmeyen durum: {state}"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:91
+#: ../libtransmission/port-forwarding-natpmp.cc:92
 msgid "Found public address '{address}'"
 msgstr "'{address}' genel adresi bulundu"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:129
+#: ../libtransmission/port-forwarding-natpmp.cc:130
 msgid "Port {port} is no longer forwarded"
 msgstr "{port} bağlantı noktası artık yönlendirilmiyor"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:178
+#: ../libtransmission/port-forwarding-natpmp.cc:179
 msgid "Port {port} forwarded successfully"
 msgstr "{port} bağlantı noktası başarıyla yönlendirildi"
 
-#: ../libtransmission/port-forwarding-upnp.cc:273
+#: ../libtransmission/port-forwarding-upnp.cc:274
 msgid "Found Internet Gateway Device '{url}'"
 msgstr "'{url}' İnternet Ağ Geçidi Aygıtı bulundu"
 
-#: ../libtransmission/port-forwarding-upnp.cc:275
+#: ../libtransmission/port-forwarding-upnp.cc:276
 msgid "Local Address is '{address}'"
 msgstr "Yerel Adres şudur: '{address}'"
 
-#: ../libtransmission/port-forwarding-upnp.cc:300
+#: ../libtransmission/port-forwarding-upnp.cc:302
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
 msgstr "Yerel bağlantı noktası {local_port} şuna yönlendirilmedi: {advertised_port} "
 
-#: ../libtransmission/port-forwarding-upnp.cc:312
+#: ../libtransmission/port-forwarding-upnp.cc:315
 msgid "Stopping port forwarding through '{url}', service '{type}'"
 msgstr "'{url}', '{type}' servisi üzerinden bağlantı noktası yönlendirme durduruluyor"
 
-#: ../libtransmission/port-forwarding-upnp.cc:345
+#: ../libtransmission/port-forwarding-upnp.cc:349
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
 msgstr "Bağlantı noktası '{url}', '{type}' servisi üzerinden yönlendiriliyor. (yerel adres: {address}:{port})"
 
-#: ../libtransmission/port-forwarding-upnp.cc:354
+#: ../libtransmission/port-forwarding-upnp.cc:359
 msgid "Forwarded local port {local_port} to {advertised_port}"
 msgstr "Yerel bağlantı noktası {local_port} şuraya yönlendirildi: {advertised_port}"
 
-#: ../libtransmission/port-forwarding-upnp.cc:362
+#: ../libtransmission/port-forwarding-upnp.cc:367
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
 msgstr "Eğer yönlendiriciniz UPnP destekliyorsa lütfen UPnP'yi etkinleştirin!"
 
@@ -2276,97 +2268,97 @@ msgstr "Durduruluyor"
 msgid "Not forwarded"
 msgstr "Yönlendirilmedi"
 
-#: ../libtransmission/port-forwarding.cc:201
+#: ../libtransmission/port-forwarding.cc:202
 msgid "Mapped private port {private_port} to public port {public_port}"
 msgstr "{private_port} özel bağlantı noktası {public_port} genel bağlantı noktasına eşlendi"
 
-#: ../libtransmission/port-forwarding.cc:217
+#: ../libtransmission/port-forwarding.cc:219
 msgid "State changed from '{old_state}' to '{state}'"
 msgstr "'{old_state}' durumu '{state}' oldu"
 
-#: ../libtransmission/rpc-server.cc:104
+#: ../libtransmission/rpc-server.cc:105
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr "Unix yuva yolu {count} karakterden ('{prefix}' ön eki ile) az olmalıdır"
 
-#: ../libtransmission/rpc-server.cc:342
+#: ../libtransmission/rpc-server.cc:348
 msgid "Rejected request from {host} (possible directory traversal attack)"
 msgstr "{host} tarafından reddedilen istek (olası dizin geçiş saldırısı)"
 
-#: ../libtransmission/rpc-server.cc:506
+#: ../libtransmission/rpc-server.cc:536
 msgid "Rejected request from {host} (brute force protection active)"
 msgstr "{host} tarafından reddedilen istek (kaba kuvvet koruması etkin)"
 
-#: ../libtransmission/rpc-server.cc:515
+#: ../libtransmission/rpc-server.cc:545
 msgid "Rejected request from {host} (IP not whitelisted)"
 msgstr "{host} tarafından reddedilen istek (IP beyaz listeye eklenmemiş)"
 
-#: ../libtransmission/rpc-server.cc:538
+#: ../libtransmission/rpc-server.cc:569
 msgid "Rejected request from {host} (failed authentication)"
 msgstr "{host} tarafından reddedilen istek (kimlik doğrulaması başarısız oldu)"
 
-#: ../libtransmission/rpc-server.cc:580
+#: ../libtransmission/rpc-server.cc:611
 msgid "Rejected request from {host} (Host not whitelisted)"
 msgstr "{host} tarafından reddedilen istek (Ana makine beyaz listede değil)"
 
-#: ../libtransmission/rpc-server.cc:612
+#: ../libtransmission/rpc-server.cc:649
 msgid "Unknown URI from {host}: '{uri}'"
 msgstr "{host} ana makinesinden bilinmeyen URI: '{uri}'"
 
-#: ../libtransmission/rpc-server.cc:631
+#: ../libtransmission/rpc-server.cc:669
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr "Unix yuvaları Windows'ta desteklenmiyor. Ayarlarınızdaki '{key}' değiştirilmelidir."
 
-#: ../libtransmission/rpc-server.cc:658
+#: ../libtransmission/rpc-server.cc:697
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr "RPC yuva kipi {mode:#o} olarak belirlenemedi, 0755 olarak öntanımlanıyor"
 
-#: ../libtransmission/rpc-server.cc:722
+#: ../libtransmission/rpc-server.cc:814
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "{count} deneme sonrası {address} adresine sarılamadı, bırakılıyor"
 msgstr[1] "{count} deneme sonrası {address} adresine sarılamadı, bırakılıyor"
 
-#: ../libtransmission/rpc-server.cc:734
+#: ../libtransmission/rpc-server.cc:827
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr "'{address}' üstünde RPC ve Web istemleri dinleniyor"
 
-#: ../libtransmission/rpc-server.cc:763
+#: ../libtransmission/rpc-server.cc:857
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr "'{address}' üstünde RPC ve Web istemleri dinleme durduruldu"
 
-#: ../libtransmission/rpc-server.cc:787
+#: ../libtransmission/rpc-server.cc:881
 msgid "Added '{entry}' to host whitelist"
 msgstr "'{entry}' ana makine beyaz listesine eklendi"
 
-#: ../libtransmission/rpc-server.cc:908
+#: ../libtransmission/rpc-server.cc:1003
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr "'{key}' , '{value}' olarak ayarlandı ancak IPv4, IPv6 adresi veya Unix yuva yolu olmalıdır. Öntanımlı '0.0.0.0' değeri kullanılıyor."
 
-#: ../libtransmission/rpc-server.cc:921
+#: ../libtransmission/rpc-server.cc:1016
 msgid "Serving RPC and Web requests on {address}"
 msgstr "{address} üstünde RPC ve Web istemleri sunuluyor"
 
-#: ../libtransmission/rpc-server.cc:926
+#: ../libtransmission/rpc-server.cc:1021
 msgid "Whitelist enabled"
 msgstr "Beyaz liste etkin"
 
-#: ../libtransmission/rpc-server.cc:931
+#: ../libtransmission/rpc-server.cc:1026
 msgid "Password required"
 msgstr "Parola gerekli"
 
-#: ../libtransmission/rpc-server.cc:938
+#: ../libtransmission/rpc-server.cc:1033
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr "'{path}' yolundan RPC ve Web istemleri sunuluyor"
 
-#: ../libtransmission/rpcimpl.cc:1158
+#: ../libtransmission/rpcimpl.cc:1496
 msgid "Couldn't test port: {error} ({error_code})"
 msgstr "Bağlantı noktası sınanamadı: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1213
+#: ../libtransmission/rpcimpl.cc:1566
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr "Engel listesi alınamadı: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1340
+#: ../libtransmission/rpcimpl.cc:1707
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr "Torrent alınamadı: {error} ({error_code})"
 
@@ -2378,23 +2370,23 @@ msgstr "Kurbağa kipini kapama zamanı"
 msgid "Time to turn on turtle mode"
 msgstr "Kurbağa kipini açma zamanı"
 
-#: ../libtransmission/session-id.cc:150
+#: ../libtransmission/session-id.cc:152
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr "'{path}' oturum kilit dosyası açılamadı: {error} ({error_code})"
 
-#: ../libtransmission/session.cc:420
+#: ../libtransmission/session.cc:423
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "{hostport} üstünde gelen eş bağlantıları dinleniyor"
 
-#: ../libtransmission/session.cc:739
+#: ../libtransmission/session.cc:748
 msgid "Transmission version {version} starting"
 msgstr "Transmission {version} sürümü başlatılıyor"
 
-#: ../libtransmission/session.cc:1428
+#: ../libtransmission/session.cc:1488
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission {version} sürümü kapatılıyor"
 
-#: ../libtransmission/session.cc:1509
+#: ../libtransmission/session.cc:1570
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "{count} torrent yüklendi"
@@ -2404,115 +2396,119 @@ msgstr[1] "{count} torrent yüklendi"
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Torrent dosyası '{old_path}' konumundan '{path}' konumuna taşındı"
 
-#: ../libtransmission/torrent.cc:138
+#: ../libtransmission/torrent.cc:139
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "'{magnet}' için '{path}' yolundan üst veri bilgisi kullanılamadı: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:167
+#: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr "Veri bulunamadı! Sürücülerinizin bağlı olduğundan emin olun ya da \"Konumu Ayarla\"yı kullanın. Yeniden indirmek için \"Yerel Veriyi Doğrula\"yı kullanın ve ardından torrent'i başlatın."
 
-#: ../libtransmission/torrent.cc:404
+#: ../libtransmission/torrent.cc:405
 msgid "Calling script '{path}'"
 msgstr "'{path}' betiği çağrılıyor"
 
-#: ../libtransmission/torrent.cc:412
+#: ../libtransmission/torrent.cc:413
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "'{path}' betiği çağrılamadı: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:446
+#: ../libtransmission/torrent.cc:447
 msgid "Seed ratio reached; pausing torrent"
 msgstr "Gönderim oranına ulaşıldı; torrent duraklatılıyor"
 
-#: ../libtransmission/torrent.cc:453
+#: ../libtransmission/torrent.cc:454
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "Gönderim boş bekleme sınırı aşıldı; torrent duraklatılıyor"
 
-#: ../libtransmission/torrent.cc:614
+#: ../libtransmission/torrent.cc:615
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Elle yeniden başlatıldı -- gönderim oranı etkizisleştiriliyor"
 
-#: ../libtransmission/torrent.cc:670
+#: ../libtransmission/torrent.cc:671
 msgid "Pausing torrent"
 msgstr "Torrent duraklatılıyor"
 
-#: ../libtransmission/torrent.cc:723
+#: ../libtransmission/torrent.cc:725
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr "Tüm torrent dosyaları kaldırılamadı: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:789
+#: ../libtransmission/torrent.cc:791
 msgid "Removing torrent"
 msgstr "Torrent kaldırılıyor"
 
-#: ../libtransmission/torrent.cc:1106 ../libtransmission/torrent.cc:1612
+#: ../libtransmission/torrent.cc:1110 ../libtransmission/torrent.cc:1618
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "'{old_path}' yolundan '{path}' yoluna taşınamadı: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1554
+#: ../libtransmission/torrent.cc:1560
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr "Veri bulunamadığından torrent duraklatıldı! Sürücülerinizin bağlı olduğundan emin olun ya da \"Konumu Ayarla\"yı kullanın, ardından \"Yerel Veriyi Doğrula\"yı yeniden kullanın. Yeniden indirmek için torrent'i başlatın."
 
-#: ../libtransmission/torrent.cc:2050
+#: ../libtransmission/torrent.cc:2066
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr "İzleyici uyarısı: '{warning}' ({url})"
 
-#: ../libtransmission/tr-dht.cc:553
+#: ../libtransmission/tr-dht.cc:554
 msgid "Couldn't parse '{filename}' line: '{line}'"
 msgstr "'{filename}' dosyasında şu satır ayrıştırılamadı: '{line}'"
 
-#: ../libtransmission/tr-dht.cc:577
+#: ../libtransmission/tr-dht.cc:579
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
 msgstr "'{address}:{port}' adresine bakılamadı: {error} ({error_code})"
 
-#: ../libtransmission/tr-lpd.cc:270 ../libtransmission/tr-lpd.cc:283
+#: ../libtransmission/tr-lpd.cc:271 ../libtransmission/tr-lpd.cc:285
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
 msgstr "{ip_protocol} LPD başlatılamadı: {error} ({error_code})"
 
-#: ../libtransmission/tr-udp.cc:180
+#: ../libtransmission/tr-udp.cc:186
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
 msgstr "IPv4 yuvası asenkron duruma getirilemedi {address}: {error} ({error_code})"
 
-#: ../libtransmission/tr-udp.cc:191
+#: ../libtransmission/tr-udp.cc:198
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
 msgstr "{address} IPv4 yuvası sarılamadı: {error} ({error_code})"
 
-#: ../libtransmission/tr-udp.cc:225
+#: ../libtransmission/tr-udp.cc:233
 msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
 msgstr "IPv6 yuvası asenkron duruma getirilemedi {address}: {error} ({error_code})"
 
-#: ../libtransmission/tr-udp.cc:236
+#: ../libtransmission/tr-udp.cc:245
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
 msgstr "{address} IPv6 yuvası sarılamadı: {error} ({error_code})"
+
+#: ../libtransmission/tr-udp.cc:265
+msgid "Couldn't create any UDP sockets."
+msgstr ""
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
 msgstr "Bilinmeyen yuva ailesi"
 
-#: ../libtransmission/utils.cc:147
+#: ../libtransmission/utils.cc:150
 msgid "Couldn't read '{path}': Not a regular file"
 msgstr "'{path}' okunamadı: Sıradan dosya değil"
 
-#: ../libtransmission/variant-json.cc:241
+#: ../libtransmission/variant-json.cc:257
 msgid "Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"
 msgstr "JSON, {position} konumunda ayrıştırılamadı '{text}': {error} ({error_code})"
 
-#: ../libtransmission/watchdir-inotify.cc:86 ../libtransmission/watchdir-inotify.cc:98 ../libtransmission/watchdir-inotify.cc:110 ../libtransmission/watchdir-kqueue.cc:75 ../libtransmission/watchdir-kqueue.cc:88 ../libtransmission/watchdir-kqueue.cc:103
+#: ../libtransmission/watchdir-inotify.cc:87 ../libtransmission/watchdir-inotify.cc:100 ../libtransmission/watchdir-inotify.cc:113 ../libtransmission/watchdir-kqueue.cc:76 ../libtransmission/watchdir-kqueue.cc:90 ../libtransmission/watchdir-kqueue.cc:106
 msgid "Couldn't watch '{path}': {error} ({error_code})"
 msgstr "'{path}' izlenemedi: {error} ({error_code})"
 
-#: ../libtransmission/watchdir-inotify.cc:142 ../libtransmission/watchdir-kqueue.cc:146 ../libtransmission/watchdir-win32.cc:294
+#: ../libtransmission/watchdir-inotify.cc:146 ../libtransmission/watchdir-kqueue.cc:152 ../libtransmission/watchdir-win32.cc:297
 msgid "Couldn't read event: {error} ({error_code})"
 msgstr "Olay okunamadı: {error} ({error_code})"
 
-#: ../libtransmission/watchdir-inotify.cc:151 ../libtransmission/watchdir-win32.cc:303
+#: ../libtransmission/watchdir-inotify.cc:156 ../libtransmission/watchdir-win32.cc:307
 msgid "Couldn't read event: expected {expected_size}, got {actual_size}"
 msgstr "Olay okunamadı: {expected_size} beklendi, {actual_size} alındı"
 
-#: ../libtransmission/watchdir-inotify.cc:168 ../libtransmission/watchdir-win32.cc:328
+#: ../libtransmission/watchdir-inotify.cc:174 ../libtransmission/watchdir-win32.cc:333
 msgid "Couldn't read filename: {error} ({error_code})"
 msgstr "Dosya adı okunamadı: {error} ({error_code})"
 
-#: ../libtransmission/watchdir-inotify.cc:177 ../libtransmission/watchdir-win32.cc:337
+#: ../libtransmission/watchdir-inotify.cc:184 ../libtransmission/watchdir-win32.cc:343
 msgid "Couldn't read filename: expected {expected_size}, got {actual_size}"
 msgstr "Dosya adı okunamadı: {expected_size} beklendi, {actual_size} alındı"
 
@@ -2520,27 +2516,27 @@ msgstr "Dosya adı okunamadı: {expected_size} beklendi, {actual_size} alındı"
 msgid "Couldn't convert '{path}' to native path"
 msgstr "'{path}', doğal yola çevrilemedi"
 
-#: ../libtransmission/watchdir-win32.cc:184
+#: ../libtransmission/watchdir-win32.cc:185
 msgid "Couldn't create pipe: {error} ({error_code})"
 msgstr "Boru oluşturulamadı: {error} ({error_code})"
 
-#: ../libtransmission/watchdir-win32.cc:209
+#: ../libtransmission/watchdir-win32.cc:211
 msgid "Couldn't create thread"
 msgstr "İş parçacığı yaratılamadı"
 
-#: ../libtransmission/watchdir-win32.cc:247
+#: ../libtransmission/watchdir-win32.cc:249
 msgid "Couldn't read directory changes"
 msgstr "Dizin değişiklikeri okunamadı"
 
-#: ../libtransmission/watchdir-win32.cc:254
+#: ../libtransmission/watchdir-win32.cc:256
 msgid "Couldn't wait for directory changes"
 msgstr "Dizin değişiklikleri için beklenemedi"
 
-#: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
+#: ../libtransmission/web.cc:170 ../libtransmission/web.cc:180
 msgid "Consider upgrading your curl installation."
 msgstr "Curl kurulumunuzu yükseltmeyi düşünün."
 
-#: ../libtransmission/web.cc:175
+#: ../libtransmission/web.cc:173
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
 msgstr "curl {curl_version} SIGPIPE çökmelerine eğilimlidir. {details_url}"
 
@@ -2548,19 +2544,19 @@ msgstr "curl {curl_version} SIGPIPE çökmelerine eğilimlidir. {details_url}"
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
 msgstr "curl {curl_version}, transmission-daemon systemd hizmeti için SIGABRT çökmelerine neden olabilecek bir eventfd çift kapatma güvenlik açığına eğilimlidir. {details_url}"
 
-#: ../libtransmission/web.cc:201
+#: ../libtransmission/web.cc:202
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr "envvar CURL_CA_BUNDLE kullanılarak izleyici sertifikaları doğrulanacak: {bundle}"
 
-#: ../libtransmission/web.cc:203
+#: ../libtransmission/web.cc:204
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr "NB: bu yalnızca openssl veya gnutls ile libcurl'e karşı inşa ederseniz çalışır, nss ile DEĞİL"
 
-#: ../libtransmission/web.cc:204
+#: ../libtransmission/web.cc:205
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr "NB: Geçersiz sertifikalar diğer birçok hata gibi 'İzleyiciye bağlanılamadı' olarak görülecektir"
 
-#: ../libtransmission/web.cc:501
+#: ../libtransmission/web.cc:514
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr "'{url}' alınamadı: HTTP yanıt kodu olarak {expected_code} beklendi, {actual_code} alındı"
 
@@ -2576,26 +2572,35 @@ msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
 msgstr[0] "{piece_count:L} parça, {piece_size}\n"
 msgstr[1] "{piece_count:L} parça, her biri {piece_size}\n"
 
-#: ../utils/remote.cc:138
+#: ../utils/remote.cc:143
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "saat"
 msgstr[1] "saat"
 
-#: ../utils/remote.cc:139
+#: ../utils/remote.cc:144
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "dakika"
 msgstr[1] "dakika"
 
-#: ../utils/remote.cc:140 ../utils/remote.cc:160
+#: ../utils/remote.cc:145 ../utils/remote.cc:165
 msgid "seconds"
 msgid_plural "seconds"
 msgstr[0] "saniye"
 msgstr[1] "saniye"
 
-#: ../utils/remote.cc:144
+#: ../utils/remote.cc:149
 msgid "day"
 msgid_plural "days"
 msgstr[0] "gün"
 msgstr[1] "gün"
+
+#~ msgid "Couldn't find pending RPC request for tag {tag}"
+#~ msgstr "{tag} etiketi için bekleyen RPC istemi bulunamadı"
+
+#~ msgid "I _Agree"
+#~ msgstr "_Onaylıyorum"
+
+#~ msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
+#~ msgstr "Transmission, dosya paylaşım programıdır. Bir torrent çalıştırdığınızda, veriler karşıya yükleme yoluyla herkesin erişimine açılacaktır. Her türlü içerik paylaşımı sizin sorumluluğunuzdadır."

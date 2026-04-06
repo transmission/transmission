@@ -4,19 +4,21 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
 
 #include <small/map.hpp>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announce-list.h"
 #include "libtransmission/error.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/quark.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 
@@ -105,7 +107,7 @@ bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier
         tracker.scrape = *scrape_str;
     }
 
-    auto const it = std::lower_bound(std::begin(trackers_), std::end(trackers_), tracker);
+    auto const it = std::ranges::lower_bound(trackers_, tracker);
     trackers_.insert(it, tracker);
 
     return true;
@@ -175,7 +177,7 @@ tr_announce_list::trackers_t::iterator tr_announce_list::find(tr_tracker_id_t id
     {
         return tracker.id == id;
     };
-    return std::find_if(std::begin(trackers_), std::end(trackers_), test);
+    return std::ranges::find_if(trackers_, test);
 }
 
 tr_announce_list::trackers_t::iterator tr_announce_list::find(std::string_view announce)
@@ -184,7 +186,7 @@ tr_announce_list::trackers_t::iterator tr_announce_list::find(std::string_view a
     {
         return announce == tracker.announce.sv();
     };
-    return std::find_if(std::begin(trackers_), std::end(trackers_), test);
+    return std::ranges::find_if(trackers_, test);
 }
 
 // if two announce URLs differ only by scheme, put them in the same tier.
@@ -206,8 +208,8 @@ tr_tracker_tier_t tr_announce_list::get_tier(tr_tracker_tier_t tier, tr_url_pars
         return candidate->host == announce.host && candidate->path == announce.path;
     };
 
-    auto const it = std::find_if(std::begin(trackers_), std::end(trackers_), is_sibling);
-    return it != std::end(trackers_) ? it->tier : tier;
+    auto const it = std::ranges::find_if(trackers_, is_sibling);
+    return it != std::ranges::end(trackers_) ? it->tier : tier;
 }
 
 bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
@@ -230,7 +232,7 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
             tracker_parsed->port == announce.port && tracker_parsed->path == announce.path &&
             tracker_parsed->query == announce.query;
     };
-    return std::none_of(std::begin(trackers_), std::end(trackers_), is_same);
+    return std::ranges::none_of(trackers_, is_same);
 }
 
 tr_variant tr_announce_list::to_tiers_variant() const

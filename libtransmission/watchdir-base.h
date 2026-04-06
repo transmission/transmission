@@ -23,7 +23,7 @@
 #include "libtransmission/timer.h"
 #include "libtransmission/watchdir.h"
 
-namespace libtransmission::impl
+namespace tr::impl
 {
 // base class for concrete tr_watchdirs
 class BaseWatchdir : public Watchdir
@@ -152,4 +152,4 @@ private:
     std::chrono::seconds timeout_duration_ = std::chrono::seconds{ 15 };
 };
 
-} // namespace libtransmission::impl
+} // namespace tr::impl

@@ -9,9 +9,9 @@
 
 #include <libtransmission/block-info.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using BlockInfoTest = ::testing::Test;
+using BlockInfoTest = ::tr::test::TransmissionTest;
 
 TEST_F(BlockInfoTest, fieldsAreSet)
 {
@@ -136,6 +136,41 @@ TEST_F(BlockInfoTest, blockLoc)
     EXPECT_EQ(0U, loc.piece_offset);
 }
 
+TEST_F(BlockInfoTest, blockLastLoc)
+{
+    static auto constexpr ExpectedBlockSize = uint64_t{ 1024U } * 16U;
+    static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
+    static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    static auto constexpr PieceCount = uint64_t{ 5U };
+    static auto constexpr TotalSize = (PieceSize * (PieceCount - 1U)) + 1U;
+
+    auto const info = tr_block_info{ TotalSize, PieceSize };
+
+    // begin
+    auto loc = info.block_last_loc(0);
+    EXPECT_EQ(ExpectedBlockSize - 1U, loc.byte);
+    EXPECT_EQ(0U, loc.block);
+    EXPECT_EQ(ExpectedBlockSize - 1U, loc.block_offset);
+    EXPECT_EQ(0U, loc.piece);
+    EXPECT_EQ(ExpectedBlockSize - 1U, loc.piece_offset);
+
+    // third block is halfway through the first piece
+    loc = info.block_last_loc(2);
+    EXPECT_EQ((ExpectedBlockSize * 3U) - 1U, loc.byte);
+    EXPECT_EQ(2U, loc.block);
+    EXPECT_EQ(ExpectedBlockSize - 1U, loc.block_offset);
+    EXPECT_EQ(0U, loc.piece);
+    EXPECT_EQ((ExpectedBlockSize * 3U) - 1U, loc.piece_offset);
+
+    // second piece aligns with fifth block
+    loc = info.block_last_loc(4);
+    EXPECT_EQ(PieceSize + ExpectedBlockSize - 1U, loc.byte);
+    EXPECT_EQ(4U, loc.block);
+    EXPECT_EQ(ExpectedBlockSize - 1U, loc.block_offset);
+    EXPECT_EQ(1U, loc.piece);
+    EXPECT_EQ(ExpectedBlockSize - 1U, loc.piece_offset);
+}
+
 TEST_F(BlockInfoTest, pieceLoc)
 {
     static auto constexpr ExpectedBlockSize = uint64_t{ 1024U } * 16U;
@@ -242,4 +277,31 @@ TEST_F(BlockInfoTest, byteLoc)
     EXPECT_EQ(0U, loc.block_offset);
     EXPECT_EQ(1U, loc.piece);
     EXPECT_EQ(0U, loc.piece_offset);
+}
+
+TEST_F(BlockInfoTest, byteSpans)
+{
+    static auto constexpr ExpectedBlockSize = uint64_t{ 1024U } * 16U;
+    static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
+    static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    static auto constexpr PieceCount = uint64_t{ 5U };
+    static auto constexpr TotalSize = (PieceSize * (PieceCount - 1U)) + 1U;
+
+    auto const info = tr_block_info{ TotalSize, PieceSize };
+
+    auto span = info.byte_span_for_block(0);
+    EXPECT_EQ(0U, span.begin);
+    EXPECT_EQ(ExpectedBlockSize, span.end);
+
+    span = info.byte_span_for_block(info.block_count() - 1U);
+    EXPECT_EQ(TotalSize - 1U, span.begin);
+    EXPECT_EQ(TotalSize, span.end);
+
+    span = info.byte_span_for_req(0, ExpectedBlockSize, ExpectedBlockSize / 2U);
+    EXPECT_EQ(ExpectedBlockSize, span.begin);
+    EXPECT_EQ(ExpectedBlockSize + (ExpectedBlockSize / 2U), span.end);
+
+    span = info.byte_span_for_req(1, PieceSize - 1U, 1U);
+    EXPECT_EQ((PieceSize * 2U) - 1U, span.begin);
+    EXPECT_EQ(PieceSize * 2U, span.end);
 }

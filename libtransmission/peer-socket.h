@@ -23,8 +23,8 @@ struct tr_session;
 class tr_peer_socket
 {
 public:
-    using InBuf = libtransmission::BufferWriter<std::byte>;
-    using OutBuf = libtransmission::BufferReader<std::byte>;
+    using InBuf = tr::BufferWriter<std::byte>;
+    using OutBuf = tr::BufferReader<std::byte>;
 
     tr_peer_socket() = default;
     tr_peer_socket(tr_session const* session, tr_socket_address const& socket_address, tr_socket_t sock);

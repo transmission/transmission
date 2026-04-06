@@ -3,6 +3,7 @@
    License text can be found in the licenses/ folder. */
 
 import { AboutDialog } from './about-dialog.js';
+import { Appearance } from './appearance-settings.js';
 import { ContextMenu } from './context-menu.js';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
@@ -18,11 +19,7 @@ import { LabelsDialog } from './labels-dialog.js';
 import { ShortcutsDialog } from './shortcuts-dialog.js';
 import { StatisticsDialog } from './statistics-dialog.js';
 import { Torrent } from './torrent.js';
-import {
-  TorrentRow,
-  TorrentRendererCompact,
-  TorrentRendererFull,
-} from './torrent-row.js';
+import { TorrentRendererCompact, TorrentRendererFull } from './torrent-row.js';
 import {
   newOpts,
   icon,
@@ -31,6 +28,7 @@ import {
   setEnabled,
   setTextContent,
 } from './utils.js';
+import Clusterize from 'clusterize.js';
 
 export class Transmission extends EventTarget {
   constructor(action_manager, notifications, prefs) {
@@ -72,13 +70,13 @@ export class Transmission extends EventTarget {
     // Initialize the implementation fields
     this.filterText = '';
     this._torrents = {};
-    this._rows = [];
+    this._selectedTorrentIds = new Set();
+    this._torrentOrder = [];
+    this._clusterize = null;
     this.oldTrackers = [];
-    this.dirtyTorrents = new Set();
 
     this.changeStatus = false;
-    this.refilterSoon = debounce(() => this._refilter(false));
-    this.refilterAllSoon = debounce(() => this._refilter(true));
+    this.refilterAllSoon = debounce(() => this._refilter());
 
     this.pointer_device = Object.seal({
       is_touch_device: 'ontouchstart' in globalThis,
@@ -141,6 +139,17 @@ export class Transmission extends EventTarget {
         case 'move-up':
           this._moveUp();
           break;
+        case 'open-appearance-settings':
+          if (
+            this.popup[Transmission.default_popup_level] instanceof Appearance
+          ) {
+            this.popup[Transmission.default_popup_level].close();
+          } else {
+            this.setCurrentPopup(
+              new Appearance(this.prefs, this.action_manager),
+            );
+          }
+          break;
         case 'open-torrent':
           this.setCurrentPopup(new OpenDialog(this, this.remote));
           break;
@@ -154,7 +163,7 @@ export class Transmission extends EventTarget {
           this._reannounceTorrents(this.getSelectedTorrents());
           break;
         case 'remove-selected-torrents':
-          this._removeSelectedTorrents();
+          this._removeSelectedTorrents(false);
           break;
         case 'resume-selected-torrents':
           this._startSelectedTorrents(false);
@@ -217,6 +226,9 @@ export class Transmission extends EventTarget {
             this.prefs.display_mode === Prefs.DisplayCompact
               ? Prefs.DisplayFull
               : Prefs.DisplayCompact;
+          break;
+        case 'trash-selected-torrents':
+          this._removeSelectedTorrents(true);
           break;
         case 'verify-selected-torrents':
           this._verifyTorrents(this.getSelectedTorrents());
@@ -296,8 +308,12 @@ export class Transmission extends EventTarget {
     this._setupSearchBox();
 
     this.elements = {
+      torrent_container: document.querySelector('#torrent-container'),
       torrent_list: document.querySelector('#torrent-list'),
     };
+
+    // Setup clusterize for virtual scrolling
+    this._initializeClusterize();
 
     const right_click = (event_) => {
       // if not already, highlight the torrent
@@ -305,9 +321,15 @@ export class Transmission extends EventTarget {
       while (row_element && !row_element.classList.contains('torrent')) {
         row_element = row_element.parentNode;
       }
-      const row = this._rows.find((r) => r.getElement() === row_element);
-      if (row && !row.isSelected()) {
-        this._setSelectedRow(row);
+
+      // Find torrent by data-torrent-id instead of row object
+      const torrentId = row_element?.dataset?.torrentId;
+      if (torrentId) {
+        const torrentIdNum = Number.parseInt(torrentId, 10);
+        if (!this._selectedTorrentIds.has(torrentIdNum)) {
+          this._setSelectedTorrent(torrentIdNum);
+          this._last_torrent_clicked = torrentIdNum;
+        }
       }
 
       if (this.handler) {
@@ -319,7 +341,12 @@ export class Transmission extends EventTarget {
       event_.preventDefault();
     };
 
+    // Set up click handlers
     this.pointer_event(this.elements.torrent_list, right_click);
+    this.elements.torrent_list.addEventListener(
+      'click',
+      this._onRowClicked.bind(this),
+    );
 
     // Get preferences & torrents from the daemon
     this.loadDaemonPrefs();
@@ -335,6 +362,50 @@ export class Transmission extends EventTarget {
     for (const [key, value] of this.prefs.entries()) {
       this._onPrefChanged(key, value);
     }
+  }
+
+  _initializeClusterize() {
+    // Initialize clusterize.js for virtual scrolling
+    this._clusterize = new Clusterize({
+      blocks_in_cluster: 4,
+      callbacks: {
+        clusterChanged: () => {
+          // Update selections on newly rendered rows
+          this._updateVisibleSelections();
+        },
+      },
+      contentId: 'torrent-list',
+      no_data_class: '',
+      no_data_text: '',
+      rows: ['<li></li>'],
+      rows_in_block: 25,
+      scrollId: 'torrent-container',
+      show_no_data_row: true,
+      tag: 'li',
+    });
+  }
+
+  _generateTorrentRowHTML(torrent) {
+    // Use existing renderers to create a temporary DOM element, then extract HTML
+    const isCompact = this.prefs.display_mode === Prefs.DisplayCompact;
+    const renderer = isCompact
+      ? new TorrentRendererCompact()
+      : new TorrentRendererFull();
+
+    // Create temporary row using existing renderer
+    const tempRow = renderer.createRow(torrent);
+    tempRow.dataset.torrentId = torrent.getId();
+
+    // Add selection class if needed
+    if (this._selectedTorrentIds.has(torrent.getId())) {
+      tempRow.classList.add('selected');
+    }
+
+    // Render the content using existing renderer
+    renderer.render(this, torrent, tempRow);
+
+    // Return the HTML string
+    return tempRow.outerHTML;
   }
 
   _openTorrentFromUrl() {
@@ -353,7 +424,7 @@ export class Transmission extends EventTarget {
 
   loadDaemonPrefs() {
     this.remote.loadDaemonPrefs((data) => {
-      this.session_properties = data.arguments;
+      this.session_properties = data.result;
       this._openTorrentFromUrl();
     });
   }
@@ -402,7 +473,6 @@ export class Transmission extends EventTarget {
         // Add custom class to the body/html element to get the appropriate contrast color scheme
         document.body.classList.remove('contrast-more', 'contrast-less');
         document.body.classList.add(`contrast-${value}`);
-        // this.refilterAllSoon();
         break;
       }
 
@@ -411,6 +481,16 @@ export class Transmission extends EventTarget {
       case Prefs.SortMode:
         this.refilterAllSoon();
         break;
+
+      case Prefs.HighlightColor: {
+        document.body.classList.remove('highlight-legacy', 'highlight-system');
+        if (!value) {
+          document.body.classList.add('highlight-legacy');
+        } else if (value === 'Highlight') {
+          document.body.classList.add('highlight-system');
+        }
+        break;
+      }
 
       case Prefs.RefreshRate: {
         clearInterval(this.refreshTorrentsInterval);
@@ -518,89 +598,129 @@ export class Transmission extends EventTarget {
 
   seedRatioLimit() {
     const p = this.session_properties;
-    if (p && p.seedRatioLimited) {
-      return p.seedRatioLimit;
+    if (p && p.seed_ratio_limited) {
+      return p.seed_ratio_limit;
     }
     return -1;
   }
 
   /// SELECTION
 
-  _getSelectedRows() {
-    return this._rows.filter((r) => r.isSelected());
-  }
-
   getSelectedTorrents() {
-    return this._getSelectedRows().map((r) => r.getTorrent());
+    return [...this._selectedTorrentIds]
+      .map((id) => this._torrents[id])
+      .filter(Boolean);
   }
 
   _getSelectedTorrentIds() {
-    return Transmission._getTorrentIds(this.getSelectedTorrents());
+    return [...this._selectedTorrentIds];
   }
 
-  _setSelectedRow(row) {
-    const e_sel = row ? row.getElement() : null;
-    for (const e of this.elements.torrent_list.children) {
-      e.classList.toggle('selected', e === e_sel);
+  _setSelectedTorrent(torrentId) {
+    this._selectedTorrentIds.clear();
+    if (torrentId) {
+      this._selectedTorrentIds.add(torrentId);
     }
+    this._updateVisibleSelections();
     this._dispatchSelectionChanged();
   }
 
-  _selectRow(row) {
-    row.getElement().classList.add('selected');
+  _selectTorrent(torrentId) {
+    this._selectedTorrentIds.add(torrentId);
+    this._updateVisibleSelections();
     this._dispatchSelectionChanged();
   }
 
-  _deselectRow(row) {
-    row.getElement().classList.remove('selected');
+  _deselectTorrent(torrentId) {
+    this._selectedTorrentIds.delete(torrentId);
+    this._updateVisibleSelections();
     this._dispatchSelectionChanged();
   }
 
   _selectAll() {
-    for (const e of this.elements.torrent_list.children) {
-      e.classList.add('selected');
+    for (const torrent of this._torrentOrder) {
+      this._selectedTorrentIds.add(torrent.getId());
     }
+    this._updateVisibleSelections();
     this._dispatchSelectionChanged();
   }
 
   _deselectAll() {
-    for (const e of this.elements.torrent_list.children) {
-      e.classList.remove('selected');
-    }
+    this._selectedTorrentIds.clear();
+    this._updateVisibleSelections();
     this._dispatchSelectionChanged();
     delete this._last_torrent_clicked;
   }
 
+  _updateVisibleSelections() {
+    // Update selection classes on visible DOM elements
+    if (this.elements.torrent_list) {
+      for (const element of this.elements.torrent_list.children) {
+        const torrentId = Number.parseInt(element.dataset.torrentId, 10);
+        if (torrentId) {
+          element.classList.toggle(
+            'selected',
+            this._selectedTorrentIds.has(torrentId),
+          );
+        }
+      }
+    }
+  }
+
   _indexOfLastTorrent() {
-    return this._rows.findIndex(
-      (row) => row.getTorrentId() === this._last_torrent_clicked,
+    if (!this._last_torrent_clicked) {
+      return -1;
+    }
+    return this._torrentOrder.findIndex(
+      (torrent) => torrent.getId() === this._last_torrent_clicked,
     );
   }
 
   // Select a range from this row to the last clicked torrent
   _selectRange(row) {
-    const last = this._indexOfLastTorrent();
+    // Convert row to torrent ID and use new implementation
+    if (row && row.getTorrent) {
+      this._selectRangeToTorrent(row.getTorrent().getId());
+    }
+  }
 
-    if (last === -1) {
-      this._selectRow(row);
-    } else {
-      // select the range between the previous & current
-      const next = this._rows.indexOf(row);
-      const min = Math.min(last, next);
-      const max = Math.max(last, next);
-      for (let index = min; index <= max; ++index) {
-        this._selectRow(this._rows[index]);
-      }
+  // Select a range from the given torrent ID to the last clicked torrent
+  _selectRangeToTorrent(torrentId) {
+    if (!this._last_torrent_clicked) {
+      this._selectTorrent(torrentId);
+      return;
     }
 
-    this._dispatchSelectionChanged();
+    // Find indices in the current torrent order
+    const currentIndex = this._torrentOrder.findIndex(
+      (t) => t.getId() === torrentId,
+    );
+    const lastIndex = this._torrentOrder.findIndex(
+      (t) => t.getId() === this._last_torrent_clicked,
+    );
+
+    if (currentIndex === -1 || lastIndex === -1) {
+      this._selectTorrent(torrentId);
+      return;
+    }
+
+    // Select the range between the previous & current
+    const min = Math.min(lastIndex, currentIndex);
+    const max = Math.max(lastIndex, currentIndex);
+    for (let index = min; index <= max; ++index) {
+      this._selectTorrent(this._torrentOrder[index].getId());
+    }
   }
 
   _dispatchSelectionChanged() {
     const nonselected = [];
     const selected = [];
-    for (const r of this._rows) {
-      (r.isSelected() ? selected : nonselected).push(r.getTorrent());
+    for (const torrent of Object.values(this._torrents)) {
+      if (this._selectedTorrentIds.has(torrent.getId())) {
+        selected.push(torrent);
+      } else {
+        nonselected.push(torrent);
+      }
     }
 
     const event = new Event('torrent-selection-changed');
@@ -657,7 +777,7 @@ export class Transmission extends EventTarget {
     }
 
     const any_popup_active = document.querySelector('.popup:not(.hidden)');
-    const rows = this._rows;
+    const torrents = this._torrentOrder;
 
     // Some shortcuts can only be used if the following conditions are met:
     // 1. when no input fields are focused
@@ -667,11 +787,11 @@ export class Transmission extends EventTarget {
       const shift_key = keyCode === 16; // shift key pressed
       const up_key = keyCode === 38; // up key pressed
       const dn_key = keyCode === 40; // down key pressed
-      if ((up_key || dn_key) && rows.length > 0) {
+      if ((up_key || dn_key) && torrents.length > 0) {
         const last = this._indexOfLastTorrent();
         const anchor = this._shift_index;
         const min = 0;
-        const max = rows.length - 1;
+        const max = torrents.length - 1;
         let index = last;
 
         if (dn_key && index + 1 <= max) {
@@ -680,7 +800,7 @@ export class Transmission extends EventTarget {
           --index;
         }
 
-        const r = rows[index];
+        const torrent = torrents[index];
 
         if (anchor >= 0) {
           // user is extending the selection
@@ -689,24 +809,34 @@ export class Transmission extends EventTarget {
             (anchor <= last && last < index) ||
             (anchor >= last && last > index)
           ) {
-            this._selectRow(r);
+            this._selectTorrent(torrent.getId());
           } else if (
             (anchor >= last && index > last) ||
             (anchor <= last && last > index)
           ) {
-            this._deselectRow(rows[last]);
+            this._deselectTorrent(torrents[last].getId());
           }
         } else {
           if (shiftKey) {
-            this._selectRange(r);
+            this._selectRangeToTorrent(torrent.getId());
           } else {
-            this._setSelectedRow(r);
+            this._setSelectedTorrent(torrent.getId());
           }
         }
-        if (r) {
-          this._last_torrent_clicked = r.getTorrentId();
-          r.getElement().scrollIntoView();
+        if (torrent) {
           event_.preventDefault();
+          this._last_torrent_clicked = torrent.getId();
+          const rowElem = [...this.elements.torrent_list.children].find(
+            (element) =>
+              Number.parseInt(element.dataset.torrentId, 10) ===
+              torrent.getId(),
+          );
+          if (rowElem) {
+            rowElem.scrollIntoView({
+              block: 'nearest',
+              inline: 'nearest',
+            });
+          }
         }
       } else if (shift_key) {
         this._shift_index = this._indexOfLastTorrent();
@@ -749,7 +879,7 @@ export class Transmission extends EventTarget {
   }
 
   shouldAddedTorrentsStart() {
-    return this.session_properties['start-added-torrents'];
+    return this.session_properties.start_added_torrents;
   }
 
   _drop(event_) {
@@ -809,18 +939,14 @@ export class Transmission extends EventTarget {
     );
   }
 
-  _onTorrentChanged(event_) {
+  _onTorrentChanged() {
     if (this.changeStatus) {
       this._dispatchSelectionChanged();
       this.changeStatus = false;
     }
 
-    // update our dirty fields
-    const tor = event_.currentTarget;
-    this.dirtyTorrents.add(tor.getId());
-
     // enqueue ui refreshes
-    this.refilterSoon();
+    this.refilterAllSoon();
   }
 
   updateTorrents(ids, fields) {
@@ -844,7 +970,6 @@ export class Transmission extends EventTarget {
         } else {
           t = this._torrents[id] = new Torrent(o);
           t.addEventListener('dataChanged', this._onTorrentChanged.bind(this));
-          this.dirtyTorrents.add(id);
           // do we need more info for this torrent?
           if (!('name' in t.fields) || !('status' in t.fields)) {
             needinfo.push(id);
@@ -860,12 +985,12 @@ export class Transmission extends EventTarget {
           ...Torrent.Fields.Stats,
         ];
         this.updateTorrents(needinfo, more_fields);
-        this.refilterSoon();
+        this.refilterAllSoon();
       }
 
       if (removed_ids) {
         this._deleteTorrents(removed_ids);
-        this.refilterSoon();
+        this.refilterAllSoon();
       }
     });
   }
@@ -891,7 +1016,7 @@ TODO: fix this when notifications get fixed
 
   refreshTorrents() {
     const fields = ['id', ...Torrent.Fields.Stats];
-    this.updateTorrents('recently-active', fields);
+    this.updateTorrents('recently_active', fields);
   }
 
   _initializeTorrents() {
@@ -900,8 +1025,24 @@ TODO: fix this when notifications get fixed
   }
 
   _onRowClicked(event_) {
-    const meta_key = event_.metaKey || event_.ctrlKey,
-      { row } = event_.currentTarget;
+    // Find the torrent row element
+    let rowElement = event_.target;
+    while (rowElement && !rowElement.classList.contains('torrent')) {
+      rowElement = rowElement.parentNode;
+    }
+
+    if (!rowElement || !rowElement.dataset.torrentId) {
+      return;
+    }
+
+    const torrentId = Number.parseInt(rowElement.dataset.torrentId, 10);
+    const torrent = this._torrents[torrentId];
+    if (!torrent) {
+      return;
+    }
+
+    const meta_key = event_.metaKey || event_.ctrlKey;
+    const isSelected = this._selectedTorrentIds.has(torrentId);
 
     if (this.popup[Transmission.default_popup_level]) {
       this.setCurrentPopup(null);
@@ -912,44 +1053,45 @@ TODO: fix this when notifications get fixed
     event_.stopPropagation();
 
     if (event_.shiftKey) {
-      this._selectRange(row);
+      this._selectRangeToTorrent(torrentId);
       // Need to deselect any selected text
       globalThis.focus();
 
       // Apple-Click, not selected
-    } else if (!row.isSelected() && meta_key) {
-      this._selectRow(row);
+    } else if (!isSelected && meta_key) {
+      this._selectTorrent(torrentId);
 
       // Regular Click, not selected
-    } else if (!row.isSelected()) {
-      this._setSelectedRow(row);
+    } else if (!isSelected) {
+      this._setSelectedTorrent(torrentId);
 
       // Apple-Click, selected
-    } else if (row.isSelected() && meta_key) {
-      this._deselectRow(row);
+    } else if (isSelected && meta_key) {
+      this._deselectTorrent(torrentId);
 
       // Regular Click, selected
-    } else if (row.isSelected()) {
-      this._setSelectedRow(row);
+    } else if (isSelected) {
+      this._setSelectedTorrent(torrentId);
     }
 
-    this._last_torrent_clicked = row.getTorrentId();
+    this._last_torrent_clicked = torrentId;
   }
 
   _deleteTorrents(ids) {
     if (ids && ids.length > 0) {
       for (const id of ids) {
-        this.dirtyTorrents.add(id);
         delete this._torrents[id];
       }
-      this.refilterSoon();
+      this.refilterAllSoon();
     }
   }
 
-  _removeSelectedTorrents() {
+  _removeSelectedTorrents(trash) {
     const torrents = this.getSelectedTorrents();
     if (torrents.length > 0) {
-      this.setCurrentPopup(new RemoveDialog({ remote: this.remote, torrents }));
+      this.setCurrentPopup(
+        new RemoveDialog({ remote: this.remote, torrents, trash }),
+      );
     }
   }
 
@@ -1053,7 +1195,11 @@ TODO: fix this when notifications get fixed
       (accumulator, tor) => accumulator + tor.getDownloadSpeed(),
       0,
     );
-    const string = fmt.countString('Transfer', 'Transfers', this._rows.length);
+    const string = fmt.countString(
+      'Transfer',
+      'Transfers',
+      this._torrentOrder.length,
+    );
 
     setTextContent(this.speed.down, fmt.speedBps(d));
     setTextContent(this.speed.up, fmt.speedBps(u));
@@ -1114,11 +1260,9 @@ TODO: fix this when notifications get fixed
     }
   }
 
-  _refilter(rebuildEverything) {
+  _refilter() {
     const { sort_mode, sort_direction, filter_mode } = this.prefs;
     const filter_tracker = this.filterTracker;
-    const renderer = this.torrentRenderer;
-    const list = this.elements.torrent_list;
 
     let filter_text = null;
     let labels = null;
@@ -1134,125 +1278,51 @@ TODO: fix this when notifications get fixed
       labels = [];
     }
 
-    const countRows = () => [...list.children].length;
-    const countSelectedRows = () =>
-      [...list.children].reduce(
-        (n, e) => (n + e.classList.contains('selected') ? 1 : 0),
-        0,
-      );
-    const old_row_count = countRows();
-    const old_sel_count = countSelectedRows();
-
     this._updateFilterSelect();
 
-    if (rebuildEverything) {
-      while (list.firstChild) {
-        list.firstChild.remove();
-      }
-      this._rows = [];
-      this.dirtyTorrents = new Set(Object.keys(this._torrents));
-
-      document.querySelector('#reset').style.display =
-        this.filterText.length > 0 ? 'block' : 'none';
-    }
-
-    // rows that overlap with dirtyTorrents need to be refiltered.
-    // those that don't are 'clean' and don't need refiltering.
-    const clean_rows = [];
-    let dirty_rows = [];
-    for (const row of this._rows) {
-      if (this.dirtyTorrents.has(row.getTorrentId())) {
-        dirty_rows.push(row);
-      } else {
-        clean_rows.push(row);
+    // Get filtered and sorted torrents
+    const filteredTorrents = [];
+    for (const torrent of Object.values(this._torrents)) {
+      if (torrent.test(filter_mode, filter_tracker, filter_text, labels)) {
+        filteredTorrents.push(torrent);
       }
     }
 
-    // remove the dirty rows from the dom
-    for (const row of dirty_rows) {
-      row.getElement().remove();
+    // Sort the torrents
+    filteredTorrents.sort((a, b) =>
+      Torrent.compareTorrents(a, b, sort_mode, sort_direction),
+    );
+
+    // Update torrent order for range selection
+    this._torrentOrder = filteredTorrents;
+
+    // Generate HTML for each torrent
+    const rowsHTML = filteredTorrents.map((torrent) =>
+      this._generateTorrentRowHTML(torrent),
+    );
+
+    // Update clusterize with new data
+    if (rowsHTML.length === 0) {
+      this._clusterize.update(['<li></li>']);
+    } else {
+      this._clusterize.update(rowsHTML);
     }
 
-    // drop any dirty rows that don't pass the filter test
-    const temporary = [];
-    for (const row of dirty_rows) {
-      const id = row.getTorrentId();
-      const t = this._torrents[id];
-      if (t && t.test(filter_mode, filter_tracker, filter_text, labels)) {
-        temporary.push(row);
-      }
-      this.dirtyTorrents.delete(id);
-    }
-    dirty_rows = temporary;
-
-    // make new rows for dirty torrents that pass the filter test
-    // but don't already have a row
-    for (const id of this.dirtyTorrents.values()) {
-      const t = this._torrents[id];
-      if (t && t.test(filter_mode, filter_tracker, filter_text, labels)) {
-        const row = new TorrentRow(renderer, this, t);
-        const e = row.getElement();
-        e.row = row;
-        dirty_rows.push(row);
-        e.addEventListener('click', this._onRowClicked.bind(this));
-      }
+    // Refresh clusterize if virtual scrolling is being performed
+    // Clusterize kicks in above 25 blocks * 4 clusters
+    if (rowsHTML.length > 100) {
+      setTimeout(() => {
+        this._clusterize.refresh(true);
+      }, 50);
     }
 
-    // sort the dirty rows
-    this.sortRows(dirty_rows);
-
-    // now we have two sorted arrays of rows
-    // and can do a simple two-way sorted merge.
-    const rows = [];
-    const cmax = clean_rows.length;
-    const dmax = dirty_rows.length;
-    const frag = document.createDocumentFragment();
-    let ci = 0;
-    let di = 0;
-    while (ci !== cmax || di !== dmax) {
-      let push_clean = null;
-      if (ci === cmax) {
-        push_clean = false;
-      } else if (di === dmax) {
-        push_clean = true;
-      } else {
-        const c = Torrent.compareTorrents(
-          clean_rows[ci].getTorrent(),
-          dirty_rows[di].getTorrent(),
-          sort_mode,
-          sort_direction,
-        );
-        push_clean = c < 0;
-      }
-
-      if (push_clean) {
-        rows.push(clean_rows[ci++]);
-      } else {
-        const row = dirty_rows[di++];
-        const e = row.getElement();
-
-        if (ci === cmax) {
-          frag.append(e);
-        } else {
-          list.insertBefore(e, clean_rows[ci].getElement());
-        }
-
-        rows.push(row);
-      }
-    }
-    list.append(frag);
-
-    // update our implementation fields
-    this._rows = rows;
-    this.dirtyTorrents.clear();
-
+    // Update status bar
     this._updateStatusbar();
-    if (
-      old_sel_count !== countSelectedRows() ||
-      old_row_count !== countRows()
-    ) {
-      this._dispatchSelectionChanged();
-    }
+
+    // Update visible selections after clusterize renders
+    setTimeout(() => {
+      this._updateVisibleSelections();
+    }, 0);
   }
 
   setFilterTracker(sitename) {

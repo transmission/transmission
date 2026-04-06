@@ -14,11 +14,10 @@
 #include <cstddef> // for size_t
 #include <memory>
 
-#include "libtransmission/transmission.h" // for tr_direction, tr_block_ind...
-
 #include "libtransmission/interned-string.h"
 #include "libtransmission/net.h" // tr_socket_address
 #include "libtransmission/peer-common.h" // for tr_peer
+#include "libtransmission/types.h"
 
 class tr_peerIo;
 class tr_peerMsgs;
@@ -102,7 +101,7 @@ public:
 
     [[nodiscard]] constexpr auto is_active(tr_direction direction) const noexcept
     {
-        return is_active_[direction];
+        return is_active_[static_cast<uint8_t>(direction)];
     }
 
     [[nodiscard]] constexpr auto is_disconnecting() const noexcept
@@ -157,7 +156,7 @@ protected:
 
     constexpr void set_active(tr_direction direction, bool active) noexcept
     {
-        is_active_[direction] = active;
+        is_active_[static_cast<uint8_t>(direction)] = active;
     }
 
     constexpr void set_user_agent(tr_interned_string val) noexcept

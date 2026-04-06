@@ -35,6 +35,7 @@
 #include "MainWindow.h"
 #include "OptionsDialog.h"
 #include "Prefs.h"
+#include "QtCompat.h"
 #include "Session.h"
 #include "TorrentModel.h"
 #include "WatchDir.h"
@@ -42,17 +43,19 @@
 namespace
 {
 
+// NOLINTBEGIN(cert-err58-cpp)
 auto const ConfigName = QStringLiteral("transmission");
-
 #ifdef QT_DBUS_LIB
 auto const FDONotificationsServiceName = QStringLiteral("org.freedesktop.Notifications");
 auto const FDONotificationsPath = QStringLiteral("/org/freedesktop/Notifications");
 auto const FDONotificationsInterfaceName = QStringLiteral("org.freedesktop.Notifications");
 #endif
+// NOLINTEND(cert-err58-cpp)
 
 auto constexpr StatsRefreshIntervalMsec = 3000;
 auto constexpr SessionRefreshIntervalMsec = 3000;
 auto constexpr ModelRefreshIntervalMsec = 3000;
+auto constexpr InternRefreshIntervalMsec = 5 * 60 * 1000;
 
 bool loadTranslation(QTranslator& translator, QString const& name, QLocale const& locale, QStringList const& search_directories)
 {
@@ -69,7 +72,7 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 
 void initUnits()
 {
-    using Config = libtransmission::Values::Config;
+    using Config = tr::Values::Config;
 
     Config::speed = { Config::Base::Kilo,
                       QObject::tr("B/s").toStdString(),
@@ -126,28 +129,30 @@ QAccessibleInterface* accessibleFactory(QString const& className, QObject* objec
 
 } // namespace
 
+void Application::pruneInternedStrings()
+{
+    std::erase_if(interned_strings_, [](QString const& str) { return str.isDetached(); });
+}
+
+QString Application::intern(QString const& in)
+{
+    return *interned_strings_.insert(in).first;
+}
+
 Application::Application(
-    std::unique_ptr<Prefs> prefs,
+    Prefs& prefs,
+    RpcClient& rpc,
     bool minimized,
     QString const& config_dir,
     QStringList const& filenames,
     int& argc,
     char** argv)
     : QApplication{ argc, argv }
-    , prefs_(std::move(prefs))
+    , prefs_{ prefs }
 {
     setApplicationName(ConfigName);
     loadTranslations();
     initUnits();
-
-#if defined(_WIN32) || defined(__APPLE__)
-
-    if (QIcon::themeName().isEmpty())
-    {
-        QIcon::setThemeName(QStringLiteral("Faenza"));
-    }
-
-#endif
 
     setWindowIcon(makeWindowIcon());
 
@@ -170,9 +175,9 @@ Application::Application(
     QAccessible::installFactory(&accessibleFactory);
 #endif
 
-    session_ = std::make_unique<Session>(config_dir, *prefs_);
-    model_ = std::make_unique<TorrentModel>(*prefs_);
-    window_ = std::make_unique<MainWindow>(*session_, *prefs_, *model_, minimized);
+    session_ = std::make_unique<Session>(config_dir, prefs_, rpc);
+    model_ = std::make_unique<TorrentModel>(prefs_);
+    window_ = std::make_unique<MainWindow>(*session_, prefs_, *model_, minimized);
     watch_dir_ = std::make_unique<WatchDir>(*model_);
 
     connect(this, &QCoreApplication::aboutToQuit, this, &Application::saveGeometry);
@@ -180,7 +185,7 @@ Application::Application(
     connect(model_.get(), &TorrentModel::torrentsCompleted, this, &Application::onTorrentsCompleted);
     connect(model_.get(), &TorrentModel::torrentsEdited, this, &Application::onTorrentsEdited);
     connect(model_.get(), &TorrentModel::torrentsNeedInfo, this, &Application::onTorrentsNeedInfo);
-    connect(prefs_.get(), &Prefs::changed, this, &Application::refreshPref);
+    connect(&prefs_, &Prefs::changed, this, &Application::refreshPref);
     connect(session_.get(), &Session::sourceChanged, this, &Application::onSessionSourceChanged);
     connect(session_.get(), &Session::torrentsRemoved, model_.get(), &TorrentModel::removeTorrents);
     connect(session_.get(), &Session::torrentsUpdated, model_.get(), &TorrentModel::updateTorrents);
@@ -210,6 +215,12 @@ Application::Application(
     timer->setInterval(SessionRefreshIntervalMsec);
     timer->start();
 
+    timer = &intern_timer_;
+    connect(timer, &QTimer::timeout, this, &Application::pruneInternedStrings);
+    timer->setSingleShot(false);
+    timer->setInterval(InternRefreshIntervalMsec);
+    timer->start();
+
     maybeUpdateBlocklist();
 
     if (!first_time)
@@ -219,26 +230,6 @@ Application::Application(
     else
     {
         window_->openSession();
-    }
-
-    if (!prefs_->getBool(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
-    {
-        auto* dialog = new QMessageBox{ QMessageBox::Information,
-                                        QString{},
-                                        tr("<b>Transmission is a file sharing program.</b>"),
-                                        QMessageBox::Ok | QMessageBox::Cancel,
-                                        window_.get() };
-        dialog->setInformativeText(
-            tr("When you run a torrent, its data will be made available to others by means of upload. "
-               "Any content you share is your sole responsibility."));
-        dialog->button(QMessageBox::Ok)->setText(tr("I &Agree"));
-        dialog->setDefaultButton(QMessageBox::Ok);
-        dialog->setModal(true);
-
-        connect(dialog, &QDialog::finished, this, &Application::consentGiven);
-
-        dialog->setAttribute(Qt::WA_DeleteOnClose);
-        dialog->show();
     }
 
     // torrent files passed in on the command line
@@ -268,12 +259,8 @@ Application::~Application() = default;
 
 void Application::loadTranslations()
 {
-    auto const qt_qm_dirs = QStringList{} <<
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        QLibraryInfo::path(QLibraryInfo::TranslationsPath) <<
-#else
-        QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
-#endif
+    auto const qt_qm_dirs = QStringList{} << //
+        IF_QT6(QLibraryInfo::path(QLibraryInfo::TranslationsPath), QLibraryInfo::location(QLibraryInfo::TranslationsPath)) <<
 #ifdef TRANSLATIONS_DIR
         QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
@@ -323,7 +310,7 @@ QStringList Application::getNames(torrent_ids_t const& torrent_ids) const
 
 void Application::onTorrentsAdded(torrent_ids_t const& torrent_ids) const
 {
-    if (!prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
+    if (!prefs_.get<bool>(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
         return;
     }
@@ -336,19 +323,19 @@ void Application::onTorrentsAdded(torrent_ids_t const& torrent_ids) const
 
 void Application::onTorrentsCompleted(torrent_ids_t const& torrent_ids) const
 {
-    if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
+    if (prefs_.get<bool>(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
     {
         auto const title = tr("Torrent(s) Completed", nullptr, static_cast<int>(std::size(torrent_ids)));
         auto const body = getNames(torrent_ids).join(QStringLiteral("\n"));
         notifyApp(title, body);
     }
 
-    if (prefs_->getBool(Prefs::COMPLETE_SOUND_ENABLED))
+    if (prefs_.get<bool>(Prefs::COMPLETE_SOUND_ENABLED))
     {
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
         beep();
 #else
-        auto args = prefs_->get<QStringList>(Prefs::COMPLETE_SOUND_COMMAND);
+        auto args = prefs_.get<QStringList>(Prefs::COMPLETE_SOUND_COMMAND);
         auto const command = args.takeFirst();
         QProcess::execute(command, args);
 #endif
@@ -370,37 +357,21 @@ void Application::notifyTorrentAdded(Torrent const* tor) const
     notifyApp(tr("Torrent Added"), tor->name(), actions);
 }
 
-/***
-****
-***/
-
-void Application::consentGiven(int result) const
-{
-    if (result == QMessageBox::Ok)
-    {
-        prefs_->set<bool>(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT, true);
-    }
-    else
-    {
-        quit();
-    }
-}
+// ---
 
 void Application::saveGeometry() const
 {
-    if (prefs_ != nullptr && window_ != nullptr)
+    if (window_ != nullptr)
     {
         auto const geometry = window_->geometry();
-        prefs_->set(Prefs::MAIN_WINDOW_HEIGHT, std::max(100, geometry.height()));
-        prefs_->set(Prefs::MAIN_WINDOW_WIDTH, std::max(100, geometry.width()));
-        prefs_->set(Prefs::MAIN_WINDOW_X, geometry.x());
-        prefs_->set(Prefs::MAIN_WINDOW_Y, geometry.y());
+        prefs_.set(Prefs::MAIN_WINDOW_HEIGHT, std::max(100, geometry.height()));
+        prefs_.set(Prefs::MAIN_WINDOW_WIDTH, std::max(100, geometry.width()));
+        prefs_.set(Prefs::MAIN_WINDOW_X, geometry.x());
+        prefs_.set(Prefs::MAIN_WINDOW_Y, geometry.y());
     }
 }
 
-/***
-****
-***/
+// ---
 
 void Application::refreshPref(int key) const
 {
@@ -412,7 +383,7 @@ void Application::refreshPref(int key) const
 
     case Prefs::DIR_WATCH:
     case Prefs::DIR_WATCH_ENABLED:
-        watch_dir_->setPath(prefs_->getString(Prefs::DIR_WATCH), prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
+        watch_dir_->setPath(prefs_.get<QString>(Prefs::DIR_WATCH), prefs_.get<bool>(Prefs::DIR_WATCH_ENABLED));
         break;
 
     default:
@@ -422,19 +393,19 @@ void Application::refreshPref(int key) const
 
 void Application::maybeUpdateBlocklist() const
 {
-    if (!prefs_->getBool(Prefs::BLOCKLIST_UPDATES_ENABLED))
+    if (!prefs_.get<bool>(Prefs::BLOCKLIST_UPDATES_ENABLED))
     {
         return;
     }
 
-    QDateTime const last_updated_at = prefs_->getDateTime(Prefs::BLOCKLIST_DATE);
-    QDateTime const next_update_at = last_updated_at.addDays(7);
-    QDateTime const now = QDateTime::currentDateTime();
+    auto const last_updated_at = prefs_.get<QDateTime>(Prefs::BLOCKLIST_DATE);
+    auto const next_update_at = last_updated_at.addDays(7);
+    auto const now = QDateTime::currentDateTime();
 
     if (now < next_update_at)
     {
         session_->updateBlocklist();
-        prefs_->set(Prefs::BLOCKLIST_DATE, now);
+        prefs_.set(Prefs::BLOCKLIST_DATE, now);
     }
 }
 
@@ -470,8 +441,8 @@ void Application::refreshTorrents()
 void Application::addWatchdirTorrent(QString const& filename) const
 {
     auto add_data = AddData{ filename };
-    auto const disposal = prefs_->getBool(Prefs::TRASH_ORIGINAL) ? AddData::FilenameDisposal::Delete :
-                                                                   AddData::FilenameDisposal::Rename;
+    auto const disposal = prefs_.get<bool>(Prefs::TRASH_ORIGINAL) ? AddData::FilenameDisposal::Delete :
+                                                                    AddData::FilenameDisposal::Rename;
     add_data.setFileDisposal(disposal);
     addTorrent(std::move(add_data));
 }
@@ -485,18 +456,18 @@ void Application::addTorrent(AddData addme) const
 
     // if there's not already a disposal action set,
     // then honor the `trash original` preference setting
-    if (!addme.fileDisposal() && prefs_->getBool(Prefs::TRASH_ORIGINAL))
+    if (!addme.fileDisposal() && prefs_.get<bool>(Prefs::TRASH_ORIGINAL))
     {
         addme.setFileDisposal(AddData::FilenameDisposal::Delete);
     }
 
-    if (!prefs_->getBool(Prefs::OPTIONS_PROMPT))
+    if (!prefs_.get<bool>(Prefs::OPTIONS_PROMPT))
     {
         session_->addTorrent(addme);
     }
     else
     {
-        auto* o = new OptionsDialog{ *session_, *prefs_, addme, window_.get() };
+        auto* o = new OptionsDialog{ *session_, prefs_, addme, window_.get() };
         o->show();
     }
 
@@ -529,9 +500,10 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
         args.append(title); // summary
         args.append(body); // body
         args.append(actions);
-        args.append(QVariantMap{ {
-            std::make_pair(QStringLiteral("category"), QVariant{ QStringLiteral("transfer.complete") }),
-        } }); // hints
+        args.append(
+            QVariantMap{ {
+                std::make_pair(QStringLiteral("category"), QVariant{ QStringLiteral("transfer.complete") }),
+            } }); // hints
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
         QDBusReply<quint32> const reply_msg = bus.call(m);
@@ -549,6 +521,7 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
 }
 
 #ifdef QT_DBUS_LIB
+// NOLINTNEXTLINE(performance-unnecessary-value-param)
 void Application::onNotificationActionInvoked(quint32 /* notification_id */, QString action_key)
 {
     static QRegularExpression const StartNowRegex{ QStringLiteral(R"rgx(start-now\((\d+)\))rgx") };

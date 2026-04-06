@@ -208,6 +208,18 @@ typedef NS_ENUM(NSUInteger, TabTag) {
     [self resetInfo];
 }
 
+- (void)removeTorrentsFromInfo:(NSArray<Torrent*>*)torrents
+{
+    if (self.fTorrents.count == 0 || torrents.count == 0)
+    {
+        return;
+    }
+
+    NSMutableArray<Torrent*>* remaining = [self.fTorrents mutableCopy];
+    [remaining removeObjectsInArray:torrents];
+    [self setInfoForTorrents:remaining];
+}
+
 - (NSRect)windowWillUseStandardFrame:(NSWindow*)window defaultFrame:(NSRect)defaultFrame
 {
     NSRect windowRect = window.frame;

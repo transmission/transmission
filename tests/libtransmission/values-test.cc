@@ -5,11 +5,10 @@
 
 #include <libtransmission/values.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using namespace libtransmission::Values;
-
-using ValuesTest = ::testing::Test;
+using ValuesTest = ::tr::test::TransmissionTest;
+using namespace tr::Values;
 
 TEST_F(ValuesTest, baseQuantity)
 {

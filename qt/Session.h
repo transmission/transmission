@@ -9,13 +9,13 @@
 #include <cstdint> // int64_t
 #include <map>
 #include <optional>
-#include <set>
 #include <string_view>
 #include <vector>
 
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QNetworkReply>
 #include <QTimer>
 
 #include <libtransmission/transmission.h>
@@ -39,7 +39,7 @@ class Session : public QObject
     Q_OBJECT
 
 public:
-    Session(QString config_dir, Prefs& prefs);
+    Session(QString config_dir, Prefs& prefs, RpcClient& rpc);
     Session(Session&&) = delete;
     Session(Session const&) = delete;
     Session& operator=(Session&&) = delete;
@@ -86,7 +86,7 @@ public:
     void portTest(PortTestIpProtocol ip_protocol);
     void copyMagnetLinkToClipboard(int torrent_id);
 
-    bool portTestPending(PortTestIpProtocol ip_protocol) const noexcept;
+    [[nodiscard]] bool portTestPending(PortTestIpProtocol ip_protocol) const noexcept;
 
     /** returns true if the transmission session is being run inside this client */
     [[nodiscard]] constexpr auto isServer() const noexcept
@@ -101,19 +101,18 @@ public:
     }
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
-    RpcResponseFuture exec(std::string_view method, tr_variant* args);
 
     using Tag = RpcQueue::Tag;
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, bool val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, int val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, double val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QString const& val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, std::vector<int> const& val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QStringList const& val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, bool val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, int val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, double val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, QString const& val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, std::vector<int> const& val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark key, QStringList const& val);
 
     void torrentSetLocation(torrent_ids_t const& torrent_ids, QString const& path, bool do_move);
     void torrentRenamePath(torrent_ids_t const& torrent_ids, QString const& oldpath, QString const& newname);
-    void addTorrent(AddData add_me, tr_variant* args_dict);
+    void addTorrent(AddData const& add_me, tr_variant* args_dict);
     void initTorrents(torrent_ids_t const& ids = {});
     void pauseTorrents(torrent_ids_t const& torrent_ids = {});
     void startTorrents(torrent_ids_t const& torrent_ids = {});
@@ -126,7 +125,7 @@ public:
     void reannounceTorrents(torrent_ids_t const& torrent_ids);
     void refreshExtraStats(torrent_ids_t const& torrent_ids);
 
-    enum class TorrentProperties
+    enum class TorrentProperties : uint8_t
     {
         MainInfo,
         MainStats,
@@ -136,28 +135,8 @@ public:
         Rename
     };
 
-    void addKeyName(TorrentProperties props, tr_quark const key)
-    {
-        // populate names cache with default values
-        if (names_[props].empty())
-        {
-            getKeyNames(props);
-        }
-
-        names_[props].emplace(tr_quark_get_string_view(key));
-    }
-
-    void removeKeyName(TorrentProperties props, tr_quark const key)
-    {
-        // do not remove id because it must be in every torrent req
-        if (key != TR_KEY_id)
-        {
-            names_[props].erase(tr_quark_get_string_view(key));
-        }
-    }
-
 public slots:
-    void addTorrent(AddData add_me);
+    void addTorrent(AddData const& add_me);
     void launchWebInterface() const;
     void queueMoveBottom(torrent_ids_t const& torrentIds = {});
     void queueMoveDown(torrent_ids_t const& torrentIds = {});
@@ -173,7 +152,7 @@ signals:
     void portTested(std::optional<bool> status, PortTestIpProtocol ip_protocol);
     void statsUpdated();
     void sessionUpdated();
-    void blocklistUpdated(int);
+    void blocklistUpdated(int64_t);
     void torrentsUpdated(tr_variant* torrent_list, bool complete_list);
     void torrentsRemoved(tr_variant* torrent_list);
     void sessionCalled(Tag);
@@ -192,20 +171,18 @@ private:
     void updateInfo(tr_variant* args_dict);
 
     Tag torrentSetImpl(tr_variant* args);
-    void sessionSet(tr_quark const key, QVariant const& value);
+    void sessionSet(tr_quark key, tr_variant val);
     void pumpRequests();
-    void sendTorrentRequest(std::string_view request, torrent_ids_t const& torrent_ids);
+    void sendTorrentRequest(tr_quark method, torrent_ids_t const& torrent_ids);
     void refreshTorrents(torrent_ids_t const& ids, TorrentProperties props);
-    std::set<std::string_view> const& getKeyNames(TorrentProperties props);
 
-    static void updateStats(tr_variant* args_dict, tr_session_stats* stats);
+    static void updateStats(tr_variant const& args_dict, tr_session_stats& stats);
 
+    void addOptionalIds(tr_variant::Map& params, torrent_ids_t const& torrent_ids) const;
     void addOptionalIds(tr_variant* args_dict, torrent_ids_t const& torrent_ids) const;
 
     QString const config_dir_;
     Prefs& prefs_;
-
-    std::map<TorrentProperties, std::set<std::string_view>> names_;
 
     int64_t blocklist_size_ = -1;
     std::array<bool, NUM_PORT_TEST_IP_PROTOCOL> port_test_pending_ = {};
@@ -216,11 +193,19 @@ private:
     QString session_version_;
     QString session_id_;
     bool is_definitely_local_session_ = true;
-    RpcClient rpc_;
-    torrent_ids_t const RecentlyActiveIDs = { -1 };
+    RpcClient& rpc_;
+
+    static inline torrent_ids_t const RecentlyActiveIDs = { -1 };
 
     std::map<QString, QString> duplicates_;
     QTimer duplicates_timer_;
 
-    static auto constexpr EmptyStats = tr_session_stats{ TR_RATIO_NA, 0, 0, 0, 0, 0 };
+    static auto constexpr EmptyStats = tr_session_stats{
+        .ratio = TR_RATIO_NA,
+        .uploadedBytes = 0,
+        .downloadedBytes = 0,
+        .filesAdded = 0,
+        .sessionCount = 0,
+        .secondsActive = time_t{},
+    };
 };

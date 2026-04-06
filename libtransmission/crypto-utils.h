@@ -15,8 +15,8 @@
 #include <string>
 #include <string_view>
 
-#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha256_d...
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/types.h" // tr_sha1_digest_t, tr_sha256_d...
 
 #if defined(WITH_CCRYPTO)
 #include <CommonCrypto/CommonDigest.h>
@@ -118,7 +118,7 @@ bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert);
 /**
  * @brief Allocate and initialize new X509 certificate from DER-encoded buffer.
  */
-tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length);
+tr_x509_cert_t tr_x509_cert_new(void const* der, long der_length);
 
 /**
  * @brief Free X509 certificate returned by @ref tr_x509_cert_new.
@@ -170,7 +170,7 @@ T tr_rand_obj()
  */
 [[nodiscard]] std::string tr_base64_decode(std::string_view input);
 
-using tr_sha1_string = tr_strbuf<char, sizeof(tr_sha1_digest_t) * 2U + 1U>;
+using tr_sha1_string = tr_strbuf<char, (sizeof(tr_sha1_digest_t) * 2U) + 1U>;
 
 /**
  * @brief Generate an ascii hex string for a sha1 digest.
@@ -182,7 +182,7 @@ using tr_sha1_string = tr_strbuf<char, sizeof(tr_sha1_digest_t) * 2U + 1U>;
  */
 [[nodiscard]] std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex);
 
-using tr_sha256_string = tr_strbuf<char, sizeof(tr_sha256_digest_t) * 2U + 1U>;
+using tr_sha256_string = tr_strbuf<char, (sizeof(tr_sha256_digest_t) * 2U) + 1U>;
 
 /**
  * @brief Generate an ascii hex string for a sha256 digest.
@@ -197,7 +197,7 @@ using tr_sha256_string = tr_strbuf<char, sizeof(tr_sha256_digest_t) * 2U + 1U>;
 /**
  * @brief Calculate CRC32-C checksum for a buffer.
  */
-[[nodiscard]] uint32_t tr_crc32c(uint8_t const* data, size_t count);
+[[nodiscard]] uint32_t tr_crc32c(void const* data, size_t count);
 
 // Convenience utility to efficiently get many random small values.
 // Use this instead of making a lot of calls to tr_rand_int().

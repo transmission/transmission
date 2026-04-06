@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <compare>
 #include <cstddef> // std::byte, size_t
 #include <string_view>
 #include <tuple>
@@ -20,9 +21,9 @@
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using NetTest = ::testing::Test;
+using NetTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(NetTest, conversionsIPv4)
@@ -82,10 +83,11 @@ TEST_F(NetTest, compact4)
     EXPECT_EQ(std::size(Compact4) - tr_port::CompactPortBytes, static_cast<size_t>(out - std::data(buf)));
     EXPECT_TRUE(
         std::equal(std::data(Compact4), std::data(Compact4) + std::size(Compact4) - tr_port::CompactPortBytes, std::data(buf)));
-    EXPECT_TRUE(std::all_of(
-        std::begin(buf) + std::size(Compact4) - tr_port::CompactPortBytes,
-        std::end(buf),
-        [](std::byte const& byte) { return static_cast<unsigned char>(byte) == 0U; }));
+    EXPECT_TRUE(
+        std::all_of(
+            std::begin(buf) + std::size(Compact4) - tr_port::CompactPortBytes,
+            std::end(buf),
+            [](std::byte const& byte) { return static_cast<unsigned char>(byte) == 0U; }));
 
     /// sockaddr --> compact
 
@@ -144,14 +146,16 @@ TEST_F(NetTest, compact6)
     out = std::data(compact6);
     out = addr.to_compact(out);
     EXPECT_EQ(std::size(Compact6) - tr_port::CompactPortBytes, static_cast<size_t>(out - std::data(compact6)));
-    EXPECT_TRUE(std::equal(
-        std::data(Compact6),
-        std::data(Compact6) + std::size(Compact6) - tr_port::CompactPortBytes,
-        std::data(compact6)));
-    EXPECT_TRUE(std::all_of(
-        std::begin(compact6) + std::size(Compact6) - tr_port::CompactPortBytes,
-        std::end(compact6),
-        [](std::byte const& byte) { return static_cast<unsigned char>(byte) == 0U; }));
+    EXPECT_TRUE(
+        std::equal(
+            std::data(Compact6),
+            std::data(Compact6) + std::size(Compact6) - tr_port::CompactPortBytes,
+            std::data(compact6)));
+    EXPECT_TRUE(
+        std::all_of(
+            std::begin(compact6) + std::size(Compact6) - tr_port::CompactPortBytes,
+            std::end(compact6),
+            [](std::byte const& byte) { return static_cast<unsigned char>(byte) == 0U; }));
 
     /// sockaddr --> compact
 
@@ -171,7 +175,7 @@ TEST_F(NetTest, compact6)
     EXPECT_EQ(port, pex.front().socket_address.port());
 
     // ...serialize that back again too
-    std::fill(std::begin(compact6), std::end(compact6), std::byte{});
+    std::ranges::fill(compact6, std::byte{});
     out = std::data(compact6);
     out = tr_pex::to_compact(out, std::data(pex), std::size(pex));
     EXPECT_EQ(std::data(compact6) + std::size(compact6), out);
@@ -918,14 +922,14 @@ TEST_F(NetTest, isIPv6Multicast)
 TEST_F(NetTest, ipCompare)
 {
     static constexpr auto IpPairs = std::array{
-        std::tuple{ "223.18.245.229"sv, "8.8.8.8"sv, 1 },
-        std::tuple{ "0.0.0.0"sv, "255.255.255.255"sv, -1 },
-        std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, 0 },
-        std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, -1 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:0:0eab:dead::a0:abcd:4e]"sv, 1 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, 0 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:1890:1112:1::20]"sv, 0 },
+        std::tuple{ "223.18.245.229"sv, "8.8.8.8"sv, std::strong_ordering::greater },
+        std::tuple{ "0.0.0.0"sv, "255.255.255.255"sv, std::strong_ordering::less },
+        std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, std::strong_ordering::equal },
+        std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, std::strong_ordering::less },
+        std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, std::strong_ordering::greater },
+        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:0:0eab:dead::a0:abcd:4e]"sv, std::strong_ordering::greater },
+        std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, std::strong_ordering::equal },
+        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:1890:1112:1::20]"sv, std::strong_ordering::equal },
     };
 
     for (auto const& [sv1, sv2, res] : IpPairs)
@@ -933,12 +937,13 @@ TEST_F(NetTest, ipCompare)
         auto const ip1 = *tr_address::from_string(sv1);
         auto const ip2 = *tr_address::from_string(sv2);
 
-        EXPECT_EQ(ip1.compare(ip2) < 0, res < 0) << sv1 << ' ' << sv2;
-        EXPECT_EQ(ip1.compare(ip2) > 0, res > 0) << sv1 << ' ' << sv2;
-        EXPECT_EQ(ip1.compare(ip2) == 0, res == 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 <=> ip2, res) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 < ip2, res < 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 <= ip2, res <= 0) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 > ip2, res > 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 >= ip2, res >= 0) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 == ip2, res == 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 != ip2, res != 0) << sv1 << ' ' << sv2;
     }
 }
 

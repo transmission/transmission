@@ -13,8 +13,18 @@ TrackerModelFilter::TrackerModelFilter(QObject* parent)
 
 void TrackerModelFilter::setShowBackupTrackers(bool b)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 10, 0)
+
     show_backups_ = b;
-    invalidateFilter();
+    invalidateFilter(); // deprecated in Qt 6.13
+
+#else
+
+    beginFilterChange();
+    show_backups_ = b;
+    endFilterChange(QSortFilterProxyModel::Direction::Rows);
+
+#endif
 }
 
 bool TrackerModelFilter::filterAcceptsRow(int source_row, QModelIndex const& source_parent) const

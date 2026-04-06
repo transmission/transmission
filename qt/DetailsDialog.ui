@@ -618,32 +618,23 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QToolButton" name="addTrackerButton">
-         <property name="toolTip">
-          <string>Add Tracker</string>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonIconOnly</enum>
+        <widget class="QPushButton" name="addTrackerButton">
+         <property name="text">
+          <string>Add</string>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QToolButton" name="editTrackersButton">
-         <property name="toolTip">
-          <string>Edit Trackers</string>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonIconOnly</enum>
+        <widget class="QPushButton" name="editTrackersButton">
+         <property name="text">
+          <string>Edit</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QToolButton" name="removeTrackerButton">
-         <property name="toolTip">
-          <string>Remove Trackers</string>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonIconOnly</enum>
+        <widget class="QPushButton" name="removeTrackerButton">
+         <property name="text">
+          <string>Remove</string>
          </property>
         </widget>
        </item>

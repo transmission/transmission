@@ -9,7 +9,9 @@
 
 #include <fmt/format.h>
 
+#ifdef WITH_UTP
 #include <libutp/utp.h>
+#endif
 
 #include "libtransmission/error.h"
 #include "libtransmission/log.h"
@@ -31,7 +33,7 @@ tr_peer_socket::tr_peer_socket(tr_session const* session, tr_socket_address cons
     TR_ASSERT(sock != TR_BAD_SOCKET);
 
     ++n_open_sockets;
-    session->setSocketTOS(sock, address().type);
+    session->setSocketDiffServ(sock, address().type);
 
     if (auto const& algo = session->peerCongestionAlgorithm(); !std::empty(algo))
     {

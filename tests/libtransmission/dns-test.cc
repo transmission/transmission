@@ -8,21 +8,20 @@
 
 #include <event2/event.h>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
 #include "dns-ev.h"
 #include "dns.h"
 #include "trevent.h" // for tr_evthread_init();
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
-class EvDnsTest : public ::testing::Test
+class EvDnsTest : public ::tr::test::TransmissionTest
 {
 protected:
     void SetUp() override
@@ -172,4 +171,4 @@ TEST_F(EvDnsTest, doesCacheEntries)
     EXPECT_GT(res->second, 0);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

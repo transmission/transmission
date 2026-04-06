@@ -32,6 +32,8 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_rand_obj
@@ -48,7 +50,6 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 #ifdef _WIN32
@@ -58,17 +59,14 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 namespace
 {
 
 bool waitFor(struct event_base* event_base, std::chrono::milliseconds msec)
 {
-    return libtransmission::test::waitFor( //
-        event_base,
-        []() { return false; },
-        msec);
+    return tr::test::waitFor(event_base, []() { return false; }, msec);
 }
 
 auto constexpr IdLength = size_t{ 20U };
@@ -196,7 +194,7 @@ protected:
         {
             auto addrport = tr_socket_address::from_sockaddr(sa);
             assert(addrport);
-            pinged_.push_back(Pinged{ *addrport, tr_time() });
+            pinged_.push_back(Pinged{ .addrport = *addrport, .timestamp = tr_time() });
             return 0;
         }
 
@@ -204,7 +202,7 @@ protected:
         {
             auto info_hash = tr_sha1_digest_t{};
             std::copy_n(reinterpret_cast<std::byte const*>(id), std::size(info_hash), std::data(info_hash));
-            searched_.push_back(Searched{ info_hash, tr_port::from_host(port), af });
+            searched_.push_back(Searched{ .info_hash = info_hash, .port = tr_port::from_host(port), .af = af });
             return 0;
         }
 
@@ -269,7 +267,7 @@ protected:
     };
 
     // Creates real timers, but with shortened intervals so that tests can run faster
-    class MockTimer final : public libtransmission::Timer
+    class MockTimer final : public tr::Timer
     {
     public:
         explicit MockTimer(std::unique_ptr<Timer> real_timer)
@@ -317,7 +315,7 @@ protected:
     };
 
     // Creates MockTimers
-    class MockTimerMaker final : public libtransmission::TimerMaker
+    class MockTimerMaker final : public tr::TimerMaker
     {
     public:
         explicit MockTimerMaker(struct event_base* evb)
@@ -361,7 +359,7 @@ protected:
             return config_dir_;
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
+        [[nodiscard]] tr::TimerMaker& timer_maker() override
         {
             return mock_timer_maker_;
         }
@@ -385,8 +383,6 @@ protected:
     void SetUp() override
     {
         SandboxedTest::SetUp();
-
-        tr_lib_init();
 
         tr_session_thread::tr_evthread_init();
         event_base_ = event_base_new();
@@ -542,7 +538,7 @@ TEST_F(DhtTest, savesStateIfSwarmIsGood)
 {
     auto const state_file = MockStateFile{};
     auto const dat_file = MockStateFile::filename(sandboxDir());
-    EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+    EXPECT_FALSE(tr_sys_path_exists(dat_file));
 
     {
         auto mediator = MockMediator{ event_base_ };
@@ -553,17 +549,17 @@ TEST_F(DhtTest, savesStateIfSwarmIsGood)
 
         // as dht goes out of scope,
         // it should save its state if the swarm is healthy
-        EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+        EXPECT_FALSE(tr_sys_path_exists(dat_file));
     }
 
-    EXPECT_TRUE(tr_sys_path_exists(dat_file.c_str()));
+    EXPECT_TRUE(tr_sys_path_exists(dat_file));
 }
 
 TEST_F(DhtTest, doesNotSaveStateIfSwarmIsBad)
 {
     auto const state_file = MockStateFile{};
     auto const dat_file = MockStateFile::filename(sandboxDir());
-    EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+    EXPECT_FALSE(tr_sys_path_exists(dat_file));
 
     {
         auto mediator = MockMediator{ event_base_ };
@@ -574,10 +570,10 @@ TEST_F(DhtTest, doesNotSaveStateIfSwarmIsBad)
 
         // as dht goes out of scope,
         // it should save its state if the swarm is healthy
-        EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+        EXPECT_FALSE(tr_sys_path_exists(dat_file));
     }
 
-    EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+    EXPECT_FALSE(tr_sys_path_exists(dat_file));
 }
 
 TEST_F(DhtTest, usesBootstrapFile)
@@ -604,10 +600,7 @@ TEST_F(DhtTest, usesBootstrapFile)
     auto const expected = tr_socket_address{ tr_address::from_string(BootstrapNodeName).value_or(tr_address{}),
                                              BootstrapNodePort };
     auto& pinged = mediator.mock_dht_.pinged_;
-    waitFor( //
-        event_base_,
-        [&pinged]() { return !std::empty(pinged); },
-        5s);
+    waitFor(event_base_, [&pinged]() { return !std::empty(pinged); }, 5s);
     ASSERT_EQ(1U, std::size(pinged));
     auto const [actual_addrport, time] = pinged.front();
     EXPECT_EQ(expected.address(), actual_addrport.address());
@@ -681,4 +674,4 @@ TEST_F(DhtTest, callsPeriodicPeriodically)
     EXPECT_NEAR(mock_dht.n_periodic_calls_, baseline + Periods, Periods / 2.0);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

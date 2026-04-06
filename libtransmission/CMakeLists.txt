@@ -28,6 +28,10 @@ target_sources(${TR_NAME}
         announcer-udp.cc
         announcer.cc
         announcer.h
+        local-data.cc
+        local-data.h
+        api-compat.cc
+        api-compat.h
         bandwidth.cc
         bandwidth.h
         benc.h
@@ -37,12 +41,11 @@ target_sources(${TR_NAME}
         block-info.h
         blocklist.cc
         blocklist.h
-        cache.cc
-        cache.h
         clients.cc
         clients.h
         completion.cc
         completion.h
+        constants.h
         crypto-utils-ccrypto.cc
         crypto-utils-fallback.cc
         crypto-utils-mbedtls.cc
@@ -53,11 +56,13 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
-        favicon-cache.h
-        file-capacity.cc
+        env.cc
+        env.h
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
+        file-utils.cc
+        file-utils.h
         file-win32.cc
         file.cc
         file.h
@@ -78,7 +83,6 @@ target_sources(${TR_NAME}
         mime-types.h
         net.cc
         net.h
-        observable.h
         open-files.cc
         open-files.h
         peer-common.h
@@ -110,6 +114,8 @@ target_sources(${TR_NAME}
         rpc-server.h
         rpcimpl.cc
         rpcimpl.h
+        serializer.cc
+        serializer.h
         session-alt-speeds.cc
         session-alt-speeds.h
         session-id.cc
@@ -118,10 +124,11 @@ target_sources(${TR_NAME}
         session-thread.h
         session.cc
         session.h
-        settings.cc
-        settings.h
         stats.cc
         stats.h
+        string-utils.cc
+        string-utils.h
+        $<$<BOOL:${IS_APPLE_CLANG}>:string-utils.mm>
         subprocess-posix.cc
         subprocess-win32.cc
         subprocess.h
@@ -157,11 +164,11 @@ target_sources(${TR_NAME}
         tr-utp.cc
         tr-utp.h
         transmission.h
+        types.h
         utils-ev.cc
         utils-ev.h
         utils.cc
         utils.h
-        $<$<BOOL:${IS_APPLE_CLANG}>:utils.mm>
         variant-benc.cc
         variant-json.cc
         variant.cc
@@ -200,8 +207,6 @@ tr_allow_compile_if(
         crypto-utils-openssl.cc
     [=[[CRYPTO_PKG STREQUAL "wolfssl"]]=]
         crypto-utils-wolfssl.cc
-    [=[[ENABLE_UTP]]=]
-        tr-utp.cc
     [=[[WITH_INOTIFY]]=]
         watchdir-inotify.cc
     [=[[WITH_KQUEUE]]=]
@@ -232,19 +237,12 @@ target_compile_definitions(${TR_NAME}
         $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
         $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
 
-tr_target_compile_definitions_for_headers(${TR_NAME}
-    PRIVATE
-        sys/statvfs.h
-        xfs/xfs.h
-        xlocale.h)
-
 tr_target_compile_definitions_for_functions(${TR_NAME}
     PRIVATE
         copyfile
         copy_file_range
         fallocate64
         flock
-        getmntent
         htonll
         mkdtemp
         ntohll
@@ -252,8 +250,7 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
         posix_fallocate
         pread
         pwrite
-        sendfile64
-        statvfs)
+        sendfile64)
 
 target_include_directories(${TR_NAME}
     PUBLIC
@@ -268,14 +265,14 @@ endif()
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
-        deflate::deflate
+        libdeflate::libdeflate
         CURL::libcurl
         FastFloat::fast_float
         psl::psl
         natpmp::natpmp
-        miniupnpc::libminiupnpc
+        miniupnpc::miniupnpc
         dht::dht
-        libutp::libutp
+        $<$<BOOL:${ENABLE_UTP}>:libutp::libutp>
         libb64::libb64
         ${Intl_LIBRARIES}
         ${LIBM_LIBRARY}
@@ -284,8 +281,8 @@ target_link_libraries(${TR_NAME}
         RapidJSON
         utf8::cpp
         wildmat
-        WideInteger::WideInteger
-        Crc32c::crc32c
+        transmission::WideInteger
+        MadlerCrcany
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
@@ -293,9 +290,11 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
         transmission::crypto_impl
-        fmt::fmt-header-only
-        small::small
-        libevent::event)
+        transmission::fmt-header-only
+        Pal::Sigslot
+        transmission::small
+        libevent::core
+        libevent::extra)
 
 if(INSTALL_LIB)
     install(
@@ -305,7 +304,6 @@ if(INSTALL_LIB)
         FILES
             error-types.h
             error.h
-            favicon-cache.h
             file.h
             log.h
             makemeta.h

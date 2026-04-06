@@ -12,6 +12,8 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
@@ -19,12 +21,11 @@
 #include <libtransmission/open-files.h>
 #include <libtransmission/tr-strbuf.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-using OpenFilesTest = libtransmission::test::SessionTest;
+using OpenFilesTest = tr::test::SessionTest;
 
 static auto constexpr PreallocateFull = tr_open_files::Preallocation::Full;
 
@@ -201,7 +202,7 @@ TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
         results[i] = static_cast<bool>(session_->openFiles().get(TorId, i, false));
     }
     sorted = results;
-    std::sort(std::begin(sorted), std::end(sorted));
+    std::ranges::sort(sorted);
     EXPECT_EQ(sorted, results);
-    EXPECT_GT(std::count(std::begin(results), std::end(results), true), 0);
+    EXPECT_GT(std::ranges::count(results, true), 0);
 }

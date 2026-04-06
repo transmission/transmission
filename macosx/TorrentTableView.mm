@@ -28,6 +28,29 @@ static CGFloat const kErrorImageSize = 20.0;
 
 static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
+@interface NSIndexSet (Transmission)
+- (NSIndexSet*)symmetricDifference:(NSIndexSet*)otherSet;
+@end
+
+@implementation NSIndexSet (Transmission)
+
+- (NSIndexSet*)symmetricDifference:(NSIndexSet*)otherSet
+{
+    NSMutableIndexSet* result = [self mutableCopy];
+    [result addIndexes:otherSet];
+
+    [self enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL*) {
+        if ([otherSet containsIndex:idx])
+        {
+            [result removeIndex:idx];
+        }
+    }];
+
+    return [result copy];
+}
+
+@end
+
 @interface TorrentTableView ()
 
 @property(nonatomic) IBOutlet Controller* fController;
@@ -48,6 +71,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 @property(nonatomic) NSView* fPositioningView;
 
 @property(nonatomic) NSDictionary* fHoverEventDict;
+
+@property(nonatomic) NSMutableIndexSet* fPendingSelectionReloadRows;
 
 @end
 
@@ -346,22 +371,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSString* groupName = groupIndex != -1 ? [GroupsController.groups nameForIndex:groupIndex] :
                                                  NSLocalizedString(@"No Group", "Group table row");
 
-        NSInteger row = [self rowForItem:item];
-        if ([self isRowSelected:row])
-        {
-            NSMutableAttributedString* string = [[NSMutableAttributedString alloc] initWithString:groupName];
-            NSDictionary* attributes = @{
-                NSFontAttributeName : [NSFont boldSystemFontOfSize:11.0],
-                NSForegroundColorAttributeName : [NSColor labelColor]
-            };
-
-            [string addAttributes:attributes range:NSMakeRange(0, string.length)];
-            groupCell.fGroupTitleField.attributedStringValue = string;
-        }
-        else
-        {
-            groupCell.fGroupTitleField.stringValue = groupName;
-        }
+        groupCell.fGroupTitleField.stringValue = groupName;
 
         groupCell.fGroupDownloadField.stringValue = [NSString stringForSpeed:group.downloadRate];
         groupCell.fGroupDownloadView.image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
@@ -430,8 +440,34 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (void)outlineViewSelectionDidChange:(NSNotification*)notification
 {
-    self.fSelectedRowIndexes = self.selectedRowIndexes;
-    [self reloadVisibleRows];
+    NSIndexSet* oldSelection = self.fSelectedRowIndexes ?: [NSIndexSet indexSet];
+    NSIndexSet* newSelection = self.selectedRowIndexes;
+    self.fSelectedRowIndexes = newSelection;
+
+    NSIndexSet* changedRows = [oldSelection symmetricDifference:newSelection];
+    if (changedRows.count > 0)
+    {
+        if (!self.fPendingSelectionReloadRows)
+        {
+            self.fPendingSelectionReloadRows = [[NSMutableIndexSet alloc] init];
+            [self performSelector:@selector(flushSelectionReload) withObject:nil afterDelay:0 inModes:@[ NSRunLoopCommonModes ]];
+        }
+
+        [self.fPendingSelectionReloadRows addIndexes:changedRows];
+    }
+}
+
+- (void)flushSelectionReload
+{
+    NSMutableIndexSet* rows = self.fPendingSelectionReloadRows;
+    self.fPendingSelectionReloadRows = nil;
+
+    NSInteger const numberOfRows = self.numberOfRows;
+    [rows removeIndexesInRange:NSMakeRange(numberOfRows, NSIntegerMax - numberOfRows)];
+    if (rows.count > 0)
+    {
+        [self reloadDataForRowIndexes:rows columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
 }
 
 - (void)outlineViewItemDidExpand:(NSNotification*)notification

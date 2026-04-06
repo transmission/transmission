@@ -45,6 +45,23 @@ On macOS, Transmission is usually built with Xcode. Everywhere else, it's CMake 
 
 Note that Transmission existed in C for over a decade and those idioms don't change overnight. "Follow the C++ core guidelines" can be difficult when working with older code, and the maintainers will understand that when reviewing your PRs. :smiley:
 
+## Pull Requests
+
+When submitting a pull request, please add a one-sentence paragraph that begins with `Notes: ` for the release notes script.
+
+- If this is a change that a user wouldn't care about -- say, a fix to a CI script -- use "Notes: none"
+- If this is a change that affects users directly, describe the change in those terms:
+  - GOOD: "Notes: Added the ability to download torrents in sequential order."
+  - GOOD: "Notes: Fixed a crash when removing local data after a torrent completes."
+  - GOOD: "Notes: Improved performance when downloading from peers using µTP."
+- If this is a change that doesn't affect users but is important to packagers, describe it in those terms.
+  - GOOD: "Notes: The Qt UI now requires Qt 5.15 or higher."
+  - GOOD: "Notes: Migrated from C++17 to C++20."
+- Pay attention to your audience: these are release notes, not commit messages.
+  - BAD: "fix: crash in tr_swarmGetStats"
+  - BAD: "address minor clang warning"
+  - BAD: "Refactor: add libtransmission::Values."
+
 ## Considerations
 
 - Prefer commonly-used tools over bespoke ones, e.g. use `std::list` instead of rolling your own list. This simplifies the code and makes it easier for other contributors to work with.

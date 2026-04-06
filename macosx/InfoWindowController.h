@@ -12,6 +12,7 @@
 @property(nonatomic, readonly) BOOL canQuickLook;
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
+- (void)removeTorrentsFromInfo:(NSArray<Torrent*>*)torrents;
 - (void)updateInfoStats;
 - (void)updateOptions;
 

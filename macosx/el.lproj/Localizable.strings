@@ -47,7 +47,7 @@
 "%lu files" = "%lu αρχεία";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%lu Αρχεία";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu εισερχόμενοι";
@@ -83,7 +83,7 @@
 "%lu tracker" = "%lu ιχνηλάτης";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%lu Ιχνηλάτες";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,7 +94,7 @@
 "%lu web seeds" = "%lu διαμοιραστές δικτύου";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%lu Διαμοιραστές Δικτύου";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u κομμάτια, %2$@ έκαστο";
@@ -121,7 +121,7 @@
 "1 time" = "1 φορά";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "1 Ιχνηλάτης";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "1 μεταφορά";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "1 Διαμοιραστής Δικτύου";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" δεν είναι ένα έγκυρο αρχείο torrent.";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "Δημιουργία Αρχείου Torrent";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "Δημιουργήθηκε την %@";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "Δημιουργήθηκε την %1$@ με %2$@";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "Δημιουργήθηκε με %@";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Η δημιουργία του \"%@\" απέτυχε.";

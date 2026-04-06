@@ -25,12 +25,15 @@ class InteropObject : public QObject
 
 public:
     explicit InteropObject(QObject* parent = nullptr);
+    ~InteropObject() override = default;
     InteropObject& operator=(InteropObject&&) = delete;
     InteropObject& operator=(InteropObject const&) = delete;
     InteropObject(InteropObject&&) = delete;
     InteropObject(InteropObject const&) = delete;
 
 public slots:
+    // NOLINTBEGIN(readability-identifier-naming)
     [[nodiscard]] bool PresentWindow() const;
     [[nodiscard]] bool AddMetainfo(QString const& metainfo) const;
+    // NOLINTEND(readability-identifier-naming)
 };

@@ -4,11 +4,11 @@
 // License text can be found in the licenses/ folder.
 
 #include "libtransmission/error.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/string-utils.h"
 
-void tr_error::set_from_errno(int errnum)
+void tr_error::set_from_errno(tr_error_code_t errnum)
 {
     code_ = errnum;
 
-    message_ = errnum != 0 ? tr_strerror(errnum) : "";
+    message_ = errnum != 0 ? tr_strerror(static_cast<int>(errnum)) : "";
 }

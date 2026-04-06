@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
 
 #import "InfoPeersViewController.h"
 #import "NSStringAdditions.h"
@@ -258,13 +257,15 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
     }
 }
 
-- (NSString*)connectedTextFrom:(NSUInteger)tracker //
+// clang-format off: compatibility with unnamed arguments
+- (NSString*)connectedTextFrom:(NSUInteger)tracker
                               :(NSUInteger)incoming
                               :(NSUInteger)cache
                               :(NSUInteger)lpd
                               :(NSUInteger)pex
                               :(NSUInteger)dht
                               :(NSUInteger)ltep
+// clang-format on
 {
     NSMutableArray* fromComponents = [NSMutableArray arrayWithCapacity:7];
     if (tracker > 0)

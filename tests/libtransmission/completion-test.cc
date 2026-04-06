@@ -16,9 +16,9 @@
 #include <libtransmission/crypto-utils.h> // for tr_rand_obj()
 #include <libtransmission/completion.h>
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
-using CompletionTest = ::testing::Test;
+using CompletionTest = ::tr::test::TransmissionTest;
 
 namespace
 {
@@ -29,7 +29,7 @@ struct TestTorrent
 
     [[nodiscard]] tr_completion makeCompletion(tr_block_info const& block_info) const
     {
-        return { [this](tr_piece_index_t const piece) { return dnd_pieces.count(piece) == 0; }, &block_info };
+        return { [this](tr_piece_index_t const piece) { return !dnd_pieces.contains(piece); }, &block_info };
     }
 };
 
@@ -300,7 +300,7 @@ TEST_F(CompletionTest, sizeWhenDone)
     auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
 
-    // check that adding or removing blocks or pieces does not affect sizeWhenDone
+    // check that adding or removing blocks or pieces does not affect size_when_done
     auto completion = torrent.makeCompletion(block_info);
     EXPECT_EQ(block_info.total_size(), completion.size_when_done());
     completion.add_block(0);
@@ -310,7 +310,7 @@ TEST_F(CompletionTest, sizeWhenDone)
     completion.remove_piece(0);
     EXPECT_EQ(block_info.total_size(), completion.size_when_done());
 
-    // check that flagging complete pieces as dnd does not affect sizeWhenDone
+    // check that flagging complete pieces as dnd does not affect size_when_done
     for (size_t i = 0; i < 32; ++i)
     {
         completion.add_piece(i);
@@ -319,7 +319,7 @@ TEST_F(CompletionTest, sizeWhenDone)
     completion.invalidate_size_when_done();
     EXPECT_EQ(block_info.total_size(), completion.size_when_done());
 
-    // check that flagging missing pieces as dnd does not affect sizeWhenDone
+    // check that flagging missing pieces as dnd does not affect size_when_done
     for (size_t i = 32; i < 48; ++i)
     {
         torrent.dnd_pieces.insert(i);
@@ -401,18 +401,18 @@ TEST_F(CompletionTest, amountDone)
         completion.remove_piece(piece);
     }
     completion.amount_done(std::data(bins), std::size(bins));
-    std::for_each(std::begin(bins), std::end(bins), [](float bin) { EXPECT_DOUBLE_EQ(0.0, bin); });
+    std::ranges::for_each(bins, [](float bin) { EXPECT_FLOAT_EQ(0.0, bin); });
 
     // one block
     completion.add_block(0);
     completion.amount_done(std::data(bins), std::size(bins));
-    EXPECT_DOUBLE_EQ(0.0, bins[1]);
+    EXPECT_FLOAT_EQ(0.0, bins[1]);
 
     // one piece
     completion.add_piece(0);
     completion.amount_done(std::data(bins), std::size(bins));
-    EXPECT_DOUBLE_EQ(1.0, bins[0]);
-    EXPECT_DOUBLE_EQ(0.0, bins[1]);
+    EXPECT_FLOAT_EQ(1.0, bins[0]);
+    EXPECT_FLOAT_EQ(0.0, bins[1]);
 
     // all pieces
     for (tr_piece_index_t piece = 0; piece < block_info.piece_count(); ++piece)
@@ -420,7 +420,7 @@ TEST_F(CompletionTest, amountDone)
         completion.add_piece(piece);
     }
     completion.amount_done(std::data(bins), std::size(bins));
-    std::for_each(std::begin(bins), std::end(bins), [](float bin) { EXPECT_DOUBLE_EQ(1.0, bin); });
+    std::ranges::for_each(bins, [](float bin) { EXPECT_FLOAT_EQ(1.0, bin); });
 
     // don't do anything if fed bad input
     auto const backup = bins;

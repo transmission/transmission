@@ -16,6 +16,7 @@ class FilterBarComboBoxDelegate : public QItemDelegate
 
 public:
     FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo);
+    ~FilterBarComboBoxDelegate() override = default;
     FilterBarComboBoxDelegate(FilterBarComboBoxDelegate&&) = delete;
     FilterBarComboBoxDelegate(FilterBarComboBoxDelegate const&) = delete;
     FilterBarComboBoxDelegate& operator=(FilterBarComboBoxDelegate&&) = delete;
@@ -26,8 +27,8 @@ public:
 
 protected:
     // QAbstractItemDelegate
-    void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const override;
-    [[nodiscard]] QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const override;
+    void paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const override;
+    [[nodiscard]] QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const override;
 
 private:
     QComboBox* const combo_ = {};

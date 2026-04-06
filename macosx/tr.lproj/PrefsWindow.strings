@@ -54,7 +54,7 @@
 "1211.title" = "Sıfırla";
 
 /* Class = "NSTextFieldCell"; title = "Reset all alerts:"; ObjectID = "1212"; */
-"1212.title" = "Tüm uyarıları sıfırla:";
+"1212.title" = "Tüm ikazları sıfırla:";
 
 /* Class = "NSButtonCell"; title = "Automatically check daily"; ObjectID = "1213"; */
 "1213.title" = "Günlük denetle";
@@ -63,7 +63,7 @@
 "1214.title" = "Güncellemeleri denetle:";
 
 /* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
-"1216.title" = "Öntanımlı konum:";
+"1216.title" = "Saptanmış konum:";
 
 /* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
 "1217.title" = "Ayarlar:";
@@ -397,3 +397,6 @@
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
 "pgY-W3-HdI.title" = "Saptanmış Uygulamayı Belirle";
+
+/* Class = "NSButtonCell"; title = "Verify data when download completes"; ObjectID = "wM8-cD-WAB"; */
+/* "wM8-cD-WAB.title" = ""; */

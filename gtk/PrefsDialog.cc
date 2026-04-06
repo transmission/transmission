@@ -51,7 +51,7 @@
 #include <string>
 #include <string_view>
 
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 /**
 ***
@@ -315,7 +315,8 @@ Gtk::ComboBox* PageBase::init_encryption_combo(Glib::ustring const& name, tr_qua
             { _("Prefer encryption"), TR_ENCRYPTION_PREFERRED },
             { _("Require encryption"), TR_ENCRYPTION_REQUIRED },
         });
-    gtr_combo_box_set_active_enum(*combo, gtr_pref_int_get(key));
+    auto const mode = gtr_pref_get<tr_encryption_mode>(key).value_or(TR_ENCRYPTION_PREFERRED);
+    gtr_combo_box_set_active_enum(*combo, static_cast<int>(mode));
     combo->signal_changed().connect([this, combo, key]() { onIntComboChanged(*combo, key); });
     return combo;
 }
@@ -424,8 +425,8 @@ void DownloadingPage::on_core_prefs_changed(tr_quark const key)
 {
     if (key == TR_KEY_download_dir)
     {
-        char const* downloadDir = tr_sessionGetDownloadDir(core_->get_session());
-        freespace_label_->set_dir(downloadDir);
+        std::string const download_dir = tr_sessionGetDownloadDir(core_->get_session());
+        freespace_label_->set_dir(download_dir);
     }
 }
 
@@ -982,7 +983,7 @@ void NetworkPage::updatePortStatusText()
 void NetworkPage::portTestSetSensitive()
 {
     // Depend on the RPC call status instead of the UI status, so that the widgets
-    // won't be enabled even if the port peer port changed while we have port-test
+    // won't be enabled even if the port peer port changed while we have port_test
     // RPC call(s) in-flight.
     auto const sensitive = !core_->port_test_pending(Session::PORT_TEST_IPV4) &&
         !core_->port_test_pending(Session::PORT_TEST_IPV6);
@@ -1007,7 +1008,7 @@ void NetworkPage::onPortTested(std::optional<bool> const result, Session::PortTe
 
     // Only update the UI if the current status is "checking", so that
     // we won't show the port test results for the old peer port if it
-    // changed while we have port-test RPC call(s) in-flight.
+    // changed while we have port_test RPC call(s) in-flight.
     if (auto& status = portTestStatus_[ip_protocol]; status == PORT_TEST_CHECKING)
     {
         status = ResultToStatus(result);

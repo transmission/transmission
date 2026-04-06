@@ -4,19 +4,22 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/favicon-cache.h>
+#include <libtransmission-app/favicon-cache.h>
 
 #include <QApplication>
 #include <QPixmap>
 #include <QStandardPaths>
 
+#include "QtCompat.h"
+
+using namespace tr::app;
 using Icon = QPixmap;
 
 template<>
 Icon FaviconCache<Icon>::create_from_file(std::string_view filename) const // NOLINT(readability-identifier-naming)
 {
     auto icon = QPixmap{};
-    if (!icon.load(QString::fromUtf8(std::data(filename), std::size(filename))))
+    if (!icon.load(QString::fromUtf8(std::data(filename), static_cast<IF_QT6(qsizetype, int)>(std::size(filename)))))
     {
         return {};
     }

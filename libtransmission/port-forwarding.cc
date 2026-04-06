@@ -10,9 +10,6 @@
 #include <fmt/format.h>
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
-
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/log.h"
 #include "libtransmission/port-forwarding-natpmp.h"
 #include "libtransmission/port-forwarding-upnp.h"
@@ -197,10 +194,11 @@ private:
         if (!std::empty(result.local_port) && !std::empty(result.advertised_port))
         {
             mediator_.on_port_forwarded(result.advertised_port);
-            tr_logAddInfo(fmt::format(
-                fmt::runtime(_("Mapped private port {private_port} to public port {public_port}")),
-                fmt::arg("private_port", result.local_port.host()),
-                fmt::arg("public_port", result.advertised_port.host())));
+            tr_logAddInfo(
+                fmt::format(
+                    fmt::runtime(_("Mapped private port {private_port} to public port {public_port}")),
+                    fmt::arg("private_port", result.local_port.host()),
+                    fmt::arg("public_port", result.advertised_port.host())));
         }
 
         upnp_state_ = tr_upnpPulse(
@@ -213,10 +211,11 @@ private:
 
         if (auto const new_state = state(); new_state != old_state)
         {
-            tr_logAddInfo(fmt::format(
-                fmt::runtime(_("State changed from '{old_state}' to '{state}'")),
-                fmt::arg("old_state", getNatStateStr(old_state)),
-                fmt::arg("state", getNatStateStr(new_state))));
+            tr_logAddInfo(
+                fmt::format(
+                    fmt::runtime(_("State changed from '{old_state}' to '{state}'")),
+                    fmt::arg("old_state", getNatStateStr(old_state)),
+                    fmt::arg("state", getNatStateStr(new_state))));
         }
     }
 
@@ -232,7 +231,7 @@ private:
     tr_upnp* upnp_ = nullptr;
     std::unique_ptr<tr_natpmp> natpmp_;
 
-    std::unique_ptr<libtransmission::Timer> timer_;
+    std::unique_ptr<tr::Timer> timer_;
 };
 
 std::unique_ptr<tr_port_forwarding> tr_port_forwarding::create(Mediator& mediator)
