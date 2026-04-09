@@ -35,6 +35,7 @@
 #include "OptionsDialog.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
+#include "QtCompat.h"
 #include "RelocateDialog.h"
 #include "Session.h"
 #include "SessionDialog.h"
@@ -291,7 +292,7 @@ void MainWindow::onSetPrefs()
     QVariantList const p = sender()->property(PrefVariantsKey).toList();
     assert(p.size() % 2 == 0);
 
-    for (int i = 0, n = p.size(); i < n; i += 2)
+    for (IF_QT6(qsizetype, int) i = 0, n = p.size(); i < n; i += 2)
     {
         prefs_.set(p[i].toInt(), p[i + 1]);
     }
@@ -1359,7 +1360,7 @@ void MainWindow::removeTorrents(bool const delete_files)
         return;
     }
 
-    int const count = ids.size();
+    auto const count = static_cast<int>(ids.size());
 
     if (!delete_files)
     {
@@ -1483,7 +1484,7 @@ void MainWindow::updateNetworkLabel()
     }
     else if (seconds_since_last_read < 120)
     {
-        tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::time_to_string(seconds_since_last_read));
+        tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::time_to_string(static_cast<int>(seconds_since_last_read)));
     }
     else
     {

@@ -98,9 +98,8 @@ private slots:
         // verify that session_set::download_dir was POSTed
         QVERIFY(nam.create_count > before);
         auto const payload_re = getSessionSetDownloadDirRegEx(initial_style, downloads_dir);
-        auto const has_session_set = std::any_of(
-            nam.request_bodies.cbegin(),
-            nam.request_bodies.cend(),
+        auto const has_session_set = std::ranges::any_of(
+            std::as_const(nam.request_bodies),
             [&payload_re](QByteArray const& body)
             {
                 auto const str = QString::fromUtf8(body);

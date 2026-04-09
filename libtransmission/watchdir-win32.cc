@@ -229,7 +229,7 @@ private:
             info->NextEntryOffset = bytes_transferred -
                 (reinterpret_cast<BYTE*>(info) - reinterpret_cast<BYTE*>(std::data(buffer_)));
 
-            send(notify_pipe_[1], reinterpret_cast<char const*>(std::data(buffer_)), bytes_transferred, 0);
+            send(notify_pipe_[1], reinterpret_cast<char const*>(std::data(buffer_)), static_cast<int>(bytes_transferred), 0);
 
             if (!to_bool(ReadDirectoryChangesW(
                     fd_,

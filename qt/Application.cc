@@ -35,6 +35,7 @@
 #include "MainWindow.h"
 #include "OptionsDialog.h"
 #include "Prefs.h"
+#include "QtCompat.h"
 #include "Session.h"
 #include "TorrentModel.h"
 #include "WatchDir.h"
@@ -54,6 +55,7 @@ auto const FDONotificationsInterfaceName = QStringLiteral("org.freedesktop.Notif
 auto constexpr StatsRefreshIntervalMsec = 3000;
 auto constexpr SessionRefreshIntervalMsec = 3000;
 auto constexpr ModelRefreshIntervalMsec = 3000;
+auto constexpr InternRefreshIntervalMsec = 5 * 60 * 1000;
 
 bool loadTranslation(QTranslator& translator, QString const& name, QLocale const& locale, QStringList const& search_directories)
 {
@@ -126,6 +128,16 @@ QAccessibleInterface* accessibleFactory(QString const& className, QObject* objec
 #endif // QT_CONFIG(accessibility)
 
 } // namespace
+
+void Application::pruneInternedStrings()
+{
+    std::erase_if(interned_strings_, [](QString const& str) { return str.isDetached(); });
+}
+
+QString Application::intern(QString const& in)
+{
+    return *interned_strings_.insert(in).first;
+}
 
 Application::Application(
     Prefs& prefs,
@@ -203,6 +215,12 @@ Application::Application(
     timer->setInterval(SessionRefreshIntervalMsec);
     timer->start();
 
+    timer = &intern_timer_;
+    connect(timer, &QTimer::timeout, this, &Application::pruneInternedStrings);
+    timer->setSingleShot(false);
+    timer->setInterval(InternRefreshIntervalMsec);
+    timer->start();
+
     maybeUpdateBlocklist();
 
     if (!first_time)
@@ -241,12 +259,8 @@ Application::~Application() = default;
 
 void Application::loadTranslations()
 {
-    auto const qt_qm_dirs = QStringList{} <<
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        QLibraryInfo::path(QLibraryInfo::TranslationsPath) <<
-#else
-        QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
-#endif
+    auto const qt_qm_dirs = QStringList{} << //
+        IF_QT6(QLibraryInfo::path(QLibraryInfo::TranslationsPath), QLibraryInfo::location(QLibraryInfo::TranslationsPath)) <<
 #ifdef TRANSLATIONS_DIR
         QStringLiteral(TRANSLATIONS_DIR) <<
 #endif

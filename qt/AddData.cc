@@ -14,6 +14,7 @@
 #include <libtransmission/web-utils.h>
 
 #include "AddData.h"
+#include "QtCompat.h"
 #include "Utils.h"
 
 namespace
@@ -44,7 +45,7 @@ QString getNameFromMagnet(QString const& magnet)
     }
 
     auto const& hashstr = tmp.info_hash_string();
-    return QString::fromUtf8(std::data(hashstr), std::size(hashstr));
+    return QString::fromUtf8(std::data(hashstr), static_cast<IF_QT6(qsizetype, int)>(std::size(hashstr)));
 }
 
 } // namespace

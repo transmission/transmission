@@ -200,9 +200,14 @@ bool FilterBar::Impl::tracker_filter_model_update()
         std::string sitename;
         std::string announce_url;
 
-        bool operator<(site_info const& that) const
+        TR_CONSTEXPR_STR auto operator<=>(site_info const& that) const noexcept
         {
-            return sitename < that.sitename;
+            return sitename <=> that.sitename;
+        }
+
+        TR_CONSTEXPR_STR auto operator==(site_info const& that) const
+        {
+            return sitename == that.sitename;
         }
     };
 
@@ -245,7 +250,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
     auto const n_sites = std::size(site_infos);
     auto sites_v = std::vector<site_info>(n_sites);
     std::ranges::transform(site_infos, std::begin(sites_v), [](auto const& it) { return it.second; });
-    std::sort(std::begin(sites_v), std::end(sites_v));
+    std::ranges::sort(sites_v);
 
     // update the "all" count
     auto iter = tracker_model_->children().begin();

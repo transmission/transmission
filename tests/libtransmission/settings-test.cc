@@ -205,13 +205,29 @@ TEST_F(SettingsTest, canLoadPort)
 
     auto settings = tr_session::Settings{};
     auto const default_value = settings.peer_port;
-    auto constexpr ExpectedValue = tr_port::from_host(8080);
+    static auto constexpr ExpectedValue = tr_port::from_host(8080);
     ASSERT_NE(ExpectedValue, default_value);
 
     auto map = tr_variant::Map{ 1U };
     map.try_emplace(Key, ExpectedValue.host());
-    settings.load(tr_variant{ std::move(map) });
+    settings.load(std::move(map));
     EXPECT_EQ(ExpectedValue, settings.peer_port);
+
+    static auto constexpr TooLargeValue = 0x10000;
+    EXPECT_NE(TooLargeValue, default_value.host());
+    settings = tr_session::Settings{};
+    map = tr_variant::Map{ 1U };
+    map.insert_or_assign(Key, TooLargeValue);
+    settings.load(std::move(map));
+    EXPECT_EQ(default_value, settings.peer_port);
+
+    static auto constexpr TooSmallValue = -1;
+    EXPECT_NE(TooSmallValue, default_value.host());
+    settings = tr_session::Settings{};
+    map = tr_variant::Map{ 1U };
+    map.insert_or_assign(Key, TooSmallValue);
+    settings.load(std::move(map));
+    EXPECT_EQ(default_value, settings.peer_port);
 }
 
 TEST_F(SettingsTest, canSavePort)
@@ -272,12 +288,22 @@ TEST_F(SettingsTest, canLoadSizeT)
     static auto constexpr Key = TR_KEY_queue_stalled_minutes;
 
     auto settings = tr_session::Settings{};
-    auto const expected_value = settings.queue_stalled_minutes + 5U;
+    auto const default_value = settings.queue_stalled_minutes;
+    auto const expected_value = default_value + 5U;
+    EXPECT_NE(expected_value, default_value);
 
     auto map = tr_variant::Map{ 1U };
     map.try_emplace(Key, expected_value);
-    settings.load(tr_variant{ std::move(map) });
+    settings.load(std::move(map));
     EXPECT_EQ(expected_value, settings.queue_stalled_minutes);
+
+    static auto constexpr NegValue = -1;
+    EXPECT_NE(default_value, NegValue);
+    settings = tr_session::Settings{};
+    map = tr_variant::Map{ 1U };
+    map.insert_or_assign(Key, NegValue);
+    settings.load(std::move(map));
+    EXPECT_EQ(default_value, settings.queue_stalled_minutes);
 }
 
 TEST_F(SettingsTest, canSaveSizeT)

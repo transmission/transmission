@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bitset>
+#include <compare>
 #include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
@@ -18,13 +19,11 @@
 #include <QString>
 #include <QStringList>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/crypto-utils.h>
-#include "libtransmission/tr-macros.h"
 #include <libtransmission/quark.h>
 
 #include "IconCache.h"
+#include "QtCompat.h"
 #include "Speed.h"
 
 class QPixmap;
@@ -115,7 +114,7 @@ public:
         : data_{ data }
     {
         auto const hashstr = tr_sha1_to_string(data_);
-        data_str_ = QString::fromUtf8(std::data(hashstr), std::size(hashstr));
+        data_str_ = QString::fromUtf8(std::data(hashstr), static_cast<IF_QT6(qsizetype, int)>(std::size(hashstr)));
     }
 
     explicit TorrentHash(std::string_view const str)
@@ -128,14 +127,9 @@ public:
         return data_ == that.data_;
     }
 
-    [[nodiscard]] constexpr auto operator!=(TorrentHash const& that) const
+    [[nodiscard]] constexpr auto operator<=>(TorrentHash const& that) const
     {
-        return !(*this == that);
-    }
-
-    [[nodiscard]] auto operator<(TorrentHash const& that) const
-    {
-        return data_ < that.data_;
+        return data_ <=> that.data_;
     }
 
     [[nodiscard]] constexpr auto& toString() const noexcept
@@ -292,21 +286,17 @@ public:
 
     [[nodiscard]] constexpr auto ratio() const noexcept
     {
-        auto const numerator = static_cast<double>(uploadedEver());
-        auto const denominator = sizeWhenDone();
-        return denominator > 0U ? numerator / denominator : double{};
+        return upload_ratio_;
     }
 
     [[nodiscard]] constexpr double percentComplete() const noexcept
     {
-        return totalSize() != 0 ? haveTotal() / static_cast<double>(totalSize()) : 0;
+        return percent_complete_;
     }
 
     [[nodiscard]] constexpr double percentDone() const noexcept
     {
-        auto const l = leftUntilDone();
-        auto const s = sizeWhenDone();
-        return s ? static_cast<double>(s - l) / static_cast<double>(s) : 0.0;
+        return percent_done_;
     }
 
     [[nodiscard]] constexpr auto failedEver() const noexcept
@@ -314,9 +304,9 @@ public:
         return failed_ever_;
     }
 
-    int compareSeedProgress(Torrent const& that) const;
-    int compareRatio(Torrent const& that) const;
-    int compareETA(Torrent const& that) const;
+    std::partial_ordering compareSeedProgress(Torrent const& that) const;
+    std::partial_ordering compareRatio(Torrent const& that) const;
+    std::strong_ordering compareETA(Torrent const& that) const;
 
     [[nodiscard]] constexpr auto getETA() const noexcept
     {
@@ -593,6 +583,7 @@ public:
         PEERS_GETTING_FROM_US,
         PEERS_SENDING_TO_US,
         PEER_LIMIT,
+        PERCENT_COMPLETE,
         PERCENT_DONE,
         PIECE_COUNT,
         PIECE_SIZE,
@@ -612,6 +603,7 @@ public:
         UPLOADED_EVER,
         UPLOAD_LIMIT,
         UPLOAD_LIMITED,
+        UPLOAD_RATIO,
         UPLOAD_SPEED,
         WEBSEEDS_SENDING_TO_US,
 
@@ -669,9 +661,11 @@ private:
     uint64_t uploaded_ever_ = {};
 
     double metadata_percent_complete_ = {};
+    double percent_complete_ = {};
     double percent_done_ = {};
     double recheck_progress_ = {};
     double seed_ratio_limit_ = {};
+    double upload_ratio_ = {};
 
     QString comment_;
     QString creator_;

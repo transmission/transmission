@@ -9,6 +9,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <functional> // std::invoke
+#include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -243,7 +244,7 @@ public:
 
     [[nodiscard]] static auto make_raw(void const* value, size_t n_bytes)
     {
-        return tr_variant{ std::string_view{ reinterpret_cast<char const*>(value), n_bytes } };
+        return tr_variant{ std::string_view{ static_cast<char const*>(value), n_bytes } };
     }
 
     template<typename CharSpan>
@@ -338,7 +339,7 @@ public:
     }
 
     template<typename Val>
-    [[nodiscard]] constexpr std::optional<Val> value_if() noexcept
+    [[nodiscard]] constexpr std::optional<Val> value_if() const noexcept
     {
         if (auto const* const val = get_if<Val>())
         {
@@ -348,11 +349,8 @@ public:
         return {};
     }
 
-    template<typename Val>
-    [[nodiscard]] std::optional<Val> value_if() const noexcept
-    {
-        return const_cast<tr_variant*>(this)->value_if<Val>();
-    }
+    template<std::integral Val>
+    [[nodiscard]] constexpr std::optional<Val> value_if() const noexcept;
 
     template<typename Val>
     [[nodiscard]] constexpr bool holds_alternative() const noexcept
@@ -398,14 +396,91 @@ private:
     std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, std::string, std::string_view, Vector, Map> val_;
 };
 
+// These specialisations could have been in the class body,
+// but aren't because https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282
+
 template<>
-[[nodiscard]] std::optional<int64_t> tr_variant::value_if() noexcept;
+[[nodiscard]] constexpr std::optional<std::string_view> tr_variant::value_if() const noexcept
+{
+    switch (index())
+    {
+    case StringIndex:
+        return *std::get_if<std::string>(&val_);
+
+    case StringViewIndex:
+        return *std::get_if<std::string_view>(&val_);
+
+    default:
+        return {};
+    }
+}
+
 template<>
-[[nodiscard]] std::optional<bool> tr_variant::value_if() noexcept;
+[[nodiscard]] constexpr std::optional<int64_t> tr_variant::value_if() const noexcept
+{
+    switch (index())
+    {
+    case IntIndex:
+        return *get_if<IntIndex>();
+
+    case BoolIndex:
+        return *get_if<BoolIndex>() ? 1 : 0;
+
+    default:
+        return {};
+    }
+}
+
 template<>
-[[nodiscard]] std::optional<double> tr_variant::value_if() noexcept;
+[[nodiscard]] constexpr std::optional<bool> tr_variant::value_if() const noexcept
+{
+    switch (index())
+    {
+    case BoolIndex:
+        return *get_if<BoolIndex>();
+
+    case IntIndex:
+        if (auto const val = *get_if<IntIndex>(); val == 0 || val == 1)
+        {
+            return val != 0;
+        }
+        break;
+
+    case StringIndex:
+    case StringViewIndex:
+        if (auto const val = value_if<std::string_view>(); val == "true")
+        {
+            return true;
+        }
+        else if (val == "false")
+        {
+            return false;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return {};
+}
+
 template<>
-[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() noexcept;
+[[nodiscard]] std::optional<double> tr_variant::value_if() const noexcept;
+
+template<std::integral Val>
+[[nodiscard]] constexpr std::optional<Val> tr_variant::value_if() const noexcept
+{
+    static_assert(!std::is_same_v<Val, bool>);
+    static_assert(!std::is_same_v<Val, int64_t>);
+    if (auto val = value_if<int64_t>(); val && std::cmp_greater_equal(*val, std::numeric_limits<Val>::lowest()) &&
+        std::cmp_less_equal(*val, std::numeric_limits<Val>::max()))
+    {
+        return val;
+    }
+
+    return {};
+}
 
 // --- Strings
 

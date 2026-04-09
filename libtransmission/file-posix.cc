@@ -583,11 +583,11 @@ bool tr_sys_file_read_at(
 
 #ifdef HAVE_PREAD
 
-    auto const my_bytes_read = pread(handle, buffer, size, offset);
+    auto const my_bytes_read = pread(handle, buffer, size, static_cast<off_t>(offset));
 
 #else
 
-    ssize_t const my_bytes_read = lseek(handle, offset, SEEK_SET) == -1 ? -1 : read(handle, buffer, size);
+    ssize_t const my_bytes_read = lseek(handle, static_cast<off_t>(offset), SEEK_SET) == -1 ? -1 : read(handle, buffer, size);
 
 #endif
 
@@ -654,11 +654,12 @@ bool tr_sys_file_write_at(
 
 #ifdef HAVE_PWRITE
 
-    auto const my_bytes_written = pwrite(handle, buffer, size, offset);
+    auto const my_bytes_written = pwrite(handle, buffer, size, static_cast<off_t>(offset));
 
 #else
 
-    ssize_t const my_bytes_written = lseek(handle, offset, SEEK_SET) == -1 ? -1 : write(handle, buffer, size);
+    ssize_t const my_bytes_written = lseek(handle, static_cast<off_t>(offset), SEEK_SET) == -1 ? -1 :
+                                                                                                 write(handle, buffer, size);
 
 #endif
 
@@ -685,7 +686,7 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    bool const ret = ftruncate(handle, size) != -1;
+    auto const ret = ftruncate(handle, static_cast<off_t>(size)) != -1;
 
     if (error != nullptr && !ret)
     {
@@ -702,7 +703,7 @@ namespace preallocate_helpers
 #ifdef HAVE_FALLOCATE64
 bool preallocate_fallocate64(tr_sys_file_t handle, uint64_t size)
 {
-    return fallocate64(handle, 0, 0, size) == 0;
+    return fallocate64(handle, 0, 0, static_cast<off64_t>(size)) == 0;
 }
 #endif
 
@@ -731,7 +732,7 @@ bool full_preallocate_apple(tr_sys_file_t handle, uint64_t size)
 #ifdef HAVE_POSIX_FALLOCATE
 bool full_preallocate_posix(tr_sys_file_t handle, uint64_t size)
 {
-    return posix_fallocate(handle, 0, size) == 0;
+    return posix_fallocate(handle, 0, static_cast<off_t>(size)) == 0;
 }
 #endif
 } // namespace preallocate_helpers

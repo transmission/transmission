@@ -90,13 +90,12 @@ public:
     {
         auto ret = std::vector<std::pair<std::string /*path*/, uint64_t /*size*/>>{};
         ret.reserve(std::size(files_));
-        std::transform(
-            std::begin(files_),
-            std::end(files_),
+        std::ranges::transform(
+            files_,
             std::back_inserter(ret),
             [](auto const& in) { return std::make_pair(in.path_, in.size_); });
 
-        std::sort(std::begin(ret), std::end(ret), [](auto const& lhs, auto const& rhs) { return lhs.first < rhs.first; });
+        std::ranges::sort(std::views::keys(ret));
 
         return ret;
     }

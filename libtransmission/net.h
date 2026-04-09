@@ -356,13 +356,16 @@ struct tr_address
     // 2001::/32
     [[nodiscard]] constexpr bool is_ipv6_teredo() const noexcept
     {
-        return is_ipv6() && reinterpret_cast<uint32_t const*>(&addr.addr6)[0] == htonl(0x20010000U);
+        return is_ipv6() && reinterpret_cast<uint8_t const*>(&addr.addr6)[0] == 0x20U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr6)[1] == 0x01U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr6)[2] == 0U && reinterpret_cast<uint8_t const*>(&addr.addr6)[3] == 0U;
     }
 
     // 2002::/16
     [[nodiscard]] constexpr bool is_ipv6_6to4() const noexcept
     {
-        return is_ipv6() && reinterpret_cast<uint16_t const*>(&addr.addr6)[0] == htons(0x2002U);
+        return is_ipv6() && reinterpret_cast<uint8_t const*>(&addr.addr6)[0] == 0x20U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr6)[1] == 0x02U;
     }
 
     // fe80::/64 from fe80::/10
@@ -387,7 +390,7 @@ struct tr_address
     } addr = {};
 
     static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
-    static auto constexpr CompactAddrMaxBytes = *std::max_element(std::begin(CompactAddrBytes), std::end(CompactAddrBytes));
+    static auto constexpr CompactAddrMaxBytes = *std::ranges::max_element(CompactAddrBytes);
     static_assert(std::size(CompactAddrBytes) == NUM_TR_AF_INET_TYPES);
 
     [[nodiscard]] static auto any(tr_address_type type) noexcept

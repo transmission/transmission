@@ -666,6 +666,7 @@ void tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
         }
     };
 
+    // NOLINTNEXTLINE(modernize-use-ranges)
     if (auto const [eq_begin, eq_end] = std::equal_range(std::begin(Clients), std::end(Clients), key, Compare{});
         eq_begin != std::end(Clients) && eq_begin != eq_end)
     {

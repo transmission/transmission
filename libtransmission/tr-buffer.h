@@ -9,6 +9,7 @@
 #include <cstddef> // size_t
 #include <memory> // std::allocator
 #include <ratio>
+#include <span>
 #include <string>
 #include <string_view>
 
@@ -22,9 +23,17 @@
 namespace tr
 {
 
+namespace detail
+{
+template<typename T>
+concept object_representation = std::same_as<T, char> || std::same_as<T, unsigned char> || std::same_as<T, std::byte>;
+}
+
 template<typename value_type>
 class BufferReader
 {
+    static_assert(detail::object_representation<value_type>);
+
 public:
     virtual ~BufferReader() = default;
     virtual void drain(size_t n_bytes) = 0;
@@ -63,6 +72,11 @@ public:
     [[nodiscard]] auto to_string() const
     {
         return std::string{ to_string_view() };
+    }
+
+    void to_buf(std::span<uint8_t> tgt)
+    {
+        to_buf(tgt.data(), tgt.size());
     }
 
     void to_buf(void* tgt, size_t n_bytes)
@@ -134,6 +148,8 @@ public:
 template<typename value_type>
 class BufferWriter
 {
+    static_assert(detail::object_representation<value_type>);
+
 public:
     virtual ~BufferWriter() = default;
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) = 0;
@@ -142,7 +158,7 @@ public:
     void add(void const* span_begin, size_t span_len)
     {
         auto [buf, buflen] = reserve_space(span_len);
-        std::copy_n(reinterpret_cast<value_type const*>(span_begin), span_len, buf);
+        std::copy_n(static_cast<value_type const*>(span_begin), span_len, buf);
         commit_space(span_len);
     }
 

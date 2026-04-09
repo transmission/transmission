@@ -205,8 +205,8 @@ public:
     static auto makeRandomPeerId()
     {
         auto peer_id = tr_rand_obj<tr_peer_id_t>();
-        auto const peer_id_prefix = "-UW110Q-"sv;
-        std::copy(std::begin(peer_id_prefix), std::end(peer_id_prefix), std::begin(peer_id));
+        static auto constexpr PeerIdPrefix = "-UW110Q-"sv;
+        std::ranges::copy(PeerIdPrefix, std::begin(peer_id));
         return peer_id;
     }
 
@@ -484,8 +484,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
                 }
                 buf.commit_space(ret);
                 n_read += ret;
-                if (auto const it = std::search(std::begin(buf), std::end(buf), std::begin(needle), std::end(needle));
-                    it != std::end(buf))
+                if (auto const range = std::ranges::search(buf, needle); !range.empty())
                 {
                     return true;
                 }

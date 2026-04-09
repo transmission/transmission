@@ -253,6 +253,8 @@ auto constexpr MyStatic = std::array<std::u8string_view, TR_N_KEYS>{
     u8"info"sv, // .torrent
     u8"inhibit-desktop-hibernation"sv, // gtk app, qt app
     u8"inhibit_desktop_hibernation"sv, // gtk app, qt app
+    u8"ip_endpoints_ipv4"sv, // tr_session::Settings
+    u8"ip_endpoints_ipv6"sv, // tr_session::Settings
     u8"ip_protocol"sv, // rpc
     u8"ipv4"sv, // BEP0010; BT protocol, rpc
     u8"ipv6"sv, // BEP0010; BT protocol, rpc

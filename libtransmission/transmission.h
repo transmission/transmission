@@ -292,7 +292,7 @@ void tr_sessionSetDefaultTrackers(tr_session* session, std::string_view trackers
  * shouldn't call libtransmission functions (to avoid deadlock),
  * and shouldn't modify client-level memory without using a mutex!
  */
-void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func);
 
 // ---
 
@@ -321,9 +321,6 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool is_enabled);
 
 bool tr_sessionIsLPDEnabled(tr_session const* session);
 void tr_sessionSetLPDEnabled(tr_session* session, bool is_enabled);
-
-size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
-void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes);
 
 tr_encryption_mode tr_sessionGetEncryption(tr_session const* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
@@ -371,7 +368,7 @@ void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight
 tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
 void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day day);
 
-void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data);
+void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func);
 
 // ---
 
@@ -417,34 +414,16 @@ void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
  * To bypass the queue and unconditionally start the torrent use
  * `tr_torrentStartNow()`.
  *
- * Torrents can be moved in the queue using the simple functions
- * `tr_torrentQueueMove{Top,Up,Down,Bottom}`. They can be moved to
- * arbitrary points in the queue with `tr_torrentSetQueuePosition()`.
+ * Torrents can be moved to arbitrary points in the queue with
+ * `tr_torrentSetQueuePosition()`.
  */
 
 /** @brief Like `tr_torrentStart()`, but resumes right away regardless of the queues. */
 void tr_torrentStartNow(tr_torrent* tor);
 
-/** @brief Return the queued torrent's position in the queue it's in. [0...n) */
-size_t tr_torrentGetQueuePosition(tr_torrent const* tor);
-
 /** @brief Set the queued torrent's position in the queue it's in.
  * Edge cases: `pos <= 0` moves to the front; `pos >= queue's length` moves to the back */
 void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position);
-
-// ---
-
-/** @brief Convenience function for moving a batch of torrents to the front of their queue(s) */
-void tr_torrentsQueueMoveTop(tr_torrent* const* torrents, size_t torrent_count);
-
-/** @brief Convenience function for moving a batch of torrents ahead one step in their queue(s) */
-void tr_torrentsQueueMoveUp(tr_torrent* const* torrents, size_t torrent_count);
-
-/** @brief Convenience function for moving a batch of torrents back one step in their queue(s) */
-void tr_torrentsQueueMoveDown(tr_torrent* const* torrents, size_t torrent_count);
-
-/** @brief Convenience function for moving a batch of torrents to the back of their queue(s) */
-void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents, size_t torrent_count);
 
 // ---
 
@@ -476,7 +455,7 @@ bool tr_sessionGetQueueStalledEnabled(tr_session const* session);
 void tr_sessionSetQueueStalledEnabled(tr_session* session, bool enabled);
 
 /** @brief Set a callback that is invoked when the queue starts a torrent */
-void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data);
+void tr_sessionSetQueueStartCallback(tr_session* session, tr_session_queue_start_func callback);
 
 // ---
 
@@ -618,12 +597,6 @@ bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme_is_paus
   (Default: not paused) */
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool is_paused);
 
-/** @brief Set the priorities for files in a torrent */
-void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t n_files, tr_priority_t priority);
-
-/** @brief Set the download flag for files in a torrent */
-void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);
-
 /** @brief Get the torrent file that this ctor's metainfo came from,
            or empty if `tr_ctorSetMetainfoFromFile()` wasn't used */
 std::optional<std::string> tr_ctorGetSourceFile(tr_ctor const* ctor);
@@ -670,7 +643,6 @@ void tr_torrentStop(tr_torrent* torrent);
  * @param oldpath       the path to the file or folder that will be renamed
  * @param newname       the file or folder's new name
  * @param callback      the callback invoked when the renaming finishes, or nullptr
- * @param callback_user_data the pointer to pass in the callback's user_data arg
  *
  * As a special case, renaming the root file in a torrent will also
  * update tr_torrentName().
@@ -702,15 +674,14 @@ void tr_torrentStop(tr_torrent* torrent);
  *   in files[*].name, or contains a directory separator, or is nullptr, "",
  *   ".", or "..", the error argument will be EINVAL.
  *
- *   If the path exists on disk but can't be renamed, the error argument
- *   will be the errno set by rename().
+ *   If the path exists on disk but can't be renamed, the callback's `error`
+ *   argument will be set via `set_with_errno()` with `rename()`'s errno.
  */
 void tr_torrentRenamePath(
     tr_torrent* tor,
     std::string_view oldpath,
     std::string_view newname,
-    tr_torrent_rename_done_func callback,
-    void* callback_user_data);
+    tr_torrent_rename_done_func callback);
 
 /**
  * @brief Tell transmission where to find this torrent's local data.
@@ -870,7 +841,7 @@ bool tr_torrentSetTrackerList(tr_torrent* tor, std::string_view txt);
  *
  * @see `tr_completeness`
  */
-void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func callback, void* user_data);
+void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func callback);
 
 /**
  * Register to be notified whenever a torrent changes from
@@ -878,7 +849,7 @@ void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completen
  * This happens when a magnet link finishes downloading
  * metadata from its peers.
  */
-void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func callback, void* user_data);
+void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func callback);
 
 /**
  * Register to be notified whenever a torrent's ratio limit
@@ -887,7 +858,7 @@ void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func
  *
  * Has the same restrictions as `tr_sessionSetCompletenessCallback`
  */
-void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func callback, void* user_data);
+void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func callback);
 
 /**
  * Register to be notified whenever a torrent's idle limit
@@ -896,7 +867,7 @@ void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_li
  *
  * Has the same restrictions as `tr_sessionSetCompletenessCallback`
  */
-void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func callback, void* user_data);
+void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func callback);
 
 /**
  * MANUAL ANNOUNCE

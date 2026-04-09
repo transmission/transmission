@@ -46,7 +46,7 @@ namespace
 {
 // Helps us to ignore errors that say "try again later"
 // since that's what peer-io does by default anyway.
-[[nodiscard]] constexpr auto can_retry_from_error(int error_code) noexcept
+[[nodiscard]] constexpr auto can_retry_from_error(tr_error_code_t error_code) noexcept
 {
 #ifdef _WIN32
     return error_code == 0 || error_code == WSAEWOULDBLOCK || error_code == WSAEINTR || error_code == WSAEINPROGRESS;
@@ -109,9 +109,15 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     io->flush_outbuf_trigger_->set_callback(
         [weak = io->weak_from_this()]
         {
+            // https://github.com/transmission/transmission/issues/7307
+            static auto constexpr MinPayloadSize = 128U;
+
             if (auto const ptr = weak.lock())
             {
-                ptr->try_write(SIZE_MAX);
+                if (ptr->outbuf_.size() >= MinPayloadSize)
+                {
+                    ptr->try_write(SIZE_MAX);
+                }
             }
         });
     tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
@@ -198,14 +204,14 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
         event_read_.reset(
             tr::evhelpers::event_new_pri2(
                 session_->event_base(),
-                socket_.handle.tcp,
+                static_cast<evutil_socket_t>(socket_.handle.tcp),
                 EV_READ,
                 &tr_peerIo::event_read_cb,
                 this));
         event_write_.reset(
             tr::evhelpers::event_new_pri2(
                 session_->event_base(),
-                socket_.handle.tcp,
+                static_cast<evutil_socket_t>(socket_.handle.tcp),
                 EV_WRITE,
                 &tr_peerIo::event_write_cb,
                 this));
@@ -599,7 +605,7 @@ void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_dat
     outbuf_info_.emplace_back(n_bytes, is_piece_data);
 
     auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
-    filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
+    filter_.encrypt(static_cast<std::byte const*>(bytes), n_bytes, resbuf);
     outbuf_.commit_space(n_bytes);
 
     flush_outbuf_soon();
@@ -618,7 +624,7 @@ size_t tr_peerIo::get_write_buffer_space(uint64_t now) const noexcept
 
 void tr_peerIo::read_bytes(void* bytes, size_t n_bytes)
 {
-    auto walk = reinterpret_cast<std::byte*>(bytes);
+    auto walk = static_cast<std::byte*>(bytes);
     n_bytes = std::min(n_bytes, std::size(inbuf_));
     if (n_decrypt_remain_)
     {

@@ -123,24 +123,23 @@ std::string getXdgEntryFromUserDirs(std::string_view key)
 
     // search for key="val" and extract val
     auto const search = fmt::format("{:s}=\"", key);
-    auto begin = std::search(std::begin(content), std::end(content), std::begin(search), std::end(search));
-    if (begin == std::end(content))
+    auto const [key_first, key_last] = std::ranges::search(content, search);
+    if (key_first == key_last)
     {
         return {};
     }
-    std::advance(begin, std::size(search));
-    auto const end = std::find(begin, std::end(content), '"');
-    if (end == std::end(content))
+    auto const end = std::find(key_last, content.end(), '"');
+    if (end == content.end())
     {
         return {};
     }
-    auto val = std::string{ begin, end };
+    auto val = std::string{ key_last, end };
 
     // if val contains "$HOME", replace that with getHomeDir()
     auto constexpr Home = "$HOME"sv;
-    if (auto const it = std::search(std::begin(val), std::end(val), std::begin(Home), std::end(Home)); it != std::end(val))
+    if (auto const [home_first, home_last] = std::ranges::search(val, Home); home_first != home_last)
     {
-        val.replace(it, it + std::size(Home), getHomeDir());
+        val.replace(home_first, home_last, getHomeDir());
     }
 
     return val;

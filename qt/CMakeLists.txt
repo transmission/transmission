@@ -70,6 +70,7 @@ target_sources(${TR_NAME}-qt-lib
         Prefs.h
         PrefsDialog.cc
         PrefsDialog.h
+        QtCompat.h
         RelocateDialog.cc
         RelocateDialog.h
         RpcClient.cc

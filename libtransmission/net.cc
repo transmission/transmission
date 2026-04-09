@@ -176,7 +176,7 @@ tr_socket_t createSocket(int domain, int type)
         return TR_BAD_SOCKET;
     }
 
-    if (evutil_make_socket_nonblocking(sockfd) == -1)
+    if (evutil_make_socket_nonblocking(static_cast<evutil_socket_t>(sockfd)) == -1)
     {
         tr_net_close_socket(sockfd);
         return TR_BAD_SOCKET;
@@ -295,7 +295,7 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
         return TR_BAD_SOCKET;
     }
 
-    if (evutil_make_socket_nonblocking(fd) == -1)
+    if (evutil_make_socket_nonblocking(static_cast<evutil_socket_t>(fd)) == -1)
     {
         *err_out = sockerrno;
         tr_net_close_socket(fd);
@@ -304,7 +304,7 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
 
     int optval = 1;
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
-    (void)evutil_make_listen_socket_reuseable(fd);
+    (void)evutil_make_listen_socket_reuseable(static_cast<evutil_socket_t>(fd));
 
     if (addr.is_ipv6() && tr_make_listen_socket_ipv6only(fd) == -1 &&
         sockerrno != ENOPROTOOPT) // if the kernel doesn't support it, ignore it
@@ -394,7 +394,8 @@ std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session
     // make the socket unblocking,
     // and confirm we don't have too many peers
     auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&sock));
-    if (!addrport || evutil_make_socket_nonblocking(sockfd) == -1 || tr_peer_socket::limit_reached(session))
+    if (!addrport || evutil_make_socket_nonblocking(static_cast<evutil_socket_t>(sockfd)) == -1 ||
+        tr_peer_socket::limit_reached(session))
     {
         tr_net_close_socket(sockfd);
         return {};
@@ -405,7 +406,7 @@ std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session
 
 void tr_net_close_socket(tr_socket_t sockfd)
 {
-    evutil_closesocket(sockfd);
+    evutil_closesocket(static_cast<evutil_socket_t>(sockfd));
 }
 
 // ---

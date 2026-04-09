@@ -8,6 +8,7 @@
 #include <string>
 #include <string_view>
 
+#include "libtransmission/error-types.h"
 #include "libtransmission/tr-macros.h"
 
 /** @brief Structure holding error information. */
@@ -16,7 +17,7 @@ struct tr_error
 public:
     TR_CONSTEXPR_STR tr_error() = default;
 
-    TR_CONSTEXPR_STR tr_error(int code, std::string message)
+    TR_CONSTEXPR_STR tr_error(tr_error_code_t code, std::string message)
         : message_{ std::move(message) }
         , code_{ code }
     {
@@ -42,19 +43,19 @@ public:
         return has_value();
     }
 
-    TR_CONSTEXPR_STR void set(int code, std::string&& message)
+    TR_CONSTEXPR_STR void set(tr_error_code_t code, std::string&& message)
     {
         code_ = code;
         message_ = std::move(message);
     }
 
-    TR_CONSTEXPR_STR void set(int code, std::string_view message)
+    TR_CONSTEXPR_STR void set(tr_error_code_t code, std::string_view message)
     {
         code_ = code;
         message_.assign(message);
     }
 
-    TR_CONSTEXPR_STR void set(int code, char const* const message)
+    TR_CONSTEXPR_STR void set(tr_error_code_t code, char const* const message)
     {
         set(code, std::string_view{ message != nullptr ? message : "" });
     }
@@ -65,12 +66,12 @@ public:
     }
 
     // convenience utility for `set(errno, tr_strerror(errno))`
-    void set_from_errno(int errnum);
+    void set_from_errno(tr_error_code_t errnum);
 
 private:
     /** @brief Error message */
     std::string message_;
 
     /** @brief Error code, platform-specific */
-    int code_ = 0;
+    tr_error_code_t code_ = 0;
 };

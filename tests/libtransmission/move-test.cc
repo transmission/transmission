@@ -14,11 +14,11 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/block-info.h>
-#include <libtransmission/cache.h> // tr_cacheWriteBlock()
 #include <libtransmission/file.h> // tr_sys_path_*()
+#include <libtransmission/inout.h>
 #include <libtransmission/quark.h>
-#include <libtransmission/torrent.h>
 #include <libtransmission/torrent-files.h>
+#include <libtransmission/torrent.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/variant.h>
 
@@ -71,12 +71,10 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor).left_until_done);
 
     auto completeness = TR_LEECH;
-    auto const zeroes_completeness_func =
-        [](tr_torrent* /*torrent*/, tr_completeness c, bool /*was_running*/, void* vc) noexcept
-    {
-        *static_cast<tr_completeness*>(vc) = c;
-    };
-    tr_sessionSetCompletenessCallback(session_, zeroes_completeness_func, &completeness);
+    tr_sessionSetCompletenessCallback(
+        session_,
+        [&completeness](tr_torrent_id_t const /*tor_id*/, tr_completeness const c, bool const /*was_running*/) noexcept
+        { completeness = c; });
 
     struct TestIncompleteDirData
     {
@@ -84,14 +82,18 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_torrent* tor = {};
         tr_block_index_t block = {};
         tr_piece_index_t pieceIndex = {};
-        std::unique_ptr<Cache::BlockData> buf;
+        std::vector<uint8_t> buf;
         bool done = {};
     };
 
     auto const test_incomplete_dir_threadfunc = [](TestIncompleteDirData* data) noexcept
     {
-        data->session->cache->write_block(data->tor->id(), data->block, std::move(data->buf));
-        data->tor->on_block_received(data->block);
+        auto& tor = *data->tor;
+        if (tr_ioWrite(tor, data->session->openFiles(), tor.block_loc(data->block), data->buf) == 0)
+        {
+            data->tor->on_block_received(data->block);
+        }
+
         data->done = true;
     };
 
@@ -105,8 +107,8 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
         for (tr_block_index_t block_index = begin; block_index < end; ++block_index)
         {
-            data.buf = std::make_unique<Cache::BlockData>(tr_block_info::BlockSize);
-            std::fill_n(std::data(*data.buf), tr_block_info::BlockSize, '\0');
+            data.buf.resize(tr_block_info::BlockSize);
+            std::ranges::fill(data.buf, '\0');
             data.block = block_index;
             data.done = false;
             session_->run_in_session_thread(test_incomplete_dir_threadfunc, &data);

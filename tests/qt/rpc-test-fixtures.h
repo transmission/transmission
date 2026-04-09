@@ -16,20 +16,14 @@
 #include <QVariant>
 #include <QVector>
 
+#include "QtCompat.h"
 #include "RpcClient.h"
 
 template<typename String>
 [[nodiscard]] QByteArray toQBA(String const& str)
 {
     auto const sv = std::string_view{ str };
-    return { sv.data(),
-             static_cast<
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-                 int
-#else
-                 qsizetype
-#endif
-                 >(sv.size()) };
+    return { sv.data(), static_cast<IF_QT6(qsizetype, int)>(sv.size()) };
 }
 
 class FakeReply final : public QNetworkReply

@@ -10,8 +10,9 @@
 #include <cstdint> // uint16_t, uint32_t, uint64_t
 #include <ctime> // time_t
 #include <functional>
-#include <string_view>
+#include <optional>
 #include <string>
+#include <string_view>
 
 #include "libtransmission/values.h"
 
@@ -258,6 +259,16 @@ struct tr_block_span_t
 
 struct tr_byte_span_t
 {
+    [[nodiscard]] constexpr bool is_valid() const noexcept
+    {
+        return begin <= end;
+    }
+
+    [[nodiscard]] constexpr auto size() const noexcept
+    {
+        return end - begin;
+    }
+
     uint64_t begin;
     uint64_t end;
 };
@@ -332,12 +343,12 @@ struct tr_peer_stat
 /** @brief Used by `tr_sessionGetStats()` and `tr_sessionGetCumulativeStats()` */
 struct tr_session_stats
 {
-    float ratio; /* TR_RATIO_INF, TR_RATIO_NA, or total up/down */
+    double ratio; /* TR_RATIO_INF, TR_RATIO_NA, or total up/down */
     uint64_t uploadedBytes; /* total up */
     uint64_t downloadedBytes; /* total down */
     uint64_t filesAdded; /* number of files added */
     uint64_t sessionCount; /* program started N times */
-    uint64_t secondsActive; /* how long Transmission's been running */
+    time_t secondsActive; /* how long Transmission's been running */
 };
 
 struct tr_stat
@@ -562,11 +573,11 @@ struct tr_tracker_view
     time_t lastScrapeTime = {}; // if hasScraped, when the latest scrape reply was received
     time_t nextScrapeTime = {}; // if scrapeState == TR_TRACKER_WAITING, time of next scrape
 
-    int downloadCount = {}; // number of times this torrent's been downloaded, or -1 if unknown
-    int lastAnnouncePeerCount = {}; // if hasAnnounced, the number of peers the tracker gave us
-    int leecherCount = {}; // number of leechers the tracker knows of, or -1 if unknown
-    int seederCount = {}; // number of seeders the tracker knows of, or -1 if unknown
-    int downloader_count = {}; // number of downloaders (BEP-21) the tracker knows of, or -1 if unknown
+    int64_t downloadCount = {}; // number of times this torrent's been downloaded, or -1 if unknown
+    size_t lastAnnouncePeerCount = {}; // if hasAnnounced, the number of peers the tracker gave us
+    int64_t leecherCount = {}; // number of leechers the tracker knows of, or -1 if unknown
+    int64_t seederCount = {}; // number of seeders the tracker knows of, or -1 if unknown
+    int64_t downloader_count = {}; // number of downloaders (BEP-21) the tracker knows of, or -1 if unknown
 
     size_t tier = {}; // which tier this tracker is in
     tr_tracker_id_t id = {}; // unique transmission-generated ID for use in libtransmission API
@@ -595,31 +606,25 @@ struct tr_webseed_view
     uint64_t download_bytes_per_second = {}; // current download speed
 };
 
-using tr_altSpeedFunc = void (*)(tr_session* session, bool active, bool user_driven, void*);
+using tr_altSpeedFunc = std::function<void(bool active, bool user_driven)>;
 
-using tr_session_idle_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
+using tr_session_queue_start_func = std::function<void(tr_torrent_id_t)>;
 
-using tr_session_metadata_func = void (*)(tr_session* session, tr_torrent* torrent, void* user_data);
+using tr_session_idle_limit_hit_func = std::function<void(tr_torrent_id_t)>;
 
-using tr_session_ratio_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
+using tr_session_metadata_func = std::function<void(tr_torrent_id_t)>;
+
+using tr_session_ratio_limit_hit_func = std::function<void(tr_torrent_id_t)>;
 
 /**
  * @param was_running whether or not the torrent was running when
  *                    it changed its completeness state
  */
-using tr_torrent_completeness_func = void (*)( //
-    tr_torrent* torrent,
-    tr_completeness completeness,
-    bool was_running,
-    void* user_data);
+using tr_torrent_completeness_func = std::function<void(tr_torrent_id_t, tr_completeness completeness, bool was_running)>;
 
 using tr_torrent_remove_func = std::function<bool(std::string_view filename, tr_error* error)>;
 
-using tr_rpc_func = tr_rpc_callback_status (*)( //
-    tr_session* session,
-    tr_rpc_callback_type type,
-    struct tr_torrent* tor_or_null,
-    void* user_data);
+using tr_rpc_func = std::function<tr_rpc_callback_status(tr_rpc_callback_type type, std::optional<tr_torrent_id_t>)>;
 
 using tr_torrent_rename_done_func = std::function<
-    void(tr_torrent* torrent, char const* oldpath, char const* newname, int error, void* user_data)>;
+    void(tr_torrent_id_t, std::string_view oldpath, std::string_view newname, tr_error const&)>;

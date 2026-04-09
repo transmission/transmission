@@ -124,7 +124,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 {
     if (denominator > 0)
     {
-        return numerator / static_cast<double>(denominator);
+        return static_cast<double>(numerator) / static_cast<double>(denominator);
     }
 
     if (numerator > 0)
@@ -196,7 +196,7 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
             std::back_inserter(argv_cstrs),
             [](auto& str) { return std::data(str); });
         argv_cstrs.push_back(nullptr); // argv is nullptr-terminated
-        return (*real_main)(std::size(*argv_strs), std::data(argv_cstrs));
+        return (*real_main)(static_cast<int>(std::size(*argv_strs)), std::data(argv_cstrs));
     }
 
     return (*real_main)(argc, argv);
@@ -277,8 +277,9 @@ std::vector<int> tr_num_parse_range(std::string_view str)
         }
     }
 
-    std::sort(std::begin(values), std::end(values));
-    values.erase(std::unique(std::begin(values), std::end(values)), std::end(values));
+    std::ranges::sort(values);
+    auto const [erase_first, erase_last] = std::ranges::unique(values);
+    values.erase(erase_first, erase_last);
     return values;
 }
 
@@ -436,15 +437,15 @@ void tr_lib_init()
 
 std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 {
-    auto constexpr Compare = [](mime_type_suffix const& entry, auto const& suffix)
+    static auto constexpr Project = [](mime_type_suffix const& entry)
     {
-        return entry.suffix < suffix;
+        return entry.suffix;
     };
 
     if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
     {
         auto const suffix_lc = tr_strlower(filename.substr(pos + 1));
-        auto const it = std::lower_bound(std::begin(MimeTypeSuffixes), std::end(MimeTypeSuffixes), suffix_lc, Compare);
+        auto const it = std::ranges::lower_bound(MimeTypeSuffixes, suffix_lc, {}, Project);
         if (it != std::end(MimeTypeSuffixes) && suffix_lc == it->suffix)
         {
             std::string_view mime_type = it->mime_type;

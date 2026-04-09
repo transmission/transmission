@@ -26,6 +26,7 @@
 #include "libtransmission/net.h" // for tr_port
 #include "libtransmission/open-files.h" // for tr_open_files::Preallocation
 #include "libtransmission/peer-io.h" // tr_preferred_transport
+#include "libtransmission/peer-mgr.h" // tr_pex
 #include "libtransmission/serializer.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/utils.h" // for tr_strv_strip(), tr_strlower()
@@ -135,9 +136,11 @@ tr_variant from_double(double const& val)
 
 // ---
 
-bool to_int64(tr_variant const& src, int64_t* tgt)
+template<std::integral T>
+bool to_int(tr_variant const& src, T* tgt)
 {
-    if (auto const val = src.value_if<int64_t>())
+    static_assert(!std::is_same_v<T, bool>);
+    if (auto const val = src.value_if<T>())
     {
         *tgt = *val;
         return true;
@@ -146,8 +149,10 @@ bool to_int64(tr_variant const& src, int64_t* tgt)
     return false;
 }
 
-tr_variant from_int64(int64_t const& val)
+template<std::integral T>
+tr_variant from_int(T const& val)
 {
+    static_assert(!std::is_same_v<T, bool>);
     return val;
 }
 
@@ -240,7 +245,7 @@ tr_variant from_msec(std::chrono::milliseconds const& src)
 
 bool to_port(tr_variant const& src, tr_port* tgt)
 {
-    if (auto const val = src.value_if<int64_t>())
+    if (auto const val = src.value_if<uint16_t>())
     {
         *tgt = tr_port::from_host(*val);
         return true;
@@ -251,7 +256,7 @@ bool to_port(tr_variant const& src, tr_port* tgt)
 
 tr_variant from_port(tr_port const& val)
 {
-    return int64_t{ val.host() };
+    return val.host();
 }
 
 // ---
@@ -336,42 +341,6 @@ tr_variant from_preferred_transport(small::max_size_vector<tr_preferred_transpor
     }
 
     return ret;
-}
-
-// ---
-
-bool to_size_t(tr_variant const& src, size_t* tgt)
-{
-    if (auto const val = src.value_if<int64_t>())
-    {
-        *tgt = static_cast<size_t>(*val);
-        return true;
-    }
-
-    return false;
-}
-
-tr_variant from_size_t(size_t const& val)
-{
-    return uint64_t{ val };
-}
-
-// ---
-
-bool to_uint64(tr_variant const& src, uint64_t* tgt)
-{
-    if (auto const val = src.value_if<int64_t>())
-    {
-        *tgt = static_cast<uint64_t>(*val);
-        return true;
-    }
-
-    return false;
-}
-
-tr_variant from_uint64(uint64_t const& val)
-{
-    return val;
 }
 
 // ---
@@ -505,6 +474,59 @@ tr_variant from_fs_path(std::filesystem::path const& path)
 {
     return from_u8string(path.u8string());
 }
+
+// ---
+
+bool to_pex(tr_variant const& src, tr_pex* tgt)
+{
+    auto* const map = src.get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        return false;
+    }
+
+    auto const sockaddr = map->value_if<std::string_view>(TR_KEY_socket_address);
+    if (!sockaddr)
+    {
+        return false;
+    }
+
+    auto pex = tr_pex{};
+    auto* const compact = reinterpret_cast<std::byte const*>(std::data(*sockaddr));
+    switch (std::size(*sockaddr))
+    {
+    case tr_socket_address::CompactSockAddrBytes[TR_AF_INET]:
+        pex.socket_address = tr_socket_address::from_compact_ipv4(compact).first;
+        break;
+
+    case tr_socket_address::CompactSockAddrBytes[TR_AF_INET6]:
+        pex.socket_address = tr_socket_address::from_compact_ipv6(compact).first;
+        break;
+
+    default:
+        return false;
+    }
+
+    pex.flags = static_cast<uint8_t>(map->value_if<int64_t>(TR_KEY_flags).value_or(0));
+
+    *tgt = std::move(pex);
+    return true;
+}
+
+tr_variant from_pex(tr_pex const& val)
+{
+    auto pex = tr_variant::Map{ 2U };
+
+    auto buf = std::array<char, tr_socket_address::CompactSockAddrMaxBytes>{};
+    auto* const buf_data = std::data(buf);
+    auto* const begin = reinterpret_cast<std::byte*>(buf_data);
+    auto const* const end = val.to_compact(begin);
+
+    pex.try_emplace(TR_KEY_socket_address, std::string_view{ buf_data, static_cast<size_t>(end - begin) });
+    pex.try_emplace(TR_KEY_flags, val.flags);
+
+    return pex;
+}
 } // unnamed namespace
 
 void Converters::ensure_default_converters()
@@ -519,17 +541,19 @@ void Converters::ensure_default_converters()
             Converters::add(to_double, from_double);
             Converters::add(to_encryption_mode, from_encryption_mode);
             Converters::add(to_fs_path, from_fs_path);
-            Converters::add(to_int64, from_int64);
+            Converters::add(to_int<int64_t>, from_int<int64_t>);
+            Converters::add(to_int<size_t>, from_int<size_t>);
+            Converters::add(to_int<time_t>, from_int<time_t>);
+            Converters::add(to_int<uint64_t>, from_int<uint64_t>);
             Converters::add(to_log_level, from_log_level);
             Converters::add(to_mode_t, from_mode_t);
             Converters::add(to_msec, from_msec);
+            Converters::add(to_pex, from_pex);
             Converters::add(to_port, from_port);
             Converters::add(to_preallocation_mode, from_preallocation_mode);
             Converters::add(to_preferred_transport, from_preferred_transport);
-            Converters::add(to_size_t, from_size_t);
             Converters::add(to_string, from_string);
             Converters::add(to_u8string, from_u8string);
-            Converters::add(to_uint64, from_uint64);
             Converters::add(to_verify_added_mode, from_verify_added_mode);
         });
 }

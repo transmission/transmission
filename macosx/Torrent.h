@@ -110,6 +110,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 @property(nonatomic, readonly) NSInteger pieceSize;
 @property(nonatomic, readonly) NSInteger pieceCount;
 @property(nonatomic, readonly) NSString* hashString;
+@property(nonatomic, readonly) tr_torrent_id_t id;
 @property(nonatomic, readonly) BOOL privateTorrent;
 
 @property(nonatomic, readonly) NSString* torrentLocation;

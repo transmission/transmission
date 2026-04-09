@@ -175,7 +175,7 @@ TEST_F(NetTest, compact6)
     EXPECT_EQ(port, pex.front().socket_address.port());
 
     // ...serialize that back again too
-    std::fill(std::begin(compact6), std::end(compact6), std::byte{});
+    std::ranges::fill(compact6, std::byte{});
     out = std::data(compact6);
     out = tr_pex::to_compact(out, std::data(pex), std::size(pex));
     EXPECT_EQ(std::data(compact6) + std::size(compact6), out);

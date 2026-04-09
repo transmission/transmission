@@ -38,6 +38,7 @@
 #include "AddData.h"
 #include "Filters.h"
 #include "Prefs.h"
+#include "QtCompat.h"
 #include "RpcQueue.h"
 #include "SessionDialog.h"
 #include "Torrent.h"
@@ -326,7 +327,8 @@ void Session::start()
 
         auto const root_path = prefs_.get<QString>(Prefs::SESSION_REMOTE_URL_BASE_PATH);
         auto const relative_path = TrHttpServerRpcRelativePath;
-        url.setPath(root_path + QString::fromUtf8(relative_path.data(), relative_path.size()));
+        url.setPath(
+            root_path + QString::fromUtf8(relative_path.data(), static_cast<IF_QT6(qsizetype, int)>(relative_path.size())));
 
         if (prefs_.get<bool>(Prefs::SESSION_REMOTE_AUTH))
         {
@@ -569,6 +571,7 @@ using TorrentProperties = Session::TorrentProperties;
                 TR_KEY_peers_connected,
                 TR_KEY_peers_getting_from_us,
                 TR_KEY_peers_sending_to_us,
+                TR_KEY_percent_complete,
                 TR_KEY_percent_done,
                 TR_KEY_primary_mime_type,
                 TR_KEY_queue_position,
@@ -581,6 +584,7 @@ using TorrentProperties = Session::TorrentProperties;
                 TR_KEY_status,
                 TR_KEY_total_size,
                 TR_KEY_trackers,
+                TR_KEY_upload_ratio,
                 TR_KEY_uploaded_ever,
                 TR_KEY_webseeds_sending_to_us,
             };
@@ -618,6 +622,7 @@ using TorrentProperties = Session::TorrentProperties;
                 TR_KEY_peers_connected,
                 TR_KEY_peers_getting_from_us,
                 TR_KEY_peers_sending_to_us,
+                TR_KEY_percent_complete,
                 TR_KEY_percent_done,
                 TR_KEY_queue_position,
                 TR_KEY_rate_download,
@@ -627,6 +632,7 @@ using TorrentProperties = Session::TorrentProperties;
                 TR_KEY_seed_ratio_mode,
                 TR_KEY_size_when_done,
                 TR_KEY_status,
+                TR_KEY_upload_ratio,
                 TR_KEY_uploaded_ever,
                 TR_KEY_webseeds_sending_to_us,
             };
@@ -811,46 +817,30 @@ RpcResponseFuture Session::exec(tr_quark method, tr_variant* args)
     return rpc_.exec(method, args);
 }
 
-void Session::updateStats(tr_variant* args_dict, tr_session_stats* stats)
+void Session::updateStats(tr_variant const& args_dict, tr_session_stats& stats)
 {
-    if (auto const value = dictFind<uint64_t>(args_dict, TR_KEY_uploaded_bytes))
-    {
-        stats->uploadedBytes = *value;
-    }
+    static constexpr auto Fields = std::tuple{
+        tr::serializer::Field<&tr_session_stats::downloadedBytes>{ TR_KEY_downloaded_bytes },
+        tr::serializer::Field<&tr_session_stats::filesAdded>{ TR_KEY_files_added },
+        tr::serializer::Field<&tr_session_stats::secondsActive>{ TR_KEY_seconds_active },
+        tr::serializer::Field<&tr_session_stats::sessionCount>{ TR_KEY_session_count },
+        tr::serializer::Field<&tr_session_stats::uploadedBytes>{ TR_KEY_uploaded_bytes },
+    };
+    tr::serializer::load(stats, Fields, args_dict);
 
-    if (auto const value = dictFind<uint64_t>(args_dict, TR_KEY_downloaded_bytes))
-    {
-        stats->downloadedBytes = *value;
-    }
-
-    if (auto const value = dictFind<uint64_t>(args_dict, TR_KEY_files_added))
-    {
-        stats->filesAdded = *value;
-    }
-
-    if (auto const value = dictFind<uint64_t>(args_dict, TR_KEY_session_count))
-    {
-        stats->sessionCount = *value;
-    }
-
-    if (auto const value = dictFind<uint64_t>(args_dict, TR_KEY_seconds_active))
-    {
-        stats->secondsActive = *value;
-    }
-
-    stats->ratio = static_cast<float>(tr_getRatio(stats->uploadedBytes, stats->downloadedBytes));
+    stats.ratio = static_cast<float>(tr_getRatio(stats.uploadedBytes, stats.downloadedBytes));
 }
 
 void Session::updateStats(tr_variant* dict)
 {
     if (tr_variant* var = nullptr; tr_variantDictFindDict(dict, TR_KEY_current_stats, &var))
     {
-        updateStats(var, &stats_);
+        updateStats(*var, stats_);
     }
 
     if (tr_variant* var = nullptr; tr_variantDictFindDict(dict, TR_KEY_cumulative_stats, &var))
     {
-        updateStats(var, &cumulative_stats_);
+        updateStats(*var, cumulative_stats_);
     }
 
     emit statsUpdated();
@@ -1008,9 +998,11 @@ void Session::onDuplicatesTimer()
     if (!lines.empty())
     {
         lines.sort(Qt::CaseInsensitive);
-        auto const title = tr("Duplicate Torrent(s)", "", lines.size());
+        // NOLINTNEXTLINE(readability-redundant-casting): Remove this comment when we drop Qt5
+        auto const title = tr("Duplicate Torrent(s)", "", static_cast<int>(lines.size()));
         auto const detail = lines.join(QStringLiteral("\n"));
-        auto const detail_text = tr("Unable to add %n duplicate torrent(s)", "", lines.size());
+        // NOLINTNEXTLINE(readability-redundant-casting): Remove this comment when we drop Qt5
+        auto const detail_text = tr("Unable to add %n duplicate torrent(s)", "", static_cast<int>(lines.size()));
         auto const use_detail = lines.size() > 1;
         auto const text = use_detail ? detail_text : detail;
 
@@ -1096,7 +1088,8 @@ void Session::launchWebInterface() const
 
         auto const root_path = prefs_.get<QString>(Prefs::SESSION_REMOTE_URL_BASE_PATH);
         auto const relative_path = TrHttpServerWebRelativePath;
-        url.setPath(root_path + QString::fromUtf8(relative_path.data(), relative_path.size()));
+        url.setPath(
+            root_path + QString::fromUtf8(relative_path.data(), static_cast<IF_QT6(qsizetype, int)>(relative_path.size())));
     }
     else // local session
     {

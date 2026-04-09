@@ -241,9 +241,16 @@ TEST_F(IPCacheTest, onResponseIPQuery)
             options.done_func(response);
         }
 
+        [[nodiscard]] std::span<std::string const> settings_ip_endpoint(tr_address_type /*type*/) override
+        {
+            return ip_endpoints;
+        }
+
         std::size_t address_type{};
         long http_code{};
         std::size_t k_{};
+
+        std::array<std::string, 1U> const ip_endpoints = { { "dummy url"s } };
     };
 
     auto mediator = LocalMockMediator{};

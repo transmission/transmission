@@ -71,7 +71,7 @@ void save(std::string_view filename, address_range_t const* ranges, size_t n_ran
     }
 
     if (!out.write(std::data(BinContentsPrefix), std::size(BinContentsPrefix)) ||
-        !out.write(reinterpret_cast<char const*>(ranges), n_ranges * sizeof(*ranges)))
+        !out.write(reinterpret_cast<char const*>(ranges), static_cast<std::streamsize>(n_ranges * sizeof(*ranges))))
     {
         tr_logAddWarn(
             fmt::format(
@@ -434,7 +434,7 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
 
     ensureLoaded();
 
-    struct Compare
+    static constexpr struct
     {
         [[nodiscard]] static auto compare(tr_address const& a, address_range_t const& b) noexcept // <=>
         {
@@ -463,9 +463,10 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
         {
             return compare(a, b) < 0;
         }
-    };
+    } Compare;
 
-    return std::binary_search(std::begin(rules_), std::end(rules_), addr, Compare{});
+    // NOLINTNEXTLINE(modernize-use-ranges)
+    return std::binary_search(std::begin(rules_), std::end(rules_), addr, Compare);
 }
 
 std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(

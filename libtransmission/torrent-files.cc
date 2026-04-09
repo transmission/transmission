@@ -389,13 +389,13 @@ namespace
     // Shortcut to avoid extra work below.
     // All the paths below involve filenames that begin with one of these chars
     static auto constexpr ReservedFilesBeginWithOneOf = "ACLNP"sv;
-    if (ReservedFilesBeginWithOneOf.find(toupper(in.front())) == std::string_view::npos)
+    if (ReservedFilesBeginWithOneOf.find(static_cast<char>(toupper(in.front()))) == std::string_view::npos)
     {
         return false;
     }
 
     auto in_upper = tr_pathbuf{ in };
-    std::ranges::for_each(in_upper, [](auto& ch) { ch = toupper(ch); });
+    std::ranges::for_each(in_upper, [](auto& ch) { ch = static_cast<char>(toupper(ch)); });
     auto const in_upper_sv = in_upper.sv();
 
     static auto constexpr ReservedNames = std::array<std::string_view, 22>{
@@ -433,9 +433,10 @@ namespace
 
 // `is_unix_reserved_char` and `is_win32_reserved_char` kept as `maybe_unused`
 // for potential support of different filesystems on the same OS
-[[nodiscard, maybe_unused]] auto constexpr is_unix_reserved_char(unsigned char ch) noexcept
+[[nodiscard, maybe_unused]] auto constexpr is_unix_reserved_char([[maybe_unused]] unsigned char ch) noexcept
 {
-    return ch == '/';
+    // TODO: keep this here for future uses
+    return false;
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
@@ -448,7 +449,6 @@ namespace
     {
     case '"':
     case '*':
-    case '/':
     case ':':
     case '<':
     case '>':
@@ -457,12 +457,17 @@ namespace
     case '|':
         return true;
     default:
-        return ch <= 31;
+        return false;
     }
 }
 
 [[nodiscard]] auto constexpr is_reserved_char(unsigned char ch, bool os_specific) noexcept
 {
+    if (ch <= 31 || ch == '/')
+    {
+        return true;
+    }
+
     if (!os_specific)
     {
         return is_unix_reserved_char(ch) || is_win32_reserved_char(ch);

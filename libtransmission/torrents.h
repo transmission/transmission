@@ -109,7 +109,7 @@ public:
 
         auto vec = std::vector<tr_torrent*>{};
         vec.reserve(size());
-        std::copy_if(std::begin(by_id_), std::end(by_id_), std::back_inserter(vec), pred);
+        std::ranges::copy_if(by_id_, std::back_inserter(vec), pred);
         return vec;
     }
 

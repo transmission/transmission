@@ -71,7 +71,7 @@ extern "C"
         void const* v3,
         int len3)
     {
-        auto* setme = reinterpret_cast<std::byte*>(hash_return);
+        auto* setme = static_cast<std::byte*>(hash_return);
         std::fill_n(static_cast<char*>(hash_return), hash_size, '\0');
 
         auto const sv1 = std::string_view{ static_cast<char const*>(v1), size_t(len1) };
@@ -100,8 +100,8 @@ extern "C"
 
         auto const d = std::chrono::system_clock::now().time_since_epoch();
         auto const s = std::chrono::duration_cast<std::chrono::seconds>(d);
-        tv->tv_sec = s.count();
-        tv->tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(d - s).count();
+        tv->tv_sec = static_cast<decltype(tv->tv_sec)>(s.count());
+        tv->tv_usec = static_cast<decltype(tv->tv_usec)>(std::chrono::duration_cast<std::chrono::microseconds>(d - s).count());
 
         return 0;
     }
@@ -159,7 +159,7 @@ public:
         }
         bootstrap_timer_->start_single_shot(100ms);
 
-        mediator_.api().init(udp4_socket_, udp6_socket_, std::data(id_), nullptr);
+        mediator_.api().init(static_cast<int>(udp4_socket_), static_cast<int>(udp6_socket_), std::data(id_), nullptr);
 
         on_announce_timer();
         announce_timer_->start_repeating(1s);
@@ -398,8 +398,7 @@ private:
             return candidate.socket_address.port_ == tr_port::from_host(1);
         };
 
-        auto const remove_it = std::remove_if(std::begin(pex), std::end(pex), IsBadPex);
-        pex.erase(remove_it, std::end(pex));
+        std::erase_if(pex, IsBadPex);
         return std::move(pex);
     }
 

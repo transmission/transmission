@@ -107,7 +107,7 @@ bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier
         tracker.scrape = *scrape_str;
     }
 
-    auto const it = std::lower_bound(std::begin(trackers_), std::end(trackers_), tracker);
+    auto const it = std::ranges::lower_bound(trackers_, tracker);
     trackers_.insert(it, tracker);
 
     return true;

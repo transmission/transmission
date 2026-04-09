@@ -21,6 +21,7 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -41,9 +42,9 @@
 #include "libtransmission/announcer.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
-#include "libtransmission/cache.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/ip-cache.h"
+#include "libtransmission/local-data.h"
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port, tr_tos_t
 #include "libtransmission/open-files.h"
@@ -339,6 +340,20 @@ private:
             }
         }
 
+        [[nodiscard]] std::span<std::string const> settings_ip_endpoint(tr_address_type type) override
+        {
+            switch (type)
+            {
+            case TR_AF_INET:
+                return session_.settings_.ip_endpoint_ipv4;
+            case TR_AF_INET6:
+                return session_.settings_.ip_endpoint_ipv6;
+            default:
+                TR_ASSERT_MSG(false, "Invalid type");
+                return {};
+            }
+        }
+
         [[nodiscard]] tr::TimerMaker& timer_maker() override
         {
             return session_.timerMaker();
@@ -446,7 +461,7 @@ public:
         bool torrent_complete_verify_enabled = false;
         bool utp_enabled = true;
         double ratio_limit = 2.0;
-        size_t cache_size_mbytes = 4U;
+        size_t unused_cache_size_mbytes = 4U; // TODO(TR5): remove
         size_t download_queue_size = 5U;
         size_t idle_seeding_limit_minutes = 30U;
         size_t peer_limit_global = TrDefaultPeerLimitGlobal;
@@ -461,6 +476,8 @@ public:
             TR_PREFER_UTP,
             TR_PREFER_TCP,
         };
+        std::vector<std::string> ip_endpoint_ipv4 = { "https://ip4.transmissionbt.com/" };
+        std::vector<std::string> ip_endpoint_ipv6 = { "https://ip6.transmissionbt.com/" };
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
         std::optional<std::string> proxy_url;
         std::string announce_ip;
@@ -497,7 +514,7 @@ public:
             Field<&Settings::bind_address_ipv6>{ TR_KEY_bind_address_ipv6 },
             Field<&Settings::blocklist_enabled>{ TR_KEY_blocklist_enabled },
             Field<&Settings::blocklist_url>{ TR_KEY_blocklist_url },
-            Field<&Settings::cache_size_mbytes>{ TR_KEY_cache_size_mib },
+            Field<&Settings::unused_cache_size_mbytes>{ TR_KEY_cache_size_mib },
             Field<&Settings::default_trackers_str>{ TR_KEY_default_trackers },
             Field<&Settings::dht_enabled>{ TR_KEY_dht_enabled },
             Field<&Settings::download_dir>{ TR_KEY_download_dir },
@@ -508,6 +525,8 @@ public:
             Field<&Settings::idle_seeding_limit_enabled>{ TR_KEY_idle_seeding_limit_enabled },
             Field<&Settings::incomplete_dir>{ TR_KEY_incomplete_dir },
             Field<&Settings::incomplete_dir_enabled>{ TR_KEY_incomplete_dir_enabled },
+            Field<&Settings::ip_endpoint_ipv4>{ TR_KEY_ip_endpoints_ipv4 },
+            Field<&Settings::ip_endpoint_ipv6>{ TR_KEY_ip_endpoints_ipv6 },
             Field<&Settings::lpd_enabled>{ TR_KEY_lpd_enabled },
             Field<&Settings::log_level>{ TR_KEY_message_level },
             Field<&Settings::peer_congestion_algorithm>{ TR_KEY_peer_congestion_algorithm },
@@ -794,7 +813,6 @@ public:
         return open_files_;
     }
 
-    void flush_torrent_files(tr_torrent_id_t tor_id) const noexcept;
     void close_torrent_files(tr_torrent_id_t tor_id) noexcept;
     void close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept;
 
@@ -817,67 +835,60 @@ public:
 
     // callbacks
 
-    using queue_start_callback_t = void (*)(tr_session*, tr_torrent*, void* user_data);
-
-    constexpr void setQueueStartCallback(queue_start_callback_t cb, void* user_data)
+    void setQueueStartCallback(tr_session_queue_start_func cb)
     {
-        queue_start_callback_ = cb;
-        queue_start_user_data_ = user_data;
+        queue_start_callback_ = std::move(cb);
     }
 
-    constexpr void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
+    void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb)
     {
-        idle_limit_hit_callback_ = cb;
-        idle_limit_hit_user_data_ = user_data;
+        idle_limit_hit_callback_ = std::move(cb);
     }
 
-    void onIdleLimitHit(tr_torrent* tor)
+    void onIdleLimitHit(tr_torrent_id_t const tor_id)
     {
-        if (idle_limit_hit_callback_ != nullptr)
+        if (idle_limit_hit_callback_)
         {
-            idle_limit_hit_callback_(this, tor, idle_limit_hit_user_data_);
+            idle_limit_hit_callback_(tor_id);
         }
     }
 
-    constexpr void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb, void* user_data)
+    void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb)
     {
-        ratio_limit_hit_cb_ = cb;
-        ratio_limit_hit_user_data_ = user_data;
+        ratio_limit_hit_cb_ = std::move(cb);
     }
 
-    void onRatioLimitHit(tr_torrent* tor)
+    void onRatioLimitHit(tr_torrent_id_t const tor_id)
     {
-        if (ratio_limit_hit_cb_ != nullptr)
+        if (ratio_limit_hit_cb_)
         {
-            ratio_limit_hit_cb_(this, tor, ratio_limit_hit_user_data_);
+            ratio_limit_hit_cb_(tor_id);
         }
     }
 
-    constexpr void setMetadataCallback(tr_session_metadata_func cb, void* user_data)
+    void setMetadataCallback(tr_session_metadata_func cb)
     {
-        got_metadata_cb_ = cb;
-        got_metadata_user_data_ = user_data;
+        got_metadata_cb_ = std::move(cb);
     }
 
-    void onMetadataCompleted(tr_torrent* tor)
+    void onMetadataCompleted(tr_torrent_id_t const tor_id)
     {
-        if (got_metadata_cb_ != nullptr)
+        if (got_metadata_cb_)
         {
-            got_metadata_cb_(this, tor, got_metadata_user_data_);
+            got_metadata_cb_(tor_id);
         }
     }
 
-    constexpr void setTorrentCompletenessCallback(tr_torrent_completeness_func cb, void* user_data)
+    void setTorrentCompletenessCallback(tr_torrent_completeness_func cb)
     {
-        completeness_func_ = cb;
-        completeness_func_user_data_ = user_data;
+        completeness_func_ = std::move(cb);
     }
 
-    void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness completeness, bool was_running)
+    void onTorrentCompletenessChanged(tr_torrent_id_t const tor_id, tr_completeness const completeness, bool const was_running)
     {
-        if (completeness_func_ != nullptr)
+        if (completeness_func_)
         {
-            completeness_func_(tor, completeness, was_running, completeness_func_user_data_);
+            completeness_func_(tor_id, completeness, was_running);
         }
     }
 
@@ -1065,11 +1076,11 @@ public:
 
     /*module_visible*/
 
-    auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
+    auto rpcNotify(tr_rpc_callback_type type, std::optional<tr_torrent_id_t> tor_id = {})
     {
-        if (rpc_func_ != nullptr)
+        if (rpc_func_)
         {
-            return (*rpc_func_)(this, type, tor, rpc_func_user_data_);
+            return rpc_func_(type, tor_id);
         }
 
         return TR_RPC_OK;
@@ -1131,7 +1142,7 @@ public:
     void set_speed_limit(tr_direction dir, Speed limit) noexcept
     {
         auto& tgt = dir == tr_direction::Down ? settings_.speed_limit_down : settings_.speed_limit_up;
-        tgt = limit.count(Speed::Units::KByps);
+        tgt = static_cast<size_t>(limit.count(Speed::Units::KByps));
         update_bandwidth(dir);
     }
 
@@ -1194,6 +1205,16 @@ public:
         {
             dht_->maybe_add_node(addr, port);
         }
+    }
+
+    [[nodiscard]] constexpr auto unused_cache_size_mbytes() const
+    {
+        return settings().unused_cache_size_mbytes;
+    }
+
+    constexpr void set_unused_cache_size_mbytes(size_t const mbytes)
+    {
+        settings_.unused_cache_size_mbytes = mbytes;
     }
 
 private:
@@ -1262,7 +1283,6 @@ private:
     friend size_t tr_blocklistSetContent(tr_session* session, std::string_view content_filename);
     friend size_t tr_sessionGetAltSpeedBegin(tr_session const* session);
     friend size_t tr_sessionGetAltSpeedEnd(tr_session const* session);
-    friend size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
     friend size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
@@ -1281,9 +1301,8 @@ private:
     friend void tr_sessionSetAltSpeedBegin(tr_session* session, size_t minutes_since_midnight);
     friend void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day days);
     friend void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight);
-    friend void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data);
+    friend void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func);
     friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, size_t limit_kbyps);
-    friend void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes);
     friend void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
@@ -1303,7 +1322,7 @@ private:
     friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
-    friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+    friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func);
     friend void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetRPCPassword(tr_session* session, std::string_view password);
     friend void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled);
@@ -1360,26 +1379,19 @@ private:
 
     Settings settings_;
 
-    queue_start_callback_t queue_start_callback_ = nullptr;
-    void* queue_start_user_data_ = nullptr;
+    tr_session_queue_start_func queue_start_callback_ = nullptr;
 
     tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
-    void* idle_limit_hit_user_data_ = nullptr;
 
     tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
-    void* ratio_limit_hit_user_data_ = nullptr;
 
     tr_session_metadata_func got_metadata_cb_ = nullptr;
-    void* got_metadata_user_data_ = nullptr;
 
     tr_torrent_completeness_func completeness_func_ = nullptr;
-    void* completeness_func_user_data_ = nullptr;
 
     tr_rpc_func rpc_func_ = nullptr;
-    void* rpc_func_user_data_ = nullptr;
 
     tr_altSpeedFunc alt_speed_active_changed_func_ = nullptr;
-    void* alt_speed_active_changed_func_user_data_ = nullptr;
 
     // The local peer port that we bind a socket to for listening
     // to incoming peer connections. Usually the same as
@@ -1449,6 +1461,11 @@ private:
     // depends-on: open_files_
     tr_torrents torrents_;
 
+public:
+    // depends-on: open_files_, torrents_
+    tr::LocalData local_data{ torrents_, open_files_ };
+
+private:
     // depends-on: settings_, session_thread_, timer_maker_, web_
     IPCacheMediator ip_cache_mediator_{ *this };
     std::shared_ptr<tr_ip_cache> ip_cache_ = tr_ip_cache::create(ip_cache_mediator_);
@@ -1457,11 +1474,6 @@ private:
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
-public:
-    // depends-on: settings_, open_files_, torrents_
-    std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, Memory{ 2U, Memory::Units::MBytes });
-
-private:
     // depends-on: timer_maker_, blocklists_, top_bandwidth_, utp_context, torrents_, web_
     std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
 

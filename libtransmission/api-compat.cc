@@ -25,6 +25,10 @@ namespace tr::api_compat
 {
 namespace
 {
+namespace keys
+{
+namespace detail
+{
 struct ApiKey
 {
     // snake-case quark
@@ -32,6 +36,27 @@ struct ApiKey
 
     // legacy mixed-case RPC quark (pre-05aef3e7)
     tr_quark legacy;
+};
+
+template<size_t N>
+struct KeyLookupTable
+{
+    std::array<tr_quark, N> value = {};
+
+    constexpr void insert(tr_quark const src, tr_quark const dst) noexcept
+    {
+        auto const idx = static_cast<size_t>(src);
+        if (idx < N)
+        {
+            value[idx] = dst;
+        }
+    }
+
+    [[nodiscard]] constexpr tr_quark lookup_or(tr_quark const src, tr_quark const fallback) const noexcept
+    {
+        auto const idx = static_cast<size_t>(src);
+        return idx < N && value[idx] != TR_KEY_NONE ? value[idx] : fallback;
+    }
 };
 
 auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
@@ -399,6 +424,83 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { .current = TR_KEY_watch_dir_force_generic, .legacy = TR_KEY_watch_dir_force_generic_kebab_APICOMPAT },
 } };
 
+[[nodiscard]] consteval size_t lookup_table_size()
+{
+    auto max_key = tr_quark{};
+
+    for (auto const [current, legacy] : RpcKeys)
+    {
+        max_key = std::max(max_key, current);
+        max_key = std::max(max_key, legacy);
+    }
+
+    for (auto const [current, legacy] : SessionKeys)
+    {
+        max_key = std::max(max_key, current);
+        max_key = std::max(max_key, legacy);
+    }
+
+    return static_cast<size_t>(max_key) + 1U;
+}
+
+template<size_t M>
+[[nodiscard]] consteval bool has_no_none_entries(std::array<ApiKey, M> const& keys)
+{
+    return std::ranges::all_of(keys, [](auto const& key) { return key.current != TR_KEY_NONE && key.legacy != TR_KEY_NONE; });
+}
+
+static_assert(has_no_none_entries(RpcKeys));
+static_assert(has_no_none_entries(SessionKeys));
+
+template<size_t N, size_t M>
+consteval void add_current_entries(KeyLookupTable<N>& table, std::array<ApiKey, M> const& keys)
+{
+    for (auto const [current, legacy] : keys)
+    {
+        table.insert(current, current);
+        table.insert(legacy, current);
+    }
+}
+
+template<size_t N, size_t M>
+consteval void add_legacy_entries(KeyLookupTable<N>& table, std::array<ApiKey, M> const& keys)
+{
+    for (auto const [current, legacy] : keys)
+    {
+        table.insert(current, legacy);
+        table.insert(legacy, legacy);
+    }
+}
+
+[[nodiscard]] consteval auto make_tr5_key_lookup_table()
+{
+    auto table = KeyLookupTable<lookup_table_size()>{};
+    add_current_entries(table, RpcKeys);
+    add_current_entries(table, SessionKeys);
+    return table;
+}
+
+[[nodiscard]] consteval auto make_legacy_rpc_key_lookup_table()
+{
+    auto table = KeyLookupTable<lookup_table_size()>{};
+    add_legacy_entries(table, RpcKeys);
+    return table;
+}
+
+[[nodiscard]] consteval auto make_legacy_settings_key_lookup_table()
+{
+    auto table = KeyLookupTable<lookup_table_size()>{};
+    add_legacy_entries(table, SessionKeys);
+    return table;
+}
+} // namespace detail
+
+auto constexpr Tr5KeyLookup = detail::make_tr5_key_lookup_table();
+auto constexpr LegacyRpcKeyLookup = detail::make_legacy_rpc_key_lookup_table();
+auto constexpr LegacySettingsKeyLookup = detail::make_legacy_settings_key_lookup_table();
+
+} // namespace keys
+
 auto constexpr MethodNotFoundLegacyErrmsg = std::string_view{ "no method name" };
 
 namespace EncryptionModeString
@@ -555,43 +657,16 @@ struct State
 
     if (state.style == Style::Tr5)
     {
-        for (auto const [current, legacy] : RpcKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return current;
-            }
-        }
-        for (auto const [current, legacy] : SessionKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return current;
-            }
-        }
-    }
-    else if (state.is_rpc) // legacy RPC
-    {
-        for (auto const [current, legacy] : RpcKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return legacy;
-            }
-        }
-    }
-    else // legacy datafiles
-    {
-        for (auto const [current, legacy] : SessionKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return legacy;
-            }
-        }
+        return keys::Tr5KeyLookup.lookup_or(src, src);
     }
 
-    return src;
+    if (state.is_rpc) // legacy RPC
+    {
+        return keys::LegacyRpcKeyLookup.lookup_or(src, src);
+    }
+
+    // legacy datafiles
+    return keys::LegacySettingsKeyLookup.lookup_or(src, src);
 }
 
 [[nodiscard]] std::optional<std::string_view> convert_string(State const& state, std::string_view const src)

@@ -79,7 +79,7 @@ void WatchDir::watcherActivated(QString const& path)
     auto const torrent_suffix = QStringLiteral(".torrent");
     for (auto const& name : files)
     {
-        if (!name.endsWith(torrent_suffix, Qt::CaseInsensitive) || (watch_dir_files_.count(name) != 0U))
+        if (!name.endsWith(torrent_suffix, Qt::CaseInsensitive) || watch_dir_files_.contains(name))
         {
             continue;
         }

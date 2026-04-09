@@ -28,6 +28,8 @@ target_sources(${TR_NAME}
         announcer-udp.cc
         announcer.cc
         announcer.h
+        local-data.cc
+        local-data.h
         api-compat.cc
         api-compat.h
         bandwidth.cc
@@ -39,8 +41,6 @@ target_sources(${TR_NAME}
         block-info.h
         blocklist.cc
         blocklist.h
-        cache.cc
-        cache.h
         clients.cc
         clients.h
         completion.cc

@@ -291,7 +291,7 @@ using OutBuf = fmt::memory_buffer;
         entries.emplace_back(tr_quark_get_string_view(key), &child);
     }
 
-    std::sort(std::begin(entries), std::end(entries));
+    std::ranges::sort(entries);
     return entries;
 }
 

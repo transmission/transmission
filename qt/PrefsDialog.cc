@@ -427,9 +427,10 @@ void PrefsDialog::onUpdateBlocklistCancelled()
     blocklist_dialog_->deleteLater();
 }
 
-void PrefsDialog::onBlocklistUpdated(int n)
+void PrefsDialog::onBlocklistUpdated(int64_t n)
 {
-    blocklist_dialog_->setText(tr("<b>Update succeeded!</b><p>Blocklist now has %Ln rule(s).</p>", nullptr, n));
+    blocklist_dialog_->setText(
+        tr("<b>Update succeeded!</b><p>Blocklist now has %Ln rule(s).</p>", nullptr, static_cast<int>(n)));
     blocklist_dialog_->setTextFormat(Qt::RichText);
 }
 
@@ -649,8 +650,8 @@ void PrefsDialog::sessionUpdated()
 
 void PrefsDialog::updateBlocklistLabel()
 {
-    int const n = session_.blocklistSize();
-    ui_.blocklistStatusLabel->setText(tr("<i>Blocklist contains %Ln rule(s)</i>", nullptr, n));
+    ui_.blocklistStatusLabel->setText(
+        tr("<i>Blocklist contains %Ln rule(s)</i>", nullptr, static_cast<int>(session_.blocklistSize())));
 }
 
 void PrefsDialog::refreshPref(int key)

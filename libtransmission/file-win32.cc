@@ -104,7 +104,7 @@ bool is_valid_path(std::string_view path)
     {
         return wch == L'/' ? L'\\' : wch;
     };
-    std::transform(std::begin(wide_path), std::end(wide_path), std::begin(wide_path), Convert);
+    std::ranges::transform(wide_path, std::begin(wide_path), Convert);
 
     // squash multiple consecutive separators into one to avoid ERROR_INVALID_NAME
     static auto constexpr Equal = [](wchar_t a, wchar_t b)
@@ -113,7 +113,7 @@ bool is_valid_path(std::string_view path)
     };
     auto const tmp = wide_path;
     wide_path.clear();
-    std::unique_copy(std::begin(tmp), std::end(tmp), std::back_inserter(wide_path), Equal);
+    std::ranges::unique_copy(tmp, std::back_inserter(wide_path), Equal);
 
     return wide_path;
 }
@@ -774,7 +774,7 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
     FILE_END_OF_FILE_INFO info;
-    info.EndOfFile.QuadPart = size;
+    info.EndOfFile.QuadPart = static_cast<LONGLONG>(size);
 
     bool const ret = to_bool(SetFileInformationByHandle(handle, FileEndOfFileInfo, &info, sizeof(info)));
 

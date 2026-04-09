@@ -8,7 +8,6 @@ Checks:
   - bugprone-*
   - -bugprone-branch-clone
   - -bugprone-easily-swappable-parameters
-  - -bugprone-narrowing-conversions
   - cert-*
   - -cert-err58-cpp,
   - -cert-int09-c
@@ -36,11 +35,9 @@ Checks:
   - -misc-no-recursion
   - -misc-non-private-member-variables-in-classes
   - modernize-*
-  - -modernize-use-ranges
   - -modernize-use-trailing-return-type # keep
   - performance-*
   - readability-*
-  - -readability-container-contains
   - -readability-convert-member-functions-to-static
   - -readability-enum-initial-value
   - -readability-function-cognitive-complexity

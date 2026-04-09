@@ -82,7 +82,8 @@ TEST(Client, clientForId)
     for (auto const& test : Tests)
     {
         auto peer_id = tr_rand_obj<tr_peer_id_t>();
-        std::copy(std::begin(test.peer_id), std::end(test.peer_id), std::begin(peer_id));
+        ASSERT_LE(test.peer_id.size(), peer_id.size()) << test.peer_id;
+        std::ranges::copy(test.peer_id, std::begin(peer_id));
 
         auto buf = std::array<char, 128>{};
         tr_clientForId(buf.data(), buf.size(), peer_id);
@@ -101,7 +102,7 @@ TEST(Client, clientForIdFuzzRegressions)
     {
         auto const input = tr_base64_decode(test);
         auto peer_id = tr_peer_id_t{};
-        std::copy(std::begin(input), std::end(input), std::begin(peer_id));
+        std::ranges::copy(input, std::begin(peer_id));
         auto buf = std::array<char, 128>{};
         tr_clientForId(buf.data(), buf.size(), peer_id);
     }

@@ -62,24 +62,6 @@ static dispatch_queue_t timeMachineExcludeQueue;
 
 @end
 
-void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char const* newNameCharString, int error, void* contextInfo)
-{
-    @autoreleasepool
-    {
-        NSString* oldPath = @(oldPathCharString);
-        NSString* newName = @(newNameCharString);
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSDictionary* contextDict = (__bridge_transfer NSDictionary*)contextInfo;
-            Torrent* torrentObject = contextDict[@"Torrent"];
-            [torrentObject renameFinished:error == 0 nodes:contextDict[@"Nodes"]
-                        completionHandler:contextDict[@"CompletionHandler"]
-                                  oldPath:oldPath
-                                  newName:newName];
-        });
-    }
-}
-
 bool trashDataFile(std::string_view const filename, tr_error* error)
 {
     if (std::empty(filename))
@@ -101,6 +83,26 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     }
 
     return true;
+}
+
+tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextInfo)
+{
+    return [contextInfo](tr_torrent_id_t const /*tor_id*/, std::string_view const oldpath, std::string_view const newname, tr_error const& error)
+    {
+        @autoreleasepool
+        {
+            NSString* const oldPath = tr_strv_to_utf8_nsstring(oldpath);
+            NSString* const newName = tr_strv_to_utf8_nsstring(newname);
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                Torrent* torrentObject = contextInfo[@"Torrent"];
+                [torrentObject renameFinished:error.code() == 0 nodes:contextInfo[@"Nodes"]
+                            completionHandler:contextInfo[@"CompletionHandler"]
+                                      oldPath:oldPath
+                                      newName:newName];
+            });
+        }
+    };
 }
 
 @implementation Torrent
@@ -875,7 +877,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
     NSDictionary* contextInfo = @{ @"Torrent" : self, @"CompletionHandler" : [completionHandler copy] };
 
-    tr_torrentRenamePath(self.fHandle, tr_torrentName(self.fHandle), newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
+    tr_torrentRenamePath(self.fHandle, tr_torrentName(self.fHandle), newName.UTF8String, makeRenameDoneCallback(contextInfo));
 }
 
 - (void)renameFileNode:(FileListNode*)node
@@ -898,7 +900,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
     NSDictionary* contextInfo = @{ @"Torrent" : self, @"Nodes" : @[ node ], @"CompletionHandler" : [completionHandler copy] };
 
     NSString* oldPath = [node.path stringByAppendingPathComponent:node.name];
-    tr_torrentRenamePath(self.fHandle, oldPath.UTF8String, newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
+    tr_torrentRenamePath(self.fHandle, oldPath.UTF8String, newName.UTF8String, makeRenameDoneCallback(contextInfo));
 }
 
 - (time_t)eta
@@ -1888,6 +1890,7 @@ bool trashDataFile(std::string_view const filename, tr_error* error)
 
     _fResumeOnWake = NO;
     _hashString = @(tr_torrentView(self.fHandle).hash_string);
+    _id = tr_torrentId(self.fHandle);
 
     //don't do after this point - it messes with auto-group functionality
     if (!self.magnet)
