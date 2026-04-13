@@ -56,6 +56,7 @@ Wishlist::Candidate::Candidate(tr_piece_index_t piece_in, tr_piece_index_t salt_
     , replication{ mediator->count_piece_replication(piece_in) }
     , priority{ mediator->priority(piece_in) }
     , salt{ salt_in }
+    , is_sequential{ mediator->is_sequential_download() }
 {
     unrequested.reserve(block_span.end - block_span.begin);
     for (auto [begin, i] = block_span; i > begin; --i)

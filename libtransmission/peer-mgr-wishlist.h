@@ -50,10 +50,14 @@ private:
 
         [[nodiscard]] constexpr auto operator<=>(Candidate const& that) const noexcept
         {
-            // prefer pieces closer to completion
-            if (auto const val = std::size(unrequested) <=> std::size(that.unrequested); val != 0)
+            // prefer pieces closer to completion. Skipped in sequential mode to allow slow peers
+            // request lower priority pieces while fast peers request blocks in order.
+            if (!is_sequential)
             {
-                return val;
+                if (auto const val = std::size(unrequested) <=> std::size(that.unrequested); val != 0)
+                {
+                    return val;
+                }
             }
 
             // prefer higher priority
@@ -99,6 +103,7 @@ private:
         tr_priority_t priority;
 
         tr_piece_index_t salt;
+        bool is_sequential;
     };
 
     using CandidateVec = std::vector<Candidate>;

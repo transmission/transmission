@@ -288,13 +288,12 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadSlowPeer)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator = MockMediator{ *this };
+        auto mediator = MockMediator{};
 
         // setup: three pieces, all missing
-        mediator.piece_count_ = 3;
-        mediator.block_span_[0] = { 0, 100 };
-        mediator.block_span_[1] = { 100, 200 };
-        mediator.block_span_[2] = { 200, 250 };
+        mediator.block_span_[0] = { .begin = 0, .end = 100 };
+        mediator.block_span_[1] = { .begin = 100, .end = 200 };
+        mediator.block_span_[2] = { .begin = 200, .end = 250 };
 
         // peer has all pieces
         mediator.piece_replication_[0] = 1;
