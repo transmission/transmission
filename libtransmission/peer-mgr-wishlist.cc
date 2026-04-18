@@ -86,7 +86,7 @@ std::vector<tr_block_span_t> Wishlist::next(
     if (mediator_.is_sequential_download() && is_slow_peer)
     {
         candidates_reversed = candidates_;
-        std::reverse(std::begin(candidates_reversed), std::end(candidates_reversed));
+        std::ranges::reverse(candidates_reversed);
     }
     auto const& candidates = mediator_.is_sequential_download() && is_slow_peer ? candidates_reversed : candidates_;
 

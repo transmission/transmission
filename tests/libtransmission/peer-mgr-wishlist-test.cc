@@ -286,7 +286,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
 
 TEST_F(PeerMgrWishlistTest, sequentialDownloadSlowPeer)
 {
-    auto const get_spans = [this](size_t n_wanted)
+    auto const get_spans = [](size_t n_wanted)
     {
         auto mediator = MockMediator{};
 
