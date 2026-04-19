@@ -637,11 +637,11 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| `speed_units`  | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
+| `speed_units`  | array  | 5 strings: B/s, kB/s, MB/s, GB/s, TB/s
 | `speed_bytes`  | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
-| `size_units`   | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
+| `size_units`   | array  | 5 strings: B, kB, MB, GB, TB
 | `size_bytes`   | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
-| `memory_units` | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
+| `memory_units` | array  | 5 strings: B, KiB, MiB, GiB, TiB
 | `memory_bytes` | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
 
 #### 4.1.1 Mutators
