@@ -19,7 +19,7 @@ using namespace std::literals;
 namespace libtransmission
 {
 
-class UvTimer final : public Timer
+class UvTimer final : public tr::Timer
 {
 public:
     explicit UvTimer(uv_loop_s* loop)
@@ -157,7 +157,7 @@ private:
     uv_timer_t* uv_timer_ = nullptr;
 };
 
-std::unique_ptr<Timer> UvTimerMaker::create()
+std::unique_ptr<tr::Timer> UvTimerMaker::create()
 {
     return std::make_unique<UvTimer>(uv_loop_);
 }

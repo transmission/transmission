@@ -84,7 +84,6 @@ tr_peerIo::tr_peerIo(
     , info_hash_{ info_hash != nullptr ? *info_hash : tr_sha1_digest_t{} }
     , session_{ session }
     , flush_outbuf_trigger_{ session->timerMaker().create() }
-    , backend_{ backend }
     , client_is_seed_{ client_is_seed }
     , is_incoming_{ is_incoming }
 {
@@ -103,7 +102,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     auto lock = session->unique_lock();
 
     auto const io = std::shared_ptr<tr_peerIo>{
-        new tr_peerIo{ backend, session, std::move(socket), parent, info_hash, is_incoming, is_seed }
+        new tr_peerIo{ session, std::move(socket), parent, info_hash, is_incoming, is_seed }
     };
     io->bandwidth().set_peer(io);
     io->flush_outbuf_trigger_->set_callback(
@@ -590,9 +589,6 @@ void tr_peerIo::set_write_enabled(bool is_enabled)
 
 void tr_peerIo::set_enabled(tr_direction dir, bool is_enabled)
 {
-    auto const event = dir == tr_direction::Up ? libtransmission::PeerIoEventHandler::EventType::WRITE :
-                                                 libtransmission::PeerIoEventHandler::EventType::READ;
-
     if (dir == tr_direction::Down)
     {
         set_read_enabled(is_enabled);

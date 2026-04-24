@@ -17,7 +17,7 @@ extern "C"
 namespace libtransmission
 {
 
-class UvTimerMaker final : public TimerMaker
+class UvTimerMaker final : public tr::TimerMaker
 {
 public:
     explicit UvTimerMaker(uv_loop_s* loop) noexcept
@@ -25,7 +25,7 @@ public:
     {
     }
 
-    [[nodiscard]] std::unique_ptr<Timer> create() override;
+    [[nodiscard]] std::unique_ptr<tr::Timer> create() override;
 
 private:
     uv_loop_s* const uv_loop_;

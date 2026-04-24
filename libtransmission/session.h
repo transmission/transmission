@@ -57,7 +57,6 @@
 #include "libtransmission/session-id.h"
 #include "libtransmission/session-thread.h"
 #include "libtransmission/serializer.h"
-#include "libtransmission/settings.h"
 #include "libtransmission/socket-event-handler.h"
 #include "libtransmission/stats.h"
 #include "libtransmission/timer.h"
