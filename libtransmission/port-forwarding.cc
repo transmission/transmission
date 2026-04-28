@@ -118,13 +118,17 @@ private:
             // if we're mapped, everything is fine... check back at `renew_time`
             // to renew the port forwarding if it's expired
             do_port_check_ = true;
-            if (auto const now = tr_time(); natpmp_->renewTime() > now)
+            if (auto const now = tr_time(); natpmp_ != nullptr && natpmp_->renewTime() > now)
             {
                 timer_->start_single_shot(std::chrono::seconds{ natpmp_->renewTime() - now });
             }
-            else // ???
+            else if (natpmp_ != nullptr) // ???
             {
                 timer_->start_single_shot(1min);
+            }
+            else
+            {
+                timer_->start_single_shot(30min);
             }
             break;
 
@@ -176,8 +180,10 @@ private:
     void natPulse(bool do_check)
     {
         auto const is_enabled = is_enabled_ && !is_shutting_down_;
+        auto const bind_interface = mediator_.bind_interface();
+        auto const is_interface_bound = !tr_net_interface_is_default(bind_interface);
 
-        if (!natpmp_)
+        if (!is_interface_bound && !natpmp_)
         {
             natpmp_ = std::make_unique<tr_natpmp>();
         }
@@ -189,25 +195,34 @@ private:
 
         auto const old_state = state();
 
-        auto const result = natpmp_->pulse(mediator_.local_peer_port(), is_enabled);
-        natpmp_state_ = result.state;
-        if (!std::empty(result.local_port) && !std::empty(result.advertised_port))
+        if (natpmp_)
         {
-            mediator_.on_port_forwarded(result.advertised_port);
-            tr_logAddInfo(
-                fmt::format(
-                    fmt::runtime(_("Mapped private port {private_port} to public port {public_port}")),
-                    fmt::arg("private_port", result.local_port.host()),
-                    fmt::arg("public_port", result.advertised_port.host())));
+            auto const result = natpmp_->pulse(mediator_.local_peer_port(), is_enabled && !is_interface_bound);
+            natpmp_state_ = result.state;
+            if (!std::empty(result.local_port) && !std::empty(result.advertised_port))
+            {
+                mediator_.on_port_forwarded(result.advertised_port);
+                tr_logAddInfo(
+                    fmt::format(
+                        fmt::runtime(_("Mapped private port {private_port} to public port {public_port}")),
+                        fmt::arg("private_port", result.local_port.host()),
+                        fmt::arg("public_port", result.advertised_port.host())));
+            }
+        }
+        else
+        {
+            natpmp_state_ = TR_PORT_UNMAPPED;
         }
 
+        auto const upnp_bindaddr = is_interface_bound ? std::string{ bind_interface } :
+                                                        mediator_.incoming_peer_address().display_name();
         upnp_state_ = tr_upnpPulse(
             upnp_,
             mediator_.advertised_peer_port(),
             mediator_.local_peer_port(),
             is_enabled,
             do_check,
-            mediator_.incoming_peer_address().display_name());
+            upnp_bindaddr);
 
         if (auto const new_state = state(); new_state != old_state)
         {

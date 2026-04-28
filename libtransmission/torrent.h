@@ -60,6 +60,7 @@ namespace tr::test
 
 class RenameTest_multifileTorrent_Test;
 class RenameTest_singleFilenameTorrent_Test;
+class SessionTest_torrentBindInterfaceResume_Test;
 
 } // namespace tr::test
 
@@ -94,6 +95,7 @@ struct tr_torrent
     private:
         friend class tr::test::RenameTest_multifileTorrent_Test;
         friend class tr::test::RenameTest_singleFilenameTorrent_Test;
+        friend class tr::test::SessionTest_torrentBindInterfaceResume_Test;
         friend struct tr_torrent;
 
         explicit ResumeHelper(tr_torrent& tor)
@@ -822,6 +824,17 @@ struct tr_torrent
         return bandwidth_group_;
     }
 
+    void set_bind_interface(std::string_view bind_interface);
+
+    [[nodiscard]] auto const& bind_interface() const noexcept
+    {
+        return bind_interface_;
+    }
+
+    [[nodiscard]] std::string_view effective_bind_interface() const noexcept;
+
+    [[nodiscard]] bool bind_interface_matches_session() const noexcept;
+
     [[nodiscard]] constexpr auto peer_limit() const noexcept
     {
         return max_connected_peers_;
@@ -1375,6 +1388,8 @@ private:
     std::vector<time_t> file_mtimes_;
 
     tr_interned_string bandwidth_group_;
+
+    std::string bind_interface_;
 
     // Where the files are when the torrent is complete.
     tr_interned_string download_dir_;

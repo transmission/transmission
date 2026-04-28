@@ -329,6 +329,11 @@ private:
             return false;
         }
 
+        if (!tr_netSetSocketInterface(sock, ip_protocol, mediator_.bind_interface()))
+        {
+            return false;
+        }
+
 #if HAVE_SO_REUSEPORT
         if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) == -1)
         {

@@ -82,6 +82,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_bind_address_ipv6_kebab_APICOMPAT,
     TR_KEY_bind_address_ipv4,
     TR_KEY_bind_address_ipv6,
+    TR_KEY_bind_interface,
     TR_KEY_bitfield,
     TR_KEY_blocklist_date_kebab_APICOMPAT,
     TR_KEY_blocklist_enabled_kebab_APICOMPAT,

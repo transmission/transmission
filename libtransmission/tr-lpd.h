@@ -41,6 +41,11 @@ public:
 
         [[nodiscard]] virtual tr_address bind_address(tr_address_type type) const = 0;
 
+        [[nodiscard]] virtual std::string_view bind_interface() const
+        {
+            return {};
+        }
+
         [[nodiscard]] virtual tr_port port() const = 0;
 
         [[nodiscard]] virtual bool allowsLPD() const = 0;

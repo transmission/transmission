@@ -99,6 +99,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic) IBOutlet NSProgressIndicator* fPortStatusProgress;
 @property(nonatomic) NSTimer* fPortStatusTimer;
 @property(nonatomic) int fPeerPort, fNatStatus;
+@property(nonatomic) NSPopUpButton* fBindInterfacePopUp;
 
 @property(nonatomic) IBOutlet NSTextField* fRPCPortField;
 @property(nonatomic) IBOutlet NSTextField* fRPCPasswordField;
@@ -245,6 +246,9 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     //set port
     self.fPortField.intValue = static_cast<int>([self.fDefaults integerForKey:@"BindPort"]);
     self.fNatStatus = -1;
+
+    [self setupBindInterfaceControl];
+    [self updateBindInterfaceMenu];
 
     [self updatePortStatus];
     self.fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(updatePortStatus)
@@ -440,6 +444,52 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 {
     tr_sessionSetPortForwardingEnabled(self.fHandle, [self.fDefaults boolForKey:@"NatTraversal"]);
 
+    self.fNatStatus = -1;
+    [self updatePortStatus];
+}
+
+- (void)setupBindInterfaceControl
+{
+    if (self.fBindInterfacePopUp != nil)
+    {
+        return;
+    }
+
+    NSView* container = self.fNatCheck.superview;
+    if (container == nil)
+    {
+        return;
+    }
+
+    NSTextField* label = [NSTextField labelWithString:NSLocalizedString(@"Connection:", "Preferences -> Network -> bind interface label")];
+    label.alignment = NSTextAlignmentRight;
+    label.toolTip = NSLocalizedString(@"Network connection used for Transmission traffic", "Preferences -> Network -> bind interface tooltip");
+    label.frame = NSMakeRect(NSWidth(container.bounds) - 262.0, 104.0, 86.0, 17.0);
+    label.autoresizingMask = NSViewMinXMargin;
+
+    self.fBindInterfacePopUp = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(NSWidth(container.bounds) - 170.0, 98.0, 150.0, 26.0)
+                                                          pullsDown:NO];
+    self.fBindInterfacePopUp.target = self;
+    self.fBindInterfacePopUp.action = @selector(setBindInterface:);
+    self.fBindInterfacePopUp.toolTip = label.toolTip;
+    self.fBindInterfacePopUp.autoresizingMask = NSViewMinXMargin;
+
+    [container addSubview:label];
+    [container addSubview:self.fBindInterfacePopUp];
+}
+
+- (void)updateBindInterfaceMenu
+{
+    TRPopulateBindInterfacePopUp(self.fBindInterfacePopUp, [self.fDefaults stringForKey:@"BindInterface"], NO, @"");
+}
+
+- (void)setBindInterface:(id)sender
+{
+    NSString* bindInterface = TRBindInterfacePopUpValue(self.fBindInterfacePopUp);
+    [self.fDefaults setObject:bindInterface forKey:@"BindInterface"];
+    tr_sessionSetBindInterface(self.fHandle, bindInterface.UTF8String);
+
+    self.fPeerPort = -1;
     self.fNatStatus = -1;
     [self updatePortStatus];
 }
@@ -1368,6 +1418,9 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const nat = tr_sessionIsPortForwardingEnabled(self.fHandle);
     [self.fDefaults setBool:nat forKey:@"NatTraversal"];
 
+    [self.fDefaults setObject:tr_strv_to_utf8_nsstring(tr_sessionGetBindInterface(self.fHandle)) forKey:@"BindInterface"];
+    [self updateBindInterfaceMenu];
+
     self.fPeerPort = -1;
     self.fNatStatus = -1;
     [self updatePortStatus];
@@ -1556,6 +1609,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     else if ([identifier isEqualToString:ToolbarTabNetwork])
     {
         view = self.fNetworkView;
+        [self updateBindInterfaceMenu];
     }
     else if ([identifier isEqualToString:ToolbarTabRemote])
     {

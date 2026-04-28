@@ -56,6 +56,11 @@ public:
             return {};
         }
 
+        [[nodiscard]] virtual std::string_view settings_bind_interface()
+        {
+            return {};
+        }
+
         [[nodiscard]] virtual std::span<std::string const> settings_ip_endpoint(tr_address_type /*type*/)
         {
             return {};

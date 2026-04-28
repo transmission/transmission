@@ -53,6 +53,8 @@ static CGFloat const kStackViewSpacing = 8.0;
 
 @property(nonatomic) IBOutlet NSStackView* fOptionsStackView;
 @property(nonatomic) IBOutlet NSView* fSeedingView;
+@property(nonatomic) NSView* fBindInterfaceView;
+@property(nonatomic) NSPopUpButton* fBindInterfacePopUp;
 @property(nonatomic, readonly) CGFloat fHeightChange;
 @property(nonatomic, readwrite) CGFloat fCurrentHeight;
 @property(nonatomic, readonly) CGFloat fHorizLayoutHeight;
@@ -76,6 +78,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 - (void)awakeFromNib
 {
     [super awakeFromNib];
+    [self setupBindInterfaceControl];
     [self checkWindowSize];
 
     [self setGlobalLabels];
@@ -88,17 +91,20 @@ static CGFloat const kStackViewSpacing = 8.0;
 
 - (CGFloat)fHorizLayoutHeight
 {
-    return NSHeight(self.fPriorityView.frame) + 2 * kStackViewInset;
+    return MAX(MAX(NSHeight(self.fPriorityView.frame), NSHeight(self.fSeedingView.frame)), NSHeight(self.fBindInterfaceView.frame)) +
+        2 * kStackViewInset;
 }
 
 - (CGFloat)fHorizLayoutWidth
 {
-    return NSWidth(self.fPriorityView.frame) + NSWidth(self.fSeedingView.frame) + (2 * kStackViewInset) + kStackViewSpacing;
+    return NSWidth(self.fPriorityView.frame) + NSWidth(self.fSeedingView.frame) + NSWidth(self.fBindInterfaceView.frame) +
+        (2 * kStackViewInset) + (2 * kStackViewSpacing);
 }
 
 - (CGFloat)fVertLayoutHeight
 {
-    return NSHeight(self.fPriorityView.frame) + NSHeight(self.fSeedingView.frame) + (2 * kStackViewInset) + kStackViewSpacing;
+    return NSHeight(self.fPriorityView.frame) + NSHeight(self.fSeedingView.frame) + NSHeight(self.fBindInterfaceView.frame) +
+        (2 * kStackViewInset) + (2 * kStackViewSpacing);
 }
 
 - (CGFloat)fHeightChange
@@ -422,6 +428,31 @@ static CGFloat const kStackViewSpacing = 8.0;
     [self.fPriorityPopUp selectItemAtIndex:index];
     self.fPriorityPopUp.enabled = YES;
 
+    //get network binding info
+    enumerator = [self.fTorrents objectEnumerator];
+    torrent = [enumerator nextObject]; //first torrent
+
+    NSString* bindInterface = torrent.bindInterface ?: @"";
+    BOOL multipleBindInterfaces = NO;
+
+    while ((torrent = [enumerator nextObject]) && !multipleBindInterfaces)
+    {
+        if (![bindInterface isEqualToString:torrent.bindInterface ?: @""])
+        {
+            multipleBindInterfaces = YES;
+        }
+    }
+
+    TRPopulateBindInterfacePopUp(self.fBindInterfacePopUp, multipleBindInterfaces ? nil : bindInterface, YES, @"default");
+    if (multipleBindInterfaces)
+    {
+        [self.fBindInterfacePopUp addItemWithTitle:NSLocalizedString(@"Mixed", "Inspector options -> bind interface mixed value")];
+        self.fBindInterfacePopUp.lastItem.representedObject = nil;
+        self.fBindInterfacePopUp.lastItem.enabled = NO;
+        [self.fBindInterfacePopUp selectItem:self.fBindInterfacePopUp.lastItem];
+    }
+    self.fBindInterfacePopUp.enabled = YES;
+
     //get peer info
     enumerator = [self.fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
@@ -448,6 +479,54 @@ static CGFloat const kStackViewSpacing = 8.0;
     {
         self.fPeersConnectField.stringValue = @"";
     }
+}
+
+- (void)setupBindInterfaceControl
+{
+    self.fBindInterfaceView = [[NSView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 280.0, 54.0)];
+    self.fBindInterfaceView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.fBindInterfaceView.widthAnchor constraintEqualToConstant:280.0].active = YES;
+    [self.fBindInterfaceView.heightAnchor constraintEqualToConstant:54.0].active = YES;
+
+    NSTextField* label = [NSTextField labelWithString:NSLocalizedString(@"Connection:", "Inspector options -> bind interface label")];
+    label.alignment = NSTextAlignmentRight;
+    label.translatesAutoresizingMaskIntoConstraints = NO;
+
+    self.fBindInterfacePopUp = [[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO];
+    self.fBindInterfacePopUp.target = self;
+    self.fBindInterfacePopUp.action = @selector(setBindInterface:);
+    self.fBindInterfacePopUp.translatesAutoresizingMaskIntoConstraints = NO;
+
+    [self.fBindInterfaceView addSubview:label];
+    [self.fBindInterfaceView addSubview:self.fBindInterfacePopUp];
+    [self.fOptionsStackView addArrangedSubview:self.fBindInterfaceView];
+
+    [NSLayoutConstraint activateConstraints:@[
+        [label.leadingAnchor constraintEqualToAnchor:self.fBindInterfaceView.leadingAnchor],
+        [label.centerYAnchor constraintEqualToAnchor:self.fBindInterfacePopUp.centerYAnchor],
+        [label.widthAnchor constraintEqualToConstant:92.0],
+        [self.fBindInterfacePopUp.leadingAnchor constraintEqualToAnchor:label.trailingAnchor constant:8.0],
+        [self.fBindInterfacePopUp.trailingAnchor constraintLessThanOrEqualToAnchor:self.fBindInterfaceView.trailingAnchor],
+        [self.fBindInterfacePopUp.centerYAnchor constraintEqualToAnchor:self.fBindInterfaceView.centerYAnchor],
+        [self.fBindInterfacePopUp.widthAnchor constraintEqualToConstant:170.0],
+    ]];
+}
+
+- (void)setBindInterface:(id)sender
+{
+    if (![self.fBindInterfacePopUp.selectedItem.representedObject isKindOfClass:NSString.class])
+    {
+        return;
+    }
+
+    NSString* bindInterface = TRBindInterfacePopUpValue(self.fBindInterfacePopUp);
+
+    for (Torrent* torrent in self.fTorrents)
+    {
+        torrent.bindInterface = bindInterface;
+    }
+
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptionsNotification" object:self];
 }
 
 - (void)setUseSpeedLimit:(id)sender

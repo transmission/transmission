@@ -289,9 +289,15 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
     auto hash = tr_sha1_digest_t{};
     peer_io->read_bytes(std::data(hash), std::size(hash));
 
-    if (auto const& info = mediator_->torrent(hash); !info || !info->is_running)
+    auto const info = mediator_->torrent(hash);
+    if (!info || !info->is_running)
     {
         tr_logAddTraceHand(this, "peer is trying to connect to us for a torrent we aren't running.");
+        return done(false);
+    }
+    if (is_incoming() && !info->allows_incoming_peer)
+    {
+        tr_logAddTraceHand(this, "peer is trying to connect to us for a torrent whose bind interface rejects incoming peers.");
         return done(false);
     }
 
@@ -453,7 +459,8 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
         obfuscated_hash[i] = x_or[i] ^ req3[i];
     }
 
-    if (auto const info = mediator_->torrent_from_obfuscated(obfuscated_hash); info && info->is_running)
+    auto const info = mediator_->torrent_from_obfuscated(obfuscated_hash);
+    if (info && info->is_running && info->allows_incoming_peer)
     {
         tr_logAddTraceHand(this, fmt::format("got INCOMING connection's MSE handshake for torrent [{}]", info->id));
         peer_io->set_torrent_hash(info->info_hash);
@@ -716,7 +723,7 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, tr::BufferWriter<std::
     auto flags = tr_bitfield{ HandshakeFlagsBits };
     flags.set(LtepFlag);
     flags.set(FextFlag);
-    if (mediator_->allows_dht())
+    if (mediator_->allows_dht() && info->allows_dht)
     {
         flags.set(DhtFlag);
     }

@@ -421,6 +421,10 @@ static void removeKeRangerRansomware()
         {
             tr_variantDictAddStr(&settings, TR_KEY_bind_address_ipv6, [_fDefaults stringForKey:@"BindAddressIPv6"].UTF8String);
         }
+        if ([_fDefaults objectForKey:@"BindInterface"])
+        {
+            tr_variantDictAddStr(&settings, TR_KEY_bind_interface, [_fDefaults stringForKey:@"BindInterface"].UTF8String);
+        }
 
         tr_variantDictAddBool(&settings, TR_KEY_blocklist_enabled, [_fDefaults boolForKey:@"BlocklistNew"]);
         if ([_fDefaults objectForKey:@"BlocklistURL"])

@@ -8,6 +8,7 @@
 #import "GroupsController.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
+#import "Utils.h"
 
 typedef NS_ENUM(NSUInteger, PopupPriority) {
     PopupPriorityHigh = 0,
@@ -23,6 +24,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 @property(nonatomic) IBOutlet NSButton* fStartCheck;
 @property(nonatomic) IBOutlet NSPopUpButton* fGroupPopUp;
 @property(nonatomic) IBOutlet NSPopUpButton* fPriorityPopUp;
+@property(nonatomic) NSPopUpButton* fBindInterfacePopUp;
 
 @property(nonatomic, readonly) Controller* fController;
 
@@ -65,6 +67,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
     [self setGroupsMenu];
     [self.fGroupPopUp selectItemWithTag:self.fGroupValue];
+    [self setupBindInterfaceMenu];
 
     PopupPriority priorityIndex;
     switch (self.torrent.priority)
@@ -133,6 +136,42 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
             }
         }
     }];
+}
+
+- (void)setupBindInterfaceMenu
+{
+    if (self.fBindInterfacePopUp != nil)
+    {
+        return;
+    }
+
+    NSView* parent = self.fGroupPopUp.superview;
+    if (parent == nil)
+    {
+        return;
+    }
+
+    CGFloat const y = NSMinY(self.fGroupPopUp.frame) + 4.0;
+    CGFloat const labelX = NSMaxX(self.fGroupPopUp.frame) + 20.0;
+    NSTextField* label = [NSTextField labelWithString:NSLocalizedString(@"Connection:", "Add magnet -> bind interface label")];
+    label.alignment = NSTextAlignmentRight;
+    label.frame = NSMakeRect(labelX, y, 84.0, 17.0);
+    label.autoresizingMask = NSViewMaxXMargin;
+
+    self.fBindInterfacePopUp = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(labelX + 88.0, y - 5.0, 108.0, 26.0) pullsDown:NO];
+    self.fBindInterfacePopUp.target = self;
+    self.fBindInterfacePopUp.action = @selector(changeBindInterface:);
+    self.fBindInterfacePopUp.autoresizingMask = NSViewMaxXMargin;
+
+    TRPopulateBindInterfacePopUp(self.fBindInterfacePopUp, self.torrent.bindInterface, YES, @"default");
+
+    [parent addSubview:label];
+    [parent addSubview:self.fBindInterfacePopUp];
+}
+
+- (void)changeBindInterface:(id)sender
+{
+    self.torrent.bindInterface = TRBindInterfacePopUpValue(self.fBindInterfacePopUp);
 }
 
 - (void)add:(id)sender

@@ -149,6 +149,22 @@ tr_resume::fields_t load_group(tr_variant::Map const& map, tr_torrent* tor)
     return {};
 }
 
+void save_bind_interface(tr_variant::Map& map, tr_torrent const* tor)
+{
+    map.insert_or_assign(TR_KEY_bind_interface, tr_variant::unmanaged_string(tor->bind_interface()));
+}
+
+tr_resume::fields_t load_bind_interface(tr_variant::Map const& map, tr_torrent* tor)
+{
+    if (auto const sv = map.value_if<std::string_view>(TR_KEY_bind_interface); sv)
+    {
+        tor->set_bind_interface(*sv);
+        return tr_resume::BindInterface;
+    }
+
+    return {};
+}
+
 // ---
 
 void save_dnd(tr_variant::Map& map, tr_torrent const* tor)
@@ -853,6 +869,11 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         fields_loaded |= load_group(map, tor);
     }
 
+    if ((fields_to_load & tr_resume::BindInterface) != 0)
+    {
+        fields_loaded |= load_bind_interface(map, tor);
+    }
+
     return fields_loaded;
 }
 
@@ -907,6 +928,15 @@ auto set_from_ctor(
         {
             tor->set_sequential_download_from_piece(*val);
             ret |= tr_resume::SequentialDownloadFromPiece;
+        }
+    }
+
+    if ((fields & tr_resume::BindInterface) != 0)
+    {
+        if (auto const& val = ctor.bind_interface(mode); !std::empty(val))
+        {
+            tor->set_bind_interface(val);
+            ret |= tr_resume::BindInterface;
         }
     }
 
@@ -992,6 +1022,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     save_name(map, tor);
     save_labels(map, tor);
     save_group(map, tor);
+    save_bind_interface(map, tor);
 
     auto out = tr_variant{ std::move(map) };
     tr::api_compat::convert_outgoing_data(out);

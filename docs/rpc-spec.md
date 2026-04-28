@@ -167,6 +167,7 @@ Request parameters:
 | Key | Value Type | Value Description
 |:--|:--|:--
 | `bandwidth_priority`             | number   | this torrent's bandwidth tr_priority_t
+| `bind_interface`                 | string   | torrent network interface override; empty inherits the session setting; `default` uses normal OS routing
 | `download_limit`                 | number   | maximum download speed (kB/s)
 | `download_limited`               | boolean  | true if `download_limit` is honored
 | `files_unwanted`                 | array    | indices of file(s) to not download
@@ -240,6 +241,7 @@ The 'source' column here corresponds to the data structure there.
 | `added_date` | number | tr_stat
 | `availability` | array (see below)| tr_torrentAvailability()
 | `bandwidth_priority` | number | tr_priority_t
+| `bind_interface` | string | tr_torrent
 | `bytes_completed` | array (see below)| n/a
 | `comment` | string | tr_torrent_view
 | `corrupt_ever`| number | tr_stat
@@ -507,6 +509,7 @@ Request parameters:
 | `paused`                         | boolean   | if true, don't start the torrent
 | `peer_limit`                     | number    | maximum number of peers
 | `bandwidth_priority`             | number    | torrent's bandwidth tr_priority_t
+| `bind_interface`                 | string    | torrent network interface override; empty inherits the session setting; `default` uses normal OS routing
 | `files_wanted`                   | array     | indices of file(s) to download
 | `files_unwanted`                 | array     | indices of file(s) to not download
 | `priority_high`                  | array     | indices of high-priority file(s)
@@ -578,6 +581,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `alt_speed_time_end` | number | when to turn off alt speeds (units: same)
 | `alt_speed_up` | number | max global upload speed (kB/s)
 | `anti_brute_force_enabled` | boolean | true means to enable a basic brute force protection for RPC server
+| `bind_interface` | string | session network interface binding; empty means normal OS routing
 | `blocklist_enabled` | boolean | true means enabled
 | `blocklist_size` | number | number of rules in the blocklist
 | `blocklist_url` | string | location of the blocklist to use for `blocklist_update`

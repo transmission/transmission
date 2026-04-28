@@ -499,6 +499,10 @@ void tr_webseed_task::request_next_chunk()
     auto options = tr_web::FetchOptions{ url.sv(), on_partial_data_fetched, this };
     options.range.emplace(file_offset, file_offset + this_chunk - 1);
     options.speed_limit_tag = tor.id();
+    if (!std::empty(tor.bind_interface()))
+    {
+        options.bind_interface = tor.bind_interface();
+    }
     options.on_data_received = [this](size_t const n_bytes)
     {
         on_data_received(n_bytes);

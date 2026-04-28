@@ -179,7 +179,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         auto const addr = session_.bind_address(TR_AF_INET);
         auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
 
-        if (evutil_make_socket_nonblocking(static_cast<evutil_socket_t>(sock)) != 0)
+        if (!tr_netSetSocketInterface(sock, TR_AF_INET, session_.bind_interface()))
+        {
+            tr_net_close_socket(sock);
+        }
+        else if (evutil_make_socket_nonblocking(static_cast<evutil_socket_t>(sock)) != 0)
         {
             auto const error_code = errno;
             tr_logAddWarn(
@@ -232,7 +236,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         auto const addr = session_.bind_address(TR_AF_INET6);
         auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
 
-        if (evutil_make_socket_nonblocking(static_cast<evutil_socket_t>(sock)) != 0)
+        if (!tr_netSetSocketInterface(sock, TR_AF_INET6, session_.bind_interface()))
+        {
+            tr_net_close_socket(sock);
+        }
+        else if (evutil_make_socket_nonblocking(static_cast<evutil_socket_t>(sock)) != 0)
         {
             auto const error_code = errno;
             tr_logAddWarn(

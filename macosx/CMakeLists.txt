@@ -416,6 +416,7 @@ target_link_libraries(${TR_NAME}-mac
         "-framework Foundation"
         "-framework Quartz"
         "-framework Security"
+        "-framework SystemConfiguration"
         "-weak_framework Sparkle"
         "-weak_framework UniformTypeIdentifiers"
         "-weak_framework UserNotifications")

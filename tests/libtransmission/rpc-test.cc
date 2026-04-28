@@ -610,6 +610,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_alt_speed_up,
         TR_KEY_anti_brute_force_enabled,
         TR_KEY_anti_brute_force_threshold,
+        TR_KEY_bind_interface,
         TR_KEY_blocklist_enabled,
         TR_KEY_blocklist_size,
         TR_KEY_blocklist_url,
@@ -686,6 +687,50 @@ TEST_F(RpcTest, sessionGet)
     tr_torrentRemove(tor, false);
 }
 
+TEST_F(RpcTest, sessionBindInterface)
+{
+    auto request_map = tr_variant::Map{ 4U };
+    request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_set));
+    request_map.try_emplace(TR_KEY_id, 12345);
+
+    auto params = tr_variant::Map{ 1U };
+    params.try_emplace(TR_KEY_bind_interface, "lo0"sv);
+    request_map.try_emplace(TR_KEY_params, std::move(params));
+
+    auto response = tr_variant{};
+    auto request = tr_variant{ std::move(request_map) };
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
+    EXPECT_TRUE(waitFor([this] { return tr_sessionGetBindInterface(session_) == "lo0"sv; }, 5s));
+
+    auto* const response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    EXPECT_NE(nullptr, response_map->find_if<tr_variant::Map>(TR_KEY_result));
+
+    request_map = tr_variant::Map{ 4U };
+    request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_get));
+    request_map.try_emplace(TR_KEY_id, 12346);
+
+    params = tr_variant::Map{ 1U };
+    auto fields = tr_variant::Vector{};
+    fields.emplace_back(tr_quark_get_string_view(TR_KEY_bind_interface));
+    params.try_emplace(TR_KEY_fields, std::move(fields));
+    request_map.try_emplace(TR_KEY_params, std::move(params));
+
+    response = {};
+    request = tr_variant{ std::move(request_map) };
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
+
+    auto* const get_response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(get_response_map, nullptr);
+    auto* const result = get_response_map->find_if<tr_variant::Map>(TR_KEY_result);
+    ASSERT_NE(result, nullptr);
+    auto const bind_interface = result->value_if<std::string_view>(TR_KEY_bind_interface);
+    ASSERT_TRUE(bind_interface);
+    EXPECT_EQ("lo0"sv, *bind_interface);
+}
+
 TEST_F(RpcTest, torrentGet)
 {
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
@@ -723,6 +768,97 @@ TEST_F(RpcTest, torrentGet)
     EXPECT_EQ(1, *first_torrent_id);
 
     // cleanup
+    tr_torrentRemove(tor, false);
+}
+
+TEST_F(RpcTest, torrentBindInterface)
+{
+    auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    ASSERT_NE(nullptr, tor);
+
+    auto request_map = tr_variant::Map{ 4U };
+    request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_set));
+    request_map.try_emplace(TR_KEY_id, 12345);
+
+    auto params = tr_variant::Map{ 2U };
+    auto ids = tr_variant::Vector{};
+    ids.emplace_back(tr_torrentId(tor));
+    params.try_emplace(TR_KEY_ids, std::move(ids));
+    params.try_emplace(TR_KEY_bind_interface, "default"sv);
+    request_map.try_emplace(TR_KEY_params, std::move(params));
+
+    auto response = tr_variant{};
+    auto request = tr_variant{ std::move(request_map) };
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
+    EXPECT_TRUE(waitFor([tor] { return tr_torrentGetBindInterface(tor) == "default"sv; }, 5s));
+
+    request_map = tr_variant::Map{ 4U };
+    request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_get));
+    request_map.try_emplace(TR_KEY_id, 12346);
+
+    params = tr_variant::Map{ 2U };
+    ids = tr_variant::Vector{};
+    ids.emplace_back(tr_torrentId(tor));
+    params.try_emplace(TR_KEY_ids, std::move(ids));
+    auto fields = tr_variant::Vector{};
+    fields.emplace_back(tr_quark_get_string_view(TR_KEY_bind_interface));
+    params.try_emplace(TR_KEY_fields, std::move(fields));
+    request_map.try_emplace(TR_KEY_params, std::move(params));
+
+    response = {};
+    request = tr_variant{ std::move(request_map) };
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
+
+    auto* const response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto* const result = response_map->find_if<tr_variant::Map>(TR_KEY_result);
+    ASSERT_NE(result, nullptr);
+    auto* const torrents = result->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    ASSERT_NE(torrents, nullptr);
+    ASSERT_EQ(1U, std::size(*torrents));
+    auto* const first_torrent = (*torrents)[0].get_if<tr_variant::Map>();
+    ASSERT_NE(first_torrent, nullptr);
+    auto const bind_interface = first_torrent->value_if<std::string_view>(TR_KEY_bind_interface);
+    ASSERT_TRUE(bind_interface);
+    EXPECT_EQ("default"sv, *bind_interface);
+
+    tr_torrentRemove(tor, false);
+}
+
+TEST_F(RpcTest, torrentAddBindInterface)
+{
+    static auto constexpr Magnet = "magnet:?xt=urn:btih:fa5794674a18241bec985ddc3390e3cb171345e4"sv;
+
+    auto request_map = tr_variant::Map{ 4U };
+    request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_add));
+    request_map.try_emplace(TR_KEY_id, 12345);
+
+    auto params = tr_variant::Map{ 3U };
+    params.try_emplace(TR_KEY_filename, Magnet);
+    params.try_emplace(TR_KEY_paused, true);
+    params.try_emplace(TR_KEY_bind_interface, "default"sv);
+    request_map.try_emplace(TR_KEY_params, std::move(params));
+
+    auto response = tr_variant{};
+    auto request = tr_variant{ std::move(request_map) };
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
+
+    auto* const response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto* const result = response_map->find_if<tr_variant::Map>(TR_KEY_result);
+    ASSERT_NE(result, nullptr);
+    auto* const added = result->find_if<tr_variant::Map>(TR_KEY_torrent_added);
+    ASSERT_NE(added, nullptr);
+    auto const id = added->value_if<int64_t>(TR_KEY_id);
+    ASSERT_TRUE(id);
+
+    auto* const tor = session_->torrents().get(static_cast<tr_torrent_id_t>(*id));
+    ASSERT_NE(tor, nullptr);
+    EXPECT_EQ("default"sv, tr_torrentGetBindInterface(tor));
+
     tr_torrentRemove(tor, false);
 }
 
