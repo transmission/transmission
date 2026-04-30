@@ -71,6 +71,7 @@ export class Remote {
         if (this._connection_alert) {
           this._connection_alert.close();
           this._connection_alert = null;
+          this._controller._initializeTorrents();
         }
       })
       .catch((error) => {
