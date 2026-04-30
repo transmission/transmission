@@ -11,7 +11,6 @@
 
 #include <cstddef>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "libtransmission/transmission.h"
@@ -42,6 +41,11 @@ public:
 
     [[nodiscard]] size_t get_pos(tr_torrent_id_t id);
     [[nodiscard]] std::vector<tr_torrent_id_t> set_pos(tr_torrent_id_t id, size_t new_pos);
+
+    [[nodiscard]] auto size() const noexcept
+    {
+        return queue_.size();
+    }
 
     bool to_file(); // NOLINT(modernize-use-nodiscard)
     [[nodiscard]] std::vector<std::string> from_file();
