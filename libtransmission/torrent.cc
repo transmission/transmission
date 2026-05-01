@@ -54,7 +54,10 @@ using namespace libtransmission::Values;
 #define tr_return_if_fail(expr) \
     do \
     { \
-        if (!(expr)) \
+        if (expr) [[likely]] \
+        { \
+        } \
+        else \
         { \
             tr_logAddWarn(#expr); \
             return; \
@@ -63,7 +66,10 @@ using namespace libtransmission::Values;
 #define tr_return_val_if_fail(expr, val) \
     do \
     { \
-        if (!(expr)) \
+        if (expr) [[likely]] \
+        { \
+        } \
+        else \
         { \
             tr_logAddWarn(#expr); \
             return val; \
@@ -511,24 +517,36 @@ void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t torrent_count
 {
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
     std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
+    auto last_consecutive_pos = tr_torrent_queue::MinQueuePosition;
     for (auto* const tor : torrents)
     {
-        if (auto const pos = tor->queue_position(); pos > tr_torrent_queue::MinQueuePosition)
+        if (auto const pos = tor->queue_position(); pos != last_consecutive_pos)
         {
             tor->set_queue_position(pos - 1U);
+        }
+        else
+        {
+            ++last_consecutive_pos;
         }
     }
 }
 
 void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t torrent_count)
 {
+    tr_return_if_fail(torrent_count > 0U);
+
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
     std::sort(std::rbegin(torrents), std::rend(torrents), tr_torrent::CompareQueuePosition);
+    auto last_consecutive_pos = torrents.front()->session->torrent_queue().size() - 1U + tr_torrent_queue::MinQueuePosition;
     for (auto* const tor : torrents)
     {
-        if (auto const pos = tor->queue_position(); pos < tr_torrent_queue::MaxQueuePosition)
+        if (auto const pos = tor->queue_position(); pos != last_consecutive_pos)
         {
             tor->set_queue_position(pos + 1U);
+        }
+        else
+        {
+            --last_consecutive_pos;
         }
     }
 }
