@@ -1426,7 +1426,7 @@ void print_file_list(tr_variant::Map const& result)
 
 void print_peers_impl(tr_variant::Vector const& peers)
 {
-    fmt::print("{:<40s}  {:<12s}  {:<5s} {:<8s}  {:<8s}  {:s}\n", "Address", "Flags", "Done", "Down", "Up", "Client");
+    fmt::print("{:<40s}  {:<12s}  {:<5s} {:>8s}  {:>8s}  {:s}\n", "Address", "Flags", "Done", "Down", "Up", "Client");
 
     for (auto const& peer_var : peers)
     {

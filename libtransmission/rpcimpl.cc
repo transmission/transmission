@@ -2116,9 +2116,9 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         [](tr_session const& src) -> tr_variant { return tr_sessionGetAltSpeedDay(&src); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
-            if (auto const val = src.value_if<int64_t>())
+            if (auto const val = tr::serializer::to_value<tr_sched_day>(src))
             {
-                tr_sessionSetAltSpeedDay(&tgt, static_cast<tr_sched_day>(*val));
+                tr_sessionSetAltSpeedDay(&tgt, *val);
             }
         });
 
@@ -2319,7 +2319,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         [](tr_session const& src) -> tr_variant { return src.idleLimitMinutes(); },
         [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
         {
-            if (auto const val = src.value_if<int64_t>())
+            if (auto const val = src.value_if<uint16_t>())
             {
                 tr_sessionSetIdleLimit(&tgt, *val);
             }

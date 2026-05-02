@@ -485,7 +485,6 @@ public:
         double ratio_limit = 2.0;
         size_t unused_cache_size_mbytes = 4U; // TODO(TR5): remove
         size_t download_queue_size = 5U;
-        size_t idle_seeding_limit_minutes = 30U;
         size_t peer_limit_global = TrDefaultPeerLimitGlobal;
         size_t peer_limit_per_torrent = TrDefaultPeerLimitTorrent;
         size_t queue_stalled_minutes = 30U;
@@ -523,6 +522,7 @@ public:
         tr_port peer_port = tr_port::from_host(TrDefaultPeerPort);
         tr_diffserv_t peer_socket_diffserv{ 0x04 };
         tr_verify_added_mode torrent_added_verify_mode = TR_VERIFY_ADDED_FAST;
+        uint16_t idle_seeding_limit_minutes = 30U;
 
     private:
         template<auto MemberPtr>

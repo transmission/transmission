@@ -1287,7 +1287,10 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_alt_speed_time_day:
-        tr_sessionSetAltSpeedDay(tr, static_cast<tr_sched_day>(gtr_pref_int_get(key)));
+        if (auto const val = gtr_pref_get<tr_sched_day>(key))
+        {
+            tr_sessionSetAltSpeedDay(tr, *val);
+        }
         break;
 
     case TR_KEY_peer_port_random_on_start:

@@ -56,7 +56,7 @@ public:
         size_t minute_end = 1020U; // minutes past midnight; 5PM
         size_t speed_down_kbyps = 50U;
         size_t speed_up_kbyps = 50U;
-        size_t use_on_these_weekdays = TR_SCHED_ALL;
+        tr_sched_day use_on_these_weekdays = TR_SCHED_ALL;
 
     private:
         template<auto MemberPtr>
@@ -152,7 +152,7 @@ public:
 
     [[nodiscard]] constexpr tr_sched_day weekdays() const noexcept
     {
-        return static_cast<tr_sched_day>(settings().use_on_these_weekdays);
+        return settings().use_on_these_weekdays;
     }
 
     [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept

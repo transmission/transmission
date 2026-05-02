@@ -225,6 +225,68 @@ tr_variant from_mode_t(tr_mode_t const& val)
 
 // ---
 
+bool to_sched_day(tr_variant const& src, tr_sched_day* tgt)
+{
+    if (auto const val = src.value_if<int64_t>())
+    {
+        switch (*val)
+        {
+        case TR_SCHED_SUN:
+            *tgt = TR_SCHED_SUN;
+            return true;
+
+        case TR_SCHED_MON:
+            *tgt = TR_SCHED_MON;
+            return true;
+
+        case TR_SCHED_TUES:
+            *tgt = TR_SCHED_TUES;
+            return true;
+
+        case TR_SCHED_WED:
+            *tgt = TR_SCHED_WED;
+            return true;
+
+        case TR_SCHED_THURS:
+            *tgt = TR_SCHED_THURS;
+            return true;
+
+        case TR_SCHED_FRI:
+            *tgt = TR_SCHED_FRI;
+            return true;
+
+        case TR_SCHED_SAT:
+            *tgt = TR_SCHED_SAT;
+            return true;
+
+        case TR_SCHED_WEEKDAY:
+            *tgt = TR_SCHED_WEEKDAY;
+            return true;
+
+        case TR_SCHED_WEEKEND:
+            *tgt = TR_SCHED_WEEKEND;
+            return true;
+
+        case TR_SCHED_ALL:
+            *tgt = TR_SCHED_ALL;
+            return true;
+
+        default:
+            tr_logAddWarn(fmt::format(fmt::runtime(_("Invalid tr_sched_days value {val}")), fmt::arg("val", *val)));
+            break;
+        }
+    }
+
+    return false;
+}
+
+tr_variant from_sched_day(tr_sched_day const& val)
+{
+    return val;
+}
+
+// ---
+
 bool to_msec(tr_variant const& src, std::chrono::milliseconds* tgt)
 {
     if (auto val = src.value_if<int64_t>())
@@ -544,6 +606,7 @@ void Converters::ensure_default_converters()
             Converters::add(to_int<int64_t>, from_int<int64_t>);
             Converters::add(to_int<size_t>, from_int<size_t>);
             Converters::add(to_int<time_t>, from_int<time_t>);
+            Converters::add(to_int<uint16_t>, from_int<uint16_t>);
             Converters::add(to_int<uint64_t>, from_int<uint64_t>);
             Converters::add(to_log_level, from_log_level);
             Converters::add(to_mode_t, from_mode_t);
@@ -552,6 +615,7 @@ void Converters::ensure_default_converters()
             Converters::add(to_port, from_port);
             Converters::add(to_preallocation_mode, from_preallocation_mode);
             Converters::add(to_preferred_transport, from_preferred_transport);
+            Converters::add(to_sched_day, from_sched_day);
             Converters::add(to_string, from_string);
             Converters::add(to_u8string, from_u8string);
             Converters::add(to_verify_added_mode, from_verify_added_mode);
