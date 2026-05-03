@@ -23,9 +23,10 @@
 #include "libtransmission/block-info.h"
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/peer-socket.h"
+#include "libtransmission/socket-event-handler.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/types.h"
-#include "libtransmission/utils-ev.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, TR_CONSTEXPR20
 
 struct struct_utp_context;
 struct tr_error;
@@ -350,11 +351,13 @@ private:
 
     void flush_outbuf_soon();
 
-    static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
-    static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio);
+    void handle_read_ready();
+    void handle_write_ready();
 
-    void event_enable(short event);
-    void event_disable(short event);
+    void set_enabled(bool read_enabled, bool write_enabled);
+    void set_disabled(bool read_enabled, bool write_enabled);
+    void set_read_enabled(bool is_enabled);
+    void set_write_enabled(bool is_enabled);
 
     void can_read_wrapper(size_t bytes_transferred);
     void did_write_wrapper(size_t bytes_transferred);
@@ -395,10 +398,10 @@ private:
 
     std::unique_ptr<tr::Timer> const flush_outbuf_trigger_;
 
-    tr::evhelpers::event_unique_ptr event_read_;
-    tr::evhelpers::event_unique_ptr event_write_;
-
-    short int pending_events_ = 0;
+    bool read_pending_ = false;
+    bool write_pending_ = false;
+    std::unique_ptr<libtransmission::SocketReadEventHandler> read_event_handler_;
+    std::unique_ptr<libtransmission::SocketWriteEventHandler> write_event_handler_;
 
     tr_priority_t priority_ = TR_PRI_NORMAL;
 

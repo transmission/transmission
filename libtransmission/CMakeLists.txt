@@ -120,10 +120,16 @@ target_sources(${TR_NAME}
         session-alt-speeds.h
         session-id.cc
         session-id.h
-        session-thread.cc
+        session-thread-libevent.cc
+        session-thread-libuv.cc
         session-thread.h
         session.cc
         session.h
+        socket-event-handler-libevent.cc
+        socket-event-handler-libevent.h
+        socket-event-handler-libuv.cc
+        socket-event-handler-libuv.h
+        socket-event-handler.h
         stats.cc
         stats.h
         string-utils.cc
@@ -134,6 +140,8 @@ target_sources(${TR_NAME}
         subprocess.h
         timer-ev.cc
         timer-ev.h
+        timer-libuv.cc
+        timer-libuv.h
         timer.h
         torrent-ctor.cc
         torrent-ctor.h
@@ -278,6 +286,7 @@ target_link_libraries(${TR_NAME}
         ${LIBM_LIBRARY}
         ${LIBQUOTA_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
+        ${TR_WIN32_LIBRARIES}
         RapidJSON
         utf8::cpp
         wildmat
@@ -293,6 +302,7 @@ target_link_libraries(${TR_NAME}
         transmission::fmt-header-only
         Pal::Sigslot
         transmission::small
+        libuv::libuv
         libevent::core
         libevent::extra)
 
@@ -311,6 +321,7 @@ if(INSTALL_LIB)
             rpcimpl.h
             session-id.h
             timer-ev.h
+            timer-libuv.h
             timer.h
             tr-assert.h
             tr-buffer.h

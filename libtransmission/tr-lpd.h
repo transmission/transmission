@@ -16,12 +16,11 @@
 
 #include "libtransmission/net.h" // for tr_address, tr_port
 
-struct event_base;
-
 namespace tr
 {
 class TimerMaker;
-}
+class SocketEventHandlerMaker;
+} // namespace libtransmission
 
 class tr_lpd
 {
@@ -49,6 +48,8 @@ public:
 
         [[nodiscard]] virtual tr::TimerMaker& timerMaker() = 0;
 
+        [[nodiscard]] virtual libtransmission::SocketEventHandlerMaker& socketEventHandlerMaker() = 0;
+
         virtual void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at) = 0;
 
         // returns true if info was used
@@ -56,5 +57,5 @@ public:
     };
 
     virtual ~tr_lpd() = default;
-    static std::unique_ptr<tr_lpd> create(Mediator& mediator, event_base* event_base);
+    static std::unique_ptr<tr_lpd> create(Mediator& mediator);
 };
