@@ -178,7 +178,7 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 // static
 void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo)
 {
-    auto const pref_level = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
+    auto const pref_level = gtr_pref_get<tr_log_level>(TR_KEY_message_level);
     auto const default_level = TR_LOG_INFO;
 
     auto has_pref_level = false;
@@ -191,7 +191,7 @@ void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo)
     }
 
     gtr_combo_box_set_enum(*level_combo, items);
-    gtr_combo_box_set_active_enum(*level_combo, has_pref_level ? pref_level : default_level);
+    gtr_combo_box_set_active_enum(*level_combo, has_pref_level ? *pref_level : default_level);
 }
 
 void MessageLogWindow::Impl::level_combo_changed_cb(Gtk::ComboBox* combo_box)
@@ -499,7 +499,7 @@ MessageLogWindow::Impl::Impl(
     , store_(Gtk::ListStore::create(message_log_cols))
     , filter_(Gtk::TreeModelFilter::create(store_))
     , sort_(Gtk::TreeModelSort::create(filter_))
-    , maxLevel_(static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level)))
+    , maxLevel_(gtr_pref_get<tr_log_level>(TR_KEY_message_level).value_or(tr_log_level{}))
     , refresh_tag_(
           Glib::signal_timeout().connect_seconds(
               sigc::mem_fun(*this, &Impl::onRefresh),

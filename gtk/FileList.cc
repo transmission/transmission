@@ -244,7 +244,8 @@ bool refreshFilesForeach(
             }
         }
 
-        new_progress = new_size != 0 ? static_cast<int>(100.0 * new_have / new_size) : 1;
+        new_progress = new_size != 0 ? static_cast<int>(100.0 * static_cast<double>(new_have) / static_cast<double>(new_size)) :
+                                       1;
     }
 
     new_progress = std::clamp(new_progress, 0, 100);
@@ -785,7 +786,7 @@ bool FileList::Impl::getAndSelectEventPath(double view_x, double view_y, Gtk::Tr
     int cell_x = 0;
     int cell_y = 0;
 
-    if (view_->get_path_at_pos(view_x, view_y, path, col, cell_x, cell_y))
+    if (view_->get_path_at_pos(static_cast<int>(view_x), static_cast<int>(view_y), path, col, cell_x, cell_y))
     {
         if (auto const sel = view_->get_selection(); !sel->is_selected(path))
         {

@@ -318,7 +318,7 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
 
         if (is_uniform)
         {
-            set_int_spin_if_different(down_limit_spin_, down_limit_spin_tag_, baseline);
+            set_int_spin_if_different(down_limit_spin_, down_limit_spin_tag_, static_cast<int>(baseline));
         }
     }
 
@@ -346,7 +346,7 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
 
         if (is_uniform)
         {
-            set_int_spin_if_different(up_limit_sping_, up_limit_spin_tag_, baseline);
+            set_int_spin_if_different(up_limit_sping_, up_limit_spin_tag_, static_cast<int>(baseline));
         }
     }
 
@@ -847,8 +847,9 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         }
 
         {
-            double const d = sizeWhenDone != 0 ? (100.0 * available) / sizeWhenDone : 0;
-            double const ratio = 100.0 * (sizeWhenDone != 0 ? (haveValid + haveUnchecked) / (double)sizeWhenDone : 1);
+            auto const d = sizeWhenDone != 0 ? 100.0 * static_cast<double>(available) / static_cast<double>(sizeWhenDone) : 0;
+            auto const ratio = 100.0 *
+                (sizeWhenDone != 0 ? static_cast<double>(haveValid + haveUnchecked) / static_cast<double>(sizeWhenDone) : 1.);
 
             auto const avail = tr_strpercent(d);
             auto const buf2 = tr_strpercent(ratio);
@@ -1388,7 +1389,7 @@ bool DetailsDialog::Impl::onPeerViewQueryTooltip(int x, int y, bool keyboard_tip
         std::ostringstream gstr;
         gstr << "<b>" << Glib::Markup::escape_text(name) << "</b>\n" << addr << "\n \n";
 
-        for (char const ch : flagstr)
+        for (auto const ch : flagstr)
         {
             char const* s = nullptr;
 
@@ -1994,7 +1995,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
             // if we didn't have that row, add it
             auto const iter = store->append();
             (*iter)[tracker_cols.torrent_id] = torrent_id;
-            (*iter)[tracker_cols.tracker_id] = tracker.id;
+            (*iter)[tracker_cols.tracker_id] = static_cast<int>(tracker.id);
             (*iter)[tracker_cols.key] = gstr.str();
 
             auto const p = store->get_path(iter);
@@ -2022,7 +2023,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
         buildTrackerSummary(gstr, summary_name, tracker, showScrape, dialog_.get_direction());
         (*iter)[tracker_cols.text] = gstr.str();
         (*iter)[tracker_cols.is_backup] = tracker.isBackup;
-        (*iter)[tracker_cols.tracker_id] = tracker.id;
+        (*iter)[tracker_cols.tracker_id] = static_cast<int>(tracker.id);
         (*iter)[tracker_cols.was_updated] = true;
     }
 
@@ -2484,8 +2485,8 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
     , file_label_(gtr_get_widget<Gtk::Label>(builder, "files_label"))
 {
     /* return saved window size */
-    auto const width = (int)gtr_pref_int_get(TR_KEY_details_window_width);
-    auto const height = (int)gtr_pref_int_get(TR_KEY_details_window_height);
+    auto const width = gtr_pref_int_get<int>(TR_KEY_details_window_width);
+    auto const height = gtr_pref_int_get<int>(TR_KEY_details_window_height);
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     dialog_.set_default_size(width, height);
     dialog_.property_default_width().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated));
@@ -2507,7 +2508,7 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 
     auto* const n = gtr_get_widget<Gtk::Notebook>(builder, "dialog_pages");
-    n->set_current_page(last_page_);
+    n->set_current_page(static_cast<int>(last_page_));
     n->signal_switch_page().connect([](Gtk::Widget* /*page*/, guint page_number) { last_page_ = page_number; });
 }
 
