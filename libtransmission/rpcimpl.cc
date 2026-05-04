@@ -1100,7 +1100,8 @@ namespace make_torrent_field_helpers
         }
     }
 
-    return { std::move(labels), Error::SUCCESS, {} };
+    auto errmsg = std::string{};
+    return { std::move(labels), Error::SUCCESS, std::move(errmsg) };
 }
 
 [[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> set_labels(tr_torrent* tor, tr_variant::Vector const& list)
@@ -1147,7 +1148,8 @@ namespace make_torrent_field_helpers
         }
     }
 
-    return { std::move(files), Error::SUCCESS, {} };
+    auto errmsg = std::string{};
+    return { std::move(files), Error::SUCCESS, std::move(errmsg) };
 }
 
 [[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> set_file_priorities(
@@ -1155,7 +1157,7 @@ namespace make_torrent_field_helpers
     tr_priority_t priority,
     tr_variant::Vector const& files_vec)
 {
-    auto const [indices, err, errmsg] = get_file_indices(tor, files_vec);
+    auto [indices, err, errmsg] = get_file_indices(tor, files_vec);
     if (err == JsonRpc::Error::SUCCESS)
     {
         tor->set_file_priorities(std::data(indices), std::size(indices), priority);
@@ -1183,7 +1185,7 @@ namespace make_torrent_field_helpers
     bool wanted,
     tr_variant::Vector const& files_vec)
 {
-    auto const [indices, err, errmsg] = get_file_indices(tor, files_vec);
+    auto [indices, err, errmsg] = get_file_indices(tor, files_vec);
     if (err == JsonRpc::Error::SUCCESS)
     {
         tor->set_files_wanted(std::data(indices), std::size(indices), wanted);
