@@ -89,7 +89,7 @@ typedef NS_ENUM(NSUInteger, TabTag) {
     windowRect.size.height = windowHeight;
     [window setFrame:windowRect display:NO];
 
-    window.becomesKeyOnlyIfNeeded = YES;
+    window.becomesKeyOnlyIfNeeded = NO;
 
     //disable green maximise window button
     //https://github.com/transmission/transmission/issues/3486
