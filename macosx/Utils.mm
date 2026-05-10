@@ -14,6 +14,20 @@
 
 #import "Utils.h"
 
+NSString* const TRBindInterfaceModeLiteral = @"literal";
+NSString* const TRBindInterfaceModeActiveVPN = @"active-vpn";
+NSString* const TRBindInterfaceActiveVPNMenuValue = @"__transmission_active_vpn__";
+NSString* const TRNoActiveVPNBindInterfaceName = @"tr-vpn-none";
+NSString* const TRActiveVPNBindInterfaceDidChangeNotification = @"TRActiveVPNBindInterfaceDidChangeNotification";
+
+NSString* const TRActiveVPNResolutionInterfaceKey = @"interface";
+NSString* const TRActiveVPNResolutionDisplayNameKey = @"displayName";
+NSString* const TRActiveVPNResolutionServiceNameKey = @"serviceName";
+NSString* const TRActiveVPNResolutionProviderIdentifierKey = @"providerIdentifier";
+NSString* const TRActiveVPNResolutionRouteInterfaceKey = @"routeInterface";
+NSString* const TRActiveVPNResolutionCandidatesKey = @"candidates";
+NSString* const TRActiveVPNResolutionActiveKey = @"active";
+
 bool isSpeedEqual(CGFloat old_speed, CGFloat new_speed)
 {
     static CGFloat constexpr kSpeedCompareEps = 0.1 / 2;
@@ -28,6 +42,150 @@ bool isRatioEqual(CGFloat old_ratio, CGFloat new_ratio)
 
 namespace
 {
+BOOL TRInterfaceNameLooksLikeVPNTunnel(NSString* name)
+{
+    return [name hasPrefix:@"utun"] || [name hasPrefix:@"tun"] || [name hasPrefix:@"tap"] || [name hasPrefix:@"ppp"];
+}
+
+BOOL TRAddressIsUsableVPNAddress(NSString* address)
+{
+    return address.length > 0 && ![address hasPrefix:@"169.254."] && ![address hasPrefix:@"fe80:"] && ![address isEqualToString:@"::1"];
+}
+
+NSString* TRPrimaryRouteInterface(SCDynamicStoreRef store, CFStringRef key)
+{
+    NSDictionary* route = CFBridgingRelease(SCDynamicStoreCopyValue(store, key));
+    NSString* interface = route[@"PrimaryInterface"];
+    return interface.length > 0 ? interface : nil;
+}
+
+NSString* TRRouteInterfaceDescription(NSString* ipv4Interface, NSString* ipv6Interface)
+{
+    NSMutableArray<NSString*>* parts = [NSMutableArray arrayWithCapacity:2];
+    if (ipv4Interface.length > 0)
+    {
+        [parts addObject:[NSString stringWithFormat:@"IPv4: %@", ipv4Interface]];
+    }
+    if (ipv6Interface.length > 0)
+    {
+        [parts addObject:[NSString stringWithFormat:@"IPv6: %@", ipv6Interface]];
+    }
+    return [parts componentsJoinedByString:@", "];
+}
+
+NSString* TRTunnelInterfaceFromConnectionStatus(NSDictionary* status)
+{
+    for (NSString* protocolKey in @[ @"IPv4", @"IPv6" ])
+    {
+        NSDictionary* protocolStatus = status[protocolKey];
+        NSString* interfaceName = protocolStatus[@"InterfaceName"];
+        if (TRInterfaceNameLooksLikeVPNTunnel(interfaceName))
+        {
+            return interfaceName;
+        }
+    }
+
+    return nil;
+}
+
+NSString* TRVPNProviderIdentifierForService(SCNetworkServiceRef service)
+{
+    for (SCNetworkInterfaceRef interface = SCNetworkServiceGetInterface(service); interface != nullptr;
+         interface = SCNetworkInterfaceGetInterface(interface))
+    {
+        NSString* type = CFBridgingRelease(
+            SCNetworkInterfaceGetInterfaceType(interface) != nullptr ? CFRetain(SCNetworkInterfaceGetInterfaceType(interface)) : nullptr);
+        if (type.length == 0 || [type isEqualToString:@"VPN"] || [type isEqualToString:@"IPv4"] || [type isEqualToString:@"IPv6"])
+        {
+            continue;
+        }
+
+        return type;
+    }
+
+    return nil;
+}
+
+NSDictionary<NSString*, NSDictionary<NSString*, NSString*>*>* TRVPNServiceInfoByInterfaceName()
+{
+    NSMutableDictionary<NSString*, NSDictionary<NSString*, NSString*>*>* serviceInfo = [NSMutableDictionary dictionary];
+
+    SCPreferencesRef prefs = SCPreferencesCreate(kCFAllocatorDefault, CFSTR("Transmission"), nullptr);
+    if (prefs == nullptr)
+    {
+        return serviceInfo;
+    }
+
+    NSArray* services = CFBridgingRelease(SCNetworkServiceCopyAll(prefs));
+    for (id object in services)
+    {
+        SCNetworkServiceRef service = (__bridge SCNetworkServiceRef)object;
+        if (!SCNetworkServiceGetEnabled(service))
+        {
+            continue;
+        }
+
+        NSString* serviceID = CFBridgingRelease(
+            SCNetworkServiceGetServiceID(service) != nullptr ? CFRetain(SCNetworkServiceGetServiceID(service)) : nullptr);
+        if (serviceID.length == 0)
+        {
+            continue;
+        }
+
+        SCNetworkInterfaceRef interface = SCNetworkServiceGetInterface(service);
+        NSString* interfaceType = interface != nullptr ?
+            CFBridgingRelease(
+                SCNetworkInterfaceGetInterfaceType(interface) != nullptr ? CFRetain(SCNetworkInterfaceGetInterfaceType(interface)) : nullptr) :
+            nil;
+        if (![interfaceType isEqualToString:@"VPN"])
+        {
+            continue;
+        }
+
+        SCNetworkConnectionRef connection = SCNetworkConnectionCreateWithServiceID(kCFAllocatorDefault, (__bridge CFStringRef)serviceID, nullptr, nullptr);
+        if (connection == nullptr)
+        {
+            continue;
+        }
+
+        SCNetworkConnectionStatus const connectionStatus = SCNetworkConnectionGetStatus(connection);
+        NSDictionary* extendedStatus = CFBridgingRelease(SCNetworkConnectionCopyExtendedStatus(connection));
+        CFRelease(connection);
+
+        if (connectionStatus != kSCNetworkConnectionConnected)
+        {
+            continue;
+        }
+
+        NSString* tunnelInterface = TRTunnelInterfaceFromConnectionStatus(extendedStatus);
+        if (tunnelInterface.length == 0)
+        {
+            continue;
+        }
+
+        NSString* serviceName = CFBridgingRelease(
+            SCNetworkServiceGetName(service) != nullptr ? CFRetain(SCNetworkServiceGetName(service)) : nullptr);
+        NSString* providerIdentifier = TRVPNProviderIdentifierForService(service);
+
+        NSMutableDictionary<NSString*, NSString*>* info = [NSMutableDictionary dictionary];
+        if (serviceName.length > 0)
+        {
+            info[TRActiveVPNResolutionServiceNameKey] = serviceName;
+        }
+        if (providerIdentifier.length > 0)
+        {
+            info[TRActiveVPNResolutionProviderIdentifierKey] = providerIdentifier;
+        }
+        if (info.count > 0)
+        {
+            serviceInfo[tunnelInterface] = info;
+        }
+    }
+
+    CFRelease(prefs);
+    return serviceInfo;
+}
+
 NSDictionary<NSString*, NSString*>* TRNetworkServiceNamesByInterfaceName()
 {
     NSMutableDictionary<NSString*, NSString*>* names = [NSMutableDictionary dictionary];
@@ -85,12 +243,22 @@ NSDictionary<NSString*, NSString*>* TRNetworkServiceNamesByInterfaceName()
         CFRelease(store);
     }
 
+    NSDictionary<NSString*, NSDictionary<NSString*, NSString*>*>* vpnServices = TRVPNServiceInfoByInterfaceName();
+    for (NSString* interfaceName in vpnServices)
+    {
+        NSString* serviceName = vpnServices[interfaceName][TRActiveVPNResolutionServiceNameKey];
+        if (serviceName.length > 0)
+        {
+            names[interfaceName] = serviceName;
+        }
+    }
+
     return names;
 }
 
 NSString* TRNetworkInterfaceKind(NSString* name)
 {
-    if ([name hasPrefix:@"utun"] || [name hasPrefix:@"tun"] || [name hasPrefix:@"tap"] || [name hasPrefix:@"ppp"])
+    if (TRInterfaceNameLooksLikeVPNTunnel(name))
     {
         return NSLocalizedString(@"VPN Tunnel", "Network interface type");
     }
@@ -235,6 +403,108 @@ NSArray<NSString*>* TRActiveNetworkInterfaceNames(void)
     return names;
 }
 
+NSDictionary<NSString*, id>* TRResolveActiveVPNInterface(void)
+{
+    SCDynamicStoreRef store = SCDynamicStoreCreate(kCFAllocatorDefault, CFSTR("Transmission"), nullptr, nullptr);
+    NSString* ipv4RouteInterface = nil;
+    NSString* ipv6RouteInterface = nil;
+    if (store != nullptr)
+    {
+        ipv4RouteInterface = TRPrimaryRouteInterface(store, CFSTR("State:/Network/Global/IPv4"));
+        ipv6RouteInterface = TRPrimaryRouteInterface(store, CFSTR("State:/Network/Global/IPv6"));
+        CFRelease(store);
+    }
+
+    NSMutableOrderedSet<NSString*>* candidates = [NSMutableOrderedSet orderedSet];
+    NSMutableSet<NSString*>* runningTunnels = [NSMutableSet set];
+
+    struct ifaddrs* ifaddrs = nullptr;
+    if (getifaddrs(&ifaddrs) == 0)
+    {
+        for (struct ifaddrs const* ifa = ifaddrs; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ifa->ifa_name == nullptr || ifa->ifa_addr == nullptr)
+            {
+                continue;
+            }
+
+            NSString* name = @(ifa->ifa_name);
+            if (!TRInterfaceNameLooksLikeVPNTunnel(name))
+            {
+                continue;
+            }
+
+            unsigned int const flags = ifa->ifa_flags;
+            if ((flags & IFF_UP) == 0 || (flags & IFF_RUNNING) == 0 || (flags & IFF_LOOPBACK) != 0)
+            {
+                continue;
+            }
+
+            [runningTunnels addObject:name];
+
+            sa_family_t const family = ifa->ifa_addr->sa_family;
+            if (family != AF_INET && family != AF_INET6)
+            {
+                continue;
+            }
+
+            char host[NI_MAXHOST] = {};
+            if (getnameinfo(ifa->ifa_addr, family == AF_INET ? sizeof(sockaddr_in) : sizeof(sockaddr_in6), host, sizeof(host), nullptr, 0, NI_NUMERICHOST) != 0)
+            {
+                continue;
+            }
+
+            if (TRAddressIsUsableVPNAddress(@(host)))
+            {
+                [candidates addObject:name];
+            }
+        }
+
+        freeifaddrs(ifaddrs);
+    }
+
+    for (NSString* routeInterface in @[ ipv4RouteInterface ?: @"", ipv6RouteInterface ?: @"" ])
+    {
+        if (TRInterfaceNameLooksLikeVPNTunnel(routeInterface) &&
+            ([runningTunnels containsObject:routeInterface] || runningTunnels.count == 0))
+        {
+            [candidates addObject:routeInterface];
+        }
+    }
+
+    NSArray<NSString*>* sortedCandidates = [[candidates array] sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
+    NSString* preferredInterface = nil;
+    for (NSString* routeInterface in @[ ipv4RouteInterface ?: @"", ipv6RouteInterface ?: @"" ])
+    {
+        if ([sortedCandidates containsObject:routeInterface])
+        {
+            preferredInterface = routeInterface;
+            break;
+        }
+    }
+    if (preferredInterface == nil && sortedCandidates.count == 1)
+    {
+        preferredInterface = sortedCandidates.firstObject;
+    }
+
+    NSDictionary<NSString*, NSDictionary<NSString*, NSString*>*>* vpnServices = TRVPNServiceInfoByInterfaceName();
+    NSDictionary<NSString*, NSString*>* preferredVPNService = preferredInterface.length > 0 ? vpnServices[preferredInterface] : nil;
+    NSString* serviceName = preferredVPNService[TRActiveVPNResolutionServiceNameKey];
+    NSString* providerIdentifier = preferredVPNService[TRActiveVPNResolutionProviderIdentifierKey];
+    NSString* displayName = serviceName.length > 0 ? [NSString stringWithFormat:@"%@ (%@)", serviceName, preferredInterface] : preferredInterface;
+
+    NSString* routeDescription = TRRouteInterfaceDescription(ipv4RouteInterface, ipv6RouteInterface);
+    return @{
+        TRActiveVPNResolutionInterfaceKey : preferredInterface ?: @"",
+        TRActiveVPNResolutionDisplayNameKey : displayName ?: @"",
+        TRActiveVPNResolutionServiceNameKey : serviceName ?: @"",
+        TRActiveVPNResolutionProviderIdentifierKey : providerIdentifier ?: @"",
+        TRActiveVPNResolutionRouteInterfaceKey : routeDescription ?: @"",
+        TRActiveVPNResolutionCandidatesKey : sortedCandidates ?: @[],
+        TRActiveVPNResolutionActiveKey : @(preferredInterface.length > 0),
+    };
+}
+
 void TRPopulateBindInterfacePopUp(NSPopUpButton* popUp, NSString* selectedInterface, BOOL includeInherit, NSString* defaultRouteValue)
 {
     selectedInterface = selectedInterface ?: @"";
@@ -293,8 +563,33 @@ void TRPopulateBindInterfacePopUp(NSPopUpButton* popUp, NSString* selectedInterf
     [popUp selectItemAtIndex:0];
 }
 
+void TRPopulateAppBindInterfacePopUp(NSPopUpButton* popUp, NSString* selectedInterface, NSString* selectedMode)
+{
+    TRPopulateBindInterfacePopUp(popUp, selectedInterface, NO, @"");
+
+    NSMenuItem* activeVPNItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Active VPN Tunnel", "Network interface binding menu item")
+                                                           action:nil
+                                                    keyEquivalent:@""];
+    activeVPNItem.representedObject = TRBindInterfaceActiveVPNMenuValue;
+    activeVPNItem.toolTip = NSLocalizedString(
+        @"Follow the active macOS VPN tunnel. Traffic is blocked when no active VPN tunnel can be resolved.",
+        "Network interface binding menu tooltip");
+    [popUp.menu insertItem:activeVPNItem atIndex:MIN(1, popUp.numberOfItems)];
+
+    if ([selectedMode isEqualToString:TRBindInterfaceModeActiveVPN])
+    {
+        [popUp selectItem:activeVPNItem];
+    }
+}
+
 NSString* TRBindInterfacePopUpValue(NSPopUpButton* popUp)
 {
     id value = popUp.selectedItem.representedObject;
     return [value isKindOfClass:NSString.class] ? value : @"";
+}
+
+NSString* TRBindInterfacePopUpModeValue(NSPopUpButton* popUp)
+{
+    return [TRBindInterfacePopUpValue(popUp) isEqualToString:TRBindInterfaceActiveVPNMenuValue] ? TRBindInterfaceModeActiveVPN :
+                                                                                                  TRBindInterfaceModeLiteral;
 }

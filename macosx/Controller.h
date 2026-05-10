@@ -50,6 +50,9 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 
 @property(nonatomic, readonly) tr_session* sessionHandle;
 
+- (void)updateActiveVPNBindInterfacePreference;
+- (NSDictionary<NSString*, id>*)activeVPNBindInterfaceStatus;
+
 - (IBAction)createFile:(id)sender;
 
 - (IBAction)resumeSelectedTorrents:(id)sender;

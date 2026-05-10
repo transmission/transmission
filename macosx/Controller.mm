@@ -7,11 +7,13 @@
 @import UserNotifications;
 
 @import Sparkle;
+@import SystemConfiguration;
 #else
 #import <Carbon/Carbon.h>
 #import <UserNotifications/UserNotifications.h>
 
 #import <Sparkle/Sparkle.h>
+#import <SystemConfiguration/SystemConfiguration.h>
 #endif
 
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
@@ -116,6 +118,14 @@ typedef NS_ENUM(NSUInteger, SortOrderTag) { //
 };
 
 static NSString* const kTorrentTableViewDataType = @"TorrentTableViewDataType";
+
+static void TRActiveVPNDynamicStoreCallback(SCDynamicStoreRef /*store*/, CFArrayRef /*changedKeys*/, void* info)
+{
+    Controller* controller = (__bridge Controller*)info;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [controller updateActiveVPNBindInterfacePreference];
+    });
+}
 
 static CGFloat const kRowHeightRegular = 62.0;
 static CGFloat const kRowHeightSmall = 22.0;
@@ -326,8 +336,13 @@ static void removeKeRangerRansomware()
 @property(nonatomic) BOOL fGlobalPopoverShown;
 @property(nonatomic) NSView* fPositioningView;
 @property(nonatomic) BOOL fSoundPlaying;
+@property(nonatomic) SCDynamicStoreRef fActiveVPNDynamicStore;
+@property(nonatomic) CFRunLoopSourceRef fActiveVPNDynamicStoreSource;
+@property(nonatomic, copy) NSDictionary<NSString*, id>* fActiveVPNBindInterfaceStatus;
 
 - (void)removeTorrentsImpl:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
+- (void)startActiveVPNBindInterfaceMonitor;
+- (void)stopActiveVPNBindInterfaceMonitor;
 
 @end
 
@@ -421,9 +436,26 @@ static void removeKeRangerRansomware()
         {
             tr_variantDictAddStr(&settings, TR_KEY_bind_address_ipv6, [_fDefaults stringForKey:@"BindAddressIPv6"].UTF8String);
         }
-        if ([_fDefaults objectForKey:@"BindInterface"])
+        NSString* bindInterface = [_fDefaults stringForKey:@"BindInterface"] ?: @"";
+        if ([[_fDefaults stringForKey:@"BindInterfaceMode"] isEqualToString:TRBindInterfaceModeActiveVPN])
         {
-            tr_variantDictAddStr(&settings, TR_KEY_bind_interface, [_fDefaults stringForKey:@"BindInterface"].UTF8String);
+            NSDictionary<NSString*, id>* resolution = TRResolveActiveVPNInterface();
+            NSString* resolvedInterface = resolution[TRActiveVPNResolutionInterfaceKey];
+            if (resolvedInterface.length > 0)
+            {
+                bindInterface = resolvedInterface;
+                [_fDefaults setObject:bindInterface forKey:@"BindInterface"];
+            }
+            else if (bindInterface.length == 0)
+            {
+                bindInterface = TRNoActiveVPNBindInterfaceName;
+            }
+
+            _fActiveVPNBindInterfaceStatus = resolution;
+        }
+        if (bindInterface.length > 0)
+        {
+            tr_variantDictAddStr(&settings, TR_KEY_bind_interface, bindInterface.UTF8String);
         }
 
         tr_variantDictAddBool(&settings, TR_KEY_blocklist_enabled, [_fDefaults boolForKey:@"BlocklistNew"]);
@@ -583,6 +615,8 @@ static void removeKeRangerRansomware()
         _fileWatcherQueue.delegate = self;
 
         _prefsController = [[PrefsController alloc] initWithHandle:_fLib];
+        [self startActiveVPNBindInterfaceMonitor];
+        [self updateActiveVPNBindInterfacePreference];
 
         _fQuitting = NO;
         _fGlobalPopoverShown = NO;
@@ -615,6 +649,98 @@ static void removeKeRangerRansomware()
         _fPauseOnLaunch = (GetCurrentKeyModifiers() & (optionKey | rightOptionKey)) != 0;
     }
     return self;
+}
+
+- (void)startActiveVPNBindInterfaceMonitor
+{
+    if (self.fActiveVPNDynamicStore != nullptr)
+    {
+        return;
+    }
+
+    SCDynamicStoreContext context = {};
+    context.info = (__bridge void*)self;
+    self.fActiveVPNDynamicStore = SCDynamicStoreCreate(kCFAllocatorDefault, CFSTR("Transmission Active VPN Monitor"), TRActiveVPNDynamicStoreCallback, &context);
+    if (self.fActiveVPNDynamicStore == nullptr)
+    {
+        return;
+    }
+
+    NSArray* keys = @[ @"State:/Network/Global/IPv4", @"State:/Network/Global/IPv6" ];
+    NSArray* patterns = @[
+        @"State:/Network/Interface/.*/IPv4",
+        @"State:/Network/Interface/.*/IPv6",
+        @"State:/Network/Interface/.*/Link",
+    ];
+    if (!SCDynamicStoreSetNotificationKeys(self.fActiveVPNDynamicStore, (__bridge CFArrayRef)keys, (__bridge CFArrayRef)patterns))
+    {
+        [self stopActiveVPNBindInterfaceMonitor];
+        return;
+    }
+
+    self.fActiveVPNDynamicStoreSource = SCDynamicStoreCreateRunLoopSource(kCFAllocatorDefault, self.fActiveVPNDynamicStore, 0);
+    if (self.fActiveVPNDynamicStoreSource == nullptr)
+    {
+        [self stopActiveVPNBindInterfaceMonitor];
+        return;
+    }
+
+    CFRunLoopAddSource(CFRunLoopGetMain(), self.fActiveVPNDynamicStoreSource, kCFRunLoopCommonModes);
+}
+
+- (void)stopActiveVPNBindInterfaceMonitor
+{
+    if (self.fActiveVPNDynamicStoreSource != nullptr)
+    {
+        CFRunLoopRemoveSource(CFRunLoopGetMain(), self.fActiveVPNDynamicStoreSource, kCFRunLoopCommonModes);
+        CFRelease(self.fActiveVPNDynamicStoreSource);
+        self.fActiveVPNDynamicStoreSource = nullptr;
+    }
+    if (self.fActiveVPNDynamicStore != nullptr)
+    {
+        CFRelease(self.fActiveVPNDynamicStore);
+        self.fActiveVPNDynamicStore = nullptr;
+    }
+}
+
+- (NSDictionary<NSString*, id>*)activeVPNBindInterfaceStatus
+{
+    if (self.fActiveVPNBindInterfaceStatus == nil)
+    {
+        self.fActiveVPNBindInterfaceStatus = TRResolveActiveVPNInterface();
+    }
+    return self.fActiveVPNBindInterfaceStatus;
+}
+
+- (void)updateActiveVPNBindInterfacePreference
+{
+    NSDictionary<NSString*, id>* resolution = TRResolveActiveVPNInterface();
+    self.fActiveVPNBindInterfaceStatus = resolution;
+
+    if ([[self.fDefaults stringForKey:@"BindInterfaceMode"] isEqualToString:TRBindInterfaceModeActiveVPN])
+    {
+        NSString* resolvedInterface = resolution[TRActiveVPNResolutionInterfaceKey];
+        NSString* bindInterface = nil;
+        if (resolvedInterface.length > 0)
+        {
+            bindInterface = resolvedInterface;
+            [self.fDefaults setObject:bindInterface forKey:@"BindInterface"];
+        }
+        else
+        {
+            NSString* lastResolvedInterface = [self.fDefaults stringForKey:@"BindInterface"];
+            bindInterface = lastResolvedInterface.length > 0 ? lastResolvedInterface : TRNoActiveVPNBindInterfaceName;
+        }
+
+        NSString* currentInterface = tr_strv_to_utf8_nsstring(tr_sessionGetBindInterface(self.fLib));
+        if (![currentInterface isEqualToString:bindInterface])
+        {
+            tr_sessionSetBindInterface(self.fLib, bindInterface.UTF8String);
+        }
+    }
+
+    [NSNotificationCenter.defaultCenter postNotificationName:TRActiveVPNBindInterfaceDidChangeNotification object:self
+                                                    userInfo:self.activeVPNBindInterfaceStatus];
 }
 
 - (void)awakeFromNib
@@ -1040,6 +1166,7 @@ static void removeKeRangerRansomware()
 
     //stop timers and notification checking
     [NSNotificationCenter.defaultCenter removeObserver:self];
+    [self stopActiveVPNBindInterfaceMonitor];
 
     [self.fTimer invalidate];
 
