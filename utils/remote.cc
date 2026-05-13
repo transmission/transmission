@@ -2484,7 +2484,7 @@ int flush(char const* rpcurl, tr_variant* const var, RemoteConfig& config)
         case 204:
             if (!config.json)
             {
-                fmt::print("{:s} acknowledged request\n", rpcurl);
+                fmt::print("{:s} acknowledged notification\n", rpcurl);
             }
             break;
 
