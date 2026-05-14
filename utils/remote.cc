@@ -2358,7 +2358,7 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         [[fallthrough]];
 
     default:
-        fmt::print("{:s} responded: {:s}\n", rpcurl, response);
+        fmt::print("{:s} returned a successful response\n", rpcurl);
         break;
     }
 
