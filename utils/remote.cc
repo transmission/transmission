@@ -258,7 +258,7 @@ auto constexpr Options = std::array<tr_option, 106>{ {
     { 941, "info-peers", "List the current torrent(s)' peers", "ip", Arg::None, nullptr },
     { 942, "info-pieces", "List the current torrent(s)' pieces", "ic", Arg::None, nullptr },
     { 943, "info-trackers", "List the current torrent(s)' trackers", "it", Arg::None, nullptr },
-    { 'j', "json", "Return RPC response as a JSON string", "j", Arg::None, nullptr },
+    { 'j', "json", "Return RPC response as a JSON string if the request was not a notification", "j", Arg::None, nullptr },
     { 920, "session-info", "Show the session's details", "si", Arg::None, nullptr },
     { 921, "session-stats", "Show the session's statistics", "st", Arg::None, nullptr },
     { 'l', "list", "List all torrents", "l", Arg::None, nullptr },
