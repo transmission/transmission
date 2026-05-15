@@ -289,7 +289,7 @@ std::shared_ptr<tr_peer_socket_utp> tr_peer_socket_utp::create(
     tr::TimerMaker& timer_maker)
 {
 #ifdef WITH_UTP
-    return std::make_unique<tr_peer_socket_utp_impl>(socket_address, sock, timer_maker);
+    return std::make_shared<tr_peer_socket_utp_impl>(socket_address, sock, timer_maker);
 #else
     return {};
 #endif
@@ -305,7 +305,7 @@ std::shared_ptr<tr_peer_socket_utp> tr_peer_socket_utp::create(
     auto const [ss, sslen] = socket_address.to_sockaddr();
     if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
     {
-        return std::make_unique<tr_peer_socket_utp_impl>(socket_address, sock, timer_maker);
+        return std::make_shared<tr_peer_socket_utp_impl>(socket_address, sock, timer_maker);
     }
 #endif
     return {};
