@@ -179,6 +179,8 @@ tr_peerIo::~tr_peerIo()
 
 // ---
 
+// Only call this method for a peer IO object managed by shared_ptr,
+// i.e. NEVER call this method in the constructor
 void tr_peerIo::set_socket(std::shared_ptr<tr_peer_socket> socket_in)
 {
     TR_ASSERT(socket_in);
