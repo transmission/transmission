@@ -1353,13 +1353,8 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, std::shared_ptr<tr_peer_socket> 
     if (manager->blocklists_.contains(socket->address()))
     {
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", socket->display_name()));
-        socket.reset();
     }
-    else if (manager->incoming_handshakes.contains(socket->socket_address()))
-    {
-        socket.reset();
-    }
-    else // we don't have a connection to them yet...
+    else if (!manager->incoming_handshakes.contains(socket->socket_address())) // we don't have a connection to them yet...
     {
         auto const& socket_address = socket->socket_address();
         auto* const session = manager->session;
