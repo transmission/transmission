@@ -27,7 +27,7 @@ class tr_peer_socket
 public:
     // The buffer size for incoming & outgoing peer messages.
     // Starts off with enough capacity to read a single BT Piece message,
-    // but has a 5x GrowthFactor so that it can quickly to high volume.
+    // but has a 5x GrowthFactor so that it can quickly grow.
     using PeerBuffer = tr::StackBuffer<TrBlockSize + 16U, std::byte, std::ratio<5, 1>>;
 
     using InBuf = tr::BufferWriter<std::byte>;
