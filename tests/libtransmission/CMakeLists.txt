@@ -46,6 +46,7 @@ target_sources(libtransmission-test
         session-alt-speeds-test.cc
         session-test.cc
         settings-test.cc
+        socks5-udp-test.cc
         strbuf-test.cc
         string-utils-test.cc
         subprocess-test-script.cmd

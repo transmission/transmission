@@ -124,6 +124,8 @@ target_sources(${TR_NAME}
         session-thread.h
         session.cc
         session.h
+        socks5-udp.cc
+        socks5-udp.h
         stats.cc
         stats.h
         string-utils.cc
