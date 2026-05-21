@@ -80,20 +80,16 @@ std::vector<tr_block_span_t> Wishlist::next(
         return {};
     }
 
-    // for slow peers in sequential mode, reverse the candidates to
-    // assign least priority pieces from the end
-    auto candidates_reversed = CandidateVec{};
-    if (mediator_.is_sequential_download() && is_slow_peer)
-    {
-        candidates_reversed = candidates_;
-        std::ranges::reverse(candidates_reversed);
-    }
-    auto const& candidates = mediator_.is_sequential_download() && is_slow_peer ? candidates_reversed : candidates_;
+    // for slow peers in sequential mode, iterate the candidates in reverse
+    // to assign least priority pieces from the end
+    auto const reverse = mediator_.is_sequential_download() && is_slow_peer;
+    auto const n_candidates = std::size(candidates_);
 
     auto blocks = small::vector<tr_block_index_t>{};
     blocks.reserve(n_wanted_blocks);
-    for (auto const& candidate : candidates)
+    for (size_t i = 0; i < n_candidates; ++i)
     {
+        auto const& candidate = candidates_[reverse ? n_candidates - 1U - i : i];
         auto const n_added = std::size(blocks);
         TR_ASSERT(n_added <= n_wanted_blocks);
 
