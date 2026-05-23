@@ -257,7 +257,7 @@ auto constexpr Options = std::array<tr_option, 106>{ {
     { 941, "info-peers", "List the current torrent(s)' peers", "ip", Arg::None, nullptr },
     { 942, "info-pieces", "List the current torrent(s)' pieces", "ic", Arg::None, nullptr },
     { 943, "info-trackers", "List the current torrent(s)' trackers", "it", Arg::None, nullptr },
-    { 'j', "json", "Return RPC response as a JSON string", "j", Arg::None, nullptr },
+    { 'j', "json", "Return RPC response as a JSON string if the request was not a notification", "j", Arg::None, nullptr },
     { 920, "session-info", "Show the session's details", "si", Arg::None, nullptr },
     { 921, "session-stats", "Show the session's statistics", "st", Arg::None, nullptr },
     { 'l', "list", "List all torrents", "l", Arg::None, nullptr },
@@ -2355,7 +2355,7 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         [[fallthrough]];
 
     default:
-        fmt::print("{:s} responded: {:s}\n", rpcurl, response);
+        fmt::print("{:s} returned a successful response\n", rpcurl);
         break;
     }
 
@@ -2479,7 +2479,10 @@ int flush(char const* rpcurl, tr_variant* const var, RemoteConfig& config)
             break;
 
         case 204:
-            fmt::print("{:s} acknowledged request\n", rpcurl);
+            if (!config.json)
+            {
+                fmt::print("{:s} acknowledged notification\n", rpcurl);
+            }
             break;
 
         case 409:
