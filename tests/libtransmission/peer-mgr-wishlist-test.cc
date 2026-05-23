@@ -222,25 +222,30 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwice)
 
 TEST_F(PeerMgrWishlistTest, sequentialDownload)
 {
-    auto mediator = MockMediator{};
+    auto const get_spans = [](size_t n_wanted)
+    {
+        auto mediator = MockMediator{};
 
-    // setup: three pieces, all missing
-    mediator.block_span_[0] = { .begin = 0, .end = 100 };
-    mediator.block_span_[1] = { .begin = 100, .end = 200 };
-    mediator.block_span_[2] = { .begin = 200, .end = 250 };
+        // setup: three pieces, all missing
+        mediator.block_span_[0] = { .begin = 0, .end = 100 };
+        mediator.block_span_[1] = { .begin = 100, .end = 200 };
+        mediator.block_span_[2] = { .begin = 200, .end = 250 };
 
-    // peer has all pieces
-    mediator.piece_replication_[0] = 1;
-    mediator.piece_replication_[1] = 1;
-    mediator.piece_replication_[2] = 1;
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
 
-    // and we want all three pieces
-    mediator.client_wants_piece_.insert(0);
-    mediator.client_wants_piece_.insert(1);
-    mediator.client_wants_piece_.insert(2);
+        // and we want all three pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
 
-    // we enabled sequential download
-    mediator.is_sequential_download_ = true;
+        // we enabled sequential download
+        mediator.is_sequential_download_ = true;
+
+        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces);
+    };
 
     // first piece is downloaded first, then last piece, since in sequential
     // mode we do not prefer pieces close to completion.
@@ -248,41 +253,36 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
     // picked at random so this test -could- pass even if there's a bug.
     // So test several times to shake out any randomness
     static auto constexpr NumRuns = 1000;
+
+    // when nothing is downloaded yet: 100 blocks should all come from piece 0
     for (int run = 0; run < NumRuns; ++run)
     {
-        auto wishlist = Wishlist{ mediator };
-
-        // first request: 100 blocks should all come from piece 0
+        auto requested = tr_bitfield{ 250 };
+        auto const spans = get_spans(100);
+        for (auto const& [begin, end] : spans)
         {
-            auto requested = tr_bitfield{ 250 };
-            auto const spans = wishlist.next(100, PeerHasAllPieces);
-            for (auto const& [begin, end] : spans)
-            {
-                requested.set_span(begin, end);
-                for (auto block = begin; block < end; ++block)
-                {
-                    wishlist.on_got_block(block);
-                }
-            }
-            EXPECT_EQ(100U, requested.count());
-            EXPECT_EQ(100U, requested.count(0, 100));
-            EXPECT_EQ(0U, requested.count(100, 200));
-            EXPECT_EQ(0U, requested.count(200, 250));
+            requested.set_span(begin, end);
         }
+        EXPECT_EQ(100U, requested.count());
+        EXPECT_EQ(100U, requested.count(0, 100));
+        EXPECT_EQ(0U, requested.count(100, 200));
+        EXPECT_EQ(0U, requested.count(200, 250));
+    }
 
-        // second request: 50 more blocks should all come from piece 2 (last piece)
+    // Same premise as previous test, but ask for more blocks:
+    // 100 from piece 0, then piece 2 (last) before piece 1.
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 250 };
+        auto const spans = get_spans(150);
+        for (auto const& [begin, end] : spans)
         {
-            auto requested = tr_bitfield{ 250 };
-            auto const spans = wishlist.next(50, PeerHasAllPieces);
-            for (auto const& [begin, end] : spans)
-            {
-                requested.set_span(begin, end);
-            }
-            EXPECT_EQ(50U, requested.count());
-            EXPECT_EQ(0U, requested.count(0, 100));
-            EXPECT_EQ(0U, requested.count(100, 200));
-            EXPECT_EQ(50U, requested.count(200, 250));
+            requested.set_span(begin, end);
         }
+        EXPECT_EQ(150U, requested.count());
+        EXPECT_EQ(100U, requested.count(0, 100));
+        EXPECT_EQ(0U, requested.count(100, 200));
+        EXPECT_EQ(50U, requested.count(200, 250));
     }
 }
 
