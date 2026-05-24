@@ -700,6 +700,7 @@ TEST_F(RpcTest, torrentGet)
     auto params = tr_variant::Map{ 1U };
     auto fields = tr_variant::Vector{};
     fields.emplace_back(tr_quark_get_string_view(TR_KEY_id));
+    fields.emplace_back(tr_quark_get_string_view(TR_KEY_known_peers_from));
     params.try_emplace(TR_KEY_fields, std::move(fields));
     request_map.try_emplace(TR_KEY_params, std::move(params));
 
@@ -721,6 +722,24 @@ TEST_F(RpcTest, torrentGet)
     auto first_torrent_id = first_torrent->value_if<int64_t>(TR_KEY_id);
     ASSERT_TRUE(first_torrent_id);
     EXPECT_EQ(1, *first_torrent_id);
+
+    auto* known_peers_from = first_torrent->find_if<tr_variant::Map>(TR_KEY_known_peers_from);
+    ASSERT_NE(known_peers_from, nullptr);
+
+    for (auto const key : {
+             TR_KEY_from_cache,
+             TR_KEY_from_dht,
+             TR_KEY_from_incoming,
+             TR_KEY_from_lpd,
+             TR_KEY_from_ltep,
+             TR_KEY_from_pex,
+             TR_KEY_from_tracker,
+         })
+    {
+        auto const count = known_peers_from->value_if<int64_t>(key);
+        ASSERT_TRUE(count);
+        EXPECT_EQ(0, *count);
+    }
 
     // cleanup
     tr_torrentRemove(tor, false);

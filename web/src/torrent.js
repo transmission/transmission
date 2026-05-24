@@ -195,6 +195,9 @@ export class Torrent extends EventTarget {
   getPeersConnected() {
     return this.fields.peers_connected;
   }
+  getKnownPeersFrom() {
+    return this.fields.known_peers_from || {};
+  }
   getPeersGettingFromUs() {
     return this.fields.peers_getting_from_us;
   }
@@ -653,6 +656,7 @@ Torrent.Fields.StatsExtra = [
   'file_stats',
   'have_unchecked',
   'have_valid',
+  'known_peers_from',
   'peers',
   'start_date',
   'tracker_stats',
