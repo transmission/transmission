@@ -129,6 +129,27 @@ private:
     uint16_t hport_ = 0;
 };
 
+// A serializer-friendly wrapper around the DiffServ int value
+class tr_diffserv_t
+{
+public:
+    constexpr tr_diffserv_t() = default;
+
+    constexpr explicit tr_diffserv_t(int value)
+        : value_{ value }
+    {
+    }
+
+    // NOLINTNEXTLINE(google-explicit-constructor)
+    [[nodiscard]] constexpr operator int() const noexcept
+    {
+        return value_;
+    }
+
+private:
+    int value_ = 0x04;
+};
+
 using tr_tracker_id_t = uint32_t;
 
 using tr_tracker_tier_t = uint32_t;
