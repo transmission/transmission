@@ -18,3 +18,24 @@
 @property(nonatomic, class, readonly) NSGradient* progressYellowGradient;
 
 @end
+
+@interface ModernProgressGradients : NSObject
+
+@property(nonatomic, class, readonly) NSArray<NSNumber*>* locations;
+
+@property(nonatomic, class, readonly) NSArray<NSColor*>* progressWhiteGradient;
+@property(nonatomic, class, readonly) NSArray<NSColor*>* progressGrayGradient;
+@property(nonatomic, class, readonly) NSArray<NSColor*>* progressLightGrayGradient;
+@property(nonatomic, class, readonly) NSArray<NSColor*>* progressBlueGradient;
+@property(nonatomic, class, readonly) NSArray<NSColor*>* progressDarkBlueGradient;
+@property(nonatomic, class, readonly) NSArray<NSColor*>* progressGreenGradient;
+@property(nonatomic, class, readonly) NSArray<NSColor*>* progressLightGreenGradient;
+@property(nonatomic, class, readonly) NSArray<NSColor*>* progressDarkGreenGradient;
+@property(nonatomic, class, readonly) NSArray<NSColor*>* progressRedGradient;
+@property(nonatomic, class, readonly) NSArray<NSColor*>* progressYellowGradient;
+
+@end
+
+@interface NSColor (KVC_CGColor)
+@property(readonly) id cgColorKVC;
+@end

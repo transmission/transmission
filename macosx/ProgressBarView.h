@@ -12,3 +12,9 @@
 - (void)drawBarInRect:(NSRect)barRect forTableView:(TorrentTableView*)tableView withTorrent:(Torrent*)torrent;
 
 @end
+
+@interface ProgressBarView2 : NSView
+
+- (void)drawBarInRect:(NSRect)barRect forTableView:(TorrentTableView*)tableView withTorrent:(Torrent*)torrent;
+
+@end
