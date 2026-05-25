@@ -21,7 +21,6 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
-#include <arpa/inet.h>
 #include <cerrno>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -65,74 +64,6 @@ using tr_socket_t = int;
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for tr_compare_3way()
-
-/**
- * Literally just a port number.
- *
- * Exists so that you never have to wonder what byte order a port variable is in.
- */
-class tr_port
-{
-public:
-    tr_port() noexcept = default;
-
-    [[nodiscard]] constexpr static tr_port from_host(uint16_t hport) noexcept
-    {
-        return tr_port{ hport };
-    }
-
-    [[nodiscard]] static tr_port from_network(uint16_t nport) noexcept
-    {
-        return tr_port{ ntohs(nport) };
-    }
-
-    [[nodiscard]] constexpr uint16_t host() const noexcept
-    {
-        return hport_;
-    }
-
-    [[nodiscard]] uint16_t network() const noexcept
-    {
-        return htons(hport_);
-    }
-
-    constexpr void set_host(uint16_t hport) noexcept
-    {
-        hport_ = hport;
-    }
-
-    [[nodiscard]] static std::pair<tr_port, std::byte const*> from_compact(std::byte const* compact) noexcept;
-
-    [[nodiscard]] constexpr auto operator<=>(tr_port const& that) const noexcept
-    {
-        return hport_ <=> that.hport_;
-    }
-
-    [[nodiscard]] constexpr auto operator==(tr_port const& that) const noexcept
-    {
-        return (*this <=> that) == 0;
-    }
-
-    [[nodiscard]] constexpr auto empty() const noexcept
-    {
-        return hport_ == 0;
-    }
-
-    constexpr void clear() noexcept
-    {
-        hport_ = 0;
-    }
-
-    static auto constexpr CompactPortBytes = 2U;
-
-private:
-    explicit constexpr tr_port(uint16_t hport) noexcept
-        : hport_{ hport }
-    {
-    }
-
-    uint16_t hport_ = 0;
-};
 
 enum tr_address_type : uint8_t
 {
