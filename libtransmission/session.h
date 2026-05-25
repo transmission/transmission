@@ -493,7 +493,7 @@ public:
         tr_encryption_mode encryption_mode = TR_ENCRYPTION_PREFERRED;
         tr_log_level log_level = TR_LOG_INFO;
         tr_mode_t umask = 022;
-        tr_open_files::Preallocation preallocation_mode = tr_open_files::Preallocation::Sparse;
+        tr_preallocation preallocation_mode = tr_preallocation::Sparse;
         tr_port peer_port_random_high = tr_port::from_host(65535);
         tr_port peer_port_random_low = tr_port::from_host(49152);
         tr_port peer_port = tr_port::from_host(TrDefaultPeerPort);
