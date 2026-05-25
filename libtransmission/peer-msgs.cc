@@ -2181,7 +2181,7 @@ tr_peerMsgs::tr_peerMsgs(
     {
         auto buf = std::array<char, 128>{};
         tr_clientForId(std::data(buf), sizeof(buf), peer_id);
-        client = tr_interned_string{ tr_quark_new(std::data(buf)) };
+        client = tr_interned_string{ tr_strv_convert_utf8(std::data(buf)) };
     }
     set_user_agent(client);
     peer_info->set_connected(tr_time());
