@@ -2313,7 +2313,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     else
     {
         [self.fInfoController updateInfoStats];
-        [self.fInfoController.window orderFront:nil];
+        [self.fInfoController.window makeKeyAndOrderFront:nil];
 
         if (self.fInfoController.canQuickLook && [QLPreviewPanel sharedPreviewPanelExists] &&
             [QLPreviewPanel sharedPreviewPanel].visible)
