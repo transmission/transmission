@@ -1100,8 +1100,7 @@ namespace make_torrent_field_helpers
         }
     }
 
-    auto errmsg = std::string{};
-    return { std::move(labels), Error::SUCCESS, std::move(errmsg) };
+    return { std::move(labels), Error::SUCCESS, std::string{} };
 }
 
 [[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> set_labels(tr_torrent* tor, tr_variant::Vector const& list)
@@ -1148,8 +1147,7 @@ namespace make_torrent_field_helpers
         }
     }
 
-    auto errmsg = std::string{};
-    return { std::move(files), Error::SUCCESS, std::move(errmsg) };
+    return { std::move(files), Error::SUCCESS, std::string{} };
 }
 
 [[nodiscard]] std::pair<JsonRpc::Error::Code, std::string> set_file_priorities(
