@@ -48,7 +48,7 @@
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port, tr_tos_t
 #include "libtransmission/open-files.h"
-#include "libtransmission/peer-io.h" // tr_preferred_transport
+#include "libtransmission/peer-io.h"
 #include "libtransmission/platform.h"
 #include "libtransmission/port-forwarding.h"
 #include "libtransmission/quark.h"
@@ -471,9 +471,9 @@ public:
         size_t speed_limit_down = 100U;
         size_t speed_limit_up = 100U;
         size_t upload_slots_per_torrent = 8U;
-        small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transports = {
-            TR_PREFER_UTP,
-            TR_PREFER_TCP,
+        small::max_size_vector<tr_preferred_transport, PreferredTransportCount> preferred_transports = {
+            tr_preferred_transport::UTP,
+            tr_preferred_transport::TCP,
         };
         std::vector<std::string> ip_endpoint_ipv4 = { "https://ip4.transmissionbt.com/" };
         std::vector<std::string> ip_endpoint_ipv6 = { "https://ip6.transmissionbt.com/" };

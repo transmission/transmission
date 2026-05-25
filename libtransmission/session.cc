@@ -933,10 +933,10 @@ void tr_session::Settings::fixup_from_preferred_transports()
     {
         switch (transport)
         {
-        case TR_PREFER_UTP:
+        case tr_preferred_transport::UTP:
             utp_enabled = true;
             break;
-        case TR_PREFER_TCP:
+        case tr_preferred_transport::TCP:
             tcp_enabled = true;
             break;
         default:
@@ -949,24 +949,24 @@ void tr_session::Settings::fixup_to_preferred_transports()
 {
     if (!utp_enabled)
     {
-        auto const [first, last] = std::ranges::remove(preferred_transports, TR_PREFER_UTP);
+        auto const [first, last] = std::ranges::remove(preferred_transports, tr_preferred_transport::UTP);
         preferred_transports.erase(first, last);
     }
-    else if (std::ranges::find(preferred_transports, TR_PREFER_UTP) == std::ranges::end(preferred_transports))
+    else if (std::ranges::find(preferred_transports, tr_preferred_transport::UTP) == std::ranges::end(preferred_transports))
     {
         TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
-        preferred_transports.emplace(std::begin(preferred_transports), TR_PREFER_UTP);
+        preferred_transports.emplace(std::begin(preferred_transports), tr_preferred_transport::UTP);
     }
 
     if (!tcp_enabled)
     {
-        auto const [first, last] = std::ranges::remove(preferred_transports, TR_PREFER_TCP);
+        auto const [first, last] = std::ranges::remove(preferred_transports, tr_preferred_transport::TCP);
         preferred_transports.erase(first, last);
     }
-    else if (std::ranges::find(preferred_transports, TR_PREFER_TCP) == std::ranges::end(preferred_transports))
+    else if (std::ranges::find(preferred_transports, tr_preferred_transport::TCP) == std::ranges::end(preferred_transports))
     {
         TR_ASSERT(std::size(preferred_transports) < preferred_transports.max_size());
-        preferred_transports.emplace_back(TR_PREFER_TCP);
+        preferred_transports.emplace_back(tr_preferred_transport::TCP);
     }
 }
 

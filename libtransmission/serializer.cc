@@ -25,7 +25,6 @@
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port
 #include "libtransmission/open-files.h" // for tr_open_files::Preallocation
-#include "libtransmission/peer-io.h" // tr_preferred_transport
 #include "libtransmission/peer-mgr.h" // tr_pex
 #include "libtransmission/serializer.h"
 #include "libtransmission/string-utils.h"
@@ -343,30 +342,28 @@ tr_variant from_preallocation_mode(tr_open_files::Preallocation const& val)
 
 // ---
 
-auto constexpr PreferredTransportKeys = LookupTable<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{ {
-    { "utp", TR_PREFER_UTP },
-    { "tcp", TR_PREFER_TCP },
+auto constexpr PreferredTransportKeys = LookupTable<tr_preferred_transport, PreferredTransportCount>{ {
+    { "utp", tr_preferred_transport::UTP },
+    { "tcp", tr_preferred_transport::TCP },
 } };
 
-bool to_preferred_transport(
-    tr_variant const& src,
-    small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>* tgt)
+bool to_preferred_transport(tr_variant const& src, small::max_size_vector<tr_preferred_transport, PreferredTransportCount>* tgt)
 {
-    static auto constexpr LoadSingle = [](tr_variant const& var)
+    static auto constexpr LoadSingle = [](tr_variant const& var) -> std::optional<tr_preferred_transport>
     {
         auto tmp = tr_preferred_transport{};
-        return to_enum_or_integral_with_lookup(PreferredTransportKeys, var, &tmp) ? tmp : TR_NUM_PREFERRED_TRANSPORT;
+        return to_enum_or_integral_with_lookup(PreferredTransportKeys, var, &tmp) ? std::make_optional(tmp) : std::nullopt;
     };
 
     if (auto* const l = src.get_if<tr_variant::Vector>(); l != nullptr)
     {
-        auto tmp = small::max_size_unordered_set<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{};
+        auto tmp = small::max_size_unordered_set<tr_preferred_transport, PreferredTransportCount>{};
         tmp.reserve(tmp.max_size());
 
         for (size_t i = 0, n = std::min(std::size(*l), tmp.max_size()); i < n; ++i)
         {
             auto const value = LoadSingle((*l)[i]);
-            if (value >= TR_NUM_PREFERRED_TRANSPORT || !tmp.insert(value).second)
+            if (!value || !tmp.insert(*value).second)
             {
                 return false;
             }
@@ -379,20 +376,20 @@ bool to_preferred_transport(
     }
 
     auto const preferred = LoadSingle(src);
-    if (preferred >= TR_NUM_PREFERRED_TRANSPORT)
+    if (!preferred)
     {
         return false;
     }
 
-    tgt->assign(1U, preferred);
+    tgt->assign(1U, *preferred);
     return true;
 }
 
-tr_variant from_preferred_transport(small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> const& val)
+tr_variant from_preferred_transport(small::max_size_vector<tr_preferred_transport, PreferredTransportCount> const& val)
 {
     static auto constexpr SaveSingle = [](tr_preferred_transport const ele) -> tr_variant
     {
-        return from_enum_or_integral_with_lookup(PreferredTransportKeys, ele);
+        return static_cast<int64_t>(ele);
     };
 
     auto ret = tr_variant::Vector{};

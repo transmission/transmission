@@ -144,7 +144,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
 
     // N.B. This array needs to be kept in the same order as
     // the tr_preferred_transport enum.
-    auto const get_socket = std::array<std::function<tr_peer_socket()>, TR_NUM_PREFERRED_TRANSPORT>{
+    auto const get_socket = std::array<std::function<tr_peer_socket()>, PreferredTransportCount>{
         [&]() -> tr_peer_socket
         {
 #ifdef WITH_UTP
@@ -172,7 +172,8 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
 
     for (auto const& transport : session->preferred_transports())
     {
-        if (auto sock = get_socket[transport](); sock.is_valid())
+        auto const transport_index = static_cast<std::underlying_type_t<tr_preferred_transport>>(transport);
+        if (auto sock = get_socket[transport_index](); sock.is_valid())
         {
             return tr_peerIo::create(session, std::move(sock), parent, &info_hash, false, client_is_seed);
         }

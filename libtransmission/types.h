@@ -64,6 +64,14 @@ using tr_sha256_digest_t = std::array<std::byte, 32>;
 
 using tr_torrent_id_t = int;
 
+enum class tr_preferred_transport : uint8_t
+{
+    UTP,
+    TCP,
+};
+
+inline auto constexpr PreferredTransportCount = 2U;
+
 class tr_port
 {
 public:
