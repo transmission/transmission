@@ -50,13 +50,6 @@ enum class ReadState : uint8_t
     Err
 };
 
-enum tr_preferred_transport : uint8_t
-{
-    TR_PREFER_UTP,
-    TR_PREFER_TCP,
-    TR_NUM_PREFERRED_TRANSPORT
-};
-
 class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 {
     using DH = tr_message_stream_encryption::DH;

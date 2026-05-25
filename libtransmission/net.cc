@@ -431,6 +431,16 @@ namespace is_valid_for_peers_helpers
 
 // --- tr_port
 
+tr_port tr_port::from_network(uint16_t const nport) noexcept
+{
+    return tr_port{ ntohs(nport) };
+}
+
+uint16_t tr_port::network() const noexcept
+{
+    return htons(hport_);
+}
+
 std::pair<tr_port, std::byte const*> tr_port::from_compact(std::byte const* compact) noexcept
 {
     static auto constexpr PortLen = size_t{ 2 };
