@@ -2306,7 +2306,7 @@ static void removeKeRangerRansomware()
     else
     {
         [self.fInfoController updateInfoStats];
-        [self.fInfoController.window orderFront:nil];
+        [self.fInfoController.window makeKeyAndOrderFront:nil];
 
         if (self.fInfoController.canQuickLook && [QLPreviewPanel sharedPreviewPanelExists] &&
             [QLPreviewPanel sharedPreviewPanel].visible)
