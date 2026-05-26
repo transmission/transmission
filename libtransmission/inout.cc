@@ -86,7 +86,8 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, std::span<ui
 
     // does the file exist?
     auto const file_size = tor.file_size(file_index);
-    auto const prealloc = writable && tor.file_is_wanted(file_index) ? session.preallocationMode() : tr_preallocation::None;
+    auto const prealloc = writable && tor.file_is_wanted(file_index) ? session.preallocationMode() :
+                                                                       tr_file_preallocation::None;
     if (auto const found = tor.find_file(file_index); found)
     {
         return open_files.get(tor_id, file_index, writable, found->filename(), prealloc, file_size);

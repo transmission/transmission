@@ -252,7 +252,7 @@ TEST_F(SettingsTest, canLoadPreallocation)
 
     auto settings = std::make_unique<tr_session::Settings>();
     auto const default_value = settings->preallocation_mode;
-    auto constexpr ExpectedValue = tr_preallocation::Full;
+    auto constexpr ExpectedValue = tr_file_preallocation::Full;
     ASSERT_NE(ExpectedValue, default_value);
 
     auto map = tr_variant::Map{ 1U };
@@ -273,7 +273,7 @@ TEST_F(SettingsTest, canSavePreallocation)
 
     auto settings = tr_session::Settings{};
     auto const default_value = settings.preallocation_mode;
-    auto constexpr ExpectedValue = tr_preallocation::Full;
+    auto constexpr ExpectedValue = tr_file_preallocation::Full;
     ASSERT_NE(ExpectedValue, default_value);
 
     settings.preallocation_mode = ExpectedValue;
