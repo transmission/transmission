@@ -351,10 +351,11 @@ auto getFilenamesInDir(std::string_view folder)
 
 void Blocklists::Blocklist::ensureLoaded() const
 {
-    if (!std::empty(rules_))
+    if (rules_)
     {
         return;
     }
+    rules_.emplace();
 
     // get the file's size
     auto error = tr_error{};
@@ -416,17 +417,17 @@ void Blocklists::Blocklist::ensureLoaded() const
 
                 tr_logAddInfo(_("Rewriting old blocklist file format to new format"));
                 tr_sys_path_remove(bin_file_);
-                save(bin_file_, std::data(rules_), std::size(rules_));
+                save(bin_file_, std::data(*rules_), std::size(*rules_));
             }
         }
         return;
     }
 
     auto range = address_range_t{};
-    rules_.reserve((file_info->size - std::size(BinContentsPrefix)) / sizeof(address_range_t));
+    rules_->reserve((file_info->size - std::size(BinContentsPrefix)) / sizeof(address_range_t));
     while (in.read(reinterpret_cast<char*>(&range), sizeof(range)))
     {
-        rules_.emplace_back(range);
+        rules_->emplace_back(range);
     }
 
     tr_logAddInfo(
@@ -434,9 +435,9 @@ void Blocklists::Blocklist::ensureLoaded() const
             fmt::runtime(tr_ngettext(
                 "Blocklist '{path}' has {count} entry",
                 "Blocklist '{path}' has {count} entries",
-                std::size(rules_))),
+                std::size(*rules_))),
             fmt::arg("path", tr_sys_path_basename(bin_file_)),
-            fmt::arg("count", std::size(rules_))));
+            fmt::arg("count", std::size(*rules_))));
 }
 
 bool Blocklists::Blocklist::contains(tr_address const& addr) const
@@ -481,8 +482,8 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
         }
     } Compare;
 
-    // NOLINTNEXTLINE(modernize-use-ranges)
-    return std::binary_search(std::begin(rules_), std::end(rules_), addr, Compare);
+    // NOLINTNEXTLINE(modernize-use-ranges, bugprone-unchecked-optional-access)
+    return std::binary_search(std::begin(*rules_), std::end(*rules_), addr, Compare);
 }
 
 std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(

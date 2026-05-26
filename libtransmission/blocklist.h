@@ -80,8 +80,8 @@ private:
         [[nodiscard]] size_t size() const
         {
             ensureLoaded();
-
-            return std::size(rules_);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+            return std::size(*rules_);
         }
 
         [[nodiscard]] constexpr bool enabled() const noexcept
@@ -102,7 +102,7 @@ private:
     private:
         void ensureLoaded() const;
 
-        mutable std::vector<std::pair<tr_address, tr_address>> rules_;
+        mutable std::optional<std::vector<std::pair<tr_address, tr_address>>> rules_;
 
         std::string bin_file_;
         bool is_enabled_ = false;
