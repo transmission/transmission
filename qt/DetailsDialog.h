@@ -60,7 +60,7 @@ private:
 
 private slots:
     void refreshModel();
-    void refreshPref(int key);
+    void refreshPref(tr_quark key);
     void refreshUI();
 
     void onTorrentsEdited(torrent_ids_t const& ids);

@@ -271,19 +271,19 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     ui_.commentTextEdit->setMaximumHeight(QWIDGETSIZE_MAX);
     ui_.tabs->setCurrentIndex(prev_tab_index);
 
-    static std::array<int, 2> constexpr InitKeys = {
-        Prefs::SHOW_TRACKER_SCRAPES,
-        Prefs::SHOW_BACKUP_TRACKERS,
+    static std::array<tr_quark, 2> constexpr InitKeys = {
+        TR_KEY_show_tracker_scrapes,
+        TR_KEY_show_backup_trackers,
     };
 
-    for (int const key : InitKeys)
+    for (tr_quark const key : InitKeys)
     {
         refreshPref(key);
     }
 
     connect(&model_, &TorrentModel::torrentsChanged, this, &DetailsDialog::onTorrentsChanged);
     connect(&model_, &TorrentModel::torrentsEdited, this, &DetailsDialog::onTorrentsEdited);
-    connect(&prefs_, &Prefs::changed, this, &DetailsDialog::refreshPref);
+    connect(&prefs_, qOverload<tr_quark>(&Prefs::changed), this, &DetailsDialog::refreshPref);
 
     // call refreshModel periodically
     connect(&model_timer_, &QTimer::timeout, this, &DetailsDialog::refreshModel);
@@ -322,9 +322,9 @@ void DetailsDialog::setIds(torrent_ids_t const& ids)
     }
 }
 
-void DetailsDialog::refreshPref(int key)
+void DetailsDialog::refreshPref(tr_quark key)
 {
-    if (key == Prefs::SHOW_TRACKER_SCRAPES)
+    if (key == TR_KEY_show_tracker_scrapes)
     {
         auto* selection_model = ui_.trackersView->selectionModel();
         tracker_delegate_->setShowMore(prefs_.get<bool>(key));
@@ -333,7 +333,7 @@ void DetailsDialog::refreshPref(int key)
         selection_model->select(selection_model->selection(), QItemSelectionModel::Select);
         selection_model->setCurrentIndex(selection_model->currentIndex(), QItemSelectionModel::NoUpdate);
     }
-    else if (key == Prefs::SHOW_BACKUP_TRACKERS)
+    else if (key == TR_KEY_show_backup_trackers)
     {
         tracker_filter_->setShowBackupTrackers(prefs_.get<bool>(key));
     }
@@ -1331,12 +1331,12 @@ void DetailsDialog::initInfoTab()
 
 void DetailsDialog::onShowTrackerScrapesToggled(bool val)
 {
-    prefs_.set(Prefs::SHOW_TRACKER_SCRAPES, val);
+    prefs_.set(TR_KEY_show_tracker_scrapes, val);
 }
 
 void DetailsDialog::onShowBackupTrackersToggled(bool val)
 {
-    prefs_.set(Prefs::SHOW_BACKUP_TRACKERS, val);
+    prefs_.set(TR_KEY_show_backup_trackers, val);
 }
 
 void DetailsDialog::onHonorsSessionLimitsToggled(bool val)
@@ -1586,8 +1586,8 @@ void DetailsDialog::initTrackerTab()
     ui_.editTrackersButton->setIcon(icons::icon(icons::Type::EditTrackers));
     ui_.removeTrackerButton->setIcon(icons::icon(icons::Type::RemoveTracker));
 
-    ui_.showTrackerScrapesCheck->setChecked(prefs_.get<bool>(Prefs::SHOW_TRACKER_SCRAPES));
-    ui_.showBackupTrackersCheck->setChecked(prefs_.get<bool>(Prefs::SHOW_BACKUP_TRACKERS));
+    ui_.showTrackerScrapesCheck->setChecked(prefs_.get<bool>(TR_KEY_show_tracker_scrapes));
+    ui_.showBackupTrackersCheck->setChecked(prefs_.get<bool>(TR_KEY_show_backup_trackers));
 
     connect(ui_.addTrackerButton, &QAbstractButton::clicked, this, &DetailsDialog::onAddTrackerClicked);
     connect(ui_.editTrackersButton, &QAbstractButton::clicked, this, &DetailsDialog::onEditTrackersClicked);
