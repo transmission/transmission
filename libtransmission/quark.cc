@@ -455,11 +455,11 @@ auto constexpr MyStatic = std::array<std::u8string_view, TR_N_KEYS>{
     u8"rate_to_client"sv, // rpc
     u8"rate_to_peer"sv, // rpc
     u8"rate_upload"sv, // rpc
-    u8"ratio-limit"sv, // .resume, daemon, gtk app, tr_session::Settings
-    u8"ratio-limit-enabled"sv, // daemon, tr_session::Settings
+    u8"ratio-limit"sv, // APICOMPAT
+    u8"ratio-limit-enabled"sv, // APICOMPAT
     u8"ratio-mode"sv, // .resume
-    u8"ratio_limit"sv, // .resume, daemon, gtk app, tr_session::Settings
-    u8"ratio_limit_enabled"sv, // daemon, tr_session::Settings
+    u8"ratio_limit"sv, // APICOMPAT
+    u8"ratio_limit_enabled"sv, // APICOMPAT
     u8"ratio_mode"sv, // .resume
     u8"read-clipboard"sv, // qt app
     u8"read_clipboard"sv, // qt app
@@ -552,8 +552,8 @@ auto constexpr MyStatic = std::array<std::u8string_view, TR_N_KEYS>{
     u8"seed_idle_mode"sv, // rpc
     u8"seed_queue_enabled"sv, // rpc, tr_session::Settings
     u8"seed_queue_size"sv, // rpc, tr_session::Settings
-    u8"seed_ratio_limit"sv, // rpc
-    u8"seed_ratio_limited"sv, // rpc
+    u8"seed_ratio_limit"sv, // .resume, rpc, tr_session::Settings
+    u8"seed_ratio_limited"sv, // rpc, tr_session::Settings
     u8"seed_ratio_mode"sv, // rpc
     u8"seederCount"sv, // rpc
     u8"seeder_count"sv, // rpc
