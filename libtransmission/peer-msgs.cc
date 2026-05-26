@@ -2169,8 +2169,9 @@ size_t tr_peerMsgsImpl::max_available_reqs() const
     size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
     auto const ceil = peer_reqq_.value_or(PeerReqQDefault);
 
-    // Don't use std::clamp as `ceil` can be smaller than `Floor`
-    return std::max(Floor, std::min(estimated_blocks_in_period, ceil));
+    // - Don't use std::clamp as `ceil` can be smaller than `Floor`
+    // - Peer-supplied ReqQ should take the highest priority
+    return std::min(ceil, std::max(estimated_blocks_in_period, Floor));
 }
 
 } // namespace
