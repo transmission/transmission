@@ -23,7 +23,6 @@
 #include <small/vector.hpp>
 
 #include "libtransmission/log.h" // for tr_log_level
-#include "libtransmission/net.h" // for tr_port
 #include "libtransmission/peer-mgr.h" // tr_pex
 #include "libtransmission/serializer.h"
 #include "libtransmission/string-utils.h"
@@ -321,20 +320,20 @@ tr_variant from_port(tr_port const& val)
 
 // ---
 
-auto constexpr PreallocationKeys = LookupTable<tr_preallocation, 5U>{ {
-    { "off", tr_preallocation::None },
-    { "none", tr_preallocation::None },
-    { "fast", tr_preallocation::Sparse },
-    { "sparse", tr_preallocation::Sparse },
-    { "full", tr_preallocation::Full },
+auto constexpr PreallocationKeys = LookupTable<tr_file_preallocation, 5U>{ {
+    { "off", tr_file_preallocation::None },
+    { "none", tr_file_preallocation::None },
+    { "fast", tr_file_preallocation::Sparse },
+    { "sparse", tr_file_preallocation::Sparse },
+    { "full", tr_file_preallocation::Full },
 } };
 
-bool to_preallocation_mode(tr_variant const& src, tr_preallocation* tgt)
+bool to_preallocation_mode(tr_variant const& src, tr_file_preallocation* tgt)
 {
     return to_enum_or_integral_with_lookup(PreallocationKeys, src, tgt);
 }
 
-tr_variant from_preallocation_mode(tr_preallocation const& val)
+tr_variant from_preallocation_mode(tr_file_preallocation const& val)
 {
     return static_cast<int64_t>(val);
 }

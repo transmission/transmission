@@ -5,6 +5,7 @@ add_executable(libtransmission-app-test)
 target_sources(libtransmission-app-test
 	PRIVATE
 		converter-tests.cc
+		session-settings-include-test.cc
 		test-fixtures.h)
 
 set_property(

@@ -441,6 +441,7 @@
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
 		CCEBA596277340F6DF9F4480 /* session-alt-speeds.cc in Sources */ = {isa = PBXBuildFile; fileRef = CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */; };
 		CCEBA596277340F6DF9F4482 /* session-alt-speeds.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */; };
+		F0A1B2C32F1A2B3C00445566 /* session-settings.h in Headers */ = {isa = PBXBuildFile; fileRef = F0A1B2C42F1A2B3C00445566 /* session-settings.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */ = {isa = PBXBuildFile; fileRef = E23B55A5FC3B557F7746D511 /* interned-string.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		E975121263DD973CAF4AEBA0 /* timer.h in Headers */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA1 /* timer.h */; };
@@ -1407,6 +1408,7 @@
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "mime-types.h"; sourceTree = "<group>"; };
 		CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "session-alt-speeds.cc"; sourceTree = "<group>"; };
 		CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "session-alt-speeds.h"; sourceTree = "<group>"; };
+		F0A1B2C42F1A2B3C00445566 /* session-settings.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "session-settings.h"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "interned-string.h"; sourceTree = "<group>"; };
@@ -2003,6 +2005,7 @@
 				C10C644C1D9AF328003C1B4C /* session-id.h */,
 				BEFC1DF60C07861A00B0BB3C /* session.cc */,
 				BEFC1E140C07861A00B0BB3C /* session.h */,
+				F0A1B2C42F1A2B3C00445566 /* session-settings.h */,
 				CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */,
 				CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */,
 				EDC0A1B02E5A100100A1B2C3 /* local-data.cc */,
@@ -2551,6 +2554,7 @@
 				C1425B381EE9C805001DB850 /* peer-socket.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
+				F0A1B2C32F1A2B3C00445566 /* session-settings.h in Headers */,
 				CCEBA596277340F6DF9F4482 /* session-alt-speeds.h in Headers */,
 				BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */,
 				EDC0A1B12E5A100100A1B2C3 /* local-data.h in Headers */,
