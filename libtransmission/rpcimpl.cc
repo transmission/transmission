@@ -1609,6 +1609,11 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
             // couldn't decompress it; maybe we downloaded an uncompressed file
             content.assign(std::begin(body), std::end(body));
         }
+        else // LIBDEFLATE_SUCCESS
+        {
+            // shrink buffer to actual size
+            content.resize(actual_size);
+        }
         break;
     }
 
