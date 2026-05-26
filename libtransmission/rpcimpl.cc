@@ -1598,16 +1598,25 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
             std::data(content),
             std::size(content),
             &actual_size);
-        if (decompress_result == LIBDEFLATE_INSUFFICIENT_SPACE)
+        switch (decompress_result)
         {
+        case LIBDEFLATE_INSUFFICIENT_SPACE:
             // need a bigger buffer
             content.resize(content.size() * 2);
             continue;
-        }
-        if (decompress_result == LIBDEFLATE_BAD_DATA)
-        {
+
+        case LIBDEFLATE_BAD_DATA:
             // couldn't decompress it; maybe we downloaded an uncompressed file
             content.assign(std::begin(body), std::end(body));
+            break;
+
+        case LIBDEFLATE_SUCCESS:
+            // shrink buffer to actual size
+            content.resize(actual_size);
+            break;
+
+        default:
+            break;
         }
         break;
     }
