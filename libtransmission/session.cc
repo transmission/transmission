@@ -471,21 +471,19 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
 tr_variant tr_sessionGetDefaultSettings()
 {
     auto ret = tr_variant::make_map();
-    ret.merge(tr_rpc_server::Settings{}.save());
-    ret.merge(tr_session_alt_speeds::Settings{}.save());
-    ret.merge(tr_session::Settings{}.save());
+    ret.merge(tr::SessionSettingsSnapshot{}.save());
 
     // TODO(5.0.0): remove this if block
+    // N.B. Because `tr::SessionSettings::load()` calls
+    // `tr::SessionSettings::fixup_to_preferred_transports()`,
+    // the defaults of `preferred_transports` essentially
+    // just repeats `utp_enabled` + `tcp_enabled`.
+    //
+    // Erase `preferred_transports` from the defaults to avoid
+    // overwriting `utp_enabled` and `tcp_enabled` that is set
+    // by the user.
     if (auto* const map = ret.get_if<tr_variant::Map>())
     {
-        // N.B. Because `tr_session::Settings::load()` calls
-        // `tr_session::Settings::fixup_to_preferred_transports()`,
-        // the defaults of `preferred_transports` essentially
-        // just repeats `utp_enabled` + `tcp_enabled`.
-        //
-        // Erase `preferred_transports` from the defaults to avoid
-        // overwriting `utp_enabled` and `tcp_enabled` that is set
-        // by the user.
         map->erase(TR_KEY_preferred_transports);
     }
 
@@ -494,10 +492,12 @@ tr_variant tr_sessionGetDefaultSettings()
 
 tr_variant tr_sessionGetSettings(tr_session const* session)
 {
-    auto settings = tr_variant::make_map();
-    settings.merge(session->alt_speeds_.settings().save());
-    settings.merge(session->rpc_server_->settings().save());
-    settings.merge(session->settings_.save());
+    auto snapshot = tr::SessionSettingsSnapshot{};
+    snapshot.session = session->settings_;
+    snapshot.alt_speeds = session->alt_speeds_.settings();
+    snapshot.rpc_server = session->rpc_server_->settings();
+
+    auto settings = tr_variant{ snapshot.save() };
     tr_variantDictAddInt(&settings, TR_KEY_message_level, tr_logGetLevel());
     return settings;
 }
@@ -920,12 +920,12 @@ void tr_sessionSet(tr_session* session, tr_variant const& settings)
 
 // ---
 
-std::string tr_session::Settings::get_default_download_dir()
+std::string tr::SessionSettings::get_default_download_dir()
 {
     return tr_getDefaultDownloadDir();
 }
 
-void tr_session::Settings::fixup_from_preferred_transports()
+void tr::SessionSettings::fixup_from_preferred_transports()
 {
     utp_enabled = false;
     tcp_enabled = false;
@@ -945,7 +945,7 @@ void tr_session::Settings::fixup_from_preferred_transports()
     }
 }
 
-void tr_session::Settings::fixup_to_preferred_transports()
+void tr::SessionSettings::fixup_to_preferred_transports()
 {
     if (!utp_enabled)
     {

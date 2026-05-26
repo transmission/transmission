@@ -23,7 +23,6 @@
 #include <small/vector.hpp>
 
 #include "libtransmission/log.h" // for tr_log_level
-#include "libtransmission/net.h" // for tr_port
 #include "libtransmission/peer-mgr.h" // tr_pex
 #include "libtransmission/serializer.h"
 #include "libtransmission/string-utils.h"

@@ -120,6 +120,7 @@ target_sources(${TR_NAME}
         session-alt-speeds.h
         session-id.cc
         session-id.h
+        session-settings.h
         session-thread.cc
         session-thread.h
         session.cc
