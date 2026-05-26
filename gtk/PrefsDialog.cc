@@ -50,6 +50,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 using namespace tr::Values;
 
@@ -106,14 +107,27 @@ public:
     ~PageBase() override;
 
     Gtk::CheckButton* init_check_button(Glib::ustring const& name, tr_quark key);
-    Gtk::SpinButton* init_spin_button(Glib::ustring const& name, tr_quark key, int low, int high, int step);
-    Gtk::SpinButton* init_spin_button_double(Glib::ustring const& name, tr_quark key, double low, double high, double step);
     Gtk::Entry* init_entry(Glib::ustring const& name, tr_quark key);
     Gtk::TextView* init_text_view(Glib::ustring const& name, tr_quark key);
     PathButton* init_chooser_button(Glib::ustring const& name, tr_quark key);
     Gtk::ComboBox* init_encryption_combo(Glib::ustring const& name, tr_quark key);
     Gtk::ComboBox* init_time_combo(Glib::ustring const& name, tr_quark key);
     Gtk::ComboBox* init_week_combo(Glib::ustring const& name, tr_quark key);
+
+    template<typename T>
+    Gtk::SpinButton* init_spin_button(Glib::ustring const& name, tr_quark const key, T const low, T const high, T const step)
+    {
+        auto* button = get_widget<Gtk::SpinButton>(name);
+        button->set_adjustment(
+            Gtk::Adjustment::create(
+                static_cast<double>(gtr_pref_get<T>(key).value_or(T{})),
+                static_cast<double>(low),
+                static_cast<double>(high),
+                static_cast<double>(step)));
+        button->set_digits(std::is_floating_point_v<T> ? 2 : 0);
+        button->signal_value_changed().connect([this, button, key]() { spun_cb<T>(*button, key); });
+        return button;
+    }
 
     template<typename T>
     T* get_widget(Glib::ustring const& name) const
@@ -134,8 +148,44 @@ public:
     }
 
 private:
-    bool spun_cb_idle(Gtk::SpinButton& spin, tr_quark key, bool isDouble);
-    void spun_cb(Gtk::SpinButton& w, tr_quark key, bool isDouble);
+    template<typename T>
+    bool spun_cb_idle(Gtk::SpinButton const& spin, tr_quark const key)
+    {
+        // How long the spin button must be idle before we push the value to core_.
+        // Prevents flooding the core with intermediate values while the user spins.
+        static constexpr auto SpinIdleThresholdSec = 0.33;
+
+        auto const last_change_it = spin_timers_.find(key);
+        g_return_val_if_fail(last_change_it != spin_timers_.end(), false);
+
+        // if the user is still making changes, then do nothing yet
+        if (last_change_it->second.first->elapsed() < SpinIdleThresholdSec)
+        {
+            return true;
+        }
+
+        // update the core
+        core_->set_pref(key, static_cast<T>(spin.get_value()));
+
+        // cleanup
+        spin_timers_.erase(last_change_it);
+        return false;
+    }
+
+    template<typename T>
+    void spun_cb(Gtk::SpinButton& w, tr_quark const key)
+    {
+        // user may be spinning through many values, so let's hold off
+        // for a moment to keep from flooding the core with changes
+        auto last_change_it = spin_timers_.find(key);
+        if (last_change_it == spin_timers_.end())
+        {
+            auto timeout_tag = Glib::signal_timeout().connect_seconds([this, &w, key]() { return spun_cb_idle<T>(w, key); }, 1);
+            last_change_it = spin_timers_.emplace(key, std::pair(std::make_unique<Glib::Timer>(), timeout_tag)).first;
+        }
+
+        last_change_it->second.first->start();
+    }
 
     void entry_changed_cb(Gtk::Entry& w, tr_quark key);
 
@@ -172,71 +222,6 @@ Gtk::CheckButton* PageBase::init_check_button(Glib::ustring const& name, tr_quar
     auto* button = get_widget<Gtk::CheckButton>(name);
     button->set_active(gtr_pref_flag_get(key));
     button->signal_toggled().connect([this, button, key]() { core_->set_pref(key, button->get_active()); });
-    return button;
-}
-
-bool PageBase::spun_cb_idle(Gtk::SpinButton& spin, tr_quark const key, bool isDouble)
-{
-    auto const last_change_it = spin_timers_.find(key);
-    g_assert(last_change_it != spin_timers_.end());
-
-    /* has the user stopped making changes? */
-    if (last_change_it->second.first->elapsed() < 0.33)
-    {
-        return true;
-    }
-
-    /* update the core */
-    if (isDouble)
-    {
-        core_->set_pref(key, spin.get_value());
-    }
-    else
-    {
-        core_->set_pref(key, spin.get_value_as_int());
-    }
-
-    /* cleanup */
-    spin_timers_.erase(last_change_it);
-    return false;
-}
-
-void PageBase::spun_cb(Gtk::SpinButton& w, tr_quark const key, bool isDouble)
-{
-    /* user may be spinning through many values, so let's hold off
-       for a moment to keep from flooding the core with changes */
-    auto last_change_it = spin_timers_.find(key);
-    if (last_change_it == spin_timers_.end())
-    {
-        auto timeout_tag = Glib::signal_timeout().connect_seconds(
-            [this, &w, key, isDouble]() { return spun_cb_idle(w, key, isDouble); },
-            1);
-        last_change_it = spin_timers_.emplace(key, std::pair(std::make_unique<Glib::Timer>(), timeout_tag)).first;
-    }
-
-    last_change_it->second.first->start();
-}
-
-Gtk::SpinButton* PageBase::init_spin_button(Glib::ustring const& name, tr_quark const key, int low, int high, int step)
-{
-    auto* button = get_widget<Gtk::SpinButton>(name);
-    button->set_adjustment(Gtk::Adjustment::create(gtr_pref_int_get<int>(key), low, high, step));
-    button->set_digits(0);
-    button->signal_value_changed().connect([this, button, key]() { spun_cb(*button, key, false); });
-    return button;
-}
-
-Gtk::SpinButton* PageBase::init_spin_button_double(
-    Glib::ustring const& name,
-    tr_quark const key,
-    double low,
-    double high,
-    double step)
-{
-    auto* button = get_widget<Gtk::SpinButton>(name);
-    button->set_adjustment(Gtk::Adjustment::create(gtr_pref_double_get(key), low, high, step));
-    button->set_digits(2);
-    button->signal_value_changed().connect([this, button, key]() { spun_cb(*button, key, true); });
     return button;
 }
 
@@ -451,8 +436,18 @@ DownloadingPage::DownloadingPage(
     init_check_button("start_on_add_check", TR_KEY_start_added_torrents);
     init_check_button("trash_on_add_check", TR_KEY_trash_original_torrent_files);
     init_chooser_button("download_dir_chooser", TR_KEY_download_dir);
-    init_spin_button("max_active_downloads_spin", TR_KEY_download_queue_size, 0, std::numeric_limits<int>::max(), 1);
-    init_spin_button("max_inactive_time_spin", TR_KEY_queue_stalled_minutes, 1, std::numeric_limits<int>::max(), 15);
+    init_spin_button<uint16_t>(
+        "max_active_downloads_spin",
+        TR_KEY_download_queue_size,
+        0,
+        std::numeric_limits<uint16_t>::max(),
+        1);
+    init_spin_button<uint16_t>(
+        "max_inactive_time_spin",
+        TR_KEY_queue_stalled_minutes,
+        1,
+        std::numeric_limits<uint16_t>::max(),
+        15);
     init_check_button("append_suffix_to_incomplete_check", TR_KEY_rename_partial_files);
     init_check_button("incomplete_dir_check", TR_KEY_incomplete_dir_enabled);
     init_chooser_button("incomplete_dir_chooser", TR_KEY_incomplete_dir);
@@ -484,9 +479,9 @@ SeedingPage::SeedingPage(
     : PageBase(cast_item, builder, core)
 {
     init_check_button("stop_seeding_ratio_check", TR_KEY_ratio_limit_enabled);
-    init_spin_button_double("stop_seeding_ratio_spin", TR_KEY_ratio_limit, 0, 1000, 0.05);
+    init_spin_button<double>("stop_seeding_ratio_spin", TR_KEY_ratio_limit, 0, 1000, 0.05);
     init_check_button("stop_seeding_timeout_check", TR_KEY_idle_seeding_limit_enabled);
-    init_spin_button("stop_seeding_timeout_spin", TR_KEY_idle_seeding_limit, 1, 40320, 5);
+    init_spin_button<uint16_t>("stop_seeding_timeout_spin", TR_KEY_idle_seeding_limit, 1, 40320, 5);
     init_check_button("seeding_done_script_check", TR_KEY_script_torrent_done_seeding_enabled);
     init_chooser_button("seeding_done_script_chooser", TR_KEY_script_torrent_done_seeding_filename);
 }
@@ -796,7 +791,7 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
     auto* const open_button = get_widget<Gtk::Button>("open_web_client_button");
     open_button->signal_clicked().connect(&RemotePage::onLaunchClutchCB);
 
-    init_spin_button("rpc_port_spin", TR_KEY_rpc_port, 0, std::numeric_limits<uint16_t>::max(), 1);
+    init_spin_button<uint16_t>("rpc_port_spin", TR_KEY_rpc_port, 0, std::numeric_limits<uint16_t>::max(), 1);
 
     auth_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
 
@@ -866,18 +861,18 @@ SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const
     localize_label(
         *init_check_button("upload_limit_check", TR_KEY_speed_limit_up_enabled),
         fmt::arg("speed_units", speed_units_kbyps_str));
-    init_spin_button("upload_limit_spin", TR_KEY_speed_limit_up, 0, std::numeric_limits<int>::max(), 5);
+    init_spin_button<uint32_t>("upload_limit_spin", TR_KEY_speed_limit_up, 0, std::numeric_limits<uint32_t>::max(), 5);
 
     localize_label(
         *init_check_button("download_limit_check", TR_KEY_speed_limit_down_enabled),
         fmt::arg("speed_units", speed_units_kbyps_str));
-    init_spin_button("download_limit_spin", TR_KEY_speed_limit_down, 0, std::numeric_limits<int>::max(), 5);
+    init_spin_button<uint32_t>("download_limit_spin", TR_KEY_speed_limit_down, 0, std::numeric_limits<uint32_t>::max(), 5);
 
     localize_label(*get_widget<Gtk::Label>("alt_upload_limit_label"), fmt::arg("speed_units", speed_units_kbyps_str));
-    init_spin_button("alt_upload_limit_spin", TR_KEY_alt_speed_up, 0, std::numeric_limits<int>::max(), 5);
+    init_spin_button<uint32_t>("alt_upload_limit_spin", TR_KEY_alt_speed_up, 0, std::numeric_limits<uint32_t>::max(), 5);
 
     localize_label(*get_widget<Gtk::Label>("alt_download_limit_label"), fmt::arg("speed_units", speed_units_kbyps_str));
-    init_spin_button("alt_download_limit_spin", TR_KEY_alt_speed_down, 0, std::numeric_limits<int>::max(), 5);
+    init_spin_button<uint32_t>("alt_download_limit_spin", TR_KEY_alt_speed_down, 0, std::numeric_limits<uint32_t>::max(), 5);
 
     init_time_combo("alt_speed_start_time_combo", TR_KEY_alt_speed_time_begin);
     init_time_combo("alt_speed_end_time_combo", TR_KEY_alt_speed_time_end);
@@ -1043,7 +1038,7 @@ NetworkPage::NetworkPage(
     , core_(core)
     , portLabel_(get_widget<Gtk::Label>("listening_port_status_label"))
     , portButton_(get_widget<Gtk::Button>("test_listening_port_button"))
-    , portSpin_(init_spin_button("listening_port_spin", TR_KEY_peer_port, 1, std::numeric_limits<uint16_t>::max(), 1))
+    , portSpin_(init_spin_button<uint16_t>("listening_port_spin", TR_KEY_peer_port, 1, std::numeric_limits<uint16_t>::max(), 1))
 {
     portButton_->signal_clicked().connect([this]() { onPortTest(); });
     updatePortStatusText();
@@ -1052,8 +1047,13 @@ NetworkPage::NetworkPage(
 
     init_check_button("pick_random_listening_port_at_start_check", TR_KEY_peer_port_random_on_start);
     init_check_button("enable_listening_port_forwarding_check", TR_KEY_port_forwarding_enabled);
-    init_spin_button("max_torrent_peers_spin", TR_KEY_peer_limit_per_torrent, 1, INT_MAX, 5);
-    init_spin_button("max_total_peers_spin", TR_KEY_peer_limit_global, 1, INT_MAX, 5);
+    init_spin_button<uint16_t>(
+        "max_torrent_peers_spin",
+        TR_KEY_peer_limit_per_torrent,
+        1,
+        std::numeric_limits<uint16_t>::max(),
+        5);
+    init_spin_button<uint16_t>("max_total_peers_spin", TR_KEY_peer_limit_global, 1, std::numeric_limits<uint16_t>::max(), 5);
 
 #ifdef WITH_UTP
     init_check_button("enable_utp_check", TR_KEY_utp_enabled);

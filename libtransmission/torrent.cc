@@ -2507,8 +2507,8 @@ void tr_torrent::rename_path_in_session_thread(
 void tr_torrent::rename_path(std::string_view oldpath, std::string_view newname, tr_torrent_rename_done_func&& callback)
 {
     this->session->run_in_session_thread(
-        [this, oldpath = std::string(oldpath), newname = std::string(newname), cb = std::move(callback)]()
-        { rename_path_in_session_thread(oldpath, newname, std::move(cb)); });
+        [this, oldpath = std::string(oldpath), newname = std::string(newname), cb = std::move(callback)]
+        { rename_path_in_session_thread(oldpath, newname, cb); });
 }
 
 void tr_torrentRenamePath(
