@@ -414,11 +414,16 @@ void Blocklists::Blocklist::ensureLoaded() const
             if (auto rules = parseFile(sz_src_file))
             {
                 rules_ = std::move(*rules);
-
-                tr_logAddInfo(_("Rewriting old blocklist file format to new format"));
-                tr_sys_path_remove(bin_file_);
-                save(bin_file_, std::data(*rules_), std::size(*rules_));
             }
+
+            // N.B. Even if the source file cannot be parsed, save an empty bin file
+            // so that the source file won't be parsed on the next reload(s) until it
+            // was modified.
+            tr_logAddInfo(
+                fmt::format(
+                    fmt::runtime(_("Rewriting old blocklist file {path} to new format")),
+                    fmt::arg("path", tr_sys_path_basename(bin_file_))));
+            save(bin_file_, std::data(*rules_), std::size(*rules_));
         }
         return;
     }
