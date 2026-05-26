@@ -22,22 +22,41 @@ namespace tr::test
 class BlocklistTest : public SessionTest
 {
 protected:
-    static char constexpr const* const Contents1 =
+    static auto constexpr Contents1 =
         "10.5.6.7/8\n"
         "Austin Law Firm:216.16.1.144-216.16.1.151\n"
         "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
         "Corel Corporation:216.21.157.192-216.21.157.223\n"
         "Fox Speed Channel:216.79.131.192-216.79.131.223\n"
-        "IPv6 example:2001:db8::-2001:db8:ffff:ffff:ffff:ffff:ffff:ffff\n";
+        "IPv6 example:2001:db8::-2001:db8:ffff:ffff:ffff:ffff:ffff:ffff\n"sv;
 
-    static char constexpr const* const Contents2 =
+    static auto constexpr Contents2 =
         "10.5.6.7/8\n"
         "Austin Law Firm:216.16.1.144-216.16.1.151\n"
         "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
         "Corel Corporation:216.21.157.192-216.21.157.223\n"
         "Fox Speed Channel:216.79.131.192-216.79.131.223\n"
         "IPv6 example:2001:db8::-2001:db8:ffff:ffff:ffff:ffff:ffff:ffff\n"
-        "Evilcorp:216.88.88.0-216.88.88.255\n";
+        "Evilcorp:216.88.88.0-216.88.88.255\n"sv;
+
+    static auto constexpr ContentsEmpty = ""sv;
+
+    static auto constexpr ContentsWhitespaceOnly = " \t\r\n\f\n"sv;
+
+    static auto constexpr ContentsWithComments =
+        "# this is a comment\n"
+        "// this is a comment\n"
+        "10.5.6.7/8\n"
+        "Austin Law Firm:216.16.1.144-216.16.1.151\n"
+        "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
+        "Corel Corporation:216.21.157.192-216.21.157.223\n"
+        "Fox Speed Channel:216.79.131.192-216.79.131.223\n"
+        "IPv6 example:2001:db8::-2001:db8:ffff:ffff:ffff:ffff:ffff:ffff\n"
+        "Evilcorp:216.88.88.0-216.88.88.255\n"sv;
+
+    static auto constexpr ContentsCommentsOnly =
+        "# this is a comment\n"
+        "// this is a comment\n"sv;
 
     bool addressIsBlocked(char const* address_str)
     {
@@ -104,22 +123,34 @@ TEST_F(BlocklistTest, updating)
     tr_sessionReloadBlocklists(session_);
     EXPECT_EQ(6U, tr_blocklistGetRuleCount(session_));
 
+    // test that empty files are loaded as 0 rules
+    createFileWithContents(path, ContentsEmpty);
+    tr_sessionReloadBlocklists(session_);
+    EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
+
     // test that updated source files will get loaded
     createFileWithContents(path, Contents2);
     tr_sessionReloadBlocklists(session_);
     EXPECT_EQ(7U, tr_blocklistGetRuleCount(session_));
 
-    // test that updated source files will get loaded
-    createFileWithContents(path, Contents1);
+    // test that whitespace-only files are loaded as 0 rules
+    createFileWithContents(path, ContentsWhitespaceOnly);
     tr_sessionReloadBlocklists(session_);
-    EXPECT_EQ(6U, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
+
+    // test that comments get ignored and not treated as bad
+    createFileWithContents(path, ContentsWithComments);
+    tr_sessionReloadBlocklists(session_);
+    EXPECT_EQ(7U, tr_blocklistGetRuleCount(session_));
 
     // ensure that new files, if bad, get skipped
-    createFileWithContents(path, "# nothing useful\n");
+    createFileWithContents(path, "sdfsdjkfasfildbg\n");
     tr_sessionReloadBlocklists(session_);
-    EXPECT_EQ(6U, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(7U, tr_blocklistGetRuleCount(session_));
 
-    // cleanup
+    createFileWithContents(path, ContentsCommentsOnly);
+    tr_sessionReloadBlocklists(session_);
+    EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
 }
 
 } // namespace tr::test
