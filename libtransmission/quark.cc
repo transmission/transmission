@@ -104,6 +104,7 @@ auto constexpr MyStatic = std::array<std::u8string_view, TR_N_KEYS>{
     u8"complete"sv, // BEP0048; BT protocol
     u8"config-dir"sv, // rpc
     u8"config_dir"sv, // rpc
+    u8"content-layout"sv, // rpc
     u8"cookies"sv, // rpc
     u8"corrupt"sv, // .resume
     u8"corruptEver"sv, // rpc

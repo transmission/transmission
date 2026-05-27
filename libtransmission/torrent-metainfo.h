@@ -192,6 +192,9 @@ public:
         std::string_view info_hash_string,
         std::string_view suffix);
 
+    void apply_content_layout(
+        tr_content_layout layout);
+
 private:
     friend struct MetainfoHandler;
     static bool parse_impl(tr_torrent_metainfo& setme, std::string_view benc, tr_error* error);

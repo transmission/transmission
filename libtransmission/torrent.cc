@@ -1062,6 +1062,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 
     // is the metainfo valid?
     auto metainfo = ctor->steal_metainfo();
+    metainfo.apply_content_layout(ctor->content_layout());
     if (std::empty(metainfo.info_hash_string()))
     {
         return nullptr;
