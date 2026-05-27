@@ -9,6 +9,8 @@
 
 @interface ProgressBarView : NSView
 
+@property(class, nonatomic, readonly) ProgressBarView* sharedInstance;
+
 - (void)drawBarInRect:(NSRect)barRect forTableView:(TorrentTableView*)tableView withTorrent:(Torrent*)torrent;
 
 @end
