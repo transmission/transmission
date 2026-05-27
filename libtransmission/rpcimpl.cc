@@ -95,6 +95,8 @@ namespace Error
         return "HTTP error from backend service"sv;
     case CORRUPT_TORRENT:
         return "invalid or corrupt torrent file"sv;
+    case INVALID_BLOCKLIST_DATA:
+        return "couldn't parse any valid blocklist rules"sv;
     default:
         return {};
     }
@@ -1639,8 +1641,13 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 
     // feed it to the session and give the client a response
     auto const blocklist_size = tr_blocklistSetContent(session, filename);
-    data->args_out.try_emplace(TR_KEY_blocklist_size, blocklist_size);
     tr_sys_path_remove(filename);
+    if (!blocklist_size)
+    {
+        tr_rpc_idle_done(data, Error::INVALID_BLOCKLIST_DATA, {});
+        return;
+    }
+    data->args_out.try_emplace(TR_KEY_blocklist_size, *blocklist_size);
     tr_rpc_idle_done(data, Error::SUCCESS, {});
 }
 

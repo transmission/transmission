@@ -21,6 +21,7 @@
 #include <sigslot/signal.hpp>
 
 #include "libtransmission/net.h" // for tr_address
+#include "libtransmission/tr-assert.h"
 
 namespace tr
 {
@@ -53,7 +54,7 @@ public:
 
     void load(std::string_view folder, bool is_enabled);
     void set_enabled(bool is_enabled);
-    size_t update_primary_blocklist(std::string_view external_file, bool is_enabled);
+    std::optional<size_t> update_primary_blocklist(std::string_view external_file, bool is_enabled);
 
     template<typename Observer>
     [[nodiscard]] sigslot::scoped_connection observe_changes(Observer observer) const
@@ -80,8 +81,8 @@ private:
         [[nodiscard]] size_t size() const
         {
             ensureLoaded();
-
-            return std::size(rules_);
+            TR_ASSERT(rules_);
+            return std::size(*rules_);
         }
 
         [[nodiscard]] constexpr bool enabled() const noexcept
@@ -102,7 +103,7 @@ private:
     private:
         void ensureLoaded() const;
 
-        mutable std::vector<std::pair<tr_address, tr_address>> rules_;
+        mutable std::optional<std::vector<std::pair<tr_address, tr_address>>> rules_;
 
         std::string bin_file_;
         bool is_enabled_ = false;

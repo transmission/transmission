@@ -234,11 +234,9 @@ std::optional<address_range_t> parseLine(std::string_view line)
 }
 } // namespace ParseHelpers
 
-auto parseFile(std::string_view filename)
+std::optional<std::vector<address_range_t>> parseFile(std::string_view filename)
 {
     using namespace ParseHelpers;
-
-    auto ranges = std::vector<address_range_t>{};
 
     auto in = std::ifstream{ tr_pathbuf{ filename } };
     if (!in.is_open())
@@ -249,14 +247,31 @@ auto parseFile(std::string_view filename)
                 fmt::arg("path", filename),
                 fmt::arg("error", tr_strerror(errno)),
                 fmt::arg("error_code", errno)));
-        return ranges;
+        return {};
     }
+
+    auto ranges = std::vector<address_range_t>{};
 
     auto line = std::string{};
     auto line_number = size_t{ 0U };
+    auto is_empty = true;
     while (std::getline(in, line))
     {
         ++line_number;
+
+        // ignore empty lines
+        if (std::empty(line) || std::ranges::all_of(line, [](char c) { return std::isspace(static_cast<unsigned char>(c)); }))
+        {
+            continue;
+        }
+
+        // ignore comments
+        if (tr_strv_starts_with(line, "//"sv) || tr_strv_starts_with(line, "#"sv))
+        {
+            continue;
+        }
+
+        is_empty = false;
         if (auto range = parseLine(line); range && (range->first.type == range->second.type))
         {
             ranges.push_back(*range);
@@ -275,7 +290,7 @@ auto parseFile(std::string_view filename)
 
     if (std::empty(ranges))
     {
-        return ranges;
+        return is_empty ? std::make_optional(std::move(ranges)) : std::nullopt;
     }
 
     // safeguard against some joker swapping the begin & end ranges
@@ -336,10 +351,11 @@ auto getFilenamesInDir(std::string_view folder)
 
 void Blocklists::Blocklist::ensureLoaded() const
 {
-    if (!std::empty(rules_))
+    if (rules_)
     {
         return;
     }
+    rules_.emplace();
 
     // get the file's size
     auto error = tr_error{};
@@ -395,22 +411,28 @@ void Blocklists::Blocklist::ensureLoaded() const
         if (auto const sz_src_file = std::string{ std::data(bin_file_), std::size(bin_file_) - std::size(BinFileSuffix) };
             tr_sys_path_exists(sz_src_file))
         {
-            rules_ = parseFile(sz_src_file);
-            if (!std::empty(rules_))
+            if (auto rules = parseFile(sz_src_file))
             {
-                tr_logAddInfo(_("Rewriting old blocklist file format to new format"));
-                tr_sys_path_remove(bin_file_);
-                save(bin_file_, std::data(rules_), std::size(rules_));
+                rules_ = std::move(*rules);
             }
+
+            // N.B. Even if the source file cannot be parsed, save an empty bin file
+            // so that the source file won't be parsed on the next reload(s) until it
+            // was modified.
+            tr_logAddInfo(
+                fmt::format(
+                    fmt::runtime(_("Rewriting old blocklist file {path} to new format")),
+                    fmt::arg("path", tr_sys_path_basename(bin_file_))));
+            save(bin_file_, std::data(*rules_), std::size(*rules_));
         }
         return;
     }
 
     auto range = address_range_t{};
-    rules_.reserve((file_info->size - std::size(BinContentsPrefix)) / sizeof(address_range_t));
+    rules_->reserve((file_info->size - std::size(BinContentsPrefix)) / sizeof(address_range_t));
     while (in.read(reinterpret_cast<char*>(&range), sizeof(range)))
     {
-        rules_.emplace_back(range);
+        rules_->emplace_back(range);
     }
 
     tr_logAddInfo(
@@ -418,9 +440,9 @@ void Blocklists::Blocklist::ensureLoaded() const
             fmt::runtime(tr_ngettext(
                 "Blocklist '{path}' has {count} entry",
                 "Blocklist '{path}' has {count} entries",
-                std::size(rules_))),
+                std::size(*rules_))),
             fmt::arg("path", tr_sys_path_basename(bin_file_)),
-            fmt::arg("count", std::size(rules_))));
+            fmt::arg("count", std::size(*rules_))));
 }
 
 bool Blocklists::Blocklist::contains(tr_address const& addr) const
@@ -433,6 +455,7 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
     }
 
     ensureLoaded();
+    TR_ASSERT(rules_);
 
     static constexpr struct
     {
@@ -466,7 +489,7 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
     } Compare;
 
     // NOLINTNEXTLINE(modernize-use-ranges)
-    return std::binary_search(std::begin(rules_), std::end(rules_), addr, Compare);
+    return std::binary_search(std::begin(*rules_), std::end(*rules_), addr, Compare);
 }
 
 std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
@@ -476,7 +499,7 @@ std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
 {
     // if we can't parse the file, do nothing
     auto rules = parseFile(external_file);
-    if (std::empty(rules))
+    if (!rules)
     {
         return {};
     }
@@ -500,11 +523,11 @@ std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
         return {};
     }
 
-    save(bin_file, std::data(rules), std::size(rules));
+    save(bin_file, std::data(*rules), std::size(*rules));
 
     // return a new Blocklist with these rules
     auto ret = Blocklist{ bin_file, is_enabled };
-    ret.rules_ = std::move(rules);
+    ret.rules_ = std::move(*rules);
     return ret;
 }
 
@@ -529,7 +552,7 @@ void Blocklists::load(std::string_view folder, bool is_enabled)
 }
 
 // static
-std::vector<Blocklists::Blocklist> Blocklists::Blocklists::load_folder(std::string_view const folder, bool const is_enabled)
+std::vector<Blocklists::Blocklist> Blocklists::load_folder(std::string_view const folder, bool const is_enabled)
 {
     // check for files that need to be updated
     for (auto const& src_file : getFilenamesInDir(folder))
@@ -546,9 +569,9 @@ std::vector<Blocklists::Blocklist> Blocklists::Blocklists::load_folder(std::stri
         auto const bin_needs_update = src_info && (!bin_info || bin_info->last_modified_at <= src_info->last_modified_at);
         if (bin_needs_update)
         {
-            if (auto const ranges = parseFile(src_file); !std::empty(ranges))
+            if (auto const ranges = parseFile(src_file))
             {
-                save(bin_file, std::data(ranges), std::size(ranges));
+                save(bin_file, std::data(*ranges), std::size(*ranges));
             }
         }
     }
@@ -564,7 +587,7 @@ std::vector<Blocklists::Blocklist> Blocklists::Blocklists::load_folder(std::stri
     return ret;
 }
 
-size_t Blocklists::update_primary_blocklist(std::string_view const external_file, bool const is_enabled)
+std::optional<size_t> Blocklists::update_primary_blocklist(std::string_view const external_file, bool const is_enabled)
 {
     // These rules will replace the default blocklist.
     // Build the path of the default blocklist .bin file where we'll save these rules.
@@ -574,7 +597,7 @@ size_t Blocklists::update_primary_blocklist(std::string_view const external_file
     auto added = Blocklist::saveNew(external_file, bin_file, is_enabled);
     if (!added)
     {
-        return 0U;
+        return {};
     }
 
     auto const n_rules = std::size(*added);

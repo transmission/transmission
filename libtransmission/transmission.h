@@ -513,7 +513,7 @@ void tr_sessionSetScriptEnabled(tr_session* session, TrScript type, bool enabled
  * The caller only needs to invoke this when the blocklist
  * has changed.
  */
-size_t tr_blocklistSetContent(tr_session* session, std::string_view content_filename);
+std::optional<size_t> tr_blocklistSetContent(tr_session* session, std::string_view content_filename);
 
 size_t tr_blocklistGetRuleCount(tr_session const* session);
 
