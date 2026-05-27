@@ -260,7 +260,7 @@ std::optional<std::vector<address_range_t>> parseFile(std::string_view filename)
         ++line_number;
 
         // ignore empty lines
-        if (std::empty(line) || std::ranges::all_of(line, [](char c) { return std::isspace(c); }))
+        if (std::empty(line) || std::ranges::all_of(line, [](char c) { return std::isspace(static_cast<unsigned char>(c)); }))
         {
             continue;
         }
