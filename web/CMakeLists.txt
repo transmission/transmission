@@ -37,7 +37,6 @@ set(WEB_IMAGES
     assets/img/horizontal-rule.svg
     assets/img/image.svg
     assets/img/lock-fill.svg
-    assets/img/logo.png
     assets/img/magnet.svg
     assets/img/music.svg
     assets/img/package.svg
