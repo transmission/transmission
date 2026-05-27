@@ -157,37 +157,37 @@ TEST_F(BlocklistTest, updating)
 
     // test that updated source files will get loaded
     createFileWithContents(path, Contents1);
-    tr_blocklistSetContent(session_, path);
+    EXPECT_EQ(6U, tr_blocklistSetContent(session_, path));
     EXPECT_EQ(6U, tr_blocklistGetRuleCount(session_));
 
     // test that empty files are loaded as 0 rules
     createFileWithContents(path, ContentsEmpty);
-    tr_blocklistSetContent(session_, path);
+    EXPECT_EQ(0U, tr_blocklistSetContent(session_, path));
     EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
 
     // test that updated source files will get loaded
     createFileWithContents(path, Contents2);
-    tr_blocklistSetContent(session_, path);
+    EXPECT_EQ(7U, tr_blocklistSetContent(session_, path));
     EXPECT_EQ(7U, tr_blocklistGetRuleCount(session_));
 
     // test that whitespace-only files are loaded as 0 rules
     createFileWithContents(path, ContentsWhitespaceOnly);
-    tr_blocklistSetContent(session_, path);
+    EXPECT_EQ(0U, tr_blocklistSetContent(session_, path));
     EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
 
     // test that comments get ignored and not treated as bad
     createFileWithContents(path, ContentsWithComments);
-    tr_blocklistSetContent(session_, path);
+    EXPECT_EQ(7U, tr_blocklistSetContent(session_, path));
     EXPECT_EQ(7U, tr_blocklistGetRuleCount(session_));
 
     // ensure that new files, if bad, get skipped
     createFileWithContents(path, "sdfsdjkfasfildbg\n");
-    tr_blocklistSetContent(session_, path);
+    EXPECT_FALSE(tr_blocklistSetContent(session_, path));
     EXPECT_EQ(7U, tr_blocklistGetRuleCount(session_));
 
     // test that comments get ignored and not treated as bad
     createFileWithContents(path, ContentsCommentsOnly);
-    tr_blocklistSetContent(session_, path);
+    EXPECT_EQ(0U, tr_blocklistSetContent(session_, path));
     EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
 }
 
