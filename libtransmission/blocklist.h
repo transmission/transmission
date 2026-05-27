@@ -21,6 +21,7 @@
 #include <sigslot/signal.hpp>
 
 #include "libtransmission/net.h" // for tr_address
+#include "libtransmission/tr-assert.h"
 
 namespace tr
 {
@@ -80,7 +81,7 @@ private:
         [[nodiscard]] size_t size() const
         {
             ensureLoaded();
-            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+            TR_ASSERT(rules_);
             return std::size(*rules_);
         }
 

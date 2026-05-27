@@ -455,6 +455,7 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
     }
 
     ensureLoaded();
+    TR_ASSERT(rules_);
 
     static constexpr struct
     {
@@ -487,7 +488,7 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
         }
     } Compare;
 
-    // NOLINTNEXTLINE(modernize-use-ranges, bugprone-unchecked-optional-access)
+    // NOLINTNEXTLINE(modernize-use-ranges)
     return std::binary_search(std::begin(*rules_), std::end(*rules_), addr, Compare);
 }
 
