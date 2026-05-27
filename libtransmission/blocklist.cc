@@ -47,7 +47,7 @@ namespace
 // A string at the beginning of .bin files to test & make sure we don't load incompatible files
 auto constexpr BinContentsPrefix = std::string_view{ "-tr-blocklist-file-format-v3-" };
 
-// In the blocklists directory, the The plaintext source file can be anything, e.g. "level1".
+// In the blocklists directory, the plaintext source file can be anything, e.g. "level1".
 // The pre-parsed, fast-to-load binary file will have a ".bin" suffix e.g. "level1.bin".
 auto constexpr BinFileSuffix = std::string_view{ ".bin" };
 
