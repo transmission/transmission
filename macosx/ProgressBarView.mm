@@ -25,6 +25,12 @@ static NSInteger const kMaxPieces = 18 * 18;
 
 @implementation ProgressBarView
 
++ (ProgressBarView*)sharedInstance
+{
+    static ProgressBarView* sSharedInstance = [[ProgressBarView alloc] init];
+    return sSharedInstance;
+}
+
 - (instancetype)init
 {
     if ((self = [super init]))
