@@ -983,6 +983,8 @@ jobs:
         vcpkgGitCommitId: 53bef8994c541b6561884a8395ea35715ece75db # 2024.01.12
 
     - name: Install vcpkg packages
+      env:
+        VCPKG_BINARY_SOURCES: clear
       run: |
         vcpkg install openssl curl
 
