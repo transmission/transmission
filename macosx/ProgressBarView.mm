@@ -2,6 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+
 #import "ProgressBarView.h"
 #import "ProgressGradients.h"
 #import "TorrentTableView.h"
@@ -159,8 +161,8 @@ static NSInteger const kMaxPieces = 18 * 18;
     }
 
     int const pieceCount = static_cast<int>(MIN(torrent.pieceCount, kMaxPieces));
-    float* piecesPercent = static_cast<float*>(malloc(pieceCount * sizeof(float)));
-    [torrent getAmountFinished:piecesPercent size:pieceCount];
+    auto piecesPercent = std::array<float, kMaxPieces>{};
+    [torrent getAmountFinished:piecesPercent.data() size:pieceCount];
 
     NSBitmapImageRep* bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:nil pixelsWide:pieceCount pixelsHigh:1
                                                                     bitsPerSample:8
@@ -204,8 +206,6 @@ static NSInteger const kMaxPieces = 18 * 18;
         data[2] = pieceColor.blueComponent * 255;
         data[3] = pieceColor.alphaComponent * 255;
     }
-
-    free(piecesPercent);
 
     torrent.previousFinishedPieces = finishedIndexes.count > 0 ? finishedIndexes : nil; //don't bother saving if none are complete
 
