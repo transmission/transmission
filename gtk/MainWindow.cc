@@ -99,6 +99,7 @@ public:
     ~Impl();
     Impl(Impl&&) = delete;
     Impl(Impl const&) = delete;
+    Impl& operator=(Impl const&) = delete;
     Impl& operator=(Impl&&) = delete;
 
     [[nodiscard]] Glib::RefPtr<TorrentViewSelection> get_selection() const;
