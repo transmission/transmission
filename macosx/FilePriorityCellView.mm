@@ -113,7 +113,7 @@ static CGFloat const kImageOverlap = 1.0;
     }
 
     // Update tooltip
-    [self updateTooltip];
+    [self updateTooltip:priorities];
 }
 
 - (void)updatePriorityIcons:(NSSet*)priorities
@@ -272,16 +272,12 @@ static CGFloat const kImageOverlap = 1.0;
     self.hovered = NO;
 }
 
-- (void)updateTooltip
+- (void)updateTooltip:(NSSet*)priorities
 {
     if (!self.node)
     {
         return;
     }
-
-    FileListNode* node = self.node;
-    Torrent* torrent = node.torrent;
-    NSSet* priorities = [torrent filePrioritiesForIndexes:node.indexes];
 
     NSString* tooltip = nil;
     switch (priorities.count)
