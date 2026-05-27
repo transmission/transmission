@@ -1617,7 +1617,8 @@ dialog {
 }
 
 .dialog-logo {
-  background: transparent url('../img/logo.png') top left no-repeat;
+  background: transparent url('../../public_html/images/favicon.svg') top left no-repeat;
+  background-size: contain;
   grid-area: icon;
   height: var(--logo-size);
   width: var(--logo-size);
