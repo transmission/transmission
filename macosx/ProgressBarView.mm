@@ -55,7 +55,7 @@ static NSInteger const kMaxPieces = 18 * 18;
         NSDivideRect(barRect, &piecesBarRect, &regularBarRect, floor(NSHeight(barRect) * kPiecesTotalPercent * piecesBarPercent), NSMaxYEdge);
 
         [self drawRegularBar:regularBarRect forTorrent:torrent];
-        [self drawPiecesBar:piecesBarRect forTorrent:torrent];
+        [self drawPiecesBar:piecesBarRect forTorrent:torrent minimal:minimal];
     }
     else
     {
@@ -149,7 +149,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     }
 }
 
-- (void)drawPiecesBar:(NSRect)barRect forTorrent:(Torrent*)torrent
+- (void)drawPiecesBar:(NSRect)barRect forTorrent:(Torrent*)torrent minimal:(BOOL)minimal
 {
     // Fill a solid color bar for magnet links
     if (torrent.magnet)
@@ -160,7 +160,7 @@ static NSInteger const kMaxPieces = 18 * 18;
         }
         else
         {
-            [[NSColor colorWithCalibratedWhite:1.0 alpha:[self.fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0] set];
+            [[NSColor colorWithCalibratedWhite:1.0 alpha:minimal ? 0.25 : 1.0] set];
         }
         NSRectFillUsingOperation(barRect, NSCompositingOperationSourceOver);
         return;
@@ -216,8 +216,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     torrent.previousFinishedPieces = finishedIndexes.count > 0 ? finishedIndexes : nil; //don't bother saving if none are complete
 
     //actually draw image
-    [bitmap drawInRect:barRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
-              fraction:[self.fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0
+    [bitmap drawInRect:barRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:minimal ? 0.25 : 1.0
         respectFlipped:YES
                  hints:nil];
 }
