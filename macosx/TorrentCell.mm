@@ -18,8 +18,7 @@
 
         // draw progress bar
         NSRect barRect = self.fTorrentProgressBarView.frame;
-        ProgressBarView* progressBar = [[ProgressBarView alloc] init];
-        [progressBar drawBarInRect:barRect forTableView:self.fTorrentTableView withTorrent:torrent];
+        [ProgressBarView.sharedInstance drawBarInRect:barRect forTableView:self.fTorrentTableView withTorrent:torrent];
 
         // set priority icon
         if (torrent.priority != TR_PRI_NORMAL)
