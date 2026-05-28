@@ -478,8 +478,8 @@ SeedingPage::SeedingPage(
     Glib::RefPtr<Session> const& core)
     : PageBase(cast_item, builder, core)
 {
-    init_check_button("stop_seeding_ratio_check", TR_KEY_ratio_limit_enabled);
-    init_spin_button<double>("stop_seeding_ratio_spin", TR_KEY_ratio_limit, 0, 1000, 0.05);
+    init_check_button("stop_seeding_ratio_check", TR_KEY_seed_ratio_limited);
+    init_spin_button<double>("stop_seeding_ratio_spin", TR_KEY_seed_ratio_limit, 0, 1000, 0.05);
     init_check_button("stop_seeding_timeout_check", TR_KEY_idle_seeding_limit_enabled);
     init_spin_button<uint16_t>("stop_seeding_timeout_spin", TR_KEY_idle_seeding_limit, 1, 40320, 5);
     init_check_button("seeding_done_script_check", TR_KEY_script_torrent_done_seeding_enabled);

@@ -452,7 +452,7 @@ struct Floating
     double ratio = 0.0;
 
     static constexpr auto Fields = std::tuple{
-        Field<&Floating::ratio>{ TR_KEY_ratio_limit },
+        Field<&Floating::ratio>{ TR_KEY_seed_ratio_limit },
     };
 };
 
@@ -564,12 +564,12 @@ TEST_F(SerializerTest, serializableSetFromVariantUsesFloatingChangePolicy)
 {
     auto floating = Floating{ .ratio = std::numeric_limits<double>::quiet_NaN() };
 
-    EXPECT_TRUE(set_from_variant(floating, TR_KEY_ratio_limit, tr_variant{ std::numeric_limits<double>::quiet_NaN() }));
+    EXPECT_TRUE(set_from_variant(floating, TR_KEY_seed_ratio_limit, tr_variant{ std::numeric_limits<double>::quiet_NaN() }));
     EXPECT_TRUE(std::isnan(floating.ratio));
 
-    EXPECT_TRUE(set_from_variant(floating, TR_KEY_ratio_limit, tr_variant{ 2.5 }));
+    EXPECT_TRUE(set_from_variant(floating, TR_KEY_seed_ratio_limit, tr_variant{ 2.5 }));
     EXPECT_DOUBLE_EQ(2.5, floating.ratio);
-    EXPECT_FALSE(set_from_variant(floating, TR_KEY_ratio_limit, tr_variant{ 2.5 }));
+    EXPECT_FALSE(set_from_variant(floating, TR_KEY_seed_ratio_limit, tr_variant{ 2.5 }));
 }
 
 TEST_F(SerializerTest, serializableConstexprGetSet)

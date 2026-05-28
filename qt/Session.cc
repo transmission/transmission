@@ -176,6 +176,8 @@ void Session::updatePref(int key)
         case Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME:
         case Prefs::START:
         case Prefs::TRASH_ORIGINAL:
+        case Prefs::RATIO:
+        case Prefs::RATIO_ENABLED:
         case Prefs::USPEED:
         case Prefs::USPEED_ENABLED:
         case Prefs::UTP_ENABLED:
@@ -192,14 +194,6 @@ void Session::updatePref(int key)
             }
             /* this will change the 'freespace' argument, so refresh */
             refreshSessionInfo();
-            break;
-
-        case Prefs::RATIO:
-            sessionSet(TR_KEY_seed_ratio_limit, prefs_.keyval(key).second);
-            break;
-
-        case Prefs::RATIO_ENABLED:
-            sessionSet(TR_KEY_seed_ratio_limited, prefs_.keyval(key).second);
             break;
 
         case Prefs::RPC_AUTH_REQUIRED:
@@ -860,16 +854,6 @@ void Session::updateInfo(tr_variant* args_dict)
             continue;
         }
         prefs_.set(i, *b);
-    }
-
-    if (auto const b = dictFind<bool>(args_dict, TR_KEY_seed_ratio_limited))
-    {
-        prefs_.set(Prefs::RATIO_ENABLED, *b);
-    }
-
-    if (auto const x = dictFind<double>(args_dict, TR_KEY_seed_ratio_limit))
-    {
-        prefs_.set(Prefs::RATIO, *x);
     }
 
     /* Use the C API to get settings that, for security reasons, aren't supported by RPC */

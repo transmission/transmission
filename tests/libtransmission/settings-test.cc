@@ -64,7 +64,7 @@ TEST_F(SettingsTest, canSaveBools)
 
 TEST_F(SettingsTest, canLoadDoubles)
 {
-    static auto constexpr Key = TR_KEY_ratio_limit;
+    static auto constexpr Key = TR_KEY_seed_ratio_limit;
 
     auto settings = tr_session::Settings{};
     auto const expected_value = settings.ratio_limit + 1.0;
@@ -770,13 +770,13 @@ TEST_F(SettingsTest, snapshotSupportsVariantSet)
     EXPECT_TRUE(snapshot.set(TR_KEY_encryption, tr_variant{ "required"sv }));
     EXPECT_EQ(TR_ENCRYPTION_REQUIRED, snapshot.session.encryption_mode);
 
-    EXPECT_TRUE(snapshot.set(TR_KEY_ratio_limit, tr_variant{ 3.5 }));
+    EXPECT_TRUE(snapshot.set(TR_KEY_seed_ratio_limit, tr_variant{ 3.5 }));
     EXPECT_DOUBLE_EQ(3.5, snapshot.session.ratio_limit);
-    EXPECT_FALSE(snapshot.set(TR_KEY_ratio_limit, tr_variant{ 3.5 }));
+    EXPECT_FALSE(snapshot.set(TR_KEY_seed_ratio_limit, tr_variant{ 3.5 }));
 
-    auto const keyval = snapshot.keyval(TR_KEY_ratio_limit);
+    auto const keyval = snapshot.keyval(TR_KEY_seed_ratio_limit);
     ASSERT_TRUE(keyval);
-    EXPECT_EQ(TR_KEY_ratio_limit, keyval->first);
+    EXPECT_EQ(TR_KEY_seed_ratio_limit, keyval->first);
     ASSERT_TRUE(keyval->second.value_if<double>());
     EXPECT_DOUBLE_EQ(3.5, *keyval->second.value_if<double>());
 
