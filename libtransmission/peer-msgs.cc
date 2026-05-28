@@ -707,7 +707,7 @@ private:
 
     // ---
 
-    std::pair<ReadState, size_t> can_read_impl(tr_peerIo* io);
+    ReadResult can_read_impl(tr_peerIo* io);
 
     static void did_write(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_data, void* vmsgs);
     static ReadState can_read(tr_peerIo* io, void* vmsgs, size_t* piece);
@@ -1818,7 +1818,7 @@ void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool wa
     }
 }
 
-std::pair<ReadState, size_t> tr_peerMsgsImpl::can_read_impl(tr_peerIo* io)
+ReadResult tr_peerMsgsImpl::can_read_impl(tr_peerIo* io)
 {
     // https://www.bittorrent.org/beps/bep_0003.html
     // Next comes an alternating stream of length prefixes and messages.
