@@ -764,6 +764,17 @@ void gtr_priority_combo_init(Gtk::ComboBox& combo)
         });
 }
 
+void gtr_content_layout_combo_init(Gtk::ComboBox& combo)
+{
+    gtr_combo_box_set_enum(
+        combo,
+        {
+            { _("Original"), int(tr_content_layout::Original) },
+            { _("Create subfolder"), int(tr_content_layout::Subfolder) },
+            { _("Don't create subfolder"), int(tr_content_layout::NoSubfolder) },
+        });
+}
+
 // ---
 
 void gtr_widget_set_visible(Gtk::Widget& widget, bool is_visible)

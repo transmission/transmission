@@ -81,6 +81,7 @@ export class OpenDialog extends EventTarget {
           jsonrpc: RPC._JsonRpcVersion,
           method: 'torrent_add',
           params: {
+            'content-layout': elements.content_layout_input.value,
             download_dir: destination,
             metainfo: contents.slice(Math.max(0, index + key.length)),
             paused,
@@ -113,6 +114,7 @@ export class OpenDialog extends EventTarget {
         jsonrpc: RPC._JsonRpcVersion,
         method: 'torrent_add',
         params: {
+          content_layout: elements.content_layout_input.value,
           download_dir: destination,
           filename: url,
           paused,
@@ -207,6 +209,25 @@ export class OpenDialog extends EventTarget {
     label.setAttribute('for', check.id);
     label.textContent = 'Start when added';
     checkarea.append(label);
+
+    const layout_area = document.createElement('div');
+    workarea.append(layout_area);
+
+    const layout_label = document.createElement('label');
+    layout_label.textContent = 'Content layout:';
+    layout_area.append(layout_label);
+
+    const layout_select = document.createElement('select');
+    layout_select.id = 'content-layout-select';
+    for (const [text, value] of [
+      ['Original', 'original'],
+      ['Create subfolder', 'subfolder'],
+      ["Don't create subfolder", 'no-subfolder'],
+    ]) {
+      layout_select.append(new Option(text, value));
+    }
+    layout_area.append(layout_select);
+    elements.content_layout_input = layout_select;
 
     return elements;
   }

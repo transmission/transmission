@@ -104,6 +104,31 @@
               </object>
             </child>
             <child>
+              <object class="GtkLabel" id="content_layout_label">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Content _layout:</property>
+                <property name="use-underline">True</property>
+                <property name="mnemonic-widget">content_layout_combo</property>
+                <property name="xalign">0</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">6</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkComboBox" id="content_layout_combo">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="hexpand">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">6</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkCheckButton" id="start_check">
                 <property name="label" translatable="yes">_Start when added</property>
                 <property name="focusable">1</property>
@@ -111,7 +136,7 @@
                 <property name="use-underline">1</property>
                 <layout>
                   <property name="column">0</property>
-                  <property name="row">6</property>
+                  <property name="row">7</property>
                   <property name="column-span">2</property>
                 </layout>
               </object>
@@ -124,7 +149,7 @@
                 <property name="use-underline">1</property>
                 <layout>
                   <property name="column">0</property>
-                  <property name="row">7</property>
+                  <property name="row">8</property>
                   <property name="column-span">2</property>
                 </layout>
               </object>

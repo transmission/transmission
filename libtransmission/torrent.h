@@ -482,6 +482,11 @@ struct tr_torrent
         return metainfo_.file_subpath(i);
     }
 
+    [[nodiscard]] auto const& original_file_subpath(tr_file_index_t i) const
+    {
+        return metainfo_.original_file_subpath(i);
+    }
+
     [[nodiscard]] TR_CONSTEXPR_VEC auto file_size(tr_file_index_t i) const
     {
         return metainfo_.file_size(i);

@@ -93,6 +93,11 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
     ui_.priorityCombo->setCurrentIndex(1); // Normal
 
+    ui_.contentLayoutCombo->addItem(tr("Original"), QStringLiteral("original"));
+    ui_.contentLayoutCombo->addItem(tr("Create subfolder"), QStringLiteral("subfolder"));
+    ui_.contentLayoutCombo->addItem(tr("Don't create subfolder"), QStringLiteral("no-subfolder"));
+    ui_.contentLayoutCombo->setCurrentIndex(0);
+
     ui_.startCheck->setChecked(prefs.get<bool>(Prefs::START));
     ui_.trashCheck->setChecked(prefs.get<bool>(Prefs::TRASH_ORIGINAL));
 
@@ -243,6 +248,11 @@ void OptionsDialog::onAccepted()
 
     // paused
     dictAdd(&args, TR_KEY_paused, !ui_.startCheck->isChecked());
+
+    // content-layout
+    auto const layout_index = ui_.contentLayoutCombo->currentIndex();
+    auto const layout_value = ui_.contentLayoutCombo->itemData(layout_index).toString();
+    dictAdd(&args, TR_KEY_content_layout, layout_value);
 
     // priority
     int const index = ui_.priorityCombo->currentIndex();

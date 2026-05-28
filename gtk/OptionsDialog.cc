@@ -79,6 +79,7 @@ private:
     Gtk::CheckButton* run_check_ = nullptr;
     Gtk::CheckButton* trash_check_ = nullptr;
     Gtk::ComboBox* priority_combo_ = nullptr;
+    Gtk::ComboBox* content_layout_combo_ = nullptr;
     FreeSpaceLabel* freespace_label_ = nullptr;
 };
 
@@ -172,6 +173,8 @@ void OptionsDialog::Impl::sourceChanged(PathButton* b)
         tr_ctorSetDeleteSource(ctor_.get(), false);
 
         tr_torrent* duplicate_of = nullptr;
+        ctor_->set_content_layout(static_cast<tr_content_layout>(gtr_combo_box_get_active_enum(*content_layout_combo_)));
+
         if (tr_torrent* const torrent = tr_torrentNew(ctor_.get(), &duplicate_of); torrent != nullptr)
         {
             removeOldTorrent();
@@ -260,6 +263,7 @@ OptionsDialog::Impl::Impl(
     , run_check_(gtr_get_widget<Gtk::CheckButton>(builder, "start_check"))
     , trash_check_(gtr_get_widget<Gtk::CheckButton>(builder, "trash_check"))
     , priority_combo_(gtr_get_widget<Gtk::ComboBox>(builder, "priority_combo"))
+    , content_layout_combo_(gtr_get_widget<Gtk::ComboBox>(builder, "content_layout_combo"))
     , freespace_label_(gtr_get_widget_derived<FreeSpaceLabel>(builder, "free_space_label", core_, downloadDir_))
 {
     dialog_.set_default_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
@@ -267,6 +271,8 @@ OptionsDialog::Impl::Impl(
 
     gtr_priority_combo_init(*priority_combo_);
     gtr_combo_box_set_active_enum(*priority_combo_, TR_PRI_NORMAL);
+    gtr_content_layout_combo_init(*content_layout_combo_);
+    gtr_combo_box_set_active_enum(*content_layout_combo_, int(tr_content_layout::Original));
 
     auto* source_chooser = gtr_get_widget_derived<PathButton>(builder, "source_button");
     addTorrentFilters(source_chooser);

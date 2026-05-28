@@ -59,6 +59,11 @@ void tr_torrent_metainfo::apply_content_layout(tr_content_layout layout)
         return;
     }
 
+    for (tr_file_index_t i = 0; i < file_count(); ++i)
+    {
+        original_subpaths_.emplace_back(file_subpath(i));
+    }
+
     auto const& first = file_subpath(0);
     auto const sep = first.find('/');
     auto const top = sep != std::string::npos ? std::string_view{ first }.substr(0, sep) : std::string_view{};
