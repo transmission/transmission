@@ -1680,11 +1680,12 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
             {
                 if (auto const block = tor_.piece_loc(r.index, r.offset).block; active_requests.test(block))
                 {
-                    // Make sure maybe_send_block_requests() is called before removing the request,
-                    // so that it will choose a block other than the rejected block.
+                    active_requests.unset(block);
+
+                    // Make sure maybe_send_block_requests() is called before removing the request
+                    // from the wishlist, so that it will choose a block other than the rejected block.
                     maybe_send_block_requests();
 
-                    active_requests.unset(block);
                     publish(tr_peer_event::GotRejected(tor_.block_info(), block));
                 }
             }
