@@ -17,6 +17,8 @@ static NSInteger const kMaxPieces = 18 * 18;
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
+@property(nonatomic, strong) NSBitmapImageRep* fPiecesBitmap;
+
 @property(nonatomic, readonly) NSColor* fBarBorderColor;
 @property(nonatomic, readonly) NSColor* fBluePieceColor;
 @property(nonatomic, readonly) NSColor* fBarMinimalBorderColor;
@@ -36,6 +38,15 @@ static NSInteger const kMaxPieces = 18 * 18;
     if ((self = [super init]))
     {
         _fDefaults = NSUserDefaults.standardUserDefaults;
+
+        _fPiecesBitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:nil pixelsWide:kMaxPieces pixelsHigh:1
+                                                              bitsPerSample:8
+                                                            samplesPerPixel:4
+                                                                   hasAlpha:YES
+                                                                   isPlanar:NO
+                                                             colorSpaceName:NSCalibratedRGBColorSpace
+                                                                bytesPerRow:0
+                                                               bitsPerPixel:0];
 
         _fBluePieceColor = [NSColor colorWithCalibratedRed:0.0 green:0.4 blue:0.8 alpha:1.0];
         _fBarBorderColor = [NSColor colorWithCalibratedWhite:0.0 alpha:0.2];
@@ -167,17 +178,16 @@ static NSInteger const kMaxPieces = 18 * 18;
     }
 
     int const pieceCount = static_cast<int>(MIN(torrent.pieceCount, kMaxPieces));
+    if (pieceCount <= 0)
+    {
+        torrent.previousFinishedPieces = nil;
+        return;
+    }
+
     auto piecesPercent = std::array<float, kMaxPieces>{};
     [torrent getAmountFinished:piecesPercent.data() size:pieceCount];
 
-    NSBitmapImageRep* bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:nil pixelsWide:pieceCount pixelsHigh:1
-                                                                    bitsPerSample:8
-                                                                  samplesPerPixel:4
-                                                                         hasAlpha:YES
-                                                                         isPlanar:NO
-                                                                   colorSpaceName:NSCalibratedRGBColorSpace
-                                                                      bytesPerRow:0
-                                                                     bitsPerPixel:0];
+    NSBitmapImageRep* bitmap = self.fPiecesBitmap;
 
     NSIndexSet* previousFinishedIndexes = torrent.previousFinishedPieces;
     NSMutableIndexSet* finishedIndexes = [NSMutableIndexSet indexSet];
@@ -216,7 +226,8 @@ static NSInteger const kMaxPieces = 18 * 18;
     torrent.previousFinishedPieces = finishedIndexes.count > 0 ? finishedIndexes : nil; //don't bother saving if none are complete
 
     //actually draw image
-    [bitmap drawInRect:barRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:minimal ? 0.25 : 1.0
+    [bitmap drawInRect:barRect fromRect:NSMakeRect(0.0, 0.0, pieceCount, 1.0) operation:NSCompositingOperationSourceOver
+              fraction:minimal ? 0.25 : 1.0
         respectFlipped:YES
                  hints:nil];
 }
