@@ -1957,7 +1957,7 @@ void tr_peerMsgsImpl::maybe_send_metadata_requests(time_t now) const
 
 void tr_peerMsgsImpl::maybe_send_block_requests()
 {
-    if (!tor_.client_can_download())
+    if (!tor_.client_can_download() || !client_is_interested() || client_is_choked())
     {
         return;
     }
@@ -1967,9 +1967,6 @@ void tr_peerMsgsImpl::maybe_send_block_requests()
     {
         return;
     }
-
-    TR_ASSERT(client_is_interested());
-    TR_ASSERT(!client_is_choked());
 
     auto const n_wanted = desired_request_count_ - n_active;
     if (auto const requests = tr_peerMgrGetNextRequests(&tor_, this, n_wanted); !std::empty(requests))
