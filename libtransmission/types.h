@@ -79,7 +79,7 @@ enum class tr_file_preallocation : uint8_t
     Full,
 };
 
-enum class tr_content_layout :uint8_t
+enum class tr_content_layout : uint8_t
 {
     Original,
     Subfolder,

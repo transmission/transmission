@@ -1810,7 +1810,7 @@ void torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_rpc_idle
             ctor.set_content_layout(tr_content_layout::NoSubfolder);
         }
 
-        // "original" → leave as default (Original)
+        // leave as default (Original)
     }
 
     if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit); val)

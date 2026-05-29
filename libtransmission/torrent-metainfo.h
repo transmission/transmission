@@ -29,6 +29,10 @@ public:
 
     bool parse_benc(std::string_view benc, tr_error* error = nullptr);
 
+    // Helper function wrapper around parseBenc().
+    // If you're looping through several files, passing in a non-nullptr
+    // `contents` can reduce the number of memory allocations needed to
+    // load multiple files.
     bool parse_torrent_file(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error* error = nullptr);
 
     // FILES
@@ -139,6 +143,8 @@ public:
 
     [[nodiscard]] constexpr bool has_v1_metadata() const noexcept
     {
+        // need 'pieces' field and 'files' or 'length'
+        // TODO check for 'files' or 'length'
         return !std::empty(pieces_);
     }
 
@@ -229,6 +235,9 @@ private:
 
     time_t date_created_ = 0;
 
+    // Offset + size of the bencoded info dict subset of the bencoded data.
+    // Used when loading pieces of it to sent to magnet peers.
+    // See https://www.bittorrent.org/beps/bep_0009.html
     uint64_t info_dict_size_ = 0;
     uint64_t info_dict_offset_ = 0;
 

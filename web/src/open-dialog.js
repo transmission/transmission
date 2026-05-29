@@ -215,7 +215,10 @@ export class OpenDialog extends EventTarget {
 
     const layout_label = document.createElement('label');
     layout_label.textContent = 'Content layout:';
+    layout_label.setAttribute('for', 'content-layout-select');
     layout_area.append(layout_label);
+
+    layout_area.append(document.createElement('br'));
 
     const layout_select = document.createElement('select');
     layout_select.id = 'content-layout-select';
