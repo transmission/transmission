@@ -48,6 +48,8 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @property(nonatomic) BOOL fResumeOnWake;
 @property(nonatomic, copy, readwrite) NSString* hashString;
 
+- (BOOL)canChangeDownloadChecks;
+
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
      completionHandler:(void (^)(BOOL))completionHandler
@@ -59,7 +61,13 @@ static dispatch_queue_t timeMachineExcludeQueue;
 
 @end
 
-void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char const* newNameCharString, int error, void* contextInfo)
+[[nodiscard]]
+static bool canChangeDownloadCheck(tr_file_view const& file)
+{
+    return file.have < file.length;
+}
+
+static void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char const* newNameCharString, int error, void* contextInfo)
 {
     @autoreleasepool
     {
@@ -77,7 +85,7 @@ void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char
     }
 }
 
-bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
+static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 {
     if (filename == NULL)
     {
@@ -1544,39 +1552,39 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     return (CGFloat)have / node.size;
 }
 
-- (BOOL)canChangeDownloadCheckForFile:(NSUInteger)index
+- (BOOL)canChangeDownloadChecks
 {
-    NSAssert2(index < self.fileCount, @"Index %lu is greater than file count %lu", index, self.fileCount);
-
-    return [self canChangeDownloadCheckForFiles:[NSIndexSet indexSetWithIndex:index]];
+    return self.fileCount != 1 && !self.complete;
 }
 
 - (BOOL)canChangeDownloadCheckForFiles:(NSIndexSet*)indexSet
 {
-    if (self.fileCount == 1 || self.complete)
+    if ([self canChangeDownloadChecks])
     {
-        return NO;
+        for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
+        {
+            if (canChangeDownloadCheck(tr_torrentFile(self.fHandle, index)))
+            {
+                return YES;
+            }
+        }
     }
 
-    __block BOOL canChange = NO;
-    [indexSet enumerateIndexesWithOptions:NSEnumerationConcurrent usingBlock:^(NSUInteger index, BOOL* stop) {
-        auto const file = tr_torrentFile(self.fHandle, index);
-        if (file.have < file.length)
-        {
-            canChange = YES;
-            *stop = YES;
-        }
-    }];
-    return canChange;
+    return NO;
 }
 
 - (NSControlStateValue)checkForFiles:(NSIndexSet*)indexSet
 {
+    if (![self canChangeDownloadChecks])
+    {
+        return NSControlStateValueOn;
+    }
+
     BOOL onState = NO, offState = NO;
     for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
     {
         auto const file = tr_torrentFile(self.fHandle, index);
-        if (file.wanted || ![self canChangeDownloadCheckForFile:index])
+        if (file.wanted || !canChangeDownloadCheck(file))
         {
             onState = YES;
         }
@@ -1621,60 +1629,71 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 - (BOOL)hasFilePriority:(tr_priority_t)priority forIndexes:(NSIndexSet*)indexSet
 {
-    for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
+    if ([self canChangeDownloadChecks])
     {
-        if (priority == tr_torrentFile(self.fHandle, index).priority && [self canChangeDownloadCheckForFile:index])
+        for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
         {
-            return YES;
+            auto const file = tr_torrentFile(self.fHandle, index);
+            if (priority == file.priority && canChangeDownloadCheck(file))
+            {
+                return YES;
+            }
         }
     }
+
     return NO;
 }
 
 - (NSSet*)filePrioritiesForIndexes:(NSIndexSet*)indexSet
 {
-    BOOL low = NO, normal = NO, high = NO;
     NSMutableSet* priorities = [NSMutableSet setWithCapacity:MIN(indexSet.count, 3u)];
 
-    for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
+    if ([self canChangeDownloadChecks])
     {
-        if (![self canChangeDownloadCheckForFile:index])
-        {
-            continue;
-        }
+        BOOL low = NO, normal = NO, high = NO;
 
-        auto const priority = tr_torrentFile(self.fHandle, index).priority;
-        switch (priority)
+        for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
         {
-        case TR_PRI_LOW:
-            if (low)
-            {
-                continue;
-            }
-            low = YES;
-            break;
-        case TR_PRI_NORMAL:
-            if (normal)
-            {
-                continue;
-            }
-            normal = YES;
-            break;
-        case TR_PRI_HIGH:
-            if (high)
-            {
-                continue;
-            }
-            high = YES;
-            break;
-        default:
-            NSAssert2(NO, @"Unknown priority %d for file index %ld", priority, index);
-        }
+            auto const file = tr_torrentFile(self.fHandle, index);
 
-        [priorities addObject:@(priority)];
-        if (low && normal && high)
-        {
-            break;
+            if (!canChangeDownloadCheck(file))
+            {
+                continue;
+            }
+
+            auto const priority = file.priority;
+            switch (priority)
+            {
+            case TR_PRI_LOW:
+                if (low)
+                {
+                    continue;
+                }
+                low = YES;
+                break;
+            case TR_PRI_NORMAL:
+                if (normal)
+                {
+                    continue;
+                }
+                normal = YES;
+                break;
+            case TR_PRI_HIGH:
+                if (high)
+                {
+                    continue;
+                }
+                high = YES;
+                break;
+            default:
+                NSAssert2(NO, @"Unknown priority %d for file index %ld", priority, index);
+            }
+
+            [priorities addObject:@(priority)];
+            if (low && normal && high)
+            {
+                break;
+            }
         }
     }
     return priorities;

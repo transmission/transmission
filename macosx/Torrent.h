@@ -193,7 +193,6 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 //methods require fileStats to have been updated recently to be accurate
 - (CGFloat)fileProgress:(FileListNode*)node;
-- (BOOL)canChangeDownloadCheckForFile:(NSUInteger)index;
 - (BOOL)canChangeDownloadCheckForFiles:(NSIndexSet*)indexSet;
 - (NSControlStateValue)checkForFiles:(NSIndexSet*)indexSet;
 - (void)setFileCheckState:(NSControlStateValue)state forIndexes:(NSIndexSet*)indexSet;
