@@ -1783,6 +1783,7 @@ tr_error_code_t tr_peerMsgsImpl::client_got_block(std::span<uint8_t const> block
 void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_data, void* vmsgs)
 {
     auto* const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
+    auto const keep_alive = msgs->shared_from_this();
 
     if (was_piece_data)
     {
@@ -1795,6 +1796,7 @@ void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool wa
 ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
     auto* const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
+    auto const keep_alive = msgs->shared_from_this();
 
     // https://www.bittorrent.org/beps/bep_0003.html
     // Next comes an alternating stream of length prefixes and messages.
@@ -1876,7 +1878,9 @@ ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
 
 void tr_peerMsgsImpl::got_error(tr_peerIo* /*io*/, tr_error const& /*error*/, void* vmsgs)
 {
-    static_cast<tr_peerMsgsImpl*>(vmsgs)->publish(tr_peer_event::GotError(ENOTCONN));
+    auto* const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
+    auto const keep_alive = msgs->shared_from_this();
+    msgs->publish(tr_peer_event::GotError(ENOTCONN));
 }
 
 // ---
