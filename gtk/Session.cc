@@ -290,7 +290,8 @@ time_t get_file_mtime(Glib::RefPtr<Gio::File> const& file)
 {
     try
     {
-        return file->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED)->get_attribute_uint64(G_FILE_ATTRIBUTE_TIME_MODIFIED);
+        return static_cast<time_t>(
+            file->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED)->get_attribute_uint64(G_FILE_ATTRIBUTE_TIME_MODIFIED));
     }
     catch (Glib::Error const&)
     {
@@ -493,11 +494,11 @@ void Session::Impl::on_pref_changed(tr_quark const key)
         break;
 
     case TR_KEY_peer_limit_global:
-        tr_sessionSetPeerLimit(session_, gtr_pref_int_get(key));
+        tr_sessionSetPeerLimit(session_, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_peer_limit_per_torrent:
-        tr_sessionSetPeerLimitPerTorrent(session_, gtr_pref_int_get(key));
+        tr_sessionSetPeerLimitPerTorrent(session_, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_inhibit_desktop_hibernation:
@@ -763,7 +764,7 @@ void core_apply_defaults(tr_ctor* ctor)
 
     if (!tr_ctorGetPeerLimit(ctor, TR_FORCE, nullptr))
     {
-        tr_ctorSetPeerLimit(ctor, TR_FORCE, gtr_pref_int_get(TR_KEY_peer_limit_per_torrent));
+        tr_ctorSetPeerLimit(ctor, TR_FORCE, gtr_pref_int_get<size_t>(TR_KEY_peer_limit_per_torrent));
     }
 
     if (!tr_ctorGetDownloadDir(ctor, TR_FORCE).has_value())
@@ -962,7 +963,7 @@ void Session::load(bool force_paused)
         tr_ctorSetPaused(ctor, TR_FORCE, true);
     }
 
-    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, gtr_pref_int_get(TR_KEY_peer_limit_per_torrent));
+    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, gtr_pref_int_get<size_t>(TR_KEY_peer_limit_per_torrent));
 
     auto* session = impl_->get_session();
     auto const n_torrents = tr_sessionLoadTorrents(session, ctor);

@@ -130,18 +130,6 @@ tr_variant::Map& gtr_pref_get_map()
     return *getPrefs().get_if<tr_variant::Map>();
 }
 
-int64_t gtr_pref_int_get(tr_quark const key)
-{
-    int64_t i = 0;
-
-    return tr_variantDictFindInt(&getPrefs(), key, &i) ? i : 0;
-}
-
-void gtr_pref_int_set(tr_quark const key, int64_t value)
-{
-    tr_variantDictAddInt(&getPrefs(), key, value);
-}
-
 double gtr_pref_double_get(tr_quark const key)
 {
     double d = 0;

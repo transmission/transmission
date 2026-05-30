@@ -41,7 +41,8 @@ enum Code : int16_t
     FILE_IDX_OOR,
     PIECE_IDX_OOR,
     HTTP_ERROR,
-    CORRUPT_TORRENT
+    CORRUPT_TORRENT,
+    INVALID_BLOCKLIST_DATA,
 };
 
 [[nodiscard]] std::string_view to_string(Code code);

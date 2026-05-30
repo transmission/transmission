@@ -119,7 +119,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **peer_congestion_algorithm:** String. This is documented on https://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
  * **peer_limit_global:** Number (default = 200)
  * **peer_limit_per_torrent:** Number (default = 50)
- * **peer_socket_diffserv:** String (default = "le") Set the [DiffServ](https://en.wikipedia.org/wiki/Differentiated_services) parameter for outgoing packets. Allowed values are lowercase DSCP names. See the `tr_diffserv_t` class from `libtransmission/net.h` for the exact list of possible values.
+ * **peer_socket_diffserv:** String (default = "le") Set the [DiffServ](https://en.wikipedia.org/wiki/Differentiated_services) parameter for outgoing packets. Allowed values are lowercase DSCP names. See the `tr_diffserv_t` class from `libtransmission/types.h` for the exact list of possible values.
  * **reqq:** Number (default = 2000) The number of outstanding block requests a peer is allowed to queue in the client. The higher this number, the higher the max possible upload speed towards each peer.
  * **sequential_download** Boolean (default = false) Enable sequential download by default when adding torrents.
 
@@ -174,8 +174,8 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
      * **All Days**: 127 (binary: `1111111`)
  * **idle_seeding_limit:** Number (default = 30) Stop seeding after being idle for _N_ minutes.
  * **idle_seeding_limit_enabled:** Boolean (default = false)
- * **ratio_limit:** Number (default = 2.0)
- * **ratio_limit_enabled:**  Boolean (default = false)
+ * **seed_ratio_limit:** Number (default = 2.0)
+ * **seed_ratio_limited:**  Boolean (default = false)
 
 ### Legacy Options
 Only keys that differ from above are listed here. These options have been replaced in newer versions of Transmission.

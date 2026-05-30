@@ -637,11 +637,11 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| `speed_units`  | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
+| `speed_units`  | array  | 5 strings: B/s, kB/s, MB/s, GB/s, TB/s
 | `speed_bytes`  | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
-| `size_units`   | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
+| `size_units`   | array  | 5 strings: B, kB, MB, GB, TB
 | `size_bytes`   | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
-| `memory_units` | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
+| `memory_units` | array  | 5 strings: B, KiB, MiB, GiB, TiB
 | `memory_bytes` | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
 
 #### 4.1.1 Mutators
@@ -789,10 +789,10 @@ Response parameters: none
 #### 4.8.2 Bandwidth group accessor: `group_get`
 Method name: `group_get`
 
-Request parameters: An optional parameter `group`.
-`group` is either a string naming the bandwidth group,
+Request parameters: An optional parameter `name`.
+`name` is either a string naming the bandwidth group,
 or a list of such strings.
-If `group` is omitted, all bandwidth groups are used.
+If `name` is omitted, all bandwidth groups are used.
 
 Response parameters:
 

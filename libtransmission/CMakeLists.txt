@@ -96,6 +96,10 @@ target_sources(${TR_NAME}
         peer-mse.h
         peer-msgs.cc
         peer-msgs.h
+        peer-socket-tcp.cc
+        peer-socket-tcp.h
+        peer-socket-utp.cc
+        peer-socket-utp.h
         peer-socket.cc
         peer-socket.h
         platform.cc
@@ -120,6 +124,7 @@ target_sources(${TR_NAME}
         session-alt-speeds.h
         session-id.cc
         session-id.h
+        session-settings.h
         session-thread.cc
         session-thread.h
         session.cc

@@ -599,7 +599,7 @@ void handle_request(struct evhttp_request* req, void* arg)
     auto const rpc_base_path = tr_urlbuf{ base_path, TrHttpServerRpcRelativePath };
     auto const deprecated_web_path = tr_urlbuf{ base_path, "web" /*no trailing slash*/ };
 
-    char const* const uri = evhttp_request_get_uri(req);
+    auto const uri = std::string_view{ evhttp_request_get_uri(req) };
 
     if (!tr_strv_starts_with(uri, base_path) || uri == deprecated_web_path)
     {
@@ -627,14 +627,17 @@ void handle_request(struct evhttp_request* req, void* arg)
             fmt::format(fmt::runtime(_("Rejected request from {host} (Host not whitelisted)")), fmt::arg("host", remote_host)));
         send_simple_response(req, 421, Body);
     }
-    else if (uri != rpc_base_path)
+    else if (
+        !uri.starts_with(rpc_base_path.sv()) ||
+        (uri.size() != rpc_base_path.size() && uri.substr(rpc_base_path.size()) != "/"sv))
     {
         tr_logAddWarn(
             fmt::format(
                 fmt::runtime(_("Unknown URI from {host}: '{uri}'")),
                 fmt::arg("host", remote_host),
                 fmt::arg("uri", uri)));
-        send_simple_response(req, HTTP_NOTFOUND, uri);
+        // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
+        send_simple_response(req, HTTP_NOTFOUND, uri.data());
     }
 #ifdef REQUIRE_SESSION_ID
     else if (!test_session_id(server, req))
@@ -1042,6 +1045,10 @@ void tr_rpc_server::load(Settings&& settings)
         {
             tr_logAddInfo(_("Password required"));
         }
+    }
+    else
+    {
+        session->run_in_session_thread(stop_server, this);
     }
 
     if (!std::empty(web_client_dir_))

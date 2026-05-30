@@ -50,8 +50,8 @@ private:
 
         [[nodiscard]] constexpr auto operator<=>(Candidate const& that) const noexcept
         {
-            // prefer pieces closer to completion. Skipped in sequential mode to allow slow peers
-            // request lower priority pieces while fast peers request blocks in order.
+            // prefer pieces closer to completion, skipped in sequential mode
+            // where we want to prioritize pieces in order.
             if (!is_sequential)
             {
                 if (auto const val = std::size(unrequested) <=> std::size(that.unrequested); val != 0)

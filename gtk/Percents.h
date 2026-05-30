@@ -14,7 +14,7 @@ public:
     }
 
     explicit Percents(float value) noexcept
-        : raw_value_(std::round(value * 10000))
+        : raw_value_(static_cast<int>(std::round(value * 10000)))
     {
     }
 
@@ -25,7 +25,7 @@ public:
 
     [[nodiscard]] constexpr float to_fraction() const noexcept
     {
-        return raw_value_ / 10000.F;
+        return static_cast<float>(raw_value_) / 10000.F;
     }
 
     [[nodiscard]] std::string to_string() const;

@@ -57,7 +57,10 @@ using namespace tr::Values;
 #define tr_return_if_fail(expr) \
     do \
     { \
-        if (!(expr)) \
+        if (expr) [[likely]] \
+        { \
+        } \
+        else \
         { \
             tr_logAddWarn(#expr); \
             return; \
@@ -66,7 +69,10 @@ using namespace tr::Values;
 #define tr_return_val_if_fail(expr, val) \
     do \
     { \
-        if (!(expr)) \
+        if (expr) [[likely]] \
+        { \
+        } \
+        else \
         { \
             tr_logAddWarn(#expr); \
             return val; \
@@ -512,26 +518,36 @@ void tr_torrent::queue_move_up(std::span<tr_torrent* const> const torrents_in)
 
     auto torrents = std::vector<tr_torrent*>(std::begin(torrents_in), std::end(torrents_in));
     std::ranges::sort(torrents, tr_torrent::CompareQueuePosition);
-    for (auto* const tor : torrents)
+    for (auto last_consecutive_pos = tr_torrent_queue::MinQueuePosition; auto* const tor : torrents)
     {
-        if (auto const pos = tor->queue_position(); pos > tr_torrent_queue::MinQueuePosition)
+        if (auto const pos = tor->queue_position(); pos != last_consecutive_pos)
         {
             tor->set_queue_position(pos - 1U);
+        }
+        else
+        {
+            ++last_consecutive_pos;
         }
     }
 }
 
 void tr_torrent::queue_move_down(std::span<tr_torrent* const> const torrents_in)
 {
-    tr_return_if_fail(std::ranges::all_of(torrents_in, tr_isTorrent));
+    tr_return_if_fail(!torrents_in.empty() && std::ranges::all_of(torrents_in, tr_isTorrent));
 
     auto torrents = std::vector<tr_torrent*>(std::begin(torrents_in), std::end(torrents_in));
     std::ranges::sort(std::views::reverse(torrents), tr_torrent::CompareQueuePosition);
-    for (auto* const tor : torrents)
+    for (auto last_consecutive_pos =
+             torrents.front()->session->torrent_queue().size() - 1U + tr_torrent_queue::MinQueuePosition;
+         auto* const tor : torrents)
     {
-        if (auto const pos = tor->queue_position(); pos < tr_torrent_queue::MaxQueuePosition)
+        if (auto const pos = tor->queue_position(); pos != last_consecutive_pos)
         {
             tor->set_queue_position(pos + 1U);
+        }
+        else
+        {
+            --last_consecutive_pos;
         }
     }
 }
@@ -2491,8 +2507,8 @@ void tr_torrent::rename_path_in_session_thread(
 void tr_torrent::rename_path(std::string_view oldpath, std::string_view newname, tr_torrent_rename_done_func&& callback)
 {
     this->session->run_in_session_thread(
-        [this, oldpath = std::string(oldpath), newname = std::string(newname), cb = std::move(callback)]()
-        { rename_path_in_session_thread(oldpath, newname, std::move(cb)); });
+        [this, oldpath = std::string(oldpath), newname = std::string(newname), cb = std::move(callback)]
+        { rename_path_in_session_thread(oldpath, newname, cb); });
 }
 
 void tr_torrentRenamePath(

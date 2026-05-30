@@ -726,6 +726,56 @@ TEST_F(RpcTest, torrentGet)
     tr_torrentRemove(tor, false);
 }
 
+TEST_F(RpcTest, recentlyActiveEmptyOnStartup)
+{
+    static auto constexpr TorrentFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv;
+    static auto constexpr ResumeFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/debian-11.2.0-amd64-DVD-1.iso.resume"sv;
+
+    if (auto error = tr_error{};
+        !tr_sys_path_copy(
+            TorrentFile,
+            tr_pathbuf{ session_->torrentDir(), "/c9a337562cb0360fd6f5ab40fd2b1b81d5325dbd.torrent"sv },
+            &error) ||
+        !tr_sys_path_copy(
+            ResumeFile,
+            tr_pathbuf{ session_->resumeDir(), "/c9a337562cb0360fd6f5ab40fd2b1b81d5325dbd.resume"sv },
+            &error))
+    {
+        GTEST_SKIP() << fmt::format("Failed to setup torrents and resume dir: {} ({})", error.message(), error.code());
+    }
+
+    auto* const ctor = tr_ctorNew(session_);
+    ctor->set_paused(TR_FORCE, false);
+    EXPECT_EQ(tr_sessionLoadTorrents(session_, ctor), 1U);
+    tr_ctorFree(ctor);
+
+    //Query recently_active. Should be empty
+    auto request_map = tr_variant::Map{ 3U };
+    request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_get));
+    request_map.try_emplace(TR_KEY_id, 12345);
+
+    auto params = tr_variant::Map{ 2U };
+    auto fields = tr_variant::Vector{};
+    fields.emplace_back(tr_quark_get_string_view(TR_KEY_id));
+    params.try_emplace(TR_KEY_fields, std::move(fields));
+    params.try_emplace(TR_KEY_ids, tr_quark_get_string_view(TR_KEY_recently_active));
+    request_map.try_emplace(TR_KEY_params, std::move(params));
+
+    auto request = tr_variant{ std::move(request_map) };
+    auto response = tr_variant{};
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
+
+    auto* response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto* result = response_map->find_if<tr_variant::Map>(TR_KEY_result);
+    ASSERT_NE(result, nullptr);
+
+    auto* torrents = result->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    ASSERT_NE(torrents, nullptr);
+    EXPECT_EQ(0UL, std::size(*torrents));
+}
+
 TEST_F(RpcTest, torrentGetLegacy)
 {
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
@@ -879,18 +929,4 @@ TEST_F(RpcTest, DISABLED_wellFormedLegacyFreeSpace)
 }
 } // namespace free_space_test
 
-TEST_F(RpcTest, rpcPathExactMatch)
-{
-    auto const is_rpc_path = [](std::string_view uri)
-    {
-        auto constexpr RpcBasePath = "/transmission/rpc"sv;
-        return uri == RpcBasePath;
-    };
-
-    EXPECT_TRUE(is_rpc_path("/transmission/rpc"));
-    EXPECT_FALSE(is_rpc_path("/transmission/rpc/xyz"));
-    EXPECT_FALSE(is_rpc_path("/transmission/rpc/"));
-    EXPECT_FALSE(is_rpc_path("/transmission/rpcx"));
-    EXPECT_FALSE(is_rpc_path("/transmission/rpc/anything"));
-}
 } // namespace tr::test

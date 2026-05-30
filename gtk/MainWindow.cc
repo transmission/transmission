@@ -96,11 +96,11 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Gio::ActionGroup> const& actions,
         Glib::RefPtr<Session> const& core);
+    ~Impl();
     Impl(Impl&&) = delete;
     Impl(Impl const&) = delete;
-    Impl& operator=(Impl&&) = delete;
     Impl& operator=(Impl const&) = delete;
-    ~Impl();
+    Impl& operator=(Impl&&) = delete;
 
     [[nodiscard]] Glib::RefPtr<TorrentViewSelection> get_selection() const;
 
@@ -379,8 +379,10 @@ void MainWindow::Impl::syncAltSpeedButton()
             fmt::runtime(
                 b ? _("Click to disable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)") :
                     _("Click to enable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)")),
-            fmt::arg("download_speed", Speed{ gtr_pref_int_get(TR_KEY_alt_speed_down), Speed::Units::KByps }.to_string()),
-            fmt::arg("upload_speed", Speed{ gtr_pref_int_get(TR_KEY_alt_speed_up), Speed::Units::KByps }.to_string())));
+            fmt::arg(
+                "download_speed",
+                Speed{ gtr_pref_int_get<size_t>(TR_KEY_alt_speed_down), Speed::Units::KByps }.to_string()),
+            fmt::arg("upload_speed", Speed{ gtr_pref_int_get<size_t>(TR_KEY_alt_speed_up), Speed::Units::KByps }.to_string())));
 }
 
 void MainWindow::Impl::alt_speed_toggled_cb()
@@ -467,13 +469,13 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(
 void MainWindow::Impl::onRatioToggled(std::string const& action_name, bool enabled)
 {
     options_actions_->change_action_state(action_name, VariantInt::create(enabled ? 1 : 0));
-    core_->set_pref(TR_KEY_ratio_limit_enabled, enabled);
+    core_->set_pref(TR_KEY_seed_ratio_limited, enabled);
 }
 
 void MainWindow::Impl::onRatioSet(double ratio)
 {
-    core_->set_pref(TR_KEY_ratio_limit, ratio);
-    core_->set_pref(TR_KEY_ratio_limit_enabled, true);
+    core_->set_pref(TR_KEY_seed_ratio_limit, ratio);
+    core_->set_pref(TR_KEY_seed_ratio_limited, true);
 }
 
 Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createRatioMenu(Glib::RefPtr<Gio::SimpleActionGroup> const& actions)
@@ -566,20 +568,20 @@ void MainWindow::Impl::onOptionsClicked()
 
     update_menu(
         speed_menu_info_[static_cast<uint8_t>(tr_direction::Down)],
-        Speed{ gtr_pref_int_get(TR_KEY_speed_limit_down), Speed::Units::KByps }.to_string(),
+        Speed{ gtr_pref_int_get<size_t>(TR_KEY_speed_limit_down), Speed::Units::KByps }.to_string(),
         TR_KEY_speed_limit_down_enabled);
 
     update_menu(
         speed_menu_info_[static_cast<uint8_t>(tr_direction::Up)],
-        Speed{ gtr_pref_int_get(TR_KEY_speed_limit_up), Speed::Units::KByps }.to_string(),
+        Speed{ gtr_pref_int_get<size_t>(TR_KEY_speed_limit_up), Speed::Units::KByps }.to_string(),
         TR_KEY_speed_limit_up_enabled);
 
     update_menu(
         ratio_menu_info_,
         fmt::format(
-            fmt::runtime(_("Stop at Ratio ({ratio})")),
-            fmt::arg("ratio", tr_strlratio(gtr_pref_double_get(TR_KEY_ratio_limit)))),
-        TR_KEY_ratio_limit_enabled);
+            fmt::runtime(_("Stop at Seed Ratio ({ratio})")),
+            fmt::arg("ratio", tr_strlratio(gtr_pref_double_get(TR_KEY_seed_ratio_limit)))),
+        TR_KEY_seed_ratio_limited);
 }
 
 Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createStatsMenu()
@@ -674,9 +676,9 @@ MainWindow::Impl::Impl(
 {
     /* make the window */
     window.set_title(Glib::get_application_name());
-    window.set_default_size(gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
+    window.set_default_size(gtr_pref_int_get<int>(TR_KEY_main_window_width), gtr_pref_int_get<int>(TR_KEY_main_window_height));
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-    window.move(gtr_pref_int_get(TR_KEY_main_window_x), gtr_pref_int_get(TR_KEY_main_window_y));
+    window.move(gtr_pref_int_get<int>(TR_KEY_main_window_x), gtr_pref_int_get<int>(TR_KEY_main_window_y));
 #endif
 
     if (gtr_pref_flag_get(TR_KEY_main_window_is_maximized))

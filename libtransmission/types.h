@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include <compare>
 #include <cstddef> // size_t, std::byte
 #include <cstdint> // uint16_t, uint32_t, uint64_t
 #include <ctime> // time_t
@@ -13,6 +14,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include "libtransmission/values.h"
 
@@ -61,6 +63,99 @@ using tr_sha1_digest_t = std::array<std::byte, 20>;
 using tr_sha256_digest_t = std::array<std::byte, 32>;
 
 using tr_torrent_id_t = int;
+
+enum class tr_preferred_transport : uint8_t
+{
+    UTP,
+    TCP,
+};
+
+inline auto constexpr PreferredTransportCount = 2U;
+
+enum class tr_file_preallocation : uint8_t
+{
+    None,
+    Sparse,
+    Full,
+};
+
+class tr_port
+{
+public:
+    tr_port() noexcept = default;
+
+    [[nodiscard]] constexpr static tr_port from_host(uint16_t hport) noexcept
+    {
+        return tr_port{ hport };
+    }
+
+    [[nodiscard]] static tr_port from_network(uint16_t nport) noexcept;
+
+    [[nodiscard]] constexpr uint16_t host() const noexcept
+    {
+        return hport_;
+    }
+
+    [[nodiscard]] uint16_t network() const noexcept;
+
+    constexpr void set_host(uint16_t hport) noexcept
+    {
+        hport_ = hport;
+    }
+
+    [[nodiscard]] static std::pair<tr_port, std::byte const*> from_compact(std::byte const* compact) noexcept;
+
+    [[nodiscard]] constexpr auto operator<=>(tr_port const& that) const noexcept
+    {
+        return hport_ <=> that.hport_;
+    }
+
+    [[nodiscard]] constexpr auto operator==(tr_port const& that) const noexcept
+    {
+        return (*this <=> that) == 0;
+    }
+
+    [[nodiscard]] constexpr auto empty() const noexcept
+    {
+        return hport_ == 0;
+    }
+
+    constexpr void clear() noexcept
+    {
+        hport_ = 0;
+    }
+
+    static auto constexpr CompactPortBytes = 2U;
+
+private:
+    explicit constexpr tr_port(uint16_t hport) noexcept
+        : hport_{ hport }
+    {
+    }
+
+    uint16_t hport_ = 0;
+};
+
+// A serializer-friendly wrapper around the DiffServ int value
+class tr_diffserv_t
+{
+public:
+    constexpr tr_diffserv_t() = default;
+
+    constexpr explicit tr_diffserv_t(int value)
+        : value_{ value }
+    {
+    }
+
+    // NOLINTNEXTLINE(google-explicit-constructor)
+    [[nodiscard]] constexpr operator int() const noexcept
+    {
+        return value_;
+    }
+
+private:
+    int value_ = 0x04;
+};
 
 using tr_tracker_id_t = uint32_t;
 

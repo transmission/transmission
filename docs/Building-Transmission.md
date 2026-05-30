@@ -126,32 +126,6 @@ $ sudo apt-get install build-essential automake autoconf libtool pkg-config intl
 
 Then you can begin [building.](#building-transmission-from-git-first-time)
 
-#### CentOS 5.4 ####
-The packages you need are:
- * gcc
- * gcc-c++
- * m4
- * make
- * automake
- * libtool
- * gettext
- * openssl-devel
-
-Or simply run the following command:
-```bash
-$ yum install gcc gcc-c++ m4 make automake libtool gettext openssl-devel
-```
-
-However, Transmission needs other packages unavailable in `yum`:
- * [pkg-config](https://pkg-config.freedesktop.org/wiki/)
- * [libcurl](https://curl.haxx.se/)
- * [intltool](https://ftp.gnome.org/pub/gnome/sources/intltool/)
-
-Before building Transmission, you need to set the pkgconfig environment setting:
-```bash
-$ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-```
-
 ### Building Transmission from Git (first time) ###
 ```bash
 $ git clone --recurse-submodules https://github.com/transmission/transmission Transmission
