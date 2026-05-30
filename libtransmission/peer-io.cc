@@ -184,7 +184,7 @@ tr_peerIo::~tr_peerIo()
 // i.e. NEVER call this method in the constructor
 void tr_peerIo::set_socket(std::shared_ptr<tr_peer_socket> socket_in)
 {
-    TR_ASSERT(socket_in);
+    TR_ASSERT(socket_in && socket_in->socket_address().is_valid());
     close(); // tear down the previous socket, if any
 
     socket_ = std::move(socket_in);
