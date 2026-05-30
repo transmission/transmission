@@ -1226,8 +1226,9 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
         bool is_slow_peer = false;
         if (torrent->is_sequential_download())
         {
-            auto const peer_speed = peer->get_piece_speed(tr_time_msec(), tr_direction::PeerToClient);
-            is_slow_peer = peer_speed < tr::Values::Speed{ tr_block_info::BlockSize, tr::Values::Speed::Units::Byps };
+            static auto constexpr CountSeconds = 2;
+            auto const blocks_received = peer->blocks_sent_to_client.count(tr_time(), CountSeconds);
+            is_slow_peer = blocks_received <= CountSeconds;
         }
 
         return controller->next(numwant, [peer](tr_piece_index_t p) { return peer->has_piece(p); }, is_slow_peer);
