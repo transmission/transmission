@@ -188,6 +188,7 @@ void tr_peerIo::set_socket(std::shared_ptr<tr_peer_socket> socket_in)
     close(); // tear down the previous socket, if any
 
     socket_ = std::move(socket_in);
+    socket_address_ = socket_->socket_address();
 
     socket_->set_read_cb(
         [weak = weak_from_this()]
@@ -248,10 +249,9 @@ bool tr_peerIo::reconnect()
     auto const was_read_enabled = socket_->is_read_enabled();
     auto const was_write_enabled = socket_->is_write_enabled();
 
-    auto const sockaddr = socket_address();
     close();
 
-    auto s = tr_peer_socket_tcp::create(*session_, sockaddr, client_is_seed());
+    auto s = tr_peer_socket_tcp::create(*session_, socket_address(), client_is_seed());
     if (!s)
     {
         return false;

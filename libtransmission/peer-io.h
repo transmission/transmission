@@ -251,19 +251,19 @@ public:
         return is_incoming_;
     }
 
-    [[nodiscard]] auto const& address() const noexcept
+    [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
-        return socket_->address();
+        return socket_address_;
     }
 
-    [[nodiscard]] auto const& socket_address() const noexcept
+    [[nodiscard]] constexpr auto const& address() const noexcept
     {
-        return socket_->socket_address();
+        return socket_address().address();
     }
 
     [[nodiscard]] auto display_name() const
     {
-        return socket_->display_name();
+        return socket_address().display_name();
     }
 
     ///
@@ -353,6 +353,8 @@ private:
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info_;
 
     std::shared_ptr<tr_peer_socket> socket_;
+
+    tr_socket_address socket_address_;
 
     tr_bandwidth bandwidth_;
 
