@@ -282,7 +282,7 @@ std::wstring construct_cmd_line(char const* const* cmd)
 
 bool tr_spawn_async(
     char const* const* cmd,
-    std::span<std::pair<std::string_view, std::string_view>> env,
+    std::span<std::pair<std::string_view, std::string_view>> const env,
     std::string_view work_dir,
     tr_error* error)
 {
