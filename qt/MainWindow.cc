@@ -1125,16 +1125,16 @@ void MainWindow::trayActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void MainWindow::refreshPref(tr_quark const idx)
+void MainWindow::refreshPref(tr_quark const key)
 {
     auto b = bool{};
     auto str = QString{};
 
-    switch (idx)
+    switch (key)
     {
     case TR_KEY_statusbar_stats:
         {
-            auto const needle = QVariant::fromValue(prefs_.get<StatsMode>(idx));
+            auto const needle = QVariant::fromValue(prefs_.get<StatsMode>(key));
 
             for (auto* action : ui_.action_TotalRatio->actionGroup()->actions())
             {
@@ -1146,12 +1146,12 @@ void MainWindow::refreshPref(tr_quark const idx)
         break;
 
     case TR_KEY_sort_reversed:
-        ui_.action_ReverseSortOrder->setChecked(prefs_.get<bool>(idx));
+        ui_.action_ReverseSortOrder->setChecked(prefs_.get<bool>(key));
         break;
 
     case TR_KEY_sort_mode:
         {
-            auto const sort_mode = prefs_.get<SortMode>(idx);
+            auto const sort_mode = prefs_.get<SortMode>(key);
             for (auto* action : ui_.action_SortByActivity->actionGroup()->actions())
             {
                 action->setChecked(sort_mode == action->property(SortModeKey).value<SortMode>());
@@ -1161,49 +1161,49 @@ void MainWindow::refreshPref(tr_quark const idx)
         break;
 
     case TR_KEY_speed_limit_down_enabled:
-        (prefs_.get<bool>(idx) ? dlimit_on_action_ : dlimit_off_action_)->setChecked(true);
+        (prefs_.get<bool>(key) ? dlimit_on_action_ : dlimit_off_action_)->setChecked(true);
         break;
 
     case TR_KEY_speed_limit_down:
-        dlimit_on_action_->setText(tr("Limited at %1").arg(Speed{ prefs_.get<int>(idx), Speed::Units::KByps }.to_qstring()));
+        dlimit_on_action_->setText(tr("Limited at %1").arg(Speed{ prefs_.get<int>(key), Speed::Units::KByps }.to_qstring()));
         break;
 
     case TR_KEY_speed_limit_up_enabled:
-        (prefs_.get<bool>(idx) ? ulimit_on_action_ : ulimit_off_action_)->setChecked(true);
+        (prefs_.get<bool>(key) ? ulimit_on_action_ : ulimit_off_action_)->setChecked(true);
         break;
 
     case TR_KEY_speed_limit_up:
-        ulimit_on_action_->setText(tr("Limited at %1").arg(Speed{ prefs_.get<int>(idx), Speed::Units::KByps }.to_qstring()));
+        ulimit_on_action_->setText(tr("Limited at %1").arg(Speed{ prefs_.get<int>(key), Speed::Units::KByps }.to_qstring()));
         break;
 
     case TR_KEY_seed_ratio_limited:
-        (prefs_.get<bool>(idx) ? ratio_on_action_ : ratio_off_action_)->setChecked(true);
+        (prefs_.get<bool>(key) ? ratio_on_action_ : ratio_off_action_)->setChecked(true);
         break;
 
     case TR_KEY_seed_ratio_limit:
-        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(prefs_.get<double>(idx))));
+        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(prefs_.get<double>(key))));
         break;
 
     case TR_KEY_show_filterbar:
-        b = prefs_.get<bool>(idx);
+        b = prefs_.get<bool>(key);
         filter_bar_->setVisible(b);
         ui_.action_Filterbar->setChecked(b);
         break;
 
     case TR_KEY_show_statusbar:
-        b = prefs_.get<bool>(idx);
+        b = prefs_.get<bool>(key);
         ui_.statusBar->setVisible(b);
         ui_.action_Statusbar->setChecked(b);
         break;
 
     case TR_KEY_show_toolbar:
-        b = prefs_.get<bool>(idx);
+        b = prefs_.get<bool>(key);
         ui_.toolBar->setVisible(b);
         ui_.action_Toolbar->setChecked(b);
         break;
 
     case TR_KEY_show_notification_area_icon:
-        b = prefs_.get<bool>(idx);
+        b = prefs_.get<bool>(key);
         ui_.action_TrayIcon->setChecked(b);
         tray_icon_.setVisible(b);
         QApplication::setQuitOnLastWindowClosed(!b);
@@ -1211,7 +1211,7 @@ void MainWindow::refreshPref(tr_quark const idx)
         break;
 
     case TR_KEY_compact_view:
-        b = prefs_.get<bool>(idx);
+        b = prefs_.get<bool>(key);
         ui_.action_CompactView->setChecked(b);
         ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
         break;
