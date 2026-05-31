@@ -18,6 +18,8 @@
 
 #include <windows.h>
 
+#include <small/map.hpp>
+
 #include "libtransmission/error.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/subprocess.h"
@@ -80,7 +82,7 @@ public:
     }
 };
 
-using SortedWideEnv = std::map<std::wstring, std::wstring, WStrICompare>;
+using SortedWideEnv = small::map<std::wstring, std::wstring, 64U, WStrICompare>;
 
 /*
  * Var1=Value1\0
