@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-18 19:12+0000\n"
+"POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Spanish (https://app.transifex.com/transmissionbt/teams/33778/es/)\n"
@@ -79,7 +79,7 @@ msgstr "Cargando preferencias desde «{path}»"
 msgid "Saved pidfile '{path}'"
 msgstr "Archivo pid guardado «{path}»"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:248 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "No se pudo guardar «{path}»: {error} ({error_code})"
 
@@ -621,7 +621,7 @@ msgstr[0] "Uno de estos torrents no ha terminado de descargarse."
 msgstr[1] "Algunos torrents no se han descargado todavía."
 msgstr[2] "Algunos torrents no se han descargado todavía."
 
-#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:275 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr "_Cancelar"
 
@@ -649,7 +649,7 @@ msgstr "Baja"
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "No se puede renombrar «{old_path}» como «{path}»: {error} ({error_code})"
 
-#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:342
+#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:346
 msgid "Name"
 msgstr "Nombre"
 
@@ -796,44 +796,19 @@ msgstr "Analizado {file_size}"
 msgid "No source selected"
 msgstr "Ningún origen seleccionado"
 
-#: ../gtk/MessageLogWindow.cc:104
-msgctxt "Logging level"
-msgid "Critical"
-msgstr "Crítico"
-
-#: ../gtk/MessageLogWindow.cc:105
-msgctxt "Logging level"
-msgid "Error"
-msgstr "Error"
-
-#: ../gtk/MessageLogWindow.cc:106
-msgctxt "Logging level"
-msgid "Warning"
-msgstr "Advertencia"
-
-#: ../gtk/MessageLogWindow.cc:107
-msgctxt "Logging level"
-msgid "Information"
-msgstr "Información"
-
-#: ../gtk/MessageLogWindow.cc:108
-msgctxt "Logging level"
-msgid "Debug"
-msgstr "Depuración"
-
-#: ../gtk/MessageLogWindow.cc:271
+#: ../gtk/MessageLogWindow.cc:275
 msgid "Save Log"
 msgstr "Guardar registro"
 
-#: ../gtk/MessageLogWindow.cc:271 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
+#: ../gtk/MessageLogWindow.cc:275 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
 msgstr "_Guardar"
 
-#: ../gtk/MessageLogWindow.cc:351
+#: ../gtk/MessageLogWindow.cc:355
 msgid "Message"
 msgstr "Mensaje"
 
-#: ../gtk/MessageLogWindow.cc:360
+#: ../gtk/MessageLogWindow.cc:364
 msgid "Time"
 msgstr "Hora"
 
@@ -2224,11 +2199,11 @@ msgstr "Abrir torrent desde un URL"
 msgid "_URL"
 msgstr "_URL"
 
-#: ../libtransmission/announcer-http.cc:453
+#: ../libtransmission/announcer-http.cc:455
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "No se pudo analizar la respuesta de anuncio: {error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:673
+#: ../libtransmission/announcer-http.cc:675
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "No se pudo analizar la respuesta de rastreo: {error} ({error_code})"
 
@@ -2347,7 +2322,7 @@ msgstr "No se pudo prereservar «{path}»: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "No se pudo truncar «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:686
+#: ../libtransmission/peer-io.cc:692
 msgid "Unknown state: {state}"
 msgstr "Estado desconocido: {state}"
 
@@ -2419,74 +2394,74 @@ msgstr "Estado cambiado de «{old_state}» a «{state}»"
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr "La ruta del «socket» Unix debe ser menor de {count} caracteres (incluyendo el prefijo «{prefix}»)"
 
-#: ../libtransmission/rpc-server.cc:348
+#: ../libtransmission/rpc-server.cc:356
 msgid "Rejected request from {host} (possible directory traversal attack)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:536
+#: ../libtransmission/rpc-server.cc:545
 msgid "Rejected request from {host} (brute force protection active)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:545
+#: ../libtransmission/rpc-server.cc:554
 msgid "Rejected request from {host} (IP not whitelisted)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:569
+#: ../libtransmission/rpc-server.cc:578
 msgid "Rejected request from {host} (failed authentication)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:611
+#: ../libtransmission/rpc-server.cc:620
 msgid "Rejected request from {host} (Host not whitelisted)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:649
+#: ../libtransmission/rpc-server.cc:658
 msgid "Unknown URI from {host}: '{uri}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:669
+#: ../libtransmission/rpc-server.cc:678
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr "Los «sockets» Unix no está soportados en Windows. Cambie «{key}» en sus preferencias."
 
-#: ../libtransmission/rpc-server.cc:697
+#: ../libtransmission/rpc-server.cc:706
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr "No se pudo establecer el modo de «socket» a {mode:#o}, estableciendolo a 0755"
 
-#: ../libtransmission/rpc-server.cc:814
+#: ../libtransmission/rpc-server.cc:823
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "No se pudo unir a {address} después de {count} intento, renunciando"
 msgstr[1] "No se pudo unir a {address} después de {count} intentos, renunciando"
 msgstr[2] "No se pudo unir a {address} después de {count} intentos, renunciando"
 
-#: ../libtransmission/rpc-server.cc:827
+#: ../libtransmission/rpc-server.cc:836
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr "Escuchando peticiones RPC y Web en «{address}»"
 
-#: ../libtransmission/rpc-server.cc:857
+#: ../libtransmission/rpc-server.cc:866
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr "Detenida la escucha de peticiones RPC y Web en «{address}»"
 
-#: ../libtransmission/rpc-server.cc:881
+#: ../libtransmission/rpc-server.cc:890
 msgid "Added '{entry}' to host whitelist"
 msgstr "Añadido «{entry}» a la lista blanca de «host»"
 
-#: ../libtransmission/rpc-server.cc:1003
+#: ../libtransmission/rpc-server.cc:1012
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr "La preferencia «{key}» es «{value}» pero debe ser una dirección IPv4 o IPv6 o una ruta de «socket» Unix. Usando por defecto el valor «0.0.0.0»"
 
-#: ../libtransmission/rpc-server.cc:1016
+#: ../libtransmission/rpc-server.cc:1025
 msgid "Serving RPC and Web requests on {address}"
 msgstr "Sirviendo peticiones RPC y Web en {address}"
 
-#: ../libtransmission/rpc-server.cc:1021
+#: ../libtransmission/rpc-server.cc:1030
 msgid "Whitelist enabled"
 msgstr "Lista Blanca activada"
 
-#: ../libtransmission/rpc-server.cc:1026
+#: ../libtransmission/rpc-server.cc:1035
 msgid "Password required"
 msgstr "Contraseña requerida"
 
-#: ../libtransmission/rpc-server.cc:1033
+#: ../libtransmission/rpc-server.cc:1042
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr "Sirviendo peticiones RPC y Web desde «{path}»"
 
@@ -2498,7 +2473,7 @@ msgstr "No se pudo probar puerto: {error} ({error_code})"
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr "No se pudo obtener lista de bloqueos: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1707
+#: ../libtransmission/rpcimpl.cc:1716
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr "No se pudo obtener torrent: {error} ({error_code})"
 
@@ -2518,74 +2493,74 @@ msgstr "No se pudo abrir sesión de archivo cerradura «{path}»: {error} ({erro
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "Escuchando conexiones entrantes de pares en {hostport}"
 
-#: ../libtransmission/session.cc:749
+#: ../libtransmission/session.cc:764
 msgid "Transmission version {version} starting"
 msgstr "Iniciando versión {version} de Transmission"
 
-#: ../libtransmission/session.cc:1489
+#: ../libtransmission/session.cc:1504
 msgid "Transmission version {version} shutting down"
 msgstr "Versión de Tranmission {version} cerrando"
 
-#: ../libtransmission/session.cc:1571
+#: ../libtransmission/session.cc:1586
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "Subido {count} torrent"
 msgstr[1] "Subidos {count} torrents "
 msgstr[2] "Subidos {count} torrents"
 
-#: ../libtransmission/torrent-metainfo.cc:739
+#: ../libtransmission/torrent-metainfo.cc:743
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Migrado archivo torrent de «{old_path}» a «{path}»"
 
-#: ../libtransmission/torrent.cc:156
+#: ../libtransmission/torrent.cc:162
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "No se pudo usar metainformación de «{path}» para «{magnet}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:185
+#: ../libtransmission/torrent.cc:191
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr "¡No se han encontrado datos! Asegúrese de que sus unidades están conectadas o use «Cambiar ubicación». Para volver a descargar, use «Verificar datos locales» e inicie el torrent a continuación."
 
-#: ../libtransmission/torrent.cc:424
+#: ../libtransmission/torrent.cc:430
 msgid "Calling script '{path}'"
 msgstr "Invicando script «{path}»"
 
-#: ../libtransmission/torrent.cc:432
+#: ../libtransmission/torrent.cc:438
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "No se pudo invocar script «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:466
+#: ../libtransmission/torrent.cc:472
 msgid "Seed ratio reached; pausing torrent"
 msgstr "Proporción de sembrado alcanzado; pausando torrent"
 
-#: ../libtransmission/torrent.cc:473
+#: ../libtransmission/torrent.cc:479
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "Límite de inactividad de sembrado alcanzado; pausando torrent"
 
-#: ../libtransmission/torrent.cc:636
+#: ../libtransmission/torrent.cc:654
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Se ha reiniciado manualmente, desactivando su relación de compartición"
 
-#: ../libtransmission/torrent.cc:692
+#: ../libtransmission/torrent.cc:710
 msgid "Pausing torrent"
 msgstr "Pausando torrent"
 
-#: ../libtransmission/torrent.cc:737
+#: ../libtransmission/torrent.cc:755
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:780
+#: ../libtransmission/torrent.cc:798
 msgid "Removing torrent"
 msgstr "Eliminando torrent"
 
-#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
+#: ../libtransmission/torrent.cc:1117 ../libtransmission/torrent.cc:1639
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "No se pudo mover «{old_path}» a «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1563
+#: ../libtransmission/torrent.cc:1581
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr "¡Torrent pausado debido a que no se han encotrado datos! Asegurése de que sus unidades están conectadas o use «Cambiar ubicación», luego use «Verificar datos»  de nuevo. Para volver a descargar, inicie el torrent."
 
-#: ../libtransmission/torrent.cc:2069
+#: ../libtransmission/torrent.cc:2087
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr "Advertencia de rastreador: «{warning}» ({url})"
 
@@ -2742,3 +2717,23 @@ msgid_plural "days"
 msgstr[0] "día"
 msgstr[1] "días"
 msgstr[2] "días"
+
+#~ msgctxt "Logging level"
+#~ msgid "Critical"
+#~ msgstr "Crítico"
+
+#~ msgctxt "Logging level"
+#~ msgid "Debug"
+#~ msgstr "Depuración"
+
+#~ msgctxt "Logging level"
+#~ msgid "Error"
+#~ msgstr "Error"
+
+#~ msgctxt "Logging level"
+#~ msgid "Information"
+#~ msgstr "Información"
+
+#~ msgctxt "Logging level"
+#~ msgid "Warning"
+#~ msgstr "Advertencia"

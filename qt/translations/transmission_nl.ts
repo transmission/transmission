@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message numerus="yes">
-        <location filename="../Application.cc" line="+313"/>
+        <location filename="../Application.cc" line="+330"/>
         <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Torrent voltooid</numerusform>
@@ -2112,7 +2112,7 @@ Om een nieuwe primaire URL toe te voegen, voeg je deze toe na een lege regel.</t
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-266"/>
+        <location filename="../Application.cc" line="-282"/>
         <source>B/s</source>
         <translation>B/s</translation>
     </message>
@@ -2183,7 +2183,7 @@ Om een nieuwe primaire URL toe te voegen, voeg je deze toe na een lege regel.</t
         <translation>TB</translation>
     </message>
     <message>
-        <location line="+247"/>
+        <location line="+263"/>
         <source>Start Now</source>
         <translation>Nu starten</translation>
     </message>

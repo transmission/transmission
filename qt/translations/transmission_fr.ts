@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message numerus="yes">
-        <location filename="../Application.cc" line="+313"/>
+        <location filename="../Application.cc" line="+330"/>
         <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Torrent terminé</numerusform>
@@ -2112,7 +2112,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-266"/>
+        <location filename="../Application.cc" line="-282"/>
         <source>B/s</source>
         <translation>b/s</translation>
     </message>
@@ -2183,7 +2183,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
         <translation>To</translation>
     </message>
     <message>
-        <location line="+247"/>
+        <location line="+263"/>
         <source>Start Now</source>
         <translation>Démarrer maintenant</translation>
     </message>

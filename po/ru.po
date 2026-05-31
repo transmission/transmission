@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-18 19:12+0000\n"
+"POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Victor, 2026\n"
 "Language-Team: Russian (https://app.transifex.com/transmissionbt/teams/33778/ru/)\n"
@@ -80,7 +80,7 @@ msgstr "Загрузка настроек из «{path}»"
 msgid "Saved pidfile '{path}'"
 msgstr "Файл pid сохранён «{path}»"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:248 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "Не удалось сохранить «{path}»: {error} ({error_code})"
 
@@ -558,7 +558,7 @@ msgstr[1] "Загрузка некоторых из этих торрентов 
 msgstr[2] "Загрузка некоторых из этих торрентов не завершена."
 msgstr[3] "Загрузка некоторых из этих торрентов не завершена."
 
-#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:275 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr "_Отмена"
 
@@ -586,7 +586,7 @@ msgstr "Низкий"
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "Не удалось переименовать «{old_path}» в «{path}»: {error} ({error_code})"
 
-#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:342
+#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:346
 msgid "Name"
 msgstr "Имя"
 
@@ -733,44 +733,19 @@ msgstr "{file_size} отсканировано"
 msgid "No source selected"
 msgstr "Источник не выбран"
 
-#: ../gtk/MessageLogWindow.cc:104
-msgctxt "Logging level"
-msgid "Critical"
-msgstr "Критический"
-
-#: ../gtk/MessageLogWindow.cc:105
-msgctxt "Logging level"
-msgid "Error"
-msgstr "Ошибка"
-
-#: ../gtk/MessageLogWindow.cc:106
-msgctxt "Logging level"
-msgid "Warning"
-msgstr "Предупреждение"
-
-#: ../gtk/MessageLogWindow.cc:107
-msgctxt "Logging level"
-msgid "Information"
-msgstr "Информация"
-
-#: ../gtk/MessageLogWindow.cc:108
-msgctxt "Logging level"
-msgid "Debug"
-msgstr "Отладочный"
-
-#: ../gtk/MessageLogWindow.cc:271
+#: ../gtk/MessageLogWindow.cc:275
 msgid "Save Log"
 msgstr "Сохранить журнал"
 
-#: ../gtk/MessageLogWindow.cc:271 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
+#: ../gtk/MessageLogWindow.cc:275 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
 msgstr "_Сохранить"
 
-#: ../gtk/MessageLogWindow.cc:351
+#: ../gtk/MessageLogWindow.cc:355
 msgid "Message"
 msgstr "Сообщение"
 
-#: ../gtk/MessageLogWindow.cc:360
+#: ../gtk/MessageLogWindow.cc:364
 msgid "Time"
 msgstr "Время"
 
@@ -2182,11 +2157,11 @@ msgstr "Открыть торрент по ссылке"
 msgid "_URL"
 msgstr "_Ссылка"
 
-#: ../libtransmission/announcer-http.cc:453
+#: ../libtransmission/announcer-http.cc:455
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "Не удалось разобрать ответ анонса: {error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:673
+#: ../libtransmission/announcer-http.cc:675
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "Не удалось разобрать ответ запроса к трекеру: {error} ({error_code})"
 
@@ -2307,7 +2282,7 @@ msgstr "Не удалось предраспределить «{path}»: {error}
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Не удалось сократить «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:686
+#: ../libtransmission/peer-io.cc:692
 msgid "Unknown state: {state}"
 msgstr "Неизвестное состояние: {state}"
 
@@ -2379,39 +2354,39 @@ msgstr "Состояние изменено с «{old_state}» на «{state}»"
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr "Путь к сокету Unix должен быть меньше {count} символов (включая префикс «{prefix}»)"
 
-#: ../libtransmission/rpc-server.cc:348
+#: ../libtransmission/rpc-server.cc:356
 msgid "Rejected request from {host} (possible directory traversal attack)"
 msgstr "Отклоненный запрос от {host} (вероятна атака обхода каталога)"
 
-#: ../libtransmission/rpc-server.cc:536
+#: ../libtransmission/rpc-server.cc:545
 msgid "Rejected request from {host} (brute force protection active)"
 msgstr "Отклоненный запрос от {host} (активна защита от брутфорса)"
 
-#: ../libtransmission/rpc-server.cc:545
+#: ../libtransmission/rpc-server.cc:554
 msgid "Rejected request from {host} (IP not whitelisted)"
 msgstr "Отклоненный запрос от {host} (IP не входит в белый список)"
 
-#: ../libtransmission/rpc-server.cc:569
+#: ../libtransmission/rpc-server.cc:578
 msgid "Rejected request from {host} (failed authentication)"
 msgstr "Отклоненный запрос от {host} (ошибка аутентификации)"
 
-#: ../libtransmission/rpc-server.cc:611
+#: ../libtransmission/rpc-server.cc:620
 msgid "Rejected request from {host} (Host not whitelisted)"
 msgstr "Отклоненный запрос от {host} (хост не входит в белый список)"
 
-#: ../libtransmission/rpc-server.cc:649
+#: ../libtransmission/rpc-server.cc:658
 msgid "Unknown URI from {host}: '{uri}'"
 msgstr "Неизвестный URI от {host}: «{uri}»"
 
-#: ../libtransmission/rpc-server.cc:669
+#: ../libtransmission/rpc-server.cc:678
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr "Сокеты Unix не поддерживаются в Windows. Пожалуйста, измените «{key}» в ваших настройках."
 
-#: ../libtransmission/rpc-server.cc:697
+#: ../libtransmission/rpc-server.cc:706
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr "Не удалось установить режим сокета RPC на {mode:#o}, по умолчанию 0755"
 
-#: ../libtransmission/rpc-server.cc:814
+#: ../libtransmission/rpc-server.cc:823
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "Не удалось привязать {address} после {count} попытки, привязка отменена"
@@ -2419,35 +2394,35 @@ msgstr[1] "Не удалось привязать {address} после {count} �
 msgstr[2] "Не удалось привязать {address} после {count} попыток, привязка отменена"
 msgstr[3] "Не удалось привязать {address} после {count} попыток, привязка отменена"
 
-#: ../libtransmission/rpc-server.cc:827
+#: ../libtransmission/rpc-server.cc:836
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr "Прослушивание RPC и веб-запросов на «{address}»"
 
-#: ../libtransmission/rpc-server.cc:857
+#: ../libtransmission/rpc-server.cc:866
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr "Прекращено прослушивание RPC и веб-запросов на «{address}»"
 
-#: ../libtransmission/rpc-server.cc:881
+#: ../libtransmission/rpc-server.cc:890
 msgid "Added '{entry}' to host whitelist"
 msgstr "«{entry}» добавлен в список хостов белого списка"
 
-#: ../libtransmission/rpc-server.cc:1003
+#: ../libtransmission/rpc-server.cc:1012
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr "Параметр «{key}» равен «{value}», но должен быть адресом IPv4 или IPv6 или путём к сокету Unix. Используется значения по умолчанию «0.0.0.0»"
 
-#: ../libtransmission/rpc-server.cc:1016
+#: ../libtransmission/rpc-server.cc:1025
 msgid "Serving RPC and Web requests on {address}"
 msgstr "Обслуживаются RPC и веб-запросы на {address}"
 
-#: ../libtransmission/rpc-server.cc:1021
+#: ../libtransmission/rpc-server.cc:1030
 msgid "Whitelist enabled"
 msgstr "Список разрешённых задействован"
 
-#: ../libtransmission/rpc-server.cc:1026
+#: ../libtransmission/rpc-server.cc:1035
 msgid "Password required"
 msgstr "Требуется пароль"
 
-#: ../libtransmission/rpc-server.cc:1033
+#: ../libtransmission/rpc-server.cc:1042
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr "Обслуживаются RPC и веб-запросы от «{path}»"
 
@@ -2459,7 +2434,7 @@ msgstr "Не удалось проверить порт: {error} ({error_code})"
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr "Не удалось получить чёрный список: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1707
+#: ../libtransmission/rpcimpl.cc:1716
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr "Не удалось получить торрент: {error} ({error_code})"
 
@@ -2479,15 +2454,15 @@ msgstr "Не удалось открыть файл блокировки сеа�
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "Прослушиваются входящие соединения участников на {hostport}"
 
-#: ../libtransmission/session.cc:749
+#: ../libtransmission/session.cc:764
 msgid "Transmission version {version} starting"
 msgstr "Transmission версии {version} запускается"
 
-#: ../libtransmission/session.cc:1489
+#: ../libtransmission/session.cc:1504
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission версии {version} завершает работу"
 
-#: ../libtransmission/session.cc:1571
+#: ../libtransmission/session.cc:1586
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "Загружен {count} торрент"
@@ -2495,59 +2470,59 @@ msgstr[1] "Загружено {count} торрента"
 msgstr[2] "Загружено {count} торрентов"
 msgstr[3] "Загружено {count} торрентов"
 
-#: ../libtransmission/torrent-metainfo.cc:739
+#: ../libtransmission/torrent-metainfo.cc:743
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Торрент-файл перенесён из «{old_path}» в «{path}»"
 
-#: ../libtransmission/torrent.cc:156
+#: ../libtransmission/torrent.cc:162
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "Не удалось использовать метаинформацию из «{path}» для «{magnet}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:185
+#: ../libtransmission/torrent.cc:191
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr "Нет данных! Убедитесь, что ваши диски подключены или используйте \"Указать расположение\". Чтобы загрузить повторно, используйте \"Проверить локальные данные\" и запустите торрент после этого."
 
-#: ../libtransmission/torrent.cc:424
+#: ../libtransmission/torrent.cc:430
 msgid "Calling script '{path}'"
 msgstr "Вызывается сценарий «{path}»"
 
-#: ../libtransmission/torrent.cc:432
+#: ../libtransmission/torrent.cc:438
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "Не удалось вызвать сценарий «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:466
+#: ../libtransmission/torrent.cc:472
 msgid "Seed ratio reached; pausing torrent"
 msgstr "Рейтинг раздачи достигнут; приостановка торрента"
 
-#: ../libtransmission/torrent.cc:473
+#: ../libtransmission/torrent.cc:479
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "Простой раздачи достигнут; приостановка торрента"
 
-#: ../libtransmission/torrent.cc:636
+#: ../libtransmission/torrent.cc:654
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Перезагружено вручную — отключение рейтинга раздачи"
 
-#: ../libtransmission/torrent.cc:692
+#: ../libtransmission/torrent.cc:710
 msgid "Pausing torrent"
 msgstr "Приостановка торрента"
 
-#: ../libtransmission/torrent.cc:737
+#: ../libtransmission/torrent.cc:755
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr "Не удалось удалить все торрент-файлы: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:780
+#: ../libtransmission/torrent.cc:798
 msgid "Removing torrent"
 msgstr "Удаление торрента"
 
-#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
+#: ../libtransmission/torrent.cc:1117 ../libtransmission/torrent.cc:1639
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "Не удалось переместить «{old_path}» в «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1563
+#: ../libtransmission/torrent.cc:1581
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr "Приостановлен торрент, так как данные не были найдены! Убедитесь, что ваши диски подключены или используйте \"Указать расположение\", затем снова используйте \"Проверить локальные данные\". Чтобы загрузить повторно, запустите торрент."
 
-#: ../libtransmission/torrent.cc:2069
+#: ../libtransmission/torrent.cc:2087
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr "Предупреждение трекера: «{warning}» ({url})"
 
@@ -2710,3 +2685,23 @@ msgstr[0] "день"
 msgstr[1] "дня"
 msgstr[2] "дней"
 msgstr[3] "дней"
+
+#~ msgctxt "Logging level"
+#~ msgid "Critical"
+#~ msgstr "Критический"
+
+#~ msgctxt "Logging level"
+#~ msgid "Debug"
+#~ msgstr "Отладочный"
+
+#~ msgctxt "Logging level"
+#~ msgid "Error"
+#~ msgstr "Ошибка"
+
+#~ msgctxt "Logging level"
+#~ msgid "Information"
+#~ msgstr "Информация"
+
+#~ msgctxt "Logging level"
+#~ msgid "Warning"
+#~ msgstr "Предупреждение"

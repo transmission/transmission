@@ -22,7 +22,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-18 19:12+0000\n"
+"POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Ukrainian (https://app.transifex.com/transmissionbt/teams/33778/uk/)\n"
@@ -84,7 +84,7 @@ msgstr "Завантаження налаштувань з «{path}»"
 msgid "Saved pidfile '{path}'"
 msgstr "Збережено pid-файл «{path}»"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:248 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "Не вдалося зберегти «{path}»: {error} ({error_code})"
 
@@ -583,7 +583,7 @@ msgstr[1] "Завантаження деяких із цих торентів н
 msgstr[2] "Завантаження деяких із цих торентів не завершене."
 msgstr[3] "Завантаження деяких із цих торентів не завершене."
 
-#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:275 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr "_Скасувати"
 
@@ -611,7 +611,7 @@ msgstr "Низький"
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "Не вдалося перейменувати «{old_path}» як «{path}»: {error} ({error_code})"
 
-#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:342
+#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:346
 msgid "Name"
 msgstr "Назва"
 
@@ -758,44 +758,19 @@ msgstr "Проскановано {file_size}"
 msgid "No source selected"
 msgstr "Не вказано джерела"
 
-#: ../gtk/MessageLogWindow.cc:104
-msgctxt "Logging level"
-msgid "Critical"
-msgstr "Критично"
-
-#: ../gtk/MessageLogWindow.cc:105
-msgctxt "Logging level"
-msgid "Error"
-msgstr "Помилка"
-
-#: ../gtk/MessageLogWindow.cc:106
-msgctxt "Logging level"
-msgid "Warning"
-msgstr "Попередження"
-
-#: ../gtk/MessageLogWindow.cc:107
-msgctxt "Logging level"
-msgid "Information"
-msgstr "Інформація"
-
-#: ../gtk/MessageLogWindow.cc:108
-msgctxt "Logging level"
-msgid "Debug"
-msgstr "Дебаг"
-
-#: ../gtk/MessageLogWindow.cc:271
+#: ../gtk/MessageLogWindow.cc:275
 msgid "Save Log"
 msgstr "Зберегти журнал"
 
-#: ../gtk/MessageLogWindow.cc:271 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
+#: ../gtk/MessageLogWindow.cc:275 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
 msgstr "_Зберегти"
 
-#: ../gtk/MessageLogWindow.cc:351
+#: ../gtk/MessageLogWindow.cc:355
 msgid "Message"
 msgstr "Повідомлення"
 
-#: ../gtk/MessageLogWindow.cc:360
+#: ../gtk/MessageLogWindow.cc:364
 msgid "Time"
 msgstr "Час"
 
@@ -2207,11 +2182,11 @@ msgstr "Відкрити торент з адреси"
 msgid "_URL"
 msgstr "_Адреса"
 
-#: ../libtransmission/announcer-http.cc:453
+#: ../libtransmission/announcer-http.cc:455
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "Не вдалося розпізнати відповідь оголошення: {error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:673
+#: ../libtransmission/announcer-http.cc:675
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "Не вдалося розпізнати відповідь scrape: {error} ({error_code})"
 
@@ -2332,7 +2307,7 @@ msgstr "Не вдалося зарезервувати «{path}»: {error} ({err
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Не вдалося обрізати «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:686
+#: ../libtransmission/peer-io.cc:692
 msgid "Unknown state: {state}"
 msgstr "Невідомий стан: {state}"
 
@@ -2404,39 +2379,39 @@ msgstr "Стан змінено з «{old_state}» до «{state}»"
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr "Довжина шляху до Unix-сокета має бути менше {count} символів (включно з префіксом «{prefix}»)"
 
-#: ../libtransmission/rpc-server.cc:348
+#: ../libtransmission/rpc-server.cc:356
 msgid "Rejected request from {host} (possible directory traversal attack)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:536
+#: ../libtransmission/rpc-server.cc:545
 msgid "Rejected request from {host} (brute force protection active)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:545
+#: ../libtransmission/rpc-server.cc:554
 msgid "Rejected request from {host} (IP not whitelisted)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:569
+#: ../libtransmission/rpc-server.cc:578
 msgid "Rejected request from {host} (failed authentication)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:611
+#: ../libtransmission/rpc-server.cc:620
 msgid "Rejected request from {host} (Host not whitelisted)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:649
+#: ../libtransmission/rpc-server.cc:658
 msgid "Unknown URI from {host}: '{uri}'"
 msgstr "Невідомий URI від {host}: '{uri}'"
 
-#: ../libtransmission/rpc-server.cc:669
+#: ../libtransmission/rpc-server.cc:678
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr "Unix-сокети не підтримуються у Windows. Будь ласка, змініть «{key}» у ваших налаштуваннях."
 
-#: ../libtransmission/rpc-server.cc:697
+#: ../libtransmission/rpc-server.cc:706
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr "Не вдалося встановити режим доступу до RPC сокета {mode:#o}, встановлення 0755 за замовчуванням"
 
-#: ../libtransmission/rpc-server.cc:814
+#: ../libtransmission/rpc-server.cc:823
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "Не вдалося привʼязати до {address} після {count} спроби, спроби облишено"
@@ -2444,35 +2419,35 @@ msgstr[1] "Не вдалося привʼязати до {address} після {c
 msgstr[2] "Не вдалося привʼязати до {address} після {count} спроб, спроби облишено"
 msgstr[3] "Не вдалося привʼязати до {address} після {count} спроби, спроби облишено"
 
-#: ../libtransmission/rpc-server.cc:827
+#: ../libtransmission/rpc-server.cc:836
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr "Прослуховування RPC та Web запитів на «{address}»"
 
-#: ../libtransmission/rpc-server.cc:857
+#: ../libtransmission/rpc-server.cc:866
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr "Зупинено прослуховування RPC та Веб запитів на «{address}»"
 
-#: ../libtransmission/rpc-server.cc:881
+#: ../libtransmission/rpc-server.cc:890
 msgid "Added '{entry}' to host whitelist"
 msgstr "Додано «{entry}» до білого списку"
 
-#: ../libtransmission/rpc-server.cc:1003
+#: ../libtransmission/rpc-server.cc:1012
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr "Значення «{key}» встановлено до «{value}», але має бути IPv4 або IPv6 адресою або шляхом до Unix-сокета. Використовується значення за замовчанням «0.0.0.0»"
 
-#: ../libtransmission/rpc-server.cc:1016
+#: ../libtransmission/rpc-server.cc:1025
 msgid "Serving RPC and Web requests on {address}"
 msgstr "Обслуговування RPC та Web запитів на {address}"
 
-#: ../libtransmission/rpc-server.cc:1021
+#: ../libtransmission/rpc-server.cc:1030
 msgid "Whitelist enabled"
 msgstr "Білий список увімкнено"
 
-#: ../libtransmission/rpc-server.cc:1026
+#: ../libtransmission/rpc-server.cc:1035
 msgid "Password required"
 msgstr "Потрібен пароль"
 
-#: ../libtransmission/rpc-server.cc:1033
+#: ../libtransmission/rpc-server.cc:1042
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr "Обслуговування RPC та Web запитів із «{path}»"
 
@@ -2484,7 +2459,7 @@ msgstr "Не вдалося перевірити порт: {error} ({error_code}
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr "Не вдалося отримати список блокування: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1707
+#: ../libtransmission/rpcimpl.cc:1716
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr "Не вдалося отримати торент: {error} ({error_code})"
 
@@ -2504,15 +2479,15 @@ msgstr "Не вдалося відкрити lock-файл сесії «{path}»
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "Прослуховуються вхідні з'єднання вузлів на {hostport}"
 
-#: ../libtransmission/session.cc:749
+#: ../libtransmission/session.cc:764
 msgid "Transmission version {version} starting"
 msgstr "Transmission версії {version} запускається"
 
-#: ../libtransmission/session.cc:1489
+#: ../libtransmission/session.cc:1504
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission версії {version} завершує роботу"
 
-#: ../libtransmission/session.cc:1571
+#: ../libtransmission/session.cc:1586
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "Завантажено {count} торент"
@@ -2520,59 +2495,59 @@ msgstr[1] "Завантажено {count} торенти"
 msgstr[2] "Завантажено {count} торентів"
 msgstr[3] "Завантажено {count} торента"
 
-#: ../libtransmission/torrent-metainfo.cc:739
+#: ../libtransmission/torrent-metainfo.cc:743
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Торент-файл перенесено з '{old_path}' до '{path}'"
 
-#: ../libtransmission/torrent.cc:156
+#: ../libtransmission/torrent.cc:162
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "Не вдалося використати метаінформацію від  '{path}' для '{magnet}': {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:185
+#: ../libtransmission/torrent.cc:191
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr " Дані не знайдено! Переконайтеся, що ваші диски підключено, або скористайтеся «Встановити розташування». Щоб завантажити повторно, скористайтеся \"Перевірити локальні дані\" і запустіть торрент після цього."
 
-#: ../libtransmission/torrent.cc:424
+#: ../libtransmission/torrent.cc:430
 msgid "Calling script '{path}'"
 msgstr "Запуск сценарію «{path}»"
 
-#: ../libtransmission/torrent.cc:432
+#: ../libtransmission/torrent.cc:438
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "Не вдалося запустити сценарій «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:466
+#: ../libtransmission/torrent.cc:472
 msgid "Seed ratio reached; pausing torrent"
 msgstr "Досягнуто співвідношення роздачі; призупинення торента"
 
-#: ../libtransmission/torrent.cc:473
+#: ../libtransmission/torrent.cc:479
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "Досягнуто ліміту роздачі простою; призупинення торента"
 
-#: ../libtransmission/torrent.cc:636
+#: ../libtransmission/torrent.cc:654
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Перезапущено вручну — співвідношення вимкнено"
 
-#: ../libtransmission/torrent.cc:692
+#: ../libtransmission/torrent.cc:710
 msgid "Pausing torrent"
 msgstr "Призупинення торента"
 
-#: ../libtransmission/torrent.cc:737
+#: ../libtransmission/torrent.cc:755
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:780
+#: ../libtransmission/torrent.cc:798
 msgid "Removing torrent"
 msgstr "Вилучення торенту"
 
-#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
+#: ../libtransmission/torrent.cc:1117 ../libtransmission/torrent.cc:1639
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "Не вдалося пересунути «{old_path}» до «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1563
+#: ../libtransmission/torrent.cc:1581
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr " Торрент призупинено, оскільки не знайдено жодних даних!Переконайтеся, що ваші диски підключено, або скористайтеся «Встановити місцезнаходження», а потім знову скористайтеся «Перевірити локальні дані». Щоб завантажити повторно, запустіть торрент."
 
-#: ../libtransmission/torrent.cc:2069
+#: ../libtransmission/torrent.cc:2087
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr " Попередження відстеження: '{warning}' ({url})"
 
@@ -2735,3 +2710,23 @@ msgstr[0] "день"
 msgstr[1] "дні"
 msgstr[2] "днів"
 msgstr[3] "дня"
+
+#~ msgctxt "Logging level"
+#~ msgid "Critical"
+#~ msgstr "Критично"
+
+#~ msgctxt "Logging level"
+#~ msgid "Debug"
+#~ msgstr "Дебаг"
+
+#~ msgctxt "Logging level"
+#~ msgid "Error"
+#~ msgstr "Помилка"
+
+#~ msgctxt "Logging level"
+#~ msgid "Information"
+#~ msgstr "Інформація"
+
+#~ msgctxt "Logging level"
+#~ msgid "Warning"
+#~ msgstr "Попередження"
