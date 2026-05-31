@@ -22,6 +22,7 @@
         formatter.dateStyle = NSDateFormatterFullStyle;
         formatter.timeStyle = NSDateFormatterShortStyle;
         formatter.doesRelativeDateFormatting = YES;
+        formatter.timeZone = NSTimeZone.localTimeZone;
     });
     return formatter;
 }
