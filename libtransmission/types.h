@@ -79,6 +79,13 @@ enum class tr_file_preallocation : uint8_t
     Full,
 };
 
+enum class tr_content_layout : uint8_t
+{
+    Original,
+    Subfolder,
+    NoSubfolder,
+};
+
 class tr_port
 {
 public:

@@ -293,4 +293,155 @@ TEST_F(TorrentMetainfoTest, preservesInfoDictOrder)
     }
 }
 
+TEST_F(TorrentMetainfoTest, contentLayoutOriginal)
+{
+    // Original layout must never modify file paths
+
+    static auto constexpr Benc =
+        "d10:created by25:Transmission/2.82 (14160)13:creation datei1402280218e8:encoding5:UTF-8"
+        "4:infod5:filesld6:lengthi2e4:pathl5:a.txteed6:lengthi2e4:pathl5:b.txtee"
+        "e4:name3:foo12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaa7:privatei0eee"sv;
+            
+    auto tm = tr_torrent_metainfo{};
+    ASSERT_TRUE(tm.parse_benc(Benc));
+    ASSERT_EQ(2U, tm.file_count());
+
+    tm.apply_content_layout(tr_content_layout::Original);
+
+    EXPECT_EQ("foo/a.txt"sv, tm.file_subpath(0));
+    EXPECT_EQ("foo/b.txt"sv, tm.file_subpath(1));
+}
+
+TEST_F(TorrentMetainfoTest, contentLayoutSubfolderAddsFolder)
+{
+    // Subfolder wraps files in a top-level folder when none exists
+
+    static auto constexpr Benc =
+        "d10:created by25:Transmission/2.82 (14160)13:creation datei1402280218e8:encoding5:UTF-8"
+        "4:infod5:filesld6:lengthi2e4:pathl5:a.txteed6:lengthi2e4:pathl5:b.txtee"
+        "e4:name3:foo12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaa7:privatei0eee"sv;
+    
+    auto tm = tr_torrent_metainfo{};
+    ASSERT_TRUE(tm.parse_benc(Benc));
+    // manually strip the top-level folder to simulate files without one
+    tm.set_file_subpath(0, "a.txt"sv);
+    tm.set_file_subpath(1, "b.txt"sv);
+
+    tm.apply_content_layout(tr_content_layout::Subfolder);
+
+    EXPECT_EQ("foo/a.txt"sv, tm.file_subpath(0));
+    EXPECT_EQ("foo/b.txt"sv, tm.file_subpath(1));
+}
+
+TEST_F(TorrentMetainfoTest, contentLayoutSubfolderNoOp)
+{
+    // Subfolder is a no-op when a top-level folder already exists
+
+    static auto constexpr Benc =
+        "d10:created by25:Transmission/2.82 (14160)13:creation datei1402280218e8:encoding5:UTF-8"
+        "4:infod5:filesld6:lengthi2e4:pathl5:a.txteed6:lengthi2e4:pathl5:b.txtee"
+        "e4:name3:foo12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaa7:privatei0eee"sv;
+    
+    auto tm = tr_torrent_metainfo{};
+    ASSERT_TRUE(tm.parse_benc(Benc));
+    // after parsing, multi-file torrents already have the torrent name as top-level folder
+    ASSERT_EQ("foo/a.txt"sv, tm.file_subpath(0));
+    ASSERT_EQ("foo/b.txt"sv, tm.file_subpath(1));
+
+    tm.apply_content_layout(tr_content_layout::Subfolder);
+
+    EXPECT_EQ("foo/a.txt"sv, tm.file_subpath(0));
+    EXPECT_EQ("foo/b.txt"sv, tm.file_subpath(1));
+}
+
+TEST_F(TorrentMetainfoTest, contentLayoutNoSubfolderStripsFolder)
+{
+    // NoSubfolder strips the top-level folder from all paths
+
+    static auto constexpr Benc =
+        "d10:created by25:Transmission/2.82 (14160)13:creation datei1402280218e8:encoding5:UTF-8"
+        "4:infod5:filesld6:lengthi2e4:pathl5:a.txteed6:lengthi2e4:pathl5:b.txtee"
+        "e4:name3:foo12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaa7:privatei0eee"sv;
+    
+    auto tm = tr_torrent_metainfo{};
+    ASSERT_TRUE(tm.parse_benc(Benc));
+    ASSERT_EQ("foo/a.txt"sv, tm.file_subpath(0));
+    ASSERT_EQ("foo/b.txt"sv, tm.file_subpath(1));
+
+    tm.apply_content_layout(tr_content_layout::NoSubfolder);
+
+    EXPECT_EQ("a.txt"sv, tm.file_subpath(0));
+    EXPECT_EQ("b.txt"sv, tm.file_subpath(1));
+}
+
+TEST_F(TorrentMetainfoTest, contentLayoutNoSubfolderNoOp)
+{
+    // NoSubfolder is a no-op when no top-level folder exists
+
+    static auto constexpr Benc =
+        "d10:created by25:Transmission/2.82 (14160)13:creation datei1402280218e8:encoding5:UTF-8"
+        "4:infod5:filesld6:lengthi2e4:pathl5:a.txteed6:lengthi2e4:pathl5:b.txtee"
+        "e4:name3:foo12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaa7:privatei0eee"sv;
+    
+    auto tm = tr_torrent_metainfo{};
+    ASSERT_TRUE(tm.parse_benc(Benc));
+    // manually strip to simulate files without a top-level folder
+    tm.set_file_subpath(0, "a.txt"sv);
+    tm.set_file_subpath(1, "b.txt"sv);
+
+    tm.apply_content_layout(tr_content_layout::NoSubfolder);
+
+    EXPECT_EQ("a.txt"sv, tm.file_subpath(0));
+    EXPECT_EQ("b.txt"sv, tm.file_subpath(1));
+}
+
+TEST_F(TorrentMetainfoTest, contentLayoutSubfolderSingleFile)
+{
+    // Subfolder wraps a single-file torrent in a folder named after the torrent
+
+    static auto constexpr Benc =
+        "d4:infod6:lengthi500e4:name3:bar12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaa7:privatei0eee"sv;
+
+    auto tm = tr_torrent_metainfo{};
+    ASSERT_TRUE(tm.parse_benc(Benc));
+    ASSERT_EQ(1U, tm.file_count());
+    ASSERT_EQ("bar"sv, tm.file_subpath(0));
+
+    tm.apply_content_layout(tr_content_layout::Subfolder);
+
+    EXPECT_EQ("bar/bar"sv, tm.file_subpath(0));
+}
+
+TEST_F(TorrentMetainfoTest, contentLayoutNoSubfolderSingleFile)
+{
+    // NoSubfolder is a no-op for single-file torrents, which are already flat
+
+    static auto constexpr Benc =
+        "d4:infod6:lengthi500e4:name3:bar12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaa7:privatei0eee"sv;
+
+    auto tm = tr_torrent_metainfo{};
+    ASSERT_TRUE(tm.parse_benc(Benc));
+    ASSERT_EQ(1U, tm.file_count());
+    ASSERT_EQ("bar"sv, tm.file_subpath(0));
+
+    tm.apply_content_layout(tr_content_layout::NoSubfolder);
+
+    EXPECT_EQ("bar"sv, tm.file_subpath(0));
+}
+
+TEST_F(TorrentMetainfoTest, contentLayoutEmpty)
+{
+    // All layouts must handle an empty torrent without crashing
+
+    auto tm = tr_torrent_metainfo{};
+    ASSERT_EQ(0U, tm.file_count());
+
+    // should not crash on empty torrent
+    tm.apply_content_layout(tr_content_layout::Subfolder);
+    tm.apply_content_layout(tr_content_layout::NoSubfolder);
+    tm.apply_content_layout(tr_content_layout::Original);
+
+    EXPECT_EQ(0U, tm.file_count());
+}
+
 } // namespace tr::test

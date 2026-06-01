@@ -54,6 +54,11 @@ public:
         return files().path(i);
     }
 
+    [[nodiscard]] auto const& original_file_subpath(tr_file_index_t i) const
+    {
+        return original_subpaths_.empty() ? file_subpath(i) : original_subpaths_[i];
+    }
+
     void set_file_subpath(tr_file_index_t i, std::string_view subpath)
     {
         files_.set_path(i, subpath);
@@ -192,6 +197,9 @@ public:
         std::string_view info_hash_string,
         std::string_view suffix);
 
+    void apply_content_layout(
+        tr_content_layout layout);
+
 private:
     friend struct MetainfoHandler;
     static bool parse_impl(tr_torrent_metainfo& setme, std::string_view benc, tr_error* error);
@@ -236,4 +244,6 @@ private:
     bool has_magnet_info_hash_ = false;
     bool is_private_ = false;
     bool is_v2_ = false;
+
+    std::vector<std::string> original_subpaths_;
 };

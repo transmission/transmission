@@ -52,6 +52,50 @@ std::string tr_torrent_metainfo::fix_webseed_url(tr_torrent_metainfo const& tm, 
     return std::string{ url };
 }
 
+void tr_torrent_metainfo::apply_content_layout(tr_content_layout layout)
+{
+    if (layout == tr_content_layout::Original || file_count() == 0)
+    {
+        return;
+    }
+
+    for (tr_file_index_t i = 0; i < file_count(); ++i)
+    {
+        original_subpaths_.emplace_back(file_subpath(i));
+    }
+
+    auto const& first = file_subpath(0);
+    auto const sep = first.find('/');
+    auto const top = sep != std::string::npos ? std::string_view{ first }.substr(0, sep) : std::string_view{};
+
+    auto const has_top_folder = !top.empty() && [&]()
+    {
+        for (tr_file_index_t i = 1; i < file_count(); ++i)
+        {
+            auto const& p = file_subpath(i);
+            if (p.size() <= top.size() || p[top.size()] != '/' || std::string_view{ p }.substr(0, top.size()) != top)
+            {
+                return false;
+            }
+        }
+        return true;
+    }();
+
+    if (layout == tr_content_layout::Subfolder && !has_top_folder)
+    {
+        files_.insert_subpath_prefix(name());
+    }
+    else if (layout == tr_content_layout::NoSubfolder && has_top_folder)
+    {
+        auto const prefix_len = top.size() + 1;
+        for (tr_file_index_t i = 0; i < file_count(); ++i)
+        {
+            set_file_subpath(i, std::string_view{ file_subpath(i) }.substr(prefix_len));
+        }
+    }
+}
+
+
 namespace
 {
 auto constexpr MaxBencDepth = 32;

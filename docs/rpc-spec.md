@@ -499,6 +499,7 @@ Request parameters:
 
 | Key | Value Type | Description
 |:--|:--|:--
+| `content_layout`                 | string    | one of `"original"`, `"subfolder"`, `"no-subfolder"`
 | `cookies`                        | string    | pointer to a string of one or more cookies.
 | `download_dir`                   | string    | path to download the torrent to
 | `filename`                       | string    | filename or URL of the .torrent file
@@ -1055,6 +1056,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `session-get` | new arg `script-torrent-added-filename`
 | `session-get` | new arg `script-torrent-done-seeding-enabled`
 | `session-get` | new arg `script-torrent-done-seeding-filename`
+| `torrent-add` | new arg `content-layout`
 | `torrent-add` | new arg `labels`
 | `torrent-get` | new arg `availability`
 | `torrent-get` | new arg `file-count`

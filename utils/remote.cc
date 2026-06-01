@@ -218,7 +218,7 @@ enum
 
 using Arg = tr_option::Arg;
 static_assert(TrDefaultPeerPort == 51413, "update 'port' desc");
-auto constexpr Options = std::array<tr_option, 106>{ {
+auto constexpr Options = std::array<tr_option, 107>{ {
     { 'a', "add", "Add torrent files by filename or URL", "a", Arg::None, nullptr },
     { 970, "alt-speed", "Use the alternate Limits", "as", Arg::None, nullptr },
     { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", Arg::None, nullptr },
@@ -354,6 +354,7 @@ auto constexpr Options = std::array<tr_option, 106>{ {
       Arg::Optional,
       "<piece>" },
     { 995, "no-sequential-download", "Download the torrent normally", "SEQ", Arg::None, nullptr },
+    { 996, "content-layout", "Set content layout for added torrent (original, subfolder, no-subfolder)", nullptr, Arg::Required, "<layout>" },
     { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", Arg::None, nullptr },
     { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", Arg::None, nullptr },
     { 'u',
@@ -552,6 +553,7 @@ enum
     case 963: /* blocklist-update */
     case 964: /* rename */
     case 965: /* path */
+    case 996: /* content-layout */
         return -1;
 
     default:
@@ -3505,6 +3507,13 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 965:
                 rename_from = optarg_sv;
+                break;
+
+            case 996:
+                {
+                    auto& args = ensure_tadd(tadd);
+                    args.insert_or_assign(TR_KEY_content_layout, optarg_sv);
+                }
                 break;
 
             case 732:

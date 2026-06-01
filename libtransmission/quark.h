@@ -115,6 +115,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_complete,
     TR_KEY_config_dir_kebab_APICOMPAT,
     TR_KEY_config_dir,
+    TR_KEY_content_layout,
     TR_KEY_cookies,
     TR_KEY_corrupt,
     TR_KEY_corrupt_ever_camel_APICOMPAT,

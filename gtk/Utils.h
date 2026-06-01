@@ -117,6 +117,8 @@ void gtr_window_raise(Gtk::Window& window);
 
 void gtr_priority_combo_init(Gtk::ComboBox& combo);
 
+void gtr_content_layout_combo_init(Gtk::ComboBox& combo);
+
 void gtr_combo_box_set_enum(Gtk::ComboBox& combo, std::vector<std::pair<Glib::ustring, int>> const& items);
 int gtr_combo_box_get_active_enum(Gtk::ComboBox const& combo);
 void gtr_combo_box_set_active_enum(Gtk::ComboBox& combo, int value);
