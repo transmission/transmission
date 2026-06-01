@@ -188,7 +188,7 @@
     <message>
         <location line="+8"/>
         <source>Peer was discovered through DHT</source>
-        <translation>Le pair été trouvé grâce la la table de hachage distribuée</translation>
+        <translation>Le pair été trouvé grâce à la table de hachage distribuée</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2022,7 +2022,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
     <message>
         <location line="+13"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>État&#xa0;: &lt;b&gt;{status}&lt;/b&gt;</translation>
+        <translation>État&#xa0;: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>

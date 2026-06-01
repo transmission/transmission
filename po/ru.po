@@ -8,10 +8,10 @@
 # Sergey Alyoshin <alyoshin.s@gmail.com>, 2022
 # hlm hlmfn, 2022
 # Alexey Ladygin, 2025
-# Andrei Stepanov, 2026
 # Темак, 2026
 # Mike Gelfand <mikedld@mikedld.com>, 2026
 # Victor, 2026
+# Andrei Stepanov, 2026
 #
 #, fuzzy
 msgid ""
@@ -20,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Victor, 2026\n"
+"Last-Translator: Andrei Stepanov, 2026\n"
 "Language-Team: Russian (https://app.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -2520,7 +2520,7 @@ msgstr "Не удалось переместить «{old_path}» в «{path}»:
 
 #: ../libtransmission/torrent.cc:1581
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr "Приостановлен торрент, так как данные не были найдены! Убедитесь, что ваши диски подключены или используйте \"Указать расположение\", затем снова используйте \"Проверить локальные данные\". Чтобы загрузить повторно, запустите торрент."
+msgstr "Приостановлен торрент, так как данные не были найдены! Убедитесь, что ваши диски подключены или используйте «Указать расположение», затем снова используйте «Проверить локальные данные». Чтобы загрузить повторно, запустите торрент."
 
 #: ../libtransmission/torrent.cc:2087
 msgid "Tracker warning: '{warning}' ({url})"

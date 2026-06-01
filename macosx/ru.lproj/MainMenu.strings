@@ -9,7 +9,7 @@
 "57.title" = "Transmission";
 
 /* Class = "NSMenuItem"; title = "About Transmission"; ObjectID = "58"; */
-"58.title" = "О Transmission";
+"58.title" = "О приложении Transmission";
 
 /* Class = "NSMenuItem"; title = "Open Torrent File…"; ObjectID = "72"; */
 "72.title" = "Открыть торрент-файл...";
@@ -183,7 +183,7 @@
 "1685.title" = "Убрать в Dock";
 
 /* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "1687"; */
-"1687.title" = "Все окна - на передний план";
+"1687.title" = "Все окна — на передний план";
 
 /* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "1688"; */
 "1688.title" = "Изменить масштаб";
@@ -381,4 +381,4 @@
 "zIM-6D-jsa.title" = "Заголовок группы";
 
 /* Class = "NSMenuItem"; title = "ETA"; ObjectID = "zLF-YR-Oq6"; */
-"zLF-YR-Oq6.title" = "Расчётное время";
+"zLF-YR-Oq6.title" = "Расчетному времени";

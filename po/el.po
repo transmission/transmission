@@ -11,6 +11,7 @@
 # 3594141e28bdaa52cc9a5bd6ed314e0a_76a7721 <b9d2e0e012c5758f696048d590b6c558_1102917>, 2023
 # Giorgos Mousa, 2025
 # Mike Gelfand <mikedld@mikedld.com>, 2026
+# Charles Kerr <charles@charleskerr.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -19,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
+"Last-Translator: Charles Kerr <charles@charleskerr.com>, 2026\n"
 "Language-Team: Greek (https://app.transifex.com/transmissionbt/teams/33778/el/)\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -2371,7 +2372,7 @@ msgstr "Απαιτείται κωδικός"
 
 #: ../libtransmission/rpc-server.cc:1042
 msgid "Serving RPC and Web requests from '{path}'"
-msgstr "Εξυπηρέτηση RPC και Web αιτημάτων από την {address}"
+msgstr "Εξυπηρέτηση RPC και Web αιτημάτων από την '{path}'"
 
 #: ../libtransmission/rpcimpl.cc:1496
 msgid "Couldn't test port: {error} ({error_code})"

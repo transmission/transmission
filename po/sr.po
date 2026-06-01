@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Марко М. Костић (Marko M. Kostić) <marko.m.kostic@gmail.com>, 2022
+# Марко Костић <marko.m.kostic@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2026
 #
 #, fuzzy

@@ -129,7 +129,7 @@
 "1 transfer" = "1 раздача";
 
 /* quicklook web seed header */
-"1 Web Seed" = "1 сайт раздачи";
+"1 Web Seed" = "1 веб-сид";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "«%@» не является торрент-файлом.";

@@ -1225,7 +1225,7 @@ msgstr "Abiarazi Transmission minimizatua"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr "_Agiria"
+msgstr "_Fitxategia"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -2105,7 +2105,7 @@ msgstr "{ip_protocol} konexioak huts egin du"
 
 #: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "Ezin izan da '{address}:{port}'  {ip_protocol}-n bilatu: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:898
 msgid "Announce error: {error} ({url})"
@@ -2114,8 +2114,8 @@ msgstr "Iragarpen errorea: {error}({url})"
 #: ../libtransmission/announcer.cc:910
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Errorearen berri: {error} (Berriro saiatzen segundo {count}ean) ({url})"
+msgstr[1] "Errorearen berri: {error} (Berriro saiatzen {count} segundotan) ({url})"
 
 #: ../libtransmission/announcer.cc:1046 ../libtransmission/announcer.cc:1368
 msgid "Could not connect to tracker"
@@ -2154,7 +2154,7 @@ msgstr "Ezin izan da '{path}' eskuratu: {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Behar bezala eguneratu da iturria {protocol}helbidea {ip}-ra"
 
 #: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
@@ -2166,7 +2166,7 @@ msgstr "Zure gailuak ez du {protocol} protokoloa onartzen"
 
 #: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Behar bezala eguneratu da {type} helbide globala {ip}-ra   {url}-en bidez"
 
 #: ../libtransmission/log.cc:294
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2430,7 +2430,7 @@ msgstr "Torrent-a geratzen"
 
 #: ../libtransmission/torrent.cc:755
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "Ezin izan dira torrent fitxategi guztiak kendu: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:798
 msgid "Removing torrent"

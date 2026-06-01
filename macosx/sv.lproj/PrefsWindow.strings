@@ -108,7 +108,7 @@
 "1242.title" = "minuter";
 
 /* Class = "NSButtonCell"; title = "Transfer is stalled when inactive for:"; ObjectID = "1243"; */
-"1243.title" = "Överföringen stoppas när den är inaktiv i:";
+"1243.title" = "Överföringen stoppas efter inaktivitet i:";
 
 /* Class = "NSButtonCell"; title = "Automatically map port"; ObjectID = "1247"; */
 "1247.title" = "Kartlägg portar automatiskt";
@@ -357,7 +357,7 @@
 "1952.title" = "Använd lokal jämlikeupptäckt för publika torrenter";
 
 /* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "1962"; */
-"1962.title" = "Stoppa distribuering om inaktiv i:";
+"1962.title" = "Stoppa distribuering efter inaktivitet i:";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
 "1970.title" = "minuter";

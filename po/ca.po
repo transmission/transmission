@@ -5,7 +5,7 @@
 #
 # Translators:
 # Joan Montané, 2020
-# Carlos Sánchez López <erielkhan@gmail.com>, 2024
+# Carlos <erielkhan@gmail.com>, 2024
 # Mike Gelfand <mikedld@mikedld.com>, 2026
 # Robert Antoni Buj i Gelonch <rbuj@fedoraproject.org>, 2026
 #

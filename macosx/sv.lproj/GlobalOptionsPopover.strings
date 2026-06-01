@@ -24,7 +24,7 @@
 "116.title" = "Stoppa distribuering vid kvot:";
 
 /* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "118"; */
-"118.title" = "Stoppa distribuering om inaktiv i:";
+"118.title" = "Stoppa distribuering efter inaktivitet i:";
 
 /* Class = "NSButtonCell"; title = "Remaining time"; ObjectID = "130"; */
 "130.title" = "Återstående tid";

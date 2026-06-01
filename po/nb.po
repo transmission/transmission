@@ -7,6 +7,7 @@
 # Allan Nordhøy <epost@anotheragency.no>, 2017
 # 71385e305ba38256cbb5ad82ed781513_cdec8d0, 2020
 # Mike Gelfand <mikedld@mikedld.com>, 2026
+# Andreas Nore, 2026
 #
 #, fuzzy
 msgid ""
@@ -15,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
+"Last-Translator: Andreas Nore, 2026\n"
 "Language-Team: Norwegian Bokmål (https://app.transifex.com/transmissionbt/teams/33778/nb/)\n"
 "Language: nb\n"
 "MIME-Version: 1.0\n"
@@ -33,59 +34,59 @@ msgstr ""
 
 #: ../daemon/daemon.cc:218 ../gtk/Session.cc:815 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke lese '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:243 ../gtk/Session.cc:879 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
-msgstr ""
+msgstr "Kunne ikke legge til torrentfile '{path}'"
 
 #: ../daemon/daemon.cc:252
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "Fjerner torrentfil '{path}'"
 
 #: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke fjerne '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:741
 msgid "Couldn't parse log level '{level}'"
-msgstr ""
+msgstr "Kunne ikke behandle log nivå '{level}'"
 
 #: ../daemon/daemon.cc:793
 msgid "Deferring reload until session is fully started."
-msgstr ""
+msgstr "Utsetter å laste inn på nytt til økten har startet fullstendig."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "Kunne ikke laste inn på nytt: Kunne ikke hente monotontid:{errmsg}({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
-msgstr ""
+msgstr "Laster innstillinger på nytt fra '{path}'"
 
 #: ../daemon/daemon.cc:853
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke initialisere daemon: {error}({error_code})"
 
 #: ../daemon/daemon.cc:865
 msgid "Loading settings from '{path}'"
-msgstr ""
+msgstr "Laster innstillinger fra '{path}'"
 
 #: ../daemon/daemon.cc:892
 msgid "Saved pidfile '{path}'"
-msgstr ""
+msgstr "Lagret pidfil '{path}'"
 
 #: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:248 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke lagre '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:908
 msgid "Requiring authentication"
-msgstr ""
+msgstr "Krever autentisering"
 
 #: ../daemon/daemon.cc:927
 msgid "Watching '{path}' for new torrent files"
-msgstr ""
+msgstr "Overvåker '{path}' for nye torrentfiler"
 
 #: ../daemon/daemon.cc:973 ../libtransmission/watchdir-kqueue.cc:120 ../libtransmission/watchdir-win32.cc:197
 msgid "Couldn't create event: {error} ({error_code})"
@@ -614,19 +615,23 @@ msgstr ""
 
 #: ../gtk/FreeSpaceLabel.cc:57
 msgid "{disk_space} free"
-msgstr ""
+msgstr "{disk_space}ledig"
 
 #: ../gtk/MainWindow.cc:385
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Klikk for å deaktivere alternative fartsgrenser\n"
+"({download_speed}ned, {upload_speed}opp)"
 
 #: ../gtk/MainWindow.cc:386
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Klikk for å aktivere alternative fartsgrenser\n"
+"({download_speed}ned, {upload_speed}opp)"
 
 #: ../gtk/MainWindow.cc:438
 msgid "Unlimited"
@@ -650,7 +655,7 @@ msgstr "Slutt å dele når delingsforholdet er"
 
 #: ../gtk/MainWindow.cc:585
 msgid "Stop at Ratio ({ratio})"
-msgstr ""
+msgstr "Stopp ved ratio ({ratio})"
 
 #: ../gtk/MainWindow.cc:599
 msgid "Total Ratio"
@@ -670,7 +675,7 @@ msgstr "Overført denne økta"
 
 #: ../gtk/MainWindow.cc:767 ../gtk/MainWindow.cc:788 ../gtk/Torrent.cc:450
 msgid "Ratio: {ratio}"
-msgstr ""
+msgstr "Ratio: {ratio}"
 
 #: ../gtk/MainWindow.cc:773
 msgctxt "current session totals"

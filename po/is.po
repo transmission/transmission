@@ -7,6 +7,7 @@
 # Björn Þór Björnsson, 2022
 # Sveinn í Felli <sv1@fellsnet.is>, 2026
 # Mike Gelfand <mikedld@mikedld.com>, 2026
+# Charles Kerr <charles@charleskerr.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -15,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
+"Last-Translator: Charles Kerr <charles@charleskerr.com>, 2026\n"
 "Language-Team: Icelandic (https://app.transifex.com/transmissionbt/teams/33778/is/)\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
@@ -2085,11 +2086,11 @@ msgstr "_Slóð"
 
 #: ../libtransmission/announcer-http.cc:455
 msgid "Couldn't parse announce response: {error} ({error_code})"
-msgstr "Gat ekki túlkað svar tilkynningar '{path}': {error} ({error_code})"
+msgstr "Gat ekki túlkað svar tilkynningar: {error} ({error_code})"
 
 #: ../libtransmission/announcer-http.cc:675
 msgid "Couldn't parse scrape response: {error} ({error_code})"
-msgstr "Gat ekki túlkað svar skrapara '{path}': {error} ({error_code})"
+msgstr "Gat ekki túlkað svar skrapara: {error} ({error_code})"
 
 #: ../libtransmission/announcer-udp.cc:147 ../libtransmission/announcer-udp.cc:308
 msgid "Unknown error"

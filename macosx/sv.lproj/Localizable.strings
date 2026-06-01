@@ -974,7 +974,7 @@
 "The torrent file cannot be opened because it contains invalid data." = "Torrentfilen kan inte öppnas eftersom den innehåller ogiltig data.";
 
 /* Create torrent -> zero size -> title */
-"The total file size is zero bytes." = "Den totala filstorleken är noll bytes.";
+"The total file size is zero bytes." = "Den totala filstorleken är noll byte.";
 
 /* Open duplicate alert -> message */
 "The transfer cannot be added because it is a duplicate of an already existing transfer." = "Överföringen kan inte läggas till eftersom den är en dubblett av en befintlig överföring.";

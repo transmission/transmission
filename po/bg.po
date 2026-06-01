@@ -9,6 +9,7 @@
 # Miroslav Dragoev <miroslav.dragoev@icloud.com>, 2025
 # Kiril Kirilov <cybercop_montana@abv.bg>, 2026
 # Mike Gelfand <mikedld@mikedld.com>, 2026
+# Charles Kerr <charles@charleskerr.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -17,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
+"Last-Translator: Charles Kerr <charles@charleskerr.com>, 2026\n"
 "Language-Team: Bulgarian (https://app.transifex.com/transmissionbt/teams/33778/bg/)\n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
@@ -961,7 +962,7 @@ msgstr "В застой"
 
 #: ../gtk/Torrent.cc:645
 msgid "Tracker warning: '{warning}'"
-msgstr "Предупреждение от тракера: {%s}"
+msgstr "Предупреждение от тракера: {warning}"
 
 #: ../gtk/Torrent.cc:648
 msgid "Tracker Error: '{error}'"

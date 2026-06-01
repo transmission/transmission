@@ -11,6 +11,7 @@
 # AO <aol10n@duck.com>, 2026
 # Mike Gelfand <mikedld@mikedld.com>, 2026
 # Charles Monzat <c.monzat@laposte.net>, 2026
+# Charles Kerr <charles@charleskerr.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -19,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Charles Monzat <c.monzat@laposte.net>, 2026\n"
+"Last-Translator: Charles Kerr <charles@charleskerr.com>, 2026\n"
 "Language-Team: French (https://app.transifex.com/transmissionbt/teams/33778/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -403,7 +404,7 @@ msgstr[2] "Réception d’une liste de {markup_begin}{peer_count} pairs{markup_
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1786
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr "La demande de liste de pairs {markup_begin}est arrivée au bout de son délai il y a {time_span}{markup_end} ; une nouvelle tentative est prévue"
+msgstr "La demande de liste de pairs {markup_begin}est arrivée au bout de son délai il y a {time_span_ago}{markup_end} ; une nouvelle tentative est prévue"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1795

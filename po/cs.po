@@ -8,6 +8,7 @@
 # Pavel Rehak <pavel-rehak@email.cz>, 2022
 # Martin Brož, 2026
 # Mike Gelfand <mikedld@mikedld.com>, 2026
+# Martin Šiška <martin-siska@email.cz>, 2026
 #
 #, fuzzy
 msgid ""
@@ -16,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
+"Last-Translator: Martin Šiška <martin-siska@email.cz>, 2026\n"
 "Language-Team: Czech (https://app.transifex.com/transmissionbt/teams/33778/cs/)\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -484,7 +485,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:2186
 msgid "{torrent_name} - Edit Trackers"
-msgstr ""
+msgstr "{torrent_name} - Upravit trackery"
 
 #: ../gtk/DetailsDialog.cc:2220
 msgid "List contains invalid URLs"
@@ -496,7 +497,7 @@ msgstr "Opravte prosím chyby a zkuste to znovu."
 
 #: ../gtk/DetailsDialog.cc:2307
 msgid "{torrent_name} - Add Tracker"
-msgstr ""
+msgstr "{torrent_name} - Přidat tracker"
 
 #: ../gtk/DetailsDialog.cc:2414 ../gtk/ui/gtk3/DetailsDialog.ui:796 ../gtk/ui/gtk4/DetailsDialog.ui:597
 msgid "Trackers"
@@ -504,7 +505,7 @@ msgstr "Trackery"
 
 #: ../gtk/DetailsDialog.cc:2593
 msgid "{torrent_name} Properties"
-msgstr ""
+msgstr "{torrent_name} Vlastnosti"
 
 #: ../gtk/DetailsDialog.cc:2598
 msgid "Properties - {torrent_count:L} Torrent"
@@ -517,10 +518,10 @@ msgstr[3] ""
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Odebrat torrent?"
+msgstr[1] "Odebrat {count:L} torrenty?"
+msgstr[2] "Odebrat {count:L} torrentů?"
+msgstr[3] "Odebrat {count:L} torrentů? "
 
 #: ../gtk/Dialogs.cc:59
 msgid "Delete this torrent's downloaded files?"

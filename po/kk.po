@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2020
 # Mike Gelfand <mikedld@mikedld.com>, 2026
+# Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2026
 #
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-27 19:37+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
+"Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2026\n"
 "Language-Team: Kazakh (https://app.transifex.com/transmissionbt/teams/33778/kk/)\n"
 "Language: kk\n"
 "MIME-Version: 1.0\n"
@@ -28,87 +28,87 @@ msgstr "Ешнәрсе"
 
 #: ../cli/cli.cc:99
 msgid "Inf"
-msgstr ""
+msgstr "Ақп"
 
 #: ../daemon/daemon.cc:218 ../gtk/Session.cc:815 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" оқу мүмкін болмады: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:243 ../gtk/Session.cc:879 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
-msgstr ""
+msgstr "\"{path}\" торрент файлын қосу мүмкін болмады"
 
 #: ../daemon/daemon.cc:252
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "\"{path}\" торрент файлын өшіру"
 
 #: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" өшіру мүмкін болмады: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:741
 msgid "Couldn't parse log level '{level}'"
-msgstr ""
+msgstr "\"{level}\" журнал деңгейін талдау мүмкін болмады"
 
 #: ../daemon/daemon.cc:793
 msgid "Deferring reload until session is fully started."
-msgstr ""
+msgstr "Қайта жүктеу сеанс толық іске қосылғанша кейінге қалдырылды."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "Қайта жүктеу сәтсіз аяқталды: Ағымдағы монотонды уақытты алу мүмкін болмады: {errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
-msgstr ""
+msgstr "Баптауларды \"{path}\" адресінен қайта жүктеу"
 
 #: ../daemon/daemon.cc:853
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr ""
+msgstr "Қызметті іске қосу мүмкін болмады: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:865
 msgid "Loading settings from '{path}'"
-msgstr ""
+msgstr "Баптауларды \"{path}\" адресінен жүктеу"
 
 #: ../daemon/daemon.cc:892
 msgid "Saved pidfile '{path}'"
-msgstr ""
+msgstr "Pid-файл \"{path}\" сақталды"
 
 #: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:248 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" сақтау мүмкін болмады: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:908
 msgid "Requiring authentication"
-msgstr ""
+msgstr "Аутентификация талап етіледі"
 
 #: ../daemon/daemon.cc:927
 msgid "Watching '{path}' for new torrent files"
-msgstr ""
+msgstr "Жаңа торрент файлдарын \"{path}\" бумасынан бақылау"
 
 #: ../daemon/daemon.cc:973 ../libtransmission/watchdir-kqueue.cc:120 ../libtransmission/watchdir-win32.cc:197
 msgid "Couldn't create event: {error} ({error_code})"
-msgstr ""
+msgstr "Оқиғаны жасау мүмкін болмады: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:984 ../libtransmission/watchdir-kqueue.cc:131
 msgid "Couldn't add event: {error} ({error_code})"
-msgstr ""
+msgstr "Оқиғаны қосу мүмкін болмады: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:999
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
-msgstr ""
+msgstr "Қызметтің оқиғалар циклін іске қосу мүмкін болмады: {error} ({error_code})"
 
 #: ../gtk/Application.cc:402
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
-msgstr ""
+msgstr "Transmission бағдарламасын {content_type} өңдеушісі ретінде тіркеу мүмкін болмады: {error} ({error_code})"
 
 #: ../gtk/Application.cc:560
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Тоқтату сигналы алынды, таза жабу әрекеті жасалуда. Егер тұрып қалса, қайталаңыз."
 
 #: ../gtk/Application.cc:992
 msgid "Closing Connections…"
-msgstr ""
+msgstr "Байланыстарды жабу…"
 
 #: ../gtk/Application.cc:997
 msgid "Sending upload/download totals to tracker…"
@@ -136,7 +136,7 @@ msgstr "Жылдам мен қарапайым BitTorrent клиенті"
 
 #: ../gtk/Application.cc:1397
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Авторлық құқық © Transmission жобасы"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -228,15 +228,15 @@ msgstr "Публикалық торрент"
 
 #: ../gtk/DetailsDialog.cc:674
 msgid "Created by {creator} on {date}"
-msgstr ""
+msgstr "{creator} тарапынан {date} күні жасалған"
 
 #: ../gtk/DetailsDialog.cc:680
 msgid "Created by {creator}"
-msgstr ""
+msgstr "{creator} тарапынан жасалған"
 
 #: ../gtk/DetailsDialog.cc:684
 msgid "Created on {date}"
-msgstr ""
+msgstr "{date} күні жасалған"
 
 #: ../gtk/DetailsDialog.cc:798
 msgid "Unknown"
@@ -245,35 +245,35 @@ msgstr "Белгісіз"
 #: ../gtk/DetailsDialog.cc:836 ../gtk/MakeDialog.cc:393
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{file_count:L} файлдағы {total_size}"
+msgstr[1] "{file_count:L} файлдағы {total_size}"
 
 #: ../gtk/DetailsDialog.cc:851 ../gtk/MakeDialog.cc:401
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "({piece_count} BitTorrent бөлігі @ {piece_size})"
+msgstr[1] "({piece_count} BitTorrent бөлігі @ {piece_size})"
 
 #: ../gtk/DetailsDialog.cc:895
 msgid "{current_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} ({percent_done}%)"
 
 #: ../gtk/DetailsDialog.cc:903
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
-msgstr ""
+msgstr "{current_size} ({percent_done}%, {percent_available}% қолжетімді)"
 
 #: ../gtk/DetailsDialog.cc:913
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
-msgstr ""
+msgstr "{current_size} ({percent_done}%, {percent_available}% қолжетімді; {unverified_size} тексерілмеген)"
 
 #: ../gtk/DetailsDialog.cc:947
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
-msgstr ""
+msgstr "{downloaded_size} (+{discarded_size} бақылау сомасы сәтсіз болғаннан кейін алынып тасталды)"
 
 #: ../gtk/DetailsDialog.cc:977
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{uploaded_size} (Коэффициент: {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1018
 msgid "No errors"
@@ -391,18 +391,18 @@ msgstr "Веб-сидерлер"
 #: ../gtk/DetailsDialog.cc:1774
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{markup_begin}{peer_count} пир{markup_end} тізімі алынды, {time_span_ago}"
+msgstr[1] "{markup_begin}{peer_count} пир{markup_end} тізімі алынды, {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1786
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr ""
+msgstr "Пирлер тізімін сұрау {markup_begin}{time_span_ago} уақыт аяқталды{markup_end}; қайта әрекет жасалады"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1795
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "\"{markup_begin}{error}{markup_end}\" қатесі {time_span_ago} алынды"
 
 #: ../gtk/DetailsDialog.cc:1808
 msgid "No updates scheduled"
@@ -410,7 +410,7 @@ msgstr "Жоспарланған жаңартулар жоқ"
 
 #: ../gtk/DetailsDialog.cc:1815
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "Көбірек пирлерді {time_span_from_now} сұрау"
 
 #: ../gtk/DetailsDialog.cc:1822
 msgid "Queued to ask for more peers"
@@ -419,32 +419,32 @@ msgstr "Көбірек тораптарды сұрауда кезекте тұр
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1830
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Көбірек пирлер {markup_begin}{time_span_ago}{markup_end} сұралды"
 
 #: ../gtk/DetailsDialog.cc:1856
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr ""
+msgstr "Трекерде {markup_begin}{seeder_count} {seeder_or_seeders} және {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago} болды"
 
 #: ../gtk/DetailsDialog.cc:1858
 msgid "seeder"
 msgid_plural "seeders"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "сидер"
+msgstr[1] "сидер"
 
 #: ../gtk/DetailsDialog.cc:1860
 msgid "leecher"
 msgid_plural "leechers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "личер"
+msgstr[1] "личер"
 
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1869
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Scrape қатесі \"{markup_begin}{error}{markup_end}\" {time_span_ago} алынды"
 
 #: ../gtk/DetailsDialog.cc:1886
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr ""
+msgstr "Пирлер санын {time_span_from_now} сұрау"
 
 #: ../gtk/DetailsDialog.cc:1893
 msgid "Queued to ask for peer counts"
@@ -452,11 +452,11 @@ msgstr "Тораптар санын сұрауда кезекте тұр"
 
 #: ../gtk/DetailsDialog.cc:1900
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Пирлер саны {markup_begin}{time_span_ago}{markup_end} сұралды"
 
 #: ../gtk/DetailsDialog.cc:2186
 msgid "{torrent_name} - Edit Trackers"
-msgstr ""
+msgstr "{torrent_name} - Трекерлерді түзету"
 
 #: ../gtk/DetailsDialog.cc:2220
 msgid "List contains invalid URLs"
@@ -468,7 +468,7 @@ msgstr "Қателерді түзетіп, қайталап көріңіз."
 
 #: ../gtk/DetailsDialog.cc:2307
 msgid "{torrent_name} - Add Tracker"
-msgstr ""
+msgstr "{torrent_name} - Трекер қосу"
 
 #: ../gtk/DetailsDialog.cc:2414 ../gtk/ui/gtk3/DetailsDialog.ui:796 ../gtk/ui/gtk4/DetailsDialog.ui:597
 msgid "Trackers"
@@ -476,25 +476,25 @@ msgstr "Трекерлер"
 
 #: ../gtk/DetailsDialog.cc:2593
 msgid "{torrent_name} Properties"
-msgstr ""
+msgstr "{torrent_name} қасиеттері"
 
 #: ../gtk/DetailsDialog.cc:2598
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Қасиеттер - {torrent_count:L} торрент"
+msgstr[1] "Қасиеттер - {torrent_count:L} торрент"
 
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Торрентті өшіру керек пе?"
+msgstr[1] "{count:L} торрентті өшіру керек пе?"
 
 #: ../gtk/Dialogs.cc:59
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Осы торренттің жүктелген файлдарын өшіру керек пе?"
+msgstr[1] "Осы {count:L} торренттің жүктелген файлдарын өшіру керек пе?"
 
 #: ../gtk/Dialogs.cc:68
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -528,11 +528,11 @@ msgstr[1] "Бұл торренттердің кейбіреулерінің жү
 
 #: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:275 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
-msgstr ""
+msgstr "_Бас тарту"
 
 #: ../gtk/Dialogs.cc:121
 msgid "_Delete"
-msgstr ""
+msgstr "Өші_ру"
 
 #: ../gtk/Dialogs.cc:121 ../gtk/ui/gtk3/DetailsDialog.ui:729 ../gtk/ui/gtk3/PrefsDialog.ui:1897 ../gtk/ui/gtk4/DetailsDialog.ui:567 ../gtk/ui/gtk4/PrefsDialog.ui:1411
 msgid "_Remove"
@@ -552,7 +552,7 @@ msgstr "Төмен"
 
 #: ../gtk/FileList.cc:858 ../gtk/Session.cc:322
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{old_path}\" атын \"{path}\" етіп өзгерту мүмкін болмады: {error} ({error_code})"
 
 #: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:346
 msgid "Name"
@@ -597,23 +597,27 @@ msgstr "Көр_сету:"
 
 #: ../gtk/FilterBar.cc:591
 msgid "_Show {count:L} of:"
-msgstr ""
+msgstr "{count:L} ішінен _көрсету:"
 
 #: ../gtk/FreeSpaceLabel.cc:57
 msgid "{disk_space} free"
-msgstr ""
+msgstr "{disk_space} бос"
 
 #: ../gtk/MainWindow.cc:385
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Балама жылдамдық шектеулерін сөндіру үшін шертіңіз\n"
+" ({download_speed} жүктеу, {upload_speed} жіберу)"
 
 #: ../gtk/MainWindow.cc:386
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Балама жылдамдық шектеулерін іске қосу үшін шертіңіз\n"
+" ({download_speed} жүктеу, {upload_speed} жіберу)"
 
 #: ../gtk/MainWindow.cc:438
 msgid "Unlimited"
@@ -637,7 +641,7 @@ msgstr "Келесі рейтингке жеткенде таратуды тоқ
 
 #: ../gtk/MainWindow.cc:585
 msgid "Stop at Ratio ({ratio})"
-msgstr ""
+msgstr "Коэффициентке жеткенде тоқтату ({ratio})"
 
 #: ../gtk/MainWindow.cc:599
 msgid "Total Ratio"
@@ -657,41 +661,41 @@ msgstr "Осы сессияда таратылған"
 
 #: ../gtk/MainWindow.cc:767 ../gtk/MainWindow.cc:788 ../gtk/Torrent.cc:450
 msgid "Ratio: {ratio}"
-msgstr ""
+msgstr "Коэффициент: {ratio}"
 
 #: ../gtk/MainWindow.cc:773
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Жүктелген: {downloaded_size}, Жіберілген: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:781
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Жүктелген: {downloaded_size}, Жіберілген: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:815
 msgid "{download_speed} ▼"
-msgstr ""
+msgstr "{download_speed} ▼"
 
 #: ../gtk/MainWindow.cc:818 ../gtk/Torrent.cc:629
 msgid "{upload_speed} ▲"
-msgstr ""
+msgstr "{upload_speed} ▲"
 
 #: ../gtk/MakeDialog.cc:194
 msgid "Creating '{path}'"
-msgstr ""
+msgstr "\"{path}\" жасалуда"
 
 #: ../gtk/MakeDialog.cc:207
 msgid "Created '{path}'"
-msgstr ""
+msgstr "\"{path}\" жасалды"
 
 #: ../gtk/MakeDialog.cc:213 ../libtransmission/open-files.cc:171 ../libtransmission/session-id.cc:69
 msgid "Couldn't create '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" жасау мүмкін болмады: {error} ({error_code})"
 
 #: ../gtk/MakeDialog.cc:231
 msgid "Scanned {file_size}"
-msgstr ""
+msgstr "Сканерленді: {file_size}"
 
 #: ../gtk/MakeDialog.cc:386 ../gtk/MakeDialog.cc:552 ../gtk/ui/gtk3/MakeDialog.ui:172 ../gtk/ui/gtk4/MakeDialog.ui:100
 msgid "No source selected"
@@ -703,7 +707,7 @@ msgstr "Журналды сақтау"
 
 #: ../gtk/MessageLogWindow.cc:275 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
-msgstr ""
+msgstr "_Сақтау"
 
 #: ../gtk/MessageLogWindow.cc:355
 msgid "Message"
@@ -715,7 +719,7 @@ msgstr "Уақыты"
 
 #: ../gtk/Notify.cc:149
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{bus}\" үшін прокси жасау мүмкін болмады: {error} ({error_code})"
 
 #: ../gtk/Notify.cc:234
 msgid "Open File"
@@ -731,7 +735,7 @@ msgstr "Торрент аяқталды"
 
 #: ../gtk/Notify.cc:275
 msgid "Start Now"
-msgstr ""
+msgstr "Қазір бастау"
 
 #: ../gtk/Notify.cc:287
 msgid "Torrent Added"
@@ -751,19 +755,19 @@ msgstr "Торрентті ашу"
 
 #: ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:154 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:24 ../gtk/ui/gtk3/OptionsDialog.ui:35 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:34 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:75
 msgid "_Open"
-msgstr ""
+msgstr "_Ашу"
 
 #: ../gtk/OptionsDialog.cc:383
 msgid "Show options dialog"
-msgstr ""
+msgstr "Опциялар сұхбат терезесін көрсету"
 
 #: ../gtk/PathButton.cc:152
 msgid "Select a File"
-msgstr ""
+msgstr "Файлды таңдау"
 
 #: ../gtk/PathButton.cc:210
 msgid "(None)"
-msgstr ""
+msgstr "(Жоқ)"
 
 #: ../gtk/PrefsDialog.cc:314
 msgid "Allow encryption"
@@ -792,16 +796,16 @@ msgstr "Демалыс күндері"
 #: ../gtk/PrefsDialog.cc:568
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Бұғаттау тізімінде {count:L} жазба бар"
+msgstr[1] "Бұғаттау тізімінде {count:L} жазба бар"
 
 #: ../gtk/PrefsDialog.cc:584
 msgid "Blocklist updated!"
-msgstr ""
+msgstr "Бұғаттау тізімі жаңартылды!"
 
 #: ../gtk/PrefsDialog.cc:584
 msgid "Couldn't update blocklist"
-msgstr ""
+msgstr "Бұғаттау тізімін жаңарту мүмкін болмады"
 
 #: ../gtk/PrefsDialog.cc:596
 msgid "Getting new blocklist…"
@@ -810,39 +814,39 @@ msgstr "Жаңа блоктізімін алу…"
 #: ../gtk/PrefsDialog.cc:955
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "белгісіз"
 
 #: ../gtk/PrefsDialog.cc:957
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "тексеру…"
 
 #: ../gtk/PrefsDialog.cc:959
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "ашық"
 
 #: ../gtk/PrefsDialog.cc:961
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "жабық"
 
 #: ../gtk/PrefsDialog.cc:963
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "қате"
 
 #: ../gtk/PrefsDialog.cc:976
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "Күйі: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:978
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "Күйі: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
-msgstr ""
+msgstr "\"{torrent_name}\" жылжытылуда"
 
 #: ../gtk/RelocateDialog.cc:98
 msgid "Couldn't move torrent"
@@ -854,7 +858,7 @@ msgstr "Бұл біраз уақытты алуы мүмкін…"
 
 #: ../gtk/Session.cc:800 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
-msgstr ""
+msgstr "\"{path}\" оқу мүмкін болмады"
 
 #. logging
 #: ../gtk/Session.cc:1071
@@ -863,7 +867,7 @@ msgstr "Гибернацияға тыйым салу"
 
 #: ../gtk/Session.cc:1078 ../gtk/Session.cc:1104
 msgid "Couldn't inhibit desktop hibernation: {error}"
-msgstr ""
+msgstr "Жұмыс үстелінің ұйқы режимін тоқтату мүмкін болмады: {error}"
 
 #. logging
 #: ../gtk/Session.cc:1099
@@ -872,13 +876,13 @@ msgstr "Ұйықтау режиміне өтуге рұқсат беру"
 
 #: ../gtk/Session.cc:1220
 msgid "Couldn't find pending RPC request for id {id}"
-msgstr ""
+msgstr "{id} идентификаторы үшін күтудегі RPC сұрауы табылмады"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
 msgid_plural "Started {count:L} times"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{count:L} рет басталды"
+msgstr[1] "{count:L} рет басталды"
 
 #: ../gtk/StatsDialog.cc:107
 msgid "Reset your statistics?"
@@ -894,32 +898,32 @@ msgstr "Бұл статистика тек сізге мәлімет беру а
 
 #: ../gtk/SystemTrayIcon.cc:207
 msgid "{upload_speed} ▲ {download_speed} ▼"
-msgstr ""
+msgstr "{upload_speed} ▲ {download_speed} ▼"
 
 #: ../gtk/Torrent.cc:442
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
-msgstr ""
+msgstr "Жергілікті деректерді тексеру ({percent_done}% тексерілді)"
 
 #: ../gtk/Torrent.cc:469
 msgid "{current_size} of {complete_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} / {complete_size} ({percent_done}%)"
 
 #: ../gtk/Torrent.cc:480
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr ""
+msgstr "{current_size} / {complete_size} ({percent_complete}%), жіберілді {uploaded_size} (Коэффициент: {ratio}, Мақсат: {seed_ratio})"
 
 #: ../gtk/Torrent.cc:493
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{current_size} / {complete_size} ({percent_complete}%), жіберілді {uploaded_size} (Коэффициент: {ratio})"
 
 #: ../gtk/Torrent.cc:503
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr ""
+msgstr "{complete_size}, жіберілді {uploaded_size} (Коэффициент: {ratio}, Мақсат: {seed_ratio})"
 
 #: ../gtk/Torrent.cc:512
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{complete_size}, жіберілді {uploaded_size} (Коэффициент: {ratio})"
 
 #: ../gtk/Torrent.cc:525
 msgid "Remaining time unknown"
@@ -927,7 +931,7 @@ msgstr "Қалған уақыты белгісіз"
 
 #: ../gtk/Torrent.cc:622
 msgid "{download_speed} ▼  {upload_speed} ▲"
-msgstr ""
+msgstr "{download_speed} ▼  {upload_speed} ▲"
 
 #: ../gtk/Torrent.cc:634
 msgid "Stalled"
@@ -935,175 +939,175 @@ msgstr "Тоқтап қалды"
 
 #: ../gtk/Torrent.cc:645
 msgid "Tracker warning: '{warning}'"
-msgstr ""
+msgstr "Трекер ескертуі: \"{warning}\""
 
 #: ../gtk/Torrent.cc:648
 msgid "Tracker Error: '{error}'"
-msgstr ""
+msgstr "Трекер қатесі: \"{error}\""
 
 #: ../gtk/Torrent.cc:651
 msgid "Local error: '{error}'"
-msgstr ""
+msgstr "Жергілікті қате: \"{error}\""
 
 #: ../gtk/Torrent.cc:675
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{active_count} қосылған пирден метадеректерді жүктеу ({percent_done}% орындалды)"
+msgstr[1] "{active_count} қосылған пирлерден метадеректерді жүктеу ({percent_done}% орындалды)"
 
 #: ../gtk/Torrent.cc:686
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{active_count} / {connected_count} қосылған пир мен веб-сидтерден жүктеу"
+msgstr[1] "{active_count} / {connected_count} қосылған пирлер мен веб-сидтерден жүктеу"
 
 #: ../gtk/Torrent.cc:697
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{active_count} веб-сидтен жүктеу"
+msgstr[1] "{active_count} веб-сидтерден жүктеу"
 
 #: ../gtk/Torrent.cc:705
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{active_count} / {connected_count} қосылған пирден жүктеу"
+msgstr[1] "{active_count} / {connected_count} қосылған пирлерден жүктеу"
 
 #: ../gtk/Torrent.cc:714
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{active_count} / {connected_count} қосылған пирге жіберу"
+msgstr[1] "{active_count} / {connected_count} қосылған пирлерге жіберу"
 
 #: ../gtk/Utils.cc:135
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_from_now:L} күннен кейін"
+msgstr[1] "{days_from_now:L} күннен кейін"
 
 #: ../gtk/Utils.cc:142
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_from_now:L} сағаттан кейін"
+msgstr[1] "{hours_from_now:L} сағаттан кейін"
 
 #: ../gtk/Utils.cc:150
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_from_now:L} минуттан кейін"
+msgstr[1] "{minutes_from_now:L} минуттан кейін"
 
 #: ../gtk/Utils.cc:158
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_from_now:L} секундтан кейін"
+msgstr[1] "{seconds_from_now:L} секундтан кейін"
 
 #: ../gtk/Utils.cc:162 ../gtk/Utils.cc:195 ../gtk/Utils.cc:226 ../gtk/Utils.cc:259
 msgid "now"
-msgstr ""
+msgstr "қазір"
 
 #: ../gtk/Utils.cc:170
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_ago:L} күн бұрын"
+msgstr[1] "{days_ago:L} күн бұрын"
 
 #: ../gtk/Utils.cc:177
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_ago:L} сағат бұрын"
+msgstr[1] "{hours_ago:L} сағат бұрын"
 
 #: ../gtk/Utils.cc:184
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_ago:L} минут бұрын"
+msgstr[1] "{minutes_ago:L} минут бұрын"
 
 #: ../gtk/Utils.cc:191
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_ago:L} секунд бұрын"
+msgstr[1] "{seconds_ago:L} секунд бұрын"
 
 #: ../gtk/Utils.cc:204
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days:L} күн"
+msgstr[1] "{days:L} күн"
 
 #: ../gtk/Utils.cc:209
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours:L} сағат"
+msgstr[1] "{hours:L} сағат"
 
 #: ../gtk/Utils.cc:215
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes:L} минут"
+msgstr[1] "{minutes:L} минут"
 
 #: ../gtk/Utils.cc:222
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds:L} секунд"
+msgstr[1] "{seconds:L} секунд"
 
 #: ../gtk/Utils.cc:234
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_left:L} күн қалды"
+msgstr[1] "{days_left:L} күн қалды"
 
 #: ../gtk/Utils.cc:241
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_left:L} сағат қалды"
+msgstr[1] "{hours_left:L} сағат қалды"
 
 #: ../gtk/Utils.cc:248
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_left:L} минут қалды"
+msgstr[1] "{minutes_left:L} минут қалды"
 
 #: ../gtk/Utils.cc:255
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_left:L} секунд қалды"
+msgstr[1] "{seconds_left:L} секунд қалды"
 
 #: ../gtk/Utils.cc:274
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
-msgstr ""
+msgstr "\"{path}\" торрент файлы қазірдің өзінде \"{torrent_name}\" тарапынан қолданылуда."
 
 #: ../gtk/Utils.cc:285
 msgid "Couldn't open torrent"
-msgstr ""
+msgstr "Торрентті ашу мүмкін болмады"
 
 #: ../gtk/Utils.cc:546
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" қоқыс шелегіне өшіру мүмкін болмады: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:654
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "\"{url}\" ашу мүмкін болмады"
 
 #: ../gtk/Utils.cc:865 ../libtransmission/announcer.cc:186 ../libtransmission/announcer.cc:205
 msgid "Unsupported URL: '{url}'"
-msgstr ""
+msgstr "Қолдау көрсетілмейтін URL: \"{url}\""
 
 #. modal
 #: ../gtk/Utils.cc:871
 msgid "Transmission doesn't know how to use '{url}'"
-msgstr ""
+msgstr "Transmission бағдарламасы \"{url}\" сілтемесін қалай пайдалануды білмейді"
 
 #: ../gtk/Utils.cc:876
 msgid "This magnet link appears to be intended for something other than BitTorrent."
-msgstr ""
+msgstr "Бұл магниттік сілтеме BitTorrent-тен басқа нәрсеге арналған сияқты."
 
 #: ../gtk/main.cc:63 ../gtk/transmission-gtk.desktop.in:2
 msgid "Transmission"
@@ -1132,11 +1136,11 @@ msgstr "[торрент файлдары не сілтемелер]"
 
 #: ../gtk/main.cc:106
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "Пайдалануға болатын командалық жол опцияларының толық тізімін көру үшін \"{program} --help\" командасын орындаңыз.\n"
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "Б/с"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1156,7 +1160,7 @@ msgstr "КБ/сек"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "Б"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1201,15 +1205,15 @@ msgstr "BitTorrent желісінде файлдарды жүктеңіз жән
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: ../gtk/transmission-gtk.desktop.in:6
 msgid "torrents;downloading;uploading;share;sharing;"
-msgstr ""
+msgstr "торренттер;жүктеу;жіберу;бөлісу;ортақ пайдалану;"
 
 #: ../gtk/transmission-gtk.desktop.in:20
 msgid "Start Transmission with All Torrents Paused"
-msgstr ""
+msgstr "Transmission бағдарламасын барлық торренттерді аялдатып іске қосу"
 
 #: ../gtk/transmission-gtk.desktop.in:24
 msgid "Start Transmission Minimized"
-msgstr ""
+msgstr "Transmission бағдарламасын жинақы түрде іске қосу"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
@@ -1265,7 +1269,7 @@ msgstr "Ерекше_леуді барлығынан алып тастау"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "_Баптаулар"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
@@ -1273,7 +1277,7 @@ msgstr "_Торрент"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
-msgstr ""
+msgstr "Қасие_ттері"
 
 #: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:92 ../gtk/ui/gtk4/MainWindow.ui:78
 msgid "Torrent properties"
@@ -1433,7 +1437,7 @@ msgstr "Құра_масы"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "_Осы туралы"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
@@ -1461,7 +1465,7 @@ msgstr "_Анонс URL-і:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:20 ../gtk/ui/gtk3/MakeDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:36 ../gtk/ui/gtk3/PrefsDialog.ui:37 ../gtk/ui/gtk3/StatsDialog.ui:36 ../gtk/ui/gtk4/DetailsDialog.ui:886 ../gtk/ui/gtk4/MakeDialog.ui:277 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1484 ../gtk/ui/gtk4/StatsDialog.ui:284
 msgid "_Close"
-msgstr ""
+msgstr "_Жабу"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:58 ../gtk/ui/gtk4/DetailsDialog.ui:26
 msgid "Activity"
@@ -1525,7 +1529,7 @@ msgstr "Тегі:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:326
 msgid "Added:"
-msgstr ""
+msgstr "Қосылды:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:430 ../gtk/ui/gtk4/DetailsDialog.ui:338
 msgid "Comment:"
@@ -1565,11 +1569,11 @@ msgstr "Глобалды шектеу_лерді елемеу"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:903 ../gtk/ui/gtk4/DetailsDialog.ui:676
 msgid "Limit _download speed ({speed_units}):"
-msgstr ""
+msgstr "_Жүктеу жылдамдығын шектеу ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:918 ../gtk/ui/gtk4/DetailsDialog.ui:688
 msgid "Limit _upload speed ({speed_units}):"
-msgstr ""
+msgstr "_Жіберу жылдамдығын шектеу ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:935 ../gtk/ui/gtk3/OptionsDialog.ui:143 ../gtk/ui/gtk4/DetailsDialog.ui:700 ../gtk/ui/gtk4/OptionsDialog.ui:87
 msgid "Torrent _priority:"
@@ -1608,10 +1612,12 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"Қосалқы URL қосу үшін оны негізгі URL-ден кейінгі келесі жолға қосыңыз.\n"
+"Жаңа негізгі URL қосу үшін оны бос жолдан кейін қосыңыз."
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:118 ../gtk/ui/gtk4/EditTrackersDialog.ui:63
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
-msgstr ""
+msgstr "Сондай-ақ Түзету > Баптаулар > Желі мәзіріндегі Бастапқы жария трекерлерді қараңыз"
 
 #: ../gtk/ui/gtk3/MainWindow.ui:143
 msgid "Torrent"
@@ -1627,7 +1633,7 @@ msgstr "Жаңа торрент"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:35 ../gtk/ui/gtk4/MakeDialog.ui:285
 msgid "_New"
-msgstr ""
+msgstr "_Жаңа"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:85 ../gtk/ui/gtk4/MakeDialog.ui:32
 msgid "Sa_ve to:"
@@ -1643,7 +1649,7 @@ msgstr "Фай_лдан жасау:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:187 ../gtk/ui/gtk4/MakeDialog.ui:113
 msgid "Piece size:"
-msgstr ""
+msgstr "Бөлік өлшемі:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:231 ../gtk/ui/gtk4/MakeDialog.ui:146
 msgid "Properties"
@@ -1659,7 +1665,7 @@ msgstr "К_омментарийі:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:339 ../gtk/ui/gtk4/MakeDialog.ui:229
 msgid "_Source:"
-msgstr ""
+msgstr "_Көзі:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:366 ../gtk/ui/gtk4/MakeDialog.ui:252
 msgid "_Private torrent"
@@ -1675,15 +1681,15 @@ msgstr "Хабарламалар журналы"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:26 ../gtk/ui/gtk4/MessageLogWindow.ui:31
 msgid "Save _As"
-msgstr ""
+msgstr "Қалайша _сақтау"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:41 ../gtk/ui/gtk4/MessageLogWindow.ui:55
 msgid "Clear"
-msgstr ""
+msgstr "Тазарту"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:66 ../gtk/ui/gtk4/MessageLogWindow.ui:84
 msgid "P_ause"
-msgstr ""
+msgstr "А_ялдату"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:96 ../gtk/ui/gtk4/MessageLogWindow.ui:100
 msgid "Level"
@@ -1715,7 +1721,7 @@ msgstr "Қосқан кез_де жіберу"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:182 ../gtk/ui/gtk3/PrefsDialog.ui:458 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
 msgid "Mo_ve torrent file to the trash"
-msgstr ""
+msgstr "Торрент файлын қоқыс шелегіне ж_ылжыту"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
@@ -1728,12 +1734,12 @@ msgstr "Жылдамдықты шектеу"
 #. Checkbox to limit upload speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:90 ../gtk/ui/gtk4/PrefsDialog.ui:41
 msgid "_Upload ({speed_units}):"
-msgstr ""
+msgstr "_Жіберу ({speed_units}):"
 
 #. Checkbox to limit download speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:105 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
-msgstr ""
+msgstr "_Жүктеу ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:159 ../gtk/ui/gtk4/PrefsDialog.ui:93
 msgid "Alternative Speed Limits"
@@ -1746,12 +1752,12 @@ msgstr "Қалыпты жылдамдық шектеулерін қолмен н
 #. Labels a spinbutton for alternate upload speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:216 ../gtk/ui/gtk4/PrefsDialog.ui:130
 msgid "U_pload ({speed_units}):"
-msgstr ""
+msgstr "Жі_беру ({speed_units}):"
 
 #. Labels a spinbutton for alternate download speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:230 ../gtk/ui/gtk4/PrefsDialog.ui:142
 msgid "Do_wnload ({speed_units}):"
-msgstr ""
+msgstr "Жү_ктеу ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:242 ../gtk/ui/gtk4/PrefsDialog.ui:154
 msgid "_Scheduled times:"
@@ -1764,7 +1770,7 @@ msgstr "Кү_ндерде:"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:317 ../gtk/ui/gtk4/PrefsDialog.ui:210
 msgid "_to"
-msgstr ""
+msgstr "_дейін"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:395 ../gtk/ui/gtk4/PrefsDialog.ui:262
 msgctxt "Gerund"
@@ -1773,15 +1779,15 @@ msgstr "Қосылуда"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:409 ../gtk/ui/gtk4/PrefsDialog.ui:274
 msgid "Automatically add torrent files _from:"
-msgstr ""
+msgstr "Торрент файлдарын мына жерден а_втоматты түрде қосу:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:424 ../gtk/ui/gtk4/PrefsDialog.ui:286
 msgid "Show the Torrent Options _dialog"
-msgstr ""
+msgstr "Торрент опцияларының сұхбат терезесін көрс_ету"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:441 ../gtk/ui/gtk4/PrefsDialog.ui:300
 msgid "_Start added torrents"
-msgstr ""
+msgstr "Қосылған торренттерді іске қо_су"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:477 ../gtk/ui/gtk4/PrefsDialog.ui:328
 msgid "Save to _Location:"
@@ -1793,11 +1799,11 @@ msgstr "Жүктеп алу кезегі"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:573 ../gtk/ui/gtk4/PrefsDialog.ui:401
 msgid "Ma_ximum active downloads:"
-msgstr ""
+msgstr "Бе_лсенді жүктеулердің максималды саны:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:587 ../gtk/ui/gtk4/PrefsDialog.ui:413
 msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr ""
+msgstr "Соңғы _N минутта деректермен алмасқан жүктеулер белсенді болып саналады:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:636 ../gtk/ui/gtk4/PrefsDialog.ui:451
 msgid "Incomplete"
@@ -1813,7 +1819,7 @@ msgstr "Аяқтал_маған торренттерді сақтау орны:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:682 ../gtk/ui/gtk4/PrefsDialog.ui:489
 msgid "Call scrip_t when done downloading:"
-msgstr ""
+msgstr "Жүктеу аяқталған кезде с_криптті шақыру:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:740 ../gtk/ui/gtk4/PrefsDialog.ui:528
 msgctxt "Gerund"
@@ -1834,7 +1840,7 @@ msgstr "N _мин белсенді емес болса, таратуды тоқ�
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:806 ../gtk/ui/gtk4/PrefsDialog.ui:581
 msgid "Call scrip_t when done seeding:"
-msgstr ""
+msgstr "Жіберу аяқталған кезде с_криптті шақыру:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:874 ../gtk/ui/gtk4/PrefsDialog.ui:631
 msgctxt "Gerund"
@@ -1899,11 +1905,11 @@ msgstr "Жал_пы максималды тораптар саны:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1342 ../gtk/ui/gtk4/PrefsDialog.ui:985
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Пирлермен байланысу үшін µ_TP іске қосу"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1346 ../gtk/ui/gtk4/PrefsDialog.ui:987
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "µTP — желідегі кептелісті азайтуға арналған сайман."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1360 ../gtk/ui/gtk4/PrefsDialog.ui:1000
 msgid "Use PE_X to find more peers"
@@ -1931,7 +1937,7 @@ msgstr "LPD - жергілікті желіңізден тораптарды т�
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1429 ../gtk/ui/gtk4/PrefsDialog.ui:1051
 msgid "Default Public Trackers"
-msgstr ""
+msgstr "Бастапқы жария трекерлер"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1073
 msgid ""
@@ -1940,6 +1946,10 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"Барлық жария торренттер үшін пайдаланылатын трекерлер.\n"
+"\n"
+"Қосалқы URL қосу үшін оны негізгі URL-ден кейінгі келесі жолға қосыңыз.\n"
+"Жаңа негізгі URL қосу үшін оны бос жолдан кейін қосыңыз."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1487 ../gtk/ui/gtk4/PrefsDialog.ui:1095
 msgid "Network"
@@ -1979,7 +1989,7 @@ msgstr "Қашықтан басқару"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1695 ../gtk/ui/gtk4/PrefsDialog.ui:1252
 msgid "Allow _remote access"
-msgstr ""
+msgstr "Қашықтан қ_ол жеткізуге рұқсат ету"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1711 ../gtk/ui/gtk4/PrefsDialog.ui:1261
 msgid "_Open web client"
@@ -2003,7 +2013,7 @@ msgstr "Па_роль:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1795 ../gtk/ui/gtk4/PrefsDialog.ui:1329
 msgid "Only allow these IP a_ddresses:"
-msgstr ""
+msgstr "Тек мына IP а_дрестеріне рұқсат ету:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1817 ../gtk/ui/gtk4/PrefsDialog.ui:1345
 msgid "Addresses:"
@@ -2023,7 +2033,7 @@ msgstr "Торрент орналасуын көрсетіңіз"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:35 ../gtk/ui/gtk4/RelocateDialog.ui:101
 msgid "_Apply"
-msgstr ""
+msgstr "Іске а_сыру"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:69 ../gtk/ui/gtk4/RelocateDialog.ui:20
 msgid "Location"
@@ -2071,11 +2081,11 @@ msgstr "_URL сілтеме"
 
 #: ../libtransmission/announcer-http.cc:455
 msgid "Couldn't parse announce response: {error} ({error_code})"
-msgstr ""
+msgstr "Хабарлау жауабын талдау мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/announcer-http.cc:675
 msgid "Couldn't parse scrape response: {error} ({error_code})"
-msgstr ""
+msgstr "Scrape жауабын талдау мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/announcer-udp.cc:147 ../libtransmission/announcer-udp.cc:308
 msgid "Unknown error"
@@ -2083,21 +2093,21 @@ msgstr "Белгісіз қате"
 
 #: ../libtransmission/announcer-udp.cc:423
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "{ip_protocol} қосылымы сәтсіз аяқталды"
 
 #: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "{ip_protocol} протоколында \"{address}:{port}\" іздеу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:898
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Хабарлау қатесі: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:910
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Хабарлау қатесі: {error} ({count} секундтан кейін қайталанады) ({url})"
+msgstr[1] "Хабарлау қатесі: {error} ({count} секундтан кейін қайталанады) ({url})"
 
 #: ../libtransmission/announcer.cc:1046 ../libtransmission/announcer.cc:1368
 msgid "Could not connect to tracker"
@@ -2114,125 +2124,125 @@ msgstr "Сәтті"
 #: ../libtransmission/blocklist.cc:85 ../libtransmission/blocklist.cc:412
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\"{path}\" бұғаттау тізімінде {count} жазба бар"
+msgstr[1] "\"{path}\" бұғаттау тізімінде {count} жазба бар"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:264
 msgid "Couldn't parse line: '{line}'"
-msgstr ""
+msgstr "Жолды талдау мүмкін болмады: \"{line}\""
 
 #: ../libtransmission/blocklist.cc:394
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Бұғаттау тізімінің ескі пішімін жаңасына қайта жазу"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:45 ../libtransmission/crypto-utils-openssl.cc:64 ../libtransmission/crypto-utils-wolfssl.cc:48
 msgid "{crypto_library} error: {error} ({error_code})"
-msgstr ""
+msgstr "{crypto_library} қатесі: {error} ({error_code})"
 
 #: ../libtransmission/inout.cc:118
 msgid "Couldn't get '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" алу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "{protocol} бастапқы адресі {ip} мәніне сәтті жаңартылды"
 
 #: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
-msgstr ""
+msgstr "Ешбір IP протоколында бастапқы адресті алу мүмкін болмады, желілік байланыстар орнату мүмкін емес"
 
 #: ../libtransmission/ip-cache.cc:314
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Құрылғыңыз {protocol} протоколын қолдамайды"
 
 #: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "{url} арқылы глобалды {type} адресі {ip} мәніне сәтті жаңартылды"
 
 #: ../libtransmission/log.cc:294
 msgid "Too many messages like this! I won't log this message anymore this session."
-msgstr ""
+msgstr "Осындай хабарламалар тым көп! Осы сеанста бұл хабарлама бұдан былай журналға жазылмайды."
 
 #: ../libtransmission/makemeta.cc:81 ../libtransmission/watchdir.cc:53
 msgid "Skipping '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" өткізіп жіберу: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:203
 msgid "Couldn't create socket: {error} ({error_code})"
-msgstr ""
+msgstr "Сокет жасау мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:280
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
-msgstr ""
+msgstr "{socket} сокетіне {address} бастапқы адресін орнату мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:300
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
-msgstr ""
+msgstr "{socket} сокетін {address}:{port} адресіне қосу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:361
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
-msgstr ""
+msgstr "{address} адресіндегі {port} портын байланыстыру мүмкін болмады: {error} ({error_code}) -- Transmission бағдарламасының басқа көшірмесі іске қосылып тұрған жоқ па?"
 
 #: ../libtransmission/net.cc:362
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
-msgstr ""
+msgstr "{address} адресіндегі {port} портын байланыстыру мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:194
 msgid "Couldn't open '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" ашу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:223
 msgid "Couldn't preallocate '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" алдын ала бөлу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:243
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" қиып жіберу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/peer-io.cc:692
 msgid "Unknown state: {state}"
-msgstr ""
+msgstr "Белгісіз күй: {state}"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:92
 msgid "Found public address '{address}'"
-msgstr ""
+msgstr "Жария адрес табылды: \"{address}\""
 
 #: ../libtransmission/port-forwarding-natpmp.cc:130
 msgid "Port {port} is no longer forwarded"
-msgstr ""
+msgstr "{port} порты енді бағытталмайды"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:179
 msgid "Port {port} forwarded successfully"
-msgstr ""
+msgstr "{port} порты сәтті бағытталды"
 
 #: ../libtransmission/port-forwarding-upnp.cc:274
 msgid "Found Internet Gateway Device '{url}'"
-msgstr ""
+msgstr "Интернет-шлюз құрылғысы табылды: \"{url}\""
 
 #: ../libtransmission/port-forwarding-upnp.cc:276
 msgid "Local Address is '{address}'"
-msgstr ""
+msgstr "Жергілікті адрес: \"{address}\""
 
 #: ../libtransmission/port-forwarding-upnp.cc:302
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
-msgstr ""
+msgstr "{local_port} жергілікті порты {advertised_port} портына бағытталмаған"
 
 #: ../libtransmission/port-forwarding-upnp.cc:315
 msgid "Stopping port forwarding through '{url}', service '{type}'"
-msgstr ""
+msgstr "\"{url}\" арқылы портты бағыттауды тоқтату, қызмет: \"{type}\""
 
 #: ../libtransmission/port-forwarding-upnp.cc:349
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
-msgstr ""
+msgstr "\"{url}\" арқылы портты бағыттау, қызмет: \"{type}\" (жергілікті адрес: {address}:{port})"
 
 #: ../libtransmission/port-forwarding-upnp.cc:359
 msgid "Forwarded local port {local_port} to {advertised_port}"
-msgstr ""
+msgstr "{local_port} жергілікті порты {advertised_port} портына бағытталды"
 
 #: ../libtransmission/port-forwarding-upnp.cc:367
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
-msgstr ""
+msgstr "Егер роутеріңіз UPnP қолдаса, UPnP іске қосылғанына көз жеткізіңіз!"
 
 #: ../libtransmission/port-forwarding.cc:163
 msgid "Starting"
@@ -2252,77 +2262,77 @@ msgstr "Бағдарланған жоқ"
 
 #: ../libtransmission/port-forwarding.cc:202
 msgid "Mapped private port {private_port} to public port {public_port}"
-msgstr ""
+msgstr "{private_port} жеке порты {public_port} жария портына сәйкестендірілді"
 
 #: ../libtransmission/port-forwarding.cc:219
 msgid "State changed from '{old_state}' to '{state}'"
-msgstr ""
+msgstr "Күй \"{old_state}\" мәнінен \"{state}\" мәніне өзгертілді"
 
 #: ../libtransmission/rpc-server.cc:105
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
-msgstr ""
+msgstr "Unix сокетінің жолы {count} таңбадан аз болуы керек (оның ішінде \"{prefix}\" префиксі бар)"
 
 #: ../libtransmission/rpc-server.cc:356
 msgid "Rejected request from {host} (possible directory traversal attack)"
-msgstr ""
+msgstr "{host} тарапынан жіберілген сұрау қабылданбады (бумалар арасында ауысу шабуылы болуы мүмкін)"
 
 #: ../libtransmission/rpc-server.cc:545
 msgid "Rejected request from {host} (brute force protection active)"
-msgstr ""
+msgstr "{host} тарапынан жіберілген сұрау қабылданбады (іріктеу шабуылынан қорғау белсенді)"
 
 #: ../libtransmission/rpc-server.cc:554
 msgid "Rejected request from {host} (IP not whitelisted)"
-msgstr ""
+msgstr "{host} тарапынан жіберілген сұрау қабылданбады (IP ақ тізімде жоқ)"
 
 #: ../libtransmission/rpc-server.cc:578
 msgid "Rejected request from {host} (failed authentication)"
-msgstr ""
+msgstr "{host} тарапынан жіберілген сұрау қабылданбады (аутентификация сәтсіз аяқталды)"
 
 #: ../libtransmission/rpc-server.cc:620
 msgid "Rejected request from {host} (Host not whitelisted)"
-msgstr ""
+msgstr "{host} тарапынан жіберілген сұрау қабылданбады (хост ақ тізімде жоқ)"
 
 #: ../libtransmission/rpc-server.cc:658
 msgid "Unknown URI from {host}: '{uri}'"
-msgstr ""
+msgstr "{host} тарапынан келген белгісіз URI: \"{uri}\""
 
 #: ../libtransmission/rpc-server.cc:678
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
-msgstr ""
+msgstr "Windows жүйесінде Unix сокеттеріне қолдау көрсетілмейді. Баптауларыңыздағы \"{key}\" мәнін өзгертіңіз."
 
 #: ../libtransmission/rpc-server.cc:706
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
-msgstr ""
+msgstr "RPC сокет режимін {mode:#o} етіп орнату мүмкін болмады, бастапқы 0755 мәні пайдаланылады"
 
 #: ../libtransmission/rpc-server.cc:823
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{count} әрекеттен кейін {address} адресін байланыстыру мүмкін болмады, тоқтатылды"
+msgstr[1] "{count} әрекеттен кейін {address} адресін байланыстыру мүмкін болмады, тоқтатылды"
 
 #: ../libtransmission/rpc-server.cc:836
 msgid "Listening for RPC and Web requests on '{address}'"
-msgstr ""
+msgstr "RPC және веб-сұраулар үшін \"{address}\" адресі тыңдалуда"
 
 #: ../libtransmission/rpc-server.cc:866
 msgid "Stopped listening for RPC and Web requests on '{address}'"
-msgstr ""
+msgstr "RPC және веб-сұраулар үшін \"{address}\" адресін тыңдау тоқтатылды"
 
 #: ../libtransmission/rpc-server.cc:890
 msgid "Added '{entry}' to host whitelist"
-msgstr ""
+msgstr "\"{entry}\" хосттардың ақ тізіміне қосылды"
 
 #: ../libtransmission/rpc-server.cc:1012
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
-msgstr ""
+msgstr "\"{key}\" баптауы \"{value}\" мәніне тең, бірақ ол IPv4 немесе IPv6 адресі немесе Unix сокет жолы болуы керек. Бастапқы \"0.0.0.0\" мәні пайдаланылады"
 
 #: ../libtransmission/rpc-server.cc:1025
 msgid "Serving RPC and Web requests on {address}"
-msgstr ""
+msgstr "RPC және веб-сұрауларға {address} адресінде қызмет көрсету"
 
 #: ../libtransmission/rpc-server.cc:1030
 msgid "Whitelist enabled"
-msgstr ""
+msgstr "Ақ тізім іске қосылды"
 
 #: ../libtransmission/rpc-server.cc:1035
 msgid "Password required"
@@ -2330,77 +2340,77 @@ msgstr "Пароль керек"
 
 #: ../libtransmission/rpc-server.cc:1042
 msgid "Serving RPC and Web requests from '{path}'"
-msgstr ""
+msgstr "RPC және веб-сұрауларға \"{path}\" жолында қызмет көрсету"
 
 #: ../libtransmission/rpcimpl.cc:1496
 msgid "Couldn't test port: {error} ({error_code})"
-msgstr ""
+msgstr "Портты тексеру мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1566
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
-msgstr ""
+msgstr "Бұғаттау тізімін алу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1716
 msgid "Couldn't fetch torrent: {error} ({error_code})"
-msgstr ""
+msgstr "Торрентті алу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/session-alt-speeds.cc:65
 msgid "Time to turn off turtle mode"
-msgstr ""
+msgstr "Баяу режимді сөндіру уақыты келді"
 
 #: ../libtransmission/session-alt-speeds.cc:65
 msgid "Time to turn on turtle mode"
-msgstr ""
+msgstr "Баяу режимді іске қосу уақыты келді"
 
 #: ../libtransmission/session-id.cc:152
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Сеансты құлыптау файлын \"{path}\" ашу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/session.cc:423
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "{hostport} адресінде кіріс пир байланыстары тыңдалуда"
 
 #: ../libtransmission/session.cc:764
 msgid "Transmission version {version} starting"
-msgstr ""
+msgstr "Transmission {version} нұсқасы іске қосылуда"
 
 #: ../libtransmission/session.cc:1504
 msgid "Transmission version {version} shutting down"
-msgstr ""
+msgstr "Transmission {version} нұсқасы жұмысын аяқтауда"
 
 #: ../libtransmission/session.cc:1586
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{count} торрент жүктелді"
+msgstr[1] "{count} торрент жүктелді"
 
 #: ../libtransmission/torrent-metainfo.cc:743
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
-msgstr ""
+msgstr "Торрент файлы \"{old_path}\" жолынан \"{path}\" жолына көшірілді"
 
 #: ../libtransmission/torrent.cc:162
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{magnet}\" үшін \"{path}\" жолындағы метаақпаратты пайдалану мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:191
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Деректер табылмады! Дискілеріңіздің қосылғанына көз жеткізіңіз немесе \"Орналасуды орнату\" функциясын пайдаланыңыз. Қайта жүктеп алу үшін \"Жергілікті деректерді тексеру\" функциясын пайдаланып, содан кейін торрентті іске қосыңыз."
 
 #: ../libtransmission/torrent.cc:430
 msgid "Calling script '{path}'"
-msgstr ""
+msgstr "\"{path}\" скриптін шақыру"
 
 #: ../libtransmission/torrent.cc:438
 msgid "Couldn't call script '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" скриптін шақыру мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:472
 msgid "Seed ratio reached; pausing torrent"
-msgstr ""
+msgstr "Тарату коэффициентіне жетті; торрент аялдатылуда"
 
 #: ../libtransmission/torrent.cc:479
 msgid "Seeding idle limit reached; pausing torrent"
-msgstr ""
+msgstr "Таратудың бос тұру шегіне жетті; торрент аялдатылуда"
 
 #: ../libtransmission/torrent.cc:654
 msgid "Restarted manually -- disabling its seed ratio"
@@ -2408,11 +2418,11 @@ msgstr "Қолмен қайта қосылған -- тарату рейтинг�
 
 #: ../libtransmission/torrent.cc:710
 msgid "Pausing torrent"
-msgstr ""
+msgstr "Торрентті аялдату"
 
 #: ../libtransmission/torrent.cc:755
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "Барлық торрент файлдарын өшіру мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:798
 msgid "Removing torrent"
@@ -2420,160 +2430,180 @@ msgstr "Торренті өшіру"
 
 #: ../libtransmission/torrent.cc:1117 ../libtransmission/torrent.cc:1639
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{old_path}\" нысанын \"{path}\" жолына жылжыту мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:1581
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Деректер табылмағандықтан торрент аялдатылды! Дискілеріңіздің қосылғанына көз жеткізіңіз немесе \"Орналасуды орнату\" функциясын пайдаланыңыз, содан кейін \"Жергілікті деректерді тексеру\" функциясын қайта орындаңыз. Қайта жүктеп алу үшін торрентті іске қосыңыз."
 
 #: ../libtransmission/torrent.cc:2087
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Трекер ескертуі: \"{warning}\" ({url})"
 
 #: ../libtransmission/tr-dht.cc:554
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "\"{filename}\" файлының жолын талдау мүмкін емес: \"{line}\""
 
 #: ../libtransmission/tr-dht.cc:579
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{address}:{port}\" іздеу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/tr-lpd.cc:271 ../libtransmission/tr-lpd.cc:285
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
-msgstr ""
+msgstr "{ip_protocol} LPD іске қосу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:186
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "{address} адресіндегі IPv4 сокетін бұғатталмайтын ету мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:198
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "{address} адресіндегі IPv4 сокетін байланыстыру мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:233
 msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "{address} адресіндегі IPv6 сокетін бұғатталмайтын ету мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:245
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "{address} адресіндегі IPv6 сокетін байланыстыру мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:265
 msgid "Couldn't create any UDP sockets."
-msgstr ""
+msgstr "Бірде-бір UDP сокетін жасау мүмкін болмады."
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
-msgstr ""
+msgstr "Белгісіз сокеттер тобы"
 
 #: ../libtransmission/utils.cc:150
 msgid "Couldn't read '{path}': Not a regular file"
-msgstr ""
+msgstr "\"{path}\" оқу мүмкін емес: бұл кәдімгі файл емес"
 
 #: ../libtransmission/variant-json.cc:257
 msgid "Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"
-msgstr ""
+msgstr "{position} позициясындағы \"{text}\" JSON талдау мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:87 ../libtransmission/watchdir-inotify.cc:100 ../libtransmission/watchdir-inotify.cc:113 ../libtransmission/watchdir-kqueue.cc:76 ../libtransmission/watchdir-kqueue.cc:90 ../libtransmission/watchdir-kqueue.cc:106
 msgid "Couldn't watch '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "\"{path}\" бақылау мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:146 ../libtransmission/watchdir-kqueue.cc:152 ../libtransmission/watchdir-win32.cc:297
 msgid "Couldn't read event: {error} ({error_code})"
-msgstr ""
+msgstr "Оқиғаны оқу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:156 ../libtransmission/watchdir-win32.cc:307
 msgid "Couldn't read event: expected {expected_size}, got {actual_size}"
-msgstr ""
+msgstr "Оқиғаны оқу мүмкін болмады: күтілген өлшем {expected_size}, алынғаны {actual_size}"
 
 #: ../libtransmission/watchdir-inotify.cc:174 ../libtransmission/watchdir-win32.cc:333
 msgid "Couldn't read filename: {error} ({error_code})"
-msgstr ""
+msgstr "Файл атын оқу мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:184 ../libtransmission/watchdir-win32.cc:343
 msgid "Couldn't read filename: expected {expected_size}, got {actual_size}"
-msgstr ""
+msgstr "Файл атын оқу мүмкін болмады: күтілген өлшем {expected_size}, алынғаны {actual_size}"
 
 #: ../libtransmission/watchdir-win32.cc:146
 msgid "Couldn't convert '{path}' to native path"
-msgstr ""
+msgstr "\"{path}\" жолын жүйелік жолға түрлендіру мүмкін болмады"
 
 #: ../libtransmission/watchdir-win32.cc:185
 msgid "Couldn't create pipe: {error} ({error_code})"
-msgstr ""
+msgstr "Арна жасау мүмкін болмады: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-win32.cc:211
 msgid "Couldn't create thread"
-msgstr ""
+msgstr "Ағын жасау мүмкін болмады"
 
 #: ../libtransmission/watchdir-win32.cc:249
 msgid "Couldn't read directory changes"
-msgstr ""
+msgstr "Бумадағы өзгерістерді оқу мүмкін болмады"
 
 #: ../libtransmission/watchdir-win32.cc:256
 msgid "Couldn't wait for directory changes"
-msgstr ""
+msgstr "Бумадағы өзгерістерді күту мүмкін болмады"
 
 #: ../libtransmission/web.cc:170 ../libtransmission/web.cc:180
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "Сurl орнатылымын жаңғыртуды қарастырыңыз."
 
 #: ../libtransmission/web.cc:173
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} нұсқасы SIGPIPE апаттарына бейім. {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} нұсқасы eventfd қос жабылу осалдығына бейім, бұл transmission-daemon systemd қызметі үшін SIGABRT апаттарын тудыруы мүмкін. {details_url}"
 
 #: ../libtransmission/web.cc:202
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
-msgstr ""
+msgstr "Трекер сертификаттары CURL_CA_BUNDLE орта айнымалысы арқылы тексеріледі: {bundle}"
 
 #: ../libtransmission/web.cc:204
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
-msgstr ""
+msgstr "Ескертпе: бұл libcurl-ді nss емес, openssl немесе gnutls-пен құрастырған жағдайда ғана жұмыс істейді"
 
 #: ../libtransmission/web.cc:205
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
-msgstr ""
+msgstr "Ескертпе: Жарамсыз сертификаттар басқа қателер сияқты \"Трекерге қосылу мүмкін болмады\" ретінде көрсетіледі"
 
 #: ../libtransmission/web.cc:514
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "\"{url}\" алу мүмкін болмады: күтілген HTTP жауап коды {expected_code}, алынғаны {actual_code}"
 
 #: ../utils/create.cc:241
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{file_count:L} файл, {total_size}\n"
+msgstr[1] "{file_count:L} файл, {total_size}\n"
 
 #: ../utils/create.cc:247
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{piece_count:L} бөлік, {piece_size}\n"
+msgstr[1] "әрқайсысы {piece_size} болатын {piece_count:L} бөлік\n"
 
 #: ../utils/remote.cc:143
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "сағат"
+msgstr[1] "сағат"
 
 #: ../utils/remote.cc:144
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "минут"
+msgstr[1] "минут"
 
 #: ../utils/remote.cc:145 ../utils/remote.cc:165
 msgid "seconds"
 msgid_plural "seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "секунд"
+msgstr[1] "секунд"
 
 #: ../utils/remote.cc:149
 msgid "day"
 msgid_plural "days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "күн"
+msgstr[1] "күн"
+
+#~ msgctxt "Logging level"
+#~ msgid "Critical"
+#~ msgstr "Критикалық"
+
+#~ msgctxt "Logging level"
+#~ msgid "Debug"
+#~ msgstr "Жөндеу"
+
+#~ msgctxt "Logging level"
+#~ msgid "Error"
+#~ msgstr "Қате"
+
+#~ msgctxt "Logging level"
+#~ msgid "Information"
+#~ msgstr "Ақпарат"
+
+#~ msgctxt "Logging level"
+#~ msgid "Warning"
+#~ msgstr "Ескерту"

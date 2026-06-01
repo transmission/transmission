@@ -12,13 +12,13 @@
 "42.title" = "=";
 
 /* Class = "NSMenuItem"; title = "of the following are true"; ObjectID = "49"; */
-"49.title" = "из следующих условий удовлетвор.";
+"49.title" = "выполняется";
 
 /* Class = "NSMenuItem"; title = "Any"; ObjectID = "50"; */
-"50.title" = "Любое";
+"50.title" = "Какое-либо из правил";
 
 /* Class = "NSMenuItem"; title = "All"; ObjectID = "51"; */
-"51.title" = "Все";
+"51.title" = "Каждое правило";
 
 /* Class = "NSMenuItem"; title = "Name"; ObjectID = "100"; */
 "100.title" = "Имя";
@@ -57,7 +57,7 @@
 "165.title" = "содержит";
 
 /* Class = "NSMenuItem"; title = "None"; ObjectID = "166"; */
-"166.title" = "Нет";
+"166.title" = "Ни одно из правил не";
 
 /* Class = "NSMenuItem"; title = "matches"; ObjectID = "167"; */
 "167.title" = "совпадает с";
