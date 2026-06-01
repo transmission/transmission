@@ -989,19 +989,19 @@ msgstr[1] "{days_from_now:L} dae van nou af"
 #: ../gtk/Utils.cc:142
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] "{days_from_now:L} uur van nou af"
+msgstr[0] "{hours_from_now:L} uur van nou af"
 msgstr[1] "{hours_from_now:L} uur van nou af"
 
 #: ../gtk/Utils.cc:150
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
-msgstr[0] "{days_from_now:L} minuut van nou af"
+msgstr[0] "{minutes_from_now:L} minuut van nou af"
 msgstr[1] "{minutes_from_now:L} minute van nou af"
 
 #: ../gtk/Utils.cc:158
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
-msgstr[0] "{days_from_now:L} sekonde van nou af"
+msgstr[0] "{seconds_from_now:L} sekonde van nou af"
 msgstr[1] "{seconds_from_now:L}  sekondes van nou af"
 
 #: ../gtk/Utils.cc:162 ../gtk/Utils.cc:195 ../gtk/Utils.cc:226 ../gtk/Utils.cc:259

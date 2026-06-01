@@ -423,7 +423,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:1856
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr "Rekjarin hevði {markup_begin}{seeder_count}{seeder_or_seeders} og {leecher_count}{leecher_or_leechers}{markup_end}{time_span_ago}"
+msgstr "Rekjarin hevði {markup_begin}{seeder_count} {seeder_or_seeders} og {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1858
 msgid "seeder"

@@ -58,7 +58,7 @@ msgstr "Utsetter å laste inn på nytt til økten har startet fullstendig."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr "Kunne ikke laste inn på nytt: Kunne ikke hente monotontid:{errmsg}({errno})"
+msgstr "Kunne ikke laste inn på nytt: Kunne ikke hente monotontid: {errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
@@ -66,7 +66,7 @@ msgstr "Laster innstillinger på nytt fra '{path}'"
 
 #: ../daemon/daemon.cc:853
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr "Kunne ikke initialisere daemon: {error}({error_code})"
+msgstr "Kunne ikke initialisere daemon: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:865
 msgid "Loading settings from '{path}'"
@@ -623,7 +623,7 @@ msgid ""
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
 "Klikk for å deaktivere alternative fartsgrenser\n"
-"({download_speed}ned, {upload_speed}opp)"
+"({download_speed} ned, {upload_speed} opp)"
 
 #: ../gtk/MainWindow.cc:386
 msgid ""
@@ -631,7 +631,7 @@ msgid ""
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
 "Klikk for å aktivere alternative fartsgrenser\n"
-"({download_speed}ned, {upload_speed}opp)"
+"({download_speed} ned, {upload_speed} opp)"
 
 #: ../gtk/MainWindow.cc:438
 msgid "Unlimited"
