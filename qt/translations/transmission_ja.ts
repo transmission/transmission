@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message numerus="yes">
-        <location filename="../Application.cc" line="+313"/>
+        <location filename="../Application.cc" line="+330"/>
         <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>トレント完了</numerusform>
@@ -2096,7 +2096,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-266"/>
+        <location filename="../Application.cc" line="-282"/>
         <source>B/s</source>
         <translation>B/秒</translation>
     </message>
@@ -2167,7 +2167,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location line="+247"/>
+        <location line="+263"/>
         <source>Start Now</source>
         <translation>すぐ開始</translation>
     </message>

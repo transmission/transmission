@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message numerus="yes">
-        <location filename="../Application.cc" line="+313"/>
+        <location filename="../Application.cc" line="+330"/>
         <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Torrent terminé</numerusform>
@@ -188,7 +188,7 @@
     <message>
         <location line="+8"/>
         <source>Peer was discovered through DHT</source>
-        <translation>Le pair été trouvé grâce la la table de hachage distribuée</translation>
+        <translation>Le pair été trouvé grâce à la table de hachage distribuée</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2022,7 +2022,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
     <message>
         <location line="+13"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>État&#xa0;: &lt;b&gt;{status}&lt;/b&gt;</translation>
+        <translation>État&#xa0;: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2112,7 +2112,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-266"/>
+        <location filename="../Application.cc" line="-282"/>
         <source>B/s</source>
         <translation>b/s</translation>
     </message>
@@ -2183,7 +2183,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
         <translation>To</translation>
     </message>
     <message>
-        <location line="+247"/>
+        <location line="+263"/>
         <source>Start Now</source>
         <translation>Démarrer maintenant</translation>
     </message>

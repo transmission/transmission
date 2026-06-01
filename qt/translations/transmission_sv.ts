@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message numerus="yes">
-        <location filename="../Application.cc" line="+313"/>
+        <location filename="../Application.cc" line="+330"/>
         <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Torrent slutförd</numerusform>
@@ -122,7 +122,7 @@
     <message>
         <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>Privat för denna spårare -- DHT och PEX inaktiverat</translation>
+        <translation>Privat för denna spårare -- DHT och PEX är inaktiverade</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -236,7 +236,7 @@
         <location line="+9"/>
         <source>%1 of %2 (%3%), %4 Unverified</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded data (both verified and unverified), %2 is overall size of torrent data, %3 is percentage (%1/%2*100), %4 is amount of downloaded but not yet verified data</extracomment>
-        <translation>%1 av %2 (%3%), %4 Obekräftad</translation>
+        <translation>%1 av %2 (%3%), %4 overifierat</translation>
     </message>
     <message>
         <location line="+70"/>
@@ -302,7 +302,7 @@
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation>Stoppa distribuering om inaktiv i:</translation>
+        <translation>Stoppa distribuering efter inaktivitet i:</translation>
     </message>
     <message>
         <location line="+73"/>
@@ -1246,7 +1246,7 @@
     <message>
         <location line="+4"/>
         <source>Delete this torrent&apos;s downloaded files?</source>
-        <translation>Ta bort denna torrentens hämtade filer?</translation>
+        <translation>Ta bort de hämtade filerna för den här torrenten?</translation>
     </message>
     <message numerus="yes">
         <location line="-4"/>
@@ -1415,7 +1415,7 @@
         <location line="+23"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
-        <translation>För att lägga till en reserv URL, lägg till den på raden efter den primära URL:en.
+        <translation>För att lägga till en reserv-URL, lägg till den på raden efter den primära URL:en.
 För att lägga till ytterligare en primär URL, lägg till den efter en tom rad.</translation>
     </message>
     <message>
@@ -1738,7 +1738,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation>Spårare att använda på alla publika torrenter.
 
 För att lägga till en reserv-URL, lägg till den på nästa rad efter en primär URL.
-Lägg till en ny primär URL genom att lägga till den efter en tom rad.</translation>
+För att lägga till en ny primär URL, lägg till den efter en tom rad.</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -2112,7 +2112,7 @@ Lägg till en ny primär URL genom att lägga till den efter en tom rad.</transl
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-266"/>
+        <location filename="../Application.cc" line="-282"/>
         <source>B/s</source>
         <translation>B/s</translation>
     </message>
@@ -2183,7 +2183,7 @@ Lägg till en ny primär URL genom att lägga till den efter en tom rad.</transl
         <translation>TB</translation>
     </message>
     <message>
-        <location line="+247"/>
+        <location line="+263"/>
         <source>Start Now</source>
         <translation>Starta nu</translation>
     </message>
@@ -2436,7 +2436,7 @@ Lägg till en ny primär URL genom att lägga till den efter en tom rad.</transl
         <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
-        <translation>Magnetiserad överföring - hämtar metadata (%1%)</translation>
+        <translation>Magnetlänk - hämtar metadata (%1%)</translation>
     </message>
     <message>
         <location line="+9"/>

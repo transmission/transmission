@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Copyright © The Transmission Project</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Klient</translation>
+        <translation>Klient</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Server</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message numerus="yes">
-        <location filename="../Application.cc" line="+313"/>
+        <location filename="../Application.cc" line="+330"/>
         <source>Torrent(s) Completed</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2109,7 +2109,7 @@ To add a new primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-266"/>
+        <location filename="../Application.cc" line="-282"/>
         <source>B/s</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2180,7 +2180,7 @@ To add a new primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+247"/>
+        <location line="+263"/>
         <source>Start Now</source>
         <translation type="unfinished"></translation>
     </message>

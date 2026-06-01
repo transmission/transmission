@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-18 19:12+0000\n"
+"POT-Creation-Date: 2026-06-01 04:01+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Alexander Gabilondo <alexgabi@disroot.org>, 2026\n"
 "Language-Team: Basque (https://app.transifex.com/transmissionbt/teams/33778/eu/)\n"
@@ -79,7 +79,7 @@ msgstr "Ezarpenak '{path}' helbidetik kargatzen"
 msgid "Saved pidfile '{path}'"
 msgstr "Gordetako '{path}' pidfile-a"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:246 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "Ezin izan da '{path}' gorde: {error} ({error_code})"
 
@@ -534,7 +534,7 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Torrent hauetako batek ez du deskarga amaitu."
 msgstr[1] "Torrent hauetako batzuk ez dute deskarga amaitu."
 
-#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:273 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr "_Utzi bertan behera"
 
@@ -562,7 +562,7 @@ msgstr "Baxua"
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "Ezin izan da '{old_path}' '{path}' gisa berrizendatu: {error} ({error_code})"
 
-#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:342
+#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:344
 msgid "Name"
 msgstr "Izena"
 
@@ -734,19 +734,19 @@ msgctxt "Logging level"
 msgid "Debug"
 msgstr "Arazketa"
 
-#: ../gtk/MessageLogWindow.cc:271
+#: ../gtk/MessageLogWindow.cc:273
 msgid "Save Log"
 msgstr "Gorde egunkaria"
 
-#: ../gtk/MessageLogWindow.cc:271 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
+#: ../gtk/MessageLogWindow.cc:273 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
 msgstr "_Gorde"
 
-#: ../gtk/MessageLogWindow.cc:351
+#: ../gtk/MessageLogWindow.cc:353
 msgid "Message"
 msgstr "Mezua"
 
-#: ../gtk/MessageLogWindow.cc:360
+#: ../gtk/MessageLogWindow.cc:362
 msgid "Time"
 msgstr "Ordua"
 
@@ -1250,7 +1250,7 @@ msgstr "Abiarazi Transmission minimizatua"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr "_Agiria"
+msgstr "_Fitxategia"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -2112,11 +2112,11 @@ msgstr "Ireki torrent-a URL batetik"
 msgid "_URL"
 msgstr "_URLa"
 
-#: ../libtransmission/announcer-http.cc:453
+#: ../libtransmission/announcer-http.cc:455
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "Ezin izan da iragarpen erantzuna aztertu: {error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:673
+#: ../libtransmission/announcer-http.cc:675
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "Ezin izan da zuriketa erantzuna aztertu: {error} ({error_code})"
 
@@ -2130,7 +2130,7 @@ msgstr "{ip_protocol} konexioak huts egin du"
 
 #: ../libtransmission/announcer-udp.cc:886
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "Ezin izan da '{address}:{port}'  {ip_protocol}-n bilatu: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:898
 msgid "Announce error: {error} ({url})"
@@ -2139,8 +2139,8 @@ msgstr "Iragarpen errorea: {error}({url})"
 #: ../libtransmission/announcer.cc:910
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Errorearen berri: {error} (Berriro saiatzen segundo {count}ean) ({url})"
+msgstr[1] "Errorearen berri: {error} (Berriro saiatzen {count} segundotan) ({url})"
 
 #: ../libtransmission/announcer.cc:1046 ../libtransmission/announcer.cc:1368
 msgid "Could not connect to tracker"
@@ -2179,7 +2179,7 @@ msgstr "Ezin izan da '{path}' eskuratu: {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:292
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Behar bezala eguneratu da iturria {protocol}helbidea {ip}-ra"
 
 #: ../libtransmission/ip-cache.cc:306
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
@@ -2191,7 +2191,7 @@ msgstr "Zure gailuak ez du {protocol} protokoloa onartzen"
 
 #: ../libtransmission/ip-cache.cc:341
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Behar bezala eguneratu da {type} helbide globala {ip}-ra   {url}-en bidez"
 
 #: ../libtransmission/log.cc:294
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2233,7 +2233,7 @@ msgstr "Ezin izan da '{path}' aurrez esleitu: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Ezin izan da '{path}' moztu: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:686
+#: ../libtransmission/peer-io.cc:692
 msgid "Unknown state: {state}"
 msgstr "Egoera ezezaguna: {state}"
 
@@ -2305,73 +2305,73 @@ msgstr "Egoera '{old_state}' egoeratik '{state}' egoerara aldatu da"
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr "Unix-eko socket bidea  {count} karaktere baino gutxiagokoa izan behar da ('{prefix}' aurrizkia barne)"
 
-#: ../libtransmission/rpc-server.cc:348
+#: ../libtransmission/rpc-server.cc:356
 msgid "Rejected request from {host} (possible directory traversal attack)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:536
+#: ../libtransmission/rpc-server.cc:545
 msgid "Rejected request from {host} (brute force protection active)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:545
+#: ../libtransmission/rpc-server.cc:554
 msgid "Rejected request from {host} (IP not whitelisted)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:569
+#: ../libtransmission/rpc-server.cc:578
 msgid "Rejected request from {host} (failed authentication)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:611
+#: ../libtransmission/rpc-server.cc:620
 msgid "Rejected request from {host} (Host not whitelisted)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:649
+#: ../libtransmission/rpc-server.cc:658
 msgid "Unknown URI from {host}: '{uri}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:669
+#: ../libtransmission/rpc-server.cc:678
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr "Windows-en ez dira Unix-eko socket-ak onartzen. Aldatu mesedez '{key}' zure ezarpenetan."
 
-#: ../libtransmission/rpc-server.cc:697
+#: ../libtransmission/rpc-server.cc:706
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr "Ezin izan da RPC socket-moduaren {mode:#o}balioa ezarri, lehenetsitako 0755 balioa jarriko da"
 
-#: ../libtransmission/rpc-server.cc:814
+#: ../libtransmission/rpc-server.cc:823
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "Ezin izan da {address} helbidera konektatu {count} saiakera egin ondoren, alde batera uzten"
 msgstr[1] "Ezin izan da {address} helbidera konektatu {count} saiakera egin ondoren, alde batera uzten"
 
-#: ../libtransmission/rpc-server.cc:827
+#: ../libtransmission/rpc-server.cc:836
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr "RPC eta web-eskaerak entzuten '{address}' helbidean"
 
-#: ../libtransmission/rpc-server.cc:857
+#: ../libtransmission/rpc-server.cc:866
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr "RPC eta web-eskaeran entzuteari uzten '{address}' helbidean"
 
-#: ../libtransmission/rpc-server.cc:881
+#: ../libtransmission/rpc-server.cc:890
 msgid "Added '{entry}' to host whitelist"
 msgstr "'{entry}' gehitu da hostalariaren zerrenda zurira"
 
-#: ../libtransmission/rpc-server.cc:1003
+#: ../libtransmission/rpc-server.cc:1012
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr "'{key}' ezarpenak '{value}' balioa du baina IPv4 ala IPv6 helbidea edo Unix-eko socket bidea izan beharko luke. Lehenetsitako '0.0.0.0' balioa erabiliko da"
 
-#: ../libtransmission/rpc-server.cc:1016
+#: ../libtransmission/rpc-server.cc:1025
 msgid "Serving RPC and Web requests on {address}"
 msgstr "RPC eta web-eskaerak zerbitzatzen {address} helbidean"
 
-#: ../libtransmission/rpc-server.cc:1021
+#: ../libtransmission/rpc-server.cc:1030
 msgid "Whitelist enabled"
 msgstr "Zerrenda zuria gaituta"
 
-#: ../libtransmission/rpc-server.cc:1026
+#: ../libtransmission/rpc-server.cc:1035
 msgid "Password required"
 msgstr "Pasahitza beharrezkoa da"
 
-#: ../libtransmission/rpc-server.cc:1033
+#: ../libtransmission/rpc-server.cc:1042
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr "RPC eta web-eskaerak zerbitzatzen '{path}' helbidetik"
 
@@ -2383,7 +2383,7 @@ msgstr "Ezin izan da ataka probatu: {error} ({error_code})"
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr "Ezin izan da blokeo-zerrenda eskuratu: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1707
+#: ../libtransmission/rpcimpl.cc:1716
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr "Ezin izan da torrent-a eskuratu: {error} ({error_code})"
 
@@ -2403,73 +2403,73 @@ msgstr "Ezin da saioaren blokeatze-fitxategia ireki '{path}': {error} ({error_co
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "Sarrerako kideen konexioak entzutea aktibatuta {hostport}-n"
 
-#: ../libtransmission/session.cc:749
+#: ../libtransmission/session.cc:764
 msgid "Transmission version {version} starting"
 msgstr "Transmission {version} bertsioa abiarazten"
 
-#: ../libtransmission/session.cc:1489
+#: ../libtransmission/session.cc:1504
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission {version} bertsioa itzaltzen"
 
-#: ../libtransmission/session.cc:1571
+#: ../libtransmission/session.cc:1586
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "{count} torrent kargatu da"
 msgstr[1] "{count} torrent kargatu dira"
 
-#: ../libtransmission/torrent-metainfo.cc:739
+#: ../libtransmission/torrent-metainfo.cc:743
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Torrent-fitxategia '{old_path}' bidetik '{path}' bidera migratu da"
 
-#: ../libtransmission/torrent.cc:156
+#: ../libtransmission/torrent.cc:162
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "Ezin izan da '{path}'(e)ko metainformazioa erabili '{magnet}'(e)rako: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:185
+#: ../libtransmission/torrent.cc:191
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:424
+#: ../libtransmission/torrent.cc:430
 msgid "Calling script '{path}'"
 msgstr "'{path}' script-a deitzen"
 
-#: ../libtransmission/torrent.cc:432
+#: ../libtransmission/torrent.cc:438
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "Ezin izan da '{path}' script-a deitu: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:466
+#: ../libtransmission/torrent.cc:472
 msgid "Seed ratio reached; pausing torrent"
 msgstr "Igortze-mailara heldu da; torrent-a geratzen"
 
-#: ../libtransmission/torrent.cc:473
+#: ../libtransmission/torrent.cc:479
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "Igortzea geratzeko mugara iritsi da; torrent-a geratzen"
 
-#: ../libtransmission/torrent.cc:636
+#: ../libtransmission/torrent.cc:654
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Eskuz berrabiarazi da -- bere igortze-tasa desgaitzen"
 
-#: ../libtransmission/torrent.cc:692
+#: ../libtransmission/torrent.cc:710
 msgid "Pausing torrent"
 msgstr "Torrent-a geratzen"
 
-#: ../libtransmission/torrent.cc:737
+#: ../libtransmission/torrent.cc:755
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "Ezin izan dira torrent fitxategi guztiak kendu: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:780
+#: ../libtransmission/torrent.cc:798
 msgid "Removing torrent"
 msgstr "Torrent-a kentzen"
 
-#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
+#: ../libtransmission/torrent.cc:1117 ../libtransmission/torrent.cc:1639
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "Ezin izan da' {old_path}' '{path}'(e)ra mugitu: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1563
+#: ../libtransmission/torrent.cc:1581
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:2069
+#: ../libtransmission/torrent.cc:2087
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr ""
 

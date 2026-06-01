@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message numerus="yes">
-        <location filename="../Application.cc" line="+313"/>
+        <location filename="../Application.cc" line="+330"/>
         <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Torrent Tamamlandı</numerusform>
@@ -2095,7 +2095,7 @@ Yeni bir birincil URL eklemek için, bunu boş bir satırdan sonra ekleyin.</tra
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-266"/>
+        <location filename="../Application.cc" line="-282"/>
         <source>B/s</source>
         <translation>B/s</translation>
     </message>
@@ -2166,7 +2166,7 @@ Yeni bir birincil URL eklemek için, bunu boş bir satırdan sonra ekleyin.</tra
         <translation>TB</translation>
     </message>
     <message>
-        <location line="+247"/>
+        <location line="+263"/>
         <source>Start Now</source>
         <translation>Şimdi Başlat</translation>
     </message>

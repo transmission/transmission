@@ -7,15 +7,16 @@
 # Allan Nordhøy <epost@anotheragency.no>, 2017
 # 71385e305ba38256cbb5ad82ed781513_cdec8d0, 2020
 # Mike Gelfand <mikedld@mikedld.com>, 2026
+# Andreas Nore, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-18 19:12+0000\n"
+"POT-Creation-Date: 2026-06-01 04:01+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
+"Last-Translator: Andreas Nore, 2026\n"
 "Language-Team: Norwegian Bokmål (https://app.transifex.com/transmissionbt/teams/33778/nb/)\n"
 "Language: nb\n"
 "MIME-Version: 1.0\n"
@@ -33,59 +34,59 @@ msgstr ""
 
 #: ../daemon/daemon.cc:218 ../gtk/Session.cc:815 ../libtransmission/blocklist.cc:63 ../libtransmission/blocklist.cc:245 ../libtransmission/blocklist.cc:344 ../libtransmission/blocklist.cc:360 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:141 ../libtransmission/utils.cc:161 ../libtransmission/utils.cc:173 ../libtransmission/watchdir.cc:120
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke lese '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:243 ../gtk/Session.cc:879 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:92
 msgid "Couldn't add torrent file '{path}'"
-msgstr ""
+msgstr "Kunne ikke legge til torrentfile '{path}'"
 
 #: ../daemon/daemon.cc:252
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "Fjerner torrentfil '{path}'"
 
 #: ../daemon/daemon.cc:258 ../gtk/Utils.cc:565 ../libtransmission/utils.cc:649
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke fjerne '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:741
 msgid "Couldn't parse log level '{level}'"
-msgstr ""
+msgstr "Kunne ikke behandle log nivå '{level}'"
 
 #: ../daemon/daemon.cc:793
 msgid "Deferring reload until session is fully started."
-msgstr ""
+msgstr "Utsetter å laste inn på nytt til økten har startet fullstendig."
 
 #: ../daemon/daemon.cc:806
 msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
-msgstr ""
+msgstr "Kunne ikke laste inn på nytt: Kunne ikke hente monotontid: {errmsg} ({errno})"
 
 #: ../daemon/daemon.cc:827
 msgid "Reloading settings from '{path}'"
-msgstr ""
+msgstr "Laster innstillinger på nytt fra '{path}'"
 
 #: ../daemon/daemon.cc:853
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke initialisere daemon: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:865
 msgid "Loading settings from '{path}'"
-msgstr ""
+msgstr "Laster innstillinger fra '{path}'"
 
 #: ../daemon/daemon.cc:892
 msgid "Saved pidfile '{path}'"
-msgstr ""
+msgstr "Lagret pidfil '{path}'"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:246 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke lagre '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:908
 msgid "Requiring authentication"
-msgstr ""
+msgstr "Krever autentisering"
 
 #: ../daemon/daemon.cc:927
 msgid "Watching '{path}' for new torrent files"
-msgstr ""
+msgstr "Overvåker '{path}' for nye torrentfiler"
 
 #: ../daemon/daemon.cc:973 ../libtransmission/watchdir-kqueue.cc:120 ../libtransmission/watchdir-win32.cc:197
 msgid "Couldn't create event: {error} ({error_code})"
@@ -539,7 +540,7 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "En av disse torrentene er ikke ferdig nedlastet."
 msgstr[1] "Noen av disse torrentene er ikke ferdig nedlastet."
 
-#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:273 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr ""
 
@@ -567,7 +568,7 @@ msgstr "Lav"
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:342
+#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:344
 msgid "Name"
 msgstr "Navn"
 
@@ -614,19 +615,23 @@ msgstr ""
 
 #: ../gtk/FreeSpaceLabel.cc:57
 msgid "{disk_space} free"
-msgstr ""
+msgstr "{disk_space}ledig"
 
 #: ../gtk/MainWindow.cc:385
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Klikk for å deaktivere alternative fartsgrenser\n"
+"({download_speed} ned, {upload_speed} opp)"
 
 #: ../gtk/MainWindow.cc:386
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Klikk for å aktivere alternative fartsgrenser\n"
+"({download_speed} ned, {upload_speed} opp)"
 
 #: ../gtk/MainWindow.cc:438
 msgid "Unlimited"
@@ -650,7 +655,7 @@ msgstr "Slutt å dele når delingsforholdet er"
 
 #: ../gtk/MainWindow.cc:585
 msgid "Stop at Ratio ({ratio})"
-msgstr ""
+msgstr "Stopp ved ratio ({ratio})"
 
 #: ../gtk/MainWindow.cc:599
 msgid "Total Ratio"
@@ -670,7 +675,7 @@ msgstr "Overført denne økta"
 
 #: ../gtk/MainWindow.cc:767 ../gtk/MainWindow.cc:788 ../gtk/Torrent.cc:450
 msgid "Ratio: {ratio}"
-msgstr ""
+msgstr "Ratio: {ratio}"
 
 #: ../gtk/MainWindow.cc:773
 msgctxt "current session totals"
@@ -735,19 +740,19 @@ msgctxt "Logging level"
 msgid "Debug"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:271
+#: ../gtk/MessageLogWindow.cc:273
 msgid "Save Log"
 msgstr "Lagre logg"
 
-#: ../gtk/MessageLogWindow.cc:271 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
+#: ../gtk/MessageLogWindow.cc:273 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:351
+#: ../gtk/MessageLogWindow.cc:353
 msgid "Message"
 msgstr "Melding"
 
-#: ../gtk/MessageLogWindow.cc:360
+#: ../gtk/MessageLogWindow.cc:362
 msgid "Time"
 msgstr "Tid"
 
@@ -2107,11 +2112,11 @@ msgstr "Åpne torrent fra URL"
 msgid "_URL"
 msgstr "_URL"
 
-#: ../libtransmission/announcer-http.cc:453
+#: ../libtransmission/announcer-http.cc:455
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-http.cc:673
+#: ../libtransmission/announcer-http.cc:675
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr ""
 
@@ -2228,7 +2233,7 @@ msgstr ""
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/peer-io.cc:686
+#: ../libtransmission/peer-io.cc:692
 msgid "Unknown state: {state}"
 msgstr ""
 
@@ -2300,73 +2305,73 @@ msgstr ""
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:348
+#: ../libtransmission/rpc-server.cc:356
 msgid "Rejected request from {host} (possible directory traversal attack)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:536
+#: ../libtransmission/rpc-server.cc:545
 msgid "Rejected request from {host} (brute force protection active)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:545
+#: ../libtransmission/rpc-server.cc:554
 msgid "Rejected request from {host} (IP not whitelisted)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:569
+#: ../libtransmission/rpc-server.cc:578
 msgid "Rejected request from {host} (failed authentication)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:611
+#: ../libtransmission/rpc-server.cc:620
 msgid "Rejected request from {host} (Host not whitelisted)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:649
+#: ../libtransmission/rpc-server.cc:658
 msgid "Unknown URI from {host}: '{uri}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:669
+#: ../libtransmission/rpc-server.cc:678
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:697
+#: ../libtransmission/rpc-server.cc:706
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:814
+#: ../libtransmission/rpc-server.cc:823
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/rpc-server.cc:827
+#: ../libtransmission/rpc-server.cc:836
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:857
+#: ../libtransmission/rpc-server.cc:866
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:881
+#: ../libtransmission/rpc-server.cc:890
 msgid "Added '{entry}' to host whitelist"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1003
+#: ../libtransmission/rpc-server.cc:1012
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1016
+#: ../libtransmission/rpc-server.cc:1025
 msgid "Serving RPC and Web requests on {address}"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1021
+#: ../libtransmission/rpc-server.cc:1030
 msgid "Whitelist enabled"
 msgstr "Hviteliste aktivert"
 
-#: ../libtransmission/rpc-server.cc:1026
+#: ../libtransmission/rpc-server.cc:1035
 msgid "Password required"
 msgstr "Passord kreves"
 
-#: ../libtransmission/rpc-server.cc:1033
+#: ../libtransmission/rpc-server.cc:1042
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr ""
 
@@ -2378,7 +2383,7 @@ msgstr ""
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1707
+#: ../libtransmission/rpcimpl.cc:1716
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr ""
 
@@ -2398,73 +2403,73 @@ msgstr ""
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr ""
 
-#: ../libtransmission/session.cc:749
+#: ../libtransmission/session.cc:764
 msgid "Transmission version {version} starting"
 msgstr ""
 
-#: ../libtransmission/session.cc:1489
+#: ../libtransmission/session.cc:1504
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:1571
+#: ../libtransmission/session.cc:1586
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/torrent-metainfo.cc:739
+#: ../libtransmission/torrent-metainfo.cc:743
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:156
+#: ../libtransmission/torrent.cc:162
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:185
+#: ../libtransmission/torrent.cc:191
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:424
+#: ../libtransmission/torrent.cc:430
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:432
+#: ../libtransmission/torrent.cc:438
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:466
+#: ../libtransmission/torrent.cc:472
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:473
+#: ../libtransmission/torrent.cc:479
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:636
+#: ../libtransmission/torrent.cc:654
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Startet på nytt manuelt. Bruker ikke delingsforhold"
 
-#: ../libtransmission/torrent.cc:692
+#: ../libtransmission/torrent.cc:710
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:737
+#: ../libtransmission/torrent.cc:755
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:780
+#: ../libtransmission/torrent.cc:798
 msgid "Removing torrent"
 msgstr "Fjerner torrent"
 
-#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
+#: ../libtransmission/torrent.cc:1117 ../libtransmission/torrent.cc:1639
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1563
+#: ../libtransmission/torrent.cc:1581
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:2069
+#: ../libtransmission/torrent.cc:2087
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr ""
 

@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message numerus="yes">
-        <location filename="../Application.cc" line="+313"/>
+        <location filename="../Application.cc" line="+330"/>
         <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Ukończono torrent</numerusform>
@@ -2129,7 +2129,7 @@ Nowy podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-266"/>
+        <location filename="../Application.cc" line="-282"/>
         <source>B/s</source>
         <translation>B/s</translation>
     </message>
@@ -2200,7 +2200,7 @@ Nowy podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>TB</translation>
     </message>
     <message>
-        <location line="+247"/>
+        <location line="+263"/>
         <source>Start Now</source>
         <translation>Rozpocznij teraz</translation>
     </message>

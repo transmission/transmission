@@ -129,10 +129,10 @@
 "1255.title" = "Спящий режим:";
 
 /* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
-"1265.title" = "Раздачи:";
+"1265.title" = "Раздача:";
 
 /* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
-"1267.title" = "Скачивания:";
+"1267.title" = "Скачивание:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
 "1268.title" = "КБ/с";
@@ -153,13 +153,13 @@
 "1275.title" = "Режим ограничения:";
 
 /* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
-"1276.title" = "Скорость отдачи:";
+"1276.title" = "Раздача:";
 
 /* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
-"1277.title" = "Скорость загрузки:";
+"1277.title" = "Скачивание:";
 
 /* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
-"1278.title" = "В режиме ограничения скорости настройки общей ширины канала не учитывается";
+"1278.title" = "В режиме ограничения скорости глобальные ограничения не учитываются";
 
 /* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
 "1280.title" = "Включать по расписанию:";
@@ -192,19 +192,19 @@
 "1437.title" = "Обновить";
 
 /* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
-"1438.title" = "чёрный список загружен / не загружен";
+"1438.title" = "черный список загружен / не загружен";
 
 /* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
-"1439.title" = "Чёрный список:";
+"1439.title" = "Черный список:";
 
 /* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
-"1440.title" = "Не подключаться к участникам из чёрного списка";
+"1440.title" = "Не подключаться к участникам из черного списка";
 
 /* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
-"1441.title" = "Некоторые роутеры будут «тормозить» если подключений очень много";
+"1441.title" = "Производительность может снизиться, если подключений очень много";
 
 /* Class = "NSButtonCell"; title = "Use peer exchange (PEX) for public torrents"; ObjectID = "1442"; */
-"1442.title" = "Использовать одноранговый обмен (PEX) для публичных торрентов";
+"1442.title" = "Использовать обмен пирами (PEX) для публичных торрентов";
 
 /* Class = "NSTextFieldCell"; title = "Maximum connections for new transfers:"; ObjectID = "1443"; */
 "1443.title" = "Максимум подключений для новых раздач:";
@@ -237,7 +237,7 @@
 "1493.title" = "Порт прослушивания:";
 
 /* Class = "NSButtonCell"; title = "Enable remote access"; ObjectID = "1502"; */
-"1502.title" = "Включить удалённый доступ";
+"1502.title" = "Включить удаленный доступ";
 
 /* Class = "NSButtonCell"; title = "Require authentication"; ObjectID = "1505"; */
 "1505.title" = "Требовать авторизацию";
@@ -339,7 +339,7 @@
 "1920.title" = "В воскресенье";
 
 /* Class = "NSButtonCell"; title = "Use distributed hash table (DHT) for public torrents"; ObjectID = "1926"; */
-"1926.title" = "Использовать распределённую хеш-таблицу (DHT) для публичных торрентов";
+"1926.title" = "Использовать распределенную хеш-таблицу (DHT) для публичных торрентов";
 
 /* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
 "1931.title" = "Принимать магнит-ссылки:";
@@ -348,7 +348,7 @@
 "1933.title" = "Сделать программой по умолчанию";
 
 /* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
-"1940.title" = "Добавлять .part к незавершённым файлам";
+"1940.title" = "Добавлять .part к незавершенным файлам";
 
 /* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
 "1948.title" = "Показывать окно при открытии магнит-ссылки";

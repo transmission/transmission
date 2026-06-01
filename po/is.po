@@ -7,15 +7,16 @@
 # Björn Þór Björnsson, 2022
 # Sveinn í Felli <sv1@fellsnet.is>, 2026
 # Mike Gelfand <mikedld@mikedld.com>, 2026
+# Charles Kerr <charles@charleskerr.com>, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-18 19:12+0000\n"
+"POT-Creation-Date: 2026-06-01 04:01+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
+"Last-Translator: Charles Kerr <charles@charleskerr.com>, 2026\n"
 "Language-Team: Icelandic (https://app.transifex.com/transmissionbt/teams/33778/is/)\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
@@ -75,7 +76,7 @@ msgstr "Hleð inn stillingum úr '{path}'"
 msgid "Saved pidfile '{path}'"
 msgstr "Vistaði pid-skrá '{path}'"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1612 ../libtransmission/torrent.cc:1000 ../libtransmission/torrent.cc:2016 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:246 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "Gat ekki vistað '{path}': {error} ({error_code})"
 
@@ -530,7 +531,7 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Það á eftir að ljúka við að sækja eina af þessum torrent-skrám."
 msgstr[1] "Það á eftir að ljúka við að sækja nokkrar af þessum torrent-skrám."
 
-#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:273 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr "_Hætta við"
 
@@ -558,7 +559,7 @@ msgstr "Lágur"
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "Gat ekki endurnefnt '{old_path}' sem '{path}': {error} ({error_code})"
 
-#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:342
+#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:344
 msgid "Name"
 msgstr "Heiti"
 
@@ -730,19 +731,19 @@ msgctxt "Logging level"
 msgid "Debug"
 msgstr "Aflúsa"
 
-#: ../gtk/MessageLogWindow.cc:271
+#: ../gtk/MessageLogWindow.cc:273
 msgid "Save Log"
 msgstr "Vista skilaboð"
 
-#: ../gtk/MessageLogWindow.cc:271 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
+#: ../gtk/MessageLogWindow.cc:273 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
 msgstr "Vi_sta"
 
-#: ../gtk/MessageLogWindow.cc:351
+#: ../gtk/MessageLogWindow.cc:353
 msgid "Message"
 msgstr "Skilaboð"
 
-#: ../gtk/MessageLogWindow.cc:360
+#: ../gtk/MessageLogWindow.cc:362
 msgid "Time"
 msgstr "Tími"
 
@@ -2108,13 +2109,13 @@ msgstr "Opna torrent-streymi úr vefslóð"
 msgid "_URL"
 msgstr "_Slóð"
 
-#: ../libtransmission/announcer-http.cc:453
+#: ../libtransmission/announcer-http.cc:455
 msgid "Couldn't parse announce response: {error} ({error_code})"
-msgstr "Gat ekki túlkað svar tilkynningar '{path}': {error} ({error_code})"
+msgstr "Gat ekki túlkað svar tilkynningar: {error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:673
+#: ../libtransmission/announcer-http.cc:675
 msgid "Couldn't parse scrape response: {error} ({error_code})"
-msgstr "Gat ekki túlkað svar skrapara '{path}': {error} ({error_code})"
+msgstr "Gat ekki túlkað svar skrapara: {error} ({error_code})"
 
 #: ../libtransmission/announcer-udp.cc:147 ../libtransmission/announcer-udp.cc:308
 msgid "Unknown error"
@@ -2229,7 +2230,7 @@ msgstr "Gat ekki forúthlutað '{path}': {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Gat ekki stytt '{path}': {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:686
+#: ../libtransmission/peer-io.cc:692
 msgid "Unknown state: {state}"
 msgstr "Óþekkt staða: {state}"
 
@@ -2301,73 +2302,73 @@ msgstr "Stöðu breytt úr '{old_state}' yfir í '{state}'"
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr "Slóð Unix-sökkuls (socket) verður að vera færri en {count} stafir (að meðtöldu '{prefix}' forskeyti)"
 
-#: ../libtransmission/rpc-server.cc:348
+#: ../libtransmission/rpc-server.cc:356
 msgid "Rejected request from {host} (possible directory traversal attack)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:536
+#: ../libtransmission/rpc-server.cc:545
 msgid "Rejected request from {host} (brute force protection active)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:545
+#: ../libtransmission/rpc-server.cc:554
 msgid "Rejected request from {host} (IP not whitelisted)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:569
+#: ../libtransmission/rpc-server.cc:578
 msgid "Rejected request from {host} (failed authentication)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:611
+#: ../libtransmission/rpc-server.cc:620
 msgid "Rejected request from {host} (Host not whitelisted)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:649
+#: ../libtransmission/rpc-server.cc:658
 msgid "Unknown URI from {host}: '{uri}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:669
+#: ../libtransmission/rpc-server.cc:678
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr "Unix-sökklar eru ekki studdir á Windows. Breyttu '{key}' í stillingunum þínum."
 
-#: ../libtransmission/rpc-server.cc:697
+#: ../libtransmission/rpc-server.cc:706
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr "Gat ekki sett RPC-sökkulham á {mode:#o}, nota sjálfgefið 0755"
 
-#: ../libtransmission/rpc-server.cc:814
+#: ../libtransmission/rpc-server.cc:823
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "Gat ekki bundið við {address} eftir {count} tilraun, gefst upp"
 msgstr[1] "Gat ekki bundið við {address} eftir {count} tilraunir, gefst upp"
 
-#: ../libtransmission/rpc-server.cc:827
+#: ../libtransmission/rpc-server.cc:836
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr "Hlusta á RPC- og vefbeiðnir á '{address}'"
 
-#: ../libtransmission/rpc-server.cc:857
+#: ../libtransmission/rpc-server.cc:866
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr "Hætti að hlusta á RPC- og vefbeiðnir á '{address}'"
 
-#: ../libtransmission/rpc-server.cc:881
+#: ../libtransmission/rpc-server.cc:890
 msgid "Added '{entry}' to host whitelist"
 msgstr "Bætti '{entry}' á lista yfir leyfilegt"
 
-#: ../libtransmission/rpc-server.cc:1003
+#: ../libtransmission/rpc-server.cc:1012
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr "Stilling '{key}' er '{value}' en verður að vera IPv4 eða IPv6-vistfang eða slóð á Unix-sökkul. Nota sjálfgefna gildið '0.0.0.0'"
 
-#: ../libtransmission/rpc-server.cc:1016
+#: ../libtransmission/rpc-server.cc:1025
 msgid "Serving RPC and Web requests on {address}"
 msgstr "Miðla RPC- og vefbeiðnum á {address}"
 
-#: ../libtransmission/rpc-server.cc:1021
+#: ../libtransmission/rpc-server.cc:1030
 msgid "Whitelist enabled"
 msgstr "Aðgangslisti virkur"
 
-#: ../libtransmission/rpc-server.cc:1026
+#: ../libtransmission/rpc-server.cc:1035
 msgid "Password required"
 msgstr "Lykilorðs krafist"
 
-#: ../libtransmission/rpc-server.cc:1033
+#: ../libtransmission/rpc-server.cc:1042
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr "Miðla RPC- og vefbeiðnum frá '{path}'"
 
@@ -2379,7 +2380,7 @@ msgstr "Gat ekki prófað gátt: {error} ({error_code})"
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr "Gat ekki náð í bannlista: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1707
+#: ../libtransmission/rpcimpl.cc:1716
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr "Gat ekki náð í torrent: {error} ({error_code})"
 
@@ -2399,73 +2400,73 @@ msgstr "Gat ekki opnað læsiskrá setu á '{path}': {error} ({error_code})"
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "Hlusta á innkomandi tengingar jafningja á {hostport}"
 
-#: ../libtransmission/session.cc:749
+#: ../libtransmission/session.cc:764
 msgid "Transmission version {version} starting"
 msgstr "Transmission útgáfa {version} er að ræsa"
 
-#: ../libtransmission/session.cc:1489
+#: ../libtransmission/session.cc:1504
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission útgáfa {version} er að slökkva á sér"
 
-#: ../libtransmission/session.cc:1571
+#: ../libtransmission/session.cc:1586
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "Hlóð inn {count} torrent-streymi"
 msgstr[1] "Hlóð inn {count} torrent-streymum"
 
-#: ../libtransmission/torrent-metainfo.cc:739
+#: ../libtransmission/torrent-metainfo.cc:743
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Yfirfærði torrent-skrá úr '{old_path}' yfir í '{path}'"
 
-#: ../libtransmission/torrent.cc:156
+#: ../libtransmission/torrent.cc:162
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "Gat ekki notað lýsigagnaupplýsingar úr '{path}' fyrir '{magnet}': {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:185
+#: ../libtransmission/torrent.cc:191
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr "Engin gögn fundust! Gakktu úr skugga um að allir gagnamiðlar séu tengdir eða notaðu \"Stilla staðsetningu\". Til að ná aftur í gögnin, skaltu nota \"Athuga þau gögn sem eru komin\" og ræsa svo aftur torrent-streymið."
 
-#: ../libtransmission/torrent.cc:424
+#: ../libtransmission/torrent.cc:430
 msgid "Calling script '{path}'"
 msgstr "Kalla í skriftuna '{path}'"
 
-#: ../libtransmission/torrent.cc:432
+#: ../libtransmission/torrent.cc:438
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "Gat ekki kallað í skriftuna '{path}': {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:466
+#: ../libtransmission/torrent.cc:472
 msgid "Seed ratio reached; pausing torrent"
 msgstr "Deilihlutfalli hefur verið náð, set torrent-streymi í bið"
 
-#: ../libtransmission/torrent.cc:473
+#: ../libtransmission/torrent.cc:479
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "Deilihlutfalli við aðgerðaleysi hefur verið náð, set torrent-streymi í bið"
 
-#: ../libtransmission/torrent.cc:636
+#: ../libtransmission/torrent.cc:654
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Endurræst handvirkt -- deilihlutfall gert óvirkt"
 
-#: ../libtransmission/torrent.cc:692
+#: ../libtransmission/torrent.cc:710
 msgid "Pausing torrent"
 msgstr "Set torrent-streymi í bið"
 
-#: ../libtransmission/torrent.cc:737
+#: ../libtransmission/torrent.cc:755
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:780
+#: ../libtransmission/torrent.cc:798
 msgid "Removing torrent"
 msgstr "Fjarlægi Torrent-streymi"
 
-#: ../libtransmission/torrent.cc:1099 ../libtransmission/torrent.cc:1621
+#: ../libtransmission/torrent.cc:1117 ../libtransmission/torrent.cc:1639
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "Gat ekki fært '{old_path}' yfir í '{path}': {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1563
+#: ../libtransmission/torrent.cc:1581
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr "Setti streymið í bið því engin gögn fundust! Gakktu úr skugga um að allir gagnamiðlar séu tengdir eða notaðu \"Stilla staðsetningu\" og síðan \"Athuga þau gögn sem eru komin\". Til að ná aftur í gögnin, skaltu ræsa aftur torrent-streymið."
 
-#: ../libtransmission/torrent.cc:2069
+#: ../libtransmission/torrent.cc:2087
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr "Aðvörun frá rekjara: '{warning}' ({url})"
 
