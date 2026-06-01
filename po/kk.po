@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-27 19:37+0100\n"
+"POT-Creation-Date: 2026-06-01 04:01+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2026\n"
 "Language-Team: Kazakh (https://app.transifex.com/transmissionbt/teams/33778/kk/)\n"
@@ -74,7 +74,7 @@ msgstr "Баптауларды \"{path}\" адресінен жүктеу"
 msgid "Saved pidfile '{path}'"
 msgstr "Pid-файл \"{path}\" сақталды"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:248 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:246 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "\"{path}\" сақтау мүмкін болмады: {error} ({error_code})"
 
@@ -526,7 +526,7 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Бұл торренттердің кейбіреулерінің жүктелуі аяқталмаған."
 msgstr[1] "Бұл торренттердің кейбіреулерінің жүктелуі аяқталмаған."
 
-#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:275 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:273 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr "_Бас тарту"
 
@@ -554,7 +554,7 @@ msgstr "Төмен"
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "\"{old_path}\" атын \"{path}\" етіп өзгерту мүмкін болмады: {error} ({error_code})"
 
-#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:346
+#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:344
 msgid "Name"
 msgstr "Аты"
 
@@ -701,19 +701,44 @@ msgstr "Сканерленді: {file_size}"
 msgid "No source selected"
 msgstr "Көзі таңдалмаған"
 
-#: ../gtk/MessageLogWindow.cc:275
+#: ../gtk/MessageLogWindow.cc:104
+msgctxt "Logging level"
+msgid "Critical"
+msgstr "Критикалық"
+
+#: ../gtk/MessageLogWindow.cc:105
+msgctxt "Logging level"
+msgid "Error"
+msgstr "Қате"
+
+#: ../gtk/MessageLogWindow.cc:106
+msgctxt "Logging level"
+msgid "Warning"
+msgstr "Ескерту"
+
+#: ../gtk/MessageLogWindow.cc:107
+msgctxt "Logging level"
+msgid "Information"
+msgstr "Ақпарат"
+
+#: ../gtk/MessageLogWindow.cc:108
+msgctxt "Logging level"
+msgid "Debug"
+msgstr "Жөндеу"
+
+#: ../gtk/MessageLogWindow.cc:273
 msgid "Save Log"
 msgstr "Журналды сақтау"
 
-#: ../gtk/MessageLogWindow.cc:275 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
+#: ../gtk/MessageLogWindow.cc:273 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
 msgstr "_Сақтау"
 
-#: ../gtk/MessageLogWindow.cc:355
+#: ../gtk/MessageLogWindow.cc:353
 msgid "Message"
 msgstr "Хабарлама"
 
-#: ../gtk/MessageLogWindow.cc:364
+#: ../gtk/MessageLogWindow.cc:362
 msgid "Time"
 msgstr "Уақыты"
 
@@ -2587,23 +2612,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "күн"
 msgstr[1] "күн"
-
-#~ msgctxt "Logging level"
-#~ msgid "Critical"
-#~ msgstr "Критикалық"
-
-#~ msgctxt "Logging level"
-#~ msgid "Debug"
-#~ msgstr "Жөндеу"
-
-#~ msgctxt "Logging level"
-#~ msgid "Error"
-#~ msgstr "Қате"
-
-#~ msgctxt "Logging level"
-#~ msgid "Information"
-#~ msgstr "Ақпарат"
-
-#~ msgctxt "Logging level"
-#~ msgid "Warning"
-#~ msgstr "Ескерту"

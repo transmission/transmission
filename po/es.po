@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-27 19:37+0100\n"
+"POT-Creation-Date: 2026-06-01 04:01+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2026\n"
 "Language-Team: Spanish (https://app.transifex.com/transmissionbt/teams/33778/es/)\n"
@@ -79,7 +79,7 @@ msgstr "Cargando preferencias desde «{path}»"
 msgid "Saved pidfile '{path}'"
 msgstr "Archivo pid guardado «{path}»"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:248 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:246 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "No se pudo guardar «{path}»: {error} ({error_code})"
 
@@ -621,7 +621,7 @@ msgstr[0] "Uno de estos torrents no ha terminado de descargarse."
 msgstr[1] "Algunos torrents no se han descargado todavía."
 msgstr[2] "Algunos torrents no se han descargado todavía."
 
-#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:275 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:273 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr "_Cancelar"
 
@@ -649,7 +649,7 @@ msgstr "Baja"
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "No se puede renombrar «{old_path}» como «{path}»: {error} ({error_code})"
 
-#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:346
+#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:344
 msgid "Name"
 msgstr "Nombre"
 
@@ -796,19 +796,44 @@ msgstr "Analizado {file_size}"
 msgid "No source selected"
 msgstr "Ningún origen seleccionado"
 
-#: ../gtk/MessageLogWindow.cc:275
+#: ../gtk/MessageLogWindow.cc:104
+msgctxt "Logging level"
+msgid "Critical"
+msgstr "Crítico"
+
+#: ../gtk/MessageLogWindow.cc:105
+msgctxt "Logging level"
+msgid "Error"
+msgstr "Error"
+
+#: ../gtk/MessageLogWindow.cc:106
+msgctxt "Logging level"
+msgid "Warning"
+msgstr "Advertencia"
+
+#: ../gtk/MessageLogWindow.cc:107
+msgctxt "Logging level"
+msgid "Information"
+msgstr "Información"
+
+#: ../gtk/MessageLogWindow.cc:108
+msgctxt "Logging level"
+msgid "Debug"
+msgstr "Depuración"
+
+#: ../gtk/MessageLogWindow.cc:273
 msgid "Save Log"
 msgstr "Guardar registro"
 
-#: ../gtk/MessageLogWindow.cc:275 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
+#: ../gtk/MessageLogWindow.cc:273 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
 msgstr "_Guardar"
 
-#: ../gtk/MessageLogWindow.cc:355
+#: ../gtk/MessageLogWindow.cc:353
 msgid "Message"
 msgstr "Mensaje"
 
-#: ../gtk/MessageLogWindow.cc:364
+#: ../gtk/MessageLogWindow.cc:362
 msgid "Time"
 msgstr "Hora"
 
@@ -2717,23 +2742,3 @@ msgid_plural "days"
 msgstr[0] "día"
 msgstr[1] "días"
 msgstr[2] "días"
-
-#~ msgctxt "Logging level"
-#~ msgid "Critical"
-#~ msgstr "Crítico"
-
-#~ msgctxt "Logging level"
-#~ msgid "Debug"
-#~ msgstr "Depuración"
-
-#~ msgctxt "Logging level"
-#~ msgid "Error"
-#~ msgstr "Error"
-
-#~ msgctxt "Logging level"
-#~ msgid "Information"
-#~ msgstr "Información"
-
-#~ msgctxt "Logging level"
-#~ msgid "Warning"
-#~ msgstr "Advertencia"

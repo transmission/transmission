@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-27 19:37+0100\n"
+"POT-Creation-Date: 2026-06-01 04:01+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: maboroshin, 2026\n"
 "Language-Team: Japanese (https://app.transifex.com/transmissionbt/teams/33778/ja/)\n"
@@ -75,7 +75,7 @@ msgstr "以下から設定を読み込み中「{path}」"
 msgid "Saved pidfile '{path}'"
 msgstr "PidFile を保存しました「{path}」"
 
-#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:248 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
+#: ../daemon/daemon.cc:899 ../gtk/MessageLogWindow.cc:246 ../libtransmission/blocklist.cc:75 ../libtransmission/blocklist.cc:485 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1621 ../libtransmission/torrent.cc:1018 ../libtransmission/torrent.cc:2034 ../libtransmission/variant.cc:589
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "保存できませんでした「{path}」: {error} ({error_code})"
 
@@ -509,7 +509,7 @@ msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "これらのトレントの一部はダウンロードが完了していません。"
 
-#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:275 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+#: ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:273 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr "キャンセル(_C)"
 
@@ -537,7 +537,7 @@ msgstr "低"
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "改名できません。「{old_path}」から「{path}」へ: {error} ({error_code})"
 
-#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:346
+#: ../gtk/FileList.cc:963 ../gtk/MessageLogWindow.cc:344
 msgid "Name"
 msgstr "名前"
 
@@ -684,19 +684,44 @@ msgstr "スキャン済み {file_size}"
 msgid "No source selected"
 msgstr "対象ファイル未選択"
 
-#: ../gtk/MessageLogWindow.cc:275
+#: ../gtk/MessageLogWindow.cc:104
+msgctxt "Logging level"
+msgid "Critical"
+msgstr "重大"
+
+#: ../gtk/MessageLogWindow.cc:105
+msgctxt "Logging level"
+msgid "Error"
+msgstr "エラー"
+
+#: ../gtk/MessageLogWindow.cc:106
+msgctxt "Logging level"
+msgid "Warning"
+msgstr "警告"
+
+#: ../gtk/MessageLogWindow.cc:107
+msgctxt "Logging level"
+msgid "Information"
+msgstr "情報"
+
+#: ../gtk/MessageLogWindow.cc:108
+msgctxt "Logging level"
+msgid "Debug"
+msgstr "デバッグ"
+
+#: ../gtk/MessageLogWindow.cc:273
 msgid "Save Log"
 msgstr "ログを保存"
 
-#: ../gtk/MessageLogWindow.cc:275 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
+#: ../gtk/MessageLogWindow.cc:273 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
 msgstr "保存(_S)"
 
-#: ../gtk/MessageLogWindow.cc:355
+#: ../gtk/MessageLogWindow.cc:353
 msgid "Message"
 msgstr "メッセージ"
 
-#: ../gtk/MessageLogWindow.cc:364
+#: ../gtk/MessageLogWindow.cc:362
 msgid "Time"
 msgstr "時間"
 
@@ -2537,23 +2562,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
-
-#~ msgctxt "Logging level"
-#~ msgid "Critical"
-#~ msgstr "重大"
-
-#~ msgctxt "Logging level"
-#~ msgid "Debug"
-#~ msgstr "デバッグ"
-
-#~ msgctxt "Logging level"
-#~ msgid "Error"
-#~ msgstr "エラー"
-
-#~ msgctxt "Logging level"
-#~ msgid "Information"
-#~ msgstr "情報"
-
-#~ msgctxt "Logging level"
-#~ msgid "Warning"
-#~ msgstr "警告"
