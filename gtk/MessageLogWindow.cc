@@ -42,8 +42,6 @@
 #include <memory>
 #include <utility>
 
-#define LOGGING_LEVEL_CONTEXT "Logging level"
-
 class MessageLogColumnsModel : public Gtk::TreeModelColumnRecord
 {
 public:
@@ -103,11 +101,11 @@ private:
     sigc::connection refresh_tag_;
 
     static auto constexpr level_names_ = std::array<std::pair<tr_log_level, char const*>, 5U>{ {
-        { TR_LOG_CRITICAL, NC_(LOGGING_LEVEL_CONTEXT, "Critical") },
-        { TR_LOG_ERROR, NC_(LOGGING_LEVEL_CONTEXT, "Error") },
-        { TR_LOG_WARN, NC_(LOGGING_LEVEL_CONTEXT, "Warning") },
-        { TR_LOG_INFO, NC_(LOGGING_LEVEL_CONTEXT, "Information") },
-        { TR_LOG_DEBUG, NC_(LOGGING_LEVEL_CONTEXT, "Debug") },
+        { TR_LOG_CRITICAL, NC_("Logging level", "Critical") },
+        { TR_LOG_ERROR, NC_("Logging level", "Error") },
+        { TR_LOG_WARN, NC_("Logging level", "Warning") },
+        { TR_LOG_INFO, NC_("Logging level", "Information") },
+        { TR_LOG_DEBUG, NC_("Logging level", "Debug") },
     } };
 };
 
@@ -180,7 +178,7 @@ void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo)
     items.reserve(std::size(level_names_));
     for (auto const& [level, name] : level_names_)
     {
-        items.emplace_back(g_dpgettext2(nullptr, LOGGING_LEVEL_CONTEXT, name), level);
+        items.emplace_back(g_dpgettext2(nullptr, "Logging level", name), level);
         has_pref_level |= level == pref_level;
     }
 
@@ -234,7 +232,7 @@ void MessageLogWindow::Impl::doSave(std::string const& filename)
                 std::end(level_names_),
                 [key = node->level](auto const& item) { return item.first == key; });
             auto const level_str = iter != std::end(level_names_) ?
-                Glib::ustring(g_dpgettext2(nullptr, LOGGING_LEVEL_CONTEXT, iter->second)) :
+                Glib::ustring(g_dpgettext2(nullptr, "Logging level", iter->second)) :
                 Glib::ustring("???");
 
             fmt::print(stream, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
