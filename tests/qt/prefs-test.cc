@@ -12,7 +12,6 @@
 #include <QSignalSpy>
 #include <QString>
 #include <QStringList>
-#include <QTemporaryDir>
 #include <QTest>
 
 #include <fmt/format.h>
@@ -24,6 +23,7 @@
 
 #include "Prefs.h"
 #include "TrQtInit.h"
+#include "qt-test-fixtures.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 #define QCOMPARE_EQ(actual, expected) QCOMPARE(actual, expected)
@@ -34,7 +34,9 @@ using namespace std::literals;
 
 Q_DECLARE_METATYPE(tr_quark)
 
-class PrefsTest : public QObject
+class PrefsTest
+    : public QObject
+    , SandboxedTest
 {
     Q_OBJECT
 
@@ -341,12 +343,11 @@ private slots:
         QVERIFY(settings.contains(TR_KEY_sort_reversed));
     }
 
-    static void save_merges_existing_file_and_round_trips_serializer_backed_values()
+    void save_merges_existing_file_and_round_trips_serializer_backed_values()
     {
-        auto temp_dir = QTemporaryDir{};
-        QVERIFY(temp_dir.isValid());
+        auto const sandbox_dir = sandboxDir();
 
-        auto const settings_file = QDir{ temp_dir.path() }.filePath(QStringLiteral("settings.json"));
+        auto const settings_file = QDir{ sandbox_dir }.filePath(QStringLiteral("settings.json"));
         auto constexpr CustomKeyName = "custom-setting"sv;
         auto const custom_key = tr_quark_new(CustomKeyName);
 
@@ -356,7 +357,7 @@ private slots:
         existing_settings.insert_or_assign(TR_KEY_filter_text, "stale-filter"sv);
         tr_variant_serde::json().to_file(tr_variant{ std::move(existing_settings) }, settings_file.toStdString());
 
-        auto const download_dir = QDir{ temp_dir.path() }.filePath(QStringLiteral("Downloads"));
+        auto const download_dir = QDir{ sandbox_dir }.filePath(QStringLiteral("Downloads"));
         auto const blocklist_date = QDateTime::fromSecsSinceEpoch(1700000000).toUTC();
 
         auto prefs = Prefs{};
