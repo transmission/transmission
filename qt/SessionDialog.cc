@@ -13,13 +13,13 @@
 
 void SessionDialog::accept()
 {
-    prefs_.set(Prefs::SESSION_IS_REMOTE, ui_.remoteSessionRadio->isChecked());
-    prefs_.set(Prefs::SESSION_REMOTE_HOST, ui_.hostEdit->text());
-    prefs_.set(Prefs::SESSION_REMOTE_PORT, ui_.portSpin->value());
-    prefs_.set(Prefs::SESSION_REMOTE_AUTH, ui_.authCheck->isChecked());
-    prefs_.set(Prefs::SESSION_REMOTE_USERNAME, ui_.usernameEdit->text());
-    prefs_.set(Prefs::SESSION_REMOTE_PASSWORD, ui_.passwordEdit->text());
-    prefs_.set(Prefs::SESSION_REMOTE_URL_BASE_PATH, ui_.rpcEdit->text());
+    prefs_.set(TR_KEY_remote_session_enabled, ui_.remoteSessionRadio->isChecked());
+    prefs_.set(TR_KEY_remote_session_host, ui_.hostEdit->text());
+    prefs_.set(TR_KEY_remote_session_port, ui_.portSpin->value());
+    prefs_.set(TR_KEY_remote_session_requires_authentication, ui_.authCheck->isChecked());
+    prefs_.set(TR_KEY_remote_session_username, ui_.usernameEdit->text());
+    prefs_.set(TR_KEY_remote_session_password, ui_.passwordEdit->text());
+    prefs_.set(TR_KEY_remote_session_url_base_path, ui_.rpcEdit->text());
     session_.restart();
     BaseDialog::accept();
 }
@@ -51,29 +51,29 @@ SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent)
 {
     ui_.setupUi(this);
 
-    ui_.localSessionRadio->setChecked(!prefs.get<bool>(Prefs::SESSION_IS_REMOTE));
+    ui_.localSessionRadio->setChecked(!prefs.get<bool>(TR_KEY_remote_session_enabled));
     connect(ui_.localSessionRadio, &QAbstractButton::toggled, this, &SessionDialog::resensitize);
 
-    ui_.remoteSessionRadio->setChecked(prefs.get<bool>(Prefs::SESSION_IS_REMOTE));
+    ui_.remoteSessionRadio->setChecked(prefs.get<bool>(TR_KEY_remote_session_enabled));
     connect(ui_.remoteSessionRadio, &QAbstractButton::toggled, this, &SessionDialog::resensitize);
 
-    ui_.hostEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_HOST));
+    ui_.hostEdit->setText(prefs.get<QString>(TR_KEY_remote_session_host));
     remote_widgets_ << ui_.hostLabel << ui_.hostEdit;
 
-    ui_.portSpin->setValue(prefs.get<int>(Prefs::SESSION_REMOTE_PORT));
+    ui_.portSpin->setValue(prefs.get<int>(TR_KEY_remote_session_port));
     remote_widgets_ << ui_.portLabel << ui_.portSpin;
 
-    ui_.authCheck->setChecked(prefs.get<bool>(Prefs::SESSION_REMOTE_AUTH));
+    ui_.authCheck->setChecked(prefs.get<bool>(TR_KEY_remote_session_requires_authentication));
     connect(ui_.authCheck, &QAbstractButton::toggled, this, &SessionDialog::resensitize);
     remote_widgets_ << ui_.authCheck;
 
-    ui_.usernameEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_USERNAME));
+    ui_.usernameEdit->setText(prefs.get<QString>(TR_KEY_remote_session_username));
     auth_widgets_ << ui_.usernameLabel << ui_.usernameEdit;
 
-    ui_.passwordEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_PASSWORD));
+    ui_.passwordEdit->setText(prefs.get<QString>(TR_KEY_remote_session_password));
     auth_widgets_ << ui_.passwordLabel << ui_.passwordEdit;
 
-    ui_.rpcEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_URL_BASE_PATH));
+    ui_.rpcEdit->setText(prefs.get<QString>(TR_KEY_remote_session_url_base_path));
     remote_widgets_ << ui_.rpcLabel << ui_.rpcEdit;
 
     resensitize();

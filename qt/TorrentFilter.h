@@ -11,10 +11,10 @@
 #include <QTimer>
 
 #include "Filters.h"
+#include "Prefs.h"
 
 class QString;
 
-class Prefs;
 class Torrent;
 
 class TorrentFilter : public QSortFilterProxyModel
@@ -37,7 +37,7 @@ protected:
     [[nodiscard]] bool lessThan(QModelIndex const& source_left, QModelIndex const& source_right) const override;
 
 private slots:
-    void onPrefChanged(int key);
+    void onPrefChanged(tr_quark key);
     void refilter();
 
 private:

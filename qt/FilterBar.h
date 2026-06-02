@@ -14,6 +14,7 @@
 #include <QTimer>
 #include <QWidget>
 
+#include "Prefs.h"
 #include "Torrent.h"
 #include "Typedefs.h"
 
@@ -21,7 +22,6 @@ class QLabel;
 class QString;
 
 class FilterBarComboBox;
-class Prefs;
 class TorrentFilter;
 class TorrentModel;
 
@@ -90,7 +90,7 @@ private slots:
         recountSoon(Pending().set(ACTIVITY).set(TRACKERS));
     }
 
-    void refreshPref(int key);
+    void refreshPref(tr_quark key);
     void onActivityIndexChanged(int index);
     void onTextChanged(QString const& str);
     void onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields);
