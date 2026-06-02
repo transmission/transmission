@@ -64,37 +64,37 @@ class PrefsTest
     }
 
     template<typename T>
-    void verify_get_set_by_property(Prefs& prefs, tr_quark const idx, T const& val1, T const& val2)
+    void verify_get_set_by_property(Prefs& prefs, tr_quark const key, T const& val1, T const& val2)
     {
         QCOMPARE_NE(val1, val2);
 
-        prefs.set(idx, val1);
-        QCOMPARE_EQ(prefs.get<T>(idx), val1);
-        QCOMPARE_NE(prefs.get<T>(idx), val2);
+        prefs.set(key, val1);
+        QCOMPARE_EQ(prefs.get<T>(key), val1);
+        QCOMPARE_NE(prefs.get<T>(key), val2);
 
-        prefs.set(idx, val2);
-        QCOMPARE_NE(prefs.get<T>(idx), val1);
-        QCOMPARE_EQ(prefs.get<T>(idx), val2);
+        prefs.set(key, val2);
+        QCOMPARE_NE(prefs.get<T>(key), val1);
+        QCOMPARE_EQ(prefs.get<T>(key), val2);
     }
 
     template<typename T>
-    void verify_get_by_json(Prefs& prefs, tr_quark const idx, T const& val, std::string_view const valstr)
+    void verify_get_by_json(Prefs& prefs, tr_quark const key, T const& val, std::string_view const valstr)
     {
-        prefs.set(idx, val);
-        QCOMPARE_EQ(prefs.get<T>(idx), val);
-        verify_json_contains(prefs.current_settings(), prefs.keyval(idx).first, valstr);
+        prefs.set(key, val);
+        QCOMPARE_EQ(prefs.get<T>(key), val);
+        verify_json_contains(prefs.current_settings(), prefs.keyval(key).first, valstr);
     }
 
     template<typename T>
-    static void verify_set_by_json(tr_quark const idx, T const& val, std::string_view const valstr)
+    static void verify_set_by_json(tr_quark const key, T const& val, std::string_view const valstr)
     {
-        auto const json_object_str = fmt::format(R"({{{:s}}})", get_json_member_str(idx, valstr));
+        auto const json_object_str = fmt::format(R"({{{:s}}})", get_json_member_str(key, valstr));
         auto serde = tr_variant_serde::json();
         auto const var = serde.parse(json_object_str);
         QVERIFY(var.has_value());
         // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         auto const prefs = Prefs{ *var };
-        QCOMPARE_EQ(prefs.get<T>(idx), val);
+        QCOMPARE_EQ(prefs.get<T>(key), val);
     }
 
     static void verify_variant_json(tr_variant const& var, std::string_view const expected)
@@ -120,128 +120,128 @@ private slots:
 
     void handles_bool()
     {
-        auto constexpr Idx = TR_KEY_sort_reversed;
+        auto constexpr Key = TR_KEY_sort_reversed;
         auto constexpr ValA = false;
         auto constexpr ValAStr = "false"sv;
         auto constexpr ValB = true;
         auto constexpr ValBStr = "true"sv;
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, ValA, ValB);
-        verify_set_by_json(Idx, ValA, ValAStr);
-        verify_get_by_json(prefs, Idx, ValB, ValBStr);
+        verify_get_set_by_property(prefs, Key, ValA, ValB);
+        verify_set_by_json(Key, ValA, ValAStr);
+        verify_get_by_json(prefs, Key, ValB, ValBStr);
     }
 
     void handles_int()
     {
-        auto constexpr Idx = TR_KEY_main_window_height;
+        auto constexpr Key = TR_KEY_main_window_height;
         auto constexpr ValA = 4242;
         auto constexpr ValAStr = "4242"sv;
         auto constexpr ValB = 2323;
         auto constexpr ValBStr = "2323"sv;
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, ValA, ValB);
-        verify_set_by_json(Idx, ValA, ValAStr);
-        verify_get_by_json(prefs, Idx, ValB, ValBStr);
+        verify_get_set_by_property(prefs, Key, ValA, ValB);
+        verify_set_by_json(Key, ValA, ValAStr);
+        verify_get_by_json(prefs, Key, ValB, ValBStr);
     }
 
     void handles_double()
     {
-        auto constexpr Idx = TR_KEY_seed_ratio_limit;
+        auto constexpr Key = TR_KEY_seed_ratio_limit;
         auto constexpr ValA = 1.234;
         auto constexpr ValB = 5.678;
         auto const val_a_str = fmt::format("{}", ValA);
         auto const val_b_str = fmt::format("{}", ValB);
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, ValA, ValB);
-        verify_set_by_json(Idx, ValA, val_a_str);
-        verify_get_by_json(prefs, Idx, ValB, val_b_str);
+        verify_get_set_by_property(prefs, Key, ValA, ValB);
+        verify_set_by_json(Key, ValA, val_a_str);
+        verify_get_by_json(prefs, Key, ValB, val_b_str);
     }
 
     void handles_qstring()
     {
-        auto constexpr Idx = TR_KEY_download_dir;
+        auto constexpr Key = TR_KEY_download_dir;
         auto constexpr ValAStr = R"("/tmp/transmission-test-download-dir")"sv;
         auto constexpr ValBStr = R"("/tmp/transmission-test-download-dir-b")"sv;
         auto const val_a = QStringLiteral("/tmp/transmission-test-download-dir");
         auto const val_b = QStringLiteral("/tmp/transmission-test-download-dir-b");
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, val_a, val_b);
-        verify_set_by_json(Idx, val_a, ValAStr);
-        verify_get_by_json(prefs, Idx, val_b, ValBStr);
+        verify_get_set_by_property(prefs, Key, val_a, val_b);
+        verify_set_by_json(Key, val_a, ValAStr);
+        verify_get_by_json(prefs, Key, val_b, ValBStr);
     }
 
     void handles_qstringlist()
     {
-        auto constexpr Idx = TR_KEY_torrent_complete_sound_command;
+        auto constexpr Key = TR_KEY_torrent_complete_sound_command;
         auto constexpr ValAStr = R"(["one","two","three"])"sv;
         auto constexpr ValBStr = R"(["alpha","beta"])"sv;
         auto const val_a = QStringList{ QStringLiteral("one"), QStringLiteral("two"), QStringLiteral("three") };
         auto const val_b = QStringList{ QStringLiteral("alpha"), QStringLiteral("beta") };
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, val_a, val_b);
-        verify_set_by_json(Idx, val_a, ValAStr);
-        verify_get_by_json(prefs, Idx, val_b, ValBStr);
+        verify_get_set_by_property(prefs, Key, val_a, val_b);
+        verify_set_by_json(Key, val_a, ValAStr);
+        verify_get_by_json(prefs, Key, val_b, ValBStr);
     }
 
     void handles_qdatetime()
     {
-        auto constexpr Idx = TR_KEY_blocklist_date;
+        auto constexpr Key = TR_KEY_blocklist_date;
         auto const val_a = QDateTime::fromMSecsSinceEpoch(1700000000000LL).toUTC();
         auto const val_a_str = fmt::format("{}", val_a.toSecsSinceEpoch());
         auto const val_b = QDateTime::fromMSecsSinceEpoch(1700000000000LL + 123000LL).toUTC();
         auto const val_b_str = fmt::format("{}", val_b.toSecsSinceEpoch());
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, val_a, val_b);
-        verify_set_by_json(Idx, val_a, val_a_str);
-        verify_get_by_json(prefs, Idx, val_b, val_b_str);
+        verify_get_set_by_property(prefs, Key, val_a, val_b);
+        verify_set_by_json(Key, val_a, val_a_str);
+        verify_get_by_json(prefs, Key, val_b, val_b_str);
     }
 
     void handles_sortmode()
     {
-        auto constexpr Idx = TR_KEY_sort_mode;
+        auto constexpr Key = TR_KEY_sort_mode;
         auto constexpr ValA = SortMode::SortBySize;
         auto constexpr ValAStr = R"("sort_by_size")"sv;
         auto constexpr ValB = SortMode::SortByName;
         auto constexpr ValBStr = R"("sort_by_name")"sv;
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, ValA, ValB);
-        verify_set_by_json(Idx, ValA, ValAStr);
-        verify_get_by_json(prefs, Idx, ValB, ValBStr);
+        verify_get_set_by_property(prefs, Key, ValA, ValB);
+        verify_set_by_json(Key, ValA, ValAStr);
+        verify_get_by_json(prefs, Key, ValB, ValBStr);
     }
 
     void handles_showmode()
     {
-        auto constexpr Idx = TR_KEY_filter_mode;
+        auto constexpr Key = TR_KEY_filter_mode;
         auto constexpr ValA = ShowMode::ShowAll;
         auto constexpr ValAStr = R"("show_all")"sv;
         auto constexpr ValB = ShowMode::ShowActive;
         auto constexpr ValBStr = R"("show_active")"sv;
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, ValA, ValB);
-        verify_set_by_json(Idx, ValA, ValAStr);
-        verify_get_by_json(prefs, Idx, ValB, ValBStr);
+        verify_get_set_by_property(prefs, Key, ValA, ValB);
+        verify_set_by_json(Key, ValA, ValAStr);
+        verify_get_by_json(prefs, Key, ValB, ValBStr);
     }
 
     void handles_encryptionmode()
     {
-        auto constexpr Idx = TR_KEY_encryption;
+        auto constexpr Key = TR_KEY_encryption;
         auto constexpr ValA = TR_ENCRYPTION_REQUIRED;
         auto constexpr ValAStr = R"("required")"sv;
         auto constexpr ValB = TR_ENCRYPTION_PREFERRED;
         auto constexpr ValBStr = R"("preferred")"sv;
 
         auto prefs = Prefs{};
-        verify_get_set_by_property(prefs, Idx, ValA, ValB);
-        verify_set_by_json(Idx, ValA, ValAStr);
-        verify_get_by_json(prefs, Idx, ValB, ValBStr);
+        verify_get_set_by_property(prefs, Key, ValA, ValB);
+        verify_set_by_json(Key, ValA, ValAStr);
+        verify_get_by_json(prefs, Key, ValB, ValBStr);
     }
 
     static void keyval_returns_key_and_value()
@@ -249,21 +249,21 @@ private slots:
         auto prefs = Prefs{};
 
         {
-            auto constexpr Idx = TR_KEY_main_window_height;
+            auto constexpr Key = TR_KEY_main_window_height;
             auto constexpr Val = 4242;
-            prefs.set(Idx, Val);
+            prefs.set(Key, Val);
 
-            auto const [key, var] = prefs.keyval(Idx);
+            auto const [key, var] = prefs.keyval(Key);
             QCOMPARE_EQ(key, TR_KEY_main_window_height);
             verify_variant_json(var, fmt::format("{}", Val));
         }
 
         {
-            auto constexpr Idx = TR_KEY_download_dir;
+            auto constexpr Key = TR_KEY_download_dir;
             auto const val = QStringLiteral("/tmp/transmission-test-download-dir");
-            prefs.set(Idx, val);
+            prefs.set(Key, val);
 
-            auto const [key, var] = prefs.keyval(Idx);
+            auto const [key, var] = prefs.keyval(Key);
             QCOMPARE_EQ(key, TR_KEY_download_dir);
             verify_variant_json(var, fmt::format(R"("{}")", val.toStdString()));
         }
@@ -273,28 +273,28 @@ private slots:
 
     static void changed_signal_emits_when_change()
     {
-        static auto constexpr Idx = TR_KEY_sort_reversed;
+        static auto constexpr Key = TR_KEY_sort_reversed;
 
         auto prefs = Prefs{};
         auto const spy = QSignalSpy{ &prefs, qOverload<tr_quark>(&Prefs::changed) };
 
-        auto const old_value = prefs.get<bool>(Idx);
+        auto const old_value = prefs.get<bool>(Key);
         auto const new_value = !old_value;
-        prefs.set(Idx, new_value);
+        prefs.set(Key, new_value);
         QCOMPARE(spy.count(), 1);
         auto const& signal_args = spy.first();
-        QCOMPARE(signal_args.at(0).value<tr_quark>(), Idx);
+        QCOMPARE(signal_args.at(0).value<tr_quark>(), Key);
     }
 
     static void changed_signal_does_not_emit_when_unchanged()
     {
-        static auto constexpr Idx = TR_KEY_sort_reversed;
+        static auto constexpr Key = TR_KEY_sort_reversed;
 
         auto prefs = Prefs{};
         auto const spy = QSignalSpy{ &prefs, qOverload<tr_quark>(&Prefs::changed) };
 
-        auto const current_value = prefs.get<bool>(Idx);
-        prefs.set(Idx, current_value);
+        auto const current_value = prefs.get<bool>(Key);
+        prefs.set(Key, current_value);
         QCOMPARE(spy.count(), 0);
     }
 
