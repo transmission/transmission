@@ -205,7 +205,7 @@ runs:
           if [[ "${{ inputs.enable-qt }}" == "qt5" ]]; then
             $SUDO_CMD apt-get install -y --no-install-recommends libxcb-cursor0 qtbase5-dev libqt5svg5-dev qttools5-dev
           elif [[ "${{ inputs.enable-qt }}" == "qt6" ]]; then
-            $SUDO_CMD apt-get install -y --no-install-recommends qt6-base-dev qt6-tools-dev qt6-l10n-tools libqt6svg6-dev
+            $SUDO_CMD apt-get install -y --no-install-recommends qt6-base-dev qt6-tools-dev qt6-l10n-tools qt6-svg-dev
           fi
         else
           echo "Unsupported package family: $PKG_FAMILY"
