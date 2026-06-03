@@ -33,7 +33,7 @@ public:
     PrefsDialog(PrefsDialog const&) = delete;
 
 private slots:
-    void refreshPref(int key);
+    void refreshPref(tr_quark key);
     void sessionUpdated();
     void onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol);
     void onPortTest();
@@ -56,7 +56,7 @@ private:
     };
 
     template<typename T>
-    void set(int const key, T const& val)
+    void set(tr_quark const key, T const& val)
     {
         prefs_.set(key, val);
         refreshPref(key);
@@ -70,18 +70,18 @@ private:
     static QString getPortStatusText(PortTestStatus status) noexcept;
 
     template<typename T, size_t N>
-    void initComboFromItems(std::array<std::pair<QString, T>, N> const& items, QComboBox* w, int key);
+    void initComboFromItems(std::array<std::pair<QString, T>, N> const& items, QComboBox* w, tr_quark key);
 
-    void initAltSpeedDaysCombo(QComboBox* w, int key);
-    void initEncryptionCombo(QComboBox* w, int key);
-    void initWidget(FreeSpaceLabel* w, int key);
-    void initWidget(PathButton* w, int key);
-    void initWidget(QCheckBox* w, int key);
-    void initWidget(QDoubleSpinBox* w, int key);
-    void initWidget(QLineEdit* w, int key);
-    void initWidget(QPlainTextEdit* w, int key);
-    void initWidget(QSpinBox* w, int key);
-    void initWidget(QTimeEdit* w, int key);
+    void initAltSpeedDaysCombo(QComboBox* w, tr_quark key);
+    void initEncryptionCombo(QComboBox* w, tr_quark key);
+    void initWidget(FreeSpaceLabel* w, tr_quark key);
+    void initWidget(PathButton* w, tr_quark key);
+    void initWidget(QCheckBox* w, tr_quark key);
+    void initWidget(QDoubleSpinBox* w, tr_quark key);
+    void initWidget(QLineEdit* w, tr_quark key);
+    void initWidget(QPlainTextEdit* w, tr_quark key);
+    void initWidget(QSpinBox* w, tr_quark key);
+    void initWidget(QTimeEdit* w, tr_quark key);
 
     void initDownloadingTab();
     void initSeedingTab();
@@ -100,7 +100,7 @@ private:
     bool is_local_ = {};
     std::array<PortTestStatus, Session::NUM_PORT_TEST_IP_PROTOCOL> port_test_status_ = {};
 
-    std::multimap<int, std::function<void()>> updaters_;
+    std::multimap<tr_quark, std::function<void()>> updaters_;
 
     QWidgetList web_widgets_;
     QWidgetList web_auth_widgets_;

@@ -278,9 +278,9 @@ void save_speed_limits(tr_variant::Map& map, tr_torrent const* tor)
 void save_ratio_limits(tr_variant::Map& map, tr_torrent const* tor)
 {
     auto d = tr_variant::Map{ 2 };
-    d.try_emplace(TR_KEY_ratio_limit, tor->seed_ratio());
+    d.try_emplace(TR_KEY_seed_ratio_limit, tor->seed_ratio());
     d.try_emplace(TR_KEY_ratio_mode, tor->seed_ratio_mode());
-    map.insert_or_assign(TR_KEY_ratio_limit, std::move(d));
+    map.insert_or_assign(TR_KEY_seed_ratio_limit, std::move(d));
 }
 
 void save_idle_limits(tr_variant::Map& map, tr_torrent const* tor)
@@ -334,13 +334,13 @@ auto load_speed_limits(tr_variant::Map const& map, tr_torrent* tor)
 
 tr_resume::fields_t load_ratio_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
-    auto const* const d = map.find_if<tr_variant::Map>(TR_KEY_ratio_limit);
+    auto const* const d = map.find_if<tr_variant::Map>(TR_KEY_seed_ratio_limit);
     if (d == nullptr)
     {
         return {};
     }
 
-    if (auto const dratio = d->value_if<double>(TR_KEY_ratio_limit))
+    if (auto const dratio = d->value_if<double>(TR_KEY_seed_ratio_limit))
     {
         tor->set_seed_ratio(*dratio);
     }

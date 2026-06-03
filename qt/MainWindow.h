@@ -18,6 +18,7 @@
 #include <QWidgetList>
 
 #include "Filters.h"
+#include "Prefs.h"
 #include "Speed.h"
 #include "TorrentFilter.h"
 #include "Typedefs.h"
@@ -101,8 +102,6 @@ private slots:
     void onNetworkResponse(QNetworkReply::NetworkError code, QString const& message);
     void onRefreshTimer();
     void onSessionSourceChanged();
-    void onSetPrefs();
-    void onSetPrefs(bool is_checked);
     void onSortModeChanged(QAction const* action);
     void onStatsModeChanged(QAction const* action);
     void openAbout();
@@ -114,7 +113,7 @@ private slots:
     void openStats();
     void openTorrent();
     void openURL();
-    void refreshPref(int idx);
+    void refreshPref(tr_quark key);
     void removeTorrents(bool delete_files);
     void setLocation();
     void setSortAscendingPref(bool b);

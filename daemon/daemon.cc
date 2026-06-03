@@ -707,13 +707,13 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
         case 953:
             if (auto const ratio_limit = tr_num_parse<double>(optstr); ratio_limit)
             {
-                map->insert_or_assign(TR_KEY_ratio_limit, *ratio_limit);
+                map->insert_or_assign(TR_KEY_seed_ratio_limit, *ratio_limit);
             }
-            map->insert_or_assign(TR_KEY_ratio_limit_enabled, true);
+            map->insert_or_assign(TR_KEY_seed_ratio_limited, true);
             break;
 
         case 954:
-            map->insert_or_assign(TR_KEY_ratio_limit_enabled, false);
+            map->insert_or_assign(TR_KEY_seed_ratio_limited, false);
             break;
 
         case 'x':

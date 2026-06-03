@@ -345,8 +345,8 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { .current = TR_KEY_prompt_before_exit, .legacy = TR_KEY_prompt_before_exit_kebab_APICOMPAT },
     { .current = TR_KEY_queue_stalled_enabled, .legacy = TR_KEY_queue_stalled_enabled_kebab_APICOMPAT },
     { .current = TR_KEY_queue_stalled_minutes, .legacy = TR_KEY_queue_stalled_minutes_kebab_APICOMPAT },
-    { .current = TR_KEY_ratio_limit, .legacy = TR_KEY_ratio_limit_kebab_APICOMPAT },
-    { .current = TR_KEY_ratio_limit_enabled, .legacy = TR_KEY_ratio_limit_enabled_kebab_APICOMPAT },
+    { .current = TR_KEY_seed_ratio_limit, .legacy = TR_KEY_ratio_limit_kebab_APICOMPAT },
+    { .current = TR_KEY_seed_ratio_limited, .legacy = TR_KEY_ratio_limit_enabled_kebab_APICOMPAT },
     { .current = TR_KEY_ratio_mode, .legacy = TR_KEY_ratio_mode_kebab_APICOMPAT },
     { .current = TR_KEY_read_clipboard, .legacy = TR_KEY_read_clipboard_kebab_APICOMPAT },
     { .current = TR_KEY_remote_session_enabled, .legacy = TR_KEY_remote_session_enabled_kebab_APICOMPAT },
@@ -650,6 +650,25 @@ struct State
     {
         return state.style == Style::Tr5 || state.is_free_space_response ? TR_KEY_total_size :
                                                                            TR_KEY_total_size_camel_APICOMPAT;
+    }
+
+    // Crazy case:
+    // ratio_limit(_enabled) is a legacy transitional settings key in underscore case.
+    // Map it one-way to Tr5's seed_ratio_* when reading legacy settings,
+    // while preserving canonical Tr5 -> Tr4 output as kebab ratio-limit*.
+    if (state.is_settings && state.style == Style::Tr5)
+    {
+        switch (src)
+        {
+        case TR_KEY_ratio_limit_APICOMPAT:
+            return TR_KEY_seed_ratio_limit;
+
+        case TR_KEY_ratio_limit_enabled_APICOMPAT:
+            return TR_KEY_seed_ratio_limited;
+
+        default:
+            break;
+        }
     }
 
     // Crazy cases done.

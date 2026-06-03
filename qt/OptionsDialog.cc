@@ -69,7 +69,7 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     int const width = font_metrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
     ui_.sourceStack->setMinimumWidth(width);
 
-    auto const download_dir = Utils::removeTrailingDirSeparator(prefs.get<QString>(Prefs::DOWNLOAD_DIR));
+    auto const download_dir = Utils::removeTrailingDirSeparator(prefs.get<QString>(TR_KEY_download_dir));
     ui_.freeSpaceLabel->setSession(session_);
     ui_.freeSpaceLabel->setPath(download_dir);
 
@@ -93,8 +93,8 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
     ui_.priorityCombo->setCurrentIndex(1); // Normal
 
-    ui_.startCheck->setChecked(prefs.get<bool>(Prefs::START));
-    ui_.trashCheck->setChecked(prefs.get<bool>(Prefs::TRASH_ORIGINAL));
+    ui_.startCheck->setChecked(prefs.get<bool>(TR_KEY_start_added_torrents));
+    ui_.trashCheck->setChecked(prefs.get<bool>(TR_KEY_trash_original_torrent_files));
 
     connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &QObject::deleteLater);
     connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &OptionsDialog::onAccepted);

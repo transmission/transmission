@@ -263,41 +263,40 @@ int tr_main(int argc, char** argv)
     }
 
     // initialize the prefs
-    auto prefs = Prefs{};
-    prefs.loadFromConfigDir(config_dir);
+    auto prefs = Prefs{ config_dir };
 
     if (!host.isNull())
     {
-        prefs.set(Prefs::SESSION_REMOTE_HOST, host);
+        prefs.set(TR_KEY_remote_session_host, host);
     }
 
     if (!port.isNull())
     {
-        prefs.set(Prefs::SESSION_REMOTE_PORT, port.toUInt());
+        prefs.set(TR_KEY_remote_session_port, port.toUInt());
     }
 
     if (!username.isNull())
     {
-        prefs.set(Prefs::SESSION_REMOTE_USERNAME, username);
+        prefs.set(TR_KEY_remote_session_username, username);
     }
 
     if (!password.isNull())
     {
-        prefs.set(Prefs::SESSION_REMOTE_PASSWORD, password);
+        prefs.set(TR_KEY_remote_session_password, password);
     }
 
     if (!host.isNull() || !port.isNull() || !username.isNull() || !password.isNull())
     {
-        prefs.set(Prefs::SESSION_IS_REMOTE, true);
+        prefs.set(TR_KEY_remote_session_enabled, true);
     }
 
-    if (prefs.get<bool>(Prefs::START_MINIMIZED))
+    if (prefs.get<bool>(TR_KEY_start_minimized))
     {
         minimized = true;
     }
 
     // start as minimized only if the system tray present
-    if (!prefs.get<bool>(Prefs::SHOW_TRAY_ICON))
+    if (!prefs.get<bool>(TR_KEY_show_notification_area_icon))
     {
         minimized = false;
     }

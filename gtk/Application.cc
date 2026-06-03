@@ -1188,11 +1188,11 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         tr_sessionSetSpeedLimit_KBps(tr, tr_direction::Up, gtr_pref_int_get<size_t>(key));
         break;
 
-    case TR_KEY_ratio_limit_enabled:
+    case TR_KEY_seed_ratio_limited:
         tr_sessionSetRatioLimited(tr, gtr_pref_flag_get(key));
         break;
 
-    case TR_KEY_ratio_limit:
+    case TR_KEY_seed_ratio_limit:
         tr_sessionSetRatioLimit(tr, gtr_pref_double_get(key));
         break;
 

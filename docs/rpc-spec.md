@@ -793,10 +793,10 @@ Response parameters: none
 #### 4.8.2 Bandwidth group accessor: `group_get`
 Method name: `group_get`
 
-Request parameters: An optional parameter `group`.
-`group` is either a string naming the bandwidth group,
+Request parameters: An optional parameter `name`.
+`name` is either a string naming the bandwidth group,
 or a list of such strings.
-If `group` is omitted, all bandwidth groups are used.
+If `name` is omitted, all bandwidth groups are used.
 
 Response parameters:
 

@@ -519,8 +519,8 @@ static void removeKeRangerRansomware()
         tr_variantDictAddBool(&settings, TR_KEY_port_forwarding_enabled, [_fDefaults boolForKey:@"NatTraversal"]);
         tr_variantDictAddBool(&settings, TR_KEY_queue_stalled_enabled, [_fDefaults boolForKey:@"CheckStalled"]);
         tr_variantDictAddInt(&settings, TR_KEY_queue_stalled_minutes, [_fDefaults integerForKey:@"StalledMinutes"]);
-        tr_variantDictAddReal(&settings, TR_KEY_ratio_limit, [_fDefaults floatForKey:@"RatioLimit"]);
-        tr_variantDictAddBool(&settings, TR_KEY_ratio_limit_enabled, [_fDefaults boolForKey:@"RatioCheck"]);
+        tr_variantDictAddReal(&settings, TR_KEY_seed_ratio_limit, [_fDefaults floatForKey:@"RatioLimit"]);
+        tr_variantDictAddBool(&settings, TR_KEY_seed_ratio_limited, [_fDefaults boolForKey:@"RatioCheck"]);
         tr_variantDictAddBool(&settings, TR_KEY_rename_partial_files, [_fDefaults boolForKey:@"RenamePartialFiles"]);
         tr_variantDictAddBool(&settings, TR_KEY_rpc_authentication_required, [_fDefaults boolForKey:@"RPCAuthorize"]);
         tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, [_fDefaults boolForKey:@"RPC"]);
@@ -2496,7 +2496,7 @@ static void removeKeRangerRansomware()
     else
     {
         [self.fInfoController updateInfoStats];
-        [self.fInfoController.window orderFront:nil];
+        [self.fInfoController.window makeKeyAndOrderFront:nil];
 
         if (self.fInfoController.canQuickLook && [QLPreviewPanel sharedPreviewPanelExists] &&
             [QLPreviewPanel sharedPreviewPanel].visible)

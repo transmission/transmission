@@ -709,8 +709,6 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "preallocation": 1,
     "prompt_before_exit": true,
     "queue_stalled_minutes": 30,
-    "ratio_limit": 2.0,
-    "ratio_limit_enabled": false,
     "read_clipboard": false,
     "remote_session_enabled": false,
     "remote_session_host": "localhost",
@@ -731,6 +729,8 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "script_torrent_done_filename": "",
     "script_torrent_done_seeding_enabled": false,
     "script_torrent_done_seeding_filename": "",
+    "seed_ratio_limit": 2.0,
+    "seed_ratio_limited": false,
     "show_backup_trackers": false,
     "show_filterbar": true,
     "show_notification_area_icon": false,
@@ -763,6 +763,21 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "utp_enabled": true,
     "watch_dir": "/home/user/Downloads",
     "watch_dir_enabled": false
+})json";
+
+constexpr std::string_view LegacyRatioSettingsKebabJson = R"json({
+    "ratio-limit": 2.0,
+    "ratio-limit-enabled": false
+})json";
+
+constexpr std::string_view LegacyRatioSettingsUnderscoreJson = R"json({
+    "ratio_limit": 2.0,
+    "ratio_limit_enabled": false
+})json";
+
+constexpr std::string_view CurrentSeedRatioSettingsJson = R"json({
+    "seed_ratio_limit": 2.0,
+    "seed_ratio_limited": false
 })json";
 
 constexpr std::string_view LegacyPreferClearJson = R"json({
@@ -1177,10 +1192,10 @@ constexpr std::string_view ResumeBenc =
             "e"
             "6:pieces" "3:all"
         "e"
-        "11:ratio_limit"
+        "16:seed_ratio_limit"
         "d"
-            "11:ratio_limit" "8:2.000000"
             "10:ratio_mode" "i0e"
+            "16:seed_ratio_limit" "8:2.000000"
         "e"
         "20:seeding_time_seconds" "i7373039e"
         "19:sequential_download" "i0e"
@@ -1335,6 +1350,35 @@ TEST_F(ApiCompatTest, canConvertJsonDataFiles)
 
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value());
+        tr::api_compat::convert(*parsed, tgt_style);
+        EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
+    }
+}
+
+TEST_F(ApiCompatTest, migratesLegacyRatioSettingKeys)
+{
+    using Style = tr::api_compat::Style;
+    using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
+
+    static auto constexpr TestCases = std::array<TestCase, 6U>{ {
+        { "settings ratio kebab tr4 -> tr5", LegacyRatioSettingsKebabJson, Style::Tr5, CurrentSeedRatioSettingsJson },
+        { "settings ratio underscore tr4 -> tr5", LegacyRatioSettingsUnderscoreJson, Style::Tr5, CurrentSeedRatioSettingsJson },
+        { "settings ratio tr5 -> tr5", CurrentSeedRatioSettingsJson, Style::Tr5, CurrentSeedRatioSettingsJson },
+        { "settings ratio kebab tr4 -> tr4", LegacyRatioSettingsKebabJson, Style::Tr4, LegacyRatioSettingsKebabJson },
+        { "settings ratio underscore tr4 -> tr4",
+          LegacyRatioSettingsUnderscoreJson,
+          Style::Tr4,
+          LegacyRatioSettingsUnderscoreJson },
+        { "settings ratio tr5 -> tr4", CurrentSeedRatioSettingsJson, Style::Tr4, LegacyRatioSettingsKebabJson },
+    } };
+
+    for (auto const& [name, src, tgt_style, expected] : TestCases)
+    {
+        auto serde = tr_variant_serde::json();
+        serde.inplace();
+
+        auto parsed = serde.parse(src);
+        ASSERT_TRUE(parsed.has_value()) << name;
         tr::api_compat::convert(*parsed, tgt_style);
         EXPECT_EQ(expected, serde.to_string(*parsed)) << name;
     }

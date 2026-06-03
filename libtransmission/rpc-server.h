@@ -19,7 +19,7 @@
 #include "libtransmission/constants.h" // TrDefaultHttpServerBasePath
 #include "libtransmission/net.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/serializer.h"
+#include "libtransmission/session-settings.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils-ev.h"
 
@@ -36,64 +36,7 @@ class Timer;
 class tr_rpc_server
 {
 public:
-    class Settings final
-    {
-    public:
-        Settings() = default;
-
-        explicit Settings(tr_variant const& src)
-        {
-            load(src);
-        }
-
-        void load(tr_variant const& src)
-        {
-            tr::serializer::load(*this, Fields, src);
-        }
-
-        [[nodiscard]] tr_variant::Map save() const
-        {
-            return tr::serializer::save(*this, Fields);
-        }
-
-        // NB: When adding a field here, you must also add it to
-        // `fields` if you want it to be in session-settings.json
-        bool authentication_required = false;
-        bool is_anti_brute_force_enabled = false;
-        bool is_enabled = false;
-        bool is_host_whitelist_enabled = true;
-        bool is_whitelist_enabled = true;
-        size_t anti_brute_force_limit = 100U;
-        std::string bind_address_str = "0.0.0.0";
-        std::string host_whitelist_str;
-        std::string salted_password;
-        std::string url = std::string{ TrDefaultHttpServerBasePath };
-        std::string username;
-        std::string whitelist_str = std::string{ TrDefaultRpcWhitelist };
-        tr_mode_t socket_mode = 0750;
-        tr_port port = tr_port::from_host(TrDefaultRpcPort);
-
-    private:
-        template<auto MemberPtr>
-        using Field = tr::serializer::Field<MemberPtr>;
-
-        static constexpr auto Fields = std::tuple{
-            Field<&Settings::is_anti_brute_force_enabled>{ TR_KEY_anti_brute_force_enabled },
-            Field<&Settings::anti_brute_force_limit>{ TR_KEY_anti_brute_force_threshold },
-            Field<&Settings::authentication_required>{ TR_KEY_rpc_authentication_required },
-            Field<&Settings::bind_address_str>{ TR_KEY_rpc_bind_address },
-            Field<&Settings::is_enabled>{ TR_KEY_rpc_enabled },
-            Field<&Settings::host_whitelist_str>{ TR_KEY_rpc_host_whitelist },
-            Field<&Settings::is_host_whitelist_enabled>{ TR_KEY_rpc_host_whitelist_enabled },
-            Field<&Settings::port>{ TR_KEY_rpc_port },
-            Field<&Settings::salted_password>{ TR_KEY_rpc_password },
-            Field<&Settings::socket_mode>{ TR_KEY_rpc_socket_mode },
-            Field<&Settings::url>{ TR_KEY_rpc_url },
-            Field<&Settings::username>{ TR_KEY_rpc_username },
-            Field<&Settings::whitelist_str>{ TR_KEY_rpc_whitelist },
-            Field<&Settings::is_whitelist_enabled>{ TR_KEY_rpc_whitelist_enabled },
-        };
-    };
+    using Settings = tr::RpcServerSettings;
 
     tr_rpc_server(tr_session* session, Settings&& settings);
     ~tr_rpc_server();
