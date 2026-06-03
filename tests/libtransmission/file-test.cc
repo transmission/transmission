@@ -1025,10 +1025,10 @@ TEST_F(FileTest, pathNativeSeparators)
 
 TEST_F(FileTest, fileCopy)
 {
-    auto const test_dir = createTestDir(currentTestName());
+    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
 
-    auto const path1 = tr_pathbuf{ test_dir, "/a.txt" };
-    auto const path2 = tr_pathbuf{ test_dir, "/b.txt" };
+    auto const path1 = test_dir / u8"a.txt"sv;
+    auto const path2 = test_dir / u8"b.txt"sv;
     auto constexpr Contents = "hello, world!"sv;
 
     // no source file
@@ -1037,14 +1037,14 @@ TEST_F(FileTest, fileCopy)
     EXPECT_TRUE(error);
     error = {};
 
-    createFileWithContents(path1, Contents);
+    createFileWithContents(path1.string(), Contents);
 
     // source file exists but is inaccessible
-    (void)chmod(path1, 0);
+    (void)chmod(path1.string().c_str(), 0);
     EXPECT_FALSE(tr_sys_path_copy(path1, test_dir, &error));
     EXPECT_TRUE(error);
     error = {};
-    (void)chmod(path1, 0600);
+    (void)chmod(path1.string().c_str(), 0600);
 
     // source file exists but target is invalid
     EXPECT_FALSE(tr_sys_path_copy(path1, test_dir, &error));
@@ -1052,7 +1052,7 @@ TEST_F(FileTest, fileCopy)
     error = {};
 
     // source and target are valid
-    createFileWithContents(path1, Contents);
+    createFileWithContents(path1.string(), Contents);
     EXPECT_TRUE(tr_sys_path_copy(path1, path2, &error));
     EXPECT_FALSE(error) << error;
 }

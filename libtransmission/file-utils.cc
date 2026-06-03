@@ -180,7 +180,7 @@ bool tr_file_move(std::string_view oldpath, std::string_view newpath, bool allow
     }
 
     /* Otherwise, copy the file. */
-    if (!tr_sys_path_copy(oldpath, newpath, error))
+    if (!tr_sys_path_copy(tr_u8path(oldpath), tr_u8path(newpath), error))
     {
         error->prefix_message("Unable to copy: ");
         return false;

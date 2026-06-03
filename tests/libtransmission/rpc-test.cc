@@ -728,17 +728,16 @@ TEST_F(RpcTest, torrentGet)
 
 TEST_F(RpcTest, recentlyActiveEmptyOnStartup)
 {
-    static auto constexpr TorrentFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv;
-    static auto constexpr ResumeFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/debian-11.2.0-amd64-DVD-1.iso.resume"sv;
+    static auto constexpr TorrentFile = u8"" LIBTRANSMISSION_TEST_ASSETS_DIR "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv;
+    static auto constexpr ResumeFile = u8"" LIBTRANSMISSION_TEST_ASSETS_DIR "/debian-11.2.0-amd64-DVD-1.iso.resume"sv;
 
-    if (auto error = tr_error{};
-        !tr_sys_path_copy(
-            TorrentFile,
-            tr_pathbuf{ session_->torrentDir(), "/c9a337562cb0360fd6f5ab40fd2b1b81d5325dbd.torrent"sv },
-            &error) ||
+    if (auto error = tr_error{}; !tr_sys_path_copy(
+                                     TorrentFile,
+                                     tr_u8path(session_->torrentDir()) / u8"c9a337562cb0360fd6f5ab40fd2b1b81d5325dbd.torrent"sv,
+                                     &error) ||
         !tr_sys_path_copy(
             ResumeFile,
-            tr_pathbuf{ session_->resumeDir(), "/c9a337562cb0360fd6f5ab40fd2b1b81d5325dbd.resume"sv },
+            tr_u8path(session_->resumeDir()) / u8"c9a337562cb0360fd6f5ab40fd2b1b81d5325dbd.resume"sv,
             &error))
     {
         GTEST_SKIP() << fmt::format("Failed to setup torrents and resume dir: {} ({})", error.message(), error.code());

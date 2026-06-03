@@ -133,7 +133,7 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
 bool tr_torrent::use_metainfo_from_file(tr_torrent_metainfo const* metainfo, char const* filename_in, tr_error* error)
 {
     // add .torrent file
-    if (!tr_sys_path_copy(filename_in, torrent_file(), error))
+    if (!tr_sys_path_copy(tr_u8path(filename_in), tr_u8path(torrent_file()), error))
     {
         return false;
     }

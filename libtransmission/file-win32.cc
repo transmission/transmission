@@ -36,8 +36,8 @@ struct tr_sys_dir_win32
 
 namespace
 {
-auto constexpr NativeLocalPathPrefix = L"\\\\?\\"sv;
-auto constexpr NativeUncPathPrefix = L"\\\\?\\UNC\\"sv;
+auto constexpr NativeLocalPathPrefix = LR"(\\?\)"sv;
+auto constexpr NativeUncPathPrefix = LR"(\\?\UNC\)"sv;
 
 void set_system_error(tr_error* error, DWORD code)
 {
@@ -68,7 +68,13 @@ constexpr bool is_slash(char c)
     return tr_strv_contains(Slashes, c);
 }
 
-constexpr bool is_unc_path(std::string_view path)
+constexpr bool is_slash(wchar_t c)
+{
+    return c == L'/' || c == L'\\';
+}
+
+template<typename CharT>
+constexpr bool is_unc_path(std::basic_string_view<CharT> path)
 {
     return std::size(path) >= 2 && is_slash(path[0]) && path[1] == path[0];
 }
@@ -120,6 +126,7 @@ bool is_valid_path(std::string_view path)
 
 /* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
    https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx for more info */
+// TODO: remove after converting all functions to use std::filesystem::path
 [[nodiscard]] auto path_to_native_path(std::string_view path)
 {
     if (is_unc_path(path))
@@ -140,6 +147,29 @@ bool is_valid_path(std::string_view path)
     }
 
     return path_to_fixed_native_path(path);
+}
+
+// Extending maximum path length limit up to ~32K.
+// https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
+std::wstring to_long_path(std::filesystem::path const& path)
+{
+    auto ret = path.native();
+
+    if (is_unc_path(ret))
+    {
+        // UNC path: "\\server\share" -> "\\?\UNC\server\share"
+        ret.replace(0, 2, NativeUncPathPrefix);
+        return ret;
+    }
+
+    if (!tr_sys_path_is_relative(path.string()))
+    {
+        // local path: "C:" -> "\\?\C:"
+        ret.insert(0, NativeLocalPathPrefix);
+        return ret;
+    }
+
+    return ret;
 }
 
 std::string native_path_to_path(std::wstring_view wide_path)
@@ -483,11 +513,11 @@ bool tr_sys_path_rename(std::string_view const src_path, std::string_view const 
     return ret;
 }
 
-bool tr_sys_path_copy(std::string_view const src_path, std::string_view const dst_path, tr_error* error)
+bool tr_sys_path_copy(std::filesystem::path const& src_path, std::filesystem::path const& dst_path, tr_error* error)
 {
-    auto const wide_src_path = path_to_native_path(src_path);
-    auto const wide_dst_path = path_to_native_path(dst_path);
-    if (std::empty(wide_src_path) || std::empty(wide_dst_path))
+    auto const long_src_path = to_long_path(src_path);
+    auto const long_dst_path = to_long_path(dst_path);
+    if (std::empty(long_src_path) || std::empty(long_dst_path))
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
         return false;
@@ -495,7 +525,7 @@ bool tr_sys_path_copy(std::string_view const src_path, std::string_view const ds
 
     auto cancel = BOOL{ FALSE };
     DWORD const flags = COPY_FILE_ALLOW_DECRYPTED_DESTINATION | COPY_FILE_FAIL_IF_EXISTS;
-    if (!to_bool(CopyFileExW(wide_src_path.c_str(), wide_dst_path.c_str(), nullptr, nullptr, &cancel, flags)))
+    if (!to_bool(CopyFileExW(long_src_path.c_str(), long_dst_path.c_str(), nullptr, nullptr, &cancel, flags)))
     {
         set_system_error(error, GetLastError());
         return false;

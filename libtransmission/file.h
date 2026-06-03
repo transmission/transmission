@@ -149,7 +149,7 @@ template<typename InputIt>
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_path_copy(std::string_view src_path, std::string_view dst_path, tr_error* error = nullptr);
+bool tr_sys_path_copy(std::filesystem::path const& src_path, std::filesystem::path const& dst_path, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `stat()`.

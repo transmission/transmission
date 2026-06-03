@@ -216,7 +216,7 @@ bool tr_sys_path_rename(std::string_view const src_path, std::string_view const 
 /* We try to do a fast (in-kernel) copy using a variety of non-portable system
  * calls. If the current implementation does not support in-kernel copying, we
  * use a user-space fallback instead. */
-bool tr_sys_path_copy(std::string_view const src_path, std::string_view const dst_path, tr_error* error)
+bool tr_sys_path_copy(std::filesystem::path const& src_path, std::filesystem::path const& dst_path, tr_error* error)
 {
     auto local_error = tr_error{};
     if (error == nullptr)
@@ -225,9 +225,7 @@ bool tr_sys_path_copy(std::string_view const src_path, std::string_view const ds
     }
 
 #if defined(USE_COPYFILE)
-    auto const sz_src_path = tr_pathbuf{ src_path };
-    auto const sz_dst_path = tr_pathbuf{ dst_path };
-    if (copyfile(sz_src_path.c_str(), sz_dst_path.c_str(), nullptr, COPYFILE_CLONE | COPYFILE_ALL) < 0)
+    if (copyfile(src_path.c_str(), dst_path.c_str(), nullptr, COPYFILE_CLONE | COPYFILE_ALL) < 0)
     {
         error->set_from_errno(errno);
         return false;
@@ -237,7 +235,7 @@ bool tr_sys_path_copy(std::string_view const src_path, std::string_view const ds
 
 #else /* USE_COPYFILE */
 
-    auto const info = tr_sys_path_get_info(src_path, 0, error);
+    auto const info = tr_sys_path_get_info(src_path.native(), 0, error);
     if (!info)
     {
         error->prefix_message("Unable to get information on source file: ");
@@ -245,7 +243,7 @@ bool tr_sys_path_copy(std::string_view const src_path, std::string_view const ds
     }
 
     /* Other OSes require us to copy between file descriptors, so open them. */
-    tr_sys_file_t const in = tr_sys_file_open(src_path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
+    tr_sys_file_t const in = tr_sys_file_open(src_path.native(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (in == TR_BAD_SYS_FILE)
     {
         error->prefix_message("Unable to open source file: ");
@@ -253,7 +251,7 @@ bool tr_sys_path_copy(std::string_view const src_path, std::string_view const ds
     }
 
     tr_sys_file_t const out = tr_sys_file_open(
-        dst_path,
+        dst_path.native(),
         TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
         0666,
         error);

@@ -330,17 +330,16 @@ TEST_F(SessionTest, savesSettings)
 
 TEST_F(SessionTest, loadTorrentsThenMagnets)
 {
-    static auto constexpr TorrentFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/archlinux-2025.05.01-x86_64.iso.torrent";
-    static auto constexpr MagnetFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/archlinux-2025.05.01-x86_64.iso.magnet";
+    static auto constexpr TorrentFile = u8"" LIBTRANSMISSION_TEST_ASSETS_DIR "/archlinux-2025.05.01-x86_64.iso.torrent"sv;
+    static auto constexpr MagnetFile = u8"" LIBTRANSMISSION_TEST_ASSETS_DIR "/archlinux-2025.05.01-x86_64.iso.magnet"sv;
 
-    if (auto error = tr_error{};
-        !tr_sys_path_copy(
-            TorrentFile,
-            tr_pathbuf{ session_->torrentDir(), "/2e34989b1c60df821b2d046c884d8f4d1858b97a.torrent"sv },
-            &error) ||
+    if (auto error = tr_error{}; !tr_sys_path_copy(
+                                     TorrentFile,
+                                     tr_u8path(session_->torrentDir()) / u8"2e34989b1c60df821b2d046c884d8f4d1858b97a.torrent"sv,
+                                     &error) ||
         !tr_sys_path_copy(
             MagnetFile,
-            tr_pathbuf{ session_->torrentDir(), "/2e34989b1c60df821b2d046c884d8f4d1858b97a.magnet"sv },
+            tr_u8path(session_->torrentDir()) / u8"2e34989b1c60df821b2d046c884d8f4d1858b97a.magnet"sv,
             &error))
     {
         GTEST_SKIP() << fmt::format("Failed to setup torrents dir: {} ({})", error.message(), error.code());
