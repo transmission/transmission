@@ -7,46 +7,36 @@
 
 @interface PeerProgressIndicatorCell ()
 
-@property(nonatomic, copy) NSDictionary* fAttributes;
+@property(nonatomic, copy, class, readonly) NSDictionary* attributes;
 
 @end
 
 @implementation PeerProgressIndicatorCell
 
-- (id)copyWithZone:(NSZone*)zone
-{
-    PeerProgressIndicatorCell* copy = [super copyWithZone:zone];
-    copy->_fAttributes = _fAttributes;
++ (NSDictionary *)attributes {
+    static NSDictionary *attributes = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
+        paragraphStyle.alignment = NSTextAlignmentRight;
 
-    return copy;
+        attributes = @{
+            NSFontAttributeName : [NSFont systemFontOfSize:11.0],
+            NSForegroundColorAttributeName : NSColor.labelColor,
+            NSParagraphStyleAttributeName : paragraphStyle
+        };
+    });
+    return attributes;
 }
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     if ([NSUserDefaults.standardUserDefaults boolForKey:@"DisplayPeerProgressBarNumber"])
     {
-        if (!self.fAttributes)
-        {
-            NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
-            paragraphStyle.alignment = NSTextAlignmentRight;
-
-            self.fAttributes = @{
-                NSFontAttributeName : [NSFont systemFontOfSize:11.0],
-                NSForegroundColorAttributeName : NSColor.labelColor,
-                NSParagraphStyleAttributeName : paragraphStyle
-            };
-        }
-
-        [[NSString percentString:self.floatValue longDecimals:NO] drawInRect:cellFrame withAttributes:self.fAttributes];
+        [[NSString percentString:self.floatValue longDecimals:NO] drawInRect:cellFrame withAttributes:self.class.attributes];
     }
     else
     {
-        //attributes not needed anymore
-        if (self.fAttributes)
-        {
-            self.fAttributes = nil;
-        }
-
         [super drawWithFrame:cellFrame inView:controlView];
         if (self.seed)
         {
