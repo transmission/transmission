@@ -167,7 +167,7 @@ private:
         std::unique_ptr<tr_web> web_ = tr_web::create(mediator_);
     };
 
-    [[nodiscard]] Icon create_from_file(std::string_view filename) const;
+    [[nodiscard]] Icon create_from_file(std::u8string_view filename) const;
     [[nodiscard]] Icon create_from_data(void const* data, size_t datalen) const;
     [[nodiscard]] std::string app_cache_dir() const;
     void add_to_ui_thread(std::function<void()> idlefunc);
@@ -192,9 +192,9 @@ private:
         // load the cached favicons
         for (auto const& sitename : tr_sys_dir_get_files(icons_dir_))
         {
-            auto const filename = fmt::format("{:s}/{:s}", icons_dir_, sitename);
+            auto const filename = tr_u8path(icons_dir_) / tr_u8path(sitename);
 
-            if (auto icon = create_from_file(filename); !icon)
+            if (auto icon = create_from_file(filename.u8string()); !icon)
             {
                 tr_sys_path_remove(filename);
             }

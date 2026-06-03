@@ -247,7 +247,7 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
         {
             tr_logAddInfo(fmt::format(fmt::runtime(_("Removing torrent file '{path}'")), fmt::arg("path", basename)));
 
-            if (auto error = tr_error{}; !tr_sys_path_remove(filename, &error))
+            if (auto error = tr_error{}; !tr_sys_path_remove(tr_u8path(filename), &error))
             {
                 tr_logAddError(
                     fmt::format(
@@ -1031,7 +1031,7 @@ CLEANUP:
     /* cleanup */
     if (pidfile_created)
     {
-        tr_sys_path_remove(pid_filename);
+        tr_sys_path_remove(tr_u8path(pid_filename));
     }
 
     sd_notify(0, "STATUS=\n");

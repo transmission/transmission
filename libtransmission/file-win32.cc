@@ -534,23 +534,23 @@ bool tr_sys_path_copy(std::filesystem::path const& src_path, std::filesystem::pa
     return true;
 }
 
-bool tr_sys_path_remove(std::string_view const path, tr_error* error)
+bool tr_sys_path_remove(std::filesystem::path const& path, tr_error* error)
 {
     bool ret = false;
 
-    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
+    if (auto const long_path = to_long_path(path); !std::empty(long_path))
     {
-        DWORD const attributes = GetFileAttributesW(wide_path.c_str());
+        DWORD const attributes = GetFileAttributesW(long_path.c_str());
 
         if (attributes != INVALID_FILE_ATTRIBUTES)
         {
             if ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
             {
-                ret = to_bool(RemoveDirectoryW(wide_path.c_str()));
+                ret = to_bool(RemoveDirectoryW(long_path.c_str()));
             }
             else
             {
-                ret = to_bool(DeleteFileW(wide_path.c_str()));
+                ret = to_bool(DeleteFileW(long_path.c_str()));
             }
         }
     }

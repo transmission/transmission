@@ -281,7 +281,7 @@ bool tr_sys_path_rename(std::string_view src_path, std::string_view dst_path, tr
  *         Directory removal will only succeed if it is empty (contains no other
  *         files and directories).
  */
-bool tr_sys_path_remove(std::string_view path, tr_error* error = nullptr);
+bool tr_sys_path_remove(std::filesystem::path const& path, tr_error* error = nullptr);
 
 /**
  * @brief Transform path separators to native ones, in-place.

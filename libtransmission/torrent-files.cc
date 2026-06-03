@@ -245,7 +245,7 @@ bool tr_torrent_files::move(
                 // Since the files have already been moved, errors in this step
                 // are considered secondary and aren't propagated back in `err`.
                 // Log them instead.
-                if (auto log_error = tr_error{}; !tr_sys_path_remove(path, &log_error))
+                if (auto log_error = tr_error{}; !tr_sys_path_remove(tr_u8path(path), &log_error))
                 {
                     tr_logAddWarn(
                         fmt::format(
@@ -341,7 +341,7 @@ void tr_torrent_files::remove(
     // directories -- so plan B is to remove everything bottom-up.
     depth_first_walk(tmpdir, func_wrapper, 1);
     depth_first_walk(tmpdir, func_wrapper);
-    tr_sys_path_remove(tmpdir);
+    tr_sys_path_remove(tr_u8path(tmpdir));
 
     // OK we've removed the local data.
     // What's left are empty folders, junk, and user-generated files.
@@ -350,7 +350,7 @@ void tr_torrent_files::remove(
     {
         if (is_empty_folder(filename) || is_junk_file(filename))
         {
-            tr_sys_path_remove(filename);
+            tr_sys_path_remove(tr_u8path(filename));
         }
     };
     for (auto const& filename : top_files)

@@ -186,7 +186,7 @@ bool tr_file_move(std::string_view oldpath, std::string_view newpath, bool allow
         return false;
     }
 
-    if (auto log_error = tr_error{}; !tr_sys_path_remove(oldpath, &log_error))
+    if (auto log_error = tr_error{}; !tr_sys_path_remove(tr_u8path(oldpath), &log_error))
     {
         tr_logAddError(
             fmt::format(

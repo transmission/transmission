@@ -42,8 +42,8 @@ protected:
         EXPECT_TRUE(filesAreIdentical(path1, path2));
 
         /* Dispose of those files that we created. */
-        tr_sys_path_remove(path1.string());
-        tr_sys_path_remove(path2.string());
+        tr_sys_path_remove(path1);
+        tr_sys_path_remove(path2);
     }
 
 private:

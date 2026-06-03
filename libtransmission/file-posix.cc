@@ -416,11 +416,9 @@ bool tr_sys_path_copy(std::filesystem::path const& src_path, std::filesystem::pa
 #endif /* USE_COPYFILE */
 }
 
-bool tr_sys_path_remove(std::string_view const path, tr_error* error)
+bool tr_sys_path_remove(std::filesystem::path const& path, tr_error* error)
 {
-    auto const sz_path = tr_pathbuf{ path };
-
-    bool const ret = remove(sz_path.c_str()) != -1;
+    bool const ret = remove(path.c_str()) != -1;
 
     if (error != nullptr && !ret)
     {

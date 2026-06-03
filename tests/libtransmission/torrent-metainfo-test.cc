@@ -140,28 +140,28 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
 TEST_F(TorrentMetainfoTest, ctorSaveContents)
 {
     auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
-    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
-    auto const tgt_filename = tr_pathbuf{ sandbox, "save-contents-test.torrent" };
+    auto const src_filename = std::filesystem::path{ u8"" LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent"sv };
+    auto const tgt_filename = tr_u8path(sandbox) / u8"save-contents-test.torrent"sv;
 
     // try saving without passing any metainfo.
     auto* ctor = tr_ctorNew(session_);
     auto error = tr_error{};
-    EXPECT_FALSE(ctor->save(tgt_filename, &error));
+    EXPECT_FALSE(ctor->save(tgt_filename.string(), &error));
     EXPECT_TRUE(error);
     EXPECT_EQ(EINVAL, error.code());
     error = {};
 
     // now try saving _with_ metainfo
-    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename, &error));
+    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.string(), &error));
     EXPECT_FALSE(error) << error;
-    EXPECT_TRUE(ctor->save(tgt_filename, &error));
+    EXPECT_TRUE(ctor->save(tgt_filename.string(), &error));
     EXPECT_FALSE(error) << error;
 
     // the saved contents should match the source file's contents
     auto src_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_file_read(src_filename.sv(), src_contents, &error));
+    EXPECT_TRUE(tr_file_read(src_filename.string(), src_contents, &error));
     auto tgt_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_file_read(tgt_filename.sv(), tgt_contents, &error));
+    EXPECT_TRUE(tr_file_read(tgt_filename.string(), tgt_contents, &error));
     EXPECT_EQ(src_contents, tgt_contents);
 
     // cleanup

@@ -734,7 +734,7 @@ bool tr_torrent_metainfo::migrate_file(
     auto const new_filename = make_filename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
     if (tr_sys_path_exists(new_filename))
     {
-        tr_sys_path_remove(old_filename);
+        tr_sys_path_remove(tr_u8path(old_filename));
         return false;
     }
 
@@ -760,8 +760,8 @@ void tr_torrent_metainfo::remove_file(
     std::string_view suffix)
 {
     auto filename = make_filename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    tr_sys_path_remove(filename, nullptr);
+    tr_sys_path_remove(tr_u8path(filename), nullptr);
 
     filename = make_filename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    tr_sys_path_remove(filename, nullptr);
+    tr_sys_path_remove(tr_u8path(filename), nullptr);
 }

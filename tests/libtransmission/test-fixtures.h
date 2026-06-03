@@ -183,7 +183,7 @@ protected:
                 std::cerr << "cleanup: removing '" << filename << "'\n";
             }
 
-            tr_sys_path_remove(filename);
+            tr_sys_path_remove(tr_u8path(filename));
         };
 
         depthFirstWalk(path.c_str(), remove);

@@ -12,6 +12,7 @@
 #endif
 
 #include <fmt/format.h>
+#include <fmt/std.h>
 
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/error-types.h"
@@ -28,9 +29,12 @@ using namespace std::literals;
 namespace
 {
 
-void get_lockfile_path(std::string_view session_id, tr_pathbuf& path)
+auto get_lockfile_path(std::string_view session_id)
 {
-    fmt::format_to(std::back_inserter(path), "{:s}/tr_session_id_{:s}", tr_getSessionIdDir(), session_id);
+    auto ret = tr_u8path(tr_getSessionIdDir());
+    ret /= u8"tr_session_id_"sv;
+    ret += tr_u8path(session_id);
+    return ret;
 }
 
 tr_sys_file_t create_lockfile(std::string_view session_id)
@@ -40,11 +44,14 @@ tr_sys_file_t create_lockfile(std::string_view session_id)
         return TR_BAD_SYS_FILE;
     }
 
-    auto lockfile_path = tr_pathbuf{};
-    get_lockfile_path(session_id, lockfile_path);
+    auto const lockfile_path = get_lockfile_path(session_id);
 
     auto error = tr_error{};
-    auto lockfile_fd = tr_sys_file_open(lockfile_path, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, &error);
+    auto lockfile_fd = tr_sys_file_open(
+        lockfile_path.string(),
+        TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE,
+        0600,
+        &error);
 
     if (lockfile_fd != TR_BAD_SYS_FILE)
     {
@@ -84,8 +91,7 @@ void destroy_lockfile(tr_sys_file_t lockfile_fd, std::string_view session_id)
 
     if (!std::empty(session_id))
     {
-        auto lockfile_path = tr_pathbuf{};
-        get_lockfile_path(session_id, lockfile_path);
+        auto const lockfile_path = get_lockfile_path(session_id);
         tr_sys_path_remove(lockfile_path);
     }
 }
@@ -125,10 +131,10 @@ bool tr_session_id::is_local(std::string_view session_id)
     }
 
     auto is_local = false;
-    auto lockfile_path = tr_pathbuf{};
-    get_lockfile_path(session_id, lockfile_path);
+    auto const lockfile_path = get_lockfile_path(session_id);
     auto error = tr_error{};
-    if (auto lockfile_fd = tr_sys_file_open(lockfile_path, TR_SYS_FILE_READ, 0, &error); lockfile_fd == TR_BAD_SYS_FILE)
+    if (auto lockfile_fd = tr_sys_file_open(lockfile_path.string(), TR_SYS_FILE_READ, 0, &error);
+        lockfile_fd == TR_BAD_SYS_FILE)
     {
         if (tr_error_is_enoent(error.code()))
         {

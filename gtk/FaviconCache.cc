@@ -15,11 +15,15 @@ using namespace tr::app;
 using Icon = Glib::RefPtr<Gdk::Pixbuf>;
 
 template<>
-Icon FaviconCache<Icon>::create_from_file(std::string_view filename) const
+Icon FaviconCache<Icon>::create_from_file(std::u8string_view filename) const
 {
     try
     {
-        return Gdk::Pixbuf::create_from_file(std::string{ filename }, Width, Height, false);
+        return Gdk::Pixbuf::create_from_file(
+            std::string(reinterpret_cast<char const*>(filename.data()), filename.size()),
+            Width,
+            Height,
+            false);
     }
     catch (Glib::Error const&)
     {

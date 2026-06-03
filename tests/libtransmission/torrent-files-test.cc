@@ -82,8 +82,8 @@ TEST_F(TorrentFilesTest, clear)
 TEST_F(TorrentFilesTest, find)
 {
     static auto constexpr Contents = "hello"sv;
-    auto const filename = tr_pathbuf{ sandboxDir(), "/first_dir/hello.txt"sv };
-    createFileWithContents(std::string{ filename }, std::data(Contents), std::size(Contents));
+    auto const filename = tr_u8path(sandboxDir()) / u8"first_dir/hello.txt"sv;
+    createFileWithContents(filename.string(), std::data(Contents), std::size(Contents));
 
     auto files = tr_torrent_files{};
     auto const file_index = files.add("first_dir/hello.txt", 1024);
@@ -105,20 +105,21 @@ TEST_F(TorrentFilesTest, find)
     EXPECT_EQ(filename, found->filename());
 
     // now make it an incomplete file
-    auto const partial_filename = tr_pathbuf{ filename, tr_torrent_files::PartialFileSuffix };
-    EXPECT_TRUE(tr_sys_path_rename(filename, partial_filename));
+    auto partial_filename = filename;
+    partial_filename += tr_u8path(tr_torrent_files::PartialFileSuffix);
+    EXPECT_TRUE(tr_sys_path_rename(filename.string(), partial_filename.string()));
     search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
     found = files.find(file_index, std::data(search_path), std::size(search_path));
     EXPECT_TRUE(found.has_value());
     assert(found.has_value());
-    EXPECT_EQ(partial_filename, found->filename());
+    EXPECT_EQ(partial_filename.string(), found->filename());
 
     // same search, but with the search paths reversed
     search_path = std::vector<std::string_view>{ search_path_2.sv(), search_path_1.sv() };
     found = files.find(file_index, std::data(search_path), std::size(search_path));
     EXPECT_TRUE(found.has_value());
     assert(found.has_value());
-    EXPECT_EQ(partial_filename, found->filename());
+    EXPECT_EQ(partial_filename.string(), found->filename());
 
     // what about if we look for a file that does not exist
     EXPECT_TRUE(tr_sys_path_remove(partial_filename));

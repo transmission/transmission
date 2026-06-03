@@ -139,7 +139,7 @@ bool tr_torrent::use_metainfo_from_file(tr_torrent_metainfo const* metainfo, cha
     }
 
     // remove .magnet file
-    tr_sys_path_remove(magnet_file());
+    tr_sys_path_remove(tr_u8path(magnet_file()));
 
     // tor should keep this metainfo
     set_metainfo(*metainfo);
@@ -245,7 +245,7 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
     }
 
     // remove .magnet file
-    tr_sys_path_remove(magnet_file());
+    tr_sys_path_remove(tr_u8path(magnet_file()));
 
     // tor should keep this metainfo
     set_metainfo(metainfo);

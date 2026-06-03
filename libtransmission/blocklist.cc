@@ -507,7 +507,7 @@ std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
 
     // make a copy of `external_file` for our own safekeeping
     auto const src_file = std::move(tr_u8path(bin_file).replace_extension());
-    tr_sys_path_remove(src_file.string());
+    tr_sys_path_remove(src_file);
     auto error = tr_error{};
     auto const copied = tr_sys_path_copy(tr_u8path(external_file), src_file, &error);
     if (error)

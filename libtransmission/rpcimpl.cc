@@ -21,6 +21,7 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <fmt/std.h>
 
 #include <small/map.hpp>
 
@@ -1625,8 +1626,8 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
-    auto const filename = tr_pathbuf{ session->configDir(), "/blocklist.tmp"sv };
-    if (auto error = tr_error{}; !tr_file_save(filename, content, &error))
+    auto const filename = tr_u8path(session->configDir()) / u8"blocklist.tmp"sv;
+    if (auto error = tr_error{}; !tr_file_save(filename.string(), content, &error))
     {
         tr_rpc_idle_done(
             data,
@@ -1640,7 +1641,7 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     }
 
     // feed it to the session and give the client a response
-    auto const blocklist_size = tr_blocklistSetContent(session, filename);
+    auto const blocklist_size = tr_blocklistSetContent(session, filename.string());
     tr_sys_path_remove(filename);
     if (!blocklist_size)
     {
