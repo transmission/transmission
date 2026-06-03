@@ -13,7 +13,8 @@
 
 @implementation PeerProgressIndicatorCell
 
-+ (NSDictionary *)attributes {
++ (NSDictionary *)attributes
+{
     static NSDictionary *attributes = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
