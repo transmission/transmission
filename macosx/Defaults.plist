@@ -18,6 +18,10 @@
 	<string></string>
 	<key>BindInterfaceMode</key>
 	<string>literal</string>
+	<key>BindInterfaceProviderIdentifier</key>
+	<string></string>
+	<key>BindInterfaceServiceName</key>
+	<string></string>
 	<key>BlocklistAutoUpdate</key>
 	<false/>
 	<key>BlocklistNew</key>

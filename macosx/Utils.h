@@ -11,6 +11,8 @@ extern NSString* const TRBindInterfaceModeActiveVPN;
 extern NSString* const TRBindInterfaceActiveVPNMenuValue;
 extern NSString* const TRNoActiveVPNBindInterfaceName;
 extern NSString* const TRActiveVPNBindInterfaceDidChangeNotification;
+extern NSString* const TRBindInterfaceServiceNameDefaultsKey;
+extern NSString* const TRBindInterfaceProviderIdentifierDefaultsKey;
 
 extern NSString* const TRActiveVPNResolutionInterfaceKey;
 extern NSString* const TRActiveVPNResolutionDisplayNameKey;
@@ -27,6 +29,7 @@ bool isRatioEqual(CGFloat old_ratio, CGFloat new_ratio);
 
 NSArray<NSString*>* TRActiveNetworkInterfaceNames(void);
 NSDictionary<NSString*, id>* TRResolveActiveVPNInterface(void);
+NSDictionary<NSString*, id>* TRResolveActiveVPNInterfaceMatchingIdentity(NSString* serviceName, NSString* providerIdentifier);
 void TRPopulateBindInterfacePopUp(NSPopUpButton* popUp, NSString* selectedInterface, BOOL includeInherit, NSString* defaultRouteValue);
 void TRPopulateAppBindInterfacePopUp(NSPopUpButton* popUp, NSString* selectedInterface, NSString* selectedMode);
 NSString* TRBindInterfacePopUpValue(NSPopUpButton* popUp);

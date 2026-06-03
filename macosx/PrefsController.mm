@@ -44,6 +44,21 @@ static char const* const kRPCKeychainName = "Remote";
 
 static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
+static NSString* TRDisplayableBindInterface(NSString* bindInterface)
+{
+    return [bindInterface isEqualToString:TRNoActiveVPNBindInterfaceName] ? @"" : (bindInterface ?: @"");
+}
+
+static NSString* TRDisplayableSessionBindInterface(NSString* bindInterface)
+{
+    if ([bindInterface isEqualToString:TRNoActiveVPNBindInterfaceName])
+    {
+        return NSLocalizedString(@"No active VPN; traffic blocked", "Preferences -> Network -> bind interface info");
+    }
+
+    return bindInterface.length > 0 ? bindInterface : NSLocalizedString(@"Automatic", "Preferences -> Network -> bind interface info");
+}
+
 @interface PrefsController ()<NSWindowRestoration>
 
 @property(nonatomic, readonly) tr_session* fHandle;
@@ -101,6 +116,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic) NSTextField* fBindInterfaceStatusField;
 @property(nonatomic) NSButton* fBindInterfaceInfoButton;
 @property(nonatomic) NSPopover* fBindInterfaceInfoPopover;
+@property(nonatomic, copy) NSString* fActiveVPNPortProbeBindInterface;
 @property(nonatomic) NSTimer* fPortStatusTimer;
 @property(nonatomic) int fPeerPort, fNatStatus;
 
@@ -111,6 +127,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic) IBOutlet NSSegmentedControl* fRPCAddRemoveControl;
 @property(nonatomic, copy) NSString* fRPCPassword;
 @property(nonatomic, readonly) DefaultAppHelper* fDefaultAppHelper;
+
+- (void)activeVPNBindInterfaceDidChange:(NSNotification*)notification;
 
 @end
 
@@ -298,7 +316,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
                                                name:NSControlTextDidChangeNotification
                                              object:self.fBlocklistURLField];
 
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateBindInterfaceStatus)
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(activeVPNBindInterfaceDidChange:)
                                                name:TRActiveVPNBindInterfaceDidChangeNotification
                                              object:nil];
 
@@ -529,7 +547,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 {
     if (![self usesActiveVPNBindInterface])
     {
-        NSString* bindInterface = [self.fDefaults stringForKey:@"BindInterface"];
+        NSString* bindInterface = TRDisplayableBindInterface([self.fDefaults stringForKey:@"BindInterface"]);
         return bindInterface.length > 0 ?
             [NSString stringWithFormat:NSLocalizedString(@"Literal interface: %@", "Preferences -> Network -> bind interface status"),
                                        bindInterface] :
@@ -550,7 +568,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         return NSLocalizedString(@"VPN tunnel ambiguous; traffic blocked", "Preferences -> Network -> bind interface status");
     }
 
-    NSString* lastInterface = [self.fDefaults stringForKey:@"BindInterface"];
+    NSString* lastInterface = TRDisplayableBindInterface([self.fDefaults stringForKey:@"BindInterface"]);
     return lastInterface.length > 0 ?
         [NSString stringWithFormat:NSLocalizedString(@"No active VPN; blocked on %@", "Preferences -> Network -> bind interface status"),
                                    lastInterface] :
@@ -586,14 +604,31 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
                          candidates.count > 0 ? [candidates componentsJoinedByString:@", "] :
                                                 NSLocalizedString(@"None", "Preferences -> Network -> bind interface info"),
                          NSLocalizedString(@"Session bind", "Preferences -> Network -> bind interface info"),
-                         sessionInterface.length > 0 ? sessionInterface :
-                                                       NSLocalizedString(@"Automatic", "Preferences -> Network -> bind interface info")];
+                         TRDisplayableSessionBindInterface(sessionInterface)];
 }
 
 - (void)updateBindInterfaceStatus
 {
     self.fBindInterfaceStatusField.stringValue = [self bindInterfaceStatusString];
     self.fBindInterfaceStatusField.toolTip = [self bindInterfaceInfoString];
+}
+
+- (void)activeVPNBindInterfaceDidChange:(NSNotification*)notification
+{
+    NSDictionary<NSString*, id>* status = [notification.userInfo isKindOfClass:NSDictionary.class] ? notification.userInfo : @{};
+    NSString* resolvedInterface = status[TRActiveVPNResolutionInterfaceKey];
+    NSString* activeVPNBindInterface = resolvedInterface.length > 0 ? resolvedInterface : TRNoActiveVPNBindInterfaceName;
+    BOOL const probeBindChanged = ![self.fActiveVPNPortProbeBindInterface isEqualToString:activeVPNBindInterface];
+
+    [self updateBindInterfaceMenu];
+
+    if ([self usesActiveVPNBindInterface] && probeBindChanged)
+    {
+        self.fActiveVPNPortProbeBindInterface = activeVPNBindInterface;
+        self.fPeerPort = -1;
+        self.fNatStatus = -1;
+        [self updatePortStatus];
+    }
 }
 
 - (void)showBindInterfaceInfo:(id)sender
@@ -642,6 +677,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     {
         NSString* bindInterface = TRBindInterfacePopUpValue(self.fBindInterfacePopUp);
         [self.fDefaults setObject:bindInterface forKey:@"BindInterface"];
+        [self.fDefaults setObject:@"" forKey:TRBindInterfaceServiceNameDefaultsKey];
+        [self.fDefaults setObject:@"" forKey:TRBindInterfaceProviderIdentifierDefaultsKey];
         tr_sessionSetBindInterface(self.fHandle, bindInterface.UTF8String);
     }
 
