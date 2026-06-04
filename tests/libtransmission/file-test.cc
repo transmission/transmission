@@ -47,10 +47,10 @@ namespace tr::test
 class FileTest : public SandboxedTest
 {
 protected:
-    auto createTestDir(std::string const& child_name)
+    auto createTestDir(std::string_view const test_name) const
     {
-        auto test_dir = tr_pathbuf{ sandboxDir(), '/', child_name };
-        tr_sys_dir_create(test_dir, 0, 0777);
+        auto test_dir = tr_u8path(sandboxDir()) / tr_u8path(test_name);
+        tr_sys_dir_create(test_dir.string(), 0, 0777);
         return test_dir;
     }
 
@@ -188,7 +188,7 @@ protected:
 
 TEST_F(FileTest, getInfo)
 {
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     auto const path1 = test_dir / u8"a"sv;
     auto const path2 = test_dir / u8"b"sv;
@@ -285,13 +285,13 @@ TEST_F(FileTest, readFile)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path = tr_pathbuf{ test_dir, "/a.txt"sv };
+    auto const path = test_dir / u8"a.txt"sv;
     auto constexpr Contents = "hello, world!"sv;
-    createFileWithContents(path, Contents);
+    createFileWithContents(path.string(), Contents);
 
     auto n_read = uint64_t{};
     auto buf = std::array<char, 64>{};
-    auto fd = tr_sys_file_open(path, TR_SYS_FILE_READ, 0);
+    auto fd = tr_sys_file_open(path.string(), TR_SYS_FILE_READ, 0);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     // successful read
@@ -314,7 +314,7 @@ TEST_F(FileTest, readFile)
 
 TEST_F(FileTest, pathExists)
 {
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     auto const path1 = test_dir / u8"a"sv;
     auto const path2 = test_dir / u8"b"sv;
@@ -413,7 +413,7 @@ TEST_F(FileTest, pathIsSame)
 {
     // NOLINTBEGIN(readability-suspicious-call-argument)
 
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     auto const path1 = test_dir / u8"a"sv;
     auto const path2 = test_dir / u8"b"sv;
@@ -619,7 +619,7 @@ TEST_F(FileTest, pathIsSame)
 
 TEST_F(FileTest, pathResolve)
 {
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     auto error = tr_error{};
     auto const path1 = test_dir / u8"a"sv;
@@ -829,7 +829,7 @@ TEST_F(FileTest, pathDirname)
 
 TEST_F(FileTest, pathRename)
 {
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     auto const path1 = test_dir / u8"a"sv;
     auto const path2 = test_dir / u8"b"sv;
@@ -936,7 +936,7 @@ TEST_F(FileTest, pathRename)
 
 TEST_F(FileTest, pathRemove)
 {
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     auto const path1 = test_dir / u8"a"sv;
     auto const path2 = test_dir / u8"b"sv;
@@ -1000,7 +1000,7 @@ TEST_F(FileTest, pathNativeSeparators)
 
 TEST_F(FileTest, fileCopy)
 {
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     auto const path1 = test_dir / u8"a.txt"sv;
     auto const path2 = test_dir / u8"b.txt"sv;
@@ -1034,7 +1034,7 @@ TEST_F(FileTest, fileCopy)
 
 TEST_F(FileTest, fileOpen)
 {
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     // can't open non-existent file
     auto const path1 = test_dir / u8"a"sv;
@@ -1110,7 +1110,7 @@ TEST_F(FileTest, fileOpen)
 
 TEST_F(FileTest, fileTruncate)
 {
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     auto const path = test_dir / u8"a"sv;
     auto fd = tr_sys_file_open(path.string(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
@@ -1169,7 +1169,7 @@ TEST_F(FileTest, fileTruncate)
 
 TEST_F(FileTest, filePreallocate)
 {
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     auto const path1 = test_dir / u8"a"sv;
     auto fd = tr_sys_file_open(path1.string(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
@@ -1230,7 +1230,7 @@ TEST_F(FileTest, filePreallocate)
 
 TEST_F(FileTest, dirCreate)
 {
-    auto const test_dir = tr_u8path(createTestDir(currentTestName()));
+    auto const test_dir = createTestDir(currentTestName());
 
     auto const path1 = test_dir / u8"a"sv;
     auto const path2 = path1 / u8"b"sv;
@@ -1284,12 +1284,12 @@ TEST_F(FileTest, dirCreateTemp)
     auto const test_dir = createTestDir(currentTestName());
 
     auto error = tr_error{};
-    auto path = tr_pathbuf{ test_dir, "/test-XXXXXX" };
+    auto path = tr_pathbuf{ test_dir.string(), "/test-XXXXXX" };
     EXPECT_TRUE(tr_sys_dir_create_temp(std::data(path), &error));
     EXPECT_FALSE(error) << error;
     tr_sys_path_remove(tr_u8path(path));
 
-    path.assign(test_dir, "/path-does-not-exist/test-XXXXXX");
+    path.assign(test_dir.string(), "/path-does-not-exist/test-XXXXXX");
     EXPECT_FALSE(tr_sys_dir_create_temp(std::data(path), &error));
     EXPECT_TRUE(error);
 }
@@ -1298,8 +1298,8 @@ TEST_F(FileTest, dirRead)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
-    auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
+    auto const path1 = test_dir / u8"a"sv;
+    auto const path2 = test_dir / u8"b"sv;
 
     auto have1 = bool{};
     auto have2 = bool{};
@@ -1307,17 +1307,17 @@ TEST_F(FileTest, dirRead)
     EXPECT_FALSE(have1);
     EXPECT_FALSE(have2);
 
-    createFileWithContents(path1, "test");
+    createFileWithContents(path1.string(), "test");
     testDirReadImpl(test_dir, &have1, &have2);
     EXPECT_TRUE(have1);
     EXPECT_FALSE(have2);
 
-    createFileWithContents(path2, "test");
+    createFileWithContents(path2.string(), "test");
     testDirReadImpl(test_dir, &have1, &have2);
     EXPECT_TRUE(have1);
     EXPECT_TRUE(have2);
 
-    tr_sys_path_remove(tr_u8path(path1));
+    tr_sys_path_remove(path1);
     testDirReadImpl(test_dir, &have1, &have2);
     EXPECT_FALSE(have1);
     EXPECT_TRUE(have2);
@@ -1327,9 +1327,9 @@ TEST_F(FileTest, dirOpen)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const file = tr_pathbuf{ test_dir, "/foo.fxt" };
+    auto const file = test_dir / u8"foo.fxt"sv;
     auto constexpr Contents = "hello, world!"sv;
-    createFileWithContents(file, std::data(Contents), std::size(Contents));
+    createFileWithContents(file.string(), std::data(Contents), std::size(Contents));
 
     // path does not exist
     auto err = tr_error{};
@@ -1339,13 +1339,13 @@ TEST_F(FileTest, dirOpen)
     err = {};
 
     // path is not a directory
-    odir = tr_sys_dir_open(file, &err);
+    odir = tr_sys_dir_open(file.string(), &err);
     EXPECT_EQ(TR_BAD_SYS_DIR, odir);
     EXPECT_TRUE(err);
     err = {};
 
     // path exists and is readable
-    odir = tr_sys_dir_open(test_dir, &err);
+    odir = tr_sys_dir_open(test_dir.string(), &err);
     EXPECT_NE(TR_BAD_SYS_DIR, odir);
     EXPECT_FALSE(err);
     auto files = std::set<std::string>{};
