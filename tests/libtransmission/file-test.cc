@@ -71,15 +71,11 @@ protected:
         return !ec;
     }
 
-    static bool createHardlink(char const* dst_path, char const* src_path)
+    static bool createHardlink(std::filesystem::path const& dst_path, std::filesystem::path const& src_path)
     {
-#ifndef _WIN32
-        return link(src_path, dst_path) != -1;
-#else
-        auto const wide_src_path = tr_win32_utf8_to_native(src_path);
-        auto const wide_dst_path = tr_win32_utf8_to_native(dst_path);
-        return CreateHardLinkW(wide_dst_path.c_str(), wide_src_path.c_str(), nullptr) != 0;
-#endif
+        auto ec = std::error_code{};
+        std::filesystem::create_hard_link(src_path, dst_path, ec);
+        return !ec;
     }
 
     static void clearPathInfo(tr_sys_path_info* info)
@@ -587,14 +583,14 @@ TEST_F(FileTest, pathIsSame)
 
     createFileWithContents(path1.string(), "test");
 
-    if (createHardlink(path2.string().c_str(), path1.string().c_str()))
+    if (createHardlink(path2, path1))
     {
         /* File and hardlink to it are the same */
         EXPECT_TRUE(tr_sys_path_is_same(path1.string(), path2.string(), &error));
         EXPECT_FALSE(error) << error;
 
         /* Two hardlinks to the same file are the same */
-        createHardlink(path3.string().c_str(), path2.string().c_str());
+        createHardlink(path3, path2);
         EXPECT_TRUE(tr_sys_path_is_same(path2.string(), path3.string(), &error));
         EXPECT_FALSE(error) << error;
         EXPECT_TRUE(tr_sys_path_is_same(path1.string(), path3.string(), &error));
@@ -609,7 +605,7 @@ TEST_F(FileTest, pathIsSame)
 
         /* File and hardlink to another file are not the same */
         createFileWithContents(path3.string(), "test");
-        createHardlink(path2.string().c_str(), path3.string().c_str());
+        createHardlink(path2, path3);
         EXPECT_FALSE(tr_sys_path_is_same(path1.string(), path2.string(), &error));
         EXPECT_FALSE(error) << error;
         EXPECT_FALSE(tr_sys_path_is_same(path2.string(), path1.string(), &error));
@@ -623,7 +619,7 @@ TEST_F(FileTest, pathIsSame)
         fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 
-    if (createSymlink(path2, path1, false) && createHardlink(path3.string().c_str(), path1.string().c_str()))
+    if (createSymlink(path2, path1, false) && createHardlink(path3, path1))
     {
         EXPECT_TRUE(tr_sys_path_is_same(path2.string(), path3.string(), &error));
         EXPECT_FALSE(error) << error;
@@ -933,7 +929,7 @@ TEST_F(FileTest, pathRename)
         fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 
-    if (createHardlink(path2.string().c_str(), path1.string().c_str()))
+    if (createHardlink(path2, path1))
     {
         /* Preconditions */
         EXPECT_TRUE(tr_sys_path_exists(path2.string()));
