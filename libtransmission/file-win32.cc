@@ -226,7 +226,7 @@ std::string native_path_to_path(std::wstring_view wide_path)
 }
 
 [[nodiscard]] bool create_dir(
-    std::string_view const path,
+    std::filesystem::path const& path,
     int const flags,
     int /*permissions*/,
     bool const okay_if_exists,
@@ -234,7 +234,6 @@ std::string native_path_to_path(std::wstring_view wide_path)
 {
     bool ret = false;
     DWORD error_code = ERROR_SUCCESS;
-    auto const wide_path = path_to_native_path(path);
 
     // already exists (no-op)
     if (auto const info = tr_sys_path_get_info(path); info && info->isFolder())
@@ -242,14 +241,15 @@ std::string native_path_to_path(std::wstring_view wide_path)
         return true;
     }
 
+    auto const long_path = to_long_path(path);
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
-        error_code = SHCreateDirectoryExW(nullptr, wide_path.c_str(), nullptr);
+        error_code = SHCreateDirectoryExW(nullptr, long_path.c_str(), nullptr);
         ret = error_code == ERROR_SUCCESS;
     }
     else
     {
-        ret = to_bool(CreateDirectoryW(wide_path.c_str(), nullptr));
+        ret = to_bool(CreateDirectoryW(long_path.c_str(), nullptr));
 
         if (!ret)
         {
@@ -259,7 +259,7 @@ std::string native_path_to_path(std::wstring_view wide_path)
 
     if (!ret && error_code == ERROR_ALREADY_EXISTS && okay_if_exists)
     {
-        DWORD const attributes = GetFileAttributesW(wide_path.c_str());
+        DWORD const attributes = GetFileAttributesW(long_path.c_str());
 
         if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
         {
@@ -276,11 +276,9 @@ std::string native_path_to_path(std::wstring_view wide_path)
 }
 
 template<typename CallbackT>
-void create_temp_path(char* path_template, CallbackT const& callback, tr_error* error)
+void create_temp_path(std::filesystem::path& path_template, CallbackT const& callback, tr_error* error)
 {
-    TR_ASSERT(path_template != nullptr);
-
-    auto path = std::string{ path_template };
+    auto path = path_template.native();
     auto path_size = std::size(path);
 
     TR_ASSERT(path_size > 0);
@@ -291,9 +289,9 @@ void create_temp_path(char* path_template, CallbackT const& callback, tr_error* 
     {
         size_t i = path_size;
 
-        while (i > 0 && path_template[i - 1] == 'X')
+        while (i > 0 && path[i - 1] == L'X')
         {
-            static auto constexpr Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"sv;
+            static auto constexpr Chars = L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"sv;
             path[i - 1] = Chars[tr_rand_int(std::size(Chars))];
             --i;
         }
@@ -302,7 +300,7 @@ void create_temp_path(char* path_template, CallbackT const& callback, tr_error* 
 
         local_error = {};
 
-        callback(path.c_str(), &local_error);
+        callback(path, &local_error);
 
         if (!local_error)
         {
@@ -312,7 +310,7 @@ void create_temp_path(char* path_template, CallbackT const& callback, tr_error* 
 
     if (!local_error)
     {
-        std::copy_n(std::begin(path), path_size, path_template);
+        path_template = path;
     }
     else if (error != nullptr)
     {
@@ -882,15 +880,13 @@ std::string tr_sys_dir_get_current(tr_error* error)
     return {};
 }
 
-bool tr_sys_dir_create_temp(char* path_template, tr_error* error)
+bool tr_sys_dir_create_temp(std::filesystem::path& path_template, tr_error* error)
 {
-    TR_ASSERT(path_template != nullptr);
-
     bool ret = false;
 
     create_temp_path(
         path_template,
-        [&ret](char const* path, tr_error* error) { ret = create_dir(path, 0, 0, false, error); },
+        [&ret](std::filesystem::path const& path, tr_error* error) { ret = create_dir(path, 0, 0, false, error); },
         error);
 
     return ret;

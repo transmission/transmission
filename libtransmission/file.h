@@ -497,7 +497,7 @@ bool tr_sys_dir_create(std::string_view path, int flags, int permissions, tr_err
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_dir_create_temp(char* path_template, tr_error* error = nullptr);
+bool tr_sys_dir_create_temp(std::filesystem::path& path_template, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `opendir()`.

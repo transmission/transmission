@@ -902,19 +902,21 @@ std::string tr_sys_dir_get_current(tr_error* error)
     }
 }
 
-bool tr_sys_dir_create_temp(char* path_template, tr_error* error)
+bool tr_sys_dir_create_temp(std::filesystem::path& path_template, tr_error* error)
 {
-    TR_ASSERT(path_template != nullptr);
+    auto path = path_template.native();
 
 #ifdef HAVE_MKDTEMP
 
-    bool const ret = mkdtemp(path_template) != nullptr;
+    bool const ret = mkdtemp(path.data()) != nullptr;
 
 #else
 
-    bool const ret = mktemp(path_template) != nullptr && mkdir(path_template, 0700) != -1;
+    bool const ret = mktemp(path.data()) != nullptr && mkdir(path.c_str(), 0700) != -1;
 
 #endif
+
+    path_template = path;
 
     if (error != nullptr && !ret)
     {

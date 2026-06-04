@@ -291,8 +291,9 @@ void tr_torrent_files::remove(
     }
 
     // try to make a tmpdir
-    auto tmpdir = tr_pathbuf{ parent, '/', tmpdir_prefix, "__XXXXXX"sv };
-    if (!tr_sys_dir_create_temp(std::data(tmpdir), error))
+    auto tmpdir = tr_u8path(parent) / tr_u8path(tmpdir_prefix);
+    tmpdir += u8"__XXXXXX"sv;
+    if (!tr_sys_dir_create_temp(tmpdir, error))
     {
         return;
     }
@@ -304,7 +305,7 @@ void tr_torrent_files::remove(
         if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
         {
             // if moving a file fails, give up and let the error propagate
-            if (!tr_file_move(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() }, false, error))
+            if (!tr_file_move(found->filename(), (tmpdir / tr_u8path(found->subpath())).string(), false, error))
             {
                 return;
             }
@@ -316,7 +317,7 @@ void tr_torrent_files::remove(
     auto const path = tr_pathbuf{ parent, '/', tmpdir_prefix };
     auto top_files = std::set<std::string>{ std::string{ path } };
     depth_first_walk(
-        tmpdir,
+        tmpdir.string(),
         [&parent, &tmpdir, &top_files](std::string_view const filename)
         {
             if (tmpdir != filename)
@@ -339,9 +340,9 @@ void tr_torrent_files::remove(
     // the folder hierarchy by removing top-level files & folders first.
     // But that can fail -- e.g. `func` might refuse to remove nonempty
     // directories -- so plan B is to remove everything bottom-up.
-    depth_first_walk(tmpdir, func_wrapper, 1);
-    depth_first_walk(tmpdir, func_wrapper);
-    tr_sys_path_remove(tr_u8path(tmpdir));
+    depth_first_walk(tmpdir.string(), func_wrapper, 1);
+    depth_first_walk(tmpdir.string(), func_wrapper);
+    tr_sys_path_remove(tmpdir);
 
     // OK we've removed the local data.
     // What's left are empty folders, junk, and user-generated files.

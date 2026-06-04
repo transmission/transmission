@@ -1277,13 +1277,13 @@ TEST_F(FileTest, dirCreateTemp)
     auto const test_dir = createTestDir(currentTestName());
 
     auto error = tr_error{};
-    auto path = tr_pathbuf{ test_dir.string(), "/test-XXXXXX" };
-    EXPECT_TRUE(tr_sys_dir_create_temp(std::data(path), &error));
+    auto path = test_dir / u8"test-XXXXXX"sv;
+    EXPECT_TRUE(tr_sys_dir_create_temp(path, &error));
     EXPECT_FALSE(error) << error;
-    tr_sys_path_remove(tr_u8path(path));
+    tr_sys_path_remove(path);
 
-    path.assign(test_dir.string(), "/path-does-not-exist/test-XXXXXX");
-    EXPECT_FALSE(tr_sys_dir_create_temp(std::data(path), &error));
+    path = test_dir / u8"path-does-not-exist/test-XXXXXX"sv;
+    EXPECT_FALSE(tr_sys_dir_create_temp(path, &error));
     EXPECT_TRUE(error);
 }
 
