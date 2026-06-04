@@ -99,11 +99,13 @@ protected:
         return true;
     }
 
-    static bool validatePermissions([[maybe_unused]] char const* path, [[maybe_unused]] unsigned int permissions)
+    static bool validatePermissions(
+        [[maybe_unused]] std::filesystem::path const& path,
+        [[maybe_unused]] unsigned int permissions)
     {
 #ifndef _WIN32
         struct stat sb = {};
-        return stat(path, &sb) != -1 && (sb.st_mode & 0777) == permissions;
+        return stat(path.c_str(), &sb) != -1 && (sb.st_mode & 0777) == permissions;
 #else
         /* No UNIX permissions on Windows */
         return true;
@@ -1069,7 +1071,7 @@ TEST_F(FileTest, fileOpen)
     EXPECT_FALSE(error) << error;
     tr_sys_file_close(fd);
     EXPECT_TRUE(tr_sys_path_exists(path1.string()));
-    EXPECT_TRUE(validatePermissions(path1.string().c_str(), 0640));
+    EXPECT_TRUE(validatePermissions(path1, 0640));
 
     // can open existing file
     EXPECT_TRUE(tr_sys_path_exists(path1.string()));
@@ -1240,7 +1242,7 @@ TEST_F(FileTest, dirCreate)
     EXPECT_TRUE(tr_sys_dir_create(path1.string(), 0, 0700, &error));
     EXPECT_FALSE(error) << error;
     EXPECT_TRUE(tr_sys_path_exists(path1.string()));
-    EXPECT_TRUE(validatePermissions(path1.string().c_str(), 0700));
+    EXPECT_TRUE(validatePermissions(path1, 0700));
 
     tr_sys_path_remove(path1);
     createFileWithContents(path1.string(), "test");
@@ -1266,8 +1268,8 @@ TEST_F(FileTest, dirCreate)
     EXPECT_FALSE(error) << error;
     EXPECT_TRUE(tr_sys_path_exists(path1.string()));
     EXPECT_TRUE(tr_sys_path_exists(path2.string()));
-    EXPECT_TRUE(validatePermissions(path1.string().c_str(), 0751));
-    EXPECT_TRUE(validatePermissions(path2.string().c_str(), 0751));
+    EXPECT_TRUE(validatePermissions(path1, 0751));
+    EXPECT_TRUE(validatePermissions(path2, 0751));
 
     // Can create existing directory (no-op)
     EXPECT_TRUE(tr_sys_dir_create(path1.string(), 0, 0700, &error));
