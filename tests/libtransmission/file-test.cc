@@ -35,10 +35,6 @@
 
 #include "test-fixtures.h"
 
-#if !defined(__OpenBSD__)
-#define HAVE_UNIFIED_BUFFER_CACHE
-#endif
-
 using namespace std::literals;
 
 namespace tr::test
@@ -76,11 +72,6 @@ protected:
         auto ec = std::error_code{};
         std::filesystem::create_hard_link(src_path, dst_path, ec);
         return !ec;
-    }
-
-    static void clearPathInfo(tr_sys_path_info* info)
-    {
-        *info = {};
     }
 
     static bool pathContainsNoSymlinks(std::filesystem::path const& path)
