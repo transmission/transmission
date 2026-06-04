@@ -83,36 +83,17 @@ protected:
         *info = {};
     }
 
-    static bool pathContainsNoSymlinks(char const* path)
+    static bool pathContainsNoSymlinks(std::filesystem::path const& path)
     {
-        char const* p = path;
-
-        while (*p != '\0')
+        auto subpath = std::filesystem::path{};
+        for (auto const& component : path)
         {
-            char const* slash_pos = strchr(p, '/');
-
-#ifdef _WIN32
-            char const* backslash_pos = strchr(p, '\\');
-
-            if (slash_pos == nullptr || (backslash_pos != nullptr && backslash_pos < slash_pos))
-            {
-                slash_pos = backslash_pos;
-            }
-#endif
-
-            if (slash_pos == nullptr)
-            {
-                slash_pos = p + strlen(p) - 1;
-            }
-
-            auto const path_part = std::string{ path, static_cast<size_t>(slash_pos - path + 1) };
-            auto const info = tr_sys_path_get_info(path_part, TR_SYS_PATH_NO_FOLLOW);
+            subpath /= component;
+            auto const info = tr_sys_path_get_info(subpath.string(), TR_SYS_PATH_NO_FOLLOW);
             if (!info || (!info->isFile() && !info->isFolder()))
             {
                 return false;
             }
-
-            p = slash_pos + 1;
         }
 
         return true;
@@ -648,18 +629,18 @@ TEST_F(FileTest, pathResolve)
 
     if (createSymlink(path2, path1, false))
     {
-        auto resolved = tr_sys_path_resolve(path2.string(), &error);
+        auto resolved = tr_u8path(tr_sys_path_resolve(path2.string(), &error));
         EXPECT_FALSE(error) << error;
-        EXPECT_TRUE(pathContainsNoSymlinks(resolved.c_str()));
+        EXPECT_TRUE(pathContainsNoSymlinks(resolved));
 
         tr_sys_path_remove(path2);
         tr_sys_path_remove(path1);
 
         tr_sys_dir_create(path1.string(), 0, 0755);
         EXPECT_TRUE(createSymlink(path2, path1, true)); /* Win32: directory and file symlinks differ :( */
-        resolved = tr_sys_path_resolve(path2.string(), &error);
+        resolved = tr_u8path(tr_sys_path_resolve(path2.string(), &error));
         EXPECT_FALSE(error) << error;
-        EXPECT_TRUE(pathContainsNoSymlinks(resolved.c_str()));
+        EXPECT_TRUE(pathContainsNoSymlinks(resolved));
     }
     else
     {
