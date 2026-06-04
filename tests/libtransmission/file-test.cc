@@ -141,12 +141,12 @@ protected:
         }
     }
 
-    static void testDirReadImpl(tr_pathbuf const& path, bool* have1, bool* have2)
+    static void testDirReadImpl(std::filesystem::path const& path, bool* have1, bool* have2)
     {
         *have1 = *have2 = false;
 
         auto err = tr_error{};
-        auto dd = tr_sys_dir_open(path, &err);
+        auto dd = tr_sys_dir_open(path.string(), &err);
         EXPECT_NE(TR_BAD_SYS_DIR, dd);
         EXPECT_FALSE(err) << err;
 
