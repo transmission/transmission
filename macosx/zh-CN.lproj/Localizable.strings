@@ -903,7 +903,7 @@
 "Show Filter Bar" = "显示筛选栏";
 
 /* File Outline -> Menu */
-"Show in Finder" = "在 Finder 中显示";
+"Show in Finder" = "在访达中显示";
 
 /* View menu -> Inspector */
 "Show Inspector" = "显示嗅探器";
@@ -912,7 +912,7 @@
 "Show Status Bar" = "显示状态栏";
 
 /* Torrent cell -> button info */
-"Show the data file in Finder" = "在 Finder 中显示数据文件";
+"Show the data file in Finder" = "在访达中显示数据文件";
 
 /* View menu -> Toolbar */
 "Show Toolbar" = "显示工具栏";
