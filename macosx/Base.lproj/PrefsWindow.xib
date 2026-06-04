@@ -2165,15 +2165,15 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BIf-Lb-001">
+                        <textField toolTip="Choose which network connection Transmission may use. Automatic uses the normal system connection. Active VPN Tunnel only allows traffic through the detected VPN and blocks traffic if the VPN is unavailable." focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BIf-Lb-001">
                             <rect key="frame" x="18" y="124" width="132" height="16"/>
-                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Connection:" usesSingleLineMode="YES" id="BIf-LbCell-001">
+                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Bind Connection:" usesSingleLineMode="YES" id="BIf-LbCell-001">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BIf-Pu-001">
+                        <popUpButton toolTip="Choose which network connection Transmission may use. Automatic uses the normal system connection. Active VPN Tunnel only allows traffic through the detected VPN and blocks traffic if the VPN is unavailable." verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BIf-Pu-001">
                             <rect key="frame" x="152" y="119" width="385" height="26"/>
                             <popUpButtonCell key="cell" type="push" title="Automatic (Default Connection)" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="BIf-Mi-001" id="BIf-PuCell-001">
                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2285,7 +2285,7 @@
                         <constraint firstItem="BIf-Lb-001" firstAttribute="width" secondItem="660" secondAttribute="width" id="BIf-Con-003"/>
                         <constraint firstItem="BIf-Pu-001" firstAttribute="leading" secondItem="2077" secondAttribute="leading" id="BIf-Con-004"/>
                         <constraint firstAttribute="trailing" secondItem="BIf-Pu-001" secondAttribute="trailing" constant="20" symbolic="YES" id="BIf-Con-005"/>
-                        <constraint firstItem="BIf-Pu-001" firstAttribute="top" secondItem="68" secondAttribute="bottom" constant="7" id="BIf-Con-006"/>
+                        <constraint firstItem="BIf-Pu-001" firstAttribute="top" secondItem="CZ6-Q4-MLF" secondAttribute="top" id="BIf-Con-006"/>
                         <constraint firstItem="353" firstAttribute="leading" secondItem="68" secondAttribute="trailing" constant="5" id="DFR-wP-UH7"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="336" secondAttribute="trailing" constant="20" symbolic="YES" id="EqH-JF-Pvs"/>
                         <constraint firstItem="1889" firstAttribute="leading" secondItem="2077" secondAttribute="leading" id="Ero-dE-5SY"/>
@@ -2312,12 +2312,12 @@
                         <constraint firstItem="332" firstAttribute="top" secondItem="1889" secondAttribute="bottom" constant="6" symbolic="YES" id="kCe-Oo-rh0"/>
                         <constraint firstItem="665" firstAttribute="trailing" secondItem="660" secondAttribute="trailing" id="lTB-eG-SOJ"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="332" secondAttribute="trailing" constant="20" symbolic="YES" id="mLX-VC-1Vt"/>
-                        <constraint firstItem="1889" firstAttribute="top" secondItem="BIf-Pu-001" secondAttribute="bottom" constant="7" id="oHL-wz-CIw"/>
+                        <constraint firstItem="1889" firstAttribute="top" secondItem="68" secondAttribute="bottom" constant="7" id="oHL-wz-CIw"/>
                         <constraint firstItem="354" firstAttribute="centerY" secondItem="353" secondAttribute="centerY" id="ph1-a7-hHk"/>
                         <constraint firstItem="353" firstAttribute="centerY" secondItem="2081" secondAttribute="centerY" id="rHC-Gi-CUK"/>
                         <constraint firstItem="1891" firstAttribute="centerY" secondItem="1889" secondAttribute="centerY" id="rdN-Uq-Cqa"/>
                         <constraint firstItem="354" firstAttribute="centerX" secondItem="353" secondAttribute="centerX" id="saB-pe-8lR"/>
-                        <constraint firstItem="660" firstAttribute="top" secondItem="CZ6-Q4-MLF" secondAttribute="top" id="v05-Z8-iS7"/>
+                        <constraint firstItem="2077" firstAttribute="top" secondItem="BIf-Pu-001" secondAttribute="bottom" constant="28" id="v05-Z8-iS7"/>
                         <constraint firstItem="2081" firstAttribute="trailing" secondItem="660" secondAttribute="trailing" id="vXK-Q9-wXT"/>
                     </constraints>
                 </customView>

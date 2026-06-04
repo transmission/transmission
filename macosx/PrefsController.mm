@@ -483,12 +483,12 @@ static NSString* TRDisplayableSessionBindInterface(NSString* bindInterface)
     }
 
     NSView* container = self.fBindInterfacePopUp.superview;
-    NSButton* randomPortButton = nil;
+    NSButton* peerCommunicationButton = nil;
     for (NSView* view in container.subviews)
     {
-        if ([view isKindOfClass:NSButton.class] && [(NSButton*)view action] == @selector(setRandomPortOnStart:))
+        if ([view isKindOfClass:NSButton.class] && [(NSButton*)view action] == @selector(setUTP:))
         {
-            randomPortButton = (NSButton*)view;
+            peerCommunicationButton = (NSButton*)view;
             break;
         }
     }
@@ -496,7 +496,7 @@ static NSString* TRDisplayableSessionBindInterface(NSString* bindInterface)
     NSMutableArray<NSLayoutConstraint*>* constraintsToDeactivate = [NSMutableArray array];
     for (NSLayoutConstraint* constraint in container.constraints)
     {
-        if (constraint.firstItem == randomPortButton && constraint.secondItem == self.fBindInterfacePopUp)
+        if (constraint.firstItem == peerCommunicationButton && constraint.secondItem == self.fBindInterfacePopUp)
         {
             [constraintsToDeactivate addObject:constraint];
         }
@@ -515,7 +515,8 @@ static NSString* TRDisplayableSessionBindInterface(NSString* bindInterface)
                                                        action:@selector(showBindInterfaceInfo:)];
     self.fBindInterfaceInfoButton.bezelStyle = NSBezelStyleInline;
     self.fBindInterfaceInfoButton.bordered = NO;
-    self.fBindInterfaceInfoButton.toolTip = NSLocalizedString(@"Show connection binding details.", "Preferences -> Network -> bind interface info tooltip");
+    self.fBindInterfaceInfoButton.toolTip = NSLocalizedString(@"Show details about the current bind connection.",
+        "Preferences -> Network -> bind interface info tooltip");
     self.fBindInterfaceInfoButton.translatesAutoresizingMaskIntoConstraints = NO;
 
     [container addSubview:self.fBindInterfaceStatusField];
@@ -530,10 +531,10 @@ static NSString* TRDisplayableSessionBindInterface(NSString* bindInterface)
         [self.fBindInterfaceInfoButton.widthAnchor constraintEqualToConstant:16.0],
         [self.fBindInterfaceInfoButton.heightAnchor constraintEqualToConstant:16.0],
     ] mutableCopy];
-    if (randomPortButton != nil)
+    if (peerCommunicationButton != nil)
     {
-        [constraints addObject:[randomPortButton.topAnchor constraintEqualToAnchor:self.fBindInterfaceStatusField.bottomAnchor
-                                                                          constant:5.0]];
+        [constraints addObject:[peerCommunicationButton.topAnchor constraintEqualToAnchor:self.fBindInterfaceStatusField.bottomAnchor
+                                                                                 constant:9.0]];
     }
     [NSLayoutConstraint activateConstraints:constraints];
 }
