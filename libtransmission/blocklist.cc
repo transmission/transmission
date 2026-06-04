@@ -360,7 +360,7 @@ void Blocklists::Blocklist::ensureLoaded() const
 
     // get the file's size
     auto error = tr_error{};
-    auto const file_info = tr_sys_path_get_info(bin_file_, 0, &error);
+    auto const file_info = tr_sys_path_get_info(tr_u8path(bin_file_), 0, &error);
     if (error)
     {
         tr_logAddWarn(
@@ -564,9 +564,9 @@ std::vector<Blocklists::Blocklist> Blocklists::load_folder(std::string_view cons
         }
 
         // ensure this src_file has an up-to-date corresponding bin_file
-        auto const src_info = tr_sys_path_get_info(src_file);
+        auto const src_info = tr_sys_path_get_info(tr_u8path(src_file));
         auto const bin_file = tr_pathbuf{ src_file, BinFileSuffix };
-        auto const bin_info = tr_sys_path_get_info(bin_file);
+        auto const bin_info = tr_sys_path_get_info(tr_u8path(bin_file));
         auto const bin_needs_update = src_info && (!bin_info || bin_info->last_modified_at <= src_info->last_modified_at);
         if (bin_needs_update)
         {

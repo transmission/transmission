@@ -82,13 +82,11 @@ bool tr_sys_path_exists(std::string_view path, tr_error* error)
     return exists;
 }
 
-std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error* error)
+std::optional<tr_sys_path_info> tr_sys_path_get_info(std::filesystem::path const& path, int flags, tr_error* error)
 {
-    auto const filesystem_path = tr_u8path(path);
-
     auto ec = std::error_code{};
-    auto const status = (flags & TR_SYS_PATH_NO_FOLLOW) != 0 ? std::filesystem::symlink_status(filesystem_path, ec) :
-                                                               std::filesystem::status(filesystem_path, ec);
+    auto const status = (flags & TR_SYS_PATH_NO_FOLLOW) != 0 ? std::filesystem::symlink_status(path, ec) :
+                                                               std::filesystem::status(path, ec);
 
     if (ec || status.type() == std::filesystem::file_type::not_found)
     {
@@ -101,7 +99,7 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
     if (std::filesystem::is_regular_file(status))
     {
         info.type = TR_SYS_PATH_IS_FILE;
-        info.size = std::filesystem::file_size(filesystem_path, ec);
+        info.size = std::filesystem::file_size(path, ec);
         if (ec)
         {
             maybe_set_error(error, ec);
@@ -119,7 +117,7 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
         info.size = 0;
     }
 
-    auto const ftime = std::filesystem::last_write_time(filesystem_path, ec);
+    auto const ftime = std::filesystem::last_write_time(path, ec);
     if (ec)
     {
         maybe_set_error(error, ec);
@@ -258,7 +256,7 @@ std::vector<std::string> tr_sys_dir_get_files(
     std::function<bool(std::string_view)> const& test,
     tr_error* error)
 {
-    if (auto const info = tr_sys_path_get_info(folder); !info || !info->isFolder())
+    if (auto const info = tr_sys_path_get_info(tr_u8path(folder)); !info || !info->isFolder())
     {
         return {};
     }

@@ -75,7 +75,7 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
     auto path = tr_pathbuf{ top, '/', subpath };
     tr_sys_path_native_separators(std::data(path));
     auto error = tr_error{};
-    auto const info = tr_sys_path_get_info(path, 0, &error);
+    auto const info = tr_sys_path_get_info(tr_u8path(path), 0, &error);
     if (error)
     {
         tr_logAddWarn(

@@ -80,7 +80,7 @@ protected:
         for (auto const& component : path)
         {
             subpath /= component;
-            auto const info = tr_sys_path_get_info(subpath.string(), TR_SYS_PATH_NO_FOLLOW);
+            auto const info = tr_sys_path_get_info(subpath, TR_SYS_PATH_NO_FOLLOW);
             if (!info || (!info->isFile() && !info->isFolder()))
             {
                 return false;
@@ -188,7 +188,7 @@ TEST_F(FileTest, getInfo)
 
     // Can't get info of non-existent file/directory
     auto err = tr_error{};
-    auto info = tr_sys_path_get_info(path1.string(), 0, &err);
+    auto info = tr_sys_path_get_info(path1, 0, &err);
     EXPECT_FALSE(info.has_value());
     EXPECT_TRUE(err);
     err = {};
@@ -197,7 +197,7 @@ TEST_F(FileTest, getInfo)
     createFileWithContents(path1.string(), "test");
 
     // Good file info
-    info = tr_sys_path_get_info(path1.string(), 0, &err);
+    info = tr_sys_path_get_info(path1, 0, &err);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_FALSE(err) << err;
@@ -211,7 +211,7 @@ TEST_F(FileTest, getInfo)
     // Good directory info
     t = time(nullptr);
     tr_sys_dir_create(path1.string(), 0, 0777);
-    info = tr_sys_path_get_info(path1.string(), 0, &err);
+    info = tr_sys_path_get_info(path1, 0, &err);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_FALSE(err) << err;
@@ -224,7 +224,7 @@ TEST_F(FileTest, getInfo)
     if (createSymlink(path1, path2, false))
     {
         // Can't get info of non-existent file/directory
-        info = tr_sys_path_get_info(path1.string(), 0, &err);
+        info = tr_sys_path_get_info(path1, 0, &err);
         EXPECT_FALSE(info.has_value());
         EXPECT_TRUE(err);
         err = {};
@@ -233,7 +233,7 @@ TEST_F(FileTest, getInfo)
         createFileWithContents(path2.string(), "test");
 
         // Good file info
-        info = tr_sys_path_get_info(path1.string(), 0, &err);
+        info = tr_sys_path_get_info(path1, 0, &err);
         EXPECT_TRUE(info.has_value());
         assert(info.has_value());
         EXPECT_FALSE(err) << err;
@@ -243,7 +243,7 @@ TEST_F(FileTest, getInfo)
         EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
 
         // Symlink
-        info = tr_sys_path_get_info(path1.string(), TR_SYS_PATH_NO_FOLLOW, &err);
+        info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &err);
         EXPECT_TRUE(info.has_value());
         assert(info.has_value());
         EXPECT_FALSE(err) << err;
@@ -256,7 +256,7 @@ TEST_F(FileTest, getInfo)
         t = time(nullptr);
         tr_sys_dir_create(path2.string(), 0, 0777);
         EXPECT_TRUE(createSymlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
-        info = tr_sys_path_get_info(path1.string(), 0, &err);
+        info = tr_sys_path_get_info(path1, 0, &err);
         EXPECT_TRUE(info.has_value());
         assert(info.has_value());
         EXPECT_FALSE(err) << err;
@@ -1079,19 +1079,19 @@ TEST_F(FileTest, fileOpen)
     createFileWithContents(path1.string(), "test");
 
     /* File gets truncated */
-    auto info = tr_sys_path_get_info(path1.string(), TR_SYS_PATH_NO_FOLLOW);
+    auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_EQ(4U, info->size);
     fd = tr_sys_file_open(path1.string(), TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &error);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_FALSE(error) << error;
-    info = tr_sys_path_get_info(path1.string());
+    info = tr_sys_path_get_info(path1);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_EQ(0U, info->size);
     tr_sys_file_close(fd);
-    info = tr_sys_path_get_info(path1.string(), TR_SYS_PATH_NO_FOLLOW);
+    info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_EQ(0U, info->size);
@@ -1111,21 +1111,21 @@ TEST_F(FileTest, fileTruncate)
     auto error = tr_error{};
     EXPECT_TRUE(tr_sys_file_truncate(fd, 10, &error));
     EXPECT_FALSE(error) << error;
-    auto info = tr_sys_path_get_info(path.string());
+    auto info = tr_sys_path_get_info(path);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_EQ(10U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 20, &error));
     EXPECT_FALSE(error) << error;
-    info = tr_sys_path_get_info(path.string());
+    info = tr_sys_path_get_info(path);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_EQ(20U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 0, &error));
     EXPECT_FALSE(error) << error;
-    info = tr_sys_path_get_info(path.string());
+    info = tr_sys_path_get_info(path);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_EQ(0U, info->size);
@@ -1135,7 +1135,7 @@ TEST_F(FileTest, fileTruncate)
 
     tr_sys_file_close(fd);
 
-    info = tr_sys_path_get_info(path.string());
+    info = tr_sys_path_get_info(path);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_EQ(50U, info->size);
@@ -1147,7 +1147,7 @@ TEST_F(FileTest, fileTruncate)
 
     tr_sys_file_close(fd);
 
-    info = tr_sys_path_get_info(path.string());
+    info = tr_sys_path_get_info(path);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_EQ(25U, info->size);
@@ -1172,7 +1172,7 @@ TEST_F(FileTest, filePreallocate)
     if (tr_sys_file_preallocate(fd, prealloc_size, 0, &error))
     {
         EXPECT_FALSE(error) << error;
-        auto info = tr_sys_path_get_info(path1.string());
+        auto info = tr_sys_path_get_info(path1);
         EXPECT_TRUE(info.has_value());
         assert(info.has_value());
         EXPECT_EQ(prealloc_size, info->size);
@@ -1199,7 +1199,7 @@ TEST_F(FileTest, filePreallocate)
     if (tr_sys_file_preallocate(fd, prealloc_size, TR_SYS_FILE_PREALLOC_SPARSE, &error))
     {
         EXPECT_FALSE(error) << error;
-        auto info = tr_sys_path_get_info(path1.string());
+        auto info = tr_sys_path_get_info(path1);
         EXPECT_TRUE(info.has_value());
         assert(info.has_value());
         EXPECT_EQ(prealloc_size, info->size);

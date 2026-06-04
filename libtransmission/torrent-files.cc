@@ -39,7 +39,7 @@ using file_func_t = std::function<void(std::string_view filename)>;
 
 [[nodiscard]] bool is_folder(std::string_view const path)
 {
-    auto const info = tr_sys_path_get_info(path);
+    auto const info = tr_sys_path_get_info(tr_u8path(path));
     return info && info->isFolder();
 }
 
@@ -131,13 +131,13 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
         auto const base = paths[path_idx];
 
         filename.assign(base, '/', subpath);
-        if (auto const info = tr_sys_path_get_info(filename); info)
+        if (auto const info = tr_sys_path_get_info(tr_u8path(filename)); info)
         {
             return FoundFile{ *info, std::move(filename), std::size(base) };
         }
 
         filename.assign(base, '/', subpath, PartialFileSuffix);
-        if (auto const info = tr_sys_path_get_info(filename); info)
+        if (auto const info = tr_sys_path_get_info(tr_u8path(filename)); info)
         {
             return FoundFile{ *info, std::move(filename), std::size(base) };
         }

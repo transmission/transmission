@@ -162,7 +162,7 @@ bool tr_sys_path_copy(std::filesystem::path const& src_path, std::filesystem::pa
  * @return info on success, or nullopt with `error` set accordingly.
  */
 [[nodiscard]] std::optional<tr_sys_path_info> tr_sys_path_get_info(
-    std::string_view path,
+    std::filesystem::path const& path,
     int flags = 0,
     tr_error* error = nullptr);
 

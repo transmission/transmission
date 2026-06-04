@@ -45,7 +45,7 @@ namespace
     auto const path = tr_pathbuf{ dir, '/', name };
 
     auto error = tr_error{};
-    auto const info = tr_sys_path_get_info(path, 0, &error);
+    auto const info = tr_sys_path_get_info(tr_u8path(path), 0, &error);
     if (error && !tr_error_is_enoent(error.code()))
     {
         tr_logAddWarn(

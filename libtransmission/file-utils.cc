@@ -34,7 +34,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
         error = &local_error;
     }
 
-    auto const info = tr_sys_path_get_info(szfilename, 0, error);
+    auto const info = tr_sys_path_get_info(tr_u8path(filename), 0, error);
     if (*error)
     {
         tr_logAddError(
@@ -141,7 +141,7 @@ bool tr_file_move(std::string_view oldpath, std::string_view newpath, bool allow
     }
 
     // make sure the old file exists
-    auto const info = tr_sys_path_get_info(oldpath, 0, error);
+    auto const info = tr_sys_path_get_info(tr_u8path(oldpath), 0, error);
     if (!info)
     {
         error->prefix_message("Unable to get information on old file: ");

@@ -235,7 +235,7 @@ bool tr_sys_path_copy(std::filesystem::path const& src_path, std::filesystem::pa
 
 #else /* USE_COPYFILE */
 
-    auto const info = tr_sys_path_get_info(src_path.native(), 0, error);
+    auto const info = tr_sys_path_get_info(src_path, 0, error);
     if (!info)
     {
         error->prefix_message("Unable to get information on source file: ");
