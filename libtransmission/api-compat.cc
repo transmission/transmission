@@ -688,65 +688,72 @@ struct State
     return keys::LegacySettingsKeyLookup.lookup_or(src, src);
 }
 
-[[nodiscard]] std::optional<std::string_view> convert_string(State const& state, std::string_view const src)
+template<typename CharT>
+[[nodiscard]] std::optional<std::basic_string_view<CharT>> convert_string(State const& state, std::basic_string_view<CharT> const src) requires std::is_same_v<CharT, char> || std::is_same_v<CharT, char8_t>
 {
     if (state.is_settings && state.current_key_is_any_of({ TR_KEY_sort_mode, TR_KEY_sort_mode_kebab_APICOMPAT }))
     {
-        static auto constexpr Strings = std::array<std::pair<std::string_view /*Tr5*/, std::string_view /*Tr4*/>, 10U>{ {
-            { "sort_by_activity", "sort-by-activity" },
-            { "sort_by_age", "sort-by-age" },
-            { "sort_by_eta", "sort-by-eta" },
-            { "sort_by_id", "sort-by-id" },
-            { "sort_by_name", "sort-by-name" },
-            { "sort_by_progress", "sort-by-progress" },
-            { "sort_by_queue", "sort-by-queue" },
-            { "sort_by_ratio", "sort-by-ratio" },
-            { "sort_by_size", "sort-by-size" },
-            { "sort_by_state", "sort-by-state" },
+        static auto constexpr Strings = std::array<std::pair<std::u8string_view /*Tr5*/, std::u8string_view /*Tr4*/>, 10U>{ {
+            { u8"sort_by_activity", u8"sort-by-activity" },
+            { u8"sort_by_age",u8"sort-by-age" },
+            { u8"sort_by_eta", u8"sort-by-eta" },
+            { u8"sort_by_id", u8"sort-by-id" },
+            { u8"sort_by_name", u8"sort-by-name" },
+            { u8"sort_by_progress", u8"sort-by-progress" },
+            { u8"sort_by_queue", u8"sort-by-queue" },
+            { u8"sort_by_ratio", u8"sort-by-ratio" },
+            { u8"sort_by_size", u8"sort-by-size" },
+            { u8"sort_by_state", u8"sort-by-state" },
         } };
         for (auto const& [current, legacy] : Strings)
         {
-            if (src == current || src == legacy)
+            auto const current_sv = std::basic_string_view<CharT>{ reinterpret_cast<CharT const*>(current.data()), current.size() };
+            auto const legacy_sv = std::basic_string_view<CharT>{ reinterpret_cast<CharT const*>(legacy.data()), legacy.size() };
+            if (src == current_sv || src == legacy_sv)
             {
-                return state.style == Style::Tr5 ? current : legacy;
+                return state.style == Style::Tr5 ? current_sv : legacy_sv;
             }
         }
     }
 
     if (state.is_settings && state.current_key_is_any_of({ TR_KEY_filter_mode, TR_KEY_filter_mode_kebab_APICOMPAT }))
     {
-        static auto constexpr Strings = std::array<std::pair<std::string_view, std::string_view>, 8U>{ {
-            { "show_active", "show-active" },
-            { "show_all", "show-all" },
-            { "show_downloading", "show-downloading" },
-            { "show_error", "show-error" },
-            { "show_finished", "show-finished" },
-            { "show_paused", "show-paused" },
-            { "show_seeding", "show-seeding" },
-            { "show_verifying", "show-verifying" },
+        static auto constexpr Strings = std::array<std::pair<std::u8string_view, std::u8string_view>, 8U>{ {
+            { u8"show_active", u8"show-active" },
+            { u8"show_all", u8"show-all" },
+            { u8"show_downloading", u8"show-downloading" },
+            { u8"show_error", u8"show-error" },
+            { u8"show_finished", u8"show-finished" },
+            { u8"show_paused", u8"show-paused" },
+            { u8"show_seeding", u8"show-seeding" },
+            { u8"show_verifying", u8"show-verifying" },
         } };
         for (auto const& [current, legacy] : Strings)
         {
-            if (src == current || src == legacy)
+            auto const current_sv = std::basic_string_view<CharT>{ reinterpret_cast<CharT const*>(current.data()), current.size() };
+            auto const legacy_sv = std::basic_string_view<CharT>{ reinterpret_cast<CharT const*>(legacy.data()), legacy.size() };
+            if (src == current_sv || src == legacy_sv)
             {
-                return state.style == Style::Tr5 ? current : legacy;
+                return state.style == Style::Tr5 ? current_sv : legacy_sv;
             }
         }
     }
 
     if (state.is_settings && state.current_key_is_any_of({ TR_KEY_statusbar_stats, TR_KEY_statusbar_stats_kebab_APICOMPAT }))
     {
-        static auto constexpr Strings = std::array<std::pair<std::string_view, std::string_view>, 4U>{ {
-            { "total_ratio", "total-ratio" },
-            { "total_transfer", "total-transfer" },
-            { "session_ratio", "session-ratio" },
-            { "session_transfer", "session-transfer" },
+        static auto constexpr Strings = std::array<std::pair<std::u8string_view, std::u8string_view>, 4U>{ {
+            { u8"total_ratio", u8"total-ratio" },
+            { u8"total_transfer", u8"total-transfer" },
+            { u8"session_ratio", u8"session-ratio" },
+            { u8"session_transfer", u8"session-transfer" },
         } };
         for (auto const& [current, legacy] : Strings)
         {
-            if (src == current || src == legacy)
+            auto const current_sv = std::basic_string_view<CharT>{ reinterpret_cast<CharT const*>(current.data()), current.size() };
+            auto const legacy_sv = std::basic_string_view<CharT>{ reinterpret_cast<CharT const*>(legacy.data()), legacy.size() };
+            if (src == current_sv || src == legacy_sv)
             {
-                return state.style == Style::Tr5 ? current : legacy;
+                return state.style == Style::Tr5 ? current_sv : legacy_sv;
             }
         }
     }
@@ -760,7 +767,14 @@ struct State
         {
             if (auto const new_key = convert_key(state, *old_key); *old_key != new_key)
             {
-                return tr_quark_get_string_view(new_key);
+                if constexpr (std::is_same_v<CharT, char>)
+                {
+                    return tr_quark_get_string_view(new_key);
+                }
+                else
+                {
+                    return tr_quark_get_u8string_view(new_key);
+                }
             }
         }
     }
@@ -775,9 +789,9 @@ void convert_keys(tr_variant& var, State& state)
         {
             using ValueType = std::remove_cvref_t<decltype(val)>;
 
-            if constexpr (std::is_same_v<ValueType, std::string> || std::is_same_v<ValueType, std::string_view>)
+            if constexpr (std::is_same_v<ValueType, std::string> || std::is_same_v<ValueType, std::string_view> || std::is_same_v<ValueType, std::u8string> || std::is_same_v<ValueType, std::u8string_view>)
             {
-                if (auto const new_val = convert_string(state, val))
+                if (auto const new_val = convert_string(state, std::basic_string_view<typename ValueType::value_type>{ val }))
                 {
                     val = *new_val;
                 }
