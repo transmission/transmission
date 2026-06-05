@@ -73,6 +73,20 @@ TEST_F(VariantTest, getType)
     EXPECT_NE(std::data(strkey), std::data(*sv));
     EXPECT_EQ(std::size(strkey), std::size(*sv));
 
+    auto u8strkey = u8"foo"sv;
+    v = tr_variant{ u8strkey };
+    EXPECT_FALSE(v.holds_alternative<bool>());
+    auto u8sv = v.value_if<std::u8string_view>();
+    ASSERT_TRUE(u8sv);
+    EXPECT_EQ(u8strkey, *u8sv);
+    EXPECT_NE(std::data(u8strkey), std::data(*u8sv));
+    EXPECT_EQ(std::size(u8strkey), std::size(*u8sv));
+    sv = v.value_if<std::string_view>();
+    ASSERT_TRUE(sv);
+    EXPECT_EQ(strkey, *sv);
+    EXPECT_NE(static_cast<void const*>(std::data(u8strkey)), static_cast<void const*>(std::data(*sv)));
+    EXPECT_EQ(std::size(u8strkey), std::size(*sv));
+
     strkey = "anything"sv;
     v = tr_variant::unmanaged_string(strkey);
     sv = v.value_if<std::string_view>();
@@ -81,11 +95,38 @@ TEST_F(VariantTest, getType)
     EXPECT_EQ(std::data(strkey), std::data(*sv)); // literally the same memory
     EXPECT_EQ(std::size(strkey), std::size(*sv));
 
+    u8strkey = u8"anything"sv;
+    v = tr_variant::unmanaged_string(u8strkey);
+    u8sv = v.value_if<std::u8string_view>();
+    ASSERT_TRUE(u8sv);
+    EXPECT_EQ(u8strkey, *u8sv);
+    EXPECT_EQ(std::data(u8strkey), std::data(*u8sv)); // literally the same memory
+    EXPECT_EQ(std::size(u8strkey), std::size(*u8sv));
+    sv = v.value_if<std::string_view>();
+    ASSERT_TRUE(sv);
+    EXPECT_EQ(strkey, *sv);
+    EXPECT_EQ(
+        static_cast<void const*>(std::data(u8strkey)),
+        static_cast<void const*>(std::data(*sv))); // literally the same memory
+    EXPECT_EQ(std::size(u8strkey), std::size(*sv));
+
     strkey = "true"sv;
     v = tr_variant{ strkey };
     auto b = v.value_if<bool>();
     ASSERT_TRUE(b);
     EXPECT_TRUE(*b);
+    sv = v.value_if<std::string_view>();
+    ASSERT_TRUE(sv);
+    EXPECT_EQ(strkey, *sv);
+
+    u8strkey = u8"true"sv;
+    v = tr_variant{ u8strkey };
+    b = v.value_if<bool>();
+    ASSERT_TRUE(b);
+    EXPECT_TRUE(*b);
+    u8sv = v.value_if<std::u8string_view>();
+    ASSERT_TRUE(u8sv);
+    EXPECT_EQ(u8strkey, *u8sv);
     sv = v.value_if<std::string_view>();
     ASSERT_TRUE(sv);
     EXPECT_EQ(strkey, *sv);
@@ -98,12 +139,24 @@ TEST_F(VariantTest, getType)
     sv = v.value_if<std::string_view>();
     ASSERT_TRUE(sv);
     EXPECT_EQ(strkey, *sv);
+
+    u8strkey = u8"false"sv;
+    v = tr_variant{ u8strkey };
+    b = v.value_if<bool>();
+    ASSERT_TRUE(b);
+    EXPECT_FALSE(*b);
+    u8sv = v.value_if<std::u8string_view>();
+    ASSERT_TRUE(u8sv);
+    EXPECT_EQ(u8strkey, *u8sv);
+    sv = v.value_if<std::string_view>();
+    ASSERT_TRUE(sv);
+    EXPECT_EQ(strkey, *sv);
 }
 
 template<typename T>
 using VariantIntTest = ::testing::Test;
-using TestTypes = ::testing::Types<int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t>;
-TYPED_TEST_SUITE(VariantIntTest, TestTypes);
+using IntTestTypes = ::testing::Types<int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t>;
+TYPED_TEST_SUITE(VariantIntTest, IntTestTypes);
 
 TYPED_TEST(VariantIntTest, getIntTypes)
 {
@@ -180,6 +233,43 @@ TEST_F(VariantTest, mergeStringsTakesOwnership)
 
     // test that `tgt` now holds its own copy of `Original`.
     auto const actual = tgt.value_if<std::string_view>().value_or(""sv);
+    EXPECT_TRUE(is_equal_string(Original, actual));
+    EXPECT_FALSE(is_same_address(Original, actual));
+}
+
+TEST_F(VariantTest, mergeU8StringsTakesOwnership)
+{
+    auto const is_equal_string = [](std::u8string_view const a, std::u8string_view const b)
+    {
+        return a == b;
+    };
+
+    auto const is_same_address = [](std::u8string_view const a, std::u8string_view const b)
+    {
+        return std::data(a) == std::data(b);
+    };
+
+    // set up `src` to hold an unmanaged string
+    auto constexpr Original = u8"this is the string"sv;
+    auto const src = tr_variant::unmanaged_string(Original);
+    auto src_sv = src.value_if<std::u8string_view>().value_or(u8""sv);
+
+    // set up `tgt` to hold another unmanaged string
+    auto constexpr WillBeReplaced = u8"some other string"sv;
+    static_assert(Original != WillBeReplaced);
+    auto tgt = tr_variant::unmanaged_string(WillBeReplaced);
+    auto tgt_sv = tgt.value_if<std::u8string_view>().value_or(u8""sv);
+
+    // test that `src` and `tgt` hold unmanaged strings
+    EXPECT_TRUE(is_equal_string(Original, src_sv));
+    EXPECT_TRUE(is_equal_string(WillBeReplaced, tgt_sv));
+    EXPECT_TRUE(is_same_address(Original, src_sv));
+    EXPECT_TRUE(is_same_address(WillBeReplaced, tgt_sv));
+
+    tgt.merge(src);
+
+    // test that `tgt` now holds its own copy of `Original`.
+    auto const actual = tgt.value_if<std::u8string_view>().value_or(u8""sv);
     EXPECT_TRUE(is_equal_string(Original, actual));
     EXPECT_FALSE(is_same_address(Original, actual));
 }
@@ -483,6 +573,9 @@ TEST_F(VariantTest, variantConstructor)
     auto const var_sv = tr_variant{ "foo"sv };
     auto const var_s = tr_variant{ "foo"s };
     auto const var_char_ptr = tr_variant{ "foo" };
+    auto const var_u8sv = tr_variant{ u8"foo"sv };
+    auto const var_u8s = tr_variant{ u8"foo"s };
+    auto const var_char8_t_ptr = tr_variant{ u8"foo" };
     auto const var_char_nullptr = tr_variant{ static_cast<char const*>(nullptr) };
 
     EXPECT_EQ(var_none.index(), tr_variant::NoneIndex);
@@ -494,6 +587,9 @@ TEST_F(VariantTest, variantConstructor)
     EXPECT_EQ(var_sv.index(), tr_variant::StringIndex);
     EXPECT_EQ(var_s.index(), tr_variant::StringIndex);
     EXPECT_EQ(var_char_ptr.index(), tr_variant::StringIndex);
+    EXPECT_EQ(var_u8sv.index(), tr_variant::U8StringIndex);
+    EXPECT_EQ(var_u8s.index(), tr_variant::U8StringIndex);
+    EXPECT_EQ(var_char8_t_ptr.index(), tr_variant::U8StringIndex);
     EXPECT_EQ(var_char_nullptr.index(), tr_variant::StringIndex);
 }
 
@@ -525,17 +621,27 @@ TEST_F(VariantTest, variantAssingmentOperator)
     var = "foo";
     EXPECT_EQ(var.index(), tr_variant::StringIndex);
 
+    var = u8"foo"sv;
+    EXPECT_EQ(var.index(), tr_variant::U8StringIndex);
+
+    var = u8"foo"s;
+    EXPECT_EQ(var.index(), tr_variant::U8StringIndex);
+
+    var = u8"foo";
+    EXPECT_EQ(var.index(), tr_variant::U8StringIndex);
+
     var = static_cast<char const*>(nullptr);
     EXPECT_EQ(var.index(), tr_variant::StringIndex);
 }
 
 TEST_F(VariantTest, mergeOverwritesDifferingTypes)
 {
-    auto const variants = std::array<std::pair<tr_variant, std::string_view>, 7U>{ {
+    auto const variants = std::array<std::pair<tr_variant, std::string_view>, 8U>{ {
         { tr_variant{ true }, "true" },
         { tr_variant{ int64_t{ 123 } }, "123" },
         { tr_variant{ 4.5 }, "4.5" },
         { tr_variant{ "foo"sv }, R"("foo")"sv },
+        { tr_variant{ u8"u8foo"sv }, R"("u8foo")"sv },
         { tr_variant{ nullptr }, "null"sv },
         { tr_variant::make_map(0U), "{}"sv },
         { tr_variant::make_vector(), "[]"sv },
@@ -596,10 +702,10 @@ TEST_F(VariantTest, stackSmashJson)
 
 TEST_F(VariantTest, valueIfCanReadBoolsAndIntsInterchangeably)
 {
-    auto const key1 = tr_quark_new("key1"sv);
-    auto const key2 = tr_quark_new("key2"sv);
-    auto const key3 = tr_quark_new("key3"sv);
-    auto const key4 = tr_quark_new("key4"sv);
+    auto const key1 = tr_quark_new(u8"key1"sv);
+    auto const key2 = tr_quark_new(u8"key2"sv);
+    auto const key3 = tr_quark_new(u8"key3"sv);
+    auto const key4 = tr_quark_new(u8"key4"sv);
 
     auto top = tr_variant::make_map(4U);
     auto* map = top.get_if<tr_variant::Map>();
@@ -640,15 +746,17 @@ TEST_F(VariantTest, valueIfCanReadBoolsAndIntsInterchangeably)
 TEST_F(VariantTest, dictFindType)
 {
     static auto constexpr ExpectedStr = "this-is-a-string"sv;
+    static auto constexpr ExpectedU8Str = u8"this-is-a-u8string"sv;
     static auto constexpr ExpectedBool = true;
     static auto constexpr ExpectedInt = 1234;
     static auto constexpr ExpectedReal = 0.3;
 
-    auto const key_bool = tr_quark_new("this-is-a-bool"sv);
-    auto const key_real = tr_quark_new("this-is-a-real"sv);
-    auto const key_int = tr_quark_new("this-is-an-int"sv);
-    auto const key_str = tr_quark_new("this-is-a-string"sv);
-    auto const key_unknown = tr_quark_new("this-is-a-missing-entry"sv);
+    auto const key_bool = tr_quark_new(u8"this-is-a-bool"sv);
+    auto const key_real = tr_quark_new(u8"this-is-a-real"sv);
+    auto const key_int = tr_quark_new(u8"this-is-an-int"sv);
+    auto const key_str = tr_quark_new(u8"this-is-a-string"sv);
+    auto const key_u8str = tr_quark_new(u8"this-is-a-u8string"sv);
+    auto const key_unknown = tr_quark_new(u8"this-is-a-missing-entry"sv);
 
     // populate a dict
     auto top = tr_variant::make_map(4U);
@@ -657,6 +765,7 @@ TEST_F(VariantTest, dictFindType)
     map->try_emplace(key_int, ExpectedInt);
     map->try_emplace(key_real, ExpectedReal);
     map->try_emplace(key_str, ExpectedStr);
+    map->try_emplace(key_u8str, ExpectedU8Str);
 
     // look up the keys as strings
     EXPECT_FALSE(map->value_if<std::string_view>(key_bool));
@@ -665,12 +774,16 @@ TEST_F(VariantTest, dictFindType)
     auto sv = map->value_if<std::string_view>(key_str);
     ASSERT_TRUE(sv);
     EXPECT_EQ(ExpectedStr, *sv);
+    sv = map->value_if<std::string_view>(key_u8str);
+    ASSERT_TRUE(sv);
+    EXPECT_EQ((std::string_view{ reinterpret_cast<char const*>(ExpectedU8Str.data()), ExpectedU8Str.size() }), *sv);
     EXPECT_FALSE(map->value_if<std::string_view>(key_unknown));
 
     // look up the keys as bools
     EXPECT_FALSE(map->value_if<bool>(key_int));
     EXPECT_FALSE(map->value_if<bool>(key_real));
     EXPECT_FALSE(map->value_if<bool>(key_str));
+    EXPECT_FALSE(map->value_if<bool>(key_u8str));
     auto b = map->value_if<bool>(key_bool);
     ASSERT_TRUE(b);
     EXPECT_EQ(ExpectedBool, b);
@@ -682,6 +795,7 @@ TEST_F(VariantTest, dictFindType)
     ASSERT_TRUE(d);
     EXPECT_EQ(static_cast<double>(ExpectedInt), *d);
     EXPECT_FALSE(map->value_if<double>(key_str));
+    EXPECT_FALSE(map->value_if<double>(key_u8str));
     d = map->value_if<double>(key_real);
     ASSERT_TRUE(d);
     EXPECT_EQ(ExpectedReal, *d);
@@ -692,6 +806,7 @@ TEST_F(VariantTest, dictFindType)
     EXPECT_EQ(ExpectedBool ? 1 : 0, *i);
     EXPECT_FALSE(map->value_if<int64_t>(key_real));
     EXPECT_FALSE(map->value_if<int64_t>(key_str));
+    EXPECT_FALSE(map->value_if<int64_t>(key_u8str));
     i = map->value_if<int64_t>(key_int);
     ASSERT_TRUE(i);
     EXPECT_EQ(ExpectedInt, *i);
@@ -787,18 +902,7 @@ TEST_F(VariantTest, visitsNodesDepthFirst)
             {
                 using ValueType = std::remove_cvref_t<decltype(val)>;
 
-                if constexpr (
-                    std::is_same_v<ValueType, bool> || //
-                    std::is_same_v<ValueType, double> || //
-                    std::is_same_v<ValueType, int64_t> || //
-                    std::is_same_v<ValueType, std::monostate> || //
-                    std::is_same_v<ValueType, std::nullptr_t> || //
-                    std::is_same_v<ValueType, std::string_view> || //
-                    std::is_same_v<ValueType, std::string>)
-                {
-                    flattened.emplace_back(val);
-                }
-                else if constexpr (std::is_same_v<ValueType, tr_variant::Vector>)
+                if constexpr (std::is_same_v<ValueType, tr_variant::Vector>)
                 {
                     for (auto const& child : val)
                     {
@@ -812,6 +916,10 @@ TEST_F(VariantTest, visitsNodesDepthFirst)
                         flattened.emplace_back(tr_variant::unmanaged_string(key));
                         self(child, self);
                     }
+                }
+                else
+                {
+                    flattened.emplace_back(val);
                 }
             });
     };

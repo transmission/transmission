@@ -21,6 +21,8 @@
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 
+class tr_interned_string;
+
 /**
  * A variant that holds typical benc/json types: bool, int,
  * double, string, vectors of variants, and maps of variants.
@@ -40,6 +42,8 @@ public:
         DoubleIndex,
         StringIndex,
         StringViewIndex,
+        U8StringIndex,
+        U8StringViewIndex,
         VectorIndex,
         MapIndex
     };
@@ -261,10 +265,19 @@ public:
         return ret;
     }
 
+    [[nodiscard]] static tr_variant unmanaged_string(std::u8string_view val)
+    {
+        auto ret = tr_variant{};
+        ret.val_.emplace<std::u8string_view>(val);
+        return ret;
+    }
+
     [[nodiscard]] static tr_variant unmanaged_string(tr_quark const key)
     {
         return unmanaged_string(tr_quark_get_string_view(key));
     }
+
+    [[nodiscard]] static tr_variant unmanaged_string(tr_interned_string const& val);
 
     template<typename Val>
     tr_variant& operator=(Val value)
@@ -275,9 +288,19 @@ public:
             // Use unmanaged_string() if you want the variant to hold a shallow copy.
             val_.emplace<std::string>(value);
         }
+        else if constexpr (std::is_same_v<Val, std::u8string_view>)
+        {
+            // Note: std::u8string_view assignment takes ownership by copying.
+            // Use unmanaged_string() if you want the variant to hold a shallow copy.
+            val_.emplace<std::u8string>(value);
+        }
         else if constexpr (std::is_same_v<Val, char const*> || std::is_same_v<Val, char*>)
         {
             val_.emplace<std::string>(value != nullptr ? value : "");
+        }
+        else if constexpr (std::is_same_v<Val, char8_t const*> || std::is_same_v<Val, char8_t*>)
+        {
+            val_.emplace<std::u8string>(value != nullptr ? value : u8"");
         }
         // note: std::is_integral_v<bool> is true, so this check
         // must come first to prevent bools from being stored as ints
@@ -313,6 +336,10 @@ public:
             !std::is_same_v<std::remove_cvref_t<Val>, std::string> &&
                 !std::is_same_v<std::remove_cvref_t<Val>, std::string_view>,
             "not supported -- use value_if<std::string_view>() instead.");
+        static_assert(
+            !std::is_same_v<std::remove_cvref_t<Val>, std::u8string> &&
+                !std::is_same_v<std::remove_cvref_t<Val>, std::u8string_view>,
+            "not supported -- use value_if<std::u8string_view>() instead.");
         return std::get_if<Val>(&val_);
     }
 
@@ -323,6 +350,10 @@ public:
             !std::is_same_v<std::remove_cvref_t<Val>, std::string> &&
                 !std::is_same_v<std::remove_cvref_t<Val>, std::string_view>,
             "not supported -- use value_if<std::string_view>() instead.");
+        static_assert(
+            !std::is_same_v<std::remove_cvref_t<Val>, std::u8string> &&
+                !std::is_same_v<std::remove_cvref_t<Val>, std::u8string_view>,
+            "not supported -- use value_if<std::u8string_view>() instead.");
         return const_cast<tr_variant*>(this)->get_if<Val>();
     }
 
@@ -359,6 +390,10 @@ public:
         {
             return std::holds_alternative<std::string>(val_) || std::holds_alternative<std::string_view>(val_);
         }
+        if constexpr (std::is_same_v<Val, std::u8string_view>)
+        {
+            return std::holds_alternative<std::u8string>(val_) || std::holds_alternative<std::u8string_view>(val_);
+        }
         else
         {
             return std::holds_alternative<Val>(val_);
@@ -393,11 +428,39 @@ public:
     [[nodiscard]] tr_variant clone() const;
 
 private:
-    std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, std::string, std::string_view, Vector, Map> val_;
+    std::variant<
+        std::monostate,
+        std::nullptr_t,
+        bool,
+        int64_t,
+        double,
+        std::string,
+        std::string_view,
+        std::u8string,
+        std::u8string_view,
+        Vector,
+        Map>
+        val_;
 };
 
 // These specialisations could have been in the class body,
 // but aren't because https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282
+
+template<>
+[[nodiscard]] constexpr std::optional<std::u8string_view> tr_variant::value_if() const noexcept
+{
+    switch (index())
+    {
+    case U8StringIndex:
+        return *std::get_if<std::u8string>(&val_);
+
+    case U8StringViewIndex:
+        return *std::get_if<std::u8string_view>(&val_);
+
+    default:
+        return {};
+    }
+}
 
 template<>
 [[nodiscard]] constexpr std::optional<std::string_view> tr_variant::value_if() const noexcept
@@ -411,6 +474,11 @@ template<>
         return *std::get_if<std::string_view>(&val_);
 
     default:
+        // TODO(c++23): use std::optional::transform() to simplify this code
+        if (auto const u8sv = value_if<std::u8string_view>())
+        {
+            return std::string_view{ reinterpret_cast<char const*>(u8sv->data()), u8sv->size() };
+        }
         return {};
     }
 }

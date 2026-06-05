@@ -326,6 +326,11 @@ struct BencWriter
         write_string(sv);
     }
 
+    void operator()(std::u8string_view sv) const
+    {
+        write_string({ reinterpret_cast<char const*>(sv.data()), sv.size() });
+    }
+
     void operator()(tr_variant::Vector const& vec) const
     {
         out_.push_back('l');

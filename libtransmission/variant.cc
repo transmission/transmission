@@ -25,6 +25,7 @@
 #include "libtransmission/api-compat.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
+#include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
@@ -84,6 +85,13 @@ template<typename T>
 
 // ---
 
+tr_variant tr_variant::unmanaged_string(tr_interned_string const& val)
+{
+    return unmanaged_string(val.u8sv());
+}
+
+// ---
+
 template<>
 [[nodiscard]] std::optional<double> tr_variant::value_if() const noexcept
 {
@@ -122,14 +130,7 @@ tr_variant& tr_variant::merge(tr_variant const& that)
         {
             using ValueType = std::remove_cvref_t<decltype(value)>;
 
-            if constexpr (
-                std::is_same_v<ValueType, std::monostate> || std::is_same_v<ValueType, std::nullptr_t> ||
-                std::is_same_v<ValueType, bool> || std::is_same_v<ValueType, int64_t> || std::is_same_v<ValueType, double> ||
-                std::is_same_v<ValueType, std::string_view> || std::is_same_v<ValueType, std::string>)
-            {
-                *this = value;
-            }
-            else if constexpr (std::is_same_v<ValueType, Vector>)
+            if constexpr (std::is_same_v<ValueType, Vector>)
             {
                 auto& dest = val_.emplace<Vector>();
                 dest.resize(std::size(value));
@@ -153,6 +154,10 @@ tr_variant& tr_variant::merge(tr_variant const& that)
                         (*dest)[key].merge(child);
                     }
                 }
+            }
+            else
+            {
+                *this = value;
             }
         });
 

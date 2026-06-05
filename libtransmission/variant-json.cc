@@ -348,6 +348,11 @@ struct JsonWriter
         writer.String(data != nullptr ? data : "", std::size(val));
     }
 
+    void operator()(std::u8string_view const val) const
+    {
+        (*this)(std::string_view{ reinterpret_cast<char const*>(val.data()), val.size() });
+    }
+
     void operator()(tr_variant::Vector const& val) const
     {
         writer.StartArray();
