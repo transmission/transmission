@@ -139,7 +139,7 @@ protected:
         *have1 = *have2 = false;
 
         auto err = tr_error{};
-        auto dd = tr_sys_dir_open(path.string(), &err);
+        auto dd = tr_sys_dir_open(path, &err);
         EXPECT_NE(TR_BAD_SYS_DIR, dd);
         EXPECT_FALSE(err) << err;
 
@@ -1326,19 +1326,19 @@ TEST_F(FileTest, dirOpen)
 
     // path does not exist
     auto err = tr_error{};
-    auto odir = tr_sys_dir_open("/no/such/path", &err);
+    auto odir = tr_sys_dir_open(u8"/no/such/path"sv, &err);
     EXPECT_EQ(TR_BAD_SYS_DIR, odir);
     EXPECT_TRUE(err);
     err = {};
 
     // path is not a directory
-    odir = tr_sys_dir_open(file.string(), &err);
+    odir = tr_sys_dir_open(file, &err);
     EXPECT_EQ(TR_BAD_SYS_DIR, odir);
     EXPECT_TRUE(err);
     err = {};
 
     // path exists and is readable
-    odir = tr_sys_dir_open(test_dir.string(), &err);
+    odir = tr_sys_dir_open(test_dir, &err);
     EXPECT_NE(TR_BAD_SYS_DIR, odir);
     EXPECT_FALSE(err);
     auto files = std::set<std::string>{};

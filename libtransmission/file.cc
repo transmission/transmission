@@ -261,7 +261,7 @@ std::vector<std::string> tr_sys_dir_get_files(
         return {};
     }
 
-    auto const odir = tr_sys_dir_open(folder, error);
+    auto const odir = tr_sys_dir_open(tr_u8path(folder), error);
     if (odir == TR_BAD_SYS_DIR)
     {
         return {};

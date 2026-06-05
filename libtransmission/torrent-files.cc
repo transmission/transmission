@@ -50,7 +50,7 @@ using file_func_t = std::function<void(std::string_view filename)>;
         return false;
     }
 
-    if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
+    if (auto const odir = tr_sys_dir_open(tr_u8path(path)); odir != TR_BAD_SYS_DIR)
     {
         char const* name_cstr = nullptr;
         while ((name_cstr = tr_sys_dir_read_name(odir)) != nullptr)
@@ -72,7 +72,7 @@ void depth_first_walk(std::string_view const path, file_func_t const& func, std:
 {
     if (is_folder(path) && (!max_depth || *max_depth > 0))
     {
-        if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
+        if (auto const odir = tr_sys_dir_open(tr_u8path(path)); odir != TR_BAD_SYS_DIR)
         {
             char const* name_cstr = nullptr;
             while ((name_cstr = tr_sys_dir_read_name(odir)) != nullptr)

@@ -509,7 +509,7 @@ bool tr_sys_dir_create_temp(std::filesystem::path& path_template, tr_error* erro
  * @return Opened directory descriptor on success, `TR_BAD_SYS_DIR` otherwise
  *         (with `error` set accordingly).
  */
-tr_sys_dir_t tr_sys_dir_open(std::string_view path, tr_error* error = nullptr);
+tr_sys_dir_t tr_sys_dir_open(std::filesystem::path const& path, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `readdir()`.

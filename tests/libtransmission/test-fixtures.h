@@ -49,7 +49,7 @@ static void depthFirstWalk(char const* path, file_func_t const& func)
 {
     if (auto const info = tr_sys_path_get_info(tr_u8path(path)); info && info->isFolder())
     {
-        if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
+        if (auto const odir = tr_sys_dir_open(tr_u8path(path)); odir != TR_BAD_SYS_DIR)
         {
             for (;;)
             {

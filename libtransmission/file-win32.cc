@@ -892,17 +892,17 @@ bool tr_sys_dir_create_temp(std::filesystem::path& path_template, tr_error* erro
     return ret;
 }
 
-tr_sys_dir_t tr_sys_dir_open(std::string_view path, tr_error* error)
+tr_sys_dir_t tr_sys_dir_open(std::filesystem::path const& path, tr_error* error)
 {
     TR_ASSERT(!std::empty(path));
 
-    if (auto const info = tr_sys_path_get_info(tr_u8path(path), 0); !info || !info->isFolder())
+    if (auto const info = tr_sys_path_get_info(path, 0); !info || !info->isFolder())
     {
         set_system_error(error, ERROR_DIRECTORY);
         return TR_BAD_SYS_DIR;
     }
 
-    auto const pattern = path_to_native_path(path);
+    auto const pattern = to_long_path(path);
     if (std::empty(pattern))
     {
         set_system_error(error, GetLastError());
