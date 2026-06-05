@@ -18,12 +18,7 @@
 
 #include "libtransmission/values.h"
 
-struct tr_ctor;
 struct tr_error;
-struct tr_session;
-struct tr_torrent;
-struct tr_torrent_metainfo;
-struct tr_variant;
 
 // https://www.bittorrent.org/beps/bep_0007.html
 // "The client SHOULD include a key parameter in its announces. The key
