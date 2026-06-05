@@ -767,14 +767,7 @@ template<typename CharT>
         {
             if (auto const new_key = convert_key(state, *old_key); *old_key != new_key)
             {
-                if constexpr (std::is_same_v<CharT, char>)
-                {
-                    return tr_quark_get_string_view(new_key);
-                }
-                else
-                {
-                    return tr_quark_get_u8string_view(new_key);
-                }
+                    return tr_quark_get_string_view<CharT>(new_key);
             }
         }
     }
@@ -907,7 +900,7 @@ void convert_files_wanted_response(tr_variant::Map& top, State const& state)
                 if (auto const wanted_iter = std::ranges::find_if(
                         *first_vec,
                         [](tr_variant const& v)
-                        { return v.value_if<std::string_view>() == tr_quark_get_string_view(TR_KEY_wanted); });
+                        { return v.value_if<std::string_view>() == tr_quark_get_string_view<char>(TR_KEY_wanted); });
                     wanted_iter != std::ranges::end(*first_vec))
                 {
                     auto const wanted_idx = static_cast<size_t>(wanted_iter - std::begin(*first_vec));

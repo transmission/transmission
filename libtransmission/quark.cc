@@ -812,13 +812,15 @@ tr_quark tr_quark_new(std::string_view str)
     return tr_quark_new(u8str);
 }
 
+template<>
 std::string_view tr_quark_get_string_view(tr_quark q)
 {
-    auto const u8str = tr_quark_get_u8string_view(q);
+    auto const u8str = tr_quark_get_string_view<char8_t>(q);
     return { reinterpret_cast<char const*>(std::data(u8str)), std::size(u8str) };
 }
 
-std::u8string_view tr_quark_get_u8string_view(tr_quark q)
+template<>
+std::u8string_view tr_quark_get_string_view(tr_quark q)
 {
     TR_ASSERT(q < TR_N_KEYS + std::size(my_runtime));
     return q < TR_N_KEYS ? MyStatic[q] : my_runtime[q - TR_N_KEYS];

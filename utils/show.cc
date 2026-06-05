@@ -385,7 +385,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
             while (tr_variantDictChild(files, child_pos, &key, &val))
             {
-                if (hashsv == tr_quark_get_string_view(key))
+                if (hashsv == tr_quark_get_string_view<char>(key))
                 {
                     auto i = int64_t{};
                     auto const seeders = tr_variantDictFindInt(val, TR_KEY_complete, &i) ? int(i) : -1;

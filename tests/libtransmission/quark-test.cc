@@ -18,7 +18,7 @@ TEST_F(QuarkTest, allPredefinedKeysCanBeLookedUp)
 {
     for (size_t i = 0; i < TR_N_KEYS; ++i)
     {
-        auto const str = tr_quark_get_string_view(i);
+        auto const str = tr_quark_get_string_view<char>(i);
         auto const q = tr_quark_lookup(str);
         ASSERT_TRUE(q.has_value());
         assert(q.has_value());
@@ -30,5 +30,5 @@ TEST_F(QuarkTest, newQuarkByStringView)
 {
     auto constexpr UniqueString = std::string_view{ "this string is not a predefined quark" };
     auto const q = tr_quark_new(UniqueString);
-    EXPECT_EQ(UniqueString, tr_quark_get_string_view(q));
+    EXPECT_EQ(UniqueString, tr_quark_get_string_view<char>(q));
 }

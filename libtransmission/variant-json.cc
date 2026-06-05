@@ -304,7 +304,7 @@ private:
     entries.reserve(map.size());
     for (auto const& [key, child] : map)
     {
-        entries.emplace_back(tr_quark_get_string_view(key), &child);
+        entries.emplace_back(tr_quark_get_string_view<char>(key), &child);
     }
     std::ranges::sort(entries);
     return entries;

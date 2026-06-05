@@ -102,7 +102,7 @@ bool Session::portTestPending(Session::PortTestIpProtocol const ip_protocol) con
 
 void Session::copyMagnetLinkToClipboard(int torrent_id)
 {
-    static auto const Fields = std::array{ tr_quark_get_string_view(TR_KEY_magnet_link) };
+    static auto const Fields = std::array{ tr_quark_get_string_view<char>(TR_KEY_magnet_link) };
 
     tr_variant args;
     tr_variantInitDict(&args, 2);
@@ -366,7 +366,7 @@ void Session::addOptionalIds(tr_variant* args_dict, torrent_ids_t const& torrent
 {
     if (&torrent_ids == &RecentlyActiveIDs)
     {
-        dictAdd(args_dict, TR_KEY_ids, tr_quark_get_string_view(TR_KEY_recently_active));
+        dictAdd(args_dict, TR_KEY_ids, tr_quark_get_string_view<char>(TR_KEY_recently_active));
     }
     else if (!std::empty(torrent_ids))
     {

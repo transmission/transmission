@@ -686,7 +686,7 @@ bool bindUnixSocket(
     tr_logAddError(
         fmt::format(
             _("Unix sockets are unsupported on Windows. Please change '{key}' in your settings."),
-            fmt::arg("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address))));
+            fmt::arg("key", tr_quark_get_string_view<char>(TR_KEY_rpc_bind_address))));
     return false;
 #else
     auto addr = sockaddr_un{};
@@ -1020,7 +1020,7 @@ void tr_rpc_server::load(Settings&& settings)
             fmt::format(
                 fmt::runtime(_(
                     "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'")),
-                fmt::arg("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address)),
+                fmt::arg("key", tr_quark_get_string_view<char>(TR_KEY_rpc_bind_address)),
                 fmt::arg("value", settings_.bind_address_str)));
     }
 

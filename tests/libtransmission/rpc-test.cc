@@ -719,7 +719,7 @@ TEST_F(RpcTest, torrentGet)
 
     auto params = tr_variant::Map{ 1U };
     auto fields = tr_variant::Vector{};
-    fields.emplace_back(tr_quark_get_string_view(TR_KEY_id));
+    fields.emplace_back(tr_quark_get_string_view<char>(TR_KEY_id));
     params.try_emplace(TR_KEY_fields, std::move(fields));
     request_map.try_emplace(TR_KEY_params, std::move(params));
 
@@ -777,9 +777,9 @@ TEST_F(RpcTest, recentlyActiveEmptyOnStartup)
 
     auto params = tr_variant::Map{ 2U };
     auto fields = tr_variant::Vector{};
-    fields.emplace_back(tr_quark_get_string_view(TR_KEY_id));
+    fields.emplace_back(tr_quark_get_string_view<char>(TR_KEY_id));
     params.try_emplace(TR_KEY_fields, std::move(fields));
-    params.try_emplace(TR_KEY_ids, tr_quark_get_string_view(TR_KEY_recently_active));
+    params.try_emplace(TR_KEY_ids, tr_quark_get_string_view<char>(TR_KEY_recently_active));
     request_map.try_emplace(TR_KEY_params, std::move(params));
 
     auto request = tr_variant{ std::move(request_map) };
@@ -803,11 +803,11 @@ TEST_F(RpcTest, torrentGetLegacy)
 
     auto request_map = tr_variant::Map{ 1U };
 
-    request_map.try_emplace(TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_get_kebab));
+    request_map.try_emplace(TR_KEY_method, tr_quark_get_string_view<char>(TR_KEY_torrent_get_kebab));
 
     auto args_in = tr_variant::Map{ 1U };
     auto fields = tr_variant::Vector{};
-    fields.emplace_back(tr_quark_get_string_view(TR_KEY_id));
+    fields.emplace_back(tr_quark_get_string_view<char>(TR_KEY_id));
     args_in.try_emplace(TR_KEY_fields, std::move(fields));
     request_map.try_emplace(TR_KEY_arguments, std::move(args_in));
 

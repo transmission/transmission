@@ -42,7 +42,7 @@ class PrefsTest
 
     [[nodiscard]] static std::string get_json_member_str(tr_quark const key, std::string_view const valstr)
     {
-        auto const json_key = tr_quark_get_string_view(key);
+        auto const json_key = tr_quark_get_string_view<char>(key);
         return fmt::format(R"("{:s}":{:s})", json_key, valstr);
     }
 

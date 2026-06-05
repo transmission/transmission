@@ -274,7 +274,7 @@ public:
 
     [[nodiscard]] static tr_variant unmanaged_string(tr_quark const key)
     {
-        return unmanaged_string(tr_quark_get_u8string_view(key));
+        return unmanaged_string(tr_quark_get_string_view<char8_t>(key));
     }
 
     [[nodiscard]] static tr_variant unmanaged_string(tr_interned_string const& val);

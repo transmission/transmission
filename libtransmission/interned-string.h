@@ -23,7 +23,7 @@ public:
 
     explicit tr_interned_string(tr_quark quark)
         : quark_{ quark }
-        , sv_{ tr_quark_get_u8string_view(quark_) }
+        , sv_{ tr_quark_get_string_view<char8_t>(quark_) }
     {
     }
 
@@ -45,7 +45,7 @@ public:
     tr_interned_string& operator=(tr_quark quark)
     {
         quark_ = quark;
-        sv_ = tr_quark_get_u8string_view(quark_);
+        sv_ = tr_quark_get_string_view<char8_t>(quark_);
         return *this;
     }
 
