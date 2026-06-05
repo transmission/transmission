@@ -61,42 +61,42 @@ namespace JsonRpc
 // https://www.jsonrpc.org/specification#error_object
 namespace Error
 {
-[[nodiscard]] std::string_view to_string(Code const code)
+[[nodiscard]] std::u8string_view to_string(Code const code)
 {
     switch (code)
     {
     case PARSE_ERROR:
-        return "Parse error"sv;
+        return u8"Parse error"sv;
     case INVALID_REQUEST:
-        return "Invalid Request"sv;
+        return u8"Invalid Request"sv;
     case METHOD_NOT_FOUND:
-        return "Method not found"sv;
+        return u8"Method not found"sv;
     case INVALID_PARAMS:
-        return "Invalid params"sv;
+        return u8"Invalid params"sv;
     case INTERNAL_ERROR:
-        return "Internal error"sv;
+        return u8"Internal error"sv;
     case SUCCESS:
-        return "success"sv;
+        return u8"success"sv;
     case SET_ANNOUNCE_LIST:
-        return "error setting announce list"sv;
+        return u8"error setting announce list"sv;
     case INVALID_TRACKER_LIST:
-        return "Invalid tracker list"sv;
+        return u8"Invalid tracker list"sv;
     case PATH_NOT_ABSOLUTE:
-        return "path is not absolute"sv;
+        return u8"path is not absolute"sv;
     case UNRECOGNIZED_INFO:
-        return "unrecognized info"sv;
+        return u8"unrecognized info"sv;
     case SYSTEM_ERROR:
-        return "system error"sv;
+        return u8"system error"sv;
     case FILE_IDX_OOR:
-        return "file index out of range"sv;
+        return u8"file index out of range"sv;
     case PIECE_IDX_OOR:
-        return "piece index out of range"sv;
+        return u8"piece index out of range"sv;
     case HTTP_ERROR:
-        return "HTTP error from backend service"sv;
+        return u8"HTTP error from backend service"sv;
     case CORRUPT_TORRENT:
-        return "invalid or corrupt torrent file"sv;
+        return u8"invalid or corrupt torrent file"sv;
     case INVALID_BLOCKLIST_DATA:
-        return "couldn't parse any valid blocklist rules"sv;
+        return u8"couldn't parse any valid blocklist rules"sv;
     default:
         return {};
     }

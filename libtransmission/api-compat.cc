@@ -1083,7 +1083,7 @@ void convert_jsonrpc(tr_variant::Map& top, State const& state)
         error.try_emplace(TR_KEY_code, code);
         error.try_emplace(TR_KEY_message, errmsg);
         // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
-        if (errstr != errmsg && errstr != MethodNotFoundLegacyErrmsg)
+        if (errstr != std::string_view{ reinterpret_cast<char const*>(errmsg.data()), errmsg.size() } && errstr != MethodNotFoundLegacyErrmsg)
         {
             data.try_emplace(TR_KEY_error_string, errstr);
         }

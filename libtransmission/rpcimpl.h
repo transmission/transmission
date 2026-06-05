@@ -45,7 +45,7 @@ enum Code : int16_t
     INVALID_BLOCKLIST_DATA,
 };
 
-[[nodiscard]] std::string_view to_string(Code code);
+[[nodiscard]] std::u8string_view to_string(Code code);
 } // namespace Error
 } // namespace JsonRpc
 
