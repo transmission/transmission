@@ -624,7 +624,7 @@ static NSMutableSet* creatorWindowControllerSet;
     self.fFuture = self.fBuilder->make_checksums();
 
     __weak __auto_type weakSelf = self;
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer* _Nonnull timer) {
         [weakSelf checkProgress];
     }];
 }

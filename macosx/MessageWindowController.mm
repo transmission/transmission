@@ -150,7 +150,7 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
     if (!self.fTimer)
     {
         __weak __auto_type weakSelf = self;
-        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds repeats:YES block:^(NSTimer * _Nonnull timer) {
+        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds repeats:YES block:^(NSTimer* _Nonnull timer) {
             [weakSelf updateLog];
         }];
         [self updateLog];
@@ -177,7 +177,7 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 {
     [self.fTimer invalidate];
     __weak __auto_type weakSelf = self;
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds repeats:YES block:^(NSTimer * _Nonnull timer) {
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds repeats:YES block:^(NSTimer* _Nonnull timer) {
         [weakSelf updateLog];
     }];
     [self updateLog];

@@ -810,7 +810,7 @@ static void removeKeRangerRansomware()
 
     //timer to update the interface every second
     __weak __auto_type weakSelf = self;
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateUISeconds repeats:YES block:^(NSTimer * _Nonnull timer) {
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateUISeconds repeats:YES block:^(NSTimer* _Nonnull timer) {
         [weakSelf updateUI];
     }];
 
@@ -3555,7 +3555,7 @@ static void removeKeRangerRansomware()
 
     //check again in 10 seconds in case torrent file wasn't complete
     __weak __auto_type weakSelf = self;
-    self.fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval:10.0 repeats:NO block:^(NSTimer * _Nonnull timer){
+    self.fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval:10.0 repeats:NO block:^(NSTimer* _Nonnull timer) {
         [weakSelf checkAutoImportDirectory];
     }];
 

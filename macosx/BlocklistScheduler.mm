@@ -54,7 +54,7 @@ static NSTimeInterval const kFullWait = 60 * 60 * 24 * 7;
     NSDate* useDate = lastUpdateDate ? [lastUpdateDate laterDate:closeDate] : closeDate;
 
     __weak __auto_type weakSelf = self;
-    self.fTimer = [[NSTimer alloc] initWithFireDate:useDate interval:0 repeats:NO block:^(NSTimer * _Nonnull timer) {
+    self.fTimer = [[NSTimer alloc] initWithFireDate:useDate interval:0 repeats:NO block:^(NSTimer* _Nonnull timer) {
         [weakSelf runUpdater];
     }];
 
