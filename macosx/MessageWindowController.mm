@@ -149,10 +149,11 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 {
     if (!self.fTimer)
     {
-        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds target:self selector:@selector(updateLog:)
-                                                     userInfo:nil
-                                                      repeats:YES];
-        [self updateLog:nil];
+        __weak __auto_type weakSelf = self;
+        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds repeats:YES block:^(NSTimer * _Nonnull timer) {
+            [weakSelf updateLog];
+        }];
+        [self updateLog];
     }
 }
 
@@ -175,9 +176,11 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 - (void)window:(NSWindow*)window didDecodeRestorableState:(NSCoder*)coder
 {
     [self.fTimer invalidate];
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds target:self selector:@selector(updateLog:) userInfo:nil
-                                                  repeats:YES];
-    [self updateLog:nil];
+    __weak __auto_type weakSelf = self;
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds repeats:YES block:^(NSTimer * _Nonnull timer) {
+        [weakSelf updateLog];
+    }];
+    [self updateLog];
 }
 
 + (NSImage*)iconForLevel:(NSInteger)level
@@ -223,7 +226,7 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
     return icon;
 }
 
-- (void)updateLog:(NSTimer*)timer
+- (void)updateLog
 {
     tr_log_message* messages;
     if ((messages = tr_logGetQueue()) == NULL)
