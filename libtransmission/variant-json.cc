@@ -32,6 +32,7 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
+#include "string-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
@@ -341,16 +342,18 @@ struct JsonWriter
 
     void operator()(std::string_view const val) const
     {
-        // workaround for this issue: in Writer::String() at
-        // rapidjson/writer.h:205: `RAPIDJSON_ASSERT(str != 0);`
-        // that fails when val.data() is nullptr when val.empty()
-        char const* data = std::data(val);
-        writer.String(data != nullptr ? data : "", std::size(val));
+        (*this)(tr_strv_to_u8string(val));
     }
 
     void operator()(std::u8string_view const val) const
     {
-        (*this)(std::string_view{ reinterpret_cast<char const*>(val.data()), val.size() });
+        TR_ASSERT(tr_strv_find_invalid_utf8(val) == std::u8string_view::npos);
+
+        // workaround for this issue: in Writer::String() at
+        // rapidjson/writer.h:205: `RAPIDJSON_ASSERT(str != 0);`
+        // that fails when val.data() is nullptr when val.empty()
+        auto const* data = std::data(val);
+        writer.String(data != nullptr ? reinterpret_cast<char const*>(data) : "", std::size(val));
     }
 
     void operator()(tr_variant::Vector const& val) const
