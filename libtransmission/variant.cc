@@ -342,11 +342,6 @@ tr_variant* tr_variantListAdd(tr_variant* const var)
     return nullptr;
 }
 
-tr_variant* tr_variantListAddInt(tr_variant* const var, int64_t const value)
-{
-    return vec_add(var, value);
-}
-
 tr_variant* tr_variantListAddReal(tr_variant* const var, double const value)
 {
     return vec_add(var, value);
