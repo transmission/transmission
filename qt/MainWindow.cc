@@ -1307,7 +1307,10 @@ void MainWindow::addTorrents(QStringList const& filenames)
         {
             show_options = b->isChecked();
         }
-        prefs_.set(Prefs::OPEN_DIALOG_FOLDER, file_dialog->directory().absolutePath());
+        QDir current_directory();
+        if (file_dialog->directory().exists()) {
+            prefs_.set(Prefs::OPEN_DIALOG_FOLDER, file_dialog->directory().absolutePath());
+        }
     }
 
     for (QString const& filename : filenames)
