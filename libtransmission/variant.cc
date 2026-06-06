@@ -331,11 +331,6 @@ tr_variant* tr_variantListAdd(tr_variant* const var)
     return nullptr;
 }
 
-tr_variant* tr_variantListAddList(tr_variant* const var, size_t const n_reserve)
-{
-    return vec_add(var, tr_variant::make_vector(n_reserve));
-}
-
 tr_variant* tr_variantDictAdd(tr_variant* const var, tr_quark key)
 {
     TR_ASSERT(var != nullptr);

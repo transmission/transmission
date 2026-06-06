@@ -507,7 +507,6 @@ void tr_variantInitList(tr_variant* initme, size_t n_reserve);
 void tr_variantListReserve(tr_variant* var, size_t n_reserve);
 
 tr_variant* tr_variantListAdd(tr_variant* var);
-tr_variant* tr_variantListAddList(tr_variant* var, size_t n_reserve);
 tr_variant* tr_variantListChild(tr_variant* var, size_t pos);
 
 bool tr_variantListRemove(tr_variant* var, size_t pos);
