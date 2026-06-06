@@ -509,7 +509,6 @@ void tr_variantListReserve(tr_variant* var, size_t n_reserve);
 tr_variant* tr_variantListAdd(tr_variant* var);
 tr_variant* tr_variantListAddStr(tr_variant* var, std::string_view value);
 tr_variant* tr_variantListAddStrView(tr_variant* var, std::string_view value);
-tr_variant* tr_variantListAddRaw(tr_variant* var, void const* value, size_t n_bytes);
 tr_variant* tr_variantListAddList(tr_variant* var, size_t n_reserve);
 tr_variant* tr_variantListAddDict(tr_variant* var, size_t n_reserve);
 tr_variant* tr_variantListChild(tr_variant* var, size_t pos);

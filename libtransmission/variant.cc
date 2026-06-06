@@ -352,11 +352,6 @@ tr_variant* tr_variantListAddStrView(tr_variant* const var, std::string_view val
     return vec_add(var, tr_variant::unmanaged_string(value));
 }
 
-tr_variant* tr_variantListAddRaw(tr_variant* const var, void const* value, size_t n_bytes)
-{
-    return vec_add(var, tr_variant::make_raw(value, n_bytes));
-}
-
 tr_variant* tr_variantListAddList(tr_variant* const var, size_t const n_reserve)
 {
     return vec_add(var, tr_variant::make_vector(n_reserve));
