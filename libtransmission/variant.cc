@@ -352,11 +352,6 @@ tr_variant* tr_variantListAddReal(tr_variant* const var, double const value)
     return vec_add(var, value);
 }
 
-tr_variant* tr_variantListAddBool(tr_variant* const var, bool const value)
-{
-    return vec_add(var, value);
-}
-
 tr_variant* tr_variantListAddStr(tr_variant* const var, std::string_view const value)
 {
     return vec_add(var, std::string{ value });

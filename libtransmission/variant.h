@@ -507,7 +507,6 @@ void tr_variantInitList(tr_variant* initme, size_t n_reserve);
 void tr_variantListReserve(tr_variant* var, size_t n_reserve);
 
 tr_variant* tr_variantListAdd(tr_variant* var);
-tr_variant* tr_variantListAddBool(tr_variant* var, bool value);
 tr_variant* tr_variantListAddInt(tr_variant* var, int64_t value);
 tr_variant* tr_variantListAddReal(tr_variant* var, double value);
 tr_variant* tr_variantListAddStr(tr_variant* var, std::string_view value);
