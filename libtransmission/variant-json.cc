@@ -42,9 +42,9 @@ namespace
 {
 namespace parse_helpers
 {
-struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
+struct json_to_variant_handler : public rapidjson::BaseReaderHandler<rapidjson::UTF8<char8_t>>
 {
-    static_assert(std::is_same_v<Ch, char>);
+    static_assert(std::is_same_v<Ch, char8_t>);
 
     explicit json_to_variant_handler(tr_variant* const top)
     {
@@ -95,7 +95,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool String(Ch const* const str, rapidjson::SizeType const len, bool const copy)
     {
-        *get_leaf() = copy ? tr_variant{ std::string_view{ str, len } } : tr_variant::unmanaged_string({ str, len });
+        *get_leaf() = copy ? tr_variant{ std::u8string_view{ str, len } } : tr_variant::unmanaged_string({ str, len });
         return true;
     }
 
@@ -119,7 +119,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
         }
         else
         {
-            cur_key_ = std::string_view{ str, len };
+            cur_key_ = { str, len };
         }
         return true;
     }
@@ -193,7 +193,7 @@ private:
         if (parent->holds_alternative<tr_variant::Map>())
         {
             TR_ASSERT(!std::empty(cur_key_));
-            auto tmp = std::string_view{};
+            auto tmp = std::u8string_view{};
             std::swap(cur_key_, tmp);
             return tr_variantDictAdd(parent, tr_quark_new(tmp));
         }
@@ -210,8 +210,8 @@ private:
      * a preallocation heuristic for the next container at that depth. */
     std::array<size_t, MaxDepth> prealloc_guess_{};
 
-    std::string key_buf_;
-    std::string_view cur_key_;
+    std::u8string key_buf_;
+    std::u8string_view cur_key_;
     std::stack<tr_variant*> stack_;
 };
 } // namespace parse_helpers
@@ -231,7 +231,7 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
     auto handler = parse_helpers::json_to_variant_handler{ &top };
     auto ms = rapidjson::MemoryStream{ begin, size };
     auto eis = rapidjson::AutoUTFInputStream<unsigned, rapidjson::MemoryStream>{ ms };
-    auto reader = rapidjson::GenericReader<rapidjson::AutoUTF<unsigned>, rapidjson::UTF8<char>>{};
+    auto reader = rapidjson::GenericReader<rapidjson::AutoUTF<unsigned>, rapidjson::UTF8<char8_t>>{};
     reader.Parse<rapidjson::kParseStopWhenDoneFlag>(eis, handler);
 
     // Due to the nature of how AutoUTFInputStream works, when AutoUTFInputStream

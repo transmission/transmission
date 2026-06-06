@@ -936,12 +936,12 @@ TEST_F(VariantTest, visitsNodesDepthFirst)
     //
     // FIXME(ckerr): `serde.inplace()` doesn't work on JSON right now.
     // RapidJSON always copies strings unless given mutable JSON input.
-    // That's why StringViewIndex is missing two counts here.
+    // That's why U8StringViewIndex is missing two counts here.
     auto const expected_visited_count = std::map<size_t, size_t>{
         { tr_variant::BoolIndex, 1U }, //
         { tr_variant::IntIndex, 4U }, //
         { tr_variant::MapIndex, 4U }, //
-        { tr_variant::StringIndex, 2U }, //
+        { tr_variant::U8StringIndex, 2U }, //
         { tr_variant::VectorIndex, 3U }, //
     };
     EXPECT_EQ(expected_visited_count, visited_counts);

@@ -1857,7 +1857,7 @@ void print_session(tr_variant::Map const& result)
     }
 
     if (auto const* const l = result.find_if<tr_variant::Vector>(TR_KEY_preferred_transports); l != nullptr &&
-        std::ranges::all_of(*l, [](tr_variant const& var) { return var.holds_alternative<std::string_view>(); }))
+        std::ranges::all_of(*l, [](tr_variant const& var) { return var.holds_alternative<std::u8string_view>(); }))
     {
         auto const view = std::views::transform(*l, [](tr_variant const& var) { return *var.value_if<std::string_view>(); });
         fmt::print("  Transport protocol preference: {}\n", fmt::join(view, ", "));

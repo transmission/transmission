@@ -183,7 +183,7 @@ TEST_F(RpcTest, idSync)
             EXPECT_EQ(request_id.value_if<std::u8string_view>(), response_map->value_if<std::u8string_view>(TR_KEY_id));
             break;
         default:
-            EXPECT_EQ(request_id.value_if<std::string_view>(), response_map->value_if<std::string_view>(TR_KEY_id));
+            EXPECT_EQ(request_id.value_if<std::u8string_view>(), response_map->value_if<std::u8string_view>(TR_KEY_id));
             break;
         }
     }
@@ -301,7 +301,7 @@ TEST_F(RpcTest, idAsync)
             EXPECT_EQ(request_id.value_if<std::u8string_view>(), response_map->value_if<std::u8string_view>(TR_KEY_id));
             break;
         default:
-            EXPECT_EQ(request_id.value_if<std::string_view>(), response_map->value_if<std::string_view>(TR_KEY_id));
+            EXPECT_EQ(request_id.value_if<std::u8string_view>(), response_map->value_if<std::u8string_view>(TR_KEY_id));
             break;
         }
 
@@ -453,7 +453,7 @@ TEST_F(RpcTest, batch)
     request_map = tr_variant::Map{ 3U };
     request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
     request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats));
-    request_map.try_emplace(TR_KEY_id, "12345"sv);
+    request_map.try_emplace(TR_KEY_id, u8"12345"sv);
     request_vec.emplace_back(std::move(request_map));
 
     request_map = tr_variant::Map{ 3U };
@@ -510,9 +510,9 @@ TEST_F(RpcTest, batch)
     EXPECT_NE(result, nullptr);
     error_it = response_map->find(TR_KEY_error);
     EXPECT_EQ(error_it, std::end(*response_map));
-    auto id_str = response_map->value_if<std::string_view>(TR_KEY_id);
+    auto id_str = response_map->value_if<std::u8string_view>(TR_KEY_id);
     ASSERT_TRUE(id_str);
-    EXPECT_EQ(*id_str, "12345"sv);
+    EXPECT_EQ(*id_str, u8"12345"sv);
 
     response_map = response_vec[2].get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
