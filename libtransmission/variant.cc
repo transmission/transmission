@@ -259,12 +259,6 @@ bool tr_variantDictFindBool(tr_variant* const var, tr_quark key, bool* setme)
     return tr_variantGetBool(child, setme);
 }
 
-bool tr_variantDictFindReal(tr_variant* const var, tr_quark key, double* setme)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetReal(child, setme);
-}
-
 bool tr_variantDictFindStrView(tr_variant* const var, tr_quark key, std::string_view* setme)
 {
     auto const* const child = tr_variantDictFind(var, key);
