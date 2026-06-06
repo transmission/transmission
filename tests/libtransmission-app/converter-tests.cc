@@ -50,13 +50,13 @@ void expect_sys_seconds_eq(std::optional<std::chrono::sys_seconds> const& actual
 }
 
 template<typename T, size_t N>
-void testModeRoundtrip(std::array<std::pair<std::string_view, T>, N> const& items)
+void testModeRoundtrip(std::array<std::pair<std::u8string_view, T>, N> const& items)
 {
     for (auto const& [key, mode] : items)
     {
         auto const var = Converters::serialize(mode);
-        EXPECT_TRUE(var.template holds_alternative<std::string_view>());
-        EXPECT_EQ(var.template value_if<std::string_view>().value_or(""sv), key);
+        EXPECT_TRUE(var.template holds_alternative<std::u8string_view>());
+        EXPECT_EQ(var.template value_if<std::u8string_view>().value_or(u8""sv), key);
 
         auto out = T{};
         EXPECT_TRUE(Converters::deserialize(tr_variant{ key }, &out));
@@ -68,15 +68,15 @@ void testModeRoundtrip(std::array<std::pair<std::string_view, T>, N> const& item
 
 TEST_F(ConverterTest, showModeStringsRoundtrip)
 {
-    auto constexpr Items = std::array<std::pair<std::string_view, tr::app::ShowMode>, tr::app::ShowModeCount>{ {
-        { "show_active", tr::app::ShowMode::ShowActive },
-        { "show_all", tr::app::ShowMode::ShowAll },
-        { "show_downloading", tr::app::ShowMode::ShowDownloading },
-        { "show_error", tr::app::ShowMode::ShowError },
-        { "show_finished", tr::app::ShowMode::ShowFinished },
-        { "show_paused", tr::app::ShowMode::ShowPaused },
-        { "show_seeding", tr::app::ShowMode::ShowSeeding },
-        { "show_verifying", tr::app::ShowMode::ShowVerifying },
+    auto constexpr Items = std::array<std::pair<std::u8string_view, tr::app::ShowMode>, tr::app::ShowModeCount>{ {
+        { u8"show_active", tr::app::ShowMode::ShowActive },
+        { u8"show_all", tr::app::ShowMode::ShowAll },
+        { u8"show_downloading", tr::app::ShowMode::ShowDownloading },
+        { u8"show_error", tr::app::ShowMode::ShowError },
+        { u8"show_finished", tr::app::ShowMode::ShowFinished },
+        { u8"show_paused", tr::app::ShowMode::ShowPaused },
+        { u8"show_seeding", tr::app::ShowMode::ShowSeeding },
+        { u8"show_verifying", tr::app::ShowMode::ShowVerifying },
     } };
 
     testModeRoundtrip(Items);
@@ -84,17 +84,17 @@ TEST_F(ConverterTest, showModeStringsRoundtrip)
 
 TEST_F(ConverterTest, sortModeStringsRoundtrip)
 {
-    auto constexpr Items = std::array<std::pair<std::string_view, tr::app::SortMode>, tr::app::SortModeCount>{ {
-        { "sort_by_activity", tr::app::SortMode::SortByActivity },
-        { "sort_by_age", tr::app::SortMode::SortByAge },
-        { "sort_by_eta", tr::app::SortMode::SortByEta },
-        { "sort_by_id", tr::app::SortMode::SortById },
-        { "sort_by_name", tr::app::SortMode::SortByName },
-        { "sort_by_progress", tr::app::SortMode::SortByProgress },
-        { "sort_by_queue", tr::app::SortMode::SortByQueue },
-        { "sort_by_ratio", tr::app::SortMode::SortByRatio },
-        { "sort_by_size", tr::app::SortMode::SortBySize },
-        { "sort_by_state", tr::app::SortMode::SortByState },
+    auto constexpr Items = std::array<std::pair<std::u8string_view, tr::app::SortMode>, tr::app::SortModeCount>{ {
+        { u8"sort_by_activity", tr::app::SortMode::SortByActivity },
+        { u8"sort_by_age", tr::app::SortMode::SortByAge },
+        { u8"sort_by_eta", tr::app::SortMode::SortByEta },
+        { u8"sort_by_id", tr::app::SortMode::SortById },
+        { u8"sort_by_name", tr::app::SortMode::SortByName },
+        { u8"sort_by_progress", tr::app::SortMode::SortByProgress },
+        { u8"sort_by_queue", tr::app::SortMode::SortByQueue },
+        { u8"sort_by_ratio", tr::app::SortMode::SortByRatio },
+        { u8"sort_by_size", tr::app::SortMode::SortBySize },
+        { u8"sort_by_state", tr::app::SortMode::SortByState },
     } };
 
     testModeRoundtrip(Items);
@@ -102,11 +102,11 @@ TEST_F(ConverterTest, sortModeStringsRoundtrip)
 
 TEST_F(ConverterTest, statsModeStringsRoundtrip)
 {
-    auto constexpr Items = std::array<std::pair<std::string_view, tr::app::StatsMode>, tr::app::StatsModeCount>{ {
-        { "total_ratio", tr::app::StatsMode::TotalRatio },
-        { "total_transfer", tr::app::StatsMode::TotalTransfer },
-        { "session_ratio", tr::app::StatsMode::SessionRatio },
-        { "session_transfer", tr::app::StatsMode::SessionTransfer },
+    auto constexpr Items = std::array<std::pair<std::u8string_view, tr::app::StatsMode>, tr::app::StatsModeCount>{ {
+        { u8"total_ratio", tr::app::StatsMode::TotalRatio },
+        { u8"total_transfer", tr::app::StatsMode::TotalTransfer },
+        { u8"session_ratio", tr::app::StatsMode::SessionRatio },
+        { u8"session_transfer", tr::app::StatsMode::SessionTransfer },
     } };
 
     testModeRoundtrip(Items);

@@ -38,7 +38,7 @@ namespace tr::serializer
 namespace
 {
 template<typename T, size_t N>
-using LookupTable = std::array<std::pair<std::string_view, T>, N>;
+using LookupTable = std::array<std::pair<std::u8string_view, T>, N>;
 
 template<typename T, size_t N>
 [[nodiscard]] tr_variant from_enum_or_integral_with_lookup(LookupTable<T, N> const& rows, T const src)
@@ -72,7 +72,7 @@ template<typename T, size_t N>
 
         for (auto const& [key, value] : rows)
         {
-            if (key == needle)
+            if (auto const key_sv = std::string_view{ reinterpret_cast<char const*>(key.data()), key.size()}; key_sv == needle)
             {
                 *tgt = value;
                 return true;
@@ -156,9 +156,9 @@ tr_variant from_int(T const& val)
 // ---
 
 auto constexpr EncryptionKeys = LookupTable<tr_encryption_mode, 3U>{ {
-    { "required", TR_ENCRYPTION_REQUIRED },
-    { "preferred", TR_ENCRYPTION_PREFERRED },
-    { "allowed", TR_CLEAR_PREFERRED },
+    { u8"required", TR_ENCRYPTION_REQUIRED },
+    { u8"preferred", TR_ENCRYPTION_PREFERRED },
+    { u8"allowed", TR_CLEAR_PREFERRED },
 } };
 
 bool to_encryption_mode(tr_variant const& src, tr_encryption_mode* tgt)
@@ -174,13 +174,13 @@ tr_variant from_encryption_mode(tr_encryption_mode const& val)
 // ---
 
 auto constexpr LogKeys = LookupTable<tr_log_level, 7U>{ {
-    { "critical", TR_LOG_CRITICAL },
-    { "debug", TR_LOG_DEBUG },
-    { "error", TR_LOG_ERROR },
-    { "info", TR_LOG_INFO },
-    { "off", TR_LOG_OFF },
-    { "trace", TR_LOG_TRACE },
-    { "warn", TR_LOG_WARN },
+    { u8"critical", TR_LOG_CRITICAL },
+    { u8"debug", TR_LOG_DEBUG },
+    { u8"error", TR_LOG_ERROR },
+    { u8"info", TR_LOG_INFO },
+    { u8"off", TR_LOG_OFF },
+    { u8"trace", TR_LOG_TRACE },
+    { u8"warn", TR_LOG_WARN },
 } };
 
 bool to_log_level(tr_variant const& src, tr_log_level* tgt)
@@ -321,11 +321,11 @@ tr_variant from_port(tr_port const& val)
 // ---
 
 auto constexpr PreallocationKeys = LookupTable<tr_file_preallocation, 5U>{ {
-    { "off", tr_file_preallocation::None },
-    { "none", tr_file_preallocation::None },
-    { "fast", tr_file_preallocation::Sparse },
-    { "sparse", tr_file_preallocation::Sparse },
-    { "full", tr_file_preallocation::Full },
+    { u8"off", tr_file_preallocation::None },
+    { u8"none", tr_file_preallocation::None },
+    { u8"fast", tr_file_preallocation::Sparse },
+    { u8"sparse", tr_file_preallocation::Sparse },
+    { u8"full", tr_file_preallocation::Full },
 } };
 
 bool to_preallocation_mode(tr_variant const& src, tr_file_preallocation* tgt)
@@ -341,8 +341,8 @@ tr_variant from_preallocation_mode(tr_file_preallocation const& val)
 // ---
 
 auto constexpr PreferredTransportKeys = LookupTable<tr_preferred_transport, PreferredTransportCount>{ {
-    { "utp", tr_preferred_transport::UTP },
-    { "tcp", tr_preferred_transport::TCP },
+    { u8"utp", tr_preferred_transport::UTP },
+    { u8"tcp", tr_preferred_transport::TCP },
 } };
 
 bool to_preferred_transport(tr_variant const& src, small::max_size_vector<tr_preferred_transport, PreferredTransportCount>* tgt)
@@ -424,37 +424,37 @@ tr_variant from_string(std::string const& val)
 // Service class names are defined in RFC 4594, RFC 5865, and RFC 8622.
 // Not all platforms have these IPTOS_ definitions, so hardcode them here
 auto constexpr DiffServKeys = LookupTable<int, 28U>{ {
-    { "cs0", 0x00 }, // IPTOS_CLASS_CS0
-    { "le", 0x04 },
-    { "cs1", 0x20 }, // IPTOS_CLASS_CS1
-    { "af11", 0x28 }, // IPTOS_DSCP_AF11
-    { "af12", 0x30 }, // IPTOS_DSCP_AF12
-    { "af13", 0x38 }, // IPTOS_DSCP_AF13
-    { "cs2", 0x40 }, // IPTOS_CLASS_CS2
-    { "af21", 0x48 }, // IPTOS_DSCP_AF21
-    { "af22", 0x50 }, // IPTOS_DSCP_AF22
-    { "af23", 0x58 }, // IPTOS_DSCP_AF23
-    { "cs3", 0x60 }, // IPTOS_CLASS_CS3
-    { "af31", 0x68 }, // IPTOS_DSCP_AF31
-    { "af32", 0x70 }, // IPTOS_DSCP_AF32
-    { "af33", 0x78 }, // IPTOS_DSCP_AF33
-    { "cs4", 0x80 }, // IPTOS_CLASS_CS4
-    { "af41", 0x88 }, // IPTOS_DSCP_AF41
-    { "af42", 0x90 }, // IPTOS_DSCP_AF42
-    { "af43", 0x98 }, // IPTOS_DSCP_AF43
-    { "cs5", 0xa0 }, // IPTOS_CLASS_CS5
-    { "ef", 0xb8 }, // IPTOS_DSCP_EF
-    { "cs6", 0xc0 }, // IPTOS_CLASS_CS6
-    { "cs7", 0xe0 }, // IPTOS_CLASS_CS7
+    { u8"cs0", 0x00 }, // IPTOS_CLASS_CS0
+    { u8"le", 0x04 },
+    { u8"cs1", 0x20 }, // IPTOS_CLASS_CS1
+    { u8"af11", 0x28 }, // IPTOS_DSCP_AF11
+    { u8"af12", 0x30 }, // IPTOS_DSCP_AF12
+    { u8"af13", 0x38 }, // IPTOS_DSCP_AF13
+    { u8"cs2", 0x40 }, // IPTOS_CLASS_CS2
+    { u8"af21", 0x48 }, // IPTOS_DSCP_AF21
+    { u8"af22", 0x50 }, // IPTOS_DSCP_AF22
+    { u8"af23", 0x58 }, // IPTOS_DSCP_AF23
+    { u8"cs3", 0x60 }, // IPTOS_CLASS_CS3
+    { u8"af31", 0x68 }, // IPTOS_DSCP_AF31
+    { u8"af32", 0x70 }, // IPTOS_DSCP_AF32
+    { u8"af33", 0x78 }, // IPTOS_DSCP_AF33
+    { u8"cs4", 0x80 }, // IPTOS_CLASS_CS4
+    { u8"af41", 0x88 }, // IPTOS_DSCP_AF41
+    { u8"af42", 0x90 }, // IPTOS_DSCP_AF42
+    { u8"af43", 0x98 }, // IPTOS_DSCP_AF43
+    { u8"cs5", 0xa0 }, // IPTOS_CLASS_CS5
+    { u8"ef", 0xb8 }, // IPTOS_DSCP_EF
+    { u8"cs6", 0xc0 }, // IPTOS_CLASS_CS6
+    { u8"cs7", 0xe0 }, // IPTOS_CLASS_CS7
 
     // <netinet/ip.h> lists these TOS names as deprecated,
     // but keep them defined here for backward compatibility
-    { "routine", 0x00 }, // IPTOS_PREC_ROUTINE
-    { "lowcost", 0x02 }, // IPTOS_LOWCOST
-    { "mincost", 0x02 }, // IPTOS_MINCOST
-    { "reliable", 0x04 }, // IPTOS_RELIABILITY
-    { "throughput", 0x08 }, // IPTOS_THROUGHPUT
-    { "lowdelay", 0x10 }, // IPTOS_LOWDELAY
+    { u8"routine", 0x00 }, // IPTOS_PREC_ROUTINE
+    { u8"lowcost", 0x02 }, // IPTOS_LOWCOST
+    { u8"mincost", 0x02 }, // IPTOS_MINCOST
+    { u8"reliable", 0x04 }, // IPTOS_RELIABILITY
+    { u8"throughput", 0x08 }, // IPTOS_THROUGHPUT
+    { u8"lowdelay", 0x10 }, // IPTOS_LOWDELAY
 } };
 
 bool to_diffserv_t(tr_variant const& src, tr_diffserv_t* tgt)
@@ -477,8 +477,8 @@ tr_variant from_diffserv_t(tr_diffserv_t const& val)
 // ---
 
 auto constexpr VerifyModeKeys = LookupTable<tr_verify_added_mode, 2U>{ {
-    { "fast", TR_VERIFY_ADDED_FAST },
-    { "full", TR_VERIFY_ADDED_FULL },
+    { u8"fast", TR_VERIFY_ADDED_FAST },
+    { u8"full", TR_VERIFY_ADDED_FULL },
 } };
 
 bool to_verify_added_mode(tr_variant const& src, tr_verify_added_mode* tgt)

@@ -32,9 +32,6 @@ namespace
 template<typename T>
 inline constexpr bool HasTmGmtoffV = requires(T t) { t.tm_gmtoff; };
 
-template<typename T, size_t N>
-using Lookup = std::array<std::pair<std::string_view, T>, N>;
-
 // ---
 
 struct TrYearMonthDay
@@ -113,15 +110,15 @@ struct TrYearMonthDay
     return std::chrono::sys_days{ std::chrono::days{ days_from_civil(ymd.year, ymd.month, ymd.day) } };
 }
 
-auto constexpr ShowKeys = std::array<std::pair<std::string_view, ShowMode>, ShowModeCount>{ {
-    { "show_active", ShowMode::ShowActive },
-    { "show_all", ShowMode::ShowAll },
-    { "show_downloading", ShowMode::ShowDownloading },
-    { "show_error", ShowMode::ShowError },
-    { "show_finished", ShowMode::ShowFinished },
-    { "show_paused", ShowMode::ShowPaused },
-    { "show_seeding", ShowMode::ShowSeeding },
-    { "show_verifying", ShowMode::ShowVerifying },
+auto constexpr ShowKeys = std::array<std::pair<std::u8string_view, ShowMode>, ShowModeCount>{ {
+    { u8"show_active", ShowMode::ShowActive },
+    { u8"show_all", ShowMode::ShowAll },
+    { u8"show_downloading", ShowMode::ShowDownloading },
+    { u8"show_error", ShowMode::ShowError },
+    { u8"show_finished", ShowMode::ShowFinished },
+    { u8"show_paused", ShowMode::ShowPaused },
+    { u8"show_seeding", ShowMode::ShowSeeding },
+    { u8"show_verifying", ShowMode::ShowVerifying },
 } };
 
 bool to_show_mode(tr_variant const& src, ShowMode* tgt)
@@ -132,7 +129,7 @@ bool to_show_mode(tr_variant const& src, ShowMode* tgt)
     {
         for (auto const& [key, val] : Keys)
         {
-            if (str == key)
+            if (auto const key_sv = std::string_view{ reinterpret_cast<char const*>(key.data()), key.size()}; key_sv == str)
             {
                 *tgt = val;
                 return true;
@@ -160,17 +157,17 @@ tr_variant from_show_mode(ShowMode const& src)
 
 // ---
 
-auto constexpr SortKeys = std::array<std::pair<std::string_view, SortMode>, SortModeCount>{ {
-    { "sort_by_activity", SortMode::SortByActivity },
-    { "sort_by_age", SortMode::SortByAge },
-    { "sort_by_eta", SortMode::SortByEta },
-    { "sort_by_id", SortMode::SortById },
-    { "sort_by_name", SortMode::SortByName },
-    { "sort_by_progress", SortMode::SortByProgress },
-    { "sort_by_queue", SortMode::SortByQueue },
-    { "sort_by_ratio", SortMode::SortByRatio },
-    { "sort_by_size", SortMode::SortBySize },
-    { "sort_by_state", SortMode::SortByState },
+auto constexpr SortKeys = std::array<std::pair<std::u8string_view, SortMode>, SortModeCount>{ {
+    { u8"sort_by_activity", SortMode::SortByActivity },
+    { u8"sort_by_age", SortMode::SortByAge },
+    { u8"sort_by_eta", SortMode::SortByEta },
+    { u8"sort_by_id", SortMode::SortById },
+    { u8"sort_by_name", SortMode::SortByName },
+    { u8"sort_by_progress", SortMode::SortByProgress },
+    { u8"sort_by_queue", SortMode::SortByQueue },
+    { u8"sort_by_ratio", SortMode::SortByRatio },
+    { u8"sort_by_size", SortMode::SortBySize },
+    { u8"sort_by_state", SortMode::SortByState },
 } };
 
 bool to_sort_mode(tr_variant const& src, SortMode* tgt)
@@ -181,7 +178,7 @@ bool to_sort_mode(tr_variant const& src, SortMode* tgt)
     {
         for (auto const& [key, val] : Keys)
         {
-            if (str == key)
+            if (auto const key_sv = std::string_view{ reinterpret_cast<char const*>(key.data()), key.size()}; key_sv == str)
             {
                 *tgt = val;
                 return true;
@@ -209,11 +206,11 @@ tr_variant from_sort_mode(SortMode const& src)
 
 // ---
 
-auto constexpr StatsKeys = std::array<std::pair<std::string_view, StatsMode>, StatsModeCount>{ {
-    { "session_ratio", StatsMode::SessionRatio },
-    { "session_transfer", StatsMode::SessionTransfer },
-    { "total_ratio", StatsMode::TotalRatio },
-    { "total_transfer", StatsMode::TotalTransfer },
+auto constexpr StatsKeys = std::array<std::pair<std::u8string_view, StatsMode>, StatsModeCount>{ {
+    { u8"session_ratio", StatsMode::SessionRatio },
+    { u8"session_transfer", StatsMode::SessionTransfer },
+    { u8"total_ratio", StatsMode::TotalRatio },
+    { u8"total_transfer", StatsMode::TotalTransfer },
 } };
 
 bool to_stats_mode(tr_variant const& src, StatsMode* tgt)
@@ -224,7 +221,7 @@ bool to_stats_mode(tr_variant const& src, StatsMode* tgt)
     {
         for (auto const& [key, val] : Keys)
         {
-            if (str == key)
+            if (auto const key_sv = std::string_view{ reinterpret_cast<char const*>(key.data()), key.size()}; key_sv == str)
             {
                 *tgt = val;
                 return true;
