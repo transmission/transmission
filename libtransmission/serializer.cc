@@ -495,6 +495,13 @@ tr_variant from_verify_added_mode(tr_verify_added_mode const& val)
 
 bool to_u8string(tr_variant const& src, std::u8string* tgt)
 {
+    if (auto const val = src.value_if<std::u8string_view>())
+    {
+        TR_ASSERT(tr_strv_find_invalid_utf8(*val) == std::u8string_view::npos);
+        *tgt = *val;
+        return true;
+    }
+
     if (auto const val = src.value_if<std::string_view>())
     {
         if (tr_strv_find_invalid_utf8(*val) != std::string_view::npos)
@@ -511,7 +518,7 @@ bool to_u8string(tr_variant const& src, std::u8string* tgt)
 
 tr_variant from_u8string(std::u8string const& val)
 {
-    return std::string{ reinterpret_cast<char const*>(std::data(val)), std::size(val) };
+    return val;
 }
 
 // ---

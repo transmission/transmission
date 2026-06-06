@@ -174,8 +174,8 @@ TEST_F(SerializerTest, usesU8String)
 {
     auto const expected = std::u8string{ u8"hello" };
     auto const var = Converters::serialize(expected);
-    EXPECT_TRUE(var.holds_alternative<std::string_view>());
-    EXPECT_EQ(var.value_if<std::string_view>().value_or(""sv), "hello"sv);
+    EXPECT_TRUE(var.holds_alternative<std::u8string_view>());
+    EXPECT_EQ(var.value_if<std::u8string_view>().value_or(u8""sv), u8"hello"sv);
 
     auto actual = std::u8string{};
     EXPECT_TRUE(Converters::deserialize(var, &actual));
@@ -186,8 +186,8 @@ TEST_F(SerializerTest, usesFsPath)
 {
     auto const expected = std::filesystem::path{ std::u8string{ u8"foo/βar" } };
     auto const var = Converters::serialize(expected);
-    EXPECT_TRUE(var.holds_alternative<std::string_view>());
-    EXPECT_EQ(var.value_if<std::string_view>().value_or(""sv), "foo/βar"sv);
+    EXPECT_TRUE(var.holds_alternative<std::u8string_view>());
+    EXPECT_EQ(var.value_if<std::u8string_view>().value_or(u8""sv), u8"foo/βar"sv);
 
     auto actual = std::filesystem::path{};
     EXPECT_TRUE(Converters::deserialize(var, &actual));
