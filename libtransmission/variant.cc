@@ -380,11 +380,6 @@ tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark const key, std:
     return dict_set(var, key, val);
 }
 
-tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark const key, void const* const value, size_t const n_bytes)
-{
-    return dict_set(var, key, std::string{ static_cast<char const*>(value), n_bytes });
-}
-
 tr_variant* tr_variantDictAddList(tr_variant* const var, tr_quark const key, size_t const n_reserve)
 {
     return dict_set(var, key, tr_variant::make_vector(n_reserve));
