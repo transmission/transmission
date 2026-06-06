@@ -529,7 +529,6 @@ bool tr_variantListRemove(tr_variant* var, size_t pos);
 // --- Dictionaries
 
 void tr_variantInitDict(tr_variant* initme, size_t n_reserve);
-void tr_variantDictReserve(tr_variant* var, size_t n_reserve);
 bool tr_variantDictRemove(tr_variant* var, tr_quark key);
 
 tr_variant* tr_variantDictAdd(tr_variant* var, tr_quark key);
