@@ -2065,6 +2065,22 @@ void tr_session::verify_add(tr_torrent* const tor)
     }
 }
 
+void tr_session::move_add(std::unique_ptr<tr_move_worker::Mediator> mediator)
+{
+    if (mover_)
+    {
+        mover_->add(std::move(mediator));
+    }
+}
+
+void tr_session::move_remove(tr_torrent const* const tor)
+{
+    if (mover_)
+    {
+        mover_->remove(tor->info_hash());
+    }
+}
+
 // ---
 
 void tr_session::close_torrent_files(tr_torrent_id_t const tor_id) noexcept

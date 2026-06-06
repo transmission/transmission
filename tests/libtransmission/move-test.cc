@@ -131,12 +131,22 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     EXPECT_EQ(TR_SEED, completeness);
 
+    // the files are relocated to the download dir on a background thread,
+    // so wait for the move to finish before checking their final location
     auto const n = tr_torrentFileCount(tor);
-    for (tr_file_index_t i = 0; i < n; ++i)
+    auto const files_moved = [tor, &download_dir, n]()
     {
-        auto const expected = tr_pathbuf{ download_dir, '/', tr_torrentFile(tor, i).name };
-        EXPECT_EQ(expected, tr_torrentFindFile(tor, i));
-    }
+        for (tr_file_index_t i = 0; i < n; ++i)
+        {
+            auto const expected = tr_pathbuf{ download_dir, '/', tr_torrentFile(tor, i).name };
+            if (expected != tr_torrentFindFile(tor, i))
+            {
+                return false;
+            }
+        }
+        return true;
+    };
+    EXPECT_TRUE(waitFor(files_moved, MaxWaitMsec));
 
     // cleanup
     tr_torrentRemove(tor, true);
@@ -193,6 +203,111 @@ TEST_F(MoveTest, setLocation)
     }
 
     // cleanup
+    tr_torrentRemove(tor, true);
+}
+
+// The relocation runs on a background thread and is expected to create the
+// destination directory tree if it does not already exist.
+TEST_F(MoveTest, setLocationCreatesDestination)
+{
+    // a deliberately not-yet-existing, nested destination
+    auto const target_dir = tr_pathbuf{ session_->configDir(), "/new/nested/target"sv };
+    EXPECT_FALSE(tr_sys_path_exists(target_dir));
+
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    blockingTorrentVerify(tor);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
+
+    // move it; the background move thread should create the destination
+    auto state = -1;
+    tr_torrentSetLocation(tor, target_dir, true, &state);
+    auto const moved = [&state]()
+    {
+        return state == TR_LOC_DONE;
+    };
+    EXPECT_TRUE(waitFor(moved, MaxWaitMsec));
+    EXPECT_EQ(TR_LOC_DONE, state);
+
+    // confirm the files ended up at the new location...
+    sync();
+    auto const n = tr_torrentFileCount(tor);
+    for (tr_file_index_t i = 0; i < n; ++i)
+    {
+        auto const expected = tr_pathbuf{ target_dir, '/', tr_torrentFile(tor, i).name };
+        EXPECT_EQ(expected, tr_torrentFindFile(tor, i));
+    }
+
+    // ...and that the torrent is still complete
+    blockingTorrentVerify(tor);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
+
+    tr_torrentRemove(tor, true);
+}
+
+// Two relocations of the same torrent are serialized through the move worker;
+// the second one must observe the bookkeeping left by the first.
+TEST_F(MoveTest, setLocationMoveBackAndForth)
+{
+    auto const original_dir = tr_pathbuf{ tr_sessionGetDownloadDir(session_) };
+    auto const target_dir = tr_pathbuf{ session_->configDir(), "/elsewhere"sv };
+    tr_sys_dir_create(target_dir, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    blockingTorrentVerify(tor);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
+
+    auto const n = tr_torrentFileCount(tor);
+    auto const files_in = [tor, n](tr_pathbuf const& dir)
+    {
+        for (tr_file_index_t i = 0; i < n; ++i)
+        {
+            if (tr_pathbuf{ dir, '/', tr_torrentFile(tor, i).name } != tr_torrentFindFile(tor, i))
+            {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // move out...
+    auto state = -1;
+    tr_torrentSetLocation(tor, target_dir, true, &state);
+    EXPECT_TRUE(waitFor([&state]() { return state == TR_LOC_DONE; }, MaxWaitMsec));
+    sync();
+    EXPECT_TRUE(files_in(target_dir));
+
+    // ...and back again
+    state = -1;
+    tr_torrentSetLocation(tor, original_dir, true, &state);
+    EXPECT_TRUE(waitFor([&state]() { return state == TR_LOC_DONE; }, MaxWaitMsec));
+    sync();
+    EXPECT_TRUE(files_in(original_dir));
+
+    // the round trip preserved the data
+    blockingTorrentVerify(tor);
+    EXPECT_EQ(0, tr_torrentStat(tor).left_until_done);
+
+    tr_torrentRemove(tor, true);
+}
+
+// When move_from_old_path is false the files are left in place and only the
+// torrent's download dir is repointed.
+TEST_F(MoveTest, setLocationWithoutMovingUpdatesDownloadDir)
+{
+    auto const target_dir = tr_pathbuf{ session_->configDir(), "/already-there"sv };
+    tr_sys_dir_create(target_dir, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    blockingTorrentVerify(tor);
+
+    auto state = -1;
+    tr_torrentSetLocation(tor, target_dir, false, &state);
+    EXPECT_TRUE(waitFor([&state]() { return state == TR_LOC_DONE; }, MaxWaitMsec));
+    EXPECT_EQ(TR_LOC_DONE, state);
+
+    // the torrent now points at the new dir even though nothing was relocated
+    EXPECT_EQ(target_dir.sv(), tr_torrentGetDownloadDir(tor));
+
     tr_torrentRemove(tor, true);
 }
 

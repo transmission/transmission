@@ -585,6 +585,10 @@ void freeTorrent(tr_torrent* tor)
 
     tr_session* session = tor->session;
 
+    // make sure no background move is still relocating this torrent's files,
+    // since the move worker holds a raw pointer to it
+    session->move_remove(tor);
+
     tor->doomed_(tor);
 
     session->announcer_->removeTorrent(tor);
@@ -1090,49 +1094,48 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
 {
     TR_ASSERT(session->am_in_session_thread());
 
-    auto ok = true;
-    if (move_from_old_path)
+    // a relocation is already in flight; ignore the duplicate request rather
+    // than racing two moves or repointing the directory mid-copy
+    if (is_moving())
     {
+        tr_logAddWarnTor(this, "Ignoring location change: a move is already in progress");
+
         if (setme_state != nullptr)
         {
-            *setme_state = TR_LOC_MOVING;
+            *setme_state = TR_LOC_ERROR;
         }
 
-        // ensure the files are all closed and idle before moving
-        session->close_torrent_files(id());
-        session->verify_remove(this);
-
-        auto error = tr_error{};
-        ok = files().move(current_dir(), path, name(), &error);
-        if (error)
-        {
-            this->error().set_local_error(
-                fmt::format(
-                    fmt::runtime(_("Couldn't move '{old_path}' to '{path}': {error} ({error_code})")),
-                    fmt::arg("old_path", current_dir()),
-                    fmt::arg("path", path),
-                    fmt::arg("error", error.message()),
-                    fmt::arg("error_code", error.code())));
-            tr_torrentStop(this);
-        }
+        return;
     }
 
-    // tell the torrent where the files are
-    if (ok)
+    if (!move_from_old_path)
     {
+        // just point the torrent at the new directory; nothing to relocate
         set_download_dir(path);
 
-        if (move_from_old_path)
+        if (setme_state != nullptr)
         {
-            incomplete_dir_.clear();
-            current_dir_ = download_dir();
+            *setme_state = TR_LOC_DONE;
         }
+
+        return;
     }
+
+    // ensure the files are all closed and idle before moving
+    session->close_torrent_files(id());
+    session->verify_remove(this);
+
+    // Relocate on the background move thread so that a long (cross-filesystem)
+    // copy doesn't block the session thread. The bookkeeping is finished in
+    // MoveMediator::on_move_done() once the copy completes.
+    set_location_state(LocationState::Moving);
 
     if (setme_state != nullptr)
     {
-        *setme_state = ok ? TR_LOC_DONE : TR_LOC_ERROR;
+        *setme_state = TR_LOC_MOVING;
     }
+
+    session->move_add(std::make_unique<MoveMediator>(this, current_dir().sv(), path, move_from_old_path, setme_state));
 }
 
 namespace
@@ -1748,6 +1751,101 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
 
 // ---
 
+void tr_torrent::set_location_state(LocationState const state)
+{
+    location_state_ = state;
+    mark_changed();
+}
+
+tr_sha1_digest_t const& tr_torrent::MoveMediator::info_hash() const
+{
+    return tor_->info_hash();
+}
+
+void tr_torrent::MoveMediator::on_move_queued()
+{
+    tr_logAddTraceTor(tor_, "Queued to move files");
+}
+
+// (called from tr_move_worker's thread)
+void tr_torrent::MoveMediator::on_move_started()
+{
+    tr_logAddDebugTor(tor_, fmt::format("Moving files from '{:s}' to '{:s}'", source_, dest_));
+}
+
+// (called from tr_move_worker's thread)
+bool tr_torrent::MoveMediator::move(tr_error* const error)
+{
+    return tor_->files().move(source_, dest_, tor_->name(), error);
+}
+
+// (called from tr_move_worker's thread)
+void tr_torrent::MoveMediator::on_move_done(bool const ok, tr_error const* const error)
+{
+    // Finish the relocation bookkeeping on the session thread. Capture the
+    // torrent id (not the pointer) so we never touch a torrent that has been
+    // freed while the move was running.
+    tor_->session->run_in_session_thread(
+        [tor_id = tor_->id(),
+         session = tor_->session,
+         ok,
+         dest = dest_,
+         move_from_old_path = move_from_old_path_,
+         setme_state = setme_state_,
+         error_message = error != nullptr ? std::string{ error->message() } : std::string{},
+         error_code = error != nullptr ? error->code() : 0]()
+        {
+            auto* const tor = session->torrents().get(tor_id);
+            if (tor == nullptr || tor->is_deleting_)
+            {
+                return;
+            }
+
+            if (ok)
+            {
+                tor->set_download_dir(dest);
+
+                if (move_from_old_path)
+                {
+                    tor->incomplete_dir_.clear();
+                    tor->current_dir_ = tor->download_dir();
+                }
+            }
+            else
+            {
+                tor->error().set_local_error(
+                    fmt::format(
+                        fmt::runtime(_("Couldn't move '{old_path}' to '{path}': {error} ({error_code})")),
+                        fmt::arg("old_path", tor->current_dir()),
+                        fmt::arg("path", dest),
+                        fmt::arg("error", error_message),
+                        fmt::arg("error_code", error_code)));
+                tr_torrentStop(tor);
+            }
+
+            tor->set_location_state(LocationState::None);
+
+            if (setme_state != nullptr)
+            {
+                *setme_state = ok ? TR_LOC_DONE : TR_LOC_ERROR;
+            }
+
+            tor->set_dirty();
+            tor->save_resume_file();
+
+            // run the deferred post-completion script now that the files are
+            // at their final location (see recheck_completeness())
+            auto const run_done_script = ok && tor->done_script_after_move_;
+            tor->done_script_after_move_ = false;
+            if (run_done_script)
+            {
+                callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_DONE);
+            }
+        });
+}
+
+// ---
+
 void tr_torrent::save_resume_file()
 {
     if (!is_dirty())
@@ -1866,6 +1964,10 @@ void tr_torrent::recheck_completeness()
 
             if (current_dir() == incomplete_dir())
             {
+                // The files are relocated to their final home on a background
+                // thread; defer the "done" bookkeeping (resume save + script)
+                // until the move finishes so the script sees the final location.
+                done_script_after_move_ = true;
                 set_location(download_dir(), true, nullptr);
             }
 
@@ -1877,7 +1979,7 @@ void tr_torrent::recheck_completeness()
         set_dirty();
         mark_changed();
 
-        if (is_done())
+        if (is_done() && !is_moving())
         {
             save_resume_file();
             callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
