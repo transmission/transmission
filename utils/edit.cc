@@ -280,9 +280,10 @@ bool addURL(tr_variant& metainfo, std::string_view url)
     bool changed = false;
     auto const announce_opt = map->value_if<std::string_view>(TR_KEY_announce);
     auto* al_vec = map->find_if<tr_variant::Vector>(TR_KEY_announce_list);
+    bool const had_announce = announce_opt.has_value();
     bool const had_announce_list = al_vec != nullptr;
 
-    if (!announce_opt && !had_announce_list)
+    if (!had_announce && !had_announce_list)
     {
         /* this new tracker is the only one, so add it to "announce"... */
         fmt::print("\tAdded '{:s}' in 'announce'\n", url);
