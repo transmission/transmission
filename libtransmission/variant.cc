@@ -191,18 +191,6 @@ tr_variant* tr_variantListChild(tr_variant* const var, size_t pos)
     return {};
 }
 
-bool tr_variantListRemove(tr_variant* const var, size_t pos)
-{
-    if (auto* const vec = var != nullptr ? var->get_if<tr_variant::VectorIndex>() : nullptr;
-        vec != nullptr && pos < std::size(*vec))
-    {
-        vec->erase(std::begin(*vec) + static_cast<tr_variant::Vector::difference_type>(pos));
-        return true;
-    }
-
-    return false;
-}
-
 bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 {
     return value_if(var, setme);

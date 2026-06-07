@@ -506,8 +506,6 @@ void tr_variantListReserve(tr_variant* var, size_t n_reserve);
 tr_variant* tr_variantListAdd(tr_variant* var);
 tr_variant* tr_variantListChild(tr_variant* var, size_t pos);
 
-bool tr_variantListRemove(tr_variant* var, size_t pos);
-
 [[nodiscard]] constexpr size_t tr_variantListSize(tr_variant const* const var)
 {
     if (var != nullptr)
