@@ -346,16 +346,6 @@ tr_variant* tr_variantDictAddDict(tr_variant* const var, tr_quark key, size_t n_
     return dict_set(var, key, tr_variant::make_map(n_reserve));
 }
 
-bool tr_variantDictRemove(tr_variant* const var, tr_quark key)
-{
-    if (auto* const map = var != nullptr ? var->get_if<tr_variant::MapIndex>() : nullptr; map != nullptr)
-    {
-        return map->erase(key) != 0U;
-    }
-
-    return false;
-}
-
 // ---
 
 bool tr_variantDictChild(tr_variant* const var, size_t pos, tr_quark* key, tr_variant** setme_value)
