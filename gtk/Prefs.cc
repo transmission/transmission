@@ -82,24 +82,6 @@ std::string gl_confdir;
     return tr_variant{ std::move(map) };
 }
 
-void ensure_sound_cmd_is_a_list(tr_variant* dict)
-{
-    tr_quark const key = TR_KEY_torrent_complete_sound_command;
-    tr_variant* list = nullptr;
-    if (tr_variantDictFindList(dict, key, &list))
-    {
-        return;
-    }
-
-    tr_variantDictRemove(dict, key);
-    list = tr_variantDictAddList(dict, key, 5);
-    tr_variantListAddStr(list, "canberra-gtk-play"sv);
-    tr_variantListAddStr(list, "-i"sv);
-    tr_variantListAddStr(list, "complete-download"sv);
-    tr_variantListAddStr(list, "-d"sv);
-    tr_variantListAddStr(list, "transmission torrent downloaded"sv);
-}
-
 tr_variant& getPrefs()
 {
     static auto settings = tr_variant{};
@@ -108,7 +90,6 @@ tr_variant& getPrefs()
     {
         auto const app_defaults = get_default_app_settings();
         settings.merge(tr_sessionLoadSettings(gl_confdir, &app_defaults));
-        ensure_sound_cmd_is_a_list(&settings);
     }
 
     return settings;

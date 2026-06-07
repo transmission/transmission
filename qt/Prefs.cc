@@ -28,25 +28,6 @@ using namespace std::string_view_literals;
 
 // ---
 
-namespace
-{
-void ensureSoundCommandIsAList(tr_variant::Map& map)
-{
-    auto constexpr Key = TR_KEY_torrent_complete_sound_command;
-    auto constexpr DefaultVal = std::array<std::string_view, 5U>{ "canberra-gtk-play",
-                                                                  "-i",
-                                                                  "complete-download",
-                                                                  "-d",
-                                                                  "transmission torrent downloaded" };
-    if (map.find_if<tr_variant::Vector>(Key) == nullptr)
-    {
-        map.insert_or_assign(Key, ser::to_variant(DefaultVal));
-    }
-}
-} // namespace
-
-// ---
-
 Prefs::Prefs(tr_variant const& settings)
 {
     tr::serializer::load(*this, Fields, settings);
@@ -55,9 +36,8 @@ Prefs::Prefs(tr_variant const& settings)
 Prefs::Prefs(QString const& dir)
 {
     auto settings = tr_sessionLoadSettings(dir.toStdString());
-    if (auto* const map = settings.get_if<tr_variant::Map>())
+    if (settings.holds_alternative<tr_variant::Map>())
     {
-        ensureSoundCommandIsAList(*map);
         tr::serializer::load(*this, Fields, settings);
     }
 }
