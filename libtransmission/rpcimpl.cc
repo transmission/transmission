@@ -168,7 +168,7 @@ namespace
     }
 
     auto ret = tr_variant::Map{ 3U };
-    ret.try_emplace(TR_KEY_jsonrpc, Version);
+    ret.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(Version));
     if (code == Error::SUCCESS)
     {
         ret.try_emplace(TR_KEY_result, std::move(body));
