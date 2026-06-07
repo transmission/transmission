@@ -147,6 +147,7 @@ TEST_F(RpcTest, idSync)
     ids.emplace_back(12345);
     ids.emplace_back(0.5);
     ids.emplace_back("12345"sv);
+    ids.emplace_back(u8"12345"sv);
     ids.emplace_back(nullptr);
 
     for (auto const& request_id : ids)
@@ -176,6 +177,10 @@ TEST_F(RpcTest, idSync)
             break;
         case tr_variant::NullIndex:
             EXPECT_EQ(request_id.value_if<std::nullptr_t>(), response_map->value_if<std::nullptr_t>(TR_KEY_id));
+            break;
+        case tr_variant::U8StringIndex:
+        case tr_variant::U8StringViewIndex:
+            EXPECT_EQ(request_id.value_if<std::u8string_view>(), response_map->value_if<std::u8string_view>(TR_KEY_id));
             break;
         default:
             EXPECT_EQ(request_id.value_if<std::string_view>(), response_map->value_if<std::string_view>(TR_KEY_id));
@@ -250,6 +255,7 @@ TEST_F(RpcTest, idAsync)
     ids.emplace_back(12345);
     ids.emplace_back(0.5);
     ids.emplace_back("12345"sv);
+    ids.emplace_back(u8"12345"sv);
     ids.emplace_back(nullptr);
 
     for (auto const& request_id : ids)
@@ -289,6 +295,10 @@ TEST_F(RpcTest, idAsync)
             break;
         case tr_variant::NullIndex:
             EXPECT_EQ(request_id.value_if<std::nullptr_t>(), response_map->value_if<std::nullptr_t>(TR_KEY_id));
+            break;
+        case tr_variant::U8StringIndex:
+        case tr_variant::U8StringViewIndex:
+            EXPECT_EQ(request_id.value_if<std::u8string_view>(), response_map->value_if<std::u8string_view>(TR_KEY_id));
             break;
         default:
             EXPECT_EQ(request_id.value_if<std::string_view>(), response_map->value_if<std::string_view>(TR_KEY_id));
@@ -446,6 +456,12 @@ TEST_F(RpcTest, batch)
     request_map.try_emplace(TR_KEY_id, "12345"sv);
     request_vec.emplace_back(std::move(request_map));
 
+    request_map = tr_variant::Map{ 3U };
+    request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats));
+    request_map.try_emplace(TR_KEY_id, u8"12345"sv);
+    request_vec.emplace_back(std::move(request_map));
+
     request_map = tr_variant::Map{ 1U };
     request_map.try_emplace(tr_quark_new("foo"sv), "boo"sv);
     request_vec.emplace_back(std::move(request_map));
@@ -476,7 +492,7 @@ TEST_F(RpcTest, batch)
     ASSERT_NE(response_vec_ptr, nullptr);
     auto const& response_vec = *response_vec_ptr;
 
-    ASSERT_EQ(std::size(response_vec), 6U);
+    ASSERT_EQ(std::size(response_vec), 7U);
 
     auto const* response_map = response_vec[0].get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
@@ -500,6 +516,16 @@ TEST_F(RpcTest, batch)
 
     response_map = response_vec[2].get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
+    result = response_map->find_if<tr_variant::Map>(TR_KEY_result);
+    EXPECT_NE(result, nullptr);
+    error_it = response_map->find(TR_KEY_error);
+    EXPECT_EQ(error_it, std::end(*response_map));
+    auto id_u8str = response_map->value_if<std::u8string_view>(TR_KEY_id);
+    ASSERT_TRUE(id_u8str);
+    EXPECT_EQ(*id_u8str, u8"12345"sv);
+
+    response_map = response_vec[3].get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
     auto result_it = response_map->find(TR_KEY_result);
     EXPECT_EQ(result_it, std::end(*response_map));
     auto error = response_map->find_if<tr_variant::Map>(TR_KEY_error);
@@ -513,7 +539,7 @@ TEST_F(RpcTest, batch)
     auto id_null = response_map->value_if<std::nullptr_t>(TR_KEY_id);
     EXPECT_TRUE(id_null);
 
-    response_map = response_vec[3].get_if<tr_variant::Map>();
+    response_map = response_vec[4].get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
     result_it = response_map->find(TR_KEY_result);
     EXPECT_EQ(result_it, std::end(*response_map));
@@ -533,7 +559,7 @@ TEST_F(RpcTest, batch)
     id_null = response_map->value_if<std::nullptr_t>(TR_KEY_id);
     EXPECT_TRUE(id_null);
 
-    response_map = response_vec[4].get_if<tr_variant::Map>();
+    response_map = response_vec[5].get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
     result_it = response_map->find(TR_KEY_result);
     EXPECT_EQ(result_it, std::end(*response_map));
@@ -549,7 +575,7 @@ TEST_F(RpcTest, batch)
     ASSERT_TRUE(id_int);
     EXPECT_EQ(*id_int, 12345);
 
-    response_map = response_vec[5].get_if<tr_variant::Map>();
+    response_map = response_vec[6].get_if<tr_variant::Map>();
     ASSERT_NE(response_map, nullptr);
     result_it = response_map->find(TR_KEY_result);
     EXPECT_EQ(result_it, std::end(*response_map));

@@ -148,6 +148,8 @@ namespace
     // be Null and Numbers SHOULD NOT contain fractional parts
     case tr_variant::StringIndex:
     case tr_variant::StringViewIndex:
+    case tr_variant::U8StringIndex:
+    case tr_variant::U8StringViewIndex:
     case tr_variant::IntIndex:
     case tr_variant::DoubleIndex:
     case tr_variant::NullIndex:
