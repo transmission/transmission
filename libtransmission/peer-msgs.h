@@ -125,6 +125,14 @@ public:
 
     virtual void on_piece_completed(tr_piece_index_t) = 0;
 
+    // Send a BEP 10 extension message to this peer.
+    // Used by peer-mgr for cross-peer messaging (e.g. BEP 55 relay).
+    virtual void send_ltep_message(uint8_t extension_id, std::string_view payload) = 0;
+
+    // Return the remote peer's BEP 10 LTEP extension ID for ut_holepunch,
+    // or 0 if the remote did not advertise it.
+    virtual uint8_t remote_ut_holepunch_id() const = 0;
+
     static std::shared_ptr<tr_peerMsgs> create(
         tr_torrent& torrent,
         std::shared_ptr<tr_peer_info> peer_info,
