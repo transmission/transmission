@@ -597,7 +597,7 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createStatsMenu()
     // build the action group
     static auto constexpr Key = TR_KEY_statusbar_stats;
     auto const action_name = "stats-mode"s;
-    auto const current_value = gtr_pref_get<StatsMode>(Key).value_or(DefaultStatsMode);
+    auto const current_value = gtr_pref_get<StatsMode>(Key, DefaultStatsMode);
     auto actions = Gio::SimpleActionGroup::create();
     actions->add_action_radio_integer(
         action_name,
@@ -765,7 +765,7 @@ namespace
 void MainWindow::Impl::updateStats()
 {
     static_assert(StatsModeCount == 4U, "StatsMode changed: update this code");
-    auto const mode = gtr_pref_get<StatsMode>(TR_KEY_statusbar_stats).value_or(DefaultStatsMode);
+    auto const mode = gtr_pref_get<StatsMode>(TR_KEY_statusbar_stats, DefaultStatsMode);
     auto const use_session_stats = mode == StatsMode::SessionRatio || mode == StatsMode::SessionTransfer;
     auto const* const ses = core_->get_session();
     auto const stats = use_session_stats ? tr_sessionGetStats(ses) : tr_sessionGetCumulativeStats(ses);

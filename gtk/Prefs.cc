@@ -130,69 +130,50 @@ tr_variant::Map& gtr_pref_get_map()
     return *getPrefs().get_if<tr_variant::Map>();
 }
 
+bool gtr_pref_has_key(tr_quark const key)
+{
+    return gtr_pref_get_map().contains(key);
+}
+
 double gtr_pref_double_get(tr_quark const key)
 {
-    double d = 0;
-
-    return tr_variantDictFindReal(&getPrefs(), key, &d) ? d : 0.0;
+    return gtr_pref_lookup<double>(key).value_or(0.0);
 }
 
 void gtr_pref_double_set(tr_quark const key, double const value)
 {
-    gtr_pref_get_map().insert_or_assign(key, value);
+    gtr_pref_set<double>(key, value);
 }
-
-// ---
 
 bool gtr_pref_flag_get(tr_quark const key)
 {
-    bool boolVal = false;
-
-    return tr_variantDictFindBool(&getPrefs(), key, &boolVal) ? boolVal : false;
+    return gtr_pref_lookup<bool>(key).value_or(false);
 }
 
-void gtr_pref_flag_set(tr_quark const key, bool value)
+void gtr_pref_flag_set(tr_quark const key, bool const value)
 {
-    tr_variantDictAddBool(&getPrefs(), key, value);
+    gtr_pref_set<bool>(key, value);
 }
-
-// ---
 
 std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 {
-    std::vector<std::string> ret;
-
-    if (tr_variant* list = nullptr; tr_variantDictFindList(&getPrefs(), key, &list))
+    if (auto val = gtr_pref_lookup<std::vector<std::string>>(key))
     {
-        size_t const n = tr_variantListSize(list);
-        ret.reserve(n);
-
-        for (size_t i = 0; i < n; ++i)
-        {
-            auto sv = std::string_view{};
-            if (tr_variantGetStrView(tr_variantListChild(list, i), &sv))
-            {
-                ret.emplace_back(sv);
-            }
-        }
+        return std::move(*val);
     }
 
-    return ret;
+    return {};
 }
 
 std::string gtr_pref_string_get(tr_quark const key)
 {
-    auto sv = std::string_view{};
-    (void)tr_variantDictFindStrView(&getPrefs(), key, &sv);
-    return std::string{ sv };
+    return gtr_pref_lookup<std::string>(key).value_or(std::string{});
 }
 
-void gtr_pref_string_set(tr_quark const key, std::string_view value)
+void gtr_pref_string_set(tr_quark const key, std::string_view const value)
 {
-    tr_variantDictAddStr(&getPrefs(), key, value);
+    gtr_pref_set<std::string>(key, std::string{ value });
 }
-
-// ---
 
 void gtr_pref_save(tr_session* session)
 {

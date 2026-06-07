@@ -10,19 +10,37 @@
 #include <libtransmission/variant.h>
 
 #include <cstdint> // int64_t
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
 [[nodiscard]] tr_variant::Map& gtr_pref_get_map();
 
+[[nodiscard]] bool gtr_pref_has_key(tr_quark key);
+
 template<typename T>
-[[nodiscard]] std::optional<T> gtr_pref_get(tr_quark const key)
+[[nodiscard]] std::optional<T> gtr_pref_lookup(tr_quark const key)
 {
-    using namespace tr::serializer;
     auto const& map = gtr_pref_get_map();
-    auto const iter = map.find(key);
-    return iter != std::end(map) ? to_value<T>(iter->second) : std::nullopt;
+
+    if (auto iter = map.find(key); iter != map.end())
+    {
+        return tr::serializer::to_value<T>(iter->second);
+    }
+
+    return {};
+}
+
+template<typename T>
+[[nodiscard]] T gtr_pref_get(tr_quark const key, T default_value = {})
+{
+    if (auto val = gtr_pref_lookup<T>(key))
+    {
+        return std::move(*val);
+    }
+
+    return default_value;
 }
 
 template<typename T>

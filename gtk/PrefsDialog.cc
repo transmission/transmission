@@ -120,7 +120,7 @@ public:
         auto* button = get_widget<Gtk::SpinButton>(name);
         button->set_adjustment(
             Gtk::Adjustment::create(
-                static_cast<double>(gtr_pref_get<T>(key).value_or(T{})),
+                static_cast<double>(gtr_pref_get<T>(key)),
                 static_cast<double>(low),
                 static_cast<double>(high),
                 static_cast<double>(step)));
@@ -300,7 +300,7 @@ Gtk::ComboBox* PageBase::init_encryption_combo(Glib::ustring const& name, tr_qua
             { _("Prefer encryption"), TR_ENCRYPTION_PREFERRED },
             { _("Require encryption"), TR_ENCRYPTION_REQUIRED },
         });
-    auto const mode = gtr_pref_get<tr_encryption_mode>(key).value_or(TR_ENCRYPTION_PREFERRED);
+    auto const mode = gtr_pref_get<tr_encryption_mode>(key, TR_ENCRYPTION_PREFERRED);
     gtr_combo_box_set_active_enum(*combo, static_cast<int>(mode));
     combo->signal_changed().connect([this, combo, key]() { onIntComboChanged(*combo, key); });
     return combo;
