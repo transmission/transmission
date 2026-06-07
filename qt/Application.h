@@ -18,8 +18,10 @@
 #include <QWeakPointer>
 
 #include <libtransmission-app/favicon-cache.h>
+#include <libtransmission/quark.h>
 
 #include "AddData.h"
+#include "Prefs.h"
 #include "Typedefs.h"
 #include "Utils.h" // std::hash<QString>
 
@@ -92,7 +94,7 @@ private slots:
     void onTorrentsEdited(torrent_ids_t const& torrent_ids) const;
     void onTorrentsNeedInfo(torrent_ids_t const& torrent_ids) const;
     void pruneInternedStrings();
-    void refreshPref(int key) const;
+    void refreshPref(tr_quark key) const;
     void refreshTorrents();
     void saveGeometry() const;
 #ifdef QT_DBUS_LIB

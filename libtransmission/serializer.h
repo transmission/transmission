@@ -459,14 +459,14 @@ bool set(S& tgt, tr_quark key, T val)
         if constexpr (std::is_same_v<T, typename FieldType::value_type>)
         {
             auto& target = tgt.*(FieldType::MemberPointer);
-            if (target == val)
-            {
-                changed = false;
-            }
-            else
+            if (detail::values_differ(target, val))
             {
                 target = std::move(val);
                 changed = true;
+            }
+            else
+            {
+                changed = false;
             }
         }
         else

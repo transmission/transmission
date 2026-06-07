@@ -185,14 +185,14 @@ Application::Application(
     connect(model_.get(), &TorrentModel::torrentsCompleted, this, &Application::onTorrentsCompleted);
     connect(model_.get(), &TorrentModel::torrentsEdited, this, &Application::onTorrentsEdited);
     connect(model_.get(), &TorrentModel::torrentsNeedInfo, this, &Application::onTorrentsNeedInfo);
-    connect(&prefs_, &Prefs::changed, this, &Application::refreshPref);
+    connect(&prefs_, qOverload<tr_quark>(&Prefs::changed), this, &Application::refreshPref);
     connect(session_.get(), &Session::sourceChanged, this, &Application::onSessionSourceChanged);
     connect(session_.get(), &Session::torrentsRemoved, model_.get(), &TorrentModel::removeTorrents);
     connect(session_.get(), &Session::torrentsUpdated, model_.get(), &TorrentModel::updateTorrents);
     connect(watch_dir_.get(), &WatchDir::torrentFileAdded, this, qOverload<QString const&>(&Application::addWatchdirTorrent));
 
     // init from preferences
-    for (auto const key : { Prefs::DIR_WATCH })
+    for (auto const key : { TR_KEY_watch_dir })
     {
         refreshPref(key);
     }
@@ -310,7 +310,7 @@ QStringList Application::getNames(torrent_ids_t const& torrent_ids) const
 
 void Application::onTorrentsAdded(torrent_ids_t const& torrent_ids) const
 {
-    if (!prefs_.get<bool>(Prefs::SHOW_NOTIFICATION_ON_ADD))
+    if (!prefs_.get<bool>(TR_KEY_torrent_added_notification_enabled))
     {
         return;
     }
@@ -323,19 +323,19 @@ void Application::onTorrentsAdded(torrent_ids_t const& torrent_ids) const
 
 void Application::onTorrentsCompleted(torrent_ids_t const& torrent_ids) const
 {
-    if (prefs_.get<bool>(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
+    if (prefs_.get<bool>(TR_KEY_torrent_complete_notification_enabled))
     {
         auto const title = tr("Torrent(s) Completed", nullptr, static_cast<int>(std::size(torrent_ids)));
         auto const body = getNames(torrent_ids).join(QStringLiteral("\n"));
         notifyApp(title, body);
     }
 
-    if (prefs_.get<bool>(Prefs::COMPLETE_SOUND_ENABLED))
+    if (prefs_.get<bool>(TR_KEY_torrent_complete_sound_enabled))
     {
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
         beep();
 #else
-        auto args = prefs_.get<QStringList>(Prefs::COMPLETE_SOUND_COMMAND);
+        auto args = prefs_.get<QStringList>(TR_KEY_torrent_complete_sound_command);
         auto const command = args.takeFirst();
         QProcess::execute(command, args);
 #endif
@@ -364,26 +364,26 @@ void Application::saveGeometry() const
     if (window_ != nullptr)
     {
         auto const geometry = window_->geometry();
-        prefs_.set(Prefs::MAIN_WINDOW_HEIGHT, std::max(100, geometry.height()));
-        prefs_.set(Prefs::MAIN_WINDOW_WIDTH, std::max(100, geometry.width()));
-        prefs_.set(Prefs::MAIN_WINDOW_X, geometry.x());
-        prefs_.set(Prefs::MAIN_WINDOW_Y, geometry.y());
+        prefs_.set(TR_KEY_main_window_height, std::max(100, geometry.height()));
+        prefs_.set(TR_KEY_main_window_width, std::max(100, geometry.width()));
+        prefs_.set(TR_KEY_main_window_x, geometry.x());
+        prefs_.set(TR_KEY_main_window_y, geometry.y());
     }
 }
 
 // ---
 
-void Application::refreshPref(int key) const
+void Application::refreshPref(tr_quark key) const
 {
     switch (key)
     {
-    case Prefs::BLOCKLIST_UPDATES_ENABLED:
+    case TR_KEY_blocklist_updates_enabled:
         maybeUpdateBlocklist();
         break;
 
-    case Prefs::DIR_WATCH:
-    case Prefs::DIR_WATCH_ENABLED:
-        watch_dir_->setPath(prefs_.get<QString>(Prefs::DIR_WATCH), prefs_.get<bool>(Prefs::DIR_WATCH_ENABLED));
+    case TR_KEY_watch_dir:
+    case TR_KEY_watch_dir_enabled:
+        watch_dir_->setPath(prefs_.get<QString>(TR_KEY_watch_dir), prefs_.get<bool>(TR_KEY_watch_dir_enabled));
         break;
 
     default:
@@ -393,19 +393,19 @@ void Application::refreshPref(int key) const
 
 void Application::maybeUpdateBlocklist() const
 {
-    if (!prefs_.get<bool>(Prefs::BLOCKLIST_UPDATES_ENABLED))
+    if (!prefs_.get<bool>(TR_KEY_blocklist_updates_enabled))
     {
         return;
     }
 
-    auto const last_updated_at = prefs_.get<QDateTime>(Prefs::BLOCKLIST_DATE);
+    auto const last_updated_at = prefs_.get<QDateTime>(TR_KEY_blocklist_date);
     auto const next_update_at = last_updated_at.addDays(7);
     auto const now = QDateTime::currentDateTime();
 
     if (now < next_update_at)
     {
         session_->updateBlocklist();
-        prefs_.set(Prefs::BLOCKLIST_DATE, now);
+        prefs_.set(TR_KEY_blocklist_date, now);
     }
 }
 
@@ -441,8 +441,8 @@ void Application::refreshTorrents()
 void Application::addWatchdirTorrent(QString const& filename) const
 {
     auto add_data = AddData{ filename };
-    auto const disposal = prefs_.get<bool>(Prefs::TRASH_ORIGINAL) ? AddData::FilenameDisposal::Delete :
-                                                                    AddData::FilenameDisposal::Rename;
+    auto const disposal = prefs_.get<bool>(TR_KEY_trash_original_torrent_files) ? AddData::FilenameDisposal::Delete :
+                                                                                  AddData::FilenameDisposal::Rename;
     add_data.setFileDisposal(disposal);
     addTorrent(std::move(add_data));
 }
@@ -456,12 +456,12 @@ void Application::addTorrent(AddData addme) const
 
     // if there's not already a disposal action set,
     // then honor the `trash original` preference setting
-    if (!addme.fileDisposal() && prefs_.get<bool>(Prefs::TRASH_ORIGINAL))
+    if (!addme.fileDisposal() && prefs_.get<bool>(TR_KEY_trash_original_torrent_files))
     {
         addme.setFileDisposal(AddData::FilenameDisposal::Delete);
     }
 
-    if (!prefs_.get<bool>(Prefs::OPTIONS_PROMPT))
+    if (!prefs_.get<bool>(TR_KEY_show_options_window))
     {
         session_->addTorrent(addme);
     }

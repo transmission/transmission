@@ -50,7 +50,6 @@
 namespace
 {
 
-char const* const PrefVariantsKey = "submenu";
 char const* const StatsModeKey = "stats-mode";
 char const* const SortModeKey = "sort-mode";
 
@@ -203,12 +202,12 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     tray_icon_.setContextMenu(menu);
     tray_icon_.setIcon(QIcon::fromTheme(QStringLiteral("transmission-tray-icon"), QApplication::windowIcon()));
 
-    connect(&prefs_, &Prefs::changed, this, &MainWindow::refreshPref);
+    connect(&prefs_, qOverload<tr_quark>(&Prefs::changed), this, &MainWindow::refreshPref);
     connect(ui_.action_ShowMainWindow, &QAction::triggered, this, &MainWindow::toggleWindows);
     connect(&tray_icon_, &QSystemTrayIcon::activated, this, &MainWindow::trayActivated);
 
     toggleWindows(!minimized);
-    ui_.action_TrayIcon->setChecked(minimized || prefs.get<bool>(Prefs::SHOW_TRAY_ICON));
+    ui_.action_TrayIcon->setChecked(minimized || prefs.get<bool>(TR_KEY_show_notification_area_icon));
 
     initStatusBar();
     auto* filter_bar = new FilterBar{ prefs_, model_, filter_model_ };
@@ -225,24 +224,24 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_header_soon);
     connect(ui_.listView, &TorrentView::headerDoubleClicked, filter_bar, &FilterBar::clear);
 
-    static std::array<int, 17> constexpr InitKeys = {
-        Prefs::ALT_SPEED_LIMIT_ENABLED, //
-        Prefs::COMPACT_VIEW, //
-        Prefs::DSPEED, //
-        Prefs::DSPEED_ENABLED, //
-        Prefs::FILTERBAR, //
-        Prefs::MAIN_WINDOW_X, //
-        Prefs::RATIO, //
-        Prefs::RATIO_ENABLED, //
-        Prefs::READ_CLIPBOARD, //
-        Prefs::SHOW_TRAY_ICON, //
-        Prefs::SORT_MODE, //
-        Prefs::SORT_REVERSED, //
-        Prefs::STATUSBAR, //
-        Prefs::STATUSBAR_STATS, //
-        Prefs::TOOLBAR, //
-        Prefs::USPEED, //
-        Prefs::USPEED_ENABLED, //
+    static std::array<tr_quark, 17> constexpr InitKeys = {
+        TR_KEY_alt_speed_enabled, //
+        TR_KEY_compact_view, //
+        TR_KEY_speed_limit_down, //
+        TR_KEY_speed_limit_down_enabled, //
+        TR_KEY_show_filterbar, //
+        TR_KEY_main_window_x, //
+        TR_KEY_seed_ratio_limit, //
+        TR_KEY_seed_ratio_limited, //
+        TR_KEY_read_clipboard, //
+        TR_KEY_show_notification_area_icon, //
+        TR_KEY_sort_mode, //
+        TR_KEY_sort_reversed, //
+        TR_KEY_show_statusbar, //
+        TR_KEY_statusbar_stats, //
+        TR_KEY_show_toolbar, //
+        TR_KEY_speed_limit_up, //
+        TR_KEY_speed_limit_up_enabled, //
     };
     for (auto const key : InitKeys)
     {
@@ -287,25 +286,6 @@ void MainWindow::onSessionSourceChanged()
 *****
 ****/
 
-void MainWindow::onSetPrefs()
-{
-    QVariantList const p = sender()->property(PrefVariantsKey).toList();
-    assert(p.size() % 2 == 0);
-
-    for (IF_QT6(qsizetype, int) i = 0, n = p.size(); i < n; i += 2)
-    {
-        prefs_.set(p[i].toInt(), p[i + 1]);
-    }
-}
-
-void MainWindow::onSetPrefs(bool is_checked)
-{
-    if (is_checked)
-    {
-        onSetPrefs();
-    }
-}
-
 void MainWindow::initStatusBar()
 {
     ui_.optionsButton->setMenu(createOptionsMenu());
@@ -323,8 +303,18 @@ void MainWindow::initStatusBar()
 
 QMenu* MainWindow::createOptionsMenu()
 {
-    auto const init_speed_sub_menu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
+    auto const init_speed_sub_menu =
+        [this](QMenu* menu, QAction*& off_action, QAction*& on_action, tr_quark pref, tr_quark enabled_pref)
     {
+        auto const set_enabled = [this, enabled_pref](bool enabled)
+        {
+            prefs_.set(enabled_pref, enabled);
+        };
+        auto const set_limit = [this, pref, enabled_pref](int limit)
+        {
+            prefs_.set(pref, limit);
+            prefs_.set(enabled_pref, true);
+        };
         int const current_value = prefs_.get<int>(pref);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
@@ -332,53 +322,96 @@ QMenu* MainWindow::createOptionsMenu()
 
         off_action = menu->addAction(tr("Unlimited"));
         off_action->setCheckable(true);
-        off_action->setProperty(PrefVariantsKey, QVariantList{ enabled_pref, false });
         action_group->addAction(off_action);
-        connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
+        connect(
+            off_action,
+            &QAction::triggered,
+            this,
+            [set_enabled](bool is_checked)
+            {
+                if (is_checked)
+                {
+                    set_enabled(false);
+                }
+            });
 
         on_action = menu->addAction(tr("Limited at %1").arg(Speed{ current_value, Speed::Units::KByps }.to_qstring()));
         on_action->setCheckable(true);
-        on_action->setProperty(PrefVariantsKey, QVariantList{ pref, current_value, enabled_pref, true });
         action_group->addAction(on_action);
-        connect(on_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
+        connect(
+            on_action,
+            &QAction::triggered,
+            this,
+            [set_limit, current_value](bool is_checked)
+            {
+                if (is_checked)
+                {
+                    set_limit(current_value);
+                }
+            });
 
         menu->addSeparator();
 
         for (auto const kbyps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
         {
             auto* const action = menu->addAction(Speed{ kbyps, Speed::Units::KByps }.to_qstring());
-            action->setProperty(PrefVariantsKey, QVariantList{ pref, kbyps, enabled_pref, true });
-            connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
+            connect(action, &QAction::triggered, this, [set_limit, kbyps]() { set_limit(kbyps); });
         }
     };
 
     auto const init_seed_ratio_sub_menu =
-        [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
+        [this](QMenu* menu, QAction*& off_action, QAction*& on_action, tr_quark pref, tr_quark enabled_pref)
     {
         static constexpr std::array<double, 7> StockRatios = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
+        auto const set_enabled = [this, enabled_pref](bool enabled)
+        {
+            prefs_.set(enabled_pref, enabled);
+        };
+        auto const set_ratio = [this, pref, enabled_pref](double ratio)
+        {
+            prefs_.set(pref, ratio);
+            prefs_.set(enabled_pref, true);
+        };
         auto const current_value = prefs_.get<double>(pref);
 
         auto* action_group = new QActionGroup{ this };
 
         off_action = menu->addAction(tr("Seed Forever"));
         off_action->setCheckable(true);
-        off_action->setProperty(PrefVariantsKey, QVariantList{ enabled_pref, false });
         action_group->addAction(off_action);
-        connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
+        connect(
+            off_action,
+            &QAction::triggered,
+            this,
+            [set_enabled](bool is_checked)
+            {
+                if (is_checked)
+                {
+                    set_enabled(false);
+                }
+            });
 
         on_action = menu->addAction(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(current_value)));
         on_action->setCheckable(true);
-        on_action->setProperty(PrefVariantsKey, QVariantList{ pref, current_value, enabled_pref, true });
         action_group->addAction(on_action);
-        connect(on_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
+        connect(
+            on_action,
+            &QAction::triggered,
+            this,
+            [set_ratio, current_value](bool is_checked)
+            {
+                if (is_checked)
+                {
+                    set_ratio(current_value);
+                }
+            });
 
         menu->addSeparator();
 
         for (double const i : StockRatios)
         {
             QAction* action = menu->addAction(Formatter::ratio_to_string(i));
-            action->setProperty(PrefVariantsKey, QVariantList{ pref, i, enabled_pref, true });
-            connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
+            connect(action, &QAction::triggered, this, [set_ratio, i]() { set_ratio(i); });
         }
     };
 
@@ -388,14 +421,14 @@ QMenu* MainWindow::createOptionsMenu()
         menu->addMenu(tr("Limit Download Speed")),
         dlimit_off_action_,
         dlimit_on_action_,
-        Prefs::DSPEED,
-        Prefs::DSPEED_ENABLED);
+        TR_KEY_speed_limit_down,
+        TR_KEY_speed_limit_down_enabled);
     init_speed_sub_menu(
         menu->addMenu(tr("Limit Upload Speed")),
         ulimit_off_action_,
         ulimit_on_action_,
-        Prefs::USPEED,
-        Prefs::USPEED_ENABLED);
+        TR_KEY_speed_limit_up,
+        TR_KEY_speed_limit_up_enabled);
 
     menu->addSeparator();
 
@@ -403,8 +436,8 @@ QMenu* MainWindow::createOptionsMenu()
         menu->addMenu(tr("Stop Seeding at Ratio")),
         ratio_off_action_,
         ratio_on_action_,
-        Prefs::RATIO,
-        Prefs::RATIO_ENABLED);
+        TR_KEY_seed_ratio_limit,
+        TR_KEY_seed_ratio_limited);
 
     return menu;
 }
@@ -440,12 +473,12 @@ QMenu* MainWindow::createStatsModeMenu()
 
 void MainWindow::onSortModeChanged(QAction const* action)
 {
-    prefs_.set(Prefs::SORT_MODE, action->property(SortModeKey));
+    prefs_.set(TR_KEY_sort_mode, action->property(SortModeKey).value<SortMode>());
 }
 
 void MainWindow::setSortAscendingPref(bool b)
 {
-    prefs_.set(Prefs::SORT_REVERSED, b);
+    prefs_.set(TR_KEY_sort_reversed, b);
 }
 
 /****
@@ -755,7 +788,7 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
 
     static_assert(StatsModeCount == 4U && "StatsMode changed: update this code");
-    auto const mode = prefs_.get<StatsMode>(Prefs::STATUSBAR_STATS);
+    auto const mode = prefs_.get<StatsMode>(TR_KEY_statusbar_stats);
     auto const use_session_stats = mode == StatsMode::SessionRatio || mode == StatsMode::SessionTransfer;
     auto const& st = use_session_stats ? session_.getStats() : session_.getCumulativeStats();
     ui_.statsLabel->setText(
@@ -1011,7 +1044,7 @@ void MainWindow::reannounceSelected()
 
 void MainWindow::onStatsModeChanged(QAction const* action)
 {
-    prefs_.set(Prefs::STATUSBAR_STATS, action->property(StatsModeKey).value<StatsMode>());
+    prefs_.set(TR_KEY_statusbar_stats, action->property(StatsModeKey).value<StatsMode>());
 }
 
 /**
@@ -1020,30 +1053,30 @@ void MainWindow::onStatsModeChanged(QAction const* action)
 
 void MainWindow::setCompactView(bool visible)
 {
-    prefs_.set(Prefs::COMPACT_VIEW, visible);
+    prefs_.set(TR_KEY_compact_view, visible);
 }
 
 void MainWindow::toggleSpeedMode()
 {
-    auto const key = Prefs::ALT_SPEED_LIMIT_ENABLED;
+    auto const key = TR_KEY_alt_speed_enabled;
     auto const checked = !prefs_.get<bool>(key);
-    prefs_.set<bool>(key, checked);
+    prefs_.set(key, checked);
     alt_speed_action_->setChecked(checked);
 }
 
 void MainWindow::setToolbarVisible(bool visible)
 {
-    prefs_.set(Prefs::TOOLBAR, visible);
+    prefs_.set(TR_KEY_show_toolbar, visible);
 }
 
 void MainWindow::setFilterbarVisible(bool visible)
 {
-    prefs_.set(Prefs::FILTERBAR, visible);
+    prefs_.set(TR_KEY_show_filterbar, visible);
 }
 
 void MainWindow::setStatusbarVisible(bool visible)
 {
-    prefs_.set(Prefs::STATUSBAR, visible);
+    prefs_.set(TR_KEY_show_statusbar, visible);
 }
 
 /**
@@ -1092,16 +1125,16 @@ void MainWindow::trayActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void MainWindow::refreshPref(int const idx)
+void MainWindow::refreshPref(tr_quark const key)
 {
     auto b = bool{};
     auto str = QString{};
 
-    switch (idx)
+    switch (key)
     {
-    case Prefs::STATUSBAR_STATS:
+    case TR_KEY_statusbar_stats:
         {
-            auto const needle = QVariant::fromValue(prefs_.get<StatsMode>(idx));
+            auto const needle = QVariant::fromValue(prefs_.get<StatsMode>(key));
 
             for (auto* action : ui_.action_TotalRatio->actionGroup()->actions())
             {
@@ -1112,13 +1145,13 @@ void MainWindow::refreshPref(int const idx)
         }
         break;
 
-    case Prefs::SORT_REVERSED:
-        ui_.action_ReverseSortOrder->setChecked(prefs_.get<bool>(idx));
+    case TR_KEY_sort_reversed:
+        ui_.action_ReverseSortOrder->setChecked(prefs_.get<bool>(key));
         break;
 
-    case Prefs::SORT_MODE:
+    case TR_KEY_sort_mode:
         {
-            auto const sort_mode = prefs_.get<SortMode>(idx);
+            auto const sort_mode = prefs_.get<SortMode>(key);
             for (auto* action : ui_.action_SortByActivity->actionGroup()->actions())
             {
                 action->setChecked(sort_mode == action->property(SortModeKey).value<SortMode>());
@@ -1127,92 +1160,90 @@ void MainWindow::refreshPref(int const idx)
 
         break;
 
-    case Prefs::DSPEED_ENABLED:
-        (prefs_.get<bool>(idx) ? dlimit_on_action_ : dlimit_off_action_)->setChecked(true);
+    case TR_KEY_speed_limit_down_enabled:
+        (prefs_.get<bool>(key) ? dlimit_on_action_ : dlimit_off_action_)->setChecked(true);
         break;
 
-    case Prefs::DSPEED:
-        dlimit_on_action_->setText(
-            tr("Limited at %1").arg(Speed{ prefs_.get<unsigned int>(idx), Speed::Units::KByps }.to_qstring()));
+    case TR_KEY_speed_limit_down:
+        dlimit_on_action_->setText(tr("Limited at %1").arg(Speed{ prefs_.get<int>(key), Speed::Units::KByps }.to_qstring()));
         break;
 
-    case Prefs::USPEED_ENABLED:
-        (prefs_.get<bool>(idx) ? ulimit_on_action_ : ulimit_off_action_)->setChecked(true);
+    case TR_KEY_speed_limit_up_enabled:
+        (prefs_.get<bool>(key) ? ulimit_on_action_ : ulimit_off_action_)->setChecked(true);
         break;
 
-    case Prefs::USPEED:
-        ulimit_on_action_->setText(
-            tr("Limited at %1").arg(Speed{ prefs_.get<unsigned int>(idx), Speed::Units::KByps }.to_qstring()));
+    case TR_KEY_speed_limit_up:
+        ulimit_on_action_->setText(tr("Limited at %1").arg(Speed{ prefs_.get<int>(key), Speed::Units::KByps }.to_qstring()));
         break;
 
-    case Prefs::RATIO_ENABLED:
-        (prefs_.get<bool>(idx) ? ratio_on_action_ : ratio_off_action_)->setChecked(true);
+    case TR_KEY_seed_ratio_limited:
+        (prefs_.get<bool>(key) ? ratio_on_action_ : ratio_off_action_)->setChecked(true);
         break;
 
-    case Prefs::RATIO:
-        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(prefs_.get<double>(idx))));
+    case TR_KEY_seed_ratio_limit:
+        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(prefs_.get<double>(key))));
         break;
 
-    case Prefs::FILTERBAR:
-        b = prefs_.get<bool>(idx);
+    case TR_KEY_show_filterbar:
+        b = prefs_.get<bool>(key);
         filter_bar_->setVisible(b);
         ui_.action_Filterbar->setChecked(b);
         break;
 
-    case Prefs::STATUSBAR:
-        b = prefs_.get<bool>(idx);
+    case TR_KEY_show_statusbar:
+        b = prefs_.get<bool>(key);
         ui_.statusBar->setVisible(b);
         ui_.action_Statusbar->setChecked(b);
         break;
 
-    case Prefs::TOOLBAR:
-        b = prefs_.get<bool>(idx);
+    case TR_KEY_show_toolbar:
+        b = prefs_.get<bool>(key);
         ui_.toolBar->setVisible(b);
         ui_.action_Toolbar->setChecked(b);
         break;
 
-    case Prefs::SHOW_TRAY_ICON:
-        b = prefs_.get<bool>(idx);
+    case TR_KEY_show_notification_area_icon:
+        b = prefs_.get<bool>(key);
         ui_.action_TrayIcon->setChecked(b);
         tray_icon_.setVisible(b);
         QApplication::setQuitOnLastWindowClosed(!b);
         refreshSoon(RefreshTrayIcon);
         break;
 
-    case Prefs::COMPACT_VIEW:
-        b = prefs_.get<bool>(idx);
+    case TR_KEY_compact_view:
+        b = prefs_.get<bool>(key);
         ui_.action_CompactView->setChecked(b);
         ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
         break;
 
-    case Prefs::MAIN_WINDOW_X:
-    case Prefs::MAIN_WINDOW_Y:
-    case Prefs::MAIN_WINDOW_WIDTH:
-    case Prefs::MAIN_WINDOW_HEIGHT:
+    case TR_KEY_main_window_x:
+    case TR_KEY_main_window_y:
+    case TR_KEY_main_window_width:
+    case TR_KEY_main_window_height:
         setGeometry(
-            prefs_.get<int>(Prefs::MAIN_WINDOW_X),
-            prefs_.get<int>(Prefs::MAIN_WINDOW_Y),
-            prefs_.get<int>(Prefs::MAIN_WINDOW_WIDTH),
-            prefs_.get<int>(Prefs::MAIN_WINDOW_HEIGHT));
+            prefs_.get<int>(TR_KEY_main_window_x),
+            prefs_.get<int>(TR_KEY_main_window_y),
+            prefs_.get<int>(TR_KEY_main_window_width),
+            prefs_.get<int>(TR_KEY_main_window_height));
         break;
 
-    case Prefs::ALT_SPEED_LIMIT_ENABLED:
-    case Prefs::ALT_SPEED_LIMIT_UP:
-    case Prefs::ALT_SPEED_LIMIT_DOWN:
+    case TR_KEY_alt_speed_enabled:
+    case TR_KEY_alt_speed_up:
+    case TR_KEY_alt_speed_down:
         {
-            b = prefs_.get<bool>(Prefs::ALT_SPEED_LIMIT_ENABLED);
+            b = prefs_.get<bool>(TR_KEY_alt_speed_enabled);
             alt_speed_action_->setChecked(b);
             ui_.altSpeedButton->setChecked(b);
             auto const fmt = b ? tr("Click to disable Temporary Speed Limits\n (%1 down, %2 up)") :
                                  tr("Click to enable Temporary Speed Limits\n (%1 down, %2 up)");
-            auto const d = Speed{ prefs_.get<unsigned int>(Prefs::ALT_SPEED_LIMIT_DOWN), Speed::Units::KByps };
-            auto const u = Speed{ prefs_.get<unsigned int>(Prefs::ALT_SPEED_LIMIT_UP), Speed::Units::KByps };
+            auto const d = Speed{ prefs_.get<int>(TR_KEY_alt_speed_down), Speed::Units::KByps };
+            auto const u = Speed{ prefs_.get<int>(TR_KEY_alt_speed_up), Speed::Units::KByps };
             ui_.altSpeedButton->setToolTip(fmt.arg(d.to_qstring()).arg(u.to_qstring()));
             break;
         }
 
-    case Prefs::READ_CLIPBOARD:
-        auto_add_clipboard_links_ = prefs_.get<bool>(Prefs::READ_CLIPBOARD);
+    case TR_KEY_read_clipboard:
+        auto_add_clipboard_links_ = prefs_.get<bool>(TR_KEY_read_clipboard);
         break;
 
     default:
@@ -1235,7 +1266,7 @@ void MainWindow::openTorrent()
 {
     auto* const d = new QFileDialog{ this,
                                      tr("Open Torrent"),
-                                     prefs_.get<QString>(Prefs::OPEN_DIALOG_FOLDER),
+                                     prefs_.get<QString>(TR_KEY_open_dialog_dir),
                                      tr("Torrent Files (*.torrent);;All Files (*.*)") };
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
@@ -1243,7 +1274,7 @@ void MainWindow::openTorrent()
     if (auto* const l = qobject_cast<QGridLayout*>(d->layout()); l != nullptr)
     {
         auto* b = new QCheckBox{ tr("Show &options dialog") };
-        b->setChecked(prefs_.get<bool>(Prefs::OPTIONS_PROMPT));
+        b->setChecked(prefs_.get<bool>(TR_KEY_show_options_window));
         b->setObjectName(show_options_checkbox_name_);
         l->addWidget(b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
     }
@@ -1299,7 +1330,7 @@ void MainWindow::addTorrentFromClipboard()
 
 void MainWindow::addTorrents(QStringList const& filenames)
 {
-    bool show_options = prefs_.get<bool>(Prefs::OPTIONS_PROMPT);
+    bool show_options = prefs_.get<bool>(TR_KEY_show_options_window);
 
     if (auto const* const file_dialog = qobject_cast<QFileDialog const*>(sender()); file_dialog != nullptr)
     {

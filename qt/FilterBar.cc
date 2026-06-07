@@ -172,7 +172,7 @@ void FilterBar::refreshTrackers()
 
     if (any_added) // the one added might match our filter...
     {
-        refreshPref(Prefs::FILTER_TRACKERS);
+        refreshPref(TR_KEY_filter_trackers);
     }
 
     sitename_counts_.swap(new_trackers);
@@ -225,7 +225,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     connect(line_edit_, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);
 
     // listen for changes from the other players
-    connect(&prefs_, &Prefs::changed, this, &FilterBar::refreshPref);
+    connect(&prefs_, qOverload<tr_quark>(&Prefs::changed), this, &FilterBar::refreshPref);
     connect(activity_combo_, qOverload<int>(&QComboBox::currentIndexChanged), this, &FilterBar::onActivityIndexChanged);
     connect(tracker_combo_, qOverload<int>(&QComboBox::currentIndexChanged), this, &FilterBar::onTrackerIndexChanged);
     connect(&torrents_, &TorrentModel::modelReset, this, &FilterBar::recountAllSoon);
@@ -239,7 +239,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     is_bootstrapping_ = false; // NOLINT cppcoreguidelines-prefer-member-initializer
 
     // initialize our state
-    for (int const key : { Prefs::FILTER_MODE, Prefs::FILTER_TRACKERS })
+    for (tr_quark const key : { TR_KEY_filter_mode, TR_KEY_filter_trackers })
     {
         refreshPref(key);
     }
@@ -260,11 +260,11 @@ void FilterBar::clear()
 ****
 ***/
 
-void FilterBar::refreshPref(int key)
+void FilterBar::refreshPref(tr_quark key)
 {
     switch (key)
     {
-    case Prefs::FILTER_MODE:
+    case TR_KEY_filter_mode:
         {
             auto const show_mode = prefs_.get<ShowMode>(key);
             QAbstractItemModel const* const model = activity_combo_->model();
@@ -273,7 +273,7 @@ void FilterBar::refreshPref(int key)
             break;
         }
 
-    case Prefs::FILTER_TRACKERS:
+    case TR_KEY_filter_trackers:
         {
             auto const display_name = prefs_.get<QString>(key);
 
@@ -318,7 +318,7 @@ void FilterBar::onTextChanged(QString const& str)
 {
     if (!is_bootstrapping_)
     {
-        prefs_.set(Prefs::FILTER_TEXT, str.trimmed());
+        prefs_.set(TR_KEY_filter_text, str.trimmed());
     }
 }
 
@@ -327,7 +327,7 @@ void FilterBar::onTrackerIndexChanged(int i)
     if (!is_bootstrapping_)
     {
         auto const display_name = tracker_combo_->itemData(i, TRACKER_ROLE).toString();
-        prefs_.set(Prefs::FILTER_TRACKERS, display_name);
+        prefs_.set(TR_KEY_filter_trackers, display_name);
     }
 }
 
@@ -336,7 +336,7 @@ void FilterBar::onActivityIndexChanged(int i)
     if (!is_bootstrapping_)
     {
         auto const show_mode = activity_combo_->itemData(i, ACTIVITY_ROLE).value<ShowMode>();
-        prefs_.set(Prefs::FILTER_MODE, show_mode);
+        prefs_.set(TR_KEY_filter_mode, show_mode);
     }
 }
 

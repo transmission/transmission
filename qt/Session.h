@@ -21,13 +21,13 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
 
+#include "Prefs.h"
 #include "RpcClient.h"
 #include "RpcQueue.h"
 #include "Torrent.h"
 #include "Typedefs.h"
 
 class AddData;
-class Prefs;
 
 extern "C"
 {
@@ -145,7 +145,7 @@ public slots:
     void refreshSessionInfo();
     void refreshSessionStats();
     void removeTorrents(torrent_ids_t const& torrent_ids, bool delete_files = false);
-    void updatePref(int key);
+    void updatePref(tr_quark key);
 
 signals:
     void sourceChanged();

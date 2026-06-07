@@ -134,60 +134,60 @@ void Session::copyMagnetLinkToClipboard(int torrent_id)
     q->run();
 }
 
-void Session::updatePref(int key)
+void Session::updatePref(tr_quark key)
 {
     if (Prefs::isCore(key))
     {
         switch (key)
         {
-        case Prefs::ALT_SPEED_LIMIT_DOWN:
-        case Prefs::ALT_SPEED_LIMIT_ENABLED:
-        case Prefs::ALT_SPEED_LIMIT_TIME_BEGIN:
-        case Prefs::ALT_SPEED_LIMIT_TIME_DAY:
-        case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
-        case Prefs::ALT_SPEED_LIMIT_TIME_END:
-        case Prefs::ALT_SPEED_LIMIT_UP:
-        case Prefs::BLOCKLIST_DATE:
-        case Prefs::BLOCKLIST_ENABLED:
-        case Prefs::BLOCKLIST_URL:
-        case Prefs::DEFAULT_TRACKERS:
-        case Prefs::DHT_ENABLED:
-        case Prefs::DOWNLOAD_QUEUE_ENABLED:
-        case Prefs::DOWNLOAD_QUEUE_SIZE:
-        case Prefs::DSPEED:
-        case Prefs::DSPEED_ENABLED:
-        case Prefs::ENCRYPTION:
-        case Prefs::IDLE_LIMIT:
-        case Prefs::IDLE_LIMIT_ENABLED:
-        case Prefs::INCOMPLETE_DIR:
-        case Prefs::INCOMPLETE_DIR_ENABLED:
-        case Prefs::LPD_ENABLED:
-        case Prefs::PEER_LIMIT_GLOBAL:
-        case Prefs::PEER_LIMIT_TORRENT:
-        case Prefs::PEER_PORT:
-        case Prefs::PEER_PORT_RANDOM_ON_START:
-        case Prefs::QUEUE_STALLED_MINUTES:
-        case Prefs::PEX_ENABLED:
-        case Prefs::PORT_FORWARDING:
-        case Prefs::RENAME_PARTIAL_FILES:
-        case Prefs::SCRIPT_TORRENT_DONE_ENABLED:
-        case Prefs::SCRIPT_TORRENT_DONE_FILENAME:
-        case Prefs::SCRIPT_TORRENT_DONE_SEEDING_ENABLED:
-        case Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME:
-        case Prefs::START:
-        case Prefs::TRASH_ORIGINAL:
-        case Prefs::RATIO:
-        case Prefs::RATIO_ENABLED:
-        case Prefs::USPEED:
-        case Prefs::USPEED_ENABLED:
-        case Prefs::UTP_ENABLED:
+        case TR_KEY_alt_speed_down:
+        case TR_KEY_alt_speed_enabled:
+        case TR_KEY_alt_speed_time_begin:
+        case TR_KEY_alt_speed_time_day:
+        case TR_KEY_alt_speed_time_enabled:
+        case TR_KEY_alt_speed_time_end:
+        case TR_KEY_alt_speed_up:
+        case TR_KEY_blocklist_date:
+        case TR_KEY_blocklist_enabled:
+        case TR_KEY_blocklist_url:
+        case TR_KEY_default_trackers:
+        case TR_KEY_dht_enabled:
+        case TR_KEY_download_queue_enabled:
+        case TR_KEY_download_queue_size:
+        case TR_KEY_speed_limit_down:
+        case TR_KEY_speed_limit_down_enabled:
+        case TR_KEY_encryption:
+        case TR_KEY_idle_seeding_limit:
+        case TR_KEY_idle_seeding_limit_enabled:
+        case TR_KEY_incomplete_dir:
+        case TR_KEY_incomplete_dir_enabled:
+        case TR_KEY_lpd_enabled:
+        case TR_KEY_peer_limit_global:
+        case TR_KEY_peer_limit_per_torrent:
+        case TR_KEY_peer_port:
+        case TR_KEY_peer_port_random_on_start:
+        case TR_KEY_queue_stalled_minutes:
+        case TR_KEY_pex_enabled:
+        case TR_KEY_port_forwarding_enabled:
+        case TR_KEY_rename_partial_files:
+        case TR_KEY_script_torrent_done_enabled:
+        case TR_KEY_script_torrent_done_filename:
+        case TR_KEY_script_torrent_done_seeding_enabled:
+        case TR_KEY_script_torrent_done_seeding_filename:
+        case TR_KEY_start_added_torrents:
+        case TR_KEY_trash_original_torrent_files:
+        case TR_KEY_seed_ratio_limit:
+        case TR_KEY_seed_ratio_limited:
+        case TR_KEY_speed_limit_up:
+        case TR_KEY_speed_limit_up_enabled:
+        case TR_KEY_utp_enabled:
             {
                 auto [pref_key, pref_val] = prefs_.keyval(key);
                 sessionSet(pref_key, std::move(pref_val));
             }
             break;
 
-        case Prefs::DOWNLOAD_DIR:
+        case TR_KEY_download_dir:
             {
                 auto [pref_key, pref_val] = prefs_.keyval(key);
                 sessionSet(pref_key, std::move(pref_val));
@@ -196,7 +196,7 @@ void Session::updatePref(int key)
             refreshSessionInfo();
             break;
 
-        case Prefs::RPC_AUTH_REQUIRED:
+        case TR_KEY_rpc_authentication_required:
             if (session_ != nullptr)
             {
                 tr_sessionSetRPCPasswordEnabled(session_, prefs_.get<bool>(key));
@@ -204,7 +204,7 @@ void Session::updatePref(int key)
 
             break;
 
-        case Prefs::RPC_ENABLED:
+        case TR_KEY_rpc_enabled:
             if (session_ != nullptr)
             {
                 tr_sessionSetRPCEnabled(session_, prefs_.get<bool>(key));
@@ -212,7 +212,7 @@ void Session::updatePref(int key)
 
             break;
 
-        case Prefs::RPC_PASSWORD:
+        case TR_KEY_rpc_password:
             if (session_ != nullptr)
             {
                 tr_sessionSetRPCPassword(session_, prefs_.get<QString>(key).toStdString());
@@ -220,7 +220,7 @@ void Session::updatePref(int key)
 
             break;
 
-        case Prefs::RPC_PORT:
+        case TR_KEY_rpc_port:
             if (session_ != nullptr)
             {
                 tr_sessionSetRPCPort(session_, static_cast<uint16_t>(prefs_.get<int>(key)));
@@ -228,7 +228,7 @@ void Session::updatePref(int key)
 
             break;
 
-        case Prefs::RPC_USERNAME:
+        case TR_KEY_rpc_username:
             if (session_ != nullptr)
             {
                 tr_sessionSetRPCUsername(session_, prefs_.get<QString>(key).toStdString());
@@ -236,7 +236,7 @@ void Session::updatePref(int key)
 
             break;
 
-        case Prefs::RPC_WHITELIST_ENABLED:
+        case TR_KEY_rpc_whitelist_enabled:
             if (session_ != nullptr)
             {
                 tr_sessionSetRPCWhitelistEnabled(session_, prefs_.get<bool>(key));
@@ -244,7 +244,7 @@ void Session::updatePref(int key)
 
             break;
 
-        case Prefs::RPC_WHITELIST:
+        case TR_KEY_rpc_whitelist:
             if (session_ != nullptr)
             {
                 tr_sessionSetRPCWhitelist(session_, prefs_.get<QString>(key).toStdString());
@@ -253,7 +253,7 @@ void Session::updatePref(int key)
             break;
 
         default:
-            qWarning() << "unhandled pref:" << key;
+            qWarning() << "unhandled pref:" << static_cast<int>(key);
         }
     }
 }
@@ -267,7 +267,7 @@ Session::Session(QString config_dir, Prefs& prefs, RpcClient& rpc)
     , prefs_{ prefs }
     , rpc_{ rpc }
 {
-    connect(&prefs_, &Prefs::changed, this, &Session::updatePref);
+    connect(&prefs_, qOverload<tr_quark>(&Prefs::changed), this, &Session::updatePref);
     connect(&rpc_, &RpcClient::httpAuthenticationRequired, this, &Session::httpAuthenticationRequired);
     connect(&rpc_, &RpcClient::dataReadProgress, this, &Session::dataReadProgress);
     connect(&rpc_, &RpcClient::dataSendProgress, this, &Session::dataSendProgress);
@@ -305,10 +305,10 @@ void Session::restart()
 
 void Session::start()
 {
-    if (prefs_.get<bool>(Prefs::SESSION_IS_REMOTE))
+    if (prefs_.get<bool>(TR_KEY_remote_session_enabled))
     {
         QUrl url;
-        if (prefs_.get<bool>(Prefs::SESSION_REMOTE_HTTPS))
+        if (prefs_.get<bool>(TR_KEY_remote_session_https))
         {
             url.setScheme(QStringLiteral("https"));
         }
@@ -316,18 +316,18 @@ void Session::start()
         {
             url.setScheme(QStringLiteral("http"));
         }
-        url.setHost(prefs_.get<QString>(Prefs::SESSION_REMOTE_HOST));
-        url.setPort(prefs_.get<int>(Prefs::SESSION_REMOTE_PORT));
+        url.setHost(prefs_.get<QString>(TR_KEY_remote_session_host));
+        url.setPort(prefs_.get<int>(TR_KEY_remote_session_port));
 
-        auto const root_path = prefs_.get<QString>(Prefs::SESSION_REMOTE_URL_BASE_PATH);
+        auto const root_path = prefs_.get<QString>(TR_KEY_remote_session_url_base_path);
         auto const relative_path = TrHttpServerRpcRelativePath;
         url.setPath(
             root_path + QString::fromUtf8(relative_path.data(), static_cast<IF_QT6(qsizetype, int)>(relative_path.size())));
 
-        if (prefs_.get<bool>(Prefs::SESSION_REMOTE_AUTH))
+        if (prefs_.get<bool>(TR_KEY_remote_session_requires_authentication))
         {
-            url.setUserName(prefs_.get<QString>(Prefs::SESSION_REMOTE_USERNAME));
-            url.setPassword(prefs_.get<QString>(Prefs::SESSION_REMOTE_PASSWORD));
+            url.setUserName(prefs_.get<QString>(TR_KEY_remote_session_username));
+            url.setPassword(prefs_.get<QString>(TR_KEY_remote_session_password));
         }
 
         rpc_.start(url);
@@ -842,30 +842,31 @@ void Session::updateStats(tr_variant* dict)
 
 void Session::updateInfo(tr_variant* args_dict)
 {
-    disconnect(&prefs_, &Prefs::changed, this, &Session::updatePref);
+    disconnect(&prefs_, qOverload<tr_quark>(&Prefs::changed), this, &Session::updatePref);
 
-    for (int i = Prefs::FIRST_CORE_PREF; i <= Prefs::LAST_CORE_PREF; ++i)
+    if (auto const* const settings = args_dict->get_if<tr_variant::Map>(); settings != nullptr)
     {
-        auto const pref_key = prefs_.keyval(i).first;
-        tr_variant const* b(tr_variantDictFind(args_dict, pref_key));
-
-        if (b == nullptr)
+        for (auto const& [key, value] : *settings)
         {
-            continue;
+            if (!Prefs::isCore(key))
+            {
+                continue;
+            }
+
+            prefs_.set(key, value);
         }
-        prefs_.set(i, *b);
     }
 
     /* Use the C API to get settings that, for security reasons, aren't supported by RPC */
     if (session_ != nullptr)
     {
-        prefs_.set(Prefs::RPC_ENABLED, tr_sessionIsRPCEnabled(session_));
-        prefs_.set(Prefs::RPC_AUTH_REQUIRED, tr_sessionIsRPCPasswordEnabled(session_));
-        prefs_.set(Prefs::RPC_PASSWORD, QString::fromStdString(tr_sessionGetRPCPassword(session_)));
-        prefs_.set(Prefs::RPC_PORT, tr_sessionGetRPCPort(session_));
-        prefs_.set(Prefs::RPC_USERNAME, QString::fromStdString(tr_sessionGetRPCUsername(session_)));
-        prefs_.set(Prefs::RPC_WHITELIST_ENABLED, tr_sessionGetRPCWhitelistEnabled(session_));
-        prefs_.set(Prefs::RPC_WHITELIST, QString::fromStdString(tr_sessionGetRPCWhitelist(session_)));
+        prefs_.set(TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(session_));
+        prefs_.set(TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(session_));
+        prefs_.set(TR_KEY_rpc_password, QString::fromStdString(tr_sessionGetRPCPassword(session_)));
+        prefs_.set(TR_KEY_rpc_port, tr_sessionGetRPCPort(session_));
+        prefs_.set(TR_KEY_rpc_username, QString::fromStdString(tr_sessionGetRPCUsername(session_)));
+        prefs_.set(TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(session_));
+        prefs_.set(TR_KEY_rpc_whitelist, QString::fromStdString(tr_sessionGetRPCWhitelist(session_)));
     }
 
     if (auto const size = dictFind<int>(args_dict, TR_KEY_blocklist_size); size && *size != blocklistSize())
@@ -888,7 +889,7 @@ void Session::updateInfo(tr_variant* args_dict)
         session_id_.clear();
     }
 
-    connect(&prefs_, &Prefs::changed, this, &Session::updatePref);
+    connect(&prefs_, qOverload<tr_quark>(&Prefs::changed), this, &Session::updatePref);
 
     emit sessionUpdated();
 }
@@ -907,7 +908,7 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args_dict)
 
     if (tr_variantDictFind(args_dict, TR_KEY_paused) == nullptr)
     {
-        dictAdd(args_dict, TR_KEY_paused, !prefs_.get<bool>(Prefs::START));
+        dictAdd(args_dict, TR_KEY_paused, !prefs_.get<bool>(TR_KEY_start_added_torrents));
     }
 
     switch (add_me.type)
@@ -1015,7 +1016,7 @@ void Session::addNewlyCreatedTorrent(QString const& filename, QString const& loc
     tr_variant args;
     tr_variantInitDict(&args, 3);
     dictAdd(&args, TR_KEY_download_dir, local_path);
-    dictAdd(&args, TR_KEY_paused, !prefs_.get<bool>(Prefs::START));
+    dictAdd(&args, TR_KEY_paused, !prefs_.get<bool>(TR_KEY_start_added_torrents));
     dictAdd(&args, TR_KEY_metainfo, b64);
 
     exec(TR_KEY_torrent_add, &args);
@@ -1070,7 +1071,7 @@ void Session::launchWebInterface() const
     {
         url = rpc_.url();
 
-        auto const root_path = prefs_.get<QString>(Prefs::SESSION_REMOTE_URL_BASE_PATH);
+        auto const root_path = prefs_.get<QString>(TR_KEY_remote_session_url_base_path);
         auto const relative_path = TrHttpServerWebRelativePath;
         url.setPath(
             root_path + QString::fromUtf8(relative_path.data(), static_cast<IF_QT6(qsizetype, int)>(relative_path.size())));
@@ -1079,7 +1080,7 @@ void Session::launchWebInterface() const
     {
         url.setScheme(QStringLiteral("http"));
         url.setHost(QStringLiteral("localhost"));
-        url.setPort(prefs_.get<int>(Prefs::RPC_PORT));
+        url.setPort(prefs_.get<int>(TR_KEY_rpc_port));
     }
 
     QDesktopServices::openUrl(url);
