@@ -281,18 +281,6 @@ bool tr_variantDictFindDict(tr_variant* const var, tr_quark key, tr_variant** se
     return false;
 }
 
-bool tr_variantDictFindRaw(tr_variant* const var, tr_quark key, uint8_t const** setme_raw, size_t* setme_len)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetRaw(child, setme_raw, setme_len);
-}
-
-bool tr_variantDictFindRaw(tr_variant* const var, tr_quark key, std::byte const** setme_raw, size_t* setme_len)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetRaw(child, setme_raw, setme_len);
-}
-
 // ---
 
 void tr_variantInitList(tr_variant* initme, size_t n_reserve)

@@ -543,8 +543,6 @@ bool tr_variantDictFindList(tr_variant* var, tr_quark key, tr_variant** setme);
 bool tr_variantDictFindDict(tr_variant* var, tr_quark key, tr_variant** setme_value);
 bool tr_variantDictFindInt(tr_variant* var, tr_quark key, int64_t* setme);
 bool tr_variantDictFindStrView(tr_variant* var, tr_quark key, std::string_view* setme);
-bool tr_variantDictFindRaw(tr_variant* var, tr_quark key, uint8_t const** setme_raw, size_t* setme_len);
-bool tr_variantDictFindRaw(tr_variant* var, tr_quark key, std::byte const** setme_raw, size_t* setme_len);
 
 /* this is only quasi-supported. don't rely on it too heavily outside of libT */
 void tr_variantMergeDicts(tr_variant* tgt, tr_variant const* src);
