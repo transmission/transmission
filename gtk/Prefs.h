@@ -15,6 +15,10 @@
 #include <string_view>
 #include <vector>
 
+// FIXME(ckerr) remove annoying pragma
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+
 [[nodiscard]] tr_variant::Map& gtr_pref_get_map();
 
 [[nodiscard]] bool gtr_pref_has_key(tr_quark key);
@@ -78,3 +82,5 @@ void gtr_pref_string_set(tr_quark key, std::string_view value);
 
 void gtr_pref_save(tr_session* /*session*/);
 tr_variant& gtr_pref_get_all();
+
+#pragma GCC diagnostic pop // ignore -Wnull-dereference

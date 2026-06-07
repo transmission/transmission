@@ -106,6 +106,9 @@ tr_variant& gtr_pref_get_all()
     return getPrefs();
 }
 
+// FIXME(ckerr) remove annoying pragma
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
 tr_variant::Map& gtr_pref_get_map()
 {
     return *getPrefs().get_if<tr_variant::Map>();
@@ -160,3 +163,4 @@ void gtr_pref_save(tr_session* session)
 {
     tr_sessionSaveSettings(session, gl_confdir, getPrefs());
 }
+#pragma GCC diagnostic pop
