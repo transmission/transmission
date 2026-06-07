@@ -294,15 +294,15 @@ bool addURL(tr_variant& metainfo, std::string_view url)
     {
         if (!had_announce_list)
         {
-            (*map)[TR_KEY_announce_list] = tr_variant::make_vector(2);
-            al_vec = map->find_if<tr_variant::Vector>(TR_KEY_announce_list);
+            al_vec = map->insert_or_assign(TR_KEY_announce_list, tr_variant::make_vector(2)).first.get_if<tr_variant::Vector>();
 
             if (had_announce)
             {
                 /* we're moving from an 'announce' to an 'announce-list',
                  * so copy the old announce URL to the list */
-                al_vec->emplace_back(tr_variant::make_vector(1));
-                al_vec->back().get_if<tr_variant::Vector>()->emplace_back(std::string_view{ *announce_opt });
+                al_vec->emplace_back(tr_variant::make_vector(1))
+                    .get_if<tr_variant::Vector>()
+                    ->emplace_back(std::string_view{ *announce_opt });
                 changed = true;
             }
         }
@@ -310,8 +310,9 @@ bool addURL(tr_variant& metainfo, std::string_view url)
         /* If the user-specified URL isn't in the announce list yet, add it */
         if (!announce_list_has_url(*al_vec, url))
         {
-            al_vec->emplace_back(tr_variant::make_vector(1));
-            al_vec->back().get_if<tr_variant::Vector>()->emplace_back(std::string_view{ url });
+            al_vec->emplace_back(tr_variant::make_vector(1))
+                .get_if<tr_variant::Vector>()
+                ->emplace_back(std::string_view{ url });
             fmt::print("\tAdded '{:s}' to 'announce-list' tier #{:d}\n", url, al_vec->size());
             changed = true;
         }
