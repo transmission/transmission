@@ -486,9 +486,6 @@ template<std::integral Val>
 
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
-bool tr_variantGetRaw(tr_variant const* variant, std::byte const** setme_raw, size_t* setme_len);
-bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
-
 // --- Real Numbers
 
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);

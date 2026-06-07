@@ -213,30 +213,6 @@ bool tr_variantGetStrView(tr_variant const* const var, std::string_view* setme)
     return value_if(var, setme);
 }
 
-bool tr_variantGetRaw(tr_variant const* v, std::byte const** setme_raw, size_t* setme_len)
-{
-    if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
-    {
-        *setme_raw = reinterpret_cast<std::byte const*>(std::data(sv));
-        *setme_len = std::size(sv);
-        return true;
-    }
-
-    return false;
-}
-
-bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* setme_len)
-{
-    if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
-    {
-        *setme_raw = reinterpret_cast<uint8_t const*>(std::data(sv));
-        *setme_len = std::size(sv);
-        return true;
-    }
-
-    return false;
-}
-
 bool tr_variantGetBool(tr_variant const* const var, bool* setme)
 {
     return value_if(var, setme);
