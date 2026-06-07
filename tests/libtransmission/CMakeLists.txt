@@ -35,6 +35,8 @@ target_sources(libtransmission-test
         move-test.cc
         net-test.cc
         open-files-test.cc
+        bep55-holepunch-test.cc
+        bep55-introducer-store-test.cc
         peer-mgr-wishlist-test.cc
         peer-msgs-test.cc
         platform-test.cc

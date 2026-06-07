@@ -85,6 +85,9 @@ target_sources(${TR_NAME}
         net.h
         open-files.cc
         open-files.h
+        bep55-holepunch.cc
+        bep55-holepunch.h
+        bep55-introducer-store.h
         peer-common.h
         peer-io.cc
         peer-io.h
