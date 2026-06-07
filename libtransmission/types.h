@@ -236,6 +236,7 @@ enum tr_peer_from : uint8_t
     TR_PEER_FROM_PEX, /* peers found from PEX */
     TR_PEER_FROM_RESUME, /* peers found in the .resume file */
     TR_PEER_FROM_LTEP, /* peer address provided in an LTEP handshake */
+    TR_PEER_FROM_HOLEPUNCH, /* peers found via BEP 55 holepunch connect */
     TR_PEER_FROM_N_TYPES
 };
 
@@ -433,6 +434,7 @@ struct tr_peer_stat
     bool is_utp = {};
     bool peer_is_choked = {};
     bool peer_is_interested = {};
+    bool supports_holepunch = {};
 };
 
 /** @brief Used by `tr_sessionGetStats()` and `tr_sessionGetCumulativeStats()` */

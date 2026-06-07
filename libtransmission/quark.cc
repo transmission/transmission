@@ -204,6 +204,7 @@ auto constexpr MyStatic = std::array<std::u8string_view, TR_N_KEYS>{
     u8"free_space"sv, // rpc
     u8"fromCache"sv, // rpc
     u8"fromDht"sv, // rpc
+    u8"fromHolepunch"sv, // rpc
     u8"fromIncoming"sv, // rpc
     u8"fromLpd"sv, // rpc
     u8"fromLtep"sv, // rpc
@@ -211,6 +212,7 @@ auto constexpr MyStatic = std::array<std::u8string_view, TR_N_KEYS>{
     u8"fromTracker"sv, // rpc
     u8"from_cache"sv, // rpc
     u8"from_dht"sv, // rpc
+    u8"from_holepunch"sv, // rpc
     u8"from_incoming"sv, // rpc
     u8"from_lpd"sv, // rpc
     u8"from_ltep"sv, // rpc
@@ -630,6 +632,7 @@ auto constexpr MyStatic = std::array<std::u8string_view, TR_N_KEYS>{
     u8"status"sv, // rpc
     u8"statusbar-stats"sv, // gtk app, qt app
     u8"statusbar_stats"sv, // gtk app, qt app
+    u8"supports_holepunch"sv, // rpc
     u8"tag"sv, // rpc
     u8"tcp-enabled"sv, // rpc, tr_session::Settings
     u8"tcp_enabled"sv, // rpc, tr_session::Settings

@@ -30,6 +30,7 @@
  * @{
  */
 
+class tr_peerMsgs;
 class tr_peer_socket;
 struct tr_peer;
 struct tr_peerMgr;
@@ -417,6 +418,18 @@ public:
         }
     }
 
+    // ---
+
+    [[nodiscard]] constexpr auto is_holepunch_attempt() const noexcept
+    {
+        return is_holepunch_attempt_;
+    }
+
+    constexpr void set_holepunch_attempt(bool value = true) noexcept
+    {
+        is_holepunch_attempt_ = value;
+    }
+
     [[nodiscard]] constexpr uint8_t pex_flags() const noexcept
     {
         auto ret = pex_flags_;
@@ -585,6 +598,7 @@ private:
     bool is_connected_ = false;
     bool is_seed_ = false;
     bool is_upload_only_ = false;
+    bool is_holepunch_attempt_ = false;
 
     std::unique_ptr<tr_handshake> outgoing_handshake_;
 
@@ -674,6 +688,18 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, std::shared_ptr<tr_peer_socket> 
 
 size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, size_t n_pex);
 
+// BEP 55: Record that a connected peer introduced the given endpoints via PEX.
+// The sender_socket_address is the relay's socket address (the peer who sent us the PEX message).
+void tr_peerMgrRecordPexIntroducers(
+    tr_torrent* tor,
+    tr_socket_address const& sender_socket_address,
+    tr_pex const* pex,
+    size_t n_pex);
+
+// BEP 55: Find a connected peer that introduced the given target endpoint via PEX
+// and supports holepunch. Returns nullptr if no suitable introducer is found.
+[[nodiscard]] tr_peerMsgs* tr_peerMgrFindHolepunchIntroducer(tr_torrent* tor, tr_socket_address const& target_endpoint);
+
 enum : uint8_t
 {
     TR_PEERS_CONNECTED,
@@ -698,5 +724,18 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
 [[nodiscard]] std::vector<tr_peer_stat> tr_peerMgrPeerStats(tr_torrent const* tor);
 
 [[nodiscard]] tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
+
+// BEP 55: Holepunch extension relay.
+// Called when a connected peer sends us a rendezvous message.
+// Finds the target among connected peers and sends connect to both sides.
+void tr_peerMgrHandleHolepunchRendezvous(
+    tr_torrent* tor,
+    tr_socket_address const& sender_socket_address,
+    tr_socket_address const& target_endpoint);
+
+// BEP 55: Initiate an outgoing uTP-only connection to an endpoint in response
+// to a received connect message. The normal handshake, socket, blocklist, and
+// peer-limit checks still apply.
+void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoint);
 
 /* @} */

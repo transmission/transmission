@@ -159,3 +159,16 @@ TEST_F(PeerInfoTest, updateCanonicalPriority)
         EXPECT_EQ(info.get_canonical_priority(), expected);
     }
 }
+
+TEST_F(PeerInfoTest, holepunchAttemptFlag)
+{
+    auto info = tr_peer_info{ tr_address{}, 0, TR_PEER_FROM_PEX, {} };
+
+    EXPECT_FALSE(info.is_holepunch_attempt());
+
+    info.set_holepunch_attempt(true);
+    EXPECT_TRUE(info.is_holepunch_attempt());
+
+    info.set_holepunch_attempt(false);
+    EXPECT_FALSE(info.is_holepunch_attempt());
+}
