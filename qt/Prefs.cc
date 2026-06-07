@@ -149,7 +149,10 @@ void Prefs::save(QString const& filename) const
         settings.merge(*var);
     }
     settings.merge(tr_variant{ current_settings() });
-    settings.get_if<tr_variant::Map>()->erase(TR_KEY_filter_text);
+    if (auto* const settings_map = settings.get_if<tr_variant::Map>())
+    {
+        settings_map->erase(TR_KEY_filter_text);
+    }
     api_compat::convert_outgoing_data(settings);
     serde.to_file(settings, filename_str);
 }
