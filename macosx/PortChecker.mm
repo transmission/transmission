@@ -31,7 +31,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
         _fStatus = PortStatusChecking;
 
         __weak __auto_type weakSelf = self;
-        _fTimer = [NSTimer scheduledTimerWithTimeInterval:kCheckFireInterval repeats:YES block:^(NSTimer* _Nonnull timer) {
+        _fTimer = [NSTimer scheduledTimerWithTimeInterval:kCheckFireInterval repeats:NO block:^(NSTimer* _Nonnull timer) {
             [weakSelf startProbe:portNumber];
         }];
 
