@@ -16,7 +16,7 @@
 #include <optional>
 
 #include "libtransmission/quark.h"
-#include "libtransmission/serializer.h"
+#include "libtransmission/session-settings.h"
 #include "libtransmission/types.h" // for TR_SCHED_ALL
 #include "libtransmission/values.h"
 
@@ -28,50 +28,7 @@ class tr_session_alt_speeds
     using Speed = tr::Values::Speed;
 
 public:
-    class Settings final
-    {
-    public:
-        Settings() = default;
-
-        explicit Settings(tr_variant const& src)
-        {
-            load(src);
-        }
-
-        void load(tr_variant const& src)
-        {
-            tr::serializer::load(*this, Fields, src);
-        }
-
-        [[nodiscard]] tr_variant::Map save() const
-        {
-            return tr::serializer::save(*this, Fields);
-        }
-
-        // NB: When adding a field here, you must also add it to
-        // `Fields` if you want it to be in session-settings.json
-        bool is_active = false;
-        bool scheduler_enabled = false; // whether alt speeds toggle on and off on schedule
-        size_t minute_begin = 540U; // minutes past midnight; 9AM
-        size_t minute_end = 1020U; // minutes past midnight; 5PM
-        size_t speed_down_kbyps = 50U;
-        size_t speed_up_kbyps = 50U;
-        tr_sched_day use_on_these_weekdays = TR_SCHED_ALL;
-
-    private:
-        template<auto MemberPtr>
-        using Field = tr::serializer::Field<MemberPtr>;
-
-        static constexpr auto Fields = std::tuple{
-            Field<&Settings::is_active>{ TR_KEY_alt_speed_enabled },
-            Field<&Settings::speed_up_kbyps>{ TR_KEY_alt_speed_up },
-            Field<&Settings::speed_down_kbyps>{ TR_KEY_alt_speed_down },
-            Field<&Settings::scheduler_enabled>{ TR_KEY_alt_speed_time_enabled },
-            Field<&Settings::use_on_these_weekdays>{ TR_KEY_alt_speed_time_day },
-            Field<&Settings::minute_begin>{ TR_KEY_alt_speed_time_begin },
-            Field<&Settings::minute_end>{ TR_KEY_alt_speed_time_end },
-        };
-    };
+    using Settings = tr::SessionAltSpeedSettings;
 
     enum class ChangeReason : uint8_t
     {

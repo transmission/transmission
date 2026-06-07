@@ -247,13 +247,14 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
         return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces);
     };
 
-    // when we ask for blocks, apart from the last piece,
-    // which will be returned first because it is smaller,
-    // we should get pieces in order
+    // first piece is downloaded first, then last piece, since in sequential
+    // mode we do not prefer pieces close to completion.
     // NB: when all other things are equal in the wishlist, pieces are
     // picked at random so this test -could- pass even if there's a bug.
     // So test several times to shake out any randomness
     static auto constexpr NumRuns = 1000;
+
+    // when nothing is downloaded yet: 100 blocks should all come from piece 0
     for (int run = 0; run < NumRuns; ++run)
     {
         auto requested = tr_bitfield{ 250 };
@@ -263,23 +264,24 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
             requested.set_span(begin, end);
         }
         EXPECT_EQ(100U, requested.count());
-        EXPECT_EQ(50U, requested.count(0, 100));
+        EXPECT_EQ(100U, requested.count(0, 100));
         EXPECT_EQ(0U, requested.count(100, 200));
-        EXPECT_EQ(50U, requested.count(200, 250));
+        EXPECT_EQ(0U, requested.count(200, 250));
     }
 
-    // Same premise as previous test, but ask for more blocks.
+    // Same premise as previous test, but ask for more blocks:
+    // 100 from piece 0, then piece 2 (last) before piece 1.
     for (int run = 0; run < NumRuns; ++run)
     {
         auto requested = tr_bitfield{ 250 };
-        auto const spans = get_spans(200);
+        auto const spans = get_spans(150);
         for (auto const& [begin, end] : spans)
         {
             requested.set_span(begin, end);
         }
-        EXPECT_EQ(200U, requested.count());
+        EXPECT_EQ(150U, requested.count());
         EXPECT_EQ(100U, requested.count(0, 100));
-        EXPECT_EQ(50U, requested.count(100, 200));
+        EXPECT_EQ(0U, requested.count(100, 200));
         EXPECT_EQ(50U, requested.count(200, 250));
     }
 }

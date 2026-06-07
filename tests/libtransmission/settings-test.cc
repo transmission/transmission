@@ -18,6 +18,7 @@
 #include <libtransmission/peer-io.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/session.h>
+#include <libtransmission/session-settings.h>
 #include <libtransmission/variant.h>
 
 #include "test-fixtures.h"
@@ -63,7 +64,7 @@ TEST_F(SettingsTest, canSaveBools)
 
 TEST_F(SettingsTest, canLoadDoubles)
 {
-    static auto constexpr Key = TR_KEY_ratio_limit;
+    static auto constexpr Key = TR_KEY_seed_ratio_limit;
 
     auto settings = tr_session::Settings{};
     auto const expected_value = settings.ratio_limit + 1.0;
@@ -252,7 +253,7 @@ TEST_F(SettingsTest, canLoadPreallocation)
 
     auto settings = std::make_unique<tr_session::Settings>();
     auto const default_value = settings->preallocation_mode;
-    auto constexpr ExpectedValue = tr_open_files::Preallocation::Full;
+    auto constexpr ExpectedValue = tr_file_preallocation::Full;
     ASSERT_NE(ExpectedValue, default_value);
 
     auto map = tr_variant::Map{ 1U };
@@ -273,7 +274,7 @@ TEST_F(SettingsTest, canSavePreallocation)
 
     auto settings = tr_session::Settings{};
     auto const default_value = settings.preallocation_mode;
-    auto constexpr ExpectedValue = tr_open_files::Preallocation::Full;
+    auto constexpr ExpectedValue = tr_file_preallocation::Full;
     ASSERT_NE(ExpectedValue, default_value);
 
     settings.preallocation_mode = ExpectedValue;
@@ -462,9 +463,9 @@ TEST_F(SettingsTest, canSaveVerify)
 TEST_F(SettingsTest, canLoadPreferredTransport)
 {
     static auto constexpr Key = TR_KEY_preferred_transports;
-    auto const expected_value = small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{
-        TR_PREFER_TCP,
-        TR_PREFER_UTP,
+    auto const expected_value = small::max_size_vector<tr_preferred_transport, PreferredTransportCount>{
+        tr_preferred_transport::TCP,
+        tr_preferred_transport::UTP,
     };
     auto expected_value_vec = tr_variant::Vector{};
     expected_value_vec.reserve(std::size(expected_value));
@@ -482,8 +483,8 @@ TEST_F(SettingsTest, canLoadPreferredTransport)
     settings->load(tr_variant{ std::move(map) });
     EXPECT_EQ(expected_value, settings->preferred_transports);
 
-    auto const expected_value_single = small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{
-        TR_PREFER_TCP
+    auto const expected_value_single = small::max_size_vector<tr_preferred_transport, PreferredTransportCount>{
+        tr_preferred_transport::TCP
     };
 
     expected_value_vec = tr_variant::Vector{};
@@ -508,10 +509,13 @@ TEST_F(SettingsTest, canLoadPreferredTransport)
 TEST_F(SettingsTest, canSavePreferredTransport)
 {
     static auto constexpr Key = TR_KEY_preferred_transports;
-    static auto constexpr ExpectedValue = std::array<std::string_view, TR_NUM_PREFERRED_TRANSPORT>{ "tcp"sv, "utp"sv };
-    auto const setting_value = small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{
-        TR_PREFER_TCP,
-        TR_PREFER_UTP,
+    static auto constexpr ExpectedValue = std::array<int64_t, PreferredTransportCount>{
+        static_cast<int64_t>(tr_preferred_transport::TCP),
+        static_cast<int64_t>(tr_preferred_transport::UTP),
+    };
+    auto const setting_value = small::max_size_vector<tr_preferred_transport, PreferredTransportCount>{
+        tr_preferred_transport::TCP,
+        tr_preferred_transport::UTP,
     };
 
     auto settings = tr_session::Settings{};
@@ -525,10 +529,10 @@ TEST_F(SettingsTest, canSavePreferredTransport)
     ASSERT_EQ(std::size(ExpectedValue), std::size(*l));
     for (size_t i = 0, n = std::size(*l); i < n; ++i)
     {
-        auto const& expected = ExpectedValue[i];
+        auto const expected = ExpectedValue[i];
         auto const& actual = (*l)[i];
-        ASSERT_TRUE(actual.index() == tr_variant::StringIndex || actual.index() == tr_variant::StringViewIndex);
-        EXPECT_EQ(expected, actual.value_if<std::string_view>());
+        ASSERT_TRUE(actual.holds_alternative<int64_t>());
+        EXPECT_EQ(expected, actual.value_if<int64_t>());
     }
 }
 
@@ -537,43 +541,46 @@ TEST_F(SettingsTest, fixupToPreferredTransports)
     auto settings = tr_session::Settings{};
 
     // control case
-    auto expected_value = decltype(settings.preferred_transports){ TR_PREFER_UTP, TR_PREFER_TCP };
+    auto expected_value = decltype(settings.preferred_transports){
+        tr_preferred_transport::UTP,
+        tr_preferred_transport::TCP,
+    };
     settings.utp_enabled = true;
     settings.tcp_enabled = true;
     settings.fixup_to_preferred_transports();
     EXPECT_EQ(expected_value, settings.preferred_transports);
 
     // preserves order if no insert is needed
-    settings.preferred_transports = { TR_PREFER_TCP, TR_PREFER_UTP };
-    expected_value = { TR_PREFER_TCP, TR_PREFER_UTP };
+    settings.preferred_transports = { tr_preferred_transport::TCP, tr_preferred_transport::UTP };
+    expected_value = { tr_preferred_transport::TCP, tr_preferred_transport::UTP };
     settings.utp_enabled = true;
     settings.tcp_enabled = true;
     settings.fixup_to_preferred_transports();
     EXPECT_EQ(expected_value, settings.preferred_transports);
 
     // removes utp if needed
-    expected_value = { TR_PREFER_TCP };
+    expected_value = { tr_preferred_transport::TCP };
     settings.utp_enabled = false;
     settings.tcp_enabled = true;
     settings.fixup_to_preferred_transports();
     EXPECT_EQ(expected_value, settings.preferred_transports);
 
     // inserts UTP in front of TCP
-    expected_value = { TR_PREFER_UTP, TR_PREFER_TCP };
+    expected_value = { tr_preferred_transport::UTP, tr_preferred_transport::TCP };
     settings.utp_enabled = true;
     settings.tcp_enabled = true;
     settings.fixup_to_preferred_transports();
     EXPECT_EQ(expected_value, settings.preferred_transports);
 
     // removes tcp if needed
-    expected_value = { TR_PREFER_UTP };
+    expected_value = { tr_preferred_transport::UTP };
     settings.utp_enabled = true;
     settings.tcp_enabled = false;
     settings.fixup_to_preferred_transports();
     EXPECT_EQ(expected_value, settings.preferred_transports);
 
     // inserts TCP behind UTP
-    expected_value = { TR_PREFER_UTP, TR_PREFER_TCP };
+    expected_value = { tr_preferred_transport::UTP, tr_preferred_transport::TCP };
     settings.utp_enabled = true;
     settings.tcp_enabled = true;
     settings.fixup_to_preferred_transports();
@@ -588,12 +595,12 @@ TEST_F(SettingsTest, fixupFromPreferredTransports)
     EXPECT_TRUE(settings.utp_enabled);
     EXPECT_TRUE(settings.tcp_enabled);
 
-    settings.preferred_transports = { TR_PREFER_UTP };
+    settings.preferred_transports = { tr_preferred_transport::UTP };
     settings.fixup_from_preferred_transports();
     EXPECT_TRUE(settings.utp_enabled);
     EXPECT_FALSE(settings.tcp_enabled);
 
-    settings.preferred_transports = { TR_PREFER_TCP };
+    settings.preferred_transports = { tr_preferred_transport::TCP };
     settings.fixup_from_preferred_transports();
     EXPECT_FALSE(settings.utp_enabled);
     EXPECT_TRUE(settings.tcp_enabled);
@@ -634,4 +641,144 @@ TEST_F(SettingsTest, canSaveSleepPerSecondsDuringVerify)
     auto const val_raw = map.value_if<int64_t>(Key);
     ASSERT_TRUE(val_raw);
     EXPECT_EQ(ExpectedValue, std::chrono::milliseconds{ *val_raw });
+}
+
+TEST_F(SettingsTest, canInstantiateAltSpeedSettings)
+{
+    auto settings = tr::SessionAltSpeedSettings{};
+
+    auto map = settings.save();
+    EXPECT_FALSE(std::empty(map));
+}
+
+TEST_F(SettingsTest, canLoadAndSaveAltSpeedSettings)
+{
+    auto settings = tr::SessionAltSpeedSettings{};
+
+    auto map = tr_variant::Map{ 3U };
+    map.try_emplace(TR_KEY_alt_speed_enabled, true);
+    map.try_emplace(TR_KEY_alt_speed_time_enabled, true);
+    map.try_emplace(TR_KEY_alt_speed_up, 321);
+    settings.load(tr_variant{ std::move(map) });
+
+    EXPECT_TRUE(settings.is_active);
+    EXPECT_TRUE(settings.scheduler_enabled);
+    EXPECT_EQ(321U, settings.speed_up_kbyps);
+
+    auto const out = settings.save();
+    EXPECT_EQ(true, out.value_if<bool>(TR_KEY_alt_speed_enabled));
+    EXPECT_EQ(true, out.value_if<bool>(TR_KEY_alt_speed_time_enabled));
+    EXPECT_EQ(321, out.value_if<int64_t>(TR_KEY_alt_speed_up));
+}
+
+TEST_F(SettingsTest, canInstantiateRpcServerSettings)
+{
+    auto settings = tr::RpcServerSettings{};
+
+    auto map = settings.save();
+    EXPECT_FALSE(std::empty(map));
+}
+
+TEST_F(SettingsTest, canLoadAndSaveRpcServerSettings)
+{
+    auto settings = tr::RpcServerSettings{};
+
+    auto map = tr_variant::Map{ 4U };
+    map.try_emplace(TR_KEY_rpc_enabled, true);
+    map.try_emplace(TR_KEY_rpc_authentication_required, true);
+    map.try_emplace(TR_KEY_rpc_username, "alice"sv);
+    map.try_emplace(TR_KEY_rpc_port, 9091);
+    settings.load(tr_variant{ std::move(map) });
+
+    EXPECT_TRUE(settings.is_enabled);
+    EXPECT_TRUE(settings.authentication_required);
+    EXPECT_EQ("alice"sv, settings.username);
+    EXPECT_EQ(9091, settings.port.host());
+
+    auto const out = settings.save();
+    EXPECT_EQ(true, out.value_if<bool>(TR_KEY_rpc_enabled));
+    EXPECT_EQ(true, out.value_if<bool>(TR_KEY_rpc_authentication_required));
+    EXPECT_EQ("alice"sv, out.value_if<std::string_view>(TR_KEY_rpc_username));
+    EXPECT_EQ(9091, out.value_if<int64_t>(TR_KEY_rpc_port));
+}
+
+TEST_F(SettingsTest, snapshotCanLoadSaveAndClassify)
+{
+    auto snapshot = tr::SessionSettingsSnapshot{};
+    snapshot.session.seed_queue_enabled = true;
+    snapshot.alt_speeds.scheduler_enabled = true;
+    snapshot.rpc_server.is_enabled = true;
+
+    auto map = snapshot.save();
+    auto settings = tr_variant::make_map();
+    settings.merge(std::move(map));
+    auto const loaded = tr::SessionSettingsSnapshot{ settings };
+
+    EXPECT_TRUE(loaded.session.seed_queue_enabled);
+    EXPECT_TRUE(loaded.alt_speeds.scheduler_enabled);
+    EXPECT_TRUE(loaded.rpc_server.is_enabled);
+
+    EXPECT_EQ(tr::SessionSettingsSnapshot::Group::Session, tr::SessionSettingsSnapshot::classify(TR_KEY_seed_queue_enabled));
+    EXPECT_EQ(
+        tr::SessionSettingsSnapshot::Group::AltSpeeds,
+        tr::SessionSettingsSnapshot::classify(TR_KEY_alt_speed_time_enabled));
+    EXPECT_EQ(tr::SessionSettingsSnapshot::Group::RpcServer, tr::SessionSettingsSnapshot::classify(TR_KEY_rpc_enabled));
+
+    EXPECT_TRUE(tr::SessionSettingsSnapshot::has_key(TR_KEY_seed_queue_enabled));
+    EXPECT_FALSE(tr::SessionSettingsSnapshot::has_key(TR_KEY_session_id));
+}
+
+TEST_F(SettingsTest, snapshotSupportsKeyedGetSetAndKeyval)
+{
+    auto snapshot = tr::SessionSettingsSnapshot{};
+
+    ASSERT_TRUE(snapshot.set(TR_KEY_seed_queue_enabled, true));
+    EXPECT_EQ(std::optional<bool>{ true }, snapshot.get<bool>(TR_KEY_seed_queue_enabled));
+    EXPECT_FALSE(snapshot.set(TR_KEY_seed_queue_enabled, true));
+    EXPECT_FALSE(snapshot.set(TR_KEY_seed_queue_enabled, 1));
+
+    ASSERT_TRUE(snapshot.set(TR_KEY_alt_speed_up, size_t{ 777U }));
+    EXPECT_EQ(std::optional<size_t>{ 777U }, snapshot.get<size_t>(TR_KEY_alt_speed_up));
+
+    ASSERT_TRUE(snapshot.set(TR_KEY_rpc_enabled, true));
+    EXPECT_EQ(std::optional<bool>{ true }, snapshot.get<bool>(TR_KEY_rpc_enabled));
+
+    auto keyval = snapshot.keyval(TR_KEY_rpc_enabled);
+    ASSERT_TRUE(keyval);
+    EXPECT_EQ(TR_KEY_rpc_enabled, keyval->first);
+    EXPECT_EQ(std::optional<bool>{ true }, keyval->second.value_if<bool>());
+
+    EXPECT_FALSE(snapshot.keyval(TR_KEY_session_id));
+}
+
+TEST_F(SettingsTest, snapshotSupportsVariantSet)
+{
+    auto snapshot = tr::SessionSettingsSnapshot{};
+
+    EXPECT_TRUE(snapshot.set(TR_KEY_seed_queue_enabled, tr_variant{ true }));
+    EXPECT_TRUE(snapshot.session.seed_queue_enabled);
+    EXPECT_FALSE(snapshot.set(TR_KEY_seed_queue_enabled, tr_variant{ true }));
+    EXPECT_FALSE(snapshot.set(TR_KEY_seed_queue_enabled, tr_variant{ "wrong-type"sv }));
+    EXPECT_TRUE(snapshot.session.seed_queue_enabled);
+
+    EXPECT_TRUE(snapshot.set(TR_KEY_alt_speed_up, tr_variant{ int64_t{ 777 } }));
+    EXPECT_EQ(777U, snapshot.alt_speeds.speed_up_kbyps);
+
+    EXPECT_TRUE(snapshot.set(TR_KEY_rpc_username, tr_variant{ "alice"sv }));
+    EXPECT_EQ("alice"sv, snapshot.rpc_server.username);
+
+    EXPECT_TRUE(snapshot.set(TR_KEY_encryption, tr_variant{ "required"sv }));
+    EXPECT_EQ(TR_ENCRYPTION_REQUIRED, snapshot.session.encryption_mode);
+
+    EXPECT_TRUE(snapshot.set(TR_KEY_seed_ratio_limit, tr_variant{ 3.5 }));
+    EXPECT_DOUBLE_EQ(3.5, snapshot.session.ratio_limit);
+    EXPECT_FALSE(snapshot.set(TR_KEY_seed_ratio_limit, tr_variant{ 3.5 }));
+
+    auto const keyval = snapshot.keyval(TR_KEY_seed_ratio_limit);
+    ASSERT_TRUE(keyval);
+    EXPECT_EQ(TR_KEY_seed_ratio_limit, keyval->first);
+    ASSERT_TRUE(keyval->second.value_if<double>());
+    EXPECT_DOUBLE_EQ(3.5, *keyval->second.value_if<double>());
+
+    EXPECT_FALSE(snapshot.set(TR_KEY_session_id, tr_variant{ "unknown"sv }));
 }

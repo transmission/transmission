@@ -136,7 +136,7 @@ BlocklistDownloader* fBLDownloader = nil;
         //delete downloaded file
         [NSFileManager.defaultManager removeItemAtPath:blocklistFile error:nil];
 
-        if (count > 0)
+        if (count)
         {
             [self.viewController setFinished];
         }

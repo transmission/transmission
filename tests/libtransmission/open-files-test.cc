@@ -27,7 +27,7 @@ using namespace std::literals;
 
 using OpenFilesTest = tr::test::SessionTest;
 
-static auto constexpr PreallocateFull = tr_open_files::Preallocation::Full;
+static auto constexpr PreallocateFull = tr_file_preallocation::Full;
 
 TEST_F(OpenFilesTest, getCachedFailsIfNotCached)
 {
