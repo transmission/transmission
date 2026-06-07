@@ -1764,7 +1764,7 @@ tr_sha1_digest_t const& tr_torrent::MoveMediator::info_hash() const
 
 void tr_torrent::MoveMediator::on_move_queued()
 {
-    tr_logAddTraceTor(tor_, "Queued to move files");
+    tr_logAddDebugTor(tor_, fmt::format("Queued to move files from '{:s}' to '{:s}'", source_, dest_));
 }
 
 // (called from tr_move_worker's thread)
@@ -1789,6 +1789,7 @@ void tr_torrent::MoveMediator::on_move_done(bool const ok, tr_error const* const
         [tor_id = tor_->id(),
          session = tor_->session,
          ok,
+         source = source_,
          dest = dest_,
          move_from_old_path = move_from_old_path_,
          setme_state = setme_state_,
@@ -1798,11 +1799,17 @@ void tr_torrent::MoveMediator::on_move_done(bool const ok, tr_error const* const
             auto* const tor = session->torrents().get(tor_id);
             if (tor == nullptr || tor->is_deleting_)
             {
+                // The torrent was removed while its move was in flight. The
+                // files themselves were already relocated (or not) by the move;
+                // there's just no torrent left to update.
+                tr_logAddInfo(
+                    fmt::format("Move of '{:s}' -> '{:s}' finished, but the torrent is gone; skipping bookkeeping", source, dest));
                 return;
             }
 
             if (ok)
             {
+                tr_logAddInfoTor(tor, fmt::format("Finished moving files from '{:s}' to '{:s}'", source, dest));
                 tor->set_download_dir(dest);
 
                 if (move_from_old_path)
@@ -1813,13 +1820,17 @@ void tr_torrent::MoveMediator::on_move_done(bool const ok, tr_error const* const
             }
             else
             {
-                tor->error().set_local_error(
-                    fmt::format(
-                        fmt::runtime(_("Couldn't move '{old_path}' to '{path}': {error} ({error_code})")),
-                        fmt::arg("old_path", tor->current_dir()),
-                        fmt::arg("path", dest),
-                        fmt::arg("error", error_message),
-                        fmt::arg("error_code", error_code)));
+                // Report the directory the move actually started from (`source`),
+                // not current_dir(): the latter may have drifted while the copy
+                // ran on the worker thread, which would make the message lie.
+                auto const message = fmt::format(
+                    fmt::runtime(_("Couldn't move '{old_path}' to '{path}': {error} ({error_code})")),
+                    fmt::arg("old_path", source),
+                    fmt::arg("path", dest),
+                    fmt::arg("error", error_message),
+                    fmt::arg("error_code", error_code));
+                tr_logAddErrorTor(tor, std::string{ message });
+                tor->error().set_local_error(message);
                 tr_torrentStop(tor);
             }
 
