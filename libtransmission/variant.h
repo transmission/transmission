@@ -539,7 +539,6 @@ void tr_variantDictReserve(tr_variant* var, size_t n_reserve);
 bool tr_variantDictRemove(tr_variant* var, tr_quark key);
 
 tr_variant* tr_variantDictAdd(tr_variant* var, tr_quark key);
-tr_variant* tr_variantDictAddReal(tr_variant* var, tr_quark key, double value);
 tr_variant* tr_variantDictAddInt(tr_variant* var, tr_quark key, int64_t value);
 tr_variant* tr_variantDictAddBool(tr_variant* var, tr_quark key, bool value);
 tr_variant* tr_variantDictAddStr(tr_variant* var, tr_quark key, std::string_view value);

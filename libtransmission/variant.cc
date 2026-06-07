@@ -417,11 +417,6 @@ tr_variant* tr_variantDictAddBool(tr_variant* const var, tr_quark key, bool val)
     return dict_set(var, key, val);
 }
 
-tr_variant* tr_variantDictAddReal(tr_variant* const var, tr_quark const key, double const val)
-{
-    return dict_set(var, key, val);
-}
-
 tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark const key, std::string_view const val)
 {
     return dict_set(var, key, val);

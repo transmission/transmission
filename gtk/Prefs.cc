@@ -137,9 +137,9 @@ double gtr_pref_double_get(tr_quark const key)
     return tr_variantDictFindReal(&getPrefs(), key, &d) ? d : 0.0;
 }
 
-void gtr_pref_double_set(tr_quark const key, double value)
+void gtr_pref_double_set(tr_quark const key, double const value)
 {
-    tr_variantDictAddReal(&getPrefs(), key, value);
+    gtr_pref_get_map().insert_or_assign(key, value);
 }
 
 // ---
