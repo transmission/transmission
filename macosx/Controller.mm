@@ -494,10 +494,14 @@ static void removeKeRangerRansomware()
             tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, prefs_string.UTF8String);
         }
 
-        // TODO: Add to GUI
-        if ([_fDefaults objectForKey:@"RPCHostWhitelist"])
+        if (NSArray* hostWhitelist = [_fDefaults arrayForKey:@"RPCHostWhitelist"])
         {
-            tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [_fDefaults stringForKey:@"RPCHostWhitelist"].UTF8String);
+            NSString* hostWhitelistStr = [hostWhitelist componentsJoinedByString:@","];
+            tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, hostWhitelistStr.UTF8String);
+        }
+        else if (NSString* hostWhitelistStr = [_fDefaults stringForKey:@"RPCHostWhitelist"])
+        {
+            tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, hostWhitelistStr.UTF8String);
         }
 
         initUnits();

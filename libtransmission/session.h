@@ -594,6 +594,12 @@ public:
 
     [[nodiscard]] bool useRpcWhitelist() const;
 
+    void setRpcHostWhitelist(std::string_view whitelist) const;
+
+    void useRpcHostWhitelist(bool enabled) const;
+
+    [[nodiscard]] bool useRpcHostWhitelist() const;
+
     // peer networking
 
     [[nodiscard]] constexpr auto const& peerCongestionAlgorithm() const noexcept
@@ -1113,6 +1119,7 @@ private:
     friend std::string tr_sessionGetRPCPassword(tr_session const* session);
     friend std::string tr_sessionGetRPCUsername(tr_session const* session);
     friend std::string tr_sessionGetRPCWhitelist(tr_session const* session);
+    friend std::string tr_sessionGetRPCHostWhitelist(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_sessionGetAltSpeedBegin(tr_session const* session);
     friend size_t tr_sessionGetAltSpeedEnd(tr_session const* session);
