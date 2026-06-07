@@ -33,7 +33,7 @@ template<typename T>
         return tr::serializer::to_value<T>(iter->second);
     }
 
-    return {};
+    return std::nullopt;
 }
 
 template<typename T>
