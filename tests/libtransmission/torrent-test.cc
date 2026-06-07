@@ -5,7 +5,6 @@
 
 #include <array>
 #include <cstddef>
-#include <ranges>
 
 #include <libtransmission/torrent.h>
 
