@@ -643,6 +643,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_status,
     TR_KEY_statusbar_stats_kebab_APICOMPAT,
     TR_KEY_statusbar_stats,
+    TR_KEY_supports_holepunch_camel_APICOMPAT,
     TR_KEY_supports_holepunch,
     TR_KEY_tag,
     TR_KEY_tcp_enabled_kebab_APICOMPAT,

@@ -641,7 +641,7 @@ namespace make_torrent_field_helpers
     peers_vec.reserve(std::size(peers));
     for (auto const& peer : peers)
     {
-        auto peer_map = tr_variant::Map{ 19U };
+        auto peer_map = tr_variant::Map{ 20U };
         peer_map.try_emplace(TR_KEY_address, peer.addr);
         peer_map.try_emplace(TR_KEY_client_is_choked, peer.client_is_choked);
         peer_map.try_emplace(TR_KEY_client_is_interested, peer.client_is_interested);
@@ -653,6 +653,7 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_is_incoming, peer.is_incoming);
         peer_map.try_emplace(TR_KEY_is_utp, peer.is_utp);
         peer_map.try_emplace(TR_KEY_is_uploading_to, peer.is_uploading_to);
+        peer_map.try_emplace(TR_KEY_supports_holepunch, peer.supports_holepunch);
         peer_map.try_emplace(TR_KEY_peer_is_choked, peer.peer_is_choked);
         peer_map.try_emplace(TR_KEY_peer_is_interested, peer.peer_is_interested);
         peer_map.try_emplace(TR_KEY_port, peer.port);
@@ -669,9 +670,10 @@ namespace make_torrent_field_helpers
 [[nodiscard]] auto make_peer_counts_map(tr_stat const& st)
 {
     auto const& from = st.peers_from;
-    auto peer_counts_map = tr_variant::Map{ 7U };
+    auto peer_counts_map = tr_variant::Map{ 8U };
     peer_counts_map.try_emplace(TR_KEY_from_cache, from[TR_PEER_FROM_RESUME]);
     peer_counts_map.try_emplace(TR_KEY_from_dht, from[TR_PEER_FROM_DHT]);
+    peer_counts_map.try_emplace(TR_KEY_from_holepunch, from[TR_PEER_FROM_HOLEPUNCH]);
     peer_counts_map.try_emplace(TR_KEY_from_incoming, from[TR_PEER_FROM_INCOMING]);
     peer_counts_map.try_emplace(TR_KEY_from_lpd, from[TR_PEER_FROM_LPD]);
     peer_counts_map.try_emplace(TR_KEY_from_ltep, from[TR_PEER_FROM_LTEP]);

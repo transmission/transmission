@@ -632,6 +632,7 @@ auto constexpr MyStatic = std::array<std::u8string_view, TR_N_KEYS>{
     u8"status"sv, // rpc
     u8"statusbar-stats"sv, // gtk app, qt app
     u8"statusbar_stats"sv, // gtk app, qt app
+    u8"supportsHolepunch"sv, // rpc
     u8"supports_holepunch"sv, // rpc
     u8"tag"sv, // rpc
     u8"tcp-enabled"sv, // rpc, tr_session::Settings
