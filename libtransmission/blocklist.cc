@@ -489,7 +489,7 @@ bool Blocklists::Blocklist::contains(tr_address const& addr) const
     } Compare;
 
     // NOLINTNEXTLINE(modernize-use-ranges)
-    return std::binary_search(std::begin(*rules_), std::end(*rules_), addr, Compare);
+    return rules_ && std::binary_search(std::begin(*rules_), std::end(*rules_), addr, Compare);
 }
 
 std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
