@@ -70,6 +70,7 @@ namespace global_source_ip_helpers
     tr_address const& dst_addr,
     tr_port dst_port,
     tr_address const& bind_addr,
+    std::string_view const bind_interface,
     int& err_out) noexcept
 {
     TR_ASSERT(dst_addr.type == bind_addr.type);
@@ -80,7 +81,11 @@ namespace global_source_ip_helpers
     auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(bind_addr, {});
     if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        if (bind(sock, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == 0)
+        if (!tr_netSetSocketInterface(sock, dst_addr.type, bind_interface))
+        {
+            err_out = sockerrno;
+        }
+        else if (bind(sock, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == 0)
         {
             if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) == 0)
             {
@@ -110,7 +115,10 @@ namespace global_source_ip_helpers
     return {};
 }
 
-[[nodiscard]] std::optional<tr_address> get_global_source_address(tr_address const& bind_addr, int& err_out) noexcept
+[[nodiscard]] std::optional<tr_address> get_global_source_address(
+    tr_address const& bind_addr,
+    std::string_view const bind_interface,
+    int& err_out) noexcept
 {
     // Pick some destination address to pretend to send a packet to
     static auto constexpr DstIP = std::array{ "91.121.74.28"sv, "2001:1890:1112:1::20"sv };
@@ -123,7 +131,7 @@ namespace global_source_ip_helpers
 
     if (dst_addr)
     {
-        return get_source_address(*dst_addr, dst_port, bind_addr, err_out);
+        return get_source_address(*dst_addr, dst_port, bind_addr, bind_interface, err_out);
     }
 
     return {};
@@ -266,6 +274,10 @@ void tr_ip_cache::update_global_addr(tr_address_type const type) noexcept
     options.ip_proto = IPProtocolMap[type];
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
+    if (auto const bind_interface = mediator_.settings_bind_interface(); !tr_net_interface_is_default(bind_interface))
+    {
+        options.bind_interface = std::string{ bind_interface };
+    }
     mediator_.fetch(std::move(options));
 }
 
@@ -285,7 +297,8 @@ void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
     auto const protocol = tr_ip_protocol_to_sv(type);
     auto err = 0;
     source_addr_checked_[type] = true;
-    if (auto const& source_addr = get_global_source_address(bind_addr(type), err); source_addr)
+    if (auto const& source_addr = get_global_source_address(bind_addr(type), mediator_.settings_bind_interface(), err);
+        source_addr)
     {
         set_source_addr(*source_addr);
         tr_logAddDebug(

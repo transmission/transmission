@@ -198,6 +198,22 @@ public:
         }
         else if (tr_strv_starts_with(announce_sv, "udp://"sv))
         {
+            if (auto const* const tor = session->torrents().get(request.info_hash);
+                tor != nullptr && !tor->bind_interface_matches_session())
+            {
+                tr_logAddWarn(
+                    fmt::format(
+                        fmt::runtime(_(
+                            "Skipping UDP tracker announce for '{torrent}' because its bind interface cannot be enforced on the shared UDP socket")),
+                        fmt::arg("torrent", request.log_name)));
+
+                auto response = tr_announce_response{};
+                response.info_hash = request.info_hash;
+                response.errmsg = _("UDP tracker disabled by torrent bind_interface override");
+                on_response(response);
+                return;
+            }
+
             announcer_udp_.announce(request, std::move(on_response));
         }
         else
@@ -940,6 +956,7 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e, time
         .peer_id = tor->peer_id(),
         .info_hash = tor->info_hash(),
         .log_name = tier->buildLogName(),
+        .bind_interface = tor->bind_interface(),
     };
 }
 

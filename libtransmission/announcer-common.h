@@ -96,6 +96,9 @@ struct tr_announce_request
 
     /* the name to use when deep logging is enabled */
     std::string log_name;
+
+    /* torrent-specific bind interface override; empty means inherit session */
+    std::string bind_interface;
 };
 
 struct tr_announce_response

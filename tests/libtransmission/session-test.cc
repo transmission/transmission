@@ -18,8 +18,10 @@
 
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/resume.h>
 #include <libtransmission/session-id.h>
 #include <libtransmission/session.h>
+#include <libtransmission/torrent.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
@@ -52,6 +54,18 @@ TEST_F(SessionTest, propertiesApi)
         tr_sessionSetDownloadDir(session, value);
         EXPECT_EQ(value, session->downloadDir());
         EXPECT_EQ(value, tr_sessionGetDownloadDir(session));
+    }
+
+    // bind interface
+
+    {
+        auto constexpr Value = "lo0"sv;
+        EXPECT_EQ(""sv, tr_sessionGetBindInterface(session));
+        tr_sessionSetBindInterface(session, Value);
+        EXPECT_TRUE(waitFor([session, Value] { return tr_sessionGetBindInterface(session) == Value; }, 5s));
+        EXPECT_EQ(Value, tr_sessionGetBindInterface(session));
+        tr_sessionSetBindInterface(session, ""sv);
+        EXPECT_TRUE(waitFor([session] { return tr_sessionGetBindInterface(session).empty(); }, 5s));
     }
 
     // incomplete dir
@@ -326,6 +340,30 @@ TEST_F(SessionTest, savesSettings)
         ASSERT_TRUE(flag);
         EXPECT_TRUE(*flag);
     }
+}
+
+TEST_F(SessionTest, torrentBindInterfaceResume)
+{
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    ASSERT_NE(nullptr, tor);
+
+    tr_torrentSetBindInterface(tor, "utun4"sv);
+    EXPECT_EQ("utun4"sv, tr_torrentGetBindInterface(tor));
+
+    auto resume_helper = tr_torrent::ResumeHelper{ *tor };
+    tr_resume::save(tor, resume_helper);
+
+    tr_torrentSetBindInterface(tor, ""sv);
+    EXPECT_EQ(""sv, tr_torrentGetBindInterface(tor));
+
+    auto* ctor = tr_ctorNew(session_);
+    auto const loaded = tr_resume::load(tor, resume_helper, tr_resume::All, *ctor);
+    tr_ctorFree(ctor);
+
+    EXPECT_NE(decltype(loaded){ 0 }, loaded & tr_resume::BindInterface);
+    EXPECT_EQ("utun4"sv, tr_torrentGetBindInterface(tor));
+
+    tr_torrentRemove(tor, false);
 }
 
 TEST_F(SessionTest, loadTorrentsThenMagnets)

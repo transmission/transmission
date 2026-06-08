@@ -71,6 +71,7 @@ auto constexpr MyStatic = std::array<std::u8string_view, TR_N_KEYS>{
     u8"bind-address-ipv6"sv, // daemon, tr_session::Settings
     u8"bind_address_ipv4"sv, // daemon, tr_session::Settings
     u8"bind_address_ipv6"sv, // daemon, tr_session::Settings
+    u8"bind_interface"sv, // daemon, rpc, tr_session::Settings, .resume
     u8"bitfield"sv, // .resume
     u8"blocklist-date"sv, // gtk app, qt app
     u8"blocklist-enabled"sv, // daemon, gtk app, rpc, tr_session::Settings

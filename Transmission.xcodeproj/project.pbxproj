@@ -126,6 +126,7 @@
 		A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */ = {isa = PBXBuildFile; fileRef = A220EC5A118C8A060022B4BE /* tr-lpd.h */; };
 		A22180980D148A71007D09ED /* GroupsPrefsController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22180970D148A71007D09ED /* GroupsPrefsController.mm */; };
 		A221DCC8104B3660008A642D /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A221DCC7104B3660008A642D /* Quartz.framework */; };
+		A221DCCA104B3660008A642D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A221DCC9104B3660008A642D /* SystemConfiguration.framework */; };
 		A222E9870E6B21D9009FB003 /* BlocklistDownloaderViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A222E9860E6B21D9009FB003 /* BlocklistDownloaderViewController.mm */; };
 		A222EA7B0E6C32C4009FB003 /* BlocklistScheduler.mm in Sources */ = {isa = PBXBuildFile; fileRef = A222EA7A0E6C32C4009FB003 /* BlocklistScheduler.mm */; };
 		A225A4C0187E369C00CDE823 /* ShareToolbarItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = A225A4BF187E369C00CDE823 /* ShareToolbarItem.mm */; };
@@ -910,6 +911,7 @@
 		A22180960D148A71007D09ED /* GroupsPrefsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GroupsPrefsController.h; sourceTree = "<group>"; };
 		A22180970D148A71007D09ED /* GroupsPrefsController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupsPrefsController.mm; sourceTree = "<group>"; };
 		A221DCC7104B3660008A642D /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		A221DCC9104B3660008A642D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		A222E9850E6B21D9009FB003 /* BlocklistDownloaderViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlocklistDownloaderViewController.h; sourceTree = "<group>"; };
 		A222E9860E6B21D9009FB003 /* BlocklistDownloaderViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BlocklistDownloaderViewController.mm; sourceTree = "<group>"; };
 		A222EA790E6C32C4009FB003 /* BlocklistScheduler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlocklistScheduler.h; sourceTree = "<group>"; };
@@ -1517,6 +1519,7 @@
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
 				A221DCC8104B3660008A642D /* Quartz.framework in Frameworks */,
+				A221DCCA104B3660008A642D /* SystemConfiguration.framework in Frameworks */,
 				C88771B62803EEB5005C7523 /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1906,6 +1909,7 @@
 				A2E669780F5B8E5A00B4251A /* Security.framework */,
 				A22CFB810FB66EF30009BD3E /* Carbon.framework */,
 				A221DCC7104B3660008A642D /* Quartz.framework */,
+				A221DCC9104B3660008A642D /* SystemConfiguration.framework */,
 				A24F19070A3A790800C9C145 /* Sparkle.framework */,
 			);
 			name = Frameworks;

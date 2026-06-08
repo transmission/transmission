@@ -84,6 +84,10 @@ Don't store incomplete torrents in a different directory.
 Listen for IPv4 BitTorrent connections on a specific address. Only one IPv4 listening address is allowed. Default: 0.0.0.0 (All addresses)
 .It Fl I Fl -bind-address-ipv6
 Listen for IPv6 BitTorrent connections on a specific address. Only one IPv6 listening address is allowed. Default: :: (All addresses)
+.It Fl -bind-interface Ar ifname
+Route BitTorrent peer and tracker traffic through a network interface name on supported platforms, such as
+.Ar utun4
+on macOS. An empty value uses the default OS route.
 .It Fl r Fl -rpc-bind-address
 Listen for RPC connections on a specific address. This must be an IPv4 or IPv6 address. Only one RPC listening address is allowed. Default: 0.0.0.0 (All IPv4 addresses)
 .It Fl -paused

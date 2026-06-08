@@ -129,6 +129,7 @@ public:
     std::string announce_ip;
     std::string bind_address_ipv4;
     std::string bind_address_ipv6;
+    std::string bind_interface;
     std::string blocklist_url = "http://www.example.com/blocklist";
     std::string default_trackers_str;
     std::string download_dir = get_default_download_dir();
@@ -160,6 +161,7 @@ public:
         Field<&SessionSettings::announce_ip_enabled>{ TR_KEY_announce_ip_enabled },
         Field<&SessionSettings::bind_address_ipv4>{ TR_KEY_bind_address_ipv4 },
         Field<&SessionSettings::bind_address_ipv6>{ TR_KEY_bind_address_ipv6 },
+        Field<&SessionSettings::bind_interface>{ TR_KEY_bind_interface },
         Field<&SessionSettings::blocklist_enabled>{ TR_KEY_blocklist_enabled },
         Field<&SessionSettings::blocklist_url>{ TR_KEY_blocklist_url },
         Field<&SessionSettings::unused_cache_size_mbytes>{ TR_KEY_cache_size_mib },

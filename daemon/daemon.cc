@@ -87,7 +87,7 @@ static_assert(TrDefaultPeerPort == 51413, "update 'peerport' desc");
 static_assert(TrDefaultPeerLimitTorrent == 50, "update 'peerlimit-torrent' desc");
 static_assert(TrDefaultPeerLimitGlobal == 200, "update 'peerlimit-global' desc");
 static_assert(TrDefaultRpcPort == 9091 && R"(update "port" desc)");
-auto constexpr Options = std::array<tr_option, 48>{ {
+auto constexpr Options = std::array<tr_option, 49>{ {
     { 'a', "allowed", "Allowed IP addresses. (Default: '127.0.0.1,::1')", "a", Arg::Required, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
@@ -139,6 +139,12 @@ auto constexpr Options = std::array<tr_option, 48>{ {
     { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", Arg::None, nullptr },
     { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", Arg::Required, "<ipv4 addr>" },
     { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", Arg::Required, "<ipv6 addr>" },
+    { 996,
+      "bind-interface",
+      "Network interface for BitTorrent and tracker traffic on supported platforms",
+      nullptr,
+      Arg::Required,
+      "<ifname>" },
     { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", Arg::Required, "<ip addr>" },
     { 953,
       "global-seedratio",
@@ -688,6 +694,10 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
 
         case 'I':
             map->insert_or_assign(TR_KEY_bind_address_ipv6, optstr);
+            break;
+
+        case 996:
+            map->insert_or_assign(TR_KEY_bind_interface, optstr);
             break;
 
         case 'r':

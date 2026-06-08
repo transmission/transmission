@@ -8,6 +8,7 @@
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file-utils.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/types.h"
 
 using namespace std::literals;
@@ -146,6 +147,11 @@ void tr_ctorSetDownloadDir(tr_ctor* const ctor, tr_ctorMode const mode, std::str
     ctor->set_download_dir(mode, dir);
 }
 
+void tr_ctorSetBindInterface(tr_ctor* const ctor, tr_ctorMode const mode, std::string_view const bind_interface)
+{
+    ctor->set_bind_interface(mode, tr_strv_strip(bind_interface));
+}
+
 void tr_ctorSetIncompleteDir(tr_ctor* const ctor, std::string_view const dir)
 {
     ctor->set_incomplete_dir(dir);
@@ -186,6 +192,16 @@ std::optional<std::string> tr_ctorGetDownloadDir(tr_ctor const* const ctor, tr_c
     if (auto const& dir = ctor->download_dir(mode); !std::empty(dir))
     {
         return dir;
+    }
+
+    return {};
+}
+
+std::optional<std::string> tr_ctorGetBindInterface(tr_ctor const* const ctor, tr_ctorMode const mode)
+{
+    if (auto const& bind_interface = ctor->bind_interface(mode); !std::empty(bind_interface))
+    {
+        return bind_interface;
     }
 
     return {};

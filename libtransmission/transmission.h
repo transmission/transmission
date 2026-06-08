@@ -322,6 +322,9 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool is_enabled);
 bool tr_sessionIsLPDEnabled(tr_session const* session);
 void tr_sessionSetLPDEnabled(tr_session* session, bool is_enabled);
 
+[[nodiscard]] std::string tr_sessionGetBindInterface(tr_session const* session);
+void tr_sessionSetBindInterface(tr_session* session, std::string_view bind_interface);
+
 tr_encryption_mode tr_sessionGetEncryption(tr_session const* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
 
@@ -573,6 +576,12 @@ bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme_
 /** @brief Set how many peers this torrent can connect to. (Default: 50) */
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t limit);
 
+/** @brief Get the network interface route binding from this torrent constructor */
+std::optional<std::string> tr_ctorGetBindInterface(tr_ctor const* ctor, tr_ctorMode mode);
+
+/** @brief Set the network interface route binding for the torrent being added */
+void tr_ctorSetBindInterface(tr_ctor* ctor, tr_ctorMode mode, std::string_view bind_interface);
+
 /** @brief Get the download path from this peer constructor */
 std::optional<std::string> tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode);
 
@@ -762,6 +771,9 @@ void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes);
 
 uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor);
 void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
+
+[[nodiscard]] std::string tr_torrentGetBindInterface(tr_torrent const* tor);
+void tr_torrentSetBindInterface(tr_torrent* tor, std::string_view bind_interface);
 
 // --- File Priorities
 

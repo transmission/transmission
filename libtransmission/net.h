@@ -516,7 +516,19 @@ private:
 
 struct tr_session;
 
-tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_msgs);
+[[nodiscard]] bool tr_net_interface_is_default(std::string_view bind_interface);
+
+[[nodiscard]] std::string_view tr_net_effective_bind_interface(std::string_view bind_interface);
+
+[[nodiscard]] bool tr_netSetSocketInterface(
+    tr_socket_t sock,
+    tr_address_type type,
+    std::string_view bind_interface,
+    bool suppress_msgs = false);
+
+[[nodiscard]] std::optional<std::string> tr_netCurlInterfaceString(std::string_view bind_interface);
+
+tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_msgs, std::string_view bind_interface = {});
 
 [[nodiscard]] std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(
     tr_session* session,

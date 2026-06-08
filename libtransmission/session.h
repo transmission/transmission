@@ -53,6 +53,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/rpc-server.h"
 #include "libtransmission/session-alt-speeds.h"
+#include "libtransmission/session-settings.h"
 #include "libtransmission/session-id.h"
 #include "libtransmission/session-thread.h"
 #include "libtransmission/serializer.h"
@@ -95,7 +96,13 @@ private:
     {
     public:
         using IncomingCallback = void (*)(tr_socket_t, void*);
-        BoundSocket(struct event_base* base, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
+        BoundSocket(
+            struct event_base* base,
+            tr_address const& addr,
+            tr_port port,
+            std::string_view bind_interface,
+            IncomingCallback cb,
+            void* cb_data);
         BoundSocket(BoundSocket&&) = delete;
         BoundSocket(BoundSocket const&) = delete;
         BoundSocket operator=(BoundSocket&&) = delete;
@@ -205,6 +212,11 @@ private:
             return session_.bind_address(TR_AF_INET);
         }
 
+        [[nodiscard]] std::string_view bind_interface() const override
+        {
+            return session_.settings_.bind_interface;
+        }
+
         [[nodiscard]] tr_port advertised_peer_port() const override
         {
             return session_.advertisedPeerPort();
@@ -263,6 +275,7 @@ private:
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> bind_address_V4() const override;
         [[nodiscard]] std::optional<std::string> bind_address_V6() const override;
+        [[nodiscard]] std::optional<std::string> bind_interface() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
         [[nodiscard]] size_t clamp(int torrent_id, size_t byte_count) const override;
         [[nodiscard]] std::optional<std::string> proxyUrl() const override;
@@ -285,6 +298,11 @@ private:
         [[nodiscard]] tr_address bind_address(tr_address_type type) const override
         {
             return session_.bind_address(type);
+        }
+
+        [[nodiscard]] std::string_view bind_interface() const override
+        {
+            return session_.settings_.bind_interface;
         }
 
         [[nodiscard]] tr_port port() const override
@@ -337,6 +355,11 @@ private:
                 TR_ASSERT_MSG(false, "Invalid type");
                 return {};
             }
+        }
+
+        [[nodiscard]] std::string_view settings_bind_interface() override
+        {
+            return session_.settings_.bind_interface;
         }
 
         [[nodiscard]] std::span<std::string const> settings_ip_endpoint(tr_address_type type) override
@@ -595,6 +618,11 @@ public:
     [[nodiscard]] bool useRpcWhitelist() const;
 
     // peer networking
+
+    [[nodiscard]] constexpr auto const& bind_interface() const noexcept
+    {
+        return settings().bind_interface;
+    }
 
     [[nodiscard]] constexpr auto const& peerCongestionAlgorithm() const noexcept
     {
@@ -1030,6 +1058,8 @@ public:
 
     void addIncoming(std::shared_ptr<tr_peer_socket> socket);
 
+    void closeTorrentPeerConnections(tr_torrent* tor);
+
     void addTorrent(tr_torrent* tor);
 
     // NOLINTNEXTLINE(readability-make-member-function-const)
@@ -1137,6 +1167,7 @@ private:
     friend void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight);
     friend void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func);
     friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, size_t limit_kbyps);
+    friend void tr_sessionSetBindInterface(tr_session* session, std::string_view bind_interface);
     friend void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);

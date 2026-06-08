@@ -41,6 +41,7 @@
 #endif
 #include "libtransmission/env.h"
 #include "libtransmission/log.h"
+#include "libtransmission/net.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web.h"
@@ -341,8 +342,21 @@ public:
             }
         }
 
-        [[nodiscard]] auto bind_address() const
+        [[nodiscard]] auto curl_interface() const
         {
+            if (options_.bind_interface)
+            {
+                return tr_netCurlInterfaceString(*options_.bind_interface);
+            }
+
+            if (auto const bind_interface = impl.mediator.bind_interface(); bind_interface)
+            {
+                if (auto const curl_interface = tr_netCurlInterfaceString(*bind_interface); curl_interface)
+                {
+                    return curl_interface;
+                }
+            }
+
             switch (options_.ip_proto)
             {
             case FetchOptions::IPProtocol::V4:
@@ -635,7 +649,7 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_WRITEDATA, &task);
         (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, &tr_web::Impl::onDataReceived);
 
-        if (auto const addrstr = task.bind_address(); addrstr)
+        if (auto const addrstr = task.curl_interface(); addrstr)
         {
             (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
         }

@@ -10,6 +10,7 @@
 #endif
 
 #include <memory> // for std::unique_ptr
+#include <string_view>
 
 #include "libtransmission/net.h"
 #include "libtransmission/types.h" // for tr_port_forwarding_state
@@ -30,6 +31,7 @@ public:
         [[nodiscard]] virtual tr_port advertised_peer_port() const = 0;
         [[nodiscard]] virtual tr_port local_peer_port() const = 0;
         [[nodiscard]] virtual tr_address incoming_peer_address() const = 0;
+        [[nodiscard]] virtual std::string_view bind_interface() const = 0;
         [[nodiscard]] virtual tr::TimerMaker& timer_maker() = 0;
         virtual void on_port_forwarded(tr_port advertised_port) = 0;
     };

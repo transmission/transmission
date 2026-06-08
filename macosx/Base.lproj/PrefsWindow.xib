@@ -26,6 +26,7 @@
                 <outlet property="fImportFolderPopUp" destination="216" id="225"/>
                 <outlet property="fIncompleteFolderPopUp" destination="538" id="551"/>
                 <outlet property="fNatCheck" destination="332" id="333"/>
+                <outlet property="fBindInterfacePopUp" destination="BIf-Pu-001" id="BIf-Out-001"/>
                 <outlet property="fNetworkView" destination="66" id="1469"/>
                 <outlet property="fPeersGlobalField" destination="1426" id="1470"/>
                 <outlet property="fPeersTorrentField" destination="1429" id="1471"/>
@@ -2124,11 +2125,11 @@
             <point key="canvasLocation" x="114" y="1005.5"/>
         </customView>
         <customView id="66" userLabel="Network">
-            <rect key="frame" x="0.0" y="0.0" width="637" height="219"/>
+            <rect key="frame" x="0.0" y="0.0" width="637" height="270"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="CZ6-Q4-MLF">
-                    <rect key="frame" x="40" y="40" width="557" height="159"/>
+                    <rect key="frame" x="40" y="40" width="557" height="210"/>
                     <subviews>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1891">
                             <rect key="frame" x="336" y="69" width="101" height="32"/>
@@ -2141,7 +2142,7 @@
                             </connections>
                         </button>
                         <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="660">
-                            <rect key="frame" x="18" y="143" width="132" height="16"/>
+                            <rect key="frame" x="18" y="194" width="132" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Peer communication:" usesSingleLineMode="YES" id="1253">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2149,7 +2150,7 @@
                             </textFieldCell>
                         </textField>
                         <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2081">
-                            <rect key="frame" x="18" y="104" width="132" height="16"/>
+                            <rect key="frame" x="18" y="155" width="132" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Peer listening port:" usesSingleLineMode="YES" id="2082">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2157,13 +2158,36 @@
                             </textFieldCell>
                         </textField>
                         <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="357">
-                            <rect key="frame" x="228" y="104" width="77" height="16"/>
+                            <rect key="frame" x="228" y="155" width="77" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Port is open" usesSingleLineMode="YES" id="1250">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
+                        <textField toolTip="Choose which network connection Transmission may use. Automatic uses the normal system connection. Active VPN Tunnel only allows traffic through the detected VPN and blocks traffic if the VPN is unavailable." focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BIf-Lb-001">
+                            <rect key="frame" x="18" y="124" width="132" height="16"/>
+                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Bind Connection:" usesSingleLineMode="YES" id="BIf-LbCell-001">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                        <popUpButton toolTip="Choose which network connection Transmission may use. Automatic uses the normal system connection. Active VPN Tunnel only allows traffic through the detected VPN and blocks traffic if the VPN is unavailable." verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BIf-Pu-001">
+                            <rect key="frame" x="152" y="119" width="385" height="26"/>
+                            <popUpButtonCell key="cell" type="push" title="Automatic (Default Connection)" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="BIf-Mi-001" id="BIf-PuCell-001">
+                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="menu"/>
+                                <menu key="menu" id="BIf-Menu-001">
+                                    <items>
+                                        <menuItem title="Automatic (Default Connection)" state="on" id="BIf-Mi-001"/>
+                                    </items>
+                                </menu>
+                            </popUpButtonCell>
+                            <connections>
+                                <action selector="setBindInterface:" target="-2" id="BIf-Action-001"/>
+                            </connections>
+                        </popUpButton>
                         <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="336">
                             <rect key="frame" x="172" y="36" width="235" height="14"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="NAT traversal uses either NAT-PMP or UPnP" id="1248">
@@ -2173,7 +2197,7 @@
                             </textFieldCell>
                         </textField>
                         <textField focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="68">
-                            <rect key="frame" x="154" y="101" width="50" height="21"/>
+                            <rect key="frame" x="154" y="152" width="50" height="21"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="50" id="9n3-lq-hgh"/>
                             </constraints>
@@ -2216,7 +2240,7 @@
                             </connections>
                         </button>
                         <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="353">
-                            <rect key="frame" x="209" y="104" width="16" height="16"/>
+                            <rect key="frame" x="209" y="155" width="16" height="16"/>
                         </progressIndicator>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="664">
                             <rect key="frame" x="152" y="-1" width="347" height="18"/>
@@ -2237,7 +2261,7 @@
                             </textFieldCell>
                         </textField>
                         <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="2077">
-                            <rect key="frame" x="152" y="142" width="259" height="18"/>
+                            <rect key="frame" x="152" y="193" width="259" height="18"/>
                             <buttonCell key="cell" type="check" title="Enable Micro Transport Protocol (µTP)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2078">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -2248,7 +2272,7 @@
                             </connections>
                         </button>
                         <imageView translatesAutoresizingMaskIntoConstraints="NO" id="354">
-                            <rect key="frame" x="209" y="104" width="16" height="16"/>
+                            <rect key="frame" x="209" y="155" width="16" height="16"/>
                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="NSStatusPartiallyAvailable" id="1249"/>
                         </imageView>
                     </subviews>
@@ -2256,6 +2280,12 @@
                         <constraint firstItem="2077" firstAttribute="centerY" secondItem="660" secondAttribute="centerY" id="0uP-eH-lKm"/>
                         <constraint firstAttribute="width" priority="750" constant="557" id="2Ug-Ph-wa4"/>
                         <constraint firstItem="665" firstAttribute="width" secondItem="660" secondAttribute="width" id="9Hd-Tm-4K7"/>
+                        <constraint firstItem="BIf-Lb-001" firstAttribute="centerY" secondItem="BIf-Pu-001" secondAttribute="centerY" id="BIf-Con-001"/>
+                        <constraint firstItem="BIf-Lb-001" firstAttribute="trailing" secondItem="660" secondAttribute="trailing" id="BIf-Con-002"/>
+                        <constraint firstItem="BIf-Lb-001" firstAttribute="width" secondItem="660" secondAttribute="width" id="BIf-Con-003"/>
+                        <constraint firstItem="BIf-Pu-001" firstAttribute="leading" secondItem="2077" secondAttribute="leading" id="BIf-Con-004"/>
+                        <constraint firstAttribute="trailing" secondItem="BIf-Pu-001" secondAttribute="trailing" constant="20" symbolic="YES" id="BIf-Con-005"/>
+                        <constraint firstItem="BIf-Pu-001" firstAttribute="top" secondItem="CZ6-Q4-MLF" secondAttribute="top" id="BIf-Con-006"/>
                         <constraint firstItem="353" firstAttribute="leading" secondItem="68" secondAttribute="trailing" constant="5" id="DFR-wP-UH7"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="336" secondAttribute="trailing" constant="20" symbolic="YES" id="EqH-JF-Pvs"/>
                         <constraint firstItem="1889" firstAttribute="leading" secondItem="2077" secondAttribute="leading" id="Ero-dE-5SY"/>
@@ -2287,7 +2317,7 @@
                         <constraint firstItem="353" firstAttribute="centerY" secondItem="2081" secondAttribute="centerY" id="rHC-Gi-CUK"/>
                         <constraint firstItem="1891" firstAttribute="centerY" secondItem="1889" secondAttribute="centerY" id="rdN-Uq-Cqa"/>
                         <constraint firstItem="354" firstAttribute="centerX" secondItem="353" secondAttribute="centerX" id="saB-pe-8lR"/>
-                        <constraint firstItem="660" firstAttribute="top" secondItem="CZ6-Q4-MLF" secondAttribute="top" id="v05-Z8-iS7"/>
+                        <constraint firstItem="2077" firstAttribute="top" secondItem="BIf-Pu-001" secondAttribute="bottom" constant="28" id="v05-Z8-iS7"/>
                         <constraint firstItem="2081" firstAttribute="trailing" secondItem="660" secondAttribute="trailing" id="vXK-Q9-wXT"/>
                     </constraints>
                 </customView>

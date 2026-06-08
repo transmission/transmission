@@ -90,6 +90,9 @@ public:
         // IP protocol to use when making the request
         IPProtocol ip_proto = IPProtocol::ANY;
 
+        // If set, overrides the session interface binding for this request.
+        std::optional<std::string> bind_interface;
+
         static auto constexpr DefaultTimeoutSecs = std::chrono::seconds{ 120 };
     };
 
@@ -137,6 +140,11 @@ public:
 
         // Return IPv6 user public address string, or nullopt to not use one
         [[nodiscard]] virtual std::optional<std::string> bind_address_V6() const
+        {
+            return std::nullopt;
+        }
+
+        [[nodiscard]] virtual std::optional<std::string> bind_interface() const
         {
             return std::nullopt;
         }

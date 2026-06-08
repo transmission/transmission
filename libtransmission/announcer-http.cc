@@ -282,6 +282,10 @@ void tr_tracker_http_announce(
     options.timeout_secs = TrAnnounceTimeoutSec;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
+    if (!std::empty(request.bind_interface))
+    {
+        options.bind_interface = request.bind_interface;
+    }
 
     auto do_make_request = [&](std::string_view const& protocol_name, tr_web::FetchOptions&& opt)
     {

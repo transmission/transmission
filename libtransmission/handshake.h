@@ -63,6 +63,8 @@ public:
             tr_torrent_id_t id;
             bool is_done;
             bool is_running;
+            bool allows_dht = true;
+            bool allows_incoming_peer = true;
         };
 
         virtual ~Mediator() = default;

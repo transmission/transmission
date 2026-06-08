@@ -350,6 +350,32 @@ TEST_F(SettingsTest, canSaveString)
     EXPECT_EQ(ChangedValue, *val);
 }
 
+TEST_F(SettingsTest, canLoadBindInterface)
+{
+    static auto constexpr ChangedValue = std::string_view{ "utun4" };
+
+    auto settings = tr_session::Settings{};
+    EXPECT_NE(ChangedValue, settings.bind_interface);
+
+    auto map = tr_variant::Map{ 1U };
+    map.try_emplace(TR_KEY_bind_interface, ChangedValue);
+    settings.load(tr_variant{ std::move(map) });
+    EXPECT_EQ(ChangedValue, settings.bind_interface);
+}
+
+TEST_F(SettingsTest, canSaveBindInterface)
+{
+    static auto constexpr ChangedValue = std::string_view{ "utun4" };
+
+    auto settings = tr_session::Settings{};
+    settings.bind_interface = ChangedValue;
+
+    auto const map = settings.save();
+    auto const val = map.value_if<std::string_view>(TR_KEY_bind_interface);
+    ASSERT_TRUE(val);
+    EXPECT_EQ(ChangedValue, *val);
+}
+
 TEST_F(SettingsTest, canLoadNullableString)
 {
     static auto constexpr Key = TR_KEY_proxy_url;

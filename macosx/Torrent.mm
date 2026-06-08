@@ -502,6 +502,17 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 {
     return tr_torrentGetPeerLimit(self.fHandle);
 }
+
+- (void)setBindInterface:(NSString*)bindInterface
+{
+    tr_torrentSetBindInterface(self.fHandle, bindInterface.UTF8String);
+}
+
+- (NSString*)bindInterface
+{
+    return tr_strv_to_utf8_nsstring(tr_torrentGetBindInterface(self.fHandle));
+}
+
 - (BOOL)waitingToStart
 {
     return self.fStat.activity == TR_STATUS_DOWNLOAD_WAIT || self.fStat.activity == TR_STATUS_SEED_WAIT;

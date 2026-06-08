@@ -154,6 +154,16 @@ public:
         labels_ = std::move(labels);
     }
 
+    [[nodiscard]] constexpr auto const& bind_interface(tr_ctorMode const mode) const noexcept
+    {
+        return optional_args_[mode].bind_interface_;
+    }
+
+    void set_bind_interface(tr_ctorMode const mode, std::string_view const bind_interface)
+    {
+        optional_args_[mode].bind_interface_.assign(bind_interface);
+    }
+
     // --
 
     [[nodiscard]] constexpr auto paused(tr_ctorMode const mode) const noexcept
@@ -233,6 +243,7 @@ private:
         std::optional<bool> sequential_download_;
         std::optional<tr_piece_index_t> sequential_download_from_piece_;
         std::optional<uint16_t> peer_limit_;
+        std::string bind_interface_;
         std::string download_dir_;
     };
 
