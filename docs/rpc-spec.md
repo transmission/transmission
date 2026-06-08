@@ -248,7 +248,7 @@ The 'source' column here corresponds to the data structure there.
 | `desired_available`| number| tr_stat
 | `done_date`| number | tr_stat
 | `download_dir` | string  | tr_torrent
-| `integer` | number  | tr_stat
+| `downloaded_ever` | integer  | tr_stat
 | `download_limit` | integer  | tr_torrent
 | `download_limited` | boolean | tr_torrent
 | `edit_date` | number | tr_stat
