@@ -7,7 +7,6 @@
 
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
-#include <filesystem>
 #include <functional>
 #include <optional>
 #include <ranges>
@@ -102,27 +101,11 @@ struct tr_sys_path_info
     }
 };
 
-/**
- * Temporary replacement of deprecated `std::filesystem::u8path()` while we migrate
- * from char to char8_t strings.
- *
- * https://stackoverflow.com/a/57635139/11390656
- * @{
- */
-
-template<typename InputIt>
-[[nodiscard]] std::filesystem::path tr_u8path(InputIt begin, InputIt end)
+struct tr_sys_path_capacity
 {
-    auto const view = std::ranges::subrange(begin, end) | std::views::transform([](char const c) -> char8_t { return c; });
-    return { view.begin(), view.end() };
-}
-
-[[nodiscard]] inline std::filesystem::path tr_u8path(std::string_view path)
-{
-    return tr_u8path(path.begin(), path.end());
-}
-
-/// @}
+    uintmax_t available = -1;
+    uintmax_t capacity = -1;
+};
 
 /**
  * @name Platform-specific wrapper functions
@@ -173,15 +156,7 @@ bool tr_sys_path_copy(std::string_view src_path, std::string_view dst_path, tr_e
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  */
-[[nodiscard]] std::optional<std::filesystem::space_info> tr_sys_path_get_capacity(
-    std::filesystem::path const& path,
-    tr_error* error = nullptr);
-[[nodiscard]] inline std::optional<std::filesystem::space_info> tr_sys_path_get_capacity(
-    std::string_view path,
-    tr_error* error = nullptr)
-{
-    return tr_sys_path_get_capacity(tr_u8path(path), error);
-}
+[[nodiscard]] std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view path, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `access()`.
