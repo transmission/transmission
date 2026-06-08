@@ -23,12 +23,7 @@ public:
 
     explicit tr_interned_string(tr_quark quark)
         : quark_{ quark }
-        , sv_{ tr_quark_get_u8string_view(quark_) }
-    {
-    }
-
-    explicit tr_interned_string(std::u8string_view sv)
-        : tr_interned_string{ tr_quark_new(sv) }
+        , sv_{ tr_quark_get_string_view(quark_) }
     {
     }
 
@@ -44,14 +39,7 @@ public:
 
     tr_interned_string& operator=(tr_quark quark)
     {
-        quark_ = quark;
-        sv_ = tr_quark_get_u8string_view(quark_);
-        return *this;
-    }
-
-    tr_interned_string& operator=(std::u8string_view sv)
-    {
-        return *this = tr_quark_new(sv);
+        return (*this = tr_interned_string{ quark });
     }
 
     tr_interned_string& operator=(std::string_view sv)
@@ -69,19 +57,19 @@ public:
         return quark_;
     }
 
-    [[nodiscard]] constexpr auto u8sv() const noexcept
+    [[nodiscard]] constexpr auto sv() const noexcept
     {
         return sv_;
     }
 
     [[nodiscard]] constexpr auto data() const noexcept
     {
-        return std::data(u8sv());
+        return std::data(sv());
     }
 
     [[nodiscard]] char const* c_str() const noexcept
     {
-        return reinterpret_cast<char const*>(data()); // tr_quark strs are always zero-terminated
+        return data(); // tr_quark strs are always zero-terminated
     }
 
     [[nodiscard]] constexpr auto empty() const noexcept
@@ -91,12 +79,7 @@ public:
 
     [[nodiscard]] constexpr auto size() const noexcept
     {
-        return std::size(u8sv());
-    }
-
-    [[nodiscard]] auto sv() const noexcept
-    {
-        return std::string_view{ reinterpret_cast<char const*>(data()), size() };
+        return std::size(sv());
     }
 
     constexpr void clear()
@@ -106,21 +89,21 @@ public:
 
     [[nodiscard]] constexpr auto begin() const noexcept
     {
-        return std::begin(u8sv());
+        return std::begin(sv());
     }
 
     [[nodiscard]] constexpr auto end() const noexcept
     {
-        return std::end(u8sv());
+        return std::end(sv());
     }
 
     [[nodiscard]] constexpr auto rbegin() const noexcept
     {
-        return std::rbegin(u8sv());
+        return std::rbegin(sv());
     }
     [[nodiscard]] constexpr auto rend() const noexcept
     {
-        return std::rend(u8sv());
+        return std::rend(sv());
     }
 
     [[nodiscard]] constexpr auto operator<=>(tr_interned_string const& that) const noexcept
@@ -142,12 +125,6 @@ public:
     }
 
     // NOLINTNEXTLINE(google-explicit-constructor)
-    [[nodiscard]] constexpr operator std::u8string_view() const noexcept
-    {
-        return u8sv();
-    }
-
-    // NOLINTNEXTLINE(google-explicit-constructor)
     [[nodiscard]] operator std::string_view() const noexcept
     {
         return sv();
@@ -155,7 +132,7 @@ public:
 
 private:
     tr_quark quark_ = TR_KEY_NONE;
-    std::u8string_view sv_;
+    std::string_view sv_;
 };
 
 template<>
