@@ -179,15 +179,14 @@ struct MyHandler : public tr::benc::Handler
 
     bool StartDict(Context const& /*context*/) final
     {
-        auto* const variant = get_node();
-        if (variant == nullptr)
+        if (auto* const var = get_node())
         {
-            return false;
+            *var = tr_variant::Map{};
+            stack_.push_back(var);
+            return true;
         }
 
-        tr_variantInitDict(variant, 0);
-        stack_.push_back(variant);
-        return true;
+        return false;
     }
 
     bool Key(std::string_view sv, Context const& /*context*/) final
@@ -210,15 +209,14 @@ struct MyHandler : public tr::benc::Handler
 
     bool StartArray(Context const& /*context*/) final
     {
-        auto* const variant = get_node();
-        if (variant == nullptr)
+        if (auto* const var = get_node())
         {
-            return false;
+            *var = tr_variant::Vector{};
+            stack_.push_back(var);
+            return true;
         }
 
-        tr_variantInitList(variant, 0);
-        stack_.push_back(variant);
-        return true;
+        return false;
     }
 
     bool EndArray(Context const& /*context*/) final
@@ -233,25 +231,29 @@ struct MyHandler : public tr::benc::Handler
     }
 
 private:
-    tr_variant* get_node()
+    [[nodiscard]] tr_variant* get_node()
     {
-        tr_variant* node = nullptr;
-
         if (std::empty(stack_))
         {
-            node = top_;
-        }
-        else if (auto* parent = stack_.back(); parent != nullptr && parent->holds_alternative<tr_variant::Vector>())
-        {
-            node = tr_variantListAdd(parent);
-        }
-        else if (key_ && parent != nullptr && parent->holds_alternative<tr_variant::Map>())
-        {
-            node = tr_variantDictAdd(parent, *key_);
-            key_.reset();
+            return top_;
         }
 
-        return node;
+        if (auto* parent = stack_.back())
+        {
+            if (auto* const vec = parent->get_if<tr_variant::Vector>())
+            {
+                return &vec->emplace_back();
+            }
+
+            if (auto* const map = parent->get_if<tr_variant::Map>(); key_ && map != nullptr)
+            {
+                auto& entry = (*map)[*key_];
+                key_.reset();
+                return &entry;
+            }
+        }
+
+        return {};
     }
 };
 } // namespace parse_helpers

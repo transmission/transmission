@@ -99,72 +99,83 @@ int parseCommandLine(app_options& opts, int argc, char const* const* argv)
     return 0;
 }
 
-bool removeURL(tr_variant* metainfo, std::string_view url)
+bool removeURL(tr_variant& metainfo, std::string_view url)
 {
-    auto sv = std::string_view{};
-    tr_variant* announce_list;
+    auto* const map = metainfo.get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        return false;
+    }
+
     bool changed = false;
 
-    if (tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv) && url == sv)
+    if (auto sv_opt = map->value_if<std::string_view>(TR_KEY_announce); sv_opt && url == *sv_opt)
     {
-        fmt::print("\tRemoved '{:s}' from 'announce'\n", sv);
-        tr_variantDictRemove(metainfo, TR_KEY_announce);
+        fmt::print("\tRemoved '{:s}' from 'announce'\n", *sv_opt);
+        map->erase(TR_KEY_announce);
         changed = true;
     }
 
-    if (tr_variantDictFindList(metainfo, TR_KEY_announce_list, &announce_list))
+    if (auto* al_vec = map->find_if<tr_variant::Vector>(TR_KEY_announce_list); al_vec != nullptr)
     {
-        tr_variant* tier;
         int tierIndex = 0;
 
-        while ((tier = tr_variantListChild(announce_list, tierIndex)) != nullptr)
+        for (auto tier_it = al_vec->begin(); tier_it != al_vec->end();)
         {
-            int nodeIndex = 0;
-            tr_variant const* node;
-            while ((node = tr_variantListChild(tier, nodeIndex)) != nullptr)
+            auto* const tier_vec = tier_it->get_if<tr_variant::Vector>();
+            if (tier_vec == nullptr)
             {
-                if (tr_variantGetStrView(node, &sv) && url == sv)
+                ++tier_it;
+                ++tierIndex;
+                continue;
+            }
+
+            for (auto node_it = tier_vec->begin(); node_it != tier_vec->end();)
+            {
+                if (auto sv_opt = node_it->value_if<std::string_view>(); sv_opt && url == *sv_opt)
                 {
-                    fmt::print("\tRemoved '{:s}' from 'announce-list' tier #{:d}\n", sv, tierIndex + 1);
-                    tr_variantListRemove(tier, nodeIndex);
+                    fmt::print("\tRemoved '{:s}' from 'announce-list' tier #{:d}\n", *sv_opt, tierIndex + 1);
+                    node_it = tier_vec->erase(node_it);
                     changed = true;
                 }
                 else
                 {
-                    ++nodeIndex;
+                    ++node_it;
                 }
             }
 
-            if (tr_variantListSize(tier) == 0)
+            if (tier_vec->empty())
             {
                 fmt::print("\tNo URLs left in tier #{:d}... removing tier\n", tierIndex + 1);
-                tr_variantListRemove(announce_list, tierIndex);
+                tier_it = al_vec->erase(tier_it);
             }
             else
             {
+                ++tier_it;
                 ++tierIndex;
             }
         }
 
-        if (tr_variantListSize(announce_list) == 0)
+        if (al_vec->empty())
         {
             fmt::print("\tNo tiers left... removing announce-list\n");
-            tr_variantDictRemove(metainfo, TR_KEY_announce_list);
+            map->erase(TR_KEY_announce_list);
         }
     }
 
     /* if we removed the "announce" field and there's still another track left,
      * use it as the "announce" field */
-    if (changed && !tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv))
+    if (changed && !map->value_if<std::string_view>(TR_KEY_announce))
     {
-        tr_variant* const tier = tr_variantListChild(announce_list, 0);
-        if (tier != nullptr)
+        if (auto* al_vec = map->find_if<tr_variant::Vector>(TR_KEY_announce_list); al_vec != nullptr && !al_vec->empty())
         {
-            tr_variant const* const node = tr_variantListChild(tier, 0);
-            if ((node != nullptr) && tr_variantGetStrView(node, &sv))
+            if (auto* const tier_vec = al_vec->front().get_if<tr_variant::Vector>(); tier_vec != nullptr && !tier_vec->empty())
             {
-                tr_variantDictAddStr(metainfo, TR_KEY_announce, sv);
-                fmt::print("\tAdded '{:s}' to announce\n", sv);
+                if (auto sv_opt = tier_vec->front().value_if<std::string_view>())
+                {
+                    (*map)[TR_KEY_announce] = std::string_view{ *sv_opt };
+                    fmt::print("\tAdded '{:s}' to announce\n", *sv_opt);
+                }
             }
         }
     }
@@ -191,42 +202,46 @@ bool removeURL(tr_variant* metainfo, std::string_view url)
     return ret;
 }
 
-bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::string_view newval)
+bool replaceURL(tr_variant& metainfo, std::string_view oldval, std::string_view newval)
 {
-    auto sv = std::string_view{};
-    tr_variant* announce_list;
+    auto* const map = metainfo.get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        return false;
+    }
+
     bool changed = false;
 
-    if (tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv) && tr_strv_contains(sv, oldval))
+    if (auto sv_opt = map->value_if<std::string_view>(TR_KEY_announce); sv_opt && tr_strv_contains(*sv_opt, oldval))
     {
-        auto const newstr = replaceSubstr(sv, oldval, newval);
-        fmt::print("\tReplaced in 'announce': '{:s}' --> '{:s}'\n", sv, newstr);
-        tr_variantDictAddStr(metainfo, TR_KEY_announce, newstr);
+        auto const newstr = replaceSubstr(*sv_opt, oldval, newval);
+        fmt::print("\tReplaced in 'announce': '{:s}' --> '{:s}'\n", *sv_opt, newstr);
+        (*map)[TR_KEY_announce] = std::string_view{ newstr };
         changed = true;
     }
 
-    if (tr_variantDictFindList(metainfo, TR_KEY_announce_list, &announce_list))
+    if (auto* const al_vec = map->find_if<tr_variant::Vector>(TR_KEY_announce_list); al_vec != nullptr)
     {
-        tr_variant* tier;
         int tierCount = 0;
 
-        while ((tier = tr_variantListChild(announce_list, tierCount)) != nullptr)
+        for (auto& tier_variant : *al_vec)
         {
-            tr_variant* node;
-            int nodeCount = 0;
-
-            while ((node = tr_variantListChild(tier, nodeCount)) != nullptr)
+            if (auto* const tier_vec = tier_variant.get_if<tr_variant::Vector>())
             {
-                if (tr_variantGetStrView(node, &sv) && tr_strv_contains(sv, oldval))
+                for (auto& node : *tier_vec)
                 {
-                    auto const newstr = replaceSubstr(sv, oldval, newval);
-                    fmt::print("\tReplaced in 'announce-list' tier #{:d}: '{:s}' --> '{:s}'\n", tierCount + 1, sv, newstr);
-                    node->clear();
-                    *node = newstr;
-                    changed = true;
+                    if (auto sv_opt = node.value_if<std::string_view>(); sv_opt && tr_strv_contains(*sv_opt, oldval))
+                    {
+                        auto const newstr = replaceSubstr(*sv_opt, oldval, newval);
+                        fmt::print(
+                            "\tReplaced in 'announce-list' tier #{:d}: '{:s}' --> '{:s}'\n",
+                            tierCount + 1,
+                            *sv_opt,
+                            newstr);
+                        node = std::string_view{ newstr };
+                        changed = true;
+                    }
                 }
-
-                ++nodeCount;
             }
 
             ++tierCount;
@@ -235,70 +250,70 @@ bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::string_view 
 
     return changed;
 }
-
-[[nodiscard]] bool announce_list_has_url(tr_variant* announce_list, char const* url)
+[[nodiscard]] bool announce_list_has_url(tr_variant::Vector const& announce_list, std::string_view url)
 {
-    int tierCount = 0;
-    tr_variant* tier;
-
-    while ((tier = tr_variantListChild(announce_list, tierCount)) != nullptr)
+    for (auto const& tier_variant : announce_list)
     {
-        int nodeCount = 0;
-        tr_variant const* node;
-
-        while ((node = tr_variantListChild(tier, nodeCount)) != nullptr)
+        if (auto const* const tier_vec = tier_variant.get_if<tr_variant::Vector>())
         {
-            if (auto sv = std::string_view{}; tr_variantGetStrView(node, &sv) && sv == url)
+            for (auto const& node : *tier_vec)
             {
-                return true;
+                if (auto sv_opt = node.value_if<std::string_view>(); sv_opt && *sv_opt == url)
+                {
+                    return true;
+                }
             }
-
-            ++nodeCount;
         }
-
-        ++tierCount;
     }
 
     return false;
 }
 
-bool addURL(tr_variant* metainfo, char const* url)
+bool addURL(tr_variant& metainfo, std::string_view url)
 {
-    auto announce = std::string_view{};
-    tr_variant* announce_list = nullptr;
+    auto* const map = metainfo.get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        return false;
+    }
+
     bool changed = false;
-    bool const had_announce = tr_variantDictFindStrView(metainfo, TR_KEY_announce, &announce);
-    bool const had_announce_list = tr_variantDictFindList(metainfo, TR_KEY_announce_list, &announce_list);
+    auto const announce_opt = map->value_if<std::string_view>(TR_KEY_announce);
+    auto* al_vec = map->find_if<tr_variant::Vector>(TR_KEY_announce_list);
+    bool const had_announce = announce_opt.has_value();
+    bool const had_announce_list = al_vec != nullptr;
 
     if (!had_announce && !had_announce_list)
     {
         /* this new tracker is the only one, so add it to "announce"... */
         fmt::print("\tAdded '{:s}' in 'announce'\n", url);
-        tr_variantDictAddStr(metainfo, TR_KEY_announce, url);
+        (*map)[TR_KEY_announce] = std::string_view{ url };
         changed = true;
     }
     else
     {
         if (!had_announce_list)
         {
-            announce_list = tr_variantDictAddList(metainfo, TR_KEY_announce_list, 2);
+            al_vec = map->insert_or_assign(TR_KEY_announce_list, tr_variant::make_vector(2)).first.get_if<tr_variant::Vector>();
 
             if (had_announce)
             {
                 /* we're moving from an 'announce' to an 'announce-list',
                  * so copy the old announce URL to the list */
-                tr_variant* tier = tr_variantListAddList(announce_list, 1);
-                tr_variantListAddStr(tier, announce);
+                al_vec->emplace_back(tr_variant::make_vector(1))
+                    .get_if<tr_variant::Vector>()
+                    ->emplace_back(std::string_view{ *announce_opt });
                 changed = true;
             }
         }
 
         /* If the user-specified URL isn't in the announce list yet, add it */
-        if (!announce_list_has_url(announce_list, url))
+        if (!announce_list_has_url(*al_vec, url))
         {
-            tr_variant* tier = tr_variantListAddList(announce_list, 1);
-            tr_variantListAddStr(tier, url);
-            fmt::print("\tAdded '{:s}' to 'announce-list' tier #{:d}\n", url, tr_variantListSize(announce_list));
+            al_vec->emplace_back(tr_variant::make_vector(1))
+                .get_if<tr_variant::Vector>()
+                ->emplace_back(std::string_view{ url });
+            fmt::print("\tAdded '{:s}' to 'announce-list' tier #{:d}\n", url, al_vec->size());
             changed = true;
         }
     }
@@ -306,26 +321,31 @@ bool addURL(tr_variant* metainfo, char const* url)
     return changed;
 }
 
-bool setSource(tr_variant* metainfo, char const* source_value)
+bool setSource(tr_variant& metainfo, std::string_view source_value)
 {
-    auto current_source = std::string_view{};
-    bool const had_source = tr_variantDictFindStrView(metainfo, TR_KEY_source, &current_source);
-    bool changed = false;
+    auto* const map = metainfo.get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        return false;
+    }
 
-    if (!had_source)
+    auto const current_source_opt = map->value_if<std::string_view>(TR_KEY_source);
+
+    if (!current_source_opt)
     {
         fmt::print("\tAdded '{:s}' as source\n", source_value);
-        tr_variantDictAddStr(metainfo, TR_KEY_source, source_value);
-        changed = true;
-    }
-    else if (current_source.compare(source_value) != 0)
-    {
-        fmt::print("\tUpdated source: '{:s}' -> '{:s}'\n", current_source.data(), source_value);
-        tr_variantDictAddStr(metainfo, TR_KEY_source, source_value);
-        changed = true;
+        (*map)[TR_KEY_source] = std::string_view{ source_value };
+        return true;
     }
 
-    return changed;
+    if (*current_source_opt != source_value)
+    {
+        fmt::print("\tUpdated source: '{:s}' -> '{:s}'\n", *current_source_opt, source_value);
+        (*map)[TR_KEY_source] = std::string_view{ source_value };
+        return true;
+    }
+
+    return false;
 }
 } // namespace
 
@@ -382,22 +402,22 @@ int tr_main(int argc, char* argv[])
 
         if (options.deleteme != nullptr)
         {
-            changed |= removeURL(&top, options.deleteme);
+            changed |= removeURL(top, options.deleteme);
         }
 
         if (options.add != nullptr)
         {
-            changed = addURL(&top, options.add);
+            changed = addURL(top, options.add);
         }
 
         if (options.replace[0] != nullptr && options.replace[1] != nullptr)
         {
-            changed |= replaceURL(&top, options.replace[0], options.replace[1]);
+            changed |= replaceURL(top, options.replace[0], options.replace[1]);
         }
 
         if (options.source != nullptr)
         {
-            changed = setSource(&top, options.source);
+            changed = setSource(top, options.source);
         }
 
         if (changed)

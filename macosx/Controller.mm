@@ -170,6 +170,118 @@ static void initUnits()
                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 }
 
+static tr_variant getSettingsFromNSUserDefaults(NSUserDefaults* defaults)
+{
+    auto settings = tr_variant::Map{};
+
+    BOOL const usesSpeedLimitSched = [defaults boolForKey:@"SpeedLimitAuto"];
+    if (!usesSpeedLimitSched)
+    {
+        settings.insert_or_assign(TR_KEY_alt_speed_enabled, static_cast<bool>([defaults boolForKey:@"SpeedLimit"]));
+    }
+
+    settings.insert_or_assign(TR_KEY_alt_speed_up, [defaults integerForKey:@"SpeedLimitUploadLimit"]);
+    settings.insert_or_assign(TR_KEY_alt_speed_down, [defaults integerForKey:@"SpeedLimitDownloadLimit"]);
+
+    settings.insert_or_assign(TR_KEY_alt_speed_time_enabled, static_cast<bool>([defaults boolForKey:@"SpeedLimitAuto"]));
+    settings.insert_or_assign(TR_KEY_alt_speed_time_begin, [PrefsController dateToTimeSum:[defaults objectForKey:@"SpeedLimitAutoOnDate"]]);
+    settings.insert_or_assign(TR_KEY_alt_speed_time_end, [PrefsController dateToTimeSum:[defaults objectForKey:@"SpeedLimitAutoOffDate"]]);
+    settings.insert_or_assign(TR_KEY_alt_speed_time_day, [defaults integerForKey:@"SpeedLimitAutoDay"]);
+
+    settings.insert_or_assign(TR_KEY_speed_limit_down, [defaults integerForKey:@"DownloadLimit"]);
+    settings.insert_or_assign(TR_KEY_speed_limit_down_enabled, static_cast<bool>([defaults boolForKey:@"CheckDownload"]));
+    settings.insert_or_assign(TR_KEY_speed_limit_up, [defaults integerForKey:@"UploadLimit"]);
+    settings.insert_or_assign(TR_KEY_speed_limit_up_enabled, static_cast<bool>([defaults boolForKey:@"CheckUpload"]));
+
+    //hidden prefs
+    if ([defaults objectForKey:@"BindAddressIPv4"])
+    {
+        settings.insert_or_assign(TR_KEY_bind_address_ipv4, [defaults stringForKey:@"BindAddressIPv4"].UTF8String);
+    }
+    if ([defaults objectForKey:@"BindAddressIPv6"])
+    {
+        settings.insert_or_assign(TR_KEY_bind_address_ipv6, [defaults stringForKey:@"BindAddressIPv6"].UTF8String);
+    }
+
+    settings.insert_or_assign(TR_KEY_blocklist_enabled, static_cast<bool>([defaults boolForKey:@"BlocklistNew"]));
+    if ([defaults objectForKey:@"BlocklistURL"])
+    {
+        settings.insert_or_assign(TR_KEY_blocklist_url, [defaults stringForKey:@"BlocklistURL"].UTF8String);
+    }
+    settings.insert_or_assign(TR_KEY_dht_enabled, static_cast<bool>([defaults boolForKey:@"DHTGlobal"]));
+    settings.insert_or_assign(TR_KEY_download_dir, [defaults stringForKey:@"DownloadFolder"].stringByExpandingTildeInPath.UTF8String);
+    settings.insert_or_assign(TR_KEY_download_queue_enabled, static_cast<bool>([defaults boolForKey:@"Queue"]));
+    settings.insert_or_assign(TR_KEY_download_queue_size, [defaults integerForKey:@"QueueDownloadNumber"]);
+    settings.insert_or_assign(TR_KEY_idle_seeding_limit, [defaults integerForKey:@"IdleLimitMinutes"]);
+    settings.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, static_cast<bool>([defaults boolForKey:@"IdleLimitCheck"]));
+    settings.insert_or_assign(
+        TR_KEY_incomplete_dir,
+        [defaults stringForKey:@"IncompleteDownloadFolder"].stringByExpandingTildeInPath.UTF8String);
+    settings.insert_or_assign(TR_KEY_incomplete_dir_enabled, static_cast<bool>([defaults boolForKey:@"UseIncompleteDownloadFolder"]));
+    settings.insert_or_assign(TR_KEY_torrent_complete_verify_enabled, static_cast<bool>([defaults boolForKey:@"VerifyDataOnCompletion"]));
+    settings.insert_or_assign(TR_KEY_lpd_enabled, static_cast<bool>([defaults boolForKey:@"LocalPeerDiscoveryGlobal"]));
+    settings.insert_or_assign(TR_KEY_message_level, TR_LOG_DEBUG);
+    settings.insert_or_assign(TR_KEY_peer_limit_global, [defaults integerForKey:@"PeersTotal"]);
+    settings.insert_or_assign(TR_KEY_peer_limit_per_torrent, [defaults integerForKey:@"PeersTorrent"]);
+
+    NSInteger bindPort = [defaults integerForKey:@"BindPort"];
+    if (bindPort <= 0 || bindPort > 65535)
+    {
+        // First launch, we avoid a default port to be less likely blocked on such port and to have more chances of success when connecting to swarms.
+        // Ideally, we should be setting port 0, then reading the port number assigned by the system and save that value. But that would be best handled by libtransmission itself.
+        // For now, we randomize the port as a Dynamic/Private/Ephemeral Port from 49152-65535
+        // https://datatracker.ietf.org/doc/html/rfc6335#section-6
+        uint16_t defaultPort = 49152 + arc4random_uniform(65536 - 49152);
+        [defaults setInteger:defaultPort forKey:@"BindPort"];
+    }
+
+    bool const randomPort = [defaults boolForKey:@"RandomPort"];
+    settings.insert_or_assign(TR_KEY_peer_port_random_on_start, randomPort);
+    if (!randomPort)
+    {
+        settings.insert_or_assign(TR_KEY_peer_port, [defaults integerForKey:@"BindPort"]);
+    }
+
+    //hidden pref
+    if ([defaults objectForKey:@"PeerSocketTOS"])
+    {
+        settings.insert_or_assign(TR_KEY_peer_socket_diffserv, [defaults stringForKey:@"PeerSocketTOS"].UTF8String);
+    }
+
+    settings.insert_or_assign(TR_KEY_pex_enabled, static_cast<bool>([defaults boolForKey:@"PEXGlobal"]));
+    settings.insert_or_assign(TR_KEY_port_forwarding_enabled, static_cast<bool>([defaults boolForKey:@"NatTraversal"]));
+    settings.insert_or_assign(TR_KEY_queue_stalled_enabled, static_cast<bool>([defaults boolForKey:@"CheckStalled"]));
+    settings.insert_or_assign(TR_KEY_queue_stalled_minutes, [defaults integerForKey:@"StalledMinutes"]);
+    settings.insert_or_assign(TR_KEY_seed_ratio_limit, [defaults floatForKey:@"RatioLimit"]);
+    settings.insert_or_assign(TR_KEY_seed_ratio_limited, static_cast<bool>([defaults boolForKey:@"RatioCheck"]));
+    settings.insert_or_assign(TR_KEY_rename_partial_files, static_cast<bool>([defaults boolForKey:@"RenamePartialFiles"]));
+    settings.insert_or_assign(TR_KEY_rpc_authentication_required, static_cast<bool>([defaults boolForKey:@"RPCAuthorize"]));
+    settings.insert_or_assign(TR_KEY_rpc_enabled, static_cast<bool>([defaults boolForKey:@"RPC"]));
+    settings.insert_or_assign(TR_KEY_rpc_port, [defaults integerForKey:@"RPCPort"]);
+    settings.insert_or_assign(TR_KEY_rpc_username, [defaults stringForKey:@"RPCUsername"].UTF8String);
+    settings.insert_or_assign(TR_KEY_rpc_whitelist_enabled, static_cast<bool>([defaults boolForKey:@"RPCUseWhitelist"]));
+    settings.insert_or_assign(TR_KEY_rpc_host_whitelist_enabled, static_cast<bool>([defaults boolForKey:@"RPCUseHostWhitelist"]));
+    settings.insert_or_assign(TR_KEY_seed_queue_enabled, static_cast<bool>([defaults boolForKey:@"QueueSeed"]));
+    settings.insert_or_assign(TR_KEY_seed_queue_size, [defaults integerForKey:@"QueueSeedNumber"]);
+    settings.insert_or_assign(TR_KEY_start_added_torrents, static_cast<bool>([defaults boolForKey:@"AutoStartDownload"]));
+    settings.insert_or_assign(TR_KEY_utp_enabled, static_cast<bool>([defaults boolForKey:@"UTPGlobal"]));
+
+    settings.insert_or_assign(TR_KEY_script_torrent_done_enabled, static_cast<bool>([defaults boolForKey:@"DoneScriptEnabled"]));
+    NSString* prefs_string = [defaults stringForKey:@"DoneScriptPath"];
+    if (prefs_string != nil)
+    {
+        settings.insert_or_assign(TR_KEY_script_torrent_done_filename, prefs_string.UTF8String);
+    }
+
+    // TODO: Add to GUI
+    if ([defaults objectForKey:@"RPCHostWhitelist"])
+    {
+        settings.insert_or_assign(TR_KEY_rpc_host_whitelist, [defaults stringForKey:@"RPCHostWhitelist"].UTF8String);
+    }
+
+    return tr_variant{ std::move(settings) };
+}
+
 // 2.90 was infected with ransomware which we now check for and attempt to remove
 static void removeKeRangerRansomware()
 {
@@ -392,113 +504,7 @@ static void removeKeRangerRansomware()
         [NSDocumentController.sharedDocumentController clearRecentDocuments:nil];
 
         auto settings = tr_sessionGetDefaultSettings();
-
-        BOOL const usesSpeedLimitSched = [_fDefaults boolForKey:@"SpeedLimitAuto"];
-        if (!usesSpeedLimitSched)
-        {
-            tr_variantDictAddBool(&settings, TR_KEY_alt_speed_enabled, [_fDefaults boolForKey:@"SpeedLimit"]);
-        }
-
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_up, [_fDefaults integerForKey:@"SpeedLimitUploadLimit"]);
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_down, [_fDefaults integerForKey:@"SpeedLimitDownloadLimit"]);
-
-        tr_variantDictAddBool(&settings, TR_KEY_alt_speed_time_enabled, [_fDefaults boolForKey:@"SpeedLimitAuto"]);
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_time_begin, [PrefsController dateToTimeSum:[_fDefaults objectForKey:@"SpeedLimitAutoOnDate"]]);
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_time_end, [PrefsController dateToTimeSum:[_fDefaults objectForKey:@"SpeedLimitAutoOffDate"]]);
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_time_day, [_fDefaults integerForKey:@"SpeedLimitAutoDay"]);
-
-        tr_variantDictAddInt(&settings, TR_KEY_speed_limit_down, [_fDefaults integerForKey:@"DownloadLimit"]);
-        tr_variantDictAddBool(&settings, TR_KEY_speed_limit_down_enabled, [_fDefaults boolForKey:@"CheckDownload"]);
-        tr_variantDictAddInt(&settings, TR_KEY_speed_limit_up, [_fDefaults integerForKey:@"UploadLimit"]);
-        tr_variantDictAddBool(&settings, TR_KEY_speed_limit_up_enabled, [_fDefaults boolForKey:@"CheckUpload"]);
-
-        //hidden prefs
-        if ([_fDefaults objectForKey:@"BindAddressIPv4"])
-        {
-            tr_variantDictAddStr(&settings, TR_KEY_bind_address_ipv4, [_fDefaults stringForKey:@"BindAddressIPv4"].UTF8String);
-        }
-        if ([_fDefaults objectForKey:@"BindAddressIPv6"])
-        {
-            tr_variantDictAddStr(&settings, TR_KEY_bind_address_ipv6, [_fDefaults stringForKey:@"BindAddressIPv6"].UTF8String);
-        }
-
-        tr_variantDictAddBool(&settings, TR_KEY_blocklist_enabled, [_fDefaults boolForKey:@"BlocklistNew"]);
-        if ([_fDefaults objectForKey:@"BlocklistURL"])
-            tr_variantDictAddStr(&settings, TR_KEY_blocklist_url, [_fDefaults stringForKey:@"BlocklistURL"].UTF8String);
-        tr_variantDictAddBool(&settings, TR_KEY_dht_enabled, [_fDefaults boolForKey:@"DHTGlobal"]);
-        tr_variantDictAddStr(
-            &settings,
-            TR_KEY_download_dir,
-            [_fDefaults stringForKey:@"DownloadFolder"].stringByExpandingTildeInPath.UTF8String);
-        tr_variantDictAddBool(&settings, TR_KEY_download_queue_enabled, [_fDefaults boolForKey:@"Queue"]);
-        tr_variantDictAddInt(&settings, TR_KEY_download_queue_size, [_fDefaults integerForKey:@"QueueDownloadNumber"]);
-        tr_variantDictAddInt(&settings, TR_KEY_idle_seeding_limit, [_fDefaults integerForKey:@"IdleLimitMinutes"]);
-        tr_variantDictAddBool(&settings, TR_KEY_idle_seeding_limit_enabled, [_fDefaults boolForKey:@"IdleLimitCheck"]);
-        tr_variantDictAddStr(
-            &settings,
-            TR_KEY_incomplete_dir,
-            [_fDefaults stringForKey:@"IncompleteDownloadFolder"].stringByExpandingTildeInPath.UTF8String);
-        tr_variantDictAddBool(&settings, TR_KEY_incomplete_dir_enabled, [_fDefaults boolForKey:@"UseIncompleteDownloadFolder"]);
-        tr_variantDictAddBool(&settings, TR_KEY_torrent_complete_verify_enabled, [_fDefaults boolForKey:@"VerifyDataOnCompletion"]);
-        tr_variantDictAddBool(&settings, TR_KEY_lpd_enabled, [_fDefaults boolForKey:@"LocalPeerDiscoveryGlobal"]);
-        tr_variantDictAddInt(&settings, TR_KEY_message_level, TR_LOG_DEBUG);
-        tr_variantDictAddInt(&settings, TR_KEY_peer_limit_global, [_fDefaults integerForKey:@"PeersTotal"]);
-        tr_variantDictAddInt(&settings, TR_KEY_peer_limit_per_torrent, [_fDefaults integerForKey:@"PeersTorrent"]);
-
-        NSInteger bindPort = [_fDefaults integerForKey:@"BindPort"];
-        if (bindPort <= 0 || bindPort > 65535)
-        {
-            // First launch, we avoid a default port to be less likely blocked on such port and to have more chances of success when connecting to swarms.
-            // Ideally, we should be setting port 0, then reading the port number assigned by the system and save that value. But that would be best handled by libtransmission itself.
-            // For now, we randomize the port as a Dynamic/Private/Ephemeral Port from 49152–65535
-            // https://datatracker.ietf.org/doc/html/rfc6335#section-6
-            uint16_t defaultPort = 49152 + arc4random_uniform(65536 - 49152);
-            [_fDefaults setInteger:defaultPort forKey:@"BindPort"];
-        }
-
-        BOOL const randomPort = [_fDefaults boolForKey:@"RandomPort"];
-        tr_variantDictAddBool(&settings, TR_KEY_peer_port_random_on_start, randomPort);
-        if (!randomPort)
-        {
-            tr_variantDictAddInt(&settings, TR_KEY_peer_port, [_fDefaults integerForKey:@"BindPort"]);
-        }
-
-        //hidden pref
-        if ([_fDefaults objectForKey:@"PeerSocketTOS"])
-        {
-            tr_variantDictAddStr(&settings, TR_KEY_peer_socket_diffserv, [_fDefaults stringForKey:@"PeerSocketTOS"].UTF8String);
-        }
-
-        tr_variantDictAddBool(&settings, TR_KEY_pex_enabled, [_fDefaults boolForKey:@"PEXGlobal"]);
-        tr_variantDictAddBool(&settings, TR_KEY_port_forwarding_enabled, [_fDefaults boolForKey:@"NatTraversal"]);
-        tr_variantDictAddBool(&settings, TR_KEY_queue_stalled_enabled, [_fDefaults boolForKey:@"CheckStalled"]);
-        tr_variantDictAddInt(&settings, TR_KEY_queue_stalled_minutes, [_fDefaults integerForKey:@"StalledMinutes"]);
-        tr_variantDictAddReal(&settings, TR_KEY_seed_ratio_limit, [_fDefaults floatForKey:@"RatioLimit"]);
-        tr_variantDictAddBool(&settings, TR_KEY_seed_ratio_limited, [_fDefaults boolForKey:@"RatioCheck"]);
-        tr_variantDictAddBool(&settings, TR_KEY_rename_partial_files, [_fDefaults boolForKey:@"RenamePartialFiles"]);
-        tr_variantDictAddBool(&settings, TR_KEY_rpc_authentication_required, [_fDefaults boolForKey:@"RPCAuthorize"]);
-        tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, [_fDefaults boolForKey:@"RPC"]);
-        tr_variantDictAddInt(&settings, TR_KEY_rpc_port, [_fDefaults integerForKey:@"RPCPort"]);
-        tr_variantDictAddStr(&settings, TR_KEY_rpc_username, [_fDefaults stringForKey:@"RPCUsername"].UTF8String);
-        tr_variantDictAddBool(&settings, TR_KEY_rpc_whitelist_enabled, [_fDefaults boolForKey:@"RPCUseWhitelist"]);
-        tr_variantDictAddBool(&settings, TR_KEY_rpc_host_whitelist_enabled, [_fDefaults boolForKey:@"RPCUseHostWhitelist"]);
-        tr_variantDictAddBool(&settings, TR_KEY_seed_queue_enabled, [_fDefaults boolForKey:@"QueueSeed"]);
-        tr_variantDictAddInt(&settings, TR_KEY_seed_queue_size, [_fDefaults integerForKey:@"QueueSeedNumber"]);
-        tr_variantDictAddBool(&settings, TR_KEY_start_added_torrents, [_fDefaults boolForKey:@"AutoStartDownload"]);
-        tr_variantDictAddBool(&settings, TR_KEY_utp_enabled, [_fDefaults boolForKey:@"UTPGlobal"]);
-
-        tr_variantDictAddBool(&settings, TR_KEY_script_torrent_done_enabled, [_fDefaults boolForKey:@"DoneScriptEnabled"]);
-        NSString* prefs_string = [_fDefaults stringForKey:@"DoneScriptPath"];
-        if (prefs_string != nil)
-        {
-            tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, prefs_string.UTF8String);
-        }
-
-        // TODO: Add to GUI
-        if ([_fDefaults objectForKey:@"RPCHostWhitelist"])
-        {
-            tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [_fDefaults stringForKey:@"RPCHostWhitelist"].UTF8String);
-        }
+        settings.merge(getSettingsFromNSUserDefaults(_fDefaults));
 
         initUnits();
 
@@ -592,6 +598,7 @@ static void removeKeRangerRansomware()
                 [controller performSelectorOnMainThread:@selector(altSpeedToggledCallbackIsLimited:) withObject:dict
                                           waitUntilDone:NO];
             });
+        BOOL const usesSpeedLimitSched = [_fDefaults boolForKey:@"SpeedLimitAuto"];
         if (usesSpeedLimitSched)
         {
             [_fDefaults setBool:tr_sessionUsesAltSpeed(_fLib) forKey:@"SpeedLimit"];

@@ -85,8 +85,6 @@ static_assert(Options[std::size(Options) - 2].val != 0);
 
 namespace
 {
-int parseCommandLine(tr_variant*, int argc, char const** argv);
-
 void sigHandler(int signal);
 
 [[nodiscard]] std::string tr_strlratio(double ratio)
@@ -186,7 +184,7 @@ void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
 
 // ---
 
-int parseCommandLine(tr_variant* d, int argc, char const** argv)
+int parseCommandLine(tr_variant::Map& map, int argc, char const** argv)
 {
     int c;
     char const* my_optarg;
@@ -196,53 +194,53 @@ int parseCommandLine(tr_variant* d, int argc, char const** argv)
         switch (c)
         {
         case 'b':
-            tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, true);
+            map[TR_KEY_blocklist_enabled] = true;
             break;
 
         case 'B':
-            tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
+            map[TR_KEY_blocklist_enabled] = false;
             break;
 
         case 'd':
-            tr_variantDictAddInt(d, TR_KEY_speed_limit_down, atoi(my_optarg));
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, true);
+            map[TR_KEY_speed_limit_down] = int64_t(atoi(my_optarg));
+            map[TR_KEY_speed_limit_down_enabled] = true;
             break;
 
         case 'D':
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
+            map[TR_KEY_speed_limit_down_enabled] = false;
             break;
 
         case 'f':
-            tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, my_optarg);
-            tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, true);
+            map[TR_KEY_script_torrent_done_filename] = my_optarg;
+            map[TR_KEY_script_torrent_done_enabled] = true;
             break;
 
         case 'g': /* handled above */
             break;
 
         case 'm':
-            tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
+            map[TR_KEY_port_forwarding_enabled] = true;
             break;
 
         case 'M':
-            tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, false);
+            map[TR_KEY_port_forwarding_enabled] = false;
             break;
 
         case 'p':
-            tr_variantDictAddInt(d, TR_KEY_peer_port, atoi(my_optarg));
+            map[TR_KEY_peer_port] = int64_t(atoi(my_optarg));
             break;
 
         case 't':
-            tr_variantDictAddStr(d, TR_KEY_peer_socket_diffserv, my_optarg);
+            map[TR_KEY_peer_socket_diffserv] = my_optarg;
             break;
 
         case 'u':
-            tr_variantDictAddInt(d, TR_KEY_speed_limit_up, atoi(my_optarg));
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, true);
+            map[TR_KEY_speed_limit_up] = int64_t(atoi(my_optarg));
+            map[TR_KEY_speed_limit_up_enabled] = true;
             break;
 
         case 'U':
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
+            map[TR_KEY_speed_limit_up_enabled] = false;
             break;
 
         case 'v':
@@ -254,23 +252,23 @@ int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 'w':
-            tr_variantDictAddStr(d, TR_KEY_download_dir, my_optarg);
+            map[TR_KEY_download_dir] = my_optarg;
             break;
 
         case 910:
-            tr_variantDictAddInt(d, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
+            map[TR_KEY_encryption] = int64_t(TR_ENCRYPTION_REQUIRED);
             break;
 
         case 911:
-            tr_variantDictAddInt(d, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
+            map[TR_KEY_encryption] = int64_t(TR_ENCRYPTION_PREFERRED);
             break;
 
         case 912:
-            tr_variantDictAddInt(d, TR_KEY_encryption, TR_CLEAR_PREFERRED);
+            map[TR_KEY_encryption] = int64_t(TR_CLEAR_PREFERRED);
             break;
 
         case 500:
-            tr_variantDictAddBool(d, TR_KEY_sequential_download, true);
+            map[TR_KEY_sequential_download] = true;
             break;
 
         case TR_OPT_UNK:
@@ -346,7 +344,7 @@ int tr_main(int argc, char* argv[])
     auto settings = tr_sessionLoadSettings(config_dir);
 
     /* the command line overrides defaults */
-    if (parseCommandLine(&settings, argc, (char const**)argv) != 0)
+    if (parseCommandLine(*settings.get_if<tr_variant::Map>(), argc, (char const**)argv) != 0)
     {
         return EXIT_FAILURE;
     }

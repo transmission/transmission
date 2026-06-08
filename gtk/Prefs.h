@@ -10,19 +10,41 @@
 #include <libtransmission/variant.h>
 
 #include <cstdint> // int64_t
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
+// FIXME(ckerr) remove annoying pragma
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+
 [[nodiscard]] tr_variant::Map& gtr_pref_get_map();
 
+[[nodiscard]] bool gtr_pref_has_key(tr_quark key);
+
 template<typename T>
-[[nodiscard]] std::optional<T> gtr_pref_get(tr_quark const key)
+[[nodiscard]] std::optional<T> gtr_pref_lookup(tr_quark const key)
 {
-    using namespace tr::serializer;
     auto const& map = gtr_pref_get_map();
-    auto const iter = map.find(key);
-    return iter != std::end(map) ? to_value<T>(iter->second) : std::nullopt;
+
+    if (auto iter = map.find(key); iter != map.end())
+    {
+        return tr::serializer::to_value<T>(iter->second);
+    }
+
+    return std::nullopt;
+}
+
+template<typename T>
+[[nodiscard]] T gtr_pref_get(tr_quark const key, T default_value = {})
+{
+    if (auto val = gtr_pref_lookup<T>(key))
+    {
+        return std::move(*val);
+    }
+
+    return default_value;
 }
 
 template<typename T>
@@ -60,3 +82,5 @@ void gtr_pref_string_set(tr_quark key, std::string_view value);
 
 void gtr_pref_save(tr_session* /*session*/);
 tr_variant& gtr_pref_get_all();
+
+#pragma GCC diagnostic pop // ignore -Wnull-dereference

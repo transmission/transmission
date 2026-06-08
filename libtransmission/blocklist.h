@@ -82,7 +82,7 @@ private:
         {
             ensureLoaded();
             TR_ASSERT(rules_);
-            return std::size(*rules_);
+            return rules_ ? std::size(*rules_) : 0U;
         }
 
         [[nodiscard]] constexpr bool enabled() const noexcept

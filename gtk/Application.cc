@@ -1123,15 +1123,14 @@ void Application::Impl::on_add_torrent(tr_ctor* ctor)
 
 void Application::Impl::on_prefs_changed(tr_quark const key)
 {
+    g_return_if_fail(gtr_pref_has_key(key));
+
     auto* tr = core_->get_session();
 
     switch (key)
     {
     case TR_KEY_encryption:
-        if (auto const val = gtr_pref_get<tr_encryption_mode>(key))
-        {
-            tr_sessionSetEncryption(tr, *val);
-        }
+        tr_sessionSetEncryption(tr, gtr_pref_get<tr_encryption_mode>(key));
         break;
 
     case TR_KEY_default_trackers:
@@ -1143,10 +1142,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_message_level:
-        if (auto const val = gtr_pref_get<tr_log_level>(key))
-        {
-            tr_logSetLevel(*val);
-        }
+        tr_logSetLevel(gtr_pref_get<tr_log_level>(key));
         break;
 
     case TR_KEY_peer_port:
@@ -1162,7 +1158,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_show_notification_area_icon:
-        if (bool const show = gtr_pref_flag_get(key); show && icon_ == nullptr)
+        if (bool const show = gtr_pref_get<bool>(key); show && icon_ == nullptr)
         {
             icon_ = SystemTrayIcon::create(*wind_, core_);
         }
@@ -1293,10 +1289,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_alt_speed_time_day:
-        if (auto const val = gtr_pref_get<tr_sched_day>(key))
-        {
-            tr_sessionSetAltSpeedDay(tr, *val);
-        }
+        tr_sessionSetAltSpeedDay(tr, gtr_pref_get<tr_sched_day>(key));
         break;
 
     case TR_KEY_peer_port_random_on_start:

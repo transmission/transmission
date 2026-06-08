@@ -131,14 +131,13 @@ public:
      */
     void start_now(tr_torrent_id_t id);
 
-    /**
-    ***  Set a preference value, save the prefs file, and emit the "prefs-changed" signal
-    **/
-
+    // Set a preference value, save the prefs file, and emit the "prefs-changed" signal
     template<typename T>
     void set_pref(tr_quark const key, T const& val)
     {
-        if (gtr_pref_get<T>(key) != val)
+        auto const old_val = gtr_pref_lookup<T>(key);
+
+        if (!old_val || tr::serializer::detail::values_differ(*old_val, val))
         {
             gtr_pref_set<T>(key, val);
             signal_prefs_changed().emit(key);

@@ -438,10 +438,9 @@ private:
         auto const n = mediator_.api().get_nodes(std::data(sins4), &num4, std::data(sins6), &num6);
         tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num4, num6));
 
-        tr_variant benc;
-        tr_variantInitDict(&benc, 4);
-        tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(id_), std::size(id_));
-        tr_variantDictAddInt(&benc, TR_KEY_id_timestamp, id_timestamp_);
+        auto benc = tr_variant::Map{ 4U };
+        benc[TR_KEY_id] = tr_variant::make_raw(std::data(id_), std::size(id_));
+        benc[TR_KEY_id_timestamp] = id_timestamp_;
 
         if (num4 > 0)
         {
@@ -455,7 +454,7 @@ private:
                 out += PortLen;
             }
 
-            tr_variantDictAddRaw(&benc, TR_KEY_nodes, std::data(compact), out - std::data(compact));
+            benc[TR_KEY_nodes] = tr_variant::make_raw(std::data(compact), out - std::data(compact));
         }
 
         if (num6 > 0)
@@ -470,10 +469,10 @@ private:
                 out6 += PortLen;
             }
 
-            tr_variantDictAddRaw(&benc, TR_KEY_nodes6, std::data(compact6), out6 - std::data(compact6));
+            benc[TR_KEY_nodes6] = tr_variant::make_raw(std::data(compact6), out6 - std::data(compact6));
         }
 
-        tr_variant_serde::benc().to_file(benc, state_filename_);
+        tr_variant_serde::benc().to_file(tr_variant{ std::move(benc) }, state_filename_);
     }
 
     void init_state(std::string_view const filename)
@@ -499,23 +498,25 @@ private:
         static auto constexpr IdTtl = time_t{ 30 * 24 * 60 * 60 }; // 30 days
 
         auto& top = *otop;
-
-        if (auto t = int64_t{}; tr_variantDictFindInt(&top, TR_KEY_id_timestamp, &t) && t + IdTtl > id_timestamp_)
+        auto* const top_map = top.get_if<tr_variant::Map>();
+        if (top_map == nullptr)
         {
-            if (auto sv = std::string_view{};
-                tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id_))
+            return;
+        }
+
+        if (auto t_opt = top_map->value_if<int64_t>(TR_KEY_id_timestamp); t_opt && *t_opt + IdTtl > id_timestamp_)
+        {
+            if (auto sv_opt = top_map->value_if<std::string_view>(TR_KEY_id); sv_opt && sv_opt->size() == id_.size())
             {
-                id_timestamp_ = t;
-                std::ranges::copy(sv, std::begin(id_));
+                id_timestamp_ = *t_opt;
+                std::ranges::copy(*sv_opt, std::begin(id_));
             }
         }
 
-        size_t raw_len = 0U;
-        std::byte const* raw = nullptr;
-        if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % CompactLen == 0)
+        if (auto sv_opt = top_map->value_if<std::string_view>(TR_KEY_nodes); sv_opt && sv_opt->size() % CompactLen == 0)
         {
-            auto* walk = raw;
-            auto const* const end = raw + raw_len;
+            auto const* walk = reinterpret_cast<std::byte const*>(sv_opt->data());
+            auto const* const end = walk + sv_opt->size();
             while (walk < end)
             {
                 auto addr = tr_address{};
@@ -526,10 +527,10 @@ private:
             }
         }
 
-        if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % Compact6Len == 0)
+        if (auto sv_opt = top_map->value_if<std::string_view>(TR_KEY_nodes6); sv_opt && sv_opt->size() % Compact6Len == 0)
         {
-            auto* walk = raw;
-            auto const* const end = raw + raw_len;
+            auto const* walk = reinterpret_cast<std::byte const*>(sv_opt->data());
+            auto const* const end = walk + sv_opt->size();
             while (walk < end)
             {
                 auto addr = tr_address{};
