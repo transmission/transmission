@@ -39,6 +39,8 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
 @property(nonatomic) NSLock* fLock;
 
+- (void)updateLog;
+
 @end
 
 @implementation MessageWindowController
