@@ -227,6 +227,33 @@ enum tr_idlelimit : uint8_t
     TR_IDLELIMIT_UNLIMITED = 2
 };
 
+enum tr_log_level : uint8_t
+{
+    // No logging at all
+    TR_LOG_OFF,
+
+    // Errors that prevent Transmission from running
+    TR_LOG_CRITICAL,
+
+    // Errors that could prevent a single torrent from running, e.g. missing
+    // files or a private torrent's tracker responding "unregistered torrent"
+    TR_LOG_ERROR,
+
+    // Smaller errors that don't stop the overall system,
+    // e.g. unable to preallocate a file, or unable to connect to a tracker
+    // when other trackers are available
+    TR_LOG_WARN,
+
+    // User-visible info, e.g. "torrent completed" or "running script"
+    TR_LOG_INFO,
+
+    // Debug messages
+    TR_LOG_DEBUG,
+
+    // High-volume debug messages, e.g. tracing peer protocol messages
+    TR_LOG_TRACE
+};
+
 enum tr_peer_from : uint8_t
 {
     TR_PEER_FROM_INCOMING = 0, /* connections made to the listening port */
