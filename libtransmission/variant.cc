@@ -191,18 +191,6 @@ tr_variant* tr_variantListChild(tr_variant* const var, size_t pos)
     return {};
 }
 
-bool tr_variantListRemove(tr_variant* const var, size_t pos)
-{
-    if (auto* const vec = var != nullptr ? var->get_if<tr_variant::VectorIndex>() : nullptr;
-        vec != nullptr && pos < std::size(*vec))
-    {
-        vec->erase(std::begin(*vec) + static_cast<tr_variant::Vector::difference_type>(pos));
-        return true;
-    }
-
-    return false;
-}
-
 bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 {
     return value_if(var, setme);
@@ -211,30 +199,6 @@ bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 bool tr_variantGetStrView(tr_variant const* const var, std::string_view* setme)
 {
     return value_if(var, setme);
-}
-
-bool tr_variantGetRaw(tr_variant const* v, std::byte const** setme_raw, size_t* setme_len)
-{
-    if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
-    {
-        *setme_raw = reinterpret_cast<std::byte const*>(std::data(sv));
-        *setme_len = std::size(sv);
-        return true;
-    }
-
-    return false;
-}
-
-bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* setme_len)
-{
-    if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
-    {
-        *setme_raw = reinterpret_cast<uint8_t const*>(std::data(sv));
-        *setme_len = std::size(sv);
-        return true;
-    }
-
-    return false;
 }
 
 bool tr_variantGetBool(tr_variant const* const var, bool* setme)
@@ -251,24 +215,6 @@ bool tr_variantDictFindInt(tr_variant* const var, tr_quark key, int64_t* setme)
 {
     auto const* const child = tr_variantDictFind(var, key);
     return tr_variantGetInt(child, setme);
-}
-
-bool tr_variantDictFindBool(tr_variant* const var, tr_quark key, bool* setme)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetBool(child, setme);
-}
-
-bool tr_variantDictFindReal(tr_variant* const var, tr_quark key, double* setme)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetReal(child, setme);
-}
-
-bool tr_variantDictFindStrView(tr_variant* const var, tr_quark key, std::string_view* setme)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetStrView(child, setme);
 }
 
 bool tr_variantDictFindList(tr_variant* const var, tr_quark key, tr_variant** setme)
@@ -293,18 +239,6 @@ bool tr_variantDictFindDict(tr_variant* const var, tr_quark key, tr_variant** se
     return false;
 }
 
-bool tr_variantDictFindRaw(tr_variant* const var, tr_quark key, uint8_t const** setme_raw, size_t* setme_len)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetRaw(child, setme_raw, setme_len);
-}
-
-bool tr_variantDictFindRaw(tr_variant* const var, tr_quark key, std::byte const** setme_raw, size_t* setme_len)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetRaw(child, setme_raw, setme_len);
-}
-
 // ---
 
 void tr_variantInitList(tr_variant* initme, size_t n_reserve)
@@ -314,31 +248,9 @@ void tr_variantInitList(tr_variant* initme, size_t n_reserve)
     *initme = std::move(vec);
 }
 
-void tr_variantListReserve(tr_variant* const var, size_t n_reserve)
-{
-    TR_ASSERT(var != nullptr);
-    TR_ASSERT(var->holds_alternative<tr_variant::Vector>());
-
-    if (auto* const vec = var != nullptr ? var->get_if<tr_variant::VectorIndex>() : nullptr; vec != nullptr)
-    {
-        vec->reserve(std::size(*vec) + n_reserve);
-    }
-}
-
 void tr_variantInitDict(tr_variant* initme, size_t n_reserve)
 {
     *initme = tr_variant::Map{ n_reserve };
-}
-
-void tr_variantDictReserve(tr_variant* const var, size_t n_reserve)
-{
-    TR_ASSERT(var != nullptr);
-    TR_ASSERT(var->holds_alternative<tr_variant::Map>());
-
-    if (auto* const map = var != nullptr ? var->get_if<tr_variant::MapIndex>() : nullptr; map != nullptr)
-    {
-        map->reserve(std::size(*map) + n_reserve);
-    }
 }
 
 tr_variant* tr_variantListAdd(tr_variant* const var)
@@ -352,46 +264,6 @@ tr_variant* tr_variantListAdd(tr_variant* const var)
     }
 
     return nullptr;
-}
-
-tr_variant* tr_variantListAddInt(tr_variant* const var, int64_t const value)
-{
-    return vec_add(var, value);
-}
-
-tr_variant* tr_variantListAddReal(tr_variant* const var, double const value)
-{
-    return vec_add(var, value);
-}
-
-tr_variant* tr_variantListAddBool(tr_variant* const var, bool const value)
-{
-    return vec_add(var, value);
-}
-
-tr_variant* tr_variantListAddStr(tr_variant* const var, std::string_view const value)
-{
-    return vec_add(var, std::string{ value });
-}
-
-tr_variant* tr_variantListAddStrView(tr_variant* const var, std::string_view value)
-{
-    return vec_add(var, tr_variant::unmanaged_string(value));
-}
-
-tr_variant* tr_variantListAddRaw(tr_variant* const var, void const* value, size_t n_bytes)
-{
-    return vec_add(var, tr_variant::make_raw(value, n_bytes));
-}
-
-tr_variant* tr_variantListAddList(tr_variant* const var, size_t const n_reserve)
-{
-    return vec_add(var, tr_variant::make_vector(n_reserve));
-}
-
-tr_variant* tr_variantListAddDict(tr_variant* const var, size_t const n_reserve)
-{
-    return vec_add(var, tr_variant::make_map(n_reserve));
 }
 
 tr_variant* tr_variantDictAdd(tr_variant* const var, tr_quark key)
@@ -412,26 +284,6 @@ tr_variant* tr_variantDictAddInt(tr_variant* const var, tr_quark const key, int6
     return dict_set(var, key, val);
 }
 
-tr_variant* tr_variantDictAddBool(tr_variant* const var, tr_quark key, bool val)
-{
-    return dict_set(var, key, val);
-}
-
-tr_variant* tr_variantDictAddReal(tr_variant* const var, tr_quark const key, double const val)
-{
-    return dict_set(var, key, val);
-}
-
-tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark const key, std::string_view const val)
-{
-    return dict_set(var, key, val);
-}
-
-tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark const key, void const* const value, size_t const n_bytes)
-{
-    return dict_set(var, key, std::string{ static_cast<char const*>(value), n_bytes });
-}
-
 tr_variant* tr_variantDictAddList(tr_variant* const var, tr_quark const key, size_t const n_reserve)
 {
     return dict_set(var, key, tr_variant::make_vector(n_reserve));
@@ -445,16 +297,6 @@ tr_variant* tr_variantDictAddStrView(tr_variant* const var, tr_quark const key, 
 tr_variant* tr_variantDictAddDict(tr_variant* const var, tr_quark key, size_t n_reserve)
 {
     return dict_set(var, key, tr_variant::make_map(n_reserve));
-}
-
-bool tr_variantDictRemove(tr_variant* const var, tr_quark key)
-{
-    if (auto* const map = var != nullptr ? var->get_if<tr_variant::MapIndex>() : nullptr; map != nullptr)
-    {
-        return map->erase(key) != 0U;
-    }
-
-    return false;
 }
 
 // ---

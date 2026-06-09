@@ -176,7 +176,7 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 // static
 void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo)
 {
-    auto const pref_level = gtr_pref_get<tr_log_level>(TR_KEY_message_level);
+    auto const pref_level = gtr_pref_lookup<tr_log_level>(TR_KEY_message_level);
     auto const default_level = TR_LOG_INFO;
 
     auto has_pref_level = false;
@@ -497,7 +497,7 @@ MessageLogWindow::Impl::Impl(
     , store_(Gtk::ListStore::create(message_log_cols))
     , filter_(Gtk::TreeModelFilter::create(store_))
     , sort_(Gtk::TreeModelSort::create(filter_))
-    , maxLevel_(gtr_pref_get<tr_log_level>(TR_KEY_message_level).value_or(tr_log_level{}))
+    , maxLevel_{ gtr_pref_get<tr_log_level>(TR_KEY_message_level) }
     , refresh_tag_(
           Glib::signal_timeout().connect_seconds(
               sigc::mem_fun(*this, &Impl::onRefresh),
