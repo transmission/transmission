@@ -20,11 +20,11 @@ std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key);
 
 struct tr_log_message
 {
-    tr_log_level level;
+    tr_log_level level = TR_LOG_INFO;
 
     // location in the source code
     std::string_view file;
-    long line;
+    long line = 0;
 
     // when the message was generated
     std::chrono::system_clock::time_point when;
