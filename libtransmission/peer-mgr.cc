@@ -1636,17 +1636,6 @@ void tr_peerMgrHandleHolepunchRendezvous(
         return;
     }
 
-    if (sender->socket_address() == target_endpoint)
-    {
-        tr_logAddDebugTor(
-            tor,
-            fmt::format(
-                "BEP 55: rendezvous sender {} is its own target, sending ErrNoSelf",
-                sender_socket_address.display_name()));
-        send_holepunch_msg(sender, bep55::MsgError, target_endpoint, bep55::ErrNoSelf);
-        return;
-    }
-
     {
         send_holepunch_msg(sender, bep55::MsgConnect, target_endpoint);
         tr_logAddDebugTor(
