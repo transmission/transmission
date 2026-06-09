@@ -340,6 +340,11 @@ public:
         connection_attempted_at_ = value;
     }
 
+    constexpr void fast_reconnect(time_t const now) noexcept
+    {
+        connection_attempted_at_ = now - get_reconnect_interval_secs(now);
+    }
+
     constexpr void set_latest_piece_data_time(time_t value) noexcept
     {
         piece_data_at_ = value;

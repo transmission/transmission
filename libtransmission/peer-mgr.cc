@@ -1359,13 +1359,13 @@ void create_bit_torrent_peer(
         {
             info->set_holepunch_attempt(false);
 
-            // BEP 55: reset attempt timer so the scheduler retries immediately.
+            // BEP 55: rewind attempt timer so the scheduler retries immediately.
             // NAT hole-punching requires rapid concurrent connection attempts;
             // waiting for normal backoff (10s+) prevents punch-through.
             // Mirrors libtorrent's fast_reconnect(true) after a holepunch failure.
             if (was_holepunch_attempt)
             {
-                info->set_connection_attempt_time(0);
+                info->fast_reconnect(tr_time());
             }
         }
 
