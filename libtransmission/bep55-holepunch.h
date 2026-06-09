@@ -59,7 +59,8 @@ auto constexpr PayloadMinIPv6 = size_t{ 20 }; // msg_type(1) + addr_type(1) + ad
 auto constexpr PayloadFullIPv4 = size_t{ 12 }; // PayloadMinIPv4 + err_code(4)
 auto constexpr PayloadFullIPv6 = size_t{ 24 }; // PayloadMinIPv6 + err_code(4)
 
-// Common header: msg_type(1) + addr_type(1) + port(2) = 4
+// Sum of non-address fixed fields: msg_type(1) + addr_type(1) + port(2) = 4.
+// Note: port sits after addr on the wire; this constant is a size convenience, not a layout prefix.
 auto constexpr HeaderSize = size_t{ 4 };
 
 struct HolepunchMessage

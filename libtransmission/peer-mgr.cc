@@ -62,8 +62,6 @@ using namespace tr::Values;
 
 static auto constexpr CancelHistorySec = 60;
 
-// --- BEP 55 Introducer Store (defined in bep55-introducer-store.h) ---
-
 // ---
 
 namespace
@@ -1240,7 +1238,16 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     return {};
 }
 
-static void send_holepunch_msg(tr_peerMsgs* peer, uint8_t msg_type, tr_socket_address const& addr, uint32_t err_code = 0);
+static void send_holepunch_msg(tr_peerMsgs* peer, uint8_t msg_type, tr_socket_address const& addr, uint32_t err_code = 0)
+{
+    auto const remote_id = peer->remote_ut_holepunch_id();
+    if (remote_id == 0)
+    {
+        return;
+    }
+    auto payload = bep55::encode(msg_type, addr, err_code);
+    peer->send_ltep_message(remote_id, payload);
+}
 
 namespace
 {
@@ -1348,7 +1355,6 @@ void create_bit_torrent_peer(
             }
         }
 
-        // Reset the flag so future normal connections to this peer are tracked properly.
         if (info)
         {
             info->set_holepunch_attempt(false);
@@ -1422,7 +1428,6 @@ void create_bit_torrent_peer(
         info->set_connectable();
     }
 
-    // Reset holepunch attempt flag once connection succeeds
     if (info->is_holepunch_attempt())
     {
         tr_logAddDebugSwarm(swarm, fmt::format("BEP 55: holepunch connection to {} succeeded", info->display_name()));
@@ -1458,17 +1463,6 @@ void create_bit_torrent_peer(
 }
 } // namespace handshake_helpers
 } // namespace
-
-static void send_holepunch_msg(tr_peerMsgs* peer, uint8_t msg_type, tr_socket_address const& addr, uint32_t err_code)
-{
-    auto const remote_id = peer->remote_ut_holepunch_id();
-    if (remote_id == 0)
-    {
-        return;
-    }
-    auto payload = bep55::encode(msg_type, addr, err_code);
-    peer->send_ltep_message(remote_id, payload);
-}
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, std::shared_ptr<tr_peer_socket> socket)
 {
