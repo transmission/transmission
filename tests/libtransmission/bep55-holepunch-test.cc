@@ -11,21 +11,9 @@
 #include "libtransmission/bep55-holepunch.h"
 #include "libtransmission/net.h"
 
-using namespace bep55;
+#include "bep55-test-utils.h"
 
-static tr_socket_address make_ipv4(uint8_t a, uint8_t b, uint8_t c, uint8_t d, uint16_t port)
-{
-    auto addr = tr_address{};
-    addr.type = TR_AF_INET;
-    auto const* p = reinterpret_cast<uint8_t*>(&addr.addr.addr4.s_addr);
-    // NOLINTBEGIN(cppcoreguidelines-pro-type-member-init)
-    const_cast<uint8_t*>(p)[0] = a;
-    const_cast<uint8_t*>(p)[1] = b;
-    const_cast<uint8_t*>(p)[2] = c;
-    const_cast<uint8_t*>(p)[3] = d;
-    // NOLINTEND(cppcoreguidelines-pro-type-member-init)
-    return tr_socket_address{ addr, tr_port::from_host(port) };
-}
+using namespace bep55;
 
 static tr_socket_address make_ipv6(std::array<uint8_t, 16> const& bytes, uint16_t port)
 {
