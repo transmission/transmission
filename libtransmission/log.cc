@@ -37,6 +37,8 @@ using namespace std::literals;
 
 namespace
 {
+inline constexpr auto MaxQueueLength = 10000U;
+
 template<typename T>
 inline constexpr bool HasTmGmtoffV = requires(T t) { t.tm_gmtoff; };
 
@@ -127,7 +129,7 @@ void logAddImpl(
         log_state.queue_tail_ = &newmsg->next;
         ++log_state.queue_length_;
 
-        if (log_state.queue_length_ > TrLogMaxQueueLength)
+        if (log_state.queue_length_ > MaxQueueLength)
         {
             tr_log_message* old = log_state.queue_;
             log_state.queue_ = old->next;

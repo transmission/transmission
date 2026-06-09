@@ -41,8 +41,6 @@ struct tr_log_message
 
 // ---
 
-inline constexpr auto TrLogMaxQueueLength = 10000U;
-
 void tr_logSetQueueEnabled(bool is_enabled);
 
 [[nodiscard]] tr_log_message* tr_logGetQueue();

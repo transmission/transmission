@@ -21,6 +21,9 @@ typedef NS_ENUM(NSUInteger, LevelButtonLevel) {
 
 static NSTimeInterval const kUpdateSeconds = 0.75;
 
+// Maximum number of messages retained in the message window.
+static NSUInteger const kMaxQueueLength = 10000U;
+
 @interface MessageWindowController ()<NSWindowRestoration, NSMenuItemValidation>
 
 @property(nonatomic) IBOutlet NSTableView* fMessageTable;
@@ -268,11 +271,11 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
         }
     }
 
-    if (self.fMessages.count > TrLogMaxQueueLength)
+    if (self.fMessages.count > kMaxQueueLength)
     {
         NSUInteger const oldCount = self.fDisplayedMessages.count;
 
-        NSIndexSet* removeIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fMessages.count - TrLogMaxQueueLength)];
+        NSIndexSet* removeIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fMessages.count - kMaxQueueLength)];
         NSArray* itemsToRemove = [self.fMessages objectsAtIndexes:removeIndexes];
 
         [self.fMessages removeObjectsAtIndexes:removeIndexes];
