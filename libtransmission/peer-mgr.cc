@@ -1271,6 +1271,8 @@ void create_bit_torrent_peer(
 [[nodiscard]] bool is_local_peer_endpoint(tr_session const* session, tr_socket_address const& endpoint)
 {
     auto const& address = endpoint.address();
+    // If advertisedPeerPort() is 0 (not yet discovered), no endpoint can match
+    // and we silently skip self-detection. The relay will return ErrNoSelf instead.
     if (endpoint.port() != session->advertisedPeerPort())
     {
         return false;
@@ -1597,6 +1599,8 @@ void tr_peerMgrHandleHolepunchRendezvous(
                 ++port_match_count;
             }
         }
+        // port_match_count > 1 is common in large swarms where many peers share a
+        // default port (e.g. 51413); the fallback safely becomes a no-op in that case.
         if (port_match_count == 1)
         {
             tr_logAddTraceTor(
@@ -1647,6 +1651,10 @@ void tr_peerMgrHandleHolepunchRendezvous(
     }
 
     {
+        // socket_address() is the remote endpoint of our connection to the sender.
+        // For outgoing connections this is their listen port (correct for holepunch).
+        // For inbound connections it is their ephemeral source port — same trade-off
+        // as libtorrent's remote() — and is accepted by the spec.
         send_holepunch_msg(target, bep55::MsgConnect, sender->socket_address());
         tr_logAddDebugTor(
             tor,
@@ -2971,7 +2979,6 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     auto* const session = mgr->session;
     auto const peer_supports_utp = peer_info.supports_utp().value_or(true);
 
-    // Normal (non-holepunch) connection attempts should not have the flag set
     peer_info.set_holepunch_attempt(false);
 
     // Allow downloading torrents to "steal" connection slots
