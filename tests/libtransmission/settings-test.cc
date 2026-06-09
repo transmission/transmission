@@ -12,7 +12,6 @@
 
 #include <libtransmission/transmission.h>
 
-#include <libtransmission/log.h>
 #include <libtransmission/net.h>
 #include <libtransmission/open-files.h>
 #include <libtransmission/peer-io.h>

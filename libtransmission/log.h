@@ -7,7 +7,7 @@
 
 #include <chrono>
 #include <cstddef> // size_t
-#include <ctime>
+#include <deque>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -34,18 +34,17 @@ struct tr_log_message
 
     // the message
     std::string message;
-
-    // linked list of messages
-    struct tr_log_message* next;
 };
+
+using tr_log_messages = std::deque<tr_log_message>;
 
 // ---
 
 void tr_logSetQueueEnabled(bool is_enabled);
 
-[[nodiscard]] tr_log_message* tr_logGetQueue();
+void tr_logClearQueue();
 
-void tr_logFreeQueue(tr_log_message* freeme);
+[[nodiscard]] tr_log_messages tr_logGetQueue();
 
 // ---
 

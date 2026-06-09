@@ -355,7 +355,7 @@ private:
     {
         static auto constexpr DeadlineSecs = 0.1;
         tr_sessionClose(session, DeadlineSecs);
-        tr_logFreeQueue(tr_logGetQueue());
+        tr_logClearQueue();
     }
 
 protected:

@@ -4,6 +4,8 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
+#include <libtransmission/file.h>
+#include <libtransmission/string-utils.h>
 
 #import "MessageWindowController.h"
 #import "Controller.h"
@@ -228,8 +230,8 @@ static NSUInteger const kMaxQueueLength = 10000U;
 
 - (void)updateLog:(NSTimer*)timer
 {
-    tr_log_message* messages;
-    if ((messages = tr_logGetQueue()) == NULL)
+    auto const messages = tr_logGetQueue();
+    if (messages.empty())
     {
         return;
     }
@@ -246,25 +248,25 @@ static NSUInteger const kMaxQueueLength = 10000U;
 
     BOOL changed = NO;
 
-    for (tr_log_message* currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
+    for (auto const& currentMessage : messages)
     {
-        NSString* name = !std::empty(currentMessage->name) ? @(currentMessage->name.c_str()) : NSProcessInfo.processInfo.processName;
+        NSString* name = !std::empty(currentMessage.name) ? @(currentMessage.name.c_str()) : NSProcessInfo.processInfo.processName;
 
-        auto const file_string = std::string{ currentMessage->file };
-        NSString* file = [(@(file_string.c_str())).lastPathComponent stringByAppendingFormat:@":%ld", currentMessage->line];
+        auto const basename = tr_sys_path_basename(currentMessage.file);
+        NSString* file = [tr_strv_to_utf8_nsstring(basename) stringByAppendingFormat:@":%ld", currentMessage.line];
 
-        auto const secs_since_1970 = std::chrono::system_clock::to_time_t(currentMessage->when);
+        auto const secs_since_1970 = std::chrono::system_clock::to_time_t(currentMessage.when);
         NSDictionary* message = @{
-            @"Message" : [NSString convertedStringFromCString:currentMessage->message.c_str()],
+            @"Message" : [NSString convertedStringFromCString:currentMessage.message.c_str()],
             @"Date" : [NSDate dateWithTimeIntervalSince1970:secs_since_1970],
             @"Index" : @(currentIndex++), //more accurate when sorting by date
-            @"Level" : @(currentMessage->level),
+            @"Level" : @(currentMessage.level),
             @"Name" : name,
             @"File" : file
         };
         [self.fMessages addObject:message];
 
-        if (currentMessage->level <= maxLevel && [self shouldIncludeMessageForFilter:filterString message:message])
+        if (currentMessage.level <= maxLevel && [self shouldIncludeMessageForFilter:filterString message:message])
         {
             [self.fDisplayedMessages addObject:message];
             changed = YES;
@@ -294,8 +296,6 @@ static NSUInteger const kMaxQueueLength = 10000U;
     }
 
     [self.fLock unlock];
-
-    tr_logFreeQueue(messages);
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView*)tableView
