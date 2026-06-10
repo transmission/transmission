@@ -762,7 +762,6 @@ enum // NOLINT(performance-enum-size)
  *
  * @return true if the specified string exists as a quark
  */
-[[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::u8string_view key);
 [[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::string_view key);
 
 /**
@@ -771,12 +770,10 @@ enum // NOLINT(performance-enum-size)
  * Note: this view is guaranteed to be zero-terminated at view[std::size(view)]
  */
 [[nodiscard]] std::string_view tr_quark_get_string_view(tr_quark quark);
-[[nodiscard]] std::u8string_view tr_quark_get_u8string_view(tr_quark quark);
 
 /**
  * Create a new quark for the specified string. If a quark already
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-[[nodiscard]] tr_quark tr_quark_new(std::u8string_view str);
 [[nodiscard]] tr_quark tr_quark_new(std::string_view str);
