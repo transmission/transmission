@@ -32,6 +32,7 @@
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
+#include "libtransmission/move.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-magnet.h"
@@ -169,6 +170,44 @@ struct tr_torrent
     private:
         tr_torrent* const tor_;
         std::optional<time_t> time_started_;
+    };
+
+    // Relocates a torrent's files on tr_move_worker's background thread.
+    // Lifetime safety mirrors VerifyMediator: the raw torrent pointer stays
+    // valid because tr_session::move_remove() is called before the torrent is
+    // freed and blocks until any in-progress move finishes.
+    class MoveMediator : public tr_move_worker::Mediator
+    {
+    public:
+        MoveMediator(
+            tr_torrent* tor,
+            std::string_view source,
+            std::string_view dest,
+            bool move_from_old_path,
+            int volatile* setme_state)
+            : tor_{ tor }
+            , source_{ source }
+            , dest_{ dest }
+            , move_from_old_path_{ move_from_old_path }
+            , setme_state_{ setme_state }
+        {
+        }
+
+        ~MoveMediator() override = default;
+
+        [[nodiscard]] tr_sha1_digest_t const& info_hash() const override;
+
+        void on_move_queued() override;
+        void on_move_started() override;
+        [[nodiscard]] bool move(tr_error* error) override;
+        void on_move_done(bool ok, tr_error const* error) override;
+
+    private:
+        tr_torrent* const tor_;
+        std::string const source_;
+        std::string const dest_;
+        bool const move_from_old_path_;
+        int volatile* const setme_state_;
     };
 
     // ---
@@ -691,6 +730,12 @@ struct tr_torrent
         return this->is_piece_transfer_allowed(tr_direction::ClientToPeer);
     }
 
+    // true while the torrent's files are being relocated on the background move thread
+    [[nodiscard]] constexpr bool is_moving() const noexcept
+    {
+        return location_state_ == LocationState::Moving;
+    }
+
     void set_download_dir(std::string_view path, bool is_new_torrent = false);
 
     void refresh_current_dir();
@@ -1063,6 +1108,13 @@ private:
         Active
     };
 
+    enum class LocationState : uint8_t
+    {
+        None,
+        // files are being relocated on the background move thread
+        Moving
+    };
+
     // Tracks a torrent's error state, either local (e.g. file IO errors)
     // or tracker errors (e.g. warnings returned by a tracker).
     class Error
@@ -1226,6 +1278,13 @@ private:
 
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
     {
+        // don't serve data while the files are being relocated: the file
+        // currently being copied is only partially present at its destination
+        if (is_moving())
+        {
+            return false;
+        }
+
         if (uses_speed_limit(direction) && speed_limit(direction).is_zero())
         {
             return false;
@@ -1263,6 +1322,8 @@ private:
     }
 
     void set_verify_state(VerifyState state);
+
+    void set_location_state(LocationState state);
 
     [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
     {
@@ -1426,11 +1487,16 @@ private:
 
     VerifyState verify_state_ = VerifyState::None;
 
+    LocationState location_state_ = LocationState::None;
+
     tr_completeness completeness_ = TR_LEECH;
 
     uint16_t idle_limit_minutes_ = 0;
 
     uint16_t max_connected_peers_ = TrDefaultPeerLimitTorrent;
+
+    // when true, run TR_SCRIPT_ON_TORRENT_DONE once the post-completion move finishes
+    bool done_script_after_move_ = false;
 
     bool is_deleting_ = false;
     bool is_dirty_ = false;
