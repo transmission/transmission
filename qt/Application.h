@@ -17,6 +17,9 @@
 #include <QTranslator>
 #include <QWeakPointer>
 
+#include <QNetworkAccessManager>
+#include "RpcClient.h"
+
 #include <libtransmission-app/favicon-cache.h>
 #include <libtransmission/quark.h>
 
@@ -41,7 +44,6 @@ class Application : public QApplication
 public:
     Application(
         Prefs& prefs,
-        RpcClient& rpc,
         bool minimized,
         QString const& config_dir,
         QStringList const& filenames,
@@ -109,6 +111,8 @@ private:
 
     std::unordered_set<QString> interned_strings_;
 
+    std::unique_ptr<QNetworkAccessManager> nam_;
+    std::unique_ptr<RpcClient> rpc_;
     Prefs& prefs_;
     std::unique_ptr<Session> session_;
     std::unique_ptr<TorrentModel> model_;

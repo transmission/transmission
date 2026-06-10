@@ -141,7 +141,6 @@ QString Application::intern(QString const& in)
 
 Application::Application(
     Prefs& prefs,
-    RpcClient& rpc,
     bool minimized,
     QString const& config_dir,
     QStringList const& filenames,
@@ -153,6 +152,9 @@ Application::Application(
     setApplicationName(ConfigName);
     loadTranslations();
     initUnits();
+
+    nam_ = std::make_unique<QNetworkAccessManager>();
+    rpc_ = std::make_unique<RpcClient>(*nam_);
 
     setWindowIcon(makeWindowIcon());
 
@@ -175,7 +177,7 @@ Application::Application(
     QAccessible::installFactory(&accessibleFactory);
 #endif
 
-    session_ = std::make_unique<Session>(config_dir, prefs_, rpc);
+    session_ = std::make_unique<Session>(config_dir, prefs_, *rpc_);
     model_ = std::make_unique<TorrentModel>(prefs_);
     window_ = std::make_unique<MainWindow>(*session_, prefs_, *model_, minimized);
     watch_dir_ = std::make_unique<WatchDir>(*model_);
