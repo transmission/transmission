@@ -428,7 +428,7 @@ void addLatestMessagesToStore(
     }
 }
 
-void addMessages(Glib::RefPtr<Gtk::ListStore> const& store, tr_log_messages& messages, tr_log_messages&& new_messages)
+void addMessages(Glib::RefPtr<Gtk::ListStore> const& store, tr_log_messages& messages, tr_log_messages new_messages)
 {
     auto const n_messages = std::size(new_messages);
     messages.insert(messages.end(), std::make_move_iterator(new_messages.begin()), std::make_move_iterator(new_messages.end()));
