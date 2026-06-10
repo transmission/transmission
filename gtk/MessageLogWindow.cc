@@ -118,7 +118,11 @@ private:
 namespace
 {
 
-tr_log_messages log_messages;
+[[nodiscard]] auto& log_messages()
+{
+    static auto msgs = tr_log_messages{};
+    return msgs;
+}
 
 } // namespace
 
@@ -282,7 +286,7 @@ void MessageLogWindow::Impl::onSaveRequest()
 void MessageLogWindow::Impl::onClearRequest()
 {
     store_->clear();
-    log_messages.clear();
+    log_messages().clear();
 }
 
 void MessageLogWindow::Impl::onPauseToggled(Gio::SimpleAction& action)
@@ -443,7 +447,7 @@ bool MessageLogWindow::Impl::onRefresh()
 
     if (!isPaused_)
     {
-        addMessages(store_, log_messages, tr_logGetQueue());
+        addMessages(store_, log_messages(), tr_logGetQueue());
 
         if (pinned_to_new)
         {
@@ -523,7 +527,7 @@ MessageLogWindow::Impl::Impl(
     **/
 
     // cheaper to populate *before* it has listeners
-    addLatestMessagesToStore(store_, log_messages, std::size(log_messages));
+    addLatestMessagesToStore(store_, log_messages(), std::size(log_messages()));
     onRefresh();
 
     sort_->set_sort_column(message_log_cols.sequence, TR_GTK_SORT_TYPE(ASCENDING));
