@@ -77,6 +77,7 @@ option(ENABLE_TESTS "Build unit tests" ON)
 option(ENABLE_UTP "Build µTP support" ON)
 option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
+tr_auto_option(ENABLE_IPO "Enable interprocedural optimization" AUTO)
 option(INSTALL_DOC "Build/install documentation" ON)
 option(INSTALL_LIB "Install the library" OFF)
 tr_auto_option(USE_SYSTEM_DEFAULT "Default value for USE_SYSTEM_* options" AUTO)
@@ -251,6 +252,30 @@ if(WIN32)
             set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -D__USE_MINGW_ANSI_STDIO=1")
         endif()
     endforeach()
+endif()
+
+if(ENABLE_IPO)
+    tr_get_required_flag(ENABLE_IPO IPO_IS_REQUIRED)
+
+    include(CheckIPOSupported)
+    if(IPO_IS_REQUIRED)
+        check_ipo_supported() # Will fail with fatal error if IPO is not supported
+    else()
+        check_ipo_supported(
+            RESULT IPO_SUPPORTED
+            OUTPUT IPO_OUTPUT)
+    endif()
+
+    tr_fixup_auto_option(ENABLE_IPO IPO_SUPPORTED IPO_IS_REQUIRED)
+endif()
+
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ${ENABLE_IPO})
+if(ENABLE_IPO)
+    message(STATUS "IPO supported and enabled")
+elseif(DEFINED IPO_OUTPUT)
+    message(STATUS "IPO disabled (${IPO_OUTPUT})")
+else()
+    message(STATUS "IPO disabled")
 endif()
 
 set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
