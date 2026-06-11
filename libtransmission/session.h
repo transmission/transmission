@@ -45,7 +45,6 @@
 #include "libtransmission/interned-string.h"
 #include "libtransmission/ip-cache.h"
 #include "libtransmission/local-data.h"
-#include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port, tr_tos_t
 #include "libtransmission/open-files.h"
 #include "libtransmission/platform.h"

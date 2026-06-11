@@ -227,23 +227,21 @@ TEST_F(SerializerTest, u8StringWarnsOnInvalidUtf8)
     auto const old_level = tr_logGetLevel();
     tr_logSetLevel(TR_LOG_WARN);
     tr_logSetQueueEnabled(true);
-    tr_logFreeQueue(tr_logGetQueue());
+    tr_logClearQueue();
 
     auto actual = std::u8string{};
     EXPECT_TRUE(Converters::deserialize(var, &actual));
 
-    auto* const msgs = tr_logGetQueue();
     auto warned = false;
-    for (auto* msg = msgs; msg != nullptr; msg = msg->next)
+    for (auto const& msg : tr_logGetQueue())
     {
-        if (msg->level == TR_LOG_WARN && msg->message.find("contains invalid UTF-8") != std::string::npos)
+        if (msg.level == TR_LOG_WARN && msg.message.find("contains invalid UTF-8") != std::string::npos)
         {
             warned = true;
             break;
         }
     }
 
-    tr_logFreeQueue(msgs);
     tr_logSetQueueEnabled(false);
     tr_logSetLevel(old_level);
 

@@ -362,11 +362,9 @@ void printMessage(
 
 void pumpLogMessages(FILE* log_stream)
 {
-    tr_log_message* list = tr_logGetQueue();
-
-    for (tr_log_message const* l = list; l != nullptr; l = l->next)
+    for (auto const& l : tr_logGetQueue())
     {
-        printMessage(log_stream, l->when, l->level, l->name, l->message, l->file, l->line);
+        printMessage(log_stream, l.when, l.level, l.name, l.message, l.file, l.line);
     }
 
     // two reasons to not flush stderr:
@@ -376,8 +374,6 @@ void pumpLogMessages(FILE* log_stream)
     {
         fflush(log_stream);
     }
-
-    tr_logFreeQueue(list);
 }
 
 void periodic_update(evutil_socket_t /*fd*/, short /*what*/, void* arg)

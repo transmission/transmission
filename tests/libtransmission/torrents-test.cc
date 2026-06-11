@@ -27,7 +27,7 @@ using namespace std::literals;
 
 TEST_F(TorrentsTest, invalidArgsAreLogged)
 {
-    tr_logFreeQueue(tr_logGetQueue());
+    tr_logClearQueue();
     tr_logSetLevel(TR_LOG_WARN);
     tr_logSetQueueEnabled(true);
 
@@ -180,16 +180,11 @@ TEST_F(TorrentsTest, invalidArgsAreLogged)
     EXPECT_FALSE(tr_torrentHasMetadata(nullptr));
     ++expected_log_size;
 
-    auto actual_log_size = size_t{};
-    tr_log_message* const msgs = tr_logGetQueue();
-    for (auto* walk = msgs; walk != nullptr; walk = walk->next)
-    {
-        ++actual_log_size;
-    }
+    auto const msgs = tr_logGetQueue();
+    auto const actual_log_size = msgs.size();
     EXPECT_EQ(actual_log_size, expected_log_size);
 
     // cleanup
-    tr_logFreeQueue(msgs);
     tr_logSetQueueEnabled(false);
 }
 
