@@ -206,6 +206,9 @@ public:
             return std::nullopt;
         }
 
+        Map& merge(Map const& that);
+        [[nodiscard]] Map clone() const;
+
     private:
         using Vector = std::vector<std::pair<tr_quark, tr_variant>>;
         Vector vec_;

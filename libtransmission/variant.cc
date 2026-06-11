@@ -11,8 +11,8 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include <variant>
+#include <vector>
 
 #ifdef _WIN32
 #include <share.h>
@@ -24,6 +24,7 @@
 
 #include "libtransmission/api-compat.h"
 #include "libtransmission/error.h"
+#include "libtransmission/file.h"
 #include "libtransmission/file-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
@@ -35,6 +36,64 @@ using namespace std::literals;
 
 namespace
 {
+void merge_variant(tr_variant& dest, tr_variant const& src);
+
+void merge_map(tr_variant::Map& dest, tr_variant::Map const& src)
+{
+    dest.reserve(std::size(dest) + std::size(src));
+    for (auto const& [key, child] : src)
+    {
+        merge_variant(dest[key], child);
+    }
+}
+
+void merge_variant(tr_variant& dest, tr_variant const& src)
+{
+    src.visit(
+        [&dest](auto const& value)
+        {
+            using ValueType = std::remove_cvref_t<decltype(value)>;
+
+            if constexpr (
+                std::is_same_v<ValueType, std::monostate> || std::is_same_v<ValueType, std::nullptr_t> ||
+                std::is_same_v<ValueType, bool> || std::is_same_v<ValueType, int64_t> || std::is_same_v<ValueType, double>)
+            {
+                dest = value;
+            }
+            else if constexpr (std::is_same_v<ValueType, std::string> || std::is_same_v<ValueType, std::string_view>)
+            {
+                // std::string_view assignment is materialized into an owned string.
+                dest = std::string_view{ value };
+            }
+            else if constexpr (std::is_same_v<ValueType, tr_variant::Vector>)
+            {
+                dest = tr_variant::Vector{};
+
+                if (auto* out = dest.get_if<tr_variant::VectorIndex>(); out != nullptr)
+                {
+                    out->resize(std::size(value));
+
+                    for (size_t i = 0; i < std::size(value); ++i)
+                    {
+                        merge_variant((*out)[i], value[i]);
+                    }
+                }
+            }
+            else if constexpr (std::is_same_v<ValueType, tr_variant::Map>)
+            {
+                if (!dest.holds_alternative<tr_variant::Map>())
+                {
+                    dest = tr_variant::Map{};
+                }
+
+                if (auto* out = dest.get_if<tr_variant::MapIndex>(); out != nullptr)
+                {
+                    merge_map(*out, value);
+                }
+            }
+        });
+}
+
 template<typename T>
 [[nodiscard]] bool value_if(tr_variant const* const var, T* const setme)
 {
@@ -119,47 +178,22 @@ tr_variant tr_variant::clone() const
     return ret;
 }
 
+tr_variant::Map tr_variant::Map::clone() const
+{
+    auto ret = tr_variant::Map{};
+    ret.merge(*this);
+    return ret;
+}
+
+tr_variant::Map& tr_variant::Map::merge(Map const& that)
+{
+    merge_map(*this, that);
+    return *this;
+}
+
 tr_variant& tr_variant::merge(tr_variant const& that)
 {
-    that.visit(
-        [this](auto const& value)
-        {
-            using ValueType = std::remove_cvref_t<decltype(value)>;
-
-            if constexpr (
-                std::is_same_v<ValueType, std::monostate> || std::is_same_v<ValueType, std::nullptr_t> ||
-                std::is_same_v<ValueType, bool> || std::is_same_v<ValueType, int64_t> || std::is_same_v<ValueType, double> ||
-                std::is_same_v<ValueType, std::string_view> || std::is_same_v<ValueType, std::string>)
-            {
-                *this = value;
-            }
-            else if constexpr (std::is_same_v<ValueType, Vector>)
-            {
-                auto& dest = val_.emplace<Vector>();
-                dest.resize(std::size(value));
-                for (size_t i = 0; i < std::size(value); ++i)
-                {
-                    dest[i].merge(value[i]);
-                }
-            }
-            else if constexpr (std::is_same_v<ValueType, Map>)
-            {
-                if (index() != MapIndex)
-                {
-                    val_.emplace<Map>();
-                }
-
-                if (auto* dest = this->template get_if<MapIndex>(); dest != nullptr)
-                {
-                    dest->reserve(std::size(*dest) + std::size(value));
-                    for (auto const& [key, child] : value)
-                    {
-                        (*dest)[key].merge(child);
-                    }
-                }
-            }
-        });
-
+    merge_variant(*this, that);
     return *this;
 }
 
