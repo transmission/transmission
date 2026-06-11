@@ -1613,6 +1613,7 @@ jobs:
             fi
           run: |
             set -ex
+            export TMPDIR=/var/tmp # gcc's LTO takes up a lot of space in TMPDIR, and /tmp is too small
             export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
             cmake \
