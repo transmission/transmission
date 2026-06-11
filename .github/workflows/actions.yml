@@ -1593,6 +1593,7 @@ jobs:
               cmake \
               fast_float \
               fmtlib \
+              gcc14 \
               gettext-tools \
               `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm4` \
               libdeflate \
@@ -1619,8 +1620,11 @@ jobs:
               -B obj \
               -G Ninja \
               -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_CXX_COMPILER='/usr/pkg/gcc14/bin/g++' \
+              -DCMAKE_C_COMPILER='/usr/pkg/gcc14/bin/gcc' \
+              -DCMAKE_BUILD_RPATH='/usr/pkg/gcc14/lib' \
               -DCMAKE_INSTALL_PREFIX=pfx \
-              -DCMAKE_PREFIX_PATH=/usr/pkg/qt6 \
+              -DCMAKE_PREFIX_PATH='/usr/pkg/qt6;/usr/pkg' \
               -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
