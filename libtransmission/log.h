@@ -7,51 +7,24 @@
 
 #include <chrono>
 #include <cstddef> // size_t
-#include <ctime>
+#include <deque>
 #include <optional>
 #include <string>
 #include <string_view>
 
+#include "libtransmission/types.h"
+
 // ---
-
-enum tr_log_level : uint8_t
-{
-    // No logging at all
-    TR_LOG_OFF,
-
-    // Errors that prevent Transmission from running
-    TR_LOG_CRITICAL,
-
-    // Errors that could prevent a single torrent from running, e.g. missing
-    // files or a private torrent's tracker responding "unregistered torrent"
-    TR_LOG_ERROR,
-
-    // Smaller errors that don't stop the overall system,
-    // e.g. unable to preallocate a file, or unable to connect to a tracker
-    // when other trackers are available
-    TR_LOG_WARN,
-
-    // User-visible info, e.g. "torrent completed" or "running script"
-    TR_LOG_INFO,
-
-    // Debug messages
-    TR_LOG_DEBUG,
-
-    // High-volume debug messages, e.g. tracing peer protocol messages
-    TR_LOG_TRACE
-};
 
 std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key);
 
-// ---
-
 struct tr_log_message
 {
-    tr_log_level level;
+    tr_log_level level = TR_LOG_INFO;
 
     // location in the source code
     std::string_view file;
-    long line;
+    long line = 0;
 
     // when the message was generated
     std::chrono::system_clock::time_point when;
@@ -61,20 +34,17 @@ struct tr_log_message
 
     // the message
     std::string message;
-
-    // linked list of messages
-    struct tr_log_message* next;
 };
+
+using tr_log_messages = std::deque<tr_log_message>;
 
 // ---
 
-inline constexpr auto TrLogMaxQueueLength = 10000U;
-
 void tr_logSetQueueEnabled(bool is_enabled);
 
-[[nodiscard]] tr_log_message* tr_logGetQueue();
+void tr_logClearQueue();
 
-void tr_logFreeQueue(tr_log_message* freeme);
+[[nodiscard]] tr_log_messages tr_logGetQueue();
 
 // ---
 

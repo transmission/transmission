@@ -4,6 +4,8 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
+#include <libtransmission/file.h>
+#include <libtransmission/string-utils.h>
 
 #import "MessageWindowController.h"
 #import "Controller.h"
@@ -20,6 +22,9 @@ typedef NS_ENUM(NSUInteger, LevelButtonLevel) {
 };
 
 static NSTimeInterval const kUpdateSeconds = 0.75;
+
+// Maximum number of messages retained in the message window.
+static NSUInteger const kMaxQueueLength = 10000U;
 
 @interface MessageWindowController ()<NSWindowRestoration, NSMenuItemValidation>
 
@@ -225,8 +230,8 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
 - (void)updateLog:(NSTimer*)timer
 {
-    tr_log_message* messages;
-    if ((messages = tr_logGetQueue()) == NULL)
+    auto const messages = tr_logGetQueue();
+    if (messages.empty())
     {
         return;
     }
@@ -243,36 +248,36 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
     BOOL changed = NO;
 
-    for (tr_log_message* currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
+    for (auto const& currentMessage : messages)
     {
-        NSString* name = !std::empty(currentMessage->name) ? @(currentMessage->name.c_str()) : NSProcessInfo.processInfo.processName;
+        NSString* name = !std::empty(currentMessage.name) ? @(currentMessage.name.c_str()) : NSProcessInfo.processInfo.processName;
 
-        auto const file_string = std::string{ currentMessage->file };
-        NSString* file = [(@(file_string.c_str())).lastPathComponent stringByAppendingFormat:@":%ld", currentMessage->line];
+        auto const basename = tr_sys_path_basename(currentMessage.file);
+        NSString* file = [tr_strv_to_utf8_nsstring(basename) stringByAppendingFormat:@":%ld", currentMessage.line];
 
-        auto const secs_since_1970 = std::chrono::system_clock::to_time_t(currentMessage->when);
+        auto const secs_since_1970 = std::chrono::system_clock::to_time_t(currentMessage.when);
         NSDictionary* message = @{
-            @"Message" : [NSString convertedStringFromCString:currentMessage->message.c_str()],
+            @"Message" : [NSString convertedStringFromCString:currentMessage.message.c_str()],
             @"Date" : [NSDate dateWithTimeIntervalSince1970:secs_since_1970],
             @"Index" : @(currentIndex++), //more accurate when sorting by date
-            @"Level" : @(currentMessage->level),
+            @"Level" : @(currentMessage.level),
             @"Name" : name,
             @"File" : file
         };
         [self.fMessages addObject:message];
 
-        if (currentMessage->level <= maxLevel && [self shouldIncludeMessageForFilter:filterString message:message])
+        if (currentMessage.level <= maxLevel && [self shouldIncludeMessageForFilter:filterString message:message])
         {
             [self.fDisplayedMessages addObject:message];
             changed = YES;
         }
     }
 
-    if (self.fMessages.count > TrLogMaxQueueLength)
+    if (self.fMessages.count > kMaxQueueLength)
     {
         NSUInteger const oldCount = self.fDisplayedMessages.count;
 
-        NSIndexSet* removeIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fMessages.count - TrLogMaxQueueLength)];
+        NSIndexSet* removeIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fMessages.count - kMaxQueueLength)];
         NSArray* itemsToRemove = [self.fMessages objectsAtIndexes:removeIndexes];
 
         [self.fMessages removeObjectsAtIndexes:removeIndexes];
@@ -291,8 +296,6 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
     }
 
     [self.fLock unlock];
-
-    tr_logFreeQueue(messages);
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView*)tableView
