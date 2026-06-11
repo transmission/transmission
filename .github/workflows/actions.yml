@@ -1699,6 +1699,7 @@ jobs:
               utf8cpp
           run: |
             set -ex
+            export TMPDIR=/var/tmp # gcc's LTO takes up a lot of space in TMPDIR, and /tmp is too small
             export LANG=en_US.UTF-8 # Qt requires UTF-8 locales
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
             cmake \
