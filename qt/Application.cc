@@ -15,6 +15,9 @@
 #include <QRect>
 #include <QSystemTrayIcon>
 
+#include <QNetworkAccessManager>
+#include "RpcClient.h"
+
 #ifdef QT_DBUS_LIB
 #include <QDBusConnection>
 #include <QDBusMessage>

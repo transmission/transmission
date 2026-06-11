@@ -17,9 +17,6 @@
 #include <QTranslator>
 #include <QWeakPointer>
 
-#include <QNetworkAccessManager>
-#include "RpcClient.h"
-
 #include <libtransmission-app/favicon-cache.h>
 #include <libtransmission/quark.h>
 
@@ -36,6 +33,7 @@ class Session;
 class Torrent;
 class TorrentModel;
 class WatchDir;
+class QNetworkAccessManager;
 
 class Application : public QApplication
 {
