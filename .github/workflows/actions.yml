@@ -585,7 +585,6 @@ jobs:
             binutils \
             build-base \
             ca-certificates \
-            clang \
             cmake \
             curl-dev \
             fast_float \
@@ -620,8 +619,6 @@ jobs:
             -S . \
             -B obj \
             -G Ninja \
-            -DCMAKE_C_COMPILER='clang' \
-            -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
