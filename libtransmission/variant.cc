@@ -37,20 +37,37 @@ using namespace std::literals;
 namespace
 {
 void merge_variant(tr_variant& dest, tr_variant const& src);
+void merge_variant(tr_variant& dest, tr_variant&& src);
 
 void merge_map(tr_variant::Map& dest, tr_variant::Map const& src)
 {
     dest.reserve(std::size(dest) + std::size(src));
     for (auto const& [key, child] : src)
     {
-        merge_variant(dest[key], child);
+        if (!dest.contains(key))
+        {
+            dest.try_emplace(key, child.clone());
+        }
     }
 }
 
-void merge_variant(tr_variant& dest, tr_variant const& src)
+void merge_map(tr_variant::Map& dest, tr_variant::Map&& src)
+{
+    dest.reserve(std::size(dest) + std::size(src));
+    for (auto& [key, child] : std::move(src))
+    {
+        if (!dest.contains(key))
+        {
+            dest.try_emplace(key, std::move(child));
+        }
+    }
+}
+
+template<bool MoveSrc>
+void merge_variant_impl(tr_variant& dest, std::conditional_t<MoveSrc, tr_variant&, tr_variant const&> src)
 {
     src.visit(
-        [&dest](auto const& value)
+        [&dest](auto& value)
         {
             using ValueType = std::remove_cvref_t<decltype(value)>;
 
@@ -60,7 +77,19 @@ void merge_variant(tr_variant& dest, tr_variant const& src)
             {
                 dest = value;
             }
-            else if constexpr (std::is_same_v<ValueType, std::string> || std::is_same_v<ValueType, std::string_view>)
+            else if constexpr (std::is_same_v<ValueType, std::string>)
+            {
+                if constexpr (MoveSrc)
+                {
+                    dest = std::move(value);
+                }
+                else
+                {
+                    // std::string assignment via std::string_view materializes into an owned string.
+                    dest = std::string_view{ value };
+                }
+            }
+            else if constexpr (std::is_same_v<ValueType, std::string_view>)
             {
                 // std::string_view assignment is materialized into an owned string.
                 dest = std::string_view{ value };
@@ -75,7 +104,14 @@ void merge_variant(tr_variant& dest, tr_variant const& src)
 
                     for (size_t i = 0; i < std::size(value); ++i)
                     {
-                        merge_variant((*out)[i], value[i]);
+                        if constexpr (MoveSrc)
+                        {
+                            merge_variant((*out)[i], std::move(value[i]));
+                        }
+                        else
+                        {
+                            merge_variant((*out)[i], value[i]);
+                        }
                     }
                 }
             }
@@ -88,10 +124,28 @@ void merge_variant(tr_variant& dest, tr_variant const& src)
 
                 if (auto* out = dest.get_if<tr_variant::MapIndex>(); out != nullptr)
                 {
-                    merge_map(*out, value);
+                    if constexpr (MoveSrc)
+                    {
+                        merge_map(*out, std::move(value));
+                    }
+                    else
+                    {
+                        merge_map(*out, value);
+                    }
                 }
             }
         });
+}
+
+void merge_variant(tr_variant& dest, tr_variant const& src)
+{
+    merge_variant_impl<false>(dest, src);
+}
+
+void merge_variant(tr_variant& dest, tr_variant&& src)
+{
+    auto moved_src = std::move(src);
+    merge_variant_impl<true>(dest, moved_src);
 }
 
 template<typename T>
@@ -191,9 +245,21 @@ tr_variant::Map& tr_variant::Map::merge(Map const& that)
     return *this;
 }
 
+tr_variant::Map& tr_variant::Map::merge(Map&& that)
+{
+    merge_map(*this, std::move(that));
+    return *this;
+}
+
 tr_variant& tr_variant::merge(tr_variant const& that)
 {
     merge_variant(*this, that);
+    return *this;
+}
+
+tr_variant& tr_variant::merge(tr_variant&& that)
+{
+    merge_variant(*this, std::move(that));
     return *this;
 }
 

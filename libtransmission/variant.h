@@ -207,6 +207,7 @@ public:
         }
 
         Map& merge(Map const& that);
+        Map& merge(Map&& that);
         [[nodiscard]] Map clone() const;
 
     private:
@@ -386,10 +387,11 @@ public:
     }
 
     // Usually updates `this` to hold a clone of `that`, with two exceptions:
-    // 1. If both sides hold maps, recursively merge each entry and overwrite
-    //    duplicate keys from `this`.
+    // 1. If both sides hold maps, insert entries from `that` that are missing
+    //    in `this` and keep pre-existing keys in `this` unchanged.
     // 2. Any unmanaged string taken from `that` is copied so `this` owns its copy.
     tr_variant& merge(tr_variant const& that);
+    tr_variant& merge(tr_variant&& that);
 
     // Returns a new copy of `this`.
     // Any unmanaged strings in `this` are copied so the new variant owns its copy.
