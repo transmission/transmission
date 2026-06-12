@@ -458,6 +458,11 @@ void tr_peerIo::read_cb()
 
 void tr_peerIo::set_enabled(tr_direction dir, bool is_enabled)
 {
+    if (!socket_)
+    {
+        // socket was closed by tr_peerIo::close()
+        return;
+    }
     if (dir == tr_direction::Up)
     {
         socket_->set_write_enabled(is_enabled);
