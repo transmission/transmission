@@ -246,8 +246,8 @@ bool tr_peerIo::reconnect()
         return false;
     }
 
-    auto const was_read_enabled = socket_ ? socket_->is_read_enabled() : true;
-    auto const was_write_enabled = socket_ ? socket_->is_write_enabled() : true;
+    auto const was_read_enabled = socket_ ? socket_->is_read_enabled() : false;
+    auto const was_write_enabled = socket_ ? socket_->is_write_enabled() : false;
 
     close();
 
