@@ -38,7 +38,6 @@
 
 #include <libtransmission/crypto-utils.h> // tr_rand_obj
 #include <libtransmission/file.h>
-#include <libtransmission/log.h>
 #include <libtransmission/net.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/session-thread.h> // for tr_evthread_init();

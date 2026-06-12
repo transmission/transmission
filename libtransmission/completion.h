@@ -20,6 +20,8 @@
 #include "libtransmission/bitfield.h"
 #include "libtransmission/types.h"
 
+struct tr_torrent;
+
 /**
  * @brief knows which blocks and pieces we have
  */

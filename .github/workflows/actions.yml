@@ -579,8 +579,10 @@ jobs:
           set -ex
           apk update
           apk add \
-            ca-certificates \
             bash \
+            binutils \
+            build-base \
+            ca-certificates \
             clang \
             cmake \
             curl-dev \

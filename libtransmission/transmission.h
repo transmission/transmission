@@ -24,6 +24,12 @@
 #include "libtransmission/types.h"
 #include "libtransmission/values.h"
 
+struct tr_ctor;
+struct tr_session;
+struct tr_torrent;
+struct tr_torrent_metainfo;
+struct tr_variant;
+
 // --- Startup & Shutdown
 
 /**
