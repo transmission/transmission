@@ -424,9 +424,22 @@ jobs:
         with:
           arch: x64
           type: CoreDeps
+      - name: Detect Visual Studio Version
+        run: |
+          $VsWherePath = Join-Path ${Env:ProgramFiles(x86)} 'Microsoft Visual Studio' Installer vswhere.exe
+          if (-not (Test-Path $VsWherePath)) {
+            throw "vswhere.exe was not found at expected path: $VsWherePath"
+          }
+
+          $VsVersion = & $VsWherePath -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property catalog_productLineVersion
+          if (-not $VsVersion) {
+            throw 'Unable to determine Visual Studio version from vswhere.'
+          }
+
+          "VISUAL_STUDIO_VERSION=$VsVersion" | Out-File $Env:GITHUB_ENV -Append
       - name: Configure
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
+          Import-VisualStudioVars -VisualStudioVersion $Env:VISUAL_STUDIO_VERSION -Architecture x64
           cmake `
             -S src `
             -B obj `
@@ -438,16 +451,16 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=OFF
       - name: Make (Core)
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
+          Import-VisualStudioVars -VisualStudioVersion $Env:VISUAL_STUDIO_VERSION -Architecture x64
           cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
       - name: Make (App)
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
+          Import-VisualStudioVars -VisualStudioVersion $Env:VISUAL_STUDIO_VERSION -Architecture x64
           cmake --build obj --config Debug --target transmission-app 2>&1 | tee -a makelog
       - name: Make (Tests)
         if: needs.what-to-make.outputs.make-tests == 'true'
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
+          Import-VisualStudioVars -VisualStudioVersion $Env:VISUAL_STUDIO_VERSION -Architecture x64
           cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
       - name: Test for warnings
         run: |
