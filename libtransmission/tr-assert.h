@@ -11,10 +11,10 @@
 
 #include "libtransmission/tr-macros.h"
 
-[[noreturn]] bool tr_assert_report(std::string_view file, long line, std::string_view message);
+[[noreturn]] void tr_assert_report(std::string_view file, long line, std::string_view message);
 
-#define TR_ASSERT(x) ((void)((x) || tr_assert_report(__FILE__, __LINE__, #x)))
-#define TR_ASSERT_MSG(x, message) ((void)((x) || tr_assert_report(__FILE__, __LINE__, message)))
+#define TR_ASSERT(x) ((x) ? (void)0 : tr_assert_report(__FILE__, __LINE__, #x))
+#define TR_ASSERT_MSG(x, message) ((x) ? (void)0 : tr_assert_report(__FILE__, __LINE__, message))
 
 #define TR_ENABLE_ASSERTS
 

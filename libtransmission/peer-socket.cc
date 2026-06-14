@@ -28,7 +28,7 @@ tr_peer_socket::tr_peer_socket(tr_session const* session, tr_socket_address cons
     , socket_address_{ socket_address }
     , type_{ Type::TCP }
 {
-    TR_ASSERT(sock != TR_BAD_SOCKET);
+    TR_ASSERT(is_valid_socket(sock));
 
     ++n_open_sockets;
     session->setSocketDiffServ(sock, address().type);

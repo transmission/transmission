@@ -248,7 +248,7 @@ public:
 
         for (auto const sock : mcast_sockets_)
         {
-            if (sock != TR_BAD_SOCKET)
+            if (is_valid_socket(sock))
             {
                 tr_net_close_socket(sock);
             }
@@ -312,7 +312,7 @@ private:
         // setup datagram socket
         sock = socket(tr_ip_protocol_to_af(ip_protocol), SOCK_DGRAM, 0);
 
-        if (sock == TR_BAD_SOCKET)
+        if (!is_valid_socket(sock))
         {
             return false;
         }
@@ -633,7 +633,7 @@ private:
             return false;
         }
 
-        if (mcast_sockets_[ip_protocol] == TR_BAD_SOCKET)
+        if (!is_valid_socket(mcast_sockets_[ip_protocol]))
         {
             return true;
         }

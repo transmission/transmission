@@ -146,7 +146,7 @@ std::string tr_diffserv_t::toString() const
 
 void tr_netSetDiffServ([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_address_type type)
 {
-    if (s == TR_BAD_SOCKET)
+    if (!is_valid_socket(s))
     {
         return;
     }
@@ -194,7 +194,7 @@ namespace
 tr_socket_t createSocket(int domain, int type)
 {
     auto const sockfd = socket(domain, type, 0);
-    if (sockfd == TR_BAD_SOCKET)
+    if (!is_valid_socket(sockfd))
     {
         if (sockerrno != EAFNOSUPPORT)
         {
@@ -251,7 +251,7 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
     }
 
     auto const s = createSocket(tr_ip_protocol_to_af(addr.type), SOCK_STREAM);
-    if (s == TR_BAD_SOCKET)
+    if (!is_valid_socket(s))
     {
         return TR_BAD_SOCKET;
     }
@@ -321,7 +321,7 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
     TR_ASSERT(addr.is_valid());
 
     auto const fd = socket(tr_ip_protocol_to_af(addr.type), SOCK_STREAM, 0);
-    if (fd == TR_BAD_SOCKET)
+    if (!is_valid_socket(fd))
     {
         *err_out = sockerrno;
         return TR_BAD_SOCKET;
@@ -417,7 +417,7 @@ std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session
     auto sock = sockaddr_storage{};
     socklen_t len = sizeof(struct sockaddr_storage);
     auto const sockfd = accept(listening_sockfd, reinterpret_cast<sockaddr*>(&sock), &len);
-    if (sockfd == TR_BAD_SOCKET)
+    if (!is_valid_socket(sockfd))
     {
         return {};
     }

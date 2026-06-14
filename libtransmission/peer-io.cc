@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <functional>
 #include <type_traits> // std::underlying_type_t
+#include <utility> // std::cmp_equal
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -161,7 +162,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         },
         [&]() -> tr_peer_socket
         {
-            if (auto sock = tr_net_open_peer_socket(session, socket_address, client_is_seed); sock != TR_BAD_SOCKET)
+            if (auto sock = tr_net_open_peer_socket(session, socket_address, client_is_seed); is_valid_socket(sock))
             {
                 return { session, socket_address, sock };
             }
@@ -249,7 +250,7 @@ bool tr_peerIo::reconnect()
     close();
 
     auto const s = tr_net_open_peer_socket(session_, socket_address(), client_is_seed());
-    if (s == TR_BAD_SOCKET)
+    if (!is_valid_socket(s))
     {
         return false;
     }
@@ -343,7 +344,7 @@ void tr_peerIo::event_write_cb([[maybe_unused]] evutil_socket_t fd, short /*even
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for writing");
 
     TR_ASSERT(io->socket_.is_tcp());
-    TR_ASSERT(io->socket_.handle.tcp == fd);
+    TR_ASSERT(std::cmp_equal(io->socket_.handle.tcp, fd));
 
     io->pending_events_ &= ~EV_WRITE;
 
@@ -467,7 +468,7 @@ void tr_peerIo::event_read_cb([[maybe_unused]] evutil_socket_t fd, short /*event
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for reading");
 
     TR_ASSERT(io->socket_.is_tcp());
-    TR_ASSERT(io->socket_.handle.tcp == fd);
+    TR_ASSERT(std::cmp_equal(io->socket_.handle.tcp, fd));
 
     io->pending_events_ &= ~EV_READ;
 

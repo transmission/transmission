@@ -171,7 +171,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     {
         // no IPv4; do nothing
     }
-    else if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    else if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); is_valid_socket(sock))
     {
         (void)evutil_make_listen_socket_reuseable(sock);
 
@@ -217,7 +217,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     {
         // no IPv6; do nothing
     }
-    else if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    else if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); is_valid_socket(sock))
     {
         (void)evutil_make_listen_socket_reuseable(sock);
         (void)tr_make_listen_socket_ipv6only(sock);
@@ -260,7 +260,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
     }
 
-    if (udp4_socket_ == TR_BAD_SOCKET && udp6_socket_ == TR_BAD_SOCKET)
+    if (!is_valid_socket(udp4_socket_) && !is_valid_socket(udp6_socket_))
     {
         tr_logAddError(_("Couldn't create any UDP sockets."));
     }
@@ -270,7 +270,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 {
     udp6_event_.reset();
 
-    if (udp6_socket_ != TR_BAD_SOCKET)
+    if (is_valid_socket(udp6_socket_))
     {
         tr_net_close_socket(udp6_socket_);
         udp6_socket_ = TR_BAD_SOCKET;
@@ -278,7 +278,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
     udp4_event_.reset();
 
-    if (udp4_socket_ != TR_BAD_SOCKET)
+    if (is_valid_socket(udp4_socket_))
     {
         tr_net_close_socket(udp4_socket_);
         udp4_socket_ = TR_BAD_SOCKET;
@@ -292,7 +292,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     {
         errno = EAFNOSUPPORT;
     }
-    else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; sock == TR_BAD_SOCKET)
+    else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; !is_valid_socket(sock))
     {
         // don't warn on bad sockets; the system may not support IPv6
         return;

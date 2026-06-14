@@ -222,7 +222,7 @@ private:
 
     [[nodiscard]] SwarmStatus swarm_status(int family, int* const setme_node_count = nullptr) const
     {
-        if (udp_socket(family) == TR_BAD_SOCKET)
+        if (!is_valid_socket(udp_socket(family)))
         {
             if (setme_node_count != nullptr)
             {
