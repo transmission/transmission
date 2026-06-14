@@ -435,7 +435,7 @@ jobs:
             '-B obj'
             '-G Ninja'
             '-DCMAKE_BUILD_TYPE=Debug'
-            "-DCMAKE_PREFIX_PATH=$Env:DEPS_PREFIX"
+            "-DCMAKE_PREFIX_PATH=`"$Env:DEPS_PREFIX`""
             "-DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }}"
             '-DRUN_CLANG_TIDY=ON'
             '-DUSE_SYSTEM_DEFAULT=OFF'
@@ -698,7 +698,7 @@ jobs:
             '-G Ninja'
             '-DCMAKE_BUILD_TYPE=RelWithDebInfo'
             '-DCMAKE_INSTALL_PREFIX=pfx'
-            "-DCMAKE_PREFIX_PATH=$Env:DEPS_PREFIX"
+            "-DCMAKE_PREFIX_PATH=`"$Env:DEPS_PREFIX`""
             "-DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }}"
             "-DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true') && 'ON' || 'OFF' }}"
             '-DENABLE_GTK=OFF'
