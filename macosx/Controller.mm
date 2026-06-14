@@ -5304,12 +5304,6 @@ static void removeKeRangerRansomware()
 
         height = (kGroupSeparatorHeight + self.fTableView.intercellSpacing.height) * groups +
             (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
-
-        //account for group padding...
-        if (groups > 1)
-        {
-            height += (groups - 1) * 20;
-        }
     }
     else
     {
