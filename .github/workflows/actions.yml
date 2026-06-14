@@ -440,17 +440,17 @@ jobs:
             '-DRUN_CLANG_TIDY=ON'
             '-DUSE_SYSTEM_DEFAULT=OFF'
           )
-          cmd /c "\"$Env:VCVARSALL\" $Env:VC_ARCH >nul && cmake $($CmakeArgs -join ' ')"
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake $($CmakeArgs -join ' ')"
       - name: Make (Core)
         run: |
-          cmd /c "\"$Env:VCVARSALL\" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target transmission" 2>&1 | tee makelog
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target transmission" 2>&1 | tee makelog
       - name: Make (App)
         run: |
-          cmd /c "\"$Env:VCVARSALL\" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target transmission-app" 2>&1 | tee -a makelog
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target transmission-app" 2>&1 | tee -a makelog
       - name: Make (Tests)
         if: needs.what-to-make.outputs.make-tests == 'true'
         run: |
-          cmd /c "\"$Env:VCVARSALL\" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target libtransmission-test" 2>&1 | tee -a makelog
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target libtransmission-test" 2>&1 | tee -a makelog
       - name: Test for warnings
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
@@ -711,10 +711,10 @@ jobs:
             '-DRUN_CLANG_TIDY=OFF'
             '-DUSE_SYSTEM_DEFAULT=OFF'
           )
-          cmd /c "\"$Env:VCVARSALL\" $Env:VC_ARCH >nul && cmake $($CmakeArgs -join ' ')"
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake $($CmakeArgs -join ' ')"
       - name: Make
         run: |
-          cmd /c "\"$Env:VCVARSALL\" $Env:VC_ARCH >nul && cmake --build obj --config RelWithDebInfo"
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config RelWithDebInfo"
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         uses: ./.github/actions/run-tests
@@ -727,7 +727,7 @@ jobs:
       - name: Package
         if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
         run: |
-          cmd /c "\"$Env:VCVARSALL\" $Env:VC_ARCH >nul && cmake --build obj --config RelWithDebInfo --target pack-msi"
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config RelWithDebInfo --target pack-msi"
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}-${{ matrix.arch }}
