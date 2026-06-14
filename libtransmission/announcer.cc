@@ -88,10 +88,13 @@ struct StopsCompare
         return tr_compare_3way(one.announce_url, two.announce_url);
     }
 
+    // Suppress STL-instantiation noise from MSVC xutility noexcept(bool(...)).
+    // NOLINTBEGIN(readability-redundant-casting)
     [[nodiscard]] constexpr auto operator()(tr_announce_request const& one, tr_announce_request const& two) const noexcept
     {
         return compare(one, two) < 0;
     }
+    // NOLINTEND(readability-redundant-casting)
 };
 
 } // namespace
@@ -1581,11 +1584,14 @@ void scrapeAndAnnounceMore(tr_announcer_impl* announcer)
      * available, use compareAnnounceTiers to prioritize. */
     if (announce_me.size() > MaxAnnouncesPerUpkeep)
     {
+        // Suppress STL-instantiation noise from MSVC xutility noexcept(bool(...)).
+        // NOLINTBEGIN(readability-redundant-casting)
         std::partial_sort(
             std::begin(announce_me),
             std::begin(announce_me) + MaxAnnouncesPerUpkeep,
             std::end(announce_me),
             [](auto const* a, auto const* b) { return compareAnnounceTiers(a, b) < 0; });
+        // NOLINTEND(readability-redundant-casting)
         announce_me.resize(MaxAnnouncesPerUpkeep);
     }
 
