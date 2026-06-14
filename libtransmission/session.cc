@@ -421,7 +421,7 @@ tr_session::BoundSocket::BoundSocket(
           &BoundSocket::onCanRead,
           this) }
 {
-    if (socket_ == TR_BAD_SOCKET)
+    if (!is_valid_socket(socket_))
     {
         return;
     }
@@ -437,7 +437,7 @@ tr_session::BoundSocket::~BoundSocket()
 {
     ev_.reset();
 
-    if (socket_ != TR_BAD_SOCKET)
+    if (is_valid_socket(socket_))
     {
         tr_net_close_socket(socket_);
         socket_ = TR_BAD_SOCKET;

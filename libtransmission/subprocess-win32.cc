@@ -73,10 +73,13 @@ public:
         return diff;
     }
 
+    // Suppress STL-instantiation noise from MSVC xutility noexcept(bool(...)).
+    // NOLINTBEGIN(readability-redundant-casting)
     [[nodiscard]] auto operator()(std::wstring_view a, std::wstring_view b) const noexcept // <
     {
         return compare(a, b) < 0;
     }
+    // NOLINTEND(readability-redundant-casting)
 };
 
 using SortedWideEnv = std::map<std::wstring, std::wstring, WStrICompare>;

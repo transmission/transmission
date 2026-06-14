@@ -759,7 +759,7 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
     }
 
     auto const fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (fd == INVALID_SOCKET)
+    if (!is_valid_socket(fd))
     {
         freeaddrinfo(result);
         return evhttp_bind_socket(httpd, address, port);

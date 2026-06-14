@@ -55,13 +55,13 @@ int default_udp_bufsize(int const optname)
 {
     int ret = -1;
 
-    if (auto const fd = socket(PF_INET, SOCK_DGRAM, 0); fd != TR_BAD_SOCKET)
+    if (auto const fd = socket(PF_INET, SOCK_DGRAM, 0); is_valid_socket(fd))
     {
         get_bufsize(fd, optname, ret);
         tr_net_close_socket(fd);
     }
 
-    if (auto const fd = socket(PF_INET6, SOCK_DGRAM, 0); fd != TR_BAD_SOCKET)
+    if (auto const fd = socket(PF_INET6, SOCK_DGRAM, 0); is_valid_socket(fd))
     {
         get_bufsize(fd, optname, ret);
         tr_net_close_socket(fd);

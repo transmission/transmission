@@ -61,6 +61,11 @@ using tr_socket_t = int;
 #define set_sockerrno(save) (sockerrno) = (save)
 #endif
 
+[[nodiscard]] constexpr bool is_valid_socket(tr_socket_t s) noexcept
+{
+    return s != static_cast<tr_socket_t>(TR_BAD_SOCKET);
+}
+
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/types.h"
 #include "libtransmission/utils.h" // for tr_compare_3way()
