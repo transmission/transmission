@@ -6,8 +6,6 @@
 
 @interface MessageWindowController : NSWindowController
 
-- (void)updateLog:(NSTimer*)timer;
-
 - (IBAction)changeLevel:(id)sender;
 - (IBAction)changeFilter:(id)sender;
 - (IBAction)clearLog:(id)sender;

@@ -44,6 +44,8 @@ static NSUInteger const kMaxQueueLength = 10000U;
 
 @property(nonatomic) NSLock* fLock;
 
+- (void)updateLog;
+
 @end
 
 @implementation MessageWindowController
@@ -154,10 +156,11 @@ static NSUInteger const kMaxQueueLength = 10000U;
 {
     if (!self.fTimer)
     {
-        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds target:self selector:@selector(updateLog:)
-                                                     userInfo:nil
-                                                      repeats:YES];
-        [self updateLog:nil];
+        __weak __auto_type weakSelf = self;
+        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds repeats:YES block:^(NSTimer* _Nonnull timer) {
+            [weakSelf updateLog];
+        }];
+        [self updateLog];
     }
 }
 
@@ -180,9 +183,11 @@ static NSUInteger const kMaxQueueLength = 10000U;
 - (void)window:(NSWindow*)window didDecodeRestorableState:(NSCoder*)coder
 {
     [self.fTimer invalidate];
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds target:self selector:@selector(updateLog:) userInfo:nil
-                                                  repeats:YES];
-    [self updateLog:nil];
+    __weak __auto_type weakSelf = self;
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds repeats:YES block:^(NSTimer* _Nonnull timer) {
+        [weakSelf updateLog];
+    }];
+    [self updateLog];
 }
 
 + (NSImage*)iconForLevel:(NSInteger)level
@@ -228,7 +233,7 @@ static NSUInteger const kMaxQueueLength = 10000U;
     return icon;
 }
 
-- (void)updateLog:(NSTimer*)timer
+- (void)updateLog
 {
     auto const messages = tr_logGetQueue();
     if (messages.empty())
