@@ -246,8 +246,8 @@ bool tr_peerIo::reconnect()
         return false;
     }
 
-    auto const was_read_enabled = socket_->is_read_enabled();
-    auto const was_write_enabled = socket_->is_write_enabled();
+    auto const was_read_enabled = socket_ ? socket_->is_read_enabled() : false;
+    auto const was_write_enabled = socket_ ? socket_->is_write_enabled() : false;
 
     close();
 
@@ -306,6 +306,11 @@ size_t tr_peerIo::try_write(size_t max)
     static auto constexpr Dir = tr_direction::Up;
 
     if (max == 0U)
+    {
+        return {};
+    }
+
+    if (!socket_)
     {
         return {};
     }
@@ -413,6 +418,11 @@ size_t tr_peerIo::try_read(size_t max)
         return {};
     }
 
+    if (!socket_)
+    {
+        return {};
+    }
+
     // Do not read more than the bandwidth allows.
     // If there is no bandwidth left available, disable reads.
     max = bandwidth().clamp(Dir, max);
@@ -458,6 +468,11 @@ void tr_peerIo::read_cb()
 
 void tr_peerIo::set_enabled(tr_direction dir, bool is_enabled)
 {
+    if (!socket_)
+    {
+        return;
+    }
+
     if (dir == tr_direction::Up)
     {
         socket_->set_write_enabled(is_enabled);
