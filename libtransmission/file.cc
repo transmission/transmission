@@ -28,6 +28,19 @@ void maybe_set_error(tr_error* error, std::error_code const& ec)
     }
 }
 
+// Construct std::filesystem::path from UTF-8 char sequence.
+// https://stackoverflow.com/a/57635139/11390656
+template<typename InputIt>
+[[nodiscard]] std::filesystem::path tr_u8path(InputIt begin, InputIt end)
+{
+    auto const view = std::ranges::subrange(begin, end) | std::views::transform([](char const c) -> char8_t { return c; });
+    return { view.begin(), view.end() };
+}
+[[nodiscard]] std::filesystem::path tr_u8path(std::string_view const path)
+{
+    return tr_u8path(path.begin(), path.end());
+}
+
 } // namespace
 
 std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
@@ -287,13 +300,13 @@ std::vector<std::string> tr_sys_dir_get_files(
     }
 }
 
-std::optional<std::filesystem::space_info> tr_sys_path_get_capacity(std::filesystem::path const& path, tr_error* error)
+std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view const path, tr_error* error)
 {
     auto ec = std::error_code{};
-    auto space = std::filesystem::space(path, ec);
+    auto const space = std::filesystem::space(tr_u8path(path), ec);
     if (!ec)
     {
-        return space;
+        return tr_sys_path_capacity{ .available = space.available, .capacity = space.capacity };
     }
 
     maybe_set_error(error, ec);
