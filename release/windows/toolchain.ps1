@@ -20,13 +20,19 @@ if (-not (Test-Path $VsWherePath)) {
     throw 'vswhere was not found. Expected it under "Program Files (x86)\\Microsoft Visual Studio\\Installer".'
 }
 
-$VsInstance = & $VsWherePath -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -format json | ConvertFrom-Json
+$RequiredComponent = if ($BuildArch -eq 'arm64') {
+    'Microsoft.VisualStudio.Component.VC.Tools.ARM64'
+} else {
+    'Microsoft.VisualStudio.Component.VC.Tools.x86.x64'
+}
+
+$VsInstance = & $VsWherePath -latest -products * -requires $RequiredComponent -format json | ConvertFrom-Json
 if ($VsInstance -is [Array]) {
     $VsInstance = $VsInstance[0]
 }
 
 if (-not $VsInstance -or -not $VsInstance.installationPath) {
-    throw 'No Visual Studio instance with C++ x86/x64 tools was found by vswhere.'
+    throw "No Visual Studio instance with component '$RequiredComponent' was found by vswhere."
 }
 
 $global:VsInstallPrefix = $VsInstance.installationPath
