@@ -142,13 +142,12 @@ void Prefs::save(QString const& filename) const
     auto const filename_str = filename.toStdString();
     auto serde = tr_variant_serde::json();
 
-    auto settings = tr_variant::make_map(Items.size());
+    auto settings = tr_variant{ current_settings() };
     if (auto var = serde.parse_file(filename_str))
     {
         api_compat::convert_incoming_data(*var);
-        settings.merge(*var);
+        settings.merge(std::move(*var));
     }
-    settings.merge(tr_variant{ current_settings() });
     if (auto* const settings_map = settings.get_if<tr_variant::Map>())
     {
         settings_map->erase(TR_KEY_filter_text);
