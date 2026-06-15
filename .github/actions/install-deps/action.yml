@@ -162,6 +162,19 @@ runs:
           exit 1
         fi
 
+    - name: Install clang-tidy cache (ctcache)
+      if: env.OS_FAMILY == 'linux' && inputs.enable-clang-tidy == 'true'
+      shell: bash
+      run: |
+        set -ex
+        # ctcache wraps clang-tidy and caches results for unchanged translation
+        # units, so CI re-tidies only changed files (and files that include a
+        # changed header). Pinned to a commit for reproducibility.
+        python3 -m venv "${HOME}/.ctcache-venv"
+        "${HOME}/.ctcache-venv/bin/pip" install \
+          "git+https://github.com/matus-chochlik/ctcache@0c7fee26e09ae8a393ed7d56164102da118ab23a"
+        echo "${HOME}/.ctcache-venv/bin" >> "$GITHUB_PATH"
+
     - name: Install Linux GTK dependencies
       if: env.OS_FAMILY == 'linux' && env.PKG_FAMILY != 'unknown' && inputs.enable-gtk != 'false'
       shell: bash

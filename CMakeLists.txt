@@ -890,6 +890,16 @@ if(RUN_CLANG_TIDY)
     else()
         message(STATUS "Looking for clang-tidy - found: ${CLANG_TIDY}")
         set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}" --allow-no-checks)
+
+        # Optionally route clang-tidy through ctcache (https://github.com/matus-chochlik/ctcache),
+        # which caches static-analysis results and reuses them for unchanged translation
+        # units. This lets CI re-tidy only files that changed (or that include a changed
+        # header). It's a no-op when clang-tidy-cache isn't on PATH.
+        find_program(CLANG_TIDY_CACHE NAMES clang-tidy-cache)
+        if(NOT CLANG_TIDY_CACHE STREQUAL "CLANG_TIDY_CACHE-NOTFOUND")
+            message(STATUS "Looking for clang-tidy-cache - found: ${CLANG_TIDY_CACHE}")
+            set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_CACHE}" ${CMAKE_CXX_CLANG_TIDY})
+        endif()
     endif()
 endif()
 
