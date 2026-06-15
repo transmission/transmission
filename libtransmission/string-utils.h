@@ -113,8 +113,6 @@ template <typename... Args> constexpr bool tr_strv_sep(std::string_view* sv, std
 #endif
 #endif
 
-[[nodiscard]] std::u8string tr_strv_to_u8string(std::string_view sv);
-
 [[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement = 0xFFFD /*�*/);
 
 [[nodiscard]] std::string_view::size_type tr_strv_find_invalid_utf8(std::string_view sv);
