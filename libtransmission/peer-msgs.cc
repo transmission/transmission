@@ -2186,7 +2186,7 @@ bool tr_peerMsgsImpl::is_valid_request(peer_request const& req) const
 
 size_t tr_peerMsgsImpl::max_available_reqs() const
 {
-    if (tor_.is_done() || !tor_.has_metainfo() || client_is_choked() || !client_is_interested())
+    if (tor_.is_done() || !tor_.has_metainfo() || !tor_.client_can_download() || client_is_choked() || !client_is_interested())
     {
         return 0;
     }
