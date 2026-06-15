@@ -6,7 +6,6 @@
 #include <cmath>
 #include <climits>
 #include <cstdint>
-#include <filesystem>
 #include <list>
 #include <mutex>
 #include <limits>
@@ -180,18 +179,6 @@ TEST_F(SerializerTest, usesU8String)
     auto actual = std::u8string{};
     EXPECT_TRUE(Converters::deserialize(var, &actual));
     EXPECT_EQ(toString(actual), toString(expected));
-}
-
-TEST_F(SerializerTest, usesFsPath)
-{
-    auto const expected = std::filesystem::path{ std::u8string{ u8"foo/βar" } };
-    auto const var = Converters::serialize(expected);
-    EXPECT_TRUE(var.holds_alternative<std::string_view>());
-    EXPECT_EQ(var.value_if<std::string_view>().value_or(""sv), "foo/βar"sv);
-
-    auto actual = std::filesystem::path{};
-    EXPECT_TRUE(Converters::deserialize(var, &actual));
-    EXPECT_EQ(toString(actual.u8string()), toString(expected.u8string()));
 }
 
 TEST_F(SerializerTest, usesTrPex)

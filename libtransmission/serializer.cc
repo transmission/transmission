@@ -8,7 +8,6 @@
 #include <chrono>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t, uint32_t, uint64_t
-#include <filesystem>
 #include <limits>
 #include <mutex>
 #include <optional>
@@ -516,24 +515,6 @@ tr_variant from_u8string(std::u8string const& val)
 
 // ---
 
-bool to_fs_path(tr_variant const& src, std::filesystem::path* tgt)
-{
-    if (auto u8str = std::u8string{}; to_u8string(src, &u8str))
-    {
-        *tgt = std::filesystem::path{ u8str };
-        return true;
-    }
-
-    return false;
-}
-
-tr_variant from_fs_path(std::filesystem::path const& path)
-{
-    return from_u8string(path.u8string());
-}
-
-// ---
-
 bool to_pex(tr_variant const& src, tr_pex* tgt)
 {
     auto* const map = src.get_if<tr_variant::Map>();
@@ -597,7 +578,6 @@ void Converters::ensure_default_converters()
             Converters::add(to_diffserv_t, from_diffserv_t);
             Converters::add(to_double, from_double);
             Converters::add(to_encryption_mode, from_encryption_mode);
-            Converters::add(to_fs_path, from_fs_path);
             Converters::add(to_int<int64_t>, from_int<int64_t>);
             Converters::add(to_int<size_t>, from_int<size_t>);
             Converters::add(to_int<time_t>, from_int<time_t>);
