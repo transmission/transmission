@@ -110,7 +110,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 
     __auto_type delegate = self.fDelegate;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [delegate portCheckerDidFinishProbing:self]; 
+        [delegate portCheckerDidFinishProbing:self];
     });
 }
 
