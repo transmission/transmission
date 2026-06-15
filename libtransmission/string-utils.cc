@@ -159,10 +159,3 @@ std::string_view::size_type tr_strv_find_invalid_utf8(std::string_view const sv)
 {
     return utf8::find_invalid(sv);
 }
-
-std::u8string tr_strv_to_u8string(std::string_view const sv)
-{
-    auto u8str = tr_strv_to_utf8_string(sv);
-    auto const view = std::views::transform(u8str, [](char c) -> char8_t { return c; });
-    return { view.begin(), view.end() };
-}
