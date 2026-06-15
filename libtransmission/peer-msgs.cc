@@ -1769,7 +1769,7 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_da
 
 void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_data, void* vmsgs)
 {
-    auto* const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
+    auto const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs)->shared_from_this();
 
     if (was_piece_data)
     {
@@ -1781,7 +1781,9 @@ void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool wa
 
 ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
-    auto* const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
+    // Some errors (e.g. disk IO error) can immediately remove this peer from the peer mgr,
+    // which will destroy this object if we don't keep it alive
+    auto const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs)->shared_from_this();
 
     // https://www.bittorrent.org/beps/bep_0003.html
     // Next comes an alternating stream of length prefixes and messages.
