@@ -31,11 +31,6 @@ using tr::serializer::Converters;
 namespace
 {
 
-[[nodiscard]] std::string toString(std::u8string const& value)
-{
-    return { reinterpret_cast<char const*>(std::data(value)), std::size(value) };
-}
-
 struct Rect
 {
     int x = 0;
@@ -169,18 +164,6 @@ TEST_F(SerializerTest, usesTimeT)
     EXPECT_EQ(actual, Expected);
 }
 
-TEST_F(SerializerTest, usesU8String)
-{
-    auto const expected = std::u8string{ u8"hello" };
-    auto const var = Converters::serialize(expected);
-    EXPECT_TRUE(var.holds_alternative<std::string_view>());
-    EXPECT_EQ(var.value_if<std::string_view>().value_or(""sv), "hello"sv);
-
-    auto actual = std::u8string{};
-    EXPECT_TRUE(Converters::deserialize(var, &actual));
-    EXPECT_EQ(toString(actual), toString(expected));
-}
-
 TEST_F(SerializerTest, usesTrPex)
 {
     static auto constexpr CompactIp = std::array{ '\x7F', '\0', '\0', '\1', '\x73', '\x1A' }; // 127.0.0.1:6771
@@ -204,35 +187,6 @@ TEST_F(SerializerTest, usesTrPex)
     EXPECT_TRUE(Converters::deserialize(var, &actual));
     EXPECT_EQ(actual.socket_address, expected_sockaddr);
     EXPECT_EQ(actual.flags, expected_flags);
-}
-
-TEST_F(SerializerTest, u8StringWarnsOnInvalidUtf8)
-{
-    auto const bad = std::string{ static_cast<char>(0xC3), static_cast<char>(0x28) };
-    auto const var = tr_variant{ std::string_view{ bad } };
-
-    auto const old_level = tr_logGetLevel();
-    tr_logSetLevel(TR_LOG_WARN);
-    tr_logSetQueueEnabled(true);
-    tr_logClearQueue();
-
-    auto actual = std::u8string{};
-    EXPECT_TRUE(Converters::deserialize(var, &actual));
-
-    auto warned = false;
-    for (auto const& msg : tr_logGetQueue())
-    {
-        if (msg.level == TR_LOG_WARN && msg.message.find("contains invalid UTF-8") != std::string::npos)
-        {
-            warned = true;
-            break;
-        }
-    }
-
-    tr_logSetQueueEnabled(false);
-    tr_logSetLevel(old_level);
-
-    EXPECT_TRUE(warned);
 }
 
 TEST_F(SerializerTest, usesCustomTypes)

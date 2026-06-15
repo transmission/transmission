@@ -492,29 +492,6 @@ tr_variant from_verify_added_mode(tr_verify_added_mode const& val)
 
 // ---
 
-bool to_u8string(tr_variant const& src, std::u8string* tgt)
-{
-    if (auto const val = src.value_if<std::string_view>())
-    {
-        if (tr_strv_find_invalid_utf8(*val) != std::string_view::npos)
-        {
-            tr_logAddWarn(fmt::format(fmt::runtime(_("String '{string}' contains invalid UTF-8")), fmt::arg("string", *val)));
-        }
-
-        *tgt = tr_strv_to_u8string(tr_strv_replace_invalid(*val));
-        return true;
-    }
-
-    return false;
-}
-
-tr_variant from_u8string(std::u8string const& val)
-{
-    return std::string{ reinterpret_cast<char const*>(std::data(val)), std::size(val) };
-}
-
-// ---
-
 bool to_pex(tr_variant const& src, tr_pex* tgt)
 {
     auto* const map = src.get_if<tr_variant::Map>();
@@ -593,7 +570,6 @@ void Converters::ensure_default_converters()
             Converters::add(to_preferred_transport, from_preferred_transport);
             Converters::add(to_sched_day, from_sched_day);
             Converters::add(to_string, from_string);
-            Converters::add(to_u8string, from_u8string);
             Converters::add(to_verify_added_mode, from_verify_added_mode);
         });
 }
