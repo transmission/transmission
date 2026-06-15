@@ -8,7 +8,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 
 @interface PortChecker ()
 
-@property(nonatomic, weak) NSObject<PortCheckerDelegate>* fDelegate;
+@property(nonatomic, weak) id<PortCheckerDelegate> fDelegate;
 @property(nonatomic) PortStatus fStatus;
 
 @property(nonatomic) NSURLSession* fSession;
@@ -20,7 +20,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 
 @implementation PortChecker
 
-- (instancetype)initForPort:(NSInteger)portNumber delay:(BOOL)delay withDelegate:(NSObject<PortCheckerDelegate>*)delegate
+- (instancetype)initForPort:(NSInteger)portNumber delay:(BOOL)delay withDelegate:(id<PortCheckerDelegate>)delegate
 {
     if ((self = [super init]))
     {
@@ -108,8 +108,10 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 {
     self.fStatus = status;
 
-    NSObject<PortCheckerDelegate>* delegate = self.fDelegate;
-    [delegate performSelectorOnMainThread:@selector(portCheckerDidFinishProbing:) withObject:self waitUntilDone:NO];
+    __auto_type delegate = self.fDelegate;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [delegate portCheckerDidFinishProbing:self]; 
+    });
 }
 
 @end
