@@ -483,7 +483,7 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, std::opti
     case TR_RPC_SESSION_CHANGED:
         {
             auto const* const session = core_->get_session();
-            auto const newvals = tr_sessionGetSettings(session);
+            auto newvals = tr_sessionGetSettings(session);
 
             // determine which settings changed
             auto changed_keys = small::set<tr_quark>{};
@@ -509,8 +509,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, std::opti
                 }
             }
 
-            // update our settings
-            oldvals.merge(newvals);
+            // update our settings while preserving non-session GUI prefs
+            newvals.merge(oldvals);
+            oldvals = std::move(newvals);
 
             // emit change notifications
             for (auto const& changed_key : changed_keys)

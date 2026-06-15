@@ -2267,7 +2267,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         [](tr_session const& src) -> tr_variant
         {
             // TODO(C++23): use std::optional::transform() instead
-            if (auto const space = tr_sys_path_get_capacity(std::string_view{ src.downloadDir() }))
+            if (auto const space = tr_sys_path_get_capacity(src.downloadDir()))
             {
                 return space->available;
             }

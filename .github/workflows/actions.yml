@@ -74,7 +74,7 @@ jobs:
           get_changes tests      CMakeLists.txt cmake third-party libtransmission utils tests
           get_changes utils      CMakeLists.txt cmake third-party libtransmission utils
           get_changes web        CMakeLists.txt cmake web
-          get_changes ci-actions .github/workflows/actions.yml .github/actions
+          get_changes ci-actions .github/workflows/actions.yml .github/actions release
           cat "$GITHUB_OUTPUT"
 
   code-style:
@@ -424,31 +424,33 @@ jobs:
         with:
           arch: x64
           type: CoreDeps
+      - name: Setup Visual Studio Environment
+        uses: ./src/.github/actions/setup-vs-env-win32
+        with:
+          arch: x64
       - name: Configure
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
-          cmake `
-            -S src `
-            -B obj `
-            -G Ninja `
-            -DCMAKE_BUILD_TYPE=Debug `
-            -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
-            -DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }} `
-            -DRUN_CLANG_TIDY=ON `
-            -DUSE_SYSTEM_DEFAULT=OFF
+          $CmakeArgs = @(
+            '-S src'
+            '-B obj'
+            '-G Ninja'
+            '-DCMAKE_BUILD_TYPE=Debug'
+            "-DCMAKE_PREFIX_PATH=`"$Env:DEPS_PREFIX`""
+            "-DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }}"
+            '-DRUN_CLANG_TIDY=ON'
+            '-DUSE_SYSTEM_DEFAULT=OFF'
+          )
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake $($CmakeArgs -join ' ')"
       - name: Make (Core)
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
-          cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target transmission" 2>&1 | tee makelog
       - name: Make (App)
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
-          cmake --build obj --config Debug --target transmission-app 2>&1 | tee -a makelog
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target transmission-app" 2>&1 | tee -a makelog
       - name: Make (Tests)
         if: needs.what-to-make.outputs.make-tests == 'true'
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
-          cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target libtransmission-test" 2>&1 | tee -a makelog
       - name: Test for warnings
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
@@ -684,31 +686,35 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
           type: Deps
+      - name: Setup Visual Studio Environment
+        uses: ./.github/actions/setup-vs-env-win32
+        with:
+          arch: ${{ matrix.arch }}
       - name: Configure
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
-          cmake `
-            -S . `
-            -B obj `
-            -G Ninja `
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
-            -DCMAKE_INSTALL_PREFIX=pfx `
-            -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_GTK=OFF `
-            -DENABLE_MAC=OFF `
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_UTILS=ON `
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_WERROR=ON `
-            -DRUN_CLANG_TIDY=OFF `
-            -DUSE_SYSTEM_DEFAULT=OFF
+          $CmakeArgs = @(
+            '-S .'
+            '-B obj'
+            '-G Ninja'
+            '-DCMAKE_BUILD_TYPE=RelWithDebInfo'
+            '-DCMAKE_INSTALL_PREFIX=pfx'
+            "-DCMAKE_PREFIX_PATH=`"$Env:DEPS_PREFIX`""
+            "-DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }}"
+            "-DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true') && 'ON' || 'OFF' }}"
+            '-DENABLE_GTK=OFF'
+            '-DENABLE_MAC=OFF'
+            "-DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }}"
+            "-DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }}"
+            '-DENABLE_UTILS=ON'
+            "-DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }}"
+            '-DENABLE_WERROR=ON'
+            '-DRUN_CLANG_TIDY=OFF'
+            '-DUSE_SYSTEM_DEFAULT=OFF'
+          )
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake $($CmakeArgs -join ' ')"
       - name: Make
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
-          cmake --build obj --config RelWithDebInfo
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config RelWithDebInfo"
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         uses: ./.github/actions/run-tests
@@ -721,8 +727,7 @@ jobs:
       - name: Package
         if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
-          cmake --build obj --config RelWithDebInfo --target pack-msi
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config RelWithDebInfo --target pack-msi"
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}-${{ matrix.arch }}

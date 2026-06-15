@@ -2672,10 +2672,13 @@ struct ComparePeerInfo
     }
 
     template<typename T>
+    // Suppress STL-instantiation noise from MSVC xutility noexcept(bool(...)).
+    // NOLINTBEGIN(readability-redundant-casting)
     [[nodiscard]] bool operator()(T const& a, T const& b) const noexcept
     {
         return compare(*a, *b) < 0;
     }
+    // NOLINTEND(readability-redundant-casting)
 
     time_t const now_ = tr_time();
 };
