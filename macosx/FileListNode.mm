@@ -10,17 +10,25 @@
 
 #import "FileListNode.h"
 
-@interface FileListNode () {
-    @protected
-    uint64_t _size;
-    @protected
-    NSImage *_iconInternal;
-}
-- (instancetype)initWithName:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent size:(uint64_t)size;
-- (NSImage *)createIcon;
+@interface OnlyFileListNode : FileListNode
 @end
 
-@interface OnlyFileListNode () {
+@interface OnlyFolderListNode : FileListNode
+@end
+
+@interface FileListNode ()
+{
+  @protected
+    uint64_t _size;
+  @protected
+    NSImage* _iconInternal;
+}
+- (instancetype)initWithName:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent size:(uint64_t)size;
+- (NSImage*)createIcon;
+@end
+
+@interface OnlyFileListNode ()
+{
     NSIndexSet* _indexesInternal;
 }
 - (instancetype)initWithFileName:(NSString*)name
@@ -30,7 +38,8 @@
                          torrent:(Torrent*)torrent;
 @end
 
-@interface OnlyFolderListNode () {
+@interface OnlyFolderListNode ()
+{
     NSMutableIndexSet* _indexesInternal;
     NSMutableArray* _childrenInternal;
 }
@@ -39,7 +48,7 @@
 
 @implementation FileListNode
 
-- (NSMutableArray<FileListNode *> *)children
+- (NSMutableArray<FileListNode*>*)children
 {
     return nil;
 }
@@ -151,10 +160,10 @@
 }
 
 + (instancetype)createWithFileName:(NSString*)name
-                            path:(NSString*)path
-                            size:(uint64_t)size
-                           index:(NSUInteger)index
-                         torrent:(Torrent*)torrent
+                              path:(NSString*)path
+                              size:(uint64_t)size
+                             index:(NSUInteger)index
+                           torrent:(Torrent*)torrent
 {
     return [[OnlyFileListNode alloc] initWithFileName:name path:path size:size index:index torrent:torrent];
 }
@@ -230,7 +239,7 @@
     return _indexesInternal;
 }
 
-- (NSMutableArray<FileListNode *> *)children
+- (NSMutableArray<FileListNode*>*)children
 {
     return _childrenInternal;
 }
