@@ -20,8 +20,8 @@
 
 @property(nonatomic, readonly) NSIndexSet* indexes;
 
-- (instancetype)initWithFolderName:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent;
-- (instancetype)initWithFileName:(NSString*)name
++ (instancetype)createWithFolderName:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent;
++ (instancetype)createWithFileName:(NSString*)name
                             path:(NSString*)path
                             size:(uint64_t)size
                            index:(NSUInteger)index
@@ -30,8 +30,12 @@
 - (void)insertChild:(FileListNode*)child;
 - (void)insertIndex:(NSUInteger)index withSize:(uint64_t)size;
 
-@property(nonatomic, readonly) NSString* description;
-
 - (BOOL)updateFromOldName:(NSString*)oldName toNewName:(NSString*)newName inPath:(NSString*)path;
 
+@end
+
+@interface OnlyFileListNode : FileListNode
+@end
+
+@interface OnlyFolderListNode : FileListNode
 @end
