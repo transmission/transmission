@@ -450,6 +450,9 @@ jobs:
           set -ex
           apk update
           apk add \
+            bash \
+            binutils \
+            build-base \
             ca-certificates \
             clang \
             cmake \
