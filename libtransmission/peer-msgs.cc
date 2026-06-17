@@ -1061,8 +1061,7 @@ void tr_peerMsgsImpl::parse_ut_holepunch(MessageReader& payload)
         return;
     }
 
-    auto const payload_sv = payload.to_string_view();
-    auto const msg = bep55::decode(payload_sv);
+    auto const msg = bep55::decode(payload);
     if (!msg)
     {
         logdbg(this, "got malformed ut_holepunch message");

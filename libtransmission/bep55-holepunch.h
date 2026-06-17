@@ -24,7 +24,12 @@
 #include <string_view>
 
 #include "libtransmission/net.h"
-#include "libtransmission/tr-buffer.h"
+
+namespace tr
+{
+template<typename value_type>
+class BufferReader;
+}
 
 namespace bep55
 {
@@ -54,6 +59,7 @@ enum AddrType : uint8_t
 // NOLINTNEXTLINE(performance-enum-size)
 enum ErrorCode : uint32_t
 {
+    ErrNonError = 0,
     ErrNoSuchPeer = 1,
     ErrNotConnected = 2,
     ErrNoSupport = 3,
@@ -83,7 +89,7 @@ struct HolepunchMessage
 // For rendezvous/connect: a trailing 4-byte zero error code is accepted;
 // a trailing non-zero error code is rejected.
 // For error: the 4-byte error code is required.
-[[nodiscard]] std::optional<HolepunchMessage> decode(std::string_view payload) noexcept;
+[[nodiscard]] std::optional<HolepunchMessage> decode(tr::BufferReader<std::byte>& payload) noexcept;
 
 // Encode a BEP 55 ut_holepunch payload.
 //

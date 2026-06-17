@@ -5,6 +5,7 @@
 
 #include "libtransmission/bep55-holepunch.h"
 #include "libtransmission/net.h"
+#include "libtransmission/tr-buffer.h"
 
 namespace bep55
 {
@@ -14,89 +15,86 @@ namespace
 // Sum of non-address fixed fields: msg_type(1) + addr_type(1) + port(2) = 4.
 // Note: port sits after addr on the wire; this constant is a size convenience, not a layout prefix.
 auto constexpr HeaderSize = size_t{ 4 };
+
+[[nodiscard]] constexpr bool is_valid_msg_type(uint8_t const msg_type) noexcept
+{
+    return msg_type == MsgRendezvous || msg_type == MsgConnect || msg_type == MsgError;
+}
+
+[[nodiscard]] std::optional<tr_socket_address> decode_sockaddr(tr::BufferReader<std::byte>& payload)
+{
+    switch (payload.to_uint8())
+    {
+    case AddrIPv4:
+        if (payload.size() >= Ipv4CompactSize)
+        {
+            auto&& addr = tr_socket_address::from_compact_ipv4(payload.data()).first;
+            payload.drain(Ipv4CompactSize);
+            return addr;
+        }
+        return std::nullopt;
+
+    case AddrIPv6:
+        if (payload.size() >= Ipv6CompactSize)
+        {
+            auto&& addr = tr_socket_address::from_compact_ipv6(payload.data()).first;
+            payload.drain(Ipv6CompactSize);
+            return addr;
+        }
+        return std::nullopt;
+
+    default:
+        return std::nullopt;
+    }
+}
 } // namespace
 
-std::optional<HolepunchMessage> decode(std::string_view payload) noexcept
+std::optional<HolepunchMessage> decode(tr::BufferReader<std::byte>& payload) noexcept
 {
-    auto const len = payload.size();
-    auto const* data = reinterpret_cast<std::byte const*>(payload.data());
-
-    if (len < PayloadMinIPv4)
+    if (payload.size() < PayloadMinIPv4)
     {
         return std::nullopt;
     }
 
     HolepunchMessage msg{};
-    msg.msg_type = static_cast<uint8_t>(data[0]);
-    auto const addr_type = static_cast<uint8_t>(data[1]);
+    msg.msg_type = payload.to_uint8();
 
-    if (msg.msg_type != MsgRendezvous && msg.msg_type != MsgConnect && msg.msg_type != MsgError)
+    if (!is_valid_msg_type(msg.msg_type))
     {
         return std::nullopt;
     }
 
-    if (addr_type != AddrIPv4 && addr_type != AddrIPv6)
+    if (auto sockaddr = decode_sockaddr(payload))
     {
-        return std::nullopt;
-    }
-
-    auto const addr_len = (addr_type == AddrIPv4) ? size_t{ 4 } : size_t{ 16 };
-    auto const min_len = HeaderSize + addr_len; // without err_code
-    auto const full_len = min_len + 4; // with err_code
-
-    if (len < min_len)
-    {
-        return std::nullopt;
-    }
-
-    auto addr = tr_address{};
-
-    if (addr_type == AddrIPv4)
-    {
-        addr.type = TR_AF_INET;
-        std::memcpy(&addr.addr.addr4.s_addr, data + 2, 4);
+        msg.socket_address = std::move(*sockaddr);
     }
     else
     {
-        addr.type = TR_AF_INET6;
-        std::memcpy(&addr.addr.addr6.s6_addr, data + 2, 16);
+        return std::nullopt;
     }
-
-    uint16_t nport{};
-    std::memcpy(&nport, data + 2 + addr_len, sizeof(nport));
-    auto const port = tr_port::from_network(nport);
-
-    msg.socket_address = tr_socket_address{ addr, port };
 
     if (msg.msg_type == MsgError)
     {
-        if (len != full_len)
+        if (payload.size() < sizeof(ErrorCode))
         {
             return std::nullopt;
         }
 
-        uint32_t nerr_code{};
-        std::memcpy(&nerr_code, data + min_len, sizeof(nerr_code));
-        msg.err_code = ntohl(nerr_code);
+        msg.err_code = payload.to_uint32();
     }
-    else
+    // rendezvous / connect: accept trailing 4-byte zero error code
+    // (anacrolix compat); reject trailing non-zero error code.
+    else if (payload.size() == sizeof(ErrorCode))
     {
-        // rendezvous / connect: accept trailing 4-byte zero error code
-        // (anacrolix compat); reject trailing non-zero error code.
-        if (len == full_len)
-        {
-            uint32_t nerr_code{};
-            std::memcpy(&nerr_code, data + min_len, sizeof(nerr_code));
-
-            if (ntohl(nerr_code) != 0)
-            {
-                return std::nullopt;
-            }
-        }
-        else if (len != min_len)
+        if (payload.to_uint32() != 0)
         {
             return std::nullopt;
         }
+    }
+    // invalid payload size
+    else if (!payload.empty())
+    {
+        return std::nullopt;
     }
 
     return msg;

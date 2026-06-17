@@ -3,17 +3,18 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cstring>
 #include <string>
 
 #include <gtest/gtest.h>
 
 #include "libtransmission/bep55-holepunch.h"
 #include "libtransmission/net.h"
+#include "libtransmission/tr-buffer.h"
 
 #include "bep55-test-utils.h"
 
 using namespace bep55;
+using namespace std::literals;
 
 static tr_socket_address make_ipv6(std::array<uint8_t, 16> const& bytes, uint16_t port)
 {
@@ -137,18 +138,19 @@ TEST(Bep55, EncodeIPv6Error)
 
 TEST(Bep55, DecodeIPv4RendezvousStrict)
 {
-    auto payload = std::string(8, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgRendezvous);
-    data[1] = static_cast<std::byte>(AddrIPv4);
+    static auto constexpr N = PayloadMinIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgRendezvous);
+    payload.add_uint8(AddrIPv4);
     // 10.0.0.1
-    data[2] = std::byte{ 10 };
-    data[3] = std::byte{ 0 };
-    data[4] = std::byte{ 0 };
-    data[5] = std::byte{ 1 };
-    // port 51413 in network byte order
-    auto const nport = htons(51413);
-    std::memcpy(data + 6, &nport, 2);
+    payload.add_uint8(10);
+    payload.add_uint8(0);
+    payload.add_uint8(0);
+    payload.add_uint8(1);
+    // port 51413
+    payload.add_uint16(51413);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
@@ -161,16 +163,17 @@ TEST(Bep55, DecodeIPv4RendezvousStrict)
 
 TEST(Bep55, DecodeIPv4ConnectStrict)
 {
-    auto payload = std::string(8, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgConnect);
-    data[1] = static_cast<std::byte>(AddrIPv4);
-    data[2] = std::byte{ 192 };
-    data[3] = std::byte{ 168 };
-    data[4] = std::byte{ 1 };
-    data[5] = std::byte{ 50 };
-    auto const nport = htons(6881);
-    std::memcpy(data + 6, &nport, 2);
+    static auto constexpr N = PayloadMinIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgConnect);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(192);
+    payload.add_uint8(168);
+    payload.add_uint8(1);
+    payload.add_uint8(50);
+    payload.add_uint16(6881);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
@@ -180,40 +183,40 @@ TEST(Bep55, DecodeIPv4ConnectStrict)
 
 TEST(Bep55, DecodeIPv4RendezvousAnacrolix)
 {
-    auto payload = std::string(12, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgRendezvous);
-    data[1] = static_cast<std::byte>(AddrIPv4);
-    data[2] = std::byte{ 10 };
-    data[3] = std::byte{ 0 };
-    data[4] = std::byte{ 0 };
-    data[5] = std::byte{ 1 };
-    auto const nport = htons(51413);
-    std::memcpy(data + 6, &nport, 2);
-    auto const nerr = uint32_t{ 0 };
-    std::memcpy(data + 8, &nerr, 4);
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgRendezvous);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(10);
+    payload.add_uint8(0);
+    payload.add_uint8(0);
+    payload.add_uint8(1);
+    payload.add_uint16(51413);
+    payload.add_uint32(ErrNonError);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
     EXPECT_EQ(msg->msg_type, MsgRendezvous);
     EXPECT_EQ(msg->socket_address.port().host(), 51413);
-    EXPECT_EQ(msg->err_code, 0u);
+    EXPECT_EQ(msg->err_code, ErrNonError);
 }
 
 TEST(Bep55, DecodeIPv4ConnectAnacrolix)
 {
-    auto payload = std::string(12, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgConnect);
-    data[1] = static_cast<std::byte>(AddrIPv4);
-    data[2] = std::byte{ 172 };
-    data[3] = std::byte{ 16 };
-    data[4] = std::byte{ 0 };
-    data[5] = std::byte{ 5 };
-    auto const nport = htons(8080);
-    std::memcpy(data + 6, &nport, 2);
-    auto const nerr = uint32_t{ 0 };
-    std::memcpy(data + 8, &nerr, 4);
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgConnect);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(172);
+    payload.add_uint8(16);
+    payload.add_uint8(0);
+    payload.add_uint8(5);
+    payload.add_uint16(8080);
+    payload.add_uint32(ErrNonError);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
@@ -223,18 +226,18 @@ TEST(Bep55, DecodeIPv4ConnectAnacrolix)
 
 TEST(Bep55, DecodeIPv4ErrorNoSuchPeer)
 {
-    auto payload = std::string(12, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgError);
-    data[1] = static_cast<std::byte>(AddrIPv4);
-    data[2] = std::byte{ 10 };
-    data[3] = std::byte{ 0 };
-    data[4] = std::byte{ 0 };
-    data[5] = std::byte{ 2 };
-    auto const nport = htons(51413);
-    std::memcpy(data + 6, &nport, 2);
-    auto const nerr = htonl(ErrNoSuchPeer);
-    std::memcpy(data + 8, &nerr, 4);
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgError);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(10);
+    payload.add_uint8(0);
+    payload.add_uint8(0);
+    payload.add_uint8(2);
+    payload.add_uint16(51413);
+    payload.add_uint32(ErrNoSuchPeer);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
@@ -244,18 +247,18 @@ TEST(Bep55, DecodeIPv4ErrorNoSuchPeer)
 
 TEST(Bep55, DecodeIPv4ErrorNotConnected)
 {
-    auto payload = std::string(12, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgError);
-    data[1] = static_cast<std::byte>(AddrIPv4);
-    data[2] = std::byte{ 10 };
-    data[3] = std::byte{ 0 };
-    data[4] = std::byte{ 0 };
-    data[5] = std::byte{ 3 };
-    auto const nport = htons(12345);
-    std::memcpy(data + 6, &nport, 2);
-    auto const nerr = htonl(ErrNotConnected);
-    std::memcpy(data + 8, &nerr, 4);
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgError);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(10);
+    payload.add_uint8(0);
+    payload.add_uint8(0);
+    payload.add_uint8(3);
+    payload.add_uint16(12345);
+    payload.add_uint32(ErrNotConnected);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
@@ -265,18 +268,18 @@ TEST(Bep55, DecodeIPv4ErrorNotConnected)
 
 TEST(Bep55, DecodeIPv4ErrorNoSupport)
 {
-    auto payload = std::string(12, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgError);
-    data[1] = static_cast<std::byte>(AddrIPv4);
-    data[2] = std::byte{ 10 };
-    data[3] = std::byte{ 0 };
-    data[4] = std::byte{ 0 };
-    data[5] = std::byte{ 4 };
-    auto const nport = htons(12345);
-    std::memcpy(data + 6, &nport, 2);
-    auto const nerr = htonl(ErrNoSupport);
-    std::memcpy(data + 8, &nerr, 4);
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgError);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(10);
+    payload.add_uint8(0);
+    payload.add_uint8(0);
+    payload.add_uint8(4);
+    payload.add_uint16(12345);
+    payload.add_uint32(ErrNoSupport);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
@@ -285,18 +288,18 @@ TEST(Bep55, DecodeIPv4ErrorNoSupport)
 
 TEST(Bep55, DecodeIPv4ErrorNoSelf)
 {
-    auto payload = std::string(12, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgError);
-    data[1] = static_cast<std::byte>(AddrIPv4);
-    data[2] = std::byte{ 10 };
-    data[3] = std::byte{ 0 };
-    data[4] = std::byte{ 0 };
-    data[5] = std::byte{ 5 };
-    auto const nport = htons(12345);
-    std::memcpy(data + 6, &nport, 2);
-    auto const nerr = htonl(ErrNoSelf);
-    std::memcpy(data + 8, &nerr, 4);
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgError);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(10);
+    payload.add_uint8(0);
+    payload.add_uint8(0);
+    payload.add_uint8(5);
+    payload.add_uint16(12345);
+    payload.add_uint32(ErrNoSelf);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
@@ -305,18 +308,23 @@ TEST(Bep55, DecodeIPv4ErrorNoSelf)
 
 TEST(Bep55, DecodeIPv6RendezvousStrict)
 {
-    auto payload = std::string(20, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgRendezvous);
-    data[1] = static_cast<std::byte>(AddrIPv6);
+    static auto constexpr N = PayloadMinIPv6;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgRendezvous);
+    payload.add_uint8(AddrIPv6);
     // 2001:db8::1
-    data[2] = std::byte{ 0x20 };
-    data[3] = std::byte{ 0x01 };
-    data[4] = std::byte{ 0x0d };
-    data[5] = std::byte{ 0xb8 };
-    data[17] = std::byte{ 0x01 };
-    auto const nport = htons(6881);
-    std::memcpy(data + 18, &nport, 2);
+    payload.add_uint8(0x20);
+    payload.add_uint8(0x01);
+    payload.add_uint8(0x0d);
+    payload.add_uint8(0xb8);
+    while (payload.size() < sizeof(MsgType) + sizeof(AddrType) + tr_address::CompactAddrBytes[TR_AF_INET6] - 1)
+    {
+        payload.add_uint8(0);
+    }
+    payload.add_uint8(0x01);
+    payload.add_uint16(6881);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
@@ -327,17 +335,21 @@ TEST(Bep55, DecodeIPv6RendezvousStrict)
 
 TEST(Bep55, DecodeIPv6RendezvousAnacrolix)
 {
-    auto payload = std::string(24, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgRendezvous);
-    data[1] = static_cast<std::byte>(AddrIPv6);
-    data[2] = std::byte{ 0xfe };
-    data[3] = std::byte{ 0x80 };
-    data[17] = std::byte{ 0x01 };
-    auto const nport = htons(51413);
-    std::memcpy(data + 18, &nport, 2);
-    auto const nerr = uint32_t{ 0 };
-    std::memcpy(data + 20, &nerr, 4);
+    static auto constexpr N = PayloadFullIPv6;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgRendezvous);
+    payload.add_uint8(AddrIPv6);
+    payload.add_uint8(0xfe);
+    payload.add_uint8(0x80);
+    while (payload.size() < sizeof(MsgType) + sizeof(AddrType) + tr_address::CompactAddrBytes[TR_AF_INET6] - 1)
+    {
+        payload.add_uint8(0);
+    }
+    payload.add_uint8(0x01);
+    payload.add_uint16(51413);
+    payload.add_uint32(ErrNonError);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
@@ -347,17 +359,21 @@ TEST(Bep55, DecodeIPv6RendezvousAnacrolix)
 
 TEST(Bep55, DecodeIPv6Error)
 {
-    auto payload = std::string(24, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgError);
-    data[1] = static_cast<std::byte>(AddrIPv6);
-    data[2] = std::byte{ 0x20 };
-    data[3] = std::byte{ 0x01 };
-    data[17] = std::byte{ 0x01 };
-    auto const nport = htons(8080);
-    std::memcpy(data + 18, &nport, 2);
-    auto const nerr = htonl(ErrNoSupport);
-    std::memcpy(data + 20, &nerr, 4);
+    static auto constexpr N = PayloadFullIPv6;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgError);
+    payload.add_uint8(AddrIPv6);
+    payload.add_uint8(0x20);
+    payload.add_uint8(0x01);
+    while (payload.size() < sizeof(MsgType) + sizeof(AddrType) + tr_address::CompactAddrBytes[TR_AF_INET6] - 1)
+    {
+        payload.add_uint8(0);
+    }
+    payload.add_uint8(0x01);
+    payload.add_uint16(8080);
+    payload.add_uint32(ErrNoSupport);
+    EXPECT_EQ(payload.size(), N);
 
     auto const msg = decode(payload);
     ASSERT_TRUE(msg.has_value());
@@ -367,111 +383,160 @@ TEST(Bep55, DecodeIPv6Error)
 
 TEST(Bep55, RejectTooShort)
 {
-    EXPECT_FALSE(decode(std::string_view("\x00\x00", 2)).has_value());
-    EXPECT_FALSE(decode(std::string_view("", 0)).has_value());
-    EXPECT_FALSE(decode(std::string_view("\x00", 1)).has_value());
-    EXPECT_FALSE(decode(std::string_view("\x00\x00\x0a\x00\x00\x01\x00", 7)).has_value());
+    auto payload = tr::StackBuffer<PayloadFullIPv6>{};
+
+    payload.add("\x00\x00"sv);
+    EXPECT_FALSE(decode(payload).has_value());
+
+    payload.clear();
+    EXPECT_FALSE(decode(payload).has_value());
+
+    payload.clear();
+    payload.add_uint8(0);
+    EXPECT_FALSE(decode(payload).has_value());
+
+    payload.clear();
+    payload.add("\x00\x00\x0a\x00\x00\x01\x00"sv);
+    EXPECT_FALSE(decode(payload).has_value());
 }
 
 TEST(Bep55, RejectTooShortIPv6)
 {
-    auto payload = std::string(19, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgRendezvous);
-    data[1] = static_cast<std::byte>(AddrIPv6);
+    static auto constexpr N = PayloadMinIPv6 - 1;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgRendezvous);
+    payload.add_uint8(AddrIPv6);
+    while (payload.size() < N)
+    {
+        payload.add_uint8(0);
+    }
+    EXPECT_EQ(payload.size(), N);
     EXPECT_FALSE(decode(payload).has_value());
 }
 
 TEST(Bep55, RejectErrorTooShortIPv4)
 {
-    auto payload = std::string(11, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgError);
-    data[1] = static_cast<std::byte>(AddrIPv4);
+    static auto constexpr N = PayloadMinIPv4 - 1;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgError);
+    payload.add_uint8(AddrIPv4);
+    while (payload.size() < N)
+    {
+        payload.add_uint8(0);
+    }
+    EXPECT_EQ(payload.size(), N);
     EXPECT_FALSE(decode(payload).has_value());
 }
 
 TEST(Bep55, RejectErrorTooShortIPv6)
 {
-    auto payload = std::string(23, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgError);
-    data[1] = static_cast<std::byte>(AddrIPv6);
+    static auto constexpr N = PayloadFullIPv6 - 1;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgError);
+    payload.add_uint8(AddrIPv6);
+    while (payload.size() < N)
+    {
+        payload.add_uint8(0);
+    }
+    EXPECT_EQ(payload.size(), N);
     EXPECT_FALSE(decode(payload).has_value());
 }
 
 TEST(Bep55, RejectUnknownAddressType)
 {
-    auto payload = std::string(8, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgRendezvous);
-    data[1] = static_cast<std::byte>(2); // invalid
+    static auto constexpr N = PayloadMinIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgRendezvous);
+    payload.add_uint8(2); // invalid
+    while (payload.size() < N)
+    {
+        payload.add_uint8(0);
+    }
+    EXPECT_EQ(payload.size(), N);
     EXPECT_FALSE(decode(payload).has_value());
 }
 
 TEST(Bep55, RejectRendezvousWithNonZeroTrailingErrorCode)
 {
-    auto payload = std::string(12, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgRendezvous);
-    data[1] = static_cast<std::byte>(AddrIPv4);
-    data[2] = std::byte{ 10 };
-    data[3] = std::byte{ 0 };
-    data[4] = std::byte{ 0 };
-    data[5] = std::byte{ 1 };
-    auto const nport = htons(51413);
-    std::memcpy(data + 6, &nport, 2);
-    auto const nerr = htonl(42u); // non-zero
-    std::memcpy(data + 8, &nerr, 4);
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgRendezvous);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(10);
+    payload.add_uint8(0);
+    payload.add_uint8(0);
+    payload.add_uint8(1);
+    payload.add_uint16(51413);
+    payload.add_uint32(42u); // non-zero
+    EXPECT_EQ(payload.size(), N);
 
     EXPECT_FALSE(decode(payload).has_value());
 }
 
 TEST(Bep55, RejectConnectWithNonZeroTrailingErrorCode)
 {
-    auto payload = std::string(12, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgConnect);
-    data[1] = static_cast<std::byte>(AddrIPv4);
-    data[2] = std::byte{ 10 };
-    data[3] = std::byte{ 0 };
-    data[4] = std::byte{ 0 };
-    data[5] = std::byte{ 1 };
-    auto const nport = htons(51413);
-    std::memcpy(data + 6, &nport, 2);
-    auto const nerr = htonl(1u); // non-zero
-    std::memcpy(data + 8, &nerr, 4);
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgConnect);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(10);
+    payload.add_uint8(0);
+    payload.add_uint8(0);
+    payload.add_uint8(1);
+    payload.add_uint16(51413);
+    payload.add_uint32(1u); // non-zero
+    EXPECT_EQ(payload.size(), N);
 
     EXPECT_FALSE(decode(payload).has_value());
 }
 
 TEST(Bep55, RejectUnknownMessageType)
 {
-    auto payload = std::string(8, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(uint8_t{ 99 }); // unknown
-    data[1] = static_cast<std::byte>(AddrIPv4);
+    static auto constexpr N = PayloadMinIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(99); // unknown
+    payload.add_uint8(AddrIPv4);
+    while (payload.size() < N)
+    {
+        payload.add_uint8(0);
+    }
+    EXPECT_EQ(payload.size(), N);
 
     EXPECT_FALSE(decode(payload).has_value());
 }
 
 TEST(Bep55, RejectTrailingBytesBeyondErrorCode)
 {
-    auto payload = std::string(13, '\0');
-    auto* data = reinterpret_cast<std::byte*>(payload.data());
-    data[0] = static_cast<std::byte>(MsgRendezvous);
-    data[1] = static_cast<std::byte>(AddrIPv4);
-    auto const nport = htons(51413);
-    std::memcpy(data + 6, &nport, 2);
+    static auto constexpr N = PayloadFullIPv4 + 1;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgRendezvous);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(10);
+    payload.add_uint8(0);
+    payload.add_uint8(0);
+    payload.add_uint8(1);
+    payload.add_uint16(51413);
+    payload.add_uint32(0);
+    payload.add_uint8(0); // trailing byte
+    EXPECT_EQ(payload.size(), N);
 
     EXPECT_FALSE(decode(payload).has_value());
 }
 
 TEST(Bep55, RoundTripIPv4Rendezvous)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv4>{};
     auto const sa = make_ipv4(10, 0, 0, 1, 51413);
-    auto const encoded = encode(MsgRendezvous, sa);
-    auto const decoded = decode(encoded);
+    payload.add(encode(MsgRendezvous, sa));
+    auto const decoded = decode(payload);
 
     ASSERT_TRUE(decoded.has_value());
     EXPECT_EQ(decoded->msg_type, MsgRendezvous);
@@ -482,9 +547,10 @@ TEST(Bep55, RoundTripIPv4Rendezvous)
 
 TEST(Bep55, RoundTripIPv4Connect)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv4>{};
     auto const sa = make_ipv4(192, 168, 1, 100, 6881);
-    auto const encoded = encode(MsgConnect, sa);
-    auto const decoded = decode(encoded);
+    payload.add(encode(MsgConnect, sa));
+    auto const decoded = decode(payload);
 
     ASSERT_TRUE(decoded.has_value());
     EXPECT_EQ(decoded->msg_type, MsgConnect);
@@ -493,9 +559,10 @@ TEST(Bep55, RoundTripIPv4Connect)
 
 TEST(Bep55, RoundTripIPv4Error)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv4>{};
     auto const sa = make_ipv4(172, 16, 0, 5, 8080);
-    auto const encoded = encode(MsgError, sa, ErrNotConnected);
-    auto const decoded = decode(encoded);
+    payload.add(encode(MsgError, sa, ErrNotConnected));
+    auto const decoded = decode(payload);
 
     ASSERT_TRUE(decoded.has_value());
     EXPECT_EQ(decoded->msg_type, MsgError);
@@ -505,11 +572,12 @@ TEST(Bep55, RoundTripIPv4Error)
 
 TEST(Bep55, RoundTripIPv6Rendezvous)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv6>{};
     auto const sa = make_ipv6(
         { 0x20, 0x01, 0x0d, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
         6881);
-    auto const encoded = encode(MsgRendezvous, sa);
-    auto const decoded = decode(encoded);
+    payload.add(encode(MsgRendezvous, sa));
+    auto const decoded = decode(payload);
 
     ASSERT_TRUE(decoded.has_value());
     EXPECT_EQ(decoded->msg_type, MsgRendezvous);
@@ -519,11 +587,12 @@ TEST(Bep55, RoundTripIPv6Rendezvous)
 
 TEST(Bep55, RoundTripIPv6Error)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv6>{};
     auto const sa = make_ipv6(
         { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
         51413);
-    auto const encoded = encode(MsgError, sa, ErrNoSelf);
-    auto const decoded = decode(encoded);
+    payload.add(encode(MsgError, sa, ErrNoSelf));
+    auto const decoded = decode(payload);
 
     ASSERT_TRUE(decoded.has_value());
     EXPECT_EQ(decoded->msg_type, MsgError);
@@ -548,23 +617,39 @@ TEST(Bep55, EncodeAlwaysOutputsFullSize)
 
 TEST(Bep55, EncoderOutputAlwaysDecodable)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv6>{};
+
     auto const sa4 = make_ipv4(10, 0, 0, 1, 51413);
-    EXPECT_TRUE(decode(encode(MsgRendezvous, sa4)).has_value());
-    EXPECT_TRUE(decode(encode(MsgConnect, sa4)).has_value());
-    EXPECT_TRUE(decode(encode(MsgError, sa4, ErrNotConnected)).has_value());
+    payload.add(encode(MsgRendezvous, sa4));
+    EXPECT_TRUE(decode(payload).has_value());
+    payload.clear();
+    payload.add(encode(MsgConnect, sa4));
+    EXPECT_TRUE(decode(payload).has_value());
+    payload.clear();
+    payload.add(encode(MsgError, sa4, ErrNotConnected));
+    EXPECT_TRUE(decode(payload).has_value());
 
     auto const sa6 = make_ipv6(
         { 0x20, 0x01, 0x0d, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
         6881);
-    EXPECT_TRUE(decode(encode(MsgRendezvous, sa6)).has_value());
-    EXPECT_TRUE(decode(encode(MsgConnect, sa6)).has_value());
-    EXPECT_TRUE(decode(encode(MsgError, sa6, ErrNoSupport)).has_value());
+    payload.clear();
+    payload.add(encode(MsgRendezvous, sa6));
+    EXPECT_TRUE(decode(payload).has_value());
+    payload.clear();
+    payload.add(encode(MsgConnect, sa6));
+    EXPECT_TRUE(decode(payload).has_value());
+    payload.clear();
+    payload.add(encode(MsgError, sa6, ErrNoSupport));
+    EXPECT_TRUE(decode(payload).has_value());
 }
 
 TEST(Bep55, IPv4AddressPreserved)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv4>{};
+
     auto const sa = make_ipv4(123, 45, 67, 89, 9999);
-    auto const decoded = decode(encode(MsgRendezvous, sa));
+    payload.add(encode(MsgRendezvous, sa));
+    auto const decoded = decode(payload);
     ASSERT_TRUE(decoded.has_value());
 
     auto const& addr = decoded->socket_address.address();
@@ -579,10 +664,13 @@ TEST(Bep55, IPv4AddressPreserved)
 
 TEST(Bep55, IPv6AddressPreserved)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv6>{};
+
     auto const sa = make_ipv6(
         { 0x20, 0x01, 0x0d, 0xb8, 0x85, 0xa3, 0x00, 0x00, 0x8a, 0x2e, 0x03, 0x70, 0x73, 0x34, 0x00, 0x01 },
         443);
-    auto const decoded = decode(encode(MsgRendezvous, sa));
+    payload.add(encode(MsgRendezvous, sa));
+    auto const decoded = decode(payload);
     ASSERT_TRUE(decoded.has_value());
 
     auto const& addr = decoded->socket_address.address();
@@ -600,23 +688,37 @@ TEST(Bep55, LtepExtensionIdValue)
 
 TEST(Bep55, ErrorRoundTripAllCodes)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv4>{};
+
     auto const sa = make_ipv4(10, 0, 0, 1, 51413);
 
-    EXPECT_EQ(decode(encode(MsgError, sa, ErrNoSuchPeer))->err_code, ErrNoSuchPeer);
-    EXPECT_EQ(decode(encode(MsgError, sa, ErrNotConnected))->err_code, ErrNotConnected);
-    EXPECT_EQ(decode(encode(MsgError, sa, ErrNoSupport))->err_code, ErrNoSupport);
-    EXPECT_EQ(decode(encode(MsgError, sa, ErrNoSelf))->err_code, ErrNoSelf);
+    payload.add(encode(MsgError, sa, ErrNoSuchPeer));
+    EXPECT_EQ(decode(payload)->err_code, ErrNoSuchPeer);
+    payload.clear();
+    payload.add(encode(MsgError, sa, ErrNotConnected));
+    EXPECT_EQ(decode(payload)->err_code, ErrNotConnected);
+    payload.clear();
+    payload.add(encode(MsgError, sa, ErrNoSupport));
+    EXPECT_EQ(decode(payload)->err_code, ErrNoSupport);
+    payload.clear();
+    payload.add(encode(MsgError, sa, ErrNoSelf));
+    EXPECT_EQ(decode(payload)->err_code, ErrNoSelf);
 }
 
 TEST(Bep55, NonErrorZeroedErrCode)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv4>{};
+
     auto const sa = make_ipv4(10, 0, 0, 1, 51413);
 
-    auto const rv = decode(encode(MsgRendezvous, sa));
+    payload.add(encode(MsgRendezvous, sa));
+    auto const rv = decode(payload);
     ASSERT_TRUE(rv.has_value());
     EXPECT_EQ(rv->err_code, 0u);
 
-    auto const ct = decode(encode(MsgConnect, sa));
+    payload.clear();
+    payload.add(encode(MsgConnect, sa));
+    auto const ct = decode(payload);
     ASSERT_TRUE(ct.has_value());
     EXPECT_EQ(ct->err_code, 0u);
 }
