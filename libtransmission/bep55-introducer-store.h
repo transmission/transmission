@@ -66,7 +66,7 @@ public:
     static auto constexpr MaxAgeSecs = time_t{ 300 }; // 5 minutes
 
 private:
-    small::map<tr_socket_address, Entry> store_;
+    small::max_size_map<tr_socket_address, Entry, MaxSize> store_;
 };
 
 } // namespace bep55
