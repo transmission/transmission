@@ -4,11 +4,17 @@
 // License text can be found in the licenses/ folder.
 
 #include "libtransmission/bep55-holepunch.h"
-
-#include <cstring>
+#include "libtransmission/net.h"
 
 namespace bep55
 {
+namespace
+{
+
+// Sum of non-address fixed fields: msg_type(1) + addr_type(1) + port(2) = 4.
+// Note: port sits after addr on the wire; this constant is a size convenience, not a layout prefix.
+auto constexpr HeaderSize = size_t{ 4 };
+} // namespace
 
 std::optional<HolepunchMessage> decode(std::string_view payload) noexcept
 {

@@ -24,46 +24,55 @@
 #include <string_view>
 
 #include "libtransmission/net.h"
+#include "libtransmission/tr-buffer.h"
 
 namespace bep55
 {
+inline auto constexpr Ipv4CompactSize = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
+inline auto constexpr Ipv6CompactSize = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
 
 // Message types (BEP 55 §Protocol Extension)
-auto constexpr MsgRendezvous = uint8_t{ 0 };
-auto constexpr MsgConnect = uint8_t{ 1 };
-auto constexpr MsgError = uint8_t{ 2 };
+enum MsgType : uint8_t
+{
+    MsgRendezvous = 0,
+    MsgConnect = 1,
+    MsgError = 2,
+};
 
 // BEP 10 LTEP extension message ID for ut_holepunch.
 // ID 2 is free between UT_PEX_ID (1) and UT_METADATA_ID (3).
-auto constexpr LtepExtensionId = uint8_t{ 2 };
+inline auto constexpr LtepExtensionId = uint8_t{ 2 };
 
 // Address types
-auto constexpr AddrIPv4 = uint8_t{ 0 };
-auto constexpr AddrIPv6 = uint8_t{ 1 };
+enum AddrType : uint8_t
+{
+    AddrIPv4 = 0,
+    AddrIPv6 = 1,
+};
 
 // Error codes (4-byte err_code field)
-auto constexpr ErrNoSuchPeer = uint32_t{ 1 };
-auto constexpr ErrNotConnected = uint32_t{ 2 };
-auto constexpr ErrNoSupport = uint32_t{ 3 };
-auto constexpr ErrNoSelf = uint32_t{ 4 };
+// NOLINTNEXTLINE(performance-enum-size)
+enum ErrorCode : uint32_t
+{
+    ErrNoSuchPeer = 1,
+    ErrNotConnected = 2,
+    ErrNoSupport = 3,
+    ErrNoSelf = 4,
+};
 
 // Wire format sizes (non-error messages, no err_code)
-auto constexpr PayloadMinIPv4 = size_t{ 8 }; // msg_type(1) + addr_type(1) + addr(4) + port(2)
-auto constexpr PayloadMinIPv6 = size_t{ 20 }; // msg_type(1) + addr_type(1) + addr(16) + port(2)
+inline auto constexpr PayloadMinIPv4 = sizeof(MsgType) + sizeof(AddrType) + Ipv4CompactSize;
+inline auto constexpr PayloadMinIPv6 = sizeof(MsgType) + sizeof(AddrType) + Ipv6CompactSize;
 
 // Wire format sizes (all messages with err_code, including zeroed for non-error)
-auto constexpr PayloadFullIPv4 = size_t{ 12 }; // PayloadMinIPv4 + err_code(4)
-auto constexpr PayloadFullIPv6 = size_t{ 24 }; // PayloadMinIPv6 + err_code(4)
-
-// Sum of non-address fixed fields: msg_type(1) + addr_type(1) + port(2) = 4.
-// Note: port sits after addr on the wire; this constant is a size convenience, not a layout prefix.
-auto constexpr HeaderSize = size_t{ 4 };
+inline auto constexpr PayloadFullIPv4 = PayloadMinIPv4 + sizeof(ErrorCode);
+inline auto constexpr PayloadFullIPv6 = PayloadMinIPv6 + sizeof(ErrorCode);
 
 struct HolepunchMessage
 {
-    uint8_t msg_type = 0;
+    uint8_t msg_type = {};
     tr_socket_address socket_address{};
-    uint32_t err_code = 0;
+    uint32_t err_code = {};
 };
 
 // Decode a BEP 55 ut_holepunch payload.
