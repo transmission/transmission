@@ -21,9 +21,9 @@
 namespace bep55
 {
 
-// Bounded per-relay store tracking which connected peer introduced a given endpoint via PEX.
-// Maps target endpoint -> { introducing relay socket address, time recorded }.
-// Used to find a relay when a direct connection fails (rendezvous triggering).
+// Bounded per-swarm store tracking which connected peer advertised a target via PEX.
+// Maps target endpoint -> { advertising peer socket address, time recorded }.
+// Used to find a relay candidate when a direct connection fails.
 class HolepunchIntroducerStore
 {
 public:
