@@ -59,7 +59,7 @@ struct KeyLookupTable
     }
 };
 
-auto constexpr RpcKeys = std::array<ApiKey, 214U>{ {
+auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { .current = TR_KEY_active_torrent_count, .legacy = TR_KEY_active_torrent_count_camel_APICOMPAT },
     { .current = TR_KEY_activity_date, .legacy = TR_KEY_activity_date_camel_APICOMPAT },
     { .current = TR_KEY_added_date, .legacy = TR_KEY_added_date_camel_APICOMPAT },
@@ -114,7 +114,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 214U>{ {
     { .current = TR_KEY_flag_str, .legacy = TR_KEY_flag_str_camel_APICOMPAT },
     { .current = TR_KEY_from_cache, .legacy = TR_KEY_from_cache_camel_APICOMPAT },
     { .current = TR_KEY_from_dht, .legacy = TR_KEY_from_dht_camel_APICOMPAT },
-    { .current = TR_KEY_from_holepunch, .legacy = TR_KEY_from_holepunch_camel_APICOMPAT },
     { .current = TR_KEY_from_incoming, .legacy = TR_KEY_from_incoming_camel_APICOMPAT },
     { .current = TR_KEY_from_lpd, .legacy = TR_KEY_from_lpd_camel_APICOMPAT },
     { .current = TR_KEY_from_ltep, .legacy = TR_KEY_from_ltep_camel_APICOMPAT },
@@ -232,7 +231,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 214U>{ {
     { .current = TR_KEY_speed_units, .legacy = TR_KEY_speed_units_kebab_APICOMPAT },
     { .current = TR_KEY_start_added_torrents, .legacy = TR_KEY_start_added_torrents_kebab_APICOMPAT },
     { .current = TR_KEY_start_date, .legacy = TR_KEY_start_date_camel_APICOMPAT },
-    { .current = TR_KEY_supports_holepunch, .legacy = TR_KEY_supports_holepunch_camel_APICOMPAT },
     { .current = TR_KEY_tcp_enabled, .legacy = TR_KEY_tcp_enabled_kebab_APICOMPAT },
     { .current = TR_KEY_torrent_added, .legacy = TR_KEY_torrent_added_kebab_APICOMPAT },
     { .current = TR_KEY_torrent_count, .legacy = TR_KEY_torrent_count_camel_APICOMPAT },
