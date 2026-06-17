@@ -18,16 +18,12 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <array>
-#include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <optional>
 #include <string>
 #include <string_view>
 
 #include "libtransmission/net.h"
-#include "libtransmission/tr-assert.h"
 
 namespace bep55
 {
@@ -93,10 +89,5 @@ struct HolepunchMessage
 //   port      (2 bytes, network byte order)
 //   err_code  (4 bytes, network byte order, zero for non-error)
 [[nodiscard]] std::string encode(uint8_t msg_type, tr_socket_address const& addr, uint32_t err_code = 0);
-
-[[nodiscard]] inline std::string encode(uint8_t msg_type, tr_address const& addr, tr_port port, uint32_t err_code = 0)
-{
-    return encode(msg_type, tr_socket_address{ addr, port }, err_code);
-}
 
 } // namespace bep55
