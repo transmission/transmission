@@ -20,8 +20,6 @@
 
 #include <cstdint>
 #include <optional>
-#include <string>
-#include <string_view>
 
 #include "libtransmission/net.h"
 
@@ -29,7 +27,10 @@ namespace tr
 {
 template<typename value_type>
 class BufferReader;
-}
+
+template<typename value_type>
+class BufferWriter;
+} // namespace tr
 
 namespace bep55
 {
@@ -103,6 +104,10 @@ struct HolepunchMessage
 //   addr      (4 bytes for IPv4, 16 bytes for IPv6)
 //   port      (2 bytes, network byte order)
 //   err_code  (4 bytes, network byte order, zero for non-error)
-[[nodiscard]] std::string encode(uint8_t msg_type, tr_socket_address const& addr, uint32_t err_code = 0);
+[[nodiscard]] bool encode(
+    tr::BufferWriter<std::byte>& payload,
+    MsgType msg_type,
+    tr_socket_address const& addr,
+    ErrorCode err_code = ErrNonError);
 
 } // namespace bep55

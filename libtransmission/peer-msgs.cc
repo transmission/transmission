@@ -539,6 +539,16 @@ public:
         return active;
     }
 
+    void send_ut_holepunch(bep55::MsgType const msg_type, tr_socket_address const& addr, bep55::ErrorCode const err_code)
+        override
+    {
+        auto payload = tr::StackBuffer<bep55::PayloadFullIPv6>{};
+        if (can_ut_holepunch() && bep55::encode(payload, msg_type, addr, err_code))
+        {
+            protocol_send_message(BtPeerMsgs::Ltep, ut_holepunch_id_, payload);
+        }
+    }
+
 private:
     // ---
 
@@ -641,16 +651,6 @@ private:
     void parse_ut_pex(MessageReader& payload);
     void parse_ut_holepunch(MessageReader& payload);
     void parse_ltep(MessageReader& payload);
-
-    void send_ltep_message(uint8_t extension_id, std::string_view payload) override
-    {
-        protocol_send_message(BtPeerMsgs::Ltep, extension_id, payload);
-    }
-
-    [[nodiscard]] uint8_t remote_ut_holepunch_id() const override
-    {
-        return ut_holepunch_id_;
-    }
 
     [[nodiscard]] constexpr bool can_send_ut_pex() const noexcept
     {

@@ -1238,17 +1238,6 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     return {};
 }
 
-static void send_holepunch_msg(tr_peerMsgs* peer, uint8_t msg_type, tr_socket_address const& addr, uint32_t err_code = 0)
-{
-    auto const remote_id = peer->remote_ut_holepunch_id();
-    if (remote_id == 0)
-    {
-        return;
-    }
-    auto payload = bep55::encode(msg_type, addr, err_code);
-    peer->send_ltep_message(remote_id, payload);
-}
-
 namespace
 {
 namespace handshake_helpers
@@ -1404,7 +1393,7 @@ void create_bit_torrent_peer(
                     }
                     else
                     {
-                        send_holepunch_msg(introducer, bep55::MsgRendezvous, socket_address);
+                        introducer->send_ut_holepunch(bep55::MsgRendezvous, socket_address);
                         tr_logAddDebugSwarm(
                             swarm,
                             fmt::format(
@@ -1565,7 +1554,7 @@ void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, t
     if (target == nullptr)
     {
         tr_logAddTraceTor(tor, fmt::format("BEP 55: rendezvous target {} not connected", target_endpoint.display_name()));
-        send_holepunch_msg(&sender, bep55::MsgError, target_endpoint, bep55::ErrNotConnected);
+        sender.send_ut_holepunch(bep55::MsgError, target_endpoint, bep55::ErrNotConnected);
         return;
     }
 
@@ -1574,7 +1563,7 @@ void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, t
         tr_logAddTraceTor(
             tor,
             fmt::format("BEP 55: rendezvous target {} does not support holepunch", target_endpoint.display_name()));
-        send_holepunch_msg(&sender, bep55::MsgError, target_endpoint, bep55::ErrNoSupport);
+        sender.send_ut_holepunch(bep55::MsgError, target_endpoint, bep55::ErrNoSupport);
         return;
     }
 
@@ -1591,12 +1580,12 @@ void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, t
             fmt::format(
                 "BEP 55: rendezvous sender {} is its own target, sending ErrNoSelf",
                 sender.socket_address().display_name()));
-        send_holepunch_msg(&sender, bep55::MsgError, target_endpoint, bep55::ErrNoSelf);
+        sender.send_ut_holepunch(bep55::MsgError, target_endpoint, bep55::ErrNoSelf);
         return;
     }
 
     {
-        send_holepunch_msg(&sender, bep55::MsgConnect, target_endpoint);
+        sender.send_ut_holepunch(bep55::MsgConnect, target_endpoint);
         tr_logAddDebugTor(
             tor,
             fmt::format(
@@ -1610,7 +1599,7 @@ void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, t
         // For outgoing connections this is their listen port (correct for holepunch).
         // For inbound connections it is their ephemeral source port — same trade-off
         // as libtorrent's remote() — and is accepted by the spec.
-        send_holepunch_msg(target, bep55::MsgConnect, sender.socket_address());
+        target->send_ut_holepunch(bep55::MsgConnect, sender.socket_address());
         tr_logAddDebugTor(
             tor,
             fmt::format(

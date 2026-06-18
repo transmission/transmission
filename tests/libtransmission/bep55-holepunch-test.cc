@@ -26,114 +26,137 @@ static tr_socket_address make_ipv6(std::array<uint8_t, 16> const& bytes, uint16_
 
 TEST(Bep55, EncodeIPv4Rendezvous)
 {
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+
     auto const sa = make_ipv4(192, 168, 1, 100, 6881);
-    auto const payload = encode(MsgRendezvous, sa);
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa));
 
-    EXPECT_EQ(payload.size(), PayloadFullIPv4);
+    EXPECT_EQ(payload.size(), N);
 
-    auto const* data = reinterpret_cast<std::byte const*>(payload.data());
-    EXPECT_EQ(static_cast<uint8_t>(data[0]), MsgRendezvous);
-    EXPECT_EQ(static_cast<uint8_t>(data[1]), AddrIPv4);
+    EXPECT_EQ(payload.to_uint8(), MsgRendezvous);
+    EXPECT_EQ(payload.to_uint8(), AddrIPv4);
 
     // addr: 192.168.1.100
-    EXPECT_EQ(static_cast<uint8_t>(data[2]), 192);
-    EXPECT_EQ(static_cast<uint8_t>(data[3]), 168);
-    EXPECT_EQ(static_cast<uint8_t>(data[4]), 1);
-    EXPECT_EQ(static_cast<uint8_t>(data[5]), 100);
+    EXPECT_EQ(payload.to_uint8(), 192);
+    EXPECT_EQ(payload.to_uint8(), 168);
+    EXPECT_EQ(payload.to_uint8(), 1);
+    EXPECT_EQ(payload.to_uint8(), 100);
 
     // port: 6881 in network byte order
-    uint16_t nport{};
-    std::memcpy(&nport, data + 6, 2);
-    EXPECT_EQ(ntohs(nport), 6881);
+    EXPECT_EQ(payload.to_uint16(), 6881);
 
-    uint32_t nerr{};
-    std::memcpy(&nerr, data + 8, 4);
-    EXPECT_EQ(ntohl(nerr), 0u);
+    EXPECT_EQ(payload.to_uint32(), 0u);
 }
 
 TEST(Bep55, EncodeIPv4Connect)
 {
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+
     auto const sa = make_ipv4(10, 0, 0, 1, 51413);
-    auto const payload = encode(MsgConnect, sa);
+    EXPECT_TRUE(encode(payload, MsgConnect, sa));
 
-    EXPECT_EQ(payload.size(), PayloadFullIPv4);
+    EXPECT_EQ(payload.size(), N);
 
-    auto const* data = reinterpret_cast<std::byte const*>(payload.data());
-    EXPECT_EQ(static_cast<uint8_t>(data[0]), MsgConnect);
-    EXPECT_EQ(static_cast<uint8_t>(data[1]), AddrIPv4);
+    EXPECT_EQ(payload.to_uint8(), MsgConnect);
+    EXPECT_EQ(payload.to_uint8(), AddrIPv4);
 }
 
 TEST(Bep55, EncodeIPv4Error)
 {
+    static auto constexpr N = PayloadFullIPv4;
+
+    auto payload = tr::StackBuffer<N>{};
+
     auto const sa = make_ipv4(172, 16, 0, 5, 8080);
-    auto const payload = encode(MsgError, sa, ErrNotConnected);
+    EXPECT_TRUE(encode(payload, MsgError, sa, ErrNotConnected));
 
-    EXPECT_EQ(payload.size(), PayloadFullIPv4);
+    EXPECT_EQ(payload.size(), N);
 
-    auto const* data = reinterpret_cast<std::byte const*>(payload.data());
-    EXPECT_EQ(static_cast<uint8_t>(data[0]), MsgError);
-    EXPECT_EQ(static_cast<uint8_t>(data[1]), AddrIPv4);
+    EXPECT_EQ(payload.to_uint8(), MsgError);
+    EXPECT_EQ(payload.to_uint8(), AddrIPv4);
 
-    uint32_t nerr{};
-    std::memcpy(&nerr, data + 8, 4);
-    EXPECT_EQ(ntohl(nerr), ErrNotConnected);
+    payload.drain(Ipv4CompactSize);
+
+    EXPECT_EQ(payload.to_uint32(), ErrNotConnected);
 }
 
 TEST(Bep55, EncodeIPv6Rendezvous)
 {
+    static auto constexpr N = PayloadFullIPv6;
+
+    auto payload = tr::StackBuffer<N>{};
+
     auto const sa = make_ipv6(
         { 0x20, 0x01, 0x0d, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
         6881);
-    auto const payload = encode(MsgRendezvous, sa);
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa));
 
-    EXPECT_EQ(payload.size(), PayloadFullIPv6);
+    EXPECT_EQ(payload.size(), N);
 
-    auto const* data = reinterpret_cast<std::byte const*>(payload.data());
-    EXPECT_EQ(static_cast<uint8_t>(data[0]), MsgRendezvous);
-    EXPECT_EQ(static_cast<uint8_t>(data[1]), AddrIPv6);
+    EXPECT_EQ(payload.to_uint8(), MsgRendezvous);
+    EXPECT_EQ(payload.to_uint8(), AddrIPv6);
 
-    // First 2 bytes of IPv6 addr: 0x2001
-    EXPECT_EQ(static_cast<uint8_t>(data[2]), 0x20);
-    EXPECT_EQ(static_cast<uint8_t>(data[3]), 0x01);
-
-    // Last byte: 0x01
-    EXPECT_EQ(static_cast<uint8_t>(data[17]), 0x01);
+    // IPv6 addr
+    EXPECT_EQ(payload.to_uint8(), 0x20);
+    EXPECT_EQ(payload.to_uint8(), 0x01);
+    EXPECT_EQ(payload.to_uint8(), 0x0d);
+    EXPECT_EQ(payload.to_uint8(), 0xb8);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x00);
+    EXPECT_EQ(payload.to_uint8(), 0x01);
 
     // port: 6881 in network byte order
-    uint16_t nport{};
-    std::memcpy(&nport, data + 18, 2);
-    EXPECT_EQ(ntohs(nport), 6881);
+    EXPECT_EQ(payload.to_uint16(), 6881);
 }
 
 TEST(Bep55, EncodeIPv6Connect)
 {
+    static auto constexpr N = PayloadFullIPv6;
+
+    auto payload = tr::StackBuffer<N>{};
+
     auto const sa = make_ipv6(
         { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
         51413);
-    auto const payload = encode(MsgConnect, sa);
+    EXPECT_TRUE(encode(payload, MsgConnect, sa));
 
-    EXPECT_EQ(payload.size(), PayloadFullIPv6);
+    EXPECT_EQ(payload.size(), N);
 
-    auto const* data = reinterpret_cast<std::byte const*>(payload.data());
-    EXPECT_EQ(static_cast<uint8_t>(data[0]), MsgConnect);
-    EXPECT_EQ(static_cast<uint8_t>(data[1]), AddrIPv6);
+    EXPECT_EQ(payload.to_uint8(), MsgConnect);
+    EXPECT_EQ(payload.to_uint8(), AddrIPv6);
 }
 
 TEST(Bep55, EncodeIPv6Error)
 {
+    static auto constexpr N = PayloadFullIPv6;
+
+    auto payload = tr::StackBuffer<N>{};
+
     auto const sa = make_ipv6(
         { 0x20, 0x01, 0x0d, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
         8080);
-    auto const payload = encode(MsgError, sa, ErrNoSupport);
+    EXPECT_TRUE(encode(payload, MsgError, sa, ErrNoSupport));
 
-    EXPECT_EQ(payload.size(), PayloadFullIPv6);
+    EXPECT_EQ(payload.size(), N);
 
-    auto const* data = reinterpret_cast<std::byte const*>(payload.data());
-    EXPECT_EQ(static_cast<uint8_t>(data[0]), MsgError);
+    EXPECT_EQ(payload.to_uint8(), MsgError);
 
-    uint32_t nerr{};
-    std::memcpy(&nerr, data + 20, 4);
-    EXPECT_EQ(ntohl(nerr), ErrNoSupport);
+    payload.drain(PayloadMinIPv6 - 1);
+
+    EXPECT_EQ(payload.to_uint32(), ErrNoSupport);
 }
 
 TEST(Bep55, DecodeIPv4RendezvousStrict)
@@ -535,7 +558,7 @@ TEST(Bep55, RoundTripIPv4Rendezvous)
 {
     auto payload = tr::StackBuffer<PayloadFullIPv4>{};
     auto const sa = make_ipv4(10, 0, 0, 1, 51413);
-    payload.add(encode(MsgRendezvous, sa));
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa));
     auto const decoded = decode(payload);
 
     ASSERT_TRUE(decoded.has_value());
@@ -549,7 +572,7 @@ TEST(Bep55, RoundTripIPv4Connect)
 {
     auto payload = tr::StackBuffer<PayloadFullIPv4>{};
     auto const sa = make_ipv4(192, 168, 1, 100, 6881);
-    payload.add(encode(MsgConnect, sa));
+    EXPECT_TRUE(encode(payload, MsgConnect, sa));
     auto const decoded = decode(payload);
 
     ASSERT_TRUE(decoded.has_value());
@@ -561,7 +584,7 @@ TEST(Bep55, RoundTripIPv4Error)
 {
     auto payload = tr::StackBuffer<PayloadFullIPv4>{};
     auto const sa = make_ipv4(172, 16, 0, 5, 8080);
-    payload.add(encode(MsgError, sa, ErrNotConnected));
+    EXPECT_TRUE(encode(payload, MsgError, sa, ErrNotConnected));
     auto const decoded = decode(payload);
 
     ASSERT_TRUE(decoded.has_value());
@@ -576,7 +599,7 @@ TEST(Bep55, RoundTripIPv6Rendezvous)
     auto const sa = make_ipv6(
         { 0x20, 0x01, 0x0d, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
         6881);
-    payload.add(encode(MsgRendezvous, sa));
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa));
     auto const decoded = decode(payload);
 
     ASSERT_TRUE(decoded.has_value());
@@ -591,7 +614,7 @@ TEST(Bep55, RoundTripIPv6Error)
     auto const sa = make_ipv6(
         { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
         51413);
-    payload.add(encode(MsgError, sa, ErrNoSelf));
+    EXPECT_TRUE(encode(payload, MsgError, sa, ErrNoSelf));
     auto const decoded = decode(payload);
 
     ASSERT_TRUE(decoded.has_value());
@@ -602,17 +625,30 @@ TEST(Bep55, RoundTripIPv6Error)
 
 TEST(Bep55, EncodeAlwaysOutputsFullSize)
 {
+    auto payload = tr::StackBuffer<PayloadFullIPv6>{};
+
     auto const sa4 = make_ipv4(10, 0, 0, 1, 51413);
-    EXPECT_EQ(encode(MsgRendezvous, sa4).size(), PayloadFullIPv4);
-    EXPECT_EQ(encode(MsgConnect, sa4).size(), PayloadFullIPv4);
-    EXPECT_EQ(encode(MsgError, sa4, ErrNoSupport).size(), PayloadFullIPv4);
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa4));
+    EXPECT_EQ(payload.size(), PayloadFullIPv4);
+    payload.clear();
+    EXPECT_TRUE(encode(payload, MsgConnect, sa4));
+    EXPECT_EQ(payload.size(), PayloadFullIPv4);
+    payload.clear();
+    EXPECT_TRUE(encode(payload, MsgError, sa4, ErrNoSupport));
+    EXPECT_EQ(payload.size(), PayloadFullIPv4);
 
     auto const sa6 = make_ipv6(
         { 0x20, 0x01, 0x0d, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
         6881);
-    EXPECT_EQ(encode(MsgRendezvous, sa6).size(), PayloadFullIPv6);
-    EXPECT_EQ(encode(MsgConnect, sa6).size(), PayloadFullIPv6);
-    EXPECT_EQ(encode(MsgError, sa6, ErrNoSupport).size(), PayloadFullIPv6);
+    payload.clear();
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa6));
+    EXPECT_EQ(payload.size(), PayloadFullIPv6);
+    payload.clear();
+    EXPECT_TRUE(encode(payload, MsgConnect, sa6));
+    EXPECT_EQ(payload.size(), PayloadFullIPv6);
+    payload.clear();
+    EXPECT_TRUE(encode(payload, MsgError, sa6, ErrNoSupport));
+    EXPECT_EQ(payload.size(), PayloadFullIPv6);
 }
 
 TEST(Bep55, EncoderOutputAlwaysDecodable)
@@ -620,26 +656,26 @@ TEST(Bep55, EncoderOutputAlwaysDecodable)
     auto payload = tr::StackBuffer<PayloadFullIPv6>{};
 
     auto const sa4 = make_ipv4(10, 0, 0, 1, 51413);
-    payload.add(encode(MsgRendezvous, sa4));
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa4));
     EXPECT_TRUE(decode(payload).has_value());
     payload.clear();
-    payload.add(encode(MsgConnect, sa4));
+    EXPECT_TRUE(encode(payload, MsgConnect, sa4));
     EXPECT_TRUE(decode(payload).has_value());
     payload.clear();
-    payload.add(encode(MsgError, sa4, ErrNotConnected));
+    EXPECT_TRUE(encode(payload, MsgError, sa4, ErrNotConnected));
     EXPECT_TRUE(decode(payload).has_value());
 
     auto const sa6 = make_ipv6(
         { 0x20, 0x01, 0x0d, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
         6881);
     payload.clear();
-    payload.add(encode(MsgRendezvous, sa6));
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa6));
     EXPECT_TRUE(decode(payload).has_value());
     payload.clear();
-    payload.add(encode(MsgConnect, sa6));
+    EXPECT_TRUE(encode(payload, MsgConnect, sa6));
     EXPECT_TRUE(decode(payload).has_value());
     payload.clear();
-    payload.add(encode(MsgError, sa6, ErrNoSupport));
+    EXPECT_TRUE(encode(payload, MsgError, sa6, ErrNoSupport));
     EXPECT_TRUE(decode(payload).has_value());
 }
 
@@ -648,7 +684,7 @@ TEST(Bep55, IPv4AddressPreserved)
     auto payload = tr::StackBuffer<PayloadFullIPv4>{};
 
     auto const sa = make_ipv4(123, 45, 67, 89, 9999);
-    payload.add(encode(MsgRendezvous, sa));
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa));
     auto const decoded = decode(payload);
     ASSERT_TRUE(decoded.has_value());
 
@@ -669,7 +705,7 @@ TEST(Bep55, IPv6AddressPreserved)
     auto const sa = make_ipv6(
         { 0x20, 0x01, 0x0d, 0xb8, 0x85, 0xa3, 0x00, 0x00, 0x8a, 0x2e, 0x03, 0x70, 0x73, 0x34, 0x00, 0x01 },
         443);
-    payload.add(encode(MsgRendezvous, sa));
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa));
     auto const decoded = decode(payload);
     ASSERT_TRUE(decoded.has_value());
 
@@ -692,16 +728,16 @@ TEST(Bep55, ErrorRoundTripAllCodes)
 
     auto const sa = make_ipv4(10, 0, 0, 1, 51413);
 
-    payload.add(encode(MsgError, sa, ErrNoSuchPeer));
+    EXPECT_TRUE(encode(payload, MsgError, sa, ErrNoSuchPeer));
     EXPECT_EQ(decode(payload)->err_code, ErrNoSuchPeer);
     payload.clear();
-    payload.add(encode(MsgError, sa, ErrNotConnected));
+    EXPECT_TRUE(encode(payload, MsgError, sa, ErrNotConnected));
     EXPECT_EQ(decode(payload)->err_code, ErrNotConnected);
     payload.clear();
-    payload.add(encode(MsgError, sa, ErrNoSupport));
+    EXPECT_TRUE(encode(payload, MsgError, sa, ErrNoSupport));
     EXPECT_EQ(decode(payload)->err_code, ErrNoSupport);
     payload.clear();
-    payload.add(encode(MsgError, sa, ErrNoSelf));
+    EXPECT_TRUE(encode(payload, MsgError, sa, ErrNoSelf));
     EXPECT_EQ(decode(payload)->err_code, ErrNoSelf);
 }
 
@@ -711,13 +747,13 @@ TEST(Bep55, NonErrorZeroedErrCode)
 
     auto const sa = make_ipv4(10, 0, 0, 1, 51413);
 
-    payload.add(encode(MsgRendezvous, sa));
+    EXPECT_TRUE(encode(payload, MsgRendezvous, sa));
     auto const rv = decode(payload);
     ASSERT_TRUE(rv.has_value());
     EXPECT_EQ(rv->err_code, 0u);
 
     payload.clear();
-    payload.add(encode(MsgConnect, sa));
+    EXPECT_TRUE(encode(payload, MsgConnect, sa));
     auto const ct = decode(payload);
     ASSERT_TRUE(ct.has_value());
     EXPECT_EQ(ct->err_code, 0u);

@@ -11,11 +11,6 @@ namespace bep55
 {
 namespace
 {
-
-// Sum of non-address fixed fields: msg_type(1) + addr_type(1) + port(2) = 4.
-// Note: port sits after addr on the wire; this constant is a size convenience, not a layout prefix.
-auto constexpr HeaderSize = size_t{ 4 };
-
 [[nodiscard]] constexpr bool is_valid_msg_type(uint8_t const msg_type) noexcept
 {
     return msg_type == MsgRendezvous || msg_type == MsgConnect || msg_type == MsgError;
@@ -100,37 +95,32 @@ std::optional<HolepunchMessage> decode(tr::BufferReader<std::byte>& payload) noe
     return msg;
 }
 
-std::string encode(uint8_t msg_type, tr_socket_address const& addr, uint32_t err_code)
+bool encode(
+    tr::BufferWriter<std::byte>& payload,
+    MsgType const msg_type,
+    tr_socket_address const& addr,
+    ErrorCode const err_code)
 {
-    auto const& address = addr.address();
-    auto const port = addr.port();
-    auto const is_v4 = address.is_ipv4();
-
-    auto const addr_len = is_v4 ? size_t{ 4 } : size_t{ 16 };
-    auto const total = HeaderSize + addr_len + 4; // HeaderSize(4) + addr + err_code(4)
-
-    auto buf = std::string(total, '\0');
-    auto* out = reinterpret_cast<std::byte*>(buf.data());
-
-    out[0] = static_cast<std::byte>(msg_type);
-    out[1] = static_cast<std::byte>(is_v4 ? AddrIPv4 : AddrIPv6);
-
-    if (is_v4)
+    if (!is_valid_msg_type(msg_type))
     {
-        std::memcpy(out + 2, &address.addr.addr4.s_addr, 4);
-    }
-    else
-    {
-        std::memcpy(out + 2, &address.addr.addr6.s6_addr, 16);
+        return false;
     }
 
-    auto const nport = port.network();
-    std::memcpy(out + 2 + addr_len, &nport, sizeof(nport));
+    if (!addr.is_valid())
+    {
+        return false;
+    }
 
-    auto const nerr_code = htonl(err_code);
-    std::memcpy(out + 2 + addr_len + 2, &nerr_code, sizeof(nerr_code));
+    payload.add_uint8(msg_type);
+    payload.add_uint8(addr.address().is_ipv4() ? AddrIPv4 : AddrIPv6);
 
-    return buf;
+    auto const [paddr, addr_len] = payload.reserve_space(addr.address().is_ipv4() ? Ipv4CompactSize : Ipv6CompactSize);
+    addr.to_compact(paddr);
+    payload.commit_space(addr_len);
+
+    payload.add_uint32(err_code);
+
+    return true;
 }
 
 } // namespace bep55
