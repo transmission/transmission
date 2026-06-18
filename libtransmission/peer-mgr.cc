@@ -1524,25 +1524,24 @@ namespace
 
 [[nodiscard]] tr_peerMsgs* find_connected_peer(tr_swarm* swarm, tr_socket_address const& addr)
 {
+    // Inbound peers are tracked by their ephemeral source port, but the target
+    // address in a MsgRendezvous payload comes from PEX (the advertised listen
+    // port). An exact socket_address match always wins; otherwise fall back to
+    // the listen address so relay lookups succeed for peers that connected
+    // inbound to us.
+    tr_peerMsgs* listen_match = nullptr;
     for (auto& peer : swarm->peers)
     {
         if (peer->socket_address() == addr)
         {
             return peer.get();
         }
-    }
-    // Inbound peers are tracked by their ephemeral source port, but the target
-    // address in a MsgRendezvous payload comes from PEX (the advertised listen
-    // port). Fall back to the listen address so relay lookups succeed for peers
-    // that connected inbound to us.
-    for (auto& peer : swarm->peers)
-    {
-        if (peer->peer_info && peer->peer_info->listen_socket_address() == addr)
+        if (listen_match == nullptr && peer->peer_info && peer->peer_info->listen_socket_address() == addr)
         {
-            return peer.get();
+            listen_match = peer.get();
         }
     }
-    return nullptr;
+    return listen_match;
 }
 
 } // anonymous namespace
