@@ -1278,8 +1278,8 @@ void create_bit_torrent_peer(
 [[nodiscard]] bool is_local_peer_endpoint(tr_session const* session, tr_socket_address const& endpoint)
 {
     auto const& address = endpoint.address();
-    // If advertisedPeerPort() is 0 (not yet discovered), no endpoint can match
-    // and we silently skip self-detection. The relay will return ErrNoSelf instead.
+    // Peer endpoints advertised via tracker/PEX use our externally-visible
+    // peer port, which can differ from the local bind port after port mapping.
     if (endpoint.port() != session->advertisedPeerPort())
     {
         return false;
