@@ -733,10 +733,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
 // BEP 55: Holepunch extension relay.
 // Called when a connected peer sends us a rendezvous message.
 // Finds the target among connected peers and sends connect to both sides.
-void tr_peerMgrHandleHolepunchRendezvous(
-    tr_torrent* tor,
-    tr_socket_address const& sender_socket_address,
-    tr_socket_address const& target_endpoint);
+void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, tr_socket_address const& target_endpoint);
 
 // BEP 55: Initiate an outgoing uTP-only connection to an endpoint in response
 // to a received connect message. The normal handshake, socket, blocklist, and

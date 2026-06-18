@@ -1546,10 +1546,7 @@ namespace
 
 } // anonymous namespace
 
-void tr_peerMgrHandleHolepunchRendezvous(
-    tr_torrent* tor,
-    tr_socket_address const& sender_socket_address,
-    tr_socket_address const& target_endpoint)
+void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, tr_socket_address const& target_endpoint)
 {
     auto* s = tor->swarm;
     if (s == nullptr || !s->is_running)
@@ -1565,18 +1562,11 @@ void tr_peerMgrHandleHolepunchRendezvous(
         return;
     }
 
-    auto* sender = find_connected_peer(s, sender_socket_address);
-    if (sender == nullptr)
-    {
-        tr_logAddTraceTor(tor, fmt::format("BEP 55: rendezvous sender {} not connected", sender_socket_address.display_name()));
-        return;
-    }
-
-    if (!sender->peer_info || !sender->peer_info->supports_holepunch().value_or(false))
+    if (!sender.peer_info || !sender.peer_info->supports_holepunch().value_or(false))
     {
         tr_logAddTraceTor(
             tor,
-            fmt::format("BEP 55: rendezvous sender {} does not support holepunch", sender_socket_address.display_name()));
+            fmt::format("BEP 55: rendezvous sender {} does not support holepunch", sender.socket_address().display_name()));
         return;
     }
 
@@ -1594,7 +1584,7 @@ void tr_peerMgrHandleHolepunchRendezvous(
         auto port_match_count = size_t{ 0 };
         for (auto& peer : s->peers)
         {
-            if (peer.get() != sender && peer->socket_address().port() == target_endpoint.port() && peer->peer_info &&
+            if (peer.get() != &sender && peer->socket_address().port() == target_endpoint.port() && peer->peer_info &&
                 peer->peer_info->supports_holepunch().value_or(false))
             {
                 port_match = peer.get();
@@ -1618,7 +1608,7 @@ void tr_peerMgrHandleHolepunchRendezvous(
     if (target == nullptr)
     {
         tr_logAddTraceTor(tor, fmt::format("BEP 55: rendezvous target {} not connected", target_endpoint.display_name()));
-        send_holepunch_msg(sender, bep55::MsgError, target_endpoint, bep55::ErrNotConnected);
+        send_holepunch_msg(&sender, bep55::MsgError, target_endpoint, bep55::ErrNotConnected);
         return;
     }
 
@@ -1627,28 +1617,28 @@ void tr_peerMgrHandleHolepunchRendezvous(
         tr_logAddTraceTor(
             tor,
             fmt::format("BEP 55: rendezvous target {} does not support holepunch", target_endpoint.display_name()));
-        send_holepunch_msg(sender, bep55::MsgError, target_endpoint, bep55::ErrNoSupport);
+        send_holepunch_msg(&sender, bep55::MsgError, target_endpoint, bep55::ErrNoSupport);
         return;
     }
 
-    if (target == sender)
+    if (target == &sender)
     {
         tr_logAddDebugTor(
             tor,
             fmt::format(
                 "BEP 55: rendezvous sender {} is its own target, sending ErrNoSelf",
-                sender_socket_address.display_name()));
-        send_holepunch_msg(sender, bep55::MsgError, target_endpoint, bep55::ErrNoSelf);
+                sender.socket_address().display_name()));
+        send_holepunch_msg(&sender, bep55::MsgError, target_endpoint, bep55::ErrNoSelf);
         return;
     }
 
     {
-        send_holepunch_msg(sender, bep55::MsgConnect, target_endpoint);
+        send_holepunch_msg(&sender, bep55::MsgConnect, target_endpoint);
         tr_logAddDebugTor(
             tor,
             fmt::format(
                 "BEP 55: relay: sent MsgConnect to initiator {} (target={})",
-                sender_socket_address.display_name(),
+                sender.socket_address().display_name(),
                 target_endpoint.display_name()));
     }
 
@@ -1657,13 +1647,13 @@ void tr_peerMgrHandleHolepunchRendezvous(
         // For outgoing connections this is their listen port (correct for holepunch).
         // For inbound connections it is their ephemeral source port — same trade-off
         // as libtorrent's remote() — and is accepted by the spec.
-        send_holepunch_msg(target, bep55::MsgConnect, sender->socket_address());
+        send_holepunch_msg(target, bep55::MsgConnect, sender.socket_address());
         tr_logAddDebugTor(
             tor,
             fmt::format(
                 "BEP 55: relay: sent MsgConnect to target {} (initiator={})",
                 target_endpoint.display_name(),
-                sender_socket_address.display_name()));
+                sender.socket_address().display_name()));
     }
 }
 

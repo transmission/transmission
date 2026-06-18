@@ -1089,7 +1089,7 @@ void tr_peerMsgsImpl::parse_ut_holepunch(MessageReader& payload)
         logdbg(
             this,
             fmt::format("got ut_holepunch rendezvous from {} -> {}", io_->display_name(), msg->socket_address.display_name()));
-        tr_peerMgrHandleHolepunchRendezvous(&tor_, io_->socket_address(), msg->socket_address);
+        tr_peerMgrHandleHolepunchRendezvous(&tor_, *this, msg->socket_address);
         break;
 
     case bep55::MsgConnect:
