@@ -1243,12 +1243,8 @@ void tr_peerMsgsImpl::send_ltep_handshake()
     /* decide if we want to advertise pex support */
     bool const allow_pex = tor_.allows_pex();
 
-#ifdef WITH_UTP
     /* decide if we want to advertise holepunch support (bep 55) */
-    bool const allow_holepunch = tor_.is_public() && session->allowsUTP();
-#else
-    bool const allow_holepunch = false;
-#endif
+    bool const allow_holepunch = tor_.allows_holepunch();
 
     auto val = tr_variant::Map{ 8U };
     val.try_emplace(TR_KEY_e, session->encryptionMode() != TR_CLEAR_PREFERRED);

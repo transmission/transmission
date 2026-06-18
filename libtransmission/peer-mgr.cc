@@ -1377,7 +1377,7 @@ void create_bit_torrent_peer(
         if (info && !result.io->is_incoming() && !was_holepunch_attempt)
         {
             tr_torrent* tor = swarm->tor;
-            if (!tor->is_private() && tor->allows_pex() && tor->session->allowsUTP())
+            if (tor->allows_pex() && tor->allows_holepunch())
             {
                 // Don't ask an introducer to relay a connection to ourselves.
                 // The tracker/PEX may advertise our own address; the direct
@@ -3023,11 +3023,6 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
 
     auto const lock = s->unique_lock();
 
-    if (tor->is_private())
-    {
-        return;
-    }
-
     if (!endpoint.is_valid_for_peers(TR_PEER_FROM_HOLEPUNCH))
     {
         tr_logAddDebugTor(tor, fmt::format("BEP 55: invalid peer {}, skipping holepunch connect", endpoint.display_name()));
@@ -3036,9 +3031,8 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
 
     auto* const session = tor->session;
 
-    if (!session->allowsUTP())
+    if (!tor->allows_holepunch())
     {
-        tr_logAddDebugTor(tor, fmt::format("BEP 55: uTP disabled, skipping holepunch connect to {}", endpoint.display_name()));
         return;
     }
 
