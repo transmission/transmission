@@ -1392,9 +1392,9 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
             }
         }
 
-        if (auto const ut_holepunch = sub->value_if<int64_t>(TR_KEY_ut_holepunch))
+        if (auto const ut_holepunch = sub->value_if<uint8_t>(TR_KEY_ut_holepunch))
         {
-            ut_holepunch_id_ = static_cast<uint8_t>(*ut_holepunch);
+            ut_holepunch_id_ = *ut_holepunch;
             holepunch_supported = *ut_holepunch != 0;
         }
     }
