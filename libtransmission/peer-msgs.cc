@@ -658,6 +658,11 @@ private:
         return tor_.allows_pex() && ut_pex_id_ != 0U;
     }
 
+    [[nodiscard]] bool can_ut_holepunch() const noexcept
+    {
+        return tor_.allows_holepunch() && ut_holepunch_id_ != 0U;
+    }
+
     void send_ut_pex();
 
     tr_error_code_t client_got_block(std::span<uint8_t const> block_data, tr_block_index_t block);
@@ -1051,27 +1056,8 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
 
 void tr_peerMsgsImpl::parse_ut_holepunch(MessageReader& payload)
 {
-    // Ignore on private torrents even if the remote peer advertised ut_holepunch
-    if (tor_.is_private())
+    if (!can_ut_holepunch())
     {
-        logdbg(this, "got ut_holepunch on private torrent, ignoring");
-        return;
-    }
-
-#ifdef WITH_UTP
-    if (!session->allowsUTP())
-    {
-        logdbg(this, "got ut_holepunch while uTP is disabled, ignoring");
-        return;
-    }
-#else
-    logdbg(this, "got ut_holepunch without uTP support, ignoring");
-    return;
-#endif
-
-    if (ut_holepunch_id_ == 0U || !peer_info || !peer_info->supports_holepunch().value_or(false))
-    {
-        logdbg(this, "got ut_holepunch from peer that did not advertise support, ignoring");
         return;
     }
 
