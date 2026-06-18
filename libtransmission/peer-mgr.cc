@@ -1384,7 +1384,7 @@ void create_bit_torrent_peer(
                 // connect correctly fails, but sending a rendezvous for our
                 // own address wastes a round-trip (introducer returns ErrNoSelf)
                 // or worse triggers a spurious holepunch connect back to us.
-                if (is_local_peer_endpoint(tor->session, socket_address))
+                if (result.peer_id ? *result.peer_id == tor->peer_id() : is_local_peer_endpoint(tor->session, socket_address))
                 {
                     tr_logAddTraceSwarm(
                         swarm,
