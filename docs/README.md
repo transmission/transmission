@@ -7,7 +7,7 @@ New to Transmission?
   * Using Transmission [from a web browser](./Web-Interface.md)
 
 Want to learn more?
-  * Visit our [forums](https://forum.transmissionbt.com)
+  * Visit our [forums](https://forum.transmissiontorrent.com/)
   * Visit our [IRC](https://en.wikipedia.org/wiki/IRC) channel: [#transmission on Libera.Chat](https://web.libera.chat/#transmission)
   * Follow us on [Twitter](https://twitter.com/transmissionbt)
 
@@ -35,7 +35,7 @@ Much of this documentation is out-of-date or could be improved. Pull requests ar
 
 # 3. Report a problem / request a feature #
   * [Check](https://github.com/transmission/transmission/issues) whether the problem has already been reported.
-  * If you do not see a ticket matching your problem or feature, read [this post](https://forum.transmissionbt.com/viewtopic.php?f=1&t=3274) about what to write, then [add a new ticket](https://github.com/transmission/transmission/issues/new).
+  * If you do not see a ticket matching your problem or feature, then [add a new ticket](https://github.com/transmission/transmission/issues/new).
   * If you _do_ see an existing ticket, please add a comment there. The more users are interested in a ticket, the higher its priority.
 
 # 4. For contributors #

@@ -44,6 +44,4 @@ Opening a closed port is often the most frustrating task in BitTorrent. The good
 You can also test your port status at [canyouseeme.org](https://www.canyouseeme.org/).
 
 ## 10. Is it a Transmission Bug?
-If you have looked at all the reasons above and none of them fit &mdash; Ubuntu downloaded quickly, and you got the latest version of Transmission, and there are plenty of seeds _and_ downloaders in your torrent, yet things are _still_ slow &mdash; then maybe you have found a Transmission bug. Go [read this post](https://forum.transmissionbt.com/viewtopic.php?f=1&t=3274) about what information the developers need to diagnose the problem, and then post a message describing your situation.
-
-Make sure to give enough information! Vague bug reports waste everyone's time and will probably just get you referred back to this page.
+If you have looked at all the reasons above and none of them fit &mdash; Ubuntu downloaded quickly, and you got the latest version of Transmission, and there are plenty of seeds _and_ downloaders in your torrent, yet things are _still_ slow &mdash; then maybe you have found a Transmission bug. Please report an issue at the bug tracker. Make sure to give enough information! Vague bug reports waste everyone's time and will probably just get you referred back to this page.

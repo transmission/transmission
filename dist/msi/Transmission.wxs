@@ -100,7 +100,7 @@
     <Property Id="ARPPRODUCTICON" Value="Tr.ico" />
 
     <Property Id="ARPURLINFOABOUT" Value="https://transmissionbt.com/" />
-    <Property Id="ARPHELPLINK" Value="https://forum.transmissionbt.com/" />
+    <Property Id="ARPHELPLINK" Value="https://forum.transmissiontorrent.com/" />
   </Product>
 
 </Wix>
