@@ -1,5 +1,5 @@
 The Transmission Project
-https://transmissionbt.com/
+https://transmissiontorrent.com/
 
 Maintainers
   Charles Kerr (@ckerr) (libtransmission, Qt client, utils)
@@ -21,8 +21,8 @@ Hall of Fame
   Juliusz Chroboczek (DHT, network code)
   Bryan Varner (BeOS client)
   Malcolm Jarvis (Web client)
-  Kendall Hopkins <SoftwareElves@gmail.com> (Web client)
-  Kevin Glowacz <kjg@transmissionbt.com> (Web client)
+  Kendall Hopkins (Web client)
+  Kevin Glowacz (Web client)
 
 Starting with Transmission 4.0.0, contributors are credited in each
 release's notes so that repeat contributions receive repeat shout-outs.

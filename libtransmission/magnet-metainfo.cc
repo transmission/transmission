@@ -243,7 +243,12 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* err
         }
         else if (key == "tr"sv || tr_strv_starts_with(key, "tr."sv))
         {
-            // "tr." explanation @ https://trac.transmissionbt.com/ticket/3341
+            // some magnet links have tracker notation like this:
+            // tr.1=http://sometracker/announce&tr.2=http://someothertracker/announce
+            // The dot-number notation differs from BEP 9, which specifies:
+            // tr=http://sometracker/announce&tr=http://someothertracker/announce
+            // This seems to come from it does the original magnet spec (not
+            // bittorrent BEP), so we should silently support this notation
             this->announce_list_.add(tr_urlPercentDecode(value));
         }
         else if (key == "ws"sv)

@@ -99,7 +99,7 @@
     <Icon Id="Tr.ico" SourceFile="transmission.ico" />
     <Property Id="ARPPRODUCTICON" Value="Tr.ico" />
 
-    <Property Id="ARPURLINFOABOUT" Value="https://transmissionbt.com/" />
+    <Property Id="ARPURLINFOABOUT" Value="https://transmissiontorrent.com/" />
     <Property Id="ARPHELPLINK" Value="https://forum.transmissiontorrent.com/" />
   </Product>
 

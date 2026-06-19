@@ -73,7 +73,7 @@ namespace
 {
 char constexpr MyName[] = "transmission-daemon";
 char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
-                         "  https://transmissionbt.com/\n"
+                         "  https://transmissiontorrent.com/\n"
                          "A fast and easy BitTorrent client\n"
                          "\n"
                          "transmission-daemon is a headless Transmission session that can be\n"

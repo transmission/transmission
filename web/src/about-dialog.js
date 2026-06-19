@@ -45,9 +45,9 @@ export class AboutDialog extends EventTarget {
     elements.workarea.append(e);
 
     e = document.createElement('a');
-    e.href = 'https://transmissionbt.com/';
+    e.href = 'https://transmissiontorrent.com/';
     e.target = '_blank';
-    e.textContent = 'https://transmissionbt.com/';
+    e.textContent = 'https://transmissiontorrent.com/';
     elements.workarea.append(e);
 
     elements.confirm.remove();

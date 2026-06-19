@@ -656,7 +656,7 @@ void MainWindow::openStats()
 
 void MainWindow::openDonate() const
 {
-    QDesktopServices::openUrl(QUrl{ QStringLiteral("https://transmissionbt.com/donate/") });
+    QDesktopServices::openUrl(QUrl{ QStringLiteral("https://transmissiontorrent.com/donate/") });
 }
 
 void MainWindow::openAbout()
@@ -667,7 +667,7 @@ void MainWindow::openAbout()
 void MainWindow::openHelp() const
 {
     QDesktopServices::openUrl(
-        QUrl{ QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).arg(MINOR_VERSION / 10) });
+        QUrl{ QStringLiteral("https://transmissiontorrent.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).arg(MINOR_VERSION / 10) });
 }
 
 /****

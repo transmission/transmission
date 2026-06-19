@@ -58,7 +58,7 @@ char constexpr MyName[] = "transmission-remote";
 char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
                          "\n"
                          "A fast and easy BitTorrent client\n"
-                         "https://transmissionbt.com/\n"
+                         "https://transmissiontorrent.com/\n"
                          "\n"
                          "Usage: transmission-remote [host] [options]\n"
                          "       transmission-remote [port] [options]\n"

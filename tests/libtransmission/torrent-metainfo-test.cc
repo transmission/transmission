@@ -40,7 +40,7 @@ TEST_F(TorrentMetainfoTest, magnetLink)
         "&dn=ubuntu_12_04_1_desktop_32_bit"
         "&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce"
         "&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80"
-        "&ws=http%3A%2F%2Ftransmissionbt.com"sv;
+        "&ws=http%3A%2F%2Ftransmissiontorrent.com"sv;
 
     auto metainfo = tr_torrent_metainfo{};
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));

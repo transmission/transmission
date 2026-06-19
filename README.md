@@ -7,7 +7,7 @@ Transmission is a fast, easy, and free BitTorrent client. It comes in several fl
   * A headless daemon for servers and routers
   * A web UI for remote controlling any of the above
   
-Visit https://transmissionbt.com/ for more information.
+Visit https://transmissiontorrent.com/ for more information.
 
 ## Documentation
 

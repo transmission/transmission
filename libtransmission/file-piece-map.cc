@@ -186,7 +186,7 @@ tr_priority_t tr_file_priorities::piece_priority(tr_piece_index_t const piece) c
 {
     // increase priority if a file begins or ends in this piece
     // because that makes life easier for code/users using at incomplete files.
-    // Xrefs: f2daeb242, https://forum.transmissionbt.com/viewtopic.php?t=10473
+    // Xrefs: f2daeb242
     if (fpm_->is_edge_piece(piece))
     {
         return TR_PRI_HIGH;

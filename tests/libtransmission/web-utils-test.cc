@@ -95,7 +95,7 @@ TEST_F(WebUtilsTest, urlParse)
         "&dn=ubuntu_12_04_1_desktop_32_bit"
         "&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce"
         "&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80"
-        "&ws=http%3A%2F%2Ftransmissionbt.com"sv;
+        "&ws=http%3A%2F%2Ftransmissiontorrent.com"sv;
     parsed = tr_urlParse(url);
     EXPECT_TRUE(parsed);
     EXPECT_EQ("magnet"sv, parsed->scheme);
@@ -107,7 +107,7 @@ TEST_F(WebUtilsTest, urlParse)
         "&dn=ubuntu_12_04_1_desktop_32_bit"
         "&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce"
         "&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80"
-        "&ws=http%3A%2F%2Ftransmissionbt.com"sv,
+        "&ws=http%3A%2F%2Ftransmissiontorrent.com"sv,
         parsed->query);
 
     // test a host whose public suffix contains >1 dot

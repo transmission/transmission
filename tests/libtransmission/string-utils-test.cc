@@ -170,7 +170,6 @@ TEST_F(UtilsTest, strvReplaceInvalid)
     EXPECT_EQ(out, tr_strv_replace_invalid(out));
     EXPECT_EQ(in, out);
 
-    // https://trac.transmissionbt.com/ticket/6064
     // This was a fuzzer-generated string that crashed Transmission.
     // Even invalid strings shouldn't cause a crash.
     in = "\xF4\x00\x81\x82"sv;

@@ -1382,7 +1382,7 @@ bool Application::Impl::update_model_loop()
 
 void Application::Impl::show_about_dialog()
 {
-    auto const uri = Glib::ustring("https://transmissionbt.com/");
+    auto const uri = Glib::ustring("https://transmissiontorrent.com/");
     auto const authors = std::vector<Glib::ustring>({
         "Charles Kerr (Backend; GTK+)",
         "Mitchell Livingston (Backend; macOS)",
@@ -1528,7 +1528,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     }
     else if (action_name == "donate")
     {
-        gtr_open_uri("https://transmissionbt.com/donate/");
+        gtr_open_uri("https://transmissiontorrent.com/donate/");
     }
     else if (action_name == "pause-all-torrents")
     {

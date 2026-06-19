@@ -617,7 +617,7 @@ void gtr_object_notify_emit(Glib::ObjectBase& object)
 
 std::string gtr_get_help_uri(std::string_view const relative_path)
 {
-    return fmt::format("https://transmissionbt.com/help/gtk/{}.{}x/{}", MAJOR_VERSION, MINOR_VERSION / 10, relative_path);
+    return fmt::format("https://transmissiontorrent.com/help/gtk/{}.{}x/{}", MAJOR_VERSION, MINOR_VERSION / 10, relative_path);
 }
 
 void gtr_open_file(std::string_view const base, std::string_view const relative_path)
