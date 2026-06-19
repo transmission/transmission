@@ -20,7 +20,7 @@
 
 @implementation BlocklistDownloaderViewController
 
-BlocklistDownloaderViewController* fBLViewController = nil;
+static BlocklistDownloaderViewController* fBLViewController = nil;
 + (void)downloadWithPrefsController:(PrefsController*)prefsController
 {
     if (!fBLViewController)
