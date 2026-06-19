@@ -1357,15 +1357,18 @@ void create_bit_torrent_peer(
 
         if (info)
         {
-            info->set_holepunch_attempt(false);
-
-            // BEP 55: rewind attempt timer so the scheduler retries immediately.
-            // NAT hole-punching requires rapid concurrent connection attempts;
-            // waiting for normal backoff (10s+) prevents punch-through.
-            // Mirrors libtorrent's fast_reconnect(true) after a holepunch failure.
-            if (was_holepunch_attempt)
+            // BEP 55: retry failed punches quickly, before the NAT mapping/timing window is lost.
+            // Keep retries in holepunch mode so they stay uTP-only and do not send another
+            // rendezvous. The cap avoids a rendezvous -> connect -> fail loop for dead peers.
+            if (was_holepunch_attempt && info->can_fast_retry_holepunch())
             {
+                info->on_holepunch_fast_retry();
                 info->fast_reconnect(tr_time());
+            }
+            else
+            {
+                info->set_holepunch_attempt(false);
+                info->reset_holepunch_retries();
             }
         }
 
@@ -1442,6 +1445,7 @@ void create_bit_torrent_peer(
         tr_logAddDebugSwarm(swarm, fmt::format("BEP 55: holepunch connection to {} succeeded", info->display_name()));
     }
     info->set_holepunch_attempt(false);
+    info->reset_holepunch_retries();
 
     // If we're connected via µTP, then we know the peer supports µTP...
     if (result.io->is_utp())
@@ -3114,6 +3118,7 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
             fmt::format("BEP 55: peerIo not created for {}, marking not connectable", endpoint.display_name()));
         peer_info->set_connectable(false);
         peer_info->set_holepunch_attempt(false);
+        peer_info->reset_holepunch_retries();
         return;
     }
 
@@ -3147,7 +3152,17 @@ void tr_peerMgr::make_new_peer_connections()
         {
             if (auto const& peer_info = tor->swarm->get_existing_peer_info(sock_addr))
             {
-                initiate_connection(this, tor->swarm, *peer_info);
+                // BEP 55: a candidate still flagged as a holepunch attempt is in sticky
+                // fast-retry mode. Re-issue the uTP-forced punch instead of a normal
+                // connect, which could fall back to TCP and never open a NAT mapping.
+                if (peer_info->is_holepunch_attempt())
+                {
+                    tr_peerMgrConnectHolepunch(tor, sock_addr);
+                }
+                else
+                {
+                    initiate_connection(this, tor->swarm, *peer_info);
+                }
             }
         }
     }

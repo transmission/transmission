@@ -258,6 +258,7 @@ public:
         if (is_connected_)
         {
             piece_data_at_ = {};
+            holepunch_retries_ = {};
         }
         else if (has_transferred_piece_data())
         {
@@ -435,6 +436,21 @@ public:
         is_holepunch_attempt_ = value;
     }
 
+    [[nodiscard]] constexpr auto can_fast_retry_holepunch() const noexcept
+    {
+        return holepunch_retries_ < MaxHolepunchFastRetries;
+    }
+
+    constexpr void on_holepunch_fast_retry() noexcept
+    {
+        ++holepunch_retries_;
+    }
+
+    constexpr void reset_holepunch_retries() noexcept
+    {
+        holepunch_retries_ = {};
+    }
+
     [[nodiscard]] constexpr uint8_t pex_flags() const noexcept
     {
         auto ret = pex_flags_;
@@ -574,6 +590,11 @@ private:
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
     static auto constexpr InactiveThresSecs = time_t{ 60 * 60 };
 
+    // BEP 55: how many times we fast-retry a uTP holepunch before giving up and
+    // falling back to normal backoff. Matches libtorrent's effective fast_reconnect
+    // budget, which becomes a no-op once fast_reconnects > 1.
+    static auto constexpr MaxHolepunchFastRetries = uint8_t{ 2 };
+
     static auto inline n_known_connectable = size_t{};
 
     // if the port is 0, it SHOULD mean we don't know this peer's listen socket address
@@ -594,6 +615,7 @@ private:
     tr_peer_from from_best_; // the "best" place where this peer was found
 
     uint8_t num_consecutive_fruitless_ = {};
+    uint8_t holepunch_retries_ = {};
     uint8_t pex_flags_ = {};
 
     // https://www.bittorrent.org/beps/bep_0040.html
