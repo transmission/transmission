@@ -68,7 +68,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 {
     self.fTimer = nil;
 
-    NSString* urlString = [NSString stringWithFormat:@"https://portcheck.transmissionbt.com/%ld", port];
+    NSString* urlString = [NSString stringWithFormat:@"https://portcheck.transmissiontorrent.com/%ld", port];
     NSURLRequest* portProbeRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]
                                                       cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
                                                   timeoutInterval:15.0];
