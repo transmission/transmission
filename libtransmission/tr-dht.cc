@@ -113,7 +113,7 @@ namespace
 {
 
 constexpr std::array<std::pair<char const*, uint16_t>, 3> const DefaultBootstraps = { {
-    { "dht.transmissionbt.com", 6881 },
+    { "dht.transmissiontorrent.com", 6881 },
     { "router.bittorrent.com", 6881 },
     { "dht.libtorrent.org", 25401 },
 } };
