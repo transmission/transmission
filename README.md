@@ -44,7 +44,7 @@ $ sudo cmake --install .
 
 ### Building Transmission from the nightly builds
 
-Download a tarball from https://build.transmissionbt.com/job/trunk-linux/ and follow the steps from the previous section.
+Download a tarball from https://build.transmissiontorrent.com/ and follow the steps from the previous section.
 
 If you're new to building programs from source code, this is typically easier than building from Git.
 

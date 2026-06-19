@@ -1,5 +1,5 @@
 ## Getting the Source ##
-The source code for both official and nightly releases can be found on our [download page](https://transmissionbt.com/download/).
+The source code for both official and nightly releases can be found on our [download page](https://transmissiontorrent.com/download/).
 
 ## On macOS ##
 While the prerequisites for running the app are:
@@ -14,7 +14,7 @@ Building the project on Mac requires the source to be retrieved from GitHub. Pre
 git clone --recurse-submodules https://github.com/transmission/transmission Transmission
 ```
 
-If building from source is too daunting for you, check out the [nightly builds](https://build.transmissionbt.com/job/trunk-mac/).
+If building from source is too daunting for you, check out the [nightly builds](https://build.transmissiontorrent.com/).
 (Note: These are untested snapshots. Use them with care.)
 
 ### Building the native app with Xcode ###

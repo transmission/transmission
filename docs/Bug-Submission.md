@@ -2,13 +2,12 @@
 If you are having trouble with Transmission then the things you should do in order are:
  1. Make sure you are running the current release
  1. Search the documentation
- 1. For a bug, ideally we would like you to check if it still exists in the [nightly build](https://build.transmissionbt.com/).
+ 1. For a bug, ideally we would like you to check if it still exists in the [nightly build](https://build.transmissiontorrent.com/).
  1. Search the Issue Tracker to see if your concern has already been reported:
-     * [All open tickets](https://trac.transmissionbt.com/report/2)
-     * [Search](https://trac.transmissionbt.com/search)
+     * [All open tickets](https://github.com/transmissiontorrent/transmission/issues)
  1. If you _do not_ see a ticket matching your problem or feature
      * Read the section below on **Submitting a bug report**
-     * [Add a new ticket](https://trac.transmissionbt.com/newticket).
+     * [Add a new ticket](https://github.com/transmissiontorrent/transmission/issues/new/choose).
 
    If you _do_ see an existing ticket, please add a comment there again adding as much information as possible.
    The more users are interested in a ticket, the higher its priority will be.
