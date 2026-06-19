@@ -1577,40 +1577,6 @@ void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, t
     auto* target = find_connected_peer(s, target_endpoint);
     if (target == nullptr)
     {
-        // Dual-stack fallback: on a dual-stack network the initiator may request
-        // a rendezvous to a peer's IPv6 address, but we are connected to that
-        // same peer via IPv4 (or vice versa). The exact socket_address lookup
-        // above fails because the address families differ. As a heuristic, scan
-        // connected peers for a holepunch-supporting peer on the same port — but
-        // only if exactly one peer matches, to avoid ambiguity with common
-        // default ports (e.g. 51413) shared by multiple hosts in a swarm.
-        tr_peerMsgs* port_match = nullptr;
-        auto port_match_count = size_t{ 0 };
-        for (auto& peer : s->peers)
-        {
-            if (peer.get() != &sender && peer->socket_address().port() == target_endpoint.port() && peer->peer_info &&
-                peer->peer_info->supports_holepunch().value_or(false))
-            {
-                port_match = peer.get();
-                ++port_match_count;
-            }
-        }
-        // port_match_count > 1 is common in large swarms where many peers share a
-        // default port (e.g. 51413); the fallback safely becomes a no-op in that case.
-        if (port_match_count == 1)
-        {
-            tr_logAddTraceTor(
-                tor,
-                fmt::format(
-                    "BEP 55: rendezvous target {} not found by address, "
-                    "matched by port to connected peer {} (dual-stack fallback)",
-                    target_endpoint.display_name(),
-                    port_match->display_name()));
-            target = port_match;
-        }
-    }
-    if (target == nullptr)
-    {
         tr_logAddTraceTor(tor, fmt::format("BEP 55: rendezvous target {} not connected", target_endpoint.display_name()));
         send_holepunch_msg(&sender, bep55::MsgError, target_endpoint, bep55::ErrNotConnected);
         return;
