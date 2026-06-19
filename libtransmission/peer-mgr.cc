@@ -1621,6 +1621,12 @@ void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, t
         return;
     }
 
+    // Match libtorrent (refuse when target == sender) rather than BEP 55's literal
+    // wording ("target belongs to the relay"). The literal reading, an
+    // is_local_peer_endpoint(target) check, would be dead code: we never connect to
+    // ourselves (handshake.cc), so a self-endpoint target hits ErrNotConnected above
+    // before we reach this. Seen real peers in swarms ask us to introduce them to
+    // themselves. Not sure why they do it, but libtorrent guards the same case.
     if (target == &sender)
     {
         tr_logAddDebugTor(
