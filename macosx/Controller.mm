@@ -594,8 +594,9 @@ static void removeKeRangerRansomware()
             [controller = self](bool const active, bool const by_user)
             {
                 NSDictionary* const dict = @{ @"Active" : @(active), @"ByUser" : @(by_user) };
-                [controller performSelectorOnMainThread:@selector(altSpeedToggledCallbackIsLimited:) withObject:dict
-                                          waitUntilDone:NO];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [controller altSpeedToggledCallbackIsLimited:dict];
+                });
             });
         BOOL const usesSpeedLimitSched = [_fDefaults boolForKey:@"SpeedLimitAuto"];
         if (usesSpeedLimitSched)
@@ -1195,7 +1196,9 @@ static void removeKeRangerRansomware()
     if ([urlString rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
     {
         // originalRequest was a redirect to a magnet
-        [self performSelectorOnMainThread:@selector(openMagnet:) withObject:urlString waitUntilDone:NO];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self openMagnet:urlString];
+        });
         return;
     }
 
@@ -1488,7 +1491,9 @@ static void removeKeRangerRansomware()
 - (void)open:(NSArray*)files
 {
     NSDictionary* dict = @{ @"Filenames" : files, @"AddType" : @(AddTypeManual) };
-    [self performSelectorOnMainThread:@selector(openFilesWithDict:) withObject:dict waitUntilDone:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self openFilesWithDict:dict];
+    });
 }
 
 - (void)openShowSheet:(id)sender
@@ -1514,7 +1519,9 @@ static void removeKeRangerRansomware()
                 @"Filenames" : filenames,
                 @"AddType" : sender == self.fOpenIgnoreDownloadFolder ? @(AddTypeShowOptions) : @(AddTypeManual)
             };
-            [self performSelectorOnMainThread:@selector(openFilesWithDict:) withObject:dictionary waitUntilDone:NO];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self openFilesWithDict:dictionary];
+            });
         }
     }];
 }
@@ -2191,7 +2198,9 @@ static void removeKeRangerRansomware()
             }
 
             [torrents removeObjectAtIndex:0];
-            [self performSelectorOnMainThread:@selector(copyTorrentFileForTorrents:) withObject:torrents waitUntilDone:NO];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self copyTorrentFileForTorrents:torrents];
+            });
         }];
     }
     else
@@ -5304,12 +5313,6 @@ static void removeKeRangerRansomware()
 
         height = (kGroupSeparatorHeight + self.fTableView.intercellSpacing.height) * groups +
             (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
-
-        //account for group padding...
-        if (groups > 1)
-        {
-            height += (groups - 1) * 20;
-        }
     }
     else
     {

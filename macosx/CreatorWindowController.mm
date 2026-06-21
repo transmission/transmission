@@ -333,7 +333,9 @@ static NSMutableSet* creatorWindowControllerSet;
 
             if (returnCode == NSAlertFirstButtonReturn)
             {
-                [self performSelectorOnMainThread:@selector(createReal) withObject:nil waitUntilDone:NO];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self createReal];
+                });
             }
         }];
     }
