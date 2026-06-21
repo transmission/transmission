@@ -460,7 +460,7 @@ TEST_F(VariantTest, mergeMapsCreatesCombinedMap)
     EXPECT_EQ(R"({"src_key":123,"tgt_key":456})"sv, serde.to_string(tgt));
 }
 
-TEST_F(VariantTest, mergeMapsOverwritesSrcMapEntries)
+TEST_F(VariantTest, mergeMapsPreservesTargetMapEntries)
 {
     auto serde = tr_variant_serde::json();
     serde.compact();
@@ -469,7 +469,140 @@ TEST_F(VariantTest, mergeMapsOverwritesSrcMapEntries)
     auto src = serde.parse(R"({"src_key": 123, "dup_key":789})"sv).value_or(tr_variant{});
     auto tgt = serde.parse(R"({"tgt_key": 456, "dup_key":456})"sv).value_or(tr_variant{});
     tgt.merge(src);
-    EXPECT_EQ(R"({"dup_key":789,"src_key":123,"tgt_key":456})"sv, serde.to_string(tgt));
+    EXPECT_EQ(R"({"dup_key":456,"src_key":123,"tgt_key":456})"sv, serde.to_string(tgt));
+}
+
+TEST_F(VariantTest, mergeMapsKeepsExistingNestedMapUnchanged)
+{
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
+
+    auto src = serde.parse(R"({"dup_key":{"src_only":2}})"sv).value_or(tr_variant{});
+    auto tgt = serde.parse(R"({"dup_key":{"tgt_only":1}})"sv).value_or(tr_variant{});
+    tgt.merge(src);
+    EXPECT_EQ(R"({"dup_key":{"tgt_only":1}})"sv, serde.to_string(tgt));
+}
+
+TEST_F(VariantTest, mapMergePreservesTargetEntries)
+{
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+
+    auto const key_dup = tr_quark_new("dup_key"sv);
+    auto const key_src = tr_quark_new("src_key"sv);
+    auto map_src = tr_variant::Map{};
+    map_src.try_emplace(key_dup, 2);
+    map_src.try_emplace(key_src, 3);
+
+    auto map_tgt = tr_variant::Map{};
+    map_tgt.try_emplace(key_dup, 1);
+
+    map_tgt.merge(map_src);
+
+    EXPECT_EQ(R"({"dup_key":1,"src_key":3})"sv, serde.to_string(tr_variant{ std::move(map_tgt) }));
+}
+
+TEST_F(VariantTest, mapMergeMovePreservesTargetEntries)
+{
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+
+    auto const key_dup = tr_quark_new("dup_key"sv);
+    auto const key_src = tr_quark_new("src_key"sv);
+    auto map_src = tr_variant::Map{};
+    map_src.try_emplace(key_dup, 2);
+    map_src.try_emplace(key_src, 3);
+
+    auto map_tgt = tr_variant::Map{};
+    map_tgt.try_emplace(key_dup, 1);
+
+    map_tgt.merge(std::move(map_src));
+
+    EXPECT_EQ(R"({"dup_key":1,"src_key":3})"sv, serde.to_string(tr_variant{ std::move(map_tgt) }));
+}
+
+TEST_F(VariantTest, variantMergeMovePreservesTargetEntries)
+{
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
+
+    auto src = serde.parse(R"({"src_key": 123, "dup_key":789})"sv).value_or(tr_variant{});
+    auto tgt = serde.parse(R"({"tgt_key": 456, "dup_key":456})"sv).value_or(tr_variant{});
+    tgt.merge(std::move(src));
+    EXPECT_EQ(R"({"dup_key":456,"src_key":123,"tgt_key":456})"sv, serde.to_string(tgt));
+}
+
+TEST_F(VariantTest, variantMergeMoveCopiesVectorValues)
+{
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    serde.inplace();
+
+    auto src = serde.parse(R"([{"a":1},"x"])"sv).value_or(tr_variant{});
+    auto tgt = serde.parse(R"([0])"sv).value_or(tr_variant{});
+    tgt.merge(std::move(src));
+    EXPECT_EQ(R"([{"a":1},"x"])"sv, serde.to_string(tgt));
+}
+
+TEST_F(VariantTest, mapCloneReturnsDeepCopy)
+{
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+
+    auto const key_outer = tr_quark_new("outer"sv);
+    auto const key_inner = tr_quark_new("inner"sv);
+
+    auto original = tr_variant::Map{};
+    auto nested = tr_variant::make_map();
+    auto* nested_map = nested.get_if<tr_variant::Map>();
+    ASSERT_NE(nullptr, nested_map);
+    nested_map->try_emplace(key_inner, 1);
+    original.try_emplace(key_outer, std::move(nested));
+
+    auto copy = original.clone();
+    auto* copy_outer = copy.find_if<tr_variant::Map>(key_outer);
+    ASSERT_NE(nullptr, copy_outer);
+    copy_outer->insert_or_assign(key_inner, 2);
+
+    auto* original_outer = original.find_if<tr_variant::Map>(key_outer);
+    ASSERT_NE(nullptr, original_outer);
+
+    EXPECT_EQ(R"({"outer":{"inner":1}})"sv, serde.to_string(tr_variant{ original.clone() }));
+    EXPECT_EQ(R"({"outer":{"inner":2}})"sv, serde.to_string(tr_variant{ copy.clone() }));
+}
+
+TEST_F(VariantTest, variantCloneReturnsDeepCopy)
+{
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+
+    auto const key_outer = tr_quark_new("outer"sv);
+    auto const key_inner = tr_quark_new("inner"sv);
+
+    auto original = tr_variant::make_map();
+    auto* original_map = original.get_if<tr_variant::Map>();
+    ASSERT_NE(nullptr, original_map);
+
+    auto nested = tr_variant::make_map();
+    auto* nested_map = nested.get_if<tr_variant::Map>();
+    ASSERT_NE(nullptr, nested_map);
+    nested_map->try_emplace(key_inner, 1);
+    original_map->try_emplace(key_outer, std::move(nested));
+
+    auto copy = original.clone();
+    auto* copy_map = copy.get_if<tr_variant::Map>();
+    ASSERT_NE(nullptr, copy_map);
+    auto* copy_outer = copy_map->find_if<tr_variant::Map>(key_outer);
+    ASSERT_NE(nullptr, copy_outer);
+    copy_outer->insert_or_assign(key_inner, 2);
+
+    auto* original_outer = original_map->find_if<tr_variant::Map>(key_outer);
+    ASSERT_NE(nullptr, original_outer);
+
+    EXPECT_EQ(R"({"outer":{"inner":1}})"sv, serde.to_string(original));
+    EXPECT_EQ(R"({"outer":{"inner":2}})"sv, serde.to_string(copy));
 }
 
 TEST_F(VariantTest, variantConstructor)

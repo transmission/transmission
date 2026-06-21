@@ -94,7 +94,7 @@ public:
 
     [[nodiscard]] auto is_utp() const noexcept
     {
-        return socket_->is_utp();
+        return socket_ ? socket_->is_utp() : false;
     }
 
     void clear();
