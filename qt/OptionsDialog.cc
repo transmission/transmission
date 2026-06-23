@@ -52,6 +52,8 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
         ui_.sourceButton->setTitle(tr("Open Torrent"));
         ui_.sourceButton->setNameFilter(tr("Torrent Files (*.torrent);;All Files (*.*)"));
         ui_.sourceButton->setPath(add_.filename);
+        ui_.searchLineEdit->setPlaceholderText(QStringLiteral("Search..."));
+        connect(ui_.searchLineEdit, &QLineEdit::textEdited, this, &OptionsDialog::onSearchedStringChanged);
         connect(ui_.sourceButton, &PathButton::pathChanged, this, &OptionsDialog::onSourceChanged);
     }
     else
@@ -123,7 +125,7 @@ void OptionsDialog::clearInfo()
     files_.clear();
 }
 
-void OptionsDialog::reload()
+void OptionsDialog::reload(const QString& searched_string, bool reload_only_to_search)
 {
     clearInfo();
 
@@ -151,8 +153,11 @@ void OptionsDialog::reload()
     metainfo_.reset();
     ui_.filesView->clear();
     files_.clear();
-    priorities_.clear();
-    wanted_.clear();
+    if (!reload_only_to_search)
+    {
+        priorities_.clear();
+        wanted_.clear();
+    }
 
     if (ok)
     {
@@ -167,8 +172,10 @@ void OptionsDialog::reload()
     if (metainfo_)
     {
         auto const n_files = metainfo_->file_count();
-        priorities_.assign(n_files, TR_PRI_NORMAL);
-        wanted_.assign(n_files, true);
+        if (!reload_only_to_search) {
+            priorities_.assign(n_files, TR_PRI_NORMAL);
+            wanted_.assign(n_files, true);
+        }
 
         for (tr_file_index_t i = 0; i < n_files; ++i)
         {
@@ -179,7 +186,10 @@ void OptionsDialog::reload()
             f.size = metainfo_->file_size(i);
             f.have = 0;
             f.filename = QString::fromStdString(metainfo_->file_subpath(i));
-            files_.push_back(f);
+            if (searched_string.isEmpty() || (!searched_string.isEmpty() && f.filename.contains(searched_string, Qt::CaseInsensitive)))
+            {
+                files_.push_back(f);
+            }
         }
     }
 
@@ -330,4 +340,8 @@ void OptionsDialog::onDestinationChanged()
     {
         ui_.freeSpaceLabel->setPath(ui_.destinationEdit->text());
     }
+}
+
+void OptionsDialog::onSearchedStringChanged(const QString& newText) {
+    OptionsDialog::reload(newText, true);
 }
