@@ -556,17 +556,9 @@ void handle_request(struct evhttp_request* req, void* arg)
         return;
     }
 
-    evhttp_add_header(output_headers, "Access-Control-Allow-Origin", "*");
-
     auto const* const input_headers = evhttp_request_get_input_headers(req);
     if (auto const cmd = evhttp_request_get_command(req); cmd == EVHTTP_REQ_OPTIONS)
     {
-        if (char const* headers = evhttp_find_header(input_headers, "Access-Control-Request-Headers"); headers != nullptr)
-        {
-            evhttp_add_header(output_headers, "Access-Control-Allow-Headers", headers);
-        }
-
-        evhttp_add_header(output_headers, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         send_simple_response(req, HTTP_OK);
         return;
     }
@@ -640,10 +632,6 @@ void handle_request(struct evhttp_request* req, void* arg)
             session_id);
         evhttp_add_header(output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
         evhttp_add_header(output_headers, TR_RPC_RPC_VERSION_HEADER, std::data(TrRpcVersionSemver));
-        evhttp_add_header(
-            output_headers,
-            "Access-Control-Expose-Headers",
-            TR_RPC_SESSION_ID_HEADER ", " TR_RPC_RPC_VERSION_HEADER);
         send_simple_response(req, 409, body.c_str());
     }
 #endif
@@ -1033,6 +1021,14 @@ void tr_rpc_server::load(Settings&& settings)
         if (this->is_password_enabled())
         {
             tr_logAddInfo(_("Password required"));
+        }
+        else if (!this->is_whitelist_enabled())
+        {
+            tr_logAddWarn(
+                "The RPC server has no password and its IP whitelist is disabled. "
+                "Anyone who can reach it has full control. "
+                "Consider enabling 'rpc_whitelist_enabled' or "
+                "setting 'rpc_authentication_required' and 'rpc_password'.");
         }
     }
 
