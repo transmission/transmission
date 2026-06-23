@@ -12,6 +12,10 @@ static CGFloat const kImageOverlap = 1.0;
 @interface FilePriorityCellView ()
 @property(nonatomic, weak) NSSegmentedControl* segmentedControl;
 @property(nonatomic, weak) NSView* iconsContainerView;
+@property(nonatomic, strong) NSStackView* stackView;
+@property(nonatomic, strong) NSImageView* lowPriorityView;
+@property(nonatomic, strong) NSImageView* mediumPriorityView;
+@property(nonatomic, strong) NSImageView* highPriorityView;
 @property(nonatomic, strong) NSTrackingArea* trackingArea;
 @end
 
@@ -62,9 +66,53 @@ static CGFloat const kImageOverlap = 1.0;
             [iconsContainerView.heightAnchor constraintLessThanOrEqualToAnchor:self.heightAnchor],
         ]];
 
+        [self updateIconsContainerView];
+
         _hovered = NO;
     }
     return self;
+}
+
+- (void)updateIconsContainerView
+{
+    NSImage* lowPriority = [NSImage imageNamed:@"PriorityLowTemplate"];
+    NSImage* mediumPriority = [NSImage imageNamed:@"PriorityNormalTemplate"];
+    NSImage* highPriority = [NSImage imageNamed:@"PriorityHighTemplate"];
+
+    NSImageView* lowPriorityView = [[NSImageView alloc] init];
+    lowPriorityView.image = lowPriority;
+    NSImageView* mediumPriorityView = [[NSImageView alloc] init];
+    mediumPriorityView.image = mediumPriority;
+    NSImageView* highPriorityView = [[NSImageView alloc] init];
+    highPriorityView.image = highPriority;
+
+    NSStackView* stackView = [[NSStackView alloc] init];
+    stackView.spacing = -kImageOverlap;
+
+    [stackView addArrangedSubview:lowPriorityView];
+    [stackView addArrangedSubview:mediumPriorityView];
+    [stackView addArrangedSubview:highPriorityView];
+
+    self.stackView = stackView;
+    self.lowPriorityView = lowPriorityView;
+    self.mediumPriorityView = mediumPriorityView;
+    self.highPriorityView = highPriorityView;
+
+    [self.iconsContainerView addSubview:stackView];
+
+    __auto_type view = stackView;
+    __auto_type superview = stackView.superview;
+    view.translatesAutoresizingMaskIntoConstraints = NO;
+
+    CGFloat height = lowPriority.size.height;
+
+    [NSLayoutConstraint activateConstraints:@[
+        [view.leadingAnchor constraintEqualToAnchor:superview.leadingAnchor],
+        [view.trailingAnchor constraintEqualToAnchor:superview.trailingAnchor],
+        [view.topAnchor constraintEqualToAnchor:superview.topAnchor],
+        [view.bottomAnchor constraintEqualToAnchor:superview.bottomAnchor],
+        [view.heightAnchor constraintEqualToConstant:height]
+    ]];
 }
 
 - (void)setNode:(FileListNode*)node
@@ -118,73 +166,18 @@ static CGFloat const kImageOverlap = 1.0;
 
 - (void)updatePriorityIcons:(NSSet*)priorities
 {
-    // Remove all existing image views
-    for (NSView* subview in self.iconsContainerView.subviews)
-    {
-        [subview removeFromSuperview];
-    }
-
     NSUInteger const count = priorities.count;
-    NSMutableArray* images = [NSMutableArray arrayWithCapacity:MAX(count, 1u)];
-
     if (count == 0)
     {
-        NSImage* image = [[NSImage imageNamed:@"PriorityNormalTemplate"] imageWithColor:NSColor.lightGrayColor];
-        [images addObject:image];
+        self.lowPriorityView.hidden = YES;
+        self.mediumPriorityView.hidden = NO;
+        self.highPriorityView.hidden = YES;
     }
     else
     {
-        NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor : NSColor.darkGrayColor;
-
-        if ([priorities containsObject:@(TR_PRI_LOW)])
-        {
-            NSImage* image = [[NSImage imageNamed:@"PriorityLowTemplate"] imageWithColor:priorityColor];
-            [images addObject:image];
-        }
-        if ([priorities containsObject:@(TR_PRI_NORMAL)])
-        {
-            NSImage* image = [[NSImage imageNamed:@"PriorityNormalTemplate"] imageWithColor:priorityColor];
-            [images addObject:image];
-        }
-        if ([priorities containsObject:@(TR_PRI_HIGH)])
-        {
-            NSImage* image = [[NSImage imageNamed:@"PriorityHighTemplate"] imageWithColor:priorityColor];
-            [images addObject:image];
-        }
-    }
-
-    NSView* previousView = nil;
-
-    for (NSImage* image in images)
-    {
-        NSImageView* imageView = [[NSImageView alloc] initWithFrame:NSZeroRect];
-        imageView.translatesAutoresizingMaskIntoConstraints = NO;
-        imageView.image = image;
-        [self.iconsContainerView addSubview:imageView];
-
-        NSSize const imageSize = image.size;
-
-        [NSLayoutConstraint activateConstraints:@[
-            [imageView.widthAnchor constraintEqualToConstant:imageSize.width],
-            [imageView.heightAnchor constraintEqualToConstant:imageSize.height],
-            [imageView.centerYAnchor constraintEqualToAnchor:self.iconsContainerView.centerYAnchor],
-        ]];
-
-        if (previousView == nil)
-        {
-            [imageView.leadingAnchor constraintEqualToAnchor:self.iconsContainerView.leadingAnchor].active = YES;
-        }
-        else
-        {
-            [imageView.leadingAnchor constraintEqualToAnchor:previousView.trailingAnchor constant:-kImageOverlap].active = YES;
-        }
-
-        previousView = imageView;
-    }
-
-    if (previousView)
-    {
-        [previousView.trailingAnchor constraintEqualToAnchor:self.iconsContainerView.trailingAnchor].active = YES;
+        self.lowPriorityView.hidden = [priorities containsObject:@(TR_PRI_LOW)] == NO;
+        self.mediumPriorityView.hidden = [priorities containsObject:@(TR_PRI_NORMAL)] == NO;
+        self.highPriorityView.hidden = [priorities containsObject:@(TR_PRI_HIGH)] == NO;
     }
 }
 
@@ -224,7 +217,11 @@ static CGFloat const kImageOverlap = 1.0;
 - (void)setBackgroundStyle:(NSBackgroundStyle)backgroundStyle
 {
     [super setBackgroundStyle:backgroundStyle];
-    [self updateDisplay];
+
+    NSColor* priorityColor = backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor : NSColor.darkGrayColor;
+    self.lowPriorityView.contentTintColor = priorityColor;
+    self.mediumPriorityView.contentTintColor = priorityColor;
+    self.highPriorityView.contentTintColor = priorityColor;
 }
 
 - (void)updateTrackingAreas
