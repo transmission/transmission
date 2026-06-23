@@ -341,11 +341,6 @@ public:
         connection_attempted_at_ = value;
     }
 
-    constexpr void fast_reconnect(time_t const now) noexcept
-    {
-        connection_attempted_at_ = now - get_reconnect_interval_secs(now);
-    }
-
     constexpr void set_latest_piece_data_time(time_t value) noexcept
     {
         piece_data_at_ = value;
@@ -428,17 +423,20 @@ public:
 
     [[nodiscard]] constexpr auto is_holepunch_attempt() const noexcept
     {
-        return is_holepunch_attempt_;
+        return holepunch_retries_ > 0;
     }
 
-    constexpr void set_holepunch_attempt(bool value = true) noexcept
+    constexpr void set_holepunch_attempt() noexcept
     {
-        is_holepunch_attempt_ = value;
+        if (holepunch_retries_ == 0)
+        {
+            holepunch_retries_ = 1;
+        }
     }
 
     [[nodiscard]] constexpr auto can_fast_retry_holepunch() const noexcept
     {
-        return holepunch_retries_ < MaxHolepunchFastRetries;
+        return holepunch_retries_ <= MaxHolepunchFastRetries;
     }
 
     constexpr void on_holepunch_fast_retry() noexcept
@@ -547,6 +545,11 @@ public:
 private:
     [[nodiscard]] constexpr time_t get_reconnect_interval_secs(time_t const now) const noexcept
     {
+        if (holepunch_retries_ > 0)
+        {
+            return 0U;
+        }
+
         // if we were recently connected to this peer and transferring piece
         // data, try to reconnect to them sooner rather that later -- we don't
         // want network troubles to get in the way of a good peer.
@@ -625,7 +628,6 @@ private:
     bool is_connected_ = false;
     bool is_seed_ = false;
     bool is_upload_only_ = false;
-    bool is_holepunch_attempt_ = false;
 
     std::unique_ptr<tr_handshake> outgoing_handshake_;
 

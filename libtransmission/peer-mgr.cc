@@ -252,8 +252,8 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
             outgoing_handshake_ = std::move(that.outgoing_handshake_);
             if (that.is_holepunch_attempt())
             {
-                set_holepunch_attempt(true);
-                that.set_holepunch_attempt(false);
+                holepunch_retries_ = that.holepunch_retries_;
+                that.reset_holepunch_retries();
             }
         }
     }
@@ -1363,11 +1363,9 @@ void create_bit_torrent_peer(
             if (was_holepunch_attempt && info->can_fast_retry_holepunch())
             {
                 info->on_holepunch_fast_retry();
-                info->fast_reconnect(tr_time());
             }
             else
             {
-                info->set_holepunch_attempt(false);
                 info->reset_holepunch_retries();
             }
         }
@@ -1444,7 +1442,6 @@ void create_bit_torrent_peer(
     {
         tr_logAddDebugSwarm(swarm, fmt::format("BEP 55: holepunch connection to {} succeeded", info->display_name()));
     }
-    info->set_holepunch_attempt(false);
     info->reset_holepunch_retries();
 
     // If we're connected via µTP, then we know the peer supports µTP...
@@ -2951,7 +2948,7 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     auto* const session = mgr->session;
     auto const peer_supports_utp = peer_info.supports_utp().value_or(true);
 
-    peer_info.set_holepunch_attempt(false);
+    peer_info.reset_holepunch_retries();
 
     // Allow downloading torrents to "steal" connection slots
     if (tr_peer_socket::limit_reached(session) && s->tor->is_done())
@@ -3068,7 +3065,7 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
         return;
     }
 
-    peer_info->set_holepunch_attempt(true);
+    peer_info->set_holepunch_attempt();
 
     // Note: We bypass normal outbound candidate pacing here because BEP 55 connect
     // timing matters; admission is still bounded by existing handshake, socket,
@@ -3083,7 +3080,6 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
             tor,
             fmt::format("BEP 55: peerIo not created for {}, marking not connectable", endpoint.display_name()));
         peer_info->set_connectable(false);
-        peer_info->set_holepunch_attempt(false);
         peer_info->reset_holepunch_retries();
         return;
     }
