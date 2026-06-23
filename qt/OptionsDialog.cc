@@ -342,6 +342,6 @@ void OptionsDialog::onDestinationChanged()
     }
 }
 
-void OptionsDialog::onSearchedStringChanged(const QString& newText) {
-    OptionsDialog::reload(newText, true);
+void OptionsDialog::onSearchedStringChanged(const QString& new_searched_string) {
+    OptionsDialog::reload(new_searched_string, true);
 }
