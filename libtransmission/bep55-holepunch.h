@@ -78,7 +78,7 @@ inline auto constexpr PayloadFullIPv6 = PayloadMinIPv6 + sizeof(ErrorCode);
 struct HolepunchMessage
 {
     uint8_t msg_type = {};
-    tr_socket_address socket_address{};
+    tr_socket_address socket_address;
     uint32_t err_code = {};
 };
 

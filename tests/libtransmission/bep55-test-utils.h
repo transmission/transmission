@@ -9,12 +9,8 @@
 
 #include "libtransmission/net.h"
 
-inline tr_socket_address make_ipv4(uint8_t a, uint8_t b, uint8_t c, uint8_t d, uint16_t port)
+inline tr_socket_address makeIpv4(uint8_t a, uint8_t b, uint8_t c, uint8_t d, uint16_t port)
 {
-    auto addr = tr_address{};
-    addr.type = TR_AF_INET;
-    addr.addr.addr4.s_addr = htonl(
-        (static_cast<uint32_t>(a) << 24) | (static_cast<uint32_t>(b) << 16) | (static_cast<uint32_t>(c) << 8) |
-        static_cast<uint32_t>(d));
-    return tr_socket_address{ addr, tr_port::from_host(port) };
+    auto const buf = std::to_array({ a, b, c, d, static_cast<uint8_t>(port >> 8), static_cast<uint8_t>(port) });
+    return tr_socket_address::from_compact_ipv4(reinterpret_cast<std::byte const*>(buf.data())).first;
 }

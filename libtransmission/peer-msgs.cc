@@ -1054,6 +1054,23 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
     }
 }
 
+[[nodiscard]] constexpr std::string_view get_bep55_error_name(uint32_t const c) noexcept
+{
+    switch (c)
+    {
+    case bep55::ErrNoSuchPeer:
+        return "NoSuchPeer";
+    case bep55::ErrNotConnected:
+        return "NotConnected";
+    case bep55::ErrNoSupport:
+        return "NoSupport";
+    case bep55::ErrNoSelf:
+        return "NoSelf";
+    default:
+        return "Unknown";
+    }
+}
+
 void tr_peerMsgsImpl::parse_ut_holepunch(MessageReader& payload)
 {
     if (!can_ut_holepunch())
@@ -1085,34 +1102,16 @@ void tr_peerMsgsImpl::parse_ut_holepunch(MessageReader& payload)
         break;
 
     case bep55::MsgError:
-        {
-            // Intentionally dropping MsgError instead of failing the peer to prevent
-            // spoofing attacks. Failed attempts will naturally clean themselves up via
-            // standard connection timeouts. Matches libtorrent behavior.
-            auto const err_name = [](uint32_t c) -> std::string_view
-            {
-                switch (c)
-                {
-                case bep55::ErrNoSuchPeer:
-                    return "NoSuchPeer";
-                case bep55::ErrNotConnected:
-                    return "NotConnected";
-                case bep55::ErrNoSupport:
-                    return "NoSupport";
-                case bep55::ErrNoSelf:
-                    return "NoSelf";
-                default:
-                    return "Unknown";
-                }
-            };
-            logdbg(
-                this,
-                fmt::format(
-                    "got ut_holepunch error {} ({}) from {}",
-                    msg->err_code,
-                    err_name(msg->err_code),
-                    io_->display_name()));
-        }
+        // Intentionally dropping MsgError instead of failing the peer to prevent
+        // spoofing attacks. Failed attempts will naturally clean themselves up via
+        // standard connection timeouts. Matches libtorrent behavior.
+        logdbg(
+            this,
+            fmt::format(
+                "got ut_holepunch error {} ({}) from {}",
+                msg->err_code,
+                get_bep55_error_name(msg->err_code),
+                io_->display_name()));
         break;
 
     default:

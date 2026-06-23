@@ -15,8 +15,8 @@ TEST(Bep55IntroducerStore, RecordAndLookup)
 {
     HolepunchIntroducerStore store;
 
-    auto const target = make_ipv4(192, 168, 1, 1, 6881);
-    auto const introducer = make_ipv4(10, 0, 0, 1, 6882);
+    auto const target = makeIpv4(192, 168, 1, 1, 6881);
+    auto const introducer = makeIpv4(10, 0, 0, 1, 6882);
 
     EXPECT_FALSE(store.find_introducer(target));
 
@@ -29,9 +29,9 @@ TEST(Bep55IntroducerStore, RecordAndLookup)
 
 TEST(Bep55IntroducerStore, UnknownTargetReturnsNullopt)
 {
-    HolepunchIntroducerStore store;
+    HolepunchIntroducerStore const store;
 
-    auto const target = make_ipv4(192, 168, 1, 1, 6881);
+    auto const target = makeIpv4(192, 168, 1, 1, 6881);
     EXPECT_FALSE(store.find_introducer(target));
 }
 
@@ -41,22 +41,22 @@ TEST(Bep55IntroducerStore, MaxSizeEvictsOldest)
 
     for (size_t i = 0; i < HolepunchIntroducerStore::MaxSize; ++i)
     {
-        auto const target = make_ipv4(192, 168, 1, 0, static_cast<uint16_t>(i));
-        auto const introducer = make_ipv4(10, 0, 0, 0, static_cast<uint16_t>(i));
+        auto const target = makeIpv4(192, 168, 1, 0, static_cast<uint16_t>(i));
+        auto const introducer = makeIpv4(10, 0, 0, 0, static_cast<uint16_t>(i));
         store.record(target, introducer);
     }
 
     for (size_t i = 0; i < HolepunchIntroducerStore::MaxSize; ++i)
     {
-        auto const target = make_ipv4(192, 168, 1, 0, static_cast<uint16_t>(i));
+        auto const target = makeIpv4(192, 168, 1, 0, static_cast<uint16_t>(i));
         EXPECT_TRUE(store.find_introducer(target));
     }
 
-    auto const overflow = make_ipv4(192, 168, 1, 0, static_cast<uint16_t>(HolepunchIntroducerStore::MaxSize));
-    auto const overflow_intro = make_ipv4(10, 0, 0, 99, 0);
+    auto const overflow = makeIpv4(192, 168, 1, 0, static_cast<uint16_t>(HolepunchIntroducerStore::MaxSize));
+    auto const overflow_intro = makeIpv4(10, 0, 0, 99, 0);
     store.record(overflow, overflow_intro);
 
-    auto const evicted = make_ipv4(192, 168, 1, 0, 0);
+    auto const evicted = makeIpv4(192, 168, 1, 0, 0);
     EXPECT_FALSE(store.find_introducer(evicted));
 
     EXPECT_TRUE(store.find_introducer(overflow));
@@ -66,10 +66,10 @@ TEST(Bep55IntroducerStore, MultipleTargetsAndIntroducers)
 {
     HolepunchIntroducerStore store;
 
-    auto const target1 = make_ipv4(192, 168, 1, 1, 6881);
-    auto const target2 = make_ipv4(192, 168, 1, 2, 6882);
-    auto const introducer1 = make_ipv4(10, 0, 0, 1, 6881);
-    auto const introducer2 = make_ipv4(10, 0, 0, 2, 6882);
+    auto const target1 = makeIpv4(192, 168, 1, 1, 6881);
+    auto const target2 = makeIpv4(192, 168, 1, 2, 6882);
+    auto const introducer1 = makeIpv4(10, 0, 0, 1, 6881);
+    auto const introducer2 = makeIpv4(10, 0, 0, 2, 6882);
 
     store.record(target1, introducer1);
     store.record(target2, introducer2);

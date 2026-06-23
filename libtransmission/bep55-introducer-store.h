@@ -39,7 +39,7 @@ public:
 
         // Enforce max size only when inserting a new key (updates don't grow the store).
         // Each call inserts at most one new key, so at most one eviction is needed.
-        if (store_.find(target) == store_.end() && std::size(store_) >= MaxSize)
+        if (!store_.contains(target) && std::size(store_) >= MaxSize)
         {
             store_.erase(
                 std::ranges::min_element(
@@ -47,7 +47,7 @@ public:
                     [](auto const& a, auto const& b) { return a.second.recorded_at < b.second.recorded_at; }));
         }
 
-        store_[target] = Entry{ introducer, now };
+        store_.insert_or_assign(target, Entry{ .introducer = introducer, .recorded_at = now });
     }
 
     [[nodiscard]] std::optional<tr_socket_address> find_introducer(tr_socket_address const& target) const
@@ -55,7 +55,7 @@ public:
         auto const now = tr_time();
         auto const cutoff = now - MaxAgeSecs;
 
-        if (auto it = store_.find(target); it != store_.end() && it->second.recorded_at >= cutoff)
+        if (auto const it = store_.find(target); it != store_.end() && it->second.recorded_at >= cutoff)
         {
             return it->second.introducer;
         }
