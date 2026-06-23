@@ -1614,8 +1614,7 @@ void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, t
 void tr_peerMgrRecordPexIntroducers(
     tr_torrent* tor,
     tr_socket_address const& sender_socket_address,
-    tr_pex const* pex,
-    size_t n_pex)
+    std::span<tr_pex const> const pex)
 {
     if (!tor->allows_pex() || tor->is_private())
     {
@@ -1631,14 +1630,9 @@ void tr_peerMgrRecordPexIntroducers(
     auto const lock = s->unique_lock();
     auto& store = s->introducer_store();
 
-    for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
+    for (auto const& p : pex)
     {
-        if (!tr_isPex(pex))
-        {
-            continue;
-        }
-
-        if (pex->socket_address.address() == sender_socket_address.address())
+        if (p.socket_address.address() == sender_socket_address.address())
         {
             tr_logAddTraceTor(
                 tor,
@@ -1646,7 +1640,7 @@ void tr_peerMgrRecordPexIntroducers(
             continue;
         }
 
-        store.record(pex->socket_address, sender_socket_address);
+        store.record(p.socket_address, sender_socket_address);
     }
 }
 

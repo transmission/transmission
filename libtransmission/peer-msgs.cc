@@ -1038,7 +1038,7 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
         auto pex = tr_pex::from_compact_ipv4(std::data(*added), std::size(*added), added_f, added_f_len);
         pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
         tr_peerMgrAddPex(&tor_, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
-        tr_peerMgrRecordPexIntroducers(&tor_, io_->socket_address(), std::data(pex), std::size(pex));
+        tr_peerMgrRecordPexIntroducers(&tor_, io_->socket_address(), pex);
     }
 
     if (auto const added = map->value_if<std::string_view>(TR_KEY_added6))
@@ -1050,7 +1050,7 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
         auto pex = tr_pex::from_compact_ipv6(std::data(*added), std::size(*added), added_f, added_f_len);
         pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
         tr_peerMgrAddPex(&tor_, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
-        tr_peerMgrRecordPexIntroducers(&tor_, io_->socket_address(), std::data(pex), std::size(pex));
+        tr_peerMgrRecordPexIntroducers(&tor_, io_->socket_address(), pex);
     }
 }
 

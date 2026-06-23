@@ -722,8 +722,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
 void tr_peerMgrRecordPexIntroducers(
     tr_torrent* tor,
     tr_socket_address const& sender_socket_address,
-    tr_pex const* pex,
-    size_t n_pex);
+    std::span<tr_pex const> pex);
 
 // BEP 55: Find a connected peer that introduced the given target endpoint via PEX
 // and supports holepunch. Returns nullptr if no suitable introducer is found.
