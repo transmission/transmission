@@ -79,8 +79,8 @@ target_sources(${TR_NAME}-mac
         FileListNode.mm
         FileCheckCellView.h
         FileCheckCellView.mm
-        FileNameCellView.h
-        FileNameCellView.mm
+        BaseFileNameCellView.h
+        BaseFileNameCellView.mm
         FileOutlineController.h
         FileOutlineController.mm
         FileOutlineView.h

@@ -6,14 +6,14 @@
 
 @class FileListNode;
 
-@interface FileNameCellView : NSTableCellView
+@interface BaseFileNameCellView : NSTableCellView
 
 @property(nonatomic, weak) FileListNode* node;
 
 @end
 
-@interface OnlyFileNameCellView : FileNameCellView
+@interface FileNameCellView : BaseFileNameCellView
 @end
 
-@interface OnlyFolderNameCellView : FileNameCellView
+@interface FolderNameCellView : BaseFileNameCellView
 @end

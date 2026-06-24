@@ -4,7 +4,7 @@
 
 #include <libtransmission/transmission.h>
 
-#import "FileNameCellView.h"
+#import "BaseFileNameCellView.h"
 #import "FileListNode.h"
 #import "Torrent.h"
 #import "NSStringAdditions.h"
@@ -17,14 +17,14 @@ static CGFloat const kPaddingAboveTitleFile = 2.0;
 static CGFloat const kPaddingBelowStatusFile = 2.0;
 static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 
-@interface FileNameCellView ()
+@interface BaseFileNameCellView ()
 @property(nonatomic, weak) NSImageView* iconView;
 @property(nonatomic, weak) NSTextField* nameField;
 @property(nonatomic, weak) NSTextField* statusField;
 @property(nonatomic, strong) NSArray<NSLayoutConstraint*>* dynamicConstraints;
 @end
 
-@implementation FileNameCellView
+@implementation BaseFileNameCellView
 
 - (instancetype)initWithFrame:(NSRect)frameRect
 {
@@ -164,7 +164,7 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 
 @end
 
-@implementation OnlyFileNameCellView
+@implementation FileNameCellView
 
 - (void)setupConstraints
 {
@@ -195,7 +195,7 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 
 @end
 
-@implementation OnlyFolderNameCellView
+@implementation FolderNameCellView
 
 - (void)setupConstraints
 {
