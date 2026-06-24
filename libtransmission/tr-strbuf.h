@@ -102,6 +102,16 @@ public:
         return buffer_[pos];
     }
 
+    [[nodiscard]] constexpr Char& operator[](size_t pos) noexcept
+    {
+        return buffer_[pos];
+    }
+
+    [[nodiscard]] constexpr Char operator[](size_t pos) const noexcept
+    {
+        return buffer_[pos];
+    }
+
     [[nodiscard]] constexpr auto size() const noexcept
     {
         return buffer_.size();
