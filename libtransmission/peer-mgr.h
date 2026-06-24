@@ -717,10 +717,6 @@ void tr_peerMgrRecordPexIntroducers(
     tr_socket_address const& sender_socket_address,
     std::span<tr_pex const> pex);
 
-// BEP 55: Find a connected peer that introduced the given target endpoint via PEX
-// and supports holepunch. Returns nullptr if no suitable introducer is found.
-[[nodiscard]] tr_peerMsgs* tr_peerMgrFindHolepunchIntroducer(tr_torrent* tor, tr_socket_address const& target_endpoint);
-
 enum : uint8_t
 {
     TR_PEERS_CONNECTED,

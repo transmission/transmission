@@ -717,6 +717,16 @@ public:
         }
     }
 
+    [[nodiscard]] constexpr auto& introducer_store() noexcept
+    {
+        return introducer_store_;
+    }
+
+    [[nodiscard]] constexpr auto const& introducer_store() const noexcept
+    {
+        return introducer_store_;
+    }
+
     sigslot::signal<tr_torrent*, tr_bitfield const& /*bitfield*/, tr_bitfield const& /*active requests*/> peer_disconnect;
     sigslot::signal<tr_torrent*, tr_bitfield const&> got_bitfield;
     sigslot::signal<tr_torrent*, tr_block_index_t> got_block;
@@ -752,11 +762,6 @@ public:
     {
         return tor->session->advertisedPeerPort();
     };
-
-    [[nodiscard]] auto& introducer_store() noexcept
-    {
-        return introducer_store_;
-    }
 
 private:
     void rebuild_webseeds()
@@ -1238,6 +1243,199 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     return {};
 }
 
+// --- BEP 55: Holepunch extension ---
+
+namespace
+{
+
+[[nodiscard]] tr_peerMsgs* find_connected_peer(tr_swarm const* const swarm, tr_socket_address const& addr)
+{
+    for (auto const& peer : swarm->peers)
+    {
+        if (peer->socket_address() == addr)
+        {
+            return peer.get();
+        }
+
+        // Inbound peers are tracked by their ephemeral source port, but the target
+        // address in a MsgRendezvous payload comes from PEX (the advertised listen
+        // port). An exact socket_address match always wins; otherwise fall back to
+        // the listen address so relay lookups succeed for peers that connected
+        // inbound to us.
+        if (peer->peer_info && peer->peer_info->listen_socket_address() == addr)
+        {
+            return peer.get();
+        }
+    }
+    return nullptr;
+}
+
+// BEP 55: Find a connected peer that introduced the given target endpoint via PEX
+// and supports holepunch. Returns nullptr if no suitable introducer is found.
+[[nodiscard]] tr_peerMsgs* find_holepunch_introducer(tr_torrent const* const tor, tr_socket_address const& target_endpoint)
+{
+    auto const* const s = tor->swarm;
+    if (s == nullptr)
+    {
+        return nullptr;
+    }
+
+    auto const lock = s->unique_lock();
+    auto const& store = s->introducer_store();
+
+    auto introducer_addr = store.find_introducer(target_endpoint);
+    if (!introducer_addr)
+    {
+        return nullptr;
+    }
+
+    auto* peer = find_connected_peer(s, *introducer_addr);
+    if (peer == nullptr)
+    {
+        tr_logAddTraceTor(
+            tor,
+            fmt::format(
+                "BEP 55: introducer {} for {} not currently connected",
+                introducer_addr->display_name(),
+                target_endpoint.display_name()));
+        return nullptr;
+    }
+
+    if (!peer->peer_info || !peer->peer_info->supports_holepunch().value_or(false))
+    {
+        tr_logAddTraceTor(
+            tor,
+            fmt::format(
+                "BEP 55: introducer {} for {} connected but no holepunch support",
+                introducer_addr->display_name(),
+                target_endpoint.display_name()));
+        return nullptr;
+    }
+
+    tr_logAddTraceTor(
+        tor,
+        fmt::format("BEP 55: found introducer {} for {}", introducer_addr->display_name(), target_endpoint.display_name()));
+    return peer;
+}
+
+} // anonymous namespace
+
+void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, tr_socket_address const& target_endpoint)
+{
+    auto* s = tor->swarm;
+    if (s == nullptr || !s->is_running)
+    {
+        return;
+    }
+
+    auto const lock = s->unique_lock();
+
+    if (tor->is_private())
+    {
+        tr_logAddDebugTor(tor, "BEP 55: ignoring rendezvous on private torrent");
+        return;
+    }
+
+    if (!sender.peer_info || !sender.peer_info->supports_holepunch().value_or(false))
+    {
+        tr_logAddTraceTor(
+            tor,
+            fmt::format("BEP 55: rendezvous sender {} does not support holepunch", sender.socket_address().display_name()));
+        return;
+    }
+
+    auto* target = find_connected_peer(s, target_endpoint);
+    if (target == nullptr)
+    {
+        tr_logAddTraceTor(tor, fmt::format("BEP 55: rendezvous target {} not connected", target_endpoint.display_name()));
+        sender.send_ut_holepunch(bep55::MsgError, target_endpoint, bep55::ErrNotConnected);
+        return;
+    }
+
+    if (!target->peer_info || !target->peer_info->supports_holepunch().value_or(false))
+    {
+        tr_logAddTraceTor(
+            tor,
+            fmt::format("BEP 55: rendezvous target {} does not support holepunch", target_endpoint.display_name()));
+        sender.send_ut_holepunch(bep55::MsgError, target_endpoint, bep55::ErrNoSupport);
+        return;
+    }
+
+    // Match libtorrent (refuse when target == sender) rather than BEP 55's literal
+    // wording ("target belongs to the relay"). The literal reading, an
+    // is_local_peer_endpoint(target) check, would be dead code: we never connect to
+    // ourselves (handshake.cc), so a self-endpoint target hits ErrNotConnected above
+    // before we reach this. Seen real peers in swarms ask us to introduce them to
+    // themselves. Not sure why they do it, but libtorrent guards the same case.
+    if (target == &sender)
+    {
+        tr_logAddDebugTor(
+            tor,
+            fmt::format(
+                "BEP 55: rendezvous sender {} is its own target, sending ErrNoSelf",
+                sender.socket_address().display_name()));
+        sender.send_ut_holepunch(bep55::MsgError, target_endpoint, bep55::ErrNoSelf);
+        return;
+    }
+
+    sender.send_ut_holepunch(bep55::MsgConnect, target_endpoint);
+    tr_logAddDebugTor(
+        tor,
+        fmt::format(
+            "BEP 55: relay: sent MsgConnect to initiator {} (target={})",
+            sender.socket_address().display_name(),
+            target_endpoint.display_name()));
+
+    // socket_address() is the remote endpoint of our connection to the sender.
+    // For outgoing connections this is their listen port (correct for holepunch).
+    // For inbound connections it is their ephemeral source port — same trade-off
+    // as libtorrent's remote() — and is accepted by the spec.
+    target->send_ut_holepunch(bep55::MsgConnect, sender.socket_address());
+    tr_logAddDebugTor(
+        tor,
+        fmt::format(
+            "BEP 55: relay: sent MsgConnect to target {} (initiator={})",
+            target_endpoint.display_name(),
+            sender.socket_address().display_name()));
+}
+
+// --- BEP 55: PEX Provenance Store ---
+
+void tr_peerMgrRecordPexIntroducers(
+    tr_torrent* tor,
+    tr_socket_address const& sender_socket_address,
+    std::span<tr_pex const> const pex)
+{
+    if (!tor->allows_pex() || tor->is_private())
+    {
+        return;
+    }
+
+    tr_swarm* s = tor->swarm;
+    if (s == nullptr)
+    {
+        return;
+    }
+
+    auto const lock = s->unique_lock();
+    auto& store = s->introducer_store();
+
+    for (auto const& p : pex)
+    {
+        if (p.socket_address.address() == sender_socket_address.address())
+        {
+            tr_logAddTraceTor(
+                tor,
+                fmt::format("BEP 55: PEX: filtered self-advertisement from {}", sender_socket_address.display_name()));
+            continue;
+        }
+
+        store.record(p.socket_address, sender_socket_address);
+    }
+}
+
+// ---
+
 namespace
 {
 namespace handshake_helpers
@@ -1372,7 +1570,7 @@ void create_bit_torrent_peer(
                         swarm,
                         fmt::format("BEP 55: skipping rendezvous for {} — it is our own address", info->display_name()));
                 }
-                else if (auto* const introducer = tr_peerMgrFindHolepunchIntroducer(tor, socket_address))
+                else if (auto* const introducer = find_holepunch_introducer(tor, socket_address))
                 {
                     introducer->send_ut_holepunch(bep55::MsgRendezvous, socket_address);
                     tr_logAddDebugSwarm(
@@ -1494,195 +1692,6 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     }
 
     return n_used;
-}
-
-// --- BEP 55: Holepunch extension ---
-
-namespace
-{
-
-[[nodiscard]] tr_peerMsgs* find_connected_peer(tr_swarm* swarm, tr_socket_address const& addr)
-{
-    for (auto const& peer : swarm->peers)
-    {
-        if (peer->socket_address() == addr)
-        {
-            return peer.get();
-        }
-
-        // Inbound peers are tracked by their ephemeral source port, but the target
-        // address in a MsgRendezvous payload comes from PEX (the advertised listen
-        // port). An exact socket_address match always wins; otherwise fall back to
-        // the listen address so relay lookups succeed for peers that connected
-        // inbound to us.
-        if (peer->peer_info && peer->peer_info->listen_socket_address() == addr)
-        {
-            return peer.get();
-        }
-    }
-    return nullptr;
-}
-
-} // anonymous namespace
-
-void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, tr_socket_address const& target_endpoint)
-{
-    auto* s = tor->swarm;
-    if (s == nullptr || !s->is_running)
-    {
-        return;
-    }
-
-    auto const lock = s->unique_lock();
-
-    if (tor->is_private())
-    {
-        tr_logAddDebugTor(tor, "BEP 55: ignoring rendezvous on private torrent");
-        return;
-    }
-
-    if (!sender.peer_info || !sender.peer_info->supports_holepunch().value_or(false))
-    {
-        tr_logAddTraceTor(
-            tor,
-            fmt::format("BEP 55: rendezvous sender {} does not support holepunch", sender.socket_address().display_name()));
-        return;
-    }
-
-    auto* target = find_connected_peer(s, target_endpoint);
-    if (target == nullptr)
-    {
-        tr_logAddTraceTor(tor, fmt::format("BEP 55: rendezvous target {} not connected", target_endpoint.display_name()));
-        sender.send_ut_holepunch(bep55::MsgError, target_endpoint, bep55::ErrNotConnected);
-        return;
-    }
-
-    if (!target->peer_info || !target->peer_info->supports_holepunch().value_or(false))
-    {
-        tr_logAddTraceTor(
-            tor,
-            fmt::format("BEP 55: rendezvous target {} does not support holepunch", target_endpoint.display_name()));
-        sender.send_ut_holepunch(bep55::MsgError, target_endpoint, bep55::ErrNoSupport);
-        return;
-    }
-
-    // Match libtorrent (refuse when target == sender) rather than BEP 55's literal
-    // wording ("target belongs to the relay"). The literal reading, an
-    // is_local_peer_endpoint(target) check, would be dead code: we never connect to
-    // ourselves (handshake.cc), so a self-endpoint target hits ErrNotConnected above
-    // before we reach this. Seen real peers in swarms ask us to introduce them to
-    // themselves. Not sure why they do it, but libtorrent guards the same case.
-    if (target == &sender)
-    {
-        tr_logAddDebugTor(
-            tor,
-            fmt::format(
-                "BEP 55: rendezvous sender {} is its own target, sending ErrNoSelf",
-                sender.socket_address().display_name()));
-        sender.send_ut_holepunch(bep55::MsgError, target_endpoint, bep55::ErrNoSelf);
-        return;
-    }
-
-    sender.send_ut_holepunch(bep55::MsgConnect, target_endpoint);
-    tr_logAddDebugTor(
-        tor,
-        fmt::format(
-            "BEP 55: relay: sent MsgConnect to initiator {} (target={})",
-            sender.socket_address().display_name(),
-            target_endpoint.display_name()));
-
-    // socket_address() is the remote endpoint of our connection to the sender.
-    // For outgoing connections this is their listen port (correct for holepunch).
-    // For inbound connections it is their ephemeral source port — same trade-off
-    // as libtorrent's remote() — and is accepted by the spec.
-    target->send_ut_holepunch(bep55::MsgConnect, sender.socket_address());
-    tr_logAddDebugTor(
-        tor,
-        fmt::format(
-            "BEP 55: relay: sent MsgConnect to target {} (initiator={})",
-            target_endpoint.display_name(),
-            sender.socket_address().display_name()));
-}
-
-// --- BEP 55: PEX Provenance Store ---
-
-void tr_peerMgrRecordPexIntroducers(
-    tr_torrent* tor,
-    tr_socket_address const& sender_socket_address,
-    std::span<tr_pex const> const pex)
-{
-    if (!tor->allows_pex() || tor->is_private())
-    {
-        return;
-    }
-
-    tr_swarm* s = tor->swarm;
-    if (s == nullptr)
-    {
-        return;
-    }
-
-    auto const lock = s->unique_lock();
-    auto& store = s->introducer_store();
-
-    for (auto const& p : pex)
-    {
-        if (p.socket_address.address() == sender_socket_address.address())
-        {
-            tr_logAddTraceTor(
-                tor,
-                fmt::format("BEP 55: PEX: filtered self-advertisement from {}", sender_socket_address.display_name()));
-            continue;
-        }
-
-        store.record(p.socket_address, sender_socket_address);
-    }
-}
-
-[[nodiscard]] tr_peerMsgs* tr_peerMgrFindHolepunchIntroducer(tr_torrent* const tor, tr_socket_address const& target_endpoint)
-{
-    tr_swarm* const s = tor->swarm;
-    if (s == nullptr)
-    {
-        return nullptr;
-    }
-
-    auto const lock = s->unique_lock();
-    auto& store = s->introducer_store();
-
-    auto introducer_addr = store.find_introducer(target_endpoint);
-    if (!introducer_addr)
-    {
-        return nullptr;
-    }
-
-    auto* peer = find_connected_peer(s, *introducer_addr);
-    if (peer == nullptr)
-    {
-        tr_logAddTraceTor(
-            tor,
-            fmt::format(
-                "BEP 55: introducer {} for {} not currently connected",
-                introducer_addr->display_name(),
-                target_endpoint.display_name()));
-        return nullptr;
-    }
-
-    if (!peer->peer_info || !peer->peer_info->supports_holepunch().value_or(false))
-    {
-        tr_logAddTraceTor(
-            tor,
-            fmt::format(
-                "BEP 55: introducer {} for {} connected but no holepunch support",
-                introducer_addr->display_name(),
-                target_endpoint.display_name()));
-        return nullptr;
-    }
-
-    tr_logAddTraceTor(
-        tor,
-        fmt::format("BEP 55: found introducer {} for {}", introducer_addr->display_name(), target_endpoint.display_name()));
-    return peer;
 }
 
 // TODO(C++20): convert to std::span
