@@ -258,7 +258,7 @@ public:
         if (is_connected_)
         {
             piece_data_at_ = {};
-            holepunch_retries_ = {};
+            reset_holepunch_attempts();
         }
         else if (has_transferred_piece_data())
         {
@@ -423,30 +423,22 @@ public:
 
     [[nodiscard]] constexpr auto is_holepunch_attempt() const noexcept
     {
-        return holepunch_retries_ > 0;
-    }
-
-    constexpr void set_holepunch_attempt() noexcept
-    {
-        if (holepunch_retries_ == 0)
-        {
-            holepunch_retries_ = 1;
-        }
+        return holepunch_attempts_ > 0;
     }
 
     [[nodiscard]] constexpr auto can_fast_retry_holepunch() const noexcept
     {
-        return holepunch_retries_ <= MaxHolepunchFastRetries;
+        return holepunch_attempts_ <= MaxHolepunchFastRetries;
     }
 
-    constexpr void on_holepunch_fast_retry() noexcept
+    constexpr void on_holepunch_attempt() noexcept
     {
-        ++holepunch_retries_;
+        ++holepunch_attempts_;
     }
 
-    constexpr void reset_holepunch_retries() noexcept
+    constexpr void reset_holepunch_attempts() noexcept
     {
-        holepunch_retries_ = {};
+        holepunch_attempts_ = {};
     }
 
     [[nodiscard]] constexpr uint8_t pex_flags() const noexcept
@@ -545,7 +537,8 @@ public:
 private:
     [[nodiscard]] constexpr time_t get_reconnect_interval_secs(time_t const now) const noexcept
     {
-        if (holepunch_retries_ > 0)
+        // BEP 55: fast-retry in holepunch mode.
+        if (is_holepunch_attempt())
         {
             return 0U;
         }
@@ -618,7 +611,7 @@ private:
     tr_peer_from from_best_; // the "best" place where this peer was found
 
     uint8_t num_consecutive_fruitless_ = {};
-    uint8_t holepunch_retries_ = {};
+    uint8_t holepunch_attempts_ = {};
     uint8_t pex_flags_ = {};
 
     // https://www.bittorrent.org/beps/bep_0040.html

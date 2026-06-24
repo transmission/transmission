@@ -252,8 +252,8 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
             outgoing_handshake_ = std::move(that.outgoing_handshake_);
             if (that.is_holepunch_attempt())
             {
-                holepunch_retries_ = that.holepunch_retries_;
-                that.reset_holepunch_retries();
+                holepunch_attempts_ = that.holepunch_attempts_;
+                that.reset_holepunch_attempts();
             }
         }
     }
@@ -1344,19 +1344,11 @@ void create_bit_torrent_peer(
             }
         }
 
-        if (info)
+        // BEP 55: retry failed punches quickly, before the NAT mapping/timing window is lost.
+        // Only exit holepunch mode if the number of retries reached the maximum.
+        if (was_holepunch_attempt && info && !info->can_fast_retry_holepunch())
         {
-            // BEP 55: retry failed punches quickly, before the NAT mapping/timing window is lost.
-            // Keep retries in holepunch mode so they stay uTP-only and do not send another
-            // rendezvous. The cap avoids a rendezvous -> connect -> fail loop for dead peers.
-            if (was_holepunch_attempt && info->can_fast_retry_holepunch())
-            {
-                info->on_holepunch_fast_retry();
-            }
-            else
-            {
-                info->reset_holepunch_retries();
-            }
+            info->reset_holepunch_attempts();
         }
 
         // BEP 55: Rendezvous trigger — if a *direct* connection fails, try to find
@@ -1427,7 +1419,7 @@ void create_bit_torrent_peer(
     {
         tr_logAddDebugSwarm(swarm, fmt::format("BEP 55: holepunch connection to {} succeeded", info->display_name()));
     }
-    info->reset_holepunch_retries();
+    info->reset_holepunch_attempts();
 
     // If we're connected via µTP, then we know the peer supports µTP...
     if (result.io->is_utp())
@@ -2923,7 +2915,7 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     auto* const session = mgr->session;
     auto const peer_supports_utp = peer_info.supports_utp().value_or(true);
 
-    peer_info.reset_holepunch_retries();
+    peer_info.reset_holepunch_attempts();
 
     // Allow downloading torrents to "steal" connection slots
     if (tr_peer_socket::limit_reached(session) && s->tor->is_done())
@@ -3025,6 +3017,7 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
     auto peer_info = s->get_existing_peer_info(endpoint);
     if (peer_info && peer_info->is_banned())
     {
+        peer_info->reset_holepunch_attempts();
         tr_logAddDebugTor(tor, fmt::format("BEP 55: peer {} is banned, skipping holepunch connect", endpoint.display_name()));
         return;
     }
@@ -3040,7 +3033,16 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
         return;
     }
 
-    peer_info->set_holepunch_attempt();
+    if (!peer_info->can_fast_retry_holepunch())
+    {
+        peer_info->reset_holepunch_attempts();
+        tr_logAddDebugTor(
+            tor,
+            fmt::format("BEP 55: peer {} has exceeded holepunch retry limit, exiting holepunch mode", endpoint.display_name()));
+        return;
+    }
+
+    peer_info->on_holepunch_attempt();
 
     // Note: We bypass normal outbound candidate pacing here because BEP 55 connect
     // timing matters; admission is still bounded by existing handshake, socket,
@@ -3055,7 +3057,7 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
             tor,
             fmt::format("BEP 55: peerIo not created for {}, marking not connectable", endpoint.display_name()));
         peer_info->set_connectable(false);
-        peer_info->reset_holepunch_retries();
+        peer_info->reset_holepunch_attempts();
         return;
     }
 

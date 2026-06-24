@@ -167,20 +167,16 @@ TEST_F(PeerInfoTest, holepunchAttemptFlag)
     EXPECT_FALSE(info.is_holepunch_attempt());
 
     // entering holepunch mode sets counter to 1
-    info.set_holepunch_attempt();
+    info.on_holepunch_attempt();
     EXPECT_TRUE(info.is_holepunch_attempt());
     EXPECT_TRUE(info.can_fast_retry_holepunch());
 
-    // idempotent: re-entering while active must not clobber the retry count
-    info.on_holepunch_fast_retry();
-    info.set_holepunch_attempt(); // must not reset the retry count
+    // cannot attempt again after this one
+    info.on_holepunch_attempt();
     EXPECT_TRUE(info.is_holepunch_attempt());
-    EXPECT_TRUE(info.can_fast_retry_holepunch());
-
-    info.on_holepunch_fast_retry();
     EXPECT_FALSE(info.can_fast_retry_holepunch());
 
     // reset clears holepunch mode
-    info.reset_holepunch_retries();
+    info.reset_holepunch_attempts();
     EXPECT_FALSE(info.is_holepunch_attempt());
 }
