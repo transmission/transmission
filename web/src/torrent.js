@@ -477,6 +477,13 @@ export class Torrent extends EventTarget {
     return a - b || Torrent.compareByName(ta, tb);
   }
 
+  static compareByUploaded(ta, tb) {
+    const a = ta.getUploadedEver();
+    const b = tb.getUploadedEver();
+
+    return a - b || Torrent.compareByName(ta, tb);
+  }
+
   static compareTorrents(a, b, sortMode, sortDirection) {
     let index = 0;
 
@@ -504,6 +511,9 @@ export class Torrent extends EventTarget {
         break;
       case Prefs.SortByName:
         index = Torrent.compareByName(a, b);
+        break;
+      case Prefs.SortByUploaded:
+        index = Torrent.compareByUploaded(a, b);
         break;
       default:
         console.log(`Unrecognized sort mode: ${sortMode}`);
@@ -548,6 +558,9 @@ export class Torrent extends EventTarget {
         break;
       case Prefs.SortByState:
         torrents.sort(this.compareByState);
+        break;
+      case Prefs.SortByUploaded:
+        torrents.sort(this.compareByUploaded);
         break;
       default:
         console.log(`Unrecognized sort mode: ${sortMode}`);
