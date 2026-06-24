@@ -48,6 +48,8 @@ target_sources(${TR_NAME}-mac
         Badger.mm
         BadgeView.h
         BadgeView.mm
+        BaseFileNameCellView.h
+        BaseFileNameCellView.mm
         BlocklistDownloader.h
         BlocklistDownloader.mm
         BlocklistDownloaderViewController.h
@@ -79,8 +81,6 @@ target_sources(${TR_NAME}-mac
         FileListNode.mm
         FileCheckCellView.h
         FileCheckCellView.mm
-        BaseFileNameCellView.h
-        BaseFileNameCellView.mm
         FileOutlineController.h
         FileOutlineController.mm
         FileOutlineView.h
