@@ -1417,6 +1417,7 @@ void create_bit_torrent_peer(
 
     if (info->is_holepunch_attempt())
     {
+        info->set_utp_supported();
         tr_logAddDebugSwarm(swarm, fmt::format("BEP 55: holepunch connection to {} succeeded", info->display_name()));
     }
     info->reset_holepunch_attempts();
