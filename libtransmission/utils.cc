@@ -24,7 +24,7 @@
 #include <string_view>
 #include <system_error>
 #include <type_traits>
-#include <utility> // std::cmp_equal
+#include <utility> // std::move
 #include <vector>
 
 #ifdef _WIN32
@@ -421,7 +421,7 @@ std::optional<std::vector<std::string>> win32MakeUtf8Argv()
         LocalFree(reinterpret_cast<HLOCAL>(wargv));
     }
 
-    if (std::cmp_equal(std::size(argv), argc))
+    if (static_cast<int>(std::size(argv)) == argc)
     {
         return argv;
     }

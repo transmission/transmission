@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <functional>
 #include <type_traits> // std::underlying_type_t
-#include <utility> // std::cmp_equal
+#include <utility> // std::move
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -344,7 +344,7 @@ void tr_peerIo::event_write_cb([[maybe_unused]] evutil_socket_t fd, short /*even
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for writing");
 
     TR_ASSERT(io->socket_.is_tcp());
-    TR_ASSERT(std::cmp_equal(io->socket_.handle.tcp, fd));
+    TR_ASSERT(io->socket_.handle.tcp == fd);
 
     io->pending_events_ &= ~EV_WRITE;
 
@@ -468,7 +468,7 @@ void tr_peerIo::event_read_cb([[maybe_unused]] evutil_socket_t fd, short /*event
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for reading");
 
     TR_ASSERT(io->socket_.is_tcp());
-    TR_ASSERT(std::cmp_equal(io->socket_.handle.tcp, fd));
+    TR_ASSERT(io->socket_.handle.tcp == fd);
 
     io->pending_events_ &= ~EV_READ;
 
