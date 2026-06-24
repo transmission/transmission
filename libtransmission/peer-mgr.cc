@@ -2343,6 +2343,7 @@ void close_bad_peers(tr_swarm* s, time_t const now_sec, bad_peers_t& bad_peers_b
         tr_logAddTraceSwarm(peer->swarm, fmt::format("removing bad peer {}", peer->display_name()));
         close_peer(peer);
     }
+    bad_peers_buf.clear();
 }
 
 void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
