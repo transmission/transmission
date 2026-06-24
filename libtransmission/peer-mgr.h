@@ -428,7 +428,7 @@ public:
 
     [[nodiscard]] constexpr auto can_fast_retry_holepunch() const noexcept
     {
-        return holepunch_attempts_ <= MaxHolepunchFastRetries;
+        return holepunch_attempts_ < MaxHolepunchFastRetries;
     }
 
     constexpr void on_holepunch_attempt() noexcept
