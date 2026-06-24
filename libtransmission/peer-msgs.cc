@@ -539,6 +539,11 @@ public:
         return active;
     }
 
+    [[nodiscard]] bool can_ut_holepunch() const noexcept override
+    {
+        return tor_.allows_holepunch() && ut_holepunch_id_ != 0U;
+    }
+
     void send_ut_holepunch(bep55::MsgType const msg_type, tr_socket_address const& addr, bep55::ErrorCode const err_code)
         override
     {
@@ -656,11 +661,6 @@ private:
     {
         // only send pex if both the torrent and peer support it
         return tor_.allows_pex() && ut_pex_id_ != 0U;
-    }
-
-    [[nodiscard]] bool can_ut_holepunch() const noexcept
-    {
-        return tor_.allows_holepunch() && ut_holepunch_id_ != 0U;
     }
 
     void send_ut_pex();

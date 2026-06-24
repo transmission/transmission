@@ -126,6 +126,7 @@ public:
 
     virtual void on_piece_completed(tr_piece_index_t) = 0;
 
+    [[nodiscard]] virtual bool can_ut_holepunch() const noexcept = 0;
     virtual void send_ut_holepunch(
         bep55::MsgType msg_type,
         tr_socket_address const& addr,

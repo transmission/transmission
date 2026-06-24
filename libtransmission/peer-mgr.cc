@@ -1301,7 +1301,7 @@ namespace
         return nullptr;
     }
 
-    if (!peer->peer_info || !peer->peer_info->supports_holepunch().value_or(false))
+    if (!peer->can_ut_holepunch())
     {
         tr_logAddTraceTor(
             tor,
@@ -1336,7 +1336,7 @@ void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, t
         return;
     }
 
-    if (!sender.peer_info || !sender.peer_info->supports_holepunch().value_or(false))
+    if (!sender.can_ut_holepunch())
     {
         tr_logAddTraceTor(
             tor,
@@ -1352,7 +1352,7 @@ void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, t
         return;
     }
 
-    if (!target->peer_info || !target->peer_info->supports_holepunch().value_or(false))
+    if (!target->can_ut_holepunch())
     {
         tr_logAddTraceTor(
             tor,
@@ -2000,7 +2000,7 @@ namespace peer_stat_helpers
     stats.is_downloading_from = peer->is_active(tr_direction::PeerToClient);
     stats.is_uploading_to = peer->is_active(tr_direction::ClientToPeer);
     stats.is_seed = peer->is_seed();
-    stats.supports_holepunch = peer->peer_info && peer->peer_info->supports_holepunch().value_or(false);
+    stats.supports_holepunch = peer->can_ut_holepunch();
 
     stats.blocks_to_peer = peer->blocks_sent_to_peer.count(now, CancelHistorySec);
     stats.blocks_to_client = peer->blocks_sent_to_client.count(now, CancelHistorySec);
