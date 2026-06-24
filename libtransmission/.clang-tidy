@@ -2,6 +2,8 @@
 HeaderFilterRegex: .*/libtransmission/.*
 
 # TODO: Enable `portability-template-virtual-member-function` after https://github.com/llvm/llvm-project/issues/139031 is fixed
+# `readability-redundant-casting` is disabled to silence false positives from MSVC STL's
+# `static_cast<bool>` in comparator noexcept clauses (e.g. when calling std::sort)
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
 Checks: >
   bugprone-*,
@@ -43,6 +45,7 @@ Checks: >
   -readability-identifier-length,
   -readability-magic-numbers,
   -readability-qualified-auto,
+  -readability-redundant-casting,
 
 CheckOptions:
   - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros,                    value: true       }

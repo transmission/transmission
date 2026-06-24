@@ -54,7 +54,7 @@ using namespace libtransmission::Values;
 #define tr_return_if_fail(expr) \
     do \
     { \
-        if (expr) [[likely]] \
+        if (expr) \
         { \
         } \
         else \
@@ -66,7 +66,7 @@ using namespace libtransmission::Values;
 #define tr_return_val_if_fail(expr, val) \
     do \
     { \
-        if (expr) [[likely]] \
+        if (expr) \
         { \
         } \
         else \

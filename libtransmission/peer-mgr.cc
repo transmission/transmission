@@ -2457,12 +2457,15 @@ struct ComparePeerInfo
     }
 
     template<typename T>
+    // Suppress STL-instantiation noise from MSVC xutility noexcept(bool(...)).
+    // NOLINTBEGIN(readability-redundant-casting)
     [[nodiscard]] std::enable_if_t<std::is_same_v<std::decay_t<decltype(*std::declval<T>())>, tr_peer_info>, bool> operator()(
         T const& a,
         T const& b) const noexcept
     {
         return compare(*a, *b) < 0;
     }
+    // NOLINTEND(readability-redundant-casting)
 
     time_t const now_ = tr_time();
 };

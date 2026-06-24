@@ -24,6 +24,7 @@
 #include <string_view>
 #include <system_error>
 #include <type_traits>
+#include <utility> // std::move
 #include <vector>
 
 #ifdef _WIN32
