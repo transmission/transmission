@@ -2973,6 +2973,24 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
 
     auto const lock = s->unique_lock();
 
+    auto peer_info = s->get_existing_peer_info(endpoint);
+
+    if (peer_info)
+    {
+        if (!peer_info->can_fast_retry_holepunch())
+        {
+            peer_info->reset_holepunch_attempts();
+            tr_logAddDebugTor(
+                tor,
+                fmt::format(
+                    "BEP 55: peer {} has exceeded holepunch retry limit, exiting holepunch mode",
+                    endpoint.display_name()));
+            return;
+        }
+
+        peer_info->on_holepunch_attempt();
+    }
+
     if (!endpoint.is_valid_for_peers(TR_PEER_FROM_HOLEPUNCH))
     {
         tr_logAddDebugTor(tor, fmt::format("BEP 55: invalid peer {}, skipping holepunch connect", endpoint.display_name()));
@@ -3024,10 +3042,8 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
         return;
     }
 
-    auto peer_info = s->get_existing_peer_info(endpoint);
     if (peer_info && peer_info->is_banned())
     {
-        peer_info->reset_holepunch_attempts();
         tr_logAddDebugTor(tor, fmt::format("BEP 55: peer {} is banned, skipping holepunch connect", endpoint.display_name()));
         return;
     }
@@ -3043,17 +3059,6 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
         return;
     }
 
-    if (!peer_info->can_fast_retry_holepunch())
-    {
-        peer_info->reset_holepunch_attempts();
-        tr_logAddDebugTor(
-            tor,
-            fmt::format("BEP 55: peer {} has exceeded holepunch retry limit, exiting holepunch mode", endpoint.display_name()));
-        return;
-    }
-
-    peer_info->on_holepunch_attempt();
-
     // Note: We bypass normal outbound candidate pacing here because BEP 55 connect
     // timing matters; admission is still bounded by existing handshake, socket,
     // blocklist, and peer-limit checks.
@@ -3067,7 +3072,6 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
             tor,
             fmt::format("BEP 55: peerIo not created for {}, marking not connectable", endpoint.display_name()));
         peer_info->set_connectable(false);
-        peer_info->reset_holepunch_attempts();
         return;
     }
 
