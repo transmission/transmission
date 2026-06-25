@@ -26,6 +26,7 @@ private:
 
 public:
     using value_type = Char;
+    using reference = Char&;
     using const_reference = Char const&;
 
     tr_strbuf()
