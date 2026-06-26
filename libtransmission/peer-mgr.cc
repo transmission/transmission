@@ -3068,10 +3068,7 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
 
     if (!peer_io)
     {
-        tr_logAddDebugTor(
-            tor,
-            fmt::format("BEP 55: peerIo not created for {}, marking not connectable", endpoint.display_name()));
-        peer_info->set_connectable(false);
+        tr_logAddDebugTor(tor, fmt::format("BEP 55: peerIo not created for {}, skipping", endpoint.display_name()));
         return;
     }
 
