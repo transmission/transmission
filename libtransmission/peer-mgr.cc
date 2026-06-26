@@ -1386,10 +1386,8 @@ void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, t
             sender.socket_address().display_name(),
             target_endpoint.display_name()));
 
-    // socket_address() is the remote endpoint of our connection to the sender.
-    // For outgoing connections this is their listen port (correct for holepunch).
-    // For inbound connections it is their ephemeral source port — same trade-off
-    // as libtorrent's remote() — and is accepted by the spec.
+    // Use the observed remote endpoint (NAT-external port), not the self-reported
+    // listen port. Matches libtorrent's remote().
     target->send_ut_holepunch(bep55::MsgConnect, sender.socket_address());
     tr_logAddDebugTor(
         tor,
