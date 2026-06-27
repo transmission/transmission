@@ -9,9 +9,9 @@
 #include <chrono>
 #include <cstddef> // size_t
 #include <ctime>
-#include <map>
-#include <sstream>
 #include <ranges>
+#include <span>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -416,7 +416,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
     auto const localtime_str = fmt::format("{:%a %b %d %T %Y%n}", *std::localtime(&now));
     auto const priority_str = std::to_string(tor->get_priority());
 
-    auto const env = std::map<std::string_view, std::string_view>{
+    auto env = std::array<std::pair<std::string_view, std::string_view>, 10U>{ {
         { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
         { "TR_TIME_LOCALTIME"sv, localtime_str },
         { "TR_TORRENT_BYTES_DOWNLOADED"sv, bytes_downloaded_str },
@@ -427,12 +427,12 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
         { "TR_TORRENT_NAME"sv, tor->name() },
         { "TR_TORRENT_PRIORITY"sv, priority_str },
         { "TR_TORRENT_TRACKERS"sv, trackers_str },
-    };
+    } };
 
     tr_logAddInfoTor(tor, fmt::format(fmt::runtime(_("Calling script '{path}'")), fmt::arg("path", script)));
 
     auto error = tr_error{};
-    if (!tr_spawn_async(std::data(cmd), env, TR_IF_WIN32("\\", "/"), &error))
+    if (!tr_spawn_async(std::data(cmd), std::span{ env }, TR_IF_WIN32("\\", "/"), &error))
     {
         tr_logAddWarnTor(
             tor,

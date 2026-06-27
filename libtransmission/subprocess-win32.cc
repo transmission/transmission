@@ -7,15 +7,18 @@
 #include <climits>
 #include <cstring>
 #include <cwchar>
-#include <map>
 #include <iterator>
+#include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <fmt/format.h>
 #include <fmt/xchar.h> // for wchar_t support
 
 #include <windows.h>
+
+#include <small/map.hpp>
 
 #include "libtransmission/error.h"
 #include "libtransmission/string-utils.h"
@@ -82,7 +85,7 @@ public:
     // NOLINTEND(readability-redundant-casting)
 };
 
-using SortedWideEnv = std::map<std::wstring, std::wstring, WStrICompare>;
+using SortedWideEnv = small::map<std::wstring, std::wstring, 64U, WStrICompare>;
 
 /*
  * Var1=Value1\0
@@ -282,7 +285,7 @@ std::wstring construct_cmd_line(char const* const* cmd)
 
 bool tr_spawn_async(
     char const* const* cmd,
-    std::map<std::string_view, std::string_view> const& env,
+    std::span<std::pair<std::string_view, std::string_view>> const env,
     std::string_view work_dir,
     tr_error* error)
 {

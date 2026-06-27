@@ -8,9 +8,10 @@
 #include <cstdlib> // setenv
 #include <cstring> // strerror
 #include <fstream>
-#include <map>
+#include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <gtest/gtest.h>
 
@@ -176,18 +177,18 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
         nullptr, //
     };
 
-    auto const env = std::map<std::string_view, std::string_view>{
+    auto env = std::array<std::pair<std::string_view, std::string_view>, 4U>{ {
         { test_env_key1, test_env_value1 },
         { test_env_key2, test_env_value2 },
         { test_env_key3, test_env_value3 },
         { test_env_key5, test_env_value5 },
-    };
+    } };
 
     setenv("FOO", "bar", 1 /*true*/); // inherited
     setenv("ZOO", "tar", 1 /*true*/); // overridden
 
     auto error = tr_error{};
-    bool const ret = tr_spawn_async(std::data(args), env, {}, &error);
+    bool const ret = tr_spawn_async(std::data(args), std::span{ env }, {}, &error);
     EXPECT_TRUE(ret);
     EXPECT_FALSE(error) << error;
 
