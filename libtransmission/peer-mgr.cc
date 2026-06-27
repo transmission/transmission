@@ -1257,11 +1257,8 @@ namespace
             return peer.get();
         }
 
-        // Inbound peers are tracked by their ephemeral source port, but the target
-        // address in a MsgRendezvous payload comes from PEX (the advertised listen
-        // port). An exact socket_address match always wins; otherwise fall back to
-        // the listen address so relay lookups succeed for peers that connected
-        // inbound to us.
+        // Inbound peers are tracked by their ephemeral source port, while
+        // rendezvous targets come from PEX and use the advertised listen port.
         if (peer->peer_info && peer->peer_info->listen_socket_address() == addr)
         {
             return peer.get();
