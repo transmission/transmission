@@ -624,6 +624,12 @@ a {
 
     .torrent-peer-details,
     .torrent-progress-details {
+      // Let these grid items shrink below their content width and clip
+      // long metric strings instead of overflowing the row. Mirrors the
+      // .torrent-name / .torrent-labels treatment above. (#7665)
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
       font-size: small;
 
       &.error {
