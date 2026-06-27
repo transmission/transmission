@@ -463,7 +463,7 @@
 		ED5E0F0F2CD31BC20071433B /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
 		ED67FB422B70FCE400D8A037 /* serializer.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED67FB402B70FCE400D8A037 /* serializer.cc */; };
 		ED67FB432B70FCE400D8A037 /* serializer.h in Headers */ = {isa = PBXBuildFile; fileRef = ED67FB412B70FCE400D8A037 /* serializer.h */; };
-		ED6F16B52EB8F1EB007CD864 /* FileNameCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED6F16B22EB8F1EB007CD864 /* FileNameCellView.mm */; };
+		ED6F16B52EB8F1EB007CD864 /* BaseFileNameCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED6F16B22EB8F1EB007CD864 /* BaseFileNameCellView.mm */; };
 		ED6F16B62EB8F1EB007CD864 /* FilePriorityCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED6F16B42EB8F1EB007CD864 /* FilePriorityCellView.mm */; };
 		ED6F16B72EB8F1EB007CD864 /* FileCheckCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED6F16B02EB8F1EB007CD864 /* FileCheckCellView.mm */; };
 		ED86936F2ADAE34D00342B1A /* DefaultAppHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED86936E2ADAE34D00342B1A /* DefaultAppHelper.mm */; };
@@ -1459,8 +1459,8 @@
 		ED67FB412B70FCE400D8A037 /* serializer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = serializer.h; sourceTree = "<group>"; };
 		ED6F16AF2EB8F1EB007CD864 /* FileCheckCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileCheckCellView.h; sourceTree = "<group>"; };
 		ED6F16B02EB8F1EB007CD864 /* FileCheckCellView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileCheckCellView.mm; sourceTree = "<group>"; };
-		ED6F16B12EB8F1EB007CD864 /* FileNameCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileNameCellView.h; sourceTree = "<group>"; };
-		ED6F16B22EB8F1EB007CD864 /* FileNameCellView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileNameCellView.mm; sourceTree = "<group>"; };
+		ED6F16B12EB8F1EB007CD864 /* BaseFileNameCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BaseFileNameCellView.h; sourceTree = "<group>"; };
+		ED6F16B22EB8F1EB007CD864 /* BaseFileNameCellView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BaseFileNameCellView.mm; sourceTree = "<group>"; };
 		ED6F16B32EB8F1EB007CD864 /* FilePriorityCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilePriorityCellView.h; sourceTree = "<group>"; };
 		ED6F16B42EB8F1EB007CD864 /* FilePriorityCellView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilePriorityCellView.mm; sourceTree = "<group>"; };
 		ED86936D2ADAE34D00342B1A /* DefaultAppHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultAppHelper.h; sourceTree = "<group>"; };
@@ -2167,8 +2167,8 @@
 				A2AF1C370A3D0F6200F1575D /* FileOutlineView.mm */,
 				ED6F16AF2EB8F1EB007CD864 /* FileCheckCellView.h */,
 				ED6F16B02EB8F1EB007CD864 /* FileCheckCellView.mm */,
-				ED6F16B12EB8F1EB007CD864 /* FileNameCellView.h */,
-				ED6F16B22EB8F1EB007CD864 /* FileNameCellView.mm */,
+				ED6F16B12EB8F1EB007CD864 /* BaseFileNameCellView.h */,
+				ED6F16B22EB8F1EB007CD864 /* BaseFileNameCellView.mm */,
 				ED6F16B32EB8F1EB007CD864 /* FilePriorityCellView.h */,
 				ED6F16B42EB8F1EB007CD864 /* FilePriorityCellView.mm */,
 			);
@@ -3525,7 +3525,7 @@
 				A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.mm in Sources */,
 				A2FB057F0BFEB6800095564D /* DragOverlayView.mm in Sources */,
 				E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */,
-				ED6F16B52EB8F1EB007CD864 /* FileNameCellView.mm in Sources */,
+				ED6F16B52EB8F1EB007CD864 /* BaseFileNameCellView.mm in Sources */,
 				ED6F16B62EB8F1EB007CD864 /* FilePriorityCellView.mm in Sources */,
 				ED6F16B72EB8F1EB007CD864 /* FileCheckCellView.mm in Sources */,
 				A2DF37070C220D03006523C1 /* CreatorWindowController.mm in Sources */,
