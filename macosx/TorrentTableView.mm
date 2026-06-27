@@ -785,11 +785,55 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
 }
 
+- (void)updateGroupRatio:(BOOL)displayGroupRowRatio inCell:(GroupCell*)groupCell forGroup:(TorrentGroup*)group
+{
+    groupCell.fGroupDownloadField.hidden = displayGroupRowRatio;
+    groupCell.fGroupDownloadView.hidden = displayGroupRowRatio;
+
+    if (displayGroupRowRatio)
+    {
+        groupCell.fGroupUploadAndRatioView.image = [NSImage imageNamed:@"YingYangGroupTemplate"];
+        groupCell.fGroupUploadAndRatioView.image.accessibilityDescription = NSLocalizedString(@"Ratio", "Torrent -> status image");
+
+        groupCell.fGroupUploadAndRatioField.stringValue = [NSString stringForRatio:group.ratio];
+
+        NSString* tooltipRatio = NSLocalizedString(@"Ratio", "Torrent table -> group row -> tooltip");
+        groupCell.fGroupUploadAndRatioField.toolTip = tooltipRatio;
+        groupCell.fGroupUploadAndRatioView.toolTip = tooltipRatio;
+    }
+    else
+    {
+        groupCell.fGroupUploadAndRatioView.image = [NSImage imageNamed:@"UpArrowGroupTemplate"];
+        groupCell.fGroupUploadAndRatioView.image.accessibilityDescription = NSLocalizedString(@"UL", "Torrent -> status image");
+
+        groupCell.fGroupUploadAndRatioField.stringValue = [NSString stringForSpeed:group.uploadRate];
+
+        NSString* tooltipUpload = NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
+        groupCell.fGroupUploadAndRatioField.toolTip = tooltipUpload;
+        groupCell.fGroupUploadAndRatioView.toolTip = tooltipUpload;
+    }
+}
+
 - (void)toggleGroupRowRatio
 {
     BOOL displayGroupRowRatio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
-    [self.fDefaults setBool:!displayGroupRowRatio forKey:@"DisplayGroupRowRatio"];
-    [self reloadVisibleRows];
+    BOOL updatedDisplayGroupRowRatio = !displayGroupRowRatio;
+    [self.fDefaults setBool:updatedDisplayGroupRowRatio forKey:@"DisplayGroupRowRatio"];
+
+    if ([self.fDefaults boolForKey:@"SortByGroup"])
+    {
+        __auto_type count = [self.dataSource outlineView:self numberOfChildrenOfItem:nil];
+        for (NSInteger i = 0; i < count; ++i)
+        {
+            __auto_type item = (NSObject*)[self.dataSource outlineView:self child:i ofItem:nil];
+            if ([item isKindOfClass:[TorrentGroup class]])
+            {
+                __auto_type row = [self rowForItem:item];
+                __auto_type groupCell = [self viewAtColumn:0 row:row makeIfNecessary:NO];
+                [self updateGroupRatio:updatedDisplayGroupRowRatio inCell:groupCell forGroup:(TorrentGroup*)item];
+            }
+        }
+    }
 }
 
 - (IBAction)toggleControlForTorrent:(id)sender
