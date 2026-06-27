@@ -1226,6 +1226,11 @@ private:
 
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
     {
+        if (!is_running())
+        {
+            return false;
+        }
+
         if (uses_speed_limit(direction) && speed_limit(direction).is_zero())
         {
             return false;
