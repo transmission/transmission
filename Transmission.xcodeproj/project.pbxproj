@@ -11,6 +11,9 @@
 		0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6169A60FE5C9A200C66CE6 /* bitfield.h */; };
 		0A89346B736DBCF81F3A4850 /* torrent-metainfo.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */; };
 		0A89346B736DBCF81F3A4852 /* torrent-metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */; };
+		EDB550032F55000100B05501 /* bep55-holepunch.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDB550012F55000100B05501 /* bep55-holepunch.cc */; };
+		EDB550042F55000100B05501 /* bep55-holepunch.h in Headers */ = {isa = PBXBuildFile; fileRef = EDB550022F55000100B05501 /* bep55-holepunch.h */; };
+		EDB550062F55000100B05501 /* bep55-introducer-store.h in Headers */ = {isa = PBXBuildFile; fileRef = EDB550052F55000100B05501 /* bep55-introducer-store.h */; };
 		9F0B1F302E4D1A0100A1B2C3 /* env.h in Headers */ = {isa = PBXBuildFile; fileRef = 9F0B1F2A2E4D1A0100A1B2C3 /* env.h */; };
 		9F0B1F312E4D1A0100A1B2C3 /* file-utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 9F0B1F2C2E4D1A0100A1B2C3 /* file-utils.h */; };
 		9F0B1F322E4D1A0100A1B2C3 /* string-utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 9F0B1F2E2E4D1A0100A1B2C3 /* string-utils.h */; };
@@ -678,6 +681,9 @@
 		0A6169A60FE5C9A200C66CE6 /* bitfield.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = bitfield.h; sourceTree = "<group>"; };
 		0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-metainfo.cc"; sourceTree = "<group>"; };
 		0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "torrent-metainfo.h"; sourceTree = "<group>"; };
+		EDB550012F55000100B05501 /* bep55-holepunch.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "bep55-holepunch.cc"; sourceTree = "<group>"; };
+		EDB550022F55000100B05501 /* bep55-holepunch.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "bep55-holepunch.h"; sourceTree = "<group>"; };
+		EDB550052F55000100B05501 /* bep55-introducer-store.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "bep55-introducer-store.h"; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-piece-map.cc"; sourceTree = "<group>"; };
 		1BB44E07B1B52E28291B4E31 /* file-piece-map.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "file-piece-map.h"; sourceTree = "<group>"; };
@@ -1938,6 +1944,9 @@
 				A21FBBAA0EDA78C300BC3C51 /* bandwidth.cc */,
 				A21FBBA90EDA78C300BC3C51 /* bandwidth.h */,
 				2856E0656A49F2665D69E761 /* benc.h */,
+				EDB550012F55000100B05501 /* bep55-holepunch.cc */,
+				EDB550022F55000100B05501 /* bep55-holepunch.h */,
+				EDB550052F55000100B05501 /* bep55-introducer-store.h */,
 				0A6169A50FE5C9A200C66CE6 /* bitfield.cc */,
 				0A6169A60FE5C9A200C66CE6 /* bitfield.h */,
 				A54D44C6A7AAF131D9AE29F5 /* block-info.cc */,
@@ -2612,6 +2621,8 @@
 				A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */,
 				CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */,
 				2856E0656A49F2665D69E760 /* benc.h in Headers */,
+				EDB550042F55000100B05501 /* bep55-holepunch.h in Headers */,
+				EDB550062F55000100B05501 /* bep55-introducer-store.h in Headers */,
 				E975121263DD973CAF4AEBA0 /* timer.h in Headers */,
 				EDBAAC8C29E486BC00D9495F /* ip-cache.h in Headers */,
 				E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */,
@@ -3446,6 +3457,7 @@
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.cc in Sources */,
 				C1033E081A3279B800EF44D8 /* crypto-utils-ccrypto.cc in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.cc in Sources */,
+				EDB550032F55000100B05501 /* bep55-holepunch.cc in Sources */,
 				0A6169A70FE5C9A200C66CE6 /* bitfield.cc in Sources */,
 				ED67FB422B70FCE400D8A037 /* serializer.cc in Sources */,
 				1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */,

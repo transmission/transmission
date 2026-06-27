@@ -364,6 +364,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `progress`             | double     | tr_peer_stat
 | `rate_to_client` (B/s) | number     | tr_peer_stat
 | `rate_to_peer` (B/s)   | number     | tr_peer_stat
+| `supports_holepunch`   | boolean    | tr_peer_stat
 
 `peers_from`: an object containing:
 
@@ -371,6 +372,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 |:--|:--|:--
 | `from_cache`    | number     | tr_stat
 | `from_dht`      | number     | tr_stat
+| `from_holepunch` | number   | tr_stat
 | `from_incoming` | number     | tr_stat
 | `from_lpd`      | number     | tr_stat
 | `from_ltep`     | number     | tr_stat

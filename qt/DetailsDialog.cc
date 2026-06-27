@@ -1253,6 +1253,10 @@ void DetailsDialog::refreshUI()
                     txt = tr("Peer is connected over µTP");
                     break;
 
+                case 'h':
+                    txt = tr("Peer supports holepunch (BEP 55)");
+                    break;
+
                 default:
                     break;
                 }

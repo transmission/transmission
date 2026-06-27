@@ -681,6 +681,11 @@ struct tr_torrent
         return this->is_public() && this->session->allowsLPD();
     }
 
+    [[nodiscard]] auto allows_holepunch() const noexcept
+    {
+        return this->is_public() && this->session->allowsUTP();
+    }
+
     [[nodiscard]] constexpr bool client_can_download() const
     {
         return this->is_piece_transfer_allowed(tr_direction::PeerToClient);

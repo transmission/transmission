@@ -72,6 +72,13 @@ public:
         bool client_is_seed,
         bool utp);
 
+    static std::shared_ptr<tr_peerIo> new_outgoing_utp(
+        tr_session* session,
+        tr_bandwidth* parent,
+        tr_socket_address const& socket_address,
+        tr_sha1_digest_t const& info_hash,
+        bool client_is_seed);
+
     static std::shared_ptr<tr_peerIo> new_incoming(
         tr_session* session,
         tr_bandwidth* parent,

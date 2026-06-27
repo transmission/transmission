@@ -623,6 +623,7 @@ export class Inspector extends EventTarget {
       U: 'Uploading to peer',
       X: 'Peer was discovered through Peer Exchange (PEX)',
       d: "We would download from this peer if they'd let us",
+      h: 'Peer supports holepunch (BEP 55)',
       u: "We would upload to this peer if they'd ask",
     });
 

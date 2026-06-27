@@ -30,6 +30,7 @@
  * @{
  */
 
+class tr_peerMsgs;
 class tr_peer_socket;
 struct tr_peer;
 struct tr_peerMgr;
@@ -257,6 +258,7 @@ public:
         if (is_connected_)
         {
             piece_data_at_ = {};
+            reset_holepunch_attempts();
         }
         else if (has_transferred_piece_data())
         {
@@ -417,6 +419,28 @@ public:
         }
     }
 
+    // ---
+
+    [[nodiscard]] constexpr auto is_holepunch_attempt() const noexcept
+    {
+        return holepunch_attempts_ > 0;
+    }
+
+    [[nodiscard]] constexpr auto can_fast_retry_holepunch() const noexcept
+    {
+        return holepunch_attempts_ < MaxHolepunchFastRetries;
+    }
+
+    constexpr void on_holepunch_attempt() noexcept
+    {
+        ++holepunch_attempts_;
+    }
+
+    constexpr void reset_holepunch_attempts() noexcept
+    {
+        holepunch_attempts_ = {};
+    }
+
     [[nodiscard]] constexpr uint8_t pex_flags() const noexcept
     {
         auto ret = pex_flags_;
@@ -513,6 +537,12 @@ public:
 private:
     [[nodiscard]] constexpr time_t get_reconnect_interval_secs(time_t const now) const noexcept
     {
+        // BEP 55: fast-retry in holepunch mode.
+        if (is_holepunch_attempt())
+        {
+            return 0U;
+        }
+
         // if we were recently connected to this peer and transferring piece
         // data, try to reconnect to them sooner rather that later -- we don't
         // want network troubles to get in the way of a good peer.
@@ -556,6 +586,11 @@ private:
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
     static auto constexpr InactiveThresSecs = time_t{ 60 * 60 };
 
+    // BEP 55: how many times we fast-retry a uTP holepunch before giving up and
+    // falling back to normal backoff. Matches libtorrent's effective fast_reconnect
+    // budget, which becomes a no-op once fast_reconnects > 1.
+    static auto constexpr MaxHolepunchFastRetries = uint8_t{ 2 };
+
     static auto inline n_known_connectable = size_t{};
 
     // if the port is 0, it SHOULD mean we don't know this peer's listen socket address
@@ -576,6 +611,7 @@ private:
     tr_peer_from from_best_; // the "best" place where this peer was found
 
     uint8_t num_consecutive_fruitless_ = {};
+    uint8_t holepunch_attempts_ = {};
     uint8_t pex_flags_ = {};
 
     // https://www.bittorrent.org/beps/bep_0040.html
@@ -674,6 +710,13 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, std::shared_ptr<tr_peer_socket> 
 
 size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, size_t n_pex);
 
+// BEP 55: Record that a connected peer introduced the given endpoints via PEX.
+// The sender_socket_address is the relay's socket address (the peer who sent us the PEX message).
+void tr_peerMgrRecordPexIntroducers(
+    tr_torrent* tor,
+    tr_socket_address const& sender_socket_address,
+    std::span<tr_pex const> pex);
+
 enum : uint8_t
 {
     TR_PEERS_CONNECTED,
@@ -698,5 +741,15 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
 [[nodiscard]] std::vector<tr_peer_stat> tr_peerMgrPeerStats(tr_torrent const* tor);
 
 [[nodiscard]] tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
+
+// BEP 55: Holepunch extension relay.
+// Called when a connected peer sends us a rendezvous message.
+// Finds the target among connected peers and sends connect to both sides.
+void tr_peerMgrHandleHolepunchRendezvous(tr_torrent* tor, tr_peerMsgs& sender, tr_socket_address const& target_endpoint);
+
+// BEP 55: Initiate an outgoing uTP-only connection to an endpoint in response
+// to a received connect message. The normal handshake, socket, blocklist, and
+// peer-limit checks still apply.
+void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoint);
 
 /* @} */

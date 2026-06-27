@@ -170,6 +170,30 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     return {};
 }
 
+std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing_utp(
+    tr_session* session,
+    tr_bandwidth* parent,
+    tr_socket_address const& socket_address,
+    tr_sha1_digest_t const& info_hash,
+    bool client_is_seed)
+{
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(socket_address.is_valid());
+
+    if (!session->allowsUTP())
+    {
+        return {};
+    }
+
+    auto socket = tr_peer_socket_utp::create(socket_address, session->utp_context, session->timerMaker());
+    if (!socket)
+    {
+        return {};
+    }
+
+    return tr_peerIo::create(session, std::move(socket), parent, &info_hash, false, client_is_seed);
+}
+
 tr_peerIo::~tr_peerIo()
 {
     auto const lock = session_->unique_lock();

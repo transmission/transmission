@@ -14,6 +14,7 @@
 #include <cstddef> // for size_t
 #include <memory>
 
+#include "libtransmission/bep55-holepunch.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/net.h" // tr_socket_address
 #include "libtransmission/peer-common.h" // for tr_peer
@@ -124,6 +125,12 @@ public:
     virtual void on_torrent_got_metainfo() noexcept = 0;
 
     virtual void on_piece_completed(tr_piece_index_t) = 0;
+
+    [[nodiscard]] virtual bool can_ut_holepunch() const noexcept = 0;
+    virtual void send_ut_holepunch(
+        bep55::MsgType msg_type,
+        tr_socket_address const& addr,
+        bep55::ErrorCode err_code = bep55::ErrNonError) = 0;
 
     static std::shared_ptr<tr_peerMsgs> create(
         tr_torrent& torrent,
