@@ -3049,6 +3049,7 @@ void tr_peerMgrConnectHolepunch(tr_torrent* tor, tr_socket_address const& endpoi
     if (!peer_info)
     {
         peer_info = s->ensure_info_exists(endpoint, ADDED_F_HOLEPUNCH | ADDED_F_UTP_FLAGS, TR_PEER_FROM_HOLEPUNCH);
+        peer_info->on_holepunch_attempt();
     }
 
     if (peer_info->has_handshake())
