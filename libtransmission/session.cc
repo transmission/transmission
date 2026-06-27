@@ -49,6 +49,7 @@
 #include "libtransmission/rpc-server.h"
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/session.h"
+#include "libtransmission/socks5-udp.h"
 #include "libtransmission/string-utils.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/torrent.h"
@@ -62,6 +63,7 @@
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web.h"
+#include "libtransmission/web-utils.h"
 
 struct tr_ctor;
 
@@ -246,6 +248,11 @@ void tr_session::DhtMediator::add_pex(tr_sha1_digest_t const& info_hash, tr_pex 
     {
         tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n_pex);
     }
+}
+
+tr_socks5_udp* tr_session::AnnouncerUdpMediator::socks5_udp() const noexcept
+{
+    return session_.socks5_udp_.get();
 }
 
 // ---
@@ -875,6 +882,35 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
     }
 
+    // Initialize SOCKS5 UDP relay if proxy_url points to a socks5:// proxy
+    if (auto const& proxy_url = new_settings.proxy_url; force || proxy_url != old_settings.proxy_url)
+    {
+        socks5_udp_.reset();
+
+        if (proxy_url && tr_strv_starts_with(*proxy_url, "socks5://"sv))
+        {
+            // Parse host:port from socks5://host:port
+            if (auto const parsed = tr_urlParse(*proxy_url); parsed)
+            {
+                socks5_udp_ = std::make_unique<tr_socks5_udp>(
+                    event_base(),
+                    parsed->host,
+                    parsed->port != 0 ? parsed->port : uint16_t{ 1080 },
+                    tr_socks5_udp::ReadyCallback{});
+
+                // Route incoming relay packets to the UDP announcer
+                socks5_udp_->set_incoming_callback(
+                    [this](uint8_t const* payload, size_t payload_len, sockaddr const* from, socklen_t fromlen)
+                    {
+                        if (announcer_udp_)
+                        {
+                            announcer_udp_->handle_message(payload, payload_len, from, fromlen);
+                        }
+                    });
+            }
+        }
+    }
+
     // Sends out announce messages with advertisedPeerPort(), so this
     // section needs to happen here after the peer port settings changes
     if (auto const& val = new_settings.lpd_enabled; force || val != old_settings.lpd_enabled)
@@ -1468,6 +1504,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
 
     this->announcer_.reset();
     this->announcer_udp_.reset();
+    this->socks5_udp_.reset();
 
     stats().save();
     peer_mgr_.reset();
