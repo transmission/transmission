@@ -19,7 +19,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="71" y="712" width="480" height="269"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1290"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1120"/>
             <value key="minSize" type="size" width="350" height="5"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="348"/>
@@ -235,6 +235,9 @@
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="14" id="D7V-m1-heE"/>
                                                             </constraints>
+                                                            <connections>
+                                                                <outlet property="menu" destination="456" id="LmU-Ep-DYj"/>
+                                                            </connections>
                                                         </customView>
                                                     </subviews>
                                                     <constraints>
@@ -280,7 +283,7 @@
                                                     <rect key="frame" x="11" y="87" width="458" height="22"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
-                                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="x9c-7U-Odp">
+                                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="x9c-7U-Odp" customClass="CustomProgressView">
                                                             <rect key="frame" x="45" y="2" width="408" height="18"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="18" id="UN3-pW-1Yw"/>
@@ -1200,6 +1203,7 @@ CA
                     </connections>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="-79" y="-630"/>
         </menu>
         <customObject id="1812" userLabel="SUUpdater" customClass="SUUpdater"/>
         <userDefaultsController representsSharedInstance="YES" id="1815" userLabel="Shared Defaults"/>
