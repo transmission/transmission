@@ -666,9 +666,8 @@ namespace make_torrent_field_helpers
     return tr_variant{ std::move(peers_vec) };
 }
 
-[[nodiscard]] auto make_peer_counts_map(tr_stat const& st)
+[[nodiscard]] auto make_peer_counts_map(std::array<uint16_t, TR_PEER_FROM_N_TYPES> const& from)
 {
-    auto const& from = st.peers_from;
     auto peer_counts_map = tr_variant::Map{ 7U };
     peer_counts_map.try_emplace(TR_KEY_from_cache, from[TR_PEER_FROM_RESUME]);
     peer_counts_map.try_emplace(TR_KEY_from_dht, from[TR_PEER_FROM_DHT]);
@@ -740,6 +739,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_is_finished:
     case TR_KEY_is_private:
     case TR_KEY_is_stalled:
+    case TR_KEY_known_peers_from:
     case TR_KEY_labels:
     case TR_KEY_left_until_done:
     case TR_KEY_magnet_link:
@@ -889,7 +889,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_peers_connected:
         return st.peers_connected;
     case TR_KEY_peers_from:
-        return make_peer_counts_map(st);
+        return make_peer_counts_map(st.peers_from);
+    case TR_KEY_known_peers_from:
+        return make_peer_counts_map(st.known_peers_from);
     case TR_KEY_peers_getting_from_us:
         return st.peers_getting_from_us;
     case TR_KEY_peers_sending_to_us:

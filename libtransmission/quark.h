@@ -289,6 +289,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_is_uploading_to,
     TR_KEY_is_utp,
     TR_KEY_jsonrpc,
+    TR_KEY_known_peers_from,
     TR_KEY_labels,
     TR_KEY_last_announce_peer_count_camel_APICOMPAT,
     TR_KEY_last_announce_result_camel_APICOMPAT,
