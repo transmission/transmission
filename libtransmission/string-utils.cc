@@ -19,10 +19,18 @@
 
 #include <utf8.h>
 
+#ifdef WITH_UCHARDET
+#include "libtransmission/charset-detect.h"
+#ifndef _WIN32
+#include "libtransmission/charset-convert.h"
+#endif
+#endif
+
 #include <wildmat.h>
 
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/log.h"
 
 /* User-level routine. returns whether or not 'text' and 'pattern' matched */
 bool tr_wildmat(char const* text, char const* pattern)
@@ -71,7 +79,7 @@ std::string tr_strv_to_utf8_string(std::string_view sv)
 
 #endif
 
-std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
+std::string tr_strv_replace_invalid(std::string_view sv, [[maybe_unused]] uint32_t replacement)
 {
     // stripping characters after first \0
     if (auto first_null = sv.find('\0'); first_null != std::string::npos)
@@ -80,7 +88,79 @@ std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
     }
     auto out = std::string{};
     out.reserve(std::size(sv));
-    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
+    bool do_replacement = true;
+#ifdef WITH_UCHARDET
+    if (utf8::is_valid(sv))
+    {
+        out = sv;
+        do_replacement = false;
+    }
+    else
+    {
+        tr_charset_detector detector;
+        if (detector.detect_from_string(sv) == tr_charset_detector::Status::OK)
+        {
+            auto const info = tr_charset_detector::lookup_encoding(detector.encoding());
+            tr_logAddDebug(fmt::format("tr_charset_detector found {}", detector.encoding()));
+#ifdef _WIN32
+            auto const cp = info.codepage;
+            if (cp == 0)
+            {
+                tr_logAddError(fmt::format("No codepage for encoding '{}'", detector.encoding()));
+            }
+            else
+            {
+                auto const len_wide = MultiByteToWideChar(cp, 0, std::data(sv), static_cast<int>(std::size(sv)), nullptr, 0);
+                if (len_wide > 0)
+                {
+                    auto wide = std::wstring(len_wide, L'\0');
+                    MultiByteToWideChar(cp, 0, std::data(sv), static_cast<int>(std::size(sv)), std::data(wide), len_wide);
+                    auto const
+                        len_utf8 = WideCharToMultiByte(CP_UTF8, 0, std::data(wide), len_wide, nullptr, 0, nullptr, nullptr);
+                    if (len_utf8 > 0)
+                    {
+                        out.resize(len_utf8);
+                        WideCharToMultiByte(CP_UTF8, 0, std::data(wide), len_wide, std::data(out), len_utf8, nullptr, nullptr);
+                        do_replacement = false;
+                    }
+                }
+                if (do_replacement)
+                {
+                    tr_logAddError(fmt::format("Windows conversion failed for codepage {}", cp));
+                }
+            }
+#else
+            tr_charset_converter conv("UTF-8", info.iconv_name);
+            if (!conv.is_valid())
+            {
+                tr_logAddError("Failed to open iconv");
+            }
+            else
+            {
+                out = conv.convert(sv);
+                if (out.empty())
+                {
+                    tr_logAddError("Failed to convert to UTF-8");
+                }
+                else
+                {
+                    tr_logAddDebug(fmt::format("Converted '{}' to UTF-8 '{}'", sv, out));
+                    do_replacement = false;
+                }
+            }
+#endif
+        }
+        else
+        {
+            tr_logAddError("tr_charset_detector failed");
+        }
+    }
+#endif
+    if (do_replacement)
+    {
+        utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
+    }
+
     return out;
 }
 

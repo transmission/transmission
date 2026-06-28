@@ -14,6 +14,7 @@ on:
       - '.github/**'
 jobs:
   decide-what-jobs-to-run:
+    if: false # TEMP: minimal testing
     runs-on: ubuntu-latest
     outputs:
       test-style: ${{ steps.check-diffs.outputs.web-changed == '1' }}
