@@ -240,6 +240,7 @@ target_compile_definitions(${TR_NAME}
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
         $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
+        $<$<BOOL:${ENABLE_PSL}>:WITH_PSL>
         $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
 
 tr_target_compile_definitions_for_functions(${TR_NAME}
@@ -273,7 +274,7 @@ target_link_libraries(${TR_NAME}
         libdeflate::libdeflate
         CURL::libcurl
         FastFloat::fast_float
-        psl::psl
+        $<$<BOOL:${ENABLE_PSL}>:psl::psl>
         natpmp::natpmp
         miniupnpc::miniupnpc
         dht::dht

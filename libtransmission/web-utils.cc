@@ -17,8 +17,10 @@
 
 #include <fmt/format.h>
 
+#ifdef WITH_PSL
 #define PSL_STATIC
 #include <libpsl.h>
+#endif
 
 #include "libtransmission/web-utils.h"
 
@@ -221,16 +223,19 @@ bool tr_isValidTrackerScheme(std::string_view scheme)
     return std::ranges::find(Schemes, scheme) != std::ranges::end(Schemes);
 }
 
+#ifdef WITH_PSL
 bool isAsciiNonUpperCase(std::string_view host)
 {
     return std::ranges::all_of(host, [](unsigned char ch) { return (ch < 128) && (std::isupper(ch) == 0); });
 }
+#endif
 
 // www.example.com -> example
 // www.example.co.uk -> example
 // 127.0.0.1 -> 127.0.0.1
 std::string_view getSiteName(std::string_view host)
 {
+#ifdef WITH_PSL
     // is it empty?
     if (std::empty(host))
     {
@@ -278,6 +283,7 @@ std::string_view getSiteName(std::string_view host)
     {
         host = host.substr(0, dot_pos);
     }
+#endif
 
     return host;
 }
