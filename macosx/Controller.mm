@@ -440,6 +440,11 @@ static void removeKeRangerRansomware()
 
 - (void)removeTorrentsImpl:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
 
+- (NSScreen*)screenForLayout;
+- (CGFloat)mainWindowChromeHeight;
+- (void)positionAutoSizeWindowWithScrollViewHeight:(CGFloat)scrollViewHeight;
+- (void)repinAutoSizeWindowIfMaxed;
+
 @end
 
 @implementation Controller
@@ -5194,6 +5199,14 @@ static void removeKeRangerRansomware()
             [self.fTableView reloadData];
 
             self.fFixedHeightConstraint.active = YES;
+
+            // Position the window explicitly. Growing the scroll view via Auto Layout
+            // keeps the window's top fixed and lets AppKit clamp the height to whatever
+            // fits below that top, so a window sitting low on screen can't grow to use
+            // the full height. Grow downward from the current top instead, clamped to
+            // the visible frame, which snaps the top under the menu bar once the list is
+            // tall enough to fill the screen.
+            [self positionAutoSizeWindowWithScrollViewHeight:height];
         }
 
         scrollView.hasVerticalScroller = YES;
@@ -5204,20 +5217,126 @@ static void removeKeRangerRansomware()
     }
 }
 
+- (void)positionAutoSizeWindowWithScrollViewHeight:(CGFloat)scrollViewHeight
+{
+    NSRect visibleFrame = [self screenForLayout].visibleFrame;
+    CGFloat chrome = [self mainWindowChromeHeight];
+    CGFloat cap = NSHeight(visibleFrame) - chrome;
+    CGFloat windowHeight = scrollViewHeight + chrome;
+
+    NSRect frame = self.fWindow.frame;
+    BOOL maxed = scrollViewHeight >= cap - 0.5;
+
+    if (maxed)
+    {
+        // The list is taller than fits on screen: fill the visible frame and pin the
+        // top under the menu bar so the window always maximises the available space
+        // (and snaps back there if the user drags it away).
+        frame.size.height = NSHeight(visibleFrame);
+        frame.origin.y = NSMinY(visibleFrame);
+    }
+    else
+    {
+        // The list fits: size to content, growing/shrinking from the current top edge,
+        // kept within the visible frame.
+        CGFloat top = NSMaxY(frame);
+        frame.size.height = windowHeight;
+        frame.origin.y = top - windowHeight;
+        if (NSMaxY(frame) > NSMaxY(visibleFrame))
+        {
+            frame.origin.y = NSMaxY(visibleFrame) - windowHeight;
+        }
+        if (NSMinY(frame) < NSMinY(visibleFrame))
+        {
+            frame.origin.y = NSMinY(visibleFrame);
+        }
+    }
+
+    if (!NSEqualRects(frame, self.fWindow.frame))
+    {
+        [self.fWindow setFrame:frame display:YES];
+    }
+}
+
+- (void)windowDidMove:(NSNotification*)notification
+{
+    [self repinAutoSizeWindowIfMaxed];
+}
+
+- (void)repinAutoSizeWindowIfMaxed
+{
+    // A maxed AutoSize window is exactly the visible-frame height, so moving it would push
+    // its bottom past the Dock; AppKit's default constraining only keeps the title bar
+    // reachable and won't prevent that. Snap it back to fill the visible frame. A list that
+    // fits on screen leaves the window shorter than the visible frame, so it stays freely
+    // movable.
+    if (self.isFullScreen || ![self.fDefaults boolForKey:@"AutoSize"])
+    {
+        return;
+    }
+
+    NSRect visibleFrame = [self screenForLayout].visibleFrame;
+    NSRect frame = self.fWindow.frame;
+    BOOL maxed = NSHeight(frame) >= NSHeight(visibleFrame) - 0.5;
+    if (!maxed)
+    {
+        return;
+    }
+
+    frame.size.height = NSHeight(visibleFrame);
+    frame.origin.y = NSMinY(visibleFrame);
+    if (!NSEqualRects(frame, self.fWindow.frame))
+    {
+        [self.fWindow setFrame:frame display:YES];
+    }
+}
+
 - (CGFloat)calculateScrollViewHeightWithDockAdjustment
 {
     CGFloat height = self.scrollViewHeight;
 
     // Get the main screen's visible frame
-    NSScreen* screen = self.fWindow.screen;
+    NSScreen* screen = [self screenForLayout];
     if (screen)
     {
         // This frame respects the Dock and menu bar
         NSRect visibleFrame = screen.visibleFrame;
-        height = MIN(height, visibleFrame.size.height - [self toolbarHeight] - [self mainWindowComponentHeight]);
+        height = MIN(height, visibleFrame.size.height - [self mainWindowChromeHeight]);
     }
 
     return height;
+}
+
+- (CGFloat)mainWindowChromeHeight
+{
+    // The non-scroll-area chrome (title bar, toolbar, filter/status/bottom bars), measured
+    // directly as the difference between the window and its scroll view so it always
+    // reflects the current layout regardless of which bars are visible.
+    return NSHeight(self.fWindow.frame) - NSHeight(self.fTableView.enclosingScrollView.frame);
+}
+
+- (NSScreen*)screenForLayout
+{
+    // fWindow.screen is nil when the window is fully off-screen; fall back so the
+    // height cap and the on-screen clamp always have a screen to work with.
+    NSScreen* screen = self.fWindow.screen;
+    if (screen == nil)
+    {
+        NSPoint center = NSMakePoint(NSMidX(self.fWindow.frame), NSMidY(self.fWindow.frame));
+        for (NSScreen* candidate in NSScreen.screens)
+        {
+            if (NSPointInRect(center, candidate.frame))
+            {
+                screen = candidate;
+                break;
+            }
+        }
+        if (screen == nil)
+        {
+            screen = NSScreen.mainScreen;
+        }
+    }
+    return screen;
 }
 
 - (void)updateForAutoSize
@@ -5282,7 +5401,10 @@ static void removeKeRangerRansomware()
 
 - (CGFloat)toolbarHeight
 {
-    return self.fWindow.frame.size.height - [self.fWindow contentRectForFrameRect:self.fWindow.frame].size.height;
+    // The window uses fullSizeContentView, so contentRectForFrameRect: spans the full
+    // window height and would report a toolbar height of ~0. contentLayoutRect excludes
+    // the title bar and toolbar even in that mode, giving the real chrome height.
+    return NSHeight(self.fWindow.frame) - NSHeight(self.fWindow.contentLayoutRect);
 }
 
 - (CGFloat)mainWindowComponentHeight
@@ -5320,12 +5442,11 @@ static void removeKeRangerRansomware()
     }
 
     //make sure we don't go bigger than the screen height
-    NSScreen* screen = self.fWindow.screen;
+    NSScreen* screen = [self screenForLayout];
     if (screen)
     {
         NSSize maxSize = screen.visibleFrame.size;
-        maxSize.height -= self.toolbarHeight;
-        maxSize.height -= self.mainWindowComponentHeight;
+        maxSize.height -= self.mainWindowChromeHeight;
 
         if (height > maxSize.height)
         {
