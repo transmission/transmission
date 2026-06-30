@@ -585,7 +585,6 @@ jobs:
             binutils \
             build-base \
             ca-certificates \
-            clang \
             cmake \
             curl-dev \
             fast_float \
@@ -620,8 +619,6 @@ jobs:
             -S . \
             -B obj \
             -G Ninja \
-            -DCMAKE_C_COMPILER='clang' \
-            -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
@@ -1593,6 +1590,7 @@ jobs:
               cmake \
               fast_float \
               fmtlib \
+              gcc14 \
               gettext-tools \
               `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm4` \
               libdeflate \
@@ -1612,6 +1610,7 @@ jobs:
             fi
           run: |
             set -ex
+            export TMPDIR=/var/tmp # gcc's LTO takes up a lot of space in TMPDIR, and /tmp is too small
             export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
             cmake \
@@ -1619,8 +1618,11 @@ jobs:
               -B obj \
               -G Ninja \
               -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_CXX_COMPILER='/usr/pkg/gcc14/bin/g++' \
+              -DCMAKE_C_COMPILER='/usr/pkg/gcc14/bin/gcc' \
+              -DCMAKE_BUILD_RPATH='/usr/pkg/gcc14/lib' \
               -DCMAKE_INSTALL_PREFIX=pfx \
-              -DCMAKE_PREFIX_PATH=/usr/pkg/qt6 \
+              -DCMAKE_PREFIX_PATH='/usr/pkg/qt6;/usr/pkg' \
               -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
@@ -1699,6 +1701,7 @@ jobs:
               utf8cpp
           run: |
             set -ex
+            export TMPDIR=/var/tmp # gcc's LTO takes up a lot of space in TMPDIR, and /tmp is too small
             export LANG=en_US.UTF-8 # Qt requires UTF-8 locales
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
             cmake \

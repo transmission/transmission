@@ -21,7 +21,8 @@ macro(tr_setup_gtest_target TARGET_NAME TEST_PREFIX)
 
     if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
         gtest_discover_tests(${TARGET_NAME}
-            TEST_PREFIX "${TEST_PREFIX}")
+            TEST_PREFIX "${TEST_PREFIX}"
+            DISCOVERY_TIMEOUT 15)
     else()
         add_test(
             NAME ${TARGET_NAME}
@@ -261,6 +262,7 @@ macro(tr_add_external_auto_library ID PACKAGENAME)
                 "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
                 "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
                 "-DCMAKE_INSTALL_LIBDIR:STRING=lib"
+                "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${CMAKE_INTERPROCEDURAL_OPTIMIZATION}"
                 ${${PACKAGENAME}_EXT_PROJ_CMAKE_ARGS}
                 ${_TAEAL_ARG_CMAKE_ARGS}
             BUILD_BYPRODUCTS "${${PACKAGENAME}_LIBRARY}")
