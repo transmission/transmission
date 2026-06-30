@@ -141,7 +141,6 @@
 		A22CFCC30FC24F890009BD3E /* dht.c in Sources */ = {isa = PBXBuildFile; fileRef = A22CFCC10FC24F890009BD3E /* dht.c */; };
 		A22CFCCB0FC24FDA0009BD3E /* libdht.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22CFCBA0FC24F710009BD3E /* libdht.a */; };
 		A22CFCCD0FC250480009BD3E /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
-		A22F1E550E7DA8030065DB9D /* sparkle_dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = A22F1E540E7DA8030065DB9D /* sparkle_dsa_pub.pem */; };
 		A231274C0D11D0B7003F9AFF /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A231274B0D11D0B7003F9AFF /* AboutWindow.xib */; };
 		A232F07E0EEA034A00041646 /* BonjourController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A232F07D0EEA034A00041646 /* BonjourController.mm */; };
 		A233BD330D8C6585007EE7B4 /* MessageWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A233BD320D8C6585007EE7B4 /* MessageWindow.xib */; };
@@ -929,7 +928,6 @@
 		A22CFCBA0FC24F710009BD3E /* libdht.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdht.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A22CFCC00FC24F890009BD3E /* dht.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dht.h; sourceTree = "<group>"; };
 		A22CFCC10FC24F890009BD3E /* dht.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dht.c; sourceTree = "<group>"; };
-		A22F1E540E7DA8030065DB9D /* sparkle_dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = sparkle_dsa_pub.pem; sourceTree = "<group>"; };
 		A231274B0D11D0B7003F9AFF /* AboutWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AboutWindow.xib; sourceTree = "<group>"; };
 		A232F07C0EEA034A00041646 /* BonjourController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BonjourController.h; sourceTree = "<group>"; };
 		A232F07D0EEA034A00041646 /* BonjourController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BonjourController.mm; sourceTree = "<group>"; };
@@ -1865,7 +1863,6 @@
 				A2CB38AE0E1E6896002B514C /* COPYING */,
 				4DE5CCCA0981D9BE00BE280E /* Defaults.plist */,
 				8D1107310486CEB800E47090 /* Info.plist */,
-				A22F1E540E7DA8030065DB9D /* sparkle_dsa_pub.pem */,
 				A2795C5828EFC6700002C8D9 /* public_html */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				A23F50000D1D99D7002FCB97 /* MainMenu.xib */,
@@ -3227,7 +3224,6 @@
 				A233BD690D8CF2C7007EE7B4 /* StatsWindow.xib in Resources */,
 				A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */,
 				A2CB38AF0E1E6896002B514C /* COPYING in Resources */,
-				A22F1E550E7DA8030065DB9D /* sparkle_dsa_pub.pem in Resources */,
 				A215BF5C0F02EBB800350CDB /* GroupRules.xib in Resources */,
 				A209EAEC1142D294002B02D1 /* InfoActivityView.xib in Resources */,
 				A209EAED1142D294002B02D1 /* InfoGeneralView.xib in Resources */,
