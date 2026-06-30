@@ -440,6 +440,10 @@ install(
     DESTINATION Applications)
 
 install(
+    DIRECTORY Sparkle.framework
+    DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Frameworks)
+
+install(
     DIRECTORY TransmissionHelp
     DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
 tr_install_web(Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
