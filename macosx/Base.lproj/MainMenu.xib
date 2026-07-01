@@ -1061,6 +1061,7 @@ CA
                 <outlet property="fSpeedLimitButton" destination="2690" id="2703"/>
                 <outlet property="fTableView" destination="3091" id="3118"/>
                 <outlet property="fTotalTorrentsField" destination="2700" id="2702"/>
+                <outlet property="fUpdaterController" destination="1812" id="1816"/>
                 <outlet property="fWindow" destination="21" id="246"/>
             </connections>
         </customObject>
@@ -1201,7 +1202,11 @@ CA
                 </menuItem>
             </items>
         </menu>
-        <customObject id="1812" userLabel="SUUpdater" customClass="SUUpdater"/>
+        <customObject id="1812" userLabel="SPUStandardUpdaterController" customClass="SPUStandardUpdaterController">
+            <connections>
+                <outlet property="updaterDelegate" destination="206" id="1817"/>
+            </connections>
+        </customObject>
         <userDefaultsController representsSharedInstance="YES" id="1815" userLabel="Shared Defaults"/>
     </objects>
     <resources>
