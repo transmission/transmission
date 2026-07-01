@@ -12,7 +12,7 @@
 #import "NSStringAdditions.h"
 
 // Development-only proxy when app is not signed for running Sparkle
-void SUUpdater_checkForUpdates(id /*self*/, SEL /*_cmd*/, ...)
+void SPUStandardUpdaterController_checkForUpdates(id /*self*/, SEL /*_cmd*/, ...)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAlert* alert = [[NSAlert alloc] init];
@@ -24,14 +24,20 @@ void SUUpdater_checkForUpdates(id /*self*/, SEL /*_cmd*/, ...)
     });
 }
 
-/// Proxy SUUpdater if isn't registered at program startup due to codesigning.
-__attribute__((constructor)) static void registerSUUpdater()
+// No-op so the nib's updaterDelegate outlet connection doesn't throw an unknown-key exception.
+void SPUStandardUpdaterController_setUpdaterDelegate(id /*self*/, SEL /*_cmd*/, id /*delegate*/)
 {
-    if (!objc_getClass("SUUpdater"))
+}
+
+/// Proxy SPUStandardUpdaterController if isn't registered at program startup due to codesigning.
+__attribute__((constructor)) static void registerSPUStandardUpdaterController()
+{
+    if (!objc_getClass("SPUStandardUpdaterController"))
     {
         NSLog(@"App is not signed for running Sparkle");
-        Class SUUpdaterClass = objc_allocateClassPair(objc_getClass("NSObject"), "SUUpdater", 0);
-        class_addMethod(SUUpdaterClass, sel_getUid("checkForUpdates:"), (IMP)SUUpdater_checkForUpdates, "v@:@");
-        objc_registerClassPair(SUUpdaterClass);
+        Class updaterControllerClass = objc_allocateClassPair(objc_getClass("NSObject"), "SPUStandardUpdaterController", 0);
+        class_addMethod(updaterControllerClass, sel_getUid("checkForUpdates:"), (IMP)SPUStandardUpdaterController_checkForUpdates, "v@:@");
+        class_addMethod(updaterControllerClass, sel_getUid("setUpdaterDelegate:"), (IMP)SPUStandardUpdaterController_setUpdaterDelegate, "v@:@");
+        objc_registerClassPair(updaterControllerClass);
     }
 }
