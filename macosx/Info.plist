@@ -81,8 +81,8 @@
 	<false/>
 	<key>SUFeedURL</key>
 	<string>https://update.transmissionbt.com/appcast.xml</string>
-	<key>SUPublicDSAKeyFile</key>
-	<string>sparkle_dsa_pub.pem</string>
+	<key>SUPublicEDKey</key>
+	<string>7z50Cf3+j+rhWuwFKn6C5T+SEeZoqoQ3E02Xkj+cyN8=</string>
 	<key>SUScheduledCheckInterval</key>
 	<string>86400</string>
 	<key>UTExportedTypeDeclarations</key>
