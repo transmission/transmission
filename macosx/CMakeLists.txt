@@ -218,7 +218,6 @@ set(XIB_FILES
 set(RESOURCES
     Defaults.plist
     Credits.rtf
-    sparkle_dsa_pub.pem
     ../COPYING
     Images/TransmissionDocument.icns)
 source_group(Resources
