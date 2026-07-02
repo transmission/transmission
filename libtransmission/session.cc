@@ -1484,16 +1484,39 @@ void tr_sessionClose(tr_session* session, double const timeout_secs)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(!session->am_in_session_thread());
 
+    using namespace std::chrono_literals;
+
     tr_logAddInfo(
         fmt::format(fmt::runtime(_("Transmission version {version} shutting down")), fmt::arg("version", LONG_VERSION_STRING)));
 
-    auto closed_promise = std::promise<void>{};
-    auto closed_future = closed_promise.get_future();
+    // The promise lives on the heap: on the timeout path below, the session
+    // thread may still fulfil it later, so it must be able to outlive this
+    // function's stack frame.
+    auto closed_promise = std::make_unique<std::promise<void>>();
+    auto closed_future = closed_promise->get_future();
     auto const deadline = std::chrono::steady_clock::now() +
         std::chrono::milliseconds{ static_cast<int64_t>(timeout_secs * 1000.0) };
-    session->run_in_session_thread([&closed_promise, deadline, session]()
-                                   { session->closeImplPart1(&closed_promise, deadline); });
-    closed_future.wait();
+    session->run_in_session_thread([promise = closed_promise.get(), deadline, session]()
+                                   { session->closeImplPart1(promise, deadline); });
+
+    // Use wait_for() instead of wait() to prevent the main thread from
+    // blocking indefinitely when the session thread is stuck in a kernel
+    // call (e.g., connect() on macOS with ECN-incompatible peers or
+    // uninterruptible I/O on external drives).
+    auto const wait_limit = std::chrono::milliseconds{ static_cast<int64_t>(timeout_secs * 1000.0) } + 5s;
+    if (closed_future.wait_for(wait_limit) == std::future_status::timeout)
+    {
+        // The session thread is still stuck in a blocking kernel call and may
+        // dereference `session` or fulfil the promise later. Freeing either
+        // one would be a use-after-free, so intentionally leak both: the
+        // process is exiting anyway.
+        tr_logAddWarn(
+            fmt::format(
+                fmt::runtime(_("Session shutdown timed out after {seconds} seconds; exiting without final cleanup")),
+                fmt::arg("seconds", timeout_secs + 5.0)));
+        [[maybe_unused]] auto* const leaked_promise = closed_promise.release();
+        return;
+    }
 
     delete session;
 }
