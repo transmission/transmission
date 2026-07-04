@@ -42,11 +42,8 @@
 #import "AddMagnetWindowController.h"
 #import "MessageWindowController.h"
 #import "GlobalOptionsPopoverViewController.h"
-#import "ButtonToolbarItem.h"
-#import "GroupToolbarItem.h"
-#import "ShareToolbarItem.h"
+#import "MainToolbarController.h"
 #import "ShareTorrentFileHelper.h"
-#import "Toolbar.h"
 #import "BlocklistDownloader.h"
 #import "StatusBarController.h"
 #import "FilterBarController.h"
@@ -62,28 +59,6 @@
 #import "VersionComparator.h"
 #import "PowerManager.h"
 #import "Utils.h"
-
-typedef NSString* ToolbarItemIdentifier NS_TYPED_EXTENSIBLE_ENUM;
-
-static ToolbarItemIdentifier const ToolbarItemIdentifierCreate = @"Toolbar Create";
-static ToolbarItemIdentifier const ToolbarItemIdentifierOpenFile = @"Toolbar Open";
-static ToolbarItemIdentifier const ToolbarItemIdentifierOpenWeb = @"Toolbar Open Web";
-static ToolbarItemIdentifier const ToolbarItemIdentifierRemove = @"Toolbar Remove";
-static ToolbarItemIdentifier const ToolbarItemIdentifierInfo = @"Toolbar Info";
-static ToolbarItemIdentifier const ToolbarItemIdentifierPauseAll = @"Toolbar Pause All";
-static ToolbarItemIdentifier const ToolbarItemIdentifierResumeAll = @"Toolbar Resume All";
-static ToolbarItemIdentifier const ToolbarItemIdentifierPauseResumeAll = @"Toolbar Pause / Resume All";
-static ToolbarItemIdentifier const ToolbarItemIdentifierPauseSelected = @"Toolbar Pause Selected";
-static ToolbarItemIdentifier const ToolbarItemIdentifierResumeSelected = @"Toolbar Resume Selected";
-static ToolbarItemIdentifier const ToolbarItemIdentifierPauseResumeSelected = @"Toolbar Pause / Resume Selected";
-static ToolbarItemIdentifier const ToolbarItemIdentifierFilter = @"Toolbar Toggle Filter";
-static ToolbarItemIdentifier const ToolbarItemIdentifierQuickLook = @"Toolbar QuickLook";
-static ToolbarItemIdentifier const ToolbarItemIdentifierShare = @"Toolbar Share";
-
-typedef NS_ENUM(NSUInteger, ToolbarGroupTag) { //
-    ToolbarGroupTagPause = 0,
-    ToolbarGroupTagResume = 1
-};
 
 typedef NSString* SortType NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -371,7 +346,7 @@ static void removeKeRangerRansomware()
     NSLog(@"OSX.KeRanger.A ransomware removal completed, proceeding to normal operation");
 }
 
-@interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate, PowerManagerDelegate>
+@interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate, PowerManagerDelegate, MainToolbarControllerDelegate>
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
 @property(nonatomic) NSLayoutConstraint* fMinHeightConstraint;
@@ -416,6 +391,8 @@ static void removeKeRangerRansomware()
 @property(nonatomic) StatusBarController* fStatusBar;
 
 @property(nonatomic) FilterBarController* fFilterBar;
+
+@property(nonatomic) MainToolbarController* fToolbarController;
 
 @property(nonatomic) QLPreviewPanel* fPreviewPanel;
 @property(nonatomic) BOOL fQuitting;
@@ -624,12 +601,8 @@ static void removeKeRangerRansomware()
 {
     [super awakeFromNib];
 
-    Toolbar* toolbar = [[Toolbar alloc] initWithIdentifier:@"TRMainToolbar"];
-    toolbar.delegate = self;
-    toolbar.allowsUserCustomization = YES;
-    toolbar.autosavesConfiguration = YES;
-    toolbar.displayMode = NSToolbarDisplayModeIconOnly;
-    self.fWindow.toolbar = toolbar;
+    self.fToolbarController = [[MainToolbarController alloc] initWithDelegate:self];
+    self.fWindow.toolbar = [self.fToolbarController createToolbar];
 
     self.fWindow.toolbarStyle = NSWindowToolbarStyleUnified;
     self.fWindow.titleVisibility = NSWindowTitleHidden;
@@ -4216,393 +4189,94 @@ static void removeKeRangerRansomware()
     return self.fWindow;
 }
 
-- (ButtonToolbarItem*)standardToolbarButtonWithIdentifier:(NSString*)ident
+- (NSArray<Torrent*>*)mainToolbarAllTorrents
 {
-    return [self toolbarButtonWithIdentifier:ident forToolbarButtonClass:[ButtonToolbarItem class]];
+    return self.fTorrents;
 }
 
-- (__kindof ButtonToolbarItem*)toolbarButtonWithIdentifier:(NSString*)ident forToolbarButtonClass:(Class)klass
+- (NSArray<Torrent*>*)mainToolbarSelectedTorrents
 {
-    ButtonToolbarItem* item = [[klass alloc] initWithItemIdentifier:ident];
-
-    NSButton* button = [[NSButton alloc] init];
-    button.bezelStyle = NSBezelStyleTexturedRounded;
-    button.stringValue = @"";
-
-    item.view = button;
-
-    return item;
+    return self.fTableView.selectedTorrents;
 }
 
-- (NSToolbarItem*)toolbar:(NSToolbar*)toolbar itemForItemIdentifier:(NSString*)ident willBeInsertedIntoToolbar:(BOOL)flag
+- (NSInteger)mainToolbarSelectedTorrentCount
 {
-    if ([ident isEqualToString:ToolbarItemIdentifierCreate])
-    {
-        ButtonToolbarItem* item = [self standardToolbarButtonWithIdentifier:ident];
-
-        item.label = NSLocalizedString(@"Create", "Create toolbar item -> label");
-        item.paletteLabel = NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label");
-        item.toolTip = NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip");
-        item.image = [NSImage imageWithSystemSymbolName:@"doc.badge.plus" accessibilityDescription:nil];
-        item.target = self;
-        item.action = @selector(createFile:);
-        item.autovalidates = NO;
-
-        return item;
-    }
-    else if ([ident isEqualToString:ToolbarItemIdentifierOpenFile])
-    {
-        ButtonToolbarItem* item = [self standardToolbarButtonWithIdentifier:ident];
-
-        item.label = NSLocalizedString(@"Open", "Open toolbar item -> label");
-        item.paletteLabel = NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label");
-        item.toolTip = NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip");
-        item.image = [NSImage imageWithSystemSymbolName:@"folder" accessibilityDescription:nil];
-        item.target = self;
-        item.action = @selector(openShowSheet:);
-        item.autovalidates = NO;
-
-        return item;
-    }
-    else if ([ident isEqualToString:ToolbarItemIdentifierOpenWeb])
-    {
-        ButtonToolbarItem* item = [self standardToolbarButtonWithIdentifier:ident];
-
-        item.label = NSLocalizedString(@"Open Address", "Open address toolbar item -> label");
-        item.paletteLabel = NSLocalizedString(@"Open Torrent Address", "Open address toolbar item -> palette label");
-        item.toolTip = NSLocalizedString(@"Open torrent web address", "Open address toolbar item -> tooltip");
-        item.image = [NSImage imageWithSystemSymbolName:@"globe" accessibilityDescription:nil];
-        item.target = self;
-        item.action = @selector(openURLShowSheet:);
-        item.autovalidates = NO;
-
-        return item;
-    }
-    else if ([ident isEqualToString:ToolbarItemIdentifierRemove])
-    {
-        ButtonToolbarItem* item = [self standardToolbarButtonWithIdentifier:ident];
-
-        item.label = NSLocalizedString(@"Remove", "Remove toolbar item -> label");
-        item.paletteLabel = NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label");
-        item.toolTip = NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip");
-        item.image = [NSImage imageWithSystemSymbolName:@"nosign" accessibilityDescription:nil];
-        item.target = self;
-        item.action = @selector(removeNoDelete:);
-        item.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
-
-        return item;
-    }
-    else if ([ident isEqualToString:ToolbarItemIdentifierInfo])
-    {
-        ButtonToolbarItem* item = [self standardToolbarButtonWithIdentifier:ident];
-        ((NSButtonCell*)((NSButton*)item.view).cell).showsStateBy = NSContentsCellMask; //blue when enabled
-
-        item.label = NSLocalizedString(@"Inspector", "Inspector toolbar item -> label");
-        item.paletteLabel = NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label");
-        item.toolTip = NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip");
-        item.image = [NSImage imageWithSystemSymbolName:@"info.circle" accessibilityDescription:nil];
-        item.target = self;
-        item.action = @selector(showInfo:);
-
-        return item;
-    }
-    else if ([ident isEqualToString:ToolbarItemIdentifierPauseResumeAll])
-    {
-        GroupToolbarItem* groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier:ident];
-
-        NSToolbarItem* itemPause = [self standardToolbarButtonWithIdentifier:ToolbarItemIdentifierPauseAll];
-        NSToolbarItem* itemResume = [self standardToolbarButtonWithIdentifier:ToolbarItemIdentifierResumeAll];
-
-        NSSegmentedControl* segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
-        segmentedControl.segmentStyle = NSSegmentStyleTexturedRounded;
-        segmentedControl.trackingMode = NSSegmentSwitchTrackingMomentary;
-        segmentedControl.segmentCount = 2;
-
-        [segmentedControl setTag:ToolbarGroupTagPause forSegment:ToolbarGroupTagPause];
-        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"pause.circle.fill" accessibilityDescription:nil]
-                        forSegment:ToolbarGroupTagPause];
-        [segmentedControl setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip")
-                          forSegment:ToolbarGroupTagPause];
-
-        [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
-        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"arrow.clockwise.circle.fill" accessibilityDescription:nil]
-                        forSegment:ToolbarGroupTagResume];
-        [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
-                          forSegment:ToolbarGroupTagResume];
-        if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
-        {
-            // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
-            [segmentedControl setWidth:64 forSegment:ToolbarGroupTagPause];
-            [segmentedControl setWidth:64 forSegment:ToolbarGroupTagResume];
-        }
-
-        groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
-        groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
-        groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
-        groupItem.subitems = @[ itemPause, itemResume ];
-        groupItem.view = segmentedControl;
-        groupItem.target = self;
-        groupItem.action = @selector(allToolbarClicked:);
-
-        [groupItem createMenu:@[
-            NSLocalizedString(@"Pause All", "All toolbar item -> label"),
-            NSLocalizedString(@"Resume All", "All toolbar item -> label")
-        ]];
-
-        return groupItem;
-    }
-    else if ([ident isEqualToString:ToolbarItemIdentifierPauseResumeSelected])
-    {
-        GroupToolbarItem* groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier:ident];
-
-        NSToolbarItem* itemPause = [self standardToolbarButtonWithIdentifier:ToolbarItemIdentifierPauseSelected];
-        NSToolbarItem* itemResume = [self standardToolbarButtonWithIdentifier:ToolbarItemIdentifierResumeSelected];
-
-        NSSegmentedControl* segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
-        segmentedControl.segmentStyle = NSSegmentStyleTexturedRounded;
-        segmentedControl.trackingMode = NSSegmentSwitchTrackingMomentary;
-        segmentedControl.segmentCount = 2;
-
-        [segmentedControl setTag:ToolbarGroupTagPause forSegment:ToolbarGroupTagPause];
-        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"pause" accessibilityDescription:nil]
-                        forSegment:ToolbarGroupTagPause];
-        [segmentedControl setToolTip:NSLocalizedString(@"Pause selected transfers", "Selected toolbar item -> tooltip")
-                          forSegment:ToolbarGroupTagPause];
-
-        [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
-        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"arrow.clockwise" accessibilityDescription:nil]
-                        forSegment:ToolbarGroupTagResume];
-        [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
-                          forSegment:ToolbarGroupTagResume];
-        if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
-        {
-            // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
-            [segmentedControl setWidth:64 forSegment:ToolbarGroupTagPause];
-            [segmentedControl setWidth:64 forSegment:ToolbarGroupTagResume];
-        }
-
-        groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
-        groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
-        groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
-        groupItem.subitems = @[ itemPause, itemResume ];
-        groupItem.view = segmentedControl;
-        groupItem.target = self;
-        groupItem.action = @selector(selectedToolbarClicked:);
-
-        [groupItem createMenu:@[
-            NSLocalizedString(@"Pause Selected", "Selected toolbar item -> label"),
-            NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label")
-        ]];
-
-        return groupItem;
-    }
-    else if ([ident isEqualToString:ToolbarItemIdentifierFilter])
-    {
-        ButtonToolbarItem* item = [self standardToolbarButtonWithIdentifier:ident];
-        ((NSButtonCell*)((NSButton*)item.view).cell).showsStateBy = NSContentsCellMask; //blue when enabled
-
-        item.label = NSLocalizedString(@"Filter", "Filter toolbar item -> label");
-        item.paletteLabel = NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label");
-        item.toolTip = NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip");
-        item.image = [NSImage imageWithSystemSymbolName:@"magnifyingglass" accessibilityDescription:nil];
-        item.target = self;
-        item.action = @selector(toggleFilterBar:);
-
-        return item;
-    }
-    else if ([ident isEqualToString:ToolbarItemIdentifierQuickLook])
-    {
-        ButtonToolbarItem* item = [self standardToolbarButtonWithIdentifier:ident];
-        ((NSButtonCell*)((NSButton*)item.view).cell).showsStateBy = NSContentsCellMask; //blue when enabled
-
-        item.label = NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> label");
-        item.paletteLabel = NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> palette label");
-        item.toolTip = NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> tooltip");
-        item.image = [NSImage imageNamed:NSImageNameQuickLookTemplate];
-        item.target = self;
-        item.action = @selector(toggleQuickLook:);
-        item.visibilityPriority = NSToolbarItemVisibilityPriorityLow;
-
-        return item;
-    }
-    else if ([ident isEqualToString:ToolbarItemIdentifierShare])
-    {
-        ShareToolbarItem* item = [self toolbarButtonWithIdentifier:ident forToolbarButtonClass:[ShareToolbarItem class]];
-
-        item.label = NSLocalizedString(@"Share", "Share toolbar item -> label");
-        item.paletteLabel = NSLocalizedString(@"Share", "Share toolbar item -> palette label");
-        item.toolTip = NSLocalizedString(@"Share torrent file", "Share toolbar item -> tooltip");
-        item.image = [NSImage imageNamed:NSImageNameShareTemplate];
-        item.visibilityPriority = NSToolbarItemVisibilityPriorityLow;
-
-        NSButton* itemButton = (NSButton*)item.view;
-        itemButton.target = self;
-        itemButton.action = @selector(showToolbarShare:);
-        [itemButton sendActionOn:NSEventMaskLeftMouseDown];
-
-        return item;
-    }
-    else
-    {
-        return nil;
-    }
+    return self.fTableView.numberOfSelectedRows;
 }
 
-- (void)allToolbarClicked:(id)sender
+- (BOOL)mainToolbarInfoVisible
 {
-    NSInteger tagValue = [sender isKindOfClass:[NSSegmentedControl class]] ? [(NSSegmentedControl*)sender selectedTag] :
-                                                                             ((NSControl*)sender).tag;
-    switch (tagValue)
-    {
-    case ToolbarGroupTagPause:
-        [self stopAllTorrents:sender];
-        break;
-    case ToolbarGroupTagResume:
-        [self resumeAllTorrents:sender];
-        break;
-    }
+    return self.fInfoController.window.visible;
 }
 
-- (void)selectedToolbarClicked:(id)sender
+- (BOOL)mainToolbarFilterBarVisible
 {
-    NSInteger tagValue = [sender isKindOfClass:[NSSegmentedControl class]] ? [(NSSegmentedControl*)sender selectedTag] :
-                                                                             ((NSControl*)sender).tag;
-    switch (tagValue)
-    {
-    case ToolbarGroupTagPause:
-        [self stopSelectedTorrents:sender];
-        break;
-    case ToolbarGroupTagResume:
-        [self resumeSelectedTorrents:sender];
-        break;
-    }
+    return !(self.fFilterBar == nil || self.fFilterBar.isHidden);
 }
 
-- (NSArray*)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
+- (BOOL)mainToolbarQuickLookVisible
 {
-    return @[
-        ToolbarItemIdentifierCreate,
-        ToolbarItemIdentifierOpenFile,
-        ToolbarItemIdentifierOpenWeb,
-        ToolbarItemIdentifierRemove,
-        ToolbarItemIdentifierPauseResumeSelected,
-        ToolbarItemIdentifierPauseResumeAll,
-        ToolbarItemIdentifierShare,
-        ToolbarItemIdentifierQuickLook,
-        ToolbarItemIdentifierFilter,
-        ToolbarItemIdentifierInfo,
-        NSToolbarSpaceItemIdentifier,
-        NSToolbarFlexibleSpaceItemIdentifier
-    ];
+    return self.fPreviewPanel != nil;
 }
 
-- (NSArray*)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
+- (void)mainToolbarCreateFile:(id)sender
 {
-    return @[
-        ToolbarItemIdentifierCreate,
-        ToolbarItemIdentifierOpenFile,
-        ToolbarItemIdentifierRemove,
-        NSToolbarSpaceItemIdentifier,
-        ToolbarItemIdentifierPauseResumeAll,
-        NSToolbarFlexibleSpaceItemIdentifier,
-        ToolbarItemIdentifierShare,
-        ToolbarItemIdentifierQuickLook,
-        ToolbarItemIdentifierFilter,
-        ToolbarItemIdentifierInfo,
-    ];
+    [self createFile:sender];
 }
 
-- (BOOL)validateToolbarItem:(NSToolbarItem*)toolbarItem
+- (void)mainToolbarOpenFile:(id)sender
 {
-    NSString* ident = toolbarItem.itemIdentifier;
+    [self openShowSheet:sender];
+}
 
-    //enable remove item
-    if ([ident isEqualToString:ToolbarItemIdentifierRemove])
-    {
-        return self.fTableView.numberOfSelectedRows > 0;
-    }
+- (void)mainToolbarOpenURL:(id)sender
+{
+    [self openURLShowSheet:sender];
+}
 
-    //enable pause all item
-    if ([ident isEqualToString:ToolbarItemIdentifierPauseAll])
-    {
-        for (Torrent* torrent in self.fTorrents)
-        {
-            if (torrent.active || torrent.waitingToStart)
-            {
-                return YES;
-            }
-        }
-        return NO;
-    }
+- (void)mainToolbarRemoveSelected:(id)sender
+{
+    [self removeNoDelete:sender];
+}
 
-    //enable resume all item
-    if ([ident isEqualToString:ToolbarItemIdentifierResumeAll])
-    {
-        for (Torrent* torrent in self.fTorrents)
-        {
-            if (!torrent.active && !torrent.waitingToStart && !torrent.finishedSeeding)
-            {
-                return YES;
-            }
-        }
-        return NO;
-    }
+- (void)mainToolbarToggleInfo:(id)sender
+{
+    [self showInfo:sender];
+}
 
-    //enable pause item
-    if ([ident isEqualToString:ToolbarItemIdentifierPauseSelected])
-    {
-        for (Torrent* torrent in self.fTableView.selectedTorrents)
-        {
-            if (torrent.active || torrent.waitingToStart)
-            {
-                return YES;
-            }
-        }
-        return NO;
-    }
+- (void)mainToolbarToggleFilterBar:(id)sender
+{
+    [self toggleFilterBar:sender];
+}
 
-    //enable resume item
-    if ([ident isEqualToString:ToolbarItemIdentifierResumeSelected])
-    {
-        for (Torrent* torrent in self.fTableView.selectedTorrents)
-        {
-            if (!torrent.active && !torrent.waitingToStart)
-            {
-                return YES;
-            }
-        }
-        return NO;
-    }
+- (void)mainToolbarToggleQuickLook:(id)sender
+{
+    [self toggleQuickLook:sender];
+}
 
-    //set info item
-    if ([ident isEqualToString:ToolbarItemIdentifierInfo])
-    {
-        ((NSButton*)toolbarItem.view).state = self.fInfoController.window.visible;
-        return YES;
-    }
+- (void)mainToolbarShowShare:(id)sender
+{
+    [self showToolbarShare:sender];
+}
 
-    //set filter item
-    if ([ident isEqualToString:ToolbarItemIdentifierFilter])
-    {
-        BOOL shown = !(self.fFilterBar == nil || self.fFilterBar.isHidden);
-        ((NSButton*)toolbarItem.view).state = shown ? NSControlStateValueOn : NSControlStateValueOff;
-        return YES;
-    }
+- (void)mainToolbarStopAllTorrents:(id)sender
+{
+    [self stopAllTorrents:sender];
+}
 
-    //set quick look item
-    if ([ident isEqualToString:ToolbarItemIdentifierQuickLook])
-    {
-        ((NSButton*)toolbarItem.view).state = self.fPreviewPanel != nil;
-        return self.fTableView.numberOfSelectedRows > 0;
-    }
+- (void)mainToolbarResumeAllTorrents:(id)sender
+{
+    [self resumeAllTorrents:sender];
+}
 
-    //enable share item
-    if ([ident isEqualToString:ToolbarItemIdentifierShare])
-    {
-        return self.fTableView.numberOfSelectedRows > 0;
-    }
+- (void)mainToolbarStopSelectedTorrents:(id)sender
+{
+    [self stopSelectedTorrents:sender];
+}
 
-    return YES;
+- (void)mainToolbarResumeSelectedTorrents:(id)sender
+{
+    [self resumeSelectedTorrents:sender];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
