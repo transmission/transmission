@@ -44,6 +44,8 @@ target_sources(${TR_NAME}-mac
         AddMagnetWindowController.mm
         AddWindowController.h
         AddWindowController.mm
+        AutoImportController.h
+        AutoImportController.mm
         Badger.h
         Badger.mm
         BadgeView.h
