@@ -26,7 +26,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 };
 
 @interface Controller
-    : NSObject<NSApplicationDelegate, NSMenuItemValidation, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSToolbarItemValidation, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
+    : NSObject<NSApplicationDelegate, NSMenuItemValidation, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
 
 - (void)openFiles:(NSArray<NSString*>*)filenames addType:(AddType)type forcePath:(NSString*)path;
 
@@ -156,9 +156,6 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (IBAction)toggleFilterBar:(id)sender;
 - (IBAction)toggleToolbarShown:(id)sender;
 - (void)focusFilterField;
-
-- (void)allToolbarClicked:(id)sender;
-- (void)selectedToolbarClicked:(id)sender;
 
 - (void)updateMainWindow;
 
