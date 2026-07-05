@@ -922,8 +922,15 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             };
 
             auto timer_maker = tr::EvTimerMaker{ ev_base_ };
-            watchdir = force_generic ? Watchdir::create_generic(dir, handler, timer_maker) :
-                                       Watchdir::create(dir, handler, timer_maker, ev_base_);
+            if (force_generic)
+            {
+                auto constexpr rescan_interval = 100ms;
+                watchdir = Watchdir::create_generic(dir, handler, timer_maker, rescan_interval);
+            }
+            else
+            {
+                watchdir = Watchdir::create(dir, handler, timer_maker, ev_base_);
+            }
         }
     }
 
