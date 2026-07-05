@@ -9,8 +9,6 @@
 
 #include <libtransmission/transmission.h>
 
-#import "VDKQueue.h"
-
 @class AddMagnetWindowController;
 @class AddWindowController;
 @class MessageWindowController;
@@ -26,7 +24,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 };
 
 @interface Controller
-    : NSObject<NSApplicationDelegate, NSMenuItemValidation, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSToolbarItemValidation, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
+    : NSObject<NSApplicationDelegate, NSMenuItemValidation, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSToolbarItemValidation, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, SUUpdaterDelegate>
 
 - (void)openFiles:(NSArray<NSString*>*)filenames addType:(AddType)type forcePath:(NSString*)path;
 
@@ -138,13 +136,6 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (IBAction)toggleSpeedLimit:(id)sender;
 - (IBAction)speedLimitChanged:(id)sender;
 - (void)altSpeedToggledCallbackIsLimited:(NSDictionary*)dict;
-
-- (void)changeAutoImport;
-- (void)checkAutoImportDirectory;
-
-- (void)beginCreateFile:(NSNotification*)notification;
-
-@property(nonatomic, readonly) VDKQueue* fileWatcherQueue;
 
 - (void)torrentTableViewSelectionDidChange:(NSNotification*)notification;
 

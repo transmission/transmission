@@ -6,8 +6,6 @@
 
 #include <libtransmission/string-utils.h>
 
-#import "VDKQueue.h"
-
 #import "PrefsController.h"
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
@@ -151,14 +149,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         if ([_fDefaults boolForKey:@"RandomPort"])
         {
             [_fDefaults setInteger:tr_sessionGetPeerPort(_fHandle) forKey:@"BindPort"];
-        }
-
-        //set auto import
-        NSString* autoPath;
-        if ([_fDefaults boolForKey:@"AutoImport"] && (autoPath = [_fDefaults stringForKey:@"AutoImportDirectory"]))
-        {
-            [((Controller*)NSApp.delegate).fileWatcherQueue addPath:autoPath.stringByExpandingTildeInPath
-                                                     notifyingAbout:VDKQueueNotifyAboutWrite];
         }
 
         //set blocklist scheduler
@@ -1058,20 +1048,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)setAutoImport:(id)sender
 {
-    NSString* path;
-    if ((path = [self.fDefaults stringForKey:@"AutoImportDirectory"]))
+    if ([self.fDefaults stringForKey:@"AutoImportDirectory"])
     {
-        VDKQueue* watcherQueue = ((Controller*)NSApp.delegate).fileWatcherQueue;
-        if ([self.fDefaults boolForKey:@"AutoImport"])
-        {
-            path = path.stringByExpandingTildeInPath;
-            [watcherQueue addPath:path notifyingAbout:VDKQueueNotifyAboutWrite];
-        }
-        else
-        {
-            [watcherQueue removeAllPaths];
-        }
-
         [NSNotificationCenter.defaultCenter postNotificationName:@"AutoImportSettingChange" object:self];
     }
     else
@@ -1093,12 +1071,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
         if (result == NSModalResponseOK)
         {
-            VDKQueue* watcherQueue = ((Controller*)NSApp.delegate).fileWatcherQueue;
-            [watcherQueue removeAllPaths];
-
             NSString* path = (panel.URLs[0]).path;
             [self.fDefaults setObject:path forKey:@"AutoImportDirectory"];
-            [watcherQueue addPath:path.stringByExpandingTildeInPath notifyingAbout:VDKQueueNotifyAboutWrite];
 
             [NSNotificationCenter.defaultCenter postNotificationName:@"AutoImportSettingChange" object:self];
         }
