@@ -159,7 +159,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setModel(&filter_model_);
     connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
-    auto const sort_modes = std::array<std::pair<QAction*, SortMode>, 9U>{ {
+    auto const sort_modes = std::array<std::pair<QAction*, SortMode>, 10U>{ {
         { ui_.action_SortByActivity, SortMode::SortByActivity },
         { ui_.action_SortByAge, SortMode::SortByAge },
         { ui_.action_SortByETA, SortMode::SortByEta },
@@ -169,6 +169,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
         { ui_.action_SortByRatio, SortMode::SortByRatio },
         { ui_.action_SortBySize, SortMode::SortBySize },
         { ui_.action_SortByState, SortMode::SortByState },
+        { ui_.action_SortByUploaded, SortMode::SortByUploaded },
     } };
 
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)

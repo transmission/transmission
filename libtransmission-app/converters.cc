@@ -171,6 +171,7 @@ auto constexpr SortKeys = std::array<std::pair<std::string_view, SortMode>, Sort
     { "sort_by_ratio", SortMode::SortByRatio },
     { "sort_by_size", SortMode::SortBySize },
     { "sort_by_state", SortMode::SortByState },
+    { "sort_by_uploaded", SortMode::SortByUploaded },
 } };
 
 bool to_sort_mode(tr_variant const& src, SortMode* tgt)
