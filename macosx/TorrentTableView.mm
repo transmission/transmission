@@ -250,7 +250,12 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         TorrentCell* torrentCell;
         if (minimal)
         {
-            torrentCell = [outlineView makeViewWithIdentifier:@"SmallTorrentCell" owner:self];
+            torrentCell = [outlineView makeViewWithIdentifier:@"NewSmallTorrentCell" owner:self];
+            if (!torrentCell)
+            {
+                torrentCell = [[SmallTorrentCell alloc] initWithFrame:NSZeroRect];
+                torrentCell.identifier = @"NewSmallTorrentCell";
+            }
 
             // set torrent icon or error badge
             torrentCell.fIconView.image = error ? [NSImage imageNamed:NSImageNameCaution] : torrent.icon;
@@ -278,6 +283,10 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
                 torrentCell.fControlButton.hidden = YES;
                 torrentCell.fRevealButton.hidden = YES;
             }
+
+            ((TorrentCellControlButton*)torrentCell.fControlButton).torrentCell = torrentCell;
+            ((TorrentCellRevealButton*)torrentCell.fRevealButton).torrentCell = torrentCell;
+            ((TorrentCellActionButton*)torrentCell.fActionButton).torrentCell = torrentCell;
         }
         else
         {
