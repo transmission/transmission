@@ -95,7 +95,7 @@ size_t tr_bitfield::count_flags(size_t begin, size_t end) const noexcept
 
         auto i = begin & 7U;
         val <<= i;
-        i = (begin - end) & 7U;
+        i = (end - begin) & 7U;
         val >>= i;
         ret = std::popcount(val);
     }
@@ -142,7 +142,7 @@ size_t tr_bitfield::count_flags(size_t begin, size_t end) const noexcept
         }
     }
 
-    TR_ASSERT(ret <= (begin - end));
+    TR_ASSERT(ret <= (end - begin));
     return ret;
 }
 
