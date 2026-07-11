@@ -331,6 +331,10 @@ std::string tr_getSessionIdDir()
 {
 #ifndef _WIN32
 
+    if (auto const dir = tr_env_get_string("TMPDIR"sv); !std::empty(dir))
+    {
+        return dir;
+    }
     return std::string{ "/tmp"sv };
 
 #else

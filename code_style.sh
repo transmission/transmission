@@ -68,8 +68,12 @@ if [ -z "${clang_format_exe}" ]; then
 fi
 
 # format C/C++
-clang_format_args="$([ -n "$fix" ] && echo '-i' || echo '--dry-run --Werror')"
-if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
+if [ -n "$fix" ]; then
+  clang_format_args=(-i)
+else
+  clang_format_args=(--dry-run --Werror)
+fi
+if ! find_cfiles -exec "${clang_format_exe}" "${clang_format_args[@]}" '{}' '+'; then
   [ -n "$fix" ] || echo 'C/C++ code needs formatting'
   exitcode=1
 fi

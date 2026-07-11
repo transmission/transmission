@@ -1,3 +1,15 @@
+* text=auto
+
+*.png binary
+*.ico binary
+*.icns binary
+*.jpg binary
+*.gif binary
+*.psd binary
+*.bmp binary
+*.torrent binary
+*.a binary
+
 # libtransmission
 libtransmission/mime-types.h linguist-generated=true
 
