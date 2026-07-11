@@ -74,6 +74,18 @@ void depth_first_walk(std::string_view const path, file_func_t const& func, std:
     {
         if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
         {
+            struct DirGuard
+            {
+                tr_sys_dir_t h;
+                ~DirGuard()
+                {
+                    if (h != TR_BAD_SYS_DIR)
+                    {
+                        tr_sys_dir_close(h);
+                    }
+                }
+            } guard{ odir };
+
             char const* name_cstr = nullptr;
             while ((name_cstr = tr_sys_dir_read_name(odir)) != nullptr)
             {
@@ -85,8 +97,6 @@ void depth_first_walk(std::string_view const path, file_func_t const& func, std:
 
                 depth_first_walk(tr_pathbuf{ path, '/', name }, func, max_depth ? *max_depth - 1 : max_depth);
             }
-
-            tr_sys_dir_close(odir);
         }
     }
 

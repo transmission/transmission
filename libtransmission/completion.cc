@@ -213,7 +213,7 @@ uint64_t tr_completion::count_has_bytes_in_span(tr_byte_span_t span) const
     // the first block
     if (has_block(begin_block))
     {
-        uint64_t u = begin_block + 1;
+        uint64_t u = static_cast<uint64_t>(begin_block) + 1;
         u *= tr_block_info::BlockSize;
         u -= begin_byte;
         total += u;
