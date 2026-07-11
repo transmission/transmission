@@ -8,6 +8,7 @@
 #include <csignal>
 #include <cstdlib>
 #include <map>
+#include <mutex>
 #include <string>
 #include <string_view>
 
@@ -118,18 +119,25 @@ bool tr_spawn_async(
     std::string_view work_dir,
     tr_error* error)
 {
-    static bool sigchld_handler_set = false;
+    static std::once_flag sigchld_once;
 
-    if (!sigchld_handler_set)
+    int saved_errno = 0;
+    std::call_once(sigchld_once, [&]()
     {
-        /* FIXME: "The effects of signal() in a multithreaded process are unspecified." © man 2 signal */
-        if (signal(SIGCHLD, &handle_sigchld) == SIG_ERR) // NOLINT(performance-no-int-to-ptr)
+        struct sigaction sa = {};
+        sa.sa_handler = &handle_sigchld;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+        if (sigaction(SIGCHLD, &sa, nullptr) == -1)
         {
-            set_system_error(error, errno, "Call to signal()");
-            return false;
+            saved_errno = errno;
         }
+    });
 
-        sigchld_handler_set = true;
+    if (saved_errno != 0)
+    {
+        set_system_error(error, saved_errno, "Call to sigaction()");
+        return false;
     }
 
     auto pipe_fds = std::array<int, 2>{};

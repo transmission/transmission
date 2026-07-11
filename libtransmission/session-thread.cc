@@ -230,7 +230,10 @@ private:
     {
 #ifndef _WIN32
         /* Don't exit when writing on a broken socket */
-        (void)signal(SIGPIPE, SIG_IGN);
+        struct sigaction sa = {};
+        sa.sa_handler = SIG_IGN;
+        sigemptyset(&sa.sa_mask);
+        sigaction(SIGPIPE, &sa, nullptr);
 #endif
         tr_evthread_init();
 

@@ -399,9 +399,12 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    signal(SIGINT, sigHandler);
+    struct sigaction sa = {};
+    sa.sa_handler = sigHandler;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGINT, &sa, nullptr);
 #ifndef _WIN32
-    signal(SIGHUP, sigHandler);
+    sigaction(SIGHUP, &sa, nullptr);
 #endif
     tr_torrentStart(tor);
 
