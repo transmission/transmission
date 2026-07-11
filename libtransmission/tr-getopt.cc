@@ -180,7 +180,13 @@ void tr_getopt_usage(char const* app_name, char const* description, struct tr_op
         description = "Usage: %s [options]";
     }
 
-    printf(description, app_name);
+    auto usage_line = std::string{ description };
+    auto const pos = usage_line.find("%s");
+    if (pos != std::string::npos)
+    {
+        usage_line.replace(pos, 2, app_name);
+    }
+    fputs(usage_line.c_str(), stdout);
     printf("\n\nOptions:\n");
     getopts_usage_line(&help, long_width, short_width, arg_width);
 
