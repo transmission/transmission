@@ -196,8 +196,6 @@ target_sources(${TR_NAME}-mac
         URLSheetWindowController.mm
         Utils.h
         Utils.mm
-        VersionComparator.h
-        VersionComparator.mm
         WebSeedTableView.h
         WebSeedTableView.mm)
 

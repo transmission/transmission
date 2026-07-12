@@ -59,7 +59,6 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-#import "VersionComparator.h"
 #import "PowerManager.h"
 #import "Utils.h"
 
@@ -5563,9 +5562,9 @@ static void removeKeRangerRansomware()
     self.fQuitRequested = YES;
 }
 
-- (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SPUUpdater*)updater
+- (NSSet<NSString*>*)allowedChannelsForUpdater:(SPUUpdater*)updater
 {
-    return [VersionComparator new];
+    return [NSUserDefaults.standardUserDefaults boolForKey:@"AutoUpdateBeta"] ? [NSSet setWithObject:@"beta"] : NSSet.set;
 }
 
 @end
