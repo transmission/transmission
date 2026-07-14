@@ -59,7 +59,6 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-#import "VersionComparator.h"
 #import "PowerManager.h"
 #import "Utils.h"
 
@@ -374,6 +373,7 @@ static void removeKeRangerRansomware()
 @interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate, PowerManagerDelegate>
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
+@property(nonatomic) IBOutlet SPUStandardUpdaterController* fUpdaterController;
 @property(nonatomic) NSLayoutConstraint* fMinHeightConstraint;
 @property(nonatomic) NSLayoutConstraint* fFixedHeightConstraint;
 @property(nonatomic) IBOutlet TorrentTableView* fTableView;
@@ -612,7 +612,6 @@ static void removeKeRangerRansomware()
                 return TR_RPC_NOREMOVE; // we'll do the remove manually
             });
 
-        [SUUpdater sharedUpdater].delegate = self;
         _fQuitRequested = NO;
 
         _fPauseOnLaunch = (GetCurrentKeyModifiers() & (optionKey | rightOptionKey)) != 0;
@@ -5556,16 +5555,16 @@ static void removeKeRangerRansomware()
 
 @end
 
-@implementation Controller (SUUpdaterDelegate)
+@implementation Controller (SPUUpdaterDelegate)
 
-- (void)updaterWillRelaunchApplication:(SUUpdater*)updater
+- (void)updaterWillRelaunchApplication:(SPUUpdater*)updater
 {
     self.fQuitRequested = YES;
 }
 
-- (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater*)updater
+- (NSSet<NSString*>*)allowedChannelsForUpdater:(SPUUpdater*)updater
 {
-    return [VersionComparator new];
+    return [NSUserDefaults.standardUserDefaults boolForKey:@"AutoUpdateBeta"] ? [NSSet setWithObject:@"beta"] : NSSet.set;
 }
 
 @end
