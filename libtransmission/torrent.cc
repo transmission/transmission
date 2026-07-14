@@ -10,10 +10,13 @@
 #include <cstddef> // size_t
 #include <ctime>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <sstream>
 #include <ranges>
 #include <string>
 #include <string_view>
+#include <tuple> // std::ignore
 #include <utility>
 #include <vector>
 
@@ -1037,6 +1040,10 @@ void tr_torrent::init(tr_ctor const& ctor)
     {
         date_done_ = now_sec;
     }
+
+    // seed stats_snapshot_ so tr_torrentStat() has a fallback
+    // if its first call comes while the session lock is contended
+    std::ignore = stats();
 }
 
 void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
@@ -1392,12 +1399,35 @@ tr_stat tr_torrent::stats() const
     TR_ASSERT(stats.size_when_done <= this->total_size());
     TR_ASSERT(stats.left_until_done <= stats.size_when_done);
     TR_ASSERT(stats.desired_available <= stats.left_until_done);
+
+    {
+        auto const snapshot_lock = std::lock_guard{ stats_snapshot_mutex_ };
+        stats_snapshot_ = std::make_shared<tr_stat const>(stats);
+    }
+
     return stats;
 }
 
 tr_stat tr_torrentStat(tr_torrent* const tor)
 {
     tr_return_val_if_fail(tr_isTorrent(tor), {});
+
+    if (tor->session->am_in_session_thread())
+    {
+        return tor->stats();
+    }
+
+    if (auto const lock = tor->session->try_unique_lock(); lock)
+    {
+        return tor->stats();
+    }
+
+    // The session thread is holding the lock, possibly blocked on slow
+    // disk I/O. Return the most recent snapshot rather than blocking.
+    if (auto const snapshot = tor->stats_snapshot(); snapshot)
+    {
+        return *snapshot;
+    }
 
     return tor->stats();
 }
@@ -1413,11 +1443,24 @@ std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torren
     {
         ret.reserve(n_torrents);
 
-        auto const lock = torrents[0]->unique_lock();
+        auto* const session = torrents[0]->session;
 
-        for (size_t idx = 0U; idx != n_torrents; ++idx)
+        if (auto const lock = session->try_unique_lock(); lock || session->am_in_session_thread())
         {
-            ret.emplace_back(torrents[idx]->stats());
+            for (size_t idx = 0U; idx != n_torrents; ++idx)
+            {
+                ret.emplace_back(torrents[idx]->stats());
+            }
+        }
+        else
+        {
+            // The session thread is holding the lock, possibly blocked on slow
+            // disk I/O. Return the most recent snapshots rather than blocking.
+            for (size_t idx = 0U; idx != n_torrents; ++idx)
+            {
+                auto const snapshot = torrents[idx]->stats_snapshot();
+                ret.emplace_back(snapshot ? *snapshot : torrents[idx]->stats());
+            }
         }
     }
 

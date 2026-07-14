@@ -14,6 +14,7 @@
 #include <ctime>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <span>
 #include <string>
@@ -645,6 +646,14 @@ struct tr_torrent
     ///
 
     [[nodiscard]] tr_stat stats() const;
+
+    // the most recent stats() result, readable without the session lock.
+    // may be stale; empty until stats() has run at least once.
+    [[nodiscard]] std::shared_ptr<tr_stat const> stats_snapshot() const
+    {
+        auto const lock = std::lock_guard{ stats_snapshot_mutex_ };
+        return stats_snapshot_;
+    }
 
     [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
@@ -1390,6 +1399,13 @@ private:
     tr_sha1_digest_t obfuscated_hash_ = {};
 
     mutable SimpleSmoothedSpeed eta_speed_;
+
+    // copy of the last stats() result, served by tr_torrentStat() when the
+    // session mutex is contended so UI polling never blocks behind disk I/O.
+    // stats_snapshot_mutex_ is a leaf lock: hold it only to copy the pointer,
+    // never while acquiring the session lock or calling out.
+    mutable std::shared_ptr<tr_stat const> stats_snapshot_;
+    mutable std::mutex stats_snapshot_mutex_;
 
     tr_files_wanted files_wanted_{ &fpm_ };
     tr_file_priorities file_priorities_{ &fpm_ };

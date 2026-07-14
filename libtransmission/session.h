@@ -456,6 +456,11 @@ public:
         return std::unique_lock(session_mutex_);
     }
 
+    [[nodiscard]] auto try_unique_lock() const
+    {
+        return std::unique_lock(session_mutex_, std::try_to_lock);
+    }
+
     [[nodiscard]] constexpr auto const& settings() const noexcept
     {
         return settings_;
