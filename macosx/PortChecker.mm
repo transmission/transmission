@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #import "PortChecker.h"
+#import "Logging.h"
 
 static NSTimeInterval const kCheckFireInterval = 3.0;
 
@@ -73,34 +74,35 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
                                                       cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
                                                   timeoutInterval:15.0];
 
-    _fTask = [_fSession dataTaskWithRequest:portProbeRequest
-                          completionHandler:^(NSData* _Nullable data, NSURLResponse* _Nullable, NSError* _Nullable error) {
-                              if (error)
-                              {
-                                  NSLog(@"Unable to get port status: connection failed (%@)", error.localizedDescription);
-                                  [self callBackWithStatus:PortStatusError];
-                                  return;
-                              }
-                              NSString* probeString = [[NSString alloc] initWithData:data ?: NSData.data encoding:NSUTF8StringEncoding];
-                              if (!probeString)
-                              {
-                                  NSLog(@"Unable to get port status: invalid data received");
-                                  [self callBackWithStatus:PortStatusError];
-                              }
-                              else if ([probeString isEqualToString:@"1"])
-                              {
-                                  [self callBackWithStatus:PortStatusOpen];
-                              }
-                              else if ([probeString isEqualToString:@"0"])
-                              {
-                                  [self callBackWithStatus:PortStatusClosed];
-                              }
-                              else
-                              {
-                                  NSLog(@"Unable to get port status: invalid response (%@)", probeString);
-                                  [self callBackWithStatus:PortStatusError];
-                              }
-                          }];
+    _fTask = [_fSession
+        dataTaskWithRequest:portProbeRequest
+          completionHandler:^(NSData* _Nullable data, NSURLResponse* _Nullable, NSError* _Nullable error) {
+              if (error)
+              {
+                  os_log_error(Logging.portChecking, "Unable to get port status: connection failed (%@)", error.localizedDescription);
+                  [self callBackWithStatus:PortStatusError];
+                  return;
+              }
+              NSString* probeString = [[NSString alloc] initWithData:data ?: NSData.data encoding:NSUTF8StringEncoding];
+              if (!probeString)
+              {
+                  os_log_error(Logging.portChecking, "Unable to get port status: invalid data received");
+                  [self callBackWithStatus:PortStatusError];
+              }
+              else if ([probeString isEqualToString:@"1"])
+              {
+                  [self callBackWithStatus:PortStatusOpen];
+              }
+              else if ([probeString isEqualToString:@"0"])
+              {
+                  [self callBackWithStatus:PortStatusClosed];
+              }
+              else
+              {
+                  os_log_error(Logging.portChecking, "Unable to get port status: invalid response (%@)", probeString);
+                  [self callBackWithStatus:PortStatusError];
+              }
+          }];
     [_fTask resume];
 }
 

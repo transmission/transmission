@@ -17,6 +17,7 @@
 		9F0B1F332E4D1A0100A1B2C3 /* env.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9F0B1F2B2E4D1A0100A1B2C3 /* env.cc */; };
 		9F0B1F342E4D1A0100A1B2C3 /* file-utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9F0B1F2D2E4D1A0100A1B2C3 /* file-utils.cc */; };
 		9F0B1F352E4D1A0100A1B2C3 /* string-utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9F0B1F2F2E4D1A0100A1B2C3 /* string-utils.cc */; };
+		0AAC75C33007CB740051FD9B /* Logging.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0AAC75C23007CB740051FD9B /* Logging.mm */; };
 		1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */; };
 		1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E31 /* file-piece-map.h */; };
 		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
@@ -676,6 +677,8 @@
 		0A6169A60FE5C9A200C66CE6 /* bitfield.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = bitfield.h; sourceTree = "<group>"; };
 		0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-metainfo.cc"; sourceTree = "<group>"; };
 		0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "torrent-metainfo.h"; sourceTree = "<group>"; };
+		0AAC75C13007CB740051FD9B /* Logging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
+		0AAC75C23007CB740051FD9B /* Logging.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Logging.mm; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-piece-map.cc"; sourceTree = "<group>"; };
 		1BB44E07B1B52E28291B4E31 /* file-piece-map.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "file-piece-map.h"; sourceTree = "<group>"; };
@@ -1686,6 +1689,8 @@
 		080E96DDFE201D6D7F000001 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				0AAC75C13007CB740051FD9B /* Logging.h */,
+				0AAC75C23007CB740051FD9B /* Logging.mm */,
 				29B97316FDCFA39411CA2CEA /* main.mm */,
 				C86BCD9828228A9600F45599 /* SparkleProxy.mm */,
 				4DF0C5AA0899190500DD8943 /* Controller.h */,
@@ -3509,6 +3514,7 @@
 				ED6F16B72EB8F1EB007CD864 /* FileCheckCellView.mm in Sources */,
 				A2DF37070C220D03006523C1 /* CreatorWindowController.mm in Sources */,
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.mm in Sources */,
+				0AAC75C33007CB740051FD9B /* Logging.mm in Sources */,
 				A257C1820CAD3003004E121C /* PeerTableView.mm in Sources */,
 				45489C5429AF6FB20098A812 /* TorrentCellActionButton.mm in Sources */,
 				A2A6321B0CD9751700E3DA60 /* BadgeView.mm in Sources */,

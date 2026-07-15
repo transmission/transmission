@@ -13,6 +13,8 @@
 #include <libtransmission/log.h>
 #include <libtransmission/string-utils.h>
 
+#import "Logging.h"
+
 #import "Torrent.h"
 #import "GroupsController.h"
 #import "FileListNode.h"
@@ -522,7 +524,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     // Attempt to move to trash
     if ([NSFileManager.defaultManager trashItemAtURL:[NSURL fileURLWithPath:path] resultingItemURL:nil error:nil])
     {
-        NSLog(@"Old moved to Trash %@", path);
+        os_log_info(Logging.torrents, "Old moved to Trash %@", path);
         return YES;
     }
 
@@ -530,11 +532,11 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     NSError* localError;
     if ([NSFileManager.defaultManager removeItemAtPath:path error:&localError])
     {
-        NSLog(@"Old removed %@", path);
+        os_log_info(Logging.torrents, "Old removed %@", path);
         return YES;
     }
 
-    NSLog(@"Old could not be trashed or removed %@: %@", path, localError.localizedDescription);
+    os_log_error(Logging.torrents, "Old could not be trashed or removed %@: %@", path, localError.localizedDescription);
     if (error != nil)
     {
         *error = localError;
@@ -2086,7 +2088,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
             NSError* error = nil;
             if (![dataLocationUrl setResourceValue:quarantineProperties forKey:NSURLQuarantinePropertiesKey error:&error])
             {
-                NSLog(@"Failed to quarantine %@: %@", dataLocation, error.description);
+                os_log_error(Logging.torrents, "Failed to quarantine %@: %@", dataLocation, error.description);
             }
             break;
         }
@@ -2190,7 +2192,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     }
     else
     {
-        NSLog(@"Error renaming %@ to %@", oldPath, [path stringByAppendingPathComponent:newName]);
+        os_log_error(Logging.torrents, "Error renaming %@ to %@", oldPath, [path stringByAppendingPathComponent:newName]);
     }
 
     completionHandler(success);

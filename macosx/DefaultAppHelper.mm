@@ -9,6 +9,8 @@
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #endif
 
+#import "Logging.h"
+
 static NSString* const kMagnetURLScheme = @"magnet";
 static NSString* const kTorrentFileType = @"org.bittorrent.torrent";
 
@@ -90,7 +92,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
         [NSWorkspace.sharedWorkspace setDefaultApplicationAtURL:appUrl toOpenContentType:fileType completionHandler:^(NSError* error) {
             if (error)
             {
-                NSLog(@"Failed setting default torrent file handler: %@", error.localizedDescription);
+                os_log_error(Logging.workspace, "Failed setting default torrent file handler: %@", error.localizedDescription);
             }
             if (completionHandler != nil)
             {
@@ -109,7 +111,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
             (__bridge CFStringRef)self.bundleIdentifier);
         if (result != noErr)
         {
-            NSLog(@"Failed setting default torrent file handler");
+            os_log_error(Logging.workspace, "Failed setting default torrent file handler");
         }
         if (completionHandler != nil)
         {
@@ -143,19 +145,18 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
     if (@available(macOS 12, *))
     {
         NSURL* appUrl = [NSWorkspace.sharedWorkspace URLForApplicationWithBundleIdentifier:self.bundleIdentifier];
-        [NSWorkspace.sharedWorkspace setDefaultApplicationAtURL:appUrl toOpenURLsWithScheme:kMagnetURLScheme
-                                              completionHandler:^(NSError* error) {
-                                                  if (error)
-                                                  {
-                                                      NSLog(@"Failed setting default magnet link handler: %@", error.localizedDescription);
-                                                  }
-                                                  if (completionHandler != nil)
-                                                  {
-                                                      dispatch_async(dispatch_get_main_queue(), ^{
-                                                          completionHandler();
-                                                      });
-                                                  }
-                                              }];
+        [NSWorkspace.sharedWorkspace setDefaultApplicationAtURL:appUrl toOpenURLsWithScheme:kMagnetURLScheme completionHandler:^(NSError* error) {
+            if (error)
+            {
+                os_log_error(Logging.workspace, "Failed setting default magnet link handler: %@", error.localizedDescription);
+            }
+            if (completionHandler != nil)
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionHandler();
+                });
+            }
+        }];
     }
     else
 #endif
@@ -165,7 +166,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
             (__bridge CFStringRef)self.bundleIdentifier);
         if (result != noErr)
         {
-            NSLog(@"Failed setting default magnet link handler");
+            os_log_error(Logging.workspace, "Failed setting default magnet link handler");
         }
         if (completionHandler != nil)
         {

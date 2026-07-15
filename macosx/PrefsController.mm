@@ -7,6 +7,7 @@
 #include <libtransmission/string-utils.h>
 
 #import "VDKQueue.h"
+#import "Logging.h"
 
 #import "PrefsController.h"
 #import "BlocklistDownloaderViewController.h"
@@ -1630,7 +1631,7 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
         &data);
     if (result != noErr && result != errSecItemNotFound)
     {
-        NSLog(@"Problem accessing Keychain: %@", getOSStatusDescription(result));
+        os_log_error(Logging.keychain, "Problem accessing Keychain: %@", getOSStatusDescription(result));
     }
     char const* password = (char const*)((__bridge_transfer NSData*)data).bytes;
     if (password)
@@ -1652,7 +1653,7 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
         &item);
     if (result != noErr && result != errSecItemNotFound)
     {
-        NSLog(@"Problem accessing Keychain: %@", getOSStatusDescription(result));
+        os_log_error(Logging.keychain, "Problem accessing Keychain: %@", getOSStatusDescription(result));
         return;
     }
 
@@ -1672,7 +1673,7 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
                 });
             if (result != noErr)
             {
-                NSLog(@"Problem updating Keychain item: %@", getOSStatusDescription(result));
+                os_log_error(Logging.keychain, "Problem updating Keychain item: %@", getOSStatusDescription(result));
             }
         }
         else // found and not needed, so remove it
@@ -1684,7 +1685,7 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
             });
             if (result != noErr)
             {
-                NSLog(@"Problem removing Keychain item: %@", getOSStatusDescription(result));
+                os_log_error(Logging.keychain, "Problem removing Keychain item: %@", getOSStatusDescription(result));
             }
         }
         CFRelease(item);
@@ -1703,7 +1704,7 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
                 nil);
             if (result != noErr)
             {
-                NSLog(@"Problem adding Keychain item: %@", getOSStatusDescription(result));
+                os_log_error(Logging.keychain, "Problem adding Keychain item: %@", getOSStatusDescription(result));
             }
         }
     }
