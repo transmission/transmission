@@ -963,7 +963,7 @@ void tr_rpc_server::set_password(std::string_view password) noexcept
 {
     auto const is_salted = tr_ssha1_test(password);
     settings_.salted_password = is_salted ? password : tr_ssha1(password);
-    tr_logAddDebug(fmt::format("setting our salted password to '{:s}'", settings_.salted_password));
+    tr_logAddDebug("setting salted password (value redacted)");
 }
 
 void tr_rpc_server::set_password_enabled(bool enabled)
