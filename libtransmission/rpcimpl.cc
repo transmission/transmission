@@ -2199,11 +2199,22 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
     map.try_emplace(
         TR_KEY_blocklist_url,
         [](tr_session const& src) -> tr_variant { return src.blocklistUrl(); },
-        [](tr_session& tgt, tr_variant const& src, ErrorInfo& /*err*/)
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& err)
         {
             if (auto const val = src.value_if<std::string_view>())
             {
-                tgt.setBlocklistUrl(*val);
+                if (!tr_urlIsValid(*val))
+                {
+                    err = { JsonRpc::Error::INVALID_PARAMS, "invalid URL" };
+                }
+                else if (auto const parsed = tr_urlParse(*val); parsed && parsed->scheme != "http" && parsed->scheme != "https")
+                {
+                    err = { JsonRpc::Error::INVALID_PARAMS, "only http and https URLs are allowed" };
+                }
+                else
+                {
+                    tgt.setBlocklistUrl(*val);
+                }
             }
         });
 
