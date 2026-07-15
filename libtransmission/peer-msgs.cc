@@ -326,6 +326,8 @@ public:
         io_->set_callbacks(can_read, did_write, got_error, this);
         update_desired_request_count();
 
+        client_sent_at_ = tr_time();
+
         update_active();
     }
 
@@ -1811,6 +1813,8 @@ void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool wa
 {
     auto* const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
+    msgs->client_sent_at_ = tr_time();
+
     if (was_piece_data)
     {
         msgs->peer_info->set_latest_piece_data_time(tr_time());
@@ -2039,6 +2043,7 @@ void tr_peerMsgsImpl::check_request_timeout(time_t const now)
     if (client_sent_at_ != 0 && now_sec - client_sent_at_ > KeepaliveIntervalSecs)
     {
         n_bytes_written += protocol_send_keepalive();
+        client_sent_at_ = now_sec;
     }
 
     return n_bytes_written;
