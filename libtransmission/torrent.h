@@ -60,6 +60,7 @@ namespace tr::test
 
 class RenameTest_multifileTorrent_Test;
 class RenameTest_singleFilenameTorrent_Test;
+class ResumeTest;
 
 } // namespace tr::test
 
@@ -79,6 +80,7 @@ struct tr_torrent
         void load_incomplete_dir(std::string_view dir) noexcept;
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
+        void load_resume_filenames_need_verification(bool val) noexcept;
         void load_start_when_stable(bool val) noexcept;
 
         [[nodiscard]] tr_bitfield const& blocks() const noexcept;
@@ -89,11 +91,13 @@ struct tr_torrent
         [[nodiscard]] time_t date_done() const noexcept;
         [[nodiscard]] time_t seconds_downloading(time_t now) const noexcept;
         [[nodiscard]] time_t seconds_seeding(time_t now) const noexcept;
+        [[nodiscard]] bool resume_filenames_need_verification() const noexcept;
         [[nodiscard]] bool start_when_stable() const noexcept;
 
     private:
         friend class tr::test::RenameTest_multifileTorrent_Test;
         friend class tr::test::RenameTest_singleFilenameTorrent_Test;
+        friend class tr::test::ResumeTest;
         friend struct tr_torrent;
 
         explicit ResumeHelper(tr_torrent& tor)
@@ -1341,6 +1345,9 @@ private:
 
     void start_in_session_thread();
 
+    [[nodiscard]] bool set_local_error_if_resume_filenames_need_verification();
+    [[nodiscard]] bool clear_resume_filenames_need_verification();
+
     void stop_now();
 
     [[nodiscard]] bool is_new_torrent_a_seed();
@@ -1441,6 +1448,8 @@ private:
     bool finished_seeding_by_idle_ = false;
 
     bool needs_completeness_check_ = true;
+
+    bool resume_filenames_need_verification_ = false;
 
     bool sequential_download_ = false;
 

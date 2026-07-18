@@ -601,6 +601,37 @@ void freeTorrent(tr_torrent* tor)
 } // namespace start_stop_helpers
 } // namespace
 
+bool tr_torrent::set_local_error_if_resume_filenames_need_verification()
+{
+    if (!resume_filenames_need_verification_)
+    {
+        return false;
+    }
+
+    tr_logAddTraceTor(this, "Invalid file paths were found in the resume data");
+    error().set_local_error(
+        _("Paused torrent because invalid file paths were found in its resume data. "
+          "Restore the filenames if necessary, then use \"Verify Local Data\"."));
+    return true;
+}
+
+bool tr_torrent::clear_resume_filenames_need_verification()
+{
+    if (!resume_filenames_need_verification_)
+    {
+        return false;
+    }
+
+    resume_filenames_need_verification_ = false;
+    if (error().is_local_error())
+    {
+        error().clear();
+    }
+
+    set_dirty();
+    return true;
+}
+
 // has_any_local_data is true or false if we know whether or not local data exists,
 // or unset if we don't know and need to check for ourselves
 void tr_torrent::start(bool bypass_queue, std::optional<bool> has_any_local_data)
@@ -608,6 +639,16 @@ void tr_torrent::start(bool bypass_queue, std::optional<bool> has_any_local_data
     using namespace start_stop_helpers;
 
     auto const lock = unique_lock();
+
+    // Loading the canonical metainfo paths while retaining completion data
+    // from a conflicting resume file could make us transfer corrupt bytes.
+    // Keep the torrent stopped until the user verifies its local data.
+    if (set_local_error_if_resume_filenames_need_verification())
+    {
+        start_when_stable_ = false;
+        set_is_queued(false);
+        return;
+    }
 
     switch (activity())
     {
@@ -1029,7 +1070,10 @@ void tr_torrent::init(tr_ctor const& ctor)
     }
     else
     {
-        set_local_error_if_files_disappeared(this, has_any_local_data);
+        if (!set_local_error_if_resume_filenames_need_verification())
+        {
+            set_local_error_if_files_disappeared(this, has_any_local_data);
+        }
     }
 
     // Recover from the bug reported at https://github.com/transmission/transmission/issues/6899
@@ -1597,7 +1641,11 @@ void tr_torrentVerify(tr_torrent* tor)
                 tor->stop_now();
             }
 
-            if (did_files_disappear(tor))
+            if (tor->set_local_error_if_resume_filenames_need_verification())
+            {
+                tor->start_when_stable_ = false;
+            }
+            else if (did_files_disappear(tor))
             {
                 tor->error().set_local_error(
                     _("Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", "
@@ -1731,7 +1779,14 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
                     tor->update_file_path(file, {});
                 }
 
+                auto const repaired_resume_filenames = tor->clear_resume_filenames_need_verification();
+
                 tor->recheck_completeness();
+
+                if (repaired_resume_filenames)
+                {
+                    tor->save_resume_file();
+                }
 
                 if (tor->verify_done_callback_)
                 {
@@ -2689,6 +2744,18 @@ void tr_torrent::ResumeHelper::load_incomplete_dir(std::string_view const dir) n
     {
         tor_.current_dir_ = tor_.incomplete_dir_;
     }
+}
+
+// ---
+
+void tr_torrent::ResumeHelper::load_resume_filenames_need_verification(bool const val) noexcept
+{
+    tor_.resume_filenames_need_verification_ = val;
+}
+
+bool tr_torrent::ResumeHelper::resume_filenames_need_verification() const noexcept
+{
+    return tor_.resume_filenames_need_verification_;
 }
 
 // ---
