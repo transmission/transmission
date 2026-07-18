@@ -228,25 +228,31 @@ public:
 
     ~Impl()
     {
-        deadline_ns_ = to_ns(mediator.now());
-        queued_tasks_cv_.notify_one();
+        startShutdown(0ms);
         curl_thread->join();
     }
 
     void startShutdown(std::chrono::milliseconds deadline)
     {
-        deadline_ns_ = to_ns(mediator.now() + deadline);
+        // the deadline must be set under the mutex: curlThreadFunc() decides
+        // whether to sleep by testing it, so an unsynchronized store could
+        // land between that test and the sleep and never be noticed
+        {
+            auto const lock = std::unique_lock{ tasks_mutex_ };
+            deadline_ns_ = to_ns(mediator.now() + deadline);
+        }
         queued_tasks_cv_.notify_one();
     }
 
     void fetch(FetchOptions&& options)
     {
-        if (deadline_exists())
+        auto const lock = std::unique_lock{ tasks_mutex_ };
+
+        if (deadline_exists()) // no new tasks once shutdown has begun
         {
             return;
         }
 
-        auto const lock = std::unique_lock{ tasks_mutex_ };
         queued_tasks_.emplace_back(*this, std::move(options));
         queued_tasks_cv_.notify_one();
     }
@@ -751,21 +757,23 @@ public:
                 }
             }
 
-            if (deadline_exists() && is_idle())
-            {
-                break;
-            }
-
             if (auto lock = std::unique_lock{ tasks_mutex_ }; lock.owns_lock())
             {
-                // sleep until there's something to do
+                // sleep until there's something to do.
+                // NB: a pending shutdown must stop the wait; if it prolonged
+                // it instead, the loop could sleep through its exit condition
                 auto const stop_waiting = [this]()
                 {
-                    return !is_idle() || !deadline_exists();
+                    return !is_idle() || deadline_exists();
                 };
                 if (!stop_waiting())
                 {
                     queued_tasks_cv_.wait(lock, stop_waiting);
+                }
+
+                if (deadline_exists() && is_idle())
+                {
+                    break;
                 }
 
                 // add queued tasks
@@ -885,10 +893,9 @@ tr_web::tr_web(Mediator& mediator)
 {
 }
 
-tr_web::~tr_web()
-{
-    impl_->startShutdown(0ms);
-}
+// ~Impl() itself starts an immediate shutdown before joining the curl
+// thread, so there's nothing to do here beyond destroying the members
+tr_web::~tr_web() = default;
 
 std::unique_ptr<tr_web> tr_web::create(Mediator& mediator)
 {
