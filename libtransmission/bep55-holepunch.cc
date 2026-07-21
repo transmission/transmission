@@ -70,7 +70,7 @@ std::optional<HolepunchMessage> decode(tr::BufferReader<std::byte>& payload) noe
 
     if (msg.msg_type == MsgError)
     {
-        if (payload.size() < sizeof(ErrorCode))
+        if (payload.size() != sizeof(ErrorCode))
         {
             return std::nullopt;
         }

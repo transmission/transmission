@@ -558,6 +558,25 @@ TEST(Bep55, RejectTrailingBytesBeyondErrorCode)
     EXPECT_FALSE(decode(payload).has_value());
 }
 
+TEST(Bep55, RejectErrorTrailingBytesBeyondErrorCode)
+{
+    static auto constexpr N = PayloadFullIPv4 + 1;
+
+    auto payload = tr::StackBuffer<N>{};
+    payload.add_uint8(MsgError);
+    payload.add_uint8(AddrIPv4);
+    payload.add_uint8(10);
+    payload.add_uint8(0);
+    payload.add_uint8(0);
+    payload.add_uint8(1);
+    payload.add_uint16(51413);
+    payload.add_uint32(ErrNotConnected);
+    payload.add_uint8(0); // trailing byte
+    EXPECT_EQ(payload.size(), N);
+
+    EXPECT_FALSE(decode(payload).has_value());
+}
+
 TEST(Bep55, RoundTripIPv4Rendezvous)
 {
     auto payload = tr::StackBuffer<PayloadFullIPv4>{};
