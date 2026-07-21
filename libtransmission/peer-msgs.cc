@@ -28,9 +28,9 @@
 
 #include <small/vector.hpp>
 
+#include "libtransmission/bep55-holepunch.h"
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
-#include "libtransmission/bep55-holepunch.h"
 #include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/inout.h"
