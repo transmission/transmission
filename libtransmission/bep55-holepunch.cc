@@ -81,7 +81,7 @@ std::optional<HolepunchMessage> decode(tr::BufferReader<std::byte>& payload) noe
     // (anacrolix compat); reject trailing non-zero error code.
     else if (payload.size() == sizeof(ErrorCode))
     {
-        if (payload.to_uint32() != 0)
+        if (payload.to_uint32() != ErrNonError)
         {
             return std::nullopt;
         }
