@@ -1264,15 +1264,13 @@ bool tr_torrentCanManualUpdate(tr_torrent const* tor)
 
 // ---
 
-tr_stat tr_torrent::stats() const
+tr_stat tr_torrent::stats_locked() const
 {
     static auto constexpr IsStalled = [](tr_torrent const* const tor, std::optional<time_t> idle_secs)
     {
         return tor->session->queueStalledEnabled() &&
             idle_secs > static_cast<time_t>(tor->session->queueStalledMinutes() * 60U);
     };
-
-    auto const lock = unique_lock();
 
     auto const now_msec = tr_time_msec();
     auto const now_sec = tr_time();
@@ -1395,11 +1393,43 @@ tr_stat tr_torrent::stats() const
     return stats;
 }
 
+tr_stat tr_torrent::stats() const
+{
+    auto const lock = unique_lock();
+    return stats_locked();
+}
+
+std::optional<tr_stat> tr_torrent::try_stats() const
+{
+    auto lock = session->try_unique_lock();
+    if (!lock.owns_lock())
+    {
+        return {};
+    }
+
+    return stats_locked();
+}
+
 tr_stat tr_torrentStat(tr_torrent* const tor)
 {
     tr_return_val_if_fail(tr_isTorrent(tor), {});
 
     return tor->stats();
+}
+
+bool tr_torrentTryStat(tr_torrent* const tor, tr_stat* const setme)
+{
+    tr_return_val_if_fail(tr_isTorrent(tor), false);
+    tr_return_val_if_fail(setme != nullptr, false);
+
+    auto stats = tor->try_stats();
+    if (!stats)
+    {
+        return false;
+    }
+
+    *setme = *stats;
+    return true;
 }
 
 std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents)
@@ -1422,6 +1452,31 @@ std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torren
     }
 
     return ret;
+}
+
+bool tr_torrentTryStat(tr_torrent* const* torrents, size_t n_torrents, tr_stat* const setme)
+{
+    tr_return_val_if_fail(torrents != nullptr, false);
+    tr_return_val_if_fail(setme != nullptr, false);
+    tr_return_val_if_fail(std::all_of(torrents, torrents + n_torrents, tr_isTorrent), false);
+
+    if (n_torrents == 0U)
+    {
+        return true;
+    }
+
+    auto lock = torrents[0]->session->try_unique_lock();
+    if (!lock.owns_lock())
+    {
+        return false;
+    }
+
+    for (size_t idx = 0U; idx != n_torrents; ++idx)
+    {
+        setme[idx] = torrents[idx]->stats_locked();
+    }
+
+    return true;
 }
 
 // ---

@@ -948,3 +948,18 @@ tr_stat tr_torrentStat(tr_torrent* torrent);
 // Prefer calling this over calling the single-torrent version in a loop.
 // TODO(c++20) take a std::span argument
 std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+
+// Non-blocking counterpart of tr_torrentStat(). If the session thread
+// currently holds the session lock (e.g. it is in the middle of a disk
+// write), this returns false immediately and leaves *setme untouched,
+// instead of blocking the caller for the duration of that write. UI
+// refresh loops should fall back to their last cached tr_stat when this
+// returns false, rather than stalling.
+bool tr_torrentTryStat(tr_torrent* torrent, tr_stat* setme);
+
+// Batch version of tr_torrentTryStat(). setme must point to an array of at
+// least n_torrents tr_stat entries. On success (true), every entry is
+// filled in. On failure (false, because the session lock is currently
+// held elsewhere), no entries are touched at all -- the caller should keep
+// showing its previous cached stats for this refresh cycle.
+bool tr_torrentTryStat(tr_torrent* const* torrents, size_t n_torrents, tr_stat* setme);

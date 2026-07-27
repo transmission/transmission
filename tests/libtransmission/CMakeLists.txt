@@ -29,6 +29,7 @@ target_sources(libtransmission-test
         ip-cache-test.cc
         json-test.cc
         local-data-test.cc
+        lock-contention-test.cc
         lpd-test.cc
         magnet-metainfo-test.cc
         makemeta-test.cc
