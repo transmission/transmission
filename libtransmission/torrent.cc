@@ -1432,6 +1432,26 @@ bool tr_torrentTryStat(tr_torrent* const tor, tr_stat* const setme)
     return true;
 }
 
+namespace
+{
+// The batch stat functions below take a single lock (from torrents[0]) and
+// use it to guard every torrent in the array, which is only safe if they
+// all belong to the same session -- otherwise it's a data race (reading a
+// torrent's state without holding its own session's lock) and, in the
+// locked/blocking overload, a lock-order hazard across two session mutexes.
+// This is expected to always be true in practice (a process has one
+// tr_session), but the public API doesn't require it, so check rather than
+// assume.
+[[nodiscard]] bool all_same_session(tr_torrent* const* torrents, size_t n_torrents)
+{
+    auto const* const session = torrents[0]->session;
+    return std::all_of(
+        torrents,
+        torrents + n_torrents,
+        [session](tr_torrent const* const tor) { return tor->session == session; });
+}
+} // namespace
+
 std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents)
 {
     tr_return_val_if_fail(torrents != nullptr, {});
@@ -1443,11 +1463,23 @@ std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torren
     {
         ret.reserve(n_torrents);
 
-        auto const lock = torrents[0]->unique_lock();
-
-        for (size_t idx = 0U; idx != n_torrents; ++idx)
+        if (all_same_session(torrents, n_torrents))
         {
-            ret.emplace_back(torrents[idx]->stats());
+            auto const lock = torrents[0]->unique_lock();
+            for (size_t idx = 0U; idx != n_torrents; ++idx)
+            {
+                ret.emplace_back(torrents[idx]->stats_locked());
+            }
+        }
+        else
+        {
+            // Mixed sessions: lock (and unlock) each torrent's own session
+            // in turn rather than holding one session's lock while touching
+            // another's torrents.
+            for (size_t idx = 0U; idx != n_torrents; ++idx)
+            {
+                ret.emplace_back(torrents[idx]->stats());
+            }
         }
     }
 
@@ -1465,15 +1497,38 @@ bool tr_torrentTryStat(tr_torrent* const* torrents, size_t n_torrents, tr_stat* 
         return true;
     }
 
-    auto lock = torrents[0]->session->try_unique_lock();
-    if (!lock.owns_lock())
+    if (all_same_session(torrents, n_torrents))
     {
-        return false;
+        auto lock = torrents[0]->session->try_unique_lock();
+        if (!lock.owns_lock())
+        {
+            return false;
+        }
+
+        for (size_t idx = 0U; idx != n_torrents; ++idx)
+        {
+            setme[idx] = torrents[idx]->stats_locked();
+        }
+
+        return true;
+    }
+
+    // Mixed sessions: each torrent's session lock is independent, so try_stats()
+    // each one in turn. If any of them is unavailable, bail out without writing
+    // to setme at all -- same all-or-nothing contract as the common-session case.
+    auto results = std::vector<std::optional<tr_stat>>(n_torrents);
+    for (size_t idx = 0U; idx != n_torrents; ++idx)
+    {
+        results[idx] = torrents[idx]->try_stats();
+        if (!results[idx])
+        {
+            return false;
+        }
     }
 
     for (size_t idx = 0U; idx != n_torrents; ++idx)
     {
-        setme[idx] = torrents[idx]->stats_locked();
+        setme[idx] = *results[idx];
     }
 
     return true;

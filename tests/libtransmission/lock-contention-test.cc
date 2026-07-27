@@ -1,17 +1,14 @@
-// Scratch reproducer: empirically measure whether tr_torrentStat() blocks
-// on the UI-calling thread while the session thread holds session_->unique_lock()
+// Regression test: empirically measures whether tr_torrentStat() blocks on
+// the calling thread while the session thread holds session_->unique_lock()
 // for an extended period (simulating a slow synchronous disk write happening
-// inside tr_peerIo::can_read_wrapper()).
-//
-// This is not part of the permanent test suite -- it exists to validate a
-// hypothesis about a real-world performance regression with an actual build
-// and actual measured timings, rather than by reading diffs.
+// inside tr_peerIo::can_read_wrapper()), and that tr_torrentTryStat() does not.
 
 #include <array>
 #include <chrono>
 #include <future>
 #include <thread>
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include <libtransmission/transmission.h>
