@@ -57,7 +57,10 @@ private:
     void addAssociatedFileIcon(QFileInfo const& file_info, unsigned int icon_size, QIcon& icon) const;
 #else
     mutable std::unordered_set<QString> suffixes_;
+
+    // A null icon is a cached miss: the theme has no icon for that suffix.
     mutable std::unordered_map<QString, QIcon> ext_to_icon_;
+
     QIcon getMimeIcon(QString const& filename) const;
 #endif
 
