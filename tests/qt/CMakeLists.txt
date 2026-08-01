@@ -14,6 +14,7 @@ function(add_trqt_test source)
     set_property(TARGET ${target} PROPERTY AUTOMOC ON)
     set_property(TARGET ${target} PROPERTY AUTORCC ON)
     add_test(NAME QT.${test_name} COMMAND ${target})
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} APPEND PROPERTY QT_TEST_TARGETS ${target})
 
     if(UNIX AND NOT APPLE)
         set_tests_properties(
@@ -27,11 +28,15 @@ add_trqt_test(prefs-test.cc)
 add_trqt_test(rpcclient-test.cc)
 add_trqt_test(session-test.cc)
 
+if(ENABLE_QT_COM_INTEROP)
+    add_trqt_test(com-interop-test.cc)
+endif()
+
+get_property(QT_TEST_TARGETS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY QT_TEST_TARGETS)
+
 add_custom_target(qt-tests
     DEPENDS
-        qt-test-prefs
-        qt-test-rpcclient
-        qt-test-session)
+        ${QT_TEST_TARGETS})
 
 set_property(
     TARGET qt-tests
