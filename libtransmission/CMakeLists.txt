@@ -45,6 +45,8 @@ target_sources(${TR_NAME}
         clients.h
         completion.cc
         completion.h
+        config-dir-lock.cc
+        config-dir-lock.h
         constants.h
         crypto-utils-ccrypto.cc
         crypto-utils-fallback.cc
