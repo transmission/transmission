@@ -42,6 +42,7 @@
 #include "libtransmission/announcer.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
+#include "libtransmission/config-dir-lock.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/ip-cache.h"
 #include "libtransmission/local-data.h"
@@ -466,6 +467,14 @@ public:
     [[nodiscard]] constexpr std::string const& configDir() const noexcept
     {
         return config_dir_;
+    }
+
+    // False when the config dir could not be locked, which usually means another
+    // session is already using it. Callers that can present a choice -- attach to
+    // the running session, pick another dir, quit -- should do so before writing.
+    [[nodiscard]] bool ownsConfigDir() const noexcept
+    {
+        return config_dir_lock_.is_held();
     }
 
     [[nodiscard]] constexpr auto const& torrentDir() const noexcept
@@ -1199,6 +1208,11 @@ private:
     /// const fields
 
     std::string const config_dir_;
+
+    // Held for the session's lifetime so that a second session on this config
+    // dir can discover the first instead of overwriting its state.
+    tr_config_dir_lock const config_dir_lock_;
+
     std::string const resume_dir_;
     std::string const torrent_dir_;
     std::string const blocklist_dir_;

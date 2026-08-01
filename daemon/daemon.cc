@@ -853,6 +853,16 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             return TR_RPC_OK;
         });
     tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", config_dir_)));
+
+    if (!tr_sessionOwnsConfigDir(session))
+    {
+        tr_logAddWarn(
+            fmt::format(
+                fmt::runtime(_(
+                    "Couldn't lock '{path}'. Another instance may be running; if so, both will overwrite each other's settings.")),
+                fmt::arg("path", config_dir_)));
+    }
+
     tr_sessionSaveSettings(session, config_dir_, settings_);
 
     auto const* const settings_map = settings_.get_if<tr_variant::Map>();

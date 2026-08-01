@@ -169,6 +169,18 @@ void tr_sessionClose(tr_session* session, double timeout_secs = 15.0);
 [[nodiscard]] std::string tr_sessionGetConfigDir(tr_session const* session);
 
 /**
+ * @brief Return whether this session holds the lock on its config dir.
+ *
+ * A session's settings, resume files and stats are written as though they
+ * have a single owner, so two sessions sharing a config dir overwrite each
+ * other's state. False usually means another session is already using it.
+ *
+ * False is not proof: a config dir on a read-only or lock-less filesystem
+ * cannot be locked either. Treat it as "unknown" and ask rather than refuse.
+ */
+[[nodiscard]] bool tr_sessionOwnsConfigDir(tr_session const* session);
+
+/**
  * @brief Get the default download folder for new torrents.
  *
  * This is set by `tr_sessionInit()` or `tr_sessionSetDownloadDir()`,

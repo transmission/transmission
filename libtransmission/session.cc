@@ -999,6 +999,13 @@ std::string tr_sessionGetConfigDir(tr_session const* session)
     return session->configDir();
 }
 
+bool tr_sessionOwnsConfigDir(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->ownsConfigDir();
+}
+
 // ---
 
 void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled)
@@ -2164,6 +2171,7 @@ auto makeBlocklistDir(std::string_view config_dir)
 
 tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_dict)
     : config_dir_{ config_dir }
+    , config_dir_lock_{ tr_config_dir_lock::create(config_dir) }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , blocklist_dir_{ makeBlocklistDir(config_dir) }
