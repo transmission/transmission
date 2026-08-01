@@ -101,6 +101,37 @@ TEST_F(TorrentTest, queueMoveTop)
     }
 }
 
+TEST_F(TorrentTest, undoneFiresWhenTorrentLeavesDoneState)
+{
+    // file 0's first piece is deliberately wrong, so it starts out incomplete
+    // files 1 and 2 are already correct on disk.
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::Partial);
+    static constexpr auto File0 = tr_file_index_t{ 0 };
+    ASSERT_FALSE(tor->is_done());
+
+    auto done_count = 0;
+    auto undone_count = 0;
+    auto const done_tag = tor->done_.connect_scoped([&done_count](tr_torrent*, bool) { ++done_count; });
+    auto const undone_tag = tor->undone_.connect_scoped([&undone_count](tr_torrent*) { ++undone_count; });
+
+    // unwant file 0: every remaining wanted file is already complete, so the torrent becomes "done"
+    tor->set_files_wanted(&File0, 1, false);
+    EXPECT_TRUE(tor->is_done());
+    EXPECT_EQ(1, done_count);
+    EXPECT_EQ(0, undone_count);
+
+    // want file 0 again while it's still missing data: the torrent leaves the "done" state
+    tor->set_files_wanted(&File0, 1, true);
+    EXPECT_FALSE(tor->is_done());
+    EXPECT_EQ(1, done_count);
+    EXPECT_EQ(1, undone_count);
+
+    // re-asserting the same wanted state is not a transition and should not re-fire either signal
+    tor->set_files_wanted(&File0, 1, true);
+    EXPECT_EQ(1, done_count);
+    EXPECT_EQ(1, undone_count);
+}
+
 TEST_F(TorrentTest, queueMoveBottom)
 {
     static constexpr auto ExpectedQueuePosition = std::array{ 1, 2, 0, 3 };

@@ -1014,6 +1014,8 @@ struct tr_torrent
     // ---
 
     sigslot::signal<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
+    // fires when completeness transitions away from done (e.g. a file is marked wanted again)
+    sigslot::signal<tr_torrent*> undone_;
     sigslot::signal<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     sigslot::signal<tr_torrent*, tr_piece_index_t> piece_completed_;
     sigslot::signal<tr_torrent*> doomed_;
