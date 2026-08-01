@@ -3,11 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <memory>
+
 #include <windows.h>
 #include <objbase.h>
+#include <oleauto.h>
 
 #include <QAxFactory>
+#include <QAxObject>
 #include <QString>
+#include <QUuid>
 #include <QVariant>
 
 #include "ComInteropHelper.h"
@@ -23,18 +28,45 @@ extern bool qAxOutProcServer; // NOLINT
 extern wchar_t qAxModuleFilename[MAX_PATH]; // NOLINT
 extern QString qAxInit(); // NOLINT
 
+namespace
+{
+
+// Returns the interop object of a Qt client that is already running, or nullptr
+// if none is. GetActiveObject reads the running object table and nothing else,
+// so a miss stays a miss; handing the class id to QAxObject instead would let
+// COM start a client from its registered LocalServer32 and report success.
+std::unique_ptr<QAxObject> connectToRunningClient()
+{
+    auto* unknown = static_cast<IUnknown*>(nullptr);
+
+    if (::GetActiveObject(QUuid{ QStringLiteral(TR_COM_CLIENT_CLSID) }, nullptr, &unknown) != S_OK || unknown == nullptr)
+    {
+        return {};
+    }
+
+    // QAxObject adopts the reference that GetActiveObject returned.
+    return std::make_unique<QAxObject>(unknown);
+}
+
+} // namespace
+
 ComInteropHelper::ComInteropHelper()
-    : client_{ new QAxObject{ QStringLiteral("Transmission.QtClient") } }
+    : client_{ connectToRunningClient() }
 {
 }
 
 bool ComInteropHelper::isConnected() const
 {
-    return !client_->isNull();
+    return client_ != nullptr && !client_->isNull();
 }
 
 QVariant ComInteropHelper::addMetainfo(QString const& metainfo) const
 {
+    if (client_ == nullptr)
+    {
+        return {};
+    }
+
     return client_->dynamicCall("AddMetainfo(QString)", metainfo);
 }
 

@@ -27,11 +27,20 @@ add_trqt_test(prefs-test.cc)
 add_trqt_test(rpcclient-test.cc)
 add_trqt_test(session-test.cc)
 
+set(QT_TEST_TARGETS
+    qt-test-prefs
+    qt-test-rpcclient
+    qt-test-session)
+
+# Exercises the COM path, so it only builds where that path does.
+if(ENABLE_QT_COM_INTEROP)
+    add_trqt_test(com-interop-test.cc)
+    list(APPEND QT_TEST_TARGETS qt-test-com-interop)
+endif()
+
 add_custom_target(qt-tests
     DEPENDS
-        qt-test-prefs
-        qt-test-rpcclient
-        qt-test-session)
+        ${QT_TEST_TARGETS})
 
 set_property(
     TARGET qt-tests
