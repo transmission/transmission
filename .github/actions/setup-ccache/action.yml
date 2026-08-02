@@ -1,0 +1,63 @@
+name: Setup ccache
+description: >
+  Derive this job's ccache key, export it as CCACHE_KEY for finalize-ccache,
+  and restore the newest matching snapshot without scheduling a post-job save.
+inputs:
+  in-container:
+    description: >
+      Restore with plain actions/cache instead of the ccache action.
+      Container jobs need this: the workflow-level CCACHE_DIR holds the
+      host's workspace path, and ccache comes from the image's package
+      manager rather than a downloaded static build.
+    default: 'false'
+  key-suffix:
+    description: Extra key component for matrix jobs (e.g. the cell's os or arch)
+    default: ''
+  max-size:
+    description: >
+      Local ccache size limit. This is build-time headroom, not the
+      persisted size -- finalize-ccache's trim governs what a snapshot
+      keeps. A limit under the working set makes ccache clean mid-build,
+      and mid-build cleanup cannot tell dead churn from entries the build
+      has not reached yet.
+    default: 1G
+runs:
+  using: composite
+  steps:
+    - name: Derive the cache key
+      shell: bash
+      env:
+        KEY_SUFFIX: ${{ inputs.key-suffix }}
+      run: |
+        if [ -z "$CACHE_SCHEMA" ]; then
+          echo '::error::CACHE_SCHEMA is unset; define it in the workflow env'
+          exit 1
+        fi
+        echo "CCACHE_KEY=${{ github.job }}${KEY_SUFFIX:+-$KEY_SUFFIX}-$CACHE_SCHEMA" >> "$GITHUB_ENV"
+    - name: Point ccache at the container workspace
+      if: ${{ inputs.in-container == 'true' }}
+      shell: bash
+      run: |
+        echo "CCACHE_DIR=$GITHUB_WORKSPACE/.ccache" >> "$GITHUB_ENV"
+        echo "CCACHE_MAXSIZE=${{ inputs.max-size }}" >> "$GITHUB_ENV"
+    - name: Restore ccache
+      if: ${{ inputs.in-container == 'true' }}
+      uses: actions/cache/restore@v5
+      with:
+        path: ${{ env.CCACHE_DIR }}
+        key: ccache-${{ env.CCACHE_KEY }}-
+        restore-keys: |
+          ccache-${{ env.CCACHE_KEY }}-
+    - name: Zero the restored statistics
+      # ccache keeps its counters inside CCACHE_DIR, so a restored snapshot
+      # arrives carrying its whole lineage's totals. The ccache-action
+      # branch below zeroes them itself.
+      if: ${{ inputs.in-container == 'true' }}
+      shell: bash
+      run: ccache --zero-stats
+    - if: ${{ inputs.in-container != 'true' }}
+      uses: hendrikmuhs/ccache-action@v1.2.23
+      with:
+        key: ${{ env.CCACHE_KEY }}
+        max-size: ${{ inputs.max-size }}
+        save: false

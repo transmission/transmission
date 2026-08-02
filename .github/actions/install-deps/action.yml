@@ -6,11 +6,7 @@ inputs:
     required: false
     default: 'clang'
   enable-clang-tidy:
-    description: 'Install clang-tidy-20'
-    required: false
-    default: 'false'
-  enable-debugging:
-    description: 'Install debugging tools (gdb, lldb, valgrind, etc.)'
+    description: 'Install clang-tidy-22'
     required: false
     default: 'false'
   enable-gtk:
@@ -25,6 +21,14 @@ inputs:
     description: 'Use sudo for package installation (false for containers)'
     required: false
     default: 'true'
+  enable-mold:
+    description: 'Install the mold linker (used via -fuse-ld=mold)'
+    required: false
+    default: 'false'
+  enable-ccache:
+    description: 'Install ccache'
+    required: false
+    default: 'false'
 runs:
   using: composite
   steps:
@@ -40,7 +44,6 @@ runs:
         if [[ "$PKG_FAMILY" == "dnf" ]]; then
           # Fedora/DNF-based installation
           dnf install -y \
-            ca-certificates \
             cmake \
             gettext \
             ninja-build \
@@ -51,15 +54,15 @@ runs:
           dnf install -y \
             fast_float-devel \
             fmt-devel \
-            libb64-devel \
+            libarchive-devel \
             libcurl-devel \
-            libdeflate-devel \
             libevent-devel \
             libnatpmp-devel \
             libpsl-devel \
             miniupnpc-devel \
             openssl-devel \
-            utf8cpp-devel
+            simdutf-devel \
+            zlib-devel
 
           # Compiler packages
           if [[ "${{ inputs.compiler }}" == "clang" ]]; then
@@ -68,9 +71,14 @@ runs:
             dnf install -y gcc-c++
           fi
 
-          # Debugging tools
-          if [[ "${{ inputs.enable-debugging }}" == "true" ]]; then
-            dnf install -y gdb valgrind
+          # Faster linker
+          if [[ "${{ inputs.enable-mold }}" == "true" ]]; then
+            dnf install -y mold
+          fi
+
+          # Compiler cache
+          if [[ "${{ inputs.enable-ccache }}" == "true" ]]; then
+            dnf install -y ccache
           fi
 
         elif [[ "$PKG_FAMILY" == "apt" ]]; then
@@ -80,13 +88,15 @@ runs:
             SUDO_CMD="sudo"
           fi
 
-          # Setup LLVM repo if clang-tidy is needed
-          if [[ "${{ inputs.enable-clang-tidy }}" == "true" ]]; then
+          # Setup LLVM repo if clang-tidy is needed.
+          # Ubuntu 26.04 already ships clang-tidy-22 in its own repositories,
+          # so apt.llvm.org is only needed on older releases.
+          if [[ "${{ inputs.enable-clang-tidy }}" == "true" && ! ( "$DISTRO" == "ubuntu" && "$DISTRO_VERSION" == "26.04" ) ]]; then
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | $SUDO_CMD apt-key add -
-            if [[ "$DISTRO" == "ubuntu" && "$DISTRO_VERSION" == "24.04" ]]; then
-              $SUDO_CMD add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main"
-            else
-              $SUDO_CMD add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-20 main"
+            if [[ "$DISTRO_VERSION" == "24.04" ]]; then
+              $SUDO_CMD add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-22 main"
+            elif [[ "$DISTRO_VERSION" == "22.04" ]]; then
+              $SUDO_CMD add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-22 main"
             fi
           fi
 
@@ -95,12 +105,10 @@ runs:
           # Base packages
           BASE_PACKAGES=(
             appstream
-            ca-certificates
             cmake
             gettext
-            libb64-dev
+            libarchive-dev
             libcurl4-openssl-dev
-            libdeflate-dev
             libevent-dev
             libminiupnpc-dev
             libnatpmp-dev
@@ -110,6 +118,7 @@ runs:
             ninja-build
             pkg-config
             xz-utils
+            zlib1g-dev
           )
 
           # Debian wants to build Transmission with system gtest
@@ -122,7 +131,6 @@ runs:
             BASE_PACKAGES+=(
               libfast-float-dev
               libfmt-dev
-              libutfcpp-dev
             )
           fi
 
@@ -135,15 +143,20 @@ runs:
 
           # clang-tidy
           if [[ "${{ inputs.enable-clang-tidy }}" == "true" ]]; then
-            BASE_PACKAGES+=(clang-tidy-20)
+            BASE_PACKAGES+=(clang-tidy-22)
           fi
 
-          # Debugging tools
-          if [[ "${{ inputs.enable-debugging }}" == "true" ]]; then
-            BASE_PACKAGES+=(gdb libc6-dbg valgrind)
+          # Faster linker
+          if [[ "${{ inputs.enable-mold }}" == "true" ]]; then
+            BASE_PACKAGES+=(mold)
           fi
 
-          $SUDO_CMD apt-get install -y --no-install-recommends "${BASE_PACKAGES[@]}"
+          # Compiler cache
+          if [[ "${{ inputs.enable-ccache }}" == "true" ]]; then
+            BASE_PACKAGES+=(ccache)
+          fi
+
+          SUDO_CMD="$SUDO_CMD" bash "$GITHUB_ACTION_PATH/apt-install.sh" "${BASE_PACKAGES[@]}"
 
           # Setup UTF-8 locale for Qt builds
           if [[ "${{ inputs.enable-qt }}" != "false" ]]; then
@@ -178,9 +191,9 @@ runs:
             SUDO_CMD="sudo"
           fi
           if [ '${{ inputs.enable-gtk }}' = 'gtk3' ]; then
-            $SUDO_CMD apt-get install -y --no-install-recommends libgtkmm-3.0-dev
+            SUDO_CMD="$SUDO_CMD" bash "$GITHUB_ACTION_PATH/apt-install.sh" libgtkmm-3.0-dev
           elif [ '${{ inputs.enable-gtk }}' = 'gtk4' ]; then
-            $SUDO_CMD apt-get install -y --no-install-recommends libgtkmm-4.0-dev
+            SUDO_CMD="$SUDO_CMD" bash "$GITHUB_ACTION_PATH/apt-install.sh" libgtkmm-4.0-dev
           fi
         else
           echo "Unsupported package family: $PKG_FAMILY"
@@ -203,33 +216,37 @@ runs:
             SUDO_CMD="sudo"
           fi
           if [[ "${{ inputs.enable-qt }}" == "qt5" ]]; then
-            $SUDO_CMD apt-get install -y --no-install-recommends libxcb-cursor0 qtbase5-dev libqt5svg5-dev qttools5-dev
+            SUDO_CMD="$SUDO_CMD" bash "$GITHUB_ACTION_PATH/apt-install.sh" libxcb-cursor0 qtbase5-dev libqt5svg5-dev qttools5-dev
           elif [[ "${{ inputs.enable-qt }}" == "qt6" ]]; then
-            $SUDO_CMD apt-get install -y --no-install-recommends qt6-base-dev qt6-tools-dev qt6-l10n-tools qt6-svg-dev
+            SUDO_CMD="$SUDO_CMD" bash "$GITHUB_ACTION_PATH/apt-install.sh" qt6-base-dev qt6-tools-dev qt6-l10n-tools qt6-svg-dev
           fi
         else
           echo "Unsupported package family: $PKG_FAMILY"
           exit 1
         fi
 
+    - name: Remove untrusted pre-tapped Homebrew taps
+      if: env.OS_FAMILY == 'macos'
+      shell: bash
+      run: brew tap | grep -qx 'aws/tap' && brew untap aws/tap || true
+
     - name: Install macOS dependencies
       if: env.OS_FAMILY == 'macos'
       shell: bash
       run: |
         # Base packages for macOS
-        BASE_PACKAGES=(cmake gettext ninja node pkgconf)
+        BASE_PACKAGES=(cmake gettext ninja pkgconf)
 
         # Transmission-specific libraries
         BASE_PACKAGES+=(
           fast_float
           fmt
-          libb64
-          libdeflate
+          libarchive
           libevent
           libnatpmp
           libpsl
           miniupnpc
-          utf8cpp
+          simdutf
         )
 
         brew install --formulae "${BASE_PACKAGES[@]}"
@@ -315,17 +332,6 @@ runs:
         # Development tools (if enabled)
         if [[ "${{ inputs.enable-clang-tidy }}" == "true" ]]; then
           echo "Static Analysis:"
-          clang-tidy-20 --version 2>/dev/null | head -1 || clang-tidy --version 2>/dev/null | head -1 || echo "clang-tidy: not found"
-          echo ""
-        fi
-
-        if [[ "${{ inputs.enable-debugging }}" == "true" ]]; then
-          echo "Debugging Tools:"
-          gdb --version 2>/dev/null | head -1 || echo "gdb: not found"
-          if [[ "$OS_FAMILY" == "macos" ]]; then
-            lldb --version 2>/dev/null | head -1 || echo "lldb: not found"
-          else
-            valgrind --version 2>/dev/null || echo "valgrind: not found"
-          fi
+          clang-tidy-22 --version 2>/dev/null | head -1 || clang-tidy --version 2>/dev/null | head -1 || echo "clang-tidy: not found"
           echo ""
         fi

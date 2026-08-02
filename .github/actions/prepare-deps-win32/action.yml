@@ -1,4 +1,5 @@
 name: Prepare Win32 build dependencies
+description: Restore or build the cached Windows dependency prefix
 inputs:
   arch:
     description: Architecture (x86, x64)
@@ -12,25 +13,27 @@ runs:
     - name: Get Build Tools
       shell: pwsh
       run: |
+        $RepoRoot = if (Test-Path (Join-Path . 'src/release/windows/main.ps1')) { Join-Path . 'src' } else { (Get-Item .).FullName }
         $DepsPrefix = (Join-Path (Get-Item .).Root.Name "${{ inputs.arch }}-prefix")
+        "REPO_ROOT=${RepoRoot}" | Out-File $Env:GITHUB_ENV -Append
         "DEPS_PREFIX=${DepsPrefix}" | Out-File $Env:GITHUB_ENV -Append
         (Join-Path $DepsPrefix bin) | Out-File $Env:GITHUB_PATH -Append
 
-        choco install `
-          jom `
-          nasm `
-          wixtoolset
+        # the preinstalled OpenSSL would shadow the built one at configure time
         & "C:\Program Files\OpenSSL\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- | Out-Host
-        (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
-        (Join-Path (Get-Item -Path "${Env:ProgramFiles(x86)}\WiX Toolset v3.*")[0].FullName bin) | Out-File $Env:GITHUB_PATH -Append
     - name: Get Cache Key
       id: cache-key
       shell: pwsh
       run: |
-        $RepoRoot = if (Test-Path (Join-Path . 'src/release/windows/main.ps1')) { Join-Path . 'src' } else { (Get-Item .).FullName }
+        if (-not $Env:CACHE_SCHEMA) {
+            Write-Output '::error::CACHE_SCHEMA is unset; define it in the workflow env'
+            exit 1
+        }
         try {
-            $DepsHash = & (Join-Path $RepoRoot release windows main.ps1) -Mode DepsHash -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
-            "hash=${DepsHash}" | Out-File $Env:GITHUB_OUTPUT -Append
+            $DepsHash = & (Join-Path $Env:REPO_ROOT release windows main.ps1) -Mode DepsHash -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
+            # The janitor retires old generations by matching "-$CACHE_SCHEMA-",
+            # so the schema needs a dash on either side of it.
+            "key=win-deps-${{ inputs.arch }}-${{ inputs.type }}-${Env:CACHE_SCHEMA}-${DepsHash}" | Out-File $Env:GITHUB_OUTPUT -Append
         } catch {
             Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
             exit 1
@@ -40,14 +43,17 @@ runs:
       id: restore-cache
       with:
         path: ${{ env.DEPS_PREFIX }}
-        key: ${{ github.job }}-${{ inputs.arch }}-${{ steps.cache-key.outputs.hash }}
+        key: ${{ steps.cache-key.outputs.key }}
     - name: Build Dependencies
       if: steps.restore-cache.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
-        $RepoRoot = if (Test-Path (Join-Path . 'src/release/windows/main.ps1')) { Join-Path . 'src' } else { (Get-Item .).FullName }
+        choco install `
+          jom `
+          nasm
+        $Env:PATH = "$(Join-Path $Env:ProgramFiles NASM);$Env:PATH"
         try {
-            & (Join-Path $RepoRoot release windows main.ps1) -Mode Build -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
+            & (Join-Path $Env:REPO_ROOT release windows main.ps1) -Mode Build -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
         } catch {
             Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
             exit 1
@@ -58,4 +64,4 @@ runs:
       id: cache
       with:
         path: ${{ env.DEPS_PREFIX }}
-        key: ${{ github.job }}-${{ inputs.arch }}-${{ steps.cache-key.outputs.hash }}
+        key: ${{ steps.cache-key.outputs.key }}

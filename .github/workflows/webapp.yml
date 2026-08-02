@@ -14,9 +14,10 @@ on:
       - '.github/**'
 jobs:
   decide-what-jobs-to-run:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       test-style: ${{ steps.check-diffs.outputs.web-changed == '1' }}
+      test-cmake-build: ${{ steps.check-diffs.outputs.web-changed == '1' }}
       test-generated-files: ${{ steps.check-diffs.outputs.web-changed == '1' && steps.check-main-push.outputs.is-main-push == '0'}}
       update-generated-files: ${{ steps.check-diffs.outputs.web-changed == '1' && steps.check-main-push.outputs.is-main-push == '1'}}
     steps:
@@ -52,17 +53,39 @@ jobs:
           }
           get_changes web CMakeLists.txt web
 
+  # the platform build jobs in actions.yml all use the prebuilt bundle
+  # (REBUILD_WEB=OFF); this is the one job that checks the bundle can be
+  # rebuilt from source with nothing but cmake and a standalone esbuild
+  # binary -- no node or npm -- which is how distro packagers build it
+  cmake-build:
+    # 26.04 rather than ubuntu-latest: its packaged esbuild (0.27.2) meets
+    # the ESBUILD_MINIMUM in CMakeLists.txt; 24.04's (0.20.1) does not
+    runs-on: ubuntu-26.04
+    needs: [ decide-what-jobs-to-run ]
+    if: ${{ needs.decide-what-jobs-to-run.outputs.test-cmake-build == 'true' }}
+    steps:
+      - name: Get source
+        uses: actions/checkout@v6
+      - name: Get esbuild
+        run: |
+          set -ex # abort if any command fails; echo commands
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends esbuild
+          esbuild --version
+      - name: Build the webapp with CMake and esbuild
+        run: |
+          set -ex # abort if any command fails; echo commands
+          cmake -S web -B obj
+          cmake --build obj
+          ls -l obj/public_html
+
   code-style:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: [ decide-what-jobs-to-run ]
     if: ${{ needs.decide-what-jobs-to-run.outputs.test-style == 'true' }}
     steps:
       - name: Get source
         uses: actions/checkout@v6
-      - name: Get NPM
-        uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
       - name: Check for style diffs
         id: check-for-diffs
         run: |
@@ -92,7 +115,7 @@ jobs:
           exit 1
 
   test-generated-files:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: [ decide-what-jobs-to-run ]
     if: ${{ needs.decide-what-jobs-to-run.outputs.test-generated-files == 'true' }}
     steps:
@@ -110,7 +133,6 @@ jobs:
           echo
           echo Please undo your changes to these files:
           git diff --exit-code --name-only --merge-base "origin/$GITHUB_BASE_REF" -- \
-              web/package.json.buildonly \
               web/public_html/transmission-app.css \
               web/public_html/transmission-app.css.LEGAL.txt \
               web/public_html/transmission-app.css.map \
@@ -119,28 +141,21 @@ jobs:
               web/public_html/transmission-app.js.map
 
   update-generated-files:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: [ decide-what-jobs-to-run ]
     if: ${{ needs.decide-what-jobs-to-run.outputs.update-generated-files == 'true' }}
     steps:
       - name: Show env
         run: |
           env | sort
-      - name: Get NPM
-        uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
       - name: Get source
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 2 # >1 needed for merge base
       - name: Generate webapp files
         run: |
           set -x # echo all executed commands to the terminal
           set -e # abort if any command fails
           npm --prefix web ci
           npm --prefix web run build
-          npm --prefix web run generate-buildonly
           git diff --name-only
           git add --update web
       - name: Create pull request
@@ -151,4 +166,8 @@ jobs:
           delete-branch: true
           title: 'chore: update generated transmission-web files'
           body: Generated from https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          labels: |
+            notes:none
+            scope:web
+            type:chore
 

@@ -39,12 +39,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends \
-            ca-certificates \
             cmake \
             g++ \
             gettext \
             libcurl4-openssl-dev \
-            libdeflate-dev \
             libevent-dev \
             libfmt-dev \
             libglibmm-2.4-dev \
@@ -56,7 +54,8 @@ jobs:
             ninja-build \
             pkg-config \
             qt6-svg-dev \
-            qt6-tools-dev
+            qt6-tools-dev \
+            zlib1g-dev
 
     - name: Configure Project
       if: ${{ matrix.language == 'cpp' }}
@@ -87,6 +86,7 @@ jobs:
       uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
+        trap-caching: false
 
     - name: Build Project
       if: ${{ matrix.language == 'cpp' }}

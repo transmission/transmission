@@ -32,6 +32,10 @@ elif [[ -f /etc/os-release ]]; then
       echo "Warning: Unsupported Linux distribution: $ID"
       ;;
   esac
+elif [[ "$(uname -s)" == MINGW* || "$(uname -s)" == MSYS* || "$(uname -s)" == CYGWIN* || "${OS:-}" == "Windows_NT" ]]; then
+  OS_FAMILY="windows"
+  PKG_FAMILY="choco"
+  echo "Detected Windows"
 else
   echo "Error: Unable to detect platform"
 fi
@@ -42,8 +46,5 @@ echo "DISTRO_VERSION=$DISTRO_VERSION" >> "$GITHUB_ENV"
 echo "PKG_FAMILY=$PKG_FAMILY" >> "$GITHUB_ENV"
 
 echo "os-family=$OS_FAMILY" >> "$GITHUB_OUTPUT"
-echo "distro=$DISTRO" >> "$GITHUB_OUTPUT"
-echo "distro-version=$DISTRO_VERSION" >> "$GITHUB_OUTPUT"
-echo "pkg-family=$PKG_FAMILY" >> "$GITHUB_OUTPUT"
 
 echo "Final detected platform: OS_FAMILY=$OS_FAMILY DISTRO=$DISTRO DISTRO_VERSION=$DISTRO_VERSION PKG_FAMILY=$PKG_FAMILY"

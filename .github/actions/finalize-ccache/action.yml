@@ -1,0 +1,67 @@
+name: Finalize ccache
+description: >
+  Trim ccache, save a successful main-branch snapshot, verify it is visible,
+  then delete older snapshots from the same cache family.
+inputs:
+  trim-age:
+    description: Age passed to ccache --evict-older-than
+    default: 7d
+  ignore-trim-errors:
+    description: Continue saving when the installed ccache cannot trim by age
+    default: 'false'
+runs:
+  using: composite
+  steps:
+    - name: Validate ccache environment
+      if: ${{ github.ref == 'refs/heads/main' }}
+      shell: bash
+      run: |
+        : "${CCACHE_KEY:?setup-ccache did not set CCACHE_KEY}"
+        : "${CCACHE_DIR:?CCACHE_DIR is unset; workflow env or setup-ccache container mode must set it}"
+    - name: Trim ccache
+      if: ${{ github.ref == 'refs/heads/main' }}
+      shell: bash
+      env:
+        IGNORE_TRIM_ERRORS: ${{ inputs.ignore-trim-errors }}
+        TRIM_AGE: ${{ inputs.trim-age }}
+      run: ccache --evict-older-than "$TRIM_AGE" || [ "$IGNORE_TRIM_ERRORS" = 'true' ]
+    - name: Save replacement snapshot
+      if: ${{ github.ref == 'refs/heads/main' }}
+      uses: actions/cache/save@v5
+      with:
+        path: ${{ env.CCACHE_DIR }}
+        key: ccache-${{ env.CCACHE_KEY }}-${{ github.run_id }}
+    - name: Delete superseded snapshots
+      # github-script rather than gh: this step also runs inside the debian
+      # and fedora containers, which mount node for JS actions but carry no
+      # GitHub CLI.
+      if: ${{ github.ref == 'refs/heads/main' }}
+      uses: actions/github-script@v8
+      env:
+        KEEP: ccache-${{ env.CCACHE_KEY }}-${{ github.run_id }}
+        PREFIX: ccache-${{ env.CCACHE_KEY }}-
+      with:
+        script: |
+          const caches = await github.paginate(github.rest.actions.getActionsCacheList, {
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            key: process.env.PREFIX,
+            ref: 'refs/heads/main',
+            per_page: 100,
+          });
+          if (!caches.some(cache => cache.key === process.env.KEEP)) {
+            core.warning(`replacement ${process.env.KEEP} is not visible; keeping superseded snapshots`);
+            return;
+          }
+          for (const cache of caches) {
+            if (cache.key === process.env.KEEP) {
+              continue;
+            }
+            core.info(`deleting ${cache.key} (${(cache.size_in_bytes / 1048576).toFixed(1)} MB)`);
+            // the entry can vanish between the listing and the delete
+            await github.rest.actions.deleteActionsCacheById({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              cache_id: cache.id,
+            }).catch(() => {});
+          }

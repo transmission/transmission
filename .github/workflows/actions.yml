@@ -11,11 +11,28 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  # ccache jobs and the cache janitor delete superseded cache entries
+  actions: write
+
 env:
+  # See .github/CACHE_POLICY.md for cache classes, lifecycle, and budget.
+  CACHE_LIMIT_GIB: '10'
+  CACHE_WARNING_GIB: '9'
+  # Bumping CACHE_SCHEMA re-keys every ccache and win-deps family; the
+  # janitor deletes keys that do not carry the current value.
+  CACHE_SCHEMA: cache-v2
+  # Identify the compiler by its contents. Runner images are respun more
+  # often than the compilers they ship, and the mtime default counts a
+  # reinstalled but unchanged compiler as a different one.
+  CCACHE_COMPILERCHECK: content
+  CCACHE_COMPRESSLEVEL: '5'
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
   GTEST_OUTPUT: xml:./
 jobs:
   what-to-make:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       make-core: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.core-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-android: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.android-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
@@ -29,8 +46,10 @@ jobs:
       make-source-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-web: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.web-changed == '1' }}
       test-style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      tidy-core: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tidy-core-src-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' || steps.check-diffs.outputs.tidy-config-changed == '1' }}
+      tidy-gtk: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tidy-gtk-src-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' || steps.check-diffs.outputs.tidy-config-changed == '1' }}
+      tidy-qt: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tidy-qt-src-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' || steps.check-diffs.outputs.tidy-config-changed == '1' }}
     steps:
       - name: Check Push to Main Branch
         id: check-main-push
@@ -47,7 +66,6 @@ jobs:
         with:
           fetch-depth: 0
           path: src
-          submodules: recursive
       - name: Check for diffs
         id: check-diffs
         run: |
@@ -60,25 +78,31 @@ jobs:
             git diff --exit-code "$MERGE_BASE" -- "$@"
             echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
           }
-          get_changes core       CMakeLists.txt cmake third-party libtransmission
+          get_changes core       CMakeLists.txt cmake third-party libtransmission libtransmission-app
           get_changes android    CMakeLists.txt cmake third-party libtransmission android
           get_changes cli        CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission cli
-          get_changes any-code   CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
-          get_changes our-code   CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
+          get_changes any-code   CMakeLists.txt cmake Transmission.xcodeproj libtransmission libtransmission-app cli daemon gtk macosx qt utils tests web third-party
+          get_changes our-code   CMakeLists.txt cmake Transmission.xcodeproj libtransmission libtransmission-app cli daemon gtk macosx qt utils tests web
+          get_changes tidy-config libtransmission/.clang-tidy libtransmission-app/.clang-tidy gtk/.clang-tidy qt/.clang-tidy tests/libtransmission/.clang-tidy tests/qt/.clang-tidy
+          # Each tidy cell only checks the directories its regex covers, so it
+          # keys off just those sources -- not the wider build deps (a
+          # libtransmission-only change has no gtk/qt files to re-check).
+          get_changes tidy-core-src libtransmission libtransmission-app tests/libtransmission
+          get_changes tidy-gtk-src  gtk
+          get_changes tidy-qt-src   qt tests/qt
           get_changes daemon     CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission daemon
           get_changes dist       dist release
           get_changes docs       docs
-          get_changes gtk        CMakeLists.txt cmake third-party libtransmission gtk
+          get_changes gtk        CMakeLists.txt cmake third-party libtransmission libtransmission-app gtk
           get_changes mac        CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission macosx
-          get_changes qt         CMakeLists.txt cmake third-party libtransmission qt
-          get_changes tests      CMakeLists.txt cmake third-party libtransmission utils tests
+          get_changes qt         CMakeLists.txt cmake third-party libtransmission libtransmission-app qt
+          get_changes tests      CMakeLists.txt cmake third-party libtransmission libtransmission-app utils tests
           get_changes utils      CMakeLists.txt cmake third-party libtransmission utils
-          get_changes web        CMakeLists.txt cmake web
           get_changes ci-actions .github/workflows/actions.yml .github/actions release
           cat "$GITHUB_OUTPUT"
 
   code-style:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
     steps:
@@ -89,25 +113,11 @@ jobs:
           cat /etc/os-release
       - name: Get Source
         uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Get Dependencies
-        run: |
-          set -ex
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main"
-          sudo apt update
-          sudo apt install -y clang-format-20
-      - name: Get NPM
-        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .
         run: |
-          ./code_style.sh
+          ./code_style.sh --force
           set +e
           git diff --exit-code > style.diff
           echo "differs=$?" >> $GITHUB_OUTPUT
@@ -127,8 +137,8 @@ jobs:
           echo "When CI is done, the above patch will be uploaded as 'code-style.diff' to https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
           exit 1
 
-  sanitizer-tests-ubuntu:
-    runs-on: ubuntu-24.04
+  sanitizer-tests-linux:
+    runs-on: ubuntu-latest
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
@@ -145,14 +155,18 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: clang
-          enable-debugging: true
+          enable-qt: qt6
           use-sudo: true
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
       - name: Configure
         run: |
           cmake \
             -S . \
             -B obj \
             -G Ninja \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
@@ -162,15 +176,18 @@ jobs:
             -DENABLE_CLI=OFF \
             -DENABLE_DAEMON=OFF \
             -DENABLE_GTK=OFF \
+            -DENABLE_IPO=OFF \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=OFF \
+            -DENABLE_QT=ON \
             -DENABLE_TESTS=ON \
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_ARCHIVE=OFF `# Build vendored libarchive here to exercise its ExternalProject scripts on Linux` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -182,8 +199,13 @@ jobs:
           build-dir: obj
           build-config: Debug
           enable-sanitizers: true
+          # disable container-overflow reports to avoid false errors
+          # that are caused by Qt libraries not being asan instrumented
+          extra-asan-options: detect_container_overflow=0
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
 
-  sanitizer-tests-macos:
+  sanitizer-tests-macos-26:
     runs-on: macos-26
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
@@ -201,12 +223,16 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: clang
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
       - name: Configure
         run: |
           cmake \
             -S . \
             -B obj \
             -G Ninja \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,undefined' \
             -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,undefined' \
@@ -214,6 +240,7 @@ jobs:
             -DENABLE_CLI=OFF \
             -DENABLE_DAEMON=OFF \
             -DENABLE_GTK=OFF \
+            -DENABLE_IPO=OFF \
             -DENABLE_MAC=OFF \
             -DENABLE_QT=OFF \
             -DENABLE_TESTS=ON \
@@ -234,141 +261,177 @@ jobs:
           build-dir: obj
           build-config: Debug
           enable-sanitizers: true
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
 
-  clang-tidy-libtransmission:
-    runs-on: ubuntu-24.04
-    needs: what-to-make
-    if: |
-      needs.what-to-make.outputs.make-core == 'true' ||
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-qt == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true'
+  sanitizer-tests-windows:
+    runs-on: windows-2022
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
       - name: Show Configuration
         run: |
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
-          cat /etc/os-release
-      - name: Cache project files
-        id: cache-project-files
-        uses: actions/cache@v5
-        with:
-          key: clang-tidy-${{ github.sha }}
-          path: .
       - name: Get Source
-        if: steps.cache-project-files.outputs.cache-hit != 'true'
         uses: actions/checkout@v6
         with:
           submodules: recursive
-      - name: Get Dependencies
-        uses: ./.github/actions/install-deps
+      - name: Prepare Build Deps
+        uses: ./.github/actions/prepare-deps-win32
         with:
-          compiler: clang
-          enable-clang-tidy: true
-          use-sudo: true
+          arch: x64
+          type: Deps
+      - name: Setup Visual Studio Environment
+        uses: ./.github/actions/setup-vs-env-win32
+        with:
+          arch: x64
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
       - name: Configure
+        env:
+          # MSVC AddressSanitizer is address-only (no leak/undefined sanitizers).
+          # Disable STL container annotations: the prebuilt Qt libraries are not
+          # ASan-instrumented, so annotated std::string/std::vector trip LNK2038
+          # 'annotate_string'/'annotate_vector' mismatches at link time.
+          # Set via CFLAGS/CXXFLAGS to seed CMAKE_*_FLAGS without escaping spaces
+          # through the PowerShell -> cmd -> cmake invocation below.
+          CFLAGS: /fsanitize=address /D_DISABLE_STRING_ANNOTATION /D_DISABLE_VECTOR_ANNOTATION
+          CXXFLAGS: /fsanitize=address /D_DISABLE_STRING_ANNOTATION /D_DISABLE_VECTOR_ANNOTATION
         run: |
-          cmake \
-            -S . \
-            -B obj \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_COMPILER='clang++' \
-            -DCMAKE_C_COMPILER='clang' \
-            -DCMAKE_INSTALL_PREFIX=pfx \
-            -DRUN_CLANG_TIDY=ON \
-            -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
-      - name: Make (Core)
+          $CmakeArgs = @(
+            '-S .'
+            '-B obj'
+            '-G Ninja'
+            '-DCMAKE_C_COMPILER_LAUNCHER=ccache'
+            '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+            # ccache cannot cache /Zi; store debug info in the objects (/Z7) instead
+            '-DCMAKE_POLICY_DEFAULT_CMP0141=NEW'
+            '-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded'
+            # RelWithDebInfo avoids Debug's /RTC1, which is incompatible with ASan.
+            '-DCMAKE_BUILD_TYPE=RelWithDebInfo'
+            "-DCMAKE_PREFIX_PATH=`"$Env:DEPS_PREFIX`""
+            '-DENABLE_CLI=OFF'
+            '-DENABLE_DAEMON=OFF'
+            '-DENABLE_GTK=OFF'
+            '-DENABLE_IPO=OFF'
+            '-DENABLE_MAC=OFF'
+            # Qt must be ON so the Qt unit tests are built and exercised under ASan.
+            '-DENABLE_QT=ON'
+            '-DENABLE_TESTS=ON'
+            '-DENABLE_UTILS=ON'
+            '-DREBUILD_WEB=OFF'
+            '-DRUN_CLANG_TIDY=OFF'
+            '-DUSE_SYSTEM_DEFAULT=OFF'
+          )
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake $($CmakeArgs -join ' ')"
+      - name: Make
         run: |
-          set -euo pipefail
-          cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
-      - name: Make (App)
+          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config RelWithDebInfo --target all-tests"
+      - name: Configure AddressSanitizer runtime
         run: |
-          set -euo pipefail
-          cmake --build obj --config Debug --target transmission-app 2>&1 | tee -a makelog
-      - name: Test for warnings
-        run: |
-          if grep 'warning:' makelog; then exit 1; fi
+          # The ASan runtime DLL ships with the MSVC toolchain; ctest runs outside
+          # the vcvarsall environment, so expose its directory to later steps.
+          $AsanDll = cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && where clang_rt.asan_dynamic-x86_64.dll" | Select-Object -First 1
+          if (-not $AsanDll) { throw 'Could not locate the AddressSanitizer runtime DLL' }
+          $AsanDir = Split-Path $AsanDll
+          Write-Host "AddressSanitizer runtime: $AsanDir"
+          $AsanDir | Out-File $Env:GITHUB_PATH -Append
 
-  what-to-clang-tidy:
-    runs-on: ubuntu-latest
-    needs: [ what-to-make, clang-tidy-libtransmission ]
+          # Point ASan at a native-path llvm-symbolizer so stacks are fully
+          # symbolized (otherwise the runtime logs 'Failed to use and restart
+          # external symbolizer!'). set-test-env honors this pre-set path.
+          $found = cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && where llvm-symbolizer.exe 2>nul" | Select-Object -First 1
+          $Symbolizer = @($found, 'C:\Program Files\LLVM\bin\llvm-symbolizer.exe') |
+            Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
+          if ($Symbolizer) {
+            Write-Host "ASan symbolizer: $Symbolizer"
+            "ASAN_SYMBOLIZER_PATH=$Symbolizer" | Out-File $Env:GITHUB_ENV -Append
+            "LLVM_SYMBOLIZER_PATH=$Symbolizer" | Out-File $Env:GITHUB_ENV -Append
+          } else {
+            Write-Host '::warning::llvm-symbolizer.exe not found; ASan stacks may be partially symbolized.'
+          }
+      - name: Test with AddressSanitizer
+        uses: ./.github/actions/run-tests
+        with:
+          build-config: RelWithDebInfo
+          build-dir: obj
+          enable-asan: true
+          extra-asan-options: allocator_may_return_null=0
+          timeout: 600
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
+        with:
+          trim-age: 3d
+
+  clang-tidy-linux:
+    runs-on: ${{ matrix.runner }}
+    needs: what-to-make
     if: |
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-qt == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true'
-    outputs:
-      matrix: ${{ steps.generate-matrix.outputs.matrix }}
-    steps:
-      - name: Generate clang-tidy matrix
-        id: generate-matrix
-        run: |
-          set -exuo pipefail
-
-          # Generate elements in the include array
-          jobs=()
-          if [ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ]; then
-            jobs+=("$(
-              jq -nc '$ARGS.named' \
-                --arg target transmission-gtk \
-                --arg enable-gtk gtk3 \
-                --argjson enable-qt false \
-                --argjson enable-tests false
-            )")
-          fi
-          if [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
-            jobs+=("$(
-              jq -nc '$ARGS.named' \
-                --arg target transmission-qt \
-                --argjson enable-gtk false \
-                --arg enable-qt qt6 \
-                --argjson enable-tests false
-            )"
-            "$(
-              jq -nc '$ARGS.named' \
-                --arg target transmission-qt \
-                --argjson enable-gtk false \
-                --arg enable-qt qt5 \
-                --argjson enable-tests false
-            )")
-          fi
-          if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
-            jobs+=("$(
-              jq -nc '$ARGS.named' \
-                --arg target libtransmission-test \
-                --argjson enable-gtk false \
-                --argjson enable-qt '${{ needs.what-to-make.outputs.make-qt == 'true' && '"qt6"' || 'false' }}' \
-                --argjson enable-tests true
-            )")
-          fi
-
-          # Combine the include array elements into a JSON string and output
-          echo "matrix=$(printf "%s\n" "${jobs[@]}" | jq -sc '{include: .}')" >> "$GITHUB_OUTPUT"
-
-  clang-tidy:
-    runs-on: ubuntu-24.04
-    needs: what-to-clang-tidy
+      needs.what-to-make.outputs.tidy-core == 'true' ||
+      needs.what-to-make.outputs.tidy-gtk == 'true' ||
+      needs.what-to-make.outputs.tidy-qt == 'true'
+    # One cell per toolkit version. Each cell generates code (Qt moc/uic) so
+    # clang-tidy can parse every TU, but never compiles the whole target;
+    # ctcache caches per-TU results across runs. The matrix.enabled flag (wired
+    # to the what-to-make tidy-* outputs) skips cells whose area did not change.
+    # TODO: try removing '-DFMT_USE_CONSTEVAL=0' either when upgrading clang or fmt
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.what-to-clang-tidy.outputs.matrix) }}
+      matrix:
+        toolkit: [core, gtk3, gtk4, qt5, qt6]
+        include:
+          - toolkit: core
+            enable-gtk: false
+            enable-qt: false
+            enable-tests: true
+            enabled: ${{ needs.what-to-make.outputs.tidy-core }}
+            regex: '(libtransmission|libtransmission-app|tests/libtransmission)/.*'
+            runner: ubuntu-latest
+          - toolkit: gtk3
+            enable-gtk: gtk3
+            enable-qt: false
+            enable-tests: false
+            enabled: ${{ needs.what-to-make.outputs.tidy-gtk }}
+            regex: 'gtk/.*'
+            runner: ubuntu-latest
+          - toolkit: gtk4
+            enable-gtk: gtk4
+            enable-qt: false
+            enable-tests: false
+            enabled: ${{ needs.what-to-make.outputs.tidy-gtk }}
+            regex: 'gtk/.*'
+            runner: ubuntu-26.04 # 24.04 doesn't have GTKMM4_MINIMUM
+          - toolkit: qt5
+            enable-gtk: false
+            enable-qt: qt5
+            enable-tests: true
+            enabled: ${{ needs.what-to-make.outputs.tidy-qt }}
+            regex: '(qt|tests/qt)/.*'
+            runner: ubuntu-latest
+          - toolkit: qt6
+            enable-gtk: false
+            enable-qt: qt6
+            enable-tests: true
+            enabled: ${{ needs.what-to-make.outputs.tidy-qt }}
+            regex: '(qt|tests/qt)/.*'
+            runner: ubuntu-latest
     steps:
       - name: Show Configuration
         run: |
-          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(matrix) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
-      - name: Get cached project files
-        uses: actions/cache/restore@v5
+      - name: Get Source
+        if: matrix.enabled == 'true'
+        uses: actions/checkout@v6
         with:
-          key: clang-tidy-${{ github.sha }}
-          path: .
-          fail-on-cache-miss: true
+          submodules: false
+      - name: Check out submodules (shallow)
+        if: matrix.enabled == 'true'
+        run: git submodule update --init --recursive --depth 1
       - name: Get Dependencies
+        if: matrix.enabled == 'true'
         uses: ./.github/actions/install-deps
         with:
           compiler: clang
@@ -377,6 +440,7 @@ jobs:
           enable-gtk: ${{ matrix.enable-gtk }}
           enable-qt: ${{ matrix.enable-qt }}
       - name: Configure
+        if: matrix.enabled == 'true'
         run: |
           cmake \
             -S . \
@@ -385,77 +449,138 @@ jobs:
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_GTK=${{ matrix.enable-gtk && 'ON' || 'OFF' }} \
             -DENABLE_QT=${{ matrix.enable-qt && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ matrix.enable-tests && 'ON' || 'OFF' }} \
-            -DRUN_CLANG_TIDY=ON \
+            -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_FMT=${{ matrix.toolkit == 'gtk4' && 'OFF' || 'ON' }} `# TODO: remove this line when fmt>10 or clang>20` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
-      - name: Make
+      - name: Generate sources
+        if: matrix.enabled == 'true'
         run: |
-          set -euo pipefail
-          cmake --build obj --config Debug --target ${{ matrix.target }} 2>&1 | tee makelog
-      - name: Test for warnings
-        run: |
-          if grep 'warning:' makelog; then exit 1; fi
+          # clang-tidy parses each changed TU fully, so its headers must exist
+          # even though we never build the main targets. Build the Qt *_autogen
+          # headers and the bundled ExternalProject libs whose installed headers
+          # (e.g. dht/dht.h) only appear once their `_<lib>` target is built.
+          mapfile -t targets < <(
+            ninja -C obj -t targets all 2>/dev/null \
+              | sed -n -e 's/^\([^:]*_autogen\):.*/\1/p' -e 's/^\(_[A-Za-z0-9_]*\): phony$/\1/p' \
+              | sort -u)
+          if [ "${#targets[@]}" -gt 0 ]; then
+            cmake --build obj --target "${targets[@]}"
+          fi
+      - name: Run clang-tidy
+        if: matrix.enabled == 'true'
+        uses: ./.github/actions/clang-tidy-cached
+        with:
+          regex: ${{ matrix.regex }}
+          cache-key: ${{ github.job }}-${{ matrix.toolkit }}
+          clang-tidy-binary: clang-tidy-22
+          extra-arg: '-DFMT_USE_CONSTEVAL=0'
 
-  clang-tidy-libtransmission-win32:
+  clang-tidy-windows:
     runs-on: windows-2025
     needs: what-to-make
     if: |
-      needs.what-to-make.outputs.make-core == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true'
+      needs.what-to-make.outputs.tidy-core == 'true' ||
+      needs.what-to-make.outputs.tidy-qt == 'true'
+    # MSVC + Qt6 coverage. qt5 on Windows is intentionally omitted for now: it
+    # would require building Qt5 from source on the runners (see
+    # prepare-deps-win32 / release/windows). Linux covers qt5.
+    strategy:
+      fail-fast: false
+      matrix:
+        toolkit: [core, qt6]
+        include:
+          - toolkit: core
+            deps: CoreDeps
+            enable-qt: 'OFF'
+            enabled: ${{ needs.what-to-make.outputs.tidy-core }}
+            regex: '(libtransmission|libtransmission-app|tests/libtransmission)/.*'
+          - toolkit: qt6
+            deps: Deps
+            enable-qt: 'ON'
+            enabled: ${{ needs.what-to-make.outputs.tidy-qt }}
+            regex: '(qt|tests/qt)/.*'
     steps:
       - name: Show Configuration
         run: |
-          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(matrix) }}'
           echo '${{ toJSON(runner) }}'
       - name: Get Source
+        if: matrix.enabled == 'true'
         uses: actions/checkout@v6
         with:
-          submodules: recursive
-          path: src
+          submodules: false
+      - name: Check out submodules (shallow)
+        if: matrix.enabled == 'true'
+        shell: bash
+        run: git submodule update --init --recursive --depth 1
       - name: Prepare Build Deps
-        uses: ./src/.github/actions/prepare-deps-win32
+        if: matrix.enabled == 'true'
+        uses: ./.github/actions/prepare-deps-win32
         with:
           arch: x64
-          type: CoreDeps
+          type: ${{ matrix.deps }}
       - name: Setup Visual Studio Environment
-        uses: ./src/.github/actions/setup-vs-env-win32
+        if: matrix.enabled == 'true'
+        uses: ./.github/actions/setup-vs-env-win32
         with:
           arch: x64
       - name: Configure
+        if: matrix.enabled == 'true'
         run: |
           $CmakeArgs = @(
-            '-S src'
+            '-S .'
             '-B obj'
             '-G Ninja'
             '-DCMAKE_BUILD_TYPE=Debug'
+            '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
             "-DCMAKE_PREFIX_PATH=`"$Env:DEPS_PREFIX`""
-            "-DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }}"
-            '-DRUN_CLANG_TIDY=ON'
+            '-DENABLE_QT=${{ matrix.enable-qt }}'
+            '-DENABLE_TESTS=ON'
+            '-DRUN_CLANG_TIDY=OFF'
             '-DUSE_SYSTEM_DEFAULT=OFF'
           )
           cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake $($CmakeArgs -join ' ')"
-      - name: Make (Core)
+      - name: Generate sources
+        if: matrix.enabled == 'true'
         run: |
-          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target transmission" 2>&1 | tee makelog
-      - name: Make (App)
-        run: |
-          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target transmission-app" 2>&1 | tee -a makelog
-      - name: Make (Tests)
-        if: needs.what-to-make.outputs.make-tests == 'true'
-        run: |
-          cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config Debug --target libtransmission-test" 2>&1 | tee -a makelog
-      - name: Test for warnings
-        run: |
-          if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
+          # Like the Linux job, but USE_SYSTEM_DEFAULT=OFF bundles every lib, so
+          # build the Qt *_autogen headers plus all `_*` ExternalProject targets
+          # (e.g. _dht) to install headers like dht/dht.h before clang-tidy runs.
+          $list = cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && ninja -C obj -t targets all"
+          $targets = $list |
+            ForEach-Object {
+              if ($_ -match '^([^:]+_autogen):') { $Matches[1] }
+              elseif ($_ -match '^(_[A-Za-z0-9_]+): phony$') { $Matches[1] }
+            } |
+            Sort-Object -Unique
+          if ($targets) {
+            cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --target $($targets -join ' ')"
+          }
+      - name: Run clang-tidy
+        if: matrix.enabled == 'true'
+        uses: ./.github/actions/clang-tidy-cached
+        with:
+          regex: ${{ matrix.regex }}
+          cache-key: ${{ github.job }}-${{ matrix.toolkit }}
+          clang-tidy-binary: clang-tidy
+          # MSVC-style compile commands carry flags clang-cl ignores (e.g. /GL);
+          # silence the resulting driver diagnostic so -warnings-as-errors=* does
+          # not treat it as a finding.
+          extra-arg: -Wno-unused-command-line-argument
+          msvc-env: true
 
-  macos-xcodebuild-universal:
+  macos-xcodebuild-universal-git-26:
     runs-on: macos-26
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
@@ -468,6 +593,8 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           sw_vers
+      - name: Remove untrusted pre-tapped Homebrew taps
+        run: brew tap | grep -qx 'aws/tap' && brew untap aws/tap || true
       - name: Get Dependencies
         run: brew install --formulae xcbeautify
       - name: Get Source
@@ -482,19 +609,7 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/Build/Products/**/Transmission.app*
 
-  macos-cmake-universal:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [
-          # This is the last and the only macOS Intel runner that GitHub Actions supports.
-          # Xref https://github.com/actions/runner-images/issues/13046
-          macos-15-intel,
-
-          # Tahoe preview. Added Sept 2025.
-          # Xref https://github.com/actions/runner-images/pull/13007
-          macos-26
-        ]
+  macos-cmake-intel-git-15:
     needs: [what-to-make]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
             needs.what-to-make.outputs.make-daemon == 'true' ||
@@ -503,7 +618,9 @@ jobs:
             needs.what-to-make.outputs.make-qt == 'true' ||
             needs.what-to-make.outputs.make-tests == 'true' ||
             needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ${{ matrix.os }}
+    # The last and only macOS Intel runner GitHub Actions supports.
+    # Xref https://github.com/actions/runner-images/issues/13046
+    runs-on: macos-15-intel
     steps:
       - name: Show Configuration
         run: |
@@ -520,12 +637,16 @@ jobs:
           compiler: clang
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk4' || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
       - name: Configure
         run: |
           cmake \
             -S . \
             -B obj \
             -G Ninja \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
@@ -538,7 +659,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
@@ -561,8 +682,12 @@ jobs:
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ matrix.os }}-cmake-universal
+          name: binaries-${{ github.job }}
           path: pfx/**/*
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
+        with:
+          trim-age: 3d
 
   alpine-musl:
     needs: [ what-to-make ]
@@ -584,29 +709,27 @@ jobs:
             bash \
             binutils \
             build-base \
-            ca-certificates \
-            clang \
             cmake \
             curl-dev \
             fast_float \
             fmt-dev \
             gettext-dev \
             git \
-            libdeflate-dev \
-            libdeflate-static \
+            libarchive-dev \
             libevent-dev \
             libnatpmp-dev \
             libpsl-dev \
             linux-headers \
             miniupnpc-dev \
+            mold \
             ninja \
-            npm \
             pkgconfig \
-            utfcpp \
-            xz
+            simdutf-dev \
+            xz \
+            zlib-dev
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: apk add --upgrade glibmm-dev gtkmm3-dev
+        run: apk add --upgrade gtkmm4-dev
       - name: Get Dependencies (Qt6)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: apk add --upgrade qt6-qtbase-dev qt6-qttools-dev qt6-qtsvg-dev xcb-util-cursor
@@ -620,9 +743,7 @@ jobs:
             -S . \
             -B obj \
             -G Ninja \
-            -DCMAKE_C_COMPILER='clang' \
-            -DCMAKE_CXX_COMPILER='clang++' \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
@@ -631,28 +752,26 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=mold \
             -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_B64=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Alpine`
       - name: Make
-        run: cmake --build obj --config RelWithDebInfo
+        run: cmake --build obj --config Release
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        env:
-          TMPDIR: /private/tmp
         uses: ./.github/actions/run-tests
         with:
           build-dir: obj
-          build-config: RelWithDebInfo
+          build-config: Release
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --install obj --config Release --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}
@@ -664,13 +783,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # IPO only on the x64 reference cell: it carries the LTO coverage
+        # and the release-shaped artifacts. The other cells build without
+        # it -- no /LTCG time on throwaway binaries, and since the flag is
+        # the same on push and PR, main's ccache snapshots warm PR builds.
         include:
           - arch: x86
+            ipo: 'OFF'
             runner: windows-2022
+            publish: true
           - arch: x64
+            ipo: 'ON'
             runner: windows-2022
+            publish: true
+          # Coverage-only (newer toolchain, extra warnings). Not published: its
+          # MSI would require a VC++ redist too new for most machines.
+          - arch: x64
+            ipo: 'OFF'
+            runner: windows-2025-vs2026
           - arch: arm64
+            ipo: 'OFF'
             runner: windows-11-arm
+            publish: true
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Show Configuration
@@ -690,23 +824,33 @@ jobs:
         uses: ./.github/actions/setup-vs-env-win32
         with:
           arch: ${{ matrix.arch }}
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
+        with:
+          key-suffix: ${{ matrix.arch }}-${{ matrix.runner }}-ipo-${{ matrix.ipo }}
       - name: Configure
         run: |
           $CmakeArgs = @(
             '-S .'
             '-B obj'
             '-G Ninja'
+            '-DCMAKE_C_COMPILER_LAUNCHER=ccache'
+            '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+            # ccache cannot cache /Zi; store debug info in the objects (/Z7) instead
+            '-DCMAKE_POLICY_DEFAULT_CMP0141=NEW'
+            '-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded'
             '-DCMAKE_BUILD_TYPE=RelWithDebInfo'
             '-DCMAKE_INSTALL_PREFIX=pfx'
             "-DCMAKE_PREFIX_PATH=`"$Env:DEPS_PREFIX`""
             "-DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }}"
             "-DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true') && 'ON' || 'OFF' }}"
             '-DENABLE_GTK=OFF'
+            "-DENABLE_IPO=${{ matrix.ipo }}"
             '-DENABLE_MAC=OFF'
             "-DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }}"
             "-DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }}"
             '-DENABLE_UTILS=ON'
-            "-DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }}"
+            '-DREBUILD_WEB=OFF'
             '-DENABLE_WERROR=ON'
             '-DRUN_CLANG_TIDY=OFF'
             '-DUSE_SYSTEM_DEFAULT=OFF'
@@ -724,21 +868,32 @@ jobs:
           timeout: 600
       - name: Install
         run: cmake --install obj --config RelWithDebInfo
-      - name: Package
+      - name: Get Packaging Tools
         if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
+        run: |
+          choco install wixtoolset
+          (Join-Path (Get-Item -Path "${Env:ProgramFiles(x86)}\WiX Toolset v3.*")[0].FullName bin) | Out-File $Env:GITHUB_PATH -Append
+      - name: Package
+        if: ${{ matrix.publish && (needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true')) }}
         run: |
           cmd /c "`"$Env:VCVARSALL`" $Env:VC_ARCH >nul && cmake --build obj --config RelWithDebInfo --target pack-msi"
       - uses: actions/upload-artifact@v6
+        if: ${{ matrix.publish }}
         with:
-          name: binaries-${{ github.job }}-${{ matrix.arch }}
+          name: binaries-${{ github.job }}-${{ matrix.arch }}-${{ matrix.runner }}
           path: pfx/**/*
       - uses: actions/upload-artifact@v6
+        if: ${{ matrix.publish }}
         with:
-          name: binaries-${{ github.job }}-${{ matrix.arch }}-msi
+          name: binaries-${{ github.job }}-${{ matrix.arch }}-${{ matrix.runner }}-msi
           path: obj/dist/msi/*.msi
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
+        with:
+          trim-age: 3d
 
   make-source-tarball:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-source-tarball == 'true' }}
     steps:
@@ -752,11 +907,8 @@ jobs:
           set -ex
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            ca-certificates \
-            cmake \
             libcurl4-openssl-dev \
-            libssl-dev \
-            ninja-build
+            libssl-dev
       - name: Get Source
         uses: actions/checkout@v6
         with:
@@ -775,19 +927,11 @@ jobs:
           name: source-tarball
           path: obj/transmission*.tar.*
 
-  macos:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [
-          # This is the last and the only macOS Intel runner that GitHub Actions supports.
-          # Xref https://github.com/actions/runner-images/issues/13046
-          macos-15-intel,
-
-          # Tahoe preview. Added Sept 2025.
-          # Xref https://github.com/actions/runner-images/pull/13007
-          macos-26
-        ]
+  macos-cmake-arm64-tar-26:
+    # This job covers source tarballs and bundled dependencies on Tahoe
+    # (runner notes: https://github.com/actions/runner-images/pull/13007).
+    # macos-cmake-intel-git-15 covers Intel with system dependencies; the
+    # Intel/tarball/bundled combination is intentionally omitted.
     needs: [make-source-tarball, what-to-make]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
             needs.what-to-make.outputs.make-daemon == 'true' ||
@@ -796,7 +940,7 @@ jobs:
             needs.what-to-make.outputs.make-qt == 'true' ||
             needs.what-to-make.outputs.make-tests == 'true' ||
             needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-26
     steps:
       - name: Show Configuration
         run: |
@@ -804,7 +948,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext ninja node pkgconf
+        run: brew install --formulae cmake gettext ninja pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install --formula gtkmm3
@@ -823,12 +967,16 @@ jobs:
           name: source-tarball
       - name: Extract Source
         run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
       - name: Configure
         run: |
           cmake \
             -S src \
             -B obj \
             -G Ninja \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_CXX_FLAGS='--system-header-prefix=fmt/' `# Needed to supress system header warnings in macos-26` \
             -DCMAKE_C_FLAGS='--system-header-prefix=fmt/' `# Needed to supress system header warnings in macos26` \
@@ -841,7 +989,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }}  \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=OFF
@@ -859,8 +1007,12 @@ jobs:
         run: cmake --install obj --config RelWithDebInfo --strip
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ matrix.os }}
+          name: binaries-${{ github.job }}
           path: pfx/**/*
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
+        with:
+          trim-age: 3d
 
   debian:
     needs: [ make-source-tarball, what-to-make ]
@@ -910,11 +1062,14 @@ jobs:
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && matrix.gtk || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && matrix.qt || 'false' }}
           use-sudo: false
-      - name: Get NPM
-        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
-        uses: actions/setup-node@v6
+          # Debian 11 (oldoldstable) has no mold package and its GCC 10 predates -fuse-ld=mold.
+          enable-mold: ${{ matrix.use-legacy-packages != true }}
+          enable-ccache: true
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
         with:
-          node-version: lts/*
+          in-container: 'true'
+          key-suffix: ${{ matrix.version }}
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
@@ -927,7 +1082,9 @@ jobs:
             -S src \
             -B obj \
             -G Ninja \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
@@ -936,13 +1093,14 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_GTEST=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF \
             -DUSE_SYSTEM_SIGSLOT=OFF \
+            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in sid` \
             -DUSE_SYSTEM_SMALL=OFF \
             -DUSE_SYSTEM_UTP=OFF \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF
@@ -950,25 +1108,34 @@ jobs:
           if [ '${{ matrix.use-legacy-packages }}' = 'true' ]; then
             set -- "$@" \
               -DUSE_SYSTEM_FAST_FLOAT=OFF \
-              -DUSE_SYSTEM_FMT=OFF \
-              -DUSE_SYSTEM_UTF8CPP=OFF
+              -DUSE_SYSTEM_FMT=OFF
+          else
+            set -- "$@" -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=mold
           fi
 
           cmake "$@"
       - name: Build
-        run: cmake --build obj --config RelWithDebInfo
+        run: cmake --build obj --config Release
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         uses: ./.github/actions/run-tests
         with:
           build-dir: obj
-          build-config: RelWithDebInfo
+          build-config: Release
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --install obj --config Release --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}-${{ matrix.version }}
           path: pfx/**/*
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
+        with:
+          ignore-trim-errors: ${{ matrix.use-legacy-packages }}
+          trim-age: 3d
+      - name: Show ccache stats
+        if: always()
+        run: ccache --show-stats
 
   fedora:
     needs: [ make-source-tarball, what-to-make ]
@@ -996,14 +1163,19 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: gcc
-          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk4' || 'false' }}
+          # TODO(ci): rawhide's glibmm2.68 2.88.1 FTBFS against glib 2.89's gtkmm/giomm
+          # headers (conflicting GDBusActionGroupClass/GEmblemClass); skip GTK there
+          # until Fedora rebuilds glibmm. Upstream skew, not a Transmission bug.
+          enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && matrix.version != 'rawhide' && 'gtk4' || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
           use-sudo: false
-      - name: Get NPM
-        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
-        uses: actions/setup-node@v6
+          enable-mold: true
+          enable-ccache: true
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
         with:
-          node-version: lts/*
+          in-container: 'true'
+          key-suffix: ${{ matrix.version }}
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
@@ -1016,18 +1188,21 @@ jobs:
             -S src \
             -B obj \
             -G Ninja \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true' && matrix.version != 'rawhide') && 'ON' || 'OFF' }} `# rawhide: see enable-gtk note above` \
             -DENABLE_MAC=OFF \
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF \
+            -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=mold \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Fedora` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Fedora` \
@@ -1035,19 +1210,26 @@ jobs:
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Fedora` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Fedora`
       - name: Build
-        run: cmake --build obj --config RelWithDebInfo
+        run: cmake --build obj --config Release
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         uses: ./.github/actions/run-tests
         with:
           build-dir: obj
-          build-config: RelWithDebInfo
+          build-config: Release
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --install obj --config Release --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}-${{ matrix.version }}
           path: pfx/**/*
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
+        with:
+          trim-age: 3d
+      - name: Show ccache stats
+        if: always()
+        run: ccache --show-stats
 
   utp-disabled:
     needs: [ make-source-tarball, what-to-make ]
@@ -1072,24 +1254,24 @@ jobs:
         with:
           compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
           use-sudo: true
-      - name: Get NPM
-        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
+          enable-mold: true
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
           name: source-tarball
       - name: Extract Source
         run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
       - name: Configure
         run: |
           cmake \
             -S src \
             -B obj \
             -G Ninja \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
@@ -1104,28 +1286,30 @@ jobs:
             -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=mold \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
       - name: Make
-        run: cmake --build obj --config RelWithDebInfo
+        run: cmake --build obj --config Release
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        env:
-          TMPDIR: /private/tmp
         uses: ./.github/actions/run-tests
         with:
           build-dir: obj
-          build-config: RelWithDebInfo
+          build-config: Release
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --install obj --config Release --strip
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries-${{ github.job }}-${{ matrix.enable-utp && 'with' || 'without' }}-utp
+          name: binaries-${{ github.job }}-without-utp
           path: pfx/**/*
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
 
   android:
     needs: [ what-to-make ]
@@ -1133,6 +1317,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VCPKG_DEFAULT_TRIPLET: arm64-android
+      VCPKG_COMMIT: 389d14fa0e0692f36967e9eb5499e909317644d5 # 2026.01.15
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/.vcpkg-binary-cache
     steps:
     - name: Get Dependencies
       run: |
@@ -1166,10 +1352,17 @@ jobs:
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v11
       with:
-        vcpkgGitCommitId: 389d14fa0e0692f36967e9eb5499e909317644d5 # 2026.01.15
+        vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
+
+    - name: Cache vcpkg binaries
+      uses: actions/cache@v5
+      with:
+        path: .vcpkg-binary-cache
+        key: vcpkg-${{ env.VCPKG_DEFAULT_TRIPLET }}-${{ env.VCPKG_COMMIT }}
 
     - name: Install vcpkg packages
       run: |
+        mkdir -p "$VCPKG_DEFAULT_BINARY_CACHE"
         vcpkg install openssl curl
 
     - name: Build Transmission
@@ -1177,10 +1370,10 @@ jobs:
       run: |
         gradle build
 
-  ubuntu-24-04-cxx-23:
+  cxx23:
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Show Configuration
         run: |
@@ -1198,17 +1391,23 @@ jobs:
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk3' || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
           use-sudo: true
+          enable-mold: true
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
       - name: Configure
         run: |
           cmake \
             -S . \
             -B obj \
             -G Ninja \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_STANDARD=23 \
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=mold \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
@@ -1222,11 +1421,14 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
       - name: Make
-        run: cmake --build obj --config RelWithDebInfo -- "-k 0"
+        run: cmake --build obj --config Release -- "-k 0"
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
 
   ubuntu-24-04-arm64:
     needs: [ make-source-tarball, what-to-make ]
@@ -1257,65 +1459,67 @@ jobs:
           enable-gtk: ${{ needs.what-to-make.outputs.make-gtk == 'true' && 'gtk3' || 'false' }}
           enable-qt: ${{ needs.what-to-make.outputs.make-qt == 'true' && 'qt6' || 'false' }}
           use-sudo: true
-      - name: Get NPM
-        if: needs.what-to-make.outputs.make-web == 'true'
-        uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
+          enable-mold: true
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
           name: source-tarball
       - name: Extract Source
         run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
       - name: Configure
         run: |
           cmake \
             -S src \
             -B obj \
             -G Ninja \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=pfx \
-             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=mold \
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=OFF \
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
       - name: Build
-        run: cmake --build obj --config RelWithDebInfo
+        run: cmake --build obj --config Release
       - name: Test
         if: needs.what-to-make.outputs.make-tests == 'true'
         uses: ./.github/actions/run-tests
         with:
           build-dir: obj
-          build-config: RelWithDebInfo
+          build-config: Release
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --install obj --config Release --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
 
   freebsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
       needs.what-to-make.outputs.make-daemon == 'true' ||
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-qt == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true' ||
       needs.what-to-make.outputs.make-utils == 'true'
     runs-on: ubuntu-latest
@@ -1324,6 +1528,11 @@ jobs:
         run: |
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
@@ -1332,31 +1541,27 @@ jobs:
         uses: vmactions/freebsd-vm@v1
         with:
           usesh: true
+          mem: 12288
+          # Caching the image costs more Actions quota than the setup time it saves.
+          disable-cache: true
           prepare: |
             set -ex
             uname -a
             pkg update
-            pkg upgrade -y
             pkg install -y \
               curl \
               cmake \
               dht \
               fast_float \
-              gettext \
-              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm40` \
-              libb64 \
-              libdeflate \
               libevent \
               libfmt \
               libnatpmp \
               libpsl \
               miniupnpc \
               ninja \
-              `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo npm` \
               pkgconf \
-              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
               rapidjson \
-              utf8cpp
+              simdutf
           run: |
             set -ex
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
@@ -1364,15 +1569,16 @@ jobs:
               -S src \
               -B obj \
               -G Ninja \
-              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_INSTALL_PREFIX=pfx \
               -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_GTK=OFF `# GUI clients are covered on non-emulated runners` \
+              -DENABLE_IPO=OFF `# LTO is too slow for a portability smoke test` \
+              -DENABLE_QT=OFF `# GUI clients are covered on non-emulated runners` \
               -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-              -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+              -DREBUILD_WEB=OFF \
               -DENABLE_WERROR=ON \
               -DRUN_CLANG_TIDY=OFF \
               -DUSE_SYSTEM_DEFAULT=ON \
@@ -1381,11 +1587,11 @@ jobs:
               -DUSE_SYSTEM_UTP=OFF `# Not packaged in FreeBSD` \
               -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in FreeBSD` \
               -DWITH_CRYPTO=openssl
-            cmake --build obj --config RelWithDebInfo
+            cmake --build obj --config Release
             if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
-              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
+              cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config Release --output-on-failure
             fi
-            cmake --install obj --config RelWithDebInfo --strip
+            cmake --install obj --config Release --strip
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
@@ -1399,9 +1605,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # WITH_CRYPTO=AUTO resolves to OpenSSL on Linux, so every other Linux
+        # job already covers that backend; only the alternatives need a cell.
         crypto:
-          - cmake: openssl
-            apt: libssl-dev
           - cmake: wolfssl
             apt: libwolfssl-dev
           - cmake: mbedtls
@@ -1422,29 +1628,29 @@ jobs:
         uses: ./.github/actions/install-deps
         with:
           compiler: clang # Workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109717
-          enable-gtk: false
-          enable-qt: false
           use-sudo: true
+          enable-mold: true
       - name: Install Crypto Library
         run: sudo apt-get install -y --no-install-recommends ${{ matrix.crypto.apt }}
-      - name: Get NPM
-        if: ${{ needs.what-to-make.outputs.make-web == 'true' }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
           name: source-tarball
       - name: Extract Source
         run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Setup ccache
+        uses: ./.github/actions/setup-ccache
+        with:
+          key-suffix: ${{ matrix.crypto.cmake }}
       - name: Configure
         run: |
           cmake \
             -S src \
             -B obj \
             -G Ninja \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
@@ -1458,34 +1664,36 @@ jobs:
             -DENABLE_WERROR=ON \
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
+            -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=mold \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
+            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu` \
             -DWITH_CRYPTO=${{ matrix.crypto.cmake }}
       - name: Make
-        run: cmake --build obj --config RelWithDebInfo
+        run: cmake --build obj --config Release
       - name: Test
         uses: ./.github/actions/run-tests
         with:
           build-dir: obj
-          build-config: RelWithDebInfo
+          build-config: Release
       - name: Install
-        run: cmake --install obj --config RelWithDebInfo --strip
+        run: cmake --install obj --config Release --strip
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}-${{ matrix.crypto.cmake }}
           path: pfx/**/*
+      - name: Finalize ccache
+        uses: ./.github/actions/finalize-ccache
 
   openbsd:
     needs: [ make-source-tarball, what-to-make ]
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
       needs.what-to-make.outputs.make-daemon == 'true' ||
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-qt == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true' ||
       needs.what-to-make.outputs.make-utils == 'true'
     runs-on: ubuntu-latest
@@ -1494,6 +1702,11 @@ jobs:
         run: |
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
@@ -1502,28 +1715,25 @@ jobs:
         uses: vmactions/openbsd-vm@v1
         with:
           usesh: true
+          mem: 12288
+          # Caching the image costs more Actions quota than the setup time it saves.
+          disable-cache: true
           prepare: |
             set -ex
             uname -a
-            pkg_add -u
             pkg_add -I -v \
               curl \
               cmake \
               fast-float \
               fmt \
-              gettext-tools \
               gtar-- \
-              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm40` \
-              libdeflate \
               libevent \
               libnatpmp \
               libpsl \
               miniupnpc \
               ninja \
-              `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo node` \
-              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
               rapidjson \
-              utfcpp
+              simdutf
           run: |
             set -ex
             mkdir src && gtar xf transmission*.tar.* -C src --strip-components 1
@@ -1531,29 +1741,29 @@ jobs:
               -S src \
               -B obj \
               -G Ninja \
-              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_INSTALL_PREFIX=pfx \
               -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_GTK=OFF `# GUI clients are covered on non-emulated runners` \
+              -DENABLE_IPO=OFF `# LTO is too slow for a portability smoke test` \
+              -DENABLE_QT=OFF `# GUI clients are covered on non-emulated runners` \
               -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-              -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+              -DREBUILD_WEB=OFF \
               -DENABLE_WERROR=ON \
               -DRUN_CLANG_TIDY=OFF \
               -DUSE_SYSTEM_DEFAULT=ON \
-              -DUSE_SYSTEM_B64=OFF `# Not packaged in OpenBSD` \
               -DUSE_SYSTEM_DHT=OFF `# Not packaged in OpenBSD` \
               -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in OpenBSD` \
               -DUSE_SYSTEM_SMALL=OFF `# Not packaged in OpenBSD` \
               -DUSE_SYSTEM_UTP=OFF `# Not packaged in OpenBSD` \
               -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in OpenBSD`
-            cmake --build obj --config RelWithDebInfo
+            cmake --build obj --config Release
             if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
-              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
+              cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config Release --output-on-failure
             fi
-            cmake --install obj --config RelWithDebInfo --strip
+            cmake --install obj --config Release --strip
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
@@ -1565,8 +1775,6 @@ jobs:
     if: |
       needs.what-to-make.outputs.make-cli == 'true' ||
       needs.what-to-make.outputs.make-daemon == 'true' ||
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-qt == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true' ||
       needs.what-to-make.outputs.make-utils == 'true'
     runs-on: ubuntu-latest
@@ -1575,6 +1783,11 @@ jobs:
         run: |
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Get Source
         uses: actions/download-artifact@v7
         with:
@@ -1583,155 +1796,128 @@ jobs:
         uses: vmactions/netbsd-vm@v1
         with:
           usesh: true
+          mem: 12288
+          # Caching the image costs more Actions quota than the setup time it saves.
+          disable-cache: true
           prepare: |
             set -ex
             uname -a
             export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
-            export PKG_PATH="https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/`uname -p`/`uname -r`/All"
-            /usr/sbin/pkg_add -u \
+            export PKG_PATH="https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/`uname -p`/`uname -r`/All;https://ftp.netbsd.org/pub/pkgsrc/packages/NetBSD/`uname -p`/`uname -r`/All"
+            n=0
+            until /usr/sbin/pkg_add -u \
               curl \
               cmake \
               fast_float \
               fmtlib \
-              gettext-tools \
-              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm4` \
-              libdeflate \
+              gcc14 \
               libevent \
               libpsl \
               miniupnpc \
               ninja-build \
-              `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo nodejs` \
               pkgconf \
-              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
-              rapidjson \
-              utf8-cpp
-            if [ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] || [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
-              for set in xbase xcomp; do
-                curl -sL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-`uname -r`/amd64/binary/sets/$set.tar.xz" | tar xJpf - -C /
-              done
-            fi
+              rapidjson; do
+              n=$((n+1))
+              [ $n -lt 3 ] || exit 1
+              echo "pkg_add attempt $n failed, retrying in 30s..."
+              sleep 30
+            done
           run: |
             set -ex
+            export TMPDIR=/var/tmp # gcc's LTO takes up a lot of space in TMPDIR, and /tmp is too small
             export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
             cmake \
               -S src \
               -B obj \
               -G Ninja \
-              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_CXX_COMPILER='/usr/pkg/gcc14/bin/g++' \
+              -DCMAKE_C_COMPILER='/usr/pkg/gcc14/bin/gcc' \
+              -DCMAKE_BUILD_RPATH='/usr/pkg/gcc14/lib' \
               -DCMAKE_INSTALL_PREFIX=pfx \
-              -DCMAKE_PREFIX_PATH=/usr/pkg/qt6 \
+              -DCMAKE_PREFIX_PATH='/usr/pkg' \
               -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_GTK=OFF `# GUI clients are covered on non-emulated runners` \
+              -DENABLE_IPO=OFF `# LTO is too slow for a portability smoke test` \
+              -DENABLE_QT=OFF `# GUI clients are covered on non-emulated runners` \
               -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-              -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+              -DREBUILD_WEB=OFF \
               -DENABLE_WERROR=ON \
               -DRUN_CLANG_TIDY=OFF \
               -DUSE_SYSTEM_DEFAULT=ON \
-              -DUSE_SYSTEM_B64=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_DHT=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_NATPMP=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_SIMDUTF=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_SMALL=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_UTP=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in NetBSD`
-            cmake --build obj --config RelWithDebInfo
+            cmake --build obj --config Release
             if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
-              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
+              cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config Release --output-on-failure
             fi
-            cmake --install obj --config RelWithDebInfo --strip
+            cmake --install obj --config Release --strip
             rm -rf obj src
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  dragonflybsd:
-    needs: [ make-source-tarball, what-to-make ]
-    if: |
-      needs.what-to-make.outputs.make-cli == 'true' ||
-      needs.what-to-make.outputs.make-daemon == 'true' ||
-      needs.what-to-make.outputs.make-gtk == 'true' ||
-      needs.what-to-make.outputs.make-qt == 'true' ||
-      needs.what-to-make.outputs.make-tests == 'true' ||
-      needs.what-to-make.outputs.make-utils == 'true'
-    runs-on: ubuntu-latest
+  prune-caches:
+    # Build jobs supersede their own snapshots as they save, so this sweep
+    # collects what those steps miss: snapshots orphaned by failed or
+    # cancelled runs, keys from retired schemas, and branch copies shadowed
+    # by main. Families that stop being produced age out through the
+    # provider's 7-day unused-entry eviction.
+    # Runs only on pushes to main: PR runs from forks get a read-only token.
+    needs: [ android, clang-tidy-linux, clang-tidy-windows, crypto, cxx23, debian, fedora, freebsd, macos-cmake-arm64-tar-26, macos-cmake-intel-git-15, netbsd, openbsd, sanitizer-tests-linux, sanitizer-tests-macos-26, sanitizer-tests-windows, ubuntu-24-04-arm64, utp-disabled, windows ]
+    if: ${{ always() && github.event_name == 'push' }}
+    runs-on: ubuntu-slim
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Show Configuration
+      - name: Prune redundant cache entries
+        # Selector 1: a "-<run id>" suffix is the only per-run part of a
+        # ccache/ctcache key, so keep just the newest snapshot per
+        # (ref, family). Selector 2: ccache and win-deps keys lacking the
+        # current CACHE_SCHEMA can never be restored again. Selector 3: the
+        # content-addressed families (win-deps, vcpkg) are byte-identical per
+        # key+version, and every branch can restore main's copy through the
+        # base-branch fallback, so branch copies are redundant once main
+        # holds the key.
         run: |
-          echo '${{ toJSON(needs) }}'
-          echo '${{ toJSON(runner) }}'
-      - name: Get Source
-        uses: actions/download-artifact@v7
-        with:
-          name: source-tarball
-      - name: Extract, Build, Test and Install
-        uses: vmactions/dragonflybsd-vm@v1
-        with:
-          usesh: true
-          prepare: |
-            set -ex
-            uname -a
-            pkg update
-            pkg upgrade -y
-            pkg install -y \
-              curl \
-              cmake \
-              `# dht (somehow installing dht causes the build to fail with a bunch of "/usr/local/lib/libdht.so: error: undefined reference to 'dht_*'" messages` \
-              fast_float \
-              gcc14 \
-              gettext \
-              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm30` \
-              libb64 \
-              libdeflate \
-              libevent \
-              libfmt \
-              libnatpmp \
-              libpsl \
-              miniupnpc \
-              ninja \
-              pkgconf \
-              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
-              rapidjson \
-              utf8cpp
-          run: |
-            set -ex
-            export LANG=en_US.UTF-8 # Qt requires UTF-8 locales
-            mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
-            cmake \
-              -S src \
-              -B obj \
-              -G Ninja \
-              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-              -DCMAKE_CXX_COMPILER='/usr/local/bin/g++14' \
-              -DCMAKE_C_COMPILER='/usr/local/bin/gcc14' \
-              -DCMAKE_BUILD_RPATH='/usr/local/lib/gcc14' \
-              -DCMAKE_INSTALL_PREFIX=pfx \
-              -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-              -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-              -DREBUILD_WEB=OFF `# Installing esbuild via npm is not supported on DragonFlyBSD, the full list of supported platforms can be found at https://esbuild.github.io/getting-started/#download-a-build` \
-              -DENABLE_WERROR=ON \
-              -DRUN_CLANG_TIDY=OFF \
-              -DUSE_SYSTEM_DEFAULT=ON \
-              -DUSE_SYSTEM_DHT=OFF `# DragonflyBSD port does not work` \
-              -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in DragonflyBSD` \
-              -DUSE_SYSTEM_SMALL=OFF `# Not packaged in DragonflyBSD` \
-              -DUSE_SYSTEM_UTP=OFF `# Not packaged in DragonflyBSD` \
-              -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in DragonflyBSD`
-            cmake --build obj --config RelWithDebInfo
-            if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
-              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
-            fi
-            cmake --install obj --config RelWithDebInfo --strip
-            rm -rf obj src
-      - uses: actions/upload-artifact@v6
-        with:
-          name: binaries-${{ github.job }}
-          path: pfx/**/*
+          set -euo pipefail
+          inventory="$RUNNER_TEMP/caches.json"
+          # gh rejects --slurp combined with --jq, so flatten with jq itself
+          gh api --paginate --slurp 'repos/${{ github.repository }}/actions/caches?per_page=100' |
+            jq '[ .[].actions_caches[] ]' > "$inventory"
+          jq -r --arg schema "-${{ env.CACHE_SCHEMA }}-" '
+            . as $inventory
+            | [
+                ($inventory
+                 | map(select(.key | startswith("ccache-") or startswith("ctcache-")))
+                 | group_by([.ref, (.key | sub("-[0-9]+$"; ""))])[]
+                 | sort_by(.created_at) | .[:-1][].id),
+                ($inventory[]
+                 | select((.key | test("^(ccache|win-deps)-")) and ((.key | contains($schema)) | not)).id),
+                ($inventory
+                 | map(select(.key | test("^(win-deps|vcpkg)-")))
+                 | group_by([.key, .version])[]
+                 | select(any(.[]; .ref == "refs/heads/main"))
+                 | .[] | select(.ref != "refs/heads/main").id)
+              ]
+            | unique[]' "$inventory" |
+            # entries can vanish mid-run (TTL, a re-run's finalize), so a 404
+            # on one id must not abort the sweep
+            xargs --no-run-if-empty -P 4 -I '{}' bash -c 'gh api -X DELETE "repos/${{ github.repository }}/actions/caches/$1" || true' _ '{}'
+      - name: Check cache headroom
+        if: ${{ always() }}
+        run: |
+          bytes=$(gh api 'repos/${{ github.repository }}/actions/cache/usage' --jq '.active_caches_size_in_bytes')
+          if [ "$bytes" -gt $((CACHE_WARNING_GIB * 1024 * 1024 * 1024)) ]; then
+            gib=$(awk -v bytes="$bytes" 'BEGIN { printf "%.2f", bytes / 1024 / 1024 / 1024 }')
+            echo "::warning title=Actions cache near capacity::${gib} GiB of the ${CACHE_LIMIT_GIB} GiB repository limit is in use"
+          fi
