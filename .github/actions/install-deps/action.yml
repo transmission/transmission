@@ -44,6 +44,7 @@ runs:
         if [[ "$PKG_FAMILY" == "dnf" ]]; then
           # Fedora/DNF-based installation
           dnf install -y \
+            ca-certificates \
             cmake \
             gettext \
             ninja-build \
@@ -54,15 +55,15 @@ runs:
           dnf install -y \
             fast_float-devel \
             fmt-devel \
-            libarchive-devel \
+            libb64-devel \
             libcurl-devel \
+            libdeflate-devel \
             libevent-devel \
             libnatpmp-devel \
             libpsl-devel \
             miniupnpc-devel \
             openssl-devel \
-            simdutf-devel \
-            zlib-devel
+            utf8cpp-devel
 
           # Compiler packages
           if [[ "${{ inputs.compiler }}" == "clang" ]]; then
@@ -105,10 +106,12 @@ runs:
           # Base packages
           BASE_PACKAGES=(
             appstream
+            ca-certificates
             cmake
             gettext
-            libarchive-dev
+            libb64-dev
             libcurl4-openssl-dev
+            libdeflate-dev
             libevent-dev
             libminiupnpc-dev
             libnatpmp-dev
@@ -118,7 +121,6 @@ runs:
             ninja-build
             pkg-config
             xz-utils
-            zlib1g-dev
           )
 
           # Debian wants to build Transmission with system gtest
@@ -131,6 +133,7 @@ runs:
             BASE_PACKAGES+=(
               libfast-float-dev
               libfmt-dev
+              libutfcpp-dev
             )
           fi
 
@@ -241,12 +244,13 @@ runs:
         BASE_PACKAGES+=(
           fast_float
           fmt
-          libarchive
+          libb64
+          libdeflate
           libevent
           libnatpmp
           libpsl
           miniupnpc
-          simdutf
+          utf8cpp
         )
 
         brew install --formulae "${BASE_PACKAGES[@]}"

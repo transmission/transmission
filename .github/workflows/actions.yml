@@ -184,10 +184,8 @@ jobs:
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
-            -DUSE_SYSTEM_ARCHIVE=OFF `# Build vendored libarchive here to exercise its ExternalProject scripts on Linux` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -459,7 +457,6 @@ jobs:
             -DUSE_SYSTEM_FMT=${{ matrix.toolkit == 'gtk4' && 'OFF' || 'ON' }} `# TODO: remove this line when fmt>10 or clang>20` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -709,13 +706,15 @@ jobs:
             bash \
             binutils \
             build-base \
+            ca-certificates \
             cmake \
             curl-dev \
             fast_float \
             fmt-dev \
             gettext-dev \
             git \
-            libarchive-dev \
+            libdeflate-dev \
+            libdeflate-static \
             libevent-dev \
             libnatpmp-dev \
             libpsl-dev \
@@ -724,9 +723,8 @@ jobs:
             mold \
             ninja \
             pkgconfig \
-            simdutf-dev \
-            xz \
-            zlib-dev
+            utfcpp \
+            xz
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: apk add --upgrade gtkmm4-dev
@@ -757,6 +755,7 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=mold \
             -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_B64=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Alpine` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Alpine` \
@@ -1100,9 +1099,9 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF \
             -DUSE_SYSTEM_SIGSLOT=OFF \
-            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in sid` \
             -DUSE_SYSTEM_SMALL=OFF \
             -DUSE_SYSTEM_UTP=OFF \
+            -DUSE_SYSTEM_UTF8CPP=OFF `# Not packaged in oldoldstable` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF
 
           if [ '${{ matrix.use-legacy-packages }}' = 'true' ]; then
@@ -1290,7 +1289,6 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -1421,7 +1419,6 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -1494,7 +1491,6 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
@@ -1553,6 +1549,8 @@ jobs:
               cmake \
               dht \
               fast_float \
+              libb64 \
+              libdeflate \
               libevent \
               libfmt \
               libnatpmp \
@@ -1561,7 +1559,7 @@ jobs:
               ninja \
               pkgconf \
               rapidjson \
-              simdutf
+              utf8cpp
           run: |
             set -ex
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
@@ -1668,7 +1666,6 @@ jobs:
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
-            -DUSE_SYSTEM_SIMDUTF=OFF `# TODO: YES in 26.04` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_UTP=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu` \
@@ -1727,13 +1724,14 @@ jobs:
               fast-float \
               fmt \
               gtar-- \
+              libdeflate \
               libevent \
               libnatpmp \
               libpsl \
               miniupnpc \
               ninja \
               rapidjson \
-              simdutf
+              utfcpp
           run: |
             set -ex
             mkdir src && gtar xf transmission*.tar.* -C src --strip-components 1
@@ -1754,6 +1752,7 @@ jobs:
               -DENABLE_WERROR=ON \
               -DRUN_CLANG_TIDY=OFF \
               -DUSE_SYSTEM_DEFAULT=ON \
+              -DUSE_SYSTEM_B64=OFF `# Not packaged in OpenBSD` \
               -DUSE_SYSTEM_DHT=OFF `# Not packaged in OpenBSD` \
               -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in OpenBSD` \
               -DUSE_SYSTEM_SMALL=OFF `# Not packaged in OpenBSD` \
@@ -1811,6 +1810,7 @@ jobs:
               fast_float \
               fmtlib \
               gcc14 \
+              libdeflate \
               libevent \
               libpsl \
               miniupnpc \
@@ -1848,10 +1848,10 @@ jobs:
               -DENABLE_WERROR=ON \
               -DRUN_CLANG_TIDY=OFF \
               -DUSE_SYSTEM_DEFAULT=ON \
+              -DUSE_SYSTEM_B64=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_DHT=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_NATPMP=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in NetBSD` \
-              -DUSE_SYSTEM_SIMDUTF=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_SMALL=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_UTP=OFF `# Not packaged in NetBSD` \
               -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in NetBSD`

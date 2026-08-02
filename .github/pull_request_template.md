@@ -2,7 +2,7 @@
 
 Description goes here.
 
-Notes: If the PR has user-facing changes, add a short (ideally one-sentence) description here in terms an end user will understand.
+Notes: If users will see a difference, describe it here for the release notes. Otherwise, remove this paragraph.
 
 ## Checklist
 
