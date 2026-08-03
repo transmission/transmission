@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:Qt5Version = '5.15.17'
+$global:Qt5Version = '5.15.19'
 
 $global:Qt5Deps = @(
     'DBus'
