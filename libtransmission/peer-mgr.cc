@@ -480,6 +480,7 @@ public:
         , tor{ tor_in }
         , tags_{ {
               tor_in->done_.connect_scoped([this](tr_torrent*, bool) { on_torrent_done(); }),
+              tor_in->undone_.connect_scoped([this](tr_torrent*) { on_torrent_undone(); }),
               tor_in->doomed_.connect_scoped([this](tr_torrent*) { on_torrent_doomed(); }),
               tor_in->got_bad_piece_.connect_scoped([this](tr_torrent*, tr_piece_index_t p) { on_got_bad_piece(p); }),
               tor_in->got_metainfo_.connect_scoped([this](tr_torrent*) { on_got_metainfo(); }),
@@ -823,6 +824,14 @@ private:
         wishlist_controller.reset();
     }
 
+    void on_torrent_undone()
+    {
+        if (is_running && !wishlist_controller)
+        {
+            wishlist_controller = std::make_unique<WishlistController>(*this);
+        }
+    }
+
     void on_swarm_is_all_upload_only()
     {
         auto const lock = unique_lock();
@@ -1040,7 +1049,7 @@ EXIT:
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = 5U;
 
-    std::array<sigslot::scoped_connection, 8> const tags_;
+    std::array<sigslot::scoped_connection, 9> const tags_;
 
     mutable std::optional<bool> pool_is_all_upload_only_;
 };
