@@ -999,6 +999,13 @@ char const* tr_sessionGetConfigDir(tr_session const* session)
     return session->configDir().c_str();
 }
 
+bool tr_sessionOwnsConfigDir(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->ownsConfigDir();
+}
+
 // ---
 
 void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled)
@@ -2242,10 +2249,20 @@ auto makeBlocklistDir(std::string_view config_dir)
     tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
     return dir;
 }
+
+auto makeConfigDirLock(std::string_view config_dir)
+{
+    // A dir has to exist before it can be locked, and the subdirs below are the
+    // first things written into it, so a session on a new config dir claims it
+    // too.
+    tr_sys_dir_create(std::string{ config_dir }, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return tr_config_dir_lock{ config_dir };
+}
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_dict)
     : config_dir_{ config_dir }
+    , config_dir_lock_{ makeConfigDirLock(config_dir) }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , blocklist_dir_{ makeBlocklistDir(config_dir) }

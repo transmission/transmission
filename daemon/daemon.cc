@@ -863,7 +863,20 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     auto* session = tr_sessionInit(config_dir_, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
     tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", config_dir_)));
-    tr_sessionSaveSettings(session, cdir, settings_);
+
+    // A warning, not a failure: see tr_sessionOwnsConfigDir() for why this is
+    // not proof of a second session.
+    if (!tr_sessionOwnsConfigDir(session))
+    {
+        tr_logAddWarn(
+            fmt::format(
+                fmt::runtime(
+                    _("Couldn't claim '{path}'. If another Transmission session is using it, the two will "
+                      "overwrite each other's settings, resume files and stats.")),
+                fmt::arg("path", config_dir_)));
+    }
+
+    tr_sessionSaveSettings(session, config_dir_.c_str(), settings_);
 
     auto const* const settings_map = settings_.get_if<tr_variant::Map>();
     if (settings_map == nullptr)
