@@ -339,23 +339,9 @@ private:
         // blocklists
         tr_sys_dir_create(tr_pathbuf{ sandboxDir(), "/blocklists" }, TR_SYS_DIR_CREATE_PARENTS, 0700);
 
-        // fill in any missing settings
-        settings_map->try_emplace(TR_KEY_port_forwarding_enabled, false);
-        settings_map->try_emplace(TR_KEY_dht_enabled, false);
-        settings_map->try_emplace(TR_KEY_message_level, verbose_ ? TR_LOG_DEBUG : TR_LOG_ERROR);
-
-        // disable ip query
-        settings_map->insert_or_assign(TR_KEY_ip_endpoints_ipv4, tr_variant::Vector{});
-        settings_map->insert_or_assign(TR_KEY_ip_endpoints_ipv6, tr_variant::Vector{});
+        applyQuietDefaults(*settings_map);
 
         return tr_sessionInit(sandboxDir(), !verbose_, settings);
-    }
-
-    static void sessionClose(tr_session* session)
-    {
-        static auto constexpr DeadlineSecs = 0.1;
-        tr_sessionClose(session, DeadlineSecs);
-        tr_logClearQueue();
     }
 
 protected:
@@ -519,6 +505,45 @@ protected:
         return settings_.get();
     }
 
+    // Fills in any missing setting with one that keeps a session quiet and off
+    // the network. Tests that start one of their own want the same treatment.
+    void applyQuietDefaults(tr_variant::Map& settings_map) const
+    {
+        settings_map.try_emplace(TR_KEY_port_forwarding_enabled, false);
+        settings_map.try_emplace(TR_KEY_dht_enabled, false);
+        settings_map.try_emplace(TR_KEY_message_level, verbose_ ? TR_LOG_DEBUG : TR_LOG_ERROR);
+        settings_map.insert_or_assign(TR_KEY_ip_endpoints_ipv4, tr_variant::Vector{});
+        settings_map.insert_or_assign(TR_KEY_ip_endpoints_ipv6, tr_variant::Vector{});
+    }
+
+    // Settings for a test that starts a second session, quieted the same way the
+    // fixture's own session is. Only the settings named here are set, so that
+    // the quiet ones are the ones missing for applyQuietDefaults() to fill in;
+    // tr_sessionInit() supplies the rest. The port is randomized so the two
+    // sessions do not contend for one.
+    [[nodiscard]] tr_variant quietSettings() const
+    {
+        auto settings = tr_variant::make_map();
+        auto* const settings_map = settings.get_if<tr_variant::Map>();
+        settings_map->insert_or_assign(TR_KEY_peer_port_random_on_start, true);
+        applyQuietDefaults(*settings_map);
+        return settings;
+    }
+
+    // Ends the fixture's session, releasing its hold on the config dir.
+    void closeSession()
+    {
+        static auto constexpr DeadlineSecs = 0.1;
+
+        if (session_ != nullptr)
+        {
+            tr_sessionClose(session_, DeadlineSecs);
+            session_ = nullptr;
+        }
+
+        tr_logClearQueue();
+    }
+
     void SetUp() override
     {
         SandboxedTest::SetUp();
@@ -528,8 +553,7 @@ protected:
 
     void TearDown() override
     {
-        sessionClose(session_);
-        session_ = nullptr;
+        closeSession();
         settings_.reset();
 
         SandboxedTest::TearDown();
