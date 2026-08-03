@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:Qt6Version = '6.10.1'
+$global:Qt6Version = '6.10.3'
 
 $global:Qt6Deps = @(
     'DBus'
@@ -108,6 +108,11 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-L'; (Join-Path $DepsPrefixDir lib).Replace('\', '/')
         '--'
         "-DCMAKE_PREFIX_PATH=${DepsPrefixDir}"
+        # We don't use Qt's SBOM, we only need the libraries/runtime.
+        # In Qt 6.10.3, enabling SBOM bakes CMAKE_PREFIX_PATH (eg D:\x86-prefix)
+        # verbatim into a generated .cmake which trips up CMake's '\x' escape.
+        # Re-enable iff we someday need SBOM *and* upstream Qt is fixed.
+        '-DQT_GENERATE_SBOM=OFF'
     )
 
     # No need in GUI and some other tools
