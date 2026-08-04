@@ -2397,15 +2397,20 @@ static void removeKeRangerRansomware()
 
     PowerManager.shared.shouldPreventSleep = anyActive && [self.fDefaults boolForKey:@"SleepPrevent"];
 
+    BOOL const mainWindowVisible = self.fWindow.visible && (self.fWindow.occlusionState & NSWindowOcclusionStateVisible) != 0;
+
     if (!NSApp.hidden)
     {
-        if (self.fWindow.visible)
+        // No need to run any main window updates if there are no visible pixels, saves some CPU time.
+        if (mainWindowVisible)
         {
             [self sortTorrentsAndIncludeQueueOrder:NO];
 
             [self.fStatusBar updateWithDownload:dlRate upload:ulRate];
 
             self.fClearCompletedButton.hidden = !anyCompleted;
+
+            [self.fTableView reloadVisibleRows];
         }
 
         //update non-constant parts of info window
@@ -2413,8 +2418,6 @@ static void removeKeRangerRansomware()
         {
             [self.fInfoController updateInfoStats];
         }
-
-        [self.fTableView reloadVisibleRows];
     }
 
     //badge dock
