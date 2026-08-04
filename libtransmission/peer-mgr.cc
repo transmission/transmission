@@ -408,9 +408,12 @@ public:
         {
         }
 
-        [[nodiscard]] auto next(size_t const n_wanted_blocks, std::function<bool(tr_piece_index_t)> const& peer_has_piece)
+        [[nodiscard]] auto next(
+            size_t const n_wanted_blocks,
+            std::function<bool(tr_piece_index_t)> const& peer_has_piece,
+            bool is_slow_peer = false)
         {
-            return wishlist_.next(n_wanted_blocks, peer_has_piece);
+            return wishlist_.next(n_wanted_blocks, peer_has_piece, is_slow_peer);
         }
 
         [[nodiscard]] bool client_has_block(tr_block_index_t const block) const override
@@ -1218,7 +1221,17 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
     if (auto& controller = torrent->swarm->wishlist_controller)
     {
-        return controller->next(numwant, [peer](tr_piece_index_t p) { return peer->has_piece(p); });
+        // check if peer is slow (< 1 block/s) in sequential mode.
+        // slow peer will request blocks from the end (not urgent for streaming)
+        bool is_slow_peer = false;
+        if (torrent->is_sequential_download())
+        {
+            static auto constexpr CountSeconds = 2;
+            auto const blocks_received = peer->blocks_sent_to_client.count(tr_time(), CountSeconds);
+            is_slow_peer = blocks_received <= CountSeconds;
+        }
+
+        return controller->next(numwant, [peer](tr_piece_index_t p) { return peer->has_piece(p); }, is_slow_peer);
     }
 
     return {};
