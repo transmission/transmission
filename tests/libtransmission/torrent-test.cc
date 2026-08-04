@@ -7,6 +7,8 @@
 #include <cstddef>
 #include <ranges>
 
+#include <libtransmission/transmission.h>
+
 #include <libtransmission/torrent.h>
 
 #include "test-fixtures.h"
@@ -73,6 +75,28 @@ TEST_F(TorrentTest, queueMoveDown)
     {
         EXPECT_EQ(ExpectedQueuePosition[i], torrents[i]->queue_position()) << i;
     }
+}
+
+TEST_F(TorrentTest, useSessionLimitsAffectsBothDirections)
+{
+    auto* const tor = torrentInitFromFile(TorFilenames[0]);
+    ASSERT_NE(nullptr, tor);
+
+    // Torrents honor the session (parent) limits in both directions by default.
+    EXPECT_TRUE(tor->bandwidth().are_parent_limits_honored(tr_direction::Up));
+    EXPECT_TRUE(tor->bandwidth().are_parent_limits_honored(tr_direction::Down));
+
+    // Disabling must clear the flag for BOTH directions. Regression test for a
+    // short-circuit `||` that skipped the Down call once the Up call changed,
+    // leaving downloads still bound by the session limit.
+    tr_torrentUseSessionLimits(tor, false);
+    EXPECT_FALSE(tor->bandwidth().are_parent_limits_honored(tr_direction::Up));
+    EXPECT_FALSE(tor->bandwidth().are_parent_limits_honored(tr_direction::Down));
+
+    // Re-enabling restores both directions.
+    tr_torrentUseSessionLimits(tor, true);
+    EXPECT_TRUE(tor->bandwidth().are_parent_limits_honored(tr_direction::Up));
+    EXPECT_TRUE(tor->bandwidth().are_parent_limits_honored(tr_direction::Down));
 }
 
 TEST_F(TorrentTest, queueMoveTop)
