@@ -46,6 +46,7 @@
 #import "GroupToolbarItem.h"
 #import "ShareToolbarItem.h"
 #import "ShareTorrentFileHelper.h"
+#import "RpcController.h"
 #import "Toolbar.h"
 #import "BlocklistDownloader.h"
 #import "StatusBarController.h"
@@ -370,7 +371,7 @@ static void removeKeRangerRansomware()
     NSLog(@"OSX.KeRanger.A ransomware removal completed, proceeding to normal operation");
 }
 
-@interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate, PowerManagerDelegate>
+@interface Controller ()<RpcControllerDelegate, UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate, PowerManagerDelegate>
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
 @property(nonatomic) IBOutlet SPUStandardUpdaterController* fUpdaterController;
@@ -428,6 +429,7 @@ static void removeKeRangerRansomware()
 @property(nonatomic) NSTimer* fAutoImportTimer;
 
 @property(nonatomic) NSURLSession* fSession;
+@property(nonatomic) RpcController* fRpcController;
 
 @property(nonatomic) NSMutableSet<Torrent*>* fAddingTransfers;
 
@@ -604,13 +606,7 @@ static void removeKeRangerRansomware()
             [_fDefaults setBool:tr_sessionUsesAltSpeed(_fLib) forKey:@"SpeedLimit"];
         }
 
-        tr_sessionSetRPCCallback(
-            _fLib,
-            [controller = self](tr_rpc_callback_type const type, std::optional<tr_torrent_id_t> const tor_id)
-            {
-                [controller rpcCallback:type forTorrentId:tor_id];
-                return TR_RPC_NOREMOVE; // we'll do the remove manually
-            });
+        _fRpcController = [[RpcController alloc] initWithLib:_fLib delegate:self];
 
         _fQuitRequested = NO;
 
@@ -5410,91 +5406,13 @@ static void removeKeRangerRansomware()
     [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:kDonateURL]];
 }
 
-- (void)rpcCallback:(tr_rpc_callback_type)type forTorrentId:(std::optional<tr_torrent_id_t>)torrentId
+- (Torrent*)rpcController:(RpcController*)controller torrentForId:(tr_torrent_id_t)torrent_id
 {
-    @autoreleasepool
-    {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            //get the torrent
-            Torrent* torrent = nil;
-            if (torrentId.has_value() && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
-            {
-                torrent = [self torrentForId:*torrentId];
-
-                if (!torrent)
-                {
-                    NSLog(@"No torrent found matching the given torrent id from the RPC callback!");
-                    return;
-                }
-            }
-
-            switch (type)
-            {
-            case TR_RPC_TORRENT_ADDED:
-                if (torrentId.has_value())
-                {
-                    if (auto* const torrentStruct = tr_torrentFindFromId(self.fLib, *torrentId); torrentStruct != nullptr)
-                    {
-                        [self rpcAddTorrentStruct:torrentStruct];
-                    }
-                }
-                break;
-
-            case TR_RPC_TORRENT_STARTED:
-            case TR_RPC_TORRENT_STOPPED:
-                [self rpcStartedStoppedTorrent:torrent];
-                break;
-
-            case TR_RPC_TORRENT_REMOVING:
-                [self rpcRemoveTorrent:torrent deleteData:NO];
-                break;
-
-            case TR_RPC_TORRENT_TRASHING:
-                [self rpcRemoveTorrent:torrent deleteData:YES];
-                break;
-
-            case TR_RPC_TORRENT_CHANGED:
-                [self rpcChangedTorrent:torrent];
-                break;
-
-            case TR_RPC_TORRENT_MOVED:
-                [self rpcMovedTorrent:torrent];
-                break;
-
-            case TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED:
-                [self rpcUpdateQueue];
-                break;
-
-            case TR_RPC_SESSION_CHANGED:
-                [self.prefsController rpcUpdatePrefs];
-                break;
-
-            case TR_RPC_SESSION_CLOSE:
-                self.fQuitRequested = YES;
-                [NSApp terminate:self];
-                break;
-
-            default:
-                NSAssert1(NO, @"Unknown RPC command received: %d", type);
-            }
-        });
-    }
+    return [self torrentForId:torrent_id];
 }
 
-- (void)rpcAddTorrentStruct:(struct tr_torrent*)torrentStruct
+- (void)rpcController:(RpcController*)controller addTorrent:(Torrent*)torrent
 {
-    NSString* location = tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(torrentStruct));
-
-    Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:torrentStruct location:location lib:self.fLib];
-
-    //change the location if the group calls for it (this has to wait until after the torrent is created)
-    if ([GroupsController.groups usesCustomDownloadLocationForIndex:torrent.groupValue])
-    {
-        location = [GroupsController.groups customDownloadLocationForIndex:torrent.groupValue];
-        [torrent changeDownloadFolderBeforeUsing:location determinationType:TorrentDeterminationAutomatic];
-    }
-
-    [torrent update];
     [self.fTorrents addObject:torrent];
 
     if (!self.fAddingTransfers)
@@ -5506,24 +5424,20 @@ static void removeKeRangerRansomware()
     [self fullUpdateUI];
 }
 
-- (void)rpcRemoveTorrent:(Torrent*)torrent deleteData:(BOOL)deleteData
+- (void)rpcController:(RpcController*)controller removeTorrent:(Torrent*)torrent deleteData:(BOOL)deleteData
 {
     [self confirmRemoveTorrents:@[ torrent ] deleteData:deleteData];
 }
 
-- (void)rpcStartedStoppedTorrent:(Torrent*)torrent
+- (void)rpcControllerDidStartOrStopTorrent:(RpcController*)controller
 {
-    [torrent update];
-
     [self updateUI];
     [self applyFilter];
     [self updateTorrentHistory];
 }
 
-- (void)rpcChangedTorrent:(Torrent*)torrent
+- (void)rpcControllerDidChangeTorrent:(RpcController*)controller torrent:(Torrent*)torrent
 {
-    [torrent update];
-
     if ([self.fTableView.selectedTorrents containsObject:torrent])
     {
         [self.fInfoController updateInfoStats]; //this will reload the file table
@@ -5531,18 +5445,15 @@ static void removeKeRangerRansomware()
     }
 }
 
-- (void)rpcMovedTorrent:(Torrent*)torrent
+- (void)rpcControllerDidMoveTorrent:(RpcController*)controller torrent:(Torrent*)torrent
 {
-    [torrent update];
-    [torrent updateTimeMachineExclude];
-
     if ([self.fTableView.selectedTorrents containsObject:torrent])
     {
         [self.fInfoController updateInfoStats];
     }
 }
 
-- (void)rpcUpdateQueue
+- (void)rpcControllerDidUpdateQueue:(RpcController*)controller
 {
     [Torrent updateTorrents:self.fTorrents];
 
@@ -5551,6 +5462,17 @@ static void removeKeRangerRansomware()
     [self.fTorrents sortUsingDescriptors:descriptors];
 
     [self sortTorrentsAndIncludeQueueOrder:YES];
+}
+
+- (void)rpcControllerDidChangeSession:(RpcController*)controller
+{
+    [self.prefsController rpcUpdatePrefs];
+}
+
+- (void)rpcControllerDidRequestSessionClose:(RpcController*)controller
+{
+    self.fQuitRequested = YES;
+    [NSApp terminate:self];
 }
 
 @end
