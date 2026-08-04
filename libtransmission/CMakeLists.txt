@@ -35,6 +35,9 @@ target_sources(${TR_NAME}
         bandwidth.cc
         bandwidth.h
         benc.h
+        bep55-holepunch.cc
+        bep55-holepunch.h
+        bep55-introducer-store.h
         bitfield.cc
         bitfield.h
         block-info.cc

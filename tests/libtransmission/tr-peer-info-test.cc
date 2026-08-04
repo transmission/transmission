@@ -159,3 +159,24 @@ TEST_F(PeerInfoTest, updateCanonicalPriority)
         EXPECT_EQ(info.get_canonical_priority(), expected);
     }
 }
+
+TEST_F(PeerInfoTest, holepunchAttemptFlag)
+{
+    auto info = tr_peer_info{ tr_address{}, 0, TR_PEER_FROM_PEX, {} };
+
+    EXPECT_FALSE(info.is_holepunch_attempt());
+
+    // entering holepunch mode sets counter to 1
+    info.on_holepunch_attempt();
+    EXPECT_TRUE(info.is_holepunch_attempt());
+    EXPECT_TRUE(info.can_fast_retry_holepunch());
+
+    // cannot attempt again after this one
+    info.on_holepunch_attempt();
+    EXPECT_TRUE(info.is_holepunch_attempt());
+    EXPECT_FALSE(info.can_fast_retry_holepunch());
+
+    // reset clears holepunch mode
+    info.reset_holepunch_attempts();
+    EXPECT_FALSE(info.is_holepunch_attempt());
+}

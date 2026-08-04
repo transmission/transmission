@@ -9,6 +9,7 @@ The cryptic "peer status" is shown in transmission-remote's `--peers` argument a
 <tr><td><tt>K</tt></td><td>Peer has unchoked us, but we are not interested</td></tr>
 <tr><td><tt>?</tt></td><td>We unchoked this peer, but they are not interested</td></tr>
 <tr><td><tt>E</tt></td><td>Encrypted Connection</td></tr>
+<tr><td><tt>h</tt></td><td>Peer supports holepunch (BEP 55)</td></tr>
 <tr><td><tt>H</tt></td><td>Peer was discovered through Distributed Hash Table (DHT)</td></tr>
 <tr><td><tt>X</tt></td><td>Peer was discovered through Peer Exchange (PEX)</td></tr>
 <tr><td><tt>I</tt></td><td>Peer is an incoming connection</td></tr>
