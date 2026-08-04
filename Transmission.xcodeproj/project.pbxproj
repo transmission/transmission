@@ -313,6 +313,7 @@
 		BEFC1E530C07861A00B0BB3C /* open-files.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1A0C07861A00B0BB3C /* open-files.cc */; };
 		BEFC1E550C07861A00B0BB3C /* completion.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1C0C07861A00B0BB3C /* completion.h */; };
 		BEFC1E560C07861A00B0BB3C /* completion.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1D0C07861A00B0BB3C /* completion.cc */; };
+		ED0C0D1A2E5F400100112233 /* config-dir-lock.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED0C0D1B2E5F400100112233 /* config-dir-lock.cc */; };
 		BEFC1E570C07861A00B0BB3C /* clients.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1E0C07861A00B0BB3C /* clients.h */; };
 		BEFC1E580C07861A00B0BB3C /* clients.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1F0C07861A00B0BB3C /* clients.cc */; };
 		C1033E071A3279B800EF44D8 /* crypto-utils-fallback.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1033E031A3279B800EF44D8 /* crypto-utils-fallback.cc */; };
@@ -1167,6 +1168,8 @@
 		BEFC1E1A0C07861A00B0BB3C /* open-files.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "open-files.cc"; sourceTree = "<group>"; };
 		BEFC1E1C0C07861A00B0BB3C /* completion.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = completion.h; sourceTree = "<group>"; };
 		BEFC1E1D0C07861A00B0BB3C /* completion.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = completion.cc; sourceTree = "<group>"; };
+		ED0C0D1B2E5F400100112233 /* config-dir-lock.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "config-dir-lock.cc"; sourceTree = "<group>"; };
+		ED0C0D1C2E5F400100112233 /* config-dir-lock.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "config-dir-lock.h"; sourceTree = "<group>"; };
 		BEFC1E1E0C07861A00B0BB3C /* clients.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = clients.h; sourceTree = "<group>"; };
 		BEFC1E1F0C07861A00B0BB3C /* clients.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = clients.cc; sourceTree = "<group>"; };
 		C1033E031A3279B800EF44D8 /* crypto-utils-fallback.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "crypto-utils-fallback.cc"; sourceTree = "<group>"; };
@@ -1949,6 +1952,8 @@
 				BEFC1E1E0C07861A00B0BB3C /* clients.h */,
 				BEFC1E1D0C07861A00B0BB3C /* completion.cc */,
 				BEFC1E1C0C07861A00B0BB3C /* completion.h */,
+				ED0C0D1B2E5F400100112233 /* config-dir-lock.cc */,
+				ED0C0D1C2E5F400100112233 /* config-dir-lock.h */,
 				C1033E041A3279B800EF44D8 /* crypto-utils-ccrypto.cc */,
 				C1033E031A3279B800EF44D8 /* crypto-utils-fallback.cc */,
 				C1033E051A3279B800EF44D8 /* crypto-utils.cc */,
@@ -3421,6 +3426,7 @@
 				BEFC1E530C07861A00B0BB3C /* open-files.cc in Sources */,
 				C1FEE5781C3223CC00D62832 /* watchdir-generic.cc in Sources */,
 				BEFC1E560C07861A00B0BB3C /* completion.cc in Sources */,
+				ED0C0D1A2E5F400100112233 /* config-dir-lock.cc in Sources */,
 				BEFC1E580C07861A00B0BB3C /* clients.cc in Sources */,
 				C1425B381EE9C805001DB852 /* peer-socket.cc in Sources */,
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.cc in Sources */,

@@ -38,7 +38,7 @@ function global:Build-Transmission(
     }
 
     $OpenSslLibSuffix = if ($Arch -eq 'x86') { '' } else { '-x64' }
-    foreach ($x in @('libcurl', "libcrypto-3${OpenSslLibSuffix}", "libssl-3${OpenSslLibSuffix}", 'zlib', 'dbus-1')) {
+    foreach ($x in @('libcurl', "libcrypto-3${OpenSslLibSuffix}", "libssl-3${OpenSslLibSuffix}", 'z', 'dbus-1')) {
         if ($DepsPrefixDir -ne $PrefixDir) {
             Copy-Item -Path (Join-Path $DepsPrefixDir bin "${x}.dll") -Destination (Join-Path $PrefixDir bin)
         }

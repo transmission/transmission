@@ -18,6 +18,7 @@ target_sources(libtransmission-test
         buffer-test.cc
         clients-test.cc
         completion-test.cc
+        config-dir-lock-test.cc
         copy-test.cc
         crypto-test.cc
         dht-test.cc
