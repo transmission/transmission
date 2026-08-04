@@ -447,8 +447,19 @@
                                                     <binding destination="365" name="value" keyPath="values.RenamePartialFiles" id="1942"/>
                                                 </connections>
                                             </button>
+                                            <button toolTip="Downloads the first and last pieces first, then the remaining pieces in order. This may reduce download performance and piece availability." translatesAutoresizingMaskIntoConstraints="NO" id="seq-download">
+                                                <rect key="frame" x="84" y="170" width="222" height="18"/>
+                                                <buttonCell key="cell" type="check" title="Download pieces sequentially" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="seq-download-cell">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <connections>
+                                                    <action selector="setSequentialDownload:" target="-2" id="seq-download-action"/>
+                                                    <binding destination="365" name="value" keyPath="values.SequentialDownload" id="seq-download-binding"/>
+                                                </connections>
+                                            </button>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="209">
-                                                <rect key="frame" x="84" y="56" width="177" height="18"/>
+                                                <rect key="frame" x="84" y="36" width="177" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Watch for torrent files in:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1219">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -459,7 +470,7 @@
                                                 </connections>
                                             </button>
                                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="216">
-                                                <rect key="frame" x="263" y="51" width="83" height="25"/>
+                                                <rect key="frame" x="263" y="31" width="83" height="25"/>
                                                 <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="220" id="1220">
                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="menu"/>
@@ -496,7 +507,7 @@
                                                 </connections>
                                             </popUpButton>
                                             <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="352">
-                                                <rect key="frame" x="-2" y="57" width="82" height="16"/>
+                                                <rect key="frame" x="-2" y="37" width="82" height="16"/>
                                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Auto add:" usesSingleLineMode="YES" id="1226">
                                                     <font key="font" metaFont="system"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -551,7 +562,7 @@
                                                 </connections>
                                             </popUpButton>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="1293">
-                                                <rect key="frame" x="84" y="154" width="297" height="18"/>
+                                                <rect key="frame" x="84" y="134" width="297" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Display a window when opening a torrent file" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1294">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -561,7 +572,7 @@
                                                 </connections>
                                             </button>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="1947">
-                                                <rect key="frame" x="84" y="94" width="304" height="18"/>
+                                                <rect key="frame" x="84" y="74" width="304" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Display a window when opening a magnet link" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1948">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -595,7 +606,7 @@
                                                 </connections>
                                             </button>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="1476">
-                                                <rect key="frame" x="104" y="114" width="193" height="18"/>
+                                                <rect key="frame" x="104" y="94" width="193" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Only when adding manually" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1477">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -606,7 +617,7 @@
                                                 </connections>
                                             </button>
                                             <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1337">
-                                                <rect key="frame" x="-2" y="155" width="82" height="16"/>
+                                                <rect key="frame" x="-2" y="135" width="82" height="16"/>
                                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Add window:" usesSingleLineMode="YES" id="1338">
                                                     <font key="font" metaFont="system"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -614,7 +625,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="1339">
-                                                <rect key="frame" x="104" y="134" width="228" height="18"/>
+                                                <rect key="frame" x="104" y="114" width="228" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Only when there are multiple files" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1340">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -636,6 +647,9 @@
                                             <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="209" secondAttribute="bottom" constant="57" id="89P-iu-qPB"/>
                                             <constraint firstItem="51" firstAttribute="leading" secondItem="59" secondAttribute="trailing" constant="5" id="9cs-sM-t7g"/>
                                             <constraint firstItem="1939" firstAttribute="top" secondItem="115" secondAttribute="bottom" constant="4" id="DPz-89-UIF"/>
+                                            <constraint firstItem="seq-download" firstAttribute="top" secondItem="1939" secondAttribute="bottom" constant="4" id="seq-download-top"/>
+                                            <constraint firstItem="seq-download" firstAttribute="leading" secondItem="59" secondAttribute="leading" id="seq-download-leading"/>
+                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="seq-download" secondAttribute="trailing" constant="20" symbolic="YES" id="seq-download-trailing"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="538" secondAttribute="trailing" constant="20" symbolic="YES" id="Dlu-at-N1m"/>
                                             <constraint firstItem="61" firstAttribute="top" secondItem="xj0-Op-GeN" secondAttribute="top" constant="2" id="EWr-pf-pAl"/>
                                             <constraint firstItem="352" firstAttribute="width" secondItem="61" secondAttribute="width" id="Igi-E1-Olu"/>
@@ -664,7 +678,7 @@
                                             <constraint firstItem="1337" firstAttribute="width" secondItem="61" secondAttribute="width" id="pUr-gl-HWr"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="51" secondAttribute="trailing" constant="20" symbolic="YES" id="pdr-Mz-OEr"/>
                                             <constraint firstItem="115" firstAttribute="leading" secondItem="59" secondAttribute="leading" id="r9n-Jd-yn7"/>
-                                            <constraint firstItem="1293" firstAttribute="top" secondItem="1939" secondAttribute="bottom" constant="20" id="sc7-xe-pwG"/>
+                                            <constraint firstItem="1293" firstAttribute="top" secondItem="seq-download" secondAttribute="bottom" constant="20" id="sc7-xe-pwG"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1334" secondAttribute="trailing" constant="20" symbolic="YES" id="uBl-jP-kgp"/>
                                             <constraint firstItem="59" firstAttribute="leading" secondItem="61" secondAttribute="trailing" constant="8" symbolic="YES" id="udm-xI-Bf1"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="216" secondAttribute="trailing" constant="20" symbolic="YES" id="ulA-rw-Yfo"/>
