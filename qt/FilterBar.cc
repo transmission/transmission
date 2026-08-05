@@ -62,7 +62,7 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     add_row(ShowMode::ShowSeeding, tr("Seeding"), icons::Type::TorrentStateSeeding);
     add_row(ShowMode::ShowDownloading, tr("Downloading"), icons::Type::TorrentStateDownloading);
     add_row(ShowMode::ShowPaused, tr("Paused"), icons::Type::TorrentStatePaused);
-    add_row(ShowMode::ShowFinished, tr("Finished"), {});
+    add_row(ShowMode::ShowFinished, tr("Finished"), icons::Type::TorrentStateFinished);
     add_row(ShowMode::ShowVerifying, tr("Verifying"), icons::Type::TorrentStateVerifying);
     add_row(ShowMode::ShowError, tr("Error"), icons::Type::TorrentStateError);
 
