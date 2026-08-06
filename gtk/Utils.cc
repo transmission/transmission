@@ -9,6 +9,8 @@
 #include "PrefsDialog.h"
 #include "Session.h"
 
+#include <libtransmission-app/interop.h>
+
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>

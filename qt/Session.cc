@@ -26,6 +26,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/log.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/serializer.h>
 #include <libtransmission/session-id.h>
@@ -365,6 +366,13 @@ void Session::start()
         auto config_dir = config_dir_.toStdString();
         auto const settings = tr_sessionLoadSettings(config_dir);
         session_ = tr_sessionInit(config_dir, true, settings);
+
+        config_dir_contended_ = tr_sessionConfigDirIsContended(session_);
+        if (config_dir_contended_)
+        {
+            emit configDirContended();
+            return;
+        }
 
         rpc_.start(session_);
 

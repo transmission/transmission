@@ -45,6 +45,8 @@ target_sources(${TR_NAME}
         clients.h
         completion.cc
         completion.h
+        config-dir-lock.cc
+        config-dir-lock.h
         crypto-utils-ccrypto.cc
         crypto-utils-fallback.cc
         crypto-utils-mbedtls.cc
@@ -70,6 +72,8 @@ target_sources(${TR_NAME}
         ip-cache.cc
         ip-cache.h
         log.cc
+        lock-file.cc
+        lock-file.h
         log.h
         lru-cache.h
         magnet-metainfo.cc

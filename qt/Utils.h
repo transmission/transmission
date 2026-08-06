@@ -25,6 +25,12 @@ public:
 
     static QString removeTrailingDirSeparator(QString const& path);
 
+    // QString from UTF-8 bytes without an intermediate std::string.
+    [[nodiscard]] static QString toQString(std::string_view const sv)
+    {
+        return QString::fromUtf8(std::data(sv), static_cast<int>(std::size(sv)));
+    }
+
     static void narrowRect(QRect& rect, int dx1, int dx2, Qt::LayoutDirection direction)
     {
         if (direction == Qt::RightToLeft)

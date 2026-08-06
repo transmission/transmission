@@ -20,9 +20,13 @@
 class tr_stats
 {
 public:
-    tr_stats(std::string_view config_dir, time_t now)
+    // `persist` is false when the config dir belongs to another session.
+    // We go on counting in memory, but save() does nothing.
+    // stats.json is the owner's to write.
+    tr_stats(std::string_view const config_dir, time_t const now, bool const persist)
         : config_dir_{ config_dir }
         , start_time_{ now }
+        , persist_{ persist }
         , is_dirty_{ true }
     {
         single_.sessionCount = 1;
@@ -80,5 +84,6 @@ private:
     static constexpr auto Zero = tr_session_stats{ TR_RATIO_NA, 0U, 0U, 0U, 0U, 0U };
     tr_session_stats single_ = Zero;
     tr_session_stats old_ = Zero;
+    bool persist_ = true;
     bool is_dirty_ = false;
 };

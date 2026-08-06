@@ -804,6 +804,10 @@ if(RUN_CLANG_TIDY)
     endif()
 endif()
 
+# This is GTK-specific, but is exposed in this top-level file so that
+# it can be shared by `gtk/` and by `tests/gtk/`.
+set(TR_GTK_APP_ID "com.transmissionbt.transmission" CACHE INTERNAL "the app id the client and its desktop file share")
+
 if(ENABLE_TESTS)
     enable_testing()
     add_subdirectory(tests)

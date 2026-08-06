@@ -5,7 +5,9 @@
 
 #include <array>
 #include <memory>
+#include <string>
 #include <string_view>
+#include <vector>
 
 #include <fmt/format.h>
 
@@ -16,10 +18,13 @@
 #include <libtransmission/version.h>
 
 #include <libtransmission-app/app.h>
+#include <libtransmission-app/interop.h>
+#include <libtransmission-app/startup-coordinator.h>
 
 #include "Application.h"
-#include "InteropHelper.h"
 #include "Prefs.h"
+#include "Transports.h"
+#include "Utils.h"
 #include "VariantHelpers.h"
 
 using namespace std::string_view_literals;
@@ -54,47 +59,39 @@ char const* getUsage()
            "  transmission-qt [options...] [[--] torrent files...] [--- Qt options...]";
 }
 
-bool tryDelegate(QStringList const& filenames)
+// What this launch would have another instance do for it, if one is there.
+[[nodiscard]] tr::interop::Intent intentOf(bool const standalone, bool const have_torrents)
 {
-    InteropHelper const interop_client;
-    if (!interop_client.isConnected())
+    if (standalone)
     {
-        return false;
+        return tr::interop::Intent::Standalone;
     }
 
-    bool delegated = false;
+    return have_torrents ? tr::interop::Intent::AddTorrents : tr::interop::Intent::Present;
+}
+
+// Arguments in AddMetainfo(s) wire form; see tr::interop::encode_metainfo_arg().
+[[nodiscard]] std::vector<std::string> delegatableMetainfos(QStringList const& filenames)
+{
+    auto metainfos = std::vector<std::string>{};
+    metainfos.reserve(std::size(filenames));
 
     for (auto const& filename : filenames)
     {
-        auto const add_data = AddData(filename);
-        QString metainfo;
-
-        switch (add_data.type)
+        if (auto encoded = tr::interop::encode_metainfo_arg(filename.toStdString()))
         {
-        case AddData::URL:
-            metainfo = add_data.url.toString();
-            break;
-
-        case AddData::MAGNET:
-            metainfo = add_data.magnet;
-            break;
-
-        case AddData::FILENAME:
-        case AddData::METAINFO:
-            metainfo = QString::fromUtf8(add_data.toBase64());
-            break;
-
-        default:
-            break;
+            metainfos.push_back(std::move(*encoded));
         }
-
-        if (!metainfo.isEmpty() && interop_client.addMetainfo(metainfo))
+        else
         {
-            delegated = true;
+            // Report it here. This launch is being handed over, so it never reaches the code
+            // that would otherwise report it, and saying nothing would look like every
+            // argument landed.
+            fmt::print(stderr, "Skipping '{:s}': not a torrent file, URL or magnet link.\n", filename.toStdString());
         }
     }
 
-    return delegated;
+    return metainfos;
 }
 
 } // namespace
@@ -187,19 +184,32 @@ int tr_main(int argc, char** argv)
         }
     }
 
-    InteropHelper::initialize();
-
-    // try to delegate the work to an existing copy of Transmission
-    // before starting ourselves...
-    if (tryDelegate(filenames))
-    {
-        return 0;
-    }
-
-    // set the fallback config dir
+    // Resolve the config dir before asking whether a client is already running. The answer
+    // is per config dir, and two clients on different dirs are separate instances,
+    // not duplicates.
     if (config_dir.isNull())
     {
-        config_dir = QString::fromStdString(tr_getDefaultConfigDir("transmission"));
+        config_dir = QString::fromStdString(tr_getDefaultConfigDir(TR_CONFIG_DIR_NAME));
+    }
+
+    // Spell the dir the way every client does,
+    // so that `-g dir`, `-g dir/` and a symlink to it all name one instance.
+    auto const config_dir_str = tr::interop::canonical_config_dir_created(config_dir.toStdString());
+    config_dir = Utils::toQString(config_dir_str);
+    auto startup_coordinator = std::make_unique<tr::interop::StartupCoordinator>(
+        config_dir_str,
+        tr::interop::make_transport(config_dir));
+    // -r/-p/-u/-w name a session on another host, which is not this config dir's instance at all.
+    // -m asks for a window that opens minimized, and presenting one would do the opposite.
+    // These are read into prefs further down, past the point a handed-over launch returns from.
+    auto const standalone = minimized || !host.isNull() || !port.isNull() || !username.isNull() || !password.isNull();
+
+    auto const intent = intentOf(standalone, !filenames.isEmpty());
+
+    if (auto const exit_code = startup_coordinator->delegate(intent, [&filenames] { return delegatableMetainfos(filenames); });
+        exit_code)
+    {
+        return *exit_code;
     }
 
     // initialize the prefs
@@ -249,6 +259,21 @@ int tr_main(int argc, char** argv)
 
     auto qt_argc = static_cast<int>(std::size(qt_argv));
 
-    Application const app(std::move(prefs), minimized, config_dir, filenames, qt_argc, std::data(qt_argv));
-    return QApplication::exec();
+    auto app = Application{ std::move(prefs),  std::move(startup_coordinator), minimized, config_dir, filenames, qt_argc,
+                            std::data(qt_argv) };
+
+    if (app.configDirIsContended())
+    {
+        return tr::interop::report_config_dir_busy(config_dir_str);
+    }
+
+    auto const result = QApplication::exec();
+
+    // A launch that starts its session from the connection dialog only finds out here that the dir is held.
+    if (app.configDirIsContended())
+    {
+        return tr::interop::report_config_dir_busy(config_dir_str);
+    }
+
+    return result;
 }

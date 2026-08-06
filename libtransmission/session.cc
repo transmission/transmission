@@ -532,6 +532,11 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 
     TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
 
+    if (!session->mayWriteConfigDir())
+    {
+        return;
+    }
+
     auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
 
     // from highest to lowest precedence:
@@ -732,6 +737,11 @@ void tr_session::on_queue_timer()
 // in the case of a crash, unclean shutdown, clumsy user, etc.
 void tr_session::on_save_timer()
 {
+    if (!mayWriteConfigDir())
+    {
+        return;
+    }
+
     for (auto* const tor : torrents())
     {
         tor->save_resume_file();
@@ -997,6 +1007,13 @@ char const* tr_sessionGetConfigDir(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->configDir().c_str();
+}
+
+bool tr_sessionConfigDirIsContended(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->configDirIsContended();
 }
 
 // ---
@@ -1426,7 +1443,10 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     bound_ipv6_.reset();
     bound_ipv4_.reset();
 
-    torrent_queue().to_file();
+    if (mayWriteConfigDir())
+    {
+        torrent_queue().to_file();
+    }
 
     // Close the torrents in order of most active to least active
     // so that the most important announce=stopped events are
@@ -2242,10 +2262,19 @@ auto makeBlocklistDir(std::string_view config_dir)
     tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
     return dir;
 }
+
+auto makeConfigDirLock(std::string_view const config_dir)
+{
+    // A dir has to exist before it can be locked,
+    // so create it here rather than wait for the first write.
+    tr_sys_dir_create(std::string{ config_dir }, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return tr_config_dir_lock{ config_dir };
+}
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_dict)
     : config_dir_{ config_dir }
+    , config_dir_lock_{ makeConfigDirLock(config_dir) }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , blocklist_dir_{ makeBlocklistDir(config_dir) }
@@ -2262,6 +2291,20 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
     now_timer_->start_repeating(1s);
     queue_timer_->start_repeating(QueueInterval);
     save_timer_->start_repeating(SaveInterval);
+
+    // Warn here rather than in each client, and only when locking failed outright.
+    // Nobody can then tell whether another session is using the dir.
+    // A dir another session holds is a different matter. The caller decides what to do
+    // about that (see tr_sessionConfigDirIsContended()).
+    if (configDirLockStatus() == tr_config_dir_lock::Status::Unavailable)
+    {
+        tr_logAddWarn(
+            fmt::format(
+                fmt::runtime(
+                    _("Couldn't claim '{path}'. If another session is using it, the two will "
+                      "overwrite each other's settings, resume files and stats.")),
+                fmt::arg("path", config_dir_)));
+    }
 }
 
 void tr_session::addIncoming(tr_peer_socket&& socket)

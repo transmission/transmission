@@ -61,6 +61,9 @@ public:
         return tray_icon_;
     }
 
+    // Bring the window up from wherever it is: hidden to the tray, minimized, or behind another.
+    void presentWindow();
+
 public slots:
     void startAll();
     void startSelected();

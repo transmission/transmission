@@ -299,6 +299,11 @@ Prefs::Prefs(QString config_dir)
 
 Prefs::~Prefs()
 {
+    if (!save_on_exit_)
+    {
+        return;
+    }
+
     // make a dict from settings.json
     tr_variant current_settings;
     tr_variantInitDict(&current_settings, PREFS_COUNT);

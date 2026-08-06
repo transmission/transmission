@@ -164,8 +164,9 @@ public:
         tr_logAddTrace("Uninitializing DHT");
 
         // Since we only save known good nodes,
-        // only overwrite older data if we know enough nodes.
-        if (is_ready(AF_INET) || is_ready(AF_INET6))
+        // only overwrite older data if we know enough nodes --
+        // and only when this session may write the config dir.
+        if (mediator_.may_write_config_dir() && (is_ready(AF_INET) || is_ready(AF_INET6)))
         {
             save_state();
         }

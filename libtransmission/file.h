@@ -455,6 +455,9 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
  */
 bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error* error = nullptr);
 
+/** @brief Return whether a failed nonblocking lock was held by another process. */
+[[nodiscard]] bool tr_sys_file_lock_error_is_contended(tr_error const& error) noexcept;
+
 /* Directory-related wrappers */
 
 /**

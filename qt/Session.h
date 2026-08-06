@@ -93,6 +93,11 @@ public:
         return session_ != nullptr;
     }
 
+    [[nodiscard]] constexpr bool configDirIsContended() const noexcept
+    {
+        return config_dir_contended_;
+    }
+
     /** returns true if isServer() is true or if the remote address is the localhost */
     [[nodiscard]] auto isLocal() const noexcept
     {
@@ -148,6 +153,11 @@ public slots:
 
 signals:
     void sourceChanged();
+
+    // The session found its config dir held by another and started nothing.
+    // Emitted from every path that reaches start(), so a handler need not know which one ran.
+    void configDirContended();
+
     void portTested(std::optional<bool> status, PortTestIpProtocol ip_protocol);
     void statsUpdated();
     void sessionUpdated();
@@ -182,6 +192,7 @@ private:
 
     QString const config_dir_;
     Prefs& prefs_;
+    bool config_dir_contended_ = false;
 
     int64_t blocklist_size_ = -1;
     std::array<bool, NUM_PORT_TEST_IP_PROTOCOL> port_test_pending_ = {};

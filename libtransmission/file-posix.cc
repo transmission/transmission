@@ -993,6 +993,11 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
     return *result;
 }
 
+bool tr_sys_file_lock_error_is_contended(tr_error const& error) noexcept
+{
+    return error.code() == EWOULDBLOCK || error.code() == EACCES;
+}
+
 std::string tr_sys_dir_get_current(tr_error* error)
 {
     auto buf = std::vector<char>{};

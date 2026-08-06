@@ -1064,6 +1064,11 @@ void MainWindow::setStatusbarVisible(bool visible)
 ***
 **/
 
+void MainWindow::presentWindow()
+{
+    toggleWindows(true);
+}
+
 void MainWindow::toggleWindows(bool do_show)
 {
     if (!do_show)

@@ -358,6 +358,11 @@ protected:
             return config_dir_;
         }
 
+        [[nodiscard]] bool may_write_config_dir() const override
+        {
+            return may_write_config_dir_;
+        }
+
         [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return mock_timer_maker_;
@@ -373,6 +378,7 @@ protected:
         }
 
         std::string config_dir_;
+        bool may_write_config_dir_ = true;
         std::vector<tr_torrent_id_t> torrents_allowing_dht_;
         std::map<tr_torrent_id_t, tr_sha1_digest_t> info_hashes_;
         MockDht mock_dht_;
@@ -552,6 +558,26 @@ TEST_F(DhtTest, savesStateIfSwarmIsGood)
     }
 
     EXPECT_TRUE(tr_sys_path_exists(dat_file.c_str()));
+}
+
+// dht.dat lives in the config dir, so a session that found the dir held by another leaves
+// it alone, however healthy its own view of the swarm.
+TEST_F(DhtTest, doesNotSaveStateToAConfigDirAnotherSessionHolds)
+{
+    auto const state_file = MockStateFile{};
+    auto const dat_file = MockStateFile::filename(sandboxDir());
+    EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+
+    {
+        auto mediator = MockMediator{ event_base_ };
+        mediator.config_dir_ = sandboxDir();
+        mediator.may_write_config_dir_ = false;
+        mediator.mock_dht_.setHealthySwarm();
+
+        auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
+    }
+
+    EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
 }
 
 TEST_F(DhtTest, doesNotSaveStateIfSwarmIsBad)

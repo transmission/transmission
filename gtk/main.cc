@@ -6,11 +6,15 @@
 #include "GtkCompat.h"
 #include "Notify.h"
 #include "Prefs.h"
+#include "Transports.h"
 #include "Utils.h"
 
 #include <libtransmission-app/app.h>
+#include <libtransmission-app/interop.h>
+#include <libtransmission-app/startup-coordinator.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/crypto-utils.h> // tr_base64_encode()
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
@@ -30,11 +34,13 @@
 #include <fmt/format.h>
 
 #include <cstdio>
+#include <iterator> // std::next()
 #include <string>
+#include <string_view>
+#include <vector>
 
 namespace
 {
-auto const* const AppConfigDirName = "transmission";
 auto const* const AppTranslationDomainName = "transmission-gtk";
 auto const* const AppName = "transmission-gtk";
 
@@ -45,6 +51,41 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
     entry.set_short_name(short_name);
     entry.set_description(description);
     return entry;
+}
+
+// What this launch would have another instance do for it, if one is there.
+[[nodiscard]] tr::interop::Intent intent_of(bool const standalone, bool const have_torrents)
+{
+    if (standalone)
+    {
+        return tr::interop::Intent::Standalone;
+    }
+
+    return have_torrents ? tr::interop::Intent::AddTorrents : tr::interop::Intent::Present;
+}
+
+// Arguments in AddMetainfo(s) wire form; see tr::interop::encode_metainfo_arg().
+[[nodiscard]] std::vector<std::string> delegatable_metainfos(int const argc, char** const argv)
+{
+    auto metainfos = std::vector<std::string>{};
+
+    for (int i = 1; i < argc; ++i)
+    {
+        auto const* const arg = *std::next(argv, i);
+        if (auto encoded = tr::interop::encode_metainfo_arg(arg))
+        {
+            metainfos.push_back(std::move(*encoded));
+        }
+        else
+        {
+            // Report it here. This launch is being handed over, so it never reaches the code
+            // that would otherwise report it, and saying nothing would look like every
+            // argument landed.
+            fmt::print(stderr, "Skipping '{}': not a torrent file, URL or magnet link.\n", arg);
+        }
+    }
+
+    return metainfos;
 }
 } // namespace
 
@@ -90,7 +131,10 @@ int main(int argc, char** argv)
     Glib::OptionContext option_context(_("[torrent files or urls]"));
     option_context.set_main_group(main_group);
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-    Gtk::Main::add_gtk_option_group(option_context);
+    // Recognize GTK's own options without opening the display.
+    // A launch that only hands its torrents to a running instance needs no display,
+    // and asking for one where there is none fails the whole launch.
+    Gtk::Main::add_gtk_option_group(option_context, false);
 #endif
     option_context.set_translation_domain(GETTEXT_PACKAGE);
 
@@ -124,15 +168,48 @@ int main(int argc, char** argv)
     /* set up the config dir */
     if (std::empty(config_dir))
     {
-        config_dir = tr_getDefaultConfigDir(AppConfigDirName);
+        config_dir = tr_getDefaultConfigDir(TR_CONFIG_DIR_NAME);
     }
 
+    // Spell the dir the way every client does,
+    // so that `-g dir`, `-g dir/` and a symlink to it all name one instance.
+    config_dir = tr::interop::canonical_config_dir_created(config_dir);
+
     gtr_pref_init(config_dir);
-    g_mkdir_with_parents(config_dir.c_str(), 0755);
+
+    // Try to hand this launch to an instance already running on this config dir before starting ourselves.
+    // GApplication would forward the arguments if this were a unique application,
+    // but its bus name reaches only clients built on this toolkit.
+    // This reaches whoever serves the config dir.
+    auto startup_coordinator = std::make_unique<tr::interop::StartupCoordinator>(
+        config_dir,
+        tr::interop::make_transport(config_dir));
+    // Intent comes from the raw argument list, as in the Qt client.
+    // A launch whose torrent arguments were all unreadable must report that, not present
+    // someone else's window. It reports on stderr and exits when an instance is there,
+    // and in the client it goes on to start when none is.
+    // A launch asked to start iconified does not want a window raised, so it hands nothing over.
+    auto const intent = intent_of(start_iconified, argc > 1);
+
+    if (auto const exit_code = startup_coordinator->delegate(
+            intent,
+            [argc, argv] { return delegatable_metainfos(argc, argv); });
+        exit_code)
+    {
+        return *exit_code;
+    }
 
     /* init notifications */
     gtr_notify_init();
 
     /* init the application for the specified config dir */
-    return Application(config_dir, start_paused, start_iconified).run(argc, argv);
+    auto app = Application{ config_dir, start_paused, start_iconified, std::move(startup_coordinator) };
+    auto const result = app.run(argc, argv);
+
+    if (app.configDirIsContended())
+    {
+        return tr::interop::report_config_dir_busy(config_dir);
+    }
+
+    return result;
 }
