@@ -13,15 +13,28 @@
 #include <string>
 #include <vector>
 
+namespace tr::interop
+{
+class StartupCoordinator;
+} // namespace tr::interop
+
 class Application : public Gtk::Application
 {
 public:
-    Application(std::string const& config_dir, bool start_paused, bool start_iconified);
+    Application(
+        std::string const& config_dir,
+        bool start_paused,
+        bool start_iconified,
+        std::unique_ptr<tr::interop::StartupCoordinator> startup_coordinator);
     Application(Application&&) = delete;
     Application(Application const&) = delete;
     Application& operator=(Application&&) = delete;
     Application& operator=(Application const&) = delete;
     ~Application() override;
+
+    // True when this launch found the config dir held by another session.
+    // We give way rather than write over the files that session owns.
+    [[nodiscard]] bool configDirIsContended() const noexcept;
 
     friend void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data);
 

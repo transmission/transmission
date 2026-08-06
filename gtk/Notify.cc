@@ -49,13 +49,6 @@ Glib::RefPtr<Gio::DBus::Proxy> proxy;
 std::map<guint32, TrNotification> active_notifications;
 bool server_supports_actions = false;
 
-template<typename... Ts>
-Glib::VariantContainerBase make_variant_tuple(Ts&&... args)
-{
-    return Glib::VariantContainerBase::create_tuple(
-        { Glib::Variant<std::remove_cv_t<std::remove_reference_t<Ts>>>::create(std::forward<Ts>(args))... });
-}
-
 void get_capabilities_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 {
     auto result = Glib::VariantContainerBase();
@@ -246,7 +239,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_
     proxy->call(
         "Notify",
         [n](auto& res) { notify_callback(res, n); },
-        make_variant_tuple(
+        gtr_variant_tuple(
             Glib::ustring("Transmission"),
             0U,
             Glib::ustring("transmission"),
@@ -280,7 +273,7 @@ void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, tr_torrent_id_t
     proxy->call(
         "Notify",
         [n](auto& res) { notify_callback(res, n); },
-        make_variant_tuple(
+        gtr_variant_tuple(
             Glib::ustring("Transmission"),
             0U,
             Glib::ustring("transmission"),

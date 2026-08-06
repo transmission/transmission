@@ -44,6 +44,7 @@
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
+#include "libtransmission/config-dir-lock.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/ip-cache.h"
 #include "libtransmission/log.h" // for tr_log_level
@@ -179,6 +180,11 @@ private:
         [[nodiscard]] std::string_view config_dir() const override
         {
             return session_.config_dir_;
+        }
+
+        [[nodiscard]] bool may_write_config_dir() const override
+        {
+            return session_.mayWriteConfigDir();
         }
 
         [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
@@ -622,6 +628,26 @@ public:
     [[nodiscard]] constexpr std::string const& configDir() const noexcept
     {
         return config_dir_;
+    }
+
+    [[nodiscard]] constexpr tr_config_dir_lock::Status configDirLockStatus() const noexcept
+    {
+        return config_dir_lock_.status();
+    }
+
+    [[nodiscard]] constexpr bool configDirIsContended() const noexcept
+    {
+        return configDirLockStatus() == tr_config_dir_lock::Status::Contended;
+    }
+
+    // Whether this session may save its state to the config dir.
+    // False when another session holds the dir. Anything we wrote there would clobber
+    // the owner's files.
+    // True when we could not take the lock at all. That tells us nothing about who else
+    // is using the dir, so we go on saving.
+    [[nodiscard]] constexpr bool mayWriteConfigDir() const noexcept
+    {
+        return !configDirIsContended();
     }
 
     [[nodiscard]] constexpr auto const& torrentDir() const noexcept
@@ -1319,6 +1345,10 @@ private:
     /// const fields
 
     std::string const config_dir_;
+
+    // Held for the session's lifetime.
+    tr_config_dir_lock const config_dir_lock_;
+
     std::string const resume_dir_;
     std::string const torrent_dir_;
     std::string const blocklist_dir_;
@@ -1372,7 +1402,7 @@ private:
 
     mutable std::recursive_mutex session_mutex_;
 
-    tr_stats session_stats_{ config_dir_, time(nullptr) };
+    tr_stats session_stats_{ config_dir_, time(nullptr), mayWriteConfigDir() };
 
     tr_announce_list default_trackers_;
 

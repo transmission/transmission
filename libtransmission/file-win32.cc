@@ -207,6 +207,40 @@ std::string native_path_to_path(std::wstring_view wide_path)
     return tr_win32_native_to_utf8(wide_path);
 }
 
+[[nodiscard]] std::wstring path_to_normalized_native_path(std::string_view const path)
+{
+    auto wide_path = path_to_fixed_native_path(path);
+
+    // path_to_fixed_native_path() squashes repeated separators, including the leading pair
+    // that makes a path UNC. Restore it, or GetFullPathNameW() resolves \\server\share
+    // against the current drive.
+    if (is_unc_path(path))
+    {
+        wide_path.insert(0, 1, L'\\');
+    }
+
+    // Past MAX_PATH, GetFullPathNameW() only answers for a path carrying the "\\?\" prefix,
+    // and that prefix also tells it not to normalize. Such a path therefore keeps the
+    // spelling it arrived with.
+    // That is safe. Nothing relative reaches that length, so the path is already absolute,
+    // and tr_sys_path_resolve() canonicalizes from the open handle anyway.
+    auto const size = GetFullPathNameW(wide_path.c_str(), 0, nullptr, nullptr);
+    if (size == 0)
+    {
+        return path_to_native_path(path);
+    }
+
+    auto normalized = std::wstring(size, L'\0');
+    auto const length = GetFullPathNameW(wide_path.c_str(), size, std::data(normalized), nullptr);
+    if (length == 0 || length >= size)
+    {
+        return path_to_native_path(path);
+    }
+
+    normalized.resize(length);
+    return path_to_native_path(native_path_to_path(normalized));
+}
+
 tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD disposition, DWORD flags, tr_error* error)
 {
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
@@ -487,7 +521,7 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
 {
     auto ret = std::string{};
 
-    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
+    if (auto const wide_path = path_to_normalized_native_path(path); !std::empty(wide_path))
     {
         if (auto const handle = CreateFileW(
                 wide_path.c_str(),
@@ -1074,6 +1108,11 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error* error)
     }
 
     return ret;
+}
+
+bool tr_sys_file_lock_error_is_contended(tr_error const& error) noexcept
+{
+    return error.code() == ERROR_LOCK_VIOLATION;
 }
 
 std::string tr_sys_dir_get_current(tr_error* error)

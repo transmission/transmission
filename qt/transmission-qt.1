@@ -42,6 +42,12 @@ Multiple .torrent files may be added at startup
 by appending them on the command line. If
 .Nm
 is already running, the torrents will be added to the running instance.
+.Pp
+A client already running on the same config dir takes over the launch. It receives any
+torrents you named, or comes to the front when you named none. Either way, no second
+client starts. That client need not be
+.Nm ,
+since any client sharing the config dir will do.
 .Sh ENVIRONMENT
 .Bl -tag -width Fl
 .It Ev TRANSMISSION_HOME

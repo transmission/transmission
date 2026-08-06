@@ -18,6 +18,8 @@ library TransmissionLib
 	methods:
 		[id(1)] VARIANT_BOOL PresentWindow();
 		[id(2)] VARIANT_BOOL AddMetainfo([in] BSTR p_metainfo);
+		[id(3)] BSTR ConfigDir();
+		[id(4)] VARIANT_BOOL PresentWindowWithToken([in] BSTR p_activation_token);
 	};
 
 	[

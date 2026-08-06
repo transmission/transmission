@@ -95,6 +95,10 @@ public:
         [[nodiscard]] virtual tr_sha1_digest_t torrent_info_hash(tr_torrent_id_t) const = 0;
 
         [[nodiscard]] virtual std::string_view config_dir() const = 0;
+
+        // False when the config dir belongs to another session, whose dht.dat this one
+        // must not overwrite. See tr_session::mayWriteConfigDir().
+        [[nodiscard]] virtual bool may_write_config_dir() const = 0;
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual API& api()
         {
