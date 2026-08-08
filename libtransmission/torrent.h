@@ -58,6 +58,7 @@ void tr_torrentChangeMyPort(tr_torrent* tor);
 namespace tr::test
 {
 
+class TorrentTest_doneScriptNotTriggeredTwiceAfterRecheck_Test;
 class RenameTest_multifileTorrent_Test;
 class RenameTest_singleFilenameTorrent_Test;
 
@@ -1039,6 +1040,7 @@ struct tr_torrent
     time_t lpdAnnounceAt = 0;
 
 private:
+    friend class tr::test::TorrentTest_doneScriptNotTriggeredTwiceAfterRecheck_Test;
     friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat tr_torrentStat(tr_torrent* tor);
