@@ -20,6 +20,16 @@ const peer_column_classes = [
 
 const webseed_column_classes = ['url', 'speed-down'];
 
+const known_peer_sources = [
+  ['from_tracker', 'tracker'],
+  ['from_pex', 'PEX'],
+  ['from_dht', 'DHT'],
+  ['from_lpd', 'LPD'],
+  ['from_ltep', 'LTEP'],
+  ['from_incoming', 'incoming'],
+  ['from_cache', 'cache'],
+];
+
 export class Inspector extends EventTarget {
   constructor(controller) {
     super();
@@ -720,6 +730,19 @@ export class Inspector extends EventTarget {
       tortr.firstChild.setAttribute('colspan', cell_setters.length);
       peersRows.push(tortr);
 
+      const knownPeersText = Inspector._knownPeersTitle(
+        tor.getKnownPeersFrom(),
+      );
+      if (knownPeersText) {
+        const knownPeersTr = document.createElement('tr');
+        knownPeersTr.classList.add('known-peer-row');
+        const knownPeersTd = document.createElement('td');
+        knownPeersTd.setAttribute('colspan', cell_setters.length);
+        setTextContent(knownPeersTd, knownPeersText);
+        knownPeersTr.append(knownPeersTd);
+        peersRows.push(knownPeersTr);
+      }
+
       // peers
       for (const peer of tor.getPeers()) {
         const tr = document.createElement('tr');
@@ -746,6 +769,19 @@ export class Inspector extends EventTarget {
       tbody.firstChild.remove();
     }
     tbody.append(...peersRows);
+  }
+
+  static _knownPeersTitle(knownPeersFrom) {
+    const parts = [];
+
+    for (const [key, label] of known_peer_sources) {
+      const count = knownPeersFrom[key] || 0;
+      if (count > 0) {
+        parts.push(`${count} ${label}`);
+      }
+    }
+
+    return parts.length > 0 ? `(known: ${parts.join(', ')})` : '';
   }
 
   /// TRACKERS PAGE
