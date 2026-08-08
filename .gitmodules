@@ -64,3 +64,6 @@
 [submodule "third-party/sigslot"]
 	path = third-party/sigslot
 	url = https://github.com/transmission/sigslot
+[submodule "third-party/uchardet"]
+	path = third-party/uchardet
+	url = https://gitlab.freedesktop.org/uchardet/uchardet.git
