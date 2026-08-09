@@ -138,6 +138,13 @@ void read_bytes(
         return;
     }
 
+    // BEP 47: padding files are virtual zeros — no disk access needed
+    if (tor.file_is_padding(file_index))
+    {
+        std::ranges::fill(buf, 0);
+        return;
+    }
+
     auto const fd = get_fd(session, open_files, tor, false, file_index, error);
     if (!fd || error)
     {
@@ -172,6 +179,12 @@ void write_bytes(
     TR_ASSERT(file_size == 0U || file_offset < file_size);
     TR_ASSERT(file_offset + std::size(buf) <= file_size);
     if (file_size == 0U)
+    {
+        return;
+    }
+
+    // BEP 47: padding files are virtual — nothing to write to disk
+    if (tor.file_is_padding(file_index))
     {
         return;
     }

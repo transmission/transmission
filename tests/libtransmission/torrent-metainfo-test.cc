@@ -293,4 +293,26 @@ TEST_F(TorrentMetainfoTest, preservesInfoDictOrder)
     }
 }
 
+TEST_F(TorrentMetainfoTest, bep47PaddingFile)
+{
+    // Torrent with three files: file1.txt (2B), a BEP 47 padding file (26B), file2.txt (2B).
+    // Total 30 bytes fits in one piece (length 32768), so pieces field is one SHA1 (20 bytes).
+    // Key ordering in each dict must be lexicographic per the bencoding spec.
+    static auto constexpr Benc =
+        "d4:infod5:filesl"
+        "d6:lengthi2e4:pathl9:file1.txtee"
+        "d4:attr1:p6:lengthi26e4:pathl4:.pad2:26ee"
+        "d6:lengthi2e4:pathl9:file2.txtee"
+        "e4:name7:test-v112:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaaee"sv;
+
+    tr_logSetLevel(TR_LOG_OFF);
+
+    auto metainfo = tr_torrent_metainfo{};
+    ASSERT_TRUE(metainfo.parse_benc(Benc));
+    ASSERT_EQ(3U, metainfo.file_count());
+    EXPECT_FALSE(metainfo.file_is_padding(0)); // file1.txt
+    EXPECT_TRUE(metainfo.file_is_padding(1)); // .pad/26
+    EXPECT_FALSE(metainfo.file_is_padding(2)); // file2.txt
+}
+
 } // namespace tr::test
