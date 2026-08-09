@@ -1054,8 +1054,9 @@ private:
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat tr_torrentStat(tr_torrent* tor);
     friend bool tr_torrentTryStat(tr_torrent* tor, tr_stat* setme);
-    friend bool tr_torrentTryStat(tr_torrent* const* torrents, size_t n_torrents, tr_stat* setme);
+    friend bool tr_torrentTryStat(tr_session* session, std::span<tr_torrent_id_t const> ids, tr_stat* setme);
     friend std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+    friend tr_session* tr_torrentSession(tr_torrent* torrent);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);

@@ -273,8 +273,10 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     std::vector<Torrent*> torrent_objects;
     torrent_objects.reserve(torrents.count);
 
-    std::vector<tr_torrent*> torrent_handles;
-    torrent_handles.reserve(torrents.count);
+    std::vector<tr_torrent_id_t> torrent_ids;
+    torrent_ids.reserve(torrents.count);
+
+    tr_session* session = nullptr;
 
     for (Torrent* torrent in torrents)
     {
@@ -283,17 +285,22 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
             continue;
         }
 
+        if (session == nullptr)
+        {
+            session = tr_torrentSession(torrent.fHandle);
+        }
+
         torrent_objects.emplace_back(torrent);
-        torrent_handles.emplace_back(torrent.fHandle);
+        torrent_ids.emplace_back(tr_torrentId(torrent.fHandle));
     }
 
-    if (torrent_handles.empty())
+    if (torrent_objects.empty())
     {
         return;
     }
 
-    auto stats = std::vector<tr_stat>(torrent_handles.size());
-    if (!tr_torrentTryStat(torrent_handles.data(), torrent_handles.size(), stats.data()))
+    auto stats = std::vector<tr_stat>(torrent_ids.size());
+    if (!tr_torrentTryStat(session, torrent_ids, stats.data()))
     {
         // The session thread currently holds the session lock (e.g. it's in
         // the middle of a disk write). Rather than block the calling thread

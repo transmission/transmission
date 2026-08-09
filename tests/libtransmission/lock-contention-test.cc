@@ -147,7 +147,7 @@ TEST_F(LockContentionTest, BatchTrTorrentTryStatDoesNotBlockWhileSessionLockIsHe
 {
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
     ASSERT_NE(tor, nullptr);
-    auto const torrents = std::array<tr_torrent*, 1>{ tor };
+    auto const ids = std::array<tr_torrent_id_t, 1>{ tr_torrentId(tor) };
 
     static constexpr auto SimulatedWriteDelay = 300ms;
 
@@ -167,7 +167,7 @@ TEST_F(LockContentionTest, BatchTrTorrentTryStatDoesNotBlockWhileSessionLockIsHe
 
     auto stats = std::array<tr_stat, 1>{};
     auto const t0 = std::chrono::steady_clock::now();
-    auto const got_stats = tr_torrentTryStat(std::data(torrents), std::size(torrents), std::data(stats));
+    auto const got_stats = tr_torrentTryStat(session_, ids, std::data(stats));
     auto const elapsed = std::chrono::steady_clock::now() - t0;
 
     writer.join();

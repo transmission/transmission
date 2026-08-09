@@ -12,6 +12,7 @@
 #include <map>
 #include <sstream>
 #include <ranges>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -1486,52 +1487,43 @@ std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torren
     return ret;
 }
 
-bool tr_torrentTryStat(tr_torrent* const* torrents, size_t n_torrents, tr_stat* const setme)
+bool tr_torrentTryStat(tr_session* const session, std::span<tr_torrent_id_t const> const ids, tr_stat* const setme)
 {
-    tr_return_val_if_fail(torrents != nullptr, false);
+    tr_return_val_if_fail(session != nullptr, false);
     tr_return_val_if_fail(setme != nullptr, false);
-    tr_return_val_if_fail(std::all_of(torrents, torrents + n_torrents, tr_isTorrent), false);
 
-    if (n_torrents == 0U)
+    if (std::empty(ids))
     {
         return true;
     }
 
-    if (all_same_session(torrents, n_torrents))
+    auto lock = session->try_unique_lock();
+    if (!lock.owns_lock())
     {
-        auto lock = torrents[0]->session->try_unique_lock();
-        if (!lock.owns_lock())
+        return false;
+    }
+
+    // Addressing by id rather than by pointer means every lookup is
+    // implicitly scoped to `session` -- there's no "what if these torrents
+    // belong to different sessions" question to answer, since an id that
+    // isn't in `session` just fails the lookup like any other bad id.
+    for (size_t idx = 0U; idx != std::size(ids); ++idx)
+    {
+        auto const* const tor = session->torrents().get(ids[idx]);
+        if (tor == nullptr)
         {
             return false;
         }
 
-        for (size_t idx = 0U; idx != n_torrents; ++idx)
-        {
-            setme[idx] = torrents[idx]->stats_locked();
-        }
-
-        return true;
-    }
-
-    // Mixed sessions: each torrent's session lock is independent, so try_stats()
-    // each one in turn. If any of them is unavailable, bail out without writing
-    // to setme at all -- same all-or-nothing contract as the common-session case.
-    auto results = std::vector<std::optional<tr_stat>>(n_torrents);
-    for (size_t idx = 0U; idx != n_torrents; ++idx)
-    {
-        results[idx] = torrents[idx]->try_stats();
-        if (!results[idx])
-        {
-            return false;
-        }
-    }
-
-    for (size_t idx = 0U; idx != n_torrents; ++idx)
-    {
-        setme[idx] = *results[idx];
+        setme[idx] = tor->stats_locked();
     }
 
     return true;
+}
+
+tr_session* tr_torrentSession(tr_torrent* const torrent)
+{
+    return tr_isTorrent(torrent) ? torrent->session : nullptr;
 }
 
 // ---
