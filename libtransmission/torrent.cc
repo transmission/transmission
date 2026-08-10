@@ -1507,15 +1507,23 @@ bool tr_torrentTryStat(tr_session* const session, std::span<tr_torrent_id_t cons
     // implicitly scoped to `session` -- there's no "what if these torrents
     // belong to different sessions" question to answer, since an id that
     // isn't in `session` just fails the lookup like any other bad id.
+    //
+    // Resolve every id before writing anything to setme: if one partway
+    // through doesn't resolve, we still need to return false having left
+    // setme completely untouched, per this function's documented contract.
+    auto torrents = std::vector<tr_torrent*>(std::size(ids));
     for (size_t idx = 0U; idx != std::size(ids); ++idx)
     {
-        auto const* const tor = session->torrents().get(ids[idx]);
-        if (tor == nullptr)
+        torrents[idx] = session->torrents().get(ids[idx]);
+        if (torrents[idx] == nullptr)
         {
             return false;
         }
+    }
 
-        setme[idx] = tor->stats_locked();
+    for (size_t idx = 0U; idx != std::size(ids); ++idx)
+    {
+        setme[idx] = torrents[idx]->stats_locked();
     }
 
     return true;

@@ -43,8 +43,11 @@ TEST_F(LockContentionTest, TrTorrentStatBlocksWhileSessionLockIsHeld)
             std::this_thread::sleep_for(SimulatedWriteDelay);
         });
 
+    // The promise only fires after the writer's unique_lock() has already
+    // succeeded, and the writer holds it continuously through its sleep, so
+    // the lock is guaranteed held here already -- no extra wall-clock head
+    // start needed (or safe to rely on) beyond this synchronization point.
     lock_acquired_future.wait();
-    std::this_thread::sleep_for(20ms); // give the writer a head start into its sleep
 
     auto const t0 = std::chrono::steady_clock::now();
     auto const stat = tr_torrentStat(tor);
@@ -101,8 +104,10 @@ TEST_F(LockContentionTest, TrTorrentTryStatDoesNotBlockWhileSessionLockIsHeld)
             std::this_thread::sleep_for(SimulatedWriteDelay);
         });
 
+    // See the comment on the equivalent wait() in
+    // TrTorrentStatBlocksWhileSessionLockIsHeld above: the lock is already
+    // guaranteed held by this point, so no extra sleep is needed.
     lock_acquired_future.wait();
-    std::this_thread::sleep_for(20ms); // give the writer a head start into its sleep
 
     auto stat = tr_stat{};
     auto const t0 = std::chrono::steady_clock::now();
@@ -162,8 +167,9 @@ TEST_F(LockContentionTest, BatchTrTorrentTryStatDoesNotBlockWhileSessionLockIsHe
             std::this_thread::sleep_for(SimulatedWriteDelay);
         });
 
+    // Same reasoning as the other tests in this file: the promise guarantees
+    // the lock is already held, so no extra sleep is needed here.
     lock_acquired_future.wait();
-    std::this_thread::sleep_for(20ms);
 
     auto stats = std::array<tr_stat, 1>{};
     auto const t0 = std::chrono::steady_clock::now();
@@ -180,6 +186,37 @@ TEST_F(LockContentionTest, BatchTrTorrentTryStatDoesNotBlockWhileSessionLockIsHe
 
     EXPECT_FALSE(got_stats);
     EXPECT_LT(elapsed, 50ms) << "batch tr_torrentTryStat() blocked instead of returning immediately";
+}
+
+// Regression test: a failure partway through the batch (here, an id that
+// doesn't resolve to any torrent) must leave every setme entry untouched,
+// including ones for ids earlier in the list that resolved just fine --
+// per this function's documented all-or-nothing contract.
+TEST_F(LockContentionTest, BatchTrTorrentTryStatLeavesSetmeUntouchedOnInvalidId)
+{
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    ASSERT_NE(tor, nullptr);
+
+    // A bogus id that will never resolve, after a valid one. If the
+    // implementation wrote setme[0] before validating ids[1], this would
+    // (wrongly) still leave setme[0] populated despite returning false.
+    static constexpr auto BogusId = tr_torrent_id_t{ -12345 };
+    auto const ids = std::array<tr_torrent_id_t, 2>{ tr_torrentId(tor), BogusId };
+
+    static constexpr auto SentinelId = tr_torrent_id_t{ -99999 };
+    auto stats = std::array<tr_stat, 2>{};
+    for (auto& stat : stats)
+    {
+        stat.id = SentinelId;
+    }
+
+    auto const got_stats = tr_torrentTryStat(session_, ids, std::data(stats));
+
+    EXPECT_FALSE(got_stats);
+    for (auto const& stat : stats)
+    {
+        EXPECT_EQ(stat.id, SentinelId) << "setme was modified even though tr_torrentTryStat() returned false";
+    }
 }
 
 } // namespace tr::test
