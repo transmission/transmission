@@ -188,6 +188,44 @@ TEST_F(LockContentionTest, BatchTrTorrentTryStatDoesNotBlockWhileSessionLockIsHe
     EXPECT_LT(elapsed, 50ms) << "batch tr_torrentTryStat() blocked instead of returning immediately";
 }
 
+// The above only covers the batch overload's failure paths (contention,
+// bad id). Confirm the actual happy path too: with no contention and every
+// id valid, it should return true and fill in setme with the right stat
+// for the right torrent, in the same order as the requested ids.
+TEST_F(LockContentionTest, BatchTrTorrentTryStatSucceedsWithNoContention)
+{
+    auto* const tor1 = zeroTorrentInit(ZeroTorrentState::Complete);
+    ASSERT_NE(tor1, nullptr);
+    auto* const tor2 = torrentInitFromFile("debian-11.2.0-amd64-DVD-1.iso.torrent");
+    ASSERT_NE(tor2, nullptr);
+
+    auto const ids = std::array<tr_torrent_id_t, 2>{ tr_torrentId(tor1), tr_torrentId(tor2) };
+    auto stats = std::array<tr_stat, 2>{};
+
+    // Torrent creation/verification can leave brief session-thread
+    // bookkeeping in flight right after the verify-done callback fires.
+    // Let that settle before measuring, so this test genuinely exercises
+    // the no-contention path instead of racing that unrelated activity.
+    for (auto i = 0; i < 1000 && !session_->try_unique_lock().owns_lock(); ++i)
+    {
+        std::this_thread::sleep_for(1ms);
+    }
+
+    auto const t0 = std::chrono::steady_clock::now();
+    auto const got_stats = tr_torrentTryStat(session_, ids, std::data(stats));
+    auto const elapsed = std::chrono::steady_clock::now() - t0;
+
+    fmt::print(
+        "batch tr_torrentTryStat() took {:d}us (returned {:s}) with no lock contention (baseline)\n",
+        std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count(),
+        got_stats ? "true" : "false");
+
+    ASSERT_TRUE(got_stats);
+    EXPECT_LT(elapsed, 50ms);
+    EXPECT_EQ(stats[0].id, tr_torrentId(tor1));
+    EXPECT_EQ(stats[1].id, tr_torrentId(tor2));
+}
+
 // Regression test: a failure partway through the batch (here, an id that
 // doesn't resolve to any torrent) must leave every setme entry untouched,
 // including ones for ids earlier in the list that resolved just fine --
