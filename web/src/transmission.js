@@ -469,6 +469,21 @@ export class Transmission extends EventTarget {
         this.refilterAllSoon();
         break;
       }
+      case Prefs.ColorScheme: {
+        // Pin the color scheme to the user's choice. When it's left up to the
+        // system, drop the attribute so the prefers-color-scheme media queries
+        // take over again.
+        if (
+          value === Prefs.ColorSchemeLight ||
+          value === Prefs.ColorSchemeDark
+        ) {
+          document.documentElement.dataset.colorScheme = value;
+        } else {
+          delete document.documentElement.dataset.colorScheme;
+        }
+        break;
+      }
+
       case Prefs.ContrastMode: {
         // Add custom class to the body/html element to get the appropriate contrast color scheme
         document.body.classList.remove('contrast-more', 'contrast-less');
