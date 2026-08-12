@@ -1977,12 +1977,8 @@ tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) cons
 
 void tr_torrent::set_file_priorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
 {
-    if (std::any_of(
-            files,
-            files + file_count,
-            [this, priority](tr_file_index_t file) { return priority != file_priorities_.file_priority(file); }))
+    if (file_priorities_.set(files, file_count, priority))
     {
-        file_priorities_.set(files, file_count, priority);
         priority_changed_.emit(this, files, file_count, priority);
         set_dirty();
         mark_changed();

@@ -435,9 +435,8 @@ struct tr_torrent
 
     void set_file_priority(tr_file_index_t file, tr_priority_t priority)
     {
-        if (priority != file_priorities_.file_priority(file))
+        if (file_priorities_.set(file, priority))
         {
-            file_priorities_.set(file, priority);
             priority_changed_.emit(this, &file, 1U, priority);
             set_dirty();
             mark_changed();
