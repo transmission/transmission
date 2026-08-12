@@ -295,6 +295,29 @@ TEST_F(ResumeTest, savedFilenamesListLongerThanFileCount)
     expectSubpaths(torrentInit(file_sizes, savedFilenames(saved)), canonicalSubpaths(std::size(file_sizes)));
 }
 
+// A client that applied a legacy-length list by position saved the result back
+// at full length, so the last pathname went to two files. Its length says
+// nothing; the duplicate is what gives it away. None of the list is applied,
+// not even the entries ahead of the duplicate: whatever produced one wrong
+// pathname leaves no reason to trust the others.
+TEST_F(ResumeTest, savedFilenamesFullLengthListWithDuplicate)
+{
+    auto const file_sizes = std::vector<uint64_t>{ 1U, 0U, 1U, 1U };
+    auto const saved = std::vector<std::string>{ "root/renamed", "root/f2", "root/f3", "root/f3" };
+
+    expectSubpaths(torrentInit(file_sizes, savedFilenames(saved)), canonicalSubpaths(std::size(file_sizes)));
+}
+
+// A file with no entry of its own still holds the pathname its metainfo gave
+// it, so an entry that names that pathname collides with it.
+TEST_F(ResumeTest, savedFilenamesEntryCollidingWithUnlistedFile)
+{
+    auto const file_sizes = std::vector<uint64_t>{ 1U, 0U, 1U, 1U };
+    auto const saved = std::vector<std::string>{ "root/f1", "root/f2", "root/f3" };
+
+    expectSubpaths(torrentInit(file_sizes, savedFilenames(saved)), canonicalSubpaths(std::size(file_sizes)));
+}
+
 // An entry that isn't a usable pathname leaves that one file alone. It still
 // holds a position, so the entries after it keep their alignment.
 TEST_F(ResumeTest, savedFilenamesUnusableEntry)

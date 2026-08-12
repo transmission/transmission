@@ -3,7 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> // std::min
+#include <algorithm> // std::min, std::adjacent_find, std::sort
 #include <array>
 #include <cstdint>
 #include <cstring>
@@ -469,16 +469,52 @@ tr_resume::fields_t load_filenames(tr_variant::Map const& map, tr_torrent* tor)
         return {};
     }
 
+    // The pathname each file would end up with. The mapping is built in full
+    // before any of it is applied, since a duplicate can turn up at any
+    // position and the entries before it would already be on their files.
+    auto subpaths = std::vector<std::string_view>{};
+    subpaths.reserve(n_files);
     for (tr_file_index_t i = 0, pos = 0; i < n_files; ++i)
     {
-        if (!file_has_list_entry(tor, alignment, i))
+        // A file with no entry, or whose entry isn't a usable pathname,
+        // keeps the pathname its metainfo gave it.
+        auto subpath = std::string_view{ tor->file_subpath(i) };
+
+        if (file_has_list_entry(tor, alignment, i))
         {
-            continue;
+            if (auto const sv = (*list)[pos++].value_if<std::string_view>(); sv && !std::empty(*sv))
+            {
+                subpath = *sv;
+            }
         }
 
-        if (auto const sv = (*list)[pos++].value_if<std::string_view>(); sv && !std::empty(*sv))
+        subpaths.push_back(subpath);
+    }
+
+    // Two files sharing a pathname share one file on disk, but the open-file
+    // cache keys on file index, so each gets its own descriptor and they
+    // write over each other. A torrent's own file list can't name a file
+    // twice, so a duplicate is the saved list's, and the rest of that list is
+    // no more trustworthy than the part that collided.
+    auto sorted = subpaths;
+    std::sort(std::begin(sorted), std::end(sorted));
+    if (auto const dupe = std::adjacent_find(std::begin(sorted), std::end(sorted)); dupe != std::end(sorted))
+    {
+        tr_logAddWarnTor(
+            tor,
+            fmt::format(
+                "Not using the filenames saved for this torrent: they give '{:s}' to more than one file. "
+                "Using the filenames from the torrent instead; the saved ones are in '{:s}' until it is written over.",
+                *dupe,
+                tor->resume_file()));
+        return {};
+    }
+
+    for (tr_file_index_t i = 0; i < n_files; ++i)
+    {
+        if (auto const subpath = subpaths[i]; subpath != tor->file_subpath(i))
         {
-            tor->set_file_subpath(i, *sv);
+            tor->set_file_subpath(i, subpath);
         }
     }
 
