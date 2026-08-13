@@ -357,4 +357,47 @@ TEST_F(SessionTest, loadTorrentsThenMagnets)
     EXPECT_TRUE(tor->has_metainfo());
 }
 
+namespace
+{
+// Starts a session on `config_dir` and reports whether it claimed the dir.
+[[nodiscard]] bool startsOwningConfigDir(std::string_view config_dir, tr_variant const& settings)
+{
+    auto* const session = tr_sessionInit(config_dir, false, settings);
+    auto const owns = tr_sessionOwnsConfigDir(session);
+    tr_sessionClose(session, 0.5);
+    return owns;
+}
+} // namespace
+
+// Two sessions on one config dir overwrite each other's settings, resume files
+// and stats. The second still starts; all it can do is report. `session_`
+// already holds this dir.
+TEST_F(SessionTest, doesNotOwnAConfigDirAnotherSessionHolds)
+{
+    EXPECT_FALSE(startsOwningConfigDir(sandboxDir(), quietSettings()));
+}
+
+TEST_F(SessionTest, releasesTheConfigDirWhenItCloses)
+{
+    closeSession();
+
+    EXPECT_TRUE(startsOwningConfigDir(sandboxDir(), quietSettings()));
+}
+
+TEST_F(SessionTest, claimsAConfigDirItHadToCreate)
+{
+    EXPECT_TRUE(startsOwningConfigDir(sandboxDir() + "/brand-new", quietSettings()));
+}
+
+TEST_F(SessionTest, startsOnAConfigDirItCannotLock)
+{
+    // A lock that is a directory can never be opened as a file, which is the
+    // shape of every "could not be locked at all" a real filesystem produces.
+    auto const dir = sandboxDir() + "/unlockable";
+    ASSERT_TRUE(tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700));
+    ASSERT_TRUE(tr_sys_dir_create(dir + "/lock", TR_SYS_DIR_CREATE_PARENTS, 0700));
+
+    EXPECT_FALSE(startsOwningConfigDir(dir, quietSettings()));
+}
+
 } // namespace tr::test
