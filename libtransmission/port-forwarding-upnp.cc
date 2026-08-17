@@ -277,7 +277,7 @@ auto discover_and_validate_thread_func(std::string bindaddr) // NOLINT performan
             &result->urls,
             &result->data,
             std::data(result->lanaddr),
-            std::size(result->lanaddr) - 1,
+            static_cast<int>(std::size(result->lanaddr) - 1),
             nullptr,
             0);
 #else
@@ -286,7 +286,7 @@ auto discover_and_validate_thread_func(std::string bindaddr) // NOLINT performan
             &result->urls,
             &result->data,
             std::data(result->lanaddr),
-            std::size(result->lanaddr) - 1);
+            static_cast<int>(std::size(result->lanaddr) - 1));
 #endif
         result->error = errno;
 
