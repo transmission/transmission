@@ -154,7 +154,20 @@ int Cache::write_block(tr_torrent_id_t const tor_id, tr_block_index_t const bloc
     ++cache_writes_;
     cache_write_bytes_ += std::size(*iter->buf);
 
-    return cache_trim();
+    if (auto const err = cache_trim(); err != 0)
+    {
+        // The error belongs to whichever span failed to flush, and
+        // tr_ioWrite() stopped that span's torrent with a local error.
+        // Report it here only if that torrent is the caller's, so that
+        // the caller doesn't mark this block as complete.
+        auto const* const tor = torrents_.get(tor_id);
+        if (tor == nullptr || tor->error().error_type() == TR_STAT_LOCAL_ERROR)
+        {
+            return err;
+        }
+    }
+
+    return 0;
 }
 
 Cache::CIter Cache::get_block(tr_torrent const& tor, tr_block_info::Location const& loc) noexcept
@@ -187,20 +200,39 @@ int Cache::read_block(tr_torrent const& tor, tr_block_info::Location const& loc,
 
 int Cache::flush_span(CIter const& begin, CIter const& end)
 {
-    for (auto span_begin = begin; span_begin < end;)
-    {
-        auto const span_end = find_span_end(span_begin, end);
+    // Extract the span from the cache before writing it, for two reasons:
+    //
+    // 1. A failed tr_ioWrite() stops the offending torrent with a local
+    //    error, which reentrantly flushes and erases that torrent's other
+    //    cached blocks, invalidating any iterator into `blocks_`.
+    //
+    // 2. A span that can't be written must be dropped, not kept: its
+    //    torrent has been stopped with a local error, or is gone from the
+    //    session, so the blocks can never be flushed. Keeping them would
+    //    wedge the cache and starve the torrents that can still write.
+    //    (#5747)
+    auto const first = std::distance(std::cbegin(blocks_), begin);
+    auto const count = std::distance(begin, end);
+    auto pending = Blocks{};
+    pending.reserve(static_cast<size_t>(count));
+    std::move(std::begin(blocks_) + first, std::begin(blocks_) + first + count, std::back_inserter(pending));
+    blocks_.erase(begin, end);
 
-        if (auto const err = write_contiguous(span_begin, span_end); err != 0)
+    auto first_err = int{};
+
+    for (auto span_begin = std::cbegin(pending), pending_end = std::cend(pending); span_begin < pending_end;)
+    {
+        auto const span_end = find_span_end(span_begin, pending_end);
+
+        if (auto const err = write_contiguous(span_begin, span_end); err != 0 && first_err == 0)
         {
-            return err;
+            first_err = err;
         }
 
         span_begin = span_end;
     }
 
-    blocks_.erase(begin, end);
-    return {};
+    return first_err;
 }
 
 int Cache::flush_file(tr_torrent const& tor, tr_file_index_t const file)
@@ -229,13 +261,7 @@ int Cache::flush_biggest()
         return 0;
     }
 
-    if (auto const err = write_contiguous(begin, end); err != 0)
-    {
-        return err;
-    }
-
-    blocks_.erase(begin, end);
-    return 0;
+    return flush_span(begin, end);
 }
 
 int Cache::cache_trim()
