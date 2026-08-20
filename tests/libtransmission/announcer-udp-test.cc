@@ -1269,3 +1269,63 @@ TEST_F(AnnouncerUdpTest, announceDualStackNoneSuccessful)
         }
     }
 }
+
+TEST_F(AnnouncerUdpTest, shutdownDoesNotWaitForUnresponsiveTracker)
+{
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+    auto upkeep_timer = createUpkeepTimer(mediator, announcer);
+
+    // tell announcer to scrape, but never let the "tracker" respond,
+    // as if the tracker were unreachable
+    auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
+    auto response = std::optional<tr_scrape_response>{};
+    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
+
+    // the announcer sent a connection request that will never be answered
+    (void)parseConnectionRequest(waitForAnnouncerToSendMessage(mediator));
+    EXPECT_FALSE(announcer->is_idle());
+
+    // Shutdown must not wait out the full request TTL for a tracker
+    // that isn't responding: once the grace period is up, the pending
+    // requests are failed so that is_idle() can come true.
+    announcer->startShutdown();
+    tr_timeUpdate(tr_time() + TrShutdownAnnounceGraceSecs.count() + 1);
+    announcer->upkeep();
+
+    EXPECT_TRUE(announcer->is_idle());
+    ASSERT_TRUE(response.has_value());
+    EXPECT_TRUE(response->did_timeout);
+}
+
+TEST_F(AnnouncerUdpTest, shutdownDoesNotWaitForResponsesToSentRequests)
+{
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+    auto upkeep_timer = createUpkeepTimer(mediator, announcer);
+
+    // tell announcer to scrape
+    auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
+    auto response = std::optional<tr_scrape_response>{};
+    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
+
+    auto from = sockaddr_storage{};
+    auto* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
+    auto fromlen = socklen_t{};
+
+    // let the connection handshake finish so the scrape request goes out
+    auto const connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator, from_ptr, &fromlen));
+    auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id, from_ptr, fromlen);
+    (void)parseScrapeRequest(waitForAnnouncerToSendMessage(mediator), connection_id);
+    EXPECT_FALSE(announcer->is_idle());
+
+    // A request that has been sent has served its purpose. Shutdown
+    // must not wait for its response, without needing any grace period
+    // to pass.
+    announcer->startShutdown();
+    announcer->upkeep();
+
+    EXPECT_TRUE(announcer->is_idle());
+    ASSERT_TRUE(response.has_value());
+    EXPECT_TRUE(response->did_timeout);
+}

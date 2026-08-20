@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <chrono>
 #include <cstddef> // size_t
 #include <cstdint> // uint32_t
 #include <ctime>
@@ -127,6 +128,12 @@ struct tr_scrape_response;
 
 // --- UDP ANNOUNCER
 
+// How long shutdown waits for pending announces, e.g. `event=stopped`
+// messages to trackers. A tracker that can't accept a request within
+// this window won't get it from a longer wait either, so don't let
+// unresponsive trackers stall shutdown.
+inline constexpr auto TrShutdownAnnounceGraceSecs = std::chrono::seconds{ 5 };
+
 using tr_scrape_response_func = std::function<void(tr_scrape_response const&)>;
 using tr_announce_response_func = std::function<void(tr_announce_response const&)>;
 
@@ -155,6 +162,12 @@ public:
     virtual void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response) = 0;
 
     virtual void upkeep() = 0;
+
+    // Tell the announcer that shutdown has begun: requests that have
+    // been sent are considered done without waiting for a response, and
+    // the rest get `TrShutdownAnnounceGraceSecs` to finish before they
+    // are failed so that `is_idle()` can come true.
+    virtual void startShutdown() = 0;
 
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise

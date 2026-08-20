@@ -512,6 +512,11 @@ struct tau_tracker
         return std::empty(announces) && std::empty(scrapes);
     }
 
+    void start_shutdown(time_t deadline)
+    {
+        shutdown_expires_at_ = deadline;
+    }
+
 private:
     using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
     using MaybeSockaddr = std::optional<Sockaddr>;
@@ -546,6 +551,25 @@ private:
 
     void timeout_requests(time_t now)
     {
+        if (shutdown_expires_at_ != 0)
+        {
+            // During shutdown, a request that's been sent has served its
+            // purpose, e.g. an `event=stopped` announce is delivered even
+            // when we never see the response, so don't wait for one...
+            finish_sent_requests(announces);
+            finish_sent_requests(scrapes);
+
+            // ...and when the shutdown grace period is up, whatever is
+            // left has missed its chance
+            if (shutdown_expires_at_ <= now)
+            {
+                fail_all(false, true, "");
+                connecting_at = {};
+                connection_transaction_id = {};
+                return;
+            }
+        }
+
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
             if (auto const conn_at = connecting_at[ipp]; conn_at != 0 && conn_at + ConnectionRequestTtl < now)
@@ -557,6 +581,23 @@ private:
 
         timeout_requests(announces, now, "announce"sv);
         timeout_requests(scrapes, now, "scrape"sv);
+    }
+
+    template<typename T>
+    void finish_sent_requests(std::list<T>& requests)
+    {
+        for (auto it = std::begin(requests); it != std::end(requests);)
+        {
+            if (auto& req = *it; req.sent_at != 0)
+            {
+                req.fail(true, true, "");
+                it = requests.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
     }
 
     template<typename T>
@@ -667,6 +708,8 @@ private:
 
     static constexpr auto DnsRetryIntervalSecs = time_t{ 3600 };
     static constexpr auto ConnectionRequestTtl = time_t{ 30 };
+
+    time_t shutdown_expires_at_ = 0;
 };
 
 // --- SESSION
@@ -705,6 +748,15 @@ public:
 
         tracker->scrapes.emplace_back(request, std::move(on_response));
         tracker->upkeep(false);
+    }
+
+    void startShutdown() override
+    {
+        auto const deadline = tr_time() + TrShutdownAnnounceGraceSecs.count();
+        for (auto& tracker : trackers_)
+        {
+            tracker.start_shutdown(deadline);
+        }
     }
 
     void upkeep() override
