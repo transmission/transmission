@@ -759,16 +759,19 @@ public:
 
             if (auto lock = std::unique_lock{ tasks_mutex_ }; lock.owns_lock())
             {
-                // sleep until there's something to do.
-                // NB: a pending shutdown must stop the wait; if it prolonged
-                // it instead, the loop could sleep through its exit condition
                 auto const stop_waiting = [this]()
                 {
                     return !is_idle() || deadline_exists();
                 };
+
+                // A pending shutdown ends the wait so that the loop reaches
+                // the exit check below.
+                // The timeout keeps libcurl's connection cache serviced
+                // while no tasks are running.
+                static auto constexpr IdleUpkeepInterval = std::chrono::seconds{ 1 };
                 if (!stop_waiting())
                 {
-                    queued_tasks_cv_.wait(lock, stop_waiting);
+                    queued_tasks_cv_.wait_for(lock, IdleUpkeepInterval, stop_waiting);
                 }
 
                 if (deadline_exists() && is_idle())
