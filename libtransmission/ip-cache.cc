@@ -266,6 +266,8 @@ void tr_ip_cache::update_global_addr(tr_address_type const type) noexcept
     options.ip_proto = IPProtocolMap[type];
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
+    // an in-flight IP query must not delay session shutdown
+    options.cancel_on_shutdown = true;
     mediator_.fetch(std::move(options));
 }
 

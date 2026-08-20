@@ -243,6 +243,15 @@ public:
     {
         if (deadline_exists())
         {
+            // Shutdown has begun, so refuse the task. Send the caller
+            // an empty response so that it's still notified even when
+            // its request was never run.
+            if (options.done_func)
+            {
+                auto response = FetchResponse{};
+                response.user_data = options.done_func_user_data;
+                mediator.run(std::move(options.done_func), std::move(response));
+            }
             return;
         }
 
@@ -326,6 +335,11 @@ public:
         [[nodiscard]] constexpr auto const& timeoutSecs() const
         {
             return options_.timeout_secs;
+        }
+
+        [[nodiscard]] constexpr auto cancelOnShutdown() const
+        {
+            return options_.cancel_on_shutdown;
         }
 
         [[nodiscard]] constexpr auto ipProtocol() const
@@ -778,6 +792,33 @@ public:
                     }
 
                     running_tasks_.splice(std::end(running_tasks_), queued_tasks_);
+                }
+            }
+
+            // If shutdown has begun, cancel the tasks that were flagged
+            // as not being worth waiting for, so that only tasks such as
+            // `event=stopped` announces can use the shutdown grace period.
+            // And a task whose request has already reached the server has
+            // served its purpose: what remains during shutdown are
+            // notify-style messages whose responses aren't worth waiting
+            // for either.
+            if (deadline_exists())
+            {
+                for (auto it = std::begin(running_tasks_); it != std::end(running_tasks_);)
+                {
+                    auto& task = *it++;
+
+                    auto pretransfer_secs = double{};
+                    auto const request_was_sent = task.easy() != nullptr &&
+                        curl_easy_getinfo(task.easy(), CURLINFO_PRETRANSFER_TIME, &pretransfer_secs) == CURLE_OK &&
+                        pretransfer_secs > 0.0;
+
+                    if (task.cancelOnShutdown() || request_was_sent)
+                    {
+                        task.response.did_connect = task.response.did_connect || request_was_sent;
+                        curl_multi_remove_handle(multi.get(), task.easy());
+                        remove_task(task);
+                    }
                 }
             }
 

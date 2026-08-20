@@ -83,6 +83,11 @@ public:
         // Maximum time to wait before timeout
         std::chrono::seconds timeout_secs = DefaultTimeoutSecs;
 
+        // If set, the request is not worth delaying shutdown for:
+        // startShutdown() cancels it right away instead of giving it
+        // time to finish the way it does e.g. `event=stopped` announces.
+        bool cancel_on_shutdown = false;
+
         // Called periodically by the web internals when data is received.
         // Used by webseeds to report to tr_bandwidth for data xfer stats
         std::function<void(size_t /*n_bytes*/)> on_data_received;

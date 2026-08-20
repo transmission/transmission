@@ -65,6 +65,7 @@ target_sources(libtransmission-test
         values-test.cc
         variant-test.cc
         watchdir-test.cc
+        web-test.cc
         web-utils-test.cc)
 
 if(APPLE)

@@ -1441,16 +1441,20 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // Tell the announcer to start shutdown, which sends out the stop
     // events and stops scraping.
     this->announcer_->startShutdown();
+    this->announcer_udp_->startShutdown();
     // ...since global_ip_cache_ relies on web_ to update global addresses,
     // we tell it to stop updating before web_ starts to refuse new requests.
     // But we keep it intact for now, so that udp_core_ can continue.
     this->ip_cache_->try_shutdown();
     // ...and now that those are done, tell web_ that we're shutting
     // down soon. This leaves the `event=stopped` going but refuses any
-    // new tasks.
+    // new tasks. The announces get at most `TrShutdownAnnounceGraceSecs`:
+    // a tracker that can't accept a request within that window won't
+    // get it from a longer wait either.
     auto const now = std::chrono::steady_clock::now();
     auto const remaining_ms = now < deadline ? std::chrono::duration_cast<std::chrono::milliseconds>(deadline - now) : 0ms;
-    this->web_->startShutdown(remaining_ms);
+    this->web_->startShutdown(
+        std::min(remaining_ms, std::chrono::duration_cast<std::chrono::milliseconds>(TrShutdownAnnounceGraceSecs)));
 
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
     TR_ASSERT(!save_timer_);
