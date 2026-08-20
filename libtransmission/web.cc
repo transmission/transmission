@@ -234,9 +234,10 @@ public:
 
     void startShutdown(std::chrono::milliseconds deadline)
     {
-        // the deadline must be set under the mutex: curlThreadFunc() decides
-        // whether to sleep by testing it, so an unsynchronized store could
-        // land between that test and the sleep and never be noticed
+        // Set the deadline under the mutex.
+        // curlThreadFunc() tests the deadline to decide whether to sleep.
+        // An unsynchronized store could land between that test and the
+        // sleep and go unnoticed.
         {
             auto const lock = std::unique_lock{ tasks_mutex_ };
             deadline_ns_ = to_ns(mediator.now() + deadline);
@@ -794,10 +795,10 @@ public:
 
             resumePausedTasks();
 
-            // During steady state, wake up once per second.
-            // But during startup, wake up 10x more often. This is so tests
-            // that should take a few msec don't block for a full second
-            // while tr_session waits for this thread to finish.
+            // Poll the running tasks once per second during steady state.
+            // Poll 10x more often during startup, so that tests that should
+            // take a few msec don't block for a full second while
+            // tr_session waits for this thread to finish.
             static auto constexpr StartupSecs = std::chrono::seconds{ 15 };
             auto const timeout_ms = mediator.now() - start_time < StartupSecs ? 50 : 1000;
 
