@@ -8,6 +8,8 @@
 
 #pragma once
 
+// NOMERGE: add a line to force CI to build all the clients
+
 // --- Basic Types
 
 #include <stddef.h> // size_t
