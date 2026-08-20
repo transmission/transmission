@@ -243,6 +243,15 @@ public:
     {
         if (deadline_exists())
         {
+            // Shutdown has begun, so refuse the task. Send the caller
+            // an empty response so that it's still notified even when
+            // its request was never run.
+            if (options.done_func)
+            {
+                auto response = FetchResponse{};
+                response.user_data = options.done_func_user_data;
+                mediator.run(std::move(options.done_func), std::move(response));
+            }
             return;
         }
 
@@ -326,6 +335,11 @@ public:
         [[nodiscard]] constexpr auto const& timeoutSecs() const
         {
             return options_.timeout_secs;
+        }
+
+        [[nodiscard]] constexpr auto cancelOnShutdown() const
+        {
+            return options_.cancel_on_shutdown;
         }
 
         [[nodiscard]] constexpr auto ipProtocol() const
@@ -778,6 +792,22 @@ public:
                     }
 
                     running_tasks_.splice(std::end(running_tasks_), queued_tasks_);
+                }
+            }
+
+            // if shutdown has begun, cancel the tasks that were flagged
+            // as not being worth waiting for, so that only tasks such as
+            // `event=stopped` announces can use the shutdown grace period
+            if (deadline_exists())
+            {
+                for (auto it = std::begin(running_tasks_); it != std::end(running_tasks_);)
+                {
+                    auto& task = *it++;
+                    if (task.cancelOnShutdown())
+                    {
+                        curl_multi_remove_handle(multi.get(), task.easy());
+                        remove_task(task);
+                    }
                 }
             }
 
