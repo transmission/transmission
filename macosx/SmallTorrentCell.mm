@@ -14,6 +14,81 @@
 
 @implementation SmallTorrentCell
 
+// Layout
+- (void)setupConstraints
+{
+    __auto_type groupIndicatorView = self.fGroupIndicatorView;
+    __auto_type iconView = self.fIconView;
+    __auto_type actionButton = self.fActionButton;
+    __auto_type stackView = self.fStackView;
+    __auto_type torrentStatusField = self.fTorrentStatusField;
+    __auto_type torrentProgressBarView = self.fTorrentProgressBarView;
+    __auto_type controlButton = self.fControlButton;
+    __auto_type revealButton = self.fRevealButton;
+
+    for (NSView* view in @[
+             groupIndicatorView,
+             iconView,
+             actionButton,
+             torrentProgressBarView,
+             stackView,
+             torrentStatusField,
+             controlButton,
+             revealButton,
+         ])
+    {
+        [self addSubview:view];
+    }
+
+    [NSLayoutConstraint activateConstraints:@[
+        // groupIndicatorView
+        [groupIndicatorView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [groupIndicatorView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+        [groupIndicatorView.widthAnchor constraintEqualToConstant:6],
+        [groupIndicatorView.heightAnchor constraintEqualToConstant:6],
+
+        // iconView
+        [iconView.leadingAnchor constraintEqualToAnchor:groupIndicatorView.trailingAnchor constant:8],
+        [iconView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+        [iconView.widthAnchor constraintEqualToConstant:16],
+        [iconView.heightAnchor constraintEqualToConstant:16],
+
+        // actionButton
+        [actionButton.centerXAnchor constraintEqualToAnchor:iconView.centerXAnchor],
+        [actionButton.centerYAnchor constraintEqualToAnchor:iconView.centerYAnchor],
+        [actionButton.widthAnchor constraintEqualToConstant:16],
+        [actionButton.heightAnchor constraintEqualToConstant:16],
+
+        // torrentProgressBarView
+        [torrentProgressBarView.leadingAnchor constraintEqualToAnchor:iconView.trailingAnchor constant:15],
+        [torrentProgressBarView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-5],
+        [torrentProgressBarView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+        [torrentProgressBarView.heightAnchor constraintEqualToConstant:18],
+
+        // stackView
+        [stackView.leadingAnchor constraintEqualToAnchor:torrentProgressBarView.leadingAnchor],
+        [stackView.topAnchor constraintEqualToAnchor:torrentProgressBarView.topAnchor],
+        [stackView.bottomAnchor constraintEqualToAnchor:torrentProgressBarView.bottomAnchor],
+
+        // torrentStatusField
+        [torrentStatusField.leadingAnchor constraintEqualToAnchor:stackView.trailingAnchor],
+        [torrentStatusField.trailingAnchor constraintEqualToAnchor:torrentProgressBarView.trailingAnchor constant:-3],
+        [torrentStatusField.centerYAnchor constraintEqualToAnchor:torrentProgressBarView.centerYAnchor],
+
+        // controlButton
+        [controlButton.centerYAnchor constraintEqualToAnchor:torrentProgressBarView.centerYAnchor],
+        [controlButton.widthAnchor constraintEqualToConstant:14],
+        [controlButton.heightAnchor constraintEqualToConstant:14],
+
+        // revealButton
+        [revealButton.leadingAnchor constraintEqualToAnchor:controlButton.trailingAnchor constant:3],
+        [revealButton.trailingAnchor constraintEqualToAnchor:torrentProgressBarView.trailingAnchor constant:-3],
+        [revealButton.centerYAnchor constraintEqualToAnchor:controlButton.centerYAnchor],
+        [revealButton.widthAnchor constraintEqualToConstant:14],
+        [revealButton.heightAnchor constraintEqualToConstant:14],
+    ]];
+}
+
 // show fControlButton and fRevealButton
 - (void)mouseEntered:(NSEvent*)event
 {
