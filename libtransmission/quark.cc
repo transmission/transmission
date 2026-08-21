@@ -487,6 +487,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "rename_partial_files"sv, // rpc, tr_session::Settings
     "reqq"sv, // BEP0010; BT protocol, rpc, tr_session::Settings
     "result"sv, // rpc
+    "resume_filenames_need_verification"sv, // .resume
     "rpc-authentication-required"sv, // daemon, rpc server settings
     "rpc-bind-address"sv, // daemon, rpc server settings
     "rpc-enabled"sv, // daemon, rpc server settings

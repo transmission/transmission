@@ -42,6 +42,7 @@ target_sources(libtransmission-test
         quark-test.cc
         remove-test.cc
         rename-test.cc
+        resume-test.cc
         rpc-test.cc
         serializer-tests.cc
         session-alt-speeds-test.cc
