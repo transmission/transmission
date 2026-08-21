@@ -5,6 +5,7 @@
 
 import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
+import { Prefs } from './prefs.js';
 import { Torrent } from './torrent.js';
 import { Utils, createTextualTabsContainer, setTextContent } from './utils.js';
 
@@ -21,7 +22,7 @@ const peer_column_classes = [
 const webseed_column_classes = ['url', 'speed-down'];
 
 export class Inspector extends EventTarget {
-  constructor(controller) {
+  constructor(controller, prefs) {
     super();
 
     this.closed = false;
@@ -38,6 +39,11 @@ export class Inspector extends EventTarget {
     this.file_torrent_n = null;
     this.file_rows = null;
     this.elements.dismiss.addEventListener('click', () => this.close());
+
+    this.prefs_listener = this._onPrefsChange.bind(this);
+    this.prefs = prefs;
+    this.prefs.addEventListener('change', this.prefs_listener);
+
     Object.seal(this);
 
     controller.addEventListener(
@@ -58,6 +64,7 @@ export class Inspector extends EventTarget {
         'torrent-selection-changed',
         this.selection_listener,
       );
+      this.prefs.removeEventListener('change', this.prefs_listener);
       this.dispatchEvent(new Event('close'));
       for (const property of Object.keys(this)) {
         this[property] = null;
@@ -1036,10 +1043,23 @@ export class Inspector extends EventTarget {
       this.addNodeToView(tor, parent, sub);
     }
     if (sub.children) {
-      for (const value of Object.values(sub.children)) {
+      for (const value of Inspector._getSortedFiles(sub.children)) {
         this.addSubtreeToView(tor, parent, value);
       }
     }
+  }
+
+  static _getSortedFiles(children) {
+    // sort entries - directories first
+    return Object.values(children).toSorted((a, b) => {
+      if (a.children && !b.children) {
+        return -1;
+      }
+      if (!a.children && b.children) {
+        return 1;
+      }
+      return a.name.localeCompare(b.name);
+    });
   }
 
   _updateFiles() {
@@ -1062,13 +1082,35 @@ export class Inspector extends EventTarget {
       this.file_rows = [];
       const fragment = document.createDocumentFragment();
       const tree = Inspector.createFileTreeModel(tor);
-      this.addSubtreeToView(tor, fragment, tree);
+
+      if (this.prefs.file_sort_mode === Prefs.FileSortModeNatural) {
+        this.addSubtreeToView(tor, fragment, tree);
+      } else {
+        for (const [index, file] of tor.getFiles().entries()) {
+          const node = {
+            children: {},
+            depth: 0,
+            file_index: index,
+            file_indices: [index],
+            name: file.name,
+          };
+          this.addNodeToView(tor, fragment, node);
+        }
+      }
+
       list.append(fragment);
     } else {
       // ...refresh the already-existing file list
       for (const row of file_rows) {
         row.refresh();
       }
+    }
+  }
+
+  _onPrefsChange(event_) {
+    if (event_.key === Prefs.FileSortMode) {
+      this._clearFileList();
+      this._updateFiles();
     }
   }
 }

@@ -226,6 +226,24 @@ export class OverflowMenu extends EventTarget {
 
     add_checkbox('Reverse sort', listener);
 
+    // file sort mode
+
+    div = document.createElement('div');
+    div.classList.add('table-row');
+    options.append(div);
+
+    listener = (e) => {
+      e.dataset.pref = Prefs.FileSortMode;
+      e.checked = this.prefs.file_sort_mode !== Prefs.FileSortModeTorrent;
+      e.addEventListener('input', (event_) => {
+        this.prefs.file_sort_mode = event_.target.checked
+          ? Prefs.FileSortModeNatural
+          : Prefs.FileSortModeTorrent;
+      });
+    };
+
+    add_checkbox('Natural file sorting', listener);
+
     // compact
 
     div = document.createElement('div');
