@@ -8,6 +8,18 @@
 #import "Torrent.h"
 #import "NSImageAdditions.h"
 
+@interface CustomProgressView : NSView
+@end
+
+@implementation CustomProgressView
+
+- (NSView*)hitTest:(NSPoint)point
+{
+    return nil;
+}
+
+@end
+
 @implementation TorrentCell
 
 - (void)drawRect:(NSRect)dirtyRect
