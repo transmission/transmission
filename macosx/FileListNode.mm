@@ -48,7 +48,6 @@
 - (void)insertChild:(FileListNode*)child
 {
     NSAssert(_isFolder, @"method can only be invoked on folders");
-
     [_children addObject:child];
 }
 
