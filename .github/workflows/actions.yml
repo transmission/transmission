@@ -1588,6 +1588,16 @@ jobs:
             uname -a
             export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
             export PKG_PATH="https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/`uname -p`/`uname -r`/All"
+            # cairo, dbus, gtkmm4 and qt6-qtbase check for X11 shared libraries
+            # as they install, so the sets have to go in before pkg_add adds
+            # those packages.
+            # curl is added first because the sets are fetched with it.
+            if [ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] || [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
+              /usr/sbin/pkg_add -u curl
+              for set in xbase xcomp; do
+                curl -sL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-`uname -r`/amd64/binary/sets/$set.tar.xz" | tar xJpf - -C /
+              done
+            fi
             /usr/sbin/pkg_add -u \
               curl \
               cmake \
@@ -1604,11 +1614,6 @@ jobs:
               `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
               rapidjson \
               utf8-cpp
-            if [ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] || [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
-              for set in xbase xcomp; do
-                curl -sL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-`uname -r`/amd64/binary/sets/$set.tar.xz" | tar xJpf - -C /
-              done
-            fi
           run: |
             set -ex
             export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
