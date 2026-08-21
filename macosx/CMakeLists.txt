@@ -122,6 +122,8 @@ target_sources(${TR_NAME}-mac
         InfoViewController.h
         InfoWindowController.h
         InfoWindowController.mm
+        Logging.h
+        Logging.mm
         main.mm
         MessageWindowController.h
         MessageWindowController.mm

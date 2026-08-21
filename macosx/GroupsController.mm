@@ -6,6 +6,7 @@
 #import "NSImageAdditions.h"
 #import "NSKeyedUnarchiverAdditions.h"
 #import "NSMutableArrayAdditions.h"
+#import "Logging.h"
 
 static CGFloat const kIconWidth = 16.0;
 static CGFloat const kBorderWidth = 1.25;
@@ -406,7 +407,7 @@ static CGFloat const kIconWidthSmall = 12.0;
     }
     @catch (NSException* exception)
     {
-        NSLog(@"Error when evaluating predicate (%@) - %@", predicate, exception);
+        os_log_error(Logging.groups, "Error when evaluating predicate (%@) - %@", predicate, exception);
     }
     @finally
     {
