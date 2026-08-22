@@ -85,22 +85,20 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, std::span<ui
     }
 
     // does the file exist?
-    auto err = ENOENT;
     auto const file_size = tor.file_size(file_index);
     auto const prealloc = writable && tor.file_is_wanted(file_index) ? session.preallocationMode() :
                                                                        tr_file_preallocation::None;
     if (auto const found = tor.find_file(file_index); found)
     {
-        if (auto const fd = open_files.get(tor_id, file_index, writable, found->filename(), prealloc, file_size); fd)
+        if (auto const fd = open_files.get(tor_id, file_index, writable, found->filename(), prealloc, file_size, &error); fd)
         {
             return fd;
         }
 
         // The file exists but can't be opened, e.g. no file descriptors
-        // are left or its permissions changed. Fall through and set
-        // `error` so that the caller doesn't mistake this for success
-        // and discard the data it wanted to write.
-        err = errno != 0 ? errno : EIO;
+        // are left or its permissions changed. `error` is set so that
+        // the caller doesn't mistake this for success and discard the
+        // data it wanted to write.
     }
     // do we want to create it?
     else if (writable)
@@ -108,23 +106,24 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, std::span<ui
         auto const base = tor.current_dir();
         auto const suffix = session.isIncompleteFileNamingEnabled() ? tr_torrent_files::PartialFileSuffix : ""sv;
         auto const filename = tr_pathbuf{ base, '/', tor.file_subpath(file_index), suffix };
-        if (auto const fd = open_files.get(tor_id, file_index, writable, filename, prealloc, file_size); fd)
+        if (auto const fd = open_files.get(tor_id, file_index, writable, filename, prealloc, file_size, &error); fd)
         {
             // make a note that we just created a file
             session.add_file_created();
             return fd;
         }
-
-        err = errno;
     }
 
-    error.set(
-        err,
-        fmt::format(
-            fmt::runtime(_("Couldn't get '{path}': {error} ({error_code})")),
-            fmt::arg("path", tor.file_subpath(file_index)),
-            fmt::arg("error", tr_strerror(err)),
-            fmt::arg("error_code", err)));
+    if (!error) // the file doesn't exist, and we can't create it
+    {
+        error.set(
+            ENOENT,
+            fmt::format(
+                fmt::runtime(_("Couldn't get '{path}': {error} ({error_code})")),
+                fmt::arg("path", tor.file_subpath(file_index)),
+                fmt::arg("error", tr_strerror(ENOENT)),
+                fmt::arg("error_code", ENOENT)));
+    }
     return {};
 }
 
@@ -149,6 +148,11 @@ void read_bytes(
     auto const fd = get_fd(session, open_files, tor, false, file_index, error);
     if (!fd || error)
     {
+        if (error)
+        {
+            // get_fd()'s error message is already fully formatted
+            tr_logAddErrorTor(&tor, std::string{ error.message() });
+        }
         return;
     }
 
@@ -187,6 +191,12 @@ void write_bytes(
     auto const fd = get_fd(session, open_files, tor, true, file_index, error);
     if (!fd || error)
     {
+        if (error)
+        {
+            // get_fd()'s error message is already fully formatted;
+            // the caller also surfaces it via the torrent's local error
+            tr_logAddErrorTor(&tor, std::string{ error.message() });
+        }
         return;
     }
 
