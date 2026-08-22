@@ -8,3 +8,6 @@
 bool isSpeedEqual(CGFloat old_speed, CGFloat new_speed);
 // 0.01 precision
 bool isRatioEqual(CGFloat old_ratio, CGFloat new_ratio);
+
+NSArray<NSString*>* torrentURLStringsFromPasteboard(NSArray<NSString*>* strings, NSArray<NSURL*>* urls);
+NSArray<NSString*>* torrentURLStringsFromPasteboardStrings(NSArray<NSString*>* strings, BOOL* found_magnet);

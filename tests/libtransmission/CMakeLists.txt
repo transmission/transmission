@@ -71,6 +71,8 @@ target_sources(libtransmission-test
 if(APPLE)
     target_sources(libtransmission-test
         PRIVATE
+            ../../macosx/Utils.mm
+            pasteboard-url-test.mm
             utils-apple-test.mm)
 endif()
 
