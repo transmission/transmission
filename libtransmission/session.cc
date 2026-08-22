@@ -2150,18 +2150,24 @@ void tr_session::verify_add(tr_torrent* const tor)
 // ---
 void tr_session::flush_torrent_files(tr_torrent_id_t const tor_id) const noexcept
 {
-    this->cache->flush_torrent(tor_id);
+    // failure is safe to ignore: a failed flush drops the blocks and
+    // clears their pieces from completion, so they get downloaded again
+    (void)this->cache->flush_torrent(tor_id);
 }
 
 void tr_session::close_torrent_files(tr_torrent_id_t const tor_id) noexcept
 {
-    this->cache->flush_torrent(tor_id);
+    // failure is safe to ignore: a failed flush drops the blocks and
+    // clears their pieces from completion, so they get downloaded again
+    (void)this->cache->flush_torrent(tor_id);
     openFiles().close_torrent(tor_id);
 }
 
 void tr_session::close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept
 {
-    this->cache->flush_file(tor, file_num);
+    // failure is safe to ignore: a failed flush drops the blocks and
+    // clears their pieces from completion, so they get downloaded again
+    (void)this->cache->flush_file(tor, file_num);
     openFiles().close_file(tor.id(), file_num);
 }
 

@@ -143,7 +143,8 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     bool writable,
     std::string_view filename_in,
     Preallocation allocation,
-    uint64_t file_size)
+    uint64_t file_size,
+    tr_error* out_error)
 {
     // is there already an entry
     auto key = make_key(tor_id, file_num);
@@ -172,6 +173,10 @@ std::optional<tr_sys_file_t> tr_open_files::get(
                     fmt::arg("path", dir),
                     fmt::arg("error", error.message()),
                     fmt::arg("error_code", error.code())));
+            if (out_error != nullptr)
+            {
+                *out_error = std::move(error);
+            }
             return {};
         }
     }
@@ -195,6 +200,10 @@ std::optional<tr_sys_file_t> tr_open_files::get(
                 fmt::arg("path", filename),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())));
+        if (out_error != nullptr)
+        {
+            *out_error = std::move(error);
+        }
         return {};
     }
 
@@ -225,6 +234,10 @@ std::optional<tr_sys_file_t> tr_open_files::get(
                     fmt::arg("error", error.message()),
                     fmt::arg("error_code", error.code())));
             tr_sys_file_close(fd);
+            if (out_error != nullptr)
+            {
+                *out_error = std::move(error);
+            }
             return {};
         }
 
@@ -245,6 +258,10 @@ std::optional<tr_sys_file_t> tr_open_files::get(
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())));
         tr_sys_file_close(fd);
+        if (out_error != nullptr)
+        {
+            *out_error = std::move(error);
+        }
         return {};
     }
 
