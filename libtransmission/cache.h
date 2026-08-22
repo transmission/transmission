@@ -35,12 +35,15 @@ public:
 
     int set_limit(Memory max_size);
 
-    // @return any error code from cacheTrim()
-    int write_block(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<BlockData> writeme);
+    // @return an error code if this torrent's own blocks failed to flush.
+    // A failed flush drops the affected blocks and clears their pieces
+    // from the torrent's completion; other torrents' flush errors are
+    // handled the same way but are not reported to this caller.
+    [[nodiscard]] int write_block(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<BlockData> writeme);
 
     int read_block(tr_torrent const& tor, tr_block_info::Location const& loc, size_t len, uint8_t* setme);
-    int flush_torrent(tr_torrent_id_t tor_id);
-    int flush_file(tr_torrent const& tor, tr_file_index_t file);
+    [[nodiscard]] int flush_torrent(tr_torrent_id_t tor_id);
+    [[nodiscard]] int flush_file(tr_torrent const& tor, tr_file_index_t file);
 
 private:
     using Key = std::pair<tr_torrent_id_t, tr_block_index_t>;
@@ -60,17 +63,24 @@ private:
 
     [[nodiscard]] static CIter find_span_end(CIter const& span_begin, CIter const& end) noexcept;
 
+    // (error code, id of the torrent that failed to flush).
+    // The id is only meaningful when the error code is nonzero.
+    using FlushResult = std::pair<int, tr_torrent_id_t>;
+
     // @return any error code from tr_ioWrite()
     [[nodiscard]] int write_contiguous(CIter const& begin, CIter const& end) const;
 
-    // @return any error code from writeContiguous()
-    [[nodiscard]] int flush_span(CIter const& begin, CIter const& end);
+    // Erases [begin, end) from the cache and writes it to disk.
+    // On failure, the unwritten blocks are still erased, and their
+    // pieces are cleared from the torrent's completion so that they
+    // will be re-downloaded, keeping completion and resume truthful.
+    [[nodiscard]] FlushResult flush_span(CIter const& begin, CIter const& end);
 
-    // @return any error code from writeContiguous()
-    [[nodiscard]] int flush_biggest();
+    // @return any error code from flush_span()
+    [[nodiscard]] FlushResult flush_biggest();
 
-    // @return any error code from writeContiguous()
-    [[nodiscard]] int cache_trim();
+    // @return any error code from flush_biggest()
+    [[nodiscard]] FlushResult cache_trim();
 
     [[nodiscard]] static constexpr size_t get_max_blocks(Memory const max_size) noexcept
     {

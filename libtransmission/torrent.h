@@ -1038,6 +1038,7 @@ struct tr_torrent
     time_t lpdAnnounceAt = 0;
 
 private:
+    friend class Cache; // clears pieces of blocks it failed to flush
     friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
