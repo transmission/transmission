@@ -468,12 +468,16 @@ protected:
         return tor;
     }
 
-    [[nodiscard]] tr_torrent* torrentInitFromFile(std::string_view filename)
+    [[nodiscard]] tr_torrent* torrentInitFromFile(std::string_view filename, bool const paused = false)
     {
         auto* const ctor = tr_ctorNew(session_);
 
         auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', filename };
         EXPECT_TRUE(ctor->set_metainfo_from_file(path));
+        if (paused)
+        {
+            tr_ctorSetPaused(ctor, TR_FORCE, true);
+        }
 
         auto* const tor = createTorrentAndWaitForVerifyDone(ctor);
         tr_ctorFree(ctor);

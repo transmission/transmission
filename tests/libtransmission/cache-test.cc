@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <chrono>
+#include <future>
 #include <memory>
 #include <string>
 
@@ -26,35 +28,42 @@ class CacheTest : public SessionTest
 protected:
     static auto constexpr MaxWaitMsec = 5000;
 
-    // the cache is not thread-safe, so all calls run in the session thread
+    // the cache is not thread-safe, so all calls run in the session thread.
+    // the promise is shared so that a timed-out wait can't leave the queued
+    // lambda holding a dangling reference into this frame.
 
     int blockingWriteBlock(tr_torrent_id_t const tor_id, tr_block_index_t const block)
     {
-        auto err = int{ -1 };
-        auto done = false;
+        auto const promise = std::make_shared<std::promise<int>>();
+        auto future = promise->get_future();
         session_->run_in_session_thread(
-            [this, tor_id, block, &err, &done]()
+            [session = session_, tor_id, block, promise]()
             {
                 auto buf = std::make_unique<Cache::BlockData>(tr_block_info::BlockSize);
-                std::fill_n(std::data(*buf), tr_block_info::BlockSize, '\0');
-                err = session_->cache->write_block(tor_id, block, std::move(buf));
-                done = true;
+                promise->set_value(session->cache->write_block(tor_id, block, std::move(buf)));
             });
-        EXPECT_TRUE(waitFor([&done]() { return done; }, MaxWaitMsec));
-        return err;
+        if (future.wait_for(std::chrono::milliseconds{ MaxWaitMsec }) != std::future_status::ready)
+        {
+            ADD_FAILURE() << "timed out waiting for Cache::write_block()";
+            return -1;
+        }
+        return future.get();
     }
 
     void setCacheLimitBlocks(size_t const n_blocks)
     {
-        auto done = false;
+        auto const promise = std::make_shared<std::promise<int>>();
+        auto future = promise->get_future();
         session_->run_in_session_thread(
-            [this, n_blocks, &done]()
+            [session = session_, n_blocks, promise]()
             {
-                (void)session_->cache->set_limit(
-                    Cache::Memory{ n_blocks * tr_block_info::BlockSize, Cache::Memory::Units::Bytes });
-                done = true;
+                promise->set_value(session->cache->set_limit(
+                    Cache::Memory{ n_blocks * tr_block_info::BlockSize, Cache::Memory::Units::Bytes }));
             });
-        EXPECT_TRUE(waitFor([&done]() { return done; }, MaxWaitMsec));
+        if (future.wait_for(std::chrono::milliseconds{ MaxWaitMsec }) != std::future_status::ready)
+        {
+            ADD_FAILURE() << "timed out waiting for Cache::set_limit()";
+        }
     }
 };
 
@@ -81,7 +90,7 @@ TEST_F(CacheTest, dropsBlocksOfRemovedTorrents)
 TEST_F(CacheTest, failedFlushErrorsOnlyItsOwnTorrent)
 {
     auto* const tor_bad = zeroTorrentInit(ZeroTorrentState::Complete);
-    auto* const tor_ok = torrentInitFromFile("Android-x86 8.1 r6 iso.torrent");
+    auto* const tor_ok = torrentInitFromFile("perfect-pieces.torrent", true /*paused*/);
     ASSERT_NE(nullptr, tor_ok);
     setCacheLimitBlocks(2U);
 
@@ -94,14 +103,15 @@ TEST_F(CacheTest, failedFlushErrorsOnlyItsOwnTorrent)
     // drop the file descriptors that verify left open, so that the next
     // write has to reopen the now-unwritable path
     {
-        auto done = false;
+        auto const promise = std::make_shared<std::promise<void>>();
+        auto future = promise->get_future();
         session_->run_in_session_thread(
-            [this, tor_bad, &done]()
+            [session = session_, tor_id = tor_bad->id(), promise]()
             {
-                session_->openFiles().close_torrent(tor_bad->id());
-                done = true;
+                session->openFiles().close_torrent(tor_id);
+                promise->set_value();
             });
-        ASSERT_TRUE(waitFor([&done]() { return done; }, MaxWaitMsec));
+        ASSERT_EQ(std::future_status::ready, future.wait_for(std::chrono::milliseconds{ MaxWaitMsec }));
     }
 
     // Three blocks overflow the two-block limit, forcing a flush that
@@ -114,6 +124,10 @@ TEST_F(CacheTest, failedFlushErrorsOnlyItsOwnTorrent)
     }
     EXPECT_NE(0, last_err);
     EXPECT_TRUE(waitFor([tor_bad]() { return tr_torrentStat(tor_bad)->error == TR_STAT_LOCAL_ERROR; }, MaxWaitMsec));
+
+    // ...and the dropped blocks' pieces must be cleared from completion,
+    // so that resume files and verification stay truthful about them
+    EXPECT_FALSE(tor_bad->has_piece(0U));
 
     // ...while other torrents keep writing unharmed instead of being
     // starved by tor_bad's unflushable blocks
