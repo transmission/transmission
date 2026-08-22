@@ -4,10 +4,12 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <cmath>
 #include <utility>
 
 #include <QApplication>
 #include <QBrush>
+#include <QColor>
 #include <QFont>
 #include <QFontMetrics>
 #include <QIcon>
@@ -38,6 +40,32 @@ namespace
 constexpr auto GuiPad = 6;
 constexpr auto BarWidth = 50;
 constexpr auto BarHeight = 16;
+
+double contrastRatio(QColor const& lhs, QColor const& rhs)
+{
+    auto const luminance = [](QColor const& color)
+    {
+        auto const channel_luminance = [](int channel)
+        {
+            auto const value = static_cast<double>(channel) / 255.0;
+            return value <= 0.03928 ? value / 12.92 : std::pow((value + 0.055) / 1.055, 2.4);
+        };
+
+        return (0.2126 * channel_luminance(color.red())) + (0.7152 * channel_luminance(color.green())) +
+            (0.0722 * channel_luminance(color.blue()));
+    };
+
+    auto const lhs_luminance = luminance(lhs);
+    auto const rhs_luminance = luminance(rhs);
+    return (std::max(lhs_luminance, rhs_luminance) + 0.05) / (std::min(lhs_luminance, rhs_luminance) + 0.05);
+}
+
+QColor readableTextColor(QColor const& background)
+{
+    auto const black = QColor{ Qt::black };
+    auto const white = QColor{ Qt::white };
+    return contrastRatio(black, background) >= contrastRatio(white, background) ? black : white;
+}
 
 class ItemLayout
 {
@@ -265,6 +293,12 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progress_bar_style_.textVisible = true;
     progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
+    auto const progress = std::clamp(progress_bar_style_.progress, progress_bar_style_.minimum, progress_bar_style_.maximum);
+    auto const midpoint = progress_bar_style_.minimum + ((progress_bar_style_.maximum - progress_bar_style_.minimum) / 2);
+    auto const text_background_role = progress >= midpoint ? QPalette::Highlight : QPalette::Window;
+    progress_bar_style_.palette.setColor(
+        QPalette::WindowText,
+        readableTextColor(progress_bar_style_.palette.color(text_background_role)));
     StyleHelper::drawProgressBar(*painter, progress_bar_style_);
 
     painter->restore();
