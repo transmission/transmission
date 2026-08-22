@@ -1695,7 +1695,38 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)openPasteboard
 {
-    // 1. If Pasteboard contains URL objects, we treat those and only those
+    // 1. Magnet links must be matched against the raw pasteboard string, not an NSURL object.
+    // Reading the pasteboard as NSURL (below) round-trips the string through NSURL's parser/serializer,
+    // which can corrupt percent-encoded segments of a `magnet:` URI (an opaque, non-hierarchical scheme),
+    // e.g. turning "tr=udp%3A%2F%2Ftracker.opentrackr.org" into a broken tracker hostname.
+    // See https://github.com/transmission/transmission/issues/8736
+    NSArray<NSString*>* arrayOfStrings = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
+
+    // The magnet detector
+    // https://www.bittorrent.org/beps/bep_0009.html defines the magnet URI format as `magnet:?query` where query is non-empty.
+    // https://datatracker.ietf.org/doc/html/rfc3986 defines the query format rigorously as `([!$\&-;=?-Z_a-z~]|%[0-9A-F]{2})*`.
+    // But `tr_urlParse` acknowledges that magnet links can be malformed by "not escaping text in the display name".
+    // Those malformed magnets aren't URI anymore, and since a display name can potentially contain any Unicode except '/' (see `isUnixReservedChar`), we may want to be liberal on what we accept.
+    // In practice, copy-pasted magnets might most often be separated by Horizontal tab, Line feed, Carriage Return, Space, XML delimiters '<' '>', JSON delimiter '"' and Markdown delimiter '`'.
+    // But for now, we'll keep the historical separator choice from 8392476b30491ffe7d8d64210f5cf3c3dd1d69ca, whitespaceAndNewlineCharacterSet, which is `[\p{Z}\v]`.
+    NSRegularExpression* magnetDetector = [NSRegularExpression regularExpressionWithPattern:@"magnet:?([^\\p{Z}\\v])+" options:kNilOptions
+                                                                                      error:nil];
+    BOOL foundMagnet = NO;
+    for (NSString* itemString in arrayOfStrings)
+    {
+        for (NSTextCheckingResult* result in [magnetDetector matchesInString:itemString options:0
+                                                                       range:NSMakeRange(0, itemString.length)])
+        {
+            [self openURL:[itemString substringWithRange:result.range]];
+            foundMagnet = YES;
+        }
+    }
+    if (foundMagnet)
+    {
+        return;
+    }
+
+    // 2. If Pasteboard contains URL objects (and no magnets were found above), we treat those and only those
     NSArray<NSURL*>* arrayOfURLs = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSURL class] ] options:nil];
 
     if (arrayOfURLs.count > 0)
@@ -1707,37 +1738,18 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         return;
     }
 
-    // 2. If Pasteboard contains String objects, we'll search for both links and magnets
-    NSArray<NSString*>* arrayOfStrings = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
+    // 3. Otherwise, search the pasteboard strings for plain links (magnets were already handled above)
     if (arrayOfStrings.count == 0)
     {
         return;
     }
-    // The link detector (can't detect magnets)
     NSDataDetector* linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-    // The magnet detector
-    // https://www.bittorrent.org/beps/bep_0009.html defines the magnet URI format as `magnet:?query` where query is non-empty.
-    // https://datatracker.ietf.org/doc/html/rfc3986 defines the query format rigorously as `([!$\&-;=?-Z_a-z~]|%[0-9A-F]{2})*`.
-    // But `tr_urlParse` acknowledges that magnet links can be malformed by "not escaping text in the display name".
-    // Those malformed magnets aren't URI anymore, and since a display name can potentially contain any Unicode except '/' (see `isUnixReservedChar`), we may want to be liberal on what we accept.
-    // In practice, copy-pasted magnets might most often be separated by Horizontal tab, Line feed, Carriage Return, Space, XML delimiters '<' '>', JSON delimiter '"' and Markdown delimiter '`'.
-    // But for now, we'll keep the historical separator choice from 8392476b30491ffe7d8d64210f5cf3c3dd1d69ca, whitespaceAndNewlineCharacterSet, which is `[\p{Z}\v]`.
-    NSRegularExpression* magnetDetector = [NSRegularExpression regularExpressionWithPattern:@"magnet:?([^\\p{Z}\\v])+" options:kNilOptions
-                                                                                      error:nil];
     for (NSString* itemString in arrayOfStrings)
     {
-        // We open all links
         for (NSTextCheckingResult* result in [linkDetector matchesInString:itemString options:0
                                                                      range:NSMakeRange(0, itemString.length)])
         {
             [self openURL:result.URL.absoluteString];
-        }
-
-        // We open all magnets
-        for (NSTextCheckingResult* result in [magnetDetector matchesInString:itemString options:0
-                                                                       range:NSMakeRange(0, itemString.length)])
-        {
-            [self openURL:[itemString substringWithRange:result.range]];
         }
     }
 }
