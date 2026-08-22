@@ -41,6 +41,9 @@ function global:Build-Qt5([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-ssl'
         '-openssl'
         '-system-zlib'
+        # Qt5's MSVC probe looks only for zdll.lib and zlib.lib.
+        # zlib installs z.lib, so name the library explicitly.
+        'ZLIB_LIBS=-lz'
         '-qt-pcre'
         '-qt-libpng'
         '-qt-libjpeg'
