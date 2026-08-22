@@ -777,6 +777,10 @@ void Session::add_ctor(tr_ctor* ctor)
     bool const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
     core_apply_defaults(ctor);
     impl_->add_ctor(ctor, do_prompt, do_notify);
+
+    // This is a batch of one, so end it here.
+    // Otherwise what add_ctor() reported, usually a duplicate, never reaches the user.
+    torrents_added();
 }
 
 /***
@@ -817,6 +821,10 @@ void Session::Impl::add_file_async_callback(
                 fmt::arg("error", e.what()),
                 fmt::arg("error_code", e.code())));
     }
+
+    // add_from_url() returned, and ended its batch, long before this download finished.
+    // This late arrival needs a batch end of its own.
+    torrents_added();
 
     dec_busy();
 }

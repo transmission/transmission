@@ -3,29 +3,51 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "AddData.h"
-#include "Application.h"
 #include "InteropObject.h"
 
-InteropObject::InteropObject(QObject* parent)
+namespace
+{
+
+// Mutable by design. publish_instance() names the process's one Instance once the
+// transports exist, and only ever on the GUI thread.
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+tr::interop::Instance* published_instance = nullptr;
+
+} // namespace
+
+void InteropObject::publish_instance(tr::interop::Instance* const instance) noexcept
+{
+    published_instance = instance;
+}
+
+InteropObject::InteropObject(QObject* const parent)
     : QObject{ parent }
+    , instance_{ published_instance }
 {
 }
 
-// NOLINTNEXTLINE(readability-identifier-naming)
+InteropObject::InteropObject(tr::interop::Instance& instance, QObject* const parent)
+    : QObject{ parent }
+    , instance_{ &instance }
+{
+}
+
 bool InteropObject::PresentWindow() const
 {
-    trApp->raise();
-    return true;
+    return instance_ != nullptr && instance_->present_window({}) == tr::interop::Reply::Yes;
 }
 
-// NOLINTNEXTLINE(readability-identifier-naming)
+bool InteropObject::PresentWindowWithToken(QString const& activation_token) const
+{
+    return instance_ != nullptr && instance_->present_window(activation_token.toStdString()) == tr::interop::Reply::Yes;
+}
+
 bool InteropObject::AddMetainfo(QString const& metainfo) const
 {
-    if (auto addme = AddData(metainfo); addme.type != AddData::NONE)
-    {
-        trApp->addTorrent(addme);
-    }
+    return instance_ != nullptr && instance_->add_metainfo(metainfo.toStdString()) == tr::interop::Reply::Yes;
+}
 
-    return true;
+QString InteropObject::ConfigDir() const
+{
+    return instance_ != nullptr ? QString::fromStdString(instance_->config_dir()) : QString{};
 }

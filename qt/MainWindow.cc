@@ -1064,6 +1064,19 @@ void MainWindow::setStatusbarVisible(bool visible)
 ***
 **/
 
+void MainWindow::presentWindow(QString const& activation_token)
+{
+    if (!activation_token.isEmpty())
+    {
+        // Where the Wayland backend looks for the token when activateWindow() runs.
+        // It consumes and clears the variable. Other platforms leave it, and a token
+        // is single-use, so nothing later can spend it twice.
+        qputenv("XDG_ACTIVATION_TOKEN", activation_token.toUtf8());
+    }
+
+    toggleWindows(true);
+}
+
 void MainWindow::toggleWindows(bool do_show)
 {
     if (!do_show)

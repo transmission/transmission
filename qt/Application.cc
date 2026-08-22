@@ -27,16 +27,18 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission-app/startup-coordinator.h>
+
 #include <libtransmission/values.h>
 
 #include "AccessibleSqueezeLabel.h"
 #include "AddData.h"
-#include "InteropHelper.h"
 #include "MainWindow.h"
 #include "OptionsDialog.h"
 #include "Prefs.h"
 #include "Session.h"
 #include "TorrentModel.h"
+#include "Utils.h"
 #include "WatchDir.h"
 
 namespace
@@ -140,6 +142,7 @@ QString Application::intern(QString const& in)
 
 Application::Application(
     std::unique_ptr<Prefs> prefs,
+    std::unique_ptr<tr::interop::StartupCoordinator> startup_coordinator,
     bool minimized,
     QString const& config_dir,
     QStringList const& filenames,
@@ -147,6 +150,7 @@ Application::Application(
     char** argv)
     : QApplication{ argc, argv }
     , prefs_(std::move(prefs))
+    , startup_coordinator_(std::move(startup_coordinator))
 {
     setApplicationName(ConfigName);
     loadTranslations();
@@ -185,6 +189,7 @@ Application::Application(
     connect(model_.get(), &TorrentModel::torrentsNeedInfo, this, &Application::onTorrentsNeedInfo);
     connect(prefs_.get(), &Prefs::changed, this, &Application::refreshPref);
     connect(session_.get(), &Session::sourceChanged, this, &Application::onSessionSourceChanged);
+    connect(session_.get(), &Session::configDirContended, this, &Application::onConfigDirContended);
     connect(session_.get(), &Session::torrentsRemoved, model_.get(), &TorrentModel::removeTorrents);
     connect(session_.get(), &Session::torrentsUpdated, model_.get(), &TorrentModel::updateTorrents);
     connect(watch_dir_.get(), &WatchDir::torrentFileAdded, this, qOverload<QString const&>(&Application::addWatchdirTorrent));
@@ -230,13 +235,16 @@ Application::Application(
         window_->openSession();
     }
 
+    if (configDirIsContended())
+    {
+        return;
+    }
+
     // torrent files passed in on the command line
     for (QString const& filename : filenames)
     {
         addTorrent(AddData{ filename });
     }
-
-    InteropHelper::registerObject(this);
 
 #ifdef QT_DBUS_LIB
     if (auto bus = QDBusConnection::sessionBus(); bus.isConnected())
@@ -251,9 +259,19 @@ Application::Application(
     }
 
 #endif
+
+    // Publish whichever session this client shows. A launch handed here lands in that
+    // session, a remote one included; the click reaches the window the user has open
+    // on this config dir rather than starting a second client beside it.
+    startup_coordinator_->publish(interop_instance_);
 }
 
 Application::~Application() = default;
+
+bool Application::configDirIsContended() const noexcept
+{
+    return config_dir_contended_;
+}
 
 void Application::loadTranslations()
 {
@@ -411,6 +429,18 @@ void Application::maybeUpdateBlocklist() const
     }
 }
 
+void Application::onConfigDirContended()
+{
+    config_dir_contended_ = true;
+
+    // This launch is exiting; the settings on disk are the holder's.
+    prefs_->disableSaveOnExit();
+
+    // A session started from the connection dialog gets here after exec() is under way,
+    // where returning from the constructor no longer ends the launch.
+    quit();
+}
+
 void Application::onSessionSourceChanged() const
 {
     session_->initTorrents();
@@ -534,3 +564,35 @@ void Application::onNotificationActionInvoked(quint32 /* notification_id */, QSt
     }
 }
 #endif
+
+tr::interop::Reply Application::LocalInstance::present_window(std::string_view const activation_token)
+{
+    // Show and unminimize the window rather than just alert the user.
+    // We took over another launch, and a launch that produces no window did nothing.
+    app_.window_->presentWindow(Utils::toQString(activation_token));
+    return tr::interop::Reply::Yes;
+}
+
+tr::interop::Reply Application::LocalInstance::add_metainfo(std::string_view const metainfo)
+{
+    auto add_data = AddData::fromWireMetainfo(metainfo);
+    if (!add_data)
+    {
+        return tr::interop::Reply::No;
+    }
+
+    app_.addTorrent(std::move(*add_data));
+    return tr::interop::Reply::Yes;
+}
+
+std::string Application::LocalInstance::config_dir()
+{
+    // We canonicalize here rather than trust however this process was configured.
+    // interop.h requires a canonical answer from every implementation.
+    return tr::interop::canonical_config_dir(app_.prefs_->configDir().toStdString());
+}
+
+std::string Application::LocalInstance::description() const
+{
+    return "this process";
+}

@@ -10,6 +10,9 @@ Terminal=false
 TryExec=transmission-gtk
 Type=Application
 StartupNotify=true
+# What a Wayland compositor matches windows against; CMake substitutes the same
+# value the client is built with.
+StartupWMClass=@TR_GTK_APP_ID@
 MimeType=application/x-bittorrent;x-scheme-handler/magnet;
 Categories=Network;FileTransfer;P2P;GTK;
 X-Ubuntu-Gettext-Domain=transmission

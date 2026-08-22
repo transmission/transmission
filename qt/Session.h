@@ -148,6 +148,11 @@ public slots:
 
 signals:
     void sourceChanged();
+
+    // The session found its config dir held by another and started nothing.
+    // Emitted from every path that reaches start(), so a handler need not know which one ran.
+    void configDirContended();
+
     void portTested(std::optional<bool> status, PortTestIpProtocol ip_protocol);
     void statsUpdated();
     void sessionUpdated();

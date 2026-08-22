@@ -61,6 +61,11 @@ tr_session_stats tr_stats::load_old_stats(std::string_view const config_dir)
 
 void tr_stats::save() const
 {
+    if (!persist_)
+    {
+        return;
+    }
+
     auto var = tr_variant{ serializer::save(cumulative(), Fields) };
     api_compat::convert_outgoing_data(var);
     tr_variant_serde::json().to_file(var, tr_pathbuf{ config_dir_, "/stats.json"sv });

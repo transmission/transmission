@@ -138,6 +138,19 @@ public:
     Prefs& operator=(Prefs const&) = delete;
     ~Prefs() override;
 
+    // Stops the destructor from writing settings.json.
+    // Called when the config dir turns out to belong to another session,
+    // whose settings this launch must leave alone.
+    void disableSaveOnExit() noexcept
+    {
+        save_on_exit_ = false;
+    }
+
+    [[nodiscard]] QString const& configDir() const noexcept
+    {
+        return config_dir_;
+    }
+
     [[nodiscard]] constexpr auto isCore(int key) const noexcept
     {
         return FIRST_CORE_PREF <= key && key <= LAST_CORE_PREF;
@@ -206,6 +219,8 @@ private:
     void set(int key, char const* value) = delete;
 
     QString const config_dir_;
+
+    bool save_on_exit_ = true;
 
     std::array<QVariant, PREFS_COUNT> mutable values_;
 

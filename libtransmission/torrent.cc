@@ -997,7 +997,9 @@ void tr_torrent::init(tr_ctor const& ctor)
     // assume the torrent is new
     bool const is_new_torrent = !tr_sys_path_exists(file_path);
 
-    if (is_new_torrent)
+    // The copy lands in the config dir, so leave it to the session that holds the dir.
+    // is_new_torrent still stands. It describes the torrent, not what this session may write.
+    if (is_new_torrent && session->mayWriteConfigDir())
     {
         auto error = tr_error{};
 
@@ -1725,7 +1727,8 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
 
 void tr_torrent::save_resume_file()
 {
-    if (!is_dirty())
+    // Resume files belong to the session that holds the config dir.
+    if (!is_dirty() || !session->mayWriteConfigDir())
     {
         return;
     }

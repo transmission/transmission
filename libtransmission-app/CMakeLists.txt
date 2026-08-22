@@ -12,8 +12,15 @@ target_sources(${LIBNAME}
         app.h
         converters.cc
         converters.h
+        dbus-peer-record.cc
+        dbus-peer-record.h
         display-modes.h
-        favicon-cache.h)
+        favicon-cache.h
+        interop-names.h
+        interop.cc
+        interop.h
+        startup-coordinator.cc
+        startup-coordinator.h)
 
 target_include_directories(${LIBNAME}
     PUBLIC
@@ -22,4 +29,5 @@ target_include_directories(${LIBNAME}
 
 target_link_libraries(${LIBNAME}
     PUBLIC
+        ${TR_NAME}
         fmt::fmt-header-only)

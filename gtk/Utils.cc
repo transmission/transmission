@@ -9,6 +9,8 @@
 #include "PrefsDialog.h"
 #include "Session.h"
 
+#include <libtransmission-app/interop.h>
+
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>
@@ -885,12 +887,40 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 ****
 ***/
 
+std::string gtr_activation_token()
+{
+    if (auto token = tr::interop::activation_token(); !std::empty(token))
+    {
+        return token;
+    }
+
+    // GTK4 moves the token out of the environment before main() runs, into a stash of
+    // GDK's. The stash has no public getter, but GApplicationClass.add_platform_data is
+    // public, and GTK's override fills the platform data a remote GtkApplication would
+    // send from exactly that stash. Build that data on a throwaway application and read
+    // the token back out.
+    // GTK3 leaves the environment alone this early, so the code above answers there.
+    auto* const app = G_APPLICATION(g_object_new(GTK_TYPE_APPLICATION, "flags", G_APPLICATION_NON_UNIQUE, nullptr));
+
+    GVariantBuilder builder;
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    G_APPLICATION_GET_CLASS(app)->add_platform_data(app, &builder);
+    auto* const data = g_variant_builder_end(&builder);
+
+    char const* token = nullptr;
+    g_variant_lookup(data, "activation-token", "&s", &token);
+    auto ret = std::string{ token != nullptr ? token : "" };
+
+    g_variant_unref(data);
+    g_object_unref(app);
+    return ret;
+}
+
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry)
 {
     auto const process = [&entry](Glib::ustring const& text)
     {
-        if (auto const sv = tr_strv_strip(text.raw());
-            !sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
+        if (auto const sv = tr_strv_strip(text.raw()); tr::interop::is_metainfo_link(sv))
         {
             entry.set_text(text);
             return true;

@@ -3,9 +3,9 @@ set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
 # https://doc.qt.io/qt-6/macos.html#supported-versions
 set(CMAKE_OSX_DEPLOYMENT_TARGET 11)
 
-add_executable(${TR_NAME}-qt WIN32)
+add_library(${TR_NAME}-qt-lib STATIC)
 
-target_sources(${TR_NAME}-qt
+target_sources(${TR_NAME}-qt-lib
     PRIVATE
         AboutDialog.cc
         AboutDialog.h
@@ -18,11 +18,9 @@ target_sources(${TR_NAME}-qt
         BaseDialog.h
         ColumnResizer.cc
         ColumnResizer.h
-        ComInteropHelper.cc
-        ComInteropHelper.h
+        ComTransport.cc
         CustomVariantType.h
-        DBusInteropHelper.cc
-        DBusInteropHelper.h
+        DBusTransport.cc
         DetailsDialog.cc
         DetailsDialog.h
         FaviconCache.cc
@@ -50,13 +48,10 @@ target_sources(${TR_NAME}-qt
         IconCache.h
         IconToolButton.cc
         IconToolButton.h
-        InteropHelper.cc
-        InteropHelper.h
         InteropObject.cc
         InteropObject.h
         LicenseDialog.cc
         LicenseDialog.h
-        main.cc
         MainWindow.cc
         MainWindow.h
         MakeDialog.cc
@@ -107,6 +102,7 @@ target_sources(${TR_NAME}-qt
         TrackerModel.h
         TrackerModelFilter.cc
         TrackerModelFilter.h
+        Transports.h
         Typedefs.h
         Utils.cc
         Utils.h
@@ -117,11 +113,11 @@ target_sources(${TR_NAME}-qt
 
 tr_allow_compile_if(
     [=[[ENABLE_QT_COM_INTEROP]]=]
-        ComInteropHelper.cc
+        ComTransport.cc
     [=[[ENABLE_QT_DBUS_INTEROP]]=]
-        DBusInteropHelper.cc)
+        DBusTransport.cc)
 
-target_sources(${TR_NAME}-qt
+target_sources(${TR_NAME}-qt-lib
     PRIVATE
         AboutDialog.ui
         DetailsDialog.ui
@@ -138,10 +134,6 @@ target_sources(${TR_NAME}-qt
 
 source_group(Ui
     REGULAR_EXPRESSION [[.*\.ui$]])
-
-target_sources(${TR_NAME}-qt
-    PRIVATE
-        application.qrc)
 
 source_group(Resources
     REGULAR_EXPRESSION [[.*\.qrc$]])
@@ -196,35 +188,44 @@ if(TS_FILES)
     tr_qt_add_translation(QM_FILES ${TS_FILES})
 endif()
 
-target_sources(${TR_NAME}-qt
+target_sources(${TR_NAME}-qt-lib
     PRIVATE
         ${QM_FILES})
 
-if(ENABLE_QT_COM_INTEROP)
-    tr_target_idl_files(${TR_NAME}-qt
-        transmission-qt.idl)
-endif()
-
-target_include_directories(${TR_NAME}-qt
-    PRIVATE
+target_include_directories(${TR_NAME}-qt-lib
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${TR_NAME}-qt
-    PRIVATE
+target_link_libraries(${TR_NAME}-qt-lib
+    PUBLIC
         ${TR_NAME}-app
         ${TR_NAME}
         transmission::qt_impl)
 
-target_compile_definitions(${TR_NAME}-qt
+target_compile_definitions(${TR_NAME}-qt-lib
     PRIVATE
         "TRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
         QT_NO_CAST_FROM_ASCII
         $<$<BOOL:${ENABLE_QT_COM_INTEROP}>:ENABLE_COM_INTEROP>
         $<$<BOOL:${ENABLE_QT_DBUS_INTEROP}>:ENABLE_DBUS_INTEROP>)
 
-if(MSVC)
-    tr_append_target_property(${TR_NAME}-qt LINK_FLAGS "/ENTRY:mainCRTStartup")
-endif()
+set_target_properties(
+    ${TR_NAME}-qt-lib
+    PROPERTIES
+        AUTOMOC ON
+        AUTORCC ON
+        AUTOUIC ON)
+
+add_executable(${TR_NAME}-qt WIN32)
+
+target_sources(${TR_NAME}-qt
+    PRIVATE
+        main.cc
+        application.qrc)
+
+target_link_libraries(${TR_NAME}-qt
+    PRIVATE
+        ${TR_NAME}-qt-lib)
 
 set_target_properties(
     ${TR_NAME}-qt
@@ -232,6 +233,18 @@ set_target_properties(
         AUTOMOC ON
         AUTORCC ON
         AUTOUIC ON)
+
+if(MSVC)
+    tr_append_target_property(${TR_NAME}-qt LINK_FLAGS "/ENTRY:mainCRTStartup")
+endif()
+
+if(ENABLE_QT_COM_INTEROP)
+    # The type library rides in as a resource, and a resource in a static
+    # library does not reach the executable that links it. A caller whose
+    # QAxBase finds no interface information cannot resolve a method by name.
+    tr_target_idl_files(${TR_NAME}-qt
+        transmission-qt.idl)
+endif()
 
 tr_win32_app_info(${TR_NAME}-qt
     "Transmission Qt Client"

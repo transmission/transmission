@@ -90,12 +90,6 @@ void destroy_lockfile(tr_sys_file_t lockfile_fd, std::string_view session_id)
     }
 }
 
-#ifndef _WIN32
-auto constexpr WouldBlock = EWOULDBLOCK;
-#else
-auto constexpr WouldBlock = ERROR_LOCK_VIOLATION;
-#endif
-
 } // namespace
 
 tr_session_id::session_id_t tr_session_id::make_session_id()
@@ -136,7 +130,8 @@ bool tr_session_id::is_local(std::string_view session_id) noexcept
     }
     else
     {
-        if (!tr_sys_file_lock(lockfile_fd, TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_NB, &error) && (error.code() == WouldBlock))
+        if (!tr_sys_file_lock(lockfile_fd, TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_NB, &error) &&
+            tr_sys_file_lock_error_is_contended(error))
         {
             is_local = true;
             error = {};

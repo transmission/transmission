@@ -44,6 +44,17 @@ This is a JSON-encoded file that holds all the client's settings and preferences
 ### stats.json
 This is a JSON-encoded file that holds session statistics such as running upload and download byte counts.
 
+### lock
+This empty file is kept locked by a running session to mark the configuration folder as in use to safeguard against a second session from running with the same files and accidentally overwriting each other's settings. The OS always releases the lock when the session ends.
+
+A session that finds the folder already locked reports it and stops.
+
+### lock.startup
+A launch keeps this empty file locked from the moment it looks for a client already running on this folder until it can be found itself. Without it, two launches started at the same moment could each conclude it was first.
+
+### dbus-peer
+This file records the D-Bus bus name, interface and object path of the running client. A later launch on this folder reads it and hands that client a torrent file or magnet link instead of starting a second client. The file names the interface to call rather than assuming one, so this works between clients built from different sources. Every client that starts on the folder rewrites it, and it means nothing once that client has exited.
+
 ### torrents/
 This subfolder holds the .torrent files that have been added to Transmission. The files in this folder are named with a combination of the torrent's name (to make it human-readable) and a portion of the torrent's SHA1 hash (to avoid filename collisions from similarly-named torrents).
 

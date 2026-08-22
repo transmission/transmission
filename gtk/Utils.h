@@ -14,6 +14,7 @@
 #include <glibmm/refptr.h>
 #include <glibmm/signalproxy.h>
 #include <glibmm/ustring.h>
+#include <glibmm/variant.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/combobox.h>
 #include <gtkmm/entry.h>
@@ -34,6 +35,7 @@
 #include <functional>
 #include <list>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -68,6 +70,20 @@ Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage);
 
 /* return a human-readable string for the given ratio. */
 Glib::ustring tr_strlratio(double ratio);
+
+// The desktop's activation token for this launch, from wherever the toolkit left it.
+// The GTK client calls this rather than tr::interop::activation_token(). GTK4 moves
+// the token out of the environment before main() runs, and this knows where it went.
+[[nodiscard]] std::string gtr_activation_token();
+
+// Builds a D-Bus argument list. Parameters are always a tuple,
+// even when there is one of them or none.
+template<typename... Ts>
+[[nodiscard]] Glib::VariantContainerBase gtr_variant_tuple(Ts&&... args)
+{
+    return Glib::VariantContainerBase::create_tuple(
+        { Glib::Variant<std::remove_cv_t<std::remove_reference_t<Ts>>>::create(std::forward<Ts>(args))... });
+}
 
 std::string tr_format_time_relative(time_t timestamp, time_t origin);
 std::string tr_format_time_left(time_t timestamp);
