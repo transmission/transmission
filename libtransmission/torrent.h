@@ -646,6 +646,17 @@ struct tr_torrent
 
     [[nodiscard]] tr_stat stats() const;
 
+    // Non-blocking counterpart of stats(). Returns std::nullopt instead of
+    // blocking if the session thread currently holds the session lock (e.g.
+    // it is in the middle of a disk write); callers on a UI-refresh hot path
+    // should fall back to their last cached tr_stat in that case rather than
+    // stalling.
+    [[nodiscard]] std::optional<tr_stat> try_stats() const;
+
+    // Shared computation used by both stats() and try_stats(); assumes the
+    // caller already holds the session lock.
+    [[nodiscard]] tr_stat stats_locked() const;
+
     [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
         return is_done() ? tr_direction::Up : tr_direction::Down;
@@ -1042,7 +1053,10 @@ private:
     friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat tr_torrentStat(tr_torrent* tor);
+    friend bool tr_torrentTryStat(tr_torrent* tor, tr_stat* setme);
+    friend bool tr_torrentTryStat(tr_session* session, std::span<tr_torrent_id_t const> ids, tr_stat* setme);
     friend std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+    friend tr_session* tr_torrentSession(tr_torrent* torrent);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
