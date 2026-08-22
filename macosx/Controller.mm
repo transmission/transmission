@@ -1695,10 +1695,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)openPasteboard
 {
-    // 1. Magnet links must be matched against the raw pasteboard string, not an NSURL object.
-    // Reading the pasteboard as NSURL (below) round-trips the string through NSURL's parser/serializer,
-    // which can corrupt percent-encoded segments of a `magnet:` URI (an opaque, non-hierarchical scheme),
-    // e.g. turning "tr=udp%3A%2F%2Ftracker.opentrackr.org" into a broken tracker hostname.
+    // 1. Magnet links must be matched (and handled, see the early return below) before falling through
+    // to the plain-link NSDataDetector pass further down. NSDataDetector doesn't understand percent-encoding:
+    // scanning the raw text of a magnet link, it can spuriously match a substring inside a percent-encoded
+    // `tr=` tracker parameter as if it were an unrelated bare domain (e.g. matching "2Ftracker.opentrackr.org"
+    // out of "udp%3A%2F%2Ftracker.opentrackr.org"), and NSDataDetector fills in a default "http://" scheme for
+    // such matches. That spurious match was separately opened as a direct download URL alongside the correctly
+    // recognized magnet, producing a "Torrent download failed" error even though the magnet itself added fine.
     // See https://github.com/transmission/transmission/issues/8736
     NSArray<NSString*>* arrayOfStrings = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
 
