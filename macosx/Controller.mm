@@ -1703,26 +1703,10 @@ static void removeKeRangerRansomware()
 
 - (void)openPasteboard
 {
-    // 1. If Pasteboard contains URL objects, we treat those and only those
-    NSArray<NSURL*>* arrayOfURLs = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSURL class] ] options:nil];
-
-    if (arrayOfURLs.count > 0)
-    {
-        for (NSURL* url in arrayOfURLs)
-        {
-            [self openURL:url.absoluteString];
-        }
-        return;
-    }
-
-    // 2. If Pasteboard contains String objects, we'll search for both links and magnets
+    // 1. If Pasteboard contains String objects, search them for both magnets and plain links.
+    // Magnets must be matched against the raw string, not an NSURL object read from the pasteboard (see step 2).
     NSArray<NSString*>* arrayOfStrings = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
-    if (arrayOfStrings.count == 0)
-    {
-        return;
-    }
-    // The link detector (can't detect magnets)
-    NSDataDetector* linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+
     // The magnet detector
     // https://www.bittorrent.org/beps/bep_0009.html defines the magnet URI format as `magnet:?query` where query is non-empty.
     // https://datatracker.ietf.org/doc/html/rfc3986 defines the query format rigorously as `([!$\&-;=?-Z_a-z~]|%[0-9A-F]{2})*`.
@@ -1732,21 +1716,49 @@ static void removeKeRangerRansomware()
     // But for now, we'll keep the historical separator choice from 8392476b30491ffe7d8d64210f5cf3c3dd1d69ca, whitespaceAndNewlineCharacterSet, which is `[\p{Z}\v]`.
     NSRegularExpression* magnetDetector = [NSRegularExpression regularExpressionWithPattern:@"magnet:?([^\\p{Z}\\v])+" options:kNilOptions
                                                                                       error:nil];
+    // The link detector (can't detect magnets). NSDataDetector doesn't understand percent-encoding, so scanning
+    // the raw text of a magnet link it can spuriously match a substring inside a percent-encoded `tr=` tracker
+    // parameter as if it were an unrelated bare domain (e.g. matching "2Ftracker.opentrackr.org" out of
+    // "udp%3A%2F%2Ftracker.opentrackr.org"), defaulting a bogus "http://" scheme onto it. Skipping any link match
+    // that overlaps a magnet match avoids that misfire while still opening a plain link genuinely pasted
+    // alongside a magnet. See https://github.com/transmission/transmission/issues/8736
+    NSDataDetector* linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+
+    BOOL foundMagnetOrLink = NO;
     for (NSString* itemString in arrayOfStrings)
     {
-        // We open all links
-        for (NSTextCheckingResult* result in [linkDetector matchesInString:itemString options:0
-                                                                     range:NSMakeRange(0, itemString.length)])
-        {
-            [self openURL:result.URL.absoluteString];
-        }
+        NSRange const fullRange = NSMakeRange(0, itemString.length);
 
-        // We open all magnets
-        for (NSTextCheckingResult* result in [magnetDetector matchesInString:itemString options:0
-                                                                       range:NSMakeRange(0, itemString.length)])
+        NSArray<NSTextCheckingResult*>* magnetMatches = [magnetDetector matchesInString:itemString options:0 range:fullRange];
+        for (NSTextCheckingResult* result in magnetMatches)
         {
             [self openURL:[itemString substringWithRange:result.range]];
+            foundMagnetOrLink = YES;
         }
+
+        for (NSTextCheckingResult* result in [linkDetector matchesInString:itemString options:0 range:fullRange])
+        {
+            BOOL const overlapsMagnet = [magnetMatches
+                                            indexOfObjectPassingTest:^BOOL(NSTextCheckingResult* magnetResult, NSUInteger idx, BOOL* stop) {
+                                                return NSIntersectionRange(result.range, magnetResult.range).length > 0;
+                                            }] != NSNotFound;
+            if (!overlapsMagnet)
+            {
+                [self openURL:result.URL.absoluteString];
+                foundMagnetOrLink = YES;
+            }
+        }
+    }
+    if (foundMagnetOrLink)
+    {
+        return;
+    }
+
+    // 2. Otherwise, if Pasteboard contains URL objects, we treat those and only those
+    NSArray<NSURL*>* arrayOfURLs = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSURL class] ] options:nil];
+    for (NSURL* url in arrayOfURLs)
+    {
+        [self openURL:url.absoluteString];
     }
 }
 
