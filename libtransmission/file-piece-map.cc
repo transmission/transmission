@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <utility> // std::exchange()
 #include <vector>
 
 #include <small/set.hpp>
