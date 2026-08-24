@@ -502,8 +502,8 @@ static void removeKeRangerRansomware()
         //upgrading from versions < 2.40: clear recent items
         [NSDocumentController.sharedDocumentController clearRecentDocuments:nil];
 
-        auto settings = tr_sessionGetDefaultSettings();
-        settings.merge(getSettingsFromNSUserDefaults(_fDefaults));
+        auto settings = getSettingsFromNSUserDefaults(_fDefaults);
+        settings.merge(tr_sessionGetDefaultSettings());
 
         initUnits();
 
