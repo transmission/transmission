@@ -1977,6 +1977,8 @@ tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) cons
 
 void tr_torrent::set_file_priorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
 {
+    auto const lock = unique_lock();
+
     if (file_priorities_.set(files, file_count, priority))
     {
         priority_changed_.emit(this, files, file_count, priority);
