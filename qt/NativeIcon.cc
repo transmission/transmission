@@ -404,6 +404,12 @@ struct Info
         fallback = QStyle::SP_MediaPause;
         break;
 
+    case Type::TorrentStateFinished:
+        sf_symbol_name = "checkmark.circle";
+        segoe_codepoint = 0xE73EU; // CheckMark
+        xdg_icon_name = "checkmark";
+        break;
+
     case Type::VerifyTorrent:
         [[fallthrough]];
 

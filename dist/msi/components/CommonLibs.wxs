@@ -15,7 +15,7 @@
         <File DiskId="1" KeyPath="yes" Name="$(var.OpenSslSslName)" />
       </Component>
       <Component Id="dll.zlib">
-        <File DiskId="1" KeyPath="yes" Name="zlib.dll" />
+        <File DiskId="1" KeyPath="yes" Name="z.dll" />
       </Component>
     </DirectoryRef>
   </Fragment>

@@ -1,12 +1,12 @@
 #!/usr/bin/env pwsh
 
-$global:ZlibVersion = '1.3.1'
+$global:ZlibVersion = '1.3.2'
 
 $global:ZlibDeps = @()
 
 function global:Build-Zlib([string] $PrefixDir, [string] $Arch, [string] $DepsPrefixDir) {
     $Filename = "zlib-${ZlibVersion}.tar.gz"
-    $Url = "https://zlib.net/fossils/${Filename}"
+    $Url = "https://github.com/madler/zlib/releases/download/v${ZlibVersion}/${Filename}"
 
     $SourceDir = Invoke-DownloadAndUnpack $Url $Filename
     $BuildDir = Join-Path $SourceDir .build
@@ -18,5 +18,4 @@ function global:Build-Zlib([string] $PrefixDir, [string] $Arch, [string] $DepsPr
     )
 
     Invoke-CMakeBuildAndInstall $SourceDir $BuildDir $ConfigOptions
-    Copy-Item -Path (Join-Path $BuildDir zlib.pdb) -Destination (Join-Path $PrefixDir bin)
 }

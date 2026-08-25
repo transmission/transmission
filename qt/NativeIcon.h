@@ -60,6 +60,7 @@ enum class Type : uint8_t
     TorrentStateSeeding,
     TorrentStateDownloading,
     TorrentStatePaused,
+    TorrentStateFinished,
     TorrentStateVerifying,
     TorrentStateError
 };
