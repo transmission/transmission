@@ -7,7 +7,7 @@
 #include <cstddef>
 #include <ranges>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission/types.h>
 
 #include <libtransmission/torrent.h>
 
