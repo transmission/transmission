@@ -7,9 +7,8 @@
 #include <cstddef>
 #include <ranges>
 
-#include <libtransmission/types.h>
-
 #include <libtransmission/torrent.h>
+#include <libtransmission/types.h>
 
 #include "test-fixtures.h"
 
