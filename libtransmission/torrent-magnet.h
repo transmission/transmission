@@ -34,7 +34,7 @@ public:
 
     [[nodiscard]] static constexpr auto is_valid_metadata_size(int64_t const size) noexcept
     {
-        return size > 0;
+        return 0 < size && size <= MaxMetadataSize;
     }
 
     bool set_metadata_piece(int64_t piece, void const* data, size_t len);
@@ -74,4 +74,7 @@ private:
     int64_t piece_count_ = {};
 
     std::string log_name_;
+
+    // Arbitrary upper limit on magnet metadata to defend against memory exhaustion attacks
+    static constexpr auto MaxMetadataSize = 8 * 1024 * 1024; // 8 MiB
 };
