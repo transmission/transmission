@@ -354,10 +354,10 @@
   </action>
   <action name="action_OpenFolder">
    <property name="text">
-    <string>Open Fold&amp;er</string>
+    <string>Open File/Fold&amp;er</string>
    </property>
    <property name="toolTip">
-    <string>Open the torrent's folder</string>
+    <string>Open the torrent's file/folder</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+E</string>

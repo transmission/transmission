@@ -86,7 +86,7 @@
         <item>
           <attribute name="action">win.open-torrent-folder</attribute>
           <attribute name="icon">document-open</attribute>
-          <attribute name="label" translatable="yes">Open Fold_er</attribute>
+          <attribute name="label" translatable="yes">Open File/Fold_er</attribute>
           <attribute name="accel">&lt;control&gt;E</attribute>
         </item>
       </section>
@@ -297,7 +297,7 @@
       <item>
         <attribute name="action">win.open-torrent-folder</attribute>
         <attribute name="icon">document-open</attribute>
-        <attribute name="label" translatable="yes">Open Fold_er</attribute>
+        <attribute name="label" translatable="yes">Open File/Fold_er</attribute>
         <attribute name="accel">&lt;control&gt;E</attribute>
       </item>
     </section>
