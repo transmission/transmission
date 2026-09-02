@@ -15,7 +15,7 @@ Gtk::Ordering SorterBase<T>::compare_vfunc(gpointer lhs, gpointer rhs)
     auto const* const concrete_lhs = dynamic_cast<T const*>(Glib::wrap_auto(static_cast<GObject*>(lhs)));
     auto const* const concrete_rhs = dynamic_cast<T const*>(Glib::wrap_auto(static_cast<GObject*>(rhs)));
 
-    if (concrete_lhs == nullptr && concrete_lhs == nullptr)
+    if (concrete_lhs == nullptr && concrete_rhs == nullptr)
     {
         g_return_val_if_reached(Gtk::Ordering::EQUAL);
     }
