@@ -111,7 +111,12 @@ public:
             return {};
         }
 
-        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), n_bytes, 0); n_sent >= 0)
+        if (auto const n_sent = send(
+                sockfd,
+                reinterpret_cast<char const*>(data()),
+                TR_IF_WIN32(static_cast<int>(n_bytes), n_bytes),
+                0);
+            n_sent >= 0)
         {
             drain(n_sent);
             return n_sent;
