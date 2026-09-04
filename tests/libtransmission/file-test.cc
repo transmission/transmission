@@ -1294,6 +1294,15 @@ TEST_F(FileTest, dirCreate)
     EXPECT_TRUE(validatePermissions(path1, 0751));
     EXPECT_TRUE(validatePermissions(path2, 0751));
 
+    // A created directory must be usable: we must be able to create a file in
+    // it. tr_sys_dir_create() treats a post-mkdir chmod failure as non-fatal on
+    // filesystems that reject chmod (CIFS forced-mode, FAT, some NFS), but only
+    // when the directory is genuinely writable -- as asserted here.
+    auto const child = tr_pathbuf{ path2, "/child"sv };
+    createFileWithContents(child, "x");
+    EXPECT_TRUE(tr_sys_path_exists(child));
+    tr_sys_path_remove(child);
+
     // Can create existing directory (no-op)
     EXPECT_TRUE(tr_sys_dir_create(path1, 0, 0700, &error));
     EXPECT_FALSE(error) << error;
