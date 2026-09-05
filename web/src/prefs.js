@@ -103,6 +103,10 @@ Prefs.DisplayMode = 'display-mode';
 Prefs.ContrastLess = 'less';
 Prefs.ContrastMore = 'more';
 Prefs.ContrastMode = 'contrast-mode';
+Prefs.ColorScheme = 'color-scheme';
+Prefs.ColorSchemeSystem = 'system';
+Prefs.ColorSchemeLight = 'light';
+Prefs.ColorSchemeDark = 'dark';
 Prefs.FilterActive = 'active';
 Prefs.FilterAll = 'all';
 Prefs.FilterDownloading = 'downloading';
@@ -132,6 +136,7 @@ Prefs.SortMode = 'sort-mode';
 Prefs._Defaults = {
   [Prefs.AltSpeedEnabled]: false,
   [Prefs.DisplayMode]: Prefs.DisplayFull,
+  [Prefs.ColorScheme]: Prefs.ColorSchemeSystem,
   [Prefs.ContrastMode]: globalThis.matchMedia('(prefers-contrast: more)')
     .matches
     ? Prefs.ContrastMore
