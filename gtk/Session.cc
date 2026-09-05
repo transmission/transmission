@@ -1385,7 +1385,7 @@ void Session::open_folder(tr_torrent_id_t torrent_id) const
 
         if (tr_torrentFileCount(tor) == 1)
         {
-            gtr_open_file(current_dir);
+            gtr_show_file_in_folder(current_dir, tr_torrentFile(tor, 0).name);
         }
         else
         {
