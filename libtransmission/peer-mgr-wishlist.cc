@@ -292,8 +292,10 @@ void Wishlist::candidate_list_upkeep()
 
 void Wishlist::recalculate_salt()
 {
+    auto const is_sequential = mediator_.is_sequential_download();
     for (auto& candidate : candidates_)
     {
+        candidate.is_sequential = is_sequential;
         candidate.salt = get_salt(candidate.piece);
     }
 
