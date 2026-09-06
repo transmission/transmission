@@ -110,7 +110,6 @@ bool tr_torrent_queue::to_file()
     {
         return false;
     }
-    set_dirty(false);
 
     auto vec = tr_variant::Vector{};
     vec.reserve(std::size(queue_));
@@ -119,7 +118,9 @@ bool tr_torrent_queue::to_file()
         vec.emplace_back(mediator_.store_filename(id));
     }
 
-    return tr_variant_serde::json().to_file(std::move(vec), get_file_path(mediator_.config_dir()));
+    auto const saved = tr_variant_serde::json().to_file(std::move(vec), get_file_path(mediator_.config_dir()));
+    set_dirty(!saved);
+    return saved;
 }
 
 std::vector<std::string> tr_torrent_queue::from_file()
