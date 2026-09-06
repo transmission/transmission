@@ -29,6 +29,7 @@
 
 struct tr_address;
 class tr_announcer_udp;
+class tr_socks5_udp;
 struct tr_session;
 struct tr_torrent;
 struct tr_torrent_announcer;
@@ -144,6 +145,12 @@ public:
             std::string_view name,
             uint16_t service,
             std::string_view log_name) const;
+
+        // SOCKS5 UDP relay support
+        [[nodiscard]] virtual tr_socks5_udp* socks5_udp() const noexcept
+        {
+            return nullptr;
+        }
     };
 
     virtual ~tr_announcer_udp() noexcept = default;
