@@ -1835,6 +1835,7 @@ void tr_torrent::recheck_completeness()
     {
         bool const recent_change = bytes_downloaded_.during_this_session() != 0U;
         bool const was_running = is_running();
+        bool const was_done_before = date_done_ != time_t{};
 
         if (new_completeness != TR_LEECH && was_running && session->shouldFullyVerifyCompleteTorrents())
         {
@@ -1880,7 +1881,10 @@ void tr_torrent::recheck_completeness()
         if (is_done())
         {
             save_resume_file();
-            callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
+            if (!was_done_before)
+            {
+                callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
+            }
         }
     }
 }
