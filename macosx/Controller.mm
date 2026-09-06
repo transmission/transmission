@@ -261,6 +261,7 @@ static tr_variant getSettingsFromNSUserDefaults(NSUserDefaults* defaults)
     settings.insert_or_assign(TR_KEY_rpc_host_whitelist_enabled, static_cast<bool>([defaults boolForKey:@"RPCUseHostWhitelist"]));
     settings.insert_or_assign(TR_KEY_seed_queue_enabled, static_cast<bool>([defaults boolForKey:@"QueueSeed"]));
     settings.insert_or_assign(TR_KEY_seed_queue_size, [defaults integerForKey:@"QueueSeedNumber"]);
+    settings.insert_or_assign(TR_KEY_sequential_download, static_cast<bool>([defaults boolForKey:@"SequentialDownload"]));
     settings.insert_or_assign(TR_KEY_start_added_torrents, static_cast<bool>([defaults boolForKey:@"AutoStartDownload"]));
     settings.insert_or_assign(TR_KEY_utp_enabled, static_cast<bool>([defaults boolForKey:@"UTPGlobal"]));
 
