@@ -126,7 +126,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui_.action_Donate, &QAction::triggered, this, &MainWindow::openDonate);
     connect(ui_.action_About, &QAction::triggered, this, &MainWindow::openAbout);
     connect(ui_.action_Contents, &QAction::triggered, this, &MainWindow::openHelp);
-    connect(ui_.action_OpenFolder, &QAction::triggered, this, &MainWindow::openFolder);
+    connect(ui_.action_OpenFolder, &QAction::triggered, this, &MainWindow::openFileOrFolder);
     connect(ui_.action_CopyMagnetToClipboard, &QAction::triggered, this, &MainWindow::copyMagnetLinkToClipboard);
     connect(ui_.action_SetLocation, &QAction::triggered, this, &MainWindow::setLocation);
     connect(ui_.action_Properties, &QAction::triggered, this, &MainWindow::openProperties);
@@ -621,7 +621,7 @@ void openSelect(QString const& path)
 } // namespace open_folder_helpers
 } // namespace
 
-void MainWindow::openFolder()
+void MainWindow::openFileOrFolder()
 {
     using namespace open_folder_helpers;
 
@@ -639,7 +639,7 @@ void MainWindow::openFolder()
     }
 
     auto const parent = QDir{ tor->getPath() };
-    auto const child = getTopFolder(parent, tor);
+    auto const child = tor->files().size() < 2 ? tor->name() : getTopFolder(parent, tor);
     openSelect(parent.filePath(child));
 }
 

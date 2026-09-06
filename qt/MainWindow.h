@@ -106,7 +106,7 @@ private slots:
     void onStatsModeChanged(QAction const* action);
     void openAbout();
     void openDonate() const;
-    void openFolder();
+    void openFileOrFolder();
     void openHelp() const;
     void openPreferences();
     void openProperties();

@@ -1560,7 +1560,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     }
     else if (action_name == "open-torrent-folder")
     {
-        wind_->for_each_selected_torrent([this](auto const& torrent) { core_->open_folder(torrent->get_id()); });
+        wind_->for_each_selected_torrent([this](auto const& torrent) { core_->open_file_or_folder(torrent->get_id()); });
     }
     else if (action_name == "show-torrent-properties")
     {
