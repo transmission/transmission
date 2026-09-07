@@ -37,6 +37,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 @property(nonatomic) IBOutlet NSButton* fDownloadLimitCheck;
 @property(nonatomic) IBOutlet NSButton* fGlobalLimitCheck;
 @property(nonatomic) IBOutlet NSButton* fRemoveSeedingCompleteCheck;
+@property(nonatomic) IBOutlet NSButton* fSequentialDownloadCheck;
 @property(nonatomic) IBOutlet NSTextField* fUploadLimitField;
 @property(nonatomic) IBOutlet NSTextField* fDownloadLimitField;
 @property(nonatomic) IBOutlet NSTextField* fRatioLimitField;
@@ -283,6 +284,7 @@ static CGFloat const kStackViewSpacing = 8.0;
     NSInteger checkRatio = torrent.ratioSetting;
     NSInteger checkIdle = torrent.idleSetting;
     NSInteger removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSControlStateValueOn : NSControlStateValueOff;
+    NSInteger sequentialDownload = torrent.sequentialDownload ? NSControlStateValueOn : NSControlStateValueOff;
     CGFloat ratioLimit = torrent.ratioLimit;
     BOOL multipleRatioLimits = NO;
     NSUInteger idleLimit = torrent.idleLimitMinutes;
@@ -315,6 +317,12 @@ static CGFloat const kStackViewSpacing = 8.0;
             removeWhenFinishSeeding != (torrent.removeWhenFinishSeeding ? NSControlStateValueOn : NSControlStateValueOff))
         {
             removeWhenFinishSeeding = NSControlStateValueMixed;
+        }
+
+        if (sequentialDownload != NSControlStateValueMixed &&
+            sequentialDownload != (torrent.sequentialDownload ? NSControlStateValueOn : NSControlStateValueOff))
+        {
+            sequentialDownload = NSControlStateValueMixed;
         }
     }
 
@@ -387,6 +395,9 @@ static CGFloat const kStackViewSpacing = 8.0;
     //set remove transfer when seeding finishes
     self.fRemoveSeedingCompleteCheck.state = removeWhenFinishSeeding;
     self.fRemoveSeedingCompleteCheck.enabled = YES;
+
+    self.fSequentialDownloadCheck.state = sequentialDownload;
+    self.fSequentialDownloadCheck.enabled = YES;
 
     //get priority info
     enumerator = [self.fTorrents objectEnumerator];
@@ -625,6 +636,22 @@ static CGFloat const kStackViewSpacing = 8.0;
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptionsNotification" object:self];
 }
 
+- (IBAction)setSequentialDownload:(id)sender
+{
+    if (((NSButton*)sender).state == NSControlStateValueMixed)
+    {
+        [sender setState:NSControlStateValueOn];
+    }
+    BOOL const enable = ((NSButton*)sender).state == NSControlStateValueOn;
+
+    for (Torrent* torrent in self.fTorrents)
+    {
+        torrent.sequentialDownload = enable;
+    }
+
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptionsNotification" object:self];
+}
+
 - (void)setPriority:(id)sender
 {
     tr_priority_t priority;
@@ -723,6 +750,9 @@ static CGFloat const kStackViewSpacing = 8.0;
 
         self.fRemoveSeedingCompleteCheck.enabled = NO;
         self.fRemoveSeedingCompleteCheck.state = NSControlStateValueOff;
+
+        self.fSequentialDownloadCheck.enabled = NO;
+        self.fSequentialDownloadCheck.state = NSControlStateValueOff;
 
         self.fPeersConnectField.enabled = NO;
         self.fPeersConnectField.stringValue = @"";
