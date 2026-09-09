@@ -45,6 +45,14 @@ public:
         return webseed_urls_.at(i);
     }
 
+    // Peer socket addresses named by the magnet link's "x.pe" parameters, in
+    // tr_socket_address::display_name() form. Kept as strings so that this
+    // header remains usable outside of libtransmission.
+    [[nodiscard]] constexpr auto const& peers() const noexcept
+    {
+        return peers_;
+    }
+
     [[nodiscard]] constexpr auto& announce_list() noexcept
     {
         return announce_list_;
@@ -69,9 +77,12 @@ public:
 
     void add_webseed(std::string_view webseed);
 
+    void add_peer(std::string_view socket_address);
+
 protected:
     tr_announce_list announce_list_;
     std::vector<std::string> webseed_urls_;
+    std::vector<std::string> peers_;
     tr_sha1_digest_t info_hash_ = {};
     tr_sha256_digest_t info_hash2_ = {};
     tr_sha1_string info_hash_str_;

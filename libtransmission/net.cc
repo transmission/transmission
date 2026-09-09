@@ -532,7 +532,8 @@ std::string tr_socket_address::display_name(tr_address const& address, tr_port p
 bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept
 {
     // Loopback is only meaningful from a source that can name our own host.
-    auto const loopback_allowed = from == TR_PEER_FROM_INCOMING || from == TR_PEER_FROM_LPD || from == TR_PEER_FROM_RESUME;
+    auto const loopback_allowed = from == TR_PEER_FROM_INCOMING || from == TR_PEER_FROM_LPD || from == TR_PEER_FROM_MAGNET ||
+        from == TR_PEER_FROM_RESUME;
 
     return is_valid() && !std::empty(port_) && !address_.is_ipv6_link_local() && !address_.is_ipv6_ipv4_mapped() &&
         !address_.is_ipv4_current_network() && !address_.is_ipv6_unspecified() && !address_.is_ipv4_multicast() &&

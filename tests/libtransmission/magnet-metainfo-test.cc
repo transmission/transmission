@@ -5,7 +5,10 @@
 
 #include <array>
 #include <cstddef> // size_t, std::byte
+#include <string>
 #include <string_view>
+
+#include <fmt/format.h>
 
 #include <libtransmission/crypto-utils.h> // tr_rand_buffer()
 #include <libtransmission/magnet-metainfo.h>
@@ -100,6 +103,70 @@ TEST_F(MagnetMetainfoTest, magnetParse)
         EXPECT_EQ(0U, mm.webseed_count());
         EXPECT_EQ(ExpectedHash, mm.info_hash());
     }
+}
+
+TEST_F(MagnetMetainfoTest, magnetParsePeers)
+{
+    // https://www.bittorrent.org/beps/bep_0009.html - "x.pe" peer addresses
+    auto constexpr Uri =
+        "magnet:?xt=urn:btih:"
+        "d2354010a3ca4ade5b7427bb093a62a3899ff381"
+        "&x.pe=" // empty
+        "&x.pe=192.0.2.1" // no port
+        "&x.pe=example.com%3A6881" // hostname, not a literal address
+        "&x.pe=not-an-address"
+        "&x.pe=0.0.0.0%3A6881" // current network
+        "&x.pe=%5B%3A%3A%5D%3A6881" // unspecified
+        "&x.pe=224.0.0.1%3A6881" // multicast
+        "&x.pe=%5Bfe80%3A%3A1%5D%3A6881" // link-local
+        "&x.pe=192.0.2.1%3A6881"
+        "&x.pe=192.0.2.1%3A6881" // duplicate of the previous one
+        "&x.pe=%5B%3A%3Affff%3A192.0.2.2%5D%3A6881" // ipv4-mapped, kept unmapped
+        "&x.pe=127.0.0.1%3A6881" // loopback is usable: the user named it
+        "&x.pe=%5B2001%3Adb8%3A%3A1%5D%3A6882"sv;
+
+    auto mm = tr_magnet_metainfo{};
+    ASSERT_TRUE(mm.parseMagnet(Uri));
+
+    auto const& peers = mm.peers();
+    ASSERT_EQ(4U, std::size(peers));
+    EXPECT_EQ("192.0.2.1:6881"sv, peers[0]);
+    EXPECT_EQ("192.0.2.2:6881"sv, peers[1]);
+    EXPECT_EQ("127.0.0.1:6881"sv, peers[2]);
+    EXPECT_EQ("[2001:db8::1]:6882"sv, peers[3]);
+}
+
+TEST_F(MagnetMetainfoTest, magnetPeersRoundTrip)
+{
+    // x.pe has to survive magnet(), since that is what gets saved to the
+    // .magnet file and returned by tr_torrentGetMagnetLink()
+    auto constexpr Uri =
+        "magnet:?xt=urn:btih:"
+        "d2354010a3ca4ade5b7427bb093a62a3899ff381"
+        "&x.pe=192.0.2.1%3A6881"
+        "&x.pe=%5B2001%3Adb8%3A%3A1%5D%3A6882"sv;
+
+    auto mm = tr_magnet_metainfo{};
+    ASSERT_TRUE(mm.parseMagnet(Uri));
+
+    auto round_trip = tr_magnet_metainfo{};
+    ASSERT_TRUE(round_trip.parseMagnet(mm.magnet()));
+    EXPECT_EQ(mm.peers(), round_trip.peers());
+}
+
+TEST_F(MagnetMetainfoTest, magnetParseCapsPeers)
+{
+    static auto constexpr MaxPeers = size_t{ 200U };
+
+    auto uri = std::string{ "magnet:?xt=urn:btih:d2354010a3ca4ade5b7427bb093a62a3899ff381" };
+    for (size_t i = 0; i < MaxPeers + 10U; ++i)
+    {
+        uri += fmt::format("&x.pe=192.0.2.1%3A{:d}", 1024U + i);
+    }
+
+    auto mm = tr_magnet_metainfo{};
+    ASSERT_TRUE(mm.parseMagnet(uri));
+    EXPECT_EQ(MaxPeers, std::size(mm.peers()));
 }
 
 TEST_F(MagnetMetainfoTest, parseMagnetFuzzRegressions)

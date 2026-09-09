@@ -492,6 +492,9 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
         case TR_PEER_FROM_DHT:
             [components addObject:NSLocalizedString(@"From: distributed hash table", "Inspector -> Peers tab -> table row tooltip")];
             break;
+        case TR_PEER_FROM_MAGNET:
+            [components addObject:NSLocalizedString(@"From: magnet link", "Inspector -> Peers tab -> table row tooltip")];
+            break;
         case TR_PEER_FROM_LTEP:
             [components addObject:NSLocalizedString(@"From: libtorrent extension protocol handshake", "Inspector -> Peers tab -> table row tooltip")];
             break;

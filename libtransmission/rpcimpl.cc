@@ -670,13 +670,14 @@ namespace make_torrent_field_helpers
 [[nodiscard]] auto make_peer_counts_map(tr_stat const& st)
 {
     auto const& from = st.peers_from;
-    auto peer_counts_map = tr_variant::Map{ 8U };
+    auto peer_counts_map = tr_variant::Map{ 9U };
     peer_counts_map.try_emplace(TR_KEY_from_cache, from[TR_PEER_FROM_RESUME]);
     peer_counts_map.try_emplace(TR_KEY_from_dht, from[TR_PEER_FROM_DHT]);
     peer_counts_map.try_emplace(TR_KEY_from_holepunch, from[TR_PEER_FROM_HOLEPUNCH]);
     peer_counts_map.try_emplace(TR_KEY_from_incoming, from[TR_PEER_FROM_INCOMING]);
     peer_counts_map.try_emplace(TR_KEY_from_lpd, from[TR_PEER_FROM_LPD]);
     peer_counts_map.try_emplace(TR_KEY_from_ltep, from[TR_PEER_FROM_LTEP]);
+    peer_counts_map.try_emplace(TR_KEY_from_magnet, from[TR_PEER_FROM_MAGNET]);
     peer_counts_map.try_emplace(TR_KEY_from_pex, from[TR_PEER_FROM_PEX]);
     peer_counts_map.try_emplace(TR_KEY_from_tracker, from[TR_PEER_FROM_TRACKER]);
     return tr_variant{ std::move(peer_counts_map) };
