@@ -128,6 +128,9 @@ Prefs.SortByState = 'state';
 Prefs.SortDescending = 'descending';
 Prefs.SortDirection = 'sort-direction';
 Prefs.SortMode = 'sort-mode';
+Prefs.FileSortMode = 'file-sort-mode';
+Prefs.FileSortModeNatural = 'natural';
+Prefs.FileSortModeTorrent = 'torrent';
 
 Prefs._Defaults = {
   [Prefs.AltSpeedEnabled]: false,
@@ -142,4 +145,5 @@ Prefs._Defaults = {
   [Prefs.RefreshRate]: 5,
   [Prefs.SortDirection]: Prefs.SortAscending,
   [Prefs.SortMode]: Prefs.SortByName,
+  [Prefs.FileSortMode]: Prefs.FileSortModeTorrent,
 };
