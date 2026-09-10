@@ -780,6 +780,11 @@
                                                 <action selector="setSort:" target="206" id="1934"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Uploaded" tag="9" id="upL-00-0001">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="upL-00-0002"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="2881">
                                             <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                         </menuItem>
