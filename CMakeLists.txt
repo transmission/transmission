@@ -75,6 +75,7 @@ option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
 option(ENABLE_UTP "Build µTP support" ON)
+option(ENABLE_UCHARDET "Build uchardet charset detection support" ON)
 option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
@@ -95,6 +96,7 @@ tr_auto_option(USE_SYSTEM_UTP "Use system utp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_WIDE_INTEGER "Use system WideInteger library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_UCHARDET "Use system uchardet library" ${USE_SYSTEM_DEFAULT})
 tr_list_option(USE_GTK_VERSION "Use specific GTK version" AUTO 3 4)
 tr_list_option(USE_QT_VERSION "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO "Use specified crypto library" AUTO ccrypto mbedtls openssl wolfssl)
@@ -574,6 +576,26 @@ tr_add_external_auto_library(DHT dht
 tr_add_external_auto_library(PSL libpsl
     LIBNAME psl
     TARGET psl::psl)
+
+if(APPLE OR ANDROID)
+    set(ENABLE_UCHARDET OFF)
+endif()
+
+if(ENABLE_UCHARDET)
+    tr_add_external_auto_library(UCHARDET uchardet
+        LIBNAME uchardet
+        TARGET uchardet::uchardet
+        CMAKE_ARGS
+            -DBUILD_BINARY:BOOL=OFF
+            -DBUILD_SHARED_LIBS:BOOL=OFF
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5)
+    if(NOT WIN32)
+        find_package(Iconv REQUIRED)
+        if(Iconv_IS_BUILT_IN)
+            add_compile_definitions(LIBICONV_PLUG)
+        endif()
+    endif()
+endif()
 
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp

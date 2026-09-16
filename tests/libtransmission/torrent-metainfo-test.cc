@@ -265,8 +265,12 @@ TEST_F(TorrentMetainfoTest, utf8Test)
 
     // good name: bad-utf8-path/πfile.😀😀😀
     EXPECT_EQ("bad-utf8-path/\u03C0file.\U0001F600\U0001F600\U0001F600", tm.file_subpath(0));
-    // bad name, gets masked to: bad-utf8-path/file�.foo
-    EXPECT_EQ("bad-utf8-path/file\uFFFD.foo", tm.file_subpath(1));
+    // bad name, gets replaced by : bad-utf8-path/file�.foo
+#ifdef WITH_UCHARDET
+    EXPECT_EQ("bad-utf8-path/file\u20AC.foo", tm.file_subpath(1)); // detects WINDOWS-1250: '€' {EURO}
+#else
+    EXPECT_EQ("bad-utf8-path/file\uFFFD.foo", tm.file_subpath(1)); // '�' {REPLACEMENT CHARACTER}
+#endif
 }
 
 TEST_F(TorrentMetainfoTest, preservesInfoDictOrder)
