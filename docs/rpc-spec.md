@@ -268,6 +268,7 @@ The 'source' column here corresponds to the data structure there.
 | `is_finished` | boolean| tr_stat
 | `is_private` | boolean| tr_torrent
 | `is_stalled` | boolean| tr_stat
+| `known_peers_from` | object (see below)| tr_stat
 | `labels` | array of strings | tr_torrent
 | `left_until_done` | number| tr_stat
 | `magnet_link` | string| n/a
@@ -366,7 +367,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `rate_to_peer` (B/s)   | number     | tr_peer_stat
 | `supports_holepunch`   | boolean    | tr_peer_stat
 
-`peers_from`: an object containing:
+`peers_from`: an object containing counts of connected peers by discovery source:
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
@@ -378,6 +379,8 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `from_ltep`     | number     | tr_stat
 | `from_pex`      | number     | tr_stat
 | `from_tracker`  | number     | tr_stat
+
+`known_peers_from`: an object containing counts of known peers by discovery source. It has the same keys as `peers_from`.
 
 
 `pieces`: A bitfield holding `piece_count` flags which are set to 'true' if we have the piece matching that position. JSON doesn't allow raw binary data, so this is a base64-encoded string. (Source: tr_torrent)
