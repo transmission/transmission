@@ -7,6 +7,9 @@
 
 @interface FilterButton ()
 
+/// Native NSButtonTextField that holds the correct frame.
+@property(nonatomic, strong) NSTextField* originalTextField;
+
 /// Button on its left.
 @property(nonatomic) IBOutlet FilterButton* previousButton;
 
@@ -23,13 +26,26 @@
     return self;
 }
 
-- (void)setFrame:(NSRect)frame
+- (void)addSubview:(NSView *)view
 {
     // The native NSButtonTextField is removed from the view hierarchy at unpredictable times by `[NSButtonAppearanceBasedVisualProvider removeTextField]`.
     // That removal is later followed by the re-addition of a new textfield.
-    // But the containing NSStackView is also misframing the buttons, ignoring layout constraints.
-    // Apple switched development to SwiftUI and will probably not fix this, so we override the frame ourselves.
+    if ([view isKindOfClass:NSTextField.class])
+    {
+        _originalTextField = (NSTextField*)view;
+    }
+    [super addSubview:view];
+}
 
+- (void)setFrame:(NSRect)frame
+{
+    // The containing NSStackView is misframing the buttons, ignoring layout constraints.
+    // Apple switched development to SwiftUI and will probably not fix this, so we override the frame ourselves.
+    if (frame.size.width > self.superview.bounds.size.width / 2)
+    {
+        // We cap to the intrinsicContentSize
+        frame.size.width = _originalTextField.intrinsicContentSize.width;
+    }
     if (frame.size.width < 20)
     {
         // Prevent buttons from disappearing
