@@ -1871,6 +1871,10 @@ void tr_torrent::recheck_completeness()
 
             done_(this, recent_change);
         }
+        else
+        {
+            undone_(this);
+        }
 
         session->onTorrentCompletenessChanged(id(), completeness_, was_running);
 
