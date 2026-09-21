@@ -1431,7 +1431,7 @@ void Session::open_folder(tr_torrent_id_t torrent_id) const
 
     if (tor != nullptr)
     {
-        bool const single = tr_torrentFileCount(tor) == 1;
+        bool const single = tr_torrentFileCount(tor) == 1 && !tr_torrentView(tor).is_folder;
         char const* currentDir = tr_torrentGetCurrentDir(tor);
 
         if (single)
