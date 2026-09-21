@@ -977,3 +977,59 @@ TEST_F(NetTest, IPv4MappedAddress)
         EXPECT_EQ(native_sv, native->display_name());
     }
 }
+
+TEST_F(NetTest, isValidForPeers)
+{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 13>{ {
+        { "1.2.3.4:6881"sv, true },
+        { "[2001:db8::1]:6881"sv, true },
+        { "0.0.0.0:6881"sv, false }, // "this network"
+        { "0.1.2.3:6881"sv, false }, // "this network"
+        { "[::]:6881"sv, false }, // unspecified
+        { "224.0.0.1:6881"sv, false }, // multicast
+        { "239.255.255.255:6881"sv, false }, // multicast
+        { "[ff02::1]:6881"sv, false }, // multicast
+        { "[fe80::1]:6881"sv, false }, // link-local
+        { "[::ffff:1.2.3.4]:6881"sv, false }, // ipv4-mapped
+        { "[::ffff:127.0.0.1]:6881"sv, false }, // ipv4-mapped
+        { "127.0.0.1:6881"sv, false }, // loopback, see LoopbackTests
+        { "[::1]:6881"sv, false }, // loopback, see LoopbackTests
+    } };
+
+    for (auto const& [presentation, expected] : Tests)
+    {
+        auto const socket_address = tr_socket_address::from_string(presentation);
+        ASSERT_TRUE(socket_address.has_value()) << presentation;
+        EXPECT_EQ(expected, socket_address->is_valid_for_peers(TR_PEER_FROM_TRACKER)) << presentation;
+    }
+
+    // a peer address without a port is useless
+    {
+        auto const address = tr_address::from_string("1.2.3.4"sv);
+        ASSERT_TRUE(address.has_value());
+        EXPECT_FALSE(tr_socket_address(*address, tr_port{}).is_valid_for_peers(TR_PEER_FROM_TRACKER));
+    }
+
+    // loopback peers are only accepted from sources that can legitimately name them
+    static auto constexpr LoopbackTests = std::array<std::pair<tr_peer_from, bool>, 8>{ {
+        { TR_PEER_FROM_INCOMING, true },
+        { TR_PEER_FROM_LPD, true },
+        { TR_PEER_FROM_RESUME, true },
+        { TR_PEER_FROM_TRACKER, false },
+        { TR_PEER_FROM_DHT, false },
+        { TR_PEER_FROM_PEX, false },
+        { TR_PEER_FROM_LTEP, false },
+        { TR_PEER_FROM_HOLEPUNCH, false },
+    } };
+
+    for (auto const& presentation : { "127.0.0.1:6881"sv, "[::1]:6881"sv })
+    {
+        auto const socket_address = tr_socket_address::from_string(presentation);
+        ASSERT_TRUE(socket_address.has_value()) << presentation;
+
+        for (auto const& [from, expected] : LoopbackTests)
+        {
+            EXPECT_EQ(expected, socket_address->is_valid_for_peers(from)) << presentation << " from " << from;
+        }
+    }
+}
