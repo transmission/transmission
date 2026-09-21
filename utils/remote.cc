@@ -2084,10 +2084,10 @@ void print_groups(tr_variant::Map const& result)
         }
 
         auto const name = group->value_if<std::string_view>(TR_KEY_name);
-        auto const up_enabled = group->value_if<bool>(TR_KEY_upload_limited);
-        auto const down_enabled = group->value_if<bool>(TR_KEY_download_limited);
-        auto const up_limit = group->value_if<int64_t>(TR_KEY_upload_limit);
-        auto const down_limit = group->value_if<int64_t>(TR_KEY_download_limit);
+        auto const up_enabled = group->value_if<bool>(TR_KEY_speed_limit_up_enabled);
+        auto const down_enabled = group->value_if<bool>(TR_KEY_speed_limit_down_enabled);
+        auto const up_limit = group->value_if<int64_t>(TR_KEY_speed_limit_up);
+        auto const down_limit = group->value_if<int64_t>(TR_KEY_speed_limit_down);
         auto const honors = group->value_if<bool>(TR_KEY_honors_session_limits);
         if (name && down_limit && down_enabled && up_limit && up_enabled && honors)
         {
