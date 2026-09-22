@@ -517,6 +517,20 @@
                                 </layout>
                               </object>
                             </child>
+                            <child>
+                              <object class="GtkCheckButton" id="wrap_single_file_torrents_check">
+                                <property name="label" translatable="yes">Put single-file torrents into a _subfolder</property>
+                                <property name="focusable">1</property>
+                                <property name="valign">center</property>
+                                <property name="hexpand">1</property>
+                                <property name="use-underline">1</property>
+                                <layout>
+                                  <property name="column">0</property>
+                                  <property name="row">3</property>
+                                  <property name="column-span">2</property>
+                                </layout>
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>
