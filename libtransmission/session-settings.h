@@ -106,6 +106,7 @@ public:
     bool tcp_enabled = true;
     bool torrent_complete_verify_enabled = false;
     bool utp_enabled = true;
+    bool wrap_single_file_torrents = false;
     double ratio_limit = 2.0;
     size_t unused_cache_size_mbytes = 4U; // TODO(TR5): remove
     size_t download_queue_size = 5U;
@@ -217,7 +218,8 @@ public:
         Field<&SessionSettings::should_delete_source_torrents>{ TR_KEY_trash_original_torrent_files },
         Field<&SessionSettings::umask>{ TR_KEY_umask },
         Field<&SessionSettings::upload_slots_per_torrent>{ TR_KEY_upload_slots_per_torrent },
-        Field<&SessionSettings::utp_enabled>{ TR_KEY_utp_enabled });
+        Field<&SessionSettings::utp_enabled>{ TR_KEY_utp_enabled },
+        Field<&SessionSettings::wrap_single_file_torrents>{ TR_KEY_wrap_single_file_torrents });
 };
 
 struct SessionAltSpeedSettings final

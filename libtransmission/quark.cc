@@ -740,6 +740,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "webseedsSendingToUs"sv, // rpc
     "webseeds_ex"sv, // rpc
     "webseeds_sending_to_us"sv, // rpc
+    "wrap_single_file_torrents"sv, // rpc, tr_session::Settings
     "yourip"sv, // BEP0010; BT protocol
 };
 
