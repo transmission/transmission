@@ -448,6 +448,7 @@ DownloadingPage::DownloadingPage(
         1,
         std::numeric_limits<uint16_t>::max(),
         15);
+    init_check_button("wrap_single_file_torrents_check", TR_KEY_wrap_single_file_torrents);
     init_check_button("append_suffix_to_incomplete_check", TR_KEY_rename_partial_files);
     init_check_button("incomplete_dir_check", TR_KEY_incomplete_dir_enabled);
     init_chooser_button("incomplete_dir_chooser", TR_KEY_incomplete_dir);

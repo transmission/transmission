@@ -642,6 +642,16 @@ public:
         settings_.sequential_download = seq;
     }
 
+    [[nodiscard]] constexpr auto wrap_single_file_torrents() const noexcept
+    {
+        return settings().wrap_single_file_torrents;
+    }
+
+    void set_wrap_single_file_torrents(bool wrap) noexcept
+    {
+        settings_.wrap_single_file_torrents = wrap;
+    }
+
     // bandwidth
 
     [[nodiscard]] tr_bandwidth& getBandwidthGroup(std::string_view name);
@@ -1171,6 +1181,7 @@ private:
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetWrapSingleFileTorrents(tr_session* session, bool wrap);
     friend void tr_sessionUseAltSpeed(tr_session* session, bool enabled);
     friend void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled);
 
