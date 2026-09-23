@@ -1431,12 +1431,19 @@ void Session::open_folder(tr_torrent_id_t torrent_id) const
 
     if (tor != nullptr)
     {
-        bool const single = tr_torrentFileCount(tor) == 1 && !tr_torrentView(tor).is_folder;
         char const* currentDir = tr_torrentGetCurrentDir(tor);
 
-        if (single)
+        if (tr_torrentFileCount(tor) == 1)
         {
-            gtr_open_file(currentDir);
+            auto const subpath = std::string_view{ tr_torrentFile(tor, 0).name };
+            if (auto const slash = subpath.find('/'); slash != std::string_view::npos)
+            {
+                gtr_open_file(Glib::build_filename(currentDir, std::string{ subpath.substr(0, slash) }));
+            }
+            else
+            {
+                gtr_open_file(currentDir);
+            }
         }
         else
         {
