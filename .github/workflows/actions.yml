@@ -107,7 +107,7 @@ jobs:
         id: check-for-diffs
         working-directory: .
         run: |
-          ./code_style.sh
+          ./code_style.sh --force
           set +e
           git diff --exit-code > style.diff
           echo "differs=$?" >> $GITHUB_OUTPUT
