@@ -143,9 +143,20 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
     return self.fTrackers ? self.fTrackers.count : 0;
 }
 
-- (id)tableView:(NSTableView*)tableView objectValueForTableColumn:(NSTableColumn*)column row:(NSInteger)row
+- (BOOL)tableView:(NSTableView*)tableView isTierRow:(NSInteger)row
+{
+    id node = self.fTrackers[row];
+    return [node isKindOfClass:[NSDictionary class]] || [node isKindOfClass:[NSString class]];
+}
+
+- (nullable NSString*)tierLabelForRow:(NSInteger)row
 {
     id item = self.fTrackers[row];
+
+    if ([item isKindOfClass:[TrackerNode class]])
+    {
+        return nil;
+    }
 
     if ([item isKindOfClass:[NSDictionary class]])
     {
@@ -160,16 +171,43 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
         }
         return tierString;
     }
-    else
-    {
-        return item; //TrackerNode or NSString
-    }
+
+    // Should be NSString.
+    return item;
 }
 
-- (NSCell*)tableView:(NSTableView*)tableView dataCellForTableColumn:(NSTableColumn*)tableColumn row:(NSInteger)row
+- (NSView*)tableView:(NSTableView*)tableView viewForTableColumn:(NSTableColumn*)tableColumn row:(NSInteger)row
 {
-    BOOL const tracker = [self.fTrackers[row] isKindOfClass:[TrackerNode class]];
-    return tracker ? self.fTrackerCell : [tableColumn dataCellForRow:row];
+    if ([self tableView:tableView isTierRow:row])
+    {
+        TrackerTierRowView* tierView = [tableView makeViewWithIdentifier:@"TrackerTierRowView" owner:self];
+        if (tierView == nil)
+        {
+            tierView = [[TrackerTierRowView alloc] initWithFrame:NSZeroRect];
+            tierView.identifier = @"TrackerTierRowView";
+        }
+
+        tierView.tierLabel.stringValue = [self tierLabelForRow:row];
+
+        return tierView;
+    }
+
+    // Fetch the reused cell instance using the registered identifier
+    TrackerRowView* cellView = [tableView makeViewWithIdentifier:@"TrackerRowView" owner:self];
+    if (cellView == nil)
+    {
+        cellView = [[TrackerRowView alloc] initWithFrame:NSZeroRect];
+        cellView.identifier = @"TrackerRowView";
+    }
+
+    // Extract the tracker data node object from your table's data array/source
+    // (Replace 'fTrackers' or 'fTrackerList' with the real array variable used in Transmission)
+    id trackerNode = self.fTrackers[row];
+
+    // Bind the object data directly to the semantic UI fields
+    [cellView configureWithTrackerNode:trackerNode];
+
+    return cellView;
 }
 
 - (CGFloat)tableView:(NSTableView*)tableView heightOfRow:(NSInteger)row
