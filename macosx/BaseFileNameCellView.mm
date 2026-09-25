@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 #import "BaseFileNameCellView.h"
 #import "FileListNode.h"
@@ -24,7 +25,28 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 @property(nonatomic, strong) NSArray<NSLayoutConstraint*>* dynamicConstraints;
 @end
 
+static NSCache<UTType*, NSImage*>* iconCache;
+
 @implementation BaseFileNameCellView
+
++ (void)initialize
+{
+    iconCache = [[NSCache alloc] init];
+}
+
++ (NSImage*)cachedIconForUTType:(UTType*)uttype
+{
+    __auto_type cachedIcon = [iconCache objectForKey:uttype];
+
+    if (cachedIcon == nil)
+    {
+        __auto_type icon = [NSWorkspace.sharedWorkspace iconForContentType:uttype];
+        [iconCache setObject:icon forKey:uttype];
+        return icon;
+    }
+
+    return cachedIcon;
+}
 
 - (instancetype)initWithFrame:(NSRect)frameRect
 {
@@ -73,6 +95,10 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 {
 }
 
+- (void)updateImageIfNeeded
+{
+}
+
 - (void)setNode:(FileListNode*)node
 {
     _node = node;
@@ -89,7 +115,7 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
     FileListNode* node = self.node;
 
     // Update icon
-    self.iconView.image = node.icon;
+    [self updateImageIfNeeded];
 
     // Update name
     self.nameField.stringValue = node.name;
@@ -166,6 +192,19 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 
 @implementation FileNameCellView
 
+- (void)updateImageIfNeeded
+{
+    if (self.node.name == nil)
+    {
+        return;
+    }
+
+    __auto_type uttype = [UTType typeWithFilenameExtension:self.node.name.pathExtension];
+    __auto_type image = [self.class cachedIconForUTType:uttype];
+
+    self.iconView.image = image;
+}
+
 - (void)setupConstraints
 {
     NSImageView* iconView = self.iconView;
@@ -196,6 +235,15 @@ static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 @end
 
 @implementation FolderNameCellView
+
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    if (self = [super initWithFrame:frameRect])
+    {
+        self.iconView.image = [self.class cachedIconForUTType:UTTypeFolder];
+    }
+    return self;
+}
 
 - (void)setupConstraints
 {
