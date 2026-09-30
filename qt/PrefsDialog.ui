@@ -51,8 +51,8 @@
             <property name="maximum">
              <number>999999999</number>
             </property>
-            <property name="singleStep">
-             <number>5</number>
+            <property name="stepType">
+             <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
             </property>
            </widget>
           </item>
@@ -71,8 +71,8 @@
             <property name="maximum">
              <number>999999999</number>
             </property>
-            <property name="singleStep">
-             <number>5</number>
+            <property name="stepType">
+             <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
             </property>
            </widget>
           </item>
@@ -118,8 +118,8 @@
             <property name="maximum">
              <number>999999999</number>
             </property>
-            <property name="singleStep">
-             <number>5</number>
+            <property name="stepType">
+             <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
             </property>
            </widget>
           </item>
@@ -138,8 +138,8 @@
             <property name="maximum">
              <number>999999999</number>
             </property>
-            <property name="singleStep">
-             <number>5</number>
+            <property name="stepType">
+             <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
             </property>
            </widget>
           </item>
