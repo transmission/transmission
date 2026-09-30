@@ -83,6 +83,7 @@ public:
     void set_port_test_pending(bool pending, PortTestIpProtocol ip_protocol);
 
     void update();
+    void update_torrent(tr_torrent_id_t id);
     void torrents_added();
 
     void add_files(std::vector<Glib::RefPtr<Gio::File>> const& files, bool do_start, bool do_prompt, bool do_notify);
@@ -647,12 +648,7 @@ void Session::Impl::on_torrent_metadata_changed(tr_torrent* raw_torrent)
     Glib::signal_idle().connect(
         [this, core = get_core_ptr(), torrent_id = tr_torrentId(raw_torrent)]()
         {
-            /* update the torrent's collated name */
-            if (auto const& [torrent, position] = find_torrent_by_id(torrent_id); torrent)
-            {
-                torrent->update();
-            }
-
+            update_torrent(torrent_id);
             return false;
         });
 }
@@ -934,12 +930,9 @@ void Session::Impl::torrents_added()
     signal_add_error_.emit(ERR_NO_MORE_TORRENTS, {});
 }
 
-void Session::torrent_changed(tr_torrent_id_t id)
+void Session::torrent_changed(tr_torrent_id_t const id)
 {
-    if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
-    {
-        torrent->update();
-    }
+    impl_->update_torrent(id);
 }
 
 void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
@@ -1033,6 +1026,17 @@ void Session::Impl::update()
     if (changes.any())
     {
         signal_torrents_changed_.emit(torrent_ids, changes);
+    }
+}
+
+void Session::Impl::update_torrent(tr_torrent_id_t const id)
+{
+    if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
+    {
+        if (auto const changes = torrent->update(); changes.any())
+        {
+            signal_torrents_changed_.emit({ id }, changes);
+        }
     }
 }
 
