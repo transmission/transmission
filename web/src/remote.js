@@ -34,7 +34,7 @@ export class Remote {
     this._controller = controller;
   }
 
-  sendRequest(data, callback, context) {
+  sendRequest(data, callback, context, onError) {
     const headers = new Headers();
     headers.append('cache-control', 'no-cache');
     headers.append('content-type', 'application/json');
@@ -72,17 +72,19 @@ export class Remote {
           this._connection_alert.close();
           this._connection_alert = null;
           this._controller._initializeTorrents();
+          this._controller.togglePeriodicSessionRefresh(true);
         }
       })
       .catch((error) => {
         if (error.message === Remote._SessionHeader) {
           // copy the session header and try again
           this._session_id = error.header;
-          this.sendRequest(data, callback, context);
+          this.sendRequest(data, callback, context, onError);
           return;
         }
         console.trace(error);
         this._controller.togglePeriodicSessionRefresh(false);
+        onError?.();
 
         this._connection_alert = new AlertDialog({
           heading: 'Connection failed',
@@ -180,10 +182,20 @@ export class Remote {
       method: 'free_space',
       params: { path: dir },
     };
-    this.sendRequest(o, (response) => {
-      const res = getResponseParams(response);
-      callback.call(context, res.path, res.size_bytes);
-    });
+    this.sendRequest(
+      o,
+      (response) => {
+        const res = response?.result ?? response?.error?.data?.result;
+        callback.call(
+          context,
+          res?.path ?? dir,
+          response?.error ? -1 : res?.size_bytes,
+          res?.filesystem_id,
+        );
+      },
+      null,
+      () => callback.call(context, dir, -1),
+    );
   }
 
   changeFileCommand(torrentId, fileIndices, command) {

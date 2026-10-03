@@ -190,6 +190,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "files_added"sv, // rpc, stats.json
     "files_unwanted"sv, // rpc
     "files_wanted"sv, // rpc
+    "filesystem_id"sv, // rpc
     "filter-mode"sv, // qt app
     "filter-text"sv, // qt app
     "filter-trackers"sv, // qt app
