@@ -1127,6 +1127,7 @@ Transmission 4.2.0 (`rpc_version_semver` 6.1.0, `rpc_version`: ?)
 
 | Method | Description
 |:---|:---
+| `free_space` | new optional return arg `filesystem_id` |
 | `torrent_get` | new arg `peers.supports_holepunch`
 | `torrent_get` | new arg `peers_from.from_holepunch`
 | `torrent_get` | new arg `webseeds_ex`
