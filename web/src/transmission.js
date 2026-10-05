@@ -13,6 +13,7 @@ import { OverflowMenu } from './overflow-menu.js';
 import { Prefs } from './prefs.js';
 import { PrefsDialog } from './prefs-dialog.js';
 import { Remote, RPC } from './remote.js';
+import { ServerFreeSpace } from './server-free-space.js';
 import { RemoveDialog } from './remove-dialog.js';
 import { RenameDialog } from './rename-dialog.js';
 import { LabelsDialog } from './labels-dialog.js';
@@ -40,6 +41,10 @@ export class Transmission extends EventTarget {
     this.notifications = notifications;
     this.prefs = prefs;
     this.remote = new Remote(this);
+    this.serverFreeSpace = new ServerFreeSpace(
+      this.remote,
+      document.querySelector('#server-free-space'),
+    );
     this.speed = {
       down: document.querySelector('#speed-down'),
       up: document.querySelector('#speed-up'),
@@ -424,7 +429,11 @@ export class Transmission extends EventTarget {
 
   loadDaemonPrefs() {
     this.remote.loadDaemonPrefs((data) => {
+      if (data.error || !data.result) {
+        return;
+      }
       this.session_properties = data.result;
+      this.serverFreeSpace.refresh(data.result);
       this._openTorrentFromUrl();
     });
   }
@@ -911,6 +920,9 @@ export class Transmission extends EventTarget {
 
   // turn the periodic ajax session refresh on & off
   togglePeriodicSessionRefresh(enabled) {
+    if (!enabled) {
+      this.serverFreeSpace.clear();
+    }
     if (!enabled && this.sessionInterval) {
       clearInterval(this.sessionInterval);
       delete this.sessionInterval;

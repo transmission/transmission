@@ -978,3 +978,14 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error* error)
 
     return {};
 }
+
+std::optional<std::string> tr_sys_path_get_filesystem_id(std::string_view const path)
+{
+    struct stat sb = {};
+    if (stat(std::string{ path }.c_str(), &sb) != 0)
+    {
+        return {};
+    }
+
+    return std::to_string(static_cast<uint64_t>(sb.st_dev));
+}

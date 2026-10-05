@@ -149,6 +149,10 @@ bool tr_sys_path_copy(std::string_view src_path, std::string_view dst_path, tr_e
     int flags = 0,
     tr_error* error = nullptr);
 
+/** Opaque filesystem identity for equality comparisons on this server only.
+ * Follows links; returns no identity when the path or volume cannot be resolved. */
+[[nodiscard]] std::optional<std::string> tr_sys_path_get_filesystem_id(std::string_view path);
+
 /**
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
  *

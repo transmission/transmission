@@ -2779,6 +2779,14 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
     auto error = tr_error{};
     auto const capacity = tr_sys_path_get_capacity(*path, &error);
 
+    if (capacity)
+    {
+        if (auto const filesystem_id = tr_sys_path_get_filesystem_id(*path); filesystem_id)
+        {
+            args_out.try_emplace(TR_KEY_filesystem_id, *filesystem_id);
+        }
+    }
+
     // response
     args_out.try_emplace(TR_KEY_path, *path);
     args_out.try_emplace(TR_KEY_size_bytes, capacity ? capacity->available : tr_variant{ -1 });

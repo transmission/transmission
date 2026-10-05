@@ -16,6 +16,7 @@ set(WEB_SOURCES
     src/prefs-dialog.js
     src/prefs.js
     src/remote.js
+    src/server-free-space.js
     src/remove-dialog.js
     src/rename-dialog.js
     src/shortcuts-dialog.js
