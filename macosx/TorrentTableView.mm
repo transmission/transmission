@@ -289,7 +289,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             if (error)
             {
                 NSRect frame = torrentCell.fIconView.frame;
-                NSImage* resultImage = [[NSImage alloc] initWithSize:NSMakeSize(frame.size.height, frame.size.width)];
+                NSImage* resultImage = [[NSImage alloc] initWithSize:frame.size];
                 [resultImage lockFocus];
 
                 // draw fileImage
