@@ -75,6 +75,7 @@ option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
 option(ENABLE_UTP "Build µTP support" ON)
+option(ENABLE_WEBTORRENT "Build WebTorrent (WebRTC) support" OFF)
 option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
@@ -580,6 +581,21 @@ if(ENABLE_UTP)
         SUBPROJECT
         CMAKE_ARGS
             -DLIBUTP_SHARED:BOOL=OFF)
+endif()
+
+if(ENABLE_WEBTORRENT)
+    set(NO_MEDIA ON CACHE BOOL "" FORCE)
+    set(NO_EXAMPLES ON CACHE BOOL "" FORCE)
+    set(NO_TESTS ON CACHE BOOL "" FORCE)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    include(FetchContent)
+    FetchContent_Declare(
+        libdatachannel
+        GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
+        GIT_TAG v0.24.6
+        GIT_SHALLOW TRUE
+    )
+    FetchContent_MakeAvailable(libdatachannel)
 endif()
 
 tr_add_external_auto_library(B64 libb64
