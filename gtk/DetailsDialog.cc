@@ -1135,7 +1135,7 @@ void initPeerRow(
 
     (*iter)[peer_cols.address] = peer.addr;
     (*iter)[peer_cols.address_collated] = collated_name;
-    (*iter)[peer_cols.location] = get_location_from_ip(std::data(peer->addr));
+    (*iter)[peer_cols.location] = get_location_from_ip(std::data(peer.addr));
     (*iter)[peer_cols.client] = peer.user_agent;
     (*iter)[peer_cols.encryption_stock_id] = peer.is_encrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);

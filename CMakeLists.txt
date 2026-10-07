@@ -515,9 +515,12 @@ tr_add_external_auto_library(DEFLATE libdeflate
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
 
-tr_add_external_auto_library(MAXMINDDB libmaxminddb maxminddb
+tr_add_external_auto_library(MAXMINDDB maxminddb
+    SOURCE_DIR libmaxminddb
+    LIBNAME maxminddb
     TARGET maxminddb::maxminddb
     CMAKE_ARGS
+        -DBUILD_SHARED_LIBS=OFF
         -DBUILD_TESTING=OFF
         -DMAXMINDDB_BUILD_BINARIES=OFF)
 
