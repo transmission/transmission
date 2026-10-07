@@ -64,3 +64,6 @@
 [submodule "third-party/sigslot"]
 	path = third-party/sigslot
 	url = https://github.com/transmission/sigslot
+[submodule "third-party/libmaxminddb"]
+	path = third-party/libmaxminddb
+	url = https://github.com/maxmind/libmaxminddb.git

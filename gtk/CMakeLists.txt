@@ -29,6 +29,8 @@ target_sources(${TR_NAME}-gtk
         HigWorkarea.h
         IconCache.cc
         IconCache.h
+        IPToLocation.cc
+        IPToLocation.h
         ListModelAdapter.cc
         ListModelAdapter.h
         main.cc
@@ -185,6 +187,8 @@ target_link_libraries(${TR_NAME}-gtk
         ${TR_NAME}
         transmission::gtk_impl
         transmission::fmt-header-only
+        libdeflate::libdeflate
+        maxminddb::maxminddb
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
 
 if(MSVC)
