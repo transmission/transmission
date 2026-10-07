@@ -13,7 +13,6 @@
 #include <cstdint> // int64_t
 #include <ctime> // time_t
 #include <deque>
-#include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -35,7 +34,7 @@ public:
 
     [[nodiscard]] static constexpr auto is_valid_metadata_size(int64_t const size) noexcept
     {
-        return size > 0 && size <= std::numeric_limits<int>::max();
+        return size > 0;
     }
 
     bool set_metadata_piece(int64_t piece, void const* data, size_t len);
@@ -49,7 +48,7 @@ public:
         return metadata_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 std::string_view log_name() const noexcept
+    [[nodiscard]] TR_CONSTEXPR_STR std::string_view log_name() const noexcept
     {
         return log_name_;
     }

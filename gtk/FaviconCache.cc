@@ -11,7 +11,7 @@
 #include <glibmm/main.h>
 #include <glibmm/miscutils.h>
 
-using namespace transmission::app;
+using namespace tr::app;
 using Icon = Glib::RefPtr<Gdk::Pixbuf>;
 
 template<>
@@ -33,7 +33,7 @@ Icon FaviconCache<Icon>::create_from_data(void const* data, size_t datalen) cons
     try
     {
         auto memory_stream = Gio::MemoryInputStream::create();
-        memory_stream->add_data(data, datalen, nullptr);
+        memory_stream->add_data(data, static_cast<gssize>(datalen), nullptr);
         return Gdk::Pixbuf::create_from_stream_at_scale(memory_stream, Width, Height, false);
     }
     catch (Glib::Error const&)

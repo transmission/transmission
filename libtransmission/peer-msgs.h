@@ -14,11 +14,11 @@
 #include <cstddef> // for size_t
 #include <memory>
 
-#include "libtransmission/transmission.h" // for tr_direction, tr_block_ind...
-
+#include "libtransmission/bep55-holepunch.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/net.h" // tr_socket_address
 #include "libtransmission/peer-common.h" // for tr_peer
+#include "libtransmission/types.h"
 
 class tr_peerIo;
 class tr_peerMsgs;
@@ -102,7 +102,7 @@ public:
 
     [[nodiscard]] constexpr auto is_active(tr_direction direction) const noexcept
     {
-        return is_active_[direction];
+        return is_active_[static_cast<uint8_t>(direction)];
     }
 
     [[nodiscard]] constexpr auto is_disconnecting() const noexcept
@@ -125,6 +125,12 @@ public:
     virtual void on_torrent_got_metainfo() noexcept = 0;
 
     virtual void on_piece_completed(tr_piece_index_t) = 0;
+
+    [[nodiscard]] virtual bool can_ut_holepunch() const noexcept = 0;
+    virtual void send_ut_holepunch(
+        bep55::MsgType msg_type,
+        tr_socket_address const& addr,
+        bep55::ErrorCode err_code = bep55::ErrNonError) = 0;
 
     static std::shared_ptr<tr_peerMsgs> create(
         tr_torrent& torrent,
@@ -157,7 +163,7 @@ protected:
 
     constexpr void set_active(tr_direction direction, bool active) noexcept
     {
-        is_active_[direction] = active;
+        is_active_[static_cast<uint8_t>(direction)] = active;
     }
 
     constexpr void set_user_agent(tr_interned_string val) noexcept

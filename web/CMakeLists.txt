@@ -2,6 +2,7 @@ set(WEB_SOURCES
     src/about-dialog.js
     src/action-manager.js
     src/alert-dialog.js
+    src/appearance-settings.js
     src/context-menu.js
     src/file-row.js
     src/formatter.js
@@ -37,7 +38,6 @@ set(WEB_IMAGES
     assets/img/horizontal-rule.svg
     assets/img/image.svg
     assets/img/lock-fill.svg
-    assets/img/logo.png
     assets/img/magnet.svg
     assets/img/music.svg
     assets/img/package.svg

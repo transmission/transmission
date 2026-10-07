@@ -12,6 +12,8 @@
 #include "Session.h"
 #include "Utils.h"
 
+#include <libtransmission/file-utils.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/utils.h>
 
 #include <giomm/icon.h>
@@ -38,6 +40,7 @@
 #include <memory>
 #include <optional>
 #include <queue>
+#include <ranges>
 #include <stack>
 #include <string>
 #include <string_view>
@@ -241,7 +244,8 @@ bool refreshFilesForeach(
             }
         }
 
-        new_progress = new_size != 0 ? static_cast<int>(100.0 * new_have / new_size) : 1;
+        new_progress = new_size != 0 ? static_cast<int>(100.0 * static_cast<double>(new_have) / static_cast<double>(new_size)) :
+                                       1;
     }
 
     new_progress = std::clamp(new_progress, 0, 100);
@@ -337,7 +341,7 @@ void FileList::Impl::refresh()
         int sort_column_id = 0;
         store_->get_sort_column_id(sort_column_id, order);
 
-        RefreshData refresh_data{ sort_column_id, false, tor };
+        RefreshData refresh_data{ .sort_column_id = sort_column_id, .resort_needed = false, .tor = tor };
         gtr_tree_model_foreach_postorder(
             store_,
             [this, &refresh_data](Gtk::TreeModel::iterator const& iter)
@@ -669,7 +673,7 @@ std::string build_filename(tr_torrent const* tor, Gtk::TreeModel::iterator const
     }
 
     tokens.emplace_back(tr_torrentGetCurrentDir(tor));
-    std::reverse(tokens.begin(), tokens.end());
+    std::ranges::reverse(tokens);
     return Glib::build_filename(tokens);
 }
 
@@ -782,7 +786,7 @@ bool FileList::Impl::getAndSelectEventPath(double view_x, double view_y, Gtk::Tr
     int cell_x = 0;
     int cell_y = 0;
 
-    if (view_->get_path_at_pos(view_x, view_y, path, col, cell_x, cell_y))
+    if (view_->get_path_at_pos(static_cast<int>(view_x), static_cast<int>(view_y), path, col, cell_x, cell_y))
     {
         if (auto const sel = view_->get_selection(); !sel->is_selected(path))
         {
@@ -803,6 +807,7 @@ bool FileList::Impl::onViewButtonPressed(guint button, TrGdkModifierType state, 
     bool handled = false;
 
     if (button == GDK_BUTTON_PRIMARY &&
+        // NOLINTNEXTLINE(hicpp-signed-bitwise)
         (state & (TR_GDK_MODIFIED_TYPE(SHIFT_MASK) | TR_GDK_MODIFIED_TYPE(CONTROL_MASK))) == TrGdkModifierType{} &&
         getAndSelectEventPath(view_x, view_y, col, path))
     {
@@ -811,13 +816,6 @@ bool FileList::Impl::onViewButtonPressed(guint button, TrGdkModifierType state, 
 
     return handled;
 }
-
-struct rename_data
-{
-    Glib::ustring newname;
-    Glib::ustring path_string;
-    gpointer impl = nullptr;
-};
 
 void FileList::Impl::on_rename_done(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
 {
@@ -902,21 +900,15 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
     }
 
     /* do the renaming */
-    auto rename_data = std::make_unique<struct rename_data>();
-    rename_data->newname = newname;
-    rename_data->impl = this;
-    rename_data->path_string = path_string;
     tr_torrentRenamePath(
         tor,
-        oldpath.c_str(),
-        newname.c_str(),
-        static_cast<tr_torrent_rename_done_func>(
-            [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, gpointer data)
-            {
-                auto const data_grave = std::unique_ptr<struct rename_data>(static_cast<struct rename_data*>(data));
-                static_cast<Impl*>(data_grave->impl)->on_rename_done(data_grave->path_string, data_grave->newname, error);
-            }),
-        rename_data.release());
+        oldpath.raw(),
+        newname.raw(),
+        [this, path_string, newname](
+            tr_torrent_id_t const /*tor_id*/,
+            std::string_view const /*oldpath*/,
+            std::string_view const /*newname*/,
+            tr_error const& error) { on_rename_done(path_string, newname, error ? error.code() : 0); });
 }
 
 FileList::FileList(

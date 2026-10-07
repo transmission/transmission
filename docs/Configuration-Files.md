@@ -44,6 +44,9 @@ This is a JSON-encoded file that holds all the client's settings and preferences
 ### stats.json
 This is a JSON-encoded file that holds session statistics such as running upload and download byte counts.
 
+### lock
+This empty file is kept locked by a running session to mark the configuration folder as in use to safeguard against a second session from running with the same files and accidentally overwriting each other's settings. The OS always releases the lock when the session ends.
+
 ### torrents/
 This subfolder holds the .torrent files that have been added to Transmission. The files in this folder are named with a combination of the torrent's name (to make it human-readable) and a portion of the torrent's SHA1 hash (to avoid filename collisions from similarly-named torrents).
 

@@ -19,14 +19,14 @@ static CGFloat const kIconWidthSmall = 12.0;
 
 @implementation GroupsController
 
-GroupsController* fGroupsInstance = nil;
-
 + (GroupsController*)groups
 {
-    if (!fGroupsInstance)
-    {
+    static GroupsController* fGroupsInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         fGroupsInstance = [[GroupsController alloc] init];
-    }
+    });
+
     return fGroupsInstance;
 }
 

@@ -20,7 +20,7 @@
 
 @implementation AboutWindowController
 
-AboutWindowController* fAboutBoxInstance = nil;
+static AboutWindowController* fAboutBoxInstance = nil;
 
 + (AboutWindowController*)aboutController
 {

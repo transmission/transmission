@@ -28,6 +28,8 @@
 #else
 #include <QtWin>
 #endif
+
+#include "QtCompat.h"
 #endif
 
 #include <optional>
@@ -84,21 +86,10 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
 
     if (!multifile)
     {
-        QMimeDatabase const mime_db;
-        auto const type = mime_db.mimeTypeForName(mime_type_name);
-        icon = getThemeIcon(type.iconName());
-
-        if (icon.isNull())
-        {
-            icon = getThemeIcon(type.genericIconName());
-        }
-
-        if (icon.isNull())
-        {
-            icon = file_icon_;
-        }
-
-        return icon;
+        static auto const MimeDb = QMimeDatabase{};
+        auto const type = MimeDb.mimeTypeForName(mime_type_name);
+        auto const filename = QStringLiteral("filename.%1").arg(type.preferredSuffix());
+        return guessMimeIcon(filename, file_icon_);
     }
 
     auto const mime_icon = getMimeTypeIcon(mime_type_name, false);
@@ -158,11 +149,9 @@ void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, unsigned int i
         {
             if (shell_file_info.hIcon != nullptr)
             {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-                pixmap = QPixmap::fromImage(QImage::fromHICON(shell_file_info.hIcon));
-#else
-                pixmap = QtWin::fromHICON(shell_file_info.hIcon);
-#endif
+                pixmap = IF_QT6(
+                    QPixmap::fromImage(QImage::fromHICON(shell_file_info.hIcon)),
+                    QtWin::fromHICON(shell_file_info.hIcon));
                 ::DestroyIcon(shell_file_info.hIcon);
             }
         }
@@ -190,7 +179,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
     }
 
     auto const ext = QFileInfo{ filename }.suffix();
-    if (suffixes_.count(ext) == 0)
+    if (!suffixes_.contains(ext))
     {
         return {};
     }

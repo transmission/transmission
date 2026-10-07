@@ -47,7 +47,7 @@
 "%lu files" = "%lu dosya";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%lu Dosya";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu gelen";
@@ -83,7 +83,7 @@
 "%lu tracker" = "%lu izleyici";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%lu İzleyici";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,7 +94,7 @@
 "%lu web seeds" = "%lu web beslemesi";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%lu Web Beslemesi";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u parça, her biri %2$@";
@@ -121,7 +121,7 @@
 "1 time" = "1 kez";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "1 İzleyici";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "1 aktarım";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "1 Web Beslemesi";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "“%@” geçerli bir torrent dosyası değil.";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "Torrent Dosyası Oluştur";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "%@ üzerinde oluşturuldu";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "%1$@ üzerinde %2$@ ile oluşturuldu";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "%@ ile oluşturuldu";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "“%@” oluşturulamadı.";

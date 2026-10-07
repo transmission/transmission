@@ -10,6 +10,7 @@
 #include <cstdint> // int64_t
 #include <deque>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -24,6 +25,7 @@
 
 #include "libtransmission/benc.h"
 #include "libtransmission/quark.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 
@@ -33,7 +35,7 @@ auto constexpr MaxBencStrLength = size_t{ 128 * 1024 * 1024 }; // arbitrary
 
 // ---
 
-namespace transmission::benc::impl
+namespace tr::benc::impl
 {
 
 /**
@@ -101,7 +103,7 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
 
     // get the string length
     auto svtmp = benc->substr(0, colon_pos);
-    if (!std::all_of(std::begin(svtmp), std::end(svtmp), [](auto ch) { return isdigit(static_cast<unsigned char>(ch)) != 0; }))
+    if (!std::ranges::all_of(svtmp, [](auto ch) { return isdigit(static_cast<unsigned char>(ch)) != 0; }))
     {
         return {};
     }
@@ -124,7 +126,7 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
     return string;
 }
 
-} // namespace transmission::benc::impl
+} // namespace tr::benc::impl
 
 // ---
 
@@ -132,7 +134,7 @@ namespace
 {
 namespace parse_helpers
 {
-struct MyHandler : public transmission::benc::Handler
+struct MyHandler : public tr::benc::Handler
 {
     tr_variant* const top_;
     bool inplace_;
@@ -177,15 +179,14 @@ struct MyHandler : public transmission::benc::Handler
 
     bool StartDict(Context const& /*context*/) final
     {
-        auto* const variant = get_node();
-        if (variant == nullptr)
+        if (auto* const var = get_node())
         {
-            return false;
+            *var = tr_variant::Map{};
+            stack_.push_back(var);
+            return true;
         }
 
-        tr_variantInitDict(variant, 0);
-        stack_.push_back(variant);
-        return true;
+        return false;
     }
 
     bool Key(std::string_view sv, Context const& /*context*/) final
@@ -208,15 +209,14 @@ struct MyHandler : public transmission::benc::Handler
 
     bool StartArray(Context const& /*context*/) final
     {
-        auto* const variant = get_node();
-        if (variant == nullptr)
+        if (auto* const var = get_node())
         {
-            return false;
+            *var = tr_variant::Vector{};
+            stack_.push_back(var);
+            return true;
         }
 
-        tr_variantInitList(variant, 0);
-        stack_.push_back(variant);
-        return true;
+        return false;
     }
 
     bool EndArray(Context const& /*context*/) final
@@ -231,25 +231,29 @@ struct MyHandler : public transmission::benc::Handler
     }
 
 private:
-    tr_variant* get_node()
+    [[nodiscard]] tr_variant* get_node()
     {
-        tr_variant* node = nullptr;
-
         if (std::empty(stack_))
         {
-            node = top_;
-        }
-        else if (auto* parent = stack_.back(); parent != nullptr && parent->holds_alternative<tr_variant::Vector>())
-        {
-            node = tr_variantListAdd(parent);
-        }
-        else if (key_ && parent != nullptr && parent->holds_alternative<tr_variant::Map>())
-        {
-            node = tr_variantDictAdd(parent, *key_);
-            key_.reset();
+            return top_;
         }
 
-        return node;
+        if (auto* parent = stack_.back())
+        {
+            if (auto* const vec = parent->get_if<tr_variant::Vector>())
+            {
+                return &vec->emplace_back();
+            }
+
+            if (auto* const map = parent->get_if<tr_variant::Map>(); key_ && map != nullptr)
+            {
+                auto& entry = (*map)[*key_];
+                key_.reset();
+                return &entry;
+            }
+        }
+
+        return {};
     }
 };
 } // namespace parse_helpers
@@ -258,12 +262,12 @@ private:
 std::optional<tr_variant> tr_variant_serde::parse_benc(std::string_view input)
 {
     using namespace parse_helpers;
-    using Stack = transmission::benc::ParserStack<512>;
+    using Stack = tr::benc::ParserStack<512>;
 
     auto top = tr_variant{};
     auto stack = Stack{};
     auto handler = MyHandler{ &top, parse_inplace_ };
-    if (transmission::benc::parse(input, stack, handler, &end_, &error_) && std::empty(stack))
+    if (tr::benc::parse(input, stack, handler, &end_, &error_) && std::empty(stack))
     {
         return std::optional<tr_variant>{ std::move(top) };
     }
@@ -289,7 +293,7 @@ using OutBuf = fmt::memory_buffer;
         entries.emplace_back(tr_quark_get_string_view(key), &child);
     }
 
-    std::sort(std::begin(entries), std::end(entries));
+    std::ranges::sort(entries);
     return entries;
 }
 

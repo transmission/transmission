@@ -47,7 +47,7 @@
 "%lu files" = "%lu fitxategiak";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%lu Fitxategiak";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu sartzen";
@@ -83,7 +83,7 @@
 "%lu tracker" = "%lu aztarnari";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%lu Aztarnariak";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,7 +94,7 @@
 "%lu web seeds" = "%lu web igortze";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%lu Web Igorleak";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u zati, %2$@ bakoitzak";
@@ -121,7 +121,7 @@
 "1 time" = "1 denbora";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "Aztarnari 1";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "Transmisio 1";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "1 Web hazia";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" ezin da torrent artxibo mota hau erabili.";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "Torrent artxibo mota sortu";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "%@ Sortua ";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "Honekin %2$@ %1$@ Sortua  ";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "%@ Honekin sortua";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "\"%@\"(r)en sorrerak huts egin du.";

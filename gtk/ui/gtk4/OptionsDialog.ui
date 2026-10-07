@@ -2,7 +2,7 @@
 <interface domain="transmission-gtk">
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="OptionsDialog">
-    <property name="title" translatable="1">Torrent Options</property>
+    <property name="title" translatable="yes">Torrent Options</property>
     <child internal-child="content_area">
       <object class="GtkBox" id="dialog_layout">
         <property name="orientation">vertical</property>
@@ -16,7 +16,7 @@
             <property name="column-spacing">12</property>
             <child>
               <object class="GtkLabel" id="source_label">
-                <property name="label" translatable="1">_Torrent file:</property>
+                <property name="label" translatable="yes">_Torrent file:</property>
                 <property name="use-underline">1</property>
                 <property name="mnemonic-widget">source_button</property>
                 <property name="xalign">0</property>
@@ -29,7 +29,7 @@
             <child>
               <object class="gtkmm__CustomObject_10PathButton" id="source_button">
                 <property name="hexpand">1</property>
-                <property name="title" translatable="1">Select Source File</property>
+                <property name="title" translatable="yes">Select Source File</property>
                 <layout>
                   <property name="column">1</property>
                   <property name="row">0</property>
@@ -38,7 +38,7 @@
             </child>
             <child>
               <object class="GtkLabel" id="destination_label">
-                <property name="label" translatable="1">_Destination folder:</property>
+                <property name="label" translatable="yes">_Destination folder:</property>
                 <property name="use-underline">1</property>
                 <property name="mnemonic-widget">destination_button</property>
                 <property name="xalign">0</property>
@@ -52,7 +52,7 @@
               <object class="gtkmm__CustomObject_10PathButton" id="destination_button">
                 <property name="hexpand">1</property>
                 <property name="action">select-folder</property>
-                <property name="title" translatable="1">Select Destination Folder</property>
+                <property name="title" translatable="yes">Select Destination Folder</property>
                 <layout>
                   <property name="column">1</property>
                   <property name="row">1</property>
@@ -84,7 +84,7 @@
             </child>
             <child>
               <object class="GtkLabel" id="priority_label">
-                <property name="label" translatable="1">Torrent _priority:</property>
+                <property name="label" translatable="yes">Torrent _priority:</property>
                 <property name="use-underline">1</property>
                 <property name="mnemonic-widget">priority_combo</property>
                 <property name="xalign">0</property>
@@ -105,7 +105,7 @@
             </child>
             <child>
               <object class="GtkCheckButton" id="start_check">
-                <property name="label" translatable="1">_Start when added</property>
+                <property name="label" translatable="yes">_Start when added</property>
                 <property name="focusable">1</property>
                 <property name="valign">center</property>
                 <property name="use-underline">1</property>
@@ -118,7 +118,7 @@
             </child>
             <child>
               <object class="GtkCheckButton" id="trash_check">
-                <property name="label" translatable="1">Mo_ve torrent file to the trash</property>
+                <property name="label" translatable="yes">Mo_ve torrent file to the trash</property>
                 <property name="focusable">1</property>
                 <property name="valign">center</property>
                 <property name="use-underline">1</property>
@@ -173,7 +173,7 @@
         <property name="spacing">6</property>
         <child>
           <object class="GtkButton" id="cancel_button">
-            <property name="label" translatable="1">_Cancel</property>
+            <property name="label" translatable="yes">_Cancel</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
@@ -181,7 +181,7 @@
         </child>
         <child>
           <object class="GtkButton" id="open_button">
-            <property name="label" translatable="1">_Open</property>
+            <property name="label" translatable="yes">_Open</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>

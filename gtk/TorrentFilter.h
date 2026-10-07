@@ -18,7 +18,7 @@
 class TorrentFilter : public FilterBase<Torrent>
 {
 public:
-    using ShowMode = transmission::app::ShowMode;
+    using ShowMode = tr::app::ShowMode;
 
     enum class Tracker : int8_t
     {
@@ -51,7 +51,7 @@ private:
     TorrentFilter();
 
 private:
-    ShowMode show_mode_ = transmission::app::DefaultShowMode;
+    ShowMode show_mode_ = tr::app::DefaultShowMode;
     Tracker tracker_type_ = Tracker::ALL;
     Glib::ustring tracker_host_;
     Glib::ustring text_;

@@ -15,6 +15,9 @@
 #include "Session.h"
 #include "Utils.h"
 
+#include <libtransmission/file-utils.h>
+#include <libtransmission/string-utils.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/values.h>
 #include <libtransmission/web-utils.h>
 
@@ -60,6 +63,7 @@
 #include <limits>
 #include <memory>
 #include <numeric>
+#include <ranges>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -75,7 +79,7 @@
 
 using namespace std::literals;
 
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 class DetailsDialog::Impl
 {
@@ -214,18 +218,7 @@ guint DetailsDialog::Impl::last_page_ = 0;
 
 std::vector<tr_torrent*> DetailsDialog::Impl::getTorrents() const
 {
-    std::vector<tr_torrent*> torrents;
-    torrents.reserve(ids_.size());
-
-    for (auto const id : ids_)
-    {
-        if (auto* torrent = core_->find_torrent(id); torrent != nullptr)
-        {
-            torrents.push_back(torrent);
-        }
-    }
-
-    return torrents;
+    return core_->find_torrents(ids_);
 }
 
 /****
@@ -292,9 +285,8 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         bool const baseline = tr_torrentUsesSessionLimits(torrents.front());
-        bool const is_uniform = std::all_of(
-            torrents.begin(),
-            torrents.end(),
+        bool const is_uniform = std::ranges::all_of(
+            torrents,
             [baseline](auto const* torrent) { return baseline == tr_torrentUsesSessionLimits(torrent); });
 
         if (is_uniform)
@@ -306,11 +298,10 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* down_limited_check */
     if (!torrents.empty())
     {
-        bool const baseline = tr_torrentUsesSpeedLimit(torrents.front(), TR_DOWN);
-        bool const is_uniform = std::all_of(
-            torrents.begin(),
-            torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, TR_DOWN); });
+        auto const baseline = tr_torrentUsesSpeedLimit(torrents.front(), tr_direction::Down);
+        auto const is_uniform = std::ranges::all_of(
+            torrents,
+            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, tr_direction::Down); });
 
         if (is_uniform)
         {
@@ -321,26 +312,24 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* down_limit_spin */
     if (!torrents.empty())
     {
-        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), TR_DOWN);
-        bool const is_uniform = std::all_of(
-            torrents.begin(),
-            torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, TR_DOWN); });
+        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), tr_direction::Down);
+        auto const is_uniform = std::ranges::all_of(
+            torrents,
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, tr_direction::Down); });
 
         if (is_uniform)
         {
-            set_int_spin_if_different(down_limit_spin_, down_limit_spin_tag_, baseline);
+            set_int_spin_if_different(down_limit_spin_, down_limit_spin_tag_, static_cast<int>(baseline));
         }
     }
 
     /* up_limited_check */
     if (!torrents.empty())
     {
-        bool const baseline = tr_torrentUsesSpeedLimit(torrents.front(), TR_UP);
-        bool const is_uniform = std::all_of(
-            torrents.begin(),
-            torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, TR_UP); });
+        auto const baseline = tr_torrentUsesSpeedLimit(torrents.front(), tr_direction::Up);
+        auto const is_uniform = std::ranges::all_of(
+            torrents,
+            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, tr_direction::Up); });
 
         if (is_uniform)
         {
@@ -351,15 +340,14 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     /* up_limit_sping */
     if (!torrents.empty())
     {
-        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), TR_UP);
-        bool const is_uniform = std::all_of(
-            torrents.begin(),
-            torrents.end(),
-            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, TR_UP); });
+        auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), tr_direction::Up);
+        auto const is_uniform = std::ranges::all_of(
+            torrents,
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, tr_direction::Up); });
 
         if (is_uniform)
         {
-            set_int_spin_if_different(up_limit_sping_, up_limit_spin_tag_, baseline);
+            set_int_spin_if_different(up_limit_sping_, up_limit_spin_tag_, static_cast<int>(baseline));
         }
     }
 
@@ -367,9 +355,8 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         auto const baseline = tr_torrentGetPriority(torrents.front());
-        bool const is_uniform = std::all_of(
-            torrents.begin(),
-            torrents.end(),
+        bool const is_uniform = std::ranges::all_of(
+            torrents,
             [baseline](auto const* torrent) { return baseline == tr_torrentGetPriority(torrent); });
 
         if (is_uniform)
@@ -388,9 +375,8 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         auto const baseline = tr_torrentGetRatioMode(torrents.front());
-        bool const is_uniform = std::all_of(
-            torrents.begin(),
-            torrents.end(),
+        bool const is_uniform = std::ranges::all_of(
+            torrents,
             [baseline](auto const* torrent) { return baseline == tr_torrentGetRatioMode(torrent); });
 
         if (is_uniform)
@@ -413,9 +399,8 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         auto const baseline = tr_torrentGetIdleMode(torrents.front());
-        bool const is_uniform = std::all_of(
-            torrents.begin(),
-            torrents.end(),
+        bool const is_uniform = std::ranges::all_of(
+            torrents,
             [baseline](auto const* torrent) { return baseline == tr_torrentGetIdleMode(torrent); });
 
         if (is_uniform)
@@ -582,14 +567,13 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     Glib::ustring const no_torrent = _("No Torrents Selected");
     Glib::ustring stateString;
     uint64_t sizeWhenDone = 0;
-    std::vector<tr_stat const*> stats;
-    std::vector<tr_torrent_view> infos;
 
-    stats.reserve(torrents.size());
+    auto const stats = tr_torrentStat(std::data(torrents), std::size(torrents));
+
+    std::vector<tr_torrent_view> infos;
     infos.reserve(torrents.size());
     for (auto* const torrent : torrents)
     {
-        stats.push_back(tr_torrentStat(torrent));
         infos.push_back(tr_torrentView(torrent));
     }
 
@@ -601,9 +585,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     else
     {
         bool const baseline = infos.front().is_private;
-        bool const is_uniform = std::all_of(
-            infos.begin(),
-            infos.end(),
+        bool const is_uniform = std::ranges::all_of(
+            infos,
             [baseline](auto const& info) { return info.is_private == baseline; });
 
         if (is_uniform)
@@ -625,11 +608,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = stats.front()->addedDate;
-        bool const is_uniform = std::all_of(
-            stats.begin(),
-            stats.end(),
-            [baseline](auto const* stat) { return stat->addedDate == baseline; });
+        auto const baseline = stats.front().added_date;
+        bool const is_uniform = std::ranges::all_of(
+            stats,
+            [baseline](auto const& stat) { return stat.added_date == baseline; });
 
         if (is_uniform)
         {
@@ -653,14 +635,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         auto const creator = tr_strv_strip(infos.front().creator != nullptr ? infos.front().creator : "");
         auto const date = infos.front().date_created;
         auto const datestr = get_date_string(date);
-        bool const mixed_creator = std::any_of(
-            infos.begin(),
-            infos.end(),
+        bool const mixed_creator = std::ranges::any_of(
+            infos,
             [&creator](auto const& info) { return creator != (info.creator != nullptr ? info.creator : ""); });
-        bool const mixed_date = std::any_of(
-            infos.begin(),
-            infos.end(),
-            [date](auto const& info) { return date != info.date_created; });
+        bool const mixed_date = std::ranges::any_of(infos, [date](auto const& info) { return date != info.date_created; });
 
         bool const empty_creator = std::empty(creator);
         bool const empty_date = date == 0;
@@ -700,9 +678,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     else
     {
         auto const baseline = Glib::ustring(infos.front().comment != nullptr ? infos.front().comment : "");
-        bool const is_uniform = std::all_of(
-            infos.begin(),
-            infos.end(),
+        bool const is_uniform = std::ranges::all_of(
+            infos,
             [&baseline](auto const& info) { return baseline == (info.comment != nullptr ? info.comment : ""); });
 
         str = is_uniform ? baseline : mixed;
@@ -717,13 +694,12 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = Glib::ustring(tr_torrentGetDownloadDir(torrents.front()));
-        bool const is_uniform = std::all_of(
-            torrents.begin(),
-            torrents.end(),
+        std::string_view const baseline = tr_torrentGetDownloadDir(torrents.front());
+        bool const is_uniform = std::ranges::all_of(
+            torrents,
             [&baseline](auto const* torrent) { return baseline == tr_torrentGetDownloadDir(torrent); });
 
-        str = is_uniform ? baseline : mixed;
+        str = is_uniform ? Glib::ustring{ baseline.data(), baseline.size() } : mixed;
     }
 
     destination_lb_->set_text(str);
@@ -735,14 +711,11 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const activity = stats.front()->activity;
-        bool const is_uniform = std::all_of(
-            stats.begin(),
-            stats.end(),
-            [activity](auto const* st) { return activity == st->activity; });
-        bool const allFinished = std::all_of(stats.begin(), stats.end(), [](auto const* st) { return st->finished; });
+        auto const baseline = stats.front().activity;
+        bool const is_uniform = std::ranges::all_of(stats, [baseline](auto const& st) { return baseline == st.activity; });
+        bool const all_finished = std::ranges::all_of(stats, [](auto const& st) { return st.finished; });
 
-        str = is_uniform ? activityString(activity, allFinished) : mixed;
+        str = is_uniform ? activityString(baseline, all_finished) : mixed;
     }
 
     stateString = str;
@@ -755,17 +728,14 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        time_t const baseline = stats.front()->startDate;
-        bool const is_uniform = std::all_of(
-            stats.begin(),
-            stats.end(),
-            [baseline](auto const* st) { return baseline == st->startDate; });
+        time_t const baseline = stats.front().start_date;
+        bool const is_uniform = std::ranges::all_of(stats, [baseline](auto const& st) { return baseline == st.start_date; });
 
         if (!is_uniform)
         {
             str = mixed;
         }
-        else if (baseline <= 0 || stats[0]->activity == TR_STATUS_STOPPED)
+        else if (baseline <= 0 || stats[0].activity == TR_STATUS_STOPPED)
         {
             str = stateString;
         }
@@ -784,11 +754,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = stats.front()->eta;
-        auto const is_uniform = std::all_of(
-            stats.begin(),
-            stats.end(),
-            [baseline](auto const* st) { return baseline == st->eta; });
+        auto const baseline = stats.front().eta;
+        auto const is_uniform = std::ranges::all_of(stats, [baseline](auto const& st) { return baseline == st.eta; });
 
         if (!is_uniform)
         {
@@ -839,9 +806,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
                 fmt::arg("file_count", file_count));
 
             auto const piece_size = std::empty(infos) ? uint32_t{} : infos.front().piece_size;
-            auto const piece_size_is_uniform = std::all_of(
-                std::begin(infos),
-                std::end(infos),
+            auto const piece_size_is_uniform = std::ranges::all_of(
+                infos,
                 [piece_size](auto const& info) { return info.piece_size == piece_size; });
 
             if (piece_size_is_uniform)
@@ -872,18 +838,19 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         uint64_t haveValid = 0;
         uint64_t available = 0;
 
-        for (auto const* const st : stats)
+        for (auto const& st : stats)
         {
-            haveUnchecked += st->haveUnchecked;
-            haveValid += st->haveValid;
-            sizeWhenDone += st->sizeWhenDone;
-            leftUntilDone += st->leftUntilDone;
-            available += st->sizeWhenDone - st->leftUntilDone + st->haveUnchecked + st->desiredAvailable;
+            haveUnchecked += st.have_unchecked;
+            haveValid += st.have_valid;
+            sizeWhenDone += st.size_when_done;
+            leftUntilDone += st.left_until_done;
+            available += st.size_when_done - st.left_until_done + st.have_unchecked + st.desired_available;
         }
 
         {
-            double const d = sizeWhenDone != 0 ? (100.0 * available) / sizeWhenDone : 0;
-            double const ratio = 100.0 * (sizeWhenDone != 0 ? (haveValid + haveUnchecked) / (double)sizeWhenDone : 1);
+            auto const d = sizeWhenDone != 0 ? 100.0 * static_cast<double>(available) / static_cast<double>(sizeWhenDone) : 0;
+            auto const ratio = 100.0 *
+                (sizeWhenDone != 0 ? static_cast<double>(haveValid + haveUnchecked) / static_cast<double>(sizeWhenDone) : 1.);
 
             auto const avail = tr_strpercent(d);
             auto const buf2 = tr_strpercent(ratio);
@@ -934,13 +901,13 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
                 std::begin(stats),
                 std::end(stats),
                 uint64_t{ 0 },
-                [](auto sum, auto const* st) { return sum + st->downloadedEver; }));
+                [](auto sum, auto const& st) { return sum + st.downloaded_ever; }));
 
         auto const failed = std::accumulate(
             std::begin(stats),
             std::end(stats),
             uint64_t{ 0 },
-            [](auto sum, auto const* st) { return sum + st->corruptEver; });
+            [](auto sum, auto const& st) { return sum + st.corrupt_ever; });
 
         if (failed != 0)
         {
@@ -968,12 +935,12 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             std::begin(stats),
             std::end(stats),
             uint64_t{},
-            [](auto sum, auto const* st) { return sum + st->uploadedEver; });
+            [](auto sum, auto const& st) { return sum + st.uploaded_ever; });
         auto const denominator = std::accumulate(
             std::begin(stats),
             std::end(stats),
             uint64_t{},
-            [](auto sum, auto const* st) { return sum + st->sizeWhenDone; });
+            [](auto sum, auto const& st) { return sum + st.size_when_done; });
         str = fmt::format(
             fmt::runtime(_("{uploaded_size} (Ratio: {ratio})")),
             fmt::arg("uploaded_size", tr_strlsize(uploaded)),
@@ -1005,13 +972,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = Glib::ustring(stats.front()->errorString);
-        bool const is_uniform = std::all_of(
-            stats.begin(),
-            stats.end(),
-            [&baseline](auto const* st) { return baseline == st->errorString; });
+        auto const& baseline = stats.front().error_string;
+        bool const is_uniform = std::ranges::all_of(stats, [&baseline](auto const& st) { return baseline == st.error_string; });
 
-        str = is_uniform ? baseline : mixed;
+        str = is_uniform ? Glib::ustring{ baseline } : mixed;
     }
 
     if (str.empty())
@@ -1028,17 +992,16 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        time_t const latest = (*std::max_element(
-                                   stats.begin(),
-                                   stats.end(),
-                                   [](auto const* lhs, auto const* rhs) { return lhs->activityDate < rhs->activityDate; }))
-                                  ->activityDate;
+        auto const iter = std::ranges::max_element(
+            stats,
+            [](auto const& lhs, auto const& rhs) { return lhs.activity_date < rhs.activity_date; });
+        time_t const latest = iter->activity_date;
 
         if (latest <= 0)
         {
             str = _("Never");
         }
-        else if ((now - latest) < 5)
+        else if ((now - latest) < 5U)
         {
             str = _("Active now");
         }
@@ -1132,17 +1095,17 @@ public:
     Gtk::TreeModelColumn<Glib::ustring> upload_rate_string;
     Gtk::TreeModelColumn<Glib::ustring> client;
     Gtk::TreeModelColumn<int> progress;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::activeReqsToClient)> upload_request_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::active_reqs_to_client)> upload_request_count_number;
     Gtk::TreeModelColumn<Glib::ustring> upload_request_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::activeReqsToPeer)> download_request_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::active_reqs_to_peer)> download_request_count_number;
     Gtk::TreeModelColumn<Glib::ustring> download_request_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocksToClient)> blocks_downloaded_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocks_to_client)> blocks_downloaded_count_number;
     Gtk::TreeModelColumn<Glib::ustring> blocks_downloaded_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocksToPeer)> blocks_uploaded_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocks_to_peer)> blocks_uploaded_count_number;
     Gtk::TreeModelColumn<Glib::ustring> blocks_uploaded_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancelsToPeer)> reqs_cancelled_by_client_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancels_to_peer)> reqs_cancelled_by_client_count_number;
     Gtk::TreeModelColumn<Glib::ustring> reqs_cancelled_by_client_count_string;
-    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancelsToClient)> reqs_cancelled_by_peer_count_number;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancels_to_client)> reqs_cancelled_by_peer_count_number;
     Gtk::TreeModelColumn<Glib::ustring> reqs_cancelled_by_peer_count_string;
     Gtk::TreeModelColumn<Glib::ustring> encryption_stock_id;
     Gtk::TreeModelColumn<Glib::ustring> flags;
@@ -1153,23 +1116,15 @@ PeerModelColumns const peer_cols;
 
 void initPeerRow(
     Gtk::TreeModel::iterator const& iter,
-    std::string_view key,
-    std::string_view torrent_name,
-    tr_peer_stat const* peer)
+    std::string_view const key,
+    std::string_view const torrent_name,
+    tr_peer_stat const& peer)
 {
-    g_return_if_fail(peer != nullptr);
-
-    char const* client = peer->client;
-    if (client == nullptr || g_strcmp0(client, "Unknown Client") == 0)
-    {
-        client = "";
-    }
-
     auto peer_addr4 = in_addr();
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     auto const* const peer_addr4_octets = reinterpret_cast<uint8_t const*>(&peer_addr4.s_addr);
-    auto const collated_name = inet_pton(AF_INET, std::data(peer->addr), &peer_addr4) != 1 ?
-        std::data(peer->addr) :
+    auto const collated_name = inet_pton(AF_INET, peer.addr.c_str(), &peer_addr4) != 1 ?
+        peer.addr :
         fmt::format(
             "{:03}",
             fmt::join(
@@ -1178,21 +1133,19 @@ void initPeerRow(
                 peer_addr4_octets + sizeof(peer_addr4.s_addr), // TODO(C++20): Use std::span
                 "."));
 
-    (*iter)[peer_cols.address] = std::data(peer->addr);
+    (*iter)[peer_cols.address] = peer.addr;
     (*iter)[peer_cols.address_collated] = collated_name;
     (*iter)[peer_cols.location] = get_location_from_ip(std::data(peer->addr));
-    (*iter)[peer_cols.client] = client;
-    (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
+    (*iter)[peer_cols.client] = peer.user_agent;
+    (*iter)[peer_cols.encryption_stock_id] = peer.is_encrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);
     (*iter)[peer_cols.torrent_name] = std::string(torrent_name);
 }
 
-void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* peer)
+void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const& peer)
 {
-    g_return_if_fail(peer != nullptr);
-
-    auto const down_speed = Speed{ peer->rateToClient_KBps, Speed::Units::KByps };
-    auto const up_speed = Speed{ peer->rateToPeer_KBps, Speed::Units::KByps };
+    auto const down_speed = peer.rate_to_client;
+    auto const up_speed = peer.rate_to_peer;
 
     auto blocks_to_client = std::string{};
     auto blocks_to_peer = std::string{};
@@ -1203,64 +1156,64 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
     auto up_count = std::string{};
     auto up_speed_string = std::string{};
 
-    if (peer->rateToPeer_KBps > 0.01)
+    if (peer.rate_to_peer.base_quantity() > 0U)
     {
         up_speed_string = up_speed.to_string();
     }
 
-    if (peer->rateToClient_KBps > 0)
+    if (peer.rate_to_client.base_quantity() > 0U)
     {
         down_speed_string = down_speed.to_string();
     }
 
-    if (peer->activeReqsToPeer > 0)
+    if (peer.active_reqs_to_peer > 0)
     {
-        down_count = std::to_string(peer->activeReqsToPeer);
+        down_count = std::to_string(peer.active_reqs_to_peer);
     }
 
-    if (peer->activeReqsToClient > 0)
+    if (peer.active_reqs_to_client > 0)
     {
-        up_count = std::to_string(peer->activeReqsToClient);
+        up_count = std::to_string(peer.active_reqs_to_client);
     }
 
-    if (peer->blocksToPeer > 0)
+    if (peer.blocks_to_peer > 0)
     {
-        blocks_to_peer = std::to_string(peer->blocksToPeer);
+        blocks_to_peer = std::to_string(peer.blocks_to_peer);
     }
 
-    if (peer->blocksToClient > 0)
+    if (peer.blocks_to_client > 0)
     {
-        blocks_to_client = std::to_string(peer->blocksToClient);
+        blocks_to_client = std::to_string(peer.blocks_to_client);
     }
 
-    if (peer->cancelsToPeer > 0)
+    if (peer.cancels_to_peer > 0)
     {
-        cancelled_by_client = std::to_string(peer->cancelsToPeer);
+        cancelled_by_client = std::to_string(peer.cancels_to_peer);
     }
 
-    if (peer->cancelsToClient > 0)
+    if (peer.cancels_to_client > 0)
     {
-        cancelled_by_peer = std::to_string(peer->cancelsToClient);
+        cancelled_by_peer = std::to_string(peer.cancels_to_client);
     }
 
-    (*iter)[peer_cols.progress] = static_cast<int>(100.0 * peer->progress);
-    (*iter)[peer_cols.upload_request_count_number] = peer->activeReqsToClient;
+    (*iter)[peer_cols.progress] = static_cast<int>(100.0 * peer.progress);
+    (*iter)[peer_cols.upload_request_count_number] = peer.active_reqs_to_client;
     (*iter)[peer_cols.upload_request_count_string] = up_count;
-    (*iter)[peer_cols.download_request_count_number] = peer->activeReqsToPeer;
+    (*iter)[peer_cols.download_request_count_number] = peer.active_reqs_to_peer;
     (*iter)[peer_cols.download_request_count_string] = down_count;
     (*iter)[peer_cols.download_rate_speed] = down_speed;
     (*iter)[peer_cols.download_rate_string] = down_speed_string;
     (*iter)[peer_cols.upload_rate_speed] = up_speed;
     (*iter)[peer_cols.upload_rate_string] = up_speed_string;
-    (*iter)[peer_cols.flags] = std::data(peer->flagStr);
+    (*iter)[peer_cols.flags] = peer.flag_str;
     (*iter)[peer_cols.was_updated] = true;
-    (*iter)[peer_cols.blocks_downloaded_count_number] = peer->blocksToClient;
+    (*iter)[peer_cols.blocks_downloaded_count_number] = peer.blocks_to_client;
     (*iter)[peer_cols.blocks_downloaded_count_string] = blocks_to_client;
-    (*iter)[peer_cols.blocks_uploaded_count_number] = peer->blocksToPeer;
+    (*iter)[peer_cols.blocks_uploaded_count_number] = peer.blocks_to_peer;
     (*iter)[peer_cols.blocks_uploaded_count_string] = blocks_to_peer;
-    (*iter)[peer_cols.reqs_cancelled_by_client_count_number] = peer->cancelsToPeer;
+    (*iter)[peer_cols.reqs_cancelled_by_client_count_number] = peer.cancels_to_peer;
     (*iter)[peer_cols.reqs_cancelled_by_client_count_string] = cancelled_by_client;
-    (*iter)[peer_cols.reqs_cancelled_by_peer_count_number] = peer->cancelsToClient;
+    (*iter)[peer_cols.reqs_cancelled_by_peer_count_number] = peer.cancels_to_client;
     (*iter)[peer_cols.reqs_cancelled_by_peer_count_string] = cancelled_by_peer;
 }
 
@@ -1272,16 +1225,12 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     auto const& store = peer_store_;
 
     /* step 1: get all the peers */
-    std::vector<tr_peer_stat*> peers;
-    std::vector<size_t> peerCount;
+    std::vector<std::vector<tr_peer_stat>> peers;
 
     peers.reserve(torrents.size());
-    peerCount.reserve(torrents.size());
     for (auto const* const torrent : torrents)
     {
-        size_t count = 0;
-        peers.push_back(tr_torrentPeers(torrent, &count));
-        peerCount.push_back(count);
+        peers.push_back(tr_torrentPeers(torrent));
     }
 
     /* step 2: mark all the peers in the list as not-updated */
@@ -1290,25 +1239,25 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
         row[peer_cols.was_updated] = false;
     }
 
-    auto make_key = [](tr_torrent const* tor, tr_peer_stat const* ps)
+    auto make_key = [](tr_torrent const* tor, tr_peer_stat const& ps)
     {
-        return fmt::format("{:d}.{:s}", tr_torrentId(tor), ps->addr);
+        return fmt::format("{:d}.{:s}", tr_torrentId(tor), ps.addr);
     };
 
     /* step 3: add any new peers */
     for (size_t i = 0; i < torrents.size(); ++i)
     {
         auto const* tor = torrents.at(i);
+        auto const& torrent_peers = peers.at(i);
 
-        for (size_t j = 0; j < peerCount[i]; ++j)
+        for (auto const& peer : torrent_peers)
         {
-            auto const* s = &peers.at(i)[j];
-            auto const key = make_key(tor, s);
+            auto const key = make_key(tor, peer);
 
-            if (hash.find(key) == hash.end())
+            if (!hash.contains(key))
             {
                 auto const iter = store->append();
-                initPeerRow(iter, key, tr_torrentName(tor), s);
+                initPeerRow(iter, key, tr_torrentName(tor), peer);
                 hash.try_emplace(key, Gtk::TreeRowReference(store, store->get_path(iter)));
             }
         }
@@ -1318,12 +1267,12 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     for (size_t i = 0; i < torrents.size(); ++i)
     {
         auto const* tor = torrents.at(i);
+        auto const& torrent_peers = peers.at(i);
 
-        for (size_t j = 0; j < peerCount[i]; ++j)
+        for (auto const& peer : torrent_peers)
         {
-            auto const* s = &peers.at(i)[j];
-            auto const key = make_key(tor, s);
-            refreshPeerRow(store->get_iter(hash.at(key).get_path()), s);
+            auto const key = make_key(tor, peer);
+            refreshPeerRow(store->get_iter(hash.at(key).get_path()), peer);
         }
     }
 
@@ -1343,12 +1292,6 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
                 iter = store->erase(iter);
             }
         }
-    }
-
-    /* step 6: cleanup */
-    for (size_t i = 0; i < peers.size(); ++i)
-    {
-        tr_torrentPeersFree(peers[i], peerCount[i]);
     }
 }
 
@@ -1379,7 +1322,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
             auto const* const url = tr_torrentWebseed(tor, j).url;
             auto const key = make_key(tor, url);
 
-            if (hash.find(key) == hash.end())
+            if (!hash.contains(key))
             {
                 auto const iter = store->append();
                 (*iter)[webseed_cols.url] = url;
@@ -1450,7 +1393,7 @@ bool DetailsDialog::Impl::onPeerViewQueryTooltip(int x, int y, bool keyboard_tip
         std::ostringstream gstr;
         gstr << "<b>" << Glib::Markup::escape_text(name) << "</b>\n" << addr << "\n \n";
 
-        for (char const ch : flagstr)
+        for (auto const ch : flagstr)
         {
             char const* s = nullptr;
 
@@ -1502,6 +1445,10 @@ bool DetailsDialog::Impl::onPeerViewQueryTooltip(int x, int y, bool keyboard_tip
 
             case 'T':
                 s = _("Peer is connected over µTP");
+                break;
+
+            case 'h':
+                s = _("Peer supports holepunch (BEP 55)");
                 break;
 
             default:
@@ -2059,12 +2006,12 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
         // build the key to find the row
         gstr.str({});
         gstr << torrent_id << '\t' << tracker.tier << '\t' << tracker.announce;
-        if (hash.find(gstr.str()) == hash.end())
+        if (!hash.contains(gstr.str()))
         {
             // if we didn't have that row, add it
             auto const iter = store->append();
             (*iter)[tracker_cols.torrent_id] = torrent_id;
-            (*iter)[tracker_cols.tracker_id] = tracker.id;
+            (*iter)[tracker_cols.tracker_id] = static_cast<int>(tracker.id);
             (*iter)[tracker_cols.key] = gstr.str();
 
             auto const p = store->get_path(iter);
@@ -2077,7 +2024,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     }
 
     /* step 4: update the rows */
-    auto const summary_name = std::string(std::size(torrents) == 1 ? tr_torrentName(torrents.front()) : "");
+    auto const summary_name = std::size(torrents) == 1 ? tr_torrentName(torrents.front()) : ""s;
     for (auto const& [tor, tracker] : trackers)
     {
         auto const torrent_id = tr_torrentId(tor);
@@ -2092,7 +2039,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
         buildTrackerSummary(gstr, summary_name, tracker, showScrape, dialog_.get_direction());
         (*iter)[tracker_cols.text] = gstr.str();
         (*iter)[tracker_cols.is_backup] = tracker.isBackup;
-        (*iter)[tracker_cols.tracker_id] = tracker.id;
+        (*iter)[tracker_cols.tracker_id] = static_cast<int>(tracker.id);
         (*iter)[tracker_cols.was_updated] = true;
     }
 
@@ -2221,7 +2168,7 @@ void EditTrackersDialog::on_response(int response)
 
         if (auto* const tor = core_->find_torrent(torrent_id_); tor != nullptr)
         {
-            if (tr_torrentSetTrackerList(tor, text_buffer->get_text(false).c_str()))
+            if (tr_torrentSetTrackerList(tor, text_buffer->get_text(false).raw()))
             {
                 parent_.refresh();
             }
@@ -2559,8 +2506,8 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
     maintain_mmdb_file_async();
 
     /* return saved window size */
-    auto const width = (int)gtr_pref_int_get(TR_KEY_details_window_width);
-    auto const height = (int)gtr_pref_int_get(TR_KEY_details_window_height);
+    auto const width = gtr_pref_int_get<int>(TR_KEY_details_window_width);
+    auto const height = gtr_pref_int_get<int>(TR_KEY_details_window_height);
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     dialog_.set_default_size(width, height);
     dialog_.property_default_width().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated));
@@ -2582,7 +2529,7 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 
     auto* const n = gtr_get_widget<Gtk::Notebook>(builder, "dialog_pages");
-    n->set_current_page(last_page_);
+    n->set_current_page(static_cast<int>(last_page_));
     n->signal_switch_page().connect([](Gtk::Widget* /*page*/, guint page_number) { last_page_ = page_number; });
 }
 

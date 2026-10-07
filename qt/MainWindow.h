@@ -18,6 +18,7 @@
 #include <QWidgetList>
 
 #include "Filters.h"
+#include "Prefs.h"
 #include "Speed.h"
 #include "TorrentFilter.h"
 #include "Typedefs.h"
@@ -50,7 +51,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(Session&, Prefs&, TorrentModel&, bool minimized);
+    MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool minimized);
+    ~MainWindow() override = default;
     MainWindow(MainWindow&&) = delete;
     MainWindow(MainWindow const&) = delete;
     MainWindow& operator=(MainWindow&&) = delete;
@@ -76,20 +78,20 @@ public slots:
     void queueMoveBottom();
     void reannounceSelected();
 
-    void setToolbarVisible(bool);
-    void setFilterbarVisible(bool);
-    void setStatusbarVisible(bool);
-    void setCompactView(bool);
+    void setToolbarVisible(bool visible);
+    void setFilterbarVisible(bool visible);
+    void setStatusbarVisible(bool visible);
+    void setCompactView(bool visible);
     void wrongAuthentication();
 
     void openSession();
 
 protected:
     // QWidget
-    void contextMenuEvent(QContextMenuEvent*) override;
-    void dragEnterEvent(QDragEnterEvent*) override;
-    void dropEvent(QDropEvent*) override;
-    bool event(QEvent*) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
+    void dragEnterEvent(QDragEnterEvent* event) override;
+    void dropEvent(QDropEvent* event) override;
+    bool event(QEvent* e) override;
 
 private slots:
     void addTorrents(QStringList const& filenames);
@@ -100,8 +102,6 @@ private slots:
     void onNetworkResponse(QNetworkReply::NetworkError code, QString const& message);
     void onRefreshTimer();
     void onSessionSourceChanged();
-    void onSetPrefs();
-    void onSetPrefs(bool);
     void onSortModeChanged(QAction const* action);
     void onStatsModeChanged(QAction const* action);
     void openAbout();
@@ -113,13 +113,13 @@ private slots:
     void openStats();
     void openTorrent();
     void openURL();
-    void refreshPref(int key);
-    void removeTorrents(bool const delete_files);
+    void refreshPref(tr_quark key);
+    void removeTorrents(bool delete_files);
     void setLocation();
-    void setSortAscendingPref(bool);
+    void setSortAscendingPref(bool b);
     void toggleSpeedMode();
     void toggleWindows(bool do_show);
-    void trayActivated(QSystemTrayIcon::ActivationReason);
+    void trayActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
     [[nodiscard]] torrent_ids_t getSelectedTorrents(bool with_metadata_only = false) const;
@@ -132,7 +132,7 @@ private:
 
     void clearSelection();
     void addTorrentFromClipboard();
-    void addTorrent(AddData add_me, bool show_options);
+    void addTorrent(AddData const& add_me, bool show_options);
 
     // QWidget
     void hideEvent(QHideEvent* event) override;
@@ -177,12 +177,8 @@ private:
     QAction* alt_speed_action_ = {};
     QString error_message_;
     bool auto_add_clipboard_links_ = {};
-    QStringList clipboard_processed_keys_ = {};
+    QStringList clipboard_processed_keys_;
 
-    QString const total_ratio_stats_mode_name_ = QStringLiteral("total-ratio");
-    QString const total_transfer_stats_mode_name_ = QStringLiteral("total-transfer");
-    QString const session_ratio_stats_mode_name_ = QStringLiteral("session-ratio");
-    QString const session_transfer_stats_mode_name_ = QStringLiteral("session-transfer");
     QString const show_options_checkbox_name_ = QStringLiteral("show-options-checkbox");
 
     struct TransferStats
@@ -194,22 +190,19 @@ private:
     };
     [[nodiscard]] TransferStats getTransferStats() const;
 
-    enum
-    {
-        REFRESH_TITLE = (1 << 0),
-        REFRESH_STATUS_BAR = (1 << 1),
-        REFRESH_TRAY_ICON = (1 << 2),
-        REFRESH_TORRENT_VIEW_HEADER = (1 << 3),
-        REFRESH_ACTION_SENSITIVITY = (1 << 4),
-        REFRESH_ICONS = (1 << 5)
-    };
+    static constexpr auto RefreshTitle = 1 << 0;
+    static constexpr auto RefreshStatusBar = 1 << 1;
+    static constexpr auto RefreshTrayIcon = 1 << 2;
+    static constexpr auto RefreshTorrentViewHeader = 1 << 3;
+    static constexpr auto RefreshActionSensitivity = 1 << 4;
+    static constexpr auto RefreshIcon = 1 << 5;
     int refresh_fields_ = {};
     QTimer refresh_timer_;
 
     void refreshActionSensitivity();
     void refreshIcons();
-    void refreshStatusBar(TransferStats const&);
+    void refreshStatusBar(TransferStats const& stats);
     void refreshTitle();
     void refreshTorrentViewHeader();
-    void refreshTrayIcon(TransferStats const&);
+    void refreshTrayIcon(TransferStats const& stats);
 };

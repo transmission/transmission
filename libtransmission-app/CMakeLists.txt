@@ -22,4 +22,4 @@ target_include_directories(${LIBNAME}
 
 target_link_libraries(${LIBNAME}
     PUBLIC
-        fmt::fmt-header-only)
+        transmission::fmt-header-only)

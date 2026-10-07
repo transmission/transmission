@@ -25,14 +25,18 @@
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/api-compat.h>
 #include <libtransmission/crypto-utils.h>
+#include <libtransmission/env.h>
+#include <libtransmission/file-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/rpcimpl.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/tr-assert.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
@@ -42,18 +46,14 @@
 
 using namespace std::literals;
 
-namespace api_compat = libtransmission::api_compat;
-using namespace libtransmission::Values;
+namespace api_compat = tr::api_compat;
+using namespace tr::Values;
 
 #define SPEED_K_STR "kB/s"
 #define MEM_M_STR "MiB"
 
 namespace
 {
-auto constexpr DefaultPort = uint16_t{ TrDefaultRpcPort };
-char constexpr DefaultHost[] = "localhost";
-char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
-
 char constexpr MyName[] = "transmission-remote";
 char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
                          "\n"
@@ -217,6 +217,7 @@ enum
 // --- Command-Line Arguments
 
 using Arg = tr_option::Arg;
+static_assert(TrDefaultPeerPort == 51413, "update 'port' desc");
 auto constexpr Options = std::array<tr_option, 106>{ {
     { 'a', "add", "Add torrent files by filename or URL", "a", Arg::None, nullptr },
     { 970, "alt-speed", "Use the alternate Limits", "as", Arg::None, nullptr },
@@ -257,7 +258,7 @@ auto constexpr Options = std::array<tr_option, 106>{ {
     { 941, "info-peers", "List the current torrent(s)' peers", "ip", Arg::None, nullptr },
     { 942, "info-pieces", "List the current torrent(s)' pieces", "ic", Arg::None, nullptr },
     { 943, "info-trackers", "List the current torrent(s)' trackers", "it", Arg::None, nullptr },
-    { 'j', "json", "Return RPC response as a JSON string", "j", Arg::None, nullptr },
+    { 'j', "json", "Return RPC response as a JSON string if the request was not a notification", "j", Arg::None, nullptr },
     { 920, "session-info", "Show the session's details", "si", Arg::None, nullptr },
     { 921, "session-stats", "Show the session's statistics", "st", Arg::None, nullptr },
     { 'l', "list", "List all torrents", "l", Arg::None, nullptr },
@@ -275,7 +276,7 @@ auto constexpr Options = std::array<tr_option, 106>{ {
     { 820, "ssl", "Use SSL when talking to daemon", nullptr, Arg::None, nullptr },
     { 'o', "dht", "Enable distributed hash tables (DHT)", "o", Arg::None, nullptr },
     { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", Arg::None, nullptr },
-    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", Arg::Required, "<port>" },
+    { 'p', "port", "Port for incoming peers (Default: 51413)", "p", Arg::Required, "<port>" },
     { 962, "port-test", "Port testing", "pt", Arg::None, nullptr },
     { 'P', "random-port", "Random port for incoming peers", "P", Arg::None, nullptr },
     { 900, "priority-high", "Try to download these file(s) first", "ph", Arg::Required, "<files>" },
@@ -560,7 +561,7 @@ enum
     }
 }
 
-[[nodiscard]] std::string get_encoded_metainfo(char const* filename)
+[[nodiscard]] std::string get_encoded_metainfo(std::string_view const filename)
 {
     if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_file_read(filename, contents))
     {
@@ -879,8 +880,8 @@ void warn_if_unsupported_rpc_version(std::string_view const semver)
 [[nodiscard]] size_t parse_response_header(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
     using namespace header_utils;
-    static auto const session_id_header = tr_strlower(TR_RPC_SESSION_ID_HEADER);
-    static auto const rpc_version_header = tr_strlower(TR_RPC_RPC_VERSION_HEADER);
+    static auto const session_id_header = tr_strlower(TrRpcSessionIdHeader);
+    static auto const rpc_version_header = tr_strlower(TrRpcVersionHeader);
 
     auto& config = *static_cast<RemoteConfig*>(vconfig);
 
@@ -1132,17 +1133,17 @@ void print_details(tr_variant::Map const& result)
         {
             if (auto const sv = t->value_if<std::string_view>(TR_KEY_error_string).value_or(""sv); !std::empty(sv))
             {
-                switch (i)
+                switch (static_cast<tr_stat::Error>(i))
                 {
-                case TR_STAT_TRACKER_WARNING:
+                case tr_stat::Error::TrackerWarning:
                     fmt::print("  Tracker gave a warning: {:s}\n", sv);
                     break;
 
-                case TR_STAT_TRACKER_ERROR:
+                case tr_stat::Error::TrackerError:
                     fmt::print("  Tracker gave an error: {:s}\n", sv);
                     break;
 
-                case TR_STAT_LOCAL_ERROR:
+                case tr_stat::Error::LocalError:
                     fmt::print("  Error: {:s}\n", sv);
                     break;
 
@@ -1425,7 +1426,7 @@ void print_file_list(tr_variant::Map const& result)
 
 void print_peers_impl(tr_variant::Vector const& peers)
 {
-    fmt::print("{:<40s}  {:<12s}  {:<5s} {:<8s}  {:<8s}  {:s}\n", "Address", "Flags", "Done", "Down", "Up", "Client");
+    fmt::print("{:<40s}  {:<12s}  {:<5s} {:>8s}  {:>8s}  {:s}\n", "Address", "Flags", "Done", "Down", "Up", "Client");
 
     for (auto const& peer_var : peers)
     {
@@ -1855,9 +1856,11 @@ void print_session(tr_variant::Map const& result)
         fmt::print("  Port forwarding enabled: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = result.value_if<bool>(TR_KEY_utp_enabled))
+    if (auto const* const l = result.find_if<tr_variant::Vector>(TR_KEY_preferred_transports); l != nullptr &&
+        std::ranges::all_of(*l, [](tr_variant const& var) { return var.holds_alternative<std::string_view>(); }))
     {
-        fmt::print("  µTP enabled: {:s}\n", *b ? "Yes" : "No");
+        auto const view = std::views::transform(*l, [](tr_variant const& var) { return *var.value_if<std::string_view>(); });
+        fmt::print("  Transport protocol preference: {}\n", fmt::join(view, ", "));
     }
 
     if (auto b = result.value_if<bool>(TR_KEY_dht_enabled))
@@ -2355,7 +2358,7 @@ int process_response(char const* rpcurl, std::string_view const response, Remote
         [[fallthrough]];
 
     default:
-        fmt::print("{:s} responded: {:s}\n", rpcurl, response);
+        fmt::print("{:s} returned a successful response\n", rpcurl);
         break;
     }
 
@@ -2407,7 +2410,7 @@ CURL* tr_curl_easy_init(std::string* writebuf, RemoteConfig& config)
 
     if (auto const& str = config.session_id; !std::empty(str))
     {
-        auto const h = fmt::format("{:s}: {:s}", TR_RPC_SESSION_ID_HEADER, str);
+        auto const h = fmt::format("{:s}: {:s}", TrRpcSessionIdHeader, str);
         auto* const custom_headers = curl_slist_append(nullptr, h.c_str());
 
         (void)curl_easy_setopt(curl, CURLOPT_HTTPHEADER, custom_headers);
@@ -2479,7 +2482,10 @@ int flush(char const* rpcurl, tr_variant* const var, RemoteConfig& config)
             break;
 
         case 204:
-            fmt::print("{:s} acknowledged request\n", rpcurl);
+            if (!config.json)
+            {
+                fmt::print("{:s} acknowledged notification\n", rpcurl);
+            }
             break;
 
         case 409:
@@ -2881,7 +2887,15 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 'e':
-                args.insert_or_assign(TR_KEY_cache_size_mib, tr_num_parse<int64_t>(optarg_sv).value());
+                if (auto val = tr_num_parse<int64_t>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_cache_size_mib, *val);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-e'/'--cache' should be an integer");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 910:
@@ -2949,8 +2963,16 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 953:
-                args.insert_or_assign(TR_KEY_seed_ratio_limit, tr_num_parse<double>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seed_ratio_limited, true);
+                if (auto const val = tr_num_parse<double>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_seed_ratio_limit, *val);
+                    args.insert_or_assign(TR_KEY_seed_ratio_limited, true);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-gsr'/'--global-seedratio' should be a number");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 954:
@@ -2958,8 +2980,16 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 958:
-                args.insert_or_assign(TR_KEY_idle_seeding_limit, tr_num_parse<int64_t>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, true);
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_idle_seeding_limit, *val);
+                    args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, true);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-gisl'/'--global-idle-seeding-limit' should be an integer");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 959:
@@ -3056,15 +3086,22 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 930:
-                if (targs != nullptr)
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
                 {
-                    targs->insert_or_assign(TR_KEY_peer_limit, tr_num_parse<int64_t>(optarg_sv).value());
+                    if (targs != nullptr)
+                    {
+                        targs->insert_or_assign(TR_KEY_peer_limit, *val);
+                    }
+                    else
+                    {
+                        sargs->insert_or_assign(TR_KEY_peer_limit_global, *val);
+                    }
                 }
                 else
                 {
-                    sargs->insert_or_assign(TR_KEY_peer_limit_global, tr_num_parse<int64_t>(optarg_sv).value());
+                    fmt::print(stderr, "Argument to '-pr'/'--peers' should be an integer");
+                    status |= EXIT_FAILURE;
                 }
-
                 break;
 
             default:
@@ -3079,6 +3116,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             switch (c)
             {
             case 712:
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
                 {
                     auto* list = args.find_if<tr_variant::Vector>(TR_KEY_tracker_remove);
                     if (list == nullptr)
@@ -3086,13 +3124,26 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                         list = args.insert_or_assign(TR_KEY_tracker_remove, tr_variant::make_vector(1))
                                    .first.get_if<tr_variant::Vector>();
                     }
-                    list->emplace_back(tr_num_parse<int64_t>(optarg_sv).value());
+                    list->emplace_back(*val);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-tr'/'--tracker-remove' should be an integer");
+                    status |= EXIT_FAILURE;
                 }
                 break;
 
             case 950:
-                args.insert_or_assign(TR_KEY_seed_ratio_limit, tr_num_parse<double>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seed_ratio_mode, TR_RATIOLIMIT_SINGLE);
+                if (auto const val = tr_num_parse<double>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_seed_ratio_limit, *val);
+                    args.insert_or_assign(TR_KEY_seed_ratio_mode, TR_RATIOLIMIT_SINGLE);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-sr'/'--seedratio' should be a number");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 951:
@@ -3104,8 +3155,16 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 955:
-                args.insert_or_assign(TR_KEY_seed_idle_limit, tr_num_parse<int64_t>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seed_idle_mode, TR_IDLELIMIT_SINGLE);
+                if (auto const val = tr_num_parse<int64_t>(optarg_sv))
+                {
+                    args.insert_or_assign(TR_KEY_seed_idle_limit, *val);
+                    args.insert_or_assign(TR_KEY_seed_idle_mode, TR_IDLELIMIT_SINGLE);
+                }
+                else
+                {
+                    fmt::print(stderr, "Argument to '-isl'/'--idle-seeding-limit' should be an integer");
+                    status |= EXIT_FAILURE;
+                }
                 break;
 
             case 956:
@@ -3522,12 +3581,12 @@ void get_host_and_port_and_rpc_url(
     auto const sv = std::string_view{ argv[1] };
     if (tr_strv_starts_with(sv, "http://")) /* user passed in http rpc url */
     {
-        rpcurl = fmt::format("{:s}/rpc/", sv.substr(7));
+        rpcurl = fmt::format("{:s}/{:s}", sv.substr(7), TrHttpServerRpcRelativePath);
     }
     else if (tr_strv_starts_with(sv, "https://")) /* user passed in https rpc url */
     {
         config.use_ssl = true;
-        rpcurl = fmt::format("{:s}/rpc/", sv.substr(8));
+        rpcurl = fmt::format("{:s}/{:s}", sv.substr(8), TrHttpServerRpcRelativePath);
     }
     else if (parse_port_string(sv, port))
     {
@@ -3568,8 +3627,8 @@ int tr_main(int argc, char* argv[])
     tr_locale_set_global("");
 
     auto config = RemoteConfig{};
-    auto port = DefaultPort;
-    auto host = std::string{};
+    auto port = uint16_t{ TrDefaultRpcPort };
+    auto host = std::string{ "localhost" };
     auto rpcurl = std::string{};
 
     if (argc < 2)
@@ -3580,14 +3639,9 @@ int tr_main(int argc, char* argv[])
 
     get_host_and_port_and_rpc_url(argc, argv, host, port, rpcurl, config);
 
-    if (std::empty(host))
-    {
-        host = DefaultHost;
-    }
-
     if (std::empty(rpcurl))
     {
-        rpcurl = fmt::format("{:s}:{:d}{:s}", host, port, DefaultUrl);
+        rpcurl = fmt::format("{:s}:{:d}{:s}{:s}", host, port, TrDefaultHttpServerBasePath, TrHttpServerRpcRelativePath);
     }
 
     return process_args(rpcurl.c_str(), argc, (char const* const*)argv, config);

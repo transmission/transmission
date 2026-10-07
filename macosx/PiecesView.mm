@@ -184,12 +184,12 @@ typedef struct PieceInfo
     if (numCells > 0)
     {
         self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect /*dstRect*/) {
-            NSRect cFillRects[numCells];
+            NSRect cFillRects[kMaxCells];
             for (int i = 0; i < numCells; ++i)
             {
                 cFillRects[i] = cellBounds[i].rectValue;
             }
-            NSColor* cFillColors[numCells];
+            NSColor* cFillColors[kMaxCells];
             for (int i = 0; i < numCells; ++i)
             {
                 cFillColors[i] = cellColors[i];

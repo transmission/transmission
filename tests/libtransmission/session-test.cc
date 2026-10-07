@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
@@ -21,12 +23,11 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 TEST_F(SessionTest, propertiesApi)
@@ -48,14 +49,10 @@ TEST_F(SessionTest, propertiesApi)
         EXPECT_EQ(value, session->downloadDir());
         EXPECT_EQ(value, tr_sessionGetDownloadDir(session));
 
-        tr_sessionSetDownloadDir(session, std::string(value).c_str());
+        tr_sessionSetDownloadDir(session, value);
         EXPECT_EQ(value, session->downloadDir());
         EXPECT_EQ(value, tr_sessionGetDownloadDir(session));
     }
-
-    tr_sessionSetDownloadDir(session, nullptr);
-    EXPECT_EQ(""sv, session->downloadDir());
-    EXPECT_EQ(""sv, tr_sessionGetDownloadDir(session));
 
     // incomplete dir
 
@@ -65,14 +62,10 @@ TEST_F(SessionTest, propertiesApi)
         EXPECT_EQ(value, session->incompleteDir());
         EXPECT_EQ(value, tr_sessionGetIncompleteDir(session));
 
-        tr_sessionSetIncompleteDir(session, std::string(value).c_str());
+        tr_sessionSetIncompleteDir(session, value);
         EXPECT_EQ(value, session->incompleteDir());
         EXPECT_EQ(value, tr_sessionGetIncompleteDir(session));
     }
-
-    tr_sessionSetIncompleteDir(session, nullptr);
-    EXPECT_EQ(""sv, session->incompleteDir());
-    EXPECT_EQ(""sv, tr_sessionGetIncompleteDir(session));
 
     // script
 
@@ -84,14 +77,10 @@ TEST_F(SessionTest, propertiesApi)
             EXPECT_EQ(value, session->script(type));
             EXPECT_EQ(value, tr_sessionGetScript(session, type));
 
-            tr_sessionSetScript(session, type, std::string(value).c_str());
+            tr_sessionSetScript(session, type, value);
             EXPECT_EQ(value, session->script(type));
             EXPECT_EQ(value, tr_sessionGetScript(session, type));
         }
-
-        tr_sessionSetScript(session, type, nullptr);
-        EXPECT_EQ(""sv, session->script(type));
-        EXPECT_EQ(""sv, tr_sessionGetScript(session, type));
 
         for (auto const value : { true, false })
         {
@@ -126,31 +115,24 @@ TEST_F(SessionTest, propertiesApi)
         EXPECT_EQ(value, session->blocklistUrl());
         EXPECT_EQ(value, tr_blocklistGetURL(session));
 
-        tr_blocklistSetURL(session, std::string(value).c_str());
+        tr_blocklistSetURL(session, value);
         EXPECT_EQ(value, session->blocklistUrl());
         EXPECT_EQ(value, tr_blocklistGetURL(session));
     }
-
-    tr_blocklistSetURL(session, nullptr);
-    EXPECT_EQ(""sv, session->blocklistUrl());
-    EXPECT_EQ(""sv, tr_blocklistGetURL(session));
 
     // rpc username
 
     for (auto const& value : { "foo"sv, "bar"sv, ""sv })
     {
-        tr_sessionSetRPCUsername(session, std::string{ value }.c_str());
+        tr_sessionSetRPCUsername(session, value);
         EXPECT_EQ(value, tr_sessionGetRPCUsername(session));
     }
-
-    tr_sessionSetRPCUsername(session, nullptr);
-    EXPECT_EQ(""sv, tr_sessionGetRPCUsername(session));
 
     // rpc password (unsalted)
 
     {
         auto const value = "foo"sv;
-        tr_sessionSetRPCPassword(session, std::string{ value }.c_str());
+        tr_sessionSetRPCPassword(session, value);
         EXPECT_NE(value, tr_sessionGetRPCPassword(session));
         EXPECT_EQ('{', tr_sessionGetRPCPassword(session)[0]);
     }
@@ -160,7 +142,7 @@ TEST_F(SessionTest, propertiesApi)
     {
         auto const plaintext = "foo"sv;
         auto const salted = tr_ssha1(plaintext);
-        tr_sessionSetRPCPassword(session, salted.c_str());
+        tr_sessionSetRPCPassword(session, salted);
         EXPECT_EQ(salted, tr_sessionGetRPCPassword(session));
     }
 
@@ -320,7 +302,7 @@ TEST_F(SessionTest, honorsSettings)
     EXPECT_TRUE(tr_sessionUsesAltSpeedTime(session));
     EXPECT_TRUE(tr_sessionIsRPCEnabled(session));
 
-    tr_sessionClose(session);
+    tr_sessionClose(session, 0.5);
 }
 
 TEST_F(SessionTest, savesSettings)
@@ -375,4 +357,47 @@ TEST_F(SessionTest, loadTorrentsThenMagnets)
     EXPECT_TRUE(tor->has_metainfo());
 }
 
-} // namespace libtransmission::test
+namespace
+{
+// Starts a session on `config_dir` and reports whether it claimed the dir.
+[[nodiscard]] bool startsOwningConfigDir(std::string_view config_dir, tr_variant const& settings)
+{
+    auto* const session = tr_sessionInit(config_dir, false, settings);
+    auto const owns = tr_sessionOwnsConfigDir(session);
+    tr_sessionClose(session, 0.5);
+    return owns;
+}
+} // namespace
+
+// Two sessions on one config dir overwrite each other's settings, resume files
+// and stats. The second still starts; all it can do is report. `session_`
+// already holds this dir.
+TEST_F(SessionTest, doesNotOwnAConfigDirAnotherSessionHolds)
+{
+    EXPECT_FALSE(startsOwningConfigDir(sandboxDir(), quietSettings()));
+}
+
+TEST_F(SessionTest, releasesTheConfigDirWhenItCloses)
+{
+    closeSession();
+
+    EXPECT_TRUE(startsOwningConfigDir(sandboxDir(), quietSettings()));
+}
+
+TEST_F(SessionTest, claimsAConfigDirItHadToCreate)
+{
+    EXPECT_TRUE(startsOwningConfigDir(sandboxDir() + "/brand-new", quietSettings()));
+}
+
+TEST_F(SessionTest, startsOnAConfigDirItCannotLock)
+{
+    // A lock that is a directory can never be opened as a file, which is the
+    // shape of every "could not be locked at all" a real filesystem produces.
+    auto const dir = sandboxDir() + "/unlockable";
+    ASSERT_TRUE(tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700));
+    ASSERT_TRUE(tr_sys_dir_create(dir + "/lock", TR_SYS_DIR_CREATE_PARENTS, 0700));
+
+    EXPECT_FALSE(startsOwningConfigDir(dir, quietSettings()));
+}
+
+} // namespace tr::test

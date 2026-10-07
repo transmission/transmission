@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <compare>
 #include <cstddef> // std::byte, size_t
 #include <string_view>
 #include <tuple>
@@ -22,7 +23,7 @@
 
 #include "test-fixtures.h"
 
-using NetTest = ::libtransmission::test::TransmissionTest;
+using NetTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(NetTest, conversionsIPv4)
@@ -174,7 +175,7 @@ TEST_F(NetTest, compact6)
     EXPECT_EQ(port, pex.front().socket_address.port());
 
     // ...serialize that back again too
-    std::fill(std::begin(compact6), std::end(compact6), std::byte{});
+    std::ranges::fill(compact6, std::byte{});
     out = std::data(compact6);
     out = tr_pex::to_compact(out, std::data(pex), std::size(pex));
     EXPECT_EQ(std::data(compact6) + std::size(compact6), out);
@@ -921,14 +922,14 @@ TEST_F(NetTest, isIPv6Multicast)
 TEST_F(NetTest, ipCompare)
 {
     static constexpr auto IpPairs = std::array{
-        std::tuple{ "223.18.245.229"sv, "8.8.8.8"sv, 1 },
-        std::tuple{ "0.0.0.0"sv, "255.255.255.255"sv, -1 },
-        std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, 0 },
-        std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, -1 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:0:0eab:dead::a0:abcd:4e]"sv, 1 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, 0 },
-        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:1890:1112:1::20]"sv, 0 },
+        std::tuple{ "223.18.245.229"sv, "8.8.8.8"sv, std::strong_ordering::greater },
+        std::tuple{ "0.0.0.0"sv, "255.255.255.255"sv, std::strong_ordering::less },
+        std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, std::strong_ordering::equal },
+        std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, std::strong_ordering::less },
+        std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, std::strong_ordering::greater },
+        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:0:0eab:dead::a0:abcd:4e]"sv, std::strong_ordering::greater },
+        std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, std::strong_ordering::equal },
+        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:1890:1112:1::20]"sv, std::strong_ordering::equal },
     };
 
     for (auto const& [sv1, sv2, res] : IpPairs)
@@ -936,12 +937,13 @@ TEST_F(NetTest, ipCompare)
         auto const ip1 = *tr_address::from_string(sv1);
         auto const ip2 = *tr_address::from_string(sv2);
 
-        EXPECT_EQ(ip1.compare(ip2) < 0, res < 0) << sv1 << ' ' << sv2;
-        EXPECT_EQ(ip1.compare(ip2) > 0, res > 0) << sv1 << ' ' << sv2;
-        EXPECT_EQ(ip1.compare(ip2) == 0, res == 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 <=> ip2, res) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 < ip2, res < 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 <= ip2, res <= 0) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 > ip2, res > 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 >= ip2, res >= 0) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 == ip2, res == 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 != ip2, res != 0) << sv1 << ' ' << sv2;
     }
 }
 
@@ -973,5 +975,61 @@ TEST_F(NetTest, IPv4MappedAddress)
         ASSERT_TRUE(native);
 
         EXPECT_EQ(native_sv, native->display_name());
+    }
+}
+
+TEST_F(NetTest, isValidForPeers)
+{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 13>{ {
+        { "1.2.3.4:6881"sv, true },
+        { "[2001:db8::1]:6881"sv, true },
+        { "0.0.0.0:6881"sv, false }, // "this network"
+        { "0.1.2.3:6881"sv, false }, // "this network"
+        { "[::]:6881"sv, false }, // unspecified
+        { "224.0.0.1:6881"sv, false }, // multicast
+        { "239.255.255.255:6881"sv, false }, // multicast
+        { "[ff02::1]:6881"sv, false }, // multicast
+        { "[fe80::1]:6881"sv, false }, // link-local
+        { "[::ffff:1.2.3.4]:6881"sv, false }, // ipv4-mapped
+        { "[::ffff:127.0.0.1]:6881"sv, false }, // ipv4-mapped
+        { "127.0.0.1:6881"sv, false }, // loopback, see LoopbackTests
+        { "[::1]:6881"sv, false }, // loopback, see LoopbackTests
+    } };
+
+    for (auto const& [presentation, expected] : Tests)
+    {
+        auto const socket_address = tr_socket_address::from_string(presentation);
+        ASSERT_TRUE(socket_address.has_value()) << presentation;
+        EXPECT_EQ(expected, socket_address->is_valid_for_peers(TR_PEER_FROM_TRACKER)) << presentation;
+    }
+
+    // a peer address without a port is useless
+    {
+        auto const address = tr_address::from_string("1.2.3.4"sv);
+        ASSERT_TRUE(address.has_value());
+        EXPECT_FALSE(tr_socket_address(*address, tr_port{}).is_valid_for_peers(TR_PEER_FROM_TRACKER));
+    }
+
+    // loopback peers are only accepted from sources that can legitimately name them
+    static auto constexpr LoopbackTests = std::array<std::pair<tr_peer_from, bool>, 8>{ {
+        { TR_PEER_FROM_INCOMING, true },
+        { TR_PEER_FROM_LPD, true },
+        { TR_PEER_FROM_RESUME, true },
+        { TR_PEER_FROM_TRACKER, false },
+        { TR_PEER_FROM_DHT, false },
+        { TR_PEER_FROM_PEX, false },
+        { TR_PEER_FROM_LTEP, false },
+        { TR_PEER_FROM_HOLEPUNCH, false },
+    } };
+
+    for (auto const& presentation : { "127.0.0.1:6881"sv, "[::1]:6881"sv })
+    {
+        auto const socket_address = tr_socket_address::from_string(presentation);
+        ASSERT_TRUE(socket_address.has_value()) << presentation;
+
+        for (auto const& [from, expected] : LoopbackTests)
+        {
+            EXPECT_EQ(expected, socket_address->is_valid_for_peers(from)) << presentation << " from " << from;
+        }
     }
 }

@@ -12,14 +12,12 @@ InteropObject::InteropObject(QObject* parent)
 {
 }
 
-// NOLINTNEXTLINE(readability-identifier-naming)
 bool InteropObject::PresentWindow() const
 {
     trApp->raise();
     return true;
 }
 
-// NOLINTNEXTLINE(readability-identifier-naming)
 bool InteropObject::AddMetainfo(QString const& metainfo) const
 {
     if (auto addme = AddData(metainfo); addme.type != AddData::NONE)

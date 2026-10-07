@@ -8,12 +8,14 @@
 
 #include <fmt/format.h> // fmt::ptr
 
+#ifdef WITH_UTP
 #include <libutp/utp.h>
+#endif
 
 #include "libtransmission/crypto-utils.h" // tr_rand_int()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
-#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-socket-utp.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
 #include "libtransmission/tr-assert.h"
@@ -24,47 +26,25 @@ using namespace std::literals;
 
 #ifndef WITH_UTP
 
-void utp_close(UTPSocket* socket)
-{
-    tr_logAddTrace(fmt::format("utp_close({}) was called.", fmt::ptr(socket)));
-}
-
-void utp_read_drained(UTPSocket* socket)
-{
-    tr_logAddTrace(fmt::format("utp_read_drained({}) was called.", fmt::ptr(socket)));
-}
-
-ssize_t utp_write(UTPSocket* socket, void* buf, size_t count)
-{
-    tr_logAddTrace(fmt::format("utp_write({}, {}, {}) was called.", fmt::ptr(socket), fmt::ptr(socket), count));
-    return -1;
-}
-
-void tr_utpInit(tr_session* /*session*/)
+void tr_utp_init(tr_session* /*session*/)
 {
 }
 
-bool tr_utpPacket(
+bool tr_utp_packet(
     unsigned char const* /*buf*/,
     size_t /*buflen*/,
-    sockaddr const* /*from*/,
+    struct sockaddr const* /*from*/,
     socklen_t /*fromlen*/,
     tr_session* /*ss*/)
 {
     return false;
 }
 
-struct UTPSocket* utp_create_socket(struct_utp_context* /*ctx*/)
+void tr_utp_issue_deferred_acks(tr_session* /*ss*/)
 {
-    return nullptr;
 }
 
-int utp_connect(UTPSocket* /*socket*/, sockaddr const* /*to*/, socklen_t /*tolen*/)
-{
-    return -1;
-}
-
-void tr_utpClose(tr_session* /*session*/)
+void tr_utp_close(tr_session* /*session*/)
 {
 }
 
@@ -91,7 +71,7 @@ void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
 
     if (auto addrport = tr_socket_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
     {
-        session->addIncoming({ *addrport, utp_sock });
+        session->addIncoming(tr_peer_socket_utp::create(*addrport, utp_sock, session->timerMaker()));
     }
     else
     {
@@ -194,7 +174,7 @@ void tr_utp_init(tr_session* session)
     utp_context_set_userdata(ctx, session);
     utp_set_callback(ctx, UTP_ON_ACCEPT, &utp_callback);
     utp_set_callback(ctx, UTP_SENDTO, &utp_callback);
-    tr_peerIo::utp_init(ctx);
+    tr_peer_socket_utp::init(ctx);
 
 #ifdef TR_UTP_TRACE
     utp_set_callback(ctx, UTP_LOG, &utp_callback);

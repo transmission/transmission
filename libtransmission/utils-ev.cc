@@ -8,7 +8,7 @@
 
 #include "libtransmission/utils-ev.h"
 
-namespace libtransmission::evhelpers
+namespace tr::evhelpers
 {
 
 void EventBaseDeleter::operator()(struct event_base* evbase) const noexcept
@@ -36,4 +36,18 @@ void EvhttpDeleter::operator()(struct evhttp* evh) const noexcept
     }
 }
 
-} // namespace libtransmission::evhelpers
+// RPC events (evhttp) will default to pri1, one level higher than pri2 events
+// created here. Depends on event_base having three priority levels
+struct event* event_new_pri2(
+    struct event_base* base,
+    evutil_socket_t fd,
+    short events,
+    event_callback_fn callback,
+    void* callback_arg)
+{
+    struct event* e = event_new(base, fd, events, callback, callback_arg);
+    event_priority_set(e, 2);
+    return e;
+}
+
+} // namespace tr::evhelpers

@@ -15,7 +15,7 @@ struct tr_variant;
     auto inline constexpr TrRpcVersionSemver = std::string_view{ #major "." #minor "." #patch }; \
     auto inline constexpr TrRpcVersionSemverMajor = major;
 
-RPC_VERSION_VARS(6, 0, 0)
+RPC_VERSION_VARS(6, 1, 0)
 
 #undef RPC_VERSION_VARS
 
@@ -41,14 +41,15 @@ enum Code : int16_t
     FILE_IDX_OOR,
     PIECE_IDX_OOR,
     HTTP_ERROR,
-    CORRUPT_TORRENT
+    CORRUPT_TORRENT,
+    INVALID_BLOCKLIST_DATA,
 };
 
 [[nodiscard]] std::string_view to_string(Code code);
 } // namespace Error
 } // namespace JsonRpc
 
-using tr_rpc_response_func = std::function<void(tr_session* session, tr_variant&& response)>;
+using tr_rpc_response_func = std::function<void(tr_variant&& response)>;
 
 void tr_rpc_request_exec(tr_session* session, tr_variant& request, tr_rpc_response_func&& callback = {});
 

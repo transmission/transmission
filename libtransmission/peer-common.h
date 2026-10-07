@@ -14,12 +14,11 @@
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <string>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/history.h"
 #include "libtransmission/net.h" // tr_port
+#include "libtransmission/types.h"
 
 /**
  * @addtogroup peers Peers
@@ -203,7 +202,7 @@ using tr_peer_callback_generic = void (*)(tr_peer* peer, tr_peer_event const& ev
  */
 struct tr_peer
 {
-    using Speed = libtransmission::Values::Speed;
+    using Speed = tr::Values::Speed;
 
     explicit tr_peer(tr_torrent const& tor);
     virtual ~tr_peer() = default;

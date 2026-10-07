@@ -47,7 +47,7 @@
 "%lu files" = "%lu файлів";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%lu Файлів";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu вхідних";
@@ -83,7 +83,7 @@
 "%lu tracker" = "%lu трекер";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%lu Відстежувачів";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,7 +94,7 @@
 "%lu web seeds" = "%lu сайтів роздачі";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%lu Висівів";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u частин, %2$@ кожна";
@@ -121,7 +121,7 @@
 "1 time" = "1 раз";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "1 Відстежувач";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "1 роздача";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "1 Висів";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" не є торрент-файлом.";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "Створити Торрент-Файл";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "Створено %@";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "Створено %1$@ з %2$@";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "Створено з %@";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Створення \"%@\" невдалося.";

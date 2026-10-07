@@ -11,13 +11,18 @@
 #include <mutex>
 #include <string_view>
 
+#include <QDateTime>
 #include <QUrl>
 
 #include <libtransmission/serializer.h>
+#include <libtransmission/web-utils.h>
 
 #include "Application.h" // qApp
+#include "QtCompat.h"
 #include "Speed.h"
 #include "Torrent.h"
+
+namespace ser = tr::serializer;
 
 namespace trqt::variant_helpers
 {
@@ -183,8 +188,14 @@ bool change(TrackerStat& setme, tr_variant const* value)
     {
         if (setme.sitename.isEmpty())
         {
-            QStringList const separated_host = QUrl{ setme.announce }.host().split(QStringLiteral("."));
-            setme.sitename = separated_host.at(separated_host.size() - 2);
+            auto const announce_str = setme.announce.toStdString();
+            if (auto const parsed = tr_urlParse(announce_str))
+            {
+                auto const sitename = parsed->sitename;
+                setme.sitename = QString::fromUtf8(
+                    std::data(sitename),
+                    static_cast<IF_QT6(qsizetype, int)>(std::size(sitename)));
+            }
         }
 
         setme.announce = trApp->intern(setme.announce);
@@ -253,6 +264,42 @@ tr_variant fromInt(int const& val)
 {
     return static_cast<int64_t>(val);
 }
+
+// ---
+
+bool toQDateTime(tr_variant const& src, QDateTime* tgt)
+{
+    if (auto const val = ser::to_value<int64_t>(src))
+    {
+        *tgt = QDateTime::fromSecsSinceEpoch(*val);
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromQDateTime(QDateTime const& src)
+{
+    return ser::to_variant(int64_t{ src.toSecsSinceEpoch() });
+}
+
+// ---
+
+bool toQString(tr_variant const& src, QString* tgt)
+{
+    if (auto const val = src.value_if<std::string_view>())
+    {
+        *tgt = QString::fromUtf8(std::data(*val), static_cast<IF_QT6(qsizetype, int)>(std::size(*val)));
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant fromQString(QString const& val)
+{
+    return val.toStdString();
+}
 } // namespace
 
 void register_qt_converters()
@@ -262,8 +309,10 @@ void register_qt_converters()
         once,
         []
         {
-            using namespace libtransmission::serializer;
+            using namespace tr::serializer;
             Converters::add(toInt, fromInt);
+            Converters::add(toQDateTime, fromQDateTime);
+            Converters::add(toQString, fromQString);
         });
 }
 

@@ -5,7 +5,7 @@
 #import <AppKit/AppKit.h>
 #import <Quartz/Quartz.h>
 
-#import <Sparkle/SUUpdaterDelegate.h>
+#import <Sparkle/SPUUpdaterDelegate.h>
 
 #include <libtransmission/transmission.h>
 
@@ -26,7 +26,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 };
 
 @interface Controller
-    : NSObject<NSApplicationDelegate, NSMenuItemValidation, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSToolbarItemValidation, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
+    : NSObject<NSApplicationDelegate, NSMenuItemValidation, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSToolbarItemValidation, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SPUUpdaterDelegate>
 
 - (void)openFiles:(NSArray<NSString*>*)filenames addType:(AddType)type forcePath:(NSString*)path;
 
@@ -109,6 +109,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (void)setBottomCountText:(BOOL)filtering;
 
 - (Torrent*)torrentForHash:(NSString*)hash;
+- (Torrent*)torrentForId:(tr_torrent_id_t)id;
 
 - (void)torrentFinishedDownloading:(NSNotification*)notification;
 - (void)torrentRestartedDownloading:(NSNotification*)notification;
@@ -182,7 +183,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (IBAction)linkGitHub:(id)sender;
 - (IBAction)linkDonate:(id)sender;
 
-- (void)rpcCallback:(tr_rpc_callback_type)type forTorrentStruct:(struct tr_torrent*)torrentStruct;
+- (void)rpcCallback:(tr_rpc_callback_type)type forTorrentId:(std::optional<tr_torrent_id_t>)torrentId;
 - (void)rpcAddTorrentStruct:(struct tr_torrent*)torrentStruct;
 - (void)rpcRemoveTorrent:(Torrent*)torrent deleteData:(BOOL)deleteData;
 - (void)rpcStartedStoppedTorrent:(Torrent*)torrent;

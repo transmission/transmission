@@ -14,7 +14,7 @@ static NSUInteger const kBonjourServiceNameMaxLength = 63;
 
 @implementation BonjourController
 
-BonjourController* fDefaultController = nil;
+static BonjourController* fDefaultController = nil;
 
 + (BonjourController*)defaultController
 {

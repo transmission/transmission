@@ -47,7 +47,7 @@
 "%lu files" = "%lu lêers";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%lu lêers";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu inkomend";
@@ -83,7 +83,7 @@
 "%lu tracker" = "%lu spoorder";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%lu spoorders";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,7 +94,7 @@
 "%lu web seeds" = "%lu websade";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%lu websade";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u stukke, %2$@ elk";
@@ -121,7 +121,7 @@
 "1 time" = "1 keer";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "1 Spoorder";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "1 oordrag";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "1 Websaad";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "“%@” is nie ’n geldige torrentlêer nie.";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "Skep Torrentlêer";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "Geskep op %@";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "Geskep op %1$@ met %2$@";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "Geskep met %@";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Skep van “%@” het misluk.";

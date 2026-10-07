@@ -15,6 +15,7 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/env.h>
 #include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/torrent-metainfo.h>
@@ -49,15 +50,17 @@
 #include <cstring> // strstr
 #include <functional>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
 
 using namespace std::literals;
-using namespace transmission::app;
+using namespace tr::app;
 
 class Session::Impl
 {
@@ -92,7 +95,7 @@ public:
 
     void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
-    void send_rpc_request(tr_quark method, tr_variant const& params, std::function<void(tr_variant&)> on_response);
+    void send_rpc_request(tr_quark method, tr_variant&& params, std::function<void(tr_variant&)>&& on_response);
 
     void commit_prefs_change(tr_quark key);
 
@@ -144,7 +147,7 @@ private:
     void inc_busy();
     void dec_busy();
 
-    bool add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify);
+    bool add(Glib::ustring const& name, bool do_start, bool do_prompt, bool do_notify);
     void add_file_async_callback(
         Glib::RefPtr<Gio::File> const& file,
         Glib::RefPtr<Gio::AsyncResult>& result,
@@ -168,10 +171,8 @@ private:
 
     void on_pref_changed(tr_quark key);
 
-    void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running);
-    void on_torrent_metadata_changed(tr_torrent* raw_torrent);
-
-    void on_torrent_removal_done(tr_torrent_id_t id, bool succeeded);
+    void on_torrent_completeness_changed(tr_torrent_id_t tor_id, tr_completeness completeness, bool was_running);
+    void on_torrent_metadata_changed(tr_torrent_id_t tor_id);
 
 private:
     Session& core_;
@@ -289,7 +290,8 @@ time_t get_file_mtime(Glib::RefPtr<Gio::File> const& file)
 {
     try
     {
-        return file->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED)->get_attribute_uint64(G_FILE_ATTRIBUTE_TIME_MODIFIED);
+        return static_cast<time_t>(
+            file->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED)->get_attribute_uint64(G_FILE_ATTRIBUTE_TIME_MODIFIED));
     }
     catch (Glib::Error const&)
     {
@@ -360,7 +362,7 @@ bool Session::Impl::watchdir_idle()
 
         adding_from_watch_dir_ = true;
         add_files(unchanging, do_start, do_prompt, true);
-        std::for_each(unchanging.begin(), unchanging.end(), rename_torrent);
+        std::ranges::for_each(unchanging, rename_torrent);
         adding_from_watch_dir_ = false;
     }
 
@@ -386,10 +388,7 @@ void Session::Impl::watchdir_monitor_file(Glib::RefPtr<Gio::File> const& file)
     if (is_torrent)
     {
         /* if we're not already watching this file, start watching it now */
-        bool const found = std::any_of(
-            monitor_files_.begin(),
-            monitor_files_.end(),
-            [file](auto const& f) { return file->equal(f); });
+        bool const found = std::ranges::any_of(monitor_files_, [file](auto const& f) { return file->equal(f); });
 
         if (!found)
         {
@@ -427,8 +426,14 @@ void Session::Impl::watchdir_scan()
             watchdir_monitor_file(Gio::File::create_for_path(Glib::build_filename(dirname, name)));
         }
     }
-    catch (Glib::FileError const&)
+    catch (Glib::FileError const& e)
     {
+        gtr_warning(
+            fmt::format(
+                fmt::runtime(_("Couldn't open watchdir '{dirname}': {error} ({error_code})")),
+                fmt::arg("dirname", dirname),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", static_cast<int>(e.code()))));
     }
 }
 
@@ -475,13 +480,12 @@ void Session::Impl::watchdir_update()
 
 void Session::Impl::on_pref_changed(tr_quark const key)
 {
+    g_return_if_fail(gtr_pref_has_key(key));
+
     switch (key)
     {
     case TR_KEY_sort_mode:
-        if (auto const sort_mode = gtr_pref_get<SortMode>(TR_KEY_sort_mode))
-        {
-            sorter_->set_mode(*sort_mode);
-        }
+        sorter_->set_mode(gtr_pref_get<SortMode>(TR_KEY_sort_mode));
         break;
 
     case TR_KEY_sort_reversed:
@@ -489,11 +493,11 @@ void Session::Impl::on_pref_changed(tr_quark const key)
         break;
 
     case TR_KEY_peer_limit_global:
-        tr_sessionSetPeerLimit(session_, gtr_pref_int_get(key));
+        tr_sessionSetPeerLimit(session_, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_peer_limit_per_torrent:
-        tr_sessionSetPeerLimitPerTorrent(session_, gtr_pref_int_get(key));
+        tr_sessionSetPeerLimitPerTorrent(session_, gtr_pref_int_get<size_t>(key));
         break;
 
     case TR_KEY_inhibit_desktop_hibernation:
@@ -544,16 +548,12 @@ Session::Impl::Impl(Session& core, tr_session* session)
     on_pref_changed(TR_KEY_inhibit_desktop_hibernation);
     signal_prefs_changed_.connect([this](auto key) { on_pref_changed(key); });
 
-    tr_sessionSetMetadataCallback(
-        session,
-        [](auto* /*session*/, auto* tor, gpointer impl) { static_cast<Impl*>(impl)->on_torrent_metadata_changed(tor); },
-        this);
+    tr_sessionSetMetadataCallback(session, [this](tr_torrent_id_t const tor_id) { on_torrent_metadata_changed(tor_id); });
 
     tr_sessionSetCompletenessCallback(
         session,
-        [](auto* tor, auto completeness, bool was_running, gpointer impl)
-        { static_cast<Impl*>(impl)->on_torrent_completeness_changed(tor, completeness, was_running); },
-        this);
+        [this](tr_torrent_id_t const tor_id, tr_completeness const completeness, bool const was_running)
+        { on_torrent_completeness_changed(tor_id, completeness, was_running); });
 }
 
 Session::Impl::~Impl()
@@ -585,14 +585,18 @@ tr_session* Session::Impl::close()
 
 /* this is called in the libtransmission thread, *NOT* the GTK+ thread,
    so delegate to the GTK+ thread before calling notify's dbus code... */
-void Session::Impl::on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running)
+void Session::Impl::on_torrent_completeness_changed(
+    tr_torrent_id_t const tor_id,
+    tr_completeness const completeness,
+    bool const was_running)
 {
-    if (was_running && completeness != TR_LEECH && tr_torrentStat(tor)->sizeWhenDone != 0)
+    if (auto* const tor = tr_torrentFindFromId(session_, tor_id);
+        was_running && completeness != TR_LEECH && tor != nullptr && tr_torrentStat(tor).size_when_done != 0U)
     {
         Glib::signal_idle().connect(
-            [core = get_core_ptr(), torrent_id = tr_torrentId(tor)]()
+            [core = get_core_ptr(), tor_id]()
             {
-                gtr_notify_torrent_completed(core, torrent_id);
+                gtr_notify_torrent_completed(core, tor_id);
                 return false;
             });
     }
@@ -620,7 +624,7 @@ std::pair<Glib::RefPtr<Torrent>, guint> Session::Impl::find_torrent_by_id(tr_tor
 
     while (begin_position < end_position)
     {
-        auto const position = begin_position + (end_position - begin_position) / 2;
+        auto const position = begin_position + ((end_position - begin_position) / 2);
         auto const torrent = raw_model_->get_item(position);
         auto const current_torrent_id = torrent->get_id();
 
@@ -644,13 +648,13 @@ std::pair<Glib::RefPtr<Torrent>, guint> Session::Impl::find_torrent_by_id(tr_tor
 
 /* this is called in the libtransmission thread, *NOT* the GTK+ thread,
    so delegate to the GTK+ thread before changing our list store... */
-void Session::Impl::on_torrent_metadata_changed(tr_torrent* raw_torrent)
+void Session::Impl::on_torrent_metadata_changed(tr_torrent_id_t const tor_id)
 {
     Glib::signal_idle().connect(
-        [this, core = get_core_ptr(), torrent_id = tr_torrentId(raw_torrent)]()
+        [this, core = get_core_ptr(), tor_id]()
         {
             /* update the torrent's collated name */
-            if (auto const& [torrent, position] = find_torrent_by_id(torrent_id); torrent)
+            if (auto const& [torrent, position] = find_torrent_by_id(tor_id); torrent)
             {
                 torrent->update();
             }
@@ -687,25 +691,22 @@ Glib::RefPtr<Torrent> Session::Impl::create_new_torrent(tr_ctor* ctor)
 {
     bool do_trash = false;
 
-    /* let the gtk client handle the removal, since libT
-     * doesn't have any concept of the glib trash API */
+    // let the gtk client handle the removal, since libT
+    // doesn't have any concept of the glib trash API
     tr_ctorGetDeleteSource(ctor, &do_trash);
     tr_ctorSetDeleteSource(ctor, false);
     tr_torrent* const tor = tr_torrentNew(ctor, nullptr);
 
     if (tor != nullptr && do_trash)
     {
-        char const* config = tr_sessionGetConfigDir(session_);
-        char const* source = tr_ctorGetSourceFile(ctor);
-
-        if (source != nullptr)
+        if (std::optional<std::string> const source = tr_ctorGetSourceFile(ctor))
         {
-            /* #1294: don't delete the .torrent file if it's our internal copy */
-            bool const is_internal = strstr(source, config) == source;
-
+            // #1294: don't delete the .torrent file if it's our internal copy
+            std::string const config_dir = tr_sessionGetConfigDir(session_);
+            bool const is_internal = source && source->starts_with(config_dir);
             if (!is_internal)
             {
-                gtr_file_trash_or_remove(source, nullptr);
+                gtr_file_trash_or_remove(*source);
             }
         }
     }
@@ -726,7 +727,7 @@ void Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
         /* don't complain about torrent files in the watch directory
          * that have already been added... that gets annoying and we
          * don't want to be nagging users to clean up their watch dirs */
-        if (tr_ctorGetSourceFile(ctor) == nullptr || !adding_from_watch_dir_)
+        if (!tr_ctorGetSourceFile(ctor).has_value() || !adding_from_watch_dir_)
         {
             signal_add_error_.emit(ERR_ADD_TORRENT_DUP, metainfo->name().c_str());
         }
@@ -762,12 +763,12 @@ void core_apply_defaults(tr_ctor* ctor)
 
     if (!tr_ctorGetPeerLimit(ctor, TR_FORCE, nullptr))
     {
-        tr_ctorSetPeerLimit(ctor, TR_FORCE, gtr_pref_int_get(TR_KEY_peer_limit_per_torrent));
+        tr_ctorSetPeerLimit(ctor, TR_FORCE, gtr_pref_int_get<size_t>(TR_KEY_peer_limit_per_torrent));
     }
 
-    if (!tr_ctorGetDownloadDir(ctor, TR_FORCE, nullptr))
+    if (!tr_ctorGetDownloadDir(ctor, TR_FORCE).has_value())
     {
-        tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir).c_str());
+        tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir));
     }
 }
 
@@ -823,7 +824,8 @@ void Session::Impl::add_file_async_callback(
     dec_busy();
 }
 
-bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
+// Add `name,` which might be a local filename, a magnet link, or a URI.
+bool Session::Impl::add(Glib::ustring const& name, bool const do_start, bool const do_prompt, bool const do_notify)
 {
     auto* const session = get_session();
     if (session == nullptr)
@@ -837,16 +839,17 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     tr_ctorSetPaused(ctor, TR_FORCE, !do_start);
 
     bool loaded = false;
+    auto file = Gio::File::create_for_parse_name(name);
     if (auto const path = file->get_path(); !std::empty(path))
     {
         // try to treat it as a file...
-        loaded = tr_ctorSetMetainfoFromFile(ctor, path.c_str(), nullptr);
+        loaded = tr_ctorSetMetainfoFromFile(ctor, path);
     }
 
     if (!loaded)
     {
         // try to treat it as a magnet link...
-        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri().c_str(), nullptr);
+        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, name.raw(), nullptr);
     }
 
     // if we could make sense of it, add it
@@ -881,12 +884,11 @@ bool Session::add_from_url(Glib::ustring const& url)
 
 bool Session::Impl::add_from_url(Glib::ustring const& url)
 {
-    auto const file = Gio::File::create_for_uri(url);
     auto const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
     auto const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
     auto const do_notify = false;
 
-    auto const handled = add_file(file, do_start, do_prompt, do_notify);
+    auto const handled = add(url, do_start, do_prompt, do_notify);
     torrents_added();
     return handled;
 }
@@ -900,7 +902,7 @@ void Session::Impl::add_files(std::vector<Glib::RefPtr<Gio::File>> const& files,
 {
     for (auto const& file : files)
     {
-        add_file(file, do_start, do_prompt, do_notify);
+        add(file->get_parse_name(), do_start, do_prompt, do_notify);
     }
 
     torrents_added();
@@ -930,43 +932,14 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
     impl_->remove_torrent(id, delete_files);
 }
 
-void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
+// NOLINTNEXTLINE(readability-make-member-function-const)
+void Session::Impl::remove_torrent(tr_torrent_id_t const id, bool const delete_files)
 {
-    static auto const callback = [](tr_torrent_id_t processed_id, bool succeeded, void* user_data)
-    {
-        // "Own" the core since refcount has already been incremented before operation start — only decrement required.
-        auto const core = Glib::make_refptr_for_instance(static_cast<Session*>(user_data));
-
-        Glib::signal_idle().connect_once([processed_id, succeeded, core]()
-                                         { core->impl_->on_torrent_removal_done(processed_id, succeeded); });
-    };
-
-    if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
-    {
-        // Extend core lifetime, refcount will be decremented in the callback.
-        core_.reference();
-
-        tr_torrentRemove(
-            &torrent->get_underlying(),
-            delete_files,
-            [](char const* filename, void* /*user_data*/, tr_error* error)
-            { return gtr_file_trash_or_remove(filename, error); },
-            nullptr,
-            callback,
-            &core_);
-    }
-}
-
-void Session::Impl::on_torrent_removal_done(tr_torrent_id_t id, bool succeeded)
-{
-    if (!succeeded)
-    {
-        return;
-    }
-
     if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
     {
         get_raw_model()->remove(position);
+
+        tr_torrentRemove(&torrent->get_underlying(), delete_files, gtr_file_trash_or_remove);
     }
 }
 
@@ -979,7 +952,7 @@ void Session::load(bool force_paused)
         tr_ctorSetPaused(ctor, TR_FORCE, true);
     }
 
-    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, gtr_pref_int_get(TR_KEY_peer_limit_per_torrent));
+    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, gtr_pref_int_get<size_t>(TR_KEY_peer_limit_per_torrent));
 
     auto* session = impl_->get_session();
     auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
@@ -991,8 +964,8 @@ void Session::load(bool force_paused)
 
     auto torrents = std::vector<Glib::RefPtr<Torrent>>();
     torrents.reserve(raw_torrents.size());
-    std::transform(raw_torrents.begin(), raw_torrents.end(), std::back_inserter(torrents), &Torrent::create);
-    std::sort(torrents.begin(), torrents.end(), &Torrent::less_by_id);
+    std::ranges::transform(raw_torrents, std::back_inserter(torrents), &Torrent::create);
+    std::ranges::sort(torrents, &Torrent::less_by_id);
 
     auto const model = impl_->get_raw_model();
     model->splice(0, model->get_n_items(), torrents);
@@ -1155,52 +1128,6 @@ void Session::Impl::maybe_inhibit_hibernation()
     set_hibernation_allowed(hibernation_allowed);
 }
 
-/**
-***  Prefs
-**/
-
-void Session::Impl::commit_prefs_change(tr_quark const key)
-{
-    signal_prefs_changed_.emit(key);
-    gtr_pref_save(session_);
-}
-
-void Session::set_pref(tr_quark const key, std::string const& newval)
-{
-    if (newval != gtr_pref_string_get(key))
-    {
-        gtr_pref_string_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, bool newval)
-{
-    if (newval != gtr_pref_flag_get(key))
-    {
-        gtr_pref_flag_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, int newval)
-{
-    if (newval != gtr_pref_int_get(key))
-    {
-        gtr_pref_int_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
-void Session::set_pref(tr_quark const key, double newval)
-{
-    if (std::fabs(newval - gtr_pref_double_get(key)) >= 0.0001)
-    {
-        gtr_pref_double_set(key, newval);
-        impl_->commit_prefs_change(key);
-    }
-}
-
 /***
 ****
 ****  RPC Interface
@@ -1241,7 +1168,7 @@ bool core_read_rpc_response_idle(tr_variant& response)
     return false;
 }
 
-void core_read_rpc_response(tr_session* /*session*/, tr_variant&& response)
+void core_read_rpc_response(tr_variant&& response)
 {
     auto owned_response = std::make_shared<tr_variant>(std::move(response));
     Glib::signal_idle().connect([owned_response]() mutable { return core_read_rpc_response_idle(*owned_response); });
@@ -1249,10 +1176,7 @@ void core_read_rpc_response(tr_session* /*session*/, tr_variant&& response)
 
 } // namespace
 
-void Session::Impl::send_rpc_request(
-    tr_quark const method,
-    tr_variant const& params,
-    std::function<void(tr_variant&)> on_response)
+void Session::Impl::send_rpc_request(tr_quark const method, tr_variant&& params, std::function<void(tr_variant&)>&& on_response)
 {
     if (session_ == nullptr)
     {
@@ -1268,11 +1192,11 @@ void Session::Impl::send_rpc_request(
     // add params if there are any
     if (params.has_value())
     {
-        reqmap.try_emplace(TR_KEY_params, params.clone());
+        reqmap.try_emplace(TR_KEY_params, std::move(params));
     }
 
     // add id if we want a response
-    auto callback = std::function<void(tr_session*, tr_variant&&)>{};
+    auto callback = std::function<void(tr_variant&&)>{};
     if (on_response)
     {
         auto const id = nextId++;
@@ -1376,15 +1300,15 @@ void Session::blocklist_update()
                 gtr_pref_int_set(TR_KEY_blocklist_date, tr_time());
             }
 
-            impl_->signal_blocklist_updated().emit(*n_rules >= 0);
+            impl_->signal_blocklist_updated().emit(n_rules >= 0);
         });
 }
 
 // ---
 
-void Session::exec(tr_quark method, tr_variant const& params)
+void Session::exec(tr_quark method, tr_variant&& params)
 {
-    impl_->send_rpc_request(method, params, {});
+    impl_->send_rpc_request(method, std::move(params), {});
 }
 
 /***
@@ -1416,6 +1340,26 @@ size_t Session::Impl::get_active_torrent_count() const
     return activeCount;
 }
 
+std::vector<tr_torrent*> Session::find_torrents(std::vector<tr_torrent_id_t> const& ids) const
+{
+    auto ret = std::vector<tr_torrent*>{};
+
+    if (auto* const session = impl_->get_session())
+    {
+        ret.reserve(std::size(ids));
+
+        for (auto const& id : ids)
+        {
+            if (auto* const tor = tr_torrentFindFromId(session, id))
+            {
+                ret.emplace_back(tor);
+            }
+        }
+    }
+
+    return ret;
+}
+
 tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
 {
     tr_torrent* tor = nullptr;
@@ -1435,20 +1379,17 @@ FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& Session::favicon_cache() const
 
 void Session::open_folder(tr_torrent_id_t torrent_id) const
 {
-    auto const* tor = find_torrent(torrent_id);
-
-    if (tor != nullptr)
+    if (auto const* tor = find_torrent(torrent_id); tor != nullptr)
     {
-        bool const single = tr_torrentFileCount(tor) == 1;
-        char const* currentDir = tr_torrentGetCurrentDir(tor);
+        std::string_view const current_dir = tr_torrentGetCurrentDir(tor);
 
-        if (single)
+        if (tr_torrentFileCount(tor) == 1)
         {
-            gtr_open_file(currentDir);
+            gtr_open_file(current_dir);
         }
         else
         {
-            gtr_open_file(Glib::build_filename(currentDir, tr_torrentName(tor)));
+            gtr_open_file(current_dir, tr_torrentName(tor));
         }
     }
 }

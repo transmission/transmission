@@ -15,8 +15,13 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 #include <event2/event.h>
+
+#include <gtest/gtest.h>
+
+#include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_base64_decode()
 #include <libtransmission/error.h>
@@ -27,8 +32,6 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
-
 using namespace std::literals;
 
 inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
@@ -37,7 +40,7 @@ inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
     return os;
 }
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using file_func_t = std::function<void(char const* filename)>;
@@ -153,7 +156,7 @@ public:
 
     static std::string createSandbox(std::string const& parent_dir, std::string const& tmpl)
     {
-        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
+        auto path = fmt::format("{:s}/{:s}"sv, tr_sys_path_resolve(parent_dir), tmpl);
         tr_sys_dir_create_temp(std::data(path));
         tr_sys_path_native_separators(std::data(path));
         return path;
@@ -208,13 +211,11 @@ protected:
         return child;
     }
 
-    static void buildParentDir(std::string_view path)
+    static void buildParentDir(std::string_view const path)
     {
         auto const tmperr = errno;
 
-        auto dir = tr_pathbuf{ path };
-        dir.popdir();
-        if (auto const info = tr_sys_path_get_info(path); !info)
+        if (auto const dir = tr_sys_path_dirname(path); !tr_sys_path_exists(dir))
         {
             auto error = tr_error{};
             tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
@@ -338,18 +339,9 @@ private:
         // blocklists
         tr_sys_dir_create(tr_pathbuf{ sandboxDir(), "/blocklists" }, TR_SYS_DIR_CREATE_PARENTS, 0700);
 
-        // fill in any missing settings
-        settings_map->try_emplace(TR_KEY_port_forwarding_enabled, false);
-        settings_map->try_emplace(TR_KEY_dht_enabled, false);
-        settings_map->try_emplace(TR_KEY_message_level, verbose_ ? TR_LOG_DEBUG : TR_LOG_ERROR);
+        applyQuietDefaults(*settings_map);
 
         return tr_sessionInit(sandboxDir(), !verbose_, settings);
-    }
-
-    static void sessionClose(tr_session* session)
-    {
-        tr_sessionClose(session);
-        tr_logFreeQueue(tr_logGetQueue());
     }
 
 protected:
@@ -432,16 +424,21 @@ protected:
                 auto const suffix = std::string_view{ partial ? ".part" : "" };
                 auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
 
-                auto dirname = tr_pathbuf{ filename.sv() };
-                dirname.popdir();
-                tr_sys_dir_create(dirname, TR_SYS_DIR_CREATE_PARENTS, 0700);
+                tr_sys_dir_create(tr_sys_path_dirname(filename), TR_SYS_DIR_CREATE_PARENTS, 0700);
 
                 auto fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
                 auto const file_size = metainfo->file_size(i);
-                for (uint64_t j = 0; j < file_size; ++j)
+                static auto constexpr BlockSize = uint64_t{ 524288U };
+                auto buf = std::vector<char>(BlockSize);
+                for (uint64_t j = 0; j < file_size;)
                 {
-                    auto const ch = partial && j < metainfo->piece_size() ? '\1' : '\0';
-                    tr_sys_file_write(fd, &ch, 1, nullptr);
+                    auto const piece_0_size = metainfo->piece_size(0U);
+                    auto const is_one = partial && j < piece_0_size;
+                    auto const n_write = std::min(BlockSize, (is_one ? piece_0_size : file_size) - j);
+                    auto const ch = is_one ? '\1' : '\0';
+                    std::fill_n(std::begin(buf), n_write, ch);
+                    tr_sys_file_write(fd, std::data(buf), n_write, nullptr);
+                    j += n_write;
                 }
 
                 tr_sys_file_close(fd);
@@ -464,6 +461,18 @@ protected:
 
         auto* const tor = tr_torrentNew(ctor, nullptr);
         EXPECT_NE(nullptr, tor);
+        tr_ctorFree(ctor);
+        return tor;
+    }
+
+    [[nodiscard]] tr_torrent* torrentInitFromFile(std::string_view filename)
+    {
+        auto* const ctor = tr_ctorNew(session_);
+
+        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', filename };
+        EXPECT_TRUE(ctor->set_metainfo_from_file(path));
+
+        auto* const tor = createTorrentAndWaitForVerifyDone(ctor);
         tr_ctorFree(ctor);
         return tor;
     }
@@ -496,6 +505,45 @@ protected:
         return settings_.get();
     }
 
+    // Fills in any missing setting with one that keeps a session quiet and off
+    // the network. Tests that start one of their own want the same treatment.
+    void applyQuietDefaults(tr_variant::Map& settings_map) const
+    {
+        settings_map.try_emplace(TR_KEY_port_forwarding_enabled, false);
+        settings_map.try_emplace(TR_KEY_dht_enabled, false);
+        settings_map.try_emplace(TR_KEY_message_level, verbose_ ? TR_LOG_DEBUG : TR_LOG_ERROR);
+        settings_map.insert_or_assign(TR_KEY_ip_endpoints_ipv4, tr_variant::Vector{});
+        settings_map.insert_or_assign(TR_KEY_ip_endpoints_ipv6, tr_variant::Vector{});
+    }
+
+    // Settings for a test that starts a second session, quieted the same way the
+    // fixture's own session is. Only the settings named here are set, so that
+    // the quiet ones are the ones missing for applyQuietDefaults() to fill in;
+    // tr_sessionInit() supplies the rest. The port is randomized so the two
+    // sessions do not contend for one.
+    [[nodiscard]] tr_variant quietSettings() const
+    {
+        auto settings = tr_variant::make_map();
+        auto* const settings_map = settings.get_if<tr_variant::Map>();
+        settings_map->insert_or_assign(TR_KEY_peer_port_random_on_start, true);
+        applyQuietDefaults(*settings_map);
+        return settings;
+    }
+
+    // Ends the fixture's session, releasing its hold on the config dir.
+    void closeSession()
+    {
+        static auto constexpr DeadlineSecs = 0.1;
+
+        if (session_ != nullptr)
+        {
+            tr_sessionClose(session_, DeadlineSecs);
+            session_ = nullptr;
+        }
+
+        tr_logClearQueue();
+    }
+
     void SetUp() override
     {
         SandboxedTest::SetUp();
@@ -505,8 +553,7 @@ protected:
 
     void TearDown() override
     {
-        sessionClose(session_);
-        session_ = nullptr;
+        closeSession();
         settings_.reset();
 
         SandboxedTest::TearDown();
@@ -518,4 +565,4 @@ private:
     std::vector<tr_torrent*> verified_;
 };
 
-} // namespace libtransmission::test
+} // namespace tr::test

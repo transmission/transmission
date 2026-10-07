@@ -7,8 +7,6 @@
 #include <optional>
 #include <utility>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/api-compat.h"
 #include "libtransmission/file.h"
 #include "libtransmission/quark.h"
@@ -19,7 +17,7 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
-using namespace libtransmission;
+using namespace tr;
 
 namespace
 {
@@ -66,10 +64,23 @@ void tr_stats::save() const
     tr_variant_serde::json().to_file(var, tr_pathbuf{ config_dir_, "/stats.json"sv });
 }
 
+void tr_stats::save_if_dirty()
+{
+    if (!is_dirty_)
+    {
+        return;
+    }
+
+    save();
+
+    is_dirty_ = false;
+}
+
 void tr_stats::clear()
 {
     single_ = old_ = Zero;
     start_time_ = tr_time();
+    is_dirty_ = true;
 }
 
 [[nodiscard]] tr_session_stats tr_stats::current() const

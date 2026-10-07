@@ -12,7 +12,7 @@
 
 struct event_base;
 
-namespace libtransmission
+namespace tr
 {
 
 class TimerMaker;
@@ -50,13 +50,13 @@ public:
     [[nodiscard]] static std::unique_ptr<Watchdir> create(
         std::string_view dirname,
         Callback callback,
-        libtransmission::TimerMaker& timer_maker,
+        tr::TimerMaker& timer_maker,
         struct event_base* evbase);
 
     [[nodiscard]] static std::unique_ptr<Watchdir> create_generic(
         std::string_view dirname,
         Callback callback,
-        libtransmission::TimerMaker& timer_maker,
+        tr::TimerMaker& timer_maker,
         std::chrono::milliseconds rescan_interval = generic_rescan_interval_);
 
 private:
@@ -64,4 +64,4 @@ private:
     static inline auto generic_rescan_interval_ = std::chrono::milliseconds{ 1000 };
 };
 
-} // namespace libtransmission
+} // namespace tr

@@ -21,7 +21,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
+namespace tr
 {
 namespace
 {
@@ -66,7 +66,7 @@ namespace impl
 
 void BaseWatchdir::processFile(std::string_view basename)
 {
-    if (!isRegularFile(dirname_, basename) || handled_.count(basename) != 0)
+    if (!isRegularFile(dirname_, basename) || handled_.contains(basename))
     {
         return;
     }
@@ -125,4 +125,4 @@ void BaseWatchdir::scan()
 }
 
 } // namespace impl
-} // namespace libtransmission
+} // namespace tr

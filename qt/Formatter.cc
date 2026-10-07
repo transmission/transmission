@@ -10,7 +10,7 @@
 #include <algorithm>
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 QString Formatter::memory_to_string(int64_t const bytes)
 {

@@ -20,7 +20,7 @@
 
 #include "test-fixtures.h"
 
-using WebUtilsTest = ::libtransmission::test::TransmissionTest;
+using WebUtilsTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(WebUtilsTest, urlParse)
@@ -68,6 +68,26 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("key=val&foo=bar"sv, parsed->query);
     EXPECT_EQ("fragment"sv, parsed->fragment);
     EXPECT_EQ(8080, parsed->port);
+
+    url = "http://www.some-tracker.org:invalid/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
+
+    url = "http://www.some-tracker.org:/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
+
+    url = "http://www.some-tracker.org:0/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
+
+    url = "http://www.some-tracker.org:-1/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
+
+    url = "http://www.some-tracker.org:65536/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_FALSE(parsed);
 
     url =
         "magnet:"
@@ -146,6 +166,22 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d"sv, parsed->host);
     EXPECT_EQ("/announce"sv, parsed->path);
     EXPECT_EQ(80, parsed->port);
+
+    // the same link, with and without an empty authority
+    for (auto const& magnet :
+         { "magnet:?xt=urn:btih:1&dn=A B"sv, "magnet://?xt=urn:btih:1&dn=A B"sv, "magnet:///?xt=urn:btih:1&dn=A B"sv })
+    {
+        parsed = tr_urlParse(magnet);
+        ASSERT_TRUE(parsed) << magnet;
+        EXPECT_EQ("magnet"sv, parsed->scheme) << magnet;
+        EXPECT_EQ("xt=urn:btih:1&dn=A B"sv, parsed->query) << magnet;
+    }
+
+    // a bare scheme carries no query
+    parsed = tr_urlParse("magnet:"sv);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("magnet"sv, parsed->scheme);
+    EXPECT_EQ(""sv, parsed->query);
 }
 
 TEST_F(WebUtilsTest, urlParseFuzz)
@@ -160,13 +196,15 @@ TEST_F(WebUtilsTest, urlParseFuzz)
     }
 }
 
-TEST_F(WebUtilsTest, urlNextQueryPair)
+TEST_F(WebUtilsTest, urlQueryEntries)
 {
-    auto constexpr Query = "a=1&b=two&c=si&d_has_no_val&e=&f&g=gee"sv;
-    auto const query_view = tr_url_query_view{ Query };
-    auto const end = std::end(query_view);
+    auto parsed = tr_url_parsed_t{};
+    parsed.query = "a=1&b=two&c=si&d_has_no_val&e=&f&g=gee"sv;
 
-    auto it = std::begin(query_view);
+    auto const keyvals = parsed.query_entries();
+    auto const end = std::cend(keyvals);
+
+    auto it = std::cbegin(keyvals);
     EXPECT_NE(end, it);
     EXPECT_EQ("a"sv, it->first);
     EXPECT_EQ("1"sv, it->second);
@@ -243,5 +281,28 @@ TEST_F(WebUtilsTest, urlPercentDecode)
     for (auto const& [encoded, decoded] : Tests)
     {
         EXPECT_EQ(decoded, tr_urlPercentDecode(encoded));
+    }
+}
+
+TEST_F(WebUtilsTest, urlPercentEncode)
+{
+    static auto constexpr Tests = std::array<std::tuple<std::string_view, std::string_view, bool>, 10U>{ {
+        { "192.168.202.101"sv, "192.168.202.101"sv, true },
+        { "8.8.8.8"sv, "8.8.8.8"sv, true },
+        { "[2001:0:0eab:dead::a0:abcd:4e]"sv, "%5B2001%3A0%3A0eab%3Adead%3A%3Aa0%3Aabcd%3A4e%5D"sv, true },
+        { "你好"sv, "%E4%BD%A0%E5%A5%BD"sv, true },
+        { "Letöltések"sv, "Let%C3%B6lt%C3%A9sek"sv, true },
+        { "Дыскаграфія"sv, "%D0%94%D1%8B%D1%81%D0%BA%D0%B0%D0%B3%D1%80%D0%B0%D1%84%D1%96%D1%8F"sv, true },
+        { "https://example.com/Letöltések"sv, "https://example.com/Let%C3%B6lt%C3%A9sek"sv, false },
+        { "https://example.com/Let%C3%B6lt%C3%A9sek"sv, "https://example.com/Let%C3%B6lt%C3%A9sek"sv, false },
+        { "udp://你好.com/announce"sv, "udp://%E4%BD%A0%E5%A5%BD.com/announce"sv, false },
+        { "udp://%E4%BD%A0%E5%A5%BD.com/announce"sv, "udp://%E4%BD%A0%E5%A5%BD.com/announce"sv, false },
+    } };
+
+    for (auto const& [decoded, encoded, escape_reserved] : Tests)
+    {
+        auto buf = tr_urlbuf{};
+        tr_urlPercentEncode(std::back_inserter(buf), decoded, escape_reserved);
+        EXPECT_EQ(encoded, buf);
     }
 }

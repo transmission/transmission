@@ -17,7 +17,8 @@ class RelocateDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    RelocateDialog(Session&, TorrentModel const&, torrent_ids_t ids, QWidget* parent = nullptr);
+    RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids, QWidget* parent = nullptr);
+    ~RelocateDialog() override = default;
     RelocateDialog(RelocateDialog&&) = delete;
     RelocateDialog(RelocateDialog const&) = delete;
     RelocateDialog& operator=(RelocateDialog&&) = delete;
@@ -25,7 +26,7 @@ public:
 
 private slots:
     void onSetLocation();
-    void onMoveToggled(bool) const;
+    void onMoveToggled(bool b) const;
 
 private:
     QString newLocation() const;

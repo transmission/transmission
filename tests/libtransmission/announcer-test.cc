@@ -17,7 +17,7 @@
 
 #include "test-fixtures.h"
 
-using AnnouncerTest = ::libtransmission::test::TransmissionTest;
+using AnnouncerTest = ::tr::test::TransmissionTest;
 
 using namespace std::literals;
 

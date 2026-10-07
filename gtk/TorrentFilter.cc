@@ -11,7 +11,9 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 
+#include <algorithm>
 #include <array>
+#include <ranges>
 #include <utility>
 
 TorrentFilter::TorrentFilter()
@@ -142,11 +144,8 @@ void TorrentFilter::update(Torrent::ChangeFlags changes)
             { ShowMode::ShowVerifying, Flag::ACTIVITY },
         } };
 
-        auto const iter = std::find_if(
-            std::begin(ShowModeFlags),
-            std::end(ShowModeFlags),
-            [key = show_mode_](auto const& row) { return row.first == key; });
-        refilter_needed = iter != std::end(ShowModeFlags) && changes.test(iter->second);
+        auto const iter = std::ranges::find_if(ShowModeFlags, [key = show_mode_](auto const& row) { return row.first == key; });
+        refilter_needed = iter != std::ranges::end(ShowModeFlags) && changes.test(iter->second);
     }
 
     if (!refilter_needed)
@@ -171,11 +170,11 @@ Glib::RefPtr<TorrentFilter> TorrentFilter::create()
     return Glib::make_refptr_for_instance(new TorrentFilter());
 }
 
-bool TorrentFilter::match_mode(Torrent const& torrent, ShowMode const type)
+bool TorrentFilter::match_mode(Torrent const& torrent, ShowMode const mode)
 {
     auto activity = tr_torrent_activity();
 
-    switch (type)
+    switch (mode)
     {
     case ShowMode::ShowAll:
         return true;
@@ -202,7 +201,7 @@ bool TorrentFilter::match_mode(Torrent const& torrent, ShowMode const type)
         return activity == TR_STATUS_CHECK || activity == TR_STATUS_CHECK_WAIT;
 
     case ShowMode::ShowError:
-        return torrent.get_error_code() != 0;
+        return torrent.get_error_code() != tr_stat::Error::Ok;
     }
 
     g_assert_not_reached();

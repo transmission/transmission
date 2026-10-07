@@ -9,16 +9,16 @@
 "26.title" = "KB/sn";
 
 /* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
-"43.title" = "Karşıya Yüklemeyi Sınırla:";
+"43.title" = "Karşıya yüklemeyi sınırla:";
 
 /* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
-"44.title" = "İndirmeyi Sınırla:";
+"44.title" = "İndirmeyi sınırla:";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
 "98.title" = "dakika";
 
 /* Class = "NSButtonCell"; title = "Status of selected files"; ObjectID = "114"; */
-"114.title" = "Seçili dosyaların durumu";
+"114.title" = "Seçili dosyaların durumunu görüntüle";
 
 /* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "116"; */
 "116.title" = "Şu oranda beslemeyi durdur:";

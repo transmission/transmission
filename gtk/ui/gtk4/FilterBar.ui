@@ -5,7 +5,7 @@
     <property name="spacing">3</property>
     <child>
       <object class="GtkLabel" id="show_label">
-        <property name="label" translatable="1">_Show:</property>
+        <property name="label" translatable="yes">_Show:</property>
         <property name="use-underline">1</property>
         <property name="mnemonic-widget">show_mode_combo</property>
       </object>

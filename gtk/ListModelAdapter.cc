@@ -66,7 +66,7 @@ ListModelAdapter::TrTreeModelFlags ListModelAdapter::get_flags_vfunc() const
 
 int ListModelAdapter::get_n_columns_vfunc() const
 {
-    return columns_.size();
+    return static_cast<int>(columns_.size());
 }
 
 GType ListModelAdapter::get_column_type_vfunc(int index) const
@@ -152,7 +152,7 @@ bool ListModelAdapter::iter_has_child_vfunc(const_iterator const& /*iter*/) cons
 
 int ListModelAdapter::iter_n_root_children_vfunc() const
 {
-    return items_.size();
+    return static_cast<int>(items_.size());
 }
 
 Gtk::TreeModel::Path ListModelAdapter::get_path_vfunc(const_iterator const& iter) const
@@ -165,7 +165,7 @@ Gtk::TreeModel::Path ListModelAdapter::get_path_vfunc(const_iterator const& iter
 
         if (auto const position = find_item_position_by_id(iter_get_item_id(iter)); position.has_value())
         {
-            path.push_back(position.value());
+            path.push_back(static_cast<int>(position.value()));
         }
     }
 
@@ -234,7 +234,7 @@ void ListModelAdapter::on_adaptee_items_changed(guint position, guint removed, g
         adjust_item_positions(removed_position, PositionAdjustment::DECREMENT);
 
         auto path = Path();
-        path.push_back(removed_position);
+        path.push_back(static_cast<int>(removed_position));
 
         row_deleted(path);
     }
@@ -255,7 +255,7 @@ void ListModelAdapter::on_adaptee_items_changed(guint position, guint removed, g
         item_positions_.emplace(info.id, added_position);
 
         auto path = Path();
-        path.push_back(added_position);
+        path.push_back(static_cast<int>(added_position));
 
         auto iter = iterator(this);
         iter_set_stamp(iter, stamp_);
@@ -274,7 +274,7 @@ void ListModelAdapter::on_adaptee_item_changed(Glib::RefPtr<Glib::ObjectBase con
     if (auto const position = find_item_position_by_id(item_id); position.has_value())
     {
         auto path = Path();
-        path.push_back(position.value());
+        path.push_back(static_cast<int>(position.value()));
 
         auto iter = iterator(this);
         iter_set_stamp(iter, stamp_);

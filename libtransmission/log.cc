@@ -7,6 +7,7 @@
 #include <cerrno>
 #include <chrono>
 #include <cstddef> // size_t
+#include <deque>
 #include <iterator> // back_insert_iterator, empty
 #include <mutex>
 #include <optional>
@@ -29,14 +30,18 @@
 
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
 
 namespace
 {
+inline constexpr auto MaxQueueLength = 10000U;
+
+template<typename T>
+inline constexpr bool HasTmGmtoffV = requires(T t) { t.tm_gmtoff; };
 
 class tr_log_state
 {
@@ -50,11 +55,7 @@ public:
 
     bool queue_enabled_ = false;
 
-    tr_log_message* queue_ = nullptr;
-
-    tr_log_message** queue_tail_ = &queue_;
-
-    size_t queue_length_ = 0;
+    tr_log_messages queue_;
 
     std::recursive_mutex message_mutex_;
 };
@@ -113,26 +114,17 @@ void logAddImpl(
 
     if (log_state.queue_enabled_)
     {
-        auto* const newmsg = new tr_log_message{};
-        newmsg->level = level;
-        newmsg->when = std::chrono::system_clock::now();
-        newmsg->message = std::move(msg);
-        newmsg->file = file;
-        newmsg->line = line;
-        newmsg->name = name;
+        auto& newmsg = log_state.queue_.emplace_back();
+        newmsg.level = level;
+        newmsg.when = std::chrono::system_clock::now();
+        newmsg.message = std::move(msg);
+        newmsg.file = file;
+        newmsg.line = line;
+        newmsg.name = name;
 
-        *log_state.queue_tail_ = newmsg;
-        log_state.queue_tail_ = &newmsg->next;
-        ++log_state.queue_length_;
-
-        if (log_state.queue_length_ > TrLogMaxQueueLength)
+        if (std::size(log_state.queue_) > MaxQueueLength)
         {
-            tr_log_message* old = log_state.queue_;
-            log_state.queue_ = old->next;
-            old->next = nullptr;
-            tr_logFreeQueue(old);
-            --log_state.queue_length_;
-            TR_ASSERT(log_state.queue_length_ == TrLogMaxQueueLength);
+            log_state.queue_.pop_front();
         }
     }
     else
@@ -174,26 +166,16 @@ void tr_logSetQueueEnabled(bool is_enabled)
     log_state.queue_enabled_ = is_enabled;
 }
 
-tr_log_message* tr_logGetQueue()
+tr_log_messages tr_logGetQueue()
 {
     auto const lock = log_state.unique_lock();
 
-    auto* const ret = log_state.queue_;
-    log_state.queue_ = nullptr;
-    log_state.queue_tail_ = &log_state.queue_;
-    log_state.queue_length_ = 0;
-
-    return ret;
+    return std::exchange(log_state.queue_, {});
 }
 
-void tr_logFreeQueue(tr_log_message* freeme)
+void tr_logClearQueue()
 {
-    while (freeme != nullptr)
-    {
-        auto* const next = freeme->next;
-        delete freeme;
-        freeme = next;
-    }
+    (void)tr_logGetQueue();
 }
 
 // ---
@@ -203,13 +185,9 @@ std::string_view tr_logGetTimeStr(std::chrono::system_clock::time_point const no
     auto* walk = buf;
     auto const now_time_t = std::chrono::system_clock::to_time_t(now);
     auto const now_tm = *std::localtime(&now_time_t);
-    walk = fmt::format_to_n(
-               walk,
-               buflen,
-               "{0:%FT%R:}{1:%S}" TR_IF_WIN32("", "{0:%z}"),
-               now_tm,
-               std::chrono::time_point_cast<std::chrono::milliseconds>(now))
-               .out;
+    static bool constexpr HasTmGmtoff = HasTmGmtoffV<std::tm>;
+    static auto constexpr Fmt = HasTmGmtoff ? "{0:%FT%R:}{1:%S}{0:%z}"sv : "{0:%FT%R:}{1:%S}"sv;
+    walk = fmt::format_to_n(walk, buflen, Fmt, now_tm, std::chrono::time_point_cast<std::chrono::milliseconds>(now)).out;
 #ifdef _WIN32
     if (auto tz_info = TIME_ZONE_INFORMATION{}; GetTimeZoneInformation(&tz_info) != TIME_ZONE_ID_INVALID)
     {

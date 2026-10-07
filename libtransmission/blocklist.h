@@ -18,11 +18,12 @@
 #include <utility> // for std::pair
 #include <vector>
 
-#include "libtransmission/tr-macros.h" // for TR_CONSTEXPR20
-#include "libtransmission/net.h" // for tr_address
-#include "libtransmission/observable.h"
+#include <sigslot/signal.hpp>
 
-namespace libtransmission
+#include "libtransmission/net.h" // for tr_address
+#include "libtransmission/tr-assert.h"
+
+namespace tr
 {
 
 class Blocklists
@@ -32,34 +33,33 @@ public:
 
     [[nodiscard]] bool contains(tr_address const& addr) const noexcept
     {
-        return std::any_of(
-            std::begin(blocklists_),
-            std::end(blocklists_),
+        return std::ranges::any_of(
+            blocklists_,
             [&addr](auto const& blocklist) { return blocklist.enabled() && blocklist.contains(addr); });
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto num_lists() const noexcept
+    [[nodiscard]] constexpr auto num_lists() const noexcept
     {
         return std::size(blocklists_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto num_rules() const noexcept
+    [[nodiscard]] constexpr auto num_rules() const noexcept
     {
         return std::accumulate(
             std::begin(blocklists_),
             std::end(blocklists_),
             size_t{},
-            [](int sum, auto& cur) { return sum + std::size(cur); });
+            [](auto sum, auto& cur) { return sum + std::size(cur); });
     }
 
     void load(std::string_view folder, bool is_enabled);
     void set_enabled(bool is_enabled);
-    size_t update_primary_blocklist(std::string_view external_file, bool is_enabled);
+    std::optional<size_t> update_primary_blocklist(std::string_view external_file, bool is_enabled);
 
     template<typename Observer>
-    [[nodiscard]] auto observe_changes(Observer observer)
+    [[nodiscard]] sigslot::scoped_connection observe_changes(Observer observer) const
     {
-        return changed_.observe(std::move(observer));
+        return changed_.connect_scoped(std::move(observer));
     }
 
 private:
@@ -81,8 +81,8 @@ private:
         [[nodiscard]] size_t size() const
         {
             ensureLoaded();
-
-            return std::size(rules_);
+            TR_ASSERT(rules_);
+            return rules_ ? std::size(*rules_) : 0U;
         }
 
         [[nodiscard]] constexpr bool enabled() const noexcept
@@ -103,7 +103,7 @@ private:
     private:
         void ensureLoaded() const;
 
-        mutable std::vector<std::pair<tr_address, tr_address>> rules_;
+        mutable std::optional<std::vector<std::pair<tr_address, tr_address>>> rules_;
 
         std::string bin_file_;
         bool is_enabled_ = false;
@@ -113,8 +113,8 @@ private:
 
     std::string folder_;
 
-    libtransmission::SimpleObservable<> changed_;
+    mutable sigslot::signal<> changed_;
 
     [[nodiscard]] static std::vector<Blocklist> load_folder(std::string_view folder, bool is_enabled);
 };
-} // namespace libtransmission
+} // namespace tr

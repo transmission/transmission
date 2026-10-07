@@ -129,7 +129,9 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
         {
             if (!self.fDestination)
             {
-                [self performSelectorOnMainThread:@selector(cancelAdd:) withObject:nil waitUntilDone:NO];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self cancelAdd:nil];
+                });
             }
         }
     }];
@@ -159,7 +161,9 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
             if (returnCode == NSAlertSecondButtonReturn)
             {
-                [self performSelectorOnMainThread:@selector(confirmAdd) withObject:nil waitUntilDone:NO];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self confirmAdd];
+                });
             }
         }];
     }

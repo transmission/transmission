@@ -22,7 +22,8 @@ class FileTreeView : public QTreeView
     Q_OBJECT
 
 public:
-    FileTreeView(QWidget* parent = nullptr, bool editable = true);
+    explicit FileTreeView(QWidget* parent = nullptr, bool editable = true);
+    ~FileTreeView() override = default;
     FileTreeView(FileTreeView&&) = delete;
     FileTreeView(FileTreeView const&) = delete;
     FileTreeView& operator=(FileTreeView&&) = delete;

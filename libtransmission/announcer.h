@@ -24,8 +24,6 @@
 #include <sys/socket.h> // socklen_t
 #endif
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/interned-string.h"
 #include "libtransmission/peer-mgr.h"
 
@@ -82,8 +80,6 @@ public:
 
     virtual void upkeep() = 0;
 };
-
-std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
 
 // --- For torrent customers
 
@@ -143,6 +139,11 @@ public:
         virtual ~Mediator() noexcept = default;
         virtual void sendto(void const* buf, size_t buflen, sockaddr const* addr, socklen_t addrlen) = 0;
         [[nodiscard]] virtual std::optional<tr_address> announce_ip() const = 0;
+        [[nodiscard]] virtual std::optional<tr_socket_address> dns_lookup(
+            tr_address_type ip_protocol,
+            std::string_view name,
+            uint16_t service,
+            std::string_view log_name) const;
     };
 
     virtual ~tr_announcer_udp() noexcept = default;

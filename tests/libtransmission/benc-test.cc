@@ -13,7 +13,7 @@
 
 #include "test-fixtures.h"
 
-using BencTest = ::libtransmission::test::TransmissionTest;
+using BencTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(BencTest, MalformedBenc)
@@ -22,12 +22,12 @@ TEST_F(BencTest, MalformedBenc)
     auto constexpr Benc =
         "d14:failure reason119:The tracker was unable to process your request. It may be down, overloaded, under attack or it just does not like you.12:min intervali1800e8:intervali1800e5:peers0:ee\n"sv;
     auto constexpr MaxBencDepth = 8;
-    using TestHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+    using TestHandler = tr::benc::BasicHandler<MaxBencDepth>;
 
-    auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
+    auto stack = tr::benc::ParserStack<MaxBencDepth>{};
     auto handler = TestHandler{};
     auto error = tr_error{};
-    EXPECT_FALSE(transmission::benc::parse(Benc, stack, handler, nullptr, &error));
+    EXPECT_FALSE(tr::benc::parse(Benc, stack, handler, nullptr, &error));
     EXPECT_TRUE(error);
     EXPECT_NE(""sv, error.message());
 }
@@ -47,9 +47,9 @@ TEST_F(BencTest, ContextTokenIsCorrect)
     // clang-format on
 
     auto constexpr MaxBencDepth = 32;
-    struct ContextHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
+    struct ContextHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     {
-        using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+        using BasicHandler = tr::benc::BasicHandler<MaxBencDepth>;
 
         bool StartArray(Context const& context) override
         {
@@ -92,9 +92,9 @@ TEST_F(BencTest, ContextTokenIsCorrect)
         }
     };
 
-    auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
+    auto stack = tr::benc::ParserStack<MaxBencDepth>{};
     auto handler = ContextHandler{};
     auto error = tr_error{};
-    transmission::benc::parse(Benc, stack, handler, nullptr, &error);
+    tr::benc::parse(Benc, stack, handler, nullptr, &error);
     EXPECT_FALSE(error);
 }

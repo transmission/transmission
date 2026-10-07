@@ -10,7 +10,7 @@
 #include <memory>
 #include <utility>
 
-namespace libtransmission
+namespace tr
 {
 
 class Timer
@@ -79,4 +79,4 @@ public:
     }
 };
 
-} // namespace libtransmission
+} // namespace tr

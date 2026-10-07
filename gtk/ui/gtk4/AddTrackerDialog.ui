@@ -17,7 +17,7 @@
               <object class="GtkFrame">
                 <child type="label">
                   <object class="GtkLabel" id="url_section_label">
-                    <property name="label" translatable="1">Tracker</property>
+                    <property name="label" translatable="yes">Tracker</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
                     </attributes>
@@ -29,7 +29,7 @@
                     <property name="column-spacing">12</property>
                     <child>
                       <object class="GtkLabel" id="url_label">
-                        <property name="label" translatable="1">_Announce URL:</property>
+                        <property name="label" translatable="yes">_Announce URL:</property>
                         <property name="use-underline">1</property>
                         <property name="mnemonic-widget">url_entry</property>
                         <layout>
@@ -64,7 +64,7 @@
         <property name="spacing">6</property>
         <child>
           <object class="GtkButton" id="cancel_button">
-            <property name="label" translatable="1">_Cancel</property>
+            <property name="label" translatable="yes">_Cancel</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
@@ -72,7 +72,7 @@
         </child>
         <child>
           <object class="GtkButton" id="open_button">
-            <property name="label" translatable="1">_Add</property>
+            <property name="label" translatable="yes">_Add</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>

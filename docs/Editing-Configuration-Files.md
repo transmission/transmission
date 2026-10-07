@@ -89,7 +89,9 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **cache_size_mib:** Number (default = 4), in MiB, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes. The value is the total available to the Transmission instance. Set it to the smallest value tolerable by the random access performance of your storage medium to minimize data loss in case Transmission quit unexpectedly. Setting this to 0 bypasses the cache, which may be useful if your filesystem already has a cache layer that aggregates transactions. Pieces are guaranteed to be written to filesystem if sequential download is enabled. Otherwise, data might still be in cache only.
  * **default_trackers:** String (default = "") A list of double-newline separated tracker announce URLs. These are used for all torrents in addition to the per torrent trackers specified in the torrent file. If a tracker is only meant to be a backup, it should be separated from its main tracker by a single newline character. If a tracker should be used additionally to another tracker it should be separated by two newlines. (e.g. "udp://tracker.example.invalid:1337/announce\n\nudp://tracker.another-example.invalid:6969/announce\nhttps://backup-tracker.another-example.invalid:443/announce\n\nudp://tracker.yet-another-example.invalid:1337/announce", in this case tracker.example.invalid, tracker.another-example.invalid and tracker.yet-another-example.invalid would be used as trackers and backup-tracker.another-example.invalid as backup in case tracker.another-example.invalid is unreachable.
  * **dht_enabled:** Boolean (default = true) Enable [Distributed Hash Table (DHT)](https://wiki.theory.org/BitTorrentSpecification#Distributed_Hash_Table).
- * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
+ * **encryption:** String ("allowed" = Prefer unencrypted connections, "preferred" = Prefer encrypted connections, "required" = Require encrypted connections; default = "preferred") [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
+ * **ip_endpoints_ipv4** String[] (default = ["https://ip4.transmissionbt.com/"]) A list of IP query endpoints to be tried in order, and the first valid result will be cached as the client's global IPv4 address. Specifying an empty array disables IP query for IPv4, but Transmission might not be able to announce your IPv4 address via legacy BEP-7 `&ipv4=` query parameter.
+ * **ip_endpoints_ipv6** String[] (default = ["https://ip6.transmissionbt.com/"]) Same as `ip_endpoints_ipv4`, but for IPv6.
  * **lpd_enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](https://en.wikipedia.org/wiki/Local_Peer_Discovery).
  * **message_level:** Number (0 = None, 1 = Critical, 2 = Error, 3 = Warn, 4 = Info, 5 = Debug, 6 = Trace; default = 4) Set verbosity of Transmission's log messages.
  * **pex_enabled:** Boolean (default = true) Enable [Peer Exchange (PEX)](https://en.wikipedia.org/wiki/Peer_exchange).
@@ -117,7 +119,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **peer_congestion_algorithm:** String. This is documented on https://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
  * **peer_limit_global:** Number (default = 200)
  * **peer_limit_per_torrent:** Number (default = 50)
- * **peer_socket_diffserv:** String (default = "le") Set the [DiffServ](https://en.wikipedia.org/wiki/Differentiated_services) parameter for outgoing packets. Allowed values are lowercase DSCP names. See the `tr_diffserv_t` class from `libtransmission/net.h` for the exact list of possible values.
+ * **peer_socket_diffserv:** String (default = "le") Set the [DiffServ](https://en.wikipedia.org/wiki/Differentiated_services) parameter for outgoing packets. Allowed values are lowercase DSCP names. See the `tr_diffserv_t` class from `libtransmission/types.h` for the exact list of possible values.
  * **reqq:** Number (default = 2000) The number of outstanding block requests a peer is allowed to queue in the client. The higher this number, the higher the max possible upload speed towards each peer.
  * **sequential_download** Boolean (default = false) Enable sequential download by default when adding torrents.
 
@@ -172,8 +174,8 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
      * **All Days**: 127 (binary: `1111111`)
  * **idle_seeding_limit:** Number (default = 30) Stop seeding after being idle for _N_ minutes.
  * **idle_seeding_limit_enabled:** Boolean (default = false)
- * **ratio_limit:** Number (default = 2.0)
- * **ratio_limit_enabled:**  Boolean (default = false)
+ * **seed_ratio_limit:** Number (default = 2.0)
+ * **seed_ratio_limited:**  Boolean (default = false)
 
 ### Legacy Options
 Only keys that differ from above are listed here. These options have been replaced in newer versions of Transmission.

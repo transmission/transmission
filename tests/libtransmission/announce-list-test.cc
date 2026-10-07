@@ -13,17 +13,19 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/announce-list.h>
 #include <libtransmission/error.h>
+#include <libtransmission/file-utils.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 
-using AnnounceListTest = ::libtransmission::test::TransmissionTest;
+using AnnounceListTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
 TEST_F(AnnounceListTest, canAdd)
@@ -338,9 +340,9 @@ TEST_F(AnnounceListTest, announceToScrape)
     };
 
     auto constexpr Tests = std::array<ScrapeTest, 3>{ {
-        { "https://www.example.com/announce"sv, "https://www.example.com/scrape"sv },
-        { "https://www.example.com/foo"sv, ""sv },
-        { "udp://www.example.com:999/"sv, "udp://www.example.com:999/"sv },
+        { .announce = "https://www.example.com/announce"sv, .expected_scrape = "https://www.example.com/scrape"sv },
+        { .announce = "https://www.example.com/foo"sv, .expected_scrape = ""sv },
+        { .announce = "udp://www.example.com:999/"sv, .expected_scrape = "udp://www.example.com:999/"sv },
     } };
 
     for (auto const& test : Tests)
@@ -362,7 +364,7 @@ TEST_F(AnnounceListTest, save)
     // first, set up a scratch torrent
     auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
     auto original_content = std::vector<char>{};
-    auto const sandbox = libtransmission::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const sandbox = tr::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     auto const test_file = tr_pathbuf{ sandbox, "transmission-announce-list-test.torrent"sv };
     auto error = tr_error{};
     EXPECT_TRUE(tr_file_read(OriginalFile, original_content, &error));

@@ -1,0 +1,39 @@
+name: Setup Win32 Visual Studio environment
+inputs:
+  arch:
+    description: Architecture (x86, x64, arm64)
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Detect vcvarsall
+      shell: pwsh
+      run: |
+        $Arch = '${{ inputs.arch }}'
+        if (@('x86', 'x64', 'arm64') -notcontains $Arch) {
+          throw "Unsupported architecture for vcvarsall: $Arch"
+        }
+
+        $RequiredComponent = if ($Arch -eq 'arm64') {
+          'Microsoft.VisualStudio.Component.VC.Tools.ARM64'
+        } else {
+          'Microsoft.VisualStudio.Component.VC.Tools.x86.x64'
+        }
+
+        $VsWherePath = Join-Path ${Env:ProgramFiles(x86)} 'Microsoft Visual Studio' Installer vswhere.exe
+        if (-not (Test-Path $VsWherePath)) {
+          throw "vswhere.exe was not found at expected path: $VsWherePath"
+        }
+
+        $VsInstallPath = & $VsWherePath -latest -products * -requires $RequiredComponent -property installationPath
+        if (-not $VsInstallPath) {
+          throw "No Visual Studio instance with component '$RequiredComponent' was found by vswhere."
+        }
+
+        $VcVarsAll = Join-Path $VsInstallPath 'VC\Auxiliary\Build\vcvarsall.bat'
+        if (-not (Test-Path $VcVarsAll)) {
+          throw "vcvarsall.bat was not found at expected path: $VcVarsAll"
+        }
+
+        "VCVARSALL=$VcVarsAll" | Out-File $Env:GITHUB_ENV -Append
+        "VC_ARCH=$Arch" | Out-File $Env:GITHUB_ENV -Append

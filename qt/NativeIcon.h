@@ -12,7 +12,7 @@
 namespace icons
 {
 
-enum class Type
+enum class Type : uint8_t
 {
     AddTracker,
     EditTrackers,
@@ -60,6 +60,7 @@ enum class Type
     TorrentStateSeeding,
     TorrentStateDownloading,
     TorrentStatePaused,
+    TorrentStateFinished,
     TorrentStateVerifying,
     TorrentStateError
 };

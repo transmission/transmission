@@ -12,6 +12,8 @@
 #include <vector>
 
 #include "libtransmission/quark.h"
+#include "libtransmission/string-utils.h"
+#include "libtransmission/tr-assert.h"
 
 using namespace std::literals;
 
@@ -142,6 +144,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "downloadLimit"sv, // rpc
     "downloadLimited"sv, // rpc
     "downloadSpeed"sv, // rpc
+    "download_bytes_per_second"sv, // rpc
     "download_count"sv, // rpc
     "download_dir"sv, // daemon, gtk app, rpc, tr_session::Settings
     "download_dir_free_space"sv, // rpc
@@ -208,6 +211,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "fromTracker"sv, // rpc
     "from_cache"sv, // rpc
     "from_dht"sv, // rpc
+    "from_holepunch"sv, // rpc
     "from_incoming"sv, // rpc
     "from_lpd"sv, // rpc
     "from_ltep"sv, // rpc
@@ -250,6 +254,8 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "info"sv, // .torrent
     "inhibit-desktop-hibernation"sv, // gtk app, qt app
     "inhibit_desktop_hibernation"sv, // gtk app, qt app
+    "ip_endpoints_ipv4"sv, // tr_session::Settings
+    "ip_endpoints_ipv6"sv, // tr_session::Settings
     "ip_protocol"sv, // rpc
     "ipv4"sv, // BEP0010; BT protocol, rpc
     "ipv6"sv, // BEP0010; BT protocol, rpc
@@ -263,6 +269,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "isUTP"sv, // rpc
     "isUploadingTo"sv, // rpc
     "is_backup"sv, // rpc
+    "is_downloading"sv, // rpc
     "is_downloading_from"sv, // rpc
     "is_encrypted"sv, // rpc
     "is_finished"sv, // rpc
@@ -449,11 +456,11 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "rate_to_client"sv, // rpc
     "rate_to_peer"sv, // rpc
     "rate_upload"sv, // rpc
-    "ratio-limit"sv, // .resume, daemon, gtk app, tr_session::Settings
-    "ratio-limit-enabled"sv, // daemon, tr_session::Settings
+    "ratio-limit"sv, // APICOMPAT
+    "ratio-limit-enabled"sv, // APICOMPAT
     "ratio-mode"sv, // .resume
-    "ratio_limit"sv, // .resume, daemon, gtk app, tr_session::Settings
-    "ratio_limit_enabled"sv, // daemon, tr_session::Settings
+    "ratio_limit"sv, // APICOMPAT
+    "ratio_limit_enabled"sv, // APICOMPAT
     "ratio_mode"sv, // .resume
     "read-clipboard"sv, // qt app
     "read_clipboard"sv, // qt app
@@ -474,7 +481,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "remote_session_password"sv, // qt app
     "remote_session_port"sv, // qt app
     "remote_session_requires_authentication"sv, // qt app
-    "remote_session_rpc_url_path"sv, // qt app
+    "remote_session_url_base_path"sv, // qt app
     "remote_session_username"sv, // qt app
     "removed"sv, // rpc
     "rename-partial-files"sv, // rpc, tr_session::Settings
@@ -546,8 +553,8 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "seed_idle_mode"sv, // rpc
     "seed_queue_enabled"sv, // rpc, tr_session::Settings
     "seed_queue_size"sv, // rpc, tr_session::Settings
-    "seed_ratio_limit"sv, // rpc
-    "seed_ratio_limited"sv, // rpc
+    "seed_ratio_limit"sv, // .resume, rpc, tr_session::Settings
+    "seed_ratio_limited"sv, // rpc, tr_session::Settings
     "seed_ratio_mode"sv, // rpc
     "seederCount"sv, // rpc
     "seeder_count"sv, // rpc
@@ -568,38 +575,22 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "session_id"sv, // rpc
     "session_set"sv, // rpc
     "session_stats"sv, // rpc
-    "show-active",
-    "show-all",
     "show-backup-trackers"sv, // gtk app, qt app
-    "show-downloading",
-    "show-error",
     "show-extra-peer-details"sv, // gtk app
     "show-filterbar"sv, // gtk app, qt app
-    "show-finished",
     "show-notification-area-icon"sv, // gtk app, qt app
     "show-options-window"sv, // gtk app, qt app
-    "show-paused",
-    "show-seeding",
     "show-statusbar"sv, // gtk app, qt app
     "show-toolbar"sv, // gtk app, qt app
     "show-tracker-scrapes"sv, // gtk app, qt app
-    "show-verifying",
-    "show_active",
-    "show_all",
     "show_backup_trackers"sv, // gtk app, qt app
-    "show_downloading",
-    "show_error",
     "show_extra_peer_details"sv, // gtk app
     "show_filterbar"sv, // gtk app, qt app
-    "show_finished",
     "show_notification_area_icon"sv, // gtk app, qt app
     "show_options_window"sv, // gtk app, qt app
-    "show_paused",
-    "show_seeding",
     "show_statusbar"sv, // gtk app, qt app
     "show_toolbar"sv, // gtk app, qt app
     "show_tracker_scrapes"sv, // gtk app, qt app
-    "show_verifying",
     "sitename"sv, // rpc
     "size-bytes"sv, // rpc
     "size-units"sv, // rpc
@@ -610,28 +601,8 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "sleep-per-seconds-during-verify"sv, // tr_session::Settings
     "sleep_per_seconds_during_verify"sv, // tr_session::Settings
     "socket_address"sv, // .resume
-    "sort-by-activity", // gtk app, qt app
-    "sort-by-age", // gtk app, qt app
-    "sort-by-eta", // gtk app, qt app
-    "sort-by-id", // gtk app, qt app
-    "sort-by-name", // gtk app, qt app
-    "sort-by-progress", // gtk app, qt app
-    "sort-by-queue", // gtk app, qt app
-    "sort-by-ratio", // gtk app, qt app
-    "sort-by-size", // gtk app, qt app
-    "sort-by-state", // gtk app, qt app
     "sort-mode"sv, // gtk app, qt app
     "sort-reversed"sv, // gtk app, qt app
-    "sort_by_activity", // gtk app, qt app
-    "sort_by_age", // gtk app, qt app
-    "sort_by_eta", // gtk app, qt app
-    "sort_by_id", // gtk app, qt app
-    "sort_by_name", // gtk app, qt app
-    "sort_by_progress", // gtk app, qt app
-    "sort_by_queue", // gtk app, qt app
-    "sort_by_ratio", // gtk app, qt app
-    "sort_by_size", // gtk app, qt app
-    "sort_by_state", // gtk app, qt app
     "sort_mode"sv, // gtk app, qt app
     "sort_reversed"sv, // gtk app, qt app
     "source"sv, // .torrent
@@ -660,6 +631,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "status"sv, // rpc
     "statusbar-stats"sv, // gtk app, qt app
     "statusbar_stats"sv, // gtk app, qt app
+    "supports_holepunch"sv, // rpc
     "tag"sv, // rpc
     "tcp-enabled"sv, // rpc, tr_session::Settings
     "tcp_enabled"sv, // rpc, tr_session::Settings
@@ -744,6 +716,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "uploadedEver"sv, // rpc
     "uploaded_bytes"sv, // rpc, stats.json
     "uploaded_ever"sv, // rpc
+    "url"sv, // rpc
     "url-list"sv, // .torrent
     "use-global-speed-limit"sv, // .resume
     "use-speed-limit"sv, // .resume
@@ -765,6 +738,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "watch_dir_force_generic"sv, // daemon
     "webseeds"sv, // rpc
     "webseedsSendingToUs"sv, // rpc
+    "webseeds_ex"sv, // rpc
     "webseeds_sending_to_us"sv, // rpc
     "yourip"sv, // BEP0010; BT protocol
 };
@@ -813,15 +787,16 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key)
 
 tr_quark tr_quark_new(std::string_view str)
 {
-    if (auto const prior = tr_quark_lookup(str); prior)
+    auto const utf8 = tr_strv_to_utf8_string(str);
+    if (auto const prior = tr_quark_lookup(utf8); prior)
     {
         return *prior;
     }
 
     auto const ret = TR_N_KEYS + std::size(my_runtime);
-    auto const len = std::size(str);
+    auto const len = std::size(utf8);
     auto* perma = new char[len + 1];
-    std::copy_n(std::begin(str), len, perma);
+    std::copy_n(std::begin(utf8), len, perma);
     perma[len] = '\0';
     my_runtime.emplace_back(perma);
     return ret;
@@ -829,5 +804,6 @@ tr_quark tr_quark_new(std::string_view str)
 
 std::string_view tr_quark_get_string_view(tr_quark q)
 {
+    TR_ASSERT(q < TR_N_KEYS + std::size(my_runtime));
     return q < TR_N_KEYS ? MyStatic[q] : my_runtime[q - TR_N_KEYS];
 }

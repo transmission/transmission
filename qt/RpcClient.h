@@ -53,7 +53,8 @@ class RpcClient : public QObject
     Q_OBJECT
 
 public:
-    explicit RpcClient(QObject* parent = nullptr);
+    explicit RpcClient(QNetworkAccessManager& nam, QObject* parent = nullptr);
+    ~RpcClient() override = default;
     RpcClient(RpcClient&&) = delete;
     RpcClient(RpcClient const&) = delete;
     RpcClient& operator=(RpcClient&&) = delete;
@@ -86,21 +87,23 @@ private slots:
     void localRequestFinished(TrVariantPtr response);
 
 private:
-    QNetworkAccessManager* networkAccessManager();
+    static inline QByteArray const SessionIdHeaderName = { TrRpcSessionIdHeader.data(),
+                                                           static_cast<qsizetype>(TrRpcSessionIdHeader.size()) };
+    static inline QByteArray const VersionHeaderName = { TrRpcVersionHeader.data(),
+                                                         static_cast<qsizetype>(TrRpcVersionHeader.size()) };
+
+    void connectNetworkAccessManager();
 
     void sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise);
     void sendLocalRequest(tr_variant& req, QFutureInterface<RpcResponse> const& promise, int64_t id);
     [[nodiscard]] int64_t parseResponseId(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
 
-    // TODO: change this default in 5.0.0-beta.1
-    static auto constexpr DefaultNetworkStyle = libtransmission::api_compat::Style::Tr4;
-
-    libtransmission::api_compat::Style network_style_ = DefaultNetworkStyle;
+    tr::api_compat::Style network_style_ = tr::api_compat::default_style();
     tr_session* session_ = {};
     QByteArray session_id_;
     QUrl url_;
-    QNetworkAccessManager* nam_ = {};
+    QNetworkAccessManager* const nam_;
     std::unordered_map<int64_t, QFutureInterface<RpcResponse>> local_requests_;
     bool const verbose_ = qEnvironmentVariableIsSet("TR_RPC_VERBOSE");
     bool url_is_loopback_ = false;

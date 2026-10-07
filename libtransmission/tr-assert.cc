@@ -10,7 +10,7 @@
 
 #include "libtransmission/tr-assert.h"
 
-[[noreturn]] bool tr_assert_report(std::string_view file, long line, std::string_view message)
+[[noreturn]] void tr_assert_report(std::string_view file, long line, std::string_view message)
 {
     std::cerr << "assertion failed: " << message << " (" << file << ':' << line << ")\n";
     abort();

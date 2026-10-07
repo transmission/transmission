@@ -13,6 +13,7 @@ class IconToolButton : public QToolButton
 
 public:
     explicit IconToolButton(QWidget* parent = nullptr);
+    ~IconToolButton() override = default;
     IconToolButton(IconToolButton&&) = delete;
     IconToolButton(IconToolButton const&) = delete;
     IconToolButton& operator=(IconToolButton&&) = delete;

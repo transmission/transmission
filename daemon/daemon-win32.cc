@@ -12,7 +12,7 @@
 
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
-#include <libtransmission/utils.h>
+#include <libtransmission/string-utils.h>
 
 #include "daemon.h"
 

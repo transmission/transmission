@@ -167,9 +167,6 @@
 /* Class = "NSMenuItem"; title = "Hide Filter Bar"; ObjectID = "1620"; */
 "1620.title" = "Cacher la barre de filtrage";
 
-/* Class = "NSMenuItem"; title = "Select None"; ObjectID = "1675"; */
-"1675.title" = "Ne rien sélectionner";
-
 /* Class = "NSMenuItem"; title = "Resume Selected Right Away"; ObjectID = "1678"; */
 "1678.title" = "Reprendre immédiatement le transfert de la sélection";
 
@@ -292,6 +289,9 @@
 
 /* Class = "NSMenu"; title = "Group"; ObjectID = "2850"; */
 "2850.title" = "Groupe";
+
+/* Class = "NSTextFieldCell"; title = "Transfers"; ObjectID = "3049"; */
+/* "3049.title" = ""; */
 
 /* Class = "NSMenuItem"; title = "Use Groups"; ObjectID = "3078"; */
 "3078.title" = "Utiliser les groupes";

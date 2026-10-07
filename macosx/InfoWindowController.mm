@@ -89,7 +89,8 @@ typedef NS_ENUM(NSUInteger, TabTag) {
     windowRect.size.height = windowHeight;
     [window setFrame:windowRect display:NO];
 
-    window.becomesKeyOnlyIfNeeded = YES;
+    // Let inspector gain keyboard focus when clicked on non-interactive areas
+    window.becomesKeyOnlyIfNeeded = NO;
 
     //disable green maximise window button
     //https://github.com/transmission/transmission/issues/3486
@@ -206,6 +207,18 @@ typedef NS_ENUM(NSUInteger, TabTag) {
     self.fTorrents = torrents;
 
     [self resetInfo];
+}
+
+- (void)removeTorrentsFromInfo:(NSArray<Torrent*>*)torrents
+{
+    if (self.fTorrents.count == 0 || torrents.count == 0)
+    {
+        return;
+    }
+
+    NSMutableArray<Torrent*>* remaining = [self.fTorrents mutableCopy];
+    [remaining removeObjectsInArray:torrents];
+    [self setInfoForTorrents:remaining];
 }
 
 - (NSRect)windowWillUseStandardFrame:(NSWindow*)window defaultFrame:(NSRect)defaultFrame

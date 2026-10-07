@@ -16,8 +16,6 @@
 
 #include <string>
 
-#include "libtransmission/transmission.h"
-
 class tr_port;
 struct tr_upnp;
 

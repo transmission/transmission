@@ -22,17 +22,15 @@
 
 #include <dht/dht.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/net.h" // tr_port
-#include "libtransmission/tr-macros.h"
+#include "libtransmission/types.h"
 
 struct tr_pex;
 
-namespace libtransmission
+namespace tr
 {
 class TimerMaker;
-} // namespace libtransmission
+} // namespace tr
 
 class tr_dht
 {
@@ -95,7 +93,7 @@ public:
         [[nodiscard]] virtual tr_sha1_digest_t torrent_info_hash(tr_torrent_id_t) const = 0;
 
         [[nodiscard]] virtual std::string_view config_dir() const = 0;
-        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
+        [[nodiscard]] virtual tr::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual API& api()
         {
             return api_;

@@ -110,13 +110,14 @@ tr_session_id::session_id_t tr_session_id::make_session_id()
     return session_id;
 }
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 tr_session_id::~tr_session_id()
 {
     destroy_lockfile(current_lock_file_, std::data(current_value_));
     destroy_lockfile(previous_lock_file_, std::data(previous_value_));
 }
 
-bool tr_session_id::is_local(std::string_view session_id) noexcept
+bool tr_session_id::is_local(std::string_view session_id)
 {
     if (std::empty(session_id))
     {
@@ -158,7 +159,7 @@ bool tr_session_id::is_local(std::string_view session_id) noexcept
     return is_local;
 }
 
-std::string_view tr_session_id::sv() const noexcept
+std::string_view tr_session_id::sv() const
 {
     if (auto const now = get_current_time_(); now >= expires_at_)
     {
@@ -174,7 +175,7 @@ std::string_view tr_session_id::sv() const noexcept
     return std::string_view{ std::data(current_value_), std::size(current_value_) - 1 };
 }
 
-char const* tr_session_id::c_str() const noexcept
+char const* tr_session_id::c_str() const
 {
     return std::data(sv()); // current_value_ is zero-terminated
 }

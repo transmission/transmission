@@ -7,14 +7,15 @@
 #include <future>
 #include <string>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-magnet.h>
 #include <libtransmission/torrent-metainfo.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace tr::test
 {
 
 using TorrentMagnetTest = SessionTest;
@@ -89,4 +90,4 @@ TEST_F(TorrentMagnetTest, setMetadataPiece)
     EXPECT_EQ(tor->get_metadata_percent(), 1.0);
 }
 
-} // namespace libtransmission::test
+} // namespace tr::test

@@ -19,6 +19,7 @@ class AboutDialog : public BaseDialog
 
 public:
     explicit AboutDialog(Session& session, QWidget* parent = nullptr);
+    ~AboutDialog() override = default;
     AboutDialog(AboutDialog&&) = delete;
     AboutDialog(AboutDialog const&) = delete;
     AboutDialog& operator=(AboutDialog&&) = delete;

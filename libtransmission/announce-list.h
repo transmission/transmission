@@ -5,16 +5,16 @@
 
 #pragma once
 
+#include <compare>
 #include <cstddef> // size_t
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/interned-string.h"
-#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR_VEC
+#include "libtransmission/types.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 
@@ -32,29 +32,19 @@ public:
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 
-        [[nodiscard]] constexpr int compare(tracker_info const& that) const noexcept // <=>
+        [[nodiscard]] constexpr auto operator<=>(tracker_info const& that) const noexcept
         {
-            if (this->tier != that.tier)
+            if (auto const res = this->tier <=> that.tier; res != 0)
             {
-                return this->tier < that.tier ? -1 : 1;
+                return res;
             }
 
-            if (int const i{ this->announce.compare(that.announce) }; i != 0)
-            {
-                return i;
-            }
-
-            return 0;
-        }
-
-        [[nodiscard]] constexpr bool operator<(tracker_info const& that) const noexcept
-        {
-            return compare(that) < 0;
+            return this->announce <=> that.announce;
         }
 
         [[nodiscard]] constexpr bool operator==(tracker_info const& that) const noexcept
         {
-            return compare(that) == 0;
+            return (*this <=> that) == 0;
         }
     };
 
@@ -62,41 +52,36 @@ private:
     using trackers_t = std::vector<tracker_info>;
 
 public:
-    [[nodiscard]] TR_CONSTEXPR20 auto begin() const noexcept
+    [[nodiscard]] constexpr auto begin() const noexcept
     {
         return std::begin(trackers_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto end() const noexcept
+    [[nodiscard]] constexpr auto end() const noexcept
     {
         return std::end(trackers_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
+    [[nodiscard]] constexpr bool empty() const noexcept
     {
         return std::empty(trackers_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t size() const noexcept
+    [[nodiscard]] constexpr size_t size() const noexcept
     {
         return std::size(trackers_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 tracker_info const& at(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR_VEC tracker_info const& at(size_t i) const
     {
         return trackers_.at(i);
     }
 
     [[nodiscard]] tr_tracker_tier_t nextTier() const;
 
-    [[nodiscard]] TR_CONSTEXPR20 bool operator==(tr_announce_list const& that) const
+    [[nodiscard]] TR_CONSTEXPR_VEC bool operator==(tr_announce_list const& that) const
     {
         return trackers_ == that.trackers_;
-    }
-
-    [[nodiscard]] bool operator!=(tr_announce_list const& that) const
-    {
-        return trackers_ != that.trackers_;
     }
 
     void add_to_map(tr_variant::Map& setme) const;
@@ -113,7 +98,7 @@ public:
     bool replace(tr_tracker_id_t id, std::string_view announce_url_sv);
     size_t set(char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n);
 
-    TR_CONSTEXPR20 void clear()
+    TR_CONSTEXPR_VEC void clear()
     {
         trackers_.clear();
     }

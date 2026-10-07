@@ -3,8 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <libtransmission/env.h>
 #include <libtransmission/file.h> // tr_sys_dir_get_current()
-#include <libtransmission/utils.h> // tr_env_get_string()
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -62,6 +62,6 @@ int main(int argc, char** argv)
     }
 
     out.close();
-    tr_sys_path_rename(tmp_result_path.c_str(), result_path.c_str());
+    tr_sys_path_rename(tmp_result_path, result_path);
     return 0;
 }

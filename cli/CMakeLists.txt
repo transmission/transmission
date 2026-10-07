@@ -7,7 +7,7 @@ target_sources(${TR_NAME}-cli
 target_link_libraries(${TR_NAME}-cli
     PRIVATE
         ${TR_NAME}
-        fmt::fmt-header-only)
+        transmission::fmt-header-only)
 
 tr_win32_app_info(${TR_NAME}-cli
     "Transmission Utility ('cli', obsolete)"

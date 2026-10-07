@@ -2,7 +2,7 @@
 <interface domain="transmission-gtk">
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="MakeDialog">
-    <property name="title" translatable="1">New Torrent</property>
+    <property name="title" translatable="yes">New Torrent</property>
     <child internal-child="content_area">
       <object class="GtkBox" id="dialog_layout">
         <property name="orientation">vertical</property>
@@ -17,7 +17,7 @@
               <object class="GtkFrame">
                 <child type="label">
                   <object class="GtkLabel" id="files_section_label">
-                    <property name="label" translatable="1">Files</property>
+                    <property name="label" translatable="yes">Files</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
                     </attributes>
@@ -29,7 +29,7 @@
                     <property name="column-spacing">12</property>
                     <child>
                       <object class="GtkLabel" id="destination_label">
-                        <property name="label" translatable="1">Sa_ve to:</property>
+                        <property name="label" translatable="yes">Sa_ve to:</property>
                         <property name="use-underline">1</property>
                         <property name="mnemonic-widget">destination_button</property>
                         <property name="xalign">0</property>
@@ -51,7 +51,7 @@
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="source_folder_radio">
-                        <property name="label" translatable="1">Source F_older:</property>
+                        <property name="label" translatable="yes">Source F_older:</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
                         <property name="active">1</property>
@@ -74,7 +74,7 @@
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="source_file_radio">
-                        <property name="label" translatable="1">Source _File:</property>
+                        <property name="label" translatable="yes">Source _File:</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
                         <property name="group">source_folder_radio</property>
@@ -97,7 +97,7 @@
                     <child>
                       <object class="GtkLabel" id="source_size_label">
                         <property name="hexpand">1</property>
-                        <property name="label" translatable="1">No source selected</property>
+                        <property name="label" translatable="yes">No source selected</property>
                         <property name="xalign">0</property>
                         <attributes>
                           <attribute name="style" value="italic"/>
@@ -110,7 +110,7 @@
                     </child>
                     <child>
                       <object class="GtkLabel" id="piece_size_label">
-                        <property name="label" translatable="1">Piece size:</property>
+                        <property name="label" translatable="yes">Piece size:</property>
                         <property name="use-underline">1</property>
                         <property name="mnemonic-widget">piece_size_scale</property>
                         <property name="xalign">0</property>
@@ -143,7 +143,7 @@
               <object class="GtkFrame">
                 <child type="label">
                   <object class="GtkLabel" id="properties_section_label">
-                    <property name="label" translatable="1">Properties</property>
+                    <property name="label" translatable="yes">Properties</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
                     </attributes>
@@ -156,7 +156,7 @@
                     <child>
                       <object class="GtkLabel" id="trackers_label">
                         <property name="valign">start</property>
-                        <property name="label" translatable="1">_Trackers:</property>
+                        <property name="label" translatable="yes">_Trackers:</property>
                         <property name="use-underline">1</property>
                         <property name="mnemonic-widget">trackers_view</property>
                         <property name="xalign">0</property>
@@ -190,7 +190,7 @@
                         <child>
                           <object class="GtkLabel" id="trackers_description_label">
                             <property name="hexpand">1</property>
-                            <property name="label" translatable="1"><![CDATA[To add a backup URL, add it on the next line after a primary URL.
+                            <property name="label" translatable="yes"><![CDATA[To add a backup URL, add it on the next line after a primary URL.
 To add a new primary URL, add it after a blank line.]]></property>
                             <property name="xalign">0</property>
                           </object>
@@ -203,7 +203,7 @@ To add a new primary URL, add it after a blank line.]]></property>
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="comment_check">
-                        <property name="label" translatable="1">Co_mment:</property>
+                        <property name="label" translatable="yes">Co_mment:</property>
                         <property name="focusable">1</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
@@ -226,7 +226,7 @@ To add a new primary URL, add it after a blank line.]]></property>
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="source_check">
-                        <property name="label" translatable="1">_Source:</property>
+                        <property name="label" translatable="yes">_Source:</property>
                         <property name="focusable">1</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
@@ -249,7 +249,7 @@ To add a new primary URL, add it after a blank line.]]></property>
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="private_check">
-                        <property name="label" translatable="1">_Private torrent</property>
+                        <property name="label" translatable="yes">_Private torrent</property>
                         <property name="focusable">1</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
@@ -274,7 +274,7 @@ To add a new primary URL, add it after a blank line.]]></property>
         <property name="spacing">6</property>
         <child>
           <object class="GtkButton" id="close_button">
-            <property name="label" translatable="1">_Close</property>
+            <property name="label" translatable="yes">_Close</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
@@ -282,7 +282,7 @@ To add a new primary URL, add it after a blank line.]]></property>
         </child>
         <child>
           <object class="GtkButton" id="new_button">
-            <property name="label" translatable="1">_New</property>
+            <property name="label" translatable="yes">_New</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>

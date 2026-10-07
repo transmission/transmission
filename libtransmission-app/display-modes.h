@@ -5,9 +5,11 @@
 
 #pragma once
 
-namespace transmission::app
+#include <cstdint>
+
+namespace tr::app
 {
-enum class ShowMode
+enum class ShowMode : uint8_t
 {
     ShowAll,
     ShowActive,
@@ -21,7 +23,7 @@ enum class ShowMode
 inline auto constexpr ShowModeCount = 8U;
 inline auto constexpr DefaultShowMode = ShowMode::ShowAll;
 
-enum class SortMode
+enum class SortMode : uint8_t
 {
     SortByActivity,
     SortByAge,
@@ -37,4 +39,14 @@ enum class SortMode
 inline auto constexpr SortModeCount = 10U;
 inline auto constexpr DefaultSortMode = SortMode::SortByName;
 
-} // namespace transmission::app
+enum class StatsMode : uint8_t
+{
+    TotalRatio,
+    TotalTransfer,
+    SessionRatio,
+    SessionTransfer,
+};
+inline auto constexpr StatsModeCount = 4U;
+inline auto constexpr DefaultStatsMode = StatsMode::TotalRatio;
+
+} // namespace tr::app

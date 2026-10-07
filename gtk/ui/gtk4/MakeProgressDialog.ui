@@ -2,7 +2,7 @@
 <interface domain="transmission-gtk">
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="MakeProgressDialog">
-    <property name="title" translatable="1">New Torrent</property>
+    <property name="title" translatable="yes">New Torrent</property>
     <property name="modal">1</property>
     <child internal-child="content_area">
       <object class="GtkBox" id="dialog_layout">
@@ -16,7 +16,7 @@
             <property name="spacing">6</property>
             <child>
               <object class="GtkLabel" id="progress_label">
-                <property name="label" translatable="1">Creating torrent…</property>
+                <property name="label" translatable="yes">Creating torrent…</property>
                 <property name="xalign">0</property>
               </object>
             </child>
@@ -33,7 +33,7 @@
         <property name="spacing">6</property>
         <child>
           <object class="GtkButton" id="cancel_button">
-            <property name="label" translatable="1">_Cancel</property>
+            <property name="label" translatable="yes">_Cancel</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
@@ -41,7 +41,7 @@
         </child>
         <child>
           <object class="GtkButton" id="close_button">
-            <property name="label" translatable="1">_Close</property>
+            <property name="label" translatable="yes">_Close</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
@@ -49,7 +49,7 @@
         </child>
         <child>
           <object class="GtkButton" id="add_button">
-            <property name="label" translatable="1">_Add</property>
+            <property name="label" translatable="yes">_Add</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>

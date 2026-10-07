@@ -11,8 +11,8 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include <variant>
+#include <vector>
 
 #ifdef _WIN32
 #include <share.h>
@@ -24,6 +24,8 @@
 
 #include "libtransmission/api-compat.h"
 #include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/file-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
@@ -34,6 +36,118 @@ using namespace std::literals;
 
 namespace
 {
+void merge_variant(tr_variant& dest, tr_variant const& src);
+void merge_variant(tr_variant& dest, tr_variant&& src);
+
+void merge_map(tr_variant::Map& dest, tr_variant::Map const& src)
+{
+    dest.reserve(std::size(dest) + std::size(src));
+    for (auto const& [key, child] : src)
+    {
+        if (!dest.contains(key))
+        {
+            dest.try_emplace(key, child.clone());
+        }
+    }
+}
+
+void merge_map(tr_variant::Map& dest, tr_variant::Map&& src)
+{
+    dest.reserve(std::size(dest) + std::size(src));
+    for (auto& [key, child] : std::move(src))
+    {
+        if (!dest.contains(key))
+        {
+            dest.try_emplace(key, std::move(child));
+        }
+    }
+}
+
+template<bool MoveSrc>
+void merge_variant_impl(tr_variant& dest, std::conditional_t<MoveSrc, tr_variant&, tr_variant const&> src)
+{
+    src.visit(
+        [&dest](auto& value)
+        {
+            using ValueType = std::remove_cvref_t<decltype(value)>;
+
+            if constexpr (
+                std::is_same_v<ValueType, std::monostate> || std::is_same_v<ValueType, std::nullptr_t> ||
+                std::is_same_v<ValueType, bool> || std::is_same_v<ValueType, int64_t> || std::is_same_v<ValueType, double>)
+            {
+                dest = value;
+            }
+            else if constexpr (std::is_same_v<ValueType, std::string>)
+            {
+                if constexpr (MoveSrc)
+                {
+                    dest = std::move(value);
+                }
+                else
+                {
+                    // std::string assignment via std::string_view materializes into an owned string.
+                    dest = std::string_view{ value };
+                }
+            }
+            else if constexpr (std::is_same_v<ValueType, std::string_view>)
+            {
+                // std::string_view assignment is materialized into an owned string.
+                dest = std::string_view{ value };
+            }
+            else if constexpr (std::is_same_v<ValueType, tr_variant::Vector>)
+            {
+                dest = tr_variant::Vector{};
+
+                if (auto* out = dest.get_if<tr_variant::VectorIndex>(); out != nullptr)
+                {
+                    out->resize(std::size(value));
+
+                    for (size_t i = 0; i < std::size(value); ++i)
+                    {
+                        if constexpr (MoveSrc)
+                        {
+                            merge_variant((*out)[i], std::move(value[i]));
+                        }
+                        else
+                        {
+                            merge_variant((*out)[i], value[i]);
+                        }
+                    }
+                }
+            }
+            else if constexpr (std::is_same_v<ValueType, tr_variant::Map>)
+            {
+                if (!dest.holds_alternative<tr_variant::Map>())
+                {
+                    dest = tr_variant::Map{};
+                }
+
+                if (auto* out = dest.get_if<tr_variant::MapIndex>(); out != nullptr)
+                {
+                    if constexpr (MoveSrc)
+                    {
+                        merge_map(*out, std::move(value));
+                    }
+                    else
+                    {
+                        merge_map(*out, value);
+                    }
+                }
+            }
+        });
+}
+
+void merge_variant(tr_variant& dest, tr_variant const& src)
+{
+    merge_variant_impl<false>(dest, src);
+}
+
+void merge_variant(tr_variant& dest, tr_variant&& src)
+{
+    auto moved_src = std::move(src);
+    merge_variant_impl<true>(dest, moved_src);
+}
+
 template<typename T>
 [[nodiscard]] bool value_if(tr_variant const* const var, T* const setme)
 {
@@ -83,61 +197,8 @@ template<typename T>
 
 // ---
 
-// Specialisations for int64_t and bool could have been inline and constexpr,
-// but aren't because https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282
-
 template<>
-[[nodiscard]] std::optional<int64_t> tr_variant::value_if() noexcept
-{
-    switch (index())
-    {
-    case IntIndex:
-        return *get_if<IntIndex>();
-
-    case BoolIndex:
-        return *get_if<BoolIndex>() ? 1 : 0;
-
-    default:
-        return {};
-    }
-}
-
-template<>
-[[nodiscard]] std::optional<bool> tr_variant::value_if() noexcept
-{
-    switch (index())
-    {
-    case BoolIndex:
-        return *get_if<BoolIndex>();
-
-    case IntIndex:
-        if (auto const val = *get_if<IntIndex>(); val == 0 || val == 1)
-        {
-            return val != 0;
-        }
-        break;
-
-    case StringIndex:
-    case StringViewIndex:
-        if (auto const val = value_if<std::string_view>(); val == "true"sv)
-        {
-            return true;
-        }
-        else if (val == "false"sv)
-        {
-            return false;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    return {};
-}
-
-template<>
-[[nodiscard]] std::optional<double> tr_variant::value_if() noexcept
+[[nodiscard]] std::optional<double> tr_variant::value_if() const noexcept
 {
     switch (index())
     {
@@ -162,22 +223,6 @@ template<>
     return {};
 }
 
-template<>
-[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() noexcept
-{
-    switch (index())
-    {
-    case StringIndex:
-        return *std::get_if<std::string>(&val_);
-
-    case StringViewIndex:
-        return *std::get_if<std::string_view>(&val_);
-
-    default:
-        return {};
-    }
-}
-
 // ---
 
 tr_variant tr_variant::clone() const
@@ -187,47 +232,34 @@ tr_variant tr_variant::clone() const
     return ret;
 }
 
+tr_variant::Map tr_variant::Map::clone() const
+{
+    auto ret = tr_variant::Map{};
+    ret.merge(*this);
+    return ret;
+}
+
+tr_variant::Map& tr_variant::Map::merge(Map const& that)
+{
+    merge_map(*this, that);
+    return *this;
+}
+
+tr_variant::Map& tr_variant::Map::merge(Map&& that)
+{
+    merge_map(*this, std::move(that));
+    return *this;
+}
+
 tr_variant& tr_variant::merge(tr_variant const& that)
 {
-    that.visit(
-        [this](auto const& value)
-        {
-            using ValueType = std::decay_t<decltype(value)>;
+    merge_variant(*this, that);
+    return *this;
+}
 
-            if constexpr (
-                std::is_same_v<ValueType, std::monostate> || std::is_same_v<ValueType, std::nullptr_t> ||
-                std::is_same_v<ValueType, bool> || std::is_same_v<ValueType, int64_t> || std::is_same_v<ValueType, double> ||
-                std::is_same_v<ValueType, std::string_view> || std::is_same_v<ValueType, std::string>)
-            {
-                *this = value;
-            }
-            else if constexpr (std::is_same_v<ValueType, Vector>)
-            {
-                auto& dest = val_.emplace<Vector>();
-                dest.resize(std::size(value));
-                for (size_t i = 0; i < std::size(value); ++i)
-                {
-                    dest[i].merge(value[i]);
-                }
-            }
-            else if constexpr (std::is_same_v<ValueType, Map>)
-            {
-                if (index() != MapIndex)
-                {
-                    val_.emplace<Map>();
-                }
-
-                if (auto* dest = this->template get_if<MapIndex>(); dest != nullptr)
-                {
-                    dest->reserve(std::size(*dest) + std::size(value));
-                    for (auto const& [key, child] : value)
-                    {
-                        (*dest)[key].merge(child);
-                    }
-                }
-            }
-        });
-
+tr_variant& tr_variant::merge(tr_variant&& that)
+{
+    merge_variant(*this, std::move(that));
     return *this;
 }
 
@@ -259,18 +291,6 @@ tr_variant* tr_variantListChild(tr_variant* const var, size_t pos)
     return {};
 }
 
-bool tr_variantListRemove(tr_variant* const var, size_t pos)
-{
-    if (auto* const vec = var != nullptr ? var->get_if<tr_variant::VectorIndex>() : nullptr;
-        vec != nullptr && pos < std::size(*vec))
-    {
-        vec->erase(std::begin(*vec) + pos);
-        return true;
-    }
-
-    return false;
-}
-
 bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 {
     return value_if(var, setme);
@@ -279,30 +299,6 @@ bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 bool tr_variantGetStrView(tr_variant const* const var, std::string_view* setme)
 {
     return value_if(var, setme);
-}
-
-bool tr_variantGetRaw(tr_variant const* v, std::byte const** setme_raw, size_t* setme_len)
-{
-    if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
-    {
-        *setme_raw = reinterpret_cast<std::byte const*>(std::data(sv));
-        *setme_len = std::size(sv);
-        return true;
-    }
-
-    return false;
-}
-
-bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* setme_len)
-{
-    if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
-    {
-        *setme_raw = reinterpret_cast<uint8_t const*>(std::data(sv));
-        *setme_len = std::size(sv);
-        return true;
-    }
-
-    return false;
 }
 
 bool tr_variantGetBool(tr_variant const* const var, bool* setme)
@@ -319,24 +315,6 @@ bool tr_variantDictFindInt(tr_variant* const var, tr_quark key, int64_t* setme)
 {
     auto const* const child = tr_variantDictFind(var, key);
     return tr_variantGetInt(child, setme);
-}
-
-bool tr_variantDictFindBool(tr_variant* const var, tr_quark key, bool* setme)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetBool(child, setme);
-}
-
-bool tr_variantDictFindReal(tr_variant* const var, tr_quark key, double* setme)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetReal(child, setme);
-}
-
-bool tr_variantDictFindStrView(tr_variant* const var, tr_quark key, std::string_view* setme)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetStrView(child, setme);
 }
 
 bool tr_variantDictFindList(tr_variant* const var, tr_quark key, tr_variant** setme)
@@ -361,18 +339,6 @@ bool tr_variantDictFindDict(tr_variant* const var, tr_quark key, tr_variant** se
     return false;
 }
 
-bool tr_variantDictFindRaw(tr_variant* const var, tr_quark key, uint8_t const** setme_raw, size_t* setme_len)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetRaw(child, setme_raw, setme_len);
-}
-
-bool tr_variantDictFindRaw(tr_variant* const var, tr_quark key, std::byte const** setme_raw, size_t* setme_len)
-{
-    auto const* const child = tr_variantDictFind(var, key);
-    return tr_variantGetRaw(child, setme_raw, setme_len);
-}
-
 // ---
 
 void tr_variantInitList(tr_variant* initme, size_t n_reserve)
@@ -382,31 +348,9 @@ void tr_variantInitList(tr_variant* initme, size_t n_reserve)
     *initme = std::move(vec);
 }
 
-void tr_variantListReserve(tr_variant* const var, size_t n_reserve)
-{
-    TR_ASSERT(var != nullptr);
-    TR_ASSERT(var->holds_alternative<tr_variant::Vector>());
-
-    if (auto* const vec = var != nullptr ? var->get_if<tr_variant::VectorIndex>() : nullptr; vec != nullptr)
-    {
-        vec->reserve(std::size(*vec) + n_reserve);
-    }
-}
-
 void tr_variantInitDict(tr_variant* initme, size_t n_reserve)
 {
     *initme = tr_variant::Map{ n_reserve };
-}
-
-void tr_variantDictReserve(tr_variant* const var, size_t n_reserve)
-{
-    TR_ASSERT(var != nullptr);
-    TR_ASSERT(var->holds_alternative<tr_variant::Map>());
-
-    if (auto* const map = var != nullptr ? var->get_if<tr_variant::MapIndex>() : nullptr; map != nullptr)
-    {
-        map->reserve(std::size(*map) + n_reserve);
-    }
 }
 
 tr_variant* tr_variantListAdd(tr_variant* const var)
@@ -420,46 +364,6 @@ tr_variant* tr_variantListAdd(tr_variant* const var)
     }
 
     return nullptr;
-}
-
-tr_variant* tr_variantListAddInt(tr_variant* const var, int64_t const value)
-{
-    return vec_add(var, value);
-}
-
-tr_variant* tr_variantListAddReal(tr_variant* const var, double const value)
-{
-    return vec_add(var, value);
-}
-
-tr_variant* tr_variantListAddBool(tr_variant* const var, bool const value)
-{
-    return vec_add(var, value);
-}
-
-tr_variant* tr_variantListAddStr(tr_variant* const var, std::string_view const value)
-{
-    return vec_add(var, std::string{ value });
-}
-
-tr_variant* tr_variantListAddStrView(tr_variant* const var, std::string_view value)
-{
-    return vec_add(var, tr_variant::unmanaged_string(value));
-}
-
-tr_variant* tr_variantListAddRaw(tr_variant* const var, void const* value, size_t n_bytes)
-{
-    return vec_add(var, tr_variant::make_raw(value, n_bytes));
-}
-
-tr_variant* tr_variantListAddList(tr_variant* const var, size_t const n_reserve)
-{
-    return vec_add(var, tr_variant::make_vector(n_reserve));
-}
-
-tr_variant* tr_variantListAddDict(tr_variant* const var, size_t const n_reserve)
-{
-    return vec_add(var, tr_variant::make_map(n_reserve));
 }
 
 tr_variant* tr_variantDictAdd(tr_variant* const var, tr_quark key)
@@ -480,26 +384,6 @@ tr_variant* tr_variantDictAddInt(tr_variant* const var, tr_quark const key, int6
     return dict_set(var, key, val);
 }
 
-tr_variant* tr_variantDictAddBool(tr_variant* const var, tr_quark key, bool val)
-{
-    return dict_set(var, key, val);
-}
-
-tr_variant* tr_variantDictAddReal(tr_variant* const var, tr_quark const key, double const val)
-{
-    return dict_set(var, key, val);
-}
-
-tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark const key, std::string_view const val)
-{
-    return dict_set(var, key, val);
-}
-
-tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark const key, void const* const value, size_t const n_bytes)
-{
-    return dict_set(var, key, std::string{ static_cast<char const*>(value), n_bytes });
-}
-
 tr_variant* tr_variantDictAddList(tr_variant* const var, tr_quark const key, size_t const n_reserve)
 {
     return dict_set(var, key, tr_variant::make_vector(n_reserve));
@@ -513,16 +397,6 @@ tr_variant* tr_variantDictAddStrView(tr_variant* const var, tr_quark const key, 
 tr_variant* tr_variantDictAddDict(tr_variant* const var, tr_quark key, size_t n_reserve)
 {
     return dict_set(var, key, tr_variant::make_map(n_reserve));
-}
-
-bool tr_variantDictRemove(tr_variant* const var, tr_quark key)
-{
-    if (auto* const map = var != nullptr ? var->get_if<tr_variant::MapIndex>() : nullptr; map != nullptr)
-    {
-        return map->erase(key) != 0U;
-    }
-
-    return false;
 }
 
 // ---

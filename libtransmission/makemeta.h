@@ -13,14 +13,13 @@
 #include <utility> // std::pair
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announce-list.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/torrent-files.h"
-#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR_VEC
+#include "libtransmission/types.h"
 
 class tr_metainfo_builder
 {
@@ -122,12 +121,12 @@ public:
         return comment_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
+    [[nodiscard]] constexpr auto file_count() const noexcept
     {
         return files_.file_count();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto file_size(tr_file_index_t i) const noexcept
+    [[nodiscard]] TR_CONSTEXPR_VEC auto file_size(tr_file_index_t i) const noexcept
     {
         return files_.file_size(i);
     }
@@ -142,7 +141,7 @@ public:
         return tr_sys_path_basename(top_);
     }
 
-    [[nodiscard]] auto const& path(tr_file_index_t i) const noexcept
+    [[nodiscard]] TR_CONSTEXPR_VEC auto const& path(tr_file_index_t i) const noexcept
     {
         return files_.path(i);
     }

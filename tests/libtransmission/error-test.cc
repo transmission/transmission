@@ -5,11 +5,11 @@
 
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/error.h>
 
 #include "test-fixtures.h"
-
-#include "gtest/gtest.h"
 
 using namespace std::literals;
 

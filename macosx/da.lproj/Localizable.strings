@@ -47,7 +47,7 @@
 "%lu files" = "%lu filer";
 
 /* quicklook file header */
-/* "%lu Files" = ""; */
+"%lu Files" = "%lu filer";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu indkommende";
@@ -83,7 +83,7 @@
 "%lu tracker" = "%lu tracker";
 
 /* quicklook tracker header */
-/* "%lu Trackers" = ""; */
+"%lu Trackers" = "%lu trackere";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -94,7 +94,7 @@
 "%lu web seeds" = "%lu webseeds";
 
 /* quicklook web seed header */
-/* "%lu Web Seeds" = ""; */
+"%lu Web Seeds" = "%lu webseeds";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u stykker, %2$@ hver";
@@ -121,7 +121,7 @@
 "1 time" = "1 gang";
 
 /* quicklook tracker header */
-/* "1 Tracker" = ""; */
+"1 Tracker" = "1 Tracker";
 
 /* Filter Button -> tool tip
    Status bar transfer count
@@ -129,7 +129,7 @@
 "1 transfer" = "1 overførsel";
 
 /* quicklook web seed header */
-/* "1 Web Seed" = ""; */
+"1 Web Seed" = "1 webseed";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" er ikke en gyldig torrent-fil.";
@@ -295,13 +295,13 @@
 "Create Torrent File" = "Ny torrent-fil";
 
 /* quicklook creation info */
-/* "Created on %@" = ""; */
+"Created on %@" = "Oprettet %@";
 
 /* quicklook creation info */
-/* "Created on %@ with %@" = ""; */
+"Created on %@ with %@" = "Oprettet %1$@ med %2$@";
 
 /* quicklook creation info */
-/* "Created with %@" = ""; */
+"Created with %@" = "Oprettet med %@";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Kunne ikke oprette \"%@\".";

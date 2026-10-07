@@ -9,23 +9,30 @@ target_sources(libtransmission-test
         announcer-udp-test.cc
         api-compat-test.cc
         benc-test.cc
+        bep55-holepunch-test.cc
+        bep55-introducer-store-test.cc
+        bep55-test-utils.h
         bitfield-test.cc
         block-info-test.cc
         blocklist-test.cc
         buffer-test.cc
         clients-test.cc
         completion-test.cc
+        config-dir-lock-test.cc
         copy-test.cc
         crypto-test.cc
         dht-test.cc
         error-test.cc
+        env-test.cc
         file-piece-map-test.cc
+        file-utils-test.cc
         file-test.cc
         getopt-test.cc
         handshake-test.cc
         history-test.cc
         ip-cache-test.cc
         json-test.cc
+        local-data-test.cc
         lpd-test.cc
         magnet-metainfo-test.cc
         makemeta-test.cc
@@ -40,10 +47,11 @@ target_sources(libtransmission-test
         rename-test.cc
         rpc-test.cc
         serializer-tests.cc
-        session-test.cc
         session-alt-speeds-test.cc
+        session-test.cc
         settings-test.cc
         strbuf-test.cc
+        string-utils-test.cc
         subprocess-test-script.cmd
         subprocess-test.cc
         test-fixtures.h
@@ -52,13 +60,22 @@ target_sources(libtransmission-test
         torrent-magnet-test.cc
         torrent-metainfo-test.cc
         torrent-queue-test.cc
+        torrent-test.cc
         torrents-test.cc
+        types-test.cc
         tr-peer-info-test.cc
         utils-test.cc
         values-test.cc
         variant-test.cc
         watchdir-test.cc
+        web-test.cc
         web-utils-test.cc)
+
+if(APPLE)
+    target_sources(libtransmission-test
+        PRIVATE
+            utils-apple-test.mm)
+endif()
 
 set_property(
     TARGET libtransmission-test
@@ -75,20 +92,13 @@ target_compile_options(libtransmission-test
 target_link_libraries(libtransmission-test
     PRIVATE
         ${TR_NAME}
-        gtestall
+        GTest::gtest_main
         dht::dht
-        fmt::fmt-header-only
-        libevent::event
+        transmission::fmt-header-only
+        libevent::core
         WideInteger::WideInteger)
 
-if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
-    gtest_discover_tests(libtransmission-test
-        TEST_PREFIX "LT.")
-else()
-    add_test(
-        NAME libtransmission-test
-        COMMAND libtransmission-test)
-endif()
+tr_setup_gtest_target(libtransmission-test "LT.")
 
 add_custom_command(
     TARGET libtransmission-test

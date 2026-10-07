@@ -12,7 +12,7 @@
 
 #include <glibmm/refptr.h>
 
-using SortMode = transmission::app::SortMode;
+using SortMode = tr::app::SortMode;
 
 class TorrentSorter : public SorterBase<Torrent>
 {

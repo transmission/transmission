@@ -14,7 +14,7 @@
 #include <string>
 #include <string_view>
 
-#include "libtransmission/transmission.h" // for tr_session_stats
+#include "libtransmission/types.h" // for tr_session_stats
 
 // per-session data structure for bandwidth use statistics
 class tr_stats
@@ -23,6 +23,7 @@ public:
     tr_stats(std::string_view config_dir, time_t now)
         : config_dir_{ config_dir }
         , start_time_{ now }
+        , is_dirty_{ true }
     {
         single_.sessionCount = 1;
         old_ = load_old_stats(config_dir_);
@@ -50,19 +51,23 @@ public:
     constexpr void add_uploaded(uint32_t n_bytes) noexcept
     {
         single_.uploadedBytes += n_bytes;
+        is_dirty_ = true;
     }
 
     constexpr void add_downloaded(uint32_t n_bytes) noexcept
     {
         single_.downloadedBytes += n_bytes;
+        is_dirty_ = true;
     }
 
     constexpr void add_file_created() noexcept
     {
         ++single_.filesAdded;
+        is_dirty_ = true;
     }
 
     void save() const;
+    void save_if_dirty();
 
 private:
     static tr_session_stats add(tr_session_stats const& a, tr_session_stats const& b);
@@ -72,7 +77,15 @@ private:
     std::string const config_dir_;
     time_t start_time_;
 
-    static constexpr auto Zero = tr_session_stats{ TR_RATIO_NA, 0U, 0U, 0U, 0U, 0U };
+    static constexpr auto Zero = tr_session_stats{
+        .ratio = TR_RATIO_NA,
+        .uploadedBytes = 0U,
+        .downloadedBytes = 0U,
+        .filesAdded = 0U,
+        .sessionCount = 0U,
+        .secondsActive = time_t{},
+    };
     tr_session_stats single_ = Zero;
     tr_session_stats old_ = Zero;
+    bool is_dirty_ = false;
 };

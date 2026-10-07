@@ -10,10 +10,10 @@
 #include <limits>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/bitfield.h>
-
-#include "gtest/gtest.h"
 
 TEST(Bitfield, count)
 {

@@ -15,22 +15,14 @@
 #include <string_view>
 #include <utility>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/file.h" // tr_sys_file_t
 #include "libtransmission/lru-cache.h"
+#include "libtransmission/types.h"
 
 // A pool of open files that are cached while reading / writing torrents' data
 class tr_open_files
 {
 public:
-    enum class Preallocation : uint8_t
-    {
-        None,
-        Sparse,
-        Full
-    };
-
     [[nodiscard]] std::optional<tr_sys_file_t> get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable);
 
     [[nodiscard]] std::optional<tr_sys_file_t> get(
@@ -38,7 +30,7 @@ public:
         tr_file_index_t file_num,
         bool writable,
         std::string_view filename,
-        Preallocation allocation,
+        tr_file_preallocation allocation,
         uint64_t file_size);
 
     void close_all();

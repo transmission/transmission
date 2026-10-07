@@ -1,13 +1,19 @@
+#if __has_feature(modules)
 @import AppKit;
 @import CoreFoundation;
 @import QuickLook;
+#else
+#import <AppKit/AppKit.h>
+#import <CoreFoundation/CFPlugInCOM.h>
+#import <QuickLook/QuickLook.h>
+#endif
 
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include <libtransmission/string-utils.h>
 #include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/utils.h>
 
 #import "NSStringAdditions.h"
 

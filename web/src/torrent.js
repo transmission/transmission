@@ -189,6 +189,9 @@ export class Torrent extends EventTarget {
   getPeers() {
     return this.fields.peers || [];
   }
+  getWebseedsEx() {
+    return this.fields.webseeds_ex || [];
+  }
   getPeersConnected() {
     return this.fields.peers_connected;
   }
@@ -594,6 +597,7 @@ Torrent.Fields = {};
 Torrent.Fields.Metadata = [
   'added_date',
   'file_count',
+  'is_private',
   'name',
   'primary_mime_type',
   'total_size',
@@ -635,7 +639,6 @@ Torrent.Fields.InfoExtra = [
   'date_created',
   'files',
   'hash_string',
-  'is_private',
   'magnet_link',
   'piece_count',
   'piece_size',
@@ -653,4 +656,5 @@ Torrent.Fields.StatsExtra = [
   'peers',
   'start_date',
   'tracker_stats',
+  'webseeds_ex',
 ];

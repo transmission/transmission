@@ -19,7 +19,8 @@ class WatchDir : public QObject
     Q_OBJECT
 
 public:
-    explicit WatchDir(TorrentModel const&);
+    explicit WatchDir(TorrentModel const& model);
+    ~WatchDir() override = default;
     WatchDir(WatchDir&&) = delete;
     WatchDir(WatchDir const&) = delete;
     WatchDir& operator=(WatchDir&&) = delete;
@@ -37,7 +38,7 @@ private slots:
     void rescanAllWatchedDirectories();
 
 private:
-    enum class AddResult
+    enum class AddResult : uint8_t
     {
         Success,
         Duplicate,

@@ -2,18 +2,24 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#if __has_feature(modules)
 @import Carbon;
 @import UserNotifications;
 
 @import Sparkle;
+#else
+#import <Carbon/Carbon.h>
+#import <UserNotifications/UserNotifications.h>
+
+#import <Sparkle/Sparkle.h>
+#endif
 
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
 
 #include <libtransmission/transmission.h>
 
-#include <libtransmission/log.h>
+#include <libtransmission/string-utils.h>
 #include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 
@@ -53,8 +59,8 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-#import "VersionComparator.h"
 #import "PowerManager.h"
+#import "Utils.h"
 
 typedef NSString* ToolbarItemIdentifier NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -129,7 +135,7 @@ static NSTimeInterval const kDonateNagTime = 60 * 60 * 24 * 7;
 
 static void initUnits()
 {
-    using Config = libtransmission::Values::Config;
+    using Config = tr::Values::Config;
 
     // use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes,
     // we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
@@ -162,17 +168,116 @@ static void initUnits()
                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 }
 
-static void altSpeedToggledCallback([[maybe_unused]] tr_session* handle, bool active, bool byUser, void* controller)
+static tr_variant getSettingsFromNSUserDefaults(NSUserDefaults* defaults)
 {
-    NSDictionary* dict = @{@"Active" : @(active), @"ByUser" : @(byUser)};
-    [(__bridge Controller*)controller performSelectorOnMainThread:@selector(altSpeedToggledCallbackIsLimited:) withObject:dict
-                                                    waitUntilDone:NO];
-}
+    auto settings = tr_variant::Map{};
 
-static tr_rpc_callback_status rpcCallback([[maybe_unused]] tr_session* handle, tr_rpc_callback_type type, struct tr_torrent* torrentStruct, void* controller)
-{
-    [(__bridge Controller*)controller rpcCallback:type forTorrentStruct:torrentStruct];
-    return TR_RPC_NOREMOVE; //we'll do the remove manually
+    BOOL const usesSpeedLimitSched = [defaults boolForKey:@"SpeedLimitAuto"];
+    if (!usesSpeedLimitSched)
+    {
+        settings.insert_or_assign(TR_KEY_alt_speed_enabled, static_cast<bool>([defaults boolForKey:@"SpeedLimit"]));
+    }
+
+    settings.insert_or_assign(TR_KEY_alt_speed_up, [defaults integerForKey:@"SpeedLimitUploadLimit"]);
+    settings.insert_or_assign(TR_KEY_alt_speed_down, [defaults integerForKey:@"SpeedLimitDownloadLimit"]);
+
+    settings.insert_or_assign(TR_KEY_alt_speed_time_enabled, static_cast<bool>([defaults boolForKey:@"SpeedLimitAuto"]));
+    settings.insert_or_assign(TR_KEY_alt_speed_time_begin, [PrefsController dateToTimeSum:[defaults objectForKey:@"SpeedLimitAutoOnDate"]]);
+    settings.insert_or_assign(TR_KEY_alt_speed_time_end, [PrefsController dateToTimeSum:[defaults objectForKey:@"SpeedLimitAutoOffDate"]]);
+    settings.insert_or_assign(TR_KEY_alt_speed_time_day, [defaults integerForKey:@"SpeedLimitAutoDay"]);
+
+    settings.insert_or_assign(TR_KEY_speed_limit_down, [defaults integerForKey:@"DownloadLimit"]);
+    settings.insert_or_assign(TR_KEY_speed_limit_down_enabled, static_cast<bool>([defaults boolForKey:@"CheckDownload"]));
+    settings.insert_or_assign(TR_KEY_speed_limit_up, [defaults integerForKey:@"UploadLimit"]);
+    settings.insert_or_assign(TR_KEY_speed_limit_up_enabled, static_cast<bool>([defaults boolForKey:@"CheckUpload"]));
+
+    //hidden prefs
+    if ([defaults objectForKey:@"BindAddressIPv4"])
+    {
+        settings.insert_or_assign(TR_KEY_bind_address_ipv4, [defaults stringForKey:@"BindAddressIPv4"].UTF8String);
+    }
+    if ([defaults objectForKey:@"BindAddressIPv6"])
+    {
+        settings.insert_or_assign(TR_KEY_bind_address_ipv6, [defaults stringForKey:@"BindAddressIPv6"].UTF8String);
+    }
+
+    settings.insert_or_assign(TR_KEY_blocklist_enabled, static_cast<bool>([defaults boolForKey:@"BlocklistNew"]));
+    if ([defaults objectForKey:@"BlocklistURL"])
+    {
+        settings.insert_or_assign(TR_KEY_blocklist_url, [defaults stringForKey:@"BlocklistURL"].UTF8String);
+    }
+    settings.insert_or_assign(TR_KEY_dht_enabled, static_cast<bool>([defaults boolForKey:@"DHTGlobal"]));
+    settings.insert_or_assign(TR_KEY_download_dir, [defaults stringForKey:@"DownloadFolder"].stringByExpandingTildeInPath.UTF8String);
+    settings.insert_or_assign(TR_KEY_download_queue_enabled, static_cast<bool>([defaults boolForKey:@"Queue"]));
+    settings.insert_or_assign(TR_KEY_download_queue_size, [defaults integerForKey:@"QueueDownloadNumber"]);
+    settings.insert_or_assign(TR_KEY_idle_seeding_limit, [defaults integerForKey:@"IdleLimitMinutes"]);
+    settings.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, static_cast<bool>([defaults boolForKey:@"IdleLimitCheck"]));
+    settings.insert_or_assign(
+        TR_KEY_incomplete_dir,
+        [defaults stringForKey:@"IncompleteDownloadFolder"].stringByExpandingTildeInPath.UTF8String);
+    settings.insert_or_assign(TR_KEY_incomplete_dir_enabled, static_cast<bool>([defaults boolForKey:@"UseIncompleteDownloadFolder"]));
+    settings.insert_or_assign(TR_KEY_torrent_complete_verify_enabled, static_cast<bool>([defaults boolForKey:@"VerifyDataOnCompletion"]));
+    settings.insert_or_assign(TR_KEY_lpd_enabled, static_cast<bool>([defaults boolForKey:@"LocalPeerDiscoveryGlobal"]));
+    settings.insert_or_assign(TR_KEY_message_level, TR_LOG_DEBUG);
+    settings.insert_or_assign(TR_KEY_peer_limit_global, [defaults integerForKey:@"PeersTotal"]);
+    settings.insert_or_assign(TR_KEY_peer_limit_per_torrent, [defaults integerForKey:@"PeersTorrent"]);
+
+    NSInteger bindPort = [defaults integerForKey:@"BindPort"];
+    if (bindPort <= 0 || bindPort > 65535)
+    {
+        // First launch, we avoid a default port to be less likely blocked on such port and to have more chances of success when connecting to swarms.
+        // Ideally, we should be setting port 0, then reading the port number assigned by the system and save that value. But that would be best handled by libtransmission itself.
+        // For now, we randomize the port as a Dynamic/Private/Ephemeral Port from 49152-65535
+        // https://datatracker.ietf.org/doc/html/rfc6335#section-6
+        uint16_t defaultPort = 49152 + arc4random_uniform(65536 - 49152);
+        [defaults setInteger:defaultPort forKey:@"BindPort"];
+    }
+
+    bool const randomPort = [defaults boolForKey:@"RandomPort"];
+    settings.insert_or_assign(TR_KEY_peer_port_random_on_start, randomPort);
+    if (!randomPort)
+    {
+        settings.insert_or_assign(TR_KEY_peer_port, [defaults integerForKey:@"BindPort"]);
+    }
+
+    //hidden pref
+    if ([defaults objectForKey:@"PeerSocketTOS"])
+    {
+        settings.insert_or_assign(TR_KEY_peer_socket_diffserv, [defaults stringForKey:@"PeerSocketTOS"].UTF8String);
+    }
+
+    settings.insert_or_assign(TR_KEY_pex_enabled, static_cast<bool>([defaults boolForKey:@"PEXGlobal"]));
+    settings.insert_or_assign(TR_KEY_port_forwarding_enabled, static_cast<bool>([defaults boolForKey:@"NatTraversal"]));
+    settings.insert_or_assign(TR_KEY_queue_stalled_enabled, static_cast<bool>([defaults boolForKey:@"CheckStalled"]));
+    settings.insert_or_assign(TR_KEY_queue_stalled_minutes, [defaults integerForKey:@"StalledMinutes"]);
+    settings.insert_or_assign(TR_KEY_seed_ratio_limit, [defaults floatForKey:@"RatioLimit"]);
+    settings.insert_or_assign(TR_KEY_seed_ratio_limited, static_cast<bool>([defaults boolForKey:@"RatioCheck"]));
+    settings.insert_or_assign(TR_KEY_rename_partial_files, static_cast<bool>([defaults boolForKey:@"RenamePartialFiles"]));
+    settings.insert_or_assign(TR_KEY_rpc_authentication_required, static_cast<bool>([defaults boolForKey:@"RPCAuthorize"]));
+    settings.insert_or_assign(TR_KEY_rpc_enabled, static_cast<bool>([defaults boolForKey:@"RPC"]));
+    settings.insert_or_assign(TR_KEY_rpc_port, [defaults integerForKey:@"RPCPort"]);
+    settings.insert_or_assign(TR_KEY_rpc_username, [defaults stringForKey:@"RPCUsername"].UTF8String);
+    settings.insert_or_assign(TR_KEY_rpc_whitelist_enabled, static_cast<bool>([defaults boolForKey:@"RPCUseWhitelist"]));
+    settings.insert_or_assign(TR_KEY_rpc_host_whitelist_enabled, static_cast<bool>([defaults boolForKey:@"RPCUseHostWhitelist"]));
+    settings.insert_or_assign(TR_KEY_seed_queue_enabled, static_cast<bool>([defaults boolForKey:@"QueueSeed"]));
+    settings.insert_or_assign(TR_KEY_seed_queue_size, [defaults integerForKey:@"QueueSeedNumber"]);
+    settings.insert_or_assign(TR_KEY_start_added_torrents, static_cast<bool>([defaults boolForKey:@"AutoStartDownload"]));
+    settings.insert_or_assign(TR_KEY_utp_enabled, static_cast<bool>([defaults boolForKey:@"UTPGlobal"]));
+
+    settings.insert_or_assign(TR_KEY_script_torrent_done_enabled, static_cast<bool>([defaults boolForKey:@"DoneScriptEnabled"]));
+    NSString* prefs_string = [defaults stringForKey:@"DoneScriptPath"];
+    if (prefs_string != nil)
+    {
+        settings.insert_or_assign(TR_KEY_script_torrent_done_filename, prefs_string.UTF8String);
+    }
+
+    // TODO: Add to GUI
+    if ([defaults objectForKey:@"RPCHostWhitelist"])
+    {
+        settings.insert_or_assign(TR_KEY_rpc_host_whitelist, [defaults stringForKey:@"RPCHostWhitelist"].UTF8String);
+    }
+
+    return tr_variant{ std::move(settings) };
 }
 
 // 2.90 was infected with ransomware which we now check for and attempt to remove
@@ -268,6 +373,7 @@ static void removeKeRangerRansomware()
 @interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate, PowerManagerDelegate>
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
+@property(nonatomic) IBOutlet SPUStandardUpdaterController* fUpdaterController;
 @property(nonatomic) NSLayoutConstraint* fMinHeightConstraint;
 @property(nonatomic) NSLayoutConstraint* fFixedHeightConstraint;
 @property(nonatomic) IBOutlet TorrentTableView* fTableView;
@@ -332,6 +438,8 @@ static void removeKeRangerRansomware()
 @property(nonatomic) NSView* fPositioningView;
 @property(nonatomic) BOOL fSoundPlaying;
 
+- (void)removeTorrentsImpl:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
+
 @end
 
 @implementation Controller
@@ -373,61 +481,6 @@ static void removeKeRangerRansomware()
     [NSValueTransformer setValueTransformer:iconTransformer forName:@"ExpandedPathToIconTransformer"];
 }
 
-void onStartQueue(tr_session* /*session*/, tr_torrent* /*tor*/, void* /*vself*/)
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
-        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
-                                                 postingStyle:NSPostASAP
-                                                 coalesceMask:NSNotificationCoalescingOnName
-                                                     forModes:nil];
-    });
-}
-
-void onIdleLimitHit(tr_session* /*session*/, tr_torrent* tor, void* vself)
-{
-    auto* const controller = (__bridge Controller*)(vself);
-    auto const hashstr = @(tr_torrentView(tor).hash_string);
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        auto* const torrent = [controller torrentForHash:hashstr];
-        [torrent idleLimitHit];
-    });
-}
-
-void onRatioLimitHit(tr_session* /*session*/, tr_torrent* tor, void* vself)
-{
-    auto* const controller = (__bridge Controller*)(vself);
-    auto const hashstr = @(tr_torrentView(tor).hash_string);
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        auto* const torrent = [controller torrentForHash:hashstr];
-        [torrent ratioLimitHit];
-    });
-}
-
-void onMetadataCompleted(tr_session* /*session*/, tr_torrent* tor, void* vself)
-{
-    auto* const controller = (__bridge Controller*)(vself);
-    auto const hashstr = @(tr_torrentView(tor).hash_string);
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        auto* const torrent = [controller torrentForHash:hashstr];
-        [torrent metadataRetrieved];
-    });
-}
-
-void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool wasRunning, void* vself)
-{
-    auto* const controller = (__bridge Controller*)(vself);
-    auto const hashstr = @(tr_torrentView(tor).hash_string);
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        auto* const torrent = [controller torrentForHash:hashstr];
-        [torrent completenessChange:status wasRunning:wasRunning];
-    });
-}
-
 - (instancetype)init
 {
     if ((self = [super init]))
@@ -449,114 +502,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //upgrading from versions < 2.40: clear recent items
         [NSDocumentController.sharedDocumentController clearRecentDocuments:nil];
 
-        auto settings = tr_sessionGetDefaultSettings();
-
-        BOOL const usesSpeedLimitSched = [_fDefaults boolForKey:@"SpeedLimitAuto"];
-        if (!usesSpeedLimitSched)
-        {
-            tr_variantDictAddBool(&settings, TR_KEY_alt_speed_enabled, [_fDefaults boolForKey:@"SpeedLimit"]);
-        }
-
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_up, [_fDefaults integerForKey:@"SpeedLimitUploadLimit"]);
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_down, [_fDefaults integerForKey:@"SpeedLimitDownloadLimit"]);
-
-        tr_variantDictAddBool(&settings, TR_KEY_alt_speed_time_enabled, [_fDefaults boolForKey:@"SpeedLimitAuto"]);
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_time_begin, [PrefsController dateToTimeSum:[_fDefaults objectForKey:@"SpeedLimitAutoOnDate"]]);
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_time_end, [PrefsController dateToTimeSum:[_fDefaults objectForKey:@"SpeedLimitAutoOffDate"]]);
-        tr_variantDictAddInt(&settings, TR_KEY_alt_speed_time_day, [_fDefaults integerForKey:@"SpeedLimitAutoDay"]);
-
-        tr_variantDictAddInt(&settings, TR_KEY_speed_limit_down, [_fDefaults integerForKey:@"DownloadLimit"]);
-        tr_variantDictAddBool(&settings, TR_KEY_speed_limit_down_enabled, [_fDefaults boolForKey:@"CheckDownload"]);
-        tr_variantDictAddInt(&settings, TR_KEY_speed_limit_up, [_fDefaults integerForKey:@"UploadLimit"]);
-        tr_variantDictAddBool(&settings, TR_KEY_speed_limit_up_enabled, [_fDefaults boolForKey:@"CheckUpload"]);
-
-        //hidden prefs
-        if ([_fDefaults objectForKey:@"BindAddressIPv4"])
-        {
-            tr_variantDictAddStr(&settings, TR_KEY_bind_address_ipv4, [_fDefaults stringForKey:@"BindAddressIPv4"].UTF8String);
-        }
-        if ([_fDefaults objectForKey:@"BindAddressIPv6"])
-        {
-            tr_variantDictAddStr(&settings, TR_KEY_bind_address_ipv6, [_fDefaults stringForKey:@"BindAddressIPv6"].UTF8String);
-        }
-
-        tr_variantDictAddBool(&settings, TR_KEY_blocklist_enabled, [_fDefaults boolForKey:@"BlocklistNew"]);
-        if ([_fDefaults objectForKey:@"BlocklistURL"])
-            tr_variantDictAddStr(&settings, TR_KEY_blocklist_url, [_fDefaults stringForKey:@"BlocklistURL"].UTF8String);
-        tr_variantDictAddBool(&settings, TR_KEY_dht_enabled, [_fDefaults boolForKey:@"DHTGlobal"]);
-        tr_variantDictAddStr(
-            &settings,
-            TR_KEY_download_dir,
-            [_fDefaults stringForKey:@"DownloadFolder"].stringByExpandingTildeInPath.UTF8String);
-        tr_variantDictAddBool(&settings, TR_KEY_download_queue_enabled, [_fDefaults boolForKey:@"Queue"]);
-        tr_variantDictAddInt(&settings, TR_KEY_download_queue_size, [_fDefaults integerForKey:@"QueueDownloadNumber"]);
-        tr_variantDictAddInt(&settings, TR_KEY_idle_seeding_limit, [_fDefaults integerForKey:@"IdleLimitMinutes"]);
-        tr_variantDictAddBool(&settings, TR_KEY_idle_seeding_limit_enabled, [_fDefaults boolForKey:@"IdleLimitCheck"]);
-        tr_variantDictAddStr(
-            &settings,
-            TR_KEY_incomplete_dir,
-            [_fDefaults stringForKey:@"IncompleteDownloadFolder"].stringByExpandingTildeInPath.UTF8String);
-        tr_variantDictAddBool(&settings, TR_KEY_incomplete_dir_enabled, [_fDefaults boolForKey:@"UseIncompleteDownloadFolder"]);
-        tr_variantDictAddBool(&settings, TR_KEY_torrent_complete_verify_enabled, [_fDefaults boolForKey:@"VerifyDataOnCompletion"]);
-        tr_variantDictAddBool(&settings, TR_KEY_lpd_enabled, [_fDefaults boolForKey:@"LocalPeerDiscoveryGlobal"]);
-        tr_variantDictAddInt(&settings, TR_KEY_message_level, TR_LOG_DEBUG);
-        tr_variantDictAddInt(&settings, TR_KEY_peer_limit_global, [_fDefaults integerForKey:@"PeersTotal"]);
-        tr_variantDictAddInt(&settings, TR_KEY_peer_limit_per_torrent, [_fDefaults integerForKey:@"PeersTorrent"]);
-
-        NSInteger bindPort = [_fDefaults integerForKey:@"BindPort"];
-        if (bindPort <= 0 || bindPort > 65535)
-        {
-            // First launch, we avoid a default port to be less likely blocked on such port and to have more chances of success when connecting to swarms.
-            // Ideally, we should be setting port 0, then reading the port number assigned by the system and save that value. But that would be best handled by libtransmission itself.
-            // For now, we randomize the port as a Dynamic/Private/Ephemeral Port from 49152–65535
-            // https://datatracker.ietf.org/doc/html/rfc6335#section-6
-            uint16_t defaultPort = 49152 + arc4random_uniform(65536 - 49152);
-            [_fDefaults setInteger:defaultPort forKey:@"BindPort"];
-        }
-
-        BOOL const randomPort = [_fDefaults boolForKey:@"RandomPort"];
-        tr_variantDictAddBool(&settings, TR_KEY_peer_port_random_on_start, randomPort);
-        if (!randomPort)
-        {
-            tr_variantDictAddInt(&settings, TR_KEY_peer_port, [_fDefaults integerForKey:@"BindPort"]);
-        }
-
-        //hidden pref
-        if ([_fDefaults objectForKey:@"PeerSocketTOS"])
-        {
-            tr_variantDictAddStr(&settings, TR_KEY_peer_socket_diffserv, [_fDefaults stringForKey:@"PeerSocketTOS"].UTF8String);
-        }
-
-        tr_variantDictAddBool(&settings, TR_KEY_pex_enabled, [_fDefaults boolForKey:@"PEXGlobal"]);
-        tr_variantDictAddBool(&settings, TR_KEY_port_forwarding_enabled, [_fDefaults boolForKey:@"NatTraversal"]);
-        tr_variantDictAddBool(&settings, TR_KEY_queue_stalled_enabled, [_fDefaults boolForKey:@"CheckStalled"]);
-        tr_variantDictAddInt(&settings, TR_KEY_queue_stalled_minutes, [_fDefaults integerForKey:@"StalledMinutes"]);
-        tr_variantDictAddReal(&settings, TR_KEY_ratio_limit, [_fDefaults floatForKey:@"RatioLimit"]);
-        tr_variantDictAddBool(&settings, TR_KEY_ratio_limit_enabled, [_fDefaults boolForKey:@"RatioCheck"]);
-        tr_variantDictAddBool(&settings, TR_KEY_rename_partial_files, [_fDefaults boolForKey:@"RenamePartialFiles"]);
-        tr_variantDictAddBool(&settings, TR_KEY_rpc_authentication_required, [_fDefaults boolForKey:@"RPCAuthorize"]);
-        tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, [_fDefaults boolForKey:@"RPC"]);
-        tr_variantDictAddInt(&settings, TR_KEY_rpc_port, [_fDefaults integerForKey:@"RPCPort"]);
-        tr_variantDictAddStr(&settings, TR_KEY_rpc_username, [_fDefaults stringForKey:@"RPCUsername"].UTF8String);
-        tr_variantDictAddBool(&settings, TR_KEY_rpc_whitelist_enabled, [_fDefaults boolForKey:@"RPCUseWhitelist"]);
-        tr_variantDictAddBool(&settings, TR_KEY_rpc_host_whitelist_enabled, [_fDefaults boolForKey:@"RPCUseHostWhitelist"]);
-        tr_variantDictAddBool(&settings, TR_KEY_seed_queue_enabled, [_fDefaults boolForKey:@"QueueSeed"]);
-        tr_variantDictAddInt(&settings, TR_KEY_seed_queue_size, [_fDefaults integerForKey:@"QueueSeedNumber"]);
-        tr_variantDictAddBool(&settings, TR_KEY_start_added_torrents, [_fDefaults boolForKey:@"AutoStartDownload"]);
-        tr_variantDictAddBool(&settings, TR_KEY_utp_enabled, [_fDefaults boolForKey:@"UTPGlobal"]);
-
-        tr_variantDictAddBool(&settings, TR_KEY_script_torrent_done_enabled, [_fDefaults boolForKey:@"DoneScriptEnabled"]);
-        NSString* prefs_string = [_fDefaults stringForKey:@"DoneScriptPath"];
-        if (prefs_string != nil)
-        {
-            tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, prefs_string.UTF8String);
-        }
-
-        // TODO: Add to GUI
-        if ([_fDefaults objectForKey:@"RPCHostWhitelist"])
-        {
-            tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [_fDefaults stringForKey:@"RPCHostWhitelist"].UTF8String);
-        }
+        auto settings = getSettingsFromNSUserDefaults(_fDefaults);
+        settings.merge(tr_sessionGetDefaultSettings());
 
         initUnits();
 
@@ -564,11 +511,55 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         _fLib = tr_sessionInit(default_config_dir, YES, settings);
         _fConfigDirectory = @(default_config_dir.c_str());
 
-        tr_sessionSetIdleLimitHitCallback(_fLib, onIdleLimitHit, (__bridge void*)(self));
-        tr_sessionSetQueueStartCallback(_fLib, onStartQueue, (__bridge void*)(self));
-        tr_sessionSetRatioLimitHitCallback(_fLib, onRatioLimitHit, (__bridge void*)(self));
-        tr_sessionSetMetadataCallback(_fLib, onMetadataCompleted, (__bridge void*)(self));
-        tr_sessionSetCompletenessCallback(_fLib, onTorrentCompletenessChanged, (__bridge void*)(self));
+        tr_sessionSetIdleLimitHitCallback(
+            _fLib,
+            [controller = self](tr_torrent_id_t const tor_id)
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    auto* const torrent = [controller torrentForId:tor_id];
+                    [torrent idleLimitHit];
+                });
+            });
+        tr_sessionSetQueueStartCallback(
+            _fLib,
+            [](tr_torrent_id_t const /*tor_id*/)
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
+                    [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState"
+                                                                                                        object:nil]
+                                                             postingStyle:NSPostASAP
+                                                             coalesceMask:NSNotificationCoalescingOnName
+                                                                 forModes:nil];
+                });
+            });
+        tr_sessionSetRatioLimitHitCallback(
+            _fLib,
+            [controller = self](tr_torrent_id_t const tor_id)
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    auto* const torrent = [controller torrentForId:tor_id];
+                    [torrent ratioLimitHit];
+                });
+            });
+        tr_sessionSetMetadataCallback(
+            _fLib,
+            [controller = self](tr_torrent_id_t const tor_id)
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    auto* const torrent = [controller torrentForId:tor_id];
+                    [torrent metadataRetrieved];
+                });
+            });
+        tr_sessionSetCompletenessCallback(
+            _fLib,
+            [controller = self](tr_torrent_id_t const tor_id, tr_completeness const status, bool const was_running)
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    auto* const torrent = [controller torrentForId:tor_id];
+                    [torrent completenessChange:status wasRunning:was_running];
+                });
+            });
 
         NSApp.delegate = self;
 
@@ -598,15 +589,29 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         _fGlobalPopoverShown = NO;
         _fSoundPlaying = NO;
 
-        tr_sessionSetAltSpeedFunc(_fLib, altSpeedToggledCallback, (__bridge void*)(self));
+        tr_sessionSetAltSpeedFunc(
+            _fLib,
+            [controller = self](bool const active, bool const by_user)
+            {
+                NSDictionary* const dict = @{ @"Active" : @(active), @"ByUser" : @(by_user) };
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [controller altSpeedToggledCallbackIsLimited:dict];
+                });
+            });
+        BOOL const usesSpeedLimitSched = [_fDefaults boolForKey:@"SpeedLimitAuto"];
         if (usesSpeedLimitSched)
         {
             [_fDefaults setBool:tr_sessionUsesAltSpeed(_fLib) forKey:@"SpeedLimit"];
         }
 
-        tr_sessionSetRPCCallback(_fLib, rpcCallback, (__bridge void*)(self));
+        tr_sessionSetRPCCallback(
+            _fLib,
+            [controller = self](tr_rpc_callback_type const type, std::optional<tr_torrent_id_t> const tor_id)
+            {
+                [controller rpcCallback:type forTorrentId:tor_id];
+                return TR_RPC_NOREMOVE; // we'll do the remove manually
+            });
 
-        [SUUpdater sharedUpdater].delegate = self;
         _fQuitRequested = NO;
 
         _fPauseOnLaunch = (GetCurrentKeyModifiers() & (optionKey | rightOptionKey)) != 0;
@@ -716,11 +721,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     tr_sessionGetAllTorrents(session, std::data(torrents), std::size(torrents));
     for (auto* tor : torrents)
     {
-        NSString* location;
-        if (tr_torrentGetDownloadDir(tor) != NULL)
-        {
-            location = @(tr_torrentGetDownloadDir(tor));
-        }
+        NSString* location = tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(tor));
         Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:tor location:location lib:self.fLib];
         [self.fTorrents addObject:torrent];
         self.fTorrentHashes[torrent.hashString] = torrent;
@@ -813,19 +814,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     [self updateMainWindow];
 
-    if (@available(macOS 26.0, *))
-        ;
-    else
-    {
-        // <#7908> Keep older macOS clean of visual noise
-        for (NSMenuItem* item in _fWindow.menu.itemArray)
-            for (NSMenuItem* subItem in item.submenu.itemArray)
-                subItem.image = nil;
-    }
-
     //timer to update the interface every second
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateUISeconds target:self selector:@selector(updateUI) userInfo:nil
-                                                  repeats:YES];
+    __weak __auto_type weakSelf = self;
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateUISeconds repeats:YES block:^(NSTimer* _Nonnull timer) {
+        [weakSelf updateUI];
+    }];
+
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSModalPanelRunLoopMode];
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSEventTrackingRunLoopMode];
 
@@ -1201,7 +1195,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     if ([urlString rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
     {
         // originalRequest was a redirect to a magnet
-        [self performSelectorOnMainThread:@selector(openMagnet:) withObject:urlString waitUntilDone:NO];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self openMagnet:urlString];
+        });
         return;
     }
 
@@ -1375,7 +1371,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else
     {
-        [torrent closeRemoveTorrent:NO];
+        [self removeTorrentsImpl:@[ torrent ] deleteData:NO];
     }
 
     [self.fAddWindows removeObject:addController];
@@ -1390,7 +1386,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     tr_torrent* duplicateTorrent;
     if ((duplicateTorrent = tr_torrentFindFromMagnetLink(self.fLib, address.UTF8String)))
     {
-        NSString* name = @(tr_torrentName(duplicateTorrent));
+        NSString* name = tr_strv_to_utf8_nsstring(tr_torrentName(duplicateTorrent));
         [self duplicateOpenMagnetAlert:address transferName:name];
         return;
     }
@@ -1469,7 +1465,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else
     {
-        [torrent closeRemoveTorrent:NO];
+        [self removeTorrentsImpl:@[ torrent ] deleteData:NO];
     }
 
     [self.fAddWindows removeObject:addController];
@@ -1494,7 +1490,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (void)open:(NSArray*)files
 {
     NSDictionary* dict = @{ @"Filenames" : files, @"AddType" : @(AddTypeManual) };
-    [self performSelectorOnMainThread:@selector(openFilesWithDict:) withObject:dict waitUntilDone:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self openFilesWithDict:dict];
+    });
 }
 
 - (void)openShowSheet:(id)sender
@@ -1520,7 +1518,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                 @"Filenames" : filenames,
                 @"AddType" : sender == self.fOpenIgnoreDownloadFolder ? @(AddTypeShowOptions) : @(AddTypeManual)
             };
-            [self performSelectorOnMainThread:@selector(openFilesWithDict:) withObject:dictionary waitUntilDone:NO];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self openFilesWithDict:dictionary];
+            });
         }
     }];
 }
@@ -1703,26 +1703,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)openPasteboard
 {
-    // 1. If Pasteboard contains URL objects, we treat those and only those
-    NSArray<NSURL*>* arrayOfURLs = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSURL class] ] options:nil];
-
-    if (arrayOfURLs.count > 0)
-    {
-        for (NSURL* url in arrayOfURLs)
-        {
-            [self openURL:url.absoluteString];
-        }
-        return;
-    }
-
-    // 2. If Pasteboard contains String objects, we'll search for both links and magnets
+    // 1. If Pasteboard contains String objects, search them for both magnets and plain links.
+    // Magnets must be matched against the raw string, not an NSURL object read from the pasteboard (see step 2).
     NSArray<NSString*>* arrayOfStrings = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
-    if (arrayOfStrings.count == 0)
-    {
-        return;
-    }
-    // The link detector (can't detect magnets)
-    NSDataDetector* linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+
     // The magnet detector
     // https://www.bittorrent.org/beps/bep_0009.html defines the magnet URI format as `magnet:?query` where query is non-empty.
     // https://datatracker.ietf.org/doc/html/rfc3986 defines the query format rigorously as `([!$\&-;=?-Z_a-z~]|%[0-9A-F]{2})*`.
@@ -1732,21 +1716,49 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     // But for now, we'll keep the historical separator choice from 8392476b30491ffe7d8d64210f5cf3c3dd1d69ca, whitespaceAndNewlineCharacterSet, which is `[\p{Z}\v]`.
     NSRegularExpression* magnetDetector = [NSRegularExpression regularExpressionWithPattern:@"magnet:?([^\\p{Z}\\v])+" options:kNilOptions
                                                                                       error:nil];
+    // The link detector (can't detect magnets). NSDataDetector doesn't understand percent-encoding, so scanning
+    // the raw text of a magnet link it can spuriously match a substring inside a percent-encoded `tr=` tracker
+    // parameter as if it were an unrelated bare domain (e.g. matching "2Ftracker.opentrackr.org" out of
+    // "udp%3A%2F%2Ftracker.opentrackr.org"), defaulting a bogus "http://" scheme onto it. Skipping any link match
+    // that overlaps a magnet match avoids that misfire while still opening a plain link genuinely pasted
+    // alongside a magnet. See https://github.com/transmission/transmission/issues/8736
+    NSDataDetector* linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+
+    BOOL foundMagnetOrLink = NO;
     for (NSString* itemString in arrayOfStrings)
     {
-        // We open all links
-        for (NSTextCheckingResult* result in [linkDetector matchesInString:itemString options:0
-                                                                     range:NSMakeRange(0, itemString.length)])
-        {
-            [self openURL:result.URL.absoluteString];
-        }
+        NSRange const fullRange = NSMakeRange(0, itemString.length);
 
-        // We open all magnets
-        for (NSTextCheckingResult* result in [magnetDetector matchesInString:itemString options:0
-                                                                       range:NSMakeRange(0, itemString.length)])
+        NSArray<NSTextCheckingResult*>* magnetMatches = [magnetDetector matchesInString:itemString options:0 range:fullRange];
+        for (NSTextCheckingResult* result in magnetMatches)
         {
             [self openURL:[itemString substringWithRange:result.range]];
+            foundMagnetOrLink = YES;
         }
+
+        for (NSTextCheckingResult* result in [linkDetector matchesInString:itemString options:0 range:fullRange])
+        {
+            BOOL const overlapsMagnet = [magnetMatches
+                                            indexOfObjectPassingTest:^BOOL(NSTextCheckingResult* magnetResult, NSUInteger idx, BOOL* stop) {
+                                                return NSIntersectionRange(result.range, magnetResult.range).length > 0;
+                                            }] != NSNotFound;
+            if (!overlapsMagnet)
+            {
+                [self openURL:result.URL.absoluteString];
+                foundMagnetOrLink = YES;
+            }
+        }
+    }
+    if (foundMagnetOrLink)
+    {
+        return;
+    }
+
+    // 2. Otherwise, if Pasteboard contains URL objects, we treat those and only those
+    NSArray<NSURL*>* arrayOfURLs = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSURL class] ] options:nil];
+    for (NSURL* url in arrayOfURLs)
+    {
+        [self openURL:url.absoluteString];
     }
 }
 
@@ -1946,6 +1958,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self confirmRemoveTorrents:torrents deleteData:deleteData];
 }
 
+- (void)removeTorrentsImpl:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData
+{
+    [self.fInfoController removeTorrentsFromInfo:torrents];
+
+    for (Torrent* torrent in torrents)
+    {
+        [torrent closeRemoveTorrent:deleteData];
+    }
+}
+
 - (void)confirmRemoveTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData
 {
     //miscellaneous
@@ -2003,10 +2025,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
                 //we can't closeRemoveTorrent: until it's no longer in the GUI at all
                 NSAnimationContext.currentContext.completionHandler = ^{
-                    for (Torrent* torrent in torrents)
-                    {
-                        [torrent closeRemoveTorrent:deleteData];
-                    }
+                    [self removeTorrentsImpl:torrents deleteData:deleteData];
 
                     [self fullUpdateUI];
                 };
@@ -2046,10 +2065,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     if (!beganUpdate)
     {
         //do here if we're not doing it at the end of the animation
-        for (Torrent* torrent in torrents)
-        {
-            [torrent closeRemoveTorrent:deleteData];
-        }
+        [self removeTorrentsImpl:torrents deleteData:deleteData];
     }
 }
 
@@ -2193,7 +2209,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             }
 
             [torrents removeObjectAtIndex:0];
-            [self performSelectorOnMainThread:@selector(copyTorrentFileForTorrents:) withObject:torrents waitUntilDone:NO];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self copyTorrentFileForTorrents:torrents];
+            });
         }];
     }
     else
@@ -2317,7 +2335,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     else
     {
         [self.fInfoController updateInfoStats];
-        [self.fInfoController.window orderFront:nil];
+        [self.fInfoController.window makeKeyAndOrderFront:nil];
 
         if (self.fInfoController.canQuickLook && [QLPreviewPanel sharedPreviewPanelExists] &&
             [QLPreviewPanel sharedPreviewPanel].visible)
@@ -2377,20 +2395,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     BOOL anyCompleted = NO;
     BOOL anyActive = NO;
 
+    [Torrent updateTorrents:self.fTorrents];
+
+    for (Torrent* torrent in self.fTorrents)
     {
-        // avoid having to wait for the same lock multiple times in the same operation
-        auto const lock = tr_sessionLock(self.sessionHandle);
-        for (Torrent* torrent in self.fTorrents)
-        {
-            [torrent update];
+        //pull the upload and download speeds - most consistent by using current stats
+        dlRate += torrent.downloadRate;
+        ulRate += torrent.uploadRate;
 
-            //pull the upload and download speeds - most consistent by using current stats
-            dlRate += torrent.downloadRate;
-            ulRate += torrent.uploadRate;
-
-            anyCompleted |= torrent.finishedSeeding;
-            anyActive |= torrent.active && !torrent.stalled && !torrent.error;
-        }
+        anyCompleted |= torrent.finishedSeeding;
+        anyActive |= torrent.active && !torrent.stalled && !torrent.error;
     }
 
     PowerManager.shared.shouldPreventSleep = anyActive && [self.fDefaults boolForKey:@"SleepPrevent"];
@@ -2575,6 +2589,19 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     __block Torrent* torrent = nil;
     [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(Torrent* obj, NSUInteger /*idx*/, BOOL* stop) {
         if ([obj.hashString isEqualToString:hash])
+        {
+            torrent = obj;
+            *stop = YES;
+        }
+    }];
+    return torrent;
+}
+
+- (Torrent*)torrentForId:(tr_torrent_id_t)id
+{
+    __block Torrent* torrent = nil;
+    [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(Torrent* obj, NSUInteger /*idx*/, BOOL* stop) {
+        if (obj.id == id)
         {
             torrent = obj;
             *stop = YES;
@@ -3553,10 +3580,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 
     //check again in 10 seconds in case torrent file wasn't complete
-    self.fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval:10.0 target:self
-                                                           selector:@selector(checkAutoImportDirectory)
-                                                           userInfo:nil
-                                                            repeats:NO];
+    __weak __auto_type weakSelf = self;
+    self.fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval:10.0 repeats:NO block:^(NSTimer* _Nonnull timer) {
+        [weakSelf checkAutoImportDirectory];
+    }];
 
     [self checkAutoImportDirectory];
 }
@@ -3827,8 +3854,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             for (Torrent* torrent in self.fTorrents)
             {
                 torrent.queuePosition = i++;
-                [torrent update];
             }
+
+            [Torrent updateTorrents:self.fTorrents];
 
             //do the drag animation here so that the dragged torrents are the ones that are animated as moving, and not the torrents around them
             [self.fTableView beginUpdates];
@@ -4702,20 +4730,22 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 
     //enable toggle status bar
+    BOOL statusBarVisible = self.fStatusBar && !self.fStatusBar.isHidden;
     if (action == @selector(toggleStatusBar:))
     {
-        NSString* title = !self.fStatusBar ? NSLocalizedString(@"Show Status Bar", "View menu -> Status Bar") :
-                                             NSLocalizedString(@"Hide Status Bar", "View menu -> Status Bar");
+        NSString* title = !statusBarVisible ? NSLocalizedString(@"Show Status Bar", "View menu -> Status Bar") :
+                                              NSLocalizedString(@"Hide Status Bar", "View menu -> Status Bar");
         menuItem.title = title;
 
         return self.fWindow.visible;
     }
 
     //enable toggle filter bar
+    BOOL filterBarVisible = self.fFilterBar && !self.fFilterBar.isHidden;
     if (action == @selector(toggleFilterBar:))
     {
-        NSString* title = !self.fFilterBar ? NSLocalizedString(@"Show Filter Bar", "View menu -> Filter Bar") :
-                                             NSLocalizedString(@"Hide Filter Bar", "View menu -> Filter Bar");
+        NSString* title = !filterBarVisible ? NSLocalizedString(@"Show Filter Bar", "View menu -> Filter Bar") :
+                                              NSLocalizedString(@"Hide Filter Bar", "View menu -> Filter Bar");
         menuItem.title = title;
 
         return self.fWindow.visible;
@@ -4734,7 +4764,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //enable prev/next filter button
     if (action == @selector(switchFilter:))
     {
-        return self.fWindow.visible && self.fFilterBar;
+        return self.fWindow.visible && filterBarVisible;
     }
 
     //enable reveal in finder
@@ -5294,12 +5324,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         height = (kGroupSeparatorHeight + self.fTableView.intercellSpacing.height) * groups +
             (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
-
-        //account for group padding...
-        if (groups > 1)
-        {
-            height += (groups - 1) * 20;
-        }
     }
     else
     {
@@ -5398,35 +5422,34 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:kDonateURL]];
 }
 
-- (void)rpcCallback:(tr_rpc_callback_type)type forTorrentStruct:(struct tr_torrent*)torrentStruct
+- (void)rpcCallback:(tr_rpc_callback_type)type forTorrentId:(std::optional<tr_torrent_id_t>)torrentId
 {
     @autoreleasepool
     {
-        //get the torrent
-        __block Torrent* torrent = nil;
-        if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
-        {
-            [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                             usingBlock:^(Torrent* checkTorrent, NSUInteger /*idx*/, BOOL* stop) {
-                                                 if (torrentStruct == checkTorrent.torrentStruct)
-                                                 {
-                                                     torrent = checkTorrent;
-                                                     *stop = YES;
-                                                 }
-                                             }];
-
-            if (!torrent)
-            {
-                NSLog(@"No torrent found matching the given torrent struct from the RPC callback!");
-                return;
-            }
-        }
-
         dispatch_async(dispatch_get_main_queue(), ^{
+            //get the torrent
+            Torrent* torrent = nil;
+            if (torrentId.has_value() && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
+            {
+                torrent = [self torrentForId:*torrentId];
+
+                if (!torrent)
+                {
+                    NSLog(@"No torrent found matching the given torrent id from the RPC callback!");
+                    return;
+                }
+            }
+
             switch (type)
             {
             case TR_RPC_TORRENT_ADDED:
-                [self rpcAddTorrentStruct:torrentStruct];
+                if (torrentId.has_value())
+                {
+                    if (auto* const torrentStruct = tr_torrentFindFromId(self.fLib, *torrentId); torrentStruct != nullptr)
+                    {
+                        [self rpcAddTorrentStruct:torrentStruct];
+                    }
+                }
                 break;
 
             case TR_RPC_TORRENT_STARTED:
@@ -5472,11 +5495,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)rpcAddTorrentStruct:(struct tr_torrent*)torrentStruct
 {
-    NSString* location = nil;
-    if (tr_torrentGetDownloadDir(torrentStruct) != NULL)
-    {
-        location = @(tr_torrentGetDownloadDir(torrentStruct));
-    }
+    NSString* location = tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(torrentStruct));
 
     Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:torrentStruct location:location lib:self.fLib];
 
@@ -5537,10 +5556,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)rpcUpdateQueue
 {
-    for (Torrent* torrent in self.fTorrents)
-    {
-        [torrent update];
-    }
+    [Torrent updateTorrents:self.fTorrents];
 
     NSSortDescriptor* descriptor = [NSSortDescriptor sortDescriptorWithKey:@"queuePosition" ascending:YES];
     NSArray* descriptors = @[ descriptor ];
@@ -5551,16 +5567,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 @end
 
-@implementation Controller (SUUpdaterDelegate)
+@implementation Controller (SPUUpdaterDelegate)
 
-- (void)updaterWillRelaunchApplication:(SUUpdater*)updater
+- (void)updaterWillRelaunchApplication:(SPUUpdater*)updater
 {
     self.fQuitRequested = YES;
 }
 
-- (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater*)updater
+- (NSSet<NSString*>*)allowedChannelsForUpdater:(SPUUpdater*)updater
 {
-    return [VersionComparator new];
+    return [NSUserDefaults.standardUserDefaults boolForKey:@"AutoUpdateBeta"] ? [NSSet setWithObject:@"beta"] : NSSet.set;
 }
 
 @end

@@ -9,23 +9,30 @@
 #include <cstddef> // size_t
 #include <memory> // std::allocator
 #include <ratio>
+#include <span>
 #include <string>
 #include <string_view>
 
 #include <small/vector.hpp>
 
-#include "libtransmission/error.h"
-#include "libtransmission/net.h" // tr_socket_t
+#include "libtransmission/net.h" // tr_port
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h" // TR_CONSTEXPR
 #include "libtransmission/utils.h" // for tr_htonll(), tr_ntohll()
 
-namespace libtransmission
+namespace tr
 {
+
+namespace detail
+{
+template<typename T>
+concept object_representation = std::same_as<T, char> || std::same_as<T, unsigned char> || std::same_as<T, std::byte>;
+}
 
 template<typename value_type>
 class BufferReader
 {
+    static_assert(detail::object_representation<value_type>);
+
 public:
     virtual ~BufferReader() = default;
     virtual void drain(size_t n_bytes) = 0;
@@ -48,7 +55,7 @@ public:
     }
 
     template<typename T>
-    [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
+    [[nodiscard]] constexpr bool starts_with(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
         auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
@@ -64,6 +71,11 @@ public:
     [[nodiscard]] auto to_string() const
     {
         return std::string{ to_string_view() };
+    }
+
+    void to_buf(std::span<uint8_t> tgt)
+    {
+        to_buf(tgt.data(), tgt.size());
     }
 
     void to_buf(void* tgt, size_t n_bytes)
@@ -101,31 +113,6 @@ public:
         return tr_ntohll(tmp);
     }
 
-    // Returns the number of bytes written. Check `error` for error.
-    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error* error = nullptr)
-    {
-        n_bytes = std::min(n_bytes, size());
-
-        if (n_bytes == 0U)
-        {
-            return {};
-        }
-
-        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), n_bytes, 0); n_sent >= 0U)
-        {
-            drain(n_sent);
-            return n_sent;
-        }
-
-        if (error != nullptr)
-        {
-            auto const err = sockerrno;
-            error->set(err, tr_net_strerror(err));
-        }
-
-        return {};
-    }
-
     void clear()
     {
         drain(size());
@@ -135,6 +122,8 @@ public:
 template<typename value_type>
 class BufferWriter
 {
+    static_assert(detail::object_representation<value_type>);
+
 public:
     virtual ~BufferWriter() = default;
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) = 0;
@@ -143,7 +132,7 @@ public:
     void add(void const* span_begin, size_t span_len)
     {
         auto [buf, buflen] = reserve_space(span_len);
-        std::copy_n(reinterpret_cast<value_type const*>(span_begin), span_len, buf);
+        std::copy_n(static_cast<value_type const*>(span_begin), span_len, buf);
         commit_space(span_len);
     }
 
@@ -214,37 +203,6 @@ public:
             TR_ASSERT_MSG(false, "invalid type");
             break;
         }
-    }
-
-    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error* error = nullptr)
-    {
-        auto const [buf, buflen] = reserve_space(n_bytes);
-        n_bytes = std::min(n_bytes, buflen);
-        TR_ASSERT(n_bytes > 0U);
-        auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), n_bytes, 0);
-        auto const err = sockerrno;
-
-        if (n_read > 0)
-        {
-            commit_space(n_read);
-            return static_cast<size_t>(n_read);
-        }
-
-        // When a stream socket peer has performed an orderly shutdown,
-        // the return value will be 0 (the traditional "end-of-file" return).
-        if (error != nullptr)
-        {
-            if (n_read == 0)
-            {
-                error->set_from_errno(ENOTCONN);
-            }
-            else
-            {
-                error->set(err, tr_net_strerror(err));
-            }
-        }
-
-        return {};
     }
 };
 
@@ -319,4 +277,4 @@ private:
     size_t end_pos_ = {};
 };
 
-} // namespace libtransmission
+} // namespace tr

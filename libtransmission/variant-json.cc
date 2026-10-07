@@ -65,12 +65,14 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Int(int const val)
     {
-        return Int64(val);
+        *get_leaf() = val;
+        return true;
     }
 
     bool Uint(unsigned const val)
     {
-        return Uint64(val);
+        *get_leaf() = val;
+        return true;
     }
 
     bool Int64(int64_t const val)
@@ -81,7 +83,8 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Uint64(uint64_t const val)
     {
-        return Int64(val);
+        *get_leaf() = val;
+        return true;
     }
 
     bool Double(double const val)
@@ -100,7 +103,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
     {
         if (auto* node = push_stack())
         {
-            tr_variantInitDict(node, prealloc_guess());
+            *node = tr_variant::Map{ prealloc_guess() };
             return true;
         }
 
@@ -131,7 +134,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
     {
         if (auto* node = push_stack())
         {
-            tr_variantInitList(node, prealloc_guess());
+            *node = tr_variant::make_vector(prealloc_guess());
             return true;
         }
 
@@ -178,21 +181,21 @@ private:
         }
     }
 
-    tr_variant* get_leaf()
+    [[nodiscard]] tr_variant* get_leaf()
     {
         auto* const parent = stack_.top();
         TR_ASSERT(parent != nullptr);
 
-        if (parent->holds_alternative<tr_variant::Vector>())
+        if (auto* const vec = parent->get_if<tr_variant::Vector>())
         {
-            return tr_variantListAdd(parent);
+            return &vec->emplace_back();
         }
-        if (parent->holds_alternative<tr_variant::Map>())
+        if (auto* const map = parent->get_if<tr_variant::Map>())
         {
             TR_ASSERT(!std::empty(cur_key_));
             auto tmp = std::string_view{};
             std::swap(cur_key_, tmp);
-            return tr_variantDictAdd(parent, tr_quark_new(tmp));
+            return &(*map)[tr_quark_new(tmp)];
         }
 
         return parent;
@@ -303,7 +306,7 @@ private:
     {
         entries.emplace_back(tr_quark_get_string_view(key), &child);
     }
-    std::sort(std::begin(entries), std::end(entries));
+    std::ranges::sort(entries);
     return entries;
 }
 

@@ -5,9 +5,9 @@
 
 #pragma once
 
-namespace transmission::app::detail
+namespace tr::app::detail
 {
 
 void register_app_converters();
 
-} // namespace transmission::app::detail
+} // namespace tr::app::detail

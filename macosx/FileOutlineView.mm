@@ -4,9 +4,8 @@
 
 #import "InfoWindowController.h"
 #import "FileListNode.h"
-#import "FileNameCellView.h"
+#import "BaseFileNameCellView.h"
 #import "FileOutlineView.h"
-#import "FilePriorityCellView.h"
 #import "Torrent.h"
 
 @interface FileOutlineView ()
@@ -51,12 +50,12 @@
 - (NSRect)iconRectForRow:(NSInteger)row
 {
     NSView* view = [self viewAtColumn:[self columnWithIdentifier:@"Name"] row:row makeIfNecessary:NO];
-    if (![view isKindOfClass:[FileNameCellView class]])
+    if (![view isKindOfClass:[BaseFileNameCellView class]])
     {
         return NSZeroRect;
     }
 
-    FileNameCellView* cellView = (FileNameCellView*)view;
+    __auto_type cellView = (BaseFileNameCellView*)view;
     NSImageView* iconView = [cellView valueForKey:@"iconView"];
     if (!iconView)
     {

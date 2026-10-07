@@ -34,6 +34,7 @@
 #include <functional>
 #include <list>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -64,7 +65,7 @@ Glib::ustring gtr_get_unicode_string(GtrUnicode uni);
 
 /* return a human-readable string for the size given in bytes. */
 Glib::ustring tr_strlsize(guint64 size_in_bytes);
-Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage);
+Glib::ustring tr_strlsize(tr::Values::Storage const& storage);
 
 /* return a human-readable string for the given ratio. */
 Glib::ustring tr_strlratio(double ratio);
@@ -91,11 +92,11 @@ inline GParamSpec* gtr_get_param_spec(char const* name, char const* nick, char c
     return dummy_value.create_param_spec(name, nick, blurb, TR_GLIB_PARAM_FLAGS(READABLE));
 }
 
-void gtr_open_uri(Glib::ustring const& uri);
+void gtr_open_file(std::string_view base, std::string_view relative_path);
+void gtr_open_file(std::string_view filename);
+void gtr_open_uri(std::string_view uri);
 
-void gtr_open_file(std::string const& path);
-
-Glib::ustring gtr_get_help_uri();
+[[nodiscard]] std::string gtr_get_help_uri(std::string_view relative_path = "");
 
 /***
 ****
@@ -165,7 +166,7 @@ void setup_item_view_button_event_handling(
 #endif
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error = nullptr);
+bool gtr_file_trash_or_remove(std::string_view filename, tr_error* error = nullptr);
 
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry);
 

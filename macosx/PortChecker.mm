@@ -8,7 +8,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 
 @interface PortChecker ()
 
-@property(nonatomic, weak) NSObject<PortCheckerDelegate>* fDelegate;
+@property(nonatomic, weak) id<PortCheckerDelegate> fDelegate;
 @property(nonatomic) PortStatus fStatus;
 
 @property(nonatomic) NSURLSession* fSession;
@@ -20,7 +20,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 
 @implementation PortChecker
 
-- (instancetype)initForPort:(NSInteger)portNumber delay:(BOOL)delay withDelegate:(NSObject<PortCheckerDelegate>*)delegate
+- (instancetype)initForPort:(NSInteger)portNumber delay:(BOOL)delay withDelegate:(id<PortCheckerDelegate>)delegate
 {
     if ((self = [super init]))
     {
@@ -30,9 +30,11 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 
         _fStatus = PortStatusChecking;
 
-        _fTimer = [NSTimer scheduledTimerWithTimeInterval:kCheckFireInterval target:self selector:@selector(startProbe:)
-                                                 userInfo:@(portNumber)
-                                                  repeats:NO];
+        __weak __auto_type weakSelf = self;
+        _fTimer = [NSTimer scheduledTimerWithTimeInterval:kCheckFireInterval repeats:NO block:^(NSTimer* _Nonnull timer) {
+            [weakSelf startProbe:portNumber];
+        }];
+
         if (!delay)
         {
             [_fTimer fire];
@@ -62,11 +64,11 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 
 #pragma mark - Private
 
-- (void)startProbe:(NSTimer*)timer
+- (void)startProbe:(NSInteger)port
 {
     self.fTimer = nil;
 
-    NSString* urlString = [NSString stringWithFormat:@"https://portcheck.transmissionbt.com/%ld", [(NSNumber*)timer.userInfo integerValue]];
+    NSString* urlString = [NSString stringWithFormat:@"https://portcheck.transmissionbt.com/%ld", port];
     NSURLRequest* portProbeRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]
                                                       cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
                                                   timeoutInterval:15.0];
@@ -106,8 +108,10 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 {
     self.fStatus = status;
 
-    NSObject<PortCheckerDelegate>* delegate = self.fDelegate;
-    [delegate performSelectorOnMainThread:@selector(portCheckerDidFinishProbing:) withObject:self waitUntilDone:NO];
+    __auto_type delegate = self.fDelegate;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [delegate portCheckerDidFinishProbing:self];
+    });
 }
 
 @end

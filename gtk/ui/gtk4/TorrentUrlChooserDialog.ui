@@ -2,7 +2,7 @@
 <interface domain="transmission-gtk">
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="TorrentUrlChooserDialog">
-    <property name="title" translatable="1">Open URL</property>
+    <property name="title" translatable="yes">Open URL</property>
     <child internal-child="content_area">
       <object class="GtkBox" id="dialog_layout">
         <property name="orientation">vertical</property>
@@ -17,7 +17,7 @@
               <object class="GtkFrame">
                 <child type="label">
                   <object class="GtkLabel" id="url_section_label">
-                    <property name="label" translatable="1">Open torrent from URL</property>
+                    <property name="label" translatable="yes">Open torrent from URL</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
                     </attributes>
@@ -29,7 +29,7 @@
                     <property name="column-spacing">12</property>
                     <child>
                       <object class="GtkLabel" id="url_label">
-                        <property name="label" translatable="1">_URL</property>
+                        <property name="label" translatable="yes">_URL</property>
                         <property name="use-underline">1</property>
                         <property name="mnemonic-widget">url_entry</property>
                         <layout>
@@ -64,7 +64,7 @@
         <property name="spacing">6</property>
         <child>
           <object class="GtkButton" id="cancel_button">
-            <property name="label" translatable="1">_Cancel</property>
+            <property name="label" translatable="yes">_Cancel</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
@@ -72,7 +72,7 @@
         </child>
         <child>
           <object class="GtkButton" id="open_button">
-            <property name="label" translatable="1">_Open</property>
+            <property name="label" translatable="yes">_Open</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>

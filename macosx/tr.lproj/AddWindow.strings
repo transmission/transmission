@@ -6,7 +6,7 @@
 "16.title" = "Değiştir…";
 
 /* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
-"18.title" = "İndirmeyi başlat";
+"18.title" = "Eklendiğinde indirmeyi başlat";
 
 /* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
 "20.title" = "Ekle";

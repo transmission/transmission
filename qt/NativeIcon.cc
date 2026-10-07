@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include "NativeIcon.h"
+#include "QtCompat.h"
 
 #include <optional>
 #include <string_view>
@@ -74,7 +75,7 @@ void ensureFontsLoaded()
 #endif
 }
 
-QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int const pixel_size)
+QPixmap makeIconFromCodepoint(QString const& family, QChar const codepoint, int const pixel_size)
 {
     auto font = QFont{ family };
     if (!QFontMetrics{ font }.inFont(codepoint))
@@ -403,6 +404,12 @@ struct Info
         fallback = QStyle::SP_MediaPause;
         break;
 
+    case Type::TorrentStateFinished:
+        sf_symbol_name = "checkmark.circle";
+        segoe_codepoint = 0xE73EU; // CheckMark
+        xdg_icon_name = "checkmark";
+        break;
+
     case Type::VerifyTorrent:
         [[fallthrough]];
 
@@ -424,7 +431,13 @@ struct Info
         break;
     }
 
-    return { sf_symbol_name, segoe_codepoint, xdg_icon_name, fallback, ok_in_gnome_menus };
+    return {
+        .sf_symbol_name = sf_symbol_name,
+        .segoe_codepoint = segoe_codepoint,
+        .xdg_icon_name = xdg_icon_name,
+        .fallback = fallback,
+        .ok_in_gnome_menus = ok_in_gnome_menus,
+    };
 }
 } // namespace
 
@@ -482,7 +495,7 @@ QIcon icon(Type const type, QStyle const* const style)
 
     if (auto const key = info.xdg_icon_name; !std::empty(key))
     {
-        auto const name = QString::fromUtf8(std::data(key), std::size(key));
+        auto const name = QString::fromUtf8(std::data(key), static_cast<IF_QT6(qsizetype, int)>(std::size(key)));
 
         if (auto icon = QIcon::fromTheme(name); !icon.isNull())
         {

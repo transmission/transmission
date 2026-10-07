@@ -9,6 +9,7 @@
 #include <iterator>
 #include <memory>
 #include <numeric> // std::accumulate()
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -16,28 +17,26 @@
 
 #include <fmt/format.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
-#include "libtransmission/cache.h"
+#include "libtransmission/inout.h"
 #include "libtransmission/peer-common.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/types.h"
 #include "libtransmission/web-utils.h"
 #include "libtransmission/web.h"
 #include "libtransmission/webseed.h"
 
 using namespace std::literals;
-using namespace libtransmission::Values;
+using namespace tr::Values;
 
 namespace
 {
@@ -73,7 +72,7 @@ private:
     // the current position in the task; i.e., the next block to save
     tr_block_info::Location loc_;
 
-    libtransmission::StackBuffer<tr_block_info::BlockSize, std::byte, std::ratio<5, 1>> content_;
+    tr::StackBuffer<tr_block_info::BlockSize, std::byte, std::ratio<5, 1>> content_;
 };
 
 /**
@@ -196,19 +195,23 @@ public:
 
     [[nodiscard]] Speed get_piece_speed(uint64_t now, tr_direction dir) const override
     {
-        return dir == TR_DOWN ? bandwidth_.get_piece_speed(now, dir) : Speed{};
+        return dir == tr_direction::Down ? bandwidth_.get_piece_speed(now, dir) : Speed{};
     }
 
     [[nodiscard]] tr_webseed_view get_view() const override
     {
         auto const is_downloading = !std::empty(tasks);
-        auto const speed = get_piece_speed(tr_time_msec(), TR_DOWN);
-        return { base_url.c_str(), is_downloading, speed.base_quantity() };
+        auto const speed = get_piece_speed(tr_time_msec(), tr_direction::Down);
+        return {
+            .url = base_url.c_str(),
+            .is_downloading = is_downloading,
+            .download_bytes_per_second = speed.base_quantity(),
+        };
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t active_req_count(tr_direction dir) const noexcept override
+    [[nodiscard]] constexpr size_t active_req_count(tr_direction dir) const noexcept override
     {
-        if (dir == TR_CLIENT_TO_PEER) // blocks we've requested
+        if (dir == tr_direction::ClientToPeer) // blocks we've requested
         {
             return active_requests.count();
         }
@@ -237,7 +240,7 @@ public:
         idle_timer_->stop();
 
         // flag all the pending tasks as dead
-        std::for_each(std::begin(tasks), std::end(tasks), [](auto* task) { task->dead = true; });
+        std::ranges::for_each(tasks, [](auto* task) { task->dead = true; });
         tasks.clear();
     }
 
@@ -250,8 +253,8 @@ public:
     void got_piece_data(uint32_t n_bytes)
     {
         auto const now = tr_time_msec();
-        bandwidth_.notify_bandwidth_consumed(TR_DOWN, n_bytes, false, now);
-        bandwidth_.notify_bandwidth_consumed(TR_DOWN, n_bytes, true, now);
+        bandwidth_.notify_bandwidth_consumed(tr_direction::Down, n_bytes, false, now);
+        bandwidth_.notify_bandwidth_consumed(tr_direction::Down, n_bytes, true, now);
         publish(tr_peer_event::GotPieceData(n_bytes));
         connection_limiter.got_data();
     }
@@ -327,7 +330,7 @@ public:
         // The actual value of '64' is arbitrary here;
         // we could probably be smarter about this.
         static auto constexpr PreferredBlocksPerTask = size_t{ 64 };
-        return { n_slots, n_slots * PreferredBlocksPerTask };
+        return { .max_spans = n_slots, .max_blocks = n_slots * PreferredBlocksPerTask };
     }
 
     void publish(tr_peer_event const& peer_event)
@@ -347,7 +350,7 @@ public:
 private:
     static auto constexpr IdleTimerInterval = 2s;
 
-    std::unique_ptr<libtransmission::Timer> const idle_timer_;
+    std::unique_ptr<tr::Timer> const idle_timer_;
 
     tr_bitfield have_;
 
@@ -381,17 +384,21 @@ void tr_webseed_task::use_fetched_blocks()
         }
         else
         {
-            auto block_buf = new Cache::BlockData(block_size);
-            content_.to_buf(std::data(*block_buf), std::size(*block_buf));
+            auto block_buf = std::vector<uint8_t>{};
+            block_buf.resize(block_size);
+            content_.to_buf(block_buf);
+
             session_->run_in_session_thread(
-                [session = session_, tor_id = tor.id(), block = loc_.block, block_buf, webseed = webseed_]()
+                [buf = std::move(block_buf), loc = loc_, session = session_, tor_id = tor.id(), webseed = webseed_]()
                 {
-                    auto data = std::unique_ptr<Cache::BlockData>{ block_buf };
-                    if (auto const* const torrent = tr_torrentFindFromId(session, tor_id); torrent != nullptr)
+                    if (auto* const torrent = session->torrents().get(tor_id))
                     {
-                        webseed->active_requests.unset(block);
-                        session->cache->write_block(tor_id, block, std::move(data));
-                        webseed->publish(tr_peer_event::GotBlock(torrent->block_info(), block));
+                        webseed->active_requests.unset(loc.block);
+                        if (tr_ioWrite(*torrent, session->openFiles(), loc, buf) != 0)
+                        {
+                            return;
+                        }
+                        webseed->publish(tr_peer_event::GotBlock(torrent->block_info(), loc.block));
                     }
                 });
         }
@@ -434,7 +441,7 @@ void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_r
 
     if (!success)
     {
-        webseed->on_rejection({ task->loc_.block, task->blocks.end });
+        webseed->on_rejection({ .begin = task->loc_.block, .end = task->blocks.end });
         webseed->tasks.erase(task);
         delete task;
         return;

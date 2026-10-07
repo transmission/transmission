@@ -10,9 +10,6 @@
 #include <fmt/format.h>
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
-
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/log.h"
 #include "libtransmission/port-forwarding-natpmp.h"
 #include "libtransmission/port-forwarding-upnp.h"
@@ -234,7 +231,7 @@ private:
     tr_upnp* upnp_ = nullptr;
     std::unique_ptr<tr_natpmp> natpmp_;
 
-    std::unique_ptr<libtransmission::Timer> timer_;
+    std::unique_ptr<tr::Timer> timer_;
 };
 
 std::unique_ptr<tr_port_forwarding> tr_port_forwarding::create(Mediator& mediator)

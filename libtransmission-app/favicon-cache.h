@@ -20,12 +20,12 @@
 
 #include <fmt/format.h>
 
+#include <libtransmission/file-utils.h>
 #include <libtransmission/file.h>
-#include <libtransmission/utils.h> // for tr_file_save()
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h>
 
-namespace transmission::app
+namespace tr::app
 {
 
 template<typename Icon>
@@ -249,4 +249,4 @@ private:
     std::map<std::string /*sitename*/, Icon, std::less<>> icons_;
 };
 
-} // namespace transmission::app
+} // namespace tr::app

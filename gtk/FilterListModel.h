@@ -32,6 +32,11 @@ public:
     FilterListModel(Glib::RefPtr<Gtk::TreeModel> const& model, Glib::RefPtr<FilterType> const& filter);
     ~FilterListModel() override;
 
+    FilterListModel(FilterListModel const&) = delete;
+    FilterListModel(FilterListModel&&) = delete;
+    FilterListModel& operator=(FilterListModel const&) = delete;
+    FilterListModel& operator=(FilterListModel&&) = delete;
+
     guint get_n_items() const;
 
     sigc::signal<void(guint, guint, guint)>& signal_items_changed();

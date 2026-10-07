@@ -10,7 +10,6 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
-#include <netinet/in.h> // IPV6_V6ONLY, IPPROTO_IPV6
 #include <sys/socket.h> // setsockopt, SOL_SOCKET, bind
 #endif
 
@@ -21,7 +20,9 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/session.h"
+#include "libtransmission/string-utils.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 
@@ -171,14 +172,14 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     {
         // no IPv4; do nothing
     }
-    else if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    else if (tr_socket_t const sock = socket(PF_INET, SOCK_DGRAM, 0); is_valid_socket(sock))
     {
-        (void)evutil_make_listen_socket_reuseable(sock);
+        (void)evutil_make_listen_socket_reuseable(static_cast<evutil_socket_t>(sock));
 
         auto const addr = session_.bind_address(TR_AF_INET);
         auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
 
-        if (evutil_make_socket_nonblocking(sock) != 0)
+        if (evutil_make_socket_nonblocking(static_cast<evutil_socket_t>(sock)) != 0)
         {
             auto const error_code = errno;
             tr_logAddWarn(
@@ -208,7 +209,13 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketDiffServ(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
-            udp4_event_.reset(event_new(session_.event_base(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp4_event_.reset(
+                tr::evhelpers::event_new_pri2(
+                    session_.event_base(),
+                    static_cast<evutil_socket_t>(udp4_socket_),
+                    EV_READ | EV_PERSIST,
+                    event_callback,
+                    &session_));
             event_add(udp4_event_.get(), nullptr);
         }
     }
@@ -217,15 +224,15 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     {
         // no IPv6; do nothing
     }
-    else if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    else if (tr_socket_t const sock = socket(PF_INET6, SOCK_DGRAM, 0); is_valid_socket(sock))
     {
-        (void)evutil_make_listen_socket_reuseable(sock);
-        (void)tr_make_listen_socket_ipv6only(sock);
+        (void)evutil_make_listen_socket_reuseable(static_cast<evutil_socket_t>(sock));
+        (void)tr_make_listen_socket_ipv6only(static_cast<evutil_socket_t>(sock));
 
         auto const addr = session_.bind_address(TR_AF_INET6);
         auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
 
-        if (evutil_make_socket_nonblocking(sock) != 0)
+        if (evutil_make_socket_nonblocking(static_cast<evutil_socket_t>(sock)) != 0)
         {
             auto const error_code = errno;
             tr_logAddWarn(
@@ -255,12 +262,18 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketDiffServ(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
-            udp6_event_.reset(event_new(session_.event_base(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp6_event_.reset(
+                tr::evhelpers::event_new_pri2(
+                    session_.event_base(),
+                    static_cast<evutil_socket_t>(udp6_socket_),
+                    EV_READ | EV_PERSIST,
+                    event_callback,
+                    &session_));
             event_add(udp6_event_.get(), nullptr);
         }
     }
 
-    if (udp4_socket_ == TR_BAD_SOCKET && udp6_socket_ == TR_BAD_SOCKET)
+    if (!is_valid_socket(udp4_socket_) && !is_valid_socket(udp6_socket_))
     {
         tr_logAddError(_("Couldn't create any UDP sockets."));
     }
@@ -270,7 +283,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 {
     udp6_event_.reset();
 
-    if (udp6_socket_ != TR_BAD_SOCKET)
+    if (is_valid_socket(udp6_socket_))
     {
         tr_net_close_socket(udp6_socket_);
         udp6_socket_ = TR_BAD_SOCKET;
@@ -278,7 +291,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
     udp4_event_.reset();
 
-    if (udp4_socket_ != TR_BAD_SOCKET)
+    if (is_valid_socket(udp4_socket_))
     {
         tr_net_close_socket(udp4_socket_);
         udp4_socket_ = TR_BAD_SOCKET;
@@ -292,7 +305,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     {
         errno = EAFNOSUPPORT;
     }
-    else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; sock == TR_BAD_SOCKET)
+    else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; !is_valid_socket(sock))
     {
         // don't warn on bad sockets; the system may not support IPv6
         return;
@@ -304,7 +317,8 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         // don't try to send if we don't have a route in this IP protocol
         return;
     }
-    else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
+    // NOLINTNEXTLINE(readability-redundant-casting)
+    else if (::sendto(sock, static_cast<char const*>(buf), static_cast<TR_IF_WIN32(int, size_t)>(buflen), 0, to, tolen) != -1)
     {
         return;
     }
