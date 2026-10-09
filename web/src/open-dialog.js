@@ -15,6 +15,17 @@ const is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 // https://caniuse.com/input-file-accept
 const can_use_input_accept = !(is_ios && is_safari);
 
+// Same check as Transmission._isValidURL. transmission.js already imports
+// this module.
+function isValidUrl(string) {
+  try {
+    const url = new URL(string);
+    return Boolean(url);
+  } catch {
+    return false;
+  }
+}
+
 export class OpenDialog extends EventTarget {
   constructor(controller, remote, url = '', files = null) {
     super();
@@ -227,7 +238,22 @@ export class OpenDialog extends EventTarget {
     event.preventDefault();
     event.stopPropagation();
     this.elements.root.classList.remove('drag-over');
-    this._addFilesToInput(event.dataTransfer.files);
+    if (this._addFilesToInput(event.dataTransfer.files)) {
+      return;
+    }
+
+    const text =
+      event.dataTransfer.getData('text/uri-list') ||
+      event.dataTransfer.getData('text/plain');
+    const uri = text
+      .split('\n')
+      .map((line) => line.trim())
+      .find(
+        (line) => line.length > 0 && !line.startsWith('#') && isValidUrl(line),
+      );
+    if (uri) {
+      this.elements.url_input.value = uri;
+    }
   }
 
   _create(url) {
