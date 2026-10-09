@@ -162,7 +162,10 @@ export class OpenDialog extends EventTarget {
 
   _onPaste(event) {
     // Allow text paste in url_input
-    if (event.target === this.elements.url_input && event.clipboardData.files.length === 0) {
+    if (
+      event.target === this.elements.url_input &&
+      event.clipboardData.files.length === 0
+    ) {
       return; // Allow default text paste behavior
     }
 
