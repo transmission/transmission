@@ -209,9 +209,10 @@ export class OpenDialog extends EventTarget {
   _onDragLeave(event) {
     event.preventDefault();
     event.stopPropagation();
-    // Only remove if leaving the root element entirely
-    if (event.target === this.elements.root) {
-      this.elements.root.classList.remove('drag-over');
+    const { root } = this.elements;
+    // relatedTarget is the element the pointer entered.
+    if (!root.contains(event.relatedTarget)) {
+      root.classList.remove('drag-over');
     }
   }
 
