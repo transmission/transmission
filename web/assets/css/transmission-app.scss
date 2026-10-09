@@ -1703,14 +1703,17 @@ dialog {
   .dialog-window {
     outline: 2px dashed transparent;
     outline-offset: -2px;
-    transition:
-      outline-color 0.2s ease,
-      background-color 0.2s ease;
+    transition: outline-color 0.2s ease;
   }
 
   &.drag-over .dialog-window {
     outline-color: var(--blue-200);
-    background-color: rgba(53, 122, 170, 0.08);
+    // 8% of --blue-200 over the popup fill. A translucent background-color
+    // would replace that fill and show the torrent list through the dialog.
+    background-image: linear-gradient(
+      rgba(53, 122, 170, 0.08),
+      rgba(53, 122, 170, 0.08)
+    );
   }
 }
 
