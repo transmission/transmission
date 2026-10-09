@@ -176,8 +176,9 @@ export class OpenDialog extends EventTarget {
 
   _addFilesToInput(files) {
     const torrentFiles = [...files].filter(
-      (f) =>
-        f.name.endsWith('.torrent') || f.type === 'application/x-bittorrent',
+      (file) =>
+        file.name.endsWith('.torrent') ||
+        file.type === 'application/x-bittorrent',
     );
 
     if (torrentFiles.length === 0) {
@@ -185,15 +186,21 @@ export class OpenDialog extends EventTarget {
     }
 
     const dt = new DataTransfer();
+    const seen = new Set();
+    const add = (file) => {
+      const key = `${file.name}:${file.size}:${file.lastModified}`;
+      if (seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      dt.items.add(file);
+    };
 
-    // Add existing files first (preserve them)
     for (const file of this.elements.file_input.files) {
-      dt.items.add(file);
+      add(file);
     }
-
-    // Add new files
     for (const file of torrentFiles) {
-      dt.items.add(file);
+      add(file);
     }
 
     this.elements.file_input.files = dt.files;
