@@ -15,6 +15,17 @@ const is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 // https://caniuse.com/input-file-accept
 const can_use_input_accept = !(is_ios && is_safari);
 
+// Same check as Transmission._isValidURL. transmission.js already imports
+// this module.
+function isValidUrl(string) {
+  try {
+    const url = new URL(string);
+    return Boolean(url);
+  } catch {
+    return false;
+  }
+}
+
 export class OpenDialog extends EventTarget {
   constructor(controller, remote, url = '', files = null) {
     super();
@@ -31,11 +42,38 @@ export class OpenDialog extends EventTarget {
     }
     this._updateFreeSpaceInAddDialog();
     this.elements.url_input.focus();
+
+    // Bind paste event listener
+    this._boundPasteHandler = (e) => this._onPaste(e);
+    document.addEventListener('paste', this._boundPasteHandler);
+
+    // Bind drag-and-drop listeners
+    this._boundDragOverHandler = (e) => this._onDragOver(e);
+    this._boundDragLeaveHandler = (e) => this._onDragLeave(e);
+    this._boundDropHandler = (e) => this._onDrop(e);
+
+    const { root } = this.elements;
+    root.addEventListener('dragover', this._boundDragOverHandler);
+    root.addEventListener('dragleave', this._boundDragLeaveHandler);
+    root.addEventListener('drop', this._boundDropHandler);
   }
 
   close() {
     if (!this.closed) {
       clearInterval(this.interval);
+
+      // Clean up paste event listener
+      if (this._boundPasteHandler) {
+        document.removeEventListener('paste', this._boundPasteHandler);
+      }
+
+      // Clean up drag-and-drop listeners
+      if (this._boundDragOverHandler) {
+        const { root } = this.elements;
+        root.removeEventListener('dragover', this._boundDragOverHandler);
+        root.removeEventListener('dragleave', this._boundDragLeaveHandler);
+        root.removeEventListener('drop', this._boundDropHandler);
+      }
 
       this.elements.root.remove();
       this.dispatchEvent(new Event('close'));
@@ -131,6 +169,91 @@ export class OpenDialog extends EventTarget {
     }
 
     this._onDismiss();
+  }
+
+  _onPaste(event) {
+    // Allow text paste in url_input
+    if (
+      event.target === this.elements.url_input &&
+      event.clipboardData.files.length === 0
+    ) {
+      return; // Allow default text paste behavior
+    }
+
+    if (this._addFilesToInput(event.clipboardData.files)) {
+      event.preventDefault();
+    }
+  }
+
+  _addFilesToInput(files) {
+    const torrentFiles = [...files].filter(
+      (file) =>
+        file.name.endsWith('.torrent') ||
+        file.type === 'application/x-bittorrent',
+    );
+
+    if (torrentFiles.length === 0) {
+      return false;
+    }
+
+    const dt = new DataTransfer();
+    const seen = new Set();
+    const add = (file) => {
+      const key = `${file.name}:${file.size}:${file.lastModified}`;
+      if (seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      dt.items.add(file);
+    };
+
+    for (const file of this.elements.file_input.files) {
+      add(file);
+    }
+    for (const file of torrentFiles) {
+      add(file);
+    }
+
+    this.elements.file_input.files = dt.files;
+    return true;
+  }
+
+  _onDragOver(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.elements.root.classList.add('drag-over');
+  }
+
+  _onDragLeave(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const { root } = this.elements;
+    // relatedTarget is the element the pointer entered.
+    if (!root.contains(event.relatedTarget)) {
+      root.classList.remove('drag-over');
+    }
+  }
+
+  _onDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.elements.root.classList.remove('drag-over');
+    if (this._addFilesToInput(event.dataTransfer.files)) {
+      return;
+    }
+
+    const text =
+      event.dataTransfer.getData('text/uri-list') ||
+      event.dataTransfer.getData('text/plain');
+    const uri = text
+      .split('\n')
+      .map((line) => line.trim())
+      .find(
+        (line) => line.length > 0 && !line.startsWith('#') && isValidUrl(line),
+      );
+    if (uri) {
+      this.elements.url_input.value = uri;
+    }
   }
 
   _create(url) {
