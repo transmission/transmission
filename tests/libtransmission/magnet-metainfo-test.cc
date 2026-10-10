@@ -61,11 +61,21 @@ TEST_F(MagnetMetainfoTest, magnetParse)
         "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"
         "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"sv;
 
-    for (auto const& uri : { UriHex, UriHexWithEmptyValue, UriHexWithJunkValues, UriBase32 })
+    // UriHex again, spelled the way a URI library that insists on an authority
+    // writes it.
+    auto constexpr UriHexEmptyAuthority =
+        "magnet:///?xt=urn:btih:"
+        "d2354010a3ca4ade5b7427bb093a62a3899ff381"
+        "&dn=Display%20Name"
+        "&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce"
+        "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"
+        "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"sv;
+
+    for (auto const& uri : { UriHex, UriHexWithEmptyValue, UriHexWithJunkValues, UriBase32, UriHexEmptyAuthority })
     {
         auto mm = tr_magnet_metainfo{};
 
-        EXPECT_TRUE(mm.parseMagnet(uri));
+        ASSERT_TRUE(mm.parseMagnet(uri)) << uri;
         EXPECT_EQ(2U, std::size(mm.announce_list()));
         auto it = std::begin(mm.announce_list());
         EXPECT_EQ(0U, it->tier);
