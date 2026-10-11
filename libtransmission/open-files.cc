@@ -143,7 +143,8 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     bool writable,
     std::string_view filename_in,
     Preallocation allocation,
-    uint64_t file_size)
+    uint64_t file_size,
+    tr_error& error)
 {
     // is there already an entry
     auto key = make_key(tor_id, file_num);
@@ -159,7 +160,6 @@ std::optional<tr_sys_file_t> tr_open_files::get(
 
     // create subfolders, if any
     auto const filename = tr_pathbuf{ filename_in };
-    auto error = tr_error{};
     if (writable)
     {
         auto dir = tr_pathbuf{ filename.sv() };
@@ -238,7 +238,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     // https://bugs.launchpad.net/ubuntu/+source/transmission/+bug/318249
     if (resize_needed && !tr_sys_file_truncate(fd, file_size, &error))
     {
-        tr_logAddWarn(
+        tr_logAddError(
             fmt::format(
                 fmt::runtime(_("Couldn't truncate '{path}': {error} ({error_code})")),
                 fmt::arg("path", filename),
