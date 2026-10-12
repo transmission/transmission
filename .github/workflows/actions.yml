@@ -1025,6 +1025,9 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+      with:
+        # https://github.com/android-actions/setup-android/issues/537
+        packages: 'platform-tools'
 
     - name: Install NDK
       run: sdkmanager "ndk;26.1.10909125"
