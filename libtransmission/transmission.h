@@ -16,7 +16,6 @@
 
 #ifdef __cplusplus
 #include <functional>
-#include <mutex>
 #include <string>
 #include <string_view>
 #else
@@ -159,8 +158,6 @@ inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
 inline auto constexpr TrHttpServerDefaultBasePath = std::string_view{ TR_DEFAULT_RPC_URL_STR };
 inline auto constexpr TrHttpServerRpcRelativePath = std::string_view{ "rpc" };
 inline auto constexpr TrHttpServerWebRelativePath = std::string_view{ "web/" };
-
-std::unique_lock<std::recursive_mutex> tr_sessionLock(tr_session const* session);
 
 /**
  * Add libtransmission's default settings to the benc dictionary.
