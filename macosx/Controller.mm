@@ -15,6 +15,8 @@
 #endif
 
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
+#include <unordered_set>
+#include <vector>
 
 #include <libtransmission/transmission.h>
 
@@ -422,6 +424,10 @@ static void removeKeRangerRansomware()
 @property(nonatomic, readwrite, getter=isQuitting) BOOL quitting;
 @property(nonatomic) BOOL fQuitRequested;
 @property(nonatomic) BOOL fQuitPromptActive;
+// Set once processLoadedTorrents has wrapped every torrent the session loaded
+// at launch. Until then self.fTorrents is incomplete and must not be written
+// back as the transfer history.
+@property(nonatomic) BOOL fFinishedInitialLoad;
 @property(nonatomic) NSWindow* fQuitWindow;
 @property(nonatomic, readonly) BOOL fPauseOnLaunch;
 
@@ -713,66 +719,21 @@ static void removeKeRangerRansomware()
 
     auto* const session = self.fLib;
 
-    //load previous transfers
-    tr_ctor* ctor = tr_ctorNew(session);
-    tr_ctorSetPaused(ctor, TR_FORCE, true); // paused by default; unpause below after checking state history
-    auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
-    tr_ctorFree(ctor);
+    //load previous transfers in the background so that the window is usable
+    //immediately, even when there are many torrents to load. (#8401)
+    //tr_sessionLoadTorrents() blocks until the session thread has read every
+    //.torrent and .resume file and stat'ed every data file; with thousands of
+    //files on a network volume that is minutes.
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        tr_ctor* ctor = tr_ctorNew(session);
+        tr_ctorSetPaused(ctor, TR_FORCE, true); // paused by default; unpaused in processLoadedTorrents after checking state history
+        tr_sessionLoadTorrents(session, ctor);
+        tr_ctorFree(ctor);
 
-    // process the loaded torrents
-    auto torrents = std::vector<tr_torrent*>{};
-    torrents.resize(n_torrents);
-    tr_sessionGetAllTorrents(session, std::data(torrents), std::size(torrents));
-    for (auto* tor : torrents)
-    {
-        NSString* location = tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(tor));
-        Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:tor location:location lib:self.fLib];
-        [self.fTorrents addObject:torrent];
-        self.fTorrentHashes[torrent.hashString] = torrent;
-    }
-
-    //update previous transfers state by recreating a torrent from history
-    //and comparing to torrents already loaded via tr_sessionLoadTorrents
-    NSString* historyFile = [self.fConfigDirectory stringByAppendingPathComponent:kTransferPlist];
-    NSArray* history = [NSArray arrayWithContentsOfFile:historyFile];
-    if (!history)
-    {
-        //old version saved transfer info in prefs file
-        if ((history = [self.fDefaults arrayForKey:@"History"]))
-        {
-            [self.fDefaults removeObjectForKey:@"History"];
-        }
-    }
-
-    if (history)
-    {
-        // theoretical max without doing a lot of work
-        NSMutableArray* waitToStartTorrents = [NSMutableArray
-            arrayWithCapacity:((history.count > 0 && !self.fPauseOnLaunch) ? history.count - 1 : 0)];
-
-        Torrent* t = [[Torrent alloc] init];
-        for (NSDictionary* historyItem in history)
-        {
-            NSString* hash = historyItem[@"TorrentHash"];
-            if ([self.fTorrentHashes.allKeys containsObject:hash])
-            {
-                Torrent* torrent = self.fTorrentHashes[hash];
-                [t setResumeStatusForTorrent:torrent withHistory:historyItem forcePause:self.fPauseOnLaunch];
-
-                NSNumber* waitToStart;
-                if (!self.fPauseOnLaunch && (waitToStart = historyItem[@"WaitToStart"]) && waitToStart.boolValue)
-                {
-                    [waitToStartTorrents addObject:torrent];
-                }
-            }
-        }
-
-        //now that all are loaded, let's set those in the queue to waiting
-        for (Torrent* torrent in waitToStartTorrents)
-        {
-            [torrent startTransfer];
-        }
-    }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self processLoadedTorrents];
+        });
+    });
 
     self.fBadger = [[Badger alloc] init];
 
@@ -833,6 +794,95 @@ static void removeKeRangerRansomware()
     {
         [self showInfo:nil];
     }
+}
+
+- (void)processLoadedTorrents
+{
+    // A quit that began while the load was still running has closed the
+    // session by now (applicationShouldTerminate: closes it on a background
+    // queue), so there is nothing left to wrap.
+    if (self.isQuitting)
+    {
+        return;
+    }
+
+    auto* const session = self.fLib;
+
+    // process the loaded torrents
+    auto const n_torrents = tr_sessionGetAllTorrents(session, nullptr, 0);
+    auto torrents = std::vector<tr_torrent*>{};
+    torrents.resize(n_torrents);
+    tr_sessionGetAllTorrents(session, std::data(torrents), std::size(torrents));
+
+    // don't create a second wrapper for a torrent that was already added while
+    // the session was loading in the background, e.g. by auto-import or by
+    // opening a torrent file
+    auto known = std::unordered_set<tr_torrent*>{};
+    for (Torrent* const torrent in self.fTorrents)
+    {
+        known.insert(torrent.torrentStruct);
+    }
+
+    for (auto* tor : torrents)
+    {
+        if (known.count(tor) != 0U)
+        {
+            continue;
+        }
+
+        NSString* location = tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(tor));
+        Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:tor location:location lib:self.fLib];
+        [self.fTorrents addObject:torrent];
+        self.fTorrentHashes[torrent.hashString] = torrent;
+    }
+
+    //update previous transfers state by recreating a torrent from history
+    //and comparing to torrents already loaded via tr_sessionLoadTorrents
+    NSString* historyFile = [self.fConfigDirectory stringByAppendingPathComponent:kTransferPlist];
+    NSArray* history = [NSArray arrayWithContentsOfFile:historyFile];
+    if (!history)
+    {
+        //old version saved transfer info in prefs file
+        if ((history = [self.fDefaults arrayForKey:@"History"]))
+        {
+            [self.fDefaults removeObjectForKey:@"History"];
+        }
+    }
+
+    if (history)
+    {
+        // theoretical max without doing a lot of work
+        NSMutableArray* waitToStartTorrents = [NSMutableArray
+            arrayWithCapacity:((history.count > 0 && !self.fPauseOnLaunch) ? history.count - 1 : 0)];
+
+        Torrent* t = [[Torrent alloc] init];
+        for (NSDictionary* historyItem in history)
+        {
+            NSString* hash = historyItem[@"TorrentHash"];
+            if ([self.fTorrentHashes.allKeys containsObject:hash])
+            {
+                Torrent* torrent = self.fTorrentHashes[hash];
+                [t setResumeStatusForTorrent:torrent withHistory:historyItem forcePause:self.fPauseOnLaunch];
+
+                NSNumber* waitToStart;
+                if (!self.fPauseOnLaunch && (waitToStart = historyItem[@"WaitToStart"]) && waitToStart.boolValue)
+                {
+                    [waitToStartTorrents addObject:torrent];
+                }
+            }
+        }
+
+        //now that all are loaded, let's set those in the queue to waiting
+        for (Torrent* torrent in waitToStartTorrents)
+        {
+            [torrent startTransfer];
+        }
+    }
+
+    self.fFinishedInitialLoad = YES;
+
+    [self updateMainWindow];
+    [self fullUpdateUI];
 }
 
 #pragma mark - NSApplicationDelegate
@@ -2841,6 +2891,13 @@ static void removeKeRangerRansomware()
 
 - (void)updateTorrentHistory
 {
+    // The transfer history is rewritten from self.fTorrents, so don't clobber
+    // the saved history before the torrents have finished loading from disk.
+    if (!self.fFinishedInitialLoad)
+    {
+        return;
+    }
+
     NSMutableArray* history = [NSMutableArray arrayWithCapacity:self.fTorrents.count];
 
     for (Torrent* torrent in self.fTorrents)
