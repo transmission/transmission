@@ -2667,8 +2667,24 @@ void tr_torrent::ResumeHelper::load_checked_pieces(tr_bitfield const& checked, t
     auto const n_files = tor_.file_count();
     tor_.file_mtimes_.resize(n_files);
 
+    // If none of a file's pieces are checked then clearing them below is a
+    // no-op, so we can skip looking the file up on disk. That avoids a stat()
+    // for every file the torrent has no data for. When nothing at all is
+    // checked we still walk every file, since the resulting file_mtimes_
+    // is used to tell whether the torrent has any local data on disk.
+    bool const check_all_files = tor_.checked_pieces_.has_none();
+
     for (size_t file = 0; file < n_files; ++file)
     {
+        if (!check_all_files)
+        {
+            auto const [piece_begin, piece_end] = tor_.piece_span_for_file(file);
+            if (tor_.checked_pieces_.count(piece_begin, piece_end) == 0)
+            {
+                continue;
+            }
+        }
+
         auto const found = tor_.find_file(file);
         auto const mtime = found ? found->last_modified_at : 0;
 
