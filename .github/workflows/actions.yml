@@ -589,6 +589,17 @@ jobs:
           }
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install
+      - name: Get Packaging Tools
+        if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
+        run: |
+          choco install wixtoolset
+          # a failed choco download doesn't stop this script, so verify the install
+          $WixDir = Get-Item -Path "${Env:ProgramFiles(x86)}\WiX Toolset v3.*" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $WixDir) {
+              Write-Output '::error::WiX Toolset v3 is missing after `choco install wixtoolset`'
+              exit 1
+          }
+          (Join-Path $WixDir.FullName bin) | Out-File $Env:GITHUB_PATH -Append
       - name: Package
         if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
         run: |

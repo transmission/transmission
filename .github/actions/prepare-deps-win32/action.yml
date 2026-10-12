@@ -16,13 +16,7 @@ runs:
         "DEPS_PREFIX=${DepsPrefix}" | Out-File $Env:GITHUB_ENV -Append
         (Join-Path $DepsPrefix bin) | Out-File $Env:GITHUB_PATH -Append
 
-        choco install `
-          jom `
-          nasm `
-          wixtoolset
         & "C:\Program Files\OpenSSL\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- | Out-Host
-        (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
-        (Join-Path (Get-Item -Path "${Env:ProgramFiles(x86)}\WiX Toolset v3.*")[0].FullName bin) | Out-File $Env:GITHUB_PATH -Append
     - name: Get Cache Key
       id: cache-key
       shell: pwsh
@@ -44,6 +38,10 @@ runs:
       if: steps.restore-cache.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
+        choco install `
+          jom `
+          nasm
+        $Env:PATH = "$(Join-Path $Env:ProgramFiles NASM);$Env:PATH"
         try {
             & (Join-Path . src release windows main.ps1) -Mode Build -BuildArch ${{ inputs.arch }} -BuildPart ${{ inputs.type }}
         } catch {
