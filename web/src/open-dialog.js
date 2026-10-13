@@ -6,7 +6,7 @@
 import { AlertDialog } from './alert-dialog.js';
 import { Formatter } from './formatter.js';
 import { RPC } from './remote.js';
-import { createDialogContainer, makeUUID } from './utils.js';
+import { createDialogContainer, isValidUrl, makeUUID } from './utils.js';
 
 const is_ios =
   /iPad|iPhone|iPod/.test(navigator.userAgent) && !globalThis.MSStream;
@@ -14,17 +14,6 @@ const is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 // https://github.com/transmission/transmission/pull/6320#issuecomment-1896968904
 // https://caniuse.com/input-file-accept
 const can_use_input_accept = !(is_ios && is_safari);
-
-// Same check as Transmission._isValidURL. transmission.js already imports
-// this module.
-function isValidUrl(string) {
-  try {
-    const url = new URL(string);
-    return Boolean(url);
-  } catch {
-    return false;
-  }
-}
 
 export class OpenDialog extends EventTarget {
   constructor(controller, remote, url = '', files = null) {
