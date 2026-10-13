@@ -589,6 +589,17 @@ jobs:
           }
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install
+      - name: Get Packaging Tools
+        if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
+        run: |
+          choco install wixtoolset
+          # a failed choco download doesn't stop this script, so verify the install
+          $WixDir = Get-Item -Path "${Env:ProgramFiles(x86)}\WiX Toolset v3.*" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $WixDir) {
+              Write-Output '::error::WiX Toolset v3 is missing after `choco install wixtoolset`'
+              exit 1
+          }
+          (Join-Path $WixDir.FullName bin) | Out-File $Env:GITHUB_PATH -Append
       - name: Package
         if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
         run: |
@@ -725,12 +736,26 @@ jobs:
           name: binaries-${{ matrix.os }}-from-tarball
           path: pfx/**/*
 
-  debian-11-from-tarball:
+  debian-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Debian _typically_ releases every 2 years, and each has 5 years of support+LTS.
+          # So the `oldstable` tag is the oldest Docker tag we can use without ever ending up
+          # testing on an EOL release, while not needing periodic updates to the workflow.
+          # Ref: https://wiki.debian.org/DebianReleases
+          - version: oldstable
+            gtk: gtk3
+            qt: qt5
+          - version: stable
+            gtk: gtk4
+            qt: qt6
     container:
-      image: debian:11-slim
+      image: debian:${{ matrix.version }}-slim
     steps:
       - name: Show Configuration
         run: |
@@ -761,12 +786,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+      - name: Get Dependencies (GTK3)
+        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' && matrix.gtk == 'gtk3' }}
         run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
+      - name: Get Dependencies (GTK4)
+        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' && matrix.gtk == 'gtk4' }}
+        run: apt-get install -y --no-install-recommends libgtkmm-4.0-dev
       - name: Get Dependencies (Qt5)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' && matrix.qt == 'qt5' }}
         run: apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
+      - name: Get Dependencies (Qt6)
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' && matrix.qt == 'qt6' }}
+        run: apt-get install -y --no-install-recommends qt6-base-dev qt6-tools-dev qt6-l10n-tools qt6-svg-dev
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -790,7 +821,9 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_GTK_VERSION=${{ matrix.gtk == 'gtk4' && '4' || '3' }} \
+            -DUSE_QT_VERSION=${{ matrix.qt == 'qt6' && '6' || '5' }}
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -800,7 +833,7 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ github.job }}
+          name: binaries-${{ github.job }}-${{ matrix.version }}
           path: pfx/**/*
 
   fedora-39-from-tarball:
@@ -867,7 +900,6 @@ jobs:
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DEPRECATED=ON \
             -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_Crc32c=ON
@@ -992,6 +1024,9 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+      with:
+        # https://github.com/android-actions/setup-android/issues/537
+        packages: 'platform-tools'
 
     - name: Install NDK
       run: sdkmanager "ndk;26.1.10909125"

@@ -49,11 +49,16 @@ endfunction()
 
 add_trqt_test(add-data-test.cc)
 
-# Builds a window, so it asks for a platform that needs no display on every host.
 add_trqt_test(main-window-test.cc)
-set_tests_properties(QT.main-window
-    PROPERTIES
-        ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+# Builds a window, so it asks for a platform that needs no display.
+# Qt5 builds offscreen only with FreeType, which our Windows Qt5 lacks;
+# Windows needs no display server, so the native platform serves there.
+if(NOT (WIN32 AND Qt_VERSION_MAJOR EQUAL 5))
+    set_tests_properties(QT.main-window
+        PROPERTIES
+            ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+endif()
 
 if(ENABLE_QT_COM_INTEROP)
     add_trqt_test(com-interop-test.cc)
