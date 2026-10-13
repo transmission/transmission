@@ -2170,18 +2170,21 @@ void tr_session::verify_add(tr_torrent* const tor)
 // ---
 void tr_session::flush_torrent_files(tr_torrent_id_t const tor_id) const noexcept
 {
-    this->cache->flush_torrent(tor_id);
+    // a failed flush is handled by the cache; see Cache::flush_span()
+    (void)this->cache->flush_torrent(tor_id);
 }
 
 void tr_session::close_torrent_files(tr_torrent_id_t const tor_id) noexcept
 {
-    this->cache->flush_torrent(tor_id);
+    // a failed flush is handled by the cache; see Cache::flush_span()
+    (void)this->cache->flush_torrent(tor_id);
     openFiles().close_torrent(tor_id);
 }
 
 void tr_session::close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept
 {
-    this->cache->flush_file(tor, file_num);
+    // a failed flush is handled by the cache; see Cache::flush_span()
+    (void)this->cache->flush_file(tor, file_num);
     openFiles().close_file(tor.id(), file_num);
 }
 
