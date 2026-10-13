@@ -8,8 +8,11 @@ import { Formatter } from './formatter.js';
 import { RPC } from './remote.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
+// iPadOS can report a desktop Mac user agent, so also check for touch support.
 const is_ios =
-  /iPad|iPhone|iPod/.test(navigator.userAgent) && !globalThis.MSStream;
+  (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)) &&
+  !globalThis.MSStream;
 const is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 // https://github.com/transmission/transmission/pull/6320#issuecomment-1896968904
 // https://caniuse.com/input-file-accept
