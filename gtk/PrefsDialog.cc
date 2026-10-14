@@ -436,6 +436,9 @@ DownloadingPage::DownloadingPage(
     init_check_button("start_on_add_check", TR_KEY_start_added_torrents);
     init_check_button("trash_on_add_check", TR_KEY_trash_original_torrent_files);
     init_chooser_button("download_dir_chooser", TR_KEY_download_dir);
+    auto* const download_dir_same_as_torrent_check = init_check_button(
+        "download_dir_same_as_torrent_check",
+        TR_KEY_download_dir_same_as_torrent);
     init_spin_button<uint16_t>(
         "max_active_downloads_spin",
         TR_KEY_download_queue_size,
@@ -453,6 +456,14 @@ DownloadingPage::DownloadingPage(
     init_chooser_button("incomplete_dir_chooser", TR_KEY_incomplete_dir);
     init_check_button("download_done_script_check", TR_KEY_script_torrent_done_enabled);
     init_chooser_button("download_done_script_chooser", TR_KEY_script_torrent_done_filename);
+
+    auto const set_download_dir_sensitivity = [this, download_dir_same_as_torrent_check]()
+    {
+        bool const same_as_torrent = download_dir_same_as_torrent_check->get_active();
+        get_widget<PathButton>("download_dir_chooser")->set_sensitive(!same_as_torrent);
+    };
+    download_dir_same_as_torrent_check->signal_toggled().connect(set_download_dir_sensitivity);
+    set_download_dir_sensitivity();
 
     on_core_prefs_changed(TR_KEY_download_dir);
 }
