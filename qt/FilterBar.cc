@@ -265,9 +265,8 @@ void FilterBar::refreshPref(int key)
     case Prefs::FILTER_MODE:
         {
             auto const show_mode = prefs_.get<ShowMode>(key);
-            QAbstractItemModel const* const model = activity_combo_->model();
-            QModelIndexList indices = model->match(model->index(0, 0), ACTIVITY_ROLE, QVariant::fromValue(show_mode));
-            activity_combo_->setCurrentIndex(indices.isEmpty() ? 0 : indices.first().row());
+            auto const row = activity_combo_->findData(QVariant::fromValue(show_mode), ACTIVITY_ROLE);
+            activity_combo_->setCurrentIndex(row == -1 ? 0 : row);
             break;
         }
 
