@@ -27,6 +27,7 @@ import {
   deepEqual,
   setEnabled,
   setTextContent,
+  isValidUrl,
 } from './utils.js';
 import Clusterize from 'clusterize.js';
 
@@ -870,12 +871,7 @@ export class Transmission extends EventTarget {
   }
 
   static _isValidURL(string) {
-    try {
-      const url = new URL(string);
-      return Boolean(url);
-    } catch {
-      return false;
-    }
+    return isValidUrl(string);
   }
 
   shouldAddedTorrentsStart() {
