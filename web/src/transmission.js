@@ -181,7 +181,7 @@ export class Transmission extends EventTarget {
           if (this.popup[0] instanceof Inspector) {
             this.popup[0].close();
           } else {
-            this.setCurrentPopup(new Inspector(this), 0);
+            this.setCurrentPopup(new Inspector(this, this.prefs), 0);
           }
           break;
         case 'show-move-dialog':
