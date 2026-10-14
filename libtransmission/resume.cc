@@ -9,7 +9,10 @@
 #include <cstring>
 #include <ctime>
 #include <limits>
+#include <optional>
+#include <string>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 #include <fmt/format.h>
@@ -398,7 +401,137 @@ void save_filenames(tr_variant::Map& map, tr_torrent const* tor)
     map.insert_or_assign(TR_KEY_files, std::move(list));
 }
 
-tr_resume::fields_t load_filenames(tr_variant::Map const& map, tr_torrent* tor)
+auto validated_filenames(tr_variant::Vector const& list, tr_torrent const* tor, bool const log_errors)
+    -> std::optional<std::vector<std::string>>
+{
+    auto const n_files = tor->file_count();
+    auto const n_list = std::size(list);
+    if (n_list != n_files)
+    {
+        if (log_errors)
+        {
+            tr_logAddWarnTor(
+                tor,
+                fmt::format("Couldn't load filenames from resume file: expected {} entries, got {}", n_files, n_list));
+        }
+        return {};
+    }
+
+    // Empty entries are valid in resume files written by Transmission 3.x
+    // and mean "use the path from metainfo".
+    auto filenames = std::vector<std::string>{};
+    filenames.reserve(n_files);
+    // The owning vector is fully reserved before string_views into its strings
+    // are stored in the set, so the views stay valid throughout validation.
+    auto unique_filenames = std::unordered_set<std::string_view>{};
+    unique_filenames.reserve(n_files);
+
+    for (tr_file_index_t i = 0; i < n_files; ++i)
+    {
+        auto const sv = list[i].value_if<std::string_view>();
+        if (!sv)
+        {
+            if (log_errors)
+            {
+                tr_logAddWarnTor(tor, fmt::format("Couldn't load filename {} from resume file: invalid value", i));
+            }
+            return {};
+        }
+
+        filenames.emplace_back(std::empty(*sv) ? tor->file_subpath(i) : *sv);
+        auto const& filename = filenames.back();
+        if (!unique_filenames.emplace(std::string_view{ filename }).second)
+        {
+            if (log_errors)
+            {
+                tr_logAddWarnTor(tor, fmt::format("Couldn't load filenames from resume file: duplicate path '{:s}'", filename));
+            }
+            return {};
+        }
+    }
+
+    return filenames;
+}
+
+bool migrate_legacy_zero_file_layout(tr_variant::Map& map, tr_torrent* tor, tr_torrent::ResumeHelper& helper)
+{
+    auto const n_files = tor->file_count();
+    auto n_zero_files = tr_file_index_t{};
+    for (tr_file_index_t file = 0; file < n_files; ++file)
+    {
+        n_zero_files += tor->file_size(file) == 0U ? 1U : 0U;
+    }
+
+    if (n_zero_files == 0U)
+    {
+        return false;
+    }
+
+    auto* const filenames = map.find_if<tr_variant::Vector>(TR_KEY_files);
+    auto* const dnd = map.find_if<tr_variant::Vector>(TR_KEY_dnd);
+    auto* const priorities = map.find_if<tr_variant::Vector>(TR_KEY_priority);
+    auto* const progress = map.find_if<tr_variant::Map>(TR_KEY_progress);
+    auto* const mtimes = progress != nullptr ? progress->find_if<tr_variant::Vector>(TR_KEY_mtimes) : nullptr;
+    auto const n_legacy_files = n_files - n_zero_files;
+
+    // Transmission 4.0.x omitted zero-length files from its in-memory file
+    // list, so all four per-file arrays were saved with this shorter length.
+    // Require the complete signature before treating a short resume file as
+    // that legacy layout rather than arbitrary corruption.
+    if (filenames == nullptr || dnd == nullptr || priorities == nullptr || mtimes == nullptr ||
+        std::size(*filenames) != n_legacy_files || std::size(*dnd) != n_legacy_files ||
+        std::size(*priorities) != n_legacy_files || std::size(*mtimes) != n_legacy_files)
+    {
+        return false;
+    }
+
+    auto const expand = [tor, n_files](tr_variant::Vector const& old, auto&& make_zero_value)
+    {
+        auto expanded = tr_variant::Vector{};
+        expanded.reserve(n_files);
+        auto old_index = size_t{};
+        for (tr_file_index_t file = 0; file < n_files; ++file)
+        {
+            if (tor->file_size(file) == 0U)
+            {
+                expanded.emplace_back(make_zero_value(file));
+            }
+            else
+            {
+                expanded.emplace_back(old[old_index++].clone());
+            }
+        }
+        return expanded;
+    };
+
+    auto expanded_filenames = expand(
+        *filenames,
+        [tor](tr_file_index_t const file) { return tr_variant{ tor->file_subpath(file) }; });
+    if (!validated_filenames(expanded_filenames, tor, false))
+    {
+        return false;
+    }
+
+    auto expanded_dnd = expand(*dnd, [](tr_file_index_t) { return tr_variant{ false }; });
+    auto expanded_priorities = expand(*priorities, [](tr_file_index_t) { return tr_variant{ TR_PRI_NORMAL }; });
+    auto expanded_mtimes = expand(*mtimes, [](tr_file_index_t) { return tr_variant{ int64_t{ 0 } }; });
+
+    *filenames = std::move(expanded_filenames);
+    *dnd = std::move(expanded_dnd);
+    *priorities = std::move(expanded_priorities);
+    *mtimes = std::move(expanded_mtimes);
+
+    helper.load_resume_filenames_need_verification(true);
+    tr_logAddWarnTor(
+        tor,
+        fmt::format(
+            "Migrated resume data by restoring {} zero-length file entr{}; local data must be verified",
+            n_zero_files,
+            n_zero_files == 1U ? "y" : "ies"));
+    return true;
+}
+
+tr_resume::fields_t load_filenames(tr_variant::Map const& map, tr_torrent* tor, tr_torrent::ResumeHelper& helper)
 {
     auto const* const list = map.find_if<tr_variant::Vector>(TR_KEY_files);
     if (list == nullptr)
@@ -406,14 +539,16 @@ tr_resume::fields_t load_filenames(tr_variant::Map const& map, tr_torrent* tor)
         return {};
     }
 
-    auto const n_files = tor->file_count();
-    auto const n_list = std::size(*list);
-    for (tr_file_index_t i = 0; i < n_files && i < n_list; ++i)
+    auto const filenames = validated_filenames(*list, tor, true);
+    if (!filenames)
     {
-        if (auto const sv = (*list)[i].value_if<std::string_view>(); sv && !std::empty(*sv))
-        {
-            tor->set_file_subpath(i, *sv);
-        }
+        helper.load_resume_filenames_need_verification(true);
+        return {};
+    }
+
+    for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
+    {
+        tor->set_file_subpath(i, (*filenames)[i]);
     }
 
     return tr_resume::Filenames;
@@ -646,13 +781,13 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
     }
 
     tr::api_compat::convert_incoming_data(*otop);
-    auto const* const p_map = otop->get_if<tr_variant::Map>();
+    auto* const p_map = otop->get_if<tr_variant::Map>();
     if (p_map == nullptr)
     {
         tr_logAddDebugTor(tor, fmt::format("Resume file '{}' does not contain a benc dict", filename));
         return {};
     }
-    auto const& map = *p_map;
+    auto& map = *p_map;
 
     tr_logAddDebugTor(tor, fmt::format("Read resume file '{}'", filename));
     auto fields_loaded = tr_resume::fields_t{};
@@ -802,7 +937,13 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
     // will know where to look
     if ((fields_to_load & tr_resume::Filenames) != 0)
     {
-        fields_loaded |= load_filenames(map, tor);
+        if (auto const b = map.value_if<bool>(TR_KEY_resume_filenames_need_verification); b && *b)
+        {
+            helper.load_resume_filenames_need_verification(true);
+        }
+
+        migrate_legacy_zero_file_layout(map, tor, helper);
+        fields_loaded |= load_filenames(map, tor, helper);
     }
 
     // Note: load_progress() should come before load_file_priorities()
@@ -974,6 +1115,10 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     map.try_emplace(TR_KEY_max_peers, tor->peer_limit());
     map.try_emplace(TR_KEY_bandwidth_priority, tor->get_priority());
     map.try_emplace(TR_KEY_paused, !helper.start_when_stable());
+    if (helper.resume_filenames_need_verification())
+    {
+        map.try_emplace(TR_KEY_resume_filenames_need_verification, true);
+    }
     map.try_emplace(TR_KEY_sequential_download, tor->is_sequential_download());
     map.try_emplace(TR_KEY_sequential_download_from_piece, tor->sequential_download_from_piece());
     save_peers(map, tor);

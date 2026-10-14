@@ -499,6 +499,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_rename_partial_files,
     TR_KEY_reqq,
     TR_KEY_result,
+    TR_KEY_resume_filenames_need_verification,
     TR_KEY_rpc_authentication_required_kebab_APICOMPAT,
     TR_KEY_rpc_bind_address_kebab_APICOMPAT,
     TR_KEY_rpc_enabled_kebab_APICOMPAT,
