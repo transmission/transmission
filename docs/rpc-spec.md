@@ -617,6 +617,8 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `script_torrent_done_filename` | string | filename of the script to run
 | `script_torrent_done_seeding_enabled` | boolean | whether or not to call the `seeding_done` script
 | `script_torrent_done_seeding_filename` | string | filename of the script to run
+| `script_torrent_removed_enabled` | boolean | whether or not to call the `removed` script
+| `script_torrent_removed_filename` | string | filename of the script to run
 | `seed_queue_enabled` | boolean | if true, limit how many torrents can be uploaded at once
 | `seed_queue_size` | number | max number of torrents to uploaded at once (see `seed_queue_enabled`)
 | `seed_ratio_limit` | double | the default seed ratio for torrents to use
@@ -1126,3 +1128,7 @@ Transmission 4.2.0 (`rpc_version_semver` 6.1.0, `rpc_version`: ?)
 | `torrent_get` | new arg `webseeds_ex`
 | `torrent_get` | **DEPRECATED** `webseeds`. Use `webseeds_ex` instead.
 | `session_get` | **DEPRECATED** `cache_size_mib`. The memory cache is being removed, making this setting moot. The setting will still be gettable and settable via RPC `session_get` and `session_set` until Transmission 5.0.0 to avoid client breakage, but it will be otherwise unused in libtransmission. Clients should stop using this key.
+| `session_get` | new arg `script_torrent_removed_enabled`
+| `session_set` | new arg `script_torrent_removed_enabled`
+| `session_get` | new arg `script_torrent_removed_filename`
+| `session_set` | new arg `script_torrent_removed_filename`
