@@ -1070,7 +1070,12 @@ private:
             return settings_.script_torrent_done_enabled;
         }
 
-        return settings_.script_torrent_done_seeding_enabled;
+        if (i == TR_SCRIPT_ON_TORRENT_DONE_SEEDING)
+        {
+            return settings_.script_torrent_done_seeding_enabled;
+        }
+
+        return settings_.script_torrent_removed_enabled;
     }
 
     constexpr std::string& scriptFilename(TrScript i)
@@ -1085,7 +1090,12 @@ private:
             return settings_.script_torrent_done_filename;
         }
 
-        return settings_.script_torrent_done_seeding_filename;
+        if (i == TR_SCRIPT_ON_TORRENT_DONE_SEEDING)
+        {
+            return settings_.script_torrent_done_seeding_filename;
+        }
+
+        return settings_.script_torrent_removed_filename;
     }
 
     void update_bandwidth(tr_direction dir);
@@ -1184,7 +1194,7 @@ public:
         TrScript script;
     };
 
-    static constexpr std::array<ScriptInfo, 3U> Scripts{ {
+    static constexpr std::array<ScriptInfo, 4U> Scripts{ {
         {
             .enabled_key = TR_KEY_script_torrent_added_enabled,
             .filename_key = TR_KEY_script_torrent_added_filename,
@@ -1199,6 +1209,11 @@ public:
             .enabled_key = TR_KEY_script_torrent_done_seeding_enabled,
             .filename_key = TR_KEY_script_torrent_done_seeding_filename,
             .script = TR_SCRIPT_ON_TORRENT_DONE_SEEDING,
+        },
+        {
+            .enabled_key = TR_KEY_script_torrent_removed_enabled,
+            .filename_key = TR_KEY_script_torrent_removed_filename,
+            .script = TR_SCRIPT_ON_TORRENT_REMOVED,
         },
     } };
 
