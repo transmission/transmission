@@ -1003,6 +1003,11 @@ public:
         return settings().is_incomplete_file_naming_enabled;
     }
 
+    [[nodiscard]] constexpr std::string_view partial_file_suffix() const noexcept
+    {
+        return settings().partial_file_suffix;
+    }
+
     [[nodiscard]] constexpr auto isPortRandom() const noexcept
     {
         return settings().peer_port_random_on_start;

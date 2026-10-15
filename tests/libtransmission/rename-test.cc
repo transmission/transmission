@@ -484,7 +484,8 @@ TEST_F(RenameTest, partialFile)
         EXPECT_EQ(strings[i], tor->file_subpath(i));
     }
 
-    strings[0] = "foo/bar.part";
+    auto const partial_bar = tr_pathbuf{ "foo/bar"sv, session_->partial_file_suffix() };
+    strings[0] = partial_bar.sv();
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
