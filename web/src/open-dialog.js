@@ -8,12 +8,14 @@ import { Formatter } from './formatter.js';
 import { RPC } from './remote.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
-const is_ios =
-  /iPad|iPhone|iPod/.test(navigator.userAgent) && !globalThis.MSStream;
-const is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+// iPadOS can report a desktop Mac user agent, so also check for touch support.
+const ua = navigator.userAgent;
+const is_apple_touch =
+  /iPad|iPhone|iPod/.test(ua) ||
+  (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
 // https://github.com/transmission/transmission/pull/6320#issuecomment-1896968904
 // https://caniuse.com/input-file-accept
-const can_use_input_accept = !(is_ios && is_safari);
+const can_use_input_accept = !is_apple_touch;
 
 export class OpenDialog extends EventTarget {
   constructor(controller, remote, url = '', files = null) {
