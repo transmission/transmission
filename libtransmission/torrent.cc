@@ -743,7 +743,7 @@ void tr_torrentRemoveInSessionThread(
         }
 
         auto error = tr_error{};
-        tor->files().remove(tor->current_dir(), tor->name(), remove_func, &error);
+        tor->files().remove(tor->current_dir(), tor->session->partial_file_suffix(), tor->name(), remove_func, &error);
         if (error)
         {
             tr_logAddWarnTor(
@@ -827,8 +827,8 @@ bool tr_torrent::is_new_torrent_a_seed()
             return false;
         }
 
-        // it's not a new seed if a file is partial
-        if (tr_strv_ends_with(found->filename(), tr_torrent_files::PartialFileSuffix))
+        // it's not a new seed if a file is partial, i.e. was found with a suffix
+        if (found->subpath() != file_subpath(i))
         {
             return false;
         }
@@ -1103,7 +1103,7 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
         session->verify_remove(this);
 
         auto error = tr_error{};
-        ok = files().move(current_dir(), path, name(), &error);
+        ok = files().move(current_dir(), path, session->partial_file_suffix(), name(), &error);
         if (error)
         {
             this->error().set_local_error(
@@ -1184,7 +1184,7 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent::find_file(tr_file_index_t
 
     auto paths = std::array<std::string_view, 4>{};
     auto const n_paths = buildSearchPathArray(this, std::data(paths));
-    return files().find(file_index, std::data(paths), n_paths);
+    return files().find(file_index, std::data(paths), n_paths, session->partial_file_suffix());
 }
 
 bool tr_torrent::has_any_local_data() const
@@ -1193,7 +1193,7 @@ bool tr_torrent::has_any_local_data() const
 
     auto paths = std::array<std::string_view, 4>{};
     auto const n_paths = buildSearchPathArray(this, std::data(paths));
-    return files().has_any_local_data(std::data(paths), n_paths);
+    return files().has_any_local_data(std::data(paths), n_paths, session->partial_file_suffix());
 }
 
 void tr_torrentSetDownloadDir(tr_torrent* tor, std::string_view const path)
@@ -1644,9 +1644,8 @@ void tr_torrent::update_file_path(tr_file_index_t file, std::optional<bool> has_
     auto const has = has_file ? *has_file : this->has_file(file);
     auto const needs_suffix = session->isIncompleteFileNamingEnabled() && !has;
     auto const oldpath = found->filename();
-    auto const newpath = needs_suffix ?
-        tr_pathbuf{ found->base(), '/', file_subpath(file), tr_torrent_files::PartialFileSuffix } :
-        tr_pathbuf{ found->base(), '/', file_subpath(file) };
+    auto const newpath = needs_suffix ? tr_pathbuf{ found->base(), '/', file_subpath(file), session->partial_file_suffix() } :
+                                        tr_pathbuf{ found->base(), '/', file_subpath(file) };
 
     if (tr_sys_path_is_same(oldpath, newpath))
     {
@@ -2181,7 +2180,7 @@ void tr_torrent::on_file_completed(tr_file_index_t const file)
     file_mtimes_[file] = tr_time();
 
     /* if the torrent's current filename isn't the same as the one in the
-     * metadata -- for example, if it had the ".part" suffix appended to
+     * metadata -- for example, if it had a partial-file suffix appended to
      * it until now -- then rename it to match the one in the metadata */
     update_file_path(file, true);
 }
@@ -2372,18 +2371,26 @@ auto renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_vie
     auto const base = tor->is_done() || std::empty(tor->incomplete_dir()) ? tor->download_dir() : tor->incomplete_dir();
 
     auto src = tr_pathbuf{ base, '/', oldpath };
+    auto suffix = ""sv;
 
     if (!tr_sys_path_exists(src)) /* check for it as a partial */
     {
-        src += tr_torrent_files::PartialFileSuffix;
+        for (auto const partial_suffix : { tor->session->partial_file_suffix(), tr_torrent_files::LegacyPartialFileSuffix })
+        {
+            if (tr_sys_path_exists(tr_pathbuf{ src, partial_suffix }))
+            {
+                suffix = partial_suffix;
+                break;
+            }
+        }
+
+        src += suffix;
     }
 
     if (tr_sys_path_exists(src))
     {
         auto const parent = tr_sys_path_dirname(src);
-        auto const tgt = tr_strv_ends_with(src, tr_torrent_files::PartialFileSuffix) ?
-            tr_pathbuf{ parent, '/', newname, tr_torrent_files::PartialFileSuffix } :
-            tr_pathbuf{ parent, '/', newname };
+        auto const tgt = tr_pathbuf{ parent, '/', newname, suffix };
 
         auto tmp = errno;
         bool const tgt_exists = tr_sys_path_exists(tgt);

@@ -132,6 +132,7 @@ public:
     std::string default_trackers_str;
     std::string download_dir = get_default_download_dir();
     std::string incomplete_dir = get_default_download_dir();
+    std::string partial_file_suffix = ".part.tmp";
     std::string peer_congestion_algorithm;
     std::string script_torrent_added_filename;
     std::string script_torrent_done_filename;
@@ -176,6 +177,7 @@ public:
         Field<&SessionSettings::ip_endpoint_ipv6>{ TR_KEY_ip_endpoints_ipv6 },
         Field<&SessionSettings::lpd_enabled>{ TR_KEY_lpd_enabled },
         Field<&SessionSettings::log_level>{ TR_KEY_message_level },
+        Field<&SessionSettings::partial_file_suffix>{ TR_KEY_partial_file_suffix },
         Field<&SessionSettings::peer_congestion_algorithm>{ TR_KEY_peer_congestion_algorithm },
         Field<&SessionSettings::peer_limit_global>{ TR_KEY_peer_limit_global },
         Field<&SessionSettings::peer_limit_per_torrent>{ TR_KEY_peer_limit_per_torrent },

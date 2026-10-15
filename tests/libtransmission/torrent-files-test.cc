@@ -27,6 +27,8 @@ using namespace std::literals;
 
 class TorrentFilesTest : public ::tr::test::SandboxedTest
 {
+protected:
+    static constexpr auto PartialSuffix = ".partial"sv;
 };
 
 TEST_F(TorrentFilesTest, add)
@@ -92,37 +94,45 @@ TEST_F(TorrentFilesTest, find)
     auto const search_path_2 = tr_pathbuf{ "/tmp"sv };
 
     auto search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
-    auto found = files.find(file_index, std::data(search_path), std::size(search_path));
+    auto found = files.find(file_index, std::data(search_path), std::size(search_path), PartialSuffix);
     EXPECT_TRUE(found.has_value());
     assert(found.has_value());
     EXPECT_EQ(filename, found->filename());
 
     // same search, but with the search paths reversed
     search_path = std::vector<std::string_view>{ search_path_2.sv(), search_path_1.sv() };
-    found = files.find(file_index, std::data(search_path), std::size(search_path));
+    found = files.find(file_index, std::data(search_path), std::size(search_path), PartialSuffix);
     EXPECT_TRUE(found.has_value());
     assert(found.has_value());
     EXPECT_EQ(filename, found->filename());
 
     // now make it an incomplete file
-    auto const partial_filename = tr_pathbuf{ filename, tr_torrent_files::PartialFileSuffix };
+    auto const partial_filename = tr_pathbuf{ filename, PartialSuffix };
     EXPECT_TRUE(tr_sys_path_rename(filename, partial_filename));
     search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
-    found = files.find(file_index, std::data(search_path), std::size(search_path));
+    found = files.find(file_index, std::data(search_path), std::size(search_path), PartialSuffix);
     EXPECT_TRUE(found.has_value());
     assert(found.has_value());
     EXPECT_EQ(partial_filename, found->filename());
 
     // same search, but with the search paths reversed
     search_path = std::vector<std::string_view>{ search_path_2.sv(), search_path_1.sv() };
-    found = files.find(file_index, std::data(search_path), std::size(search_path));
+    found = files.find(file_index, std::data(search_path), std::size(search_path), PartialSuffix);
     EXPECT_TRUE(found.has_value());
     assert(found.has_value());
     EXPECT_EQ(partial_filename, found->filename());
 
+    // now make it an incomplete file with the legacy suffix
+    auto const legacy_partial_filename = tr_pathbuf{ filename, tr_torrent_files::LegacyPartialFileSuffix };
+    EXPECT_TRUE(tr_sys_path_rename(partial_filename, legacy_partial_filename));
+    found = files.find(file_index, std::data(search_path), std::size(search_path), PartialSuffix);
+    EXPECT_TRUE(found.has_value());
+    assert(found.has_value());
+    EXPECT_EQ(legacy_partial_filename, found->filename());
+
     // what about if we look for a file that does not exist
-    EXPECT_TRUE(tr_sys_path_remove(partial_filename));
-    EXPECT_FALSE(files.find(file_index, std::data(search_path), std::size(search_path)));
+    EXPECT_TRUE(tr_sys_path_remove(legacy_partial_filename));
+    EXPECT_FALSE(files.find(file_index, std::data(search_path), std::size(search_path), PartialSuffix));
 }
 
 TEST_F(TorrentFilesTest, hasAnyLocalData)
@@ -138,10 +148,10 @@ TEST_F(TorrentFilesTest, hasAnyLocalData)
     auto const search_path_2 = tr_pathbuf{ "/tmp"sv };
 
     auto search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
-    EXPECT_TRUE(files.has_any_local_data(std::data(search_path), 2U));
-    EXPECT_TRUE(files.has_any_local_data(std::data(search_path), 1U));
-    EXPECT_FALSE(files.has_any_local_data(std::data(search_path) + 1, 1U));
-    EXPECT_FALSE(files.has_any_local_data(std::data(search_path), 0U));
+    EXPECT_TRUE(files.has_any_local_data(std::data(search_path), 2U, PartialSuffix));
+    EXPECT_TRUE(files.has_any_local_data(std::data(search_path), 1U, PartialSuffix));
+    EXPECT_FALSE(files.has_any_local_data(std::data(search_path) + 1, 1U, PartialSuffix));
+    EXPECT_FALSE(files.has_any_local_data(std::data(search_path), 0U, PartialSuffix));
 }
 
 TEST_F(TorrentFilesTest, mimeType)
