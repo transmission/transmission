@@ -166,6 +166,22 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d"sv, parsed->host);
     EXPECT_EQ("/announce"sv, parsed->path);
     EXPECT_EQ(80, parsed->port);
+
+    // the same link, with and without an empty authority
+    for (auto const& magnet :
+         { "magnet:?xt=urn:btih:1&dn=A B"sv, "magnet://?xt=urn:btih:1&dn=A B"sv, "magnet:///?xt=urn:btih:1&dn=A B"sv })
+    {
+        parsed = tr_urlParse(magnet);
+        ASSERT_TRUE(parsed) << magnet;
+        EXPECT_EQ("magnet"sv, parsed->scheme) << magnet;
+        EXPECT_EQ("xt=urn:btih:1&dn=A B"sv, parsed->query) << magnet;
+    }
+
+    // a bare scheme carries no query
+    parsed = tr_urlParse("magnet:"sv);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("magnet"sv, parsed->scheme);
+    EXPECT_EQ(""sv, parsed->query);
 }
 
 TEST_F(WebUtilsTest, urlParseFuzz)
