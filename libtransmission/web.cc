@@ -687,8 +687,12 @@ public:
         {
             if (it->second + BandwidthPauseMsec < now)
             {
-                curl_easy_pause(it->first, CURLPAUSE_CONT);
+                // N.B. The paused handles map iterator *MUST* be erased before calling `curl_easy_pause`,
+                // because `curl_easy_pause` may call the write callback synchronously, which might
+                // try to insert this easy handle back into the paused handles map.
+                auto* const easy = it->first;
                 it = paused.erase(it);
+                curl_easy_pause(easy, CURLPAUSE_CONT);
             }
             else
             {
