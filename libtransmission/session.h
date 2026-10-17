@@ -188,6 +188,11 @@ private:
 
         void add_pex(tr_sha1_digest_t const& info_hash, tr_pex const* pex, size_t n_pex) override;
 
+        void set_node_count(size_t node_count) override
+        {
+            session_.dht_node_count_.store(node_count, std::memory_order_relaxed);
+        }
+
     private:
         tr_session& session_;
     };
@@ -1047,6 +1052,11 @@ public:
         }
     }
 
+    [[nodiscard]] size_t dht_node_count() const noexcept
+    {
+        return dht_node_count_.load(std::memory_order_relaxed);
+    }
+
     [[nodiscard]] constexpr auto unused_cache_size_mbytes() const
     {
         return settings().unused_cache_size_mbytes;
@@ -1332,7 +1342,10 @@ private:
     // depends-on: udp_core_
     AnnouncerUdpMediator announcer_udp_mediator_{ *this };
 
-    // depends-on: timer_maker_, torrents_, peer_mgr_
+    // Published by the DHT timer for clients reading stats from other threads.
+    std::atomic<size_t> dht_node_count_ = 0;
+
+    // depends-on: timer_maker_, torrents_, peer_mgr_, dht_node_count_
     DhtMediator dht_mediator_{ *this };
 
 public:

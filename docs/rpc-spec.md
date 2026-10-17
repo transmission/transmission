@@ -682,12 +682,16 @@ Response parameters:
 | Key | Value Type | Description
 |:--|:--|:--
 | `active_torrent_count`     | number
+| `dht_nodes`                | number | DHT routing-table node count (see below)
 | `download_speed`           | number
 | `paused_torrent_count`     | number
 | `torrent_count`            | number
 | `upload_speed`             | number
 | `cumulative_stats`         | stats object (see below)
 | `current_stats`            | stats object (see below)
+
+`dht_nodes` counts good and dubious nodes across IPv4 and IPv6, excluding cached nodes.
+The count is refreshed once per second and is zero when DHT is disabled or has no nodes.
 
 A stats object contains:
 
@@ -1121,6 +1125,7 @@ Transmission 4.2.0 (`rpc_version_semver` 6.1.0, `rpc_version`: ?)
 
 | Method | Description
 |:---|:---
+| `session_stats` | new arg `dht_nodes`
 | `torrent_get` | new arg `peers.supports_holepunch`
 | `torrent_get` | new arg `peers_from.from_holepunch`
 | `torrent_get` | new arg `webseeds_ex`
