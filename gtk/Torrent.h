@@ -92,6 +92,7 @@ public:
     Glib::ustring get_name() const;
     Percents get_percent_complete() const;
     Percents get_percent_done() const;
+    Glib::ustring get_percent_done_text() const;
     float get_percent_done_fraction() const;
     tr_priority_t get_priority() const;
     size_t get_queue_position() const;
