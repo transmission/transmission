@@ -100,6 +100,7 @@ public:
         }
 
         virtual void add_pex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) = 0;
+        virtual void set_node_count(size_t node_count) = 0;
 
     private:
         API api_;

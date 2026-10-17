@@ -1626,6 +1626,13 @@ bool tr_sessionIsDHTEnabled(tr_session const* session)
     return session->allowsDHT();
 }
 
+size_t tr_sessionGetDHTNodeCount(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->dht_node_count();
+}
+
 void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
