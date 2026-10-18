@@ -159,6 +159,8 @@ target_sources(${TR_NAME}-mac
         ProgressBarView.mm
         ProgressGradients.h
         ProgressGradients.mm
+        RpcController.h
+        RpcController.mm
         ShareToolbarItem.h
         ShareToolbarItem.mm
         ShareTorrentFileHelper.h
