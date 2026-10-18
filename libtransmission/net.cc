@@ -271,26 +271,6 @@ void tr_net_close_socket(tr_socket_t sockfd)
     evutil_closesocket(static_cast<evutil_socket_t>(sockfd));
 }
 
-// ---
-
-namespace
-{
-namespace is_valid_for_peers_helpers
-{
-
-/* isMartianAddr was written by Juliusz Chroboczek,
-   and is covered under the same license as third-party/dht/dht.c. */
-[[nodiscard]] auto is_martian_addr(tr_address const& addr, tr_peer_from from)
-{
-    auto const loopback_allowed = from == TR_PEER_FROM_INCOMING || from == TR_PEER_FROM_LPD || from == TR_PEER_FROM_RESUME;
-    return addr.is_ipv4_current_network() || addr.is_ipv6_unspecified() ||
-        (!loopback_allowed && (addr.is_ipv4_loopback() || addr.is_ipv6_loopback())) || addr.is_ipv4_multicast() ||
-        addr.is_ipv6_multicast();
-}
-
-} // namespace is_valid_for_peers_helpers
-} // namespace
-
 // --- tr_port
 
 tr_port tr_port::from_network(uint16_t const nport) noexcept
@@ -551,10 +531,12 @@ std::string tr_socket_address::display_name(tr_address const& address, tr_port p
 
 bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept
 {
-    using namespace is_valid_for_peers_helpers;
+    // Loopback is only meaningful from a source that can name our own host.
+    auto const loopback_allowed = from == TR_PEER_FROM_INCOMING || from == TR_PEER_FROM_LPD || from == TR_PEER_FROM_RESUME;
 
     return is_valid() && !std::empty(port_) && !address_.is_ipv6_link_local() && !address_.is_ipv6_ipv4_mapped() &&
-        !is_martian_addr(address_, from);
+        !address_.is_ipv4_current_network() && !address_.is_ipv6_unspecified() && !address_.is_ipv4_multicast() &&
+        !address_.is_ipv6_multicast() && (loopback_allowed || (!address_.is_ipv4_loopback() && !address_.is_ipv6_loopback()));
 }
 
 std::optional<tr_socket_address> tr_socket_address::from_string(std::string_view sockaddr_sv)
