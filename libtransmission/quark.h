@@ -226,6 +226,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_from_incoming,
     TR_KEY_from_lpd,
     TR_KEY_from_ltep,
+    TR_KEY_from_magnet,
     TR_KEY_from_pex,
     TR_KEY_from_tracker,
     TR_KEY_group,

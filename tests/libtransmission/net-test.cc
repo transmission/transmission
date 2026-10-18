@@ -1011,9 +1011,10 @@ TEST_F(NetTest, isValidForPeers)
     }
 
     // loopback peers are only accepted from sources that can legitimately name them
-    static auto constexpr LoopbackTests = std::array<std::pair<tr_peer_from, bool>, 8>{ {
+    static auto constexpr LoopbackTests = std::array<std::pair<tr_peer_from, bool>, 9>{ {
         { TR_PEER_FROM_INCOMING, true },
         { TR_PEER_FROM_LPD, true },
+        { TR_PEER_FROM_MAGNET, true },
         { TR_PEER_FROM_RESUME, true },
         { TR_PEER_FROM_TRACKER, false },
         { TR_PEER_FROM_DHT, false },
