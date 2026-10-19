@@ -268,7 +268,9 @@ void tr_torrentUseSessionLimits(tr_torrent* const tor, bool const enabled)
 {
     tr_return_if_fail(tr_isTorrent(tor));
 
-    if (tor->bandwidth().honor_parent_limits(TR_UP, enabled) || tor->bandwidth().honor_parent_limits(TR_DOWN, enabled))
+    auto const changed_up = tor->bandwidth().honor_parent_limits(TR_UP, enabled);
+    auto const changed_down = tor->bandwidth().honor_parent_limits(TR_DOWN, enabled);
+    if (changed_up || changed_down)
     {
         tor->set_dirty();
     }
