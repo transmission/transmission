@@ -829,7 +829,10 @@ export class Transmission extends EventTarget {
   updateTorrents(ids, fields) {
     this.remote.updateTorrents(ids, fields, (table, removed_ids) => {
       if (!ids) {
+        // Each row keeps the Torrent it was built with,
+        // so replacing every Torrent means rebuilding every row.
         this._torrents = {};
+        this.refilterAllSoon();
       }
 
       const needinfo = [];
