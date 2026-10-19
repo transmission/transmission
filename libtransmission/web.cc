@@ -586,6 +586,8 @@ public:
 
         if (!curl_ssl_verify)
         {
+            (void)curl_easy_setopt(e, CURLOPT_CAINFO, nullptr);
+            (void)curl_easy_setopt(e, CURLOPT_CAPATH, nullptr);
 #if LIBCURL_VERSION_NUM >= 0x073400 /* 7.52.0 */
             (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
@@ -604,8 +606,6 @@ public:
 
         if (!curl_proxy_ssl_verify)
         {
-            (void)curl_easy_setopt(e, CURLOPT_CAINFO, NULL);
-            (void)curl_easy_setopt(e, CURLOPT_CAPATH, NULL);
 #if LIBCURL_VERSION_NUM >= 0x073400 /* 7.52.0 */
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
