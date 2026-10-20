@@ -568,10 +568,7 @@ TEST_F(InteropTest, contendedLaunchWaitsOutThePublisherThenDelegates)
     auto launcher_coordinator = make_coordinator(sandboxDir(), nullptr, &transport);
 
     auto exit_code = std::optional<int>{};
-    auto launcher = std::thread{ [&]
-                                 {
-                                     exit_code = launcher_coordinator->delegate(Intent::Present, {}, {}, 5s);
-                                 } };
+    auto launcher = std::thread{ [&] { exit_code = launcher_coordinator->delegate(Intent::Present, {}, {}, 5s); } };
 
     // The publisher publishes, then releases the startup lock. The launcher's final
     // delegation attempt, made once it acquires that lock, must find the published instance.
@@ -602,10 +599,7 @@ TEST_F(InteropTest, carriesARefusalThroughToTheExitCode)
     script.add_answer = interop::Reply::No;
     auto coordinator = make_coordinator(sandboxDir(), &script);
 
-    auto const provider = interop::MetainfoProvider{ []
-                                                     {
-                                                         return std::vector<std::string>{ "alpha" };
-                                                     } };
+    auto const provider = interop::MetainfoProvider{ [] { return std::vector<std::string>{ "alpha" }; } };
     EXPECT_EQ(1, coordinator->delegate(Intent::AddTorrents, provider));
 }
 
