@@ -5,10 +5,13 @@
 
 #include <array>
 #include <cstddef>
+#include <string>
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/error.h>
 #include <libtransmission/torrent.h>
+#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 
@@ -147,4 +150,17 @@ TEST_F(TorrentTest, queueMoveBottom)
     {
         EXPECT_EQ(ExpectedQueuePosition[i], torrents[i]->queue_position()) << i;
     }
+}
+
+TEST_F(TorrentTest, setAnnounceListReportsSaveFailure)
+{
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    ASSERT_NE(nullptr, tor);
+
+    // the trackers can't be saved into a .torrent file that has no info dict
+    auto error = tr_error{};
+    EXPECT_TRUE(tr_file_save(tor->torrent_file(), "d7:comment3:fooe", &error)) << error;
+    EXPECT_FALSE(tor->set_announce_list("https://a.example.com/announce"));
+    EXPECT_EQ(TR_STAT_LOCAL_ERROR, tor->error().error_type());
+    EXPECT_NE(std::string::npos, tor->error().errmsg().find("missing 'info' dict"));
 }
