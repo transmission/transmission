@@ -134,7 +134,6 @@
 		A22CFCC20FC24F890009BD3E /* dht.h in Headers */ = {isa = PBXBuildFile; fileRef = A22CFCC00FC24F890009BD3E /* dht.h */; };
 		A22CFCC30FC24F890009BD3E /* dht.c in Sources */ = {isa = PBXBuildFile; fileRef = A22CFCC10FC24F890009BD3E /* dht.c */; };
 		A22CFCCB0FC24FDA0009BD3E /* libdht.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22CFCBA0FC24F710009BD3E /* libdht.a */; };
-		A22CFCCD0FC250480009BD3E /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
 		A231274C0D11D0B7003F9AFF /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A231274B0D11D0B7003F9AFF /* AboutWindow.xib */; };
 		A232F07E0EEA034A00041646 /* BonjourController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A232F07D0EEA034A00041646 /* BonjourController.mm */; };
 		A233BD330D8C6585007EE7B4 /* MessageWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A233BD320D8C6585007EE7B4 /* MessageWindow.xib */; };
@@ -1504,7 +1503,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A22CFCCD0FC250480009BD3E /* libevent.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
