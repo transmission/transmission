@@ -7,7 +7,7 @@ While the prerequisites for running the app are:
 
 The actual software prerequisites for building the app are based on GitHub Actions [macos-14](https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md):
  * macOS 14.8.3 or newer
- * Xcode 15.0.1 or newer
+ * Xcode 26 or newer
 
 Building the project on Mac requires the source to be retrieved from GitHub. Pre-packaged source code will not compile.
 ```bash
