@@ -325,6 +325,19 @@ export function deepEqual(a, b) {
   return equal(a, b);
 }
 
+// URL.canParse matches the constructor and does not throw. The constructor
+// covers browsers that shipped URL before canParse.
+export function isValidUrl(string) {
+  if ('canParse' in URL) {
+    return URL.canParse(string);
+  }
+  try {
+    return Boolean(new URL(string));
+  } catch {
+    return false;
+  }
+}
+
 function setOrDeleteAttribute(element, attribute, b) {
   if (b) {
     element.setAttribute(attribute, true);
