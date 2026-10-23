@@ -131,8 +131,6 @@ target_sources(${TR_NAME}-mac
         NSDataAdditions.mm
         NSImageAdditions.h
         NSImageAdditions.mm
-        NSKeyedUnarchiverAdditions.h
-        NSKeyedUnarchiverAdditions.mm
         NSMutableArrayAdditions.h
         NSMutableArrayAdditions.mm
         NSStringAdditions.h
