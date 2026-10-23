@@ -495,6 +495,11 @@ protected:
 
     tr_session* session_ = nullptr;
 
+    tr_dht::Mediator& dhtMediator()
+    {
+        return session_->dht_mediator_;
+    }
+
     tr_variant* settings()
     {
         if (!settings_)

@@ -142,6 +142,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_details_window_width,
     TR_KEY_dht_enabled_kebab_APICOMPAT,
     TR_KEY_dht_enabled,
+    TR_KEY_dht_nodes, /* rpc */
     TR_KEY_dnd,
     TR_KEY_done_date_kebab_APICOMPAT,
     TR_KEY_done_date_camel_APICOMPAT,
