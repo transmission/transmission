@@ -397,7 +397,6 @@
 		C809AEE7291ECFD000BFDBE1 /* NSDataAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */; };
 		C82B30312953337B0001BD6E /* NSDataAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */; };
 		C83B17212B7341BC00B2EAE4 /* tr-assert.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1425B321EE9C5EA001DB85F /* tr-assert.cc */; };
-		C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */; };
 		C843FC8429C51B9400491854 /* utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = C843FC8329C51B9400491854 /* utils.mm */; };
 		C843FC8729C8B40800491854 /* VersionComparator.mm in Sources */ = {isa = PBXBuildFile; fileRef = C843FC8629C8B40800491854 /* VersionComparator.mm */; };
 		C86BCD9928228A9600F45599 /* SparkleProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = C86BCD9828228A9600F45599 /* SparkleProxy.mm */; };
@@ -1376,8 +1375,6 @@
 		C809AEE5291ECFD000BFDBE1 /* NSDataAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSDataAdditions.h; sourceTree = "<group>"; };
 		C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSDataAdditions.mm; sourceTree = "<group>"; };
 		C81E411127F5BABD00652F56 /* CocoaCompatibility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CocoaCompatibility.h; sourceTree = "<group>"; };
-		C841A27F29197724009F18E8 /* NSKeyedUnarchiverAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSKeyedUnarchiverAdditions.h; sourceTree = "<group>"; };
-		C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSKeyedUnarchiverAdditions.mm; sourceTree = "<group>"; };
 		C843FC8329C51B9400491854 /* utils.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = utils.mm; sourceTree = "<group>"; };
 		C843FC8529C8B40800491854 /* VersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VersionComparator.h; sourceTree = "<group>"; };
 		C843FC8629C8B40800491854 /* VersionComparator.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = VersionComparator.mm; sourceTree = "<group>"; };
@@ -2107,8 +2104,6 @@
 				C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */,
 				A234EA521453563B000F3E97 /* NSImageAdditions.h */,
 				A234EA531453563B000F3E97 /* NSImageAdditions.mm */,
-				C841A27F29197724009F18E8 /* NSKeyedUnarchiverAdditions.h */,
-				C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */,
 				A22BAE261388040500FB022F /* NSMutableArrayAdditions.h */,
 				A22BAE271388040500FB022F /* NSMutableArrayAdditions.mm */,
 				4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */,
@@ -3486,7 +3481,6 @@
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.mm in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.mm in Sources */,
 				4521532B29AF891F009331B0 /* GroupCell.mm in Sources */,
-				C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */,
 				A22180980D148A71007D09ED /* GroupsPrefsController.mm in Sources */,
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.mm in Sources */,
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.mm in Sources */,
