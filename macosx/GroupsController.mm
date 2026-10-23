@@ -4,16 +4,231 @@
 
 #import "GroupsController.h"
 #import "NSImageAdditions.h"
-#import "NSKeyedUnarchiverAdditions.h"
 #import "NSMutableArrayAdditions.h"
 
 static CGFloat const kIconWidth = 16.0;
 static CGFloat const kBorderWidth = 1.25;
 static CGFloat const kIconWidthSmall = 12.0;
 
+#pragma mark - Safe auto-assign rule (de)serialization
+
+// GHSA-v7mp-fpv3-jf5r: auto-assign rules used to be archived as live NSPredicate object graphs, which let a
+// crafted preferences plist smuggle in a function/custom-selector expression and trigger arbitrary Objective-C
+// message dispatch on evaluation. The functions below only ever build/accept the fixed AND/OR/NOT-of-comparisons
+// shape GroupRules.xib's rule editor produces, as a plain property-list schema - nothing else is stored or trusted.
+// remainingNodeBudget caps total nodes visited per tree, since depth/fan-out limits alone don't bound their product.
+static NSUInteger const kAutoGroupRuleMaxDepth = 8;
+static NSUInteger const kAutoGroupRuleMaxChildren = 32;
+static NSUInteger const kAutoGroupRuleMaxTotalNodes = 256;
+
+static NSSet<NSString*>* allowedAutoGroupRuleKeyPaths(void)
+{
+    static NSSet<NSString*>* keyPaths;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        //keep in sync with the key paths offered by GroupRules.xib's predicate row templates
+        keyPaths = [NSSet setWithObjects:@"name", @"comment", @"flatFileList.name", @"allTrackersFlat", nil];
+    });
+    return keyPaths;
+}
+
+static BOOL autoGroupRuleOperatorIsAllowed(NSPredicateOperatorType type)
+{
+    //no default case: -Wswitch will flag it if a new NSPredicateOperatorType is ever added, forcing an explicit
+    //allow/deny decision here instead of silently falling through
+    switch (type)
+    {
+    case NSEqualToPredicateOperatorType:
+    case NSNotEqualToPredicateOperatorType:
+    case NSBeginsWithPredicateOperatorType:
+    case NSEndsWithPredicateOperatorType:
+    case NSContainsPredicateOperatorType:
+    case NSMatchesPredicateOperatorType:
+        return YES;
+    case NSLessThanPredicateOperatorType:
+    case NSLessThanOrEqualToPredicateOperatorType:
+    case NSGreaterThanPredicateOperatorType:
+    case NSGreaterThanOrEqualToPredicateOperatorType:
+    case NSLikePredicateOperatorType:
+    case NSInPredicateOperatorType:
+    case NSCustomSelectorPredicateOperatorType:
+    case NSBetweenPredicateOperatorType:
+        return NO;
+    }
+}
+
+static BOOL autoGroupRuleModifierIsAllowed(NSComparisonPredicateModifier modifier)
+{
+    return modifier == NSDirectPredicateModifier || modifier == NSAllPredicateModifier || modifier == NSAnyPredicateModifier;
+}
+
+static BOOL autoGroupRuleOptionsAreAllowed(NSUInteger options)
+{
+    return (options & ~(NSCaseInsensitivePredicateOption | NSDiacriticInsensitivePredicateOption)) == 0;
+}
+
+static BOOL autoGroupRuleCompoundTypeIsAllowed(NSCompoundPredicateType type)
+{
+    return type == NSNotPredicateType || type == NSAndPredicateType || type == NSOrPredicateType;
+}
+
+static NSDictionary* safeSchemaFromAutoGroupPredicate(NSPredicate* predicate, NSUInteger depth, NSUInteger* remainingNodeBudget)
+{
+    if (depth > kAutoGroupRuleMaxDepth || *remainingNodeBudget == 0)
+    {
+        return nil;
+    }
+    (*remainingNodeBudget)--;
+
+    if ([predicate isKindOfClass:NSCompoundPredicate.class])
+    {
+        NSCompoundPredicate* compound = (NSCompoundPredicate*)predicate;
+        if (!autoGroupRuleCompoundTypeIsAllowed(compound.compoundPredicateType) || compound.subpredicates.count > kAutoGroupRuleMaxChildren)
+        {
+            return nil;
+        }
+
+        NSMutableArray<NSDictionary*>* subSchemas = [NSMutableArray arrayWithCapacity:compound.subpredicates.count];
+        for (NSPredicate* subPredicate in compound.subpredicates)
+        {
+            NSDictionary* subSchema = safeSchemaFromAutoGroupPredicate(subPredicate, depth + 1, remainingNodeBudget);
+            if (!subSchema)
+            {
+                return nil;
+            }
+            [subSchemas addObject:subSchema];
+        }
+
+        //mutableCopy to match the Comparison case: keeps old builds able to decode the archive (just not this rule)
+        return
+            [@{@"Type" : @"Compound",
+               @"Compound" : @(compound.compoundPredicateType),
+               @"Subpredicates" : subSchemas} mutableCopy];
+    }
+
+    if ([predicate isKindOfClass:NSComparisonPredicate.class])
+    {
+        NSComparisonPredicate* comparison = (NSComparisonPredicate*)predicate;
+        if (!autoGroupRuleOperatorIsAllowed(comparison.predicateOperatorType) ||
+            !autoGroupRuleModifierIsAllowed(comparison.comparisonPredicateModifier) ||
+            !autoGroupRuleOptionsAreAllowed(comparison.options))
+        {
+            return nil;
+        }
+
+        NSExpression* left = comparison.leftExpression;
+        NSExpression* right = comparison.rightExpression;
+        if (left.expressionType != NSKeyPathExpressionType || !left.keyPath || ![allowedAutoGroupRuleKeyPaths() containsObject:left.keyPath])
+        {
+            return nil;
+        }
+        if (right.expressionType != NSConstantValueExpressionType ||
+            (right.constantValue && ![right.constantValue isKindOfClass:NSString.class] &&
+             ![right.constantValue isKindOfClass:NSNumber.class]))
+        {
+            return nil;
+        }
+
+        NSMutableDictionary* schema = [@{
+            @"Type" : @"Comparison",
+            @"KeyPath" : left.keyPath,
+            @"Modifier" : @(comparison.comparisonPredicateModifier),
+            @"Operator" : @(comparison.predicateOperatorType),
+            @"Options" : @(comparison.options)
+        } mutableCopy];
+        if (right.constantValue)
+        {
+            schema[@"Value"] = right.constantValue;
+        }
+        return schema;
+    }
+
+    return nil;
+}
+
+static NSPredicate* autoGroupPredicateFromSafeSchema(NSDictionary* schema, NSUInteger depth, NSUInteger* remainingNodeBudget)
+{
+    if (depth > kAutoGroupRuleMaxDepth || *remainingNodeBudget == 0 || ![schema isKindOfClass:NSDictionary.class])
+    {
+        return nil;
+    }
+    (*remainingNodeBudget)--;
+
+    NSString* type = schema[@"Type"];
+    if ([type isEqualToString:@"Compound"])
+    {
+        NSNumber* compoundTypeNumber = schema[@"Compound"];
+        NSArray* subSchemas = schema[@"Subpredicates"];
+        if (![compoundTypeNumber isKindOfClass:NSNumber.class] || ![subSchemas isKindOfClass:NSArray.class] || subSchemas.count > kAutoGroupRuleMaxChildren)
+        {
+            return nil;
+        }
+
+        NSCompoundPredicateType compoundType = (NSCompoundPredicateType)compoundTypeNumber.integerValue;
+        if (!autoGroupRuleCompoundTypeIsAllowed(compoundType))
+        {
+            return nil;
+        }
+
+        NSMutableArray<NSPredicate*>* subPredicates = [NSMutableArray arrayWithCapacity:subSchemas.count];
+        for (NSDictionary* subSchema in subSchemas)
+        {
+            NSPredicate* subPredicate = autoGroupPredicateFromSafeSchema(subSchema, depth + 1, remainingNodeBudget);
+            if (!subPredicate)
+            {
+                return nil;
+            }
+            [subPredicates addObject:subPredicate];
+        }
+
+        if (compoundType == NSNotPredicateType)
+        {
+            return subPredicates.count == 1 ? [NSCompoundPredicate notPredicateWithSubpredicate:subPredicates.firstObject] : nil;
+        }
+        return [[NSCompoundPredicate alloc] initWithType:compoundType subpredicates:subPredicates];
+    }
+
+    if ([type isEqualToString:@"Comparison"])
+    {
+        NSString* keyPath = schema[@"KeyPath"];
+        NSNumber* modifierNumber = schema[@"Modifier"];
+        NSNumber* operatorNumber = schema[@"Operator"];
+        NSNumber* optionsNumber = schema[@"Options"];
+        id value = schema[@"Value"];
+
+        if (![keyPath isKindOfClass:NSString.class] || ![allowedAutoGroupRuleKeyPaths() containsObject:keyPath] ||
+            ![modifierNumber isKindOfClass:NSNumber.class] || ![operatorNumber isKindOfClass:NSNumber.class] ||
+            ![optionsNumber isKindOfClass:NSNumber.class] ||
+            (value && ![value isKindOfClass:NSString.class] && ![value isKindOfClass:NSNumber.class]))
+        {
+            return nil;
+        }
+
+        NSComparisonPredicateModifier modifier = (NSComparisonPredicateModifier)modifierNumber.integerValue;
+        NSPredicateOperatorType operatorType = (NSPredicateOperatorType)operatorNumber.integerValue;
+        NSUInteger options = optionsNumber.unsignedIntegerValue;
+        if (!autoGroupRuleModifierIsAllowed(modifier) || !autoGroupRuleOperatorIsAllowed(operatorType) ||
+            !autoGroupRuleOptionsAreAllowed(options))
+        {
+            return nil;
+        }
+
+        NSExpression* left = [NSExpression expressionForKeyPath:keyPath];
+        NSExpression* right = [NSExpression expressionForConstantValue:value];
+        return [NSComparisonPredicate predicateWithLeftExpression:left rightExpression:right modifier:modifier type:operatorType
+                                                          options:options];
+    }
+
+    return nil;
+}
+
 @interface GroupsController ()
 
 @property(nonatomic, readonly) NSMutableArray<NSMutableDictionary*>* fGroups;
+
+- (NSMutableArray<NSMutableDictionary*>*)decodedGroupsFromArchivedData:(NSData*)data
+                                                    migratedLegacyRule:(BOOL*)migratedLegacyRule;
+- (void)saveGroups;
 
 @end
 
@@ -37,21 +252,19 @@ GroupsController* fGroupsInstance = nil;
         NSData* data;
         if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"GroupDicts"]))
         {
-            _fGroups = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSMutableArray.class,
-                                                                                          NSMutableDictionary.class,
-                                                                                          NSNumber.class,
-                                                                                          NSColor.class,
-                                                                                          NSString.class,
-                                                                                          NSPredicate.class,
-                                                                                          nil]
-                                                           fromData:data
-                                                              error:nil];
+            BOOL migratedLegacyRule = NO;
+            _fGroups = [self decodedGroupsFromArchivedData:data migratedLegacyRule:&migratedLegacyRule];
+            if (_fGroups != nil && migratedLegacyRule)
+            {
+                //rewrite now so no raw predicate object graphs are archived going forward
+                [self saveGroups];
+            }
         }
-        else if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"Groups"])) //handle old groups
+        else if ([NSUserDefaults.standardUserDefaults objectForKey:@"Groups"])
         {
-            _fGroups = [NSKeyedUnarchiver deprecatedUnarchiveObjectWithData:data];
+            //ancient pre-GroupDicts key; used to migrate via unrestricted NSUnarchiver, an even bigger deserialization
+            //hole than GHSA-v7mp-fpv3-jf5r, so it's discarded rather than read
             [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Groups"];
-            [self saveGroups];
         }
         if (_fGroups == nil)
         {
@@ -220,6 +433,14 @@ GroupsController* fGroupsInstance = nil;
 
     if (predicate)
     {
+        //catches the rule editor producing a shape saveGroups would otherwise silently drop later
+        NSUInteger assertNodeBudget = kAutoGroupRuleMaxTotalNodes;
+        (void)assertNodeBudget; //only used inside NSAssert, which compiles out in Release
+        NSAssert(
+            safeSchemaFromAutoGroupPredicate(predicate, 0, &assertNodeBudget) != nil,
+            @"Auto-assign rule predicate (%@) doesn't match the allowlisted schema and would be silently discarded on save",
+            predicate);
+
         dict[@"AutoGroupRules"] = predicate;
         [GroupsController.groups saveGroups];
     }
@@ -329,14 +550,113 @@ GroupsController* fGroupsInstance = nil;
 
 #pragma mark - Private
 
+- (NSMutableArray<NSMutableDictionary*>*)decodedGroupsFromArchivedData:(NSData*)data
+                                                    migratedLegacyRule:(BOOL*)migratedLegacyRule
+{
+    id decoded;
+    @try
+    {
+        //NSPredicate.class is only for decoding old archives; below, any decoded predicate is validated and rebuilt
+        //from scratch (or discarded) rather than trusted or evaluated directly
+        decoded = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSMutableArray.class,
+                                                                                     NSArray.class,
+                                                                                     NSMutableDictionary.class,
+                                                                                     NSDictionary.class,
+                                                                                     NSNumber.class,
+                                                                                     NSColor.class,
+                                                                                     NSString.class,
+                                                                                     NSPredicate.class,
+                                                                                     nil]
+                                                      fromData:data
+                                                         error:nil];
+    }
+    @catch (NSException* exception)
+    {
+        NSLog(@"Error when decoding groups (%@)", exception);
+        return nil;
+    }
+
+    if (![decoded isKindOfClass:NSArray.class])
+    {
+        return nil;
+    }
+
+    NSMutableArray<NSMutableDictionary*>* validatedGroups = [NSMutableArray arrayWithCapacity:[(NSArray*)decoded count]];
+    for (id groupObject in (NSArray*)decoded)
+    {
+        if (![groupObject isKindOfClass:NSDictionary.class] || ![((NSDictionary*)groupObject)[@"Index"] isKindOfClass:NSNumber.class])
+        {
+            continue; //drop malformed entries rather than fail the whole load
+        }
+
+        NSMutableDictionary* group = [groupObject mutableCopy];
+
+        NSDictionary* schema = group[@"AutoGroupRulesSchema"];
+        id legacyPredicate = group[@"AutoGroupRules"];
+        [group removeObjectForKey:@"AutoGroupRulesSchema"];
+
+        NSPredicate* rebuilt = nil;
+        if ([schema isKindOfClass:NSDictionary.class])
+        {
+            NSUInteger nodeBudget = kAutoGroupRuleMaxTotalNodes;
+            rebuilt = autoGroupPredicateFromSafeSchema(schema, 0, &nodeBudget);
+        }
+        else if ([legacyPredicate isKindOfClass:NSPredicate.class])
+        {
+            NSUInteger schemaNodeBudget = kAutoGroupRuleMaxTotalNodes;
+            NSDictionary* legacySchema = safeSchemaFromAutoGroupPredicate(legacyPredicate, 0, &schemaNodeBudget);
+            NSUInteger rebuildNodeBudget = kAutoGroupRuleMaxTotalNodes;
+            rebuilt = legacySchema ? autoGroupPredicateFromSafeSchema(legacySchema, 0, &rebuildNodeBudget) : nil;
+            *migratedLegacyRule = YES;
+        }
+
+        if ([schema isKindOfClass:NSDictionary.class] || [legacyPredicate isKindOfClass:NSPredicate.class])
+        {
+            if (rebuilt)
+            {
+                group[@"AutoGroupRules"] = rebuilt;
+            }
+            else
+            {
+                //unrecognized shape - drop the rule rather than risk evaluating it
+                [group removeObjectForKey:@"AutoGroupRules"];
+                group[@"UsesAutoGroupRules"] = @NO;
+                NSLog(@"Transmission: discarded an auto-assign rule with an unsupported predicate structure");
+            }
+        }
+        else if (legacyPredicate != nil)
+        {
+            [group removeObjectForKey:@"AutoGroupRules"];
+            group[@"UsesAutoGroupRules"] = @NO;
+        }
+
+        [validatedGroups addObject:group];
+    }
+
+    return validatedGroups;
+}
+
 - (void)saveGroups
 {
-    //don't archive the icon
+    //don't archive the icon, and never archive a live NSPredicate - only its safe schema representation
     NSMutableArray* groups = [NSMutableArray arrayWithCapacity:self.fGroups.count];
     for (NSDictionary* dict in self.fGroups)
     {
         NSMutableDictionary* tempDict = [dict mutableCopy];
         [tempDict removeObjectForKey:@"Icon"];
+
+        NSPredicate* predicate = tempDict[@"AutoGroupRules"];
+        if (predicate)
+        {
+            NSUInteger nodeBudget = kAutoGroupRuleMaxTotalNodes;
+            NSDictionary* schema = safeSchemaFromAutoGroupPredicate(predicate, 0, &nodeBudget);
+            if (schema)
+            {
+                tempDict[@"AutoGroupRulesSchema"] = schema;
+            }
+            [tempDict removeObjectForKey:@"AutoGroupRules"];
+        }
+
         [groups addObject:tempDict];
     }
 
@@ -397,8 +717,8 @@ GroupsController* fGroupsInstance = nil;
         return NO;
     }
 
+    //always freshly built, never a raw decoded predicate, so it needs no allowEvaluation
     NSPredicate* predicate = [self autoAssignRulesForIndex:index];
-    [predicate allowEvaluation];
     BOOL eval = NO;
     @try
     {
