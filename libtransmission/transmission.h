@@ -16,6 +16,7 @@
 #include <ctime>
 #include <functional>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -720,6 +721,9 @@ tr_torrent_id_t tr_torrentId(tr_torrent const* torrent);
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, tr_torrent_id_t id);
 
+// Returns the session that owns this torrent, or nullptr if `torrent` isn't valid.
+tr_session* tr_torrentSession(tr_torrent* torrent);
+
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo);
 
 [[nodiscard]] tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, std::string_view magnet_link);
@@ -958,3 +962,21 @@ tr_stat tr_torrentStat(tr_torrent* torrent);
 // Prefer calling this over calling the single-torrent version in a loop.
 // TODO(c++20) take a std::span argument
 std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+
+// Non-blocking counterpart of tr_torrentStat(). If the session thread
+// currently holds the session lock (e.g. it is in the middle of a disk
+// write), this returns false immediately and leaves *setme untouched,
+// instead of blocking the caller for the duration of that write. UI
+// refresh loops should fall back to their last cached tr_stat when this
+// returns false, rather than stalling.
+bool tr_torrentTryStat(tr_torrent* torrent, tr_stat* setme);
+
+// Batch version of tr_torrentTryStat(), addressed by torrent id rather than
+// by pointer. This also sidesteps any question of whether every torrent
+// belongs to `session`: an id that isn't found in it is simply treated as
+// a lookup failure, the same as the session lock being unavailable. setme
+// must point to an array of at least ids.size() tr_stat entries. On
+// success (true), every entry is filled in. On failure (false), no entries
+// are touched at all -- the caller should keep showing its previous cached
+// stats for this refresh cycle.
+bool tr_torrentTryStat(tr_session* session, std::span<tr_torrent_id_t const> ids, tr_stat* setme);

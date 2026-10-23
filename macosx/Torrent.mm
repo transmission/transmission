@@ -273,8 +273,10 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     std::vector<Torrent*> torrent_objects;
     torrent_objects.reserve(torrents.count);
 
-    std::vector<tr_torrent*> torrent_handles;
-    torrent_handles.reserve(torrents.count);
+    std::vector<tr_torrent_id_t> torrent_ids;
+    torrent_ids.reserve(torrents.count);
+
+    tr_session* session = nullptr;
 
     for (Torrent* torrent in torrents)
     {
@@ -283,16 +285,30 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
             continue;
         }
 
+        if (session == nullptr)
+        {
+            session = tr_torrentSession(torrent.fHandle);
+        }
+
         torrent_objects.emplace_back(torrent);
-        torrent_handles.emplace_back(torrent.fHandle);
+        torrent_ids.emplace_back(tr_torrentId(torrent.fHandle));
     }
 
-    if (torrent_handles.empty())
+    if (torrent_objects.empty())
     {
         return;
     }
 
-    auto stats = tr_torrentStat(torrent_handles.data(), torrent_handles.size());
+    auto stats = std::vector<tr_stat>(torrent_ids.size());
+    if (!tr_torrentTryStat(session, torrent_ids, stats.data()))
+    {
+        // The session thread currently holds the session lock (e.g. it's in
+        // the middle of a disk write). Rather than block the calling thread
+        // (typically the main/UI thread) for however long that write takes,
+        // skip this refresh -- each Torrent keeps showing its last-known
+        // fStat until the next timer tick.
+        return;
+    }
 
     // Update stats
     bool transmitting_changed = false;
@@ -2067,7 +2083,12 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning
 {
-    self.fStat = tr_torrentStat(self.fHandle); //don't call update yet to avoid auto-stop
+    //don't call update yet to avoid auto-stop; fall back to the existing fStat if the session lock isn't
+    //immediately available rather than blocking the main thread -- update below will refresh it shortly after
+    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fHandle, &stat))
+    {
+        self.fStat = stat;
+    }
 
     switch (status)
     {
@@ -2101,21 +2122,30 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (void)ratioLimitHit
 {
-    self.fStat = tr_torrentStat(self.fHandle);
+    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fHandle, &stat))
+    {
+        self.fStat = stat;
+    }
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentFinishedSeeding" object:self];
 }
 
 - (void)idleLimitHit
 {
-    self.fStat = tr_torrentStat(self.fHandle);
+    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fHandle, &stat))
+    {
+        self.fStat = stat;
+    }
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentFinishedSeeding" object:self];
 }
 
 - (void)metadataRetrieved
 {
-    self.fStat = tr_torrentStat(self.fHandle);
+    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fHandle, &stat))
+    {
+        self.fStat = stat;
+    }
 
     [self createFileList];
 
