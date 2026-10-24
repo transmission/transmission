@@ -32,6 +32,9 @@ Transmission can be set to invoke a script when downloads complete. The environm
 
 [Here is an example script](https://github.com/transmission/transmission/blob/main/extras/send-email-when-torrent-done.sh) that sends an email when a torrent finishes.
 
+### On torrent removal
+Transmission can be set to invoke a script when a torrent is removed, using the `script_torrent_removed_enabled` and `script_torrent_removed_filename` settings. The script gets the same environment variables as above. If the torrent's local data was deleted along with it, that happens before the script is called.
+
 ### Obsolete
 Functionality of these scripts has been implemented in libtransmission and is thus available in all clients.
 

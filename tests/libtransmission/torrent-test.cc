@@ -6,8 +6,22 @@
 #include <array>
 #include <cstddef>
 #include <ranges>
+#include <string>
+#include <string_view>
+#include <vector>
 
+#ifndef _WIN32
+#include <sys/stat.h> // chmod()
+#endif
+
+#include <fmt/format.h>
+
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/file-utils.h>
+#include <libtransmission/file.h>
 #include <libtransmission/torrent.h>
+#include <libtransmission/tr-strbuf.h>
 
 #include "test-fixtures.h"
 
@@ -126,3 +140,28 @@ TEST_F(TorrentTest, queueMoveBottom)
         EXPECT_EQ(ExpectedQueuePosition[i], torrents[i]->queue_position()) << i;
     }
 }
+
+#ifndef _WIN32 // the test script is a POSIX shell script
+TEST_F(TorrentTest, removeCallsRemovedScript)
+{
+    auto const result_path = tr_pathbuf{ sandboxDir(), "/removed-script-result.txt"sv };
+    auto const script_path = tr_pathbuf{ sandboxDir(), "/removed-script.sh"sv };
+    auto const script = fmt::format(
+        "#!/bin/sh\nprintf '%s' \"$TR_TORRENT_HASH\" > '{0:s}.tmp' && mv '{0:s}.tmp' '{0:s}'\n",
+        result_path.sv());
+    createFileWithContents(script_path.sv(), script);
+    ASSERT_EQ(0, chmod(script_path.c_str(), 0700));
+    tr_sessionSetScript(session_, TR_SCRIPT_ON_TORRENT_REMOVED, script_path.sv());
+    tr_sessionSetScriptEnabled(session_, TR_SCRIPT_ON_TORRENT_REMOVED, true);
+
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    ASSERT_NE(nullptr, tor);
+    auto const hash = std::string{ tor->info_hash_string() };
+    tr_torrentRemove(tor, false);
+
+    ASSERT_TRUE(tr::test::waitFor([&result_path]() { return tr_sys_path_exists(result_path); }, 30000));
+    auto contents = std::vector<char>{};
+    ASSERT_TRUE(tr_file_read(result_path, contents));
+    EXPECT_EQ(hash, std::string_view(std::data(contents), std::size(contents)));
+}
+#endif

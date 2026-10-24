@@ -535,6 +535,8 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "script_torrent_done_filename"sv, // rpc, tr_session::Settings
     "script_torrent_done_seeding_enabled"sv, // rpc, tr_session::Settings
     "script_torrent_done_seeding_filename"sv, // rpc, tr_session::Settings
+    "script_torrent_removed_enabled"sv, // rpc, tr_session::Settings
+    "script_torrent_removed_filename"sv, // rpc, tr_session::Settings
     "seconds-active"sv, // stats.json
     "secondsActive"sv, // rpc
     "secondsDownloading"sv, // rpc
