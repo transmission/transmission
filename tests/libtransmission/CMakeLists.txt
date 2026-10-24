@@ -25,6 +25,7 @@ target_sources(libtransmission-test
         getopt-test.cc
         handshake-test.cc
         history-test.cc
+        inout-test.cc
         ip-cache-test.cc
         json-test.cc
         lpd-test.cc
