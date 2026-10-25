@@ -37,8 +37,6 @@ jobs:
             macosx/*/InfoPlist.strings
             macosx/QuickLookExtension/Info.plist
             macosx/QuickLookExtension/Info.plist.in
-            macosx/QuickLookPlugin/Info.plist.in
-            macosx/QuickLookPlugin/QuickLookPlugin-Info.plist
           transform: (?<=Copyright © )(?<from>\d{4})?[-–]?(\d{4})
       - uses: FantasticFiasco/action-update-license-year@v3
         with:

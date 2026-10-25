@@ -31,7 +31,6 @@ add_link_options(
     $<$<LINK_LANGUAGE:C,CXX>:-dead_strip>)
 
 add_subdirectory(QuickLookExtension)
-add_subdirectory(QuickLookPlugin)
 add_subdirectory(VDKQueue)
 
 add_executable(${TR_NAME}-mac MACOSX_BUNDLE)
