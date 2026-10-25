@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cerrno>
+#include <string>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -29,30 +30,47 @@
 
 namespace
 {
-void log_val(char const* func, int ret)
+[[nodiscard]] std::string ipv4_str(void const* addr)
 {
-    if (ret == NATPMP_TRYAGAIN)
+    auto str = std::array<char, 128>{};
+    evutil_inet_ntop(AF_INET, addr, std::data(str), std::size(str));
+    return std::data(str);
+}
+} // namespace
+
+std::string tr_natpmp::gatewayStr() const
+{
+    return ipv4_str(&natpmp_.gateway);
+}
+
+void tr_natpmp::onFailure(char const* func, int ret)
+{
+    auto const err = errno;
+    state_ = State::Err;
+
+    tr_logAddDebug(
+        fmt::format(
+            "{} failed. Natpmp returned {} ({}); errno is {} ({})",
+            func,
+            ret,
+            strnatpmperr(ret),
+            err,
+            tr_strerror(err)));
+
+    if (is_failing_)
     {
         return;
     }
 
-    if (ret >= 0)
-    {
-        tr_logAddDebug(fmt::format("{} succeeded ({})", func, ret));
-    }
-    else
-    {
-        tr_logAddDebug(
-            fmt::format(
-                "{} failed. Natpmp returned {} ({}); errno is {} ({})",
-                func,
-                ret,
-                strnatpmperr(ret),
-                errno,
-                tr_strerror(errno)));
-    }
+    is_failing_ = true;
+    tr_logAddWarn(
+        fmt::format(
+            fmt::runtime(_("NAT-PMP gateway '{gateway}' failed: {error} ({errmsg} ({errno}))")),
+            fmt::arg("gateway", gatewayStr()),
+            fmt::arg("error", strnatpmperr(ret)),
+            fmt::arg("errmsg", tr_strerror(err)),
+            fmt::arg("errno", err)));
 }
-} // namespace
 
 bool tr_natpmp::canSendCommand() const
 {
@@ -68,32 +86,53 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
 {
     if (is_enabled && state_ == State::Discover)
     {
-        int val = gateway_ ? initnatpmp(&natpmp_, 1, gateway_->addr.addr4.s_addr) : initnatpmp(&natpmp_, 0, 0);
-        log_val("initnatpmp", val);
-        val = sendpublicaddressrequest(&natpmp_);
-        log_val("sendpublicaddressrequest", val);
-        state_ = val < 0 ? State::Err : State::RecvPub;
         has_discovered_ = true;
         setCommandTime();
+
+        if (auto const val = gateway_ ? initnatpmp(&natpmp_, 1, gateway_->addr.addr4.s_addr) : initnatpmp(&natpmp_, 0, 0);
+            val < 0)
+        {
+            onFailure("initnatpmp", val);
+        }
+        else
+        {
+            tr_logAddInfo(
+                fmt::format(
+                    fmt::runtime(
+                        gateway_ ? _("Using NAT-PMP gateway '{gateway}' from natpmp_gateway_ipv4") :
+                                   _("Using NAT-PMP gateway '{gateway}' from the default route")),
+                    fmt::arg("gateway", gatewayStr())));
+
+            tr_logAddDebug(fmt::format("Asking NAT-PMP gateway '{}' for its public address", gatewayStr()));
+            if (auto const sent = sendpublicaddressrequest(&natpmp_); sent < 0)
+            {
+                onFailure("sendpublicaddressrequest", sent);
+            }
+            else
+            {
+                state_ = State::RecvPub;
+            }
+        }
     }
 
     if (state_ == State::RecvPub && canSendCommand())
     {
         natpmpresp_t response;
         auto const val = readnatpmpresponseorretry(&natpmp_, &response);
-        log_val("readnatpmpresponseorretry", val);
 
         if (val >= 0)
         {
-            auto str = std::array<char, 128>{};
-            evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, std::data(str), std::size(str));
             tr_logAddInfo(
-                fmt::format(fmt::runtime(_("Found public address '{address}'")), fmt::arg("address", std::data(str))));
+                fmt::format(
+                    fmt::runtime(_("NAT-PMP gateway '{gateway}' reports public address '{address}'")),
+                    fmt::arg("gateway", gatewayStr()),
+                    fmt::arg("address", ipv4_str(&response.pnu.publicaddress.addr))));
             state_ = State::Idle;
+            is_failing_ = false;
         }
         else if (val != NATPMP_TRYAGAIN)
         {
-            state_ = State::Err;
+            onFailure("readnatpmpresponseorretry", val);
         }
     }
 
@@ -104,14 +143,21 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
 
     if (state_ == State::SendUnmap && canSendCommand())
     {
+        tr_logAddDebug(fmt::format("Asking NAT-PMP gateway '{}' to stop forwarding port {}", gatewayStr(), local_port_.host()));
         auto const val = sendnewportmappingrequest(
             &natpmp_,
             NATPMP_PROTOCOL_TCP,
             local_port_.host(),
             advertised_port_.host(),
             0);
-        log_val("sendnewportmappingrequest", val);
-        state_ = val < 0 ? State::Err : State::RecvUnmap;
+        if (val < 0)
+        {
+            onFailure("sendnewportmappingrequest", val);
+        }
+        else
+        {
+            state_ = State::RecvUnmap;
+        }
         setCommandTime();
     }
 
@@ -119,14 +165,17 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
     {
         auto resp = natpmpresp_t{};
         auto const val = readnatpmpresponseorretry(&natpmp_, &resp);
-        log_val("readnatpmpresponseorretry", val);
 
         if (val >= 0)
         {
             auto const unmapped_port = tr_port::from_host(resp.pnu.newportmapping.privateport);
+            is_failing_ = false;
 
             tr_logAddInfo(
-                fmt::format(fmt::runtime(_("Port {port} is no longer forwarded")), fmt::arg("port", unmapped_port.host())));
+                fmt::format(
+                    fmt::runtime(_("NAT-PMP gateway '{gateway}' stopped forwarding port {port}")),
+                    fmt::arg("gateway", gatewayStr()),
+                    fmt::arg("port", unmapped_port.host())));
 
             if (local_port_ == unmapped_port)
             {
@@ -138,7 +187,7 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
         }
         else if (val != NATPMP_TRYAGAIN)
         {
-            state_ = State::Err;
+            onFailure("readnatpmpresponseorretry", val);
         }
     }
 
@@ -150,14 +199,26 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
 
     if (state_ == State::SendMap && canSendCommand())
     {
+        tr_logAddDebug(
+            fmt::format(
+                "Asking NAT-PMP gateway '{}' to forward port {} for {} seconds",
+                gatewayStr(),
+                local_port.host(),
+                LifetimeSecs));
         auto const val = sendnewportmappingrequest(
             &natpmp_,
             NATPMP_PROTOCOL_TCP,
             local_port.host(),
             local_port.host(),
             LifetimeSecs);
-        log_val("sendnewportmappingrequest", val);
-        state_ = val < 0 ? State::Err : State::RecvMap;
+        if (val < 0)
+        {
+            onFailure("sendnewportmappingrequest", val);
+        }
+        else
+        {
+            state_ = State::RecvMap;
+        }
         setCommandTime();
     }
 
@@ -165,21 +226,27 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
     {
         auto resp = natpmpresp_t{};
         auto const val = readnatpmpresponseorretry(&natpmp_, &resp);
-        log_val("readnatpmpresponseorretry", val);
 
         if (val >= 0)
         {
             state_ = State::Idle;
+            is_failing_ = false;
             is_mapped_ = true;
             renew_time_ = tr_time() + (resp.pnu.newportmapping.lifetime / 2);
             local_port_ = tr_port::from_host(resp.pnu.newportmapping.privateport);
             advertised_port_ = tr_port::from_host(resp.pnu.newportmapping.mappedpublicport);
             tr_logAddInfo(
-                fmt::format(fmt::runtime(_("Port {port} forwarded successfully")), fmt::arg("port", local_port_.host())));
+                fmt::format(
+                    fmt::runtime(_(
+                        "NAT-PMP gateway '{gateway}' forwarded port {private_port} to public port {public_port} for {lifetime} seconds")),
+                    fmt::arg("gateway", gatewayStr()),
+                    fmt::arg("private_port", local_port_.host()),
+                    fmt::arg("public_port", advertised_port_.host()),
+                    fmt::arg("lifetime", resp.pnu.newportmapping.lifetime)));
         }
         else if (val != NATPMP_TRYAGAIN)
         {
-            state_ = State::Err;
+            onFailure("readnatpmpresponseorretry", val);
         }
     }
 

@@ -12,6 +12,7 @@
 #include <ctime> // time_t
 #include <cstdint>
 #include <optional>
+#include <string>
 
 #include "natpmp.h"
 
@@ -72,6 +73,11 @@ private:
 
     void setCommandTime();
 
+    [[nodiscard]] std::string gatewayStr() const;
+
+    // enters State::Err; warns only on the first failure since the last success
+    void onFailure(char const* func, int ret);
+
     natpmp_t natpmp_ = {};
 
     std::optional<tr_address> gateway_;
@@ -84,5 +90,6 @@ private:
     State state_ = State::Discover;
 
     bool has_discovered_ = false;
+    bool is_failing_ = false;
     bool is_mapped_ = false;
 };
