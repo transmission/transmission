@@ -710,6 +710,22 @@ export class PrefsDialog extends EventTarget {
     root.append(cal.root);
     const port_forwarding_check = cal.check;
 
+    label = document.createElement('label');
+    label.textContent = 'NAT-PMP gateway (IPv4):';
+    root.append(label);
+    PrefsDialog._enableIfChecked(label, port_forwarding_check);
+
+    const natpmp_gateway_input = document.createElement('input');
+    natpmp_gateway_input.type = 'text';
+    natpmp_gateway_input.dataset.key = 'natpmp_gateway_ipv4';
+    natpmp_gateway_input.id = makeUUID();
+    natpmp_gateway_input.placeholder = 'Automatic';
+    natpmp_gateway_input.title =
+      "Leave empty to use the default route's gateway.";
+    label.setAttribute('for', natpmp_gateway_input.id);
+    root.append(natpmp_gateway_input);
+    PrefsDialog._enableIfChecked(natpmp_gateway_input, port_forwarding_check);
+
     label = document.createElement('div');
     label.textContent = 'Options';
     label.classList.add('section-label');
@@ -749,6 +765,7 @@ export class PrefsDialog extends EventTarget {
 
     return {
       default_trackers_textarea,
+      natpmp_gateway_input,
       port_forwarding_check,
       port_input,
       port_status_label: {

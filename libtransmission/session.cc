@@ -1775,6 +1775,25 @@ void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
         });
 }
 
+bool tr_session::set_natpmp_gateway_ipv4(std::string_view addr)
+{
+    if (!std::empty(addr))
+    {
+        if (auto const parsed = tr_address::from_string(addr); !parsed || !parsed->is_ipv4())
+        {
+            return false;
+        }
+    }
+
+    if (settings_.natpmp_gateway_ipv4 != addr)
+    {
+        settings_.natpmp_gateway_ipv4 = addr;
+        port_forwarding_->natpmp_gateway_ipv4_changed();
+    }
+
+    return true;
+}
+
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
