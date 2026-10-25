@@ -870,6 +870,11 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         port_forwarding_->local_port_changed();
     }
 
+    if (!force && new_settings.natpmp_gateway_ipv4 != old_settings.natpmp_gateway_ipv4)
+    {
+        port_forwarding_->natpmp_gateway_ipv4_changed();
+    }
+
     if (!udp_core_ || force || addr_changed || port_changed || utp_changed)
     {
         udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());

@@ -205,6 +205,16 @@ private:
             return session_.bind_address(TR_AF_INET);
         }
 
+        [[nodiscard]] std::optional<tr_address> natpmp_gateway_ipv4() const override
+        {
+            if (auto const addr = tr_address::from_string(session_.settings_.natpmp_gateway_ipv4); addr && addr->is_ipv4())
+            {
+                return addr;
+            }
+
+            return {};
+        }
+
         [[nodiscard]] tr_port advertised_peer_port() const override
         {
             return session_.advertisedPeerPort();

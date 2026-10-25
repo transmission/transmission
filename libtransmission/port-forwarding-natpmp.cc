@@ -68,7 +68,7 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
 {
     if (is_enabled && state_ == State::Discover)
     {
-        int val = initnatpmp(&natpmp_, 0, 0);
+        int val = gateway_ ? initnatpmp(&natpmp_, 1, gateway_->addr.addr4.s_addr) : initnatpmp(&natpmp_, 0, 0);
         log_val("initnatpmp", val);
         val = sendpublicaddressrequest(&natpmp_);
         log_val("sendpublicaddressrequest", val);
