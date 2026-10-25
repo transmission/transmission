@@ -4,8 +4,13 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <atomic>
 #include <cstddef>
+#include <future>
 #include <ranges>
+#include <thread>
+
+#include <libtransmission/transmission.h>
 
 #include <libtransmission/torrent.h>
 
@@ -125,4 +130,46 @@ TEST_F(TorrentTest, queueMoveBottom)
     {
         EXPECT_EQ(ExpectedQueuePosition[i], torrents[i]->queue_position()) << i;
     }
+}
+
+TEST_F(TorrentTest, statDoesNotBlockWhenSessionLockIsContended)
+{
+    auto* const tor = torrentInitFromFile(TorFilenames[0]);
+
+    // refresh the snapshot with an uncontended call
+    auto const baseline = tr_torrentStat(tor);
+
+    // hold the session lock on another thread, simulating a session
+    // thread that's stuck in slow disk I/O
+    auto lock_held = std::atomic<bool>{ false };
+    auto locked = std::promise<void>{};
+    auto release = std::promise<void>{};
+    auto blocker = std::thread(
+        [tor, &lock_held, &locked, &release]()
+        {
+            auto const lock = tor->unique_lock();
+            lock_held = true;
+            locked.set_value();
+            release.get_future().wait();
+            lock_held = false;
+        });
+    locked.get_future().wait();
+
+    // `lock_held` can only be cleared after `release` is set, so if these
+    // calls had blocked on the lock, it would still read true afterwards
+    auto const stats = tr_torrentStat(tor);
+    EXPECT_TRUE(lock_held) << "tr_torrentStat() blocked until the session lock was released";
+    EXPECT_EQ(baseline.id, stats.id);
+    EXPECT_EQ(baseline.activity, stats.activity);
+
+    auto const batched = tr_torrentStat(&tor, 1U);
+    EXPECT_TRUE(lock_held) << "batched tr_torrentStat() blocked until the session lock was released";
+    ASSERT_EQ(1U, std::size(batched));
+    EXPECT_EQ(baseline.id, batched.front().id);
+
+    release.set_value();
+    blocker.join();
+
+    auto const fresh = tr_torrentStat(tor);
+    EXPECT_EQ(baseline.id, fresh.id);
 }
