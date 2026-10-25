@@ -31,8 +31,12 @@ const TorrentRendererHelper = {
     let percent = 100;
     let ratio = null;
 
-    if (status === Torrent._StatusStopped) {
+    if (status === Torrent._StatusStopped && (!t.isDone() || !t.isFinished())) {
       classList.push('paused');
+    } else if (t.isDone()) {
+      classList.push('done');
+    } else if (t.isFinished()) {
+      classList.push('finished');
     }
 
     if (t.needsMetaData()) {
@@ -216,7 +220,11 @@ export class TorrentRendererFull {
   // eslint-disable-next-line class-methods-use-this
   render(controller, torrent, root) {
     const is_stopped = torrent.isStopped();
+    const is_done = torrent.isDone();
+    const is_finished = torrent.isFinished();
     root.classList.toggle('paused', is_stopped);
+    root.classList.toggle('done', is_done && !is_stopped);
+    root.classList.toggle('finished', is_finished && !is_stopped);
     const { labels, name, peer_details, progressbar, progress_details } = root;
 
     // name
@@ -316,7 +324,12 @@ export class TorrentRendererCompact {
 
   // eslint-disable-next-line class-methods-use-this
   render(controller, torrent, root) {
-    root.classList.toggle('paused', torrent.isStopped());
+    const is_stopped = torrent.isStopped();
+    const is_done = torrent.isDone();
+    const is_finished = torrent.isFinished();
+    root.classList.toggle('paused', is_stopped);
+    root.classList.toggle('done', is_done && !is_stopped);
+    root.classList.toggle('finished', is_finished && !is_stopped);
     const { labels, name, peer_details, progressbar } = root;
 
     // name
