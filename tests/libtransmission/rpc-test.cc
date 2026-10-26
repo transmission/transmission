@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include <libtransmission/file.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
@@ -816,6 +817,67 @@ TEST_F(RpcTest, torrentGetLegacy)
 
 namespace free_space_test
 {
+TEST_F(RpcTest, freeSpaceFields)
+{
+    for (auto const legacy : { false, true })
+    {
+        auto params = tr_variant::Map{};
+        params.try_emplace(TR_KEY_path, sandboxDir());
+        auto request_map = tr_variant::Map{};
+        request_map.try_emplace(TR_KEY_method, legacy ? "free-space"sv : "free_space"sv);
+        request_map.try_emplace(legacy ? TR_KEY_arguments : TR_KEY_params, std::move(params));
+        if (!legacy)
+        {
+            request_map.try_emplace(TR_KEY_jsonrpc, "2.0"sv);
+            request_map.try_emplace(TR_KEY_id, 1);
+        }
+        auto request = tr_variant{ std::move(request_map) };
+        auto response = tr_variant{};
+        tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
+        auto const* map = response.get_if<tr_variant::Map>();
+        ASSERT_NE(map, nullptr);
+        auto const* result = map->find_if<tr_variant::Map>(legacy ? TR_KEY_arguments : TR_KEY_result);
+        ASSERT_NE(result, nullptr);
+        EXPECT_EQ(result->value_if<std::string_view>(TR_KEY_path), sandboxDir());
+        auto const bytes = result->value_if<int64_t>(legacy ? TR_KEY_size_bytes_kebab_APICOMPAT : TR_KEY_size_bytes);
+        ASSERT_TRUE(bytes);
+        EXPECT_GE(*bytes, 0);
+        auto const total = result->value_if<int64_t>(TR_KEY_total_size);
+        ASSERT_TRUE(total);
+        EXPECT_GE(*total, *bytes);
+        auto const id = tr_sys_path_get_filesystem_id(sandboxDir());
+        EXPECT_EQ(result->value_if<std::string_view>(TR_KEY_filesystem_id), id);
+    }
+}
+
+TEST_F(RpcTest, missingFreeSpacePath)
+{
+    auto const missing = sandboxDir() + "/missing-free-space";
+    auto params = tr_variant::Map{};
+    params.try_emplace(TR_KEY_path, missing);
+    auto request_map = tr_variant::Map{};
+    request_map.try_emplace(TR_KEY_jsonrpc, "2.0"sv);
+    request_map.try_emplace(TR_KEY_method, "free_space"sv);
+    request_map.try_emplace(TR_KEY_id, 1);
+    request_map.try_emplace(TR_KEY_params, std::move(params));
+    auto request = tr_variant{ std::move(request_map) };
+    auto response = tr_variant{};
+    tr_rpc_request_exec(session_, request, [&response](tr_variant&& resp) { response = std::move(resp); });
+    auto const* map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(map, nullptr);
+    auto const* error = map->find_if<tr_variant::Map>(TR_KEY_error);
+    ASSERT_NE(error, nullptr);
+    auto const* data = error->find_if<tr_variant::Map>(TR_KEY_data);
+    ASSERT_NE(data, nullptr);
+    auto const* result = data->find_if<tr_variant::Map>(TR_KEY_result);
+    ASSERT_NE(result, nullptr);
+    EXPECT_EQ(result->value_if<std::string_view>(TR_KEY_path), missing);
+    EXPECT_EQ(result->value_if<int64_t>(TR_KEY_size_bytes), -1);
+    EXPECT_EQ(result->value_if<int64_t>(TR_KEY_total_size), -1);
+    EXPECT_FALSE(result->contains(TR_KEY_filesystem_id));
+    EXPECT_FALSE(tr_sys_path_exists(missing));
+}
+
 constexpr std::string_view BadRequest = R"json({
     "id": 39693,
     "jsonrpc": "2.0",

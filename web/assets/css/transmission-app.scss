@@ -326,7 +326,8 @@ a {
   background: var(--color-toolbar-background);
   border-bottom: 1px solid var(--color-border-default);
   display: flex;
-  height: var(--toolbar-height);
+  flex-wrap: wrap;
+  min-height: var(--toolbar-height);
   margin: 0;
   width: 100%;
 
@@ -1786,4 +1787,71 @@ dialog {
 .clusterize-content {
   outline: 0;
   counter-reset: clusterize-counter;
+}
+
+#server-free-space {
+  color: var(--color-fg-primary);
+  font-size: 12px;
+  margin: 0 8px;
+  position: relative;
+
+  &[hidden] {
+    display: none;
+  }
+
+  summary {
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 6px;
+    padding-right: 12px;
+    position: relative;
+
+    &::after {
+      content: '\2304';
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+
+    span + span {
+      align-items: center;
+      display: inline-flex;
+      gap: 6px;
+
+      &::before {
+        content: '\00b7';
+      }
+    }
+  }
+
+  .server-free-space-paths {
+    background: var(--color-bg-popup);
+    border: 1px solid var(--color-border-default);
+    border-radius: 5px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+    color: var(--color-fg-on-popup);
+    left: 0;
+    max-width: min(400px, 80vw);
+    overflow-wrap: anywhere;
+    padding: 8px;
+    position: absolute;
+    top: 100%;
+    width: max-content;
+    z-index: 10;
+  }
+
+  @media (width < 600px) {
+    flex-basis: 100%;
+    order: 1;
+    padding: 4px 0;
+
+    summary {
+      flex-direction: column;
+
+      span + span::before {
+        content: none;
+      }
+    }
+  }
 }

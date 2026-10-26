@@ -201,6 +201,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_files_added,
     TR_KEY_files_unwanted,
     TR_KEY_files_wanted,
+    TR_KEY_filesystem_id,
     TR_KEY_filter_mode_kebab_APICOMPAT,
     TR_KEY_filter_text_kebab_APICOMPAT,
     TR_KEY_filter_trackers_kebab_APICOMPAT,

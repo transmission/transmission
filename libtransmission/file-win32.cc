@@ -943,3 +943,34 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error* error)
 
     return ret;
 }
+
+std::optional<std::string> tr_sys_path_get_filesystem_id(std::string_view const path)
+{
+    // OPEN_EXISTING follows symlinks and junctions; never create a missing directory.
+    auto const handle = open_file(path, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+    if (handle == TR_BAD_SYS_FILE)
+    {
+        return {};
+    }
+
+    auto constexpr Flags = FILE_NAME_NORMALIZED | VOLUME_NAME_GUID;
+    auto const size = GetFinalPathNameByHandleW(handle, nullptr, 0, Flags);
+    auto resolved = std::wstring(size, L'\0');
+    auto const length = size != 0 ? GetFinalPathNameByHandleW(handle, resolved.data(), size, Flags) : 0;
+    CloseHandle(handle);
+    if (length == 0 || length >= size)
+    {
+        return {};
+    }
+
+    resolved.resize(length);
+    auto constexpr Prefix = L"\\\\?\\Volume{"sv;
+    auto const end = resolved.find(L"}\\");
+    if (!resolved.starts_with(Prefix) || end == std::wstring::npos)
+    {
+        // Network shares and volumes without a Mount Manager GUID are unsupported.
+        return {};
+    }
+
+    return tr_win32_native_to_utf8(std::wstring_view{ resolved }.substr(0, end + 2));
+}

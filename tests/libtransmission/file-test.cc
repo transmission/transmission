@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cstdint> // uint64_t
 #include <cstdio> // stderr
+#include <cstdlib> // getenv
 #include <cstring>
 #include <ctime> // time()
 #include <ostream>
@@ -641,6 +642,59 @@ TEST_F(FileTest, pathIsSame)
 
     // NOLINTEND(readability-suspicious-call-argument)
 }
+
+TEST_F(FileTest, filesystemIdentity)
+{
+    auto const dir = createTestDir(currentTestName());
+    auto const child = tr_pathbuf{ dir, "/child"sv };
+    ASSERT_TRUE(tr_sys_dir_create(child, 0, 0755));
+    auto const id = tr_sys_path_get_filesystem_id(dir);
+    ASSERT_TRUE(id);
+    EXPECT_FALSE(id->empty());
+    EXPECT_EQ(id, tr_sys_path_get_filesystem_id(child));
+
+    auto const alias = tr_pathbuf{ dir, "/alias"sv };
+    if (createSymlink(alias, child, true))
+    {
+        EXPECT_EQ(id, tr_sys_path_get_filesystem_id(alias));
+        EXPECT_TRUE(tr_sys_path_get_capacity(alias));
+    }
+
+    auto const missing = tr_pathbuf{ dir, "/missing"sv };
+    EXPECT_FALSE(tr_sys_path_get_filesystem_id(missing));
+    EXPECT_FALSE(tr_sys_path_get_capacity(missing));
+    EXPECT_FALSE(tr_sys_path_exists(missing));
+}
+
+#ifndef _WIN32
+TEST_F(FileTest, distinctFilesystemIdentity)
+{
+    struct stat first = {};
+    struct stat second = {};
+    if (stat(sandboxDir().c_str(), &first) != 0 || stat("/proc", &second) != 0 || first.st_dev == second.st_dev)
+    {
+        GTEST_SKIP() << "No distinct filesystem available";
+    }
+    auto const id = tr_sys_path_get_filesystem_id("/proc");
+    ASSERT_TRUE(id);
+    EXPECT_NE(id, tr_sys_path_get_filesystem_id(sandboxDir()));
+}
+#endif
+
+// Set this to an existing UNC directory to exercise optional identity on Windows.
+#ifdef _WIN32
+TEST_F(FileTest, networkCapacityWithoutFilesystemIdentity)
+{
+    auto const* path = std::getenv("TRANSMISSION_TEST_NETWORK_DIR");
+    if (path == nullptr)
+    {
+        GTEST_SKIP() << "No network test directory configured";
+    }
+    ASSERT_TRUE(std::string_view{ path }.starts_with(R"(\\)"sv));
+    EXPECT_TRUE(tr_sys_path_get_capacity(path));
+    EXPECT_FALSE(tr_sys_path_get_filesystem_id(path));
+}
+#endif
 
 TEST_F(FileTest, pathResolve)
 {
