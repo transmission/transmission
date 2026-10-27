@@ -170,12 +170,40 @@ export class OverflowMenu extends EventTarget {
     options.id = 'display-options';
     section.append(options);
 
-    // sort mode
+    // refresh rate
 
     div.classList.add('table-row');
     options.append(div);
 
     let label = document.createElement('label');
+    label.id = 'refresh-rate-label';
+    label.textContent = 'Refresh rate (s)';
+    div.append(label);
+
+    const refreshInput = document.createElement('input');
+    refreshInput.id = 'refresh-rate-input';
+    refreshInput.type = 'number';
+    refreshInput.min = '1';
+    refreshInput.max = '30';
+    refreshInput.step = '1';
+    refreshInput.value = this.prefs.refresh_rate_sec;
+    div.append(refreshInput);
+
+    label.setAttribute('for', refreshInput.id);
+    refreshInput.addEventListener('change', (event_) => {
+      const value = Number.parseInt(event_.target.value, 10);
+      if (value >= 1 && value <= 30) {
+        this.prefs.refresh_rate_sec = value;
+      }
+    });
+
+    // sort mode
+
+    div = document.createElement('div');
+    div.classList.add('table-row');
+    options.append(div);
+
+    label = document.createElement('label');
     label.id = 'display-sort-mode-label';
     label.textContent = 'Sort by';
     div.append(label);
