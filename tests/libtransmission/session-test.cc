@@ -69,7 +69,10 @@ TEST_F(SessionTest, propertiesApi)
 
     // script
 
-    for (auto const& type : { TR_SCRIPT_ON_TORRENT_ADDED, TR_SCRIPT_ON_TORRENT_DONE })
+    for (auto const& type : { TR_SCRIPT_ON_TORRENT_ADDED,
+                              TR_SCRIPT_ON_TORRENT_DONE,
+                              TR_SCRIPT_ON_TORRENT_DONE_SEEDING,
+                              TR_SCRIPT_ON_TORRENT_REMOVED })
     {
         for (auto const& value : { "foo"sv, "bar"sv, ""sv })
         {
@@ -276,6 +279,49 @@ TEST_F(SessionTest, getDefaultSettingsIncludesSubmodules)
         auto flag = settings_map->value_if<bool>(key);
         ASSERT_TRUE(flag);
         EXPECT_FALSE(*flag);
+    }
+}
+
+TEST_F(SessionTest, scriptsHaveTheirOwnSettings)
+{
+    struct ScriptKeys
+    {
+        TrScript script;
+        tr_quark enabled_key;
+        tr_quark filename_key;
+    };
+
+    static auto constexpr Scripts = std::array<ScriptKeys, TR_SCRIPT_N_TYPES>{ {
+        { TR_SCRIPT_ON_TORRENT_ADDED, TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename },
+        { TR_SCRIPT_ON_TORRENT_DONE, TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename },
+        { TR_SCRIPT_ON_TORRENT_DONE_SEEDING,
+          TR_KEY_script_torrent_done_seeding_enabled,
+          TR_KEY_script_torrent_done_seeding_filename },
+        { TR_SCRIPT_ON_TORRENT_REMOVED, TR_KEY_script_torrent_removed_enabled, TR_KEY_script_torrent_removed_filename },
+    } };
+
+    // give each script a different filename, and enable only one of them
+    auto const is_enabled = [](TrScript const script)
+    {
+        return script == TR_SCRIPT_ON_TORRENT_REMOVED;
+    };
+    for (auto const& [script, enabled_key, filename_key] : Scripts)
+    {
+        tr_sessionSetScript(session_, script, tr_quark_get_string_view(filename_key));
+        tr_sessionSetScriptEnabled(session_, script, is_enabled(script));
+    }
+
+    auto settings = tr_sessionGetSettings(session_);
+    auto const* const settings_map = settings.get_if<tr_variant::Map>();
+    ASSERT_NE(settings_map, nullptr);
+
+    for (auto const& [script, enabled_key, filename_key] : Scripts)
+    {
+        auto const filename = tr_quark_get_string_view(filename_key);
+        EXPECT_EQ(filename, tr_sessionGetScript(session_, script));
+        EXPECT_EQ(filename, settings_map->value_if<std::string_view>(filename_key));
+        EXPECT_EQ(is_enabled(script), tr_sessionIsScriptEnabled(session_, script));
+        EXPECT_EQ(is_enabled(script), settings_map->value_if<bool>(enabled_key));
     }
 }
 

@@ -755,6 +755,9 @@ void tr_torrentRemoveInSessionThread(
         }
     }
 
+    // after any local data is deleted, but before `tor` is freed: the script's environment is built from it
+    callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_REMOVED);
+
     tr_torrentFreeInSessionThread(tor);
 }
 

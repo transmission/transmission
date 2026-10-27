@@ -104,6 +104,8 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **script_torrent_done_filename:** String (default = "") Path to script.
  * **script_torrent_done_seeding_enabled:** Boolean (default = false) Run a script when a torrent is done seeding. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page.
  * **script_torrent_done_seeding_filename:** String (default = "") Path to script.
+ * **script_torrent_removed_enabled:** Boolean (default = false) Run a script when a torrent is removed from Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page.
+ * **script_torrent_removed_filename:** String (default = "") Path to script.
  * **start_paused**: Boolean (default = false) Pause the torrents when daemon starts. _Note: transmission-daemon only._
  * **tcp_enabled:** Boolean (default = true) **DEPRECATED**, use `preferred_transports` instead. Leave it at default and let Transmission manage this value to minimize accidents.
  * **torrent_added_verify_mode:** String ("fast", "full", default: "fast") Whether newly-added torrents' local data should be fully verified when added, or wait and verify them on-demand later. See [#2626](https://github.com/transmission/transmission/pull/2626) for more discussion.

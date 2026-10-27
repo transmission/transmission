@@ -96,6 +96,7 @@ public:
     bool script_torrent_added_enabled = false;
     bool script_torrent_done_enabled = false;
     bool script_torrent_done_seeding_enabled = false;
+    bool script_torrent_removed_enabled = false;
     bool seed_queue_enabled = false;
     bool sequential_download = false;
     bool should_delete_source_torrents = false;
@@ -136,6 +137,7 @@ public:
     std::string script_torrent_added_filename;
     std::string script_torrent_done_filename;
     std::string script_torrent_done_seeding_filename;
+    std::string script_torrent_removed_filename;
     tr_encryption_mode encryption_mode = TR_ENCRYPTION_PREFERRED;
     tr_log_level log_level = TR_LOG_INFO;
     tr_mode_t umask = 022;
@@ -202,6 +204,8 @@ public:
         Field<&SessionSettings::script_torrent_done_filename>{ TR_KEY_script_torrent_done_filename },
         Field<&SessionSettings::script_torrent_done_seeding_enabled>{ TR_KEY_script_torrent_done_seeding_enabled },
         Field<&SessionSettings::script_torrent_done_seeding_filename>{ TR_KEY_script_torrent_done_seeding_filename },
+        Field<&SessionSettings::script_torrent_removed_enabled>{ TR_KEY_script_torrent_removed_enabled },
+        Field<&SessionSettings::script_torrent_removed_filename>{ TR_KEY_script_torrent_removed_filename },
         Field<&SessionSettings::seed_queue_enabled>{ TR_KEY_seed_queue_enabled },
         Field<&SessionSettings::seed_queue_size>{ TR_KEY_seed_queue_size },
         Field<&SessionSettings::sequential_download>{ TR_KEY_sequential_download },
