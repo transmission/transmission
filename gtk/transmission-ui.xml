@@ -240,6 +240,11 @@
         </item>
         <item>
           <attribute name="action">win.sort-torrents</attribute>
+          <attribute name="label" translatable="yes">Sort by _Uploaded</attribute>
+          <attribute name="target">sort_by_uploaded</attribute>
+        </item>
+        <item>
+          <attribute name="action">win.sort-torrents</attribute>
           <attribute name="label" translatable="yes">Sort by Time _Left</attribute>
           <attribute name="target">sort_by_time_left</attribute>
         </item>

@@ -184,6 +184,14 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
         break;
 
+    case SortMode::SortByUploaded:
+        if (val == 0)
+        {
+            val = a->uploadedEver() <=> b->uploadedEver();
+        }
+
+        break;
+
     case SortMode::SortByEta:
         if (val == 0)
         {

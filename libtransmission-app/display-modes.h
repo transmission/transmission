@@ -34,9 +34,10 @@ enum class SortMode : uint8_t
     SortByRatio,
     SortBySize,
     SortByState,
+    SortByUploaded,
     SortById,
 };
-inline auto constexpr SortModeCount = 10U;
+inline auto constexpr SortModeCount = 11U;
 inline auto constexpr DefaultSortMode = SortMode::SortByName;
 
 enum class StatsMode : uint8_t
