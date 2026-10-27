@@ -122,7 +122,7 @@ void g_signal_callback(
 
         if (action == "folder")
         {
-            n.core->open_folder(n.torrent_id);
+            n.core->open_file_or_folder(n.torrent_id);
         }
         else if (action == "file")
         {
