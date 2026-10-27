@@ -48,6 +48,7 @@
 #import "ShareTorrentFileHelper.h"
 #import "Toolbar.h"
 #import "BlocklistDownloader.h"
+#import "BlocklistScheduler.h"
 #import "StatusBarController.h"
 #import "FilterBarController.h"
 #import "FileRenameSheetController.h"
@@ -418,8 +419,10 @@ static void removeKeRangerRansomware()
 @property(nonatomic) FilterBarController* fFilterBar;
 
 @property(nonatomic) QLPreviewPanel* fPreviewPanel;
-@property(nonatomic) BOOL fQuitting;
+@property(nonatomic, readwrite, getter=isQuitting) BOOL quitting;
 @property(nonatomic) BOOL fQuitRequested;
+@property(nonatomic) BOOL fQuitPromptActive;
+@property(nonatomic) NSWindow* fQuitWindow;
 @property(nonatomic, readonly) BOOL fPauseOnLaunch;
 
 @property(nonatomic) Badger* fBadger;
@@ -439,6 +442,7 @@ static void removeKeRangerRansomware()
 @property(nonatomic) BOOL fSoundPlaying;
 
 - (void)removeTorrentsImpl:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
+- (void)beginShutdown;
 
 @end
 
@@ -585,7 +589,7 @@ static void removeKeRangerRansomware()
 
         _prefsController = [[PrefsController alloc] initWithHandle:_fLib];
 
-        _fQuitting = NO;
+        _quitting = NO;
         _fGlobalPopoverShown = NO;
         _fSoundPlaying = NO;
 
@@ -961,6 +965,11 @@ static void removeKeRangerRansomware()
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication*)app hasVisibleWindows:(BOOL)visibleWindows
 {
+    if (self.quitting)
+    {
+        return NO;
+    }
+
     NSWindow* mainWindow = NSApp.mainWindow;
     if (!mainWindow || !mainWindow.visible)
     {
@@ -972,9 +981,15 @@ static void removeKeRangerRansomware()
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
+    if (self.quitting || self.fQuitPromptActive)
+    {
+        return NSTerminateLater;
+    }
+
     if (self.fQuitRequested || ![self.fDefaults boolForKey:@"CheckQuit"])
     {
-        return NSTerminateNow;
+        [self beginShutdown];
+        return NSTerminateLater;
     }
 
     NSUInteger active = 0, downloading = 0;
@@ -994,7 +1009,8 @@ static void removeKeRangerRansomware()
 
     if (!preventedByTransfer)
     {
-        return NSTerminateNow;
+        [self beginShutdown];
+        return NSTerminateLater;
     }
 
     NSAlert* alert = [[NSAlert alloc] init];
@@ -1014,20 +1030,33 @@ static void removeKeRangerRansomware()
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Confirm Quit panel -> button")];
     alert.showsSuppressionButton = YES;
 
+    self.fQuitPromptActive = YES;
     [alert beginSheetModalForWindow:self.fWindow completionHandler:^(NSModalResponse returnCode) {
+        self.fQuitPromptActive = NO;
         if (alert.suppressionButton.state == NSControlStateValueOn)
         {
             [self.fDefaults setBool:NO forKey:@"CheckQuit"];
         }
-        [NSApp replyToApplicationShouldTerminate:returnCode == NSAlertFirstButtonReturn];
+        if (returnCode == NSAlertFirstButtonReturn)
+        {
+            [self beginShutdown];
+        }
+        else
+        {
+            [NSApp replyToApplicationShouldTerminate:NO];
+        }
     }];
 
     return NSTerminateLater;
 }
 
-- (void)applicationWillTerminate:(NSNotification*)notification
+- (void)beginShutdown
 {
-    self.fQuitting = YES;
+    if (self.quitting)
+    {
+        return;
+    }
+    self.quitting = YES;
 
     [PowerManager.shared stop];
 
@@ -1042,6 +1071,7 @@ static void removeKeRangerRansomware()
     {
         [[BlocklistDownloader downloader] cancelDownload];
     }
+    [BlocklistScheduler.scheduler cancelSchedule];
 
     //stop timers and notification checking
     [NSNotificationCenter.defaultCenter removeObserver:self];
@@ -1053,6 +1083,15 @@ static void removeKeRangerRansomware()
         if (self.fAutoImportTimer.valid)
         {
             [self.fAutoImportTimer invalidate];
+        }
+    }
+
+    [self.prefsController stopUpdating];
+    for (NSWindowController* addController in self.fAddWindows)
+    {
+        if ([addController isKindOfClass:AddWindowController.class])
+        {
+            [(AddWindowController*)addController stopUpdating];
         }
     }
 
@@ -1081,9 +1120,46 @@ static void removeKeRangerRansomware()
     [self.fTableView saveCollapsedGroups];
 
     _fileWatcherQueue = nil;
+    UNUserNotificationCenter.currentNotificationCenter.delegate = nil;
 
-    //complete cleanup: this can take many seconds
-    tr_sessionClose(self.fLib);
+    // Views and queued callbacks must not use torrent handles during session teardown.
+    self.fTableView.dataSource = nil;
+    self.fTableView.delegate = nil;
+    [self.fInfoController setInfoForTorrents:@[]];
+    [self.fTorrents removeAllObjects];
+    [self.fDisplayedTorrents removeAllObjects];
+    [self.fTorrentHashes removeAllObjects];
+    self.fAddingTransfers = nil;
+    self.fAddWindows = nil;
+
+    self.fQuitWindow = [[NSPanel alloc] initWithContentRect:NSMakeRect(0, 0, 360, 100) styleMask:NSWindowStyleMaskTitled
+                                                    backing:NSBackingStoreBuffered
+                                                      defer:NO];
+    self.fQuitWindow.title = NSLocalizedString(@"Quitting Transmission", "Quit progress window -> title");
+    NSTextField* label = [NSTextField
+        wrappingLabelWithString:[NSLocalizedString(@"Closing connections", "Quit progress window -> message") stringByAppendingEllipsis]];
+    label.frame = NSMakeRect(60, 32, 276, 36);
+    [self.fQuitWindow.contentView addSubview:label];
+    NSProgressIndicator* progress = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(24, 40, 20, 20)];
+    progress.style = NSProgressIndicatorStyleSpinning;
+    progress.indeterminate = YES;
+    [self.fQuitWindow.contentView addSubview:progress];
+    [progress startAnimation:nil];
+    [self.fQuitWindow center];
+    [self.fQuitWindow makeKeyAndOrderFront:nil];
+
+    // Keep AppKit responsive while trackers receive their stopped announces.
+    auto* const session = self.fLib;
+    _fLib = nullptr;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        tr_sessionClose(session);
+        // RPC termination can run a nested event loop inside a main-queue callback.
+        CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopCommonModes, ^{
+            [self.fQuitWindow close];
+            [NSApp replyToApplicationShouldTerminate:YES];
+        });
+        CFRunLoopWakeUp(CFRunLoopGetMain());
+    });
 }
 
 - (BOOL)applicationSupportsSecureRestorableState:(NSApplication*)app
@@ -1144,6 +1220,10 @@ static void removeKeRangerRansomware()
                          suggestedName,
                          dataTask.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding];
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.quitting)
+        {
+            return;
+        }
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Download not a torrent -> button")];
         alert.messageText = NSLocalizedString(@"Torrent download failed", "Download not a torrent -> title");
@@ -1206,6 +1286,10 @@ static void removeKeRangerRansomware()
                          task.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding,
                          error.localizedDescription];
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.quitting)
+        {
+            return;
+        }
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Torrent download failed -> button")];
         alert.messageText = NSLocalizedString(@"Torrent download failed", "Torrent download error -> title");
@@ -1223,6 +1307,11 @@ static void removeKeRangerRansomware()
 
 - (void)openFiles:(NSArray<NSString*>*)filenames addType:(AddType)type forcePath:(NSString*)path
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     BOOL deleteTorrentFile, canToggleDelete = NO;
     switch (type)
     {
@@ -1352,6 +1441,11 @@ static void removeKeRangerRansomware()
 
 - (void)askOpenConfirmed:(AddWindowController*)addController add:(BOOL)add
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     Torrent* torrent = addController.torrent;
 
     if (add)
@@ -1383,6 +1477,11 @@ static void removeKeRangerRansomware()
 
 - (void)openMagnet:(NSString*)address
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     tr_torrent* duplicateTorrent;
     if ((duplicateTorrent = tr_torrentFindFromMagnetLink(self.fLib, address.UTF8String)))
     {
@@ -1446,6 +1545,11 @@ static void removeKeRangerRansomware()
 
 - (void)askOpenMagnetConfirmed:(AddMagnetWindowController*)addController add:(BOOL)add
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     Torrent* torrent = addController.torrent;
 
     if (add)
@@ -1631,6 +1735,11 @@ static void removeKeRangerRansomware()
 
 - (void)openURL:(NSString*)urlString
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     if ([urlString rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
     {
         [self openMagnet:urlString];
@@ -2391,6 +2500,11 @@ static void removeKeRangerRansomware()
 
 - (void)updateUI
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     CGFloat dlRate = 0.0, ulRate = 0.0;
     BOOL anyCompleted = NO;
     BOOL anyActive = NO;
@@ -2436,6 +2550,11 @@ static void removeKeRangerRansomware()
 #warning can this be removed or refined?
 - (void)fullUpdateUI
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     [self updateUI];
     [self applyFilter];
     [self.fWindow.toolbar validateVisibleItems];
@@ -3539,6 +3658,11 @@ static void removeKeRangerRansomware()
 
 - (void)altSpeedToggledCallbackIsLimited:(NSDictionary*)dict
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     BOOL const isLimited = [dict[@"Active"] boolValue];
 
     [self.fDefaults setBool:isLimited forKey:@"SpeedLimit"];
@@ -3567,6 +3691,11 @@ static void removeKeRangerRansomware()
 
 - (void)VDKQueue:(VDKQueue*)queue receivedNotification:(NSString*)notification forPath:(NSString*)fpath
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     //don't assume that just because we're watching for write notification, we'll only receive write notifications
 
     if (![self.fDefaults boolForKey:@"AutoImport"] || ![self.fDefaults stringForKey:@"AutoImportDirectory"])
@@ -3603,6 +3732,11 @@ static void removeKeRangerRansomware()
 
 - (void)checkAutoImportDirectory
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     NSString* path;
     if (![self.fDefaults boolForKey:@"AutoImport"] || !(path = [self.fDefaults stringForKey:@"AutoImportDirectory"]))
     {
@@ -4103,7 +4237,7 @@ static void removeKeRangerRansomware()
 
 - (BOOL)acceptsPreviewPanelControl:(QLPreviewPanel*)panel
 {
-    return !self.fQuitting;
+    return !self.quitting;
 }
 
 - (void)beginPreviewPanelControl:(QLPreviewPanel*)panel
@@ -4618,6 +4752,11 @@ static void removeKeRangerRansomware()
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
 {
+    if (self.quitting)
+    {
+        return NO;
+    }
+
     SEL action = menuItem.action;
 
     if (action == @selector(toggleSpeedLimit:))
@@ -5075,7 +5214,7 @@ static void removeKeRangerRansomware()
 
 - (NSMenu*)applicationDockMenu:(NSApplication*)sender
 {
-    if (self.fQuitting)
+    if (self.quitting)
     {
         return nil;
     }
@@ -5376,6 +5515,11 @@ static void removeKeRangerRansomware()
 
 - (void)showMainWindow:(id)sender
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     [self.fWindow makeKeyAndOrderFront:nil];
 }
 
@@ -5427,6 +5571,11 @@ static void removeKeRangerRansomware()
     @autoreleasepool
     {
         dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.quitting)
+            {
+                return;
+            }
+
             //get the torrent
             Torrent* torrent = nil;
             if (torrentId.has_value() && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
