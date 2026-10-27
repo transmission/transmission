@@ -224,11 +224,11 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session);
 /** @brief enable or disable use of the incomplete download folder */
 void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool enabled);
 
-/** @brief return true if files will end in ".part" until they're complete */
+/** @brief return true if files will end in the `partial_file_suffix` setting until they're complete */
 bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
 
 /**
- * @brief When enabled, newly-created files will have ".part" appended
+ * @brief When enabled, newly-created files will have the `partial_file_suffix` setting appended
  *        to their filename until the file is fully downloaded
  *
  * This is not retroactive -- toggling this will not rename existing files.
@@ -738,7 +738,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* torrent, tr_torrent_metainfo cons
 
 /**
  * @brief find the location of a torrent's file by looking with and without
- *        the ".part" suffix, looking in downloadDir and incompleteDir, etc.
+ *        a partial-file suffix, looking in downloadDir and incompleteDir, etc.
  * @return the path of this file, or an empty string if no file exists yet.
  * @param tor the torrent whose file we're looking for
  * @param file_num the fileIndex, in [0...tr_torrentFileCount())

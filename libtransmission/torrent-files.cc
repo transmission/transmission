@@ -121,36 +121,36 @@ bool is_junk_file(std::string_view filename)
 std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
     tr_file_index_t file_index,
     std::string_view const* paths,
-    size_t n_paths) const
+    size_t n_paths,
+    std::string_view const partial_suffix) const
 {
     auto filename = tr_pathbuf{};
     auto const& subpath = path(file_index);
+    auto const suffixes = std::array{ ""sv, partial_suffix, LegacyPartialFileSuffix };
 
     for (size_t path_idx = 0; path_idx < n_paths; ++path_idx)
     {
         auto const base = paths[path_idx];
 
-        filename.assign(base, '/', subpath);
-        if (auto const info = tr_sys_path_get_info(filename); info)
+        for (auto const suffix : suffixes)
         {
-            return FoundFile{ *info, std::move(filename), std::size(base) };
-        }
-
-        filename.assign(base, '/', subpath, PartialFileSuffix);
-        if (auto const info = tr_sys_path_get_info(filename); info)
-        {
-            return FoundFile{ *info, std::move(filename), std::size(base) };
+            filename.assign(base, '/', subpath, suffix);
+            if (auto const info = tr_sys_path_get_info(filename); info)
+            {
+                return FoundFile{ *info, std::move(filename), std::size(base) };
+            }
         }
     }
 
     return {};
 }
 
-bool tr_torrent_files::has_any_local_data(std::string_view const* paths, size_t n_paths) const
+bool tr_torrent_files::has_any_local_data(std::string_view const* paths, size_t n_paths, std::string_view const partial_suffix)
+    const
 {
     for (tr_file_index_t i = 0, n = file_count(); i < n; ++i)
     {
-        if (find(i, paths, n_paths))
+        if (find(i, paths, n_paths, partial_suffix))
         {
             return true;
         }
@@ -189,6 +189,7 @@ std::string_view tr_torrent_files::primary_mime_type() const
 bool tr_torrent_files::move(
     std::string_view old_parent_in,
     std::string_view parent_in,
+    std::string_view const partial_suffix,
     std::string_view parent_name,
     tr_error* error) const
 {
@@ -212,7 +213,7 @@ bool tr_torrent_files::move(
 
     for (tr_file_index_t i = 0, n = file_count(); i < n; ++i)
     {
-        auto const found = find(i, std::data(paths), std::size(paths));
+        auto const found = find(i, std::data(paths), std::size(paths), partial_suffix);
         if (!found)
         {
             continue;
@@ -259,7 +260,7 @@ bool tr_torrent_files::move(
             return true;
         };
 
-        remove(old_parent, parent_name, remove_empty_directories);
+        remove(old_parent, partial_suffix, parent_name, remove_empty_directories);
     }
 
     return !err;
@@ -278,6 +279,7 @@ bool tr_torrent_files::move(
  */
 void tr_torrent_files::remove(
     std::string_view parent_in,
+    std::string_view const partial_suffix,
     std::string_view tmpdir_prefix,
     tr_torrent_remove_func const& func,
     tr_error* error) const
@@ -301,7 +303,7 @@ void tr_torrent_files::remove(
     auto const paths = std::array<std::string_view, 1>{ parent.sv() };
     for (tr_file_index_t idx = 0, n_files = file_count(); idx < n_files; ++idx)
     {
-        if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
+        if (auto const found = find(idx, std::data(paths), std::size(paths), partial_suffix); found)
         {
             // if moving a file fails, give up and let the error propagate
             if (!tr_file_move(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() }, false, error))

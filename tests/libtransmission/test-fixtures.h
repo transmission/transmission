@@ -12,6 +12,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex> // std::once_flag()
+#include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -376,7 +377,9 @@ protected:
         return tor;
     }
 
-    [[nodiscard]] tr_torrent* zeroTorrentInit(ZeroTorrentState state)
+    // `partial_suffix` is the suffix for the partial file in ZeroTorrentState::Partial,
+    // or the session's `partial_file_suffix` setting if unset.
+    [[nodiscard]] tr_torrent* zeroTorrentInit(ZeroTorrentState state, std::optional<std::string_view> partial_suffix = {})
     {
         // 1048576 files-filled-with-zeroes/1048576
         //    4096 files-filled-with-zeroes/4096
@@ -421,7 +424,7 @@ protected:
                     tr_sessionGetDownloadDir(session_);
                 auto const& subpath = metainfo->file_subpath(i);
                 auto const partial = state == ZeroTorrentState::Partial && i == 0;
-                auto const suffix = std::string_view{ partial ? ".part" : "" };
+                auto const suffix = partial ? partial_suffix.value_or(session_->partial_file_suffix()) : ""sv;
                 auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
 
                 tr_sys_dir_create(tr_sys_path_dirname(filename), TR_SYS_DIR_CREATE_PARENTS, 0700);
