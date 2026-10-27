@@ -57,8 +57,16 @@ size_t tr_torrent_queue::get_pos(tr_torrent_id_t const id)
             return MaxQueuePosition;
         }
 
-        pos_cache_.resize(std::max(uid + 1U, n_cache));
-        pos_cache_[uid] = std::ranges::distance(std::ranges::cbegin(queue_), it);
+        // Refresh all positions so reading the queue after a reorder takes linear time.
+        for (size_t pos = 0U; pos < std::size(queue_); ++pos)
+        {
+            auto const cached_id = static_cast<size_t>(queue_[pos]);
+            if (cached_id >= std::size(pos_cache_))
+            {
+                pos_cache_.resize(cached_id + 1U);
+            }
+            pos_cache_[cached_id] = pos;
+        }
     }
 
     return pos_cache_[uid];
