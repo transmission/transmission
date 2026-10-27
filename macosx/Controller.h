@@ -49,6 +49,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (void)openPasteboard;
 
 @property(nonatomic, readonly) tr_session* sessionHandle;
+@property(nonatomic, readonly, getter=isQuitting) BOOL quitting;
 
 - (IBAction)createFile:(id)sender;
 
