@@ -33,6 +33,7 @@ class Session;
 class Torrent;
 class TorrentModel;
 class WatchDir;
+class QNetworkAccessManager;
 
 class Application : public QApplication
 {
@@ -41,7 +42,6 @@ class Application : public QApplication
 public:
     Application(
         Prefs& prefs,
-        RpcClient& rpc,
         bool minimized,
         QString const& config_dir,
         QStringList const& filenames,
@@ -109,6 +109,8 @@ private:
 
     std::unordered_set<QString> interned_strings_;
 
+    std::unique_ptr<QNetworkAccessManager> nam_;
+    std::unique_ptr<RpcClient> rpc_;
     Prefs& prefs_;
     std::unique_ptr<Session> session_;
     std::unique_ptr<TorrentModel> model_;

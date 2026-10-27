@@ -8,7 +8,6 @@
 #include <string_view>
 
 #include <QDir>
-#include <QNetworkAccessManager>
 
 #include <fmt/format.h>
 
@@ -23,7 +22,6 @@
 #include "Application.h"
 #include "InteropHelper.h"
 #include "Prefs.h"
-#include "RpcClient.h"
 #include "VariantHelpers.h"
 
 using namespace std::string_view_literals;
@@ -309,9 +307,7 @@ int tr_main(int argc, char** argv)
 
     // run the app
     auto qt_argc = static_cast<int>(std::size(qt_argv));
-    auto nam = QNetworkAccessManager{};
-    auto rpc = RpcClient{ nam };
-    auto const app = Application{ prefs, rpc, minimized, config_dir, filenames, qt_argc, std::data(qt_argv) };
+    auto const app = Application{ prefs, minimized, config_dir, filenames, qt_argc, std::data(qt_argv) };
     auto const ret = QApplication::exec();
 
     // save prefs before exiting
