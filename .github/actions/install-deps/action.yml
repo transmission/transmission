@@ -59,6 +59,7 @@ runs:
             libpsl-devel \
             miniupnpc-devel \
             openssl-devel \
+            uchardet-devel \
             utf8cpp-devel
 
           # Compiler packages
@@ -106,6 +107,7 @@ runs:
             libnatpmp-dev
             libpsl-dev
             libssl-dev
+            libuchardet-dev
             locales
             ninja-build
             pkg-config
@@ -229,6 +231,7 @@ runs:
           libnatpmp
           libpsl
           miniupnpc
+          uchardet
           utf8cpp
         )
 
