@@ -263,6 +263,7 @@ static tr_variant getSettingsFromNSUserDefaults(NSUserDefaults* defaults)
     settings.insert_or_assign(TR_KEY_seed_queue_size, [defaults integerForKey:@"QueueSeedNumber"]);
     settings.insert_or_assign(TR_KEY_start_added_torrents, static_cast<bool>([defaults boolForKey:@"AutoStartDownload"]));
     settings.insert_or_assign(TR_KEY_utp_enabled, static_cast<bool>([defaults boolForKey:@"UTPGlobal"]));
+    settings.insert_or_assign(TR_KEY_wrap_single_file_torrents, static_cast<bool>([defaults boolForKey:@"WrapSingleFileTorrents"]));
 
     settings.insert_or_assign(TR_KEY_script_torrent_done_enabled, static_cast<bool>([defaults boolForKey:@"DoneScriptEnabled"]));
     NSString* prefs_string = [defaults stringForKey:@"DoneScriptPath"];
