@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-# Usage: ./code_style.sh
-# Usage: ./code_style.sh --check
+# Usage: ./code_style.sh [--check] [--force]
 
 set -o noglob
 
@@ -11,10 +10,24 @@ PATH="${PATH}:/usr/local/bin"
 # for Apple Silicon Mac
 PATH="${PATH}:/opt/homebrew/bin"
 
-if [[ "x$1" == *"check"* ]]; then
-  echo "checking code format"
-else
-  fix=1
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --check)
+      check=1
+      ;;
+    --force)
+      force=1
+      ;;
+  esac
+  shift
+done
+
+if [ -n "$check" ]; then
+  echo 'checking code format'
+fi
+
+if [ -n "$force" ]; then
+  echo 'forcing C/C++ formatting check/fixes regardless of clang-format version'
 fi
 
 root="$(dirname "$0")"
@@ -42,8 +55,9 @@ find_cfiles() {
 
 # We're targeting clang-format version 20 and other versions give slightly
 # different results, so prefer `clang-format-20` if it's installed.
+clang_format_version=20
 clang_format_exe_names=(
-  'clang-format-20'
+  "clang-format-${clang_format_version}"
   'clang-format'
 )
 for name in ${clang_format_exe_names[@]}; do
@@ -68,10 +82,20 @@ if [ -z "${clang_format_exe}" ]; then
 fi
 
 # format C/C++
-clang_format_args="$([ -n "$fix" ] && echo '-i' || echo '--dry-run --Werror')"
-if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
-  [ -n "$fix" ] || echo 'C/C++ code needs formatting'
-  exitcode=1
+if [ -n "$force" ] || "${clang_format_exe}" --version | grep -qF "version ${clang_format_version}"; then
+  if [ -n "$check" ]; then
+    clang_format_args=(--dry-run --Werror)
+  else
+    clang_format_args=(-i)
+  fi
+
+  if ! find_cfiles -exec "${clang_format_exe}" "${clang_format_args[@]}" '{}' '+'; then
+    [ -n "$check" ] && echo 'C/C++ code needs formatting'
+    exitcode=1
+  fi
+else
+  echo "clang-format version is not ${clang_format_version}, skipping C/C++ code formatting checks"
+  echo "Run this script again with '--force' to force the formatting checks"
 fi
 
 # check important compatibility constraints in Xcode project
@@ -92,12 +116,12 @@ fi
 # but only if js has changed
 git diff --cached --quiet -- "web/**" && exit $exitcode
 cd "${root}/web" || exit 1
-npm_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
+npm_lint_args="$([ -z "$check" ] && echo 'lint:fix' || echo 'lint')"
 if ! npm ci --no-audit --no-fund --no-progress &>/dev/null; then
-  [ -n "$fix" ] || echo 'JS code could not be checked -- "npm ci" failed'
+  [ -n "$check" ] && echo 'JS code could not be checked -- "npm ci" failed'
   exitcode=1
 elif ! npm run --silent $npm_lint_args; then
-  [ -n "$fix" ] || echo 'JS code needs formatting'
+  [ -n "$check" ] && echo 'JS code needs formatting'
   exitcode=1
 fi
 
