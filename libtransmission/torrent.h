@@ -487,6 +487,11 @@ struct tr_torrent
         return metainfo_.file_size(i);
     }
 
+    [[nodiscard]] TR_CONSTEXPR_VEC auto file_is_padding(tr_file_index_t i) const
+    {
+        return metainfo_.file_is_padding(i);
+    }
+
     void set_file_subpath(tr_file_index_t i, std::string_view subpath)
     {
         metainfo_.set_file_subpath(i, subpath);

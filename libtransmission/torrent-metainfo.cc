@@ -69,6 +69,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     tr_tracker_tier_t tier_ = 0;
     tr_pathbuf file_subpath_;
     int64_t file_length_ = 0;
+    bool file_is_padding_ = false;
 
     enum class State : uint8_t
     {
@@ -311,8 +312,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             }
             else if (current_key == AttrKey)
             {
-                // currently unused. TODO support for BEP0047
-                // TODO https://github.com/transmission/transmission/issues/3387
+                file_is_padding_ = value.find('p') != std::string_view::npos;
             }
             else if (
                 pathIs(InfoKey, FilesKey, ArrayKey, Crc32Key) || //
@@ -467,10 +467,11 @@ private:
         }
         else
         {
-            tm_.files_.add(file_subpath_, file_length_);
+            tm_.files_.add(file_subpath_, file_length_, file_is_padding_);
         }
 
         file_length_ = 0;
+        file_is_padding_ = false;
         // NB: let caller decide how to clear file_tree_.
         // if we're in "files" mode we clear it; if in "file tree" we pop it
         return ok;
