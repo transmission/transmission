@@ -98,6 +98,33 @@ export class Appearance extends EventTarget {
 
     add_check(this.action_manager.text('toggle-contrast'), listener);
 
+    // color scheme
+
+    legend = document.createElement('h4');
+    message.append(legend);
+    legend.textContent = 'Color scheme';
+
+    div = document.createElement('div');
+    div.classList.add('table-row');
+    message.append(div);
+
+    listener = (e) => {
+      e.checked = this.prefs.color_scheme === e.value;
+      e.addEventListener('change', (event_) => {
+        this.prefs.color_scheme = event_.target.value;
+      });
+    };
+
+    add_radio(
+      'color-scheme',
+      'Match system',
+      null,
+      Prefs.ColorSchemeSystem,
+      listener,
+    );
+    add_radio('color-scheme', 'Light', null, Prefs.ColorSchemeLight, listener);
+    add_radio('color-scheme', 'Dark', null, Prefs.ColorSchemeDark, listener);
+
     // highlight color
 
     legend = document.createElement('h4');
