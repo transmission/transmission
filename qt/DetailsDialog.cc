@@ -1169,11 +1169,9 @@ void DetailsDialog::refreshUI()
 
     for (Torrent const* const t : torrents)
     {
-        auto const id_str = QString::number(t->id());
-
         for (Peer const& peer : t->peers())
         {
-            auto const key = id_str + QLatin1Char(':') + peer.address;
+            auto const key = QStringLiteral("%1:%2:%3").arg(t->id()).arg(peer.address).arg(peer.port);
 
             PeerItem* item = nullptr;
             if (auto iter = peers_.find(key); iter != std::end(peers_))
