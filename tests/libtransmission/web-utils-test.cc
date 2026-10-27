@@ -23,7 +23,11 @@
 using WebUtilsTest = ::tr::test::TransmissionTest;
 using namespace std::literals;
 
+#ifdef WITH_PSL
 TEST_F(WebUtilsTest, urlParse)
+#else
+TEST_F(WebUtilsTest, urlParseWithoutPSL)
+#endif
 {
     auto url = "http://1"sv;
     auto parsed = tr_urlParse(url);
@@ -41,7 +45,11 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
     EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+#ifdef WITH_PSL
     EXPECT_EQ("some-tracker"sv, parsed->sitename);
+#else
+    EXPECT_EQ(parsed->host, parsed->sitename);
+#endif
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ(""sv, parsed->query);
     EXPECT_EQ(""sv, parsed->fragment);
@@ -52,7 +60,11 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
     EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+#ifdef WITH_PSL
     EXPECT_EQ("some-tracker"sv, parsed->sitename);
+#else
+    EXPECT_EQ(parsed->host, parsed->sitename);
+#endif
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ(""sv, parsed->query);
     EXPECT_EQ(""sv, parsed->fragment);
@@ -63,7 +75,11 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
     EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+#ifdef WITH_PSL
     EXPECT_EQ("some-tracker"sv, parsed->sitename);
+#else
+    EXPECT_EQ(parsed->host, parsed->sitename);
+#endif
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ("key=val&foo=bar"sv, parsed->query);
     EXPECT_EQ("fragment"sv, parsed->fragment);
@@ -115,7 +131,11 @@ TEST_F(WebUtilsTest, urlParse)
     parsed = tr_urlParse(url);
     EXPECT_TRUE(parsed);
     EXPECT_EQ("https"sv, parsed->scheme);
+#ifdef WITH_PSL
     EXPECT_EQ("example"sv, parsed->sitename);
+#else
+    EXPECT_EQ(parsed->host, parsed->sitename);
+#endif
     EXPECT_EQ("www.example.co.uk"sv, parsed->host);
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ(8080, parsed->port);
@@ -125,7 +145,11 @@ TEST_F(WebUtilsTest, urlParse)
     parsed = tr_urlParse(url);
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
+#ifdef WITH_PSL
     EXPECT_EQ("some-tracker"sv, parsed->sitename);
+#else
+    EXPECT_EQ(parsed->host, parsed->sitename);
+#endif
     EXPECT_EQ("some-tracker.co.uk"sv, parsed->host);
     EXPECT_EQ("/some/other/path"sv, parsed->path);
     EXPECT_EQ(80, parsed->port);
