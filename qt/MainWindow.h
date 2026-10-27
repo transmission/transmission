@@ -115,6 +115,7 @@ private slots:
     void openURL();
     void refreshPref(tr_quark key);
     void removeTorrents(bool delete_files);
+    void renameTorrent();
     void setLocation();
     void setSortAscendingPref(bool b);
     void toggleSpeedMode();
