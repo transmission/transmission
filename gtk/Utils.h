@@ -94,6 +94,8 @@ inline GParamSpec* gtr_get_param_spec(char const* name, char const* nick, char c
 
 void gtr_open_file(std::string_view base, std::string_view relative_path);
 void gtr_open_file(std::string_view filename);
+void gtr_show_file_in_folder(std::string_view base, std::string_view relative_path);
+void gtr_show_file_in_folder(std::string_view filename);
 void gtr_open_uri(std::string_view uri);
 
 [[nodiscard]] std::string gtr_get_help_uri(std::string_view relative_path = "");

@@ -22,10 +22,12 @@
 #include <gdkmm/display.h>
 #include <giomm/appinfo.h>
 #include <giomm/asyncresult.h>
+#include <giomm/dbusconnection.h>
 #include <giomm/file.h>
 #include <glibmm/convert.h>
 #include <glibmm/error.h>
 #include <glibmm/i18n.h>
+#include <glibmm/miscutils.h>
 #include <glibmm/quark.h>
 #include <glibmm/spawn.h>
 #include <gtkmm/cellrenderertext.h>
@@ -630,6 +632,41 @@ void gtr_open_file(std::string_view const filename)
 {
     auto const filename_ustr = Glib::ustring{ filename.data(), filename.size() };
     gtr_open_uri(Glib::filename_to_uri(filename_ustr).raw());
+}
+
+void gtr_show_file_in_folder(std::string_view const base, std::string_view const relative_path)
+{
+    auto const filename = tr_pathbuf{ base, "/"sv, relative_path };
+    gtr_show_file_in_folder(filename.sv());
+}
+
+void gtr_show_file_in_folder(std::string_view const filename)
+{
+    auto const filename_ustr = Glib::ustring{ filename.data(), filename.size() };
+
+    // Ask the file manager to open the parent folder with the item selected.
+    // Not every file manager implements this, so fall back to opening the folder itself.
+    try
+    {
+        auto const uri = Glib::filename_to_uri(filename_ustr);
+        auto const connection = Gio::DBus::Connection::get_sync(TR_GIO_DBUS_BUS_TYPE(SESSION));
+        connection->call_sync(
+            "/org/freedesktop/FileManager1",
+            "org.freedesktop.FileManager1",
+            "ShowItems",
+            Glib::VariantContainerBase::create_tuple(
+                { Glib::Variant<std::vector<Glib::ustring>>::create({ uri }),
+                  Glib::Variant<Glib::ustring>::create(Glib::ustring{}) }),
+            "org.freedesktop.FileManager1",
+            1000);
+        return;
+    }
+    catch (Glib::Error const&)
+    {
+        // fall through to opening the parent folder
+    }
+
+    gtr_open_file(Glib::path_get_dirname(filename_ustr.raw()));
 }
 
 void gtr_open_uri(std::string_view const uri)
