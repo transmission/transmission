@@ -206,12 +206,12 @@ std::optional<address_range_t> parseCidrLine(std::string_view line)
     }
 
     auto const pflen = tr_num_parse<size_t>(line.substr(pos + 1));
-    if (!pflen)
+    if (!pflen || *pflen > 32U)
     {
         return {};
     }
 
-    auto const mask = ~(~uint32_t{ 0 } >> *pflen);
+    auto const mask = *pflen == 32U ? ~uint32_t{ 0 } : ~(~uint32_t{ 0 } >> *pflen);
     auto const ip_u = ntohl(addrpair.first.addr.addr4.s_addr);
     auto tmp = htonl(ip_u & mask);
     std::tie(addrpair.first, std::ignore) = tr_address::from_compact_ipv4(reinterpret_cast<std::byte*>(&tmp));
