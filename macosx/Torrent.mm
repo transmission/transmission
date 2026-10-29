@@ -276,7 +276,6 @@ static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* e
     if ([self alertForRemainingDiskSpace])
     {
         ignoreQueue ? tr_torrentStartNow(self.fHandle) : tr_torrentStart(self.fHandle);
-        [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited
         [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
@@ -298,7 +297,6 @@ static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* e
     if ([self alertForRemainingDiskSpace])
     {
         tr_torrentStart(self.fHandle);
-        [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited
         [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
@@ -308,7 +306,6 @@ static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* e
 - (void)stopTransfer
 {
     tr_torrentStop(self.fHandle);
-    [self update];
 }
 
 - (void)sleep
@@ -351,7 +348,6 @@ static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* e
 - (void)resetCache
 {
     tr_torrentVerify(self.fHandle);
-    [self update];
 }
 
 - (BOOL)isMagnet
@@ -2027,7 +2023,7 @@ static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* e
 
 - (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning
 {
-    self.fStat = tr_torrentStat(self.fHandle); //don't call update yet to avoid auto-stop
+    self.fStat = tr_torrentStat(self.fHandle);
 
     switch (status)
     {
@@ -2055,7 +2051,6 @@ static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* e
         break;
     }
 
-    [self update];
     [self updateTimeMachineExclude];
 }
 

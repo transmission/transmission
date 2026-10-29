@@ -1332,7 +1332,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                 [torrent startTransfer];
             }
 
-            [torrent update];
             [self.fTorrents addObject:torrent];
 
             if (!self.fAddingTransfers)
@@ -1354,7 +1353,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         torrent.queuePosition = self.fTorrents.count;
 
-        [torrent update];
         [self.fTorrents addObject:torrent];
 
         if (!self.fAddingTransfers)
@@ -1427,7 +1425,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             [torrent startTransfer];
         }
 
-        [torrent update];
         [self.fTorrents addObject:torrent];
 
         if (!self.fAddingTransfers)
@@ -1448,7 +1445,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         torrent.queuePosition = self.fTorrents.count;
 
-        [torrent update];
         [self.fTorrents addObject:torrent];
 
         if (!self.fAddingTransfers)
@@ -2290,6 +2286,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     for (Torrent* torrent in torrents)
     {
         [torrent resetCache];
+        [torrent update];
     }
 
     [self applyFilter];
@@ -5497,7 +5494,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         [torrent changeDownloadFolderBeforeUsing:location determinationType:TorrentDeterminationAutomatic];
     }
 
-    [torrent update];
     [self.fTorrents addObject:torrent];
 
     if (!self.fAddingTransfers)
@@ -5516,8 +5512,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)rpcStartedStoppedTorrent:(Torrent*)torrent
 {
-    [torrent update];
-
     [self updateUI];
     [self applyFilter];
     [self updateTorrentHistory];
