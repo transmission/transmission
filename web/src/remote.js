@@ -25,6 +25,14 @@ function getResponseParams(response) {
   return response.result ?? response.error.data.result;
 }
 
+// null on success
+export function getErrorMessage(response) {
+  if (response.error) {
+    return response.error.data?.error_string ?? response.error.message ?? '';
+  }
+  return null;
+}
+
 export class Remote {
   _connection_alert = null;
   _session_id = '';
