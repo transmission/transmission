@@ -11,6 +11,8 @@
 
 #include <ctime> // time_t
 #include <cstdint>
+#include <optional>
+#include <string>
 
 #include "natpmp.h"
 
@@ -20,7 +22,8 @@
 class tr_natpmp
 {
 public:
-    tr_natpmp()
+    explicit tr_natpmp(std::optional<tr_address> gateway)
+        : gateway_{ gateway }
     {
         natpmp_.s = static_cast<decltype(natpmp_.s)>(TR_BAD_SOCKET);
     }
@@ -70,7 +73,14 @@ private:
 
     void setCommandTime();
 
+    [[nodiscard]] std::string gatewayStr() const;
+
+    // enters State::Err; warns only on the first failure since the last success
+    void onFailure(char const* func, int ret);
+
     natpmp_t natpmp_ = {};
+
+    std::optional<tr_address> gateway_;
 
     tr_port local_port_;
     tr_port advertised_port_;
@@ -80,5 +90,6 @@ private:
     State state_ = State::Discover;
 
     bool has_discovered_ = false;
+    bool is_failing_ = false;
     bool is_mapped_ = false;
 };

@@ -831,6 +831,16 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
     bool port_changed = false;
     if (force || local_peer_port_ != local_peer_port)
     {
+        // startup is logged by the listening sockets instead
+        if (!force)
+        {
+            tr_logAddInfo(
+                fmt::format(
+                    fmt::runtime(_("Peer port changed from {old_port} to {port}")),
+                    fmt::arg("old_port", local_peer_port_.host()),
+                    fmt::arg("port", local_peer_port.host())));
+        }
+
         local_peer_port_ = local_peer_port;
         advertised_peer_port_ = local_peer_port;
         port_changed = true;
@@ -868,6 +878,11 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
     if (port_changed)
     {
         port_forwarding_->local_port_changed();
+    }
+
+    if (!force && new_settings.natpmp_gateway_ipv4 != old_settings.natpmp_gateway_ipv4)
+    {
+        port_forwarding_->natpmp_gateway_ipv4_changed();
     }
 
     if (!udp_core_ || force || addr_changed || port_changed || utp_changed)
@@ -1768,6 +1783,25 @@ void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
             session->settings_.port_forwarding_enabled = enabled;
             session->port_forwarding_->set_enabled(enabled);
         });
+}
+
+bool tr_session::set_natpmp_gateway_ipv4(std::string_view addr)
+{
+    if (!std::empty(addr))
+    {
+        if (auto const parsed = tr_address::from_string(addr); !parsed || !parsed->is_ipv4())
+        {
+            return false;
+        }
+    }
+
+    if (settings_.natpmp_gateway_ipv4 != addr)
+    {
+        settings_.natpmp_gateway_ipv4 = addr;
+        port_forwarding_->natpmp_gateway_ipv4_changed();
+    }
+
+    return true;
 }
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)

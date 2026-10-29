@@ -10,6 +10,7 @@
 #endif
 
 #include <memory> // for std::unique_ptr
+#include <optional>
 
 #include "libtransmission/net.h"
 #include "libtransmission/types.h" // for tr_port_forwarding_state
@@ -30,6 +31,8 @@ public:
         [[nodiscard]] virtual tr_port advertised_peer_port() const = 0;
         [[nodiscard]] virtual tr_port local_peer_port() const = 0;
         [[nodiscard]] virtual tr_address incoming_peer_address() const = 0;
+        // IPv4 gateway for NAT-PMP to use instead of autodetecting the default route
+        [[nodiscard]] virtual std::optional<tr_address> natpmp_gateway_ipv4() const = 0;
         [[nodiscard]] virtual tr::TimerMaker& timer_maker() = 0;
         virtual void on_port_forwarded(tr_port advertised_port) = 0;
     };
@@ -41,5 +44,6 @@ public:
     [[nodiscard]] virtual tr_port_forwarding_state state() const = 0;
 
     virtual void local_port_changed() = 0;
+    virtual void natpmp_gateway_ipv4_changed() = 0;
     virtual void set_enabled(bool enabled) = 0;
 };
