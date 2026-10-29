@@ -319,7 +319,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     if ([self alertForRemainingDiskSpace])
     {
         ignoreQueue ? tr_torrentStartNow(self.fHandle) : tr_torrentStart(self.fHandle);
-        [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited
         [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
@@ -341,7 +340,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     if ([self alertForRemainingDiskSpace])
     {
         tr_torrentStart(self.fHandle);
-        [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited
         [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
@@ -351,7 +349,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 - (void)stopTransfer
 {
     tr_torrentStop(self.fHandle);
-    [self update];
 }
 
 - (void)sleep
@@ -394,7 +391,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 - (void)resetCache
 {
     tr_torrentVerify(self.fHandle);
-    [self update];
 }
 
 - (BOOL)isMagnet
@@ -2067,7 +2063,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning
 {
-    self.fStat = tr_torrentStat(self.fHandle); //don't call update yet to avoid auto-stop
+    self.fStat = tr_torrentStat(self.fHandle);
 
     switch (status)
     {
@@ -2095,7 +2091,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         break;
     }
 
-    [self update];
     [self updateTimeMachineExclude];
 }
 
