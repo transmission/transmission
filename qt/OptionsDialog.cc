@@ -52,6 +52,8 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
         ui_.sourceButton->setTitle(tr("Open Torrent"));
         ui_.sourceButton->setNameFilter(tr("Torrent Files (*.torrent);;All Files (*.*)"));
         ui_.sourceButton->setPath(add_.filename);
+        ui_.searchLineEdit->setPlaceholderText(tr("Search..."));
+        connect(ui_.searchLineEdit, &QLineEdit::textEdited, this, &OptionsDialog::onSearchedStringChanged);
         connect(ui_.sourceButton, &PathButton::pathChanged, this, &OptionsDialog::onSourceChanged);
     }
     else
@@ -123,52 +125,59 @@ void OptionsDialog::clearInfo()
     files_.clear();
 }
 
-void OptionsDialog::reload()
+void OptionsDialog::reload(const QString& searched_string, bool reload_only_to_search)
 {
-    clearInfo();
-
-    auto metainfo = tr_torrent_metainfo{};
-    auto ok = bool{};
-
-    switch (add_.type)
+    if (!reload_only_to_search)
     {
-    case AddData::MAGNET:
-        ok = metainfo.parseMagnet(add_.magnet.toStdString());
-        break;
+        clearInfo();
 
-    case AddData::FILENAME:
-        ok = metainfo.parse_torrent_file(add_.filename.toStdString());
-        break;
+        auto metainfo = tr_torrent_metainfo{};
+        bool ok = false;
 
-    case AddData::METAINFO:
-        ok = metainfo.parse_benc(add_.metainfo.toStdString());
-        break;
+        switch (add_.type)
+        {
+        case AddData::MAGNET:
+            ok = metainfo.parseMagnet(add_.magnet.toStdString());
+            break;
 
-    default:
-        break;
+        case AddData::FILENAME:
+            ok = metainfo.parse_torrent_file(add_.filename.toStdString());
+            break;
+
+        case AddData::METAINFO:
+            ok = metainfo.parse_benc(add_.metainfo.toStdString());
+            break;
+
+        default:
+            break;
+        }
+
+        metainfo_.reset();
+
+        if (ok)
+        {
+            metainfo_ = metainfo;
+        }
+
+        bool const have_files_to_show = metainfo_ && !std::empty(*metainfo_);
+        ui_.filesView->setVisible(have_files_to_show);
+        layout()->setSizeConstraint(have_files_to_show ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
+
+        priorities_.clear();
+        wanted_.clear();
     }
 
-    metainfo_.reset();
     ui_.filesView->clear();
     files_.clear();
-    priorities_.clear();
-    wanted_.clear();
 
-    if (ok)
-    {
-        metainfo_ = metainfo;
-    }
-
-    bool const have_files_to_show = metainfo_ && !std::empty(*metainfo_);
-
-    ui_.filesView->setVisible(have_files_to_show);
-    layout()->setSizeConstraint(have_files_to_show ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
 
     if (metainfo_)
     {
         auto const n_files = metainfo_->file_count();
-        priorities_.assign(n_files, TR_PRI_NORMAL);
-        wanted_.assign(n_files, true);
+        if (!reload_only_to_search) {
+            priorities_.assign(n_files, TR_PRI_NORMAL);
+            wanted_.assign(n_files, true);
+        }
 
         for (tr_file_index_t i = 0; i < n_files; ++i)
         {
@@ -179,7 +188,10 @@ void OptionsDialog::reload()
             f.size = metainfo_->file_size(i);
             f.have = 0;
             f.filename = QString::fromStdString(metainfo_->file_subpath(i));
-            files_.push_back(f);
+            if (searched_string.isEmpty() || (!searched_string.isEmpty() && f.filename.contains(searched_string, Qt::CaseInsensitive)))
+            {
+                files_.push_back(f);
+            }
         }
     }
 
@@ -330,4 +342,8 @@ void OptionsDialog::onDestinationChanged()
     {
         ui_.freeSpaceLabel->setPath(ui_.destinationEdit->text());
     }
+}
+
+void OptionsDialog::onSearchedStringChanged(const QString& new_searched_string) {
+    OptionsDialog::reload(new_searched_string, true);
 }
