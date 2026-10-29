@@ -1336,7 +1336,6 @@ static void removeKeRangerRansomware()
                 [torrent startTransfer];
             }
 
-            [torrent update];
             [self.fTorrents addObject:torrent];
 
             if (!self.fAddingTransfers)
@@ -1358,7 +1357,6 @@ static void removeKeRangerRansomware()
     {
         torrent.queuePosition = self.fTorrents.count;
 
-        [torrent update];
         [self.fTorrents addObject:torrent];
 
         if (!self.fAddingTransfers)
@@ -1431,7 +1429,6 @@ static void removeKeRangerRansomware()
             [torrent startTransfer];
         }
 
-        [torrent update];
         [self.fTorrents addObject:torrent];
 
         if (!self.fAddingTransfers)
@@ -1452,7 +1449,6 @@ static void removeKeRangerRansomware()
     {
         torrent.queuePosition = self.fTorrents.count;
 
-        [torrent update];
         [self.fTorrents addObject:torrent];
 
         if (!self.fAddingTransfers)
@@ -2302,6 +2298,7 @@ static void removeKeRangerRansomware()
         [torrent resetCache];
     }
 
+    [Torrent updateTorrents:torrents];
     [self applyFilter];
 }
 
@@ -5506,7 +5503,6 @@ static void removeKeRangerRansomware()
         [torrent changeDownloadFolderBeforeUsing:location determinationType:TorrentDeterminationAutomatic];
     }
 
-    [torrent update];
     [self.fTorrents addObject:torrent];
 
     if (!self.fAddingTransfers)
@@ -5525,8 +5521,6 @@ static void removeKeRangerRansomware()
 
 - (void)rpcStartedStoppedTorrent:(Torrent*)torrent
 {
-    [torrent update];
-
     [self updateUI];
     [self applyFilter];
     [self updateTorrentHistory];
