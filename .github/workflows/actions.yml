@@ -1158,7 +1158,7 @@ jobs:
         gradle-version: 8.13
 
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v4
 
     - name: Install NDK
       run: sdkmanager "ndk;27.3.13750724"
