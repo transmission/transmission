@@ -15,6 +15,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "libtransmission/values.h"
 
@@ -742,6 +743,8 @@ using tr_session_ratio_limit_hit_func = std::function<void(tr_torrent_id_t)>;
 using tr_torrent_completeness_func = std::function<void(tr_torrent_id_t, tr_completeness completeness, bool was_running)>;
 
 using tr_torrent_remove_func = std::function<bool(std::string_view filename, tr_error* error)>;
+
+using tr_torrent_stats_func = std::function<void(std::vector<tr_stat>)>;
 
 using tr_rpc_func = std::function<tr_rpc_callback_status(tr_rpc_callback_type type, std::optional<tr_torrent_id_t>)>;
 
