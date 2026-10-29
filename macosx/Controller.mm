@@ -15,6 +15,9 @@
 #endif
 
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include <libtransmission/transmission.h>
 
@@ -412,6 +415,7 @@ static void removeKeRangerRansomware()
 @property(nonatomic) DragOverlayWindow* fOverlayWindow;
 
 @property(nonatomic) NSTimer* fTimer;
+@property(nonatomic) BOOL fTimerStatsPending;
 
 @property(nonatomic) StatusBarController* fStatusBar;
 
@@ -817,7 +821,7 @@ static void removeKeRangerRansomware()
     //timer to update the interface every second
     __weak __auto_type weakSelf = self;
     self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateUISeconds repeats:YES block:^(NSTimer* _Nonnull timer) {
-        [weakSelf updateUI];
+        [weakSelf updateUIFromTimer];
     }];
 
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSModalPanelRunLoopMode];
@@ -2298,8 +2302,9 @@ static void removeKeRangerRansomware()
         [torrent resetCache];
     }
 
-    [Torrent updateTorrents:torrents];
-    [self applyFilter];
+    [self requestStats:^{
+        [self applyFilter];
+    }];
 }
 
 - (NSArray<Torrent*>*)selectedTorrents
@@ -2388,11 +2393,70 @@ static void removeKeRangerRansomware()
 
 - (void)updateUI
 {
+    [self requestStats:nil];
+}
+
+// Skips ticks while the last tick's stats are pending, so requests can't pile up behind a stalled session thread.
+- (void)updateUIFromTimer
+{
+    if (self.fTimerStatsPending)
+    {
+        return;
+    }
+
+    self.fTimerStatsPending = YES;
+    [self requestStats:^{
+        self.fTimerStatsPending = NO;
+    }];
+}
+
+// The stats are taken on libtransmission's thread, so the main thread never waits for its lock.
+- (void)requestStats:(void (^)(void))completion
+{
+    if (self.fQuitting)
+    {
+        return; // tr_sessionClose() may have freed the session
+    }
+
+    tr_torrentStatAsync(
+        self.fLib,
+        [controller = self, completion](std::vector<tr_stat> stats)
+        {
+            // a block's C++ captures are const, so share the vector to move it out later
+            auto const shared_stats = std::make_shared<std::vector<tr_stat>>(std::move(stats));
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (controller.fQuitting)
+                {
+                    return; // tr_sessionClose() may have freed the session
+                }
+
+                [controller statsArrived:std::move(*shared_stats)];
+                if (completion != nil)
+                {
+                    completion();
+                }
+            });
+        });
+}
+
+- (void)statsArrived:(std::vector<tr_stat>)stats
+{
+    // an Add window's torrent is in the session before it is in fTorrents
+    NSMutableArray<Torrent*>* torrents = [self.fTorrents mutableCopy];
+    for (id addController in self.fAddWindows)
+    {
+        [torrents addObject:[addController torrent]];
+    }
+
+    // the "active" filter depends on `transmitting`
+    if ([Torrent updateTorrents:torrents fromStats:std::move(stats)])
+    {
+        [self applyFilter];
+    }
+
     CGFloat dlRate = 0.0, ulRate = 0.0;
     BOOL anyCompleted = NO;
     BOOL anyActive = NO;
-
-    [Torrent updateTorrents:self.fTorrents];
 
     for (Torrent* torrent in self.fTorrents)
     {
@@ -2433,10 +2497,11 @@ static void removeKeRangerRansomware()
 #warning can this be removed or refined?
 - (void)fullUpdateUI
 {
-    [self updateUI];
-    [self applyFilter];
-    [self.fWindow.toolbar validateVisibleItems];
-    [self updateTorrentHistory];
+    [self requestStats:^{
+        [self applyFilter];
+        [self.fWindow.toolbar validateVisibleItems];
+        [self updateTorrentHistory];
+    }];
 }
 
 - (void)setBottomCountText:(BOOL)filtering
@@ -3853,8 +3918,6 @@ static void removeKeRangerRansomware()
                 torrent.queuePosition = i++;
             }
 
-            [Torrent updateTorrents:self.fTorrents];
-
             //do the drag animation here so that the dragged torrents are the ones that are animated as moving, and not the torrents around them
             [self.fTableView beginUpdates];
 
@@ -3891,7 +3954,10 @@ static void removeKeRangerRansomware()
             [self.fTableView endUpdates];
         }
 
-        [self applyFilter];
+        // sorting reads the queue positions from the stats
+        [self requestStats:^{
+            [self applyFilter];
+        }];
     }
 
     return YES;
@@ -5521,25 +5587,22 @@ static void removeKeRangerRansomware()
 
 - (void)rpcStartedStoppedTorrent:(Torrent*)torrent
 {
-    [self updateUI];
-    [self applyFilter];
-    [self updateTorrentHistory];
+    [self fullUpdateUI];
 }
 
 - (void)rpcChangedTorrent:(Torrent*)torrent
 {
-    [torrent update];
-
-    if ([self.fTableView.selectedTorrents containsObject:torrent])
-    {
-        [self.fInfoController updateInfoStats]; //this will reload the file table
-        [self.fInfoController updateOptions];
-    }
+    [self requestStats:^{
+        if ([self.fTableView.selectedTorrents containsObject:torrent])
+        {
+            [self.fInfoController updateInfoStats]; //this will reload the file table
+            [self.fInfoController updateOptions];
+        }
+    }];
 }
 
 - (void)rpcMovedTorrent:(Torrent*)torrent
 {
-    [torrent update];
     [torrent updateTimeMachineExclude];
 
     if ([self.fTableView.selectedTorrents containsObject:torrent])
@@ -5550,13 +5613,13 @@ static void removeKeRangerRansomware()
 
 - (void)rpcUpdateQueue
 {
-    [Torrent updateTorrents:self.fTorrents];
+    [self requestStats:^{
+        NSSortDescriptor* descriptor = [NSSortDescriptor sortDescriptorWithKey:@"queuePosition" ascending:YES];
+        NSArray* descriptors = @[ descriptor ];
+        [self.fTorrents sortUsingDescriptors:descriptors];
 
-    NSSortDescriptor* descriptor = [NSSortDescriptor sortDescriptorWithKey:@"queuePosition" ascending:YES];
-    NSArray* descriptors = @[ descriptor ];
-    [self.fTorrents sortUsingDescriptors:descriptors];
-
-    [self sortTorrentsAndIncludeQueueOrder:YES];
+        [self sortTorrentsAndIncludeQueueOrder:YES];
+    }];
 }
 
 @end
