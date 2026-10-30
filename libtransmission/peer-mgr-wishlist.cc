@@ -72,7 +72,8 @@ Wishlist::Candidate::Candidate(tr_piece_index_t piece_in, tr_piece_index_t salt_
 
 std::vector<tr_block_span_t> Wishlist::next(
     size_t const n_wanted_blocks,
-    std::function<bool(tr_piece_index_t)> const& peer_has_piece)
+    std::function<bool(tr_piece_index_t)> const& peer_has_piece,
+    std::function<bool(tr_block_index_t)> const& peer_has_active_request)
 {
     if (n_wanted_blocks == 0U)
     {
@@ -103,8 +104,44 @@ std::vector<tr_block_span_t> Wishlist::next(
         std::copy_n(std::rbegin(candidate.unrequested), n_to_add, std::back_inserter(blocks));
     }
 
-    // Ensure the list of blocks are sorted
-    // The list needs to be unique as well, but that should come naturally
+    // Once every remaining block is already requested, let one more peer
+    // race for it instead of sitting idle. The count below is only checked
+    // here, in endgame, to keep the normal path above cheap.
+    if (std::size(blocks) < n_wanted_blocks && mediator_.is_endgame())
+    {
+        for (auto const& candidate : candidates_)
+        {
+            if (std::size(blocks) >= n_wanted_blocks)
+            {
+                break;
+            }
+
+            if (candidate.replication == 0 || !peer_has_piece(candidate.piece))
+            {
+                continue;
+            }
+
+            for (auto [block, end] = candidate.block_span; block < end && std::size(blocks) < n_wanted_blocks; ++block)
+            {
+                if (candidate.unrequested.contains(block) || mediator_.client_has_block(block) ||
+                    (peer_has_active_request && peer_has_active_request(block)))
+                {
+                    continue;
+                }
+
+                if (mediator_.is_requested_by_webseed(block) || mediator_.count_active_requests(block) >= 2U)
+                {
+                    continue;
+                }
+
+                blocks.push_back(block);
+            }
+        }
+    }
+
+    // Endgame can append blocks out of piece order, so sort. No dedupe
+    // needed: it only considers blocks already absent from unrequested, so
+    // the two phases never pick the same one.
     std::ranges::sort(blocks);
     return make_spans(blocks);
 }
