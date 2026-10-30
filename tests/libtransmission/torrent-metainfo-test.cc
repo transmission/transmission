@@ -253,6 +253,59 @@ TEST_F(TorrentMetainfoTest, pathKeyTest)
     }
 }
 
+TEST_F(TorrentMetainfoTest, bep47SharedPaddingPath)
+{
+    // BEP 47 padding files of the same length share the recommended [".pad", "<length>"] path
+    static auto constexpr Benc =
+        "d4:infod5:filesl"
+        "d6:lengthi2e4:pathl9:file1.txtee"
+        "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+        "d6:lengthi2e4:pathl9:file2.txtee"
+        "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+        "d6:lengthi2e4:pathl9:file3.txtee"
+        "e4:name4:test12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaaee"sv;
+
+    auto tm = tr_torrent_metainfo{};
+    auto error = tr_error{};
+    EXPECT_TRUE(tm.parse_benc(Benc, &error)) << error.message();
+    ASSERT_EQ(5U, tm.file_count());
+    EXPECT_EQ("test/.pad/30"sv, tm.file_subpath(1));
+    EXPECT_EQ("test/.pad/30"sv, tm.file_subpath(3));
+}
+
+TEST_F(TorrentMetainfoTest, bep47PaddingPathConflicts)
+{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 3U>{ {
+        // padding file, then regular file with the same path
+        { "d4:infod5:filesl"
+          "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+          "d6:lengthi30e4:pathl4:.pad2:30ee"
+          "e4:name4:test12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaaee"sv,
+          "duplicate path [.pad/30]"sv },
+        // regular file, then padding file with the same path
+        { "d4:infod5:filesl"
+          "d6:lengthi30e4:pathl4:.pad2:30ee"
+          "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+          "e4:name4:test12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaaee"sv,
+          "duplicate path [.pad/30]"sv },
+        // padding files with the same path but different lengths
+        { "d4:infod5:filesl"
+          "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+          "d4:attr1:p6:lengthi31e4:pathl4:.pad2:30ee"
+          "e4:name4:test12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaaee"sv,
+          "duplicate path [.pad/30]"sv },
+    } };
+
+    for (auto const& [benc, errmsg] : Tests)
+    {
+        auto tm = tr_torrent_metainfo{};
+        auto error = tr_error{};
+        EXPECT_FALSE(tm.parse_benc(benc, &error));
+        EXPECT_EQ(error.code(), EINVAL);
+        EXPECT_EQ(error.message(), errmsg);
+    }
+}
+
 TEST_F(TorrentMetainfoTest, utf8Test)
 {
 // MacOS implementation uses non-deterministic conversion for illegal UTF-8
