@@ -1951,6 +1951,19 @@ ReadResult tr_peerMsgsImpl::can_read_impl(tr_peerIo* io)
             return { ReadState::Now, {} };
         }
 
+        // Reject an overlarge length prefix while it is still just the
+        // prefix, before any payload is buffered: an unbounded declared
+        // length lets a remote peer grow our receive buffer 1:1 with the
+        // bytes it sends (memory-exhaustion DoS). Mirrors libtorrent's
+        // max_message_size (1 MiB).
+        constexpr uint32_t MaxMessageLen = 1U << 20U; // 1 MiB
+        if (message_len > MaxMessageLen)
+        {
+            logdbg(this, fmt::format("bad msg: length prefix {:d} exceeds 1 MiB", message_len));
+            publish(tr_peer_event::GotError(EMSGSIZE));
+            return { ReadState::Err, {} };
+        }
+
         current_message_len = message_len;
     }
 
