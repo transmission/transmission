@@ -26,7 +26,7 @@
 
 static void set_system_error(tr_error& error, int code, std::string_view message)
 {
-    error.set(code, fmt::format("{:s}: {:s} ({:d}", message, tr_strerror(code), code));
+    error.set(code, fmt::format("{:s}: {:s} ({:d})", message, tr_strerror(code), code));
 }
 
 #ifdef HAVE_SYS_SIGNALFD_H
@@ -169,14 +169,6 @@ bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error& error)
             set_system_error(error, errno, "setsid() failed");
             return false;
         }
-
-        /*
-        if (chdir("/") == -1)
-        {
-            set_system_error(error, errno, "chdir() failed");
-            return false;
-        }
-        */
 
         {
             int const fd = open("/dev/null", O_RDWR, 0);
