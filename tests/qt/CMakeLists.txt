@@ -49,6 +49,8 @@ endfunction()
 
 add_trqt_test(add-data-test.cc)
 
+add_trqt_test(filterbar-test.cc)
+
 add_trqt_test(main-window-test.cc)
 
 # Builds a window, so it asks for a platform that needs no display.
