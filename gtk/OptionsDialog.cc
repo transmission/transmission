@@ -19,6 +19,7 @@
 
 #include <giomm/file.h>
 #include <glibmm/i18n.h>
+#include <glibmm/miscutils.h> /* Glib::path_get_dirname() */
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/combobox.h>
 #include <gtkmm/filefilter.h>
@@ -60,6 +61,7 @@ public:
 private:
     void sourceChanged(PathButton* b);
     void downloadDirChanged(PathButton* b);
+    void onSameAsTorrentToggled();
 
     void removeOldTorrent();
     void updateTorrent();
@@ -78,6 +80,8 @@ private:
     FileList* file_list_ = nullptr;
     Gtk::CheckButton* run_check_ = nullptr;
     Gtk::CheckButton* trash_check_ = nullptr;
+    Gtk::CheckButton* same_as_torrent_check_ = nullptr;
+    PathButton* destination_chooser_ = nullptr;
     Gtk::ComboBox* priority_combo_ = nullptr;
     FreeSpaceLabel* freespace_label_ = nullptr;
 };
@@ -167,6 +171,14 @@ void OptionsDialog::Impl::sourceChanged(PathButton* b)
             new_file = true;
         }
 
+        /* if "same as torrent file" is active, keep the destination locked to
+         * the (possibly changed) source file's parent directory */
+        if (same_as_torrent_check_ != nullptr && same_as_torrent_check_->get_active() && !filename_.empty())
+        {
+            downloadDir_ = Glib::path_get_dirname(filename_);
+            freespace_label_->set_dir(downloadDir_);
+        }
+
         tr_ctorSetDownloadDir(ctor_.get(), TR_FORCE, downloadDir_);
         tr_ctorSetPaused(ctor_.get(), TR_FORCE, true);
         tr_ctorSetDeleteSource(ctor_.get(), false);
@@ -196,6 +208,26 @@ void OptionsDialog::Impl::downloadDirChanged(PathButton* b)
         updateTorrent();
 
         freespace_label_->set_dir(downloadDir_);
+    }
+}
+
+void OptionsDialog::Impl::onSameAsTorrentToggled()
+{
+    bool const active = same_as_torrent_check_ != nullptr && same_as_torrent_check_->get_active();
+
+    /* remember this choice and write it to settings.json so it persists
+     * across visits to the add dialog */
+    gtr_pref_flag_set(TR_KEY_download_dir_same_as_torrent, active);
+
+    /* when the "download to the .torrent file's folder" checkbox is active,
+     * the destination defaults to the source file's parent directory, but the
+     * user is still free to pick a different folder here */
+    if (active && !filename_.empty())
+    {
+        downloadDir_ = Glib::path_get_dirname(filename_);
+        freespace_label_->set_dir(downloadDir_);
+        destination_chooser_->set_filename(downloadDir_);
+        updateTorrent();
     }
 }
 
@@ -272,12 +304,11 @@ OptionsDialog::Impl::Impl(
     addTorrentFilters(source_chooser);
     source_chooser->signal_selection_changed().connect([this, source_chooser]() { sourceChanged(source_chooser); });
 
-    auto* destination_chooser = gtr_get_widget_derived<PathButton>(builder, "destination_button");
-    destination_chooser->set_filename(downloadDir_);
-    destination_chooser->set_shortcut_folders(gtr_get_recent_dirs("download"));
+    destination_chooser_ = gtr_get_widget_derived<PathButton>(builder, "destination_button");
+    destination_chooser_->set_filename(downloadDir_);
+    destination_chooser_->set_shortcut_folders(gtr_get_recent_dirs("download"));
 
-    destination_chooser->signal_selection_changed().connect([this, destination_chooser]()
-                                                            { downloadDirChanged(destination_chooser); });
+    destination_chooser_->signal_selection_changed().connect([this]() { downloadDirChanged(destination_chooser_); });
 
     bool flag = false;
     if (!tr_ctorGetPaused(ctor_.get(), TR_FORCE, &flag))
@@ -293,6 +324,13 @@ OptionsDialog::Impl::Impl(
     }
 
     trash_check_->set_active(flag);
+
+    /* "save to the .torrent file's folder": remember the last user choice */
+    same_as_torrent_check_ = gtr_get_widget<Gtk::CheckButton>(builder, "same_as_torrent_check");
+    same_as_torrent_check_->set_active(gtr_pref_flag_get(TR_KEY_download_dir_same_as_torrent));
+    same_as_torrent_check_->signal_toggled().connect([this]() { onSameAsTorrentToggled(); });
+
+    onSameAsTorrentToggled();
 
     /* trigger sourceChanged, either directly or indirectly,
      * so that it creates the tor/gtor objects */
