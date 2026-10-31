@@ -53,6 +53,18 @@ public:
         startTimer();
     }
 
+    void natpmp_gateway_ipv4_changed() override
+    {
+        if (!is_enabled_)
+        {
+            return;
+        }
+
+        // drop the current mapping so that discovery restarts on the new gateway
+        set_enabled(false);
+        set_enabled(true);
+    }
+
     void set_enabled(bool enabled) override
     {
         if (enabled)
@@ -179,7 +191,7 @@ private:
 
         if (!natpmp_)
         {
-            natpmp_ = std::make_unique<tr_natpmp>();
+            natpmp_ = std::make_unique<tr_natpmp>(mediator_.natpmp_gateway_ipv4());
         }
 
         if (upnp_ == nullptr)
@@ -194,11 +206,6 @@ private:
         if (!std::empty(result.local_port) && !std::empty(result.advertised_port))
         {
             mediator_.on_port_forwarded(result.advertised_port);
-            tr_logAddInfo(
-                fmt::format(
-                    fmt::runtime(_("Mapped private port {private_port} to public port {public_port}")),
-                    fmt::arg("private_port", result.local_port.host()),
-                    fmt::arg("public_port", result.advertised_port.host())));
         }
 
         upnp_state_ = tr_upnpPulse(

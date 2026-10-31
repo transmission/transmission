@@ -10,8 +10,11 @@
 #include <future>
 #include <iterator> // std::inserter
 #include <set>
+#include <string>
 #include <string_view>
 #include <vector>
+
+#include <fmt/format.h>
 
 #include <gtest/gtest.h>
 
@@ -627,6 +630,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_incomplete_dir,
         TR_KEY_incomplete_dir_enabled,
         TR_KEY_lpd_enabled,
+        TR_KEY_natpmp_gateway_ipv4,
         TR_KEY_peer_limit_global,
         TR_KEY_peer_limit_per_torrent,
         TR_KEY_peer_port,
@@ -684,6 +688,34 @@ TEST_F(RpcTest, sessionGet)
 
     // cleanup
     tr_torrentRemove(tor, false);
+}
+
+TEST_F(RpcTest, sessionSetNatpmpGatewayIpv4)
+{
+    auto const set_gateway = [this](std::string_view value)
+    {
+        return makeRequest(
+            session_,
+            fmt::format(
+                R"json({{"id":1,"jsonrpc":"2.0","method":"session_set","params":{{"natpmp_gateway_ipv4":{}}}}})json",
+                value));
+    };
+
+    auto response = set_gateway(R"("192.168.1.1")");
+    EXPECT_EQ(std::string::npos, response.find("error")) << response;
+    EXPECT_EQ("192.168.1.1", session_->natpmp_gateway_ipv4());
+
+    // rejected values leave the setting unchanged
+    for (auto const* const bad : { R"("fe80::1")", R"("not an address")", "42" })
+    {
+        response = set_gateway(bad);
+        EXPECT_NE(std::string::npos, response.find("natpmp_gateway_ipv4 must be an IPv4 address or empty")) << bad;
+        EXPECT_EQ("192.168.1.1", session_->natpmp_gateway_ipv4()) << bad;
+    }
+
+    response = set_gateway(R"("")");
+    EXPECT_EQ(std::string::npos, response.find("error")) << response;
+    EXPECT_EQ("", session_->natpmp_gateway_ipv4());
 }
 
 TEST_F(RpcTest, torrentGet)
