@@ -1596,6 +1596,27 @@ std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* tor)
     return tr_peerMgrPeerStats(tor);
 }
 
+bool tr_torrentTryPeers(tr_session* const session, tr_torrent_id_t const id, std::vector<tr_peer_stat>* const setme)
+{
+    tr_return_val_if_fail(session != nullptr, false);
+    tr_return_val_if_fail(setme != nullptr, false);
+
+    auto const lock = session->try_unique_lock();
+    if (!lock.owns_lock())
+    {
+        return false;
+    }
+
+    auto const* const tor = session->torrents().get(id);
+    if (tor == nullptr)
+    {
+        return false;
+    }
+
+    *setme = tr_peerMgrPeerStats(tor);
+    return true;
+}
+
 void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
 {
     tr_return_if_fail(tr_isTorrent(tor));

@@ -916,6 +916,14 @@ bool tr_torrentCanManualUpdate(tr_torrent const* torrent);
 
 std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* torrent);
 
+/**
+ * Like `tr_torrentPeers()`, but never waits for the session lock.
+ * Returns false, leaving `*setme` untouched, if the lock is held by another
+ * thread or `id` names no torrent in `session`. A UI thread can call it on a
+ * timer and keep its previous list on false.
+ */
+bool tr_torrentTryPeers(tr_session* session, tr_torrent_id_t id, std::vector<tr_peer_stat>* setme);
+
 // --- tr_tracker_stat
 
 struct tr_tracker_view tr_torrentTracker(tr_torrent const* torrent, size_t i);

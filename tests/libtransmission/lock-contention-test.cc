@@ -7,6 +7,7 @@
 #include <chrono>
 #include <future>
 #include <thread>
+#include <vector>
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
@@ -255,6 +256,51 @@ TEST_F(LockContentionTest, BatchTrTorrentTryStatLeavesSetmeUntouchedOnInvalidId)
     {
         EXPECT_EQ(stat.id, SentinelId) << "setme was modified even though tr_torrentTryStat() returned false";
     }
+}
+
+// The Mac inspector's Peers tab refreshes tr_torrentPeers() once a second
+// while it is visible; it takes the same lock as tr_torrentStat().
+TEST_F(LockContentionTest, TrTorrentTryPeersDoesNotBlockWhileSessionLockIsHeld)
+{
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    ASSERT_NE(tor, nullptr);
+
+    static constexpr auto SimulatedWriteDelay = 300ms;
+
+    auto lock_acquired = std::promise<void>{};
+    auto lock_acquired_future = lock_acquired.get_future();
+
+    auto writer = std::thread(
+        [this, &lock_acquired]()
+        {
+            auto const lock = session_->unique_lock();
+            lock_acquired.set_value();
+            std::this_thread::sleep_for(SimulatedWriteDelay);
+        });
+
+    lock_acquired_future.wait();
+
+    auto peers = std::vector<tr_peer_stat>{ tr_peer_stat{} };
+    auto const t0 = std::chrono::steady_clock::now();
+    auto const got_peers = tr_torrentTryPeers(session_, tr_torrentId(tor), &peers);
+    auto const elapsed = std::chrono::steady_clock::now() - t0;
+
+    writer.join();
+
+    EXPECT_FALSE(got_peers) << "expected the lock to still be held by the writer thread";
+    EXPECT_EQ(std::size(peers), 1U) << "setme was modified even though tr_torrentTryPeers() returned false";
+    EXPECT_LT(elapsed, 50ms) << "tr_torrentTryPeers() blocked instead of returning immediately";
+}
+
+TEST_F(LockContentionTest, TrTorrentTryPeersSucceedsWithNoContention)
+{
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    ASSERT_NE(tor, nullptr);
+
+    auto peers = std::vector<tr_peer_stat>{ tr_peer_stat{} };
+    EXPECT_TRUE(tr_torrentTryPeers(session_, tr_torrentId(tor), &peers));
+    EXPECT_TRUE(std::empty(peers)) << "a torrent with no peers should yield an empty list";
+    EXPECT_FALSE(tr_torrentTryPeers(session_, tr_torrent_id_t{ 0 }, &peers)) << "id 0 names no torrent";
 }
 
 } // namespace tr::test

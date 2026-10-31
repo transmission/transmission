@@ -58,6 +58,9 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @property(nonatomic, copy) NSString* fKnownDataLocation;
 @property(nonatomic) BOOL fKnownDataLocationProbed;
 @property(nonatomic) BOOL fKnownDataLocationProbeInFlight;
+// The peer list returned by the last successful tr_torrentTryPeers(); shown
+// again when the session lock is busy so the inspector never waits for it.
+@property(nonatomic, copy) NSArray<NSDictionary*>* fLastPeers;
 
 - (BOOL)canChangeDownloadChecks;
 
@@ -1156,7 +1159,11 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (NSArray<NSDictionary*>*)peers
 {
-    auto const peers = tr_torrentPeers(self.fHandle);
+    auto peers = std::vector<tr_peer_stat>{};
+    if (!tr_torrentTryPeers(self.fLib, self.id, &peers))
+    {
+        return self.fLastPeers ?: @[];
+    }
     size_t const totalPeers = peers.size();
 
     NSMutableArray* peerDicts = [NSMutableArray arrayWithCapacity:totalPeers];
@@ -1188,6 +1195,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         [peerDicts addObject:dict];
     }
 
+    self.fLastPeers = peerDicts;
     return peerDicts;
 }
 
