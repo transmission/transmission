@@ -54,6 +54,11 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @property(nonatomic) BOOL fResumeOnWake;
 @property(nonatomic, copy, readwrite) NSString* hashString;
 
+// Backing state for knownDataLocation. Main-thread only.
+@property(nonatomic, copy) NSString* fKnownDataLocation;
+@property(nonatomic) BOOL fKnownDataLocationProbed;
+@property(nonatomic) BOOL fKnownDataLocationProbeInFlight;
+
 - (BOOL)canChangeDownloadChecks;
 
 - (void)renameFinished:(BOOL)success
@@ -846,6 +851,87 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         auto const location = tr_torrentFindFile(self.fHandle, 0);
         return std::empty(location) ? nil : tr_strv_to_utf8_nsstring(location);
     }
+}
+
+- (NSString*)knownDataLocation
+{
+    if (self.magnet)
+    {
+        return nil;
+    }
+
+    [self probeDataLocationIfNeeded];
+    return self.fKnownDataLocation;
+}
+
+// Mirrors dataLocation's search: the torrent folder for multi-file torrents,
+// otherwise the places tr_torrentFindFile() looks for a single file. Built on
+// the calling thread from torrent state so that the background probe handles
+// only path strings and never the tr_torrent, which closeRemoveTorrent: frees.
+- (NSArray<NSString*>*)dataLocationCandidates
+{
+    if (self.folder)
+    {
+        return @[ [self.currentDirectory stringByAppendingPathComponent:self.name] ];
+    }
+
+    NSString* fileName = @(tr_torrentFile(self.fHandle, 0).name);
+
+    NSMutableArray<NSString*>* directories = [NSMutableArray
+        arrayWithObject:tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(self.fHandle))];
+    if (tr_sessionIsIncompleteDirEnabled(self.fLib))
+    {
+        [directories addObject:tr_strv_to_utf8_nsstring(tr_sessionGetIncompleteDir(self.fLib))];
+    }
+
+    NSMutableArray<NSString*>* candidates = [NSMutableArray arrayWithCapacity:directories.count * 2];
+    for (NSString* directory in directories)
+    {
+        NSString* path = [directory stringByAppendingPathComponent:fileName];
+        [candidates addObject:path];
+        [candidates addObject:[path stringByAppendingPathExtension:@"part"]];
+    }
+    return candidates;
+}
+
+- (void)probeDataLocationIfNeeded
+{
+    if (self.fKnownDataLocationProbeInFlight)
+    {
+        return;
+    }
+    self.fKnownDataLocationProbeInFlight = YES;
+
+    NSArray<NSString*>* candidates = self.dataLocationCandidates;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        NSString* found = nil;
+        for (NSString* path in candidates)
+        {
+            if ([NSFileManager.defaultManager fileExistsAtPath:path])
+            {
+                found = path;
+                break;
+            }
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.fKnownDataLocationProbeInFlight = NO;
+
+            // Before the first probe the UI shows nil, so only a non-nil
+            // first result is news. After that any difference is.
+            BOOL const changed = self.fKnownDataLocationProbed ?
+                (found != self.fKnownDataLocation && ![found isEqualToString:self.fKnownDataLocation]) :
+                (found != nil);
+            self.fKnownDataLocationProbed = YES;
+            self.fKnownDataLocation = found;
+
+            if (changed)
+            {
+                [NSNotificationCenter.defaultCenter postNotificationName:@"ResetInspector" object:self
+                                                                userInfo:@{ @"Torrent" : self }];
+            }
+        });
+    });
 }
 
 - (NSString*)lastKnownDataLocation
