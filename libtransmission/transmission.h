@@ -481,13 +481,24 @@ void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
 
 // ---
 
+using tr_torrent_loaded_func = void (*)(tr_torrent* tor, void* user_data);
+
 /**
  * Load all the torrents in the session's torrent folder.
  * This can be used at startup to kickstart all the torrents from the previous session.
  *
+ * `loaded`, when given, is called from the session thread for each torrent
+ * as soon as it has been added, so a client can show torrents while the rest
+ * are still being read from disk. It must return quickly and must not call
+ * back into the session; post the torrent to another thread instead.
+ *
  * @return the number of torrents in the session
  */
-size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor);
+size_t tr_sessionLoadTorrents(
+    tr_session* session,
+    tr_ctor* ctor,
+    tr_torrent_loaded_func loaded = nullptr,
+    void* user_data = nullptr);
 
 /**
  * Get pointers to all the torrents in a session.

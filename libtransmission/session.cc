@@ -1526,29 +1526,47 @@ auto get_remaining_files(std::string_view folder, std::vector<std::string>& queu
     return ret;
 }
 
-void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
+void session_load_torrents(
+    tr_session* session,
+    tr_ctor* ctor,
+    tr_torrent_loaded_func loaded,
+    void* user_data,
+    std::promise<size_t>* loaded_promise)
 {
     auto n_torrents = size_t{};
     auto const& folder = session->torrentDir();
 
-    auto load_func = [&folder, &n_torrents, ctor, buf = std::vector<char>{}](std::string_view name) mutable
+    auto on_loaded = [&n_torrents, loaded, user_data](tr_torrent* tor)
+    {
+        if (tor == nullptr)
+        {
+            return;
+        }
+
+        ++n_torrents;
+        if (loaded != nullptr)
+        {
+            loaded(tor, user_data);
+        }
+    };
+
+    auto load_func = [&folder, &on_loaded, ctor, buf = std::vector<char>{}](std::string_view name) mutable
     {
         if (tr_strv_ends_with(name, ".torrent"sv))
         {
             auto const path = tr_pathbuf{ folder, '/', name };
-            if (ctor->set_metainfo_from_file(path.sv()) && tr_torrentNew(ctor, nullptr) != nullptr)
+            if (ctor->set_metainfo_from_file(path.sv()))
             {
-                ++n_torrents;
+                on_loaded(tr_torrentNew(ctor, nullptr));
             }
         }
         else if (tr_strv_ends_with(name, ".magnet"sv))
         {
             auto const path = tr_pathbuf{ folder, '/', name };
             if (tr_file_read(path, buf) &&
-                ctor->set_metainfo_from_magnet_link(std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
-                tr_torrentNew(ctor, nullptr) != nullptr)
+                ctor->set_metainfo_from_magnet_link(std::string_view{ std::data(buf), std::size(buf) }, nullptr))
             {
-                ++n_torrents;
+                on_loaded(tr_torrentNew(ctor, nullptr));
             }
         }
     };
@@ -1577,14 +1595,14 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
 } // namespace load_torrents_helpers
 } // namespace
 
-size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
+size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor, tr_torrent_loaded_func loaded, void* user_data)
 {
     using namespace load_torrents_helpers;
 
     auto loaded_promise = std::promise<size_t>{};
     auto loaded_future = loaded_promise.get_future();
 
-    session->run_in_session_thread(session_load_torrents, session, ctor, &loaded_promise);
+    session->run_in_session_thread(session_load_torrents, session, ctor, loaded, user_data, &loaded_promise);
     loaded_future.wait();
     auto const n_torrents = loaded_future.get();
     return n_torrents;
