@@ -346,7 +346,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     if ([self alertForRemainingDiskSpace])
     {
         ignoreQueue ? tr_torrentStartNow(self.fHandle) : tr_torrentStart(self.fHandle);
-        [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited
         [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
@@ -368,7 +367,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     if ([self alertForRemainingDiskSpace])
     {
         tr_torrentStart(self.fHandle);
-        [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited
         [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
@@ -378,7 +376,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 - (void)stopTransfer
 {
     tr_torrentStop(self.fHandle);
-    [self update];
 }
 
 - (void)sleep
@@ -421,7 +418,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 - (void)resetCache
 {
     tr_torrentVerify(self.fHandle);
-    [self update];
 }
 
 - (BOOL)isMagnet
@@ -2198,8 +2194,8 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning
 {
-    //don't call update yet to avoid auto-stop; fall back to the existing fStat if the session lock isn't
-    //immediately available rather than blocking the main thread -- update below will refresh it shortly after
+    //keep the existing fStat if the session lock isn't immediately available
+    //rather than blocking the main thread; the next UI tick refreshes it
     if (auto stat = tr_stat{}; tr_torrentTryStat(self.fLib, self.id, &stat))
     {
         self.fStat = stat;
@@ -2231,7 +2227,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         break;
     }
 
-    [self update];
     [self updateTimeMachineExclude];
 }
 

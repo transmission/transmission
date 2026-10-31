@@ -5,7 +5,7 @@
 
 import { AlertDialog } from './alert-dialog.js';
 import { Formatter } from './formatter.js';
-import { RPC } from './remote.js';
+import { getErrorMessage, RPC } from './remote.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
 // iPadOS can report a desktop Mac user agent, so also check for touch support.
@@ -89,9 +89,8 @@ export class OpenDialog extends EventTarget {
           },
         };
         remote.sendRequest(o, (response) => {
-          if ('error' in response) {
-            const message =
-              response.error.data?.errorString ?? response.error.message;
+          const message = getErrorMessage(response);
+          if (message !== null) {
             alert(`Error adding "${file.name}": ${message}`);
             controller.setCurrentPopup(
               new AlertDialog({
@@ -121,11 +120,12 @@ export class OpenDialog extends EventTarget {
         },
       };
       remote.sendRequest(o, (payload) => {
-        if ('error' in payload) {
+        const message = getErrorMessage(payload);
+        if (message !== null) {
           controller.setCurrentPopup(
             new AlertDialog({
               heading: `Error adding "${url}"`,
-              message: payload.error.data?.errorString ?? payload.error.message,
+              message,
             }),
           );
         }
