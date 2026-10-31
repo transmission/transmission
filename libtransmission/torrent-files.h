@@ -95,7 +95,7 @@ public:
             std::back_inserter(ret),
             [](auto const& in) { return std::make_pair(in.path_, in.size_); });
 
-        std::ranges::sort(std::views::keys(ret));
+        std::ranges::sort(ret);
 
         return ret;
     }
