@@ -111,7 +111,7 @@ TEST_F(LockContentionTest, TrTorrentTryStatDoesNotBlockWhileSessionLockIsHeld)
 
     auto stat = tr_stat{};
     auto const t0 = std::chrono::steady_clock::now();
-    auto const got_stat = tr_torrentTryStat(tor, &stat);
+    auto const got_stat = tr_torrentTryStat(session_, tr_torrentId(tor), &stat);
     auto const elapsed = std::chrono::steady_clock::now() - t0;
 
     writer.join();
@@ -133,7 +133,7 @@ TEST_F(LockContentionTest, TrTorrentTryStatSucceedsWithNoContention)
 
     auto stat = tr_stat{};
     auto const t0 = std::chrono::steady_clock::now();
-    auto const got_stat = tr_torrentTryStat(tor, &stat);
+    auto const got_stat = tr_torrentTryStat(session_, tr_torrentId(tor), &stat);
     auto const elapsed = std::chrono::steady_clock::now() - t0;
 
     fmt::print(

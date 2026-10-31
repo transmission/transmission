@@ -1400,17 +1400,6 @@ tr_stat tr_torrent::stats() const
     return stats_locked();
 }
 
-std::optional<tr_stat> tr_torrent::try_stats() const
-{
-    auto lock = session->try_unique_lock();
-    if (!lock.owns_lock())
-    {
-        return {};
-    }
-
-    return stats_locked();
-}
-
 tr_stat tr_torrentStat(tr_torrent* const tor)
 {
     tr_return_val_if_fail(tr_isTorrent(tor), {});
@@ -1418,73 +1407,35 @@ tr_stat tr_torrentStat(tr_torrent* const tor)
     return tor->stats();
 }
 
-bool tr_torrentTryStat(tr_torrent* const tor, tr_stat* const setme)
+std::vector<tr_stat> tr_torrentStat(tr_session* const session, std::span<tr_torrent_id_t const> const ids)
 {
-    tr_return_val_if_fail(tr_isTorrent(tor), false);
-    tr_return_val_if_fail(setme != nullptr, false);
+    tr_return_val_if_fail(session != nullptr, {});
 
-    auto stats = tor->try_stats();
-    if (!stats)
+    // Value-initialized entries are what callers see for ids that don't
+    // resolve; a live torrent never has id 0.
+    auto ret = std::vector<tr_stat>(std::size(ids));
+
+    if (std::empty(ids))
     {
-        return false;
+        return ret;
     }
 
-    *setme = *stats;
-    return true;
-}
-
-namespace
-{
-// The batch stat functions below take a single lock (from torrents[0]) and
-// use it to guard every torrent in the array, which is only safe if they
-// all belong to the same session -- otherwise it's a data race (reading a
-// torrent's state without holding its own session's lock) and, in the
-// locked/blocking overload, a lock-order hazard across two session mutexes.
-// This is expected to always be true in practice (a process has one
-// tr_session), but the public API doesn't require it, so check rather than
-// assume.
-[[nodiscard]] bool all_same_session(tr_torrent* const* torrents, size_t n_torrents)
-{
-    auto const* const session = torrents[0]->session;
-    return std::all_of(
-        torrents,
-        torrents + n_torrents,
-        [session](tr_torrent const* const tor) { return tor->session == session; });
-}
-} // namespace
-
-std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents)
-{
-    tr_return_val_if_fail(torrents != nullptr, {});
-    tr_return_val_if_fail(std::all_of(torrents, torrents + n_torrents, tr_isTorrent), {});
-
-    auto ret = std::vector<tr_stat>{};
-
-    if (n_torrents != 0U)
+    // Every id is looked up in `session`, so one lock covers the batch.
+    auto const lock = session->unique_lock();
+    for (size_t idx = 0U; idx != std::size(ids); ++idx)
     {
-        ret.reserve(n_torrents);
-
-        if (all_same_session(torrents, n_torrents))
+        if (auto const* const tor = session->torrents().get(ids[idx]); tor != nullptr)
         {
-            auto const lock = torrents[0]->unique_lock();
-            for (size_t idx = 0U; idx != n_torrents; ++idx)
-            {
-                ret.emplace_back(torrents[idx]->stats_locked());
-            }
-        }
-        else
-        {
-            // Mixed sessions: lock (and unlock) each torrent's own session
-            // in turn rather than holding one session's lock while touching
-            // another's torrents.
-            for (size_t idx = 0U; idx != n_torrents; ++idx)
-            {
-                ret.emplace_back(torrents[idx]->stats());
-            }
+            ret[idx] = tor->stats_locked();
         }
     }
 
     return ret;
+}
+
+bool tr_torrentTryStat(tr_session* const session, tr_torrent_id_t const id, tr_stat* const setme)
+{
+    return tr_torrentTryStat(session, std::span<tr_torrent_id_t const>{ &id, 1U }, setme);
 }
 
 bool tr_torrentTryStat(tr_session* const session, std::span<tr_torrent_id_t const> const ids, tr_stat* const setme)
@@ -1503,11 +1454,6 @@ bool tr_torrentTryStat(tr_session* const session, std::span<tr_torrent_id_t cons
         return false;
     }
 
-    // Addressing by id rather than by pointer means every lookup is
-    // implicitly scoped to `session` -- there's no "what if these torrents
-    // belong to different sessions" question to answer, since an id that
-    // isn't in `session` just fails the lookup like any other bad id.
-    //
     // Resolve every id before writing anything to setme: if one partway
     // through doesn't resolve, we still need to return false having left
     // setme completely untouched, per this function's documented contract.
@@ -1527,11 +1473,6 @@ bool tr_torrentTryStat(tr_session* const session, std::span<tr_torrent_id_t cons
     }
 
     return true;
-}
-
-tr_session* tr_torrentSession(tr_torrent* const torrent)
-{
-    return tr_isTorrent(torrent) ? torrent->session : nullptr;
 }
 
 // ---

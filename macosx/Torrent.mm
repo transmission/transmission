@@ -31,6 +31,9 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @interface Torrent ()
 
 @property(nonatomic, readonly) tr_torrent* fHandle;
+// The session this torrent belongs to. Needed because the id-based stat
+// calls are scoped to a session, and the session outlives every torrent.
+@property(nonatomic, readonly) tr_session* fLib;
 @property(nonatomic) tr_stat fStat;
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
@@ -287,7 +290,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
         if (session == nullptr)
         {
-            session = tr_torrentSession(torrent.fHandle);
+            session = torrent.fLib;
         }
 
         torrent_objects.emplace_back(torrent);
@@ -1878,6 +1881,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
     _fDefaults = NSUserDefaults.standardUserDefaults;
     _fStat = tr_stat{};
+    _fLib = lib;
 
     if (torrentStruct)
     {
@@ -2085,7 +2089,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 {
     //don't call update yet to avoid auto-stop; fall back to the existing fStat if the session lock isn't
     //immediately available rather than blocking the main thread -- update below will refresh it shortly after
-    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fHandle, &stat))
+    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fLib, self.id, &stat))
     {
         self.fStat = stat;
     }
@@ -2122,7 +2126,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (void)ratioLimitHit
 {
-    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fHandle, &stat))
+    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fLib, self.id, &stat))
     {
         self.fStat = stat;
     }
@@ -2132,7 +2136,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (void)idleLimitHit
 {
-    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fHandle, &stat))
+    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fLib, self.id, &stat))
     {
         self.fStat = stat;
     }
@@ -2142,7 +2146,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (void)metadataRetrieved
 {
-    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fHandle, &stat))
+    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fLib, self.id, &stat))
     {
         self.fStat = stat;
     }
