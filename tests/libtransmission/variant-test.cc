@@ -791,7 +791,7 @@ TEST_F(VariantTest, visitsNodesDepthFirst)
 
 TEST_F(VariantTest, variantFromBufFuzz)
 {
-    auto benc_serde = tr_variant_serde::json();
+    auto benc_serde = tr_variant_serde::benc();
     auto json_serde = tr_variant_serde::json();
     auto buf = std::vector<char>{};
 
