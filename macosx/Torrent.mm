@@ -593,14 +593,31 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         return;
     }
 
-    int volatile status;
-    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, &status);
+    // The move runs on the session thread; across volumes it is a full copy
+    // that can take minutes. The session thread reports progress through the
+    // int it is given, so poll that from a timer and let the main thread keep
+    // running events in the meantime. The int is heap-allocated because the
+    // session thread writes to it after this method has returned.
+    auto* const status = new int volatile { TR_LOC_MOVING };
+    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, status);
 
-    while (status == TR_LOC_MOVING) //block while moving (for now)
-    {
-        [NSThread sleepForTimeInterval:0.05];
-    }
+    __weak __auto_type weakSelf = self;
+    NSTimer* timer = [NSTimer timerWithTimeInterval:0.2 repeats:YES block:^(NSTimer* t) {
+        if (*status == TR_LOC_MOVING)
+        {
+            return;
+        }
 
+        [t invalidate];
+        int const result = *status;
+        delete status;
+        [weakSelf finishMoveWithStatus:result];
+    }];
+    [NSRunLoop.mainRunLoop addTimer:timer forMode:NSRunLoopCommonModes];
+}
+
+- (void)finishMoveWithStatus:(int)status
+{
     if (status == TR_LOC_DONE)
     {
         [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateStats" object:nil];
