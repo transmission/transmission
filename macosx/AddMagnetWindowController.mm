@@ -221,6 +221,11 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)confirmAdd
 {
+    if (self.fController.quitting)
+    {
+        return;
+    }
+
     [self.torrent setGroupValue:self.fGroupValue determinationType:self.fGroupDeterminationType];
 
     if (self.fStartCheck.state == NSControlStateValueOn)
@@ -234,6 +239,11 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)setDestinationPath:(NSString*)destination determinationType:(TorrentDeterminationType)determinationType
 {
+    if (self.fController.quitting)
+    {
+        return;
+    }
+
     destination = destination.stringByExpandingTildeInPath;
     if (!self.fDestination || ![self.fDestination isEqualToString:destination])
     {

@@ -254,13 +254,17 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
     [self.window performClose:sender];
 }
 
-//only called on cancel
-- (BOOL)windowShouldClose:(id)window
+- (void)stopUpdating
 {
     [self.fTimer invalidate];
     self.fTimer = nil;
+    self.fFileController.torrent = nil;
+}
 
-    self.fFileController.torrent = nil; //avoid a crash when window tries to update
+//only called on cancel
+- (BOOL)windowShouldClose:(id)window
+{
+    [self stopUpdating];
 
     [self.fController askOpenConfirmed:self add:NO];
     return YES;
@@ -356,6 +360,12 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)updateFiles
 {
+    if (self.fController.quitting)
+    {
+        [self stopUpdating];
+        return;
+    }
+
     [self.torrent update];
 
     [self.fFileController reloadVisibleRows];
@@ -384,6 +394,11 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)confirmAdd
 {
+    if (self.fController.quitting)
+    {
+        return;
+    }
+
     [self.fTimer invalidate];
     self.fTimer = nil;
     [self.torrent setGroupValue:self.fGroupValue determinationType:self.fGroupValueDetermination];
@@ -406,6 +421,11 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)setDestinationPath:(NSString*)destination determinationType:(TorrentDeterminationType)determinationType
 {
+    if (self.fController.quitting)
+    {
+        return;
+    }
+
     destination = destination.stringByExpandingTildeInPath;
     if (!self.fDestination || ![self.fDestination isEqualToString:destination])
     {
