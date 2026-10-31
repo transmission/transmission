@@ -4121,6 +4121,7 @@
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
 					"-DRAPIDJSON_HAS_STDSTRING=1",
 					"-DHAVE_FLOCK",
+					"-DHAVE_COPYFILE",
 					"-DWITH_CCRYPTO",
 				);
 				PRODUCT_NAME = transmission;
@@ -4373,6 +4374,7 @@
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
 					"-DRAPIDJSON_HAS_STDSTRING=1",
 					"-DHAVE_FLOCK",
+					"-DHAVE_COPYFILE",
 					"-DWITH_CCRYPTO",
 				);
 				PRODUCT_NAME = transmission;
@@ -4705,6 +4707,7 @@
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
 					"-DRAPIDJSON_HAS_STDSTRING=1",
 					"-DHAVE_FLOCK",
+					"-DHAVE_COPYFILE",
 					"-DWITH_CCRYPTO",
 				);
 				PRODUCT_NAME = transmission;
