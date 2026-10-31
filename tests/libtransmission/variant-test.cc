@@ -479,6 +479,19 @@ TEST_F(VariantTest, variantAssingmentOperator)
     EXPECT_EQ(var.index(), tr_variant::StringIndex);
 }
 
+TEST_F(VariantTest, assignmentFromOwnString)
+{
+    // too long for the small-string buffer, so the old string is on the heap
+    auto const expected = std::string(64, 'x');
+
+    auto var = tr_variant{ expected };
+    var = *var.value_if<std::string_view>();
+    EXPECT_EQ(expected, var.value_if<std::string_view>().value_or(""sv));
+
+    var = std::data(*var.value_if<std::string_view>());
+    EXPECT_EQ(expected, var.value_if<std::string_view>().value_or(""sv));
+}
+
 TEST_F(VariantTest, mergeOverwritesDifferingTypes)
 {
     auto const variants = std::array<std::pair<tr_variant, std::string_view>, 7U>{ {
