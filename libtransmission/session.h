@@ -457,6 +457,15 @@ public:
         return std::unique_lock(session_mutex_);
     }
 
+    // Like unique_lock(), but never blocks. The returned lock's owns_lock()
+    // is false if the session thread currently holds the lock (e.g. it is
+    // in the middle of a disk write); callers on that path should fall back
+    // to cached data instead of stalling the calling thread.
+    [[nodiscard]] auto try_unique_lock() const
+    {
+        return std::unique_lock(session_mutex_, std::try_to_lock);
+    }
+
     [[nodiscard]] constexpr auto const& settings() const noexcept
     {
         return settings_;

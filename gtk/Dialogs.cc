@@ -35,9 +35,7 @@ void gtr_confirm_remove(
 
     size_t connected = 0;
     size_t incomplete = 0;
-    // TODO(c++20) remove `torrents` local when tr_torrentStat() takes a span
-    auto const torrents = core->find_torrents(torrent_ids);
-    for (auto const& stat : tr_torrentStat(std::data(torrents), std::size(torrents)))
+    for (auto const& stat : tr_torrentStat(core->get_session(), torrent_ids))
     {
         if (stat.left_until_done != 0)
         {

@@ -12,6 +12,7 @@
 #include <map>
 #include <sstream>
 #include <ranges>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -765,11 +766,23 @@ void tr_torrentStop(tr_torrent* tor)
         return;
     }
 
-    auto const lock = tor->unique_lock();
+    // Deferred by id so that a client thread neither waits for the session
+    // lock (the session thread holds it across disk I/O) nor uses a torrent
+    // that was removed before this work item ran.
+    tor->session->run_in_session_thread(
+        [session = tor->session, tor_id = tor->id()]()
+        {
+            auto const lock = session->unique_lock();
+            auto* const tor = session->torrents().get(tor_id);
+            if (tor == nullptr || tor->is_deleting_)
+            {
+                return;
+            }
 
-    tor->start_when_stable_ = false;
-    tor->set_dirty();
-    tor->session->run_in_session_thread([tor]() { tor->stop_now(); });
+            tor->start_when_stable_ = false;
+            tor->set_dirty();
+            tor->stop_now();
+        });
 }
 
 void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_torrent_remove_func remove_func)
@@ -1264,15 +1277,13 @@ bool tr_torrentCanManualUpdate(tr_torrent const* tor)
 
 // ---
 
-tr_stat tr_torrent::stats() const
+tr_stat tr_torrent::stats_locked() const
 {
     static auto constexpr IsStalled = [](tr_torrent const* const tor, std::optional<time_t> idle_secs)
     {
         return tor->session->queueStalledEnabled() &&
             idle_secs > static_cast<time_t>(tor->session->queueStalledMinutes() * 60U);
     };
-
-    auto const lock = unique_lock();
 
     auto const now_msec = tr_time_msec();
     auto const now_sec = tr_time();
@@ -1395,6 +1406,12 @@ tr_stat tr_torrent::stats() const
     return stats;
 }
 
+tr_stat tr_torrent::stats() const
+{
+    auto const lock = unique_lock();
+    return stats_locked();
+}
+
 tr_stat tr_torrentStat(tr_torrent* const tor)
 {
     tr_return_val_if_fail(tr_isTorrent(tor), {});
@@ -1402,26 +1419,72 @@ tr_stat tr_torrentStat(tr_torrent* const tor)
     return tor->stats();
 }
 
-std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents)
+std::vector<tr_stat> tr_torrentStat(tr_session* const session, std::span<tr_torrent_id_t const> const ids)
 {
-    tr_return_val_if_fail(torrents != nullptr, {});
-    tr_return_val_if_fail(std::all_of(torrents, torrents + n_torrents, tr_isTorrent), {});
+    tr_return_val_if_fail(session != nullptr, {});
 
-    auto ret = std::vector<tr_stat>{};
+    // Value-initialized entries are what callers see for ids that don't
+    // resolve; a live torrent never has id 0.
+    auto ret = std::vector<tr_stat>(std::size(ids));
 
-    if (n_torrents != 0U)
+    if (std::empty(ids))
     {
-        ret.reserve(n_torrents);
+        return ret;
+    }
 
-        auto const lock = torrents[0]->unique_lock();
-
-        for (size_t idx = 0U; idx != n_torrents; ++idx)
+    // Every id is looked up in `session`, so one lock covers the batch.
+    auto const lock = session->unique_lock();
+    for (size_t idx = 0U; idx != std::size(ids); ++idx)
+    {
+        if (auto const* const tor = session->torrents().get(ids[idx]); tor != nullptr)
         {
-            ret.emplace_back(torrents[idx]->stats());
+            ret[idx] = tor->stats_locked();
         }
     }
 
     return ret;
+}
+
+bool tr_torrentTryStat(tr_session* const session, tr_torrent_id_t const id, tr_stat* const setme)
+{
+    return tr_torrentTryStat(session, std::span<tr_torrent_id_t const>{ &id, 1U }, setme);
+}
+
+bool tr_torrentTryStat(tr_session* const session, std::span<tr_torrent_id_t const> const ids, tr_stat* const setme)
+{
+    tr_return_val_if_fail(session != nullptr, false);
+    tr_return_val_if_fail(setme != nullptr, false);
+
+    if (std::empty(ids))
+    {
+        return true;
+    }
+
+    auto lock = session->try_unique_lock();
+    if (!lock.owns_lock())
+    {
+        return false;
+    }
+
+    // Resolve every id before writing anything to setme: if one partway
+    // through doesn't resolve, we still need to return false having left
+    // setme completely untouched, per this function's documented contract.
+    auto torrents = std::vector<tr_torrent*>(std::size(ids));
+    for (size_t idx = 0U; idx != std::size(ids); ++idx)
+    {
+        torrents[idx] = session->torrents().get(ids[idx]);
+        if (torrents[idx] == nullptr)
+        {
+            return false;
+        }
+    }
+
+    for (size_t idx = 0U; idx != std::size(ids); ++idx)
+    {
+        setme[idx] = torrents[idx]->stats_locked();
+    }
+
+    return true;
 }
 
 // ---
@@ -1533,6 +1596,27 @@ std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* tor)
     return tr_peerMgrPeerStats(tor);
 }
 
+bool tr_torrentTryPeers(tr_session* const session, tr_torrent_id_t const id, std::vector<tr_peer_stat>* const setme)
+{
+    tr_return_val_if_fail(session != nullptr, false);
+    tr_return_val_if_fail(setme != nullptr, false);
+
+    auto const lock = session->try_unique_lock();
+    if (!lock.owns_lock())
+    {
+        return false;
+    }
+
+    auto const* const tor = session->torrents().get(id);
+    if (tor == nullptr)
+    {
+        return false;
+    }
+
+    *setme = tr_peerMgrPeerStats(tor);
+    return true;
+}
+
 void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
 {
     tr_return_if_fail(tr_isTorrent(tor));
@@ -1552,20 +1636,38 @@ void tr_torrentAmountFinished(tr_torrent const* tor, float* tabs, int n_tabs)
 
 // --- Start/Stop Callback
 
+// Deferred by id so that a client thread neither waits for the session lock
+// (the session thread holds it across disk I/O) nor uses a torrent that was
+// removed before this work item ran. On the session thread it runs at once.
+void tr_torrent::start_by_id(tr_session* const session, tr_torrent_id_t const tor_id, bool const bypass_queue)
+{
+    session->run_in_session_thread(
+        [session, tor_id, bypass_queue]()
+        {
+            auto const lock = session->unique_lock();
+            auto* const tor = session->torrents().get(tor_id);
+            if (tor == nullptr || tor->is_deleting_)
+            {
+                return;
+            }
+
+            tor->start_when_stable_ = true;
+            tor->start(bypass_queue, {});
+        });
+}
+
 void tr_torrentStart(tr_torrent* tor)
 {
     tr_return_if_fail(tr_isTorrent(tor));
 
-    tor->start_when_stable_ = true;
-    tor->start(false /*bypass_queue*/, {});
+    tr_torrent::start_by_id(tor->session, tor->id(), false /*bypass_queue*/);
 }
 
 void tr_torrentStartNow(tr_torrent* tor)
 {
     tr_return_if_fail(tr_isTorrent(tor));
 
-    tor->start_when_stable_ = true;
-    tor->start(true /*bypass_queue*/, {});
+    tr_torrent::start_by_id(tor->session, tor->id(), true /*bypass_queue*/);
 }
 
 // ---
@@ -2586,8 +2688,24 @@ void tr_torrent::ResumeHelper::load_checked_pieces(tr_bitfield const& checked, t
     auto const n_files = tor_.file_count();
     tor_.file_mtimes_.resize(n_files);
 
+    // If none of a file's pieces are checked then clearing them below is a
+    // no-op, so we can skip looking the file up on disk. That avoids a stat()
+    // for every file the torrent has no data for. When nothing at all is
+    // checked we still walk every file, since the resulting file_mtimes_
+    // is used to tell whether the torrent has any local data on disk.
+    bool const check_all_files = tor_.checked_pieces_.has_none();
+
     for (size_t file = 0; file < n_files; ++file)
     {
+        if (!check_all_files)
+        {
+            auto const [piece_begin, piece_end] = tor_.piece_span_for_file(file);
+            if (tor_.checked_pieces_.count(piece_begin, piece_end) == 0)
+            {
+                continue;
+            }
+        }
+
         auto const found = tor_.find_file(file);
         auto const mtime = found ? found->last_modified_at : 0;
 
