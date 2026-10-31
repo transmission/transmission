@@ -1353,6 +1353,11 @@ private:
 
     void start_in_session_thread();
 
+    // Runs `start()` on the session thread for the torrent with this id,
+    // if it still exists there. Client threads start torrents through this
+    // so that they never wait for the session lock.
+    static void start_by_id(tr_session* session, tr_torrent_id_t tor_id, bool bypass_queue);
+
     void stop_now();
 
     [[nodiscard]] bool is_new_torrent_a_seed();

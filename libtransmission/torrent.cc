@@ -766,11 +766,23 @@ void tr_torrentStop(tr_torrent* tor)
         return;
     }
 
-    auto const lock = tor->unique_lock();
+    // Deferred by id so that a client thread neither waits for the session
+    // lock (the session thread holds it across disk I/O) nor uses a torrent
+    // that was removed before this work item ran.
+    tor->session->run_in_session_thread(
+        [session = tor->session, tor_id = tor->id()]()
+        {
+            auto const lock = session->unique_lock();
+            auto* const tor = session->torrents().get(tor_id);
+            if (tor == nullptr || tor->is_deleting_)
+            {
+                return;
+            }
 
-    tor->start_when_stable_ = false;
-    tor->set_dirty();
-    tor->session->run_in_session_thread([tor]() { tor->stop_now(); });
+            tor->start_when_stable_ = false;
+            tor->set_dirty();
+            tor->stop_now();
+        });
 }
 
 void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_torrent_remove_func remove_func)
@@ -1603,20 +1615,38 @@ void tr_torrentAmountFinished(tr_torrent const* tor, float* tabs, int n_tabs)
 
 // --- Start/Stop Callback
 
+// Deferred by id so that a client thread neither waits for the session lock
+// (the session thread holds it across disk I/O) nor uses a torrent that was
+// removed before this work item ran. On the session thread it runs at once.
+void tr_torrent::start_by_id(tr_session* const session, tr_torrent_id_t const tor_id, bool const bypass_queue)
+{
+    session->run_in_session_thread(
+        [session, tor_id, bypass_queue]()
+        {
+            auto const lock = session->unique_lock();
+            auto* const tor = session->torrents().get(tor_id);
+            if (tor == nullptr || tor->is_deleting_)
+            {
+                return;
+            }
+
+            tor->start_when_stable_ = true;
+            tor->start(bypass_queue, {});
+        });
+}
+
 void tr_torrentStart(tr_torrent* tor)
 {
     tr_return_if_fail(tr_isTorrent(tor));
 
-    tor->start_when_stable_ = true;
-    tor->start(false /*bypass_queue*/, {});
+    tr_torrent::start_by_id(tor->session, tor->id(), false /*bypass_queue*/);
 }
 
 void tr_torrentStartNow(tr_torrent* tor)
 {
     tr_return_if_fail(tr_isTorrent(tor));
 
-    tor->start_when_stable_ = true;
-    tor->start(true /*bypass_queue*/, {});
+    tr_torrent::start_by_id(tor->session, tor->id(), true /*bypass_queue*/);
 }
 
 // ---
