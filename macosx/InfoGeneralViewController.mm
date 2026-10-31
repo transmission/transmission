@@ -61,7 +61,12 @@
 
     Torrent* torrent = self.fTorrents[0];
 
-    NSString* location = torrent.dataLocation;
+    // This runs on every selection change and once a second while the
+    // inspector is visible, so it must not stat the data path here: on a
+    // network volume that stat blocks the main thread for as long as the
+    // server takes to answer. knownDataLocation answers from its last probe
+    // and re-posts "ResetInspector" when a background probe changes it.
+    NSString* location = torrent.knownDataLocation;
     NSString* lastKnownDataLocation = torrent.lastKnownDataLocation;
 
     self.fDataLocationField.stringValue = location ? location.stringByAbbreviatingWithTildeInPath : @"";

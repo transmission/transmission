@@ -16,6 +16,7 @@
 #include <ctime>
 #include <functional>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -480,13 +481,24 @@ void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
 
 // ---
 
+using tr_torrent_loaded_func = void (*)(tr_torrent* tor, void* user_data);
+
 /**
  * Load all the torrents in the session's torrent folder.
  * This can be used at startup to kickstart all the torrents from the previous session.
  *
+ * `loaded`, when given, is called from the session thread for each torrent
+ * as soon as it has been added, so a client can show torrents while the rest
+ * are still being read from disk. It must return quickly and must not call
+ * back into the session; post the torrent to another thread instead.
+ *
  * @return the number of torrents in the session
  */
-size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor);
+size_t tr_sessionLoadTorrents(
+    tr_session* session,
+    tr_ctor* ctor,
+    tr_torrent_loaded_func loaded = nullptr,
+    void* user_data = nullptr);
 
 /**
  * Get pointers to all the torrents in a session.
@@ -904,6 +916,14 @@ bool tr_torrentCanManualUpdate(tr_torrent const* torrent);
 
 std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* torrent);
 
+/**
+ * Like `tr_torrentPeers()`, but never waits for the session lock.
+ * Returns false, leaving `*setme` untouched, if the lock is held by another
+ * thread or `id` names no torrent in `session`. A UI thread can call it on a
+ * timer and keep its previous list on false.
+ */
+bool tr_torrentTryPeers(tr_session* session, tr_torrent_id_t id, std::vector<tr_peer_stat>* setme);
+
 // --- tr_tracker_stat
 
 struct tr_tracker_view tr_torrentTracker(tr_torrent const* torrent, size_t i);
@@ -954,7 +974,26 @@ bool tr_torrentHasMetadata(tr_torrent const* tor);
 // second or so to get a new snapshot of the torrent's status.
 tr_stat tr_torrentStat(tr_torrent* torrent);
 
-// Batch version of tr_torrentStat().
-// Prefer calling this over calling the single-torrent version in a loop.
-// TODO(c++20) take a std::span argument
-std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+// Batch version of tr_torrentStat(), addressed by torrent id. Takes the
+// session lock once for the whole batch, so prefer it over calling the
+// single-torrent version in a loop. The result has one entry per id, in
+// order. An id with no torrent in `session` leaves its entry
+// value-initialized; its `id` field is then 0, which no live torrent has.
+std::vector<tr_stat> tr_torrentStat(tr_session* session, std::span<tr_torrent_id_t const> ids);
+
+// Non-blocking counterpart of tr_torrentStat(). If the session thread
+// currently holds the session lock (e.g. it is in the middle of a disk
+// write), this returns false immediately and leaves *setme untouched,
+// instead of blocking the caller for the duration of that write. UI
+// refresh loops should fall back to their last cached tr_stat when this
+// returns false, rather than stalling. An id with no torrent in `session`
+// also returns false.
+bool tr_torrentTryStat(tr_session* session, tr_torrent_id_t id, tr_stat* setme);
+
+// Batch version of tr_torrentTryStat(). setme must point to an array of at
+// least ids.size() tr_stat entries. On success (true), every entry is
+// filled in, in order. On failure (false), whether from lock contention or
+// from an id with no torrent in `session`, no entries are touched at all,
+// so the caller can keep showing its previous cached stats for this
+// refresh cycle.
+bool tr_torrentTryStat(tr_session* session, std::span<tr_torrent_id_t const> ids, tr_stat* setme);

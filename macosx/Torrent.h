@@ -115,6 +115,14 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 @property(nonatomic, readonly) NSString* torrentLocation;
 @property(nonatomic, readonly) NSString* dataLocation;
+
+// The data location as last observed, without touching the filesystem on the
+// calling thread. Returns nil until the first probe completes. Each call
+// schedules a background probe when none is running, and a changed result is
+// announced with the "ResetInspector" notification. Refresh paths that run on
+// every selection or every second use this; actions that need the answer now
+// (reveal, trash, move, Quick Look) use dataLocation, which stats synchronously.
+@property(nonatomic, readonly) NSString* knownDataLocation;
 @property(nonatomic, readonly) NSString* lastKnownDataLocation;
 - (NSString*)fileLocation:(FileListNode*)node;
 

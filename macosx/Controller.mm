@@ -15,6 +15,8 @@
 #endif
 
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
+#include <unordered_set>
+#include <vector>
 
 #include <libtransmission/transmission.h>
 
@@ -48,6 +50,7 @@
 #import "ShareTorrentFileHelper.h"
 #import "Toolbar.h"
 #import "BlocklistDownloader.h"
+#import "BlocklistScheduler.h"
 #import "StatusBarController.h"
 #import "FilterBarController.h"
 #import "FileRenameSheetController.h"
@@ -418,8 +421,26 @@ static void removeKeRangerRansomware()
 @property(nonatomic) FilterBarController* fFilterBar;
 
 @property(nonatomic) QLPreviewPanel* fPreviewPanel;
-@property(nonatomic) BOOL fQuitting;
+@property(nonatomic, readwrite, getter=isQuitting) BOOL quitting;
 @property(nonatomic) BOOL fQuitRequested;
+@property(nonatomic) BOOL fQuitPromptActive;
+// Set once processLoadedTorrents has wrapped every torrent the session loaded
+// at launch. Until then self.fTorrents is incomplete and must not be written
+// back as the transfer history.
+@property(nonatomic) BOOL fFinishedInitialLoad;
+// Saved transfer history (Transfers.plist) keyed by hash, consumed as each
+// torrent arrives from the background load; whatever is left when the load
+// completes belongs to torrents that no longer exist.
+@property(nonatomic) NSMutableDictionary<NSString*, NSDictionary*>* fPendingHistory;
+// Torrents whose history says they were waiting in the queue. They are
+// started only after every torrent has loaded, so the ones that were
+// running take the queue's slots first, as they did before quitting.
+@property(nonatomic) NSMutableArray<Torrent*>* fWaitToStartTorrents;
+@property(nonatomic) Torrent* fHistoryHelper;
+@property(nonatomic) NSTimer* fLoadRefreshTimer;
+@property(nonatomic) NSWindow* fQuitWindow;
+
+- (void)addLoadedTorrent:(tr_torrent*)tor;
 @property(nonatomic, readonly) BOOL fPauseOnLaunch;
 
 @property(nonatomic) Badger* fBadger;
@@ -439,8 +460,19 @@ static void removeKeRangerRansomware()
 @property(nonatomic) BOOL fSoundPlaying;
 
 - (void)removeTorrentsImpl:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
+- (void)beginShutdown;
 
 @end
+
+// tr_sessionLoadTorrents() calls this on the session thread for every torrent
+// it adds; the controller does the rest on the main thread.
+static void torrentLoadedCallback(tr_torrent* tor, void* user_data)
+{
+    Controller* const controller = (__bridge Controller*)user_data;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [controller addLoadedTorrent:tor];
+    });
+}
 
 @implementation Controller
 
@@ -585,7 +617,7 @@ static void removeKeRangerRansomware()
 
         _prefsController = [[PrefsController alloc] initWithHandle:_fLib];
 
-        _fQuitting = NO;
+        _quitting = NO;
         _fGlobalPopoverShown = NO;
         _fSoundPlaying = NO;
 
@@ -709,66 +741,29 @@ static void removeKeRangerRansomware()
 
     auto* const session = self.fLib;
 
-    //load previous transfers
-    tr_ctor* ctor = tr_ctorNew(session);
-    tr_ctorSetPaused(ctor, TR_FORCE, true); // paused by default; unpause below after checking state history
-    auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
-    tr_ctorFree(ctor);
+    //load previous transfers in the background so that the window is usable
+    //immediately, even when there are many torrents to load. (#8401)
+    //tr_sessionLoadTorrents() blocks until the session thread has read every
+    //.torrent and .resume file and stat'ed every data file; with thousands of
+    //files on a network volume that is minutes. Each torrent is handed to
+    //addLoadedTorrent: as soon as the session has it, so the table fills in
+    //while the rest are still loading.
+    self.fPendingHistory = [self readTransferHistory];
+    self.fWaitToStartTorrents = [NSMutableArray array];
+    self.fHistoryHelper = [[Torrent alloc] init];
+    [self updateMainWindow];
 
-    // process the loaded torrents
-    auto torrents = std::vector<tr_torrent*>{};
-    torrents.resize(n_torrents);
-    tr_sessionGetAllTorrents(session, std::data(torrents), std::size(torrents));
-    for (auto* tor : torrents)
-    {
-        NSString* location = tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(tor));
-        Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:tor location:location lib:self.fLib];
-        [self.fTorrents addObject:torrent];
-        self.fTorrentHashes[torrent.hashString] = torrent;
-    }
+    void* const controller = (__bridge void*)self;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        tr_ctor* ctor = tr_ctorNew(session);
+        tr_ctorSetPaused(ctor, TR_FORCE, true); // paused by default; unpaused from the saved history as each torrent arrives
+        tr_sessionLoadTorrents(session, ctor, torrentLoadedCallback, controller);
+        tr_ctorFree(ctor);
 
-    //update previous transfers state by recreating a torrent from history
-    //and comparing to torrents already loaded via tr_sessionLoadTorrents
-    NSString* historyFile = [self.fConfigDirectory stringByAppendingPathComponent:kTransferPlist];
-    NSArray* history = [NSArray arrayWithContentsOfFile:historyFile];
-    if (!history)
-    {
-        //old version saved transfer info in prefs file
-        if ((history = [self.fDefaults arrayForKey:@"History"]))
-        {
-            [self.fDefaults removeObjectForKey:@"History"];
-        }
-    }
-
-    if (history)
-    {
-        // theoretical max without doing a lot of work
-        NSMutableArray* waitToStartTorrents = [NSMutableArray
-            arrayWithCapacity:((history.count > 0 && !self.fPauseOnLaunch) ? history.count - 1 : 0)];
-
-        Torrent* t = [[Torrent alloc] init];
-        for (NSDictionary* historyItem in history)
-        {
-            NSString* hash = historyItem[@"TorrentHash"];
-            if ([self.fTorrentHashes.allKeys containsObject:hash])
-            {
-                Torrent* torrent = self.fTorrentHashes[hash];
-                [t setResumeStatusForTorrent:torrent withHistory:historyItem forcePause:self.fPauseOnLaunch];
-
-                NSNumber* waitToStart;
-                if (!self.fPauseOnLaunch && (waitToStart = historyItem[@"WaitToStart"]) && waitToStart.boolValue)
-                {
-                    [waitToStartTorrents addObject:torrent];
-                }
-            }
-        }
-
-        //now that all are loaded, let's set those in the queue to waiting
-        for (Torrent* torrent in waitToStartTorrents)
-        {
-            [torrent startTransfer];
-        }
-    }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self processLoadedTorrents];
+        });
+    });
 
     self.fBadger = [[Badger alloc] init];
 
@@ -829,6 +824,138 @@ static void removeKeRangerRansomware()
     {
         [self showInfo:nil];
     }
+}
+
+- (NSMutableDictionary<NSString*, NSDictionary*>*)readTransferHistory
+{
+    NSString* historyFile = [self.fConfigDirectory stringByAppendingPathComponent:kTransferPlist];
+    NSArray* history = [NSArray arrayWithContentsOfFile:historyFile];
+    if (!history)
+    {
+        //old version saved transfer info in prefs file
+        if ((history = [self.fDefaults arrayForKey:@"History"]))
+        {
+            [self.fDefaults removeObjectForKey:@"History"];
+        }
+    }
+
+    NSMutableDictionary<NSString*, NSDictionary*>* byHash = [NSMutableDictionary dictionaryWithCapacity:history.count];
+    for (NSDictionary* historyItem in history)
+    {
+        NSString* hash = historyItem[@"TorrentHash"];
+        if (hash != nil)
+        {
+            byHash[hash] = historyItem;
+        }
+    }
+    return byHash;
+}
+
+// Called on the main thread for each torrent the background load adds.
+- (void)addLoadedTorrent:(tr_torrent*)tor
+{
+    // processLoadedTorrents has already wrapped everything, or a quit that
+    // began during the load has closed the session and freed `tor`.
+    if (self.isQuitting || self.fFinishedInitialLoad)
+    {
+        return;
+    }
+
+    for (Torrent* const known in self.fTorrents)
+    {
+        if (known.torrentStruct == tor)
+        {
+            return;
+        }
+    }
+
+    [self wrapLoadedTorrent:tor];
+
+    // one table refresh per batch of arrivals rather than one per torrent
+    if (self.fLoadRefreshTimer == nil)
+    {
+        __weak __auto_type weakSelf = self;
+        self.fLoadRefreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 repeats:NO block:^(NSTimer* _Nonnull timer) {
+            weakSelf.fLoadRefreshTimer = nil;
+            [weakSelf fullUpdateUI];
+        }];
+    }
+}
+
+- (void)wrapLoadedTorrent:(tr_torrent*)tor
+{
+    NSString* location = tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(tor));
+    Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:tor location:location lib:self.fLib];
+    [self.fTorrents addObject:torrent];
+    self.fTorrentHashes[torrent.hashString] = torrent;
+
+    //update previous transfer state from the history saved at the last quit
+    NSDictionary* historyItem = self.fPendingHistory[torrent.hashString];
+    if (historyItem == nil)
+    {
+        return;
+    }
+    [self.fPendingHistory removeObjectForKey:torrent.hashString];
+
+    [self.fHistoryHelper setResumeStatusForTorrent:torrent withHistory:historyItem forcePause:self.fPauseOnLaunch];
+
+    NSNumber* waitToStart;
+    if (!self.fPauseOnLaunch && (waitToStart = historyItem[@"WaitToStart"]) && waitToStart.boolValue)
+    {
+        [self.fWaitToStartTorrents addObject:torrent];
+    }
+}
+
+- (void)processLoadedTorrents
+{
+    // A quit that began while the load was still running has closed the
+    // session by now (applicationShouldTerminate: closes it on a background
+    // queue), so there is nothing left to wrap.
+    if (self.isQuitting)
+    {
+        return;
+    }
+
+    auto* const session = self.fLib;
+
+    // wrap whatever addLoadedTorrent: has not seen yet
+    auto const n_torrents = tr_sessionGetAllTorrents(session, nullptr, 0);
+    auto torrents = std::vector<tr_torrent*>{};
+    torrents.resize(n_torrents);
+    tr_sessionGetAllTorrents(session, std::data(torrents), std::size(torrents));
+
+    // don't create a second wrapper for a torrent that was already added while
+    // the session was loading in the background, e.g. by auto-import or by
+    // opening a torrent file
+    auto known = std::unordered_set<tr_torrent*>{};
+    for (Torrent* const torrent in self.fTorrents)
+    {
+        known.insert(torrent.torrentStruct);
+    }
+
+    for (auto* tor : torrents)
+    {
+        if (known.count(tor) == 0U)
+        {
+            [self wrapLoadedTorrent:tor];
+        }
+    }
+
+    //now that all are loaded, let's set those in the queue to waiting
+    for (Torrent* torrent in self.fWaitToStartTorrents)
+    {
+        [torrent startTransfer];
+    }
+
+    [self.fLoadRefreshTimer invalidate];
+    self.fLoadRefreshTimer = nil;
+    self.fPendingHistory = nil;
+    self.fWaitToStartTorrents = nil;
+    self.fHistoryHelper = nil;
+    self.fFinishedInitialLoad = YES;
+
+    [self updateMainWindow];
+    [self fullUpdateUI];
 }
 
 #pragma mark - NSApplicationDelegate
@@ -961,6 +1088,11 @@ static void removeKeRangerRansomware()
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication*)app hasVisibleWindows:(BOOL)visibleWindows
 {
+    if (self.quitting)
+    {
+        return NO;
+    }
+
     NSWindow* mainWindow = NSApp.mainWindow;
     if (!mainWindow || !mainWindow.visible)
     {
@@ -972,9 +1104,15 @@ static void removeKeRangerRansomware()
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
+    if (self.quitting || self.fQuitPromptActive)
+    {
+        return NSTerminateLater;
+    }
+
     if (self.fQuitRequested || ![self.fDefaults boolForKey:@"CheckQuit"])
     {
-        return NSTerminateNow;
+        [self beginShutdown];
+        return NSTerminateLater;
     }
 
     NSUInteger active = 0, downloading = 0;
@@ -994,7 +1132,8 @@ static void removeKeRangerRansomware()
 
     if (!preventedByTransfer)
     {
-        return NSTerminateNow;
+        [self beginShutdown];
+        return NSTerminateLater;
     }
 
     NSAlert* alert = [[NSAlert alloc] init];
@@ -1014,20 +1153,33 @@ static void removeKeRangerRansomware()
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Confirm Quit panel -> button")];
     alert.showsSuppressionButton = YES;
 
+    self.fQuitPromptActive = YES;
     [alert beginSheetModalForWindow:self.fWindow completionHandler:^(NSModalResponse returnCode) {
+        self.fQuitPromptActive = NO;
         if (alert.suppressionButton.state == NSControlStateValueOn)
         {
             [self.fDefaults setBool:NO forKey:@"CheckQuit"];
         }
-        [NSApp replyToApplicationShouldTerminate:returnCode == NSAlertFirstButtonReturn];
+        if (returnCode == NSAlertFirstButtonReturn)
+        {
+            [self beginShutdown];
+        }
+        else
+        {
+            [NSApp replyToApplicationShouldTerminate:NO];
+        }
     }];
 
     return NSTerminateLater;
 }
 
-- (void)applicationWillTerminate:(NSNotification*)notification
+- (void)beginShutdown
 {
-    self.fQuitting = YES;
+    if (self.quitting)
+    {
+        return;
+    }
+    self.quitting = YES;
 
     [PowerManager.shared stop];
 
@@ -1042,6 +1194,7 @@ static void removeKeRangerRansomware()
     {
         [[BlocklistDownloader downloader] cancelDownload];
     }
+    [BlocklistScheduler.scheduler cancelSchedule];
 
     //stop timers and notification checking
     [NSNotificationCenter.defaultCenter removeObserver:self];
@@ -1053,6 +1206,15 @@ static void removeKeRangerRansomware()
         if (self.fAutoImportTimer.valid)
         {
             [self.fAutoImportTimer invalidate];
+        }
+    }
+
+    [self.prefsController stopUpdating];
+    for (NSWindowController* addController in self.fAddWindows)
+    {
+        if ([addController isKindOfClass:AddWindowController.class])
+        {
+            [(AddWindowController*)addController stopUpdating];
         }
     }
 
@@ -1081,9 +1243,46 @@ static void removeKeRangerRansomware()
     [self.fTableView saveCollapsedGroups];
 
     _fileWatcherQueue = nil;
+    UNUserNotificationCenter.currentNotificationCenter.delegate = nil;
 
-    //complete cleanup: this can take many seconds
-    tr_sessionClose(self.fLib);
+    // Views and queued callbacks must not use torrent handles during session teardown.
+    self.fTableView.dataSource = nil;
+    self.fTableView.delegate = nil;
+    [self.fInfoController setInfoForTorrents:@[]];
+    [self.fTorrents removeAllObjects];
+    [self.fDisplayedTorrents removeAllObjects];
+    [self.fTorrentHashes removeAllObjects];
+    self.fAddingTransfers = nil;
+    self.fAddWindows = nil;
+
+    self.fQuitWindow = [[NSPanel alloc] initWithContentRect:NSMakeRect(0, 0, 360, 100) styleMask:NSWindowStyleMaskTitled
+                                                    backing:NSBackingStoreBuffered
+                                                      defer:NO];
+    self.fQuitWindow.title = NSLocalizedString(@"Quitting Transmission", "Quit progress window -> title");
+    NSTextField* label = [NSTextField
+        wrappingLabelWithString:[NSLocalizedString(@"Closing connections", "Quit progress window -> message") stringByAppendingEllipsis]];
+    label.frame = NSMakeRect(60, 32, 276, 36);
+    [self.fQuitWindow.contentView addSubview:label];
+    NSProgressIndicator* progress = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(24, 40, 20, 20)];
+    progress.style = NSProgressIndicatorStyleSpinning;
+    progress.indeterminate = YES;
+    [self.fQuitWindow.contentView addSubview:progress];
+    [progress startAnimation:nil];
+    [self.fQuitWindow center];
+    [self.fQuitWindow makeKeyAndOrderFront:nil];
+
+    // Keep AppKit responsive while trackers receive their stopped announces.
+    auto* const session = self.fLib;
+    _fLib = nullptr;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        tr_sessionClose(session);
+        // RPC termination can run a nested event loop inside a main-queue callback.
+        CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopCommonModes, ^{
+            [self.fQuitWindow close];
+            [NSApp replyToApplicationShouldTerminate:YES];
+        });
+        CFRunLoopWakeUp(CFRunLoopGetMain());
+    });
 }
 
 - (BOOL)applicationSupportsSecureRestorableState:(NSApplication*)app
@@ -1144,6 +1343,10 @@ static void removeKeRangerRansomware()
                          suggestedName,
                          dataTask.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding];
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.quitting)
+        {
+            return;
+        }
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Download not a torrent -> button")];
         alert.messageText = NSLocalizedString(@"Torrent download failed", "Download not a torrent -> title");
@@ -1206,6 +1409,10 @@ static void removeKeRangerRansomware()
                          task.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding,
                          error.localizedDescription];
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.quitting)
+        {
+            return;
+        }
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Torrent download failed -> button")];
         alert.messageText = NSLocalizedString(@"Torrent download failed", "Torrent download error -> title");
@@ -1223,6 +1430,11 @@ static void removeKeRangerRansomware()
 
 - (void)openFiles:(NSArray<NSString*>*)filenames addType:(AddType)type forcePath:(NSString*)path
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     BOOL deleteTorrentFile, canToggleDelete = NO;
     switch (type)
     {
@@ -1351,6 +1563,11 @@ static void removeKeRangerRansomware()
 
 - (void)askOpenConfirmed:(AddWindowController*)addController add:(BOOL)add
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     Torrent* torrent = addController.torrent;
 
     if (add)
@@ -1381,6 +1598,11 @@ static void removeKeRangerRansomware()
 
 - (void)openMagnet:(NSString*)address
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     tr_torrent* duplicateTorrent;
     if ((duplicateTorrent = tr_torrentFindFromMagnetLink(self.fLib, address.UTF8String)))
     {
@@ -1443,6 +1665,11 @@ static void removeKeRangerRansomware()
 
 - (void)askOpenMagnetConfirmed:(AddMagnetWindowController*)addController add:(BOOL)add
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     Torrent* torrent = addController.torrent;
 
     if (add)
@@ -1627,6 +1854,11 @@ static void removeKeRangerRansomware()
 
 - (void)openURL:(NSString*)urlString
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     if ([urlString rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
     {
         [self openMagnet:urlString];
@@ -2388,6 +2620,11 @@ static void removeKeRangerRansomware()
 
 - (void)updateUI
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     CGFloat dlRate = 0.0, ulRate = 0.0;
     BOOL anyCompleted = NO;
     BOOL anyActive = NO;
@@ -2433,6 +2670,11 @@ static void removeKeRangerRansomware()
 #warning can this be removed or refined?
 - (void)fullUpdateUI
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     [self updateUI];
     [self applyFilter];
     [self.fWindow.toolbar validateVisibleItems];
@@ -2719,6 +2961,13 @@ static void removeKeRangerRansomware()
 
 - (void)updateTorrentHistory
 {
+    // The transfer history is rewritten from self.fTorrents, so don't clobber
+    // the saved history before the torrents have finished loading from disk.
+    if (!self.fFinishedInitialLoad)
+    {
+        return;
+    }
+
     NSMutableArray* history = [NSMutableArray arrayWithCapacity:self.fTorrents.count];
 
     for (Torrent* torrent in self.fTorrents)
@@ -3536,6 +3785,11 @@ static void removeKeRangerRansomware()
 
 - (void)altSpeedToggledCallbackIsLimited:(NSDictionary*)dict
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     BOOL const isLimited = [dict[@"Active"] boolValue];
 
     [self.fDefaults setBool:isLimited forKey:@"SpeedLimit"];
@@ -3564,6 +3818,11 @@ static void removeKeRangerRansomware()
 
 - (void)VDKQueue:(VDKQueue*)queue receivedNotification:(NSString*)notification forPath:(NSString*)fpath
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     //don't assume that just because we're watching for write notification, we'll only receive write notifications
 
     if (![self.fDefaults boolForKey:@"AutoImport"] || ![self.fDefaults stringForKey:@"AutoImportDirectory"])
@@ -3600,6 +3859,11 @@ static void removeKeRangerRansomware()
 
 - (void)checkAutoImportDirectory
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     NSString* path;
     if (![self.fDefaults boolForKey:@"AutoImport"] || !(path = [self.fDefaults stringForKey:@"AutoImportDirectory"]))
     {
@@ -4100,7 +4364,7 @@ static void removeKeRangerRansomware()
 
 - (BOOL)acceptsPreviewPanelControl:(QLPreviewPanel*)panel
 {
-    return !self.fQuitting;
+    return !self.quitting;
 }
 
 - (void)beginPreviewPanelControl:(QLPreviewPanel*)panel
@@ -4615,6 +4879,11 @@ static void removeKeRangerRansomware()
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
 {
+    if (self.quitting)
+    {
+        return NO;
+    }
+
     SEL action = menuItem.action;
 
     if (action == @selector(toggleSpeedLimit:))
@@ -5072,7 +5341,7 @@ static void removeKeRangerRansomware()
 
 - (NSMenu*)applicationDockMenu:(NSApplication*)sender
 {
-    if (self.fQuitting)
+    if (self.quitting)
     {
         return nil;
     }
@@ -5373,6 +5642,11 @@ static void removeKeRangerRansomware()
 
 - (void)showMainWindow:(id)sender
 {
+    if (self.quitting)
+    {
+        return;
+    }
+
     [self.fWindow makeKeyAndOrderFront:nil];
 }
 
@@ -5424,6 +5698,11 @@ static void removeKeRangerRansomware()
     @autoreleasepool
     {
         dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.quitting)
+            {
+                return;
+            }
+
             //get the torrent
             Torrent* torrent = nil;
             if (torrentId.has_value() && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
