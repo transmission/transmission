@@ -656,7 +656,11 @@ void Session::Impl::on_torrent_metadata_changed(tr_torrent_id_t const tor_id)
             /* update the torrent's collated name */
             if (auto const& [torrent, position] = find_torrent_by_id(tor_id); torrent)
             {
-                torrent->update();
+                auto const changes = torrent->update();
+                if (changes.any())
+                {
+                    signal_torrents_changed_.emit({ tor_id }, changes);
+                }
             }
 
             return false;
