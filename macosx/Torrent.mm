@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <optional>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -261,60 +262,28 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     self.fPreviousFinishedIndexesDate = indexes != nil ? [[NSDate alloc] init] : nil;
 }
 
-- (void)update
++ (BOOL)updateTorrents:(NSArray<Torrent*>*)torrents fromStats:(std::vector<tr_stat>)stats
 {
-    [Torrent updateTorrents:@[ self ]];
-}
-
-+ (void)updateTorrents:(NSArray<Torrent*>*)torrents
-{
-    if (torrents == nil || torrents.count == 0)
-    {
-        return;
-    }
-
-    std::vector<Torrent*> torrent_objects;
-    torrent_objects.reserve(torrents.count);
-
-    std::vector<tr_torrent*> torrent_handles;
-    torrent_handles.reserve(torrents.count);
-
+    auto torrents_by_id = std::unordered_map<tr_torrent_id_t, Torrent*>{};
+    torrents_by_id.reserve(torrents.count);
     for (Torrent* torrent in torrents)
     {
-        if (torrent == nil || torrent.fHandle == nullptr)
-        {
-            continue;
-        }
-
-        torrent_objects.emplace_back(torrent);
-        torrent_handles.emplace_back(torrent.fHandle);
+        torrents_by_id.try_emplace(torrent.id, torrent);
     }
 
-    if (torrent_handles.empty())
-    {
-        return;
-    }
-
-    auto stats = tr_torrentStat(torrent_handles.data(), torrent_handles.size());
-
-    // Update stats
     bool transmitting_changed = false;
-    for (size_t i = 0, n = torrent_objects.size(); i < n; ++i)
+    for (auto& stat : stats)
     {
-        Torrent* const torrent = torrent_objects[i];
-        auto const was_transmitting = torrent.transmitting;
-        torrent->_fStat = std::move(stats[i]);
-        transmitting_changed |= was_transmitting != torrent.transmitting;
+        if (auto const iter = torrents_by_id.find(stat.id); iter != torrents_by_id.end())
+        {
+            Torrent* const torrent = iter->second;
+            auto const was_transmitting = torrent.transmitting;
+            torrent->_fStat = std::move(stat);
+            transmitting_changed |= was_transmitting != torrent.transmitting;
+        }
     }
 
-    // make sure the "active" filter is updated if any `transmitting` property changed.
-    if (transmitting_changed)
-    {
-        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
-                                                 postingStyle:NSPostASAP
-                                                 coalesceMask:NSNotificationCoalescingOnName
-                                                     forModes:nil];
-    }
+    return transmitting_changed;
 }
 
 - (void)startTransferIgnoringQueue:(BOOL)ignoreQueue
@@ -1647,7 +1616,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     tr_torrentSetFileDLs(self.fHandle, files, count, state != NSControlStateValueOff);
     free(files);
 
-    [self update];
     [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentFileCheckChange" object:self];
 }
 
@@ -1936,7 +1904,8 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
                                                name:@"GroupValueRemoved"
                                              object:nil];
 
-    [self update];
+    // callers read these before any requested stats arrive
+    _fStat = tr_torrentStat(self.fHandle);
     [self updateTimeMachineExclude];
 
     return self;
@@ -2066,8 +2035,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning
 {
-    _fStat = tr_torrentStat(self.fHandle);
-
     switch (status)
     {
     case TR_SEED:
@@ -2094,27 +2061,21 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         break;
     }
 
-    [self updateTimeMachineExclude];
+    [self setTimeMachineExclude:status == TR_LEECH];
 }
 
 - (void)ratioLimitHit
 {
-    _fStat = tr_torrentStat(self.fHandle);
-
     [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentFinishedSeeding" object:self];
 }
 
 - (void)idleLimitHit
 {
-    _fStat = tr_torrentStat(self.fHandle);
-
     [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentFinishedSeeding" object:self];
 }
 
 - (void)metadataRetrieved
 {
-    _fStat = tr_torrentStat(self.fHandle);
-
     [self createFileList];
 
     /* If the torrent is in no group, or the group was automatically determined based on criteria evaluated

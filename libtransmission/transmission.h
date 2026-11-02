@@ -958,3 +958,9 @@ tr_stat tr_torrentStat(tr_torrent* torrent);
 // Prefer calling this over calling the single-torrent version in a loop.
 // TODO(c++20) take a std::span argument
 std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
+
+// Stats every torrent on libtransmission's thread after any work already
+// queued there, e.g. the stop queued by tr_torrentStop(), then passes the
+// results to `callback` on that thread.
+// Has the same restrictions as `tr_sessionSetCompletenessCallback`.
+void tr_torrentStatAsync(tr_session* session, tr_torrent_stats_func callback);
