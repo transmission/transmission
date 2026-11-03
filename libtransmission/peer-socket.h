@@ -93,13 +93,19 @@ public:
         return type() == Type::TCP;
     }
 
+    [[nodiscard]] constexpr auto is_rtc() const noexcept
+    {
+        return type() == Type::RTC;
+    }
+
     [[nodiscard]] static bool limit_reached(tr_session const* session) noexcept;
 
 protected:
     enum class Type : uint8_t
     {
         UTP,
-        TCP
+        TCP,
+        RTC
     };
 
     explicit tr_peer_socket(tr_socket_address const& socket_address);
