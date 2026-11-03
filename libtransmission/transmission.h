@@ -332,6 +332,13 @@ void tr_sessionSetPexEnabled(tr_session* session, bool is_enabled);
 bool tr_sessionIsDHTEnabled(tr_session const* session);
 void tr_sessionSetDHTEnabled(tr_session* session, bool is_enabled);
 
+/**
+ * @brief Get the latest DHT routing-table node count, refreshed once per second.
+ * Includes good and dubious nodes across IPv4 and IPv6, excluding cached nodes.
+ * Returns zero when DHT is disabled or has no nodes.
+ */
+size_t tr_sessionGetDHTNodeCount(tr_session const* session);
+
 bool tr_sessionIsUTPEnabled(tr_session const* session);
 void tr_sessionSetUTPEnabled(tr_session* session, bool is_enabled);
 

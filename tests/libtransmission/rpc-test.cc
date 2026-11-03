@@ -18,6 +18,7 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
+#include <libtransmission/session.h>
 #include <libtransmission/variant.h>
 
 #include "test-fixtures.h"
@@ -49,6 +50,38 @@ namespace
     return serde.to_string(response);
 }
 } // namespace
+
+TEST_F(RpcTest, SessionStatsDhtNodes)
+{
+    EXPECT_FALSE(tr_sessionIsDHTEnabled(session_));
+    EXPECT_EQ(0U, tr_sessionGetDHTNodeCount(session_));
+
+    for (auto const node_count : { 0U, 42U, 0U })
+    {
+        // Simulate the DHT timer publishing a snapshot on the session thread.
+        auto published = std::promise<void>{};
+        auto ready = published.get_future();
+        session_->run_in_session_thread(
+            [this, node_count, &published]()
+            {
+                dhtMediator().set_node_count(node_count);
+                published.set_value();
+            });
+        ready.get();
+
+        EXPECT_EQ(node_count, tr_sessionGetDHTNodeCount(session_));
+        auto const response = makeRequest(session_, R"({"jsonrpc":"2.0","method":"session_stats","id":1})");
+        auto parsed = tr_variant_serde::json().parse(response);
+        ASSERT_TRUE(parsed);
+        auto const* response_map = parsed->get_if<tr_variant::Map>();
+        ASSERT_NE(response_map, nullptr);
+        auto const* result = response_map->find_if<tr_variant::Map>(TR_KEY_result);
+        ASSERT_NE(result, nullptr);
+        auto const count = result->value_if<int64_t>(TR_KEY_dht_nodes);
+        ASSERT_TRUE(count);
+        EXPECT_EQ(node_count, *count);
+    }
+}
 
 TEST_F(RpcTest, EmptyRequest)
 {

@@ -2026,8 +2026,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         std::end(torrents),
         [](auto const* tor) { return tor->is_running(); });
 
-    args_out.reserve(std::size(args_out) + 7U);
+    args_out.reserve(std::size(args_out) + 8U);
     args_out.try_emplace(TR_KEY_active_torrent_count, n_running);
+    args_out.try_emplace(TR_KEY_dht_nodes, tr_sessionGetDHTNodeCount(session));
     args_out.try_emplace(TR_KEY_cumulative_stats, make_stats_map(session->stats().cumulative()));
     args_out.try_emplace(TR_KEY_current_stats, make_stats_map(session->stats().current()));
     args_out.try_emplace(TR_KEY_download_speed, session->piece_speed(tr_direction::Down).base_quantity());
