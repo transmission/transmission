@@ -180,7 +180,7 @@ public:
         }
 
         auto error = tr_error{};
-        if (tor->files().move(old_parent, parent, parent_name, &error))
+        if (tor->files().move(old_parent, parent, tor->session->partial_file_suffix(), parent_name, &error))
         {
             return 0;
         }
@@ -202,7 +202,7 @@ public:
         }
 
         auto error = tr_error{};
-        tor->files().remove(tor->current_dir(), tor->name(), remove_func, &error);
+        tor->files().remove(tor->current_dir(), tor->session->partial_file_suffix(), tor->name(), remove_func, &error);
         return error ? error.code() : 0;
     }
 

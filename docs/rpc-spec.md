@@ -606,7 +606,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `preferred_transports` | string[] | preference of transport protocols, see [Editing Configuration Files](Editing-Configuration-Files.md#misc) for details
 | `queue_stalled_enabled` | boolean | whether or not to consider idle torrents as stalled
 | `queue_stalled_minutes` | number | torrents that are idle for N minuets aren't counted toward `seed_queue_size` or `download_queue_size`
-| `rename_partial_files` | boolean | true means append `.part` to incomplete files
+| `rename_partial_files` | boolean | true means append a suffix (`.part.tmp` by default) to incomplete files
 | `reqq` | number | the number of outstanding block requests a peer is allowed to queue in the client
 | `rpc_version_minimum` | number | **DEPRECATED** the minimum RPC API version supported
 | `rpc_version_semver` | string | the current RPC API version in a [semver](https://semver.org)-compatible string

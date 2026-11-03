@@ -368,6 +368,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_open_dialog_dir,
     TR_KEY_p,
     TR_KEY_params,
+    TR_KEY_partial_file_suffix,
     TR_KEY_path,
     TR_KEY_paused,
     TR_KEY_paused_torrent_count_camel_APICOMPAT,
