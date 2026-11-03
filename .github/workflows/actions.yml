@@ -870,18 +870,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - version: oldoldstable
+          # Debian _typically_ releases every 2 years, and each has 5 years of support+LTS.
+          # So the `oldstable` tag is the oldest Docker tag we can use without ever ending up
+          # testing on an EOL release, while not needing periodic updates to the workflow.
+          # Ref: https://wiki.debian.org/DebianReleases
+          - version: oldstable
             gtk: gtk3
             qt: qt5
-            use-legacy-packages: true
           - version: stable
             gtk: gtk4
             qt: qt6
-            use-legacy-packages: false
           - version: unstable
             gtk: gtk4
             qt: qt6
-            use-legacy-packages: false
     container:
       image: debian:${{ matrix.version }}-slim
     steps:
@@ -890,13 +891,6 @@ jobs:
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
-      - name: Warn if oldoldstable moved past Debian 11
-        if: ${{ matrix.version == 'oldoldstable' }}
-        run: |
-          . /etc/os-release
-          if [ "$VERSION_ID" != '11' ]; then
-            echo "::warning title=Debian oldoldstable changed::debian:oldoldstable currently resolves to Debian $VERSION_ID. Consider removing matrix.use-legacy-packages if legacy package workarounds are no longer needed."
-          fi
       - name: Get Composite Actions
         uses: actions/checkout@v6
         with:
@@ -923,7 +917,7 @@ jobs:
         run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
       - name: Configure
         run: |
-          set -- \
+          cmake \
             -S src \
             -B obj \
             -G Ninja \
@@ -946,15 +940,6 @@ jobs:
             -DUSE_SYSTEM_SMALL=OFF \
             -DUSE_SYSTEM_UTP=OFF \
             -DUSE_SYSTEM_WIDE_INTEGER=OFF
-
-          if [ '${{ matrix.use-legacy-packages }}' = 'true' ]; then
-            set -- "$@" \
-              -DUSE_SYSTEM_FAST_FLOAT=OFF \
-              -DUSE_SYSTEM_FMT=OFF \
-              -DUSE_SYSTEM_UTF8CPP=OFF
-          fi
-
-          cmake "$@"
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -1158,7 +1143,7 @@ jobs:
         gradle-version: 8.13
 
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v4
 
     - name: Install NDK
       run: sdkmanager "ndk;27.3.13750724"

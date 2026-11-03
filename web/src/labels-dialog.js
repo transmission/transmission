@@ -3,6 +3,7 @@
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
+import { getErrorMessage } from './remote.js';
 import { createDialogContainer } from './utils.js';
 
 export class LabelsDialog extends EventTarget {
@@ -60,7 +61,7 @@ export class LabelsDialog extends EventTarget {
       .filter((l) => l.length > 0);
 
     remote.setLabels(ids, labels, (response) => {
-      if (response.result === 'success') {
+      if (getErrorMessage(response) === null) {
         for (const t of torrents) {
           t.refresh({ labels });
         }

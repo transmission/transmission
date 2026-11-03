@@ -102,10 +102,13 @@ runs:
             libcurl4-openssl-dev
             libdeflate-dev
             libevent-dev
+            libfast-float-dev
+            libfmt-dev
             libminiupnpc-dev
             libnatpmp-dev
             libpsl-dev
             libssl-dev
+            libutfcpp-dev
             locales
             ninja-build
             pkg-config
@@ -116,14 +119,6 @@ runs:
           # https://github.com/transmission/transmission/pull/6900
           if [ "$DISTRO" = 'debian' ]; then
             BASE_PACKAGES+=(libgtest-dev)
-          fi
-
-          if [ ! "$DISTRO" = 'debian' ] || [ ! "$DISTRO_VERSION" = '11' ]; then
-            BASE_PACKAGES+=(
-              libfast-float-dev
-              libfmt-dev
-              libutfcpp-dev
-            )
           fi
 
           # Compiler packages

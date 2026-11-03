@@ -188,7 +188,7 @@ SU_EXPORT NS_SWIFT_SENDABLE @interface SUAppcastItem : NSObject<NSSecureCoding>
  
  This version string should contain three period-separated components.
  
- Example: @c 10.13.0
+ Example: @c 12.0.0
  
  Use `minimumOperatingSystemVersionIsOK` property to test if the current running system passes this requirement.
  

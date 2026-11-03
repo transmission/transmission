@@ -6,6 +6,7 @@
 #include <array>
 #include <cassert>
 #include <cstddef> // size_t
+#include <cstdint> // uint64_t
 #include <string>
 #include <string_view>
 #include <utility>
@@ -77,6 +78,17 @@ TEST_F(TorrentFilesTest, clear)
     files.clear();
     EXPECT_TRUE(std::empty(files));
     EXPECT_EQ(size_t{ 0U }, files.file_count());
+}
+
+TEST_F(TorrentFilesTest, sortedByPath)
+{
+    auto files = tr_torrent_files{};
+    files.add("name/c"sv, 3U);
+    files.add("name/a"sv, 1U);
+    files.add("name/b"sv, 2U);
+
+    auto const expected = std::vector<std::pair<std::string, uint64_t>>{ { "name/a", 1U }, { "name/b", 2U }, { "name/c", 3U } };
+    EXPECT_EQ(expected, files.sorted_by_path());
 }
 
 TEST_F(TorrentFilesTest, find)

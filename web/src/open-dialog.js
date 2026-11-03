@@ -5,15 +5,17 @@
 
 import { AlertDialog } from './alert-dialog.js';
 import { Formatter } from './formatter.js';
-import { RPC } from './remote.js';
+import { getErrorMessage, RPC } from './remote.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
-const is_ios =
-  /iPad|iPhone|iPod/.test(navigator.userAgent) && !globalThis.MSStream;
-const is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+// iPadOS can report a desktop Mac user agent, so also check for touch support.
+const ua = navigator.userAgent;
+const is_apple_touch =
+  /iPad|iPhone|iPod/.test(ua) ||
+  (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
 // https://github.com/transmission/transmission/pull/6320#issuecomment-1896968904
 // https://caniuse.com/input-file-accept
-const can_use_input_accept = !(is_ios && is_safari);
+const can_use_input_accept = !is_apple_touch;
 
 export class OpenDialog extends EventTarget {
   constructor(controller, remote, url = '', files = null) {
@@ -87,9 +89,8 @@ export class OpenDialog extends EventTarget {
           },
         };
         remote.sendRequest(o, (response) => {
-          if ('error' in response) {
-            const message =
-              response.error.data?.errorString ?? response.error.message;
+          const message = getErrorMessage(response);
+          if (message !== null) {
             alert(`Error adding "${file.name}": ${message}`);
             controller.setCurrentPopup(
               new AlertDialog({
@@ -119,11 +120,12 @@ export class OpenDialog extends EventTarget {
         },
       };
       remote.sendRequest(o, (payload) => {
-        if ('error' in payload) {
+        const message = getErrorMessage(payload);
+        if (message !== null) {
           controller.setCurrentPopup(
             new AlertDialog({
               heading: `Error adding "${url}"`,
-              message: payload.error.data?.errorString ?? payload.error.message,
+              message,
             }),
           );
         }

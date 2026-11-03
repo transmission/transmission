@@ -4,6 +4,7 @@
    License text can be found in the licenses/ folder. */
 
 import { AlertDialog } from './alert-dialog.js';
+import { getErrorMessage } from './remote.js';
 import { createDialogContainer, setTextContent } from './utils.js';
 
 export class RenameDialog extends EventTarget {
@@ -65,7 +66,8 @@ export class RenameDialog extends EventTarget {
       file_path,
       new_name,
       (response) => {
-        if ('result' in response) {
+        const err_msg = getErrorMessage(response);
+        if (err_msg === null) {
           const args = response.result;
           if (handler) {
             handler.subtree.name = args.name;
@@ -86,12 +88,9 @@ export class RenameDialog extends EventTarget {
             tor.refresh(args);
           }
         } else {
-          const error_obj = response.error;
-          const err_msg =
-            error_obj.data?.errorString ?? error_obj.message ?? '';
           const connection_alert = new AlertDialog({
             heading: `Error renaming "${file_path}"`,
-            message: `${err_msg} (${error_obj.code}`,
+            message: err_msg,
           });
           this.controller.setCurrentPopup(connection_alert);
         }
