@@ -36,6 +36,7 @@
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h> // for tr_pex
 #include <libtransmission/session.h> // tr_peerIdInit
+#include <libtransmission/socks5-udp.h>
 #include "libtransmission/timer.h"
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-buffer.h>
@@ -79,6 +80,11 @@ protected:
         [[nodiscard]] auto* eventBase()
         {
             return event_base_.get();
+        }
+
+        [[nodiscard]] tr_socks5_udp* socks5_udp() const noexcept override
+        {
+            return socks5_udp_.get();
         }
 
         [[nodiscard]] std::optional<tr_address> announce_ip() const override
@@ -155,6 +161,7 @@ protected:
         std::deque<Sent> sent_;
 
         std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
+        std::unique_ptr<tr_socks5_udp> socks5_udp_;
     };
 
     static void expectEqual(tr_scrape_response const& expected, tr_scrape_response const& actual)
@@ -452,6 +459,27 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // Inspect that request for validity.
     std::tie(scrape_transaction_id, info_hashes) = parseScrapeRequest(waitForAnnouncerToSendMessage(mediator), connection_id);
     expectEqual(request, info_hashes);
+}
+
+TEST_F(AnnouncerUdpTest, doesNotLeakDirectUdpWhenSocks5RelayIsNotReady)
+{
+    auto mediator = MockMediator{};
+    mediator.socks5_udp_ = std::make_unique<tr_socks5_udp>(
+        mediator.eventBase(),
+        "127.0.0.1"sv,
+        uint16_t{ 1 },
+        tr_socks5_udp::ReadyCallback{});
+
+    auto announcer = tr_announcer_udp::create(mediator);
+    auto upkeep_timer = createUpkeepTimer(mediator, announcer);
+
+    auto request = buildSimpleScrapeRequestAndResponse().first;
+    auto response = std::optional<tr_scrape_response>{};
+    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
+
+    EXPECT_FALSE(tr::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); }, 500ms));
+    EXPECT_TRUE(std::empty(mediator.sent_));
+    EXPECT_FALSE(response.has_value());
 }
 
 TEST_F(AnnouncerUdpTest, canDestructCleanlyEvenWhenBusy)
