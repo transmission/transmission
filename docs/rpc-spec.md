@@ -28,8 +28,11 @@ Some people outside of the Transmission project have written libraries that wrap
 | C# .NET10 | https://www.nuget.org/packages/Transmission.API.RPC.NET/
 | C# | https://www.nuget.org/packages/Transmission.API.RPC
 | Go | https://github.com/hekmon/transmissionrpc
+| Java | https://github.com/bochkov/cordelia
+| JavaScript/NodeJS | https://github.com/DrBrad/NodeJS-Transmission-RPC
 | Python | https://github.com/Trim21/transmission-rpc
 | Rust | https://crates.io/crates/transmission-rpc
+| TypeScript | https://github.com/brielov/transmission-rpc
 
 
 ## 2 Message format
