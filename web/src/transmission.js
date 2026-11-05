@@ -676,6 +676,79 @@ export class Transmission extends EventTarget {
     );
   }
 
+  _torrentPageSize() {
+    const rows = [...this.elements.torrent_list.querySelectorAll('.torrent')];
+    const rowHeight =
+      rows.reduce(
+        (total, row) => total + row.getBoundingClientRect().height,
+        0,
+      ) / rows.length;
+
+    return Math.max(
+      1,
+      Math.floor(
+        this.elements.torrent_container.clientHeight / (rowHeight || 1),
+      ),
+    );
+  }
+
+  _scrollToTorrent(index) {
+    const container = this.elements.torrent_container;
+    const max = this._torrentOrder.length - 1;
+    const top =
+      max > 0
+        ? ((container.scrollHeight - container.clientHeight) * index) / max
+        : 0;
+    container.scrollTo({ behavior: 'auto', top });
+
+    requestAnimationFrame(() => {
+      const torrentId = this._torrentOrder[index]?.getId();
+      const row = [...this.elements.torrent_list.children].find(
+        (element) =>
+          Number.parseInt(element.dataset.torrentId, 10) === torrentId,
+      );
+      row?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    });
+  }
+
+  _selectTorrentByKeyboard(index, shiftKey) {
+    const last = this._indexOfLastTorrent();
+    const anchor = this._shift_index;
+    const torrent = this._torrentOrder[index];
+    if (!torrent) {
+      return;
+    }
+
+    if (anchor >= 0 && last >= 0) {
+      const direction = Math.sign(index - last);
+      const steps = Math.abs(index - last);
+      for (let step = 0; step < steps; ++step) {
+        const current = last + step * direction;
+        const next = current + direction;
+        if (
+          (anchor <= current && current < next) ||
+          (anchor >= current && current > next)
+        ) {
+          this._selectedTorrentIds.add(this._torrentOrder[next].getId());
+        } else if (
+          (anchor >= current && next > current) ||
+          (anchor <= current && current > next)
+        ) {
+          this._selectedTorrentIds.delete(this._torrentOrder[current].getId());
+        }
+      }
+      this._updateVisibleSelections();
+      this._dispatchSelectionChanged();
+    } else if (shiftKey) {
+      this._selectRangeToTorrent(torrent.getId());
+    } else {
+      this._setSelectedTorrent(torrent.getId());
+    }
+
+    this._last_torrent_clicked = torrent.getId();
+    this._scrollToTorrent(index);
+  }
+
   // Select a range from this row to the last clicked torrent
   _selectRange(row) {
     // Convert row to torrent ID and use new implementation
@@ -755,10 +828,12 @@ export class Transmission extends EventTarget {
 
   // Process key events
   _keyDown(event_) {
-    const { ctrlKey, keyCode, metaKey, shiftKey, target } = event_;
+    const { altKey, ctrlKey, keyCode, metaKey, shiftKey, target } = event_;
 
     // look for a shortcut
-    const is_input_focused = ['INPUT', 'TEXTAREA'].includes(target.tagName);
+    const is_input_focused =
+      target.isContentEditable ||
+      ['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName);
     if (!is_input_focused) {
       const shortcut = Transmission._createKeyShortcutFromKeyboardEvent(event_);
       const action = this.action_manager.getActionForShortcut(shortcut);
@@ -783,61 +858,42 @@ export class Transmission extends EventTarget {
     // 1. when no input fields are focused
     // 2. when no other dialogs are visible
     // 3. when the meta or ctrl key isn't pressed (i.e. opening dev tools shouldn't trigger the info panel)
-    if (!is_input_focused && !any_popup_active && !metaKey && !ctrlKey) {
+    if (
+      !is_input_focused &&
+      !any_popup_active &&
+      !altKey &&
+      !metaKey &&
+      !ctrlKey
+    ) {
       const shift_key = keyCode === 16; // shift key pressed
-      const up_key = keyCode === 38; // up key pressed
-      const dn_key = keyCode === 40; // down key pressed
-      if ((up_key || dn_key) && torrents.length > 0) {
+      const up_key = event_.key === 'ArrowUp';
+      const dn_key = event_.key === 'ArrowDown';
+      const home_key = event_.key === 'Home';
+      const end_key = event_.key === 'End';
+      const page_up_key = event_.key === 'PageUp';
+      const page_down_key = event_.key === 'PageDown';
+      const navigation_key =
+        up_key || dn_key || home_key || end_key || page_up_key || page_down_key;
+      if (navigation_key && torrents.length > 0) {
         const last = this._indexOfLastTorrent();
-        const anchor = this._shift_index;
         const min = 0;
         const max = torrents.length - 1;
-        let index = last;
+        let index = last < 0 ? min : last;
 
-        if (dn_key && index + 1 <= max) {
-          ++index;
-        } else if (up_key && index - 1 >= min) {
-          --index;
+        if (home_key) {
+          index = min;
+        } else if (end_key) {
+          index = max;
+        } else if (page_up_key) {
+          index = Math.max(min, index - this._torrentPageSize());
+        } else if (page_down_key) {
+          index = Math.min(max, index + this._torrentPageSize());
+        } else if (last >= 0) {
+          index = Math.max(min, Math.min(max, index + (dn_key ? 1 : -1)));
         }
 
-        const torrent = torrents[index];
-
-        if (anchor >= 0) {
-          // user is extending the selection
-          // with the shift + arrow keys...
-          if (
-            (anchor <= last && last < index) ||
-            (anchor >= last && last > index)
-          ) {
-            this._selectTorrent(torrent.getId());
-          } else if (
-            (anchor >= last && index > last) ||
-            (anchor <= last && last > index)
-          ) {
-            this._deselectTorrent(torrents[last].getId());
-          }
-        } else {
-          if (shiftKey) {
-            this._selectRangeToTorrent(torrent.getId());
-          } else {
-            this._setSelectedTorrent(torrent.getId());
-          }
-        }
-        if (torrent) {
-          event_.preventDefault();
-          this._last_torrent_clicked = torrent.getId();
-          const rowElem = [...this.elements.torrent_list.children].find(
-            (element) =>
-              Number.parseInt(element.dataset.torrentId, 10) ===
-              torrent.getId(),
-          );
-          if (rowElem) {
-            rowElem.scrollIntoView({
-              block: 'nearest',
-              inline: 'nearest',
-            });
-          }
-        }
+        event_.preventDefault();
+        this._selectTorrentByKeyboard(index, shiftKey);
       } else if (shift_key) {
         this._shift_index = this._indexOfLastTorrent();
       }
