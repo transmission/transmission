@@ -153,6 +153,21 @@ export class Remote {
     );
   }
 
+  setTrackerList(torrentIds, trackerList, callback) {
+    this.sendRequest(
+      {
+        id: 'webui',
+        jsonrpc: RPC._JsonRpcVersion,
+        method: 'torrent_set',
+        params: {
+          ids: torrentIds,
+          tracker_list: trackerList,
+        },
+      },
+      callback,
+    );
+  }
+
   loadDaemonStats(callback, context) {
     const o = {
       id: 'webui',
