@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef> // size_t
 #include <cstdint> // uint8_t
 #include <cstring>
 #include <iterator> // back_inserter
@@ -18,7 +19,9 @@
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error-types.h"
 #include "libtransmission/error.h"
+#include "libtransmission/log.h"
 #include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/net.h" // tr_socket_address
 #include "libtransmission/string-utils.h"
 #include "libtransmission/tr-strbuf.h" // for tr_urlbuf
 #include "libtransmission/types.h" // for tr_sha1_digest_t
@@ -190,6 +193,12 @@ std::string tr_magnet_metainfo::magnet() const
         tr_urlPercentEncode(std::back_inserter(buf), webseed);
     }
 
+    for (auto const& peer : peers_)
+    {
+        buf += "&x.pe="sv;
+        tr_urlPercentEncode(std::back_inserter(buf), peer);
+    }
+
     return std::string{ buf.sv() };
 }
 
@@ -213,6 +222,48 @@ void tr_magnet_metainfo::add_webseed(std::string_view webseed)
     }
 
     urls.emplace_back(webseed);
+}
+
+void tr_magnet_metainfo::add_peer(std::string_view socket_address)
+{
+    // Magnet links are user input, so cap this the way the other peer sources
+    // do (tracker numwant, MaxPexPeerCount, MaxRememberedPeers).
+    static auto constexpr MaxPeers = size_t{ 200U };
+
+    if (std::size(peers_) >= MaxPeers)
+    {
+        return;
+    }
+
+    // https://www.bittorrent.org/beps/bep_0009.html
+    // "x.pe" is a peer address expressed as either hostname:port,
+    // ipv4-literal:port or [ipv6-literal]:port. Only the literal forms
+    // are used here, since resolving a hostname would block.
+    socket_address = tr_strv_strip(socket_address);
+    auto addr = tr_socket_address::from_string(socket_address);
+
+    // an ipv4-mapped ipv6 literal names an ipv4 peer, so store it as one
+    if (addr)
+    {
+        if (auto const unmapped = addr->address().from_ipv4_mapped(); unmapped)
+        {
+            addr = tr_socket_address{ *unmapped, addr->port() };
+        }
+    }
+
+    // use the same test as tr_peerMgrAddPex(), so that whatever is kept
+    // here is something the peer manager will accept later on
+    if (!addr || !addr->is_valid_for_peers(TR_PEER_FROM_MAGNET))
+    {
+        tr_logAddDebug(fmt::format("Skipping unusable magnet peer address '{:s}'", socket_address));
+        return;
+    }
+
+    auto& peers = peers_;
+    if (auto display_name = addr->display_name(); std::ranges::find(peers, display_name) == std::ranges::end(peers))
+    {
+        peers.emplace_back(std::move(display_name));
+    }
 }
 
 bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* error)
@@ -254,6 +305,10 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* err
             {
                 this->webseed_urls_.emplace_back(url_sv);
             }
+        }
+        else if (key == "x.pe"sv)
+        {
+            this->add_peer(tr_urlPercentDecode(value));
         }
         else if (static auto constexpr ValPrefix = "urn:btih:"sv; key == "xt"sv && tr_strv_starts_with(value, ValPrefix))
         {
