@@ -5,6 +5,7 @@
 #import <Sparkle/Sparkle.h>
 
 #include <libtransmission/string-utils.h>
+#include <libtransmission/variant.h>
 
 #import "VDKQueue.h"
 
@@ -1018,6 +1019,15 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 - (void)setRenamePartialFiles:(id)sender
 {
     tr_sessionSetIncompleteFileNamingEnabled(self.fHandle, [self.fDefaults boolForKey:@"RenamePartialFiles"]);
+}
+
+- (void)setSequentialDownload:(id)sender
+{
+    auto settings = tr_variant::make_map();
+    settings.get_if<tr_variant::Map>()->insert_or_assign(
+        TR_KEY_sequential_download,
+        static_cast<bool>([self.fDefaults boolForKey:@"SequentialDownload"]));
+    tr_sessionSet(self.fHandle, settings);
 }
 
 - (void)setShowAddMagnetWindow:(id)sender
