@@ -39,9 +39,30 @@ enum class UpnpState : uint8_t
 {
     Idle,
     WillDiscover, // next action is upnpDiscover()
-    Discovering, // currently making blocking upnpDiscover() call in a worker thread
+    Discovering, // currently discovering and validating an IGD in a worker thread
     WillMap, // next action is UPNP_AddPortMapping()
     WillUnmap // next action is UPNP_DeletePortMapping()
+};
+
+struct UpnpDiscoveryResult
+{
+    UpnpDiscoveryResult() = default;
+    UpnpDiscoveryResult(UpnpDiscoveryResult&&) = delete;
+    UpnpDiscoveryResult(UpnpDiscoveryResult const&) = delete;
+    UpnpDiscoveryResult& operator=(UpnpDiscoveryResult&&) = delete;
+    UpnpDiscoveryResult& operator=(UpnpDiscoveryResult const&) = delete;
+
+    ~UpnpDiscoveryResult()
+    {
+        FreeUPNPUrls(&urls);
+    }
+
+    UPNPUrls urls = {};
+    IGDdatas data = {};
+    std::array<char, TrAddrStrlen> lanaddr = {};
+    int error = 0;
+    int igd_status = 0;
+    bool did_discover_device = false;
 };
 } // namespace
 
@@ -69,10 +90,10 @@ struct tr_upnp
     bool isMapped = false;
     UpnpState state = UpnpState::WillDiscover;
 
-    // Used to return the results of upnpDiscover() from a worker thread
+    // Used to return discovery and IGD validation from a worker thread
     // to be processed without blocking in tr_upnpPulse().
-    // This will be pending while the state is UpnpState::DISCOVERING.
-    std::optional<std::future<UPNPDev*>> discover_future;
+    // This will be pending while the state is UpnpState::Discovering.
+    std::optional<std::future<std::unique_ptr<UpnpDiscoveryResult>>> discover_future;
 };
 
 namespace
@@ -203,16 +224,76 @@ enum : uint8_t
 {
     UPNP_IGD_NONE = 0,
     UPNP_IGD_VALID_CONNECTED = 1,
+#if (MINIUPNPC_API_VERSION >= 18)
+    UPNP_IGD_VALID_PRIVATE = 2,
+    UPNP_IGD_VALID_NOT_CONNECTED = 3,
+    UPNP_IGD_INVALID = 4
+#else
     UPNP_IGD_VALID_NOT_CONNECTED = 2,
     UPNP_IGD_INVALID = 3
+#endif
 };
 
-auto* discover_thread_func(std::string bindaddr) // NOLINT performance-unnecessary-value-param
+char const* igd_status_string(int status)
+{
+    switch (status)
+    {
+    case UPNP_IGD_NONE:
+        return "no IGD found";
+
+    case UPNP_IGD_VALID_CONNECTED:
+        return "connected IGD";
+
+#if (MINIUPNPC_API_VERSION >= 18)
+    case UPNP_IGD_VALID_PRIVATE:
+        return "connected IGD with a private WAN address";
+#endif
+
+    case UPNP_IGD_VALID_NOT_CONNECTED:
+        return "IGD without a connected WAN";
+
+    case UPNP_IGD_INVALID:
+        return "invalid IGD";
+
+    default:
+        return "unknown IGD status";
+    }
+}
+
+auto discover_and_validate_thread_func(std::string bindaddr) // NOLINT performance-unnecessary-value-param
 {
     // If multicastif is not NULL, it will be used instead of the default
     // multicast interface for sending SSDP discover packets.
     char const* multicastif = std::empty(bindaddr) ? nullptr : bindaddr.c_str();
-    return upnp_discover(2000, multicastif);
+    auto* const devlist = upnp_discover(2000, multicastif);
+    auto result = std::make_unique<UpnpDiscoveryResult>();
+    result->did_discover_device = devlist != nullptr;
+    if (devlist != nullptr)
+    {
+        errno = 0;
+#if (MINIUPNPC_API_VERSION >= 18)
+        result->igd_status = UPNP_GetValidIGD(
+            devlist,
+            &result->urls,
+            &result->data,
+            std::data(result->lanaddr),
+            static_cast<int>(std::size(result->lanaddr) - 1),
+            nullptr,
+            0);
+#else
+        result->igd_status = UPNP_GetValidIGD(
+            devlist,
+            &result->urls,
+            &result->data,
+            std::data(result->lanaddr),
+            static_cast<int>(std::size(result->lanaddr) - 1));
+#endif
+        result->error = errno;
+
+        freeUPNPDevlist(devlist);
+    }
+
+    return result;
 }
 
 template<typename T>
@@ -246,7 +327,7 @@ tr_port_forwarding_state tr_upnpPulse(
     {
         TR_ASSERT(!handle->discover_future);
 
-        auto task = std::packaged_task<UPNPDev*(std::string)>{ discover_thread_func };
+        auto task = std::packaged_task<std::unique_ptr<UpnpDiscoveryResult>(std::string)>{ discover_and_validate_thread_func };
         handle->discover_future = task.get_future();
         handle->state = UpnpState::Discovering;
 
@@ -256,35 +337,49 @@ tr_port_forwarding_state tr_upnpPulse(
     if (is_enabled && handle->state == UpnpState::Discovering && handle->discover_future &&
         is_future_ready(*handle->discover_future))
     {
-        auto* const devlist = handle->discover_future->get();
+        auto result = handle->discover_future->get();
         handle->discover_future.reset();
 
         FreeUPNPUrls(&handle->urls);
-        auto lanaddr = std::array<char, TrAddrStrlen>{};
-        if (
-#if (MINIUPNPC_API_VERSION >= 18)
-            UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1, nullptr, 0)
-#else
-            UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1)
-#endif
-            == UPNP_IGD_VALID_CONNECTED)
+        if (result->igd_status == UPNP_IGD_VALID_CONNECTED)
         {
+            handle->urls = std::exchange(result->urls, {});
+            handle->data = result->data;
+            handle->lanaddr = std::data(result->lanaddr);
             tr_logAddInfo(
                 fmt::format(
                     fmt::runtime(_("Found Internet Gateway Device '{url}'")),
                     fmt::arg("url", handle->urls.controlURL)));
-            tr_logAddInfo(fmt::format(fmt::runtime(_("Local Address is '{address}'")), fmt::arg("address", lanaddr.data())));
+            tr_logAddInfo(fmt::format(fmt::runtime(_("Local Address is '{address}'")), fmt::arg("address", handle->lanaddr)));
             handle->state = UpnpState::Idle;
-            handle->lanaddr = std::data(lanaddr);
         }
         else
         {
             handle->state = UpnpState::WillDiscover;
-            tr_logAddDebug(fmt::format("UPNP_GetValidIGD failed: {} ({})", tr_strerror(errno), errno));
+            if (!result->did_discover_device)
+            {
+                tr_logAddDebug("No UPnP devices responded to discovery");
+            }
+            else if (result->error != 0)
+            {
+                tr_logAddDebug(
+                    fmt::format(
+                        "UPNP_GetValidIGD returned {} ({}): {} ({})",
+                        igd_status_string(result->igd_status),
+                        result->igd_status,
+                        tr_strerror(result->error),
+                        result->error));
+            }
+            else
+            {
+                tr_logAddDebug(
+                    fmt::format(
+                        "UPNP_GetValidIGD returned {} ({})",
+                        igd_status_string(result->igd_status),
+                        result->igd_status));
+            }
             tr_logAddDebug("If your router supports UPnP, please make sure UPnP is enabled!");
         }
-
-        freeUPNPDevlist(devlist);
     }
 
     if (handle->state == UpnpState::Idle && handle->isMapped &&
