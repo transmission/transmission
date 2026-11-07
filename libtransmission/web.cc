@@ -672,6 +672,11 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_ACCEPT_ENCODING, "identity");
             (void)curl_easy_setopt(e, CURLOPT_HTTP_CONTENT_DECODING, 0L);
 
+            // don't send a Referer when following redirects for webseed fragments.
+            // Some hosts ignore the Range header and reply 200 with the whole
+            // file when the request has a cross-site Referer.
+            (void)curl_easy_setopt(e, CURLOPT_AUTOREFERER, 0L);
+
             // set the range request
             auto const& [first, last] = *range;
             auto const str = fmt::format("{:d}-{:d}", first, last);
