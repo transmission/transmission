@@ -237,6 +237,14 @@ struct tr_peer
     {
     }
 
+    // A block this peer should not be offered right now even though its own
+    // active_requests bit for it is already clear, e.g. a block it just
+    // rejected, before that rejection has propagated to the wishlist.
+    [[nodiscard]] virtual bool is_refill_excluded(tr_block_index_t /*block*/) const noexcept
+    {
+        return false;
+    }
+
     virtual void ban() = 0;
 
     tr_session* const session;

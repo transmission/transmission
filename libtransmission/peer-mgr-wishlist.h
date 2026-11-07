@@ -34,6 +34,13 @@ public:
         [[nodiscard]] virtual bool client_has_block(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual bool client_has_piece(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual bool client_wants_piece(tr_piece_index_t piece) const = 0;
+        [[nodiscard]] virtual bool is_endgame() const = 0;
+        // Requesters among connected BitTorrent peers, capped at 2 since that's
+        // the wishlist's max. Does not count webseeds; see is_requested_by_webseed().
+        [[nodiscard]] virtual uint8_t count_active_requests(tr_block_index_t block) const = 0;
+        // Webseeds can't receive BitTorrent CANCEL messages, so a block they're
+        // holding is always treated as saturated, separate from the peer count.
+        [[nodiscard]] virtual bool is_requested_by_webseed(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual bool is_sequential_download() const = 0;
         [[nodiscard]] virtual tr_piece_index_t sequential_download_from_piece() const = 0;
         [[nodiscard]] virtual size_t count_piece_replication(tr_piece_index_t piece) const = 0;
@@ -136,7 +143,7 @@ public:
         }
     }
 
-    TR_CONSTEXPR_VEC void on_got_choke(tr_bitfield const& requests)
+    void on_got_choke(tr_bitfield const& requests)
     {
         reset_blocks_bitfield(requests);
     }
@@ -155,12 +162,12 @@ public:
         inc_replication();
     }
 
-    constexpr void on_got_reject(tr_block_index_t const block)
+    void on_got_reject(tr_block_index_t const block)
     {
         reset_block(block);
     }
 
-    TR_CONSTEXPR_VEC void on_peer_disconnect(tr_bitfield const& have, tr_bitfield const& requests)
+    void on_peer_disconnect(tr_bitfield const& have, tr_bitfield const& requests)
     {
         dec_replication_bitfield(have);
         reset_blocks_bitfield(requests);
@@ -173,7 +180,7 @@ public:
 
     void on_priority_changed();
 
-    constexpr void on_sent_cancel(tr_block_index_t const block)
+    void on_sent_cancel(tr_block_index_t const block)
     {
         reset_block(block);
     }
@@ -196,7 +203,8 @@ public:
     // the next blocks that we should request from a peer
     [[nodiscard]] std::vector<tr_block_span_t> next(
         size_t n_wanted_blocks,
-        std::function<bool(tr_piece_index_t)> const& peer_has_piece);
+        std::function<bool(tr_piece_index_t)> const& peer_has_piece,
+        std::function<bool(tr_block_index_t)> const& peer_has_active_request = {});
 
 private:
     constexpr void dec_replication() noexcept
@@ -270,15 +278,16 @@ private:
                 break;
             }
 
-            auto& unreq = it_p->unrequested;
+            if (auto& unreq = it_p->unrequested; !std::empty(unreq))
+            {
+                auto it_b_end = std::end(unreq);
+                it_b_end = *std::prev(it_b_end) >= block_span.begin ? it_b_end : unreq.upper_bound(block_span.begin);
 
-            auto it_b_end = std::end(unreq);
-            it_b_end = *std::prev(it_b_end) >= block_span.begin ? it_b_end : unreq.upper_bound(block_span.begin);
+                auto it_b_begin = std::begin(unreq);
+                it_b_begin = *it_b_begin < block_span.end ? it_b_begin : unreq.upper_bound(block_span.end);
 
-            auto it_b_begin = std::begin(unreq);
-            it_b_begin = *it_b_begin < block_span.end ? it_b_begin : unreq.upper_bound(block_span.end);
-
-            unreq.erase(it_b_begin, it_b_end);
+                unreq.erase(it_b_begin, it_b_end);
+            }
 
             block = it_p->block_span.end;
 
@@ -286,8 +295,18 @@ private:
         }
     }
 
-    constexpr void reset_block(tr_block_index_t block)
+    // A released block goes back in the pool only if something still needs
+    // it: not the client (already has it) and, in endgame, not a second
+    // requester (see other_requester_remains() -- can't gate this on
+    // is_endgame() itself, since that can go false from unrelated peer
+    // churn while this specific block still has two real requesters).
+    void reset_block(tr_block_index_t const block)
     {
+        if (mediator_.client_has_block(block) || other_requester_remains(block, false))
+        {
+            return;
+        }
+
         if (auto const it_p = find_by_block(block); it_p != std::end(candidates_))
         {
             it_p->unrequested.insert(block);
@@ -295,7 +314,7 @@ private:
         }
     }
 
-    TR_CONSTEXPR_VEC void reset_blocks_bitfield(tr_bitfield const& requests)
+    void reset_blocks_bitfield(tr_bitfield const& requests)
     {
         for (auto& candidate : candidates_)
         {
@@ -307,7 +326,8 @@ private:
 
             for (auto i = end; i > begin; --i)
             {
-                if (auto const block = i - 1U; requests.test(block))
+                auto const block = i - 1U;
+                if (requests.test(block) && !mediator_.client_has_block(block) && !other_requester_remains(block, true))
                 {
                     candidate.unrequested.insert(block);
                 }
@@ -315,6 +335,16 @@ private:
         }
 
         std::ranges::sort(candidates_);
+    }
+
+    // self_bit_still_set: reset_block()'s caller already cleared its own bit
+    // before calling; reset_blocks_bitfield()'s has not, so it always counts
+    // as one requester. A webseed holding the block always counts as "other
+    // requester remains", since it can't be re-requested elsewhere anyway.
+    [[nodiscard]] bool other_requester_remains(tr_block_index_t const block, bool const self_bit_still_set) const
+    {
+        return mediator_.is_requested_by_webseed(block) ||
+            mediator_.count_active_requests(block) > (self_bit_still_set ? 1U : 0U);
     }
 
     // ---
