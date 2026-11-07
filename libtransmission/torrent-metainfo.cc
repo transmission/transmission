@@ -7,6 +7,8 @@
 #include <cerrno> // for EINVAL
 #include <cstddef>
 #include <cstdint>
+#include <functional>
+#include <map>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -69,6 +71,17 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     tr_tracker_tier_t tier_ = 0;
     tr_pathbuf file_subpath_;
     int64_t file_length_ = 0;
+    bool file_is_padding_ = false;
+
+    struct SeenFile
+    {
+        int64_t length = 0;
+        bool is_padding = false;
+    };
+
+    // FIXME: update for hybrid torrents with duplicate info between "file tree" and "files"
+    // when "file tree" (bittorrent v2) supported
+    std::map<std::string, SeenFile, std::less<>> seen_files_;
 
     enum class State : uint8_t
     {
@@ -170,6 +183,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             state_ = std::empty(tm_.files_) ? State::Files : State::FilesIgnored;
             file_subpath_.clear();
             file_length_ = 0;
+            file_is_padding_ = false;
         }
         else if (pathStartsWith(InfoKey, FilesKey, ArrayKey, PathUtf8Key))
         {
@@ -311,8 +325,9 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             }
             else if (current_key == AttrKey)
             {
-                // currently unused. TODO support for BEP0047
+                // BEP 47: only padding files are recognized so far.
                 // TODO https://github.com/transmission/transmission/issues/3387
+                file_is_padding_ = tr_strv_contains(value, 'p');
             }
             else if (
                 pathIs(InfoKey, FilesKey, ArrayKey, Crc32Key) || //
@@ -456,6 +471,13 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     }
 
 private:
+    // BEP 47 recommends naming padding files [".pad", "<length>"],
+    // so padding files of equal length can safely share a path on disk.
+    [[nodiscard]] bool isSharedPaddingPath(SeenFile const& seen) const noexcept
+    {
+        return file_is_padding_ && seen.is_padding && seen.length == file_length_;
+    }
+
     [[nodiscard]] bool addFile(Context const& context)
     {
         bool ok = true;
@@ -465,12 +487,21 @@ private:
             context.error.set(EINVAL, fmt::format("invalid path [{:s}]", file_subpath_));
             ok = false;
         }
+        else if (auto const [iter, added] = seen_files_.try_emplace(
+                     std::string{ file_subpath_.sv() },
+                     SeenFile{ file_length_, file_is_padding_ });
+                 !added && !isSharedPaddingPath(iter->second))
+        {
+            context.error.set(EINVAL, fmt::format("duplicate path [{:s}]", file_subpath_));
+            ok = false;
+        }
         else
         {
             tm_.files_.add(file_subpath_, file_length_);
         }
 
         file_length_ = 0;
+        file_is_padding_ = false;
         // NB: let caller decide how to clear file_tree_.
         // if we're in "files" mode we clear it; if in "file tree" we pop it
         return ok;
@@ -487,18 +518,6 @@ private:
         if (!tm_.has_v1_metadata())
         {
             context.error.set(EINVAL, "missing v1 metadata");
-            return false;
-        }
-
-        // FIXME: update for hybrid torrents with duplicate info between "file tree" and "files"
-        // when "file tree" (bittorrent v2) supported
-        auto sorted_paths = tm_.files_.sorted_by_path();
-        if (auto dupe = std::ranges::adjacent_find(
-                sorted_paths,
-                [](auto const& p1, auto const& p2) { return p1.first == p2.first; });
-            dupe != sorted_paths.end())
-        {
-            context.error.set(EINVAL, fmt::format("duplicate path [{:s}]", dupe->first));
             return false;
         }
 
