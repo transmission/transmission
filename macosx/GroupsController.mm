@@ -20,9 +20,9 @@ static CGFloat const kIconWidthSmall = 12.0;
 // of keyword criteria in a single OR group, so the budget is generous.
 static NSUInteger const kAutoGroupRuleMaxDepth = 8;
 static NSUInteger const kAutoGroupRuleMaxTotalNodes = 2000;
-//holds the original GroupDicts archive as opaque NSData when a rule had to be discarded, so it can be recovered by hand.
-//It may contain untrusted legacy predicate archives: NEVER decode it.
-static NSString* const kGroupDictsUnconvertedBackupKey = @"GroupDictsUnconvertedBackup";
+//a rule stored in the schema format that can't be rebuilt (e.g. it exceeds a limit) is kept here as plain property-list data
+//and written back unchanged on save, so it is never lost; it is not evaluated
+static NSString* const kRetainedAutoGroupRulesSchemaKey = @"RetainedAutoGroupRulesSchema";
 
 static NSSet<NSString*>* allowedAutoGroupRuleKeyPaths(void)
 {
@@ -230,8 +230,7 @@ static NSPredicate* autoGroupPredicateFromSafeSchema(NSDictionary* schema, NSUIn
 @property(nonatomic, readonly) NSMutableArray<NSMutableDictionary*>* fGroups;
 
 - (NSMutableArray<NSMutableDictionary*>*)decodedGroupsFromArchivedData:(NSData*)data
-                                                    migratedLegacyRule:(BOOL*)migratedLegacyRule
-                                                      discardedAnyRule:(BOOL*)discardedAnyRule;
+                                                    migratedLegacyRule:(BOOL*)migratedLegacyRule;
 - (void)saveGroups;
 
 @end
@@ -257,15 +256,8 @@ GroupsController* fGroupsInstance = nil;
         if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"GroupDicts"]))
         {
             BOOL migratedLegacyRule = NO;
-            BOOL discardedAnyRule = NO;
-            _fGroups = [self decodedGroupsFromArchivedData:data migratedLegacyRule:&migratedLegacyRule
-                                          discardedAnyRule:&discardedAnyRule];
-            if (_fGroups != nil && discardedAnyRule && ![NSUserDefaults.standardUserDefaults dataForKey:kGroupDictsUnconvertedBackupKey])
-            {
-                //keep the original archive (as opaque data nothing decodes) so a discarded rule can be recovered
-                [NSUserDefaults.standardUserDefaults setObject:data forKey:kGroupDictsUnconvertedBackupKey];
-            }
-            if (_fGroups != nil && (migratedLegacyRule || discardedAnyRule))
+            _fGroups = [self decodedGroupsFromArchivedData:data migratedLegacyRule:&migratedLegacyRule];
+            if (_fGroups != nil && migratedLegacyRule)
             {
                 //rewrite now so no raw predicate object graphs are archived going forward
                 [self saveGroups];
@@ -453,11 +445,13 @@ GroupsController* fGroupsInstance = nil;
             predicate);
 
         dict[@"AutoGroupRules"] = predicate;
+        [dict removeObjectForKey:kRetainedAutoGroupRulesSchemaKey];
         [GroupsController.groups saveGroups];
     }
     else
     {
         [dict removeObjectForKey:@"AutoGroupRules"];
+        [dict removeObjectForKey:kRetainedAutoGroupRulesSchemaKey];
         [self setUsesAutoAssignRules:NO forIndex:index];
     }
 }
@@ -563,7 +557,6 @@ GroupsController* fGroupsInstance = nil;
 
 - (NSMutableArray<NSMutableDictionary*>*)decodedGroupsFromArchivedData:(NSData*)data
                                                     migratedLegacyRule:(BOOL*)migratedLegacyRule
-                                                      discardedAnyRule:(BOOL*)discardedAnyRule
 {
     id decoded;
     @try
@@ -606,6 +599,7 @@ GroupsController* fGroupsInstance = nil;
         NSDictionary* schema = group[@"AutoGroupRulesSchema"];
         id legacyPredicate = group[@"AutoGroupRules"];
         [group removeObjectForKey:@"AutoGroupRulesSchema"];
+        [group removeObjectForKey:kRetainedAutoGroupRulesSchemaKey];
 
         NSPredicate* rebuilt = nil;
         if ([schema isKindOfClass:NSDictionary.class])
@@ -633,15 +627,19 @@ GroupsController* fGroupsInstance = nil;
                 //unrecognized shape - drop the rule rather than risk evaluating it
                 [group removeObjectForKey:@"AutoGroupRules"];
                 group[@"UsesAutoGroupRules"] = @NO;
-                *discardedAnyRule = YES;
-                NSLog(@"Transmission: discarded an auto-assign rule with an unsupported predicate structure");
+                //keep an unconvertible schema-format rule as inert plist data (never a live predicate) instead of losing it
+                if ([schema isKindOfClass:NSDictionary.class] &&
+                    [NSPropertyListSerialization propertyList:schema isValidForFormat:NSPropertyListBinaryFormat_v1_0])
+                {
+                    group[kRetainedAutoGroupRulesSchemaKey] = schema;
+                }
+                NSLog(@"Transmission: could not load an auto-assign rule with an unsupported or too large predicate structure");
             }
         }
         else if (legacyPredicate != nil)
         {
             [group removeObjectForKey:@"AutoGroupRules"];
             group[@"UsesAutoGroupRules"] = @NO;
-            *discardedAnyRule = YES;
         }
 
         [validatedGroups addObject:group];
@@ -674,6 +672,11 @@ GroupsController* fGroupsInstance = nil;
             }
             [tempDict removeObjectForKey:@"AutoGroupRules"];
         }
+        else if (NSDictionary* retained = tempDict[kRetainedAutoGroupRulesSchemaKey])
+        {
+            tempDict[@"AutoGroupRulesSchema"] = retained;
+        }
+        [tempDict removeObjectForKey:kRetainedAutoGroupRulesSchemaKey];
 
         [groups addObject:tempDict];
     }
