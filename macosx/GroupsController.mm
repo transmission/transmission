@@ -16,10 +16,13 @@ static CGFloat const kIconWidthSmall = 12.0;
 // crafted preferences plist smuggle in a function/custom-selector expression and trigger arbitrary Objective-C
 // message dispatch on evaluation. The functions below only ever build/accept the fixed AND/OR/NOT-of-comparisons
 // shape GroupRules.xib's rule editor produces, as a plain property-list schema - nothing else is stored or trusted.
-// remainingNodeBudget caps total nodes visited per tree, since depth/fan-out limits alone don't bound their product.
+// remainingNodeBudget caps total nodes visited per tree (and thus per-level fan-out); real-world rules can hold hundreds
+// of keyword criteria in a single OR group, so the budget is generous.
 static NSUInteger const kAutoGroupRuleMaxDepth = 8;
-static NSUInteger const kAutoGroupRuleMaxChildren = 32;
-static NSUInteger const kAutoGroupRuleMaxTotalNodes = 256;
+static NSUInteger const kAutoGroupRuleMaxTotalNodes = 2000;
+//holds the original GroupDicts archive as opaque NSData when a rule had to be discarded, so it can be recovered by hand.
+//It may contain untrusted legacy predicate archives: NEVER decode it.
+static NSString* const kGroupDictsUnconvertedBackupKey = @"GroupDictsUnconvertedBackup";
 
 static NSSet<NSString*>* allowedAutoGroupRuleKeyPaths(void)
 {
@@ -83,7 +86,7 @@ static NSDictionary* safeSchemaFromAutoGroupPredicate(NSPredicate* predicate, NS
     if ([predicate isKindOfClass:NSCompoundPredicate.class])
     {
         NSCompoundPredicate* compound = (NSCompoundPredicate*)predicate;
-        if (!autoGroupRuleCompoundTypeIsAllowed(compound.compoundPredicateType) || compound.subpredicates.count > kAutoGroupRuleMaxChildren)
+        if (!autoGroupRuleCompoundTypeIsAllowed(compound.compoundPredicateType))
         {
             return nil;
         }
@@ -159,7 +162,7 @@ static NSPredicate* autoGroupPredicateFromSafeSchema(NSDictionary* schema, NSUIn
     {
         NSNumber* compoundTypeNumber = schema[@"Compound"];
         NSArray* subSchemas = schema[@"Subpredicates"];
-        if (![compoundTypeNumber isKindOfClass:NSNumber.class] || ![subSchemas isKindOfClass:NSArray.class] || subSchemas.count > kAutoGroupRuleMaxChildren)
+        if (![compoundTypeNumber isKindOfClass:NSNumber.class] || ![subSchemas isKindOfClass:NSArray.class])
         {
             return nil;
         }
@@ -227,7 +230,8 @@ static NSPredicate* autoGroupPredicateFromSafeSchema(NSDictionary* schema, NSUIn
 @property(nonatomic, readonly) NSMutableArray<NSMutableDictionary*>* fGroups;
 
 - (NSMutableArray<NSMutableDictionary*>*)decodedGroupsFromArchivedData:(NSData*)data
-                                                    migratedLegacyRule:(BOOL*)migratedLegacyRule;
+                                                    migratedLegacyRule:(BOOL*)migratedLegacyRule
+                                                      discardedAnyRule:(BOOL*)discardedAnyRule;
 - (void)saveGroups;
 
 @end
@@ -253,8 +257,15 @@ GroupsController* fGroupsInstance = nil;
         if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"GroupDicts"]))
         {
             BOOL migratedLegacyRule = NO;
-            _fGroups = [self decodedGroupsFromArchivedData:data migratedLegacyRule:&migratedLegacyRule];
-            if (_fGroups != nil && migratedLegacyRule)
+            BOOL discardedAnyRule = NO;
+            _fGroups = [self decodedGroupsFromArchivedData:data migratedLegacyRule:&migratedLegacyRule
+                                          discardedAnyRule:&discardedAnyRule];
+            if (_fGroups != nil && discardedAnyRule && ![NSUserDefaults.standardUserDefaults dataForKey:kGroupDictsUnconvertedBackupKey])
+            {
+                //keep the original archive (as opaque data nothing decodes) so a discarded rule can be recovered
+                [NSUserDefaults.standardUserDefaults setObject:data forKey:kGroupDictsUnconvertedBackupKey];
+            }
+            if (_fGroups != nil && (migratedLegacyRule || discardedAnyRule))
             {
                 //rewrite now so no raw predicate object graphs are archived going forward
                 [self saveGroups];
@@ -552,6 +563,7 @@ GroupsController* fGroupsInstance = nil;
 
 - (NSMutableArray<NSMutableDictionary*>*)decodedGroupsFromArchivedData:(NSData*)data
                                                     migratedLegacyRule:(BOOL*)migratedLegacyRule
+                                                      discardedAnyRule:(BOOL*)discardedAnyRule
 {
     id decoded;
     @try
@@ -621,6 +633,7 @@ GroupsController* fGroupsInstance = nil;
                 //unrecognized shape - drop the rule rather than risk evaluating it
                 [group removeObjectForKey:@"AutoGroupRules"];
                 group[@"UsesAutoGroupRules"] = @NO;
+                *discardedAnyRule = YES;
                 NSLog(@"Transmission: discarded an auto-assign rule with an unsupported predicate structure");
             }
         }
@@ -628,6 +641,7 @@ GroupsController* fGroupsInstance = nil;
         {
             [group removeObjectForKey:@"AutoGroupRules"];
             group[@"UsesAutoGroupRules"] = @NO;
+            *discardedAnyRule = YES;
         }
 
         [validatedGroups addObject:group];
@@ -653,6 +667,10 @@ GroupsController* fGroupsInstance = nil;
             if (schema)
             {
                 tempDict[@"AutoGroupRulesSchema"] = schema;
+            }
+            else
+            {
+                NSLog(@"Transmission: could not save the auto-assign rule for group %@ (too large or unsupported)", tempDict[@"Name"]);
             }
             [tempDict removeObjectForKey:@"AutoGroupRules"];
         }
