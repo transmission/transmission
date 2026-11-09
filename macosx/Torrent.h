@@ -5,6 +5,9 @@
 #import <Foundation/Foundation.h>
 #import <Quartz/Quartz.h>
 
+#include <cstdint>
+#include <vector>
+
 #include <libtransmission/transmission.h>
 
 @class FileListNode;
@@ -36,6 +39,15 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 @property(nonatomic) NSIndexSet* previousFinishedPieces;
 
 - (void)update;
+
+// Pass this to `updateTorrents:fromSnapshots:generation:` when requesting the snapshots.
++ (uint64_t)statGeneration;
+
+// Gives each torrent the snapshot with its id, unless the torrent has a newer stat
+// from a synchronous `update` made after the snapshots were requested at `generation`.
++ (void)updateTorrents:(NSArray<Torrent*>*)torrents
+         fromSnapshots:(std::vector<tr_stat_snapshot>)snapshots
+            generation:(uint64_t)generation;
 
 - (void)startTransferIgnoringQueue:(BOOL)ignoreQueue;
 - (void)startTransferNoQueue;
