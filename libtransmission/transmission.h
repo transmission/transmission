@@ -1649,7 +1649,7 @@ tr_stat const* tr_torrentStat(tr_torrent* torrent);
     of the text: moving a std::string can relocate its characters. */
 struct tr_stat_snapshot
 {
-    tr_stat stat;
+    tr_stat stat = {};
     std::string error_string;
 };
 
