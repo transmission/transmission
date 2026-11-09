@@ -179,6 +179,10 @@ std::optional<DBusPeerRecord> read_dbus_peer_record(std::string_view const confi
         {
             record.path = value;
         }
+        else if (key == "bus-id"sv)
+        {
+            record.bus_id = value;
+        }
     }
 
     // We only ever record a unique bus name, and a D-Bus library only accepts names
@@ -196,20 +200,60 @@ std::optional<DBusPeerRecord> read_dbus_peer_record(std::string_view const confi
     return record;
 }
 
+namespace
+{
+
+// Whether `record` names a client, other than this one, that is on this bus now.
+// Everything is settled with the bus driver when it can be: only a record
+// that cannot be placed on a bus costs a call to the recorded name.
+[[nodiscard]] bool names_a_live_peer(
+    DBusPeerRecord const& record,
+    std::string_view const bus_id,
+    std::string_view const self,
+    DBusNameOwner const& name_owner,
+    DBusPeerProbe const& probe)
+{
+    if (record.bus_name == self)
+    {
+        return false;
+    }
+
+    // Another bus's record. Its name may well be owned here, by whichever
+    // process happened to get it, so this is decided before asking.
+    auto const placeable = !std::empty(bus_id) && !std::empty(record.bus_id);
+    if (placeable && record.bus_id != bus_id)
+    {
+        return false;
+    }
+
+    if (std::empty(name_owner(record.bus_name)))
+    {
+        return false;
+    }
+
+    // A live name on the bus that issued it is the connection that wrote the record.
+    // Without a bus to place the record on, a live name could be anyone's.
+    return placeable || probe(record);
+}
+
+} // namespace
+
 std::optional<DBusPeerRecord> select_dbus_peer(
     std::string_view const config_dir,
+    std::string_view const bus_id,
     std::string_view const self,
-    DBusNameOwner const& name_owner)
+    DBusNameOwner const& name_owner,
+    DBusPeerProbe const& probe)
 {
     if (auto const recorded = read_dbus_peer_record(config_dir);
-        recorded && recorded->bus_name != self && !std::empty(name_owner(recorded->bus_name)))
+        recorded && names_a_live_peer(*recorded, bus_id, self, name_owner, probe))
     {
         return recorded;
     }
 
     if (auto const owner = name_owner(TR_INTEROP_DBUS_SERVICE_NAME); !std::empty(owner) && owner != self)
     {
-        return DBusPeerRecord{ TR_INTEROP_DBUS_SERVICE_NAME, TR_INTEROP_DBUS_INTERFACE_NAME, TR_INTEROP_DBUS_OBJECT_PATH };
+        return DBusPeerRecord{ TR_INTEROP_DBUS_SERVICE_NAME, TR_INTEROP_DBUS_INTERFACE_NAME, TR_INTEROP_DBUS_OBJECT_PATH, {} };
     }
 
     return {};
@@ -217,6 +261,7 @@ std::optional<DBusPeerRecord> select_dbus_peer(
 
 void publish_dbus_peer(
     std::string_view const config_dir,
+    std::string_view const bus_id,
     std::string_view const unique_name,
     std::function<bool()> const& register_object,
     std::function<bool()> const& claim_well_known_name)
@@ -234,7 +279,8 @@ void publish_dbus_peer(
     auto error = tr_error{};
     auto const record = DBusPeerRecord{ std::string{ unique_name },
                                         TR_INTEROP_DBUS_INTERFACE_NAME,
-                                        TR_INTEROP_DBUS_OBJECT_PATH };
+                                        TR_INTEROP_DBUS_OBJECT_PATH,
+                                        std::string{ bus_id } };
     if (!write_dbus_peer_record(config_dir, record, &error))
     {
         tr_logAddWarn(fmt::format("couldn't record this session in '{:s}': {:s}", config_dir, error.message()));
@@ -243,11 +289,14 @@ void publish_dbus_peer(
 
 bool write_dbus_peer_record(std::string_view const config_dir, DBusPeerRecord const& record, tr_error* const error)
 {
-    auto const contents = fmt::format(
-        "bus-name={:s}\ninterface={:s}\npath={:s}\n",
-        record.bus_name,
-        record.interface,
-        record.path);
+    auto contents = fmt::format("bus-name={:s}\ninterface={:s}\npath={:s}\n", record.bus_name, record.interface, record.path);
+
+    // Optional, so an unknown ID is left out rather than written as an empty value.
+    if (!std::empty(record.bus_id))
+    {
+        contents += fmt::format("bus-id={:s}\n", record.bus_id);
+    }
+
     return tr_file_save(record_path(config_dir), contents, error);
 }
 

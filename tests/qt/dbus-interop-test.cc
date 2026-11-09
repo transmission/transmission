@@ -17,6 +17,7 @@
 #include <QDBusConnectionInterface>
 #include <QDBusReply>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QIODevice>
 #include <QMutex>
@@ -96,7 +97,8 @@ class UnplaceableFakeClient : public FakeClientBase
 };
 
 // A stand-in that answers both calls a delegating launch makes.
-// Torrents it is handed land in received();
+// Torrents it is handed land in received(); ConfigDir() calls are only counted, since
+// a case about a name that must not be called at all has to see the probe too;
 // the interface name is left to the subclasses, since one declared here would be inherited by all of them.
 class PlaceableFakeClient : public FakeClientBase
 {
@@ -108,10 +110,16 @@ public:
     {
     }
 
+    [[nodiscard]] int configDirCalls() const noexcept
+    {
+        return config_dir_calls_.load();
+    }
+
 public slots:
     // NOLINTBEGIN(readability-identifier-naming)
     [[nodiscard]] QString ConfigDir() const
     {
+        ++config_dir_calls_;
         return config_dir_;
     }
 
@@ -124,6 +132,7 @@ public slots:
 
 private:
     QString const config_dir_;
+    mutable std::atomic<int> config_dir_calls_{ 0 };
 };
 
 class FakeClient : public PlaceableFakeClient
@@ -186,6 +195,18 @@ public:
         thread_.quit();
         thread_.wait();
         QDBusConnection::disconnectFromBus(connection_name_);
+    }
+
+    // Stops the client answering while its connection stays open and keeps its name.
+    // QtDBus hands a call to the thread the client lives on, so once that thread's loop
+    // has quit, every call to the client queues there unanswered. That is what a
+    // recorded name points at once the bus has restarted and reissued it to a process
+    // that ignores calls, and the cases that must not stall on such a name are measured
+    // against it.
+    void stall()
+    {
+        thread_.quit();
+        thread_.wait();
     }
 
     [[nodiscard]] QString const& uniqueName() const
@@ -252,14 +273,22 @@ void writeRawRecord(QString const& config_dir, QString const& contents)
     file.write(contents.toUtf8());
 }
 
+[[nodiscard]] QString sessionBusId()
+{
+    auto* const iface = QDBusConnection::sessionBus().interface();
+    return iface != nullptr ? QDBusReply<QString>{ iface->call(QStringLiteral("GetId")) }.value() : QString{};
+}
+
 // Writes the record a running client leaves in its config dir.
 // The interface and path are arguments because a caller has to honour what it finds there,
-// not assume its own.
+// not assume its own. The bus ID is one because a record from another bus is what some
+// cases below are about.
 void claimConfigDir(
     QString const& config_dir,
     QString const& bus_name,
     QString const& interface = InterfaceName,
-    QString const& path = ObjectPath)
+    QString const& path = ObjectPath,
+    QString const& bus_id = sessionBusId())
 {
     // Through the writer a real client uses, so a change to the format cannot leave these
     // cases passing against a spelling nothing writes.
@@ -267,7 +296,14 @@ void claimConfigDir(
     QVERIFY(
         tr::interop::write_dbus_peer_record(
             config_dir.toStdString(),
-            { bus_name.toStdString(), interface.toStdString(), path.toStdString() }));
+            { bus_name.toStdString(), interface.toStdString(), path.toStdString(), bus_id.toStdString() }));
+}
+
+// The record a release from before the bus ID leaves: the same three keys and no bus ID,
+// which the writer leaves out of the file.
+void claimConfigDirNamingNoBus(QString const& config_dir, QString const& bus_name)
+{
+    claimConfigDir(config_dir, bus_name, InterfaceName, ObjectPath, QString{});
 }
 
 // A launch on `config_dir` with one torrent to hand over.
@@ -288,6 +324,18 @@ void expectDelegated(QString const& config_dir, FakeClientBase const& client, QS
 {
     QVERIFY(delegate(config_dir, metainfo));
     QCOMPARE(client.received(), QStringList{ metainfo });
+}
+
+// A launch on `config_dir` that no instance takes, and the most it may spend finding that
+// out. The default D-Bus call timeout is several times DBusPeerProbeTimeout, so a bound
+// in the probe's terms tells a launch that gave up on a record from one that waited.
+void expectNotDelegatedWithin(QString const& config_dir, QString const& metainfo, qint64 const limit_msec)
+{
+    auto timer = QElapsedTimer{};
+    timer.start();
+    QVERIFY(!delegate(config_dir, metainfo));
+    auto const elapsed = timer.elapsed();
+    QVERIFY2(elapsed < limit_msec, qPrintable(QStringLiteral("took %1 ms, limit %2 ms").arg(elapsed).arg(limit_msec)));
 }
 
 } // namespace
@@ -526,18 +574,78 @@ private slots:
         QVERIFY(instance->add_metainfo("magnet:?xt=gone") == tr::interop::Reply::Gone);
     }
 
-    // Unique names are reused after a session-bus restart.
-    // A stale record can therefore name a live process whose object has nothing to do with Transmission;
-    // its D-Bus identity errors must not consume this launch.
-    static void ignores_a_stale_record_whose_bus_name_was_reused()
+    // A bus restart reissues its unique names, so a record from another bus can name a
+    // live process that ignores calls. Nothing here may call it, or the launch stalls.
+    // The client below answers at once and would take the torrent, so only its call
+    // count tells a launch that never asked from one that asked and moved on.
+    static void does_not_call_the_name_in_a_record_from_another_bus()
+    {
+        auto const dir = QTemporaryDir{};
+        auto client = FakeClient{ dir.path() };
+        auto const thread = ClientThread{ QStringLiteral("other-bus"), &client, false };
+        claimConfigDir(
+            dir.path(),
+            thread.uniqueName(),
+            InterfaceName,
+            ObjectPath,
+            QStringLiteral("0123456789abcdef0123456789abcdef"));
+
+        expectNotDelegatedWithin(dir.path(), QStringLiteral("magnet:?xt=other-bus"), tr::interop::DBusPeerProbeTimeoutMsec);
+        QCOMPARE(client.configDirCalls(), 0);
+        QVERIFY(client.received().isEmpty());
+    }
+
+    // A record that names no bus is what a release before the bus ID leaves, and the record
+    // is the only way to reach that release when it does not hold the well-known name.
+    static void delegates_through_a_record_that_names_no_bus()
+    {
+        auto const dir = QTemporaryDir{};
+        auto client = FakeClient{ dir.path() };
+        auto const thread = ClientThread{ QStringLiteral("no-bus"), &client, false };
+        claimConfigDirNamingNoBus(dir.path(), thread.uniqueName());
+
+        expectDelegated(dir.path(), client, QStringLiteral("magnet:?xt=no-bus"));
+    }
+
+    // The same record once the bus has restarted and given its name to a process that
+    // ignores calls: the launch has to give the name one short chance and then start.
+    static void gives_up_quickly_on_a_record_that_names_no_bus_when_nobody_answers()
+    {
+        auto const dir = QTemporaryDir{};
+        auto client = FakeClient{ dir.path() };
+        auto thread = ClientThread{ QStringLiteral("silent"), &client, false };
+        thread.stall();
+        claimConfigDirNamingNoBus(dir.path(), thread.uniqueName());
+
+        expectNotDelegatedWithin(dir.path(), QStringLiteral("magnet:?xt=silent"), 2 * tr::interop::DBusPeerProbeTimeoutMsec);
+    }
+
+    // ...and a process that answers the probe with an error is passed over at once.
+    // Its D-Bus identity errors must not consume this launch.
+    static void ignores_a_record_that_names_no_bus_when_an_unrelated_process_answers()
     {
         auto const dir = QTemporaryDir{};
         auto unrelated = ForeignFakeClient{ dir.path() };
         auto const thread = ClientThread{ QStringLiteral("reused"), &unrelated, false, ForeignObjectPath };
+        claimConfigDirNamingNoBus(dir.path(), thread.uniqueName());
+
+        expectNotDelegatedWithin(dir.path(), QStringLiteral("magnet:?xt=stale"), tr::interop::DBusPeerProbeTimeoutMsec);
+        QVERIFY(unrelated.received().isEmpty());
+    }
+
+    // A record from this bus is taken without a probe, so the calls that follow are the
+    // first its client sees. One that has taken its object off the bus, as a client
+    // closing down does while it still holds its name, answers each with an error at
+    // once. Those must not consume this launch either, nor cost it a wait.
+    static void ignores_a_recorded_client_that_answers_only_errors()
+    {
+        auto const dir = QTemporaryDir{};
+        auto elsewhere = ForeignFakeClient{ dir.path() };
+        auto const thread = ClientThread{ QStringLiteral("closing"), &elsewhere, false, ForeignObjectPath };
         claimConfigDir(dir.path(), thread.uniqueName());
 
-        QVERIFY(!delegate(dir.path(), QStringLiteral("magnet:?xt=stale")));
-        QVERIFY(unrelated.received().isEmpty());
+        expectNotDelegatedWithin(dir.path(), QStringLiteral("magnet:?xt=closing"), tr::interop::DBusPeerProbeTimeoutMsec);
+        QVERIFY(elsewhere.received().isEmpty());
     }
 
     // A client that predates ConfigDir() cannot say which dir it serves, and here it is the
@@ -582,6 +690,8 @@ private slots:
         QCOMPARE(QString::fromStdString(record->bus_name), QDBusConnection::sessionBus().baseService());
         QCOMPARE(QString::fromStdString(record->interface), InterfaceName);
         QCOMPARE(QString::fromStdString(record->path), ObjectPath);
+        QVERIFY(!record->bus_id.empty()); // the compare below says nothing if neither side got an ID
+        QCOMPARE(QString::fromStdString(record->bus_id), sessionBusId());
 
         QVERIFY(QDBusConnection::sessionBus().unregisterService(ServiceName));
     }

@@ -78,11 +78,13 @@ Glib::ustring tr_strlratio(double ratio);
 
 // Builds a D-Bus argument list. Parameters are always a tuple,
 // even when there is one of them or none.
+// The vector is spelled out because an empty braced list matches two create_tuple() overloads.
 template<typename... Ts>
 [[nodiscard]] Glib::VariantContainerBase gtr_variant_tuple(Ts&&... args)
 {
     return Glib::VariantContainerBase::create_tuple(
-        { Glib::Variant<std::remove_cv_t<std::remove_reference_t<Ts>>>::create(std::forward<Ts>(args))... });
+        std::vector<Glib::VariantBase>{
+            Glib::Variant<std::remove_cv_t<std::remove_reference_t<Ts>>>::create(std::forward<Ts>(args))... });
 }
 
 std::string tr_format_time_relative(time_t timestamp, time_t origin);
