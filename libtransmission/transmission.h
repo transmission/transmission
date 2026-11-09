@@ -19,6 +19,7 @@
 #include <mutex>
 #include <string>
 #include <string_view>
+#include <vector>
 #else
 #include <stdbool.h> // bool
 #endif
@@ -1259,6 +1260,14 @@ struct tr_peer_stat
 tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, size_t* peer_count);
 
 void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t peer_count);
+
+using tr_torrent_peers_func = std::function<void(std::vector<tr_peer_stat>)>;
+
+// Passes `torrent`'s peer stats to `callback` on libtransmission's thread,
+// or an empty vector if the torrent is gone by then.
+// Called from another thread, it runs after any work already queued there.
+// Has the same restrictions as `tr_sessionSetCompletenessCallback`.
+void tr_torrentPeersAsync(tr_torrent const* torrent, tr_torrent_peers_func callback);
 
 // --- tr_tracker_stat
 

@@ -48,6 +48,8 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @property(nonatomic) BOOL fResumeOnWake;
 @property(nonatomic, copy, readwrite) NSString* hashString;
 
+@property(nonatomic, copy) NSArray<NSDictionary*>* peers;
+
 - (BOOL)canChangeDownloadChecks;
 
 - (void)renameFinished:(BOOL)success
@@ -987,44 +989,67 @@ static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* e
     return error;
 }
 
-- (NSArray<NSDictionary*>*)peers
+[[nodiscard]]
+static NSArray<NSDictionary*>* peerDicts(std::vector<tr_peer_stat> const& peers, NSString* const name)
 {
-    size_t totalPeers;
-    tr_peer_stat* peers = tr_torrentPeers(self.fHandle, &totalPeers);
+    NSMutableArray* dicts = [NSMutableArray arrayWithCapacity:peers.size()];
 
-    NSMutableArray* peerDicts = [NSMutableArray arrayWithCapacity:totalPeers];
-
-    for (size_t i = 0; i < totalPeers; i++)
+    for (auto const& peer : peers)
     {
-        tr_peer_stat* peer = &peers[i];
         NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithCapacity:12];
 
-        dict[@"Name"] = self.name;
-        dict[@"From"] = @(peer->from);
-        dict[@"IP"] = @(peer->addr);
-        dict[@"Port"] = @(peer->port);
-        dict[@"Progress"] = @(peer->progress);
-        dict[@"Seed"] = @(peer->isSeed);
-        dict[@"Encryption"] = @(peer->isEncrypted);
-        dict[@"uTP"] = @(peer->isUTP);
-        dict[@"Client"] = @(peer->client);
-        dict[@"Flags"] = @(peer->flagStr);
+        dict[@"Name"] = name;
+        dict[@"From"] = @(peer.from);
+        dict[@"IP"] = @(peer.addr);
+        dict[@"Port"] = @(peer.port);
+        dict[@"Progress"] = @(peer.progress);
+        dict[@"Seed"] = @(peer.isSeed);
+        dict[@"Encryption"] = @(peer.isEncrypted);
+        dict[@"uTP"] = @(peer.isUTP);
+        dict[@"Client"] = @(peer.client);
+        dict[@"Flags"] = @(peer.flagStr);
 
-        if (peer->isUploadingTo)
+        if (peer.isUploadingTo)
         {
-            dict[@"UL To Rate"] = @(peer->rateToPeer_KBps);
+            dict[@"UL To Rate"] = @(peer.rateToPeer_KBps);
         }
-        if (peer->isDownloadingFrom)
+        if (peer.isDownloadingFrom)
         {
-            dict[@"DL From Rate"] = @(peer->rateToClient_KBps);
+            dict[@"DL From Rate"] = @(peer.rateToClient_KBps);
         }
 
-        [peerDicts addObject:dict];
+        [dicts addObject:dict];
     }
 
-    tr_torrentPeersFree(peers, totalPeers);
+    return dicts;
+}
 
-    return peerDicts;
+- (void)refreshPeers
+{
+    if (self.fHandle == nullptr)
+    {
+        return; // a safeguard: closeRemoveTorrent: clears the handle, after the inspector has dropped this torrent
+    }
+
+    NSString* const name = self.name;
+    tr_torrentPeersAsync(
+        self.fHandle,
+        [torrent = self, name](std::vector<tr_peer_stat> peers)
+        {
+            // Not dispatch_async: GCD doesn't service the main queue in a run loop nested inside a main-queue block,
+            // so during a runModal started from one each tick's arrival would pile up until it's dismissed.
+            CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopCommonModes, ^{
+                torrent.peers = peerDicts(peers, name);
+
+                // coalescing: N selected torrents bring N arrivals per update, and each reload re-sorts all their peers
+                [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"TorrentPeersChange"
+                                                                                                    object:nil]
+                                                         postingStyle:NSPostASAP
+                                                         coalesceMask:NSNotificationCoalescingOnName
+                                                             forModes:nil];
+            });
+            CFRunLoopWakeUp(CFRunLoopGetMain());
+        });
 }
 
 - (NSUInteger)webSeedCount
@@ -1865,6 +1890,7 @@ static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* e
     }
 
     _fResumeOnWake = NO;
+    _peers = @[];
     _hashString = @(tr_torrentView(self.fHandle).hash_string);
 
     //don't do after this point - it messes with auto-group functionality

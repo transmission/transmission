@@ -1515,6 +1515,32 @@ void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t /*peer_count*/)
     delete[] peer_stats;
 }
 
+void tr_torrentPeersAsync(tr_torrent const* const tor, tr_torrent_peers_func callback)
+{
+    tr_return_if_fail(tr_isTorrent(tor));
+    tr_return_if_fail(callback != nullptr);
+
+    tor->session->queue_session_thread(
+        [session = tor->session, tor_id = tor->id(), callback = std::move(callback)]()
+        {
+            auto peers = std::vector<tr_peer_stat>{};
+
+            {
+                // other threads add torrents under the session lock
+                auto const lock = session->unique_lock();
+                if (auto const* const torrent = session->torrents().get(tor_id); torrent != nullptr)
+                {
+                    auto n_peers = size_t{};
+                    auto* const stats = tr_torrentPeers(torrent, &n_peers);
+                    peers.assign(stats, stats + n_peers);
+                    tr_torrentPeersFree(stats, n_peers);
+                }
+            }
+
+            callback(std::move(peers));
+        });
+}
+
 void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
 {
     tr_return_if_fail(tr_isTorrent(tor));

@@ -42,6 +42,8 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
     if ((self = [super initWithNibName:@"InfoPeersView" bundle:nil]))
     {
         self.title = NSLocalizedString(@"Peers", "Inspector view -> title");
+
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(reloadPeers) name:@"TorrentPeersChange" object:nil];
     }
 
     return self;
@@ -101,6 +103,20 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
 }
 
 - (void)updateInfo
+{
+    [self reloadPeers];
+
+    // arrivals reload the tables through TorrentPeersChange
+    for (Torrent* torrent in self.fTorrents)
+    {
+        if (torrent.active)
+        {
+            [torrent refreshPeers];
+        }
+    }
+}
+
+- (void)reloadPeers
 {
     if (!self.fSet)
     {
