@@ -42,6 +42,7 @@ target_sources(libtransmission-test
         peer-mgr-wishlist-test.cc
         peer-msgs-test.cc
         platform-test.cc
+        port-forwarding-natpmp-test.cc
         quark-test.cc
         remove-test.cc
         rename-test.cc
@@ -96,6 +97,7 @@ target_link_libraries(libtransmission-test
         dht::dht
         transmission::fmt-header-only
         libevent::core
+        natpmp::natpmp
         WideInteger::WideInteger)
 
 tr_setup_gtest_target(libtransmission-test "LT.")
