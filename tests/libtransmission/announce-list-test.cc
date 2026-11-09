@@ -3,23 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> // std::equal
 #include <array>
-#include <cstdio>
 #include <set>
 #include <string>
 #include <string_view>
-#include <vector>
 
 #include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/announce-list.h>
-#include <libtransmission/error.h>
-#include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/tr-strbuf.h>
-#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 
@@ -348,68 +341,6 @@ TEST_F(AnnounceListTest, announceToScrape)
         auto const scrape = tr_announce_list::announce_to_scrape(test.announce);
         EXPECT_EQ(test.expected_scrape, scrape.value_or(""));
     }
-}
-
-TEST_F(AnnounceListTest, save)
-{
-    auto constexpr Urls = std::array<char const*, 3>{
-        "https://www.example.com/a/announce",
-        "https://www.example.com/b/announce",
-        "https://www.example.com/c/announce",
-    };
-    auto constexpr Tiers = std::array<tr_tracker_tier_t, 3>{ 0, 1, 2 };
-
-    // first, set up a scratch torrent
-    auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
-    auto original_content = std::vector<char>{};
-    auto const sandbox = libtransmission::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
-    auto const test_file = tr_pathbuf{ sandbox, "transmission-announce-list-test.torrent"sv };
-    auto error = tr_error{};
-    EXPECT_TRUE(tr_file_read(OriginalFile, original_content, &error));
-    EXPECT_FALSE(error) << error;
-    EXPECT_TRUE(tr_file_save(test_file.sv(), original_content, &error));
-    EXPECT_FALSE(error) << error;
-
-    // make an announce_list for it
-    auto announce_list = tr_announce_list();
-    EXPECT_TRUE(announce_list.add(Urls[0], Tiers[0]));
-    EXPECT_TRUE(announce_list.add(Urls[1], Tiers[1]));
-    EXPECT_TRUE(announce_list.add(Urls[2], Tiers[2]));
-
-    // try saving to a nonexistent torrent file
-    EXPECT_FALSE(announce_list.save("/this/path/does/not/exist", &error));
-    EXPECT_TRUE(error);
-    EXPECT_NE(0, error.code());
-    error = {};
-
-    // now save to a real torrent file
-    EXPECT_TRUE(announce_list.save(std::string{ test_file.sv() }, &error));
-    EXPECT_FALSE(error) << error;
-
-    // load the original
-    auto original_tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(original_tm.parse_benc({ std::data(original_content), std::size(original_content) }));
-
-    // load the scratch that we saved to
-    auto modified_tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(modified_tm.parse_torrent_file(test_file.sv()));
-
-    // test that non-announce parts of the metainfo are the same
-    EXPECT_EQ(original_tm.name(), modified_tm.name());
-    EXPECT_EQ(original_tm.file_count(), modified_tm.file_count());
-    EXPECT_EQ(original_tm.date_created(), modified_tm.date_created());
-    EXPECT_EQ(original_tm.piece_count(), modified_tm.piece_count());
-
-    // test that the saved version has the updated announce list
-    EXPECT_TRUE(
-        std::equal(
-            std::begin(announce_list),
-            std::end(announce_list),
-            std::begin(modified_tm.announce_list()),
-            std::end(modified_tm.announce_list())));
-
-    // cleanup
-    (void)std::remove(test_file.c_str());
 }
 
 TEST_F(AnnounceListTest, SingleAnnounce)

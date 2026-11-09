@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::equal
 #include <array>
 #include <cerrno>
 #include <cstddef> // size_t
@@ -11,6 +12,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/announce-list.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
@@ -167,6 +169,72 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     EXPECT_TRUE(tr_sys_path_remove(tgt_filename, &error));
     EXPECT_FALSE(error) << error;
     tr_ctorFree(ctor);
+}
+
+TEST_F(TorrentMetainfoTest, saveAnnounceList)
+{
+    auto constexpr Urls = std::array<char const*, 3>{
+        "https://www.example.com/a/announce",
+        "https://www.example.com/b/announce",
+        "https://www.example.com/c/announce",
+    };
+    auto constexpr Tiers = std::array<tr_tracker_tier_t, 3>{ 0, 1, 2 };
+
+    // first, set up a scratch torrent
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
+    auto const tgt_filename = tr_pathbuf{ sandboxDir(), "/save-announce-list-test.torrent"sv };
+    auto error = tr_error{};
+    EXPECT_TRUE(tr_sys_path_copy(src_filename, tgt_filename, &error)) << error;
+
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_TRUE(tm.parse_torrent_file(tgt_filename.sv()));
+    auto const old_offset = tm.info_dict_offset();
+
+    // give it new trackers
+    auto& announce_list = tm.announce_list();
+    announce_list = tr_announce_list{};
+    EXPECT_TRUE(announce_list.add(Urls[0], Tiers[0]));
+    EXPECT_TRUE(announce_list.add(Urls[1], Tiers[1]));
+    EXPECT_TRUE(announce_list.add(Urls[2], Tiers[2]));
+
+    // a failed save leaves the file and info_dict_offset() alone
+    EXPECT_FALSE(tm.save_announce_list("/this/path/does/not/exist", &error));
+    EXPECT_TRUE(error);
+    EXPECT_NE(0, error.code());
+    EXPECT_EQ(old_offset, tm.info_dict_offset());
+    error = {};
+
+    // this one fails after re-encoding, before writing: the file has no info dict
+    auto const no_info_filename = tr_pathbuf{ sandboxDir(), "/no-info.torrent"sv };
+    auto constexpr NoInfo = "d7:comment3:fooe"sv;
+    EXPECT_TRUE(tr_file_save(no_info_filename.sv(), NoInfo, &error)) << error;
+    EXPECT_FALSE(tm.save_announce_list(no_info_filename.sv(), &error));
+    EXPECT_TRUE(error);
+    EXPECT_EQ(old_offset, tm.info_dict_offset());
+    error = {};
+    auto contents = std::vector<char>{};
+    EXPECT_TRUE(tr_file_read(no_info_filename.sv(), contents, &error)) << error;
+    EXPECT_EQ(NoInfo, std::string_view(std::data(contents), std::size(contents)));
+
+    // now save to a real torrent file
+    EXPECT_TRUE(tm.save_announce_list(tgt_filename.sv(), &error));
+    EXPECT_FALSE(error) << error;
+
+    // the saved file is the same torrent with the new trackers
+    auto saved = tr_torrent_metainfo{};
+    EXPECT_TRUE(saved.parse_torrent_file(tgt_filename.sv()));
+    EXPECT_EQ(tm.info_hash(), saved.info_hash());
+    EXPECT_EQ(tm.date_created(), saved.date_created());
+    EXPECT_TRUE(
+        std::equal(
+            std::begin(announce_list),
+            std::end(announce_list),
+            std::begin(saved.announce_list()),
+            std::end(saved.announce_list())));
+
+    // the new trackers moved the info dict, and tm knows where to
+    EXPECT_NE(old_offset, saved.info_dict_offset());
+    EXPECT_EQ(saved.info_dict_offset(), tm.info_dict_offset());
 }
 
 TEST_F(TorrentMetainfoTest, magnetInfoHash)

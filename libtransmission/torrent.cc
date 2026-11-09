@@ -2010,27 +2010,26 @@ bool tr_torrent::set_announce_list(tr_announce_list announce_list)
 {
     auto const lock = unique_lock();
 
-    auto& tgt = metainfo_.announce_list();
-
-    tgt = std::move(announce_list);
+    metainfo_.announce_list() = std::move(announce_list);
 
     // save the changes
     auto save_error = tr_error{};
     auto filename = std::string{};
+    auto saved = false;
     if (has_metainfo())
     {
         filename = torrent_file();
-        tgt.save(filename, &save_error);
+        saved = metainfo_.save_announce_list(filename, &save_error);
     }
     else
     {
         filename = magnet_file();
-        tr_file_save(filename, magnet(), &save_error);
+        saved = tr_file_save(filename, magnet(), &save_error);
     }
 
     on_announce_list_changed();
 
-    if (save_error.has_value())
+    if (!saved)
     {
         error().set_local_error(
             fmt::format(
