@@ -14,6 +14,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/error-types.h>
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/open-files.h>
@@ -173,6 +174,50 @@ TEST_F(OpenFilesTest, closeTorrentClosesTheTorrentFiles)
     EXPECT_FALSE(session_->openFiles().get(TorId, 1, false));
     EXPECT_FALSE(session_->openFiles().get(TorId, 3, false));
 }
+
+namespace
+{
+
+[[nodiscard]] bool failPreallocation(tr_error* const error, bool const disk_full)
+{
+#ifdef _WIN32
+    error->set(disk_full ? ERROR_DISK_FULL : ERROR_NOT_SUPPORTED, "injected preallocation error"sv);
+#else
+    error->set(disk_full ? ENOSPC : ENOSYS, "injected preallocation error"sv);
+#endif
+    return false;
+}
+
+// Param: whether the injected preallocation failure is a full disk.
+class OpenFilesSparsePreallocationTest
+    : public libtransmission::test::SandboxedTest
+    , public ::testing::WithParamInterface<bool>
+{
+};
+
+} // namespace
+
+TEST_P(OpenFilesSparsePreallocationTest, growsFileUnlessDiskIsFull)
+{
+    static auto constexpr FileSize = uint64_t{ 4096U };
+    auto const disk_full = GetParam();
+    auto const filename = tr_pathbuf{ sandboxDir(), "/sparse.bin" };
+    auto files = tr_open_files{ [&](tr_sys_file_t, uint64_t const size, int const flags, tr_error* const error)
+                                {
+                                    EXPECT_EQ(FileSize, size);
+                                    EXPECT_EQ(TR_SYS_FILE_PREALLOC_SPARSE, flags);
+                                    return failPreallocation(error, disk_full);
+                                } };
+
+    EXPECT_EQ(!disk_full, files.get(0, 0, true, filename, tr_open_files::Preallocation::Sparse, FileSize).has_value());
+
+    // a full disk skips the fallbacks
+    auto const info = tr_sys_path_get_info(filename);
+    ASSERT_TRUE(info);
+    EXPECT_EQ(disk_full ? 0U : FileSize, info->size);
+}
+
+INSTANTIATE_TEST_SUITE_P(SparseAllocation, OpenFilesSparsePreallocationTest, ::testing::Bool());
 
 TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
 {
