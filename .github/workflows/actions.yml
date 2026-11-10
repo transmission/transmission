@@ -243,6 +243,10 @@ jobs:
       needs.what-to-make.outputs.make-gtk == 'true' ||
       needs.what-to-make.outputs.make-qt == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true'
+    env:
+      CTCACHE_DIR: /tmp/ctcache
+      CTCACHE_SAVE_OUTPUT: '1'
+      CTCACHE_NO_LOCAL_STATS: '1'
     steps:
       - name: Show Configuration
         run: |
@@ -266,6 +270,13 @@ jobs:
           compiler: clang
           enable-clang-tidy: true
           use-sudo: true
+      - name: Restore clang-tidy cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ env.CTCACHE_DIR }}
+          key: ctcache-${{ runner.os }}-core-${{ hashFiles('**/.clang-tidy') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ctcache-${{ runner.os }}-core-${{ hashFiles('**/.clang-tidy') }}-
       - name: Configure
         run: |
           cmake \
@@ -294,6 +305,17 @@ jobs:
       - name: Test for warnings
         run: |
           if grep 'warning:' makelog; then exit 1; fi
+      - name: Prune stale clang-tidy cache entries
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p "$CTCACHE_DIR"
+          find "$CTCACHE_DIR" -type f -mtime +14 -delete 2>/dev/null || true
+      - name: Save clang-tidy cache
+        if: ${{ !cancelled() }}
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ env.CTCACHE_DIR }}
+          key: ctcache-${{ runner.os }}-core-${{ hashFiles('**/.clang-tidy') }}-${{ github.run_id }}-${{ github.run_attempt }}
 
   what-to-clang-tidy:
     runs-on: ubuntu-latest
@@ -356,6 +378,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.what-to-clang-tidy.outputs.matrix) }}
+    env:
+      CTCACHE_DIR: /tmp/ctcache
+      CTCACHE_SAVE_OUTPUT: '1'
+      CTCACHE_NO_LOCAL_STATS: '1'
     steps:
       - name: Show Configuration
         run: |
@@ -376,6 +402,13 @@ jobs:
           use-sudo: true
           enable-gtk: ${{ matrix.enable-gtk }}
           enable-qt: ${{ matrix.enable-qt }}
+      - name: Restore clang-tidy cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ env.CTCACHE_DIR }}
+          key: ctcache-${{ runner.os }}-${{ matrix.target }}-${{ matrix.enable-gtk }}-${{ matrix.enable-qt }}-${{ matrix.enable-tests }}-${{ hashFiles('**/.clang-tidy') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ctcache-${{ runner.os }}-${{ matrix.target }}-${{ matrix.enable-gtk }}-${{ matrix.enable-qt }}-${{ matrix.enable-tests }}-${{ hashFiles('**/.clang-tidy') }}-
       - name: Configure
         run: |
           cmake \
@@ -402,6 +435,17 @@ jobs:
       - name: Test for warnings
         run: |
           if grep 'warning:' makelog; then exit 1; fi
+      - name: Prune stale clang-tidy cache entries
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p "$CTCACHE_DIR"
+          find "$CTCACHE_DIR" -type f -mtime +14 -delete 2>/dev/null || true
+      - name: Save clang-tidy cache
+        if: ${{ !cancelled() }}
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ env.CTCACHE_DIR }}
+          key: ctcache-${{ runner.os }}-${{ matrix.target }}-${{ matrix.enable-gtk }}-${{ matrix.enable-qt }}-${{ matrix.enable-tests }}-${{ hashFiles('**/.clang-tidy') }}-${{ github.run_id }}-${{ github.run_attempt }}
 
   clang-tidy-libtransmission-win32:
     runs-on: windows-2025
@@ -409,6 +453,10 @@ jobs:
     if: |
       needs.what-to-make.outputs.make-core == 'true' ||
       needs.what-to-make.outputs.make-tests == 'true'
+    env:
+      CTCACHE_DIR: ${{ github.workspace }}/ctcache
+      CTCACHE_SAVE_OUTPUT: '1'
+      CTCACHE_NO_LOCAL_STATS: '1'
     steps:
       - name: Show Configuration
         run: |
@@ -428,6 +476,21 @@ jobs:
         uses: ./src/.github/actions/setup-vs-env-win32
         with:
           arch: x64
+      - name: Install clang-tidy cache (ctcache)
+        run: |
+          # ctcache wraps clang-tidy and caches results for unchanged translation
+          # units, so CI re-tidies only changed files. Pinned for reproducibility.
+          python -m venv "$Env:USERPROFILE\.ctcache-venv"
+          & "$Env:USERPROFILE\.ctcache-venv\Scripts\pip.exe" install `
+            "git+https://github.com/matus-chochlik/ctcache@0c7fee26e09ae8a393ed7d56164102da118ab23a"
+          Add-Content -Path $Env:GITHUB_PATH -Value "$Env:USERPROFILE\.ctcache-venv\Scripts"
+      - name: Restore clang-tidy cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ env.CTCACHE_DIR }}
+          key: ctcache-${{ runner.os }}-core-${{ hashFiles('**/.clang-tidy') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ctcache-${{ runner.os }}-core-${{ hashFiles('**/.clang-tidy') }}-
       - name: Configure
         run: |
           $CmakeArgs = @(
@@ -454,6 +517,19 @@ jobs:
       - name: Test for warnings
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
+      - name: Prune stale clang-tidy cache entries
+        if: ${{ !cancelled() }}
+        run: |
+          New-Item -ItemType Directory -Force -Path "$Env:CTCACHE_DIR" | Out-Null
+          Get-ChildItem -Path "$Env:CTCACHE_DIR" -Recurse -File |
+            Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-14) } |
+            Remove-Item -Force -ErrorAction SilentlyContinue
+      - name: Save clang-tidy cache
+        if: ${{ !cancelled() }}
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ env.CTCACHE_DIR }}
+          key: ctcache-${{ runner.os }}-core-${{ hashFiles('**/.clang-tidy') }}-${{ github.run_id }}-${{ github.run_attempt }}
 
   macos-xcodebuild-universal:
     runs-on: macos-26
