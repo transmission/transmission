@@ -1162,10 +1162,25 @@ a {
   }
 
   .tier-list-tracker {
+    align-items: center;
+    display: flex;
     font-size: 14px;
     font-weight: bolder;
+    gap: 8px;
     grid-column: span 2;
+    justify-content: space-between;
     padding-bottom: 4px;
+
+    > span {
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .tier-remove-button {
+    flex-shrink: 0;
+    font-size: 12px;
   }
 
   .tier-announce,

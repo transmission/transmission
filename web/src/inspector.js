@@ -845,6 +845,39 @@ export class Inspector extends EventTarget {
     }
   }
 
+  // Build a `tracker_list` value (one announce URL per line, a blank line
+  // between tiers) from a torrent's trackers, leaving out `removed`.
+  static trackerListWithout(trackers, removed) {
+    const tiers = new Map();
+    for (const tracker of trackers) {
+      if (tracker.id === removed.id) {
+        continue;
+      }
+      if (!tiers.has(tracker.tier)) {
+        tiers.set(tracker.tier, []);
+      }
+      tiers.get(tracker.tier).push(tracker.announce);
+    }
+    return [...tiers.keys()]
+      .toSorted((a, b) => a - b)
+      .map((tier) => tiers.get(tier).join('\n'))
+      .join('\n\n');
+  }
+
+  _removeTracker(tor, tracker) {
+    const { controller } = this;
+    const tracker_list = Inspector.trackerListWithout(
+      tor.getTrackers(),
+      tracker,
+    );
+    controller.remote.setTrackerList([tor.getId()], tracker_list, () => {
+      controller.updateTorrents(
+        [tor.getId()],
+        ['id', ...Torrent.Fields.StatsExtra],
+      );
+    });
+  }
+
   _updateTiers() {
     const na = 'N/A';
     const { list } = this.elements.tiers;
@@ -871,8 +904,19 @@ export class Inspector extends EventTarget {
         let element = document.createElement('div');
         const site = Inspector._getOrigin(tracker);
         element.classList.add('tier-list-tracker');
-        setTextContent(element, `${site} - tier ${tracker.tier + 1}`);
-        element.setAttribute('title', tracker.announce);
+        const label = document.createElement('span');
+        setTextContent(label, `${site} - tier ${tracker.tier + 1}`);
+        label.setAttribute('title', tracker.announce);
+        element.append(label);
+        const remove_button = document.createElement('button');
+        remove_button.classList.add('tier-remove-button');
+        remove_button.setAttribute('type', 'button');
+        remove_button.setAttribute('title', `Remove ${tracker.announce}`);
+        setTextContent(remove_button, 'Remove');
+        remove_button.addEventListener('click', () =>
+          this._removeTracker(tor, tracker),
+        );
+        element.append(remove_button);
         tier_div.append(element);
 
         element = document.createElement('div');
