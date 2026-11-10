@@ -64,10 +64,13 @@ class RemoteInstance final : public tr::interop::Instance
 public:
     // The interface and path are whatever the peer recorded, and need not be this build's own.
     // A client built from other sources names its own interface, and we call whatever it named.
-    RemoteInstance(QString service, QString interface, QString path)
+    // `timeout_msec` is QtDBus's: -1 for its default, which a merely busy client must be given.
+    // answers_config_dir() is the one caller that shortens it.
+    RemoteInstance(QString service, QString interface, QString path, int const timeout_msec = -1)
         : service_{ std::move(service) }
         , interface_{ std::move(interface) }
         , path_{ std::move(path) }
+        , timeout_msec_{ timeout_msec }
     {
     }
 
@@ -108,13 +111,10 @@ private:
     {
         auto request = QDBusMessage::createMethodCall(service_, path_, interface_, method);
         request.setArguments(args);
-        // Keep the default timeout. A client that is merely busy must not look absent.
-        return QDBusConnection::sessionBus().call(request);
+        return QDBusConnection::sessionBus().call(request, QDBus::Block, timeout_msec_);
     }
 
     // Only a valid reply proves this endpoint implements the method.
-    // Identity and signature errors can come from an unrelated process that inherited
-    // a reused unique bus name from a stale record.
     template<typename T>
     [[nodiscard]] std::optional<T> call(QString const& method, QVariantList const& args = {}) const
     {
@@ -125,8 +125,7 @@ private:
     // A call whose wire answer is a bool, classified for tr::interop.
     // Two errors prove the peer is gone. ServiceUnknown is the bus reporting that nobody
     // owns the name any more, and Disconnected is this process losing the bus. Every
-    // other error can also come from a busy client, or from an unrelated process that
-    // inherited a reused unique bus name, so it proves nothing.
+    // other error can also come from a busy client, so it proves nothing.
     [[nodiscard]] tr::interop::Reply call_reply(QString const& method, QVariantList const& args = {}) const
     {
         auto const reply = QDBusReply<bool>{ raw_call(method, args) };
@@ -149,7 +148,26 @@ private:
     QString const service_;
     QString const interface_;
     QString const path_;
+    int const timeout_msec_;
 };
+
+// The ID of the bus this connection is on, or empty if the bus driver did not say.
+[[nodiscard]] std::string bus_id(QDBusConnection const& bus)
+{
+    auto* const iface = bus.interface();
+    return iface != nullptr ? QDBusReply<QString>{ iface->call(QStringLiteral("GetId")) }.value().toStdString() : std::string{};
+}
+
+// The probe select_dbus_peer() runs on a record it cannot place on a bus: ConfigDir() at
+// the record's own names, waited on only briefly. See DBusPeerProbeTimeout.
+[[nodiscard]] bool answers_config_dir(tr::interop::DBusPeerRecord const& record)
+{
+    auto peer = RemoteInstance{ QString::fromStdString(record.bus_name),
+                                QString::fromStdString(record.interface),
+                                QString::fromStdString(record.path),
+                                tr::interop::DBusPeerProbeTimeoutMsec };
+    return !peer.config_dir().empty();
+}
 
 } // namespace
 
@@ -170,6 +188,7 @@ void DBusTransport::publish(tr::interop::Instance& self)
 
     tr::interop::publish_dbus_peer(
         config_dir_,
+        bus_id(bus),
         bus.baseService().toStdString(),
         [this, &self, &bus]
         {
@@ -195,13 +214,15 @@ std::unique_ptr<tr::interop::Instance> DBusTransport::find_other_instance()
 
     auto const peer = tr::interop::select_dbus_peer(
         config_dir_,
+        bus_id(bus),
         bus.baseService().toStdString(),
         [&bus](std::string_view const name)
         {
             auto const* const iface = bus.interface();
             return iface != nullptr ? QDBusReply<QString>{ iface->serviceOwner(Utils::toQString(name)) }.value().toStdString() :
                                       std::string{};
-        });
+        },
+        answers_config_dir);
 
     if (!peer)
     {

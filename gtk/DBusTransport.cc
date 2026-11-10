@@ -93,6 +93,7 @@ auto const BusDriverPath = Glib::ustring{ "/org/freedesktop/DBus" };
 
 // The first value of a reply, or nothing when the reply is malformed.
 // Throws what the call throws.
+// `timeout_msec` is GDBus's: -1 for its default, which a merely busy client must be given.
 template<typename T>
 [[nodiscard]] std::optional<T> first_value_or_throw(
     Glib::RefPtr<Gio::DBus::Connection> const& connection,
@@ -100,9 +101,10 @@ template<typename T>
     Glib::ustring const& interface,
     Glib::ustring const& method,
     Glib::VariantContainerBase const& params,
-    Glib::ustring const& service)
+    Glib::ustring const& service,
+    int const timeout_msec = -1)
 {
-    auto const result = connection->call_sync(path, interface, method, params, service);
+    auto const result = connection->call_sync(path, interface, method, params, service, timeout_msec);
 
     // The interface and path come from another client's peer record, so nothing constrains them.
     // GDBus refuses a name it considers malformed by returning no reply and setting no error,
@@ -132,11 +134,12 @@ template<typename T>
     Glib::ustring const& interface,
     Glib::ustring const& method,
     Glib::VariantContainerBase const& params,
-    Glib::ustring const& service)
+    Glib::ustring const& service,
+    int const timeout_msec = -1)
 {
     try
     {
-        return first_value_or_throw<T>(connection, path, interface, method, params, service);
+        return first_value_or_throw<T>(connection, path, interface, method, params, service, timeout_msec);
     }
     catch (Glib::Error const&)
     {
@@ -161,6 +164,12 @@ template<typename T, typename... Args>
     return bus_driver_call<Glib::ustring>(connection, "GetNameOwner", name).value_or(Glib::ustring{});
 }
 
+// The ID of the bus this connection is on, or empty if the bus driver did not say.
+[[nodiscard]] std::string bus_id(Glib::RefPtr<Gio::DBus::Connection> const& connection)
+{
+    return bus_driver_call<Glib::ustring>(connection, "GetId").value_or(Glib::ustring{}).raw();
+}
+
 // True when this connection became the name's primary owner.
 [[nodiscard]] bool request_name(Glib::RefPtr<Gio::DBus::Connection> const& connection, Glib::ustring const& name)
 {
@@ -172,15 +181,19 @@ template<typename T, typename... Args>
 class RemoteInstance final : public tr::interop::Instance
 {
 public:
+    // `timeout_msec` goes to every call; see first_value_or_throw().
+    // answers_config_dir() is the one caller that shortens it.
     RemoteInstance(
         Glib::RefPtr<Gio::DBus::Connection> connection,
         Glib::ustring service,
         Glib::ustring interface,
-        Glib::ustring path)
+        Glib::ustring path,
+        int const timeout_msec = -1)
         : connection_{ std::move(connection) }
         , service_{ std::move(service) }
         , interface_{ std::move(interface) }
         , path_{ std::move(path) }
+        , timeout_msec_{ timeout_msec }
     {
     }
 
@@ -214,24 +227,22 @@ public:
 
 private:
     // Only a valid reply proves this endpoint implements the method.
-    // Identity and signature errors can come from an unrelated process that inherited
-    // a reused unique bus name from a stale record.
     template<typename T>
     [[nodiscard]] std::optional<T> call(Glib::ustring const& method, Glib::VariantContainerBase const& params)
     {
-        return first_value<T>(connection_, path_, interface_, method, params, service_);
+        return first_value<T>(connection_, path_, interface_, method, params, service_, timeout_msec_);
     }
 
     // A call whose wire answer is a bool, classified for tr::interop.
     // Two errors prove the peer is gone. SERVICE_UNKNOWN is the bus reporting that
     // nobody owns the name any more, and DISCONNECTED is this process losing the bus.
-    // Every other error can also come from a busy client, or from an unrelated process
-    // that inherited a reused unique bus name, so it proves nothing.
+    // Every other error can also come from a busy client, so it proves nothing.
     [[nodiscard]] tr::interop::Reply call_reply(Glib::ustring const& method, Glib::VariantContainerBase const& params)
     {
         try
         {
-            auto const value = first_value_or_throw<bool>(connection_, path_, interface_, method, params, service_);
+            auto const
+                value = first_value_or_throw<bool>(connection_, path_, interface_, method, params, service_, timeout_msec_);
             if (!value)
             {
                 return tr::interop::Reply::Unanswered;
@@ -262,7 +273,22 @@ private:
     Glib::ustring const service_;
     Glib::ustring const interface_;
     Glib::ustring const path_;
+    int const timeout_msec_;
 };
+
+// The probe select_dbus_peer() runs on a record it cannot place on a bus: ConfigDir() at
+// the record's own names, waited on only briefly. See DBusPeerProbeTimeout.
+[[nodiscard]] bool answers_config_dir(
+    Glib::RefPtr<Gio::DBus::Connection> const& connection,
+    tr::interop::DBusPeerRecord const& record)
+{
+    auto peer = RemoteInstance{ connection,
+                                to_ustring(record.bus_name),
+                                to_ustring(record.interface),
+                                to_ustring(record.path),
+                                tr::interop::DBusPeerProbeTimeoutMsec };
+    return !peer.config_dir().empty();
+}
 
 } // namespace
 
@@ -340,6 +366,7 @@ void DBusTransport::publish(tr::interop::Instance& self)
 
     tr::interop::publish_dbus_peer(
         config_dir_,
+        bus_id(connection),
         connection->get_unique_name().raw(),
         [this, &connection]
         {
@@ -373,8 +400,10 @@ std::unique_ptr<tr::interop::Instance> DBusTransport::find_other_instance()
 
     auto const peer = tr::interop::select_dbus_peer(
         config_dir_,
+        bus_id(connection),
         connection->get_unique_name().raw(),
-        [&connection](std::string_view const name) { return name_owner(connection, to_ustring(name)).raw(); });
+        [&connection](std::string_view const name) { return name_owner(connection, to_ustring(name)).raw(); },
+        [&connection](tr::interop::DBusPeerRecord const& record) { return answers_config_dir(connection, record); });
 
     if (!peer)
     {

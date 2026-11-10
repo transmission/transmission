@@ -128,8 +128,9 @@ enum class StartupDecision : uint8_t
                     return StartupDecision::Start;
 
                 case Reply::Unanswered:
-                    // Silence before any answer reads as no instance at all,
-                    // most likely a stale record, so the launch starts.
+                    // Silence before any answer proves nothing, so the launch starts.
+                    // An instance that is there but busy still holds its config dir
+                    // lock, and the launch ends on that.
                     if (decision == StartupDecision::Start)
                     {
                         return StartupDecision::Start;

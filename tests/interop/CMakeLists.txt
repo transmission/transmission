@@ -83,24 +83,32 @@ add_test(
         ${GTK_LAUNCHER}
         ${CMAKE_CURRENT_SOURCE_DIR}/mock-instance.py)
 
+# Some sixty launches, two of them waiting out a 3 s probe. The room is for a slow
+# build, and for the script to outlast a few hung launches and report them before
+# ctest cuts it off.
 set_tests_properties(interop-delegation
     PROPERTIES
         SKIP_RETURN_CODE 77
-        TIMEOUT 180
+        TIMEOUT 300
         ENVIRONMENT "${INTEROP_NAME_ENV}")
 
 # A daemon holds the config dir but answers no interop interface, so a launch
 # has nobody to delegate to and must refuse to start a second session on it.
+# The same held dir hosts the stale peer records a launch must get past quickly.
 if(ENABLE_DAEMON AND ENABLE_QT AND ENABLE_QT_DBUS_INTEROP)
     add_test(
         NAME interop-busy
         COMMAND
             bash ${CMAKE_CURRENT_SOURCE_DIR}/busy-test.sh
             $<TARGET_FILE:${TR_NAME}-daemon>
-            ${QT_LAUNCHER})
+            ${QT_LAUNCHER}
+            ${CMAKE_CURRENT_SOURCE_DIR}/mock-instance.py)
 
+    # Three launches, each allowed 60 s before the script counts it as hung, and the
+    # daemon's start. The script has to get to report a hang before ctest cuts it off.
     set_tests_properties(interop-busy
         PROPERTIES
             SKIP_RETURN_CODE 77
-            TIMEOUT 180)
+            TIMEOUT 240
+            ENVIRONMENT "${INTEROP_NAME_ENV}")
 endif()
