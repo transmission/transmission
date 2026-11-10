@@ -822,6 +822,19 @@ public:
         return is_closing_;
     }
 
+    // True while tr_sessionLoadTorrents() is between its first and last file.
+    // The torrent queue is only partly populated until then, so it must not
+    // be written to disk. Session thread only.
+    [[nodiscard]] constexpr auto isLoadingTorrents() const noexcept
+    {
+        return is_loading_torrents_;
+    }
+
+    constexpr void setLoadingTorrents(bool const loading) noexcept
+    {
+        is_loading_torrents_ = loading;
+    }
+
     [[nodiscard]] constexpr auto encryptionMode() const noexcept
     {
         return settings().encryption_mode;
@@ -1259,6 +1272,7 @@ private:
     tr_port advertised_peer_port_;
 
     bool is_closing_ = false;
+    bool is_loading_torrents_ = false;
 
     /// fields that aren't trivial,
     /// but are self-contained / don't hold references to others

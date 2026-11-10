@@ -880,11 +880,7 @@ static void torrentLoadedCallback(tr_torrent* tor, void* user_data)
         __weak __auto_type weakSelf = self;
         self.fLoadRefreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 repeats:NO block:^(NSTimer* _Nonnull timer) {
             weakSelf.fLoadRefreshTimer = nil;
-
-            // Not fullUpdateUI: its stats request queues behind the load on the session thread
-            // and would only be answered once every torrent is in. A new Torrent already has
-            // its own initial stats, which is all the filter and its counts need here.
-            [weakSelf applyFilter];
+            [weakSelf fullUpdateUI];
         }];
     }
 }
