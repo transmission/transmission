@@ -184,6 +184,7 @@ public:
         }
 
         mediator_.api().uninit();
+        mediator_.set_node_count(0);
         tr_logAddTrace("Done uninitializing DHT");
     }
 
@@ -339,8 +340,14 @@ private:
 
     void on_announce_timer()
     {
+        auto nodes4 = int{};
+        auto nodes6 = int{};
+        auto const status4 = swarm_status(AF_INET, &nodes4);
+        auto const status6 = swarm_status(AF_INET6, &nodes6);
+        mediator_.set_node_count(static_cast<size_t>(nodes4) + static_cast<size_t>(nodes6));
+
         // don't announce if the swarm isn't ready
-        if (swarm_status(AF_INET) < SwarmStatus::Poor && swarm_status(AF_INET6) < SwarmStatus::Poor)
+        if (status4 < SwarmStatus::Poor && status6 < SwarmStatus::Poor)
         {
             return;
         }

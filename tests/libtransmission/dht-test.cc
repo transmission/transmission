@@ -151,16 +151,17 @@ protected:
             return 0;
         }
 
-        int nodes(int /*af*/, int* good, int* dubious, int* cached, int* incoming) override
+        int nodes(int af, int* good, int* dubious, int* cached, int* incoming) override
         {
+            auto const it = node_counts_.find(af);
             if (good != nullptr)
             {
-                *good = good_;
+                *good = it != std::end(node_counts_) ? it->second.first : good_;
             }
 
             if (dubious != nullptr)
             {
-                *dubious = dubious_;
+                *dubious = it != std::end(node_counts_) ? it->second.second : dubious_;
             }
 
             if (cached != nullptr)
@@ -255,6 +256,7 @@ protected:
         int dubious_ = 0;
         int cached_ = 0;
         int incoming_ = 0;
+        std::map<int, std::pair<int, int>> node_counts_;
         size_t n_periodic_calls_ = 0;
         bool inited_ = false;
         std::vector<Pinged> pinged_;
@@ -372,6 +374,12 @@ protected:
         {
         }
 
+        void set_node_count(size_t node_count) override
+        {
+            node_count_ = node_count;
+        }
+
+        size_t node_count_ = 0;
         std::string config_dir_;
         std::vector<tr_torrent_id_t> torrents_allowing_dht_;
         std::map<tr_torrent_id_t, tr_sha1_digest_t> info_hashes_;
@@ -404,6 +412,50 @@ protected:
     static auto constexpr ArbitrarySock6 = tr_socket_t{ 418 };
     static auto constexpr ArbitraryPeerPort = tr_port::from_host(909);
 };
+
+TEST_F(DhtTest, publishesNodeCount)
+{
+    auto mediator = MockMediator{ event_base_ };
+    mediator.config_dir_ = sandboxDir();
+    auto& mock_dht = mediator.mock_dht_;
+    mock_dht.node_counts_ = { { AF_INET, { 3, 2 } }, { AF_INET6, { 7, 4 } } };
+    mock_dht.cached_ = 100;
+    mock_dht.incoming_ = 1;
+
+    auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
+    EXPECT_EQ(16U, mediator.node_count_);
+
+    mock_dht.node_counts_[AF_INET] = { 1, 1 };
+    EXPECT_TRUE(waitFor(event_base_, [&mediator]() { return mediator.node_count_ == 13U; }));
+
+    mock_dht.node_counts_ = { { AF_INET, { 0, 0 } }, { AF_INET6, { 0, 0 } } };
+    EXPECT_TRUE(waitFor(event_base_, [&mediator]() { return mediator.node_count_ == 0U; }));
+
+    mock_dht.node_counts_[AF_INET] = { 2, 1 };
+    EXPECT_TRUE(waitFor(event_base_, [&mediator]() { return mediator.node_count_ == 3U; }));
+    dht.reset();
+    EXPECT_EQ(0U, mediator.node_count_);
+}
+
+TEST_F(DhtTest, nodeCountExcludesUnavailableAddressFamilies)
+{
+    auto mediator = MockMediator{ event_base_ };
+    mediator.config_dir_ = sandboxDir();
+    mediator.mock_dht_.node_counts_ = { { AF_INET, { 3, 2 } }, { AF_INET6, { 7, 4 } } };
+
+    {
+        auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, TR_BAD_SOCKET);
+        EXPECT_EQ(5U, mediator.node_count_);
+    }
+    {
+        auto dht = tr_dht::create(mediator, ArbitraryPeerPort, TR_BAD_SOCKET, ArbitrarySock6);
+        EXPECT_EQ(11U, mediator.node_count_);
+    }
+    {
+        auto dht = tr_dht::create(mediator, ArbitraryPeerPort, TR_BAD_SOCKET, TR_BAD_SOCKET);
+        EXPECT_EQ(0U, mediator.node_count_);
+    }
+}
 
 TEST_F(DhtTest, initsWithCorrectSockets)
 {
