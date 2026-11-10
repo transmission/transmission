@@ -1216,6 +1216,13 @@ a {
     white-space: nowrap;
   }
 
+  .known-peer-row td {
+    color: var(--color-fg-secondary);
+    font-size: smaller;
+    padding: 4px 10px;
+    text-align: center;
+  }
+
   .encryption[data-encrypted='true'] {
     background-color: var(--color-border-starkest);
     -webkit-mask: var(--image-lock-fill) no-repeat center / 14px;
