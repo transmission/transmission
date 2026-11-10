@@ -12,6 +12,7 @@
 
 #ifndef _WIN32
 #include <sys/stat.h>
+#include <unistd.h> // access(), W_OK, X_OK
 #endif
 
 #include "libtransmission/error.h"
@@ -237,13 +238,26 @@ bool tr_sys_dir_create(std::string_view path, int flags, [[maybe_unused]] int pe
         {
             auto perm_ec = std::error_code{};
             std::filesystem::permissions(target, final_perms, std::filesystem::perm_options::replace, perm_ec);
-            if (perm_ec)
+            if (!perm_ec)
             {
-                maybe_set_error(error, perm_ec);
-                return false;
+                return true;
             }
 
-            return true;
+            // The directory was created but chmod was rejected. Some filesystems
+            // (e.g. CIFS/SMB mounted with forced uid/gid/mode, FAT, or certain
+            // NFS exports) refuse chmod with EPERM/EACCES even though the
+            // directory is created and fully usable. Treat the umask-adjusted
+            // permissions as best-effort in that case -- but only if the
+            // directory really is a usable (writable, searchable) directory.
+            // If it isn't, the chmod failure is a real problem, so report it.
+            auto check_ec = std::error_code{};
+            if (std::filesystem::is_directory(target, check_ec) && ::access(target.c_str(), W_OK | X_OK) == 0)
+            {
+                return true;
+            }
+
+            maybe_set_error(error, perm_ec);
+            return false;
         };
 
         if (parents)
