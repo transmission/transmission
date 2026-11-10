@@ -23,12 +23,14 @@ function(add_trqt_test source)
     endif()
 endfunction()
 
+add_trqt_test(filterbar-test.cc)
 add_trqt_test(prefs-test.cc)
 add_trqt_test(rpcclient-test.cc)
 add_trqt_test(session-test.cc)
 
 add_custom_target(qt-tests
     DEPENDS
+        qt-test-filterbar
         qt-test-prefs
         qt-test-rpcclient
         qt-test-session)

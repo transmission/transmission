@@ -366,8 +366,6 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
         return;
     }
 
-    [self.torrent update];
-
     [self.fFileController reloadVisibleRows];
 
     [self updateCheckButtons:nil]; //call in case button state changed by checking

@@ -277,11 +277,12 @@ public:
         {
             // Note: std::string_view assignment takes ownership by copying.
             // Use unmanaged_string() if you want the variant to hold a shallow copy.
-            val_.emplace<std::string>(value);
+            // Copy before replacing `val_`: `value` may point into it.
+            val_ = std::string{ value };
         }
         else if constexpr (std::is_same_v<Val, char const*> || std::is_same_v<Val, char*>)
         {
-            val_.emplace<std::string>(value != nullptr ? value : "");
+            val_ = std::string{ value != nullptr ? value : "" };
         }
         // note: std::is_integral_v<bool> is true, so this check
         // must come first to prevent bools from being stored as ints

@@ -1277,13 +1277,15 @@ bool tr_torrentCanManualUpdate(tr_torrent const* tor)
 
 // ---
 
-tr_stat tr_torrent::stats_locked() const
+tr_stat tr_torrent::stats() const
 {
     static auto constexpr IsStalled = [](tr_torrent const* const tor, std::optional<time_t> idle_secs)
     {
         return tor->session->queueStalledEnabled() &&
             idle_secs > static_cast<time_t>(tor->session->queueStalledMinutes() * 60U);
     };
+
+    auto const lock = unique_lock();
 
     auto const now_msec = tr_time_msec();
     auto const now_sec = tr_time();
@@ -1406,12 +1408,6 @@ tr_stat tr_torrent::stats_locked() const
     return stats;
 }
 
-tr_stat tr_torrent::stats() const
-{
-    auto const lock = unique_lock();
-    return stats_locked();
-}
-
 tr_stat tr_torrentStat(tr_torrent* const tor)
 {
     tr_return_val_if_fail(tr_isTorrent(tor), {});
@@ -1419,72 +1415,46 @@ tr_stat tr_torrentStat(tr_torrent* const tor)
     return tor->stats();
 }
 
-std::vector<tr_stat> tr_torrentStat(tr_session* const session, std::span<tr_torrent_id_t const> const ids)
+std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents)
 {
-    tr_return_val_if_fail(session != nullptr, {});
+    tr_return_val_if_fail(torrents != nullptr, {});
+    tr_return_val_if_fail(std::all_of(torrents, torrents + n_torrents, tr_isTorrent), {});
 
-    // Value-initialized entries are what callers see for ids that don't
-    // resolve; a live torrent never has id 0.
-    auto ret = std::vector<tr_stat>(std::size(ids));
+    auto ret = std::vector<tr_stat>{};
 
-    if (std::empty(ids))
+    if (n_torrents != 0U)
     {
-        return ret;
-    }
+        ret.reserve(n_torrents);
 
-    // Every id is looked up in `session`, so one lock covers the batch.
-    auto const lock = session->unique_lock();
-    for (size_t idx = 0U; idx != std::size(ids); ++idx)
-    {
-        if (auto const* const tor = session->torrents().get(ids[idx]); tor != nullptr)
+        auto const lock = torrents[0]->unique_lock();
+
+        for (size_t idx = 0U; idx != n_torrents; ++idx)
         {
-            ret[idx] = tor->stats_locked();
+            ret.emplace_back(torrents[idx]->stats());
         }
     }
 
     return ret;
 }
 
-bool tr_torrentTryStat(tr_session* const session, tr_torrent_id_t const id, tr_stat* const setme)
+void tr_torrentStatAsync(tr_session* const session, tr_torrent_stats_func callback)
 {
-    return tr_torrentTryStat(session, std::span<tr_torrent_id_t const>{ &id, 1U }, setme);
-}
+    tr_return_if_fail(session != nullptr);
+    tr_return_if_fail(callback != nullptr);
 
-bool tr_torrentTryStat(tr_session* const session, std::span<tr_torrent_id_t const> const ids, tr_stat* const setme)
-{
-    tr_return_val_if_fail(session != nullptr, false);
-    tr_return_val_if_fail(setme != nullptr, false);
-
-    if (std::empty(ids))
-    {
-        return true;
-    }
-
-    auto lock = session->try_unique_lock();
-    if (!lock.owns_lock())
-    {
-        return false;
-    }
-
-    // Resolve every id before writing anything to setme: if one partway
-    // through doesn't resolve, we still need to return false having left
-    // setme completely untouched, per this function's documented contract.
-    auto torrents = std::vector<tr_torrent*>(std::size(ids));
-    for (size_t idx = 0U; idx != std::size(ids); ++idx)
-    {
-        torrents[idx] = session->torrents().get(ids[idx]);
-        if (torrents[idx] == nullptr)
+    session->queue_session_thread(
+        [session, callback = std::move(callback)]
         {
-            return false;
-        }
-    }
-
-    for (size_t idx = 0U; idx != std::size(ids); ++idx)
-    {
-        setme[idx] = torrents[idx]->stats_locked();
-    }
-
-    return true;
+            auto stats = std::vector<tr_stat>{};
+            {
+                auto const lock = session->unique_lock();
+                if (auto const torrents = session->torrents().get_all(); !std::empty(torrents))
+                {
+                    stats = tr_torrentStat(std::data(torrents), std::size(torrents));
+                }
+            }
+            callback(std::move(stats));
+        });
 }
 
 // ---

@@ -646,11 +646,6 @@ struct tr_torrent
 
     [[nodiscard]] tr_stat stats() const;
 
-    // The computation behind stats(), for callers that already hold the
-    // session lock: the batch tr_torrentStat() and tr_torrentTryStat()
-    // take it once and then call this for every torrent in the batch.
-    [[nodiscard]] tr_stat stats_locked() const;
-
     [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
         return is_done() ? tr_direction::Up : tr_direction::Down;
@@ -1052,9 +1047,7 @@ private:
     friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat tr_torrentStat(tr_torrent* tor);
-    friend std::vector<tr_stat> tr_torrentStat(tr_session* session, std::span<tr_torrent_id_t const> ids);
-    friend bool tr_torrentTryStat(tr_session* session, tr_torrent_id_t id, tr_stat* setme);
-    friend bool tr_torrentTryStat(tr_session* session, std::span<tr_torrent_id_t const> ids, tr_stat* setme);
+    friend std::vector<tr_stat> tr_torrentStat(tr_torrent* const* torrents, size_t n_torrents);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
