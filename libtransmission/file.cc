@@ -11,6 +11,7 @@
 #include <vector>
 
 #ifndef _WIN32
+#include <cerrno>
 #include <sys/stat.h>
 #endif
 
@@ -97,6 +98,41 @@ bool tr_sys_path_exists(std::string_view path, tr_error* error)
 
 std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error* error)
 {
+#ifndef _WIN32
+    // One stat() answers type, size and mtime together. Asking
+    // std::filesystem for status, file_size and last_write_time, as the
+    // portable branch below does, is three calls, and on a network
+    // filesystem each one is a server round trip. Resume loading asks
+    // this for every file of every torrent before the window appears.
+    auto const sz_path = std::string{ path };
+    struct stat sb = {};
+    auto const rc = (flags & TR_SYS_PATH_NO_FOLLOW) != 0 ? lstat(sz_path.c_str(), &sb) : stat(sz_path.c_str(), &sb);
+    if (rc != 0)
+    {
+        if (error != nullptr)
+        {
+            error->set_from_errno(errno);
+        }
+        return {};
+    }
+
+    auto info = tr_sys_path_info{};
+    if (S_ISREG(sb.st_mode))
+    {
+        info.type = TR_SYS_PATH_IS_FILE;
+        info.size = static_cast<uint64_t>(sb.st_size);
+    }
+    else if (S_ISDIR(sb.st_mode))
+    {
+        info.type = TR_SYS_PATH_IS_DIRECTORY;
+    }
+    else
+    {
+        info.type = TR_SYS_PATH_IS_OTHER;
+    }
+    info.last_modified_at = sb.st_mtime;
+    return info;
+#else
     auto const filesystem_path = tr_u8path(path);
 
     auto ec = std::error_code{};
@@ -146,6 +182,7 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
     info.last_modified_at = std::chrono::system_clock::to_time_t(sctp);
 
     return info;
+#endif
 }
 
 bool tr_sys_path_is_same(std::string_view path1, std::string_view path2, tr_error* error)

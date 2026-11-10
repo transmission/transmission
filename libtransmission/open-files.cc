@@ -48,6 +48,20 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
     if (!tr_error_is_enospc(local_error.code()))
     {
+        local_error = {};
+
+        // Growing the file with truncate is one metadata call. Writing a
+        // byte at the end instead goes through the page cache and, on a
+        // network filesystem, waits for the server to grow the file before
+        // the write can land, with the session lock held throughout.
+        if (tr_sys_file_truncate(fd, length, &local_error))
+        {
+            return true;
+        }
+
+        tr_logAddDebug(
+            fmt::format("Sparse preallocation by truncate failed: {} ({})", local_error.message(), local_error.code()));
+
         static char constexpr Zero = '\0';
 
         local_error = {};

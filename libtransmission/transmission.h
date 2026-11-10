@@ -480,13 +480,24 @@ void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
 
 // ---
 
+using tr_torrent_loaded_func = void (*)(tr_torrent* tor, void* user_data);
+
 /**
  * Load all the torrents in the session's torrent folder.
  * This can be used at startup to kickstart all the torrents from the previous session.
  *
+ * `loaded`, when given, is called from the session thread for each torrent
+ * as soon as it has been added, so a client can show torrents while the rest
+ * are still being read from disk. It must return quickly and must not call
+ * back into the session; post the torrent to another thread instead.
+ *
  * @return the number of torrents in the session
  */
-size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor);
+size_t tr_sessionLoadTorrents(
+    tr_session* session,
+    tr_ctor* ctor,
+    tr_torrent_loaded_func loaded = nullptr,
+    void* user_data = nullptr);
 
 /**
  * Get pointers to all the torrents in a session.
@@ -903,6 +914,14 @@ void tr_torrentManualUpdate(tr_torrent* torrent);
 bool tr_torrentCanManualUpdate(tr_torrent const* torrent);
 
 std::vector<tr_peer_stat> tr_torrentPeers(tr_torrent const* torrent);
+
+/**
+ * Like `tr_torrentPeers()`, but never waits for the session lock.
+ * Returns false, leaving `*setme` untouched, if the lock is held by another
+ * thread or `id` names no torrent in `session`. A UI thread can call it on a
+ * timer and keep its previous list on false.
+ */
+bool tr_torrentTryPeers(tr_session* session, tr_torrent_id_t id, std::vector<tr_peer_stat>* setme);
 
 // --- tr_tracker_stat
 

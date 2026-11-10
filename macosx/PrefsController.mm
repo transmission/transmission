@@ -197,6 +197,12 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     }
 }
 
+- (void)stopUpdating
+{
+    [self.fPortStatusTimer invalidate];
+    [self.fPortChecker cancelProbe];
+}
+
 - (void)awakeFromNib
 {
     [super awakeFromNib];
@@ -448,6 +454,12 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)updatePortStatus
 {
+    if (((Controller*)NSApp.delegate).quitting)
+    {
+        [self stopUpdating];
+        return;
+    }
+
     auto const fwd = tr_sessionGetPortForwarding(self.fHandle);
     int const port = tr_sessionGetPeerPort(self.fHandle);
     BOOL natStatusChanged = (self.fNatStatus != fwd);

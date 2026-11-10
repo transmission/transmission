@@ -457,6 +457,15 @@ public:
         return std::unique_lock(session_mutex_);
     }
 
+    // Like unique_lock(), but never blocks. The returned lock's owns_lock()
+    // is false if the session thread currently holds the lock (e.g. it is
+    // in the middle of a disk write); callers on that path should fall back
+    // to cached data instead of stalling the calling thread.
+    [[nodiscard]] auto try_unique_lock() const
+    {
+        return std::unique_lock(session_mutex_, std::try_to_lock);
+    }
+
     [[nodiscard]] constexpr auto const& settings() const noexcept
     {
         return settings_;
@@ -811,6 +820,19 @@ public:
     [[nodiscard]] constexpr auto isClosing() const noexcept
     {
         return is_closing_;
+    }
+
+    // True while tr_sessionLoadTorrents() is between its first and last file.
+    // The torrent queue is only partly populated until then, so it must not
+    // be written to disk. Session thread only.
+    [[nodiscard]] constexpr auto isLoadingTorrents() const noexcept
+    {
+        return is_loading_torrents_;
+    }
+
+    constexpr void setLoadingTorrents(bool const loading) noexcept
+    {
+        is_loading_torrents_ = loading;
     }
 
     [[nodiscard]] constexpr auto encryptionMode() const noexcept
@@ -1250,6 +1272,7 @@ private:
     tr_port advertised_peer_port_;
 
     bool is_closing_ = false;
+    bool is_loading_torrents_ = false;
 
     /// fields that aren't trivial,
     /// but are self-contained / don't hold references to others

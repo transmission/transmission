@@ -163,6 +163,8 @@ TEST_F(TorrentTest, statAsyncRunsAfterQueuedWork)
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Complete);
     ASSERT_NE(nullptr, tor);
     tr_torrentStartNow(tor);
+    // tr_torrentStartNow() is queued to the session thread, so wait for it to run
+    ASSERT_EQ(std::future_status::ready, statAsync(session_).wait_for(5s));
     ASSERT_EQ(TR_STATUS_SEED, tr_torrentStat(tor).activity);
 
     // Hold the session thread, so that the stop is still queued when the stats are requested.

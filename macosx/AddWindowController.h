@@ -25,6 +25,7 @@
 
 - (IBAction)add:(id)sender;
 - (IBAction)cancelAdd:(id)sender;
+- (void)stopUpdating;
 
 - (IBAction)setFileFilterText:(id)sender;
 - (IBAction)checkAll:(id)sender;
