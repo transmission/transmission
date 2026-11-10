@@ -3,6 +3,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <optional>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -31,10 +33,7 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @interface Torrent ()
 
 @property(nonatomic, readonly) tr_torrent* fHandle;
-// The session this torrent belongs to. Needed because the id-based stat
-// calls are scoped to a session, and the session outlives every torrent.
 @property(nonatomic, readonly) tr_session* fLib;
-@property(nonatomic) tr_stat fStat;
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
@@ -125,6 +124,9 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 }
 
 @implementation Torrent
+{
+    tr_stat _fStat;
+}
 
 + (void)initialize
 {
@@ -269,76 +271,28 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     self.fPreviousFinishedIndexesDate = indexes != nil ? [[NSDate alloc] init] : nil;
 }
 
-- (void)update
++ (BOOL)updateTorrents:(NSArray<Torrent*>*)torrents fromStats:(std::vector<tr_stat>)stats
 {
-    [Torrent updateTorrents:@[ self ]];
-}
-
-+ (void)updateTorrents:(NSArray<Torrent*>*)torrents
-{
-    if (torrents == nil || torrents.count == 0)
-    {
-        return;
-    }
-
-    std::vector<Torrent*> torrent_objects;
-    torrent_objects.reserve(torrents.count);
-
-    std::vector<tr_torrent_id_t> torrent_ids;
-    torrent_ids.reserve(torrents.count);
-
-    tr_session* session = nullptr;
-
+    auto torrents_by_id = std::unordered_map<tr_torrent_id_t, Torrent*>{};
+    torrents_by_id.reserve(torrents.count);
     for (Torrent* torrent in torrents)
     {
-        if (torrent == nil || torrent.fHandle == nullptr)
-        {
-            continue;
-        }
-
-        if (session == nullptr)
-        {
-            session = torrent.fLib;
-        }
-
-        torrent_objects.emplace_back(torrent);
-        torrent_ids.emplace_back(tr_torrentId(torrent.fHandle));
+        torrents_by_id.try_emplace(torrent.id, torrent);
     }
 
-    if (torrent_objects.empty())
-    {
-        return;
-    }
-
-    auto stats = std::vector<tr_stat>(torrent_ids.size());
-    if (!tr_torrentTryStat(session, torrent_ids, stats.data()))
-    {
-        // The session thread currently holds the session lock (e.g. it's in
-        // the middle of a disk write). Rather than block the calling thread
-        // (typically the main/UI thread) for however long that write takes,
-        // skip this refresh -- each Torrent keeps showing its last-known
-        // fStat until the next timer tick.
-        return;
-    }
-
-    // Update stats
     bool transmitting_changed = false;
-    for (size_t i = 0, n = torrent_objects.size(); i < n; ++i)
+    for (auto& stat : stats)
     {
-        Torrent* const torrent = torrent_objects[i];
-        auto const was_transmitting = torrent.transmitting;
-        torrent.fStat = std::move(stats[i]);
-        transmitting_changed |= was_transmitting != torrent.transmitting;
+        if (auto const iter = torrents_by_id.find(stat.id); iter != torrents_by_id.end())
+        {
+            Torrent* const torrent = iter->second;
+            auto const was_transmitting = torrent.transmitting;
+            torrent->_fStat = std::move(stat);
+            transmitting_changed |= was_transmitting != torrent.transmitting;
+        }
     }
 
-    // make sure the "active" filter is updated if any `transmitting` property changed.
-    if (transmitting_changed)
-    {
-        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
-                                                 postingStyle:NSPostASAP
-                                                 coalesceMask:NSNotificationCoalescingOnName
-                                                     forModes:nil];
-    }
+    return transmitting_changed;
 }
 
 - (void)startTransferIgnoringQueue:(BOOL)ignoreQueue
@@ -397,7 +351,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (NSUInteger)queuePosition
 {
-    return self.fStat.queue_position;
+    return _fStat.queue_position;
 }
 
 - (void)setQueuePosition:(NSUInteger)index
@@ -432,7 +386,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (CGFloat)ratio
 {
-    return self.fStat.upload_ratio;
+    return _fStat.upload_ratio;
 }
 
 - (tr_ratiolimit)ratioSetting
@@ -459,7 +413,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (CGFloat)progressStopRatio
 {
-    return self.fStat.seed_ratio_percent_done;
+    return _fStat.seed_ratio_percent_done;
 }
 
 - (tr_idlelimit)idleSetting
@@ -527,7 +481,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 }
 - (BOOL)waitingToStart
 {
-    return self.fStat.activity == TR_STATUS_DOWNLOAD_WAIT || self.fStat.activity == TR_STATUS_SEED_WAIT;
+    return _fStat.activity == TR_STATUS_DOWNLOAD_WAIT || _fStat.activity == TR_STATUS_SEED_WAIT;
 }
 
 - (tr_priority_t)priority
@@ -717,7 +671,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (uint64_t)sizeLeft
 {
-    return self.fStat.left_until_done;
+    return _fStat.left_until_done;
 }
 
 - (NSMutableArray*)allTrackerStats
@@ -1034,17 +988,17 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (time_t)eta
 {
-    time_t eta = self.fStat.eta;
+    time_t eta = _fStat.eta;
     if (eta >= 0)
     {
         return eta;
     }
-    time_t etaIdle = self.fStat.eta_idle;
+    time_t etaIdle = _fStat.eta_idle;
     if (etaIdle >= 0 && etaIdle < kETAIdleDisplaySec)
     {
         return etaIdle;
     }
-    if (self.fStat.left_until_done <= 0)
+    if (_fStat.left_until_done <= 0)
     {
         // We return smallest amount of time remaining for simplest compliance with sorting.
         return 0;
@@ -1055,12 +1009,12 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (CGFloat)progress
 {
-    return self.fStat.percent_complete;
+    return _fStat.percent_complete;
 }
 
 - (CGFloat)progressDone
 {
-    return self.fStat.percent_done;
+    return _fStat.percent_done;
 }
 
 - (CGFloat)progressLeft
@@ -1075,38 +1029,38 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (CGFloat)checkingProgress
 {
-    return self.fStat.recheck_progress;
+    return _fStat.recheck_progress;
 }
 
 - (CGFloat)availableDesired
 {
-    return (CGFloat)self.fStat.desired_available / self.sizeLeft;
+    return (CGFloat)_fStat.desired_available / self.sizeLeft;
 }
 
 - (BOOL)isActive
 {
-    return self.fStat.activity != TR_STATUS_STOPPED && self.fStat.activity != TR_STATUS_DOWNLOAD_WAIT && self.fStat.activity != TR_STATUS_SEED_WAIT;
+    return _fStat.activity != TR_STATUS_STOPPED && _fStat.activity != TR_STATUS_DOWNLOAD_WAIT && _fStat.activity != TR_STATUS_SEED_WAIT;
 }
 
 - (BOOL)isTransmitting
 {
-    return self.fStat.peers_getting_from_us > 0 || self.fStat.peers_sending_to_us > 0 ||
-        self.fStat.webseeds_sending_to_us > 0 || self.fStat.activity == TR_STATUS_CHECK;
+    return _fStat.peers_getting_from_us > 0 || _fStat.peers_sending_to_us > 0 || _fStat.webseeds_sending_to_us > 0 ||
+        _fStat.activity == TR_STATUS_CHECK;
 }
 
 - (BOOL)isSeeding
 {
-    return self.fStat.activity == TR_STATUS_SEED;
+    return _fStat.activity == TR_STATUS_SEED;
 }
 
 - (BOOL)isChecking
 {
-    return self.fStat.activity == TR_STATUS_CHECK || self.fStat.activity == TR_STATUS_CHECK_WAIT;
+    return _fStat.activity == TR_STATUS_CHECK || _fStat.activity == TR_STATUS_CHECK_WAIT;
 }
 
 - (BOOL)isCheckingWaiting
 {
-    return self.fStat.activity == TR_STATUS_CHECK_WAIT;
+    return _fStat.activity == TR_STATUS_CHECK_WAIT;
 }
 
 - (BOOL)allDownloaded
@@ -1121,17 +1075,17 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (BOOL)isFinishedSeeding
 {
-    return self.fStat.finished;
+    return _fStat.finished;
 }
 
 - (BOOL)isError
 {
-    return self.fStat.error == tr_stat::Error::LocalError;
+    return _fStat.error == tr_stat::Error::LocalError;
 }
 
 - (BOOL)isAnyErrorOrWarning
 {
-    return self.fStat.error != tr_stat::Error::Ok;
+    return _fStat.error != tr_stat::Error::Ok;
 }
 
 - (NSString*)errorMessage
@@ -1141,7 +1095,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         return @"";
     }
 
-    NSString* error = tr_strv_to_utf8_nsstring(self.fStat.error_string);
+    NSString* error = tr_strv_to_utf8_nsstring(_fStat.error_string);
     if (!error || [error isEqualToString:@""])
     {
         error = [NSString stringWithFormat:@"(%@)", NSLocalizedString(@"unreadable error", "Torrent -> error string unreadable")];
@@ -1228,9 +1182,9 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 {
     if (self.magnet)
     {
-        NSString* progressString = self.fStat.metadata_percent_complete > 0.0 ?
+        NSString* progressString = _fStat.metadata_percent_complete > 0.0 ?
             [NSString stringWithFormat:NSLocalizedString(@"%@ of torrent metadata retrieved", "Torrent -> progress string"),
-                                       [NSString percentString:self.fStat.metadata_percent_complete longDecimals:YES]] :
+                                       [NSString percentString:_fStat.metadata_percent_complete longDecimals:YES]] :
             NSLocalizedString(@"torrent metadata needed", "Torrent -> progress string");
 
         return [NSString stringWithFormat:@"%@ — %@", NSLocalizedString(@"Magnetized transfer", "Torrent -> progress string"), progressString];
@@ -1297,7 +1251,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
     if (self.anyErrorOrWarning)
     {
-        switch (self.fStat.error)
+        switch (_fStat.error)
         {
         case tr_stat::Error::LocalError:
             string = NSLocalizedString(@"Error", "Torrent -> status string");
@@ -1320,7 +1274,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     }
     else
     {
-        switch (self.fStat.activity)
+        switch (_fStat.activity)
         {
         case TR_STATUS_STOPPED:
             if (self.finishedSeeding)
@@ -1364,7 +1318,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
                                                     self.peersSendingToUs];
             }
 
-            if (NSUInteger const webSeedCount = self.fStat.webseeds_sending_to_us; webSeedCount > 0)
+            if (NSUInteger const webSeedCount = _fStat.webseeds_sending_to_us; webSeedCount > 0)
             {
                 NSString* webSeedString;
                 if (webSeedCount != 1)
@@ -1409,7 +1363,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     //append even if error
     if (self.active && !self.checking)
     {
-        if (self.fStat.activity == TR_STATUS_DOWNLOAD)
+        if (_fStat.activity == TR_STATUS_DOWNLOAD)
         {
             string = [string stringByAppendingFormat:@" — %@: %@, %@: %@",
                                                      NSLocalizedString(@"DL", "Torrent -> status string"),
@@ -1432,7 +1386,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 {
     NSString* string;
 
-    switch (self.fStat.activity)
+    switch (_fStat.activity)
     {
     case TR_STATUS_STOPPED:
         if (self.finishedSeeding)
@@ -1496,7 +1450,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (NSString*)stateString
 {
-    switch (self.fStat.activity)
+    switch (_fStat.activity)
     {
     case TR_STATUS_STOPPED:
     case TR_STATUS_DOWNLOAD_WAIT:
@@ -1507,7 +1461,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
             NSString* extra = nil;
             if (self.waitingToStart)
             {
-                extra = self.fStat.activity == TR_STATUS_DOWNLOAD_WAIT ?
+                extra = _fStat.activity == TR_STATUS_DOWNLOAD_WAIT ?
                     NSLocalizedString(@"Waiting to download", "Torrent -> status string") :
                     NSLocalizedString(@"Waiting to seed", "Torrent -> status string");
             }
@@ -1537,97 +1491,97 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (NSUInteger)totalPeersConnected
 {
-    return self.fStat.peers_connected;
+    return _fStat.peers_connected;
 }
 
 - (NSUInteger)totalPeersTracker
 {
-    return self.fStat.peers_from[TR_PEER_FROM_TRACKER];
+    return _fStat.peers_from[TR_PEER_FROM_TRACKER];
 }
 
 - (NSUInteger)totalPeersIncoming
 {
-    return self.fStat.peers_from[TR_PEER_FROM_INCOMING];
+    return _fStat.peers_from[TR_PEER_FROM_INCOMING];
 }
 
 - (NSUInteger)totalPeersCache
 {
-    return self.fStat.peers_from[TR_PEER_FROM_RESUME];
+    return _fStat.peers_from[TR_PEER_FROM_RESUME];
 }
 
 - (NSUInteger)totalPeersPex
 {
-    return self.fStat.peers_from[TR_PEER_FROM_PEX];
+    return _fStat.peers_from[TR_PEER_FROM_PEX];
 }
 
 - (NSUInteger)totalPeersDHT
 {
-    return self.fStat.peers_from[TR_PEER_FROM_DHT];
+    return _fStat.peers_from[TR_PEER_FROM_DHT];
 }
 
 - (NSUInteger)totalPeersLocal
 {
-    return self.fStat.peers_from[TR_PEER_FROM_LPD];
+    return _fStat.peers_from[TR_PEER_FROM_LPD];
 }
 
 - (NSUInteger)totalPeersLTEP
 {
-    return self.fStat.peers_from[TR_PEER_FROM_LTEP];
+    return _fStat.peers_from[TR_PEER_FROM_LTEP];
 }
 
 - (NSUInteger)totalKnownPeersTracker
 {
-    return self.fStat.known_peers_from[TR_PEER_FROM_TRACKER];
+    return _fStat.known_peers_from[TR_PEER_FROM_TRACKER];
 }
 
 - (NSUInteger)totalKnownPeersIncoming
 {
-    return self.fStat.known_peers_from[TR_PEER_FROM_INCOMING];
+    return _fStat.known_peers_from[TR_PEER_FROM_INCOMING];
 }
 
 - (NSUInteger)totalKnownPeersCache
 {
-    return self.fStat.known_peers_from[TR_PEER_FROM_RESUME];
+    return _fStat.known_peers_from[TR_PEER_FROM_RESUME];
 }
 
 - (NSUInteger)totalKnownPeersPex
 {
-    return self.fStat.known_peers_from[TR_PEER_FROM_PEX];
+    return _fStat.known_peers_from[TR_PEER_FROM_PEX];
 }
 
 - (NSUInteger)totalKnownPeersDHT
 {
-    return self.fStat.known_peers_from[TR_PEER_FROM_DHT];
+    return _fStat.known_peers_from[TR_PEER_FROM_DHT];
 }
 
 - (NSUInteger)totalKnownPeersLocal
 {
-    return self.fStat.known_peers_from[TR_PEER_FROM_LPD];
+    return _fStat.known_peers_from[TR_PEER_FROM_LPD];
 }
 
 - (NSUInteger)totalKnownPeersLTEP
 {
-    return self.fStat.known_peers_from[TR_PEER_FROM_LTEP];
+    return _fStat.known_peers_from[TR_PEER_FROM_LTEP];
 }
 
 - (NSUInteger)peersSendingToUs
 {
-    return self.fStat.peers_sending_to_us;
+    return _fStat.peers_sending_to_us;
 }
 
 - (NSUInteger)peersGettingFromUs
 {
-    return self.fStat.peers_getting_from_us;
+    return _fStat.peers_getting_from_us;
 }
 
 - (CGFloat)downloadRate
 {
-    return self.fStat.piece_download_speed.count(Speed::Units::KByps);
+    return _fStat.piece_download_speed.count(Speed::Units::KByps);
 }
 
 - (CGFloat)uploadRate
 {
-    return self.fStat.piece_upload_speed.count(Speed::Units::KByps);
+    return _fStat.piece_upload_speed.count(Speed::Units::KByps);
 }
 
 - (CGFloat)totalRate
@@ -1637,32 +1591,32 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (uint64_t)haveVerified
 {
-    return self.fStat.have_valid;
+    return _fStat.have_valid;
 }
 
 - (uint64_t)haveTotal
 {
-    return self.haveVerified + self.fStat.have_unchecked;
+    return self.haveVerified + _fStat.have_unchecked;
 }
 
 - (uint64_t)totalSizeSelected
 {
-    return self.fStat.size_when_done;
+    return _fStat.size_when_done;
 }
 
 - (uint64_t)downloadedTotal
 {
-    return self.fStat.downloaded_ever;
+    return _fStat.downloaded_ever;
 }
 
 - (uint64_t)uploadedTotal
 {
-    return self.fStat.uploaded_ever;
+    return _fStat.uploaded_ever;
 }
 
 - (uint64_t)failedHash
 {
-    return self.fStat.corrupt_ever;
+    return _fStat.corrupt_ever;
 }
 
 - (void)setGroupValue:(NSInteger)groupValue determinationType:(TorrentDeterminationType)determinationType
@@ -1774,7 +1728,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     tr_torrentSetFileDLs(self.fHandle, files, count, state != NSControlStateValueOff);
     free(files);
 
-    [self update];
     [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentFileCheckChange" object:self];
 }
 
@@ -1865,19 +1818,19 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (NSDate*)dateAdded
 {
-    time_t const date = self.fStat.added_date;
+    time_t const date = _fStat.added_date;
     return [NSDate dateWithTimeIntervalSince1970:date];
 }
 
 - (NSDate*)dateCompleted
 {
-    time_t const date = self.fStat.done_date;
+    time_t const date = _fStat.done_date;
     return date != 0 ? [NSDate dateWithTimeIntervalSince1970:date] : nil;
 }
 
 - (NSDate*)dateActivity
 {
-    time_t const date = self.fStat.activity_date;
+    time_t const date = _fStat.activity_date;
     return date != 0 ? [NSDate dateWithTimeIntervalSince1970:date] : nil;
 }
 
@@ -1889,27 +1842,27 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (NSInteger)secondsDownloading
 {
-    return self.fStat.seconds_downloading;
+    return _fStat.seconds_downloading;
 }
 
 - (NSInteger)secondsSeeding
 {
-    return self.fStat.seconds_seeding;
+    return _fStat.seconds_seeding;
 }
 
 - (NSInteger)stalledMinutes
 {
-    if (self.fStat.idle_secs == -1)
+    if (_fStat.idle_secs == -1)
     {
         return -1;
     }
 
-    return self.fStat.idle_secs / 60;
+    return _fStat.idle_secs / 60;
 }
 
 - (BOOL)isStalled
 {
-    return self.fStat.is_stalled;
+    return _fStat.is_stalled;
 }
 
 - (void)updateTimeMachineExclude
@@ -2064,7 +2017,8 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
                                                name:@"GroupValueRemoved"
                                              object:nil];
 
-    [self update];
+    // callers read these before any requested stats arrive
+    _fStat = tr_torrentStat(self.fHandle);
     [self updateTimeMachineExclude];
 
     return self;
@@ -2194,13 +2148,6 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning
 {
-    //keep the existing fStat if the session lock isn't immediately available
-    //rather than blocking the main thread; the next UI tick refreshes it
-    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fLib, self.id, &stat))
-    {
-        self.fStat = stat;
-    }
-
     switch (status)
     {
     case TR_SEED:
@@ -2227,36 +2174,21 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         break;
     }
 
-    [self updateTimeMachineExclude];
+    [self setTimeMachineExclude:status == TR_LEECH];
 }
 
 - (void)ratioLimitHit
 {
-    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fLib, self.id, &stat))
-    {
-        self.fStat = stat;
-    }
-
     [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentFinishedSeeding" object:self];
 }
 
 - (void)idleLimitHit
 {
-    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fLib, self.id, &stat))
-    {
-        self.fStat = stat;
-    }
-
     [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentFinishedSeeding" object:self];
 }
 
 - (void)metadataRetrieved
 {
-    if (auto stat = tr_stat{}; tr_torrentTryStat(self.fLib, self.id, &stat))
-    {
-        self.fStat = stat;
-    }
-
     [self createFileList];
 
     /* If the torrent is in no group, or the group was automatically determined based on criteria evaluated
@@ -2338,7 +2270,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (BOOL)shouldShowEta
 {
-    if (self.fStat.activity == TR_STATUS_DOWNLOAD)
+    if (_fStat.activity == TR_STATUS_DOWNLOAD)
     {
         return YES;
     }
@@ -2351,7 +2283,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         }
 
         //idle: show only if remaining time is less than cap
-        if (self.fStat.eta_idle != TR_ETA_NOT_AVAIL && self.fStat.eta_idle < kETAIdleDisplaySec)
+        if (_fStat.eta_idle != TR_ETA_NOT_AVAIL && _fStat.eta_idle < kETAIdleDisplaySec)
         {
             return YES;
         }
@@ -2362,12 +2294,12 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (NSString*)etaString
 {
-    time_t eta = self.fStat.eta;
+    time_t eta = _fStat.eta;
     // if there's a regular ETA, the torrent isn't idle
     BOOL fromIdle = NO;
     if (eta < 0)
     {
-        eta = self.fStat.eta_idle;
+        eta = _fStat.eta_idle;
         fromIdle = YES;
     }
     // Foundation undocumented behavior: values above INT32_MAX (68 years) are interpreted as negative values by `stringFromTimeInterval` (#3451)
