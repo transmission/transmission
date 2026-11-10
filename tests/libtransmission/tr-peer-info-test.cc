@@ -137,6 +137,9 @@ TEST_F(PeerInfoTest, updateCanonicalPriority)
         std::tuple{ "[2a03:2880:f177:1cd:face:b00c:0:167]:6882"sv,
                     "[2a03:2880:f177:1cd:face:b00c:0:167]:6881"sv,
                     uint32_t{ 0x67F8FE57 } },
+        // crc32-c(01020201); ports 258/513 sort differently in host order vs. network
+        // byte order, so unlike the pair above this case catches a sort/htons ordering bug
+        std::tuple{ "123.213.32.10:513"sv, "123.213.32.10:258"sv, uint32_t{ 0x0F63009F } },
     };
 
     for (auto const& [client_sockaddr_str, peer_sockaddr_str, expected] : Tests)
