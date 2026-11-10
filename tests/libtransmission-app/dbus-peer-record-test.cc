@@ -5,8 +5,11 @@
 
 #include <array>
 #include <map>
+#include <optional>
+#include <set>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -28,9 +31,14 @@ using DBusPeerRecordTest = libtransmission::test::SandboxedTest;
 namespace
 {
 
+[[nodiscard]] tr_pathbuf record_path(std::string_view const config_dir)
+{
+    return tr_pathbuf{ config_dir, '/', interop::PeerRecordFilename };
+}
+
 void write_raw(std::string_view const config_dir, std::string_view const contents)
 {
-    tr_file_save(tr_pathbuf{ config_dir, '/', interop::PeerRecordFilename }, contents);
+    tr_file_save(record_path(config_dir), contents);
 }
 
 } // namespace
@@ -39,7 +47,8 @@ TEST_F(DBusPeerRecordTest, roundTrips)
 {
     auto const written = interop::DBusPeerRecord{ ":1.42",
                                                   "com.transmissionbt.Transmission",
-                                                  "/com/transmissionbt/Transmission" };
+                                                  "/com/transmissionbt/Transmission",
+                                                  "9e2b56eeebe8d9263fb4cf6a6ad13153" };
     interop::write_dbus_peer_record(sandboxDir(), written);
 
     auto const read = interop::read_dbus_peer_record(sandboxDir());
@@ -47,6 +56,24 @@ TEST_F(DBusPeerRecordTest, roundTrips)
     EXPECT_EQ(written.bus_name, read->bus_name);
     EXPECT_EQ(written.interface, read->interface);
     EXPECT_EQ(written.path, read->path);
+    EXPECT_EQ(written.bus_id, read->bus_id);
+}
+
+// A record from before the bus ID was recorded has no `bus-id` line, so a reader
+// must not need one, and a writer with no ID to give writes none.
+TEST_F(DBusPeerRecordTest, leavesOutABusIdItDoesNotHave)
+{
+    interop::write_dbus_peer_record(sandboxDir(), { ":1.42", "org.example.Client", "/org/example/Client", {} });
+
+    auto contents = std::vector<char>{};
+    ASSERT_TRUE(tr_file_read(record_path(sandboxDir()), contents));
+    auto const text = std::string_view{ std::data(contents), std::size(contents) };
+    EXPECT_EQ(std::string_view::npos, text.find("bus-id"sv));
+
+    auto const read = interop::read_dbus_peer_record(sandboxDir());
+    ASSERT_TRUE(read.has_value());
+    EXPECT_EQ(":1.42", read->bus_name);
+    EXPECT_TRUE(std::empty(read->bus_id));
 }
 
 TEST_F(DBusPeerRecordTest, readsNothingWhenNothingWasRecorded)
@@ -156,15 +183,24 @@ namespace
 {
 
 auto constexpr Self = ":1.7"sv;
+auto constexpr ThisBus = "9e2b56eeebe8d9263fb4cf6a6ad13153"sv;
+auto constexpr OtherBus = "0123456789abcdef0123456789abcdef"sv;
+auto constexpr NoBus = ""sv;
 
-// Stands in for the bus. A name this class was told about answers with an owner,
-// and every other name answers with nothing.
+// Stands in for the bus and for the clients on it. A name this class was told about
+// answers with an owner, and every other name answers with nothing. A probe reaches
+// only a name this class was told answers, and every probe is kept for the test to see.
 class Bus
 {
 public:
     void give(std::string_view const name, std::string_view const owner)
     {
         owners_.try_emplace(std::string{ name }, owner);
+    }
+
+    void answers(std::string_view const name)
+    {
+        answering_.emplace(name);
     }
 
     [[nodiscard]] interop::DBusNameOwner owner_lookup()
@@ -176,15 +212,39 @@ public:
         };
     }
 
+    [[nodiscard]] interop::DBusPeerProbe probe()
+    {
+        return [this](interop::DBusPeerRecord const& record)
+        {
+            probed_.push_back(record);
+            return answering_.count(record.bus_name) != 0U;
+        };
+    }
+
+    [[nodiscard]] std::vector<interop::DBusPeerRecord> const& probed() const noexcept
+    {
+        return probed_;
+    }
+
 private:
     std::map<std::string, std::string> owners_;
+    std::set<std::string> answering_;
+    std::vector<interop::DBusPeerRecord> probed_;
 };
 
-void record(std::string_view const config_dir, std::string_view const bus_name)
+void record(std::string_view const config_dir, std::string_view const bus_name, std::string_view const bus_id = ThisBus)
 {
     interop::write_dbus_peer_record(
         config_dir,
-        { std::string{ bus_name }, TR_INTEROP_DBUS_INTERFACE_NAME, TR_INTEROP_DBUS_OBJECT_PATH });
+        { std::string{ bus_name }, TR_INTEROP_DBUS_INTERFACE_NAME, TR_INTEROP_DBUS_OBJECT_PATH, std::string{ bus_id } });
+}
+
+[[nodiscard]] std::optional<interop::DBusPeerRecord> select(
+    std::string_view const config_dir,
+    Bus& bus,
+    std::string_view const bus_id = ThisBus)
+{
+    return interop::select_dbus_peer(config_dir, bus_id, Self, bus.owner_lookup(), bus.probe());
 }
 
 } // namespace
@@ -197,9 +257,12 @@ TEST_F(DBusPeerRecordTest, prefersWhoeverRecordedItselfOnTheConfigDir)
     bus.give(":1.9", ":1.9");
     bus.give(TR_INTEROP_DBUS_SERVICE_NAME, ":1.4"); // someone else holds the shared name
 
-    auto const peer = interop::select_dbus_peer(sandboxDir(), Self, bus.owner_lookup());
+    auto const peer = select(sandboxDir(), bus);
     ASSERT_TRUE(peer.has_value());
     EXPECT_EQ(":1.9", peer->bus_name);
+
+    // The bus ID placed the record here, and a bus never reuses a unique name.
+    EXPECT_TRUE(std::empty(bus.probed()));
 }
 
 // A record outlives the client that wrote it, so a name nobody owns is a client that has exited.
@@ -210,20 +273,113 @@ TEST_F(DBusPeerRecordTest, passesOverARecordedNameNobodyOwns)
     auto bus = Bus{};
     bus.give(TR_INTEROP_DBUS_SERVICE_NAME, ":1.4");
 
-    auto const peer = interop::select_dbus_peer(sandboxDir(), Self, bus.owner_lookup());
+    auto const peer = select(sandboxDir(), bus);
     ASSERT_TRUE(peer.has_value());
     EXPECT_EQ(TR_INTEROP_DBUS_SERVICE_NAME, peer->bus_name);
+    EXPECT_TRUE(std::empty(bus.probed()));
+}
+
+// After a reboot, the recorded name can belong to an unrelated process that never answers.
+// The record is passed over without a call, and whoever holds the shared name is tried instead.
+TEST_F(DBusPeerRecordTest, passesOverARecordFromAnotherBusWithoutCallingIt)
+{
+    record(sandboxDir(), ":1.9", OtherBus);
+
+    auto bus = Bus{};
+    bus.give(":1.9", ":1.9");
+    bus.answers(":1.9"); // would be taken for a client if it were asked
+
+    EXPECT_FALSE(select(sandboxDir(), bus).has_value());
+    EXPECT_TRUE(std::empty(bus.probed()));
+
+    bus.give(TR_INTEROP_DBUS_SERVICE_NAME, ":1.4");
+    auto const peer = select(sandboxDir(), bus);
+    ASSERT_TRUE(peer.has_value());
+    EXPECT_EQ(TR_INTEROP_DBUS_SERVICE_NAME, peer->bus_name);
+    EXPECT_TRUE(std::empty(bus.probed()));
+}
+
+// A record that names no bus is how a release before the bus ID left one. It is still
+// the only way to reach that release when it does not hold the shared name, so it is
+// asked, at the names it recorded, and taken when it answers.
+TEST_F(DBusPeerRecordTest, probesARecordThatNamesNoBus)
+{
+    write_raw(sandboxDir(), "bus-name=:1.9\ninterface=org.example.Client\npath=/org/example/Client\n"sv);
+
+    auto bus = Bus{};
+    bus.give(":1.9", ":1.9");
+    bus.answers(":1.9");
+
+    auto const peer = select(sandboxDir(), bus);
+    ASSERT_TRUE(peer.has_value());
+    EXPECT_EQ(":1.9", peer->bus_name);
+
+    ASSERT_EQ(1U, std::size(bus.probed()));
+    EXPECT_EQ(":1.9", bus.probed().front().bus_name);
+    EXPECT_EQ("org.example.Client", bus.probed().front().interface);
+    EXPECT_EQ("/org/example/Client", bus.probed().front().path);
+}
+
+// ...and passed over when it does not. The live name is then something other than
+// the client that wrote the record, and the shared name is tried instead.
+TEST_F(DBusPeerRecordTest, passesOverARecordThatNamesNoBusWhenNobodyAnswersThere)
+{
+    record(sandboxDir(), ":1.9", NoBus);
+
+    auto bus = Bus{};
+    bus.give(":1.9", ":1.9");
+    bus.give(TR_INTEROP_DBUS_SERVICE_NAME, ":1.4");
+
+    auto const peer = select(sandboxDir(), bus);
+    ASSERT_TRUE(peer.has_value());
+    EXPECT_EQ(TR_INTEROP_DBUS_SERVICE_NAME, peer->bus_name);
+    EXPECT_EQ(1U, std::size(bus.probed()));
+}
+
+// A record that names no bus outlives its client too, and then nobody owns its name.
+// The bus driver settles that, so the name is not probed.
+TEST_F(DBusPeerRecordTest, doesNotProbeARecordThatNamesNoBusWhenNobodyOwnsItsName)
+{
+    record(sandboxDir(), ":1.9", NoBus);
+
+    auto bus = Bus{};
+    bus.give(TR_INTEROP_DBUS_SERVICE_NAME, ":1.4");
+
+    auto const peer = select(sandboxDir(), bus);
+    ASSERT_TRUE(peer.has_value());
+    EXPECT_EQ(TR_INTEROP_DBUS_SERVICE_NAME, peer->bus_name);
+    EXPECT_TRUE(std::empty(bus.probed()));
+}
+
+// A bus whose ID this launch could not learn cannot place any record,
+// so each one is asked rather than trusted or thrown away.
+TEST_F(DBusPeerRecordTest, probesEveryRecordWhenThisBusHasNoId)
+{
+    record(sandboxDir(), ":1.9", OtherBus);
+
+    auto bus = Bus{};
+    bus.give(":1.9", ":1.9");
+
+    EXPECT_FALSE(select(sandboxDir(), bus, NoBus).has_value());
+    EXPECT_EQ(1U, std::size(bus.probed()));
+
+    bus.answers(":1.9");
+    auto const peer = select(sandboxDir(), bus, NoBus);
+    ASSERT_TRUE(peer.has_value());
+    EXPECT_EQ(":1.9", peer->bus_name);
 }
 
 TEST_F(DBusPeerRecordTest, neverSelectsThisProcess)
 {
-    record(sandboxDir(), Self);
+    record(sandboxDir(), Self, NoBus); // not even when the record cannot be placed
 
     auto bus = Bus{};
     bus.give(Self, Self);
+    bus.answers(Self);
     bus.give(TR_INTEROP_DBUS_SERVICE_NAME, Self); // this process holds the shared name too
 
-    EXPECT_FALSE(interop::select_dbus_peer(sandboxDir(), Self, bus.owner_lookup()).has_value());
+    EXPECT_FALSE(select(sandboxDir(), bus).has_value());
+    EXPECT_TRUE(std::empty(bus.probed()));
 }
 
 // How a client too old to leave a record, or one whose record could not be written, is still reached.
@@ -232,7 +388,7 @@ TEST_F(DBusPeerRecordTest, fallsBackToTheWellKnownNameWithNoRecord)
     auto bus = Bus{};
     bus.give(TR_INTEROP_DBUS_SERVICE_NAME, ":1.4");
 
-    auto const peer = interop::select_dbus_peer(sandboxDir(), Self, bus.owner_lookup());
+    auto const peer = select(sandboxDir(), bus);
     ASSERT_TRUE(peer.has_value());
     EXPECT_EQ(TR_INTEROP_DBUS_SERVICE_NAME, peer->bus_name);
     EXPECT_EQ(TR_INTEROP_DBUS_INTERFACE_NAME, peer->interface);
@@ -242,19 +398,21 @@ TEST_F(DBusPeerRecordTest, fallsBackToTheWellKnownNameWithNoRecord)
 TEST_F(DBusPeerRecordTest, findsNobodyOnAnEmptyBus)
 {
     auto bus = Bus{};
-    EXPECT_FALSE(interop::select_dbus_peer(sandboxDir(), Self, bus.owner_lookup()).has_value());
+    EXPECT_FALSE(select(sandboxDir(), bus).has_value());
 }
 
 // The record names an interface and path rather than assuming them.
 // That is how a client built from other sources can be handed a torrent.
 TEST_F(DBusPeerRecordTest, callsAPeerAtTheNamesItRecorded)
 {
-    write_raw(sandboxDir(), "bus-name=:1.9\ninterface=org.example.Client\npath=/org/example/Client\n"sv);
+    interop::write_dbus_peer_record(
+        sandboxDir(),
+        { ":1.9", "org.example.Client", "/org/example/Client", std::string{ ThisBus } });
 
     auto bus = Bus{};
     bus.give(":1.9", ":1.9");
 
-    auto const peer = interop::select_dbus_peer(sandboxDir(), Self, bus.owner_lookup());
+    auto const peer = select(sandboxDir(), bus);
     ASSERT_TRUE(peer.has_value());
     EXPECT_EQ("org.example.Client", peer->interface);
     EXPECT_EQ("/org/example/Client", peer->path);

@@ -13,7 +13,6 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
-#include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
@@ -268,40 +267,6 @@ void tr_announce_list::add_to_map(tr_variant::Map& setme) const
     {
         setme.try_emplace(TR_KEY_announce_list, tr_announce_list::to_tiers_variant());
     }
-}
-
-bool tr_announce_list::save(std::string_view torrent_file, tr_error* error) const
-{
-    // load the torrent file
-    auto serde = tr_variant_serde::benc();
-    auto ometainfo = serde.parse_file(torrent_file);
-    if (!ometainfo)
-    {
-        if (error != nullptr)
-        {
-            *error = std::move(serde.error_);
-            serde.error_ = {};
-        }
-
-        return false;
-    }
-    auto& metainfo = *ometainfo;
-
-    // replace the trackers
-    if (auto* const metainfo_map = metainfo.get_if<tr_variant::Map>(); metainfo_map != nullptr)
-    {
-        add_to_map(*metainfo_map);
-    }
-
-    // confirm that it's good by parsing it back again
-    auto const contents = serde.to_string(metainfo);
-    if (!serde.parse(contents).has_value())
-    {
-        return false;
-    }
-
-    // save it
-    return tr_file_save(torrent_file, contents, error);
 }
 
 bool tr_announce_list::parse(std::string_view text)

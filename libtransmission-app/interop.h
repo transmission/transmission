@@ -48,8 +48,7 @@ enum class Reply : uint8_t
     // lock when it died, so a launch it stops answering may start.
     Gone,
 
-    // No answer, and no proof the instance is gone. A busy instance looks like this,
-    // and so does a stale record that reaches an unrelated process.
+    // No answer, and no proof the instance is gone. A busy instance looks like this.
     Unanswered,
 };
 

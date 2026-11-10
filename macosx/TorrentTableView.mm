@@ -126,9 +126,15 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 //make sure we don't lose selection on manual reloads
 - (void)reloadData
 {
-    NSArray<Torrent*>* selectedTorrents = self.selectedTorrents;
+    // remember the items, not selectedTorrents: a collapsed group's torrents have no rows
+    NSMutableArray* selectedItems = [NSMutableArray arrayWithCapacity:self.numberOfSelectedRows];
+    [self.selectedRowIndexes enumerateIndexesUsingBlock:^(NSUInteger row, BOOL*) {
+        [selectedItems addObject:[self itemAtRow:row]];
+    }];
+
     [super reloadData];
-    self.selectedTorrents = selectedTorrents;
+
+    [self selectItems:selectedItems];
 }
 
 - (void)reloadVisibleRows
@@ -579,12 +585,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (void)setSelectedTorrents:(NSArray<Torrent*>*)selectedTorrents
 {
-    NSMutableIndexSet* selectedIndexes = [NSMutableIndexSet new];
-    for (Torrent* i in selectedTorrents)
-    {
-        [selectedIndexes addIndex:[self rowForItem:i]];
-    }
-    [self selectRowIndexes:selectedIndexes byExtendingSelection:NO];
+    [self selectItems:selectedTorrents];
 }
 
 - (NSMenu*)menuForEvent:(NSEvent*)event
@@ -953,6 +954,21 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 }
 
 #pragma mark - Private
+
+- (void)selectItems:(NSArray*)items
+{
+    NSMutableIndexSet* selectedIndexes = [NSMutableIndexSet new];
+    for (id item in items)
+    {
+        // selectRowIndexes: ignores the whole set if it holds -1
+        NSInteger const row = [self rowForItem:item];
+        if (row != -1)
+        {
+            [selectedIndexes addIndex:row];
+        }
+    }
+    [self selectRowIndexes:selectedIndexes byExtendingSelection:NO];
+}
 
 - (BOOL)pointInGroupStatusRect:(NSPoint)point
 {

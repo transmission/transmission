@@ -30,7 +30,7 @@ namespace
     return fd != TR_BAD_SYS_FILE;
 }
 
-bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
+bool preallocate_file_sparse(tr_open_files::Preallocate const& preallocate, tr_sys_file_t fd, uint64_t length, tr_error* error)
 {
     if (length == 0U)
     {
@@ -39,7 +39,7 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
     auto local_error = tr_error{};
 
-    if (tr_sys_file_preallocate(fd, length, TR_SYS_FILE_PREALLOC_SPARSE, &local_error))
+    if (preallocate(fd, length, TR_SYS_FILE_PREALLOC_SPARSE, &local_error))
     {
         return true;
     }
@@ -48,13 +48,27 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
     if (!tr_error_is_enospc(local_error.code()))
     {
+        local_error = {};
+
+        // Truncate is one metadata call. The write below dirties a page and,
+        // on a network filesystem, waits for the server to grow the file.
+        if (tr_sys_file_truncate(fd, length, &local_error))
+        {
+            return true;
+        }
+
+        tr_logAddDebug(
+            fmt::format("Sparse preallocation by truncate failed: {} ({})", local_error.message(), local_error.code()));
+    }
+
+    if (!tr_error_is_enospc(local_error.code()))
+    {
         static char constexpr Zero = '\0';
 
         local_error = {};
 
         /* fallback: the old-style seek-and-write */
-        if (tr_sys_file_write_at(fd, &Zero, 1, length - 1, nullptr, &local_error) &&
-            tr_sys_file_truncate(fd, length, &local_error))
+        if (tr_sys_file_write_at(fd, &Zero, 1, length - 1, nullptr, &local_error))
         {
             return true;
         }
@@ -70,7 +84,7 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
     return false;
 }
 
-bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error* error)
+bool preallocate_file_full(tr_open_files::Preallocate const& preallocate, tr_sys_file_t fd, uint64_t length, tr_error* error)
 {
     if (length == 0U)
     {
@@ -79,7 +93,7 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
     auto local_error = tr_error{};
 
-    if (tr_sys_file_preallocate(fd, length, 0, &local_error))
+    if (preallocate(fd, length, 0, &local_error))
     {
         return true;
     }
@@ -205,12 +219,12 @@ std::optional<tr_sys_file_t> tr_open_files::get(
 
         if (allocation == Preallocation::Full)
         {
-            success = preallocate_file_full(fd, file_size, &error);
+            success = preallocate_file_full(preallocate_, fd, file_size, &error);
             type = "full";
         }
         else if (allocation == Preallocation::Sparse)
         {
-            success = preallocate_file_sparse(fd, file_size, &error);
+            success = preallocate_file_sparse(preallocate_, fd, file_size, &error);
             type = "sparse";
         }
 

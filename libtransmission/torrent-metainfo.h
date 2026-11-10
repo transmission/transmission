@@ -36,6 +36,11 @@ public:
     // load multiple files.
     bool parse_torrent_file(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error* error = nullptr);
 
+    // Writes announce_list() into `benc_filename`, this torrent's .torrent file.
+    // Also updates info_dict_offset(), since the announce keys precede the info dict.
+    // On failure, the file is left unchanged.
+    [[nodiscard]] bool save_announce_list(std::string_view benc_filename, tr_error* error = nullptr);
+
     // FILES
 
     [[nodiscard]] constexpr auto const& files() const noexcept

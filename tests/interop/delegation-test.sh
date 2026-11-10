@@ -22,6 +22,22 @@
 #                        reaches a separately-built client, so it is the round
 #                        that fails if a launcher calls the names it was built
 #                        with instead of the ones it was given.
+#   old-record        -- the foreign mock again, but its record names no bus,
+#                        as a record from a release before the bus ID does.
+#                        A launcher cannot place such a record without asking
+#                        the client it names, and must ask: the record is its
+#                        only way to reach that client.
+#   silent            -- a record from before the bus ID again, but its name
+#                        now belongs to a connection that never answers, as
+#                        happens once the bus has restarted. A launcher gives
+#                        that name one short chance and then finds the client
+#                        on the shared name, instead of waiting out a default
+#                        call timeout on every call.
+#   other-bus         -- a record naming a bus other than the launcher's, and
+#                        a live client that would answer and log any call on
+#                        the recorded name. A launcher must pass the record
+#                        over without a call and find the client on the
+#                        shared name.
 #   legacy            -- a mock owning the shared name but answering no
 #                        ConfigDir method, standing in for a release older
 #                        than the method. This is the upgrade path: the first
@@ -48,44 +64,27 @@ if [ -z "${DELEGATION_TEST_ON_PRIVATE_BUS:-}" ]; then
     DELEGATION_TEST_ON_PRIVATE_BUS=1 exec dbus-run-session -- "$0" "$@"
 fi
 
+. "$(dirname "$0")/mock-lib.sh"
+
 workdir="$(mktemp -d)"
-mock_pid=''
-trap '[ -n "$mock_pid" ] && kill "$mock_pid" 2> /dev/null; rm -rf "$workdir"' EXIT
+trap 'kill ${mock_pids[@]+"${mock_pids[@]}"} 2> /dev/null; rm -rf "$workdir"' EXIT
 
 torrent="$workdir/example.torrent"
 printf 'torrent-file-payload' > "$torrent"
 
 failures=0
 log=''
+stale_log=''
 config_args=()
 round_mode=''
+stale_record_mode=''
 
-# Only one process can own a given bus name, so each round gets the mock to
-# itself, claiming that round's config dir.
-start_mock() {
-    local mode="$1"
-    local dir="$2"
-    log="$3"
+# Which of run_launcher_cases' cases a round runs: `all`, or `magnet` for a round
+# about how a launcher finds the instance, which every case does the same way.
+launcher_cases=all
 
-    python3 "$MOCK" "$mode" "$dir" "$log" &
-    mock_pid=$!
-
-    for _ in $(seq 1 50); do
-        grep -q '^ready$' "$log" 2> /dev/null && break
-        sleep 0.1
-    done
-
-    grep -q '^ready$' "$log" || {
-        echo "FAIL: mock never owned the name"
-        exit 1
-    }
-}
-
-stop_mock() {
-    kill "$mock_pid" 2> /dev/null
-    wait "$mock_pid" 2> /dev/null
-    mock_pid=''
-}
+# How many seconds a launch may run before it counts as hung.
+launch_timeout=30
 
 # Checks that one launcher invocation made exactly one expected call. Counting
 # from a snapshot keeps one client's result from satisfying the next client's
@@ -112,7 +111,7 @@ call_count() {
 # Runs the launcher the way this round names its config dir: with -g, or with
 # nothing at all so that the client has to find the default itself.
 launch() {
-    timeout 30 "$1" ${config_args[@]+"${config_args[@]}"} "${@:2}"
+    timeout "$launch_timeout" "$1" ${config_args[@]+"${config_args[@]}"} "${@:2}"
 }
 
 run_launcher_cases() {
@@ -133,6 +132,9 @@ run_launcher_cases() {
         failures=$((failures + 1))
     }
     expect_one_new_call "$label hands its magnet to the running instance" "$call" "$before"
+
+    # The cases below differ from that one only after the instance has been found.
+    [ "$launcher_cases" = all ] || return 0
 
     # File arguments travel as base64 contents, both as an argv path and as
     # the file URI supplied by a desktop Exec=%U launch.
@@ -218,6 +220,9 @@ ran_any=0
 # `mode` is how the mock makes itself reachable (see mock-instance.py); `dir` is
 # the config dir it claims; the arguments after it are how a launcher is told to
 # use that same dir.
+# With `stale_record_mode` set, a second mock in that mode shares the dir. Its
+# record is what a launcher reads first, and the round is about the launcher
+# getting past that record to the first mock. Its log stays for the round to check.
 run_round() {
     local round="$1"
     local mode="$2"
@@ -225,9 +230,14 @@ run_round() {
     shift 3
     config_args=("$@")
     round_mode="$mode"
+    log="$workdir/calls-$round.log"
+    stale_log="$workdir/stale-$round.log"
 
     mkdir -p "$dir"
-    start_mock "$mode" "$dir" "$workdir/calls-$round.log"
+    start_mock "$mode" "$dir" "$log"
+    if [ -n "$stale_record_mode" ]; then
+        start_mock "$stale_record_mode" "$dir" "$stale_log"
+    fi
 
     if [ "$QT_BIN" != "-" ]; then
         run_launcher_cases "qt ($round)" "$QT_BIN" aa
@@ -239,7 +249,7 @@ run_round() {
         ran_any=1
     fi
 
-    stop_mock
+    stop_mocks
 }
 
 # The launchers never reach window creation, because delegation runs first, so they
@@ -251,6 +261,30 @@ run_round named --well-known "$workdir/named-config" -g "$workdir/named-config"
 # The handoff a fork depends on. Nothing here shares a D-Bus name with the
 # launchers, so every one of them has to come out of the peer record.
 run_round foreign --foreign "$workdir/foreign-config" -g "$workdir/foreign-config"
+
+# The other upgrade path. A record from before the bus ID is the only way to reach
+# the client that wrote it, so a launcher asks that client rather than pass it over.
+run_round old-record --old-record "$workdir/old-record-config" -g "$workdir/old-record-config"
+
+# The same record once the bus has restarted and given its name to a connection that
+# never answers. A launcher asks that name once, briefly, and finds the client on the
+# shared name. The hang limit is the check, so it is set below the 25 s that one
+# default D-Bus call timeout on the stale name would take. Every launch kind gets past
+# the record the same way and pays the probe's wait to do it, so one per client is run.
+stale_record_mode=--silent
+launcher_cases=magnet
+launch_timeout=15
+run_round silent --well-known "$workdir/silent-config" -g "$workdir/silent-config"
+launch_timeout=30
+launcher_cases=all
+
+# A record from another bus, naming a live client that would answer and log any call.
+# The bus ID alone settles it: a launcher finds the client on the shared name without
+# calling the recorded name, so the record's client logs nothing.
+stale_record_mode=--other-bus
+run_round other-bus --well-known "$workdir/other-bus-config" -g "$workdir/other-bus-config"
+stale_record_mode=''
+expect_mock_uncalled "$stale_log" "the name in a record from another bus"
 
 # The upgrade path. A release predating ConfigDir() cannot say which dir it is on,
 # and a launcher must read that as "too old to say" and hand off anyway.
