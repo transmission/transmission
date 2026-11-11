@@ -8,6 +8,9 @@
 @import Sparkle;
 
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include <libtransmission/transmission.h>
 
@@ -306,6 +309,9 @@ static void removeKeRangerRansomware()
 @property(nonatomic) DragOverlayWindow* fOverlayWindow;
 
 @property(nonatomic) NSTimer* fTimer;
+@property(nonatomic) BOOL fTimerStatsPending;
+@property(nonatomic) BOOL fFullUpdatePending;
+@property(nonatomic) BOOL fFullUpdateAgain;
 
 @property(nonatomic) StatusBarController* fStatusBar;
 
@@ -816,7 +822,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self updateMainWindow];
 
     //timer to update the interface every second
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateUISeconds target:self selector:@selector(updateUI) userInfo:nil
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateUISeconds target:self selector:@selector(updateUIFromTimer)
+                                                 userInfo:nil
                                                   repeats:YES];
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSModalPanelRunLoopMode];
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSEventTrackingRunLoopMode];
@@ -1075,6 +1082,15 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self.fBadger updateBadgeWithDownload:0 upload:0];
 
     //save history
+    //stats are refreshed asynchronously, so update them or a transfer paused just before quitting is saved as active
+    {
+        // avoid having to wait for the same lock multiple times in the same operation
+        auto const lock = tr_sessionLock(self.sessionHandle);
+        for (Torrent* torrent in self.fTorrents)
+        {
+            [torrent update];
+        }
+    }
     [self updateTorrentHistory];
     [self.fTableView saveCollapsedGroups];
 
@@ -2378,24 +2394,72 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)updateUI
 {
+    [self requestStats:nil];
+}
+
+// Skips ticks while the last tick's stats are pending, so requests can't pile up behind a stalled session thread.
+- (void)updateUIFromTimer
+{
+    if (self.fTimerStatsPending)
+    {
+        return;
+    }
+
+    self.fTimerStatsPending = YES;
+    [self requestStats:^{
+        self.fTimerStatsPending = NO;
+    }];
+}
+
+// The stats are taken on libtransmission's thread, so the main thread never waits for its lock.
+- (void)requestStats:(void (^)(void))completion
+{
+    if (self.fQuitting)
+    {
+        return; // tr_sessionClose() may have freed the session
+    }
+
+    tr_torrentStatAsync(
+        self.fLib,
+        [controller = self, completion, generation = [Torrent statGeneration]](std::vector<tr_stat_snapshot> snapshots)
+        {
+            // a block's C++ captures are const, so share the vector to move it out later
+            auto const shared_snapshots = std::make_shared<std::vector<tr_stat_snapshot>>(std::move(snapshots));
+
+            // Not dispatch_async: GCD doesn't service the main queue in a run loop nested inside a main-queue block,
+            // so a runModal started from one would stop stat delivery until it's dismissed.
+            CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopCommonModes, ^{
+                if (controller.fQuitting)
+                {
+                    return; // tr_sessionClose() may have freed the session
+                }
+
+                [controller statsArrived:std::move(*shared_snapshots) generation:generation];
+                if (completion != nil)
+                {
+                    completion();
+                }
+            });
+            CFRunLoopWakeUp(CFRunLoopGetMain());
+        });
+}
+
+- (void)statsArrived:(std::vector<tr_stat_snapshot>)snapshots generation:(uint64_t)generation
+{
+    [Torrent updateTorrents:self.fTorrents fromSnapshots:std::move(snapshots) generation:generation];
+
     CGFloat dlRate = 0.0, ulRate = 0.0;
     BOOL anyCompleted = NO;
     BOOL anyActive = NO;
 
+    for (Torrent* torrent in self.fTorrents)
     {
-        // avoid having to wait for the same lock multiple times in the same operation
-        auto const lock = tr_sessionLock(self.sessionHandle);
-        for (Torrent* torrent in self.fTorrents)
-        {
-            [torrent update];
+        //pull the upload and download speeds - most consistent by using current stats
+        dlRate += torrent.downloadRate;
+        ulRate += torrent.uploadRate;
 
-            //pull the upload and download speeds - most consistent by using current stats
-            dlRate += torrent.downloadRate;
-            ulRate += torrent.uploadRate;
-
-            anyCompleted |= torrent.finishedSeeding;
-            anyActive |= torrent.active && !torrent.stalled && !torrent.error;
-        }
+        anyCompleted |= torrent.finishedSeeding;
+        anyActive |= torrent.active && !torrent.stalled && !torrent.error;
     }
 
     PowerManager.shared.shouldPreventSleep = anyActive && [self.fDefaults boolForKey:@"SleepPrevent"];
@@ -2425,12 +2489,30 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 }
 
 #warning can this be removed or refined?
+// One refresh at a time, so a burst of calls can't pile up behind a stalled session thread.
+// Calls made while a refresh is pending share one follow-up, since that refresh's stats may predate them.
 - (void)fullUpdateUI
 {
-    [self updateUI];
-    [self applyFilter];
-    [self.fWindow.toolbar validateVisibleItems];
-    [self updateTorrentHistory];
+    if (self.fFullUpdatePending)
+    {
+        self.fFullUpdateAgain = YES;
+        return;
+    }
+
+    self.fFullUpdatePending = YES;
+    [self requestStats:^{
+        self.fFullUpdatePending = NO;
+
+        [self applyFilter];
+        [self.fWindow.toolbar validateVisibleItems];
+        [self updateTorrentHistory];
+
+        if (self.fFullUpdateAgain)
+        {
+            self.fFullUpdateAgain = NO;
+            [self fullUpdateUI];
+        }
+    }];
 }
 
 - (void)setBottomCountText:(BOOL)filtering
@@ -5512,9 +5594,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)rpcStartedStoppedTorrent:(Torrent*)torrent
 {
-    [self updateUI];
-    [self applyFilter];
-    [self updateTorrentHistory];
+    [self fullUpdateUI];
 }
 
 - (void)rpcChangedTorrent:(Torrent*)torrent

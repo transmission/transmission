@@ -1649,6 +1649,26 @@ struct tr_stat
     second or so to get a new snapshot of the torrent's status. */
 tr_stat const* tr_torrentStat(tr_torrent* torrent);
 
+/** @brief A `tr_stat` that can outlive the session lock.
+
+    `stat.errorString` is null, since what it points at belongs to the torrent
+    and can change once the lock is released. `error_string` holds a copy of it.
+    A receiver that keeps `stat` must point `stat.errorString` at its own copy
+    of the text: moving a std::string can relocate its characters. */
+struct tr_stat_snapshot
+{
+    tr_stat stat = {};
+    std::string error_string;
+};
+
+using tr_torrent_stats_func = std::function<void(std::vector<tr_stat_snapshot>)>;
+
+// Stats every torrent on libtransmission's thread after any work already
+// queued there, e.g. the stop queued by tr_torrentStop(), then passes the
+// results to `callback` on that thread.
+// Has the same restrictions as `tr_sessionSetCompletenessCallback`.
+void tr_torrentStatAsync(tr_session* session, tr_torrent_stats_func callback);
+
 /** @} */
 
 /** @brief Sanity checker to test that the direction is `TR_UP` or `TR_DOWN` */

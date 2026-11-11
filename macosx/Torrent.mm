@@ -3,6 +3,9 @@
 // License text can be found in the licenses/ folder.
 
 #include <optional>
+#include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -25,9 +28,13 @@ static int const kETAIdleDisplaySec = 2 * 60;
 
 static dispatch_queue_t timeMachineExcludeQueue;
 
+// main thread only; bumped by every synchronous stat
+static uint64_t currentStatGeneration = 0;
+
 @interface Torrent ()
 
 @property(nonatomic, readonly) tr_torrent* fHandle;
+@property(nonatomic, readonly) tr_torrent_id_t fTorrentId;
 @property(nonatomic) tr_stat const* fStat;
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
@@ -111,6 +118,11 @@ static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* e
 }
 
 @implementation Torrent
+{
+    tr_stat _fStatStorage;
+    std::string _fErrorString; // what _fStatStorage.errorString points at
+    uint64_t _fStatGeneration; // currentStatGeneration at this torrent's last synchronous stat
+}
 
 + (void)initialize
 {
@@ -260,17 +272,88 @@ static bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* e
     //get previous stalled value before update
     BOOL const wasTransmitting = self.fStat != NULL && self.transmitting;
 
-    self.fStat = tr_torrentStat(self.fHandle);
+    [self refreshStat];
 
     //make sure the "active" filter is updated when transmitting changes
     if (wasTransmitting != self.transmitting)
     {
-        //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
-        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
-                                                 postingStyle:NSPostASAP
-                                                 coalesceMask:NSNotificationCoalescingOnName
-                                                     forModes:nil];
+        [Torrent postTorrentsStateChange];
     }
+}
+
++ (uint64_t)statGeneration
+{
+    return currentStatGeneration;
+}
+
++ (void)updateTorrents:(NSArray<Torrent*>*)torrents
+         fromSnapshots:(std::vector<tr_stat_snapshot>)snapshots
+            generation:(uint64_t)generation
+{
+    auto torrents_by_id = std::unordered_map<tr_torrent_id_t, Torrent*>{};
+    torrents_by_id.reserve(torrents.count);
+    for (Torrent* torrent in torrents)
+    {
+        torrents_by_id.try_emplace(torrent.fTorrentId, torrent);
+    }
+
+    BOOL transmittingChanged = NO;
+    for (auto& snapshot : snapshots)
+    {
+        auto const iter = torrents_by_id.find(snapshot.stat.id);
+        if (iter == torrents_by_id.end())
+        {
+            continue;
+        }
+
+        Torrent* const torrent = iter->second;
+        if (torrent->_fStatGeneration > generation)
+        {
+            continue; // a synchronous stat ran after these snapshots were requested
+        }
+
+        BOOL const wasTransmitting = torrent.fStat != NULL && torrent.transmitting;
+        [torrent storeStat:snapshot.stat errorString:std::move(snapshot.error_string)];
+        transmittingChanged |= wasTransmitting != torrent.transmitting;
+    }
+
+    //make sure the "active" filter is updated when transmitting changes
+    if (transmittingChanged)
+    {
+        [Torrent postTorrentsStateChange];
+    }
+}
+
+// posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
++ (void)postTorrentsStateChange
+{
+    [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
+                                             postingStyle:NSPostASAP
+                                             coalesceMask:NSNotificationCoalescingOnName
+                                                 forModes:nil];
+}
+
+// Every stat is stored here, in storage this Torrent owns, so what `fStat` points at stays valid until the next store.
+// (A synchronous stat's error text is copied after its lock is released, so that copy can still race a change to the error.)
+- (void)storeStat:(tr_stat const&)stat errorString:(std::string)errorString
+{
+    _fStatStorage = stat;
+    _fErrorString = std::move(errorString);
+    _fStatStorage.errorString = _fErrorString.c_str();
+    self.fStat = &_fStatStorage;
+}
+
+// Stats this torrent synchronously, which waits for libtransmission's lock.
+- (void)refreshStat
+{
+    tr_stat const* const stat = tr_torrentStat(self.fHandle);
+    if (stat == nullptr)
+    {
+        return;
+    }
+
+    [self storeStat:*stat errorString:stat->errorString];
+    _fStatGeneration = ++currentStatGeneration;
 }
 
 - (void)startTransferIgnoringQueue:(BOOL)ignoreQueue
@@ -1892,6 +1975,7 @@ static NSArray<NSDictionary*>* peerDicts(std::vector<tr_peer_stat> const& peers,
     _fResumeOnWake = NO;
     _peers = @[];
     _hashString = @(tr_torrentView(self.fHandle).hash_string);
+    _fTorrentId = tr_torrentId(self.fHandle);
 
     //don't do after this point - it messes with auto-group functionality
     if (!self.magnet)
@@ -2049,7 +2133,7 @@ static NSArray<NSDictionary*>* peerDicts(std::vector<tr_peer_stat> const& peers,
 
 - (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning
 {
-    self.fStat = tr_torrentStat(self.fHandle);
+    [self refreshStat];
 
     switch (status)
     {
@@ -2082,21 +2166,21 @@ static NSArray<NSDictionary*>* peerDicts(std::vector<tr_peer_stat> const& peers,
 
 - (void)ratioLimitHit
 {
-    self.fStat = tr_torrentStat(self.fHandle);
+    [self refreshStat];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentFinishedSeeding" object:self];
 }
 
 - (void)idleLimitHit
 {
-    self.fStat = tr_torrentStat(self.fHandle);
+    [self refreshStat];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"TorrentFinishedSeeding" object:self];
 }
 
 - (void)metadataRetrieved
 {
-    self.fStat = tr_torrentStat(self.fHandle);
+    [self refreshStat];
 
     [self createFileList];
 
