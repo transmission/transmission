@@ -3,9 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstddef>
+#include <future>
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include <libtransmission/transmission.h>
 
@@ -25,6 +31,45 @@ auto constexpr TorFilenames = std::array{
     "ubuntu-18.04.6-desktop-amd64.iso.torrent"sv,
     "ubuntu-20.04.4-desktop-amd64.iso.torrent"sv,
 };
+}
+
+TEST_F(TorrentTest, peersAsyncCallsBackOnTheSessionThread)
+{
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    ASSERT_NE(nullptr, tor);
+
+    auto const on_session_thread = std::make_shared<std::promise<bool>>();
+    auto future = on_session_thread->get_future();
+    tr_torrentPeersAsync(
+        tor,
+        [session = session_, on_session_thread](std::vector<tr_peer_stat> const& peers)
+        {
+            EXPECT_TRUE(std::empty(peers)); // nothing is connected
+            on_session_thread->set_value(session->am_in_session_thread());
+        });
+    ASSERT_EQ(std::future_status::ready, future.wait_for(5s));
+    EXPECT_TRUE(future.get());
+}
+
+TEST_F(TorrentTest, peersAsyncReportsNoPeersForARemovedTorrent)
+{
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    ASSERT_NE(nullptr, tor);
+
+    // Hold the session thread, so that the removal runs before the peers request.
+    auto release = std::promise<void>{};
+    session_->queue_session_thread([released = release.get_future().share()] { released.wait(); });
+    tr_torrentRemove(tor, false, nullptr, nullptr);
+
+    auto const peer_count = std::make_shared<std::promise<size_t>>();
+    auto future = peer_count->get_future();
+    tr_torrentPeersAsync(
+        tor,
+        [peer_count](std::vector<tr_peer_stat> const& peers) { peer_count->set_value(std::size(peers)); });
+
+    release.set_value();
+    ASSERT_EQ(std::future_status::ready, future.wait_for(5s));
+    EXPECT_EQ(0U, future.get());
 }
 
 TEST_F(TorrentTest, queueMoveUp)

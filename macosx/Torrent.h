@@ -140,7 +140,10 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 @property(nonatomic, getter=isAnyErrorOrWarning, readonly) BOOL anyErrorOrWarning;
 @property(nonatomic, readonly) NSString* errorMessage;
 
+/// The peer list `refreshPeers` fetched last, as dictionaries for the inspector's peers table.
 @property(nonatomic, readonly) NSArray<NSDictionary*>* peers;
+/// Fetches the peer list on libtransmission's thread, so the main thread never waits for its lock.
+- (void)refreshPeers;
 
 @property(nonatomic, readonly) NSUInteger webSeedCount;
 @property(nonatomic, readonly) NSArray<NSDictionary*>* webSeeds;
