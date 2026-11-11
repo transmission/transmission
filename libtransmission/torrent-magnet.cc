@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <cerrno> // EINVAL
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>
@@ -202,6 +203,11 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
     // test the info_dict checksum
     if (tr_sha1::digest(m->get_metadata()) != info_hash())
     {
+        if (error != nullptr)
+        {
+            error->set(EINVAL, "metadata doesn't match the info hash");
+        }
+
         return false;
     }
 
@@ -226,7 +232,7 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
 
     // does this synthetic torrent file parse?
     auto metainfo = tr_torrent_metainfo{};
-    if (!metainfo.parse_benc(benc))
+    if (!metainfo.parse_benc(benc, error))
     {
         return false;
     }
@@ -256,10 +262,11 @@ void tr_torrent::on_have_all_metainfo()
 
     if (auto error = tr_error{}; !use_new_metainfo(&error)) /* drat. */
     {
-        auto msg = std::string_view{ error && !std::empty(error.message()) ? error.message() : "unknown error" };
         tr_logAddWarnTor(
             this,
-            fmt::format("Couldn't parse magnet metainfo: '{error}'. Redownloading metadata", fmt::arg("error", msg)));
+            fmt::format(
+                "Couldn't parse magnet metainfo: '{error}'. Redownloading metadata",
+                fmt::arg("error", error.message())));
     }
 
     m.reset();

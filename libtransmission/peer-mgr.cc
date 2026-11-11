@@ -1933,18 +1933,18 @@ tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
-    auto const peers = tor->swarm->peers;
-    auto const n = std::size(peers);
-    auto* const ret = new tr_peer_stat[n];
-
     auto const lock = tor->unique_lock();
+    auto const& peers = tor->swarm->peers;
     auto const now = tr_time();
     auto const now_msec = tr_time_msec();
+
+    auto const n = std::size(peers);
+    auto* const ret = new tr_peer_stat[n];
     std::transform(
         std::begin(peers),
         std::end(peers),
         ret,
-        [&now, &now_msec](auto const& peer) { return peer_stat_helpers::get_peer_stats(peer.get(), now, now_msec); });
+        [now, now_msec](auto const& peer) { return peer_stat_helpers::get_peer_stats(peer.get(), now, now_msec); });
 
     *setme_count = n;
     return ret;

@@ -11,6 +11,7 @@
 
 #include <cstddef> // for size_t
 #include <cstdint> // for uintX_t
+#include <functional>
 #include <optional>
 #include <string_view>
 #include <utility>
@@ -30,6 +31,13 @@ public:
         Sparse,
         Full
     };
+
+    using Preallocate = std::function<bool(tr_sys_file_t, uint64_t, int, tr_error*)>;
+
+    explicit tr_open_files(Preallocate preallocate = tr_sys_file_preallocate)
+        : preallocate_{ std::move(preallocate) }
+    {
+    }
 
     [[nodiscard]] std::optional<tr_sys_file_t> get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable);
 
@@ -75,5 +83,6 @@ private:
     };
 
     static constexpr size_t MaxOpenFiles = 32U;
+    Preallocate const preallocate_;
     tr_lru_cache<Key, Val, MaxOpenFiles> pool_;
 };

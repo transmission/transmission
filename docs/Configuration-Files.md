@@ -53,7 +53,9 @@ A session that finds the folder already locked reports it and stops.
 A launch keeps this empty file locked from the moment it looks for a client already running on this folder until it can be found itself. Without it, two launches started at the same moment could each conclude it was first.
 
 ### dbus-peer
-This file records the D-Bus bus name, interface and object path of the running client. A later launch on this folder reads it and hands that client a torrent file or magnet link instead of starting a second client. The file names the interface to call rather than assuming one, so this works between clients built from different sources. Every client that starts on the folder rewrites it, and it means nothing once that client has exited.
+This file records the D-Bus bus name, interface and object path of the running client, and the ID of the bus that issued the name. A later launch on this folder reads it and hands that client a torrent file or magnet link instead of starting a second client. The file names the interface to call rather than assuming one, so this works between clients built from different sources. Every client that starts on the folder rewrites it, and it means nothing once that client has exited.
+
+The bus ID is how a later launch tells a live record from one left behind by a reboot. A bus never reuses a name, but the next bus starts over, so a stale record's name can belong to an unrelated process. A record from another bus is ignored without a call. A record with no `bus-id` line is used only if the client it names answers within a few seconds.
 
 ### torrents/
 This subfolder holds the .torrent files that have been added to Transmission. The files in this folder are named with a combination of the torrent's name (to make it human-readable) and a portion of the torrent's SHA1 hash (to avoid filename collisions from similarly-named torrents).

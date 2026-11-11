@@ -7,8 +7,10 @@
 #include <cerrno> // for EINVAL
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -26,6 +28,7 @@
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
@@ -647,6 +650,27 @@ private:
     static constexpr std::string_view XCrossSeedKey = "x_cross_seed"sv;
 };
 
+namespace
+{
+// Finds the info dict the way MetainfoHandler does, skipping the rest of its work.
+struct InfoDictOffsetHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
+{
+    using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+
+    std::optional<uint64_t> offset;
+
+    bool StartDict(Context const& context) override
+    {
+        if (pathIs("info"sv))
+        {
+            offset = context.tokenSpan().first;
+        }
+
+        return BasicHandler::StartDict(context);
+    }
+};
+} // namespace
+
 bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error* error)
 {
     // Reset the object to avoid accidentally failing checks
@@ -663,6 +687,12 @@ bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error* error)
     }
 
     auto const ok = transmission::benc::parse(benc, stack, handler, nullptr, error);
+
+    // a handler that rejects the input doesn't always say why
+    if (!ok && !*error)
+    {
+        error->set(EINVAL, "invalid metainfo");
+    }
 
     if (*error)
     {
@@ -692,6 +722,53 @@ bool tr_torrent_metainfo::parse_torrent_file(std::string_view filename, std::vec
     }
 
     return tr_file_read(filename, *contents, error) && parse_benc({ std::data(*contents), std::size(*contents) }, error);
+}
+
+bool tr_torrent_metainfo::save_announce_list(std::string_view const benc_filename, tr_error* const error)
+{
+    auto serde = tr_variant_serde::benc();
+    auto top = serde.parse_file(benc_filename);
+    if (!top)
+    {
+        if (error != nullptr)
+        {
+            *error = std::move(serde.error_);
+        }
+
+        return false;
+    }
+
+    if (auto* const map = top->get_if<tr_variant::Map>(); map != nullptr)
+    {
+        announce_list().add_to_map(*map);
+    }
+
+    // find the info dict before writing, so a rewrite without one leaves the file untouched
+    auto const benc = serde.to_string(*top);
+    auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
+    auto handler = InfoDictOffsetHandler{};
+    if (!transmission::benc::parse(benc, stack, handler, nullptr, error))
+    {
+        return false;
+    }
+
+    if (!handler.offset)
+    {
+        if (error != nullptr)
+        {
+            error->set(EINVAL, "missing 'info' dict");
+        }
+
+        return false;
+    }
+
+    if (!tr_file_save(benc_filename, benc, error))
+    {
+        return false;
+    }
+
+    info_dict_offset_ = *handler.offset;
+    return true;
 }
 
 std::string tr_torrent_metainfo::make_filename(

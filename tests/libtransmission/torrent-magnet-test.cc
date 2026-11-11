@@ -3,10 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cstddef> // size_t
-#include <future>
 #include <string>
 
+#include <libtransmission/crypto-utils.h> // tr_base64_decode(), tr_sha1
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-magnet.h>
 #include <libtransmission/torrent-metainfo.h>
@@ -19,29 +18,37 @@ namespace libtransmission::test
 
 using TorrentMagnetTest = SessionTest;
 
+namespace
+{
+[[nodiscard]] std::string getMetadata(tr_torrent const& tor)
+{
+    auto metadata = std::string{};
+    for (auto piece = 0;; ++piece)
+    {
+        auto const data = tor.get_metadata_piece(piece);
+        if (!data)
+        {
+            return metadata;
+        }
+
+        metadata.append(reinterpret_cast<char const*>(std::data(*data)), std::size(*data));
+    }
+}
+} // namespace
+
 TEST_F(TorrentMagnetTest, getMetadataPiece)
 {
     auto* tor = zeroTorrentInit(ZeroTorrentState::Complete);
     EXPECT_NE(nullptr, tor);
 
+    auto const metadata = getMetadata(*tor);
+    EXPECT_EQ(tor->info_dict_size(), std::size(metadata));
+
     auto benc = std::string{
         "d8:announce31:http://www.example.com/announce10:created by25:Transmission/2.61 (13407)13:creation datei1358704075e8:encoding5:UTF-84:info"
     };
-    auto piece = 0;
-    auto info_dict_size = size_t{ 0U };
-    for (;;)
-    {
-        auto data = tor->get_metadata_piece(piece++);
-        if (!data)
-        {
-            break;
-        }
-
-        benc.append(reinterpret_cast<char const*>(std::data(*data)), std::size(*data));
-        info_dict_size += std::size(*data);
-    }
-    benc.append("e");
-    EXPECT_EQ(tor->info_dict_size(), info_dict_size);
+    benc += metadata;
+    benc += 'e';
 
     auto torrent_metainfo = tr_torrent_metainfo{};
     auto error = tr_error{};
@@ -49,6 +56,19 @@ TEST_F(TorrentMagnetTest, getMetadataPiece)
     EXPECT_FALSE(error) << error.message();
 
     EXPECT_EQ(tor->piece_hash(0), torrent_metainfo.piece_hash(0));
+}
+
+TEST_F(TorrentMagnetTest, getMetadataPieceAfterTrackerEdit)
+{
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    ASSERT_NE(nullptr, tor);
+
+    // two trackers add "announce-list", which precedes "info" in the .torrent file
+    auto const old_offset = tor->info_dict_offset();
+    EXPECT_TRUE(tor->set_announce_list("https://a.example.com/announce\nhttps://b.example.com/announce"));
+    EXPECT_NE(old_offset, tor->info_dict_offset());
+
+    EXPECT_EQ(tor->info_hash(), tr_sha1::digest(getMetadata(*tor)));
 }
 
 TEST_F(TorrentMagnetTest, setMetadataPiece)

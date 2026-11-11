@@ -1193,7 +1193,11 @@ namespace make_torrent_field_helpers
         return { Error::SET_ANNOUNCE_LIST, {} };
     }
 
-    tor->set_announce_list(std::move(ann));
+    if (!tor->set_announce_list(std::move(ann)))
+    {
+        return { Error::SYSTEM_ERROR, tor->error().errmsg() };
+    }
+
     return { Error::SUCCESS, {} };
 }
 
@@ -1220,7 +1224,11 @@ namespace make_torrent_field_helpers
         return { Error::SET_ANNOUNCE_LIST, {} };
     }
 
-    tor->set_announce_list(std::move(ann));
+    if (!tor->set_announce_list(std::move(ann)))
+    {
+        return { Error::SYSTEM_ERROR, tor->error().errmsg() };
+    }
+
     return { Error::SUCCESS, {} };
 }
 
@@ -1244,7 +1252,11 @@ namespace make_torrent_field_helpers
         return { Error::SET_ANNOUNCE_LIST, {} };
     }
 
-    tor->set_announce_list(std::move(ann));
+    if (!tor->set_announce_list(std::move(ann)))
+    {
+        return { Error::SYSTEM_ERROR, tor->error().errmsg() };
+    }
+
     return { Error::SUCCESS, {} };
 }
 
