@@ -16,10 +16,13 @@ static CGFloat const kIconWidthSmall = 12.0;
 // crafted preferences plist smuggle in a function/custom-selector expression and trigger arbitrary Objective-C
 // message dispatch on evaluation. The functions below only ever build/accept the fixed AND/OR/NOT-of-comparisons
 // shape GroupRules.xib's rule editor produces, as a plain property-list schema - nothing else is stored or trusted.
-// remainingNodeBudget caps total nodes visited per tree, since depth/fan-out limits alone don't bound their product.
+// remainingNodeBudget caps total nodes visited per tree (and thus per-level fan-out); real-world rules can hold hundreds
+// of keyword criteria in a single OR group, so the budget is generous.
 static NSUInteger const kAutoGroupRuleMaxDepth = 8;
-static NSUInteger const kAutoGroupRuleMaxChildren = 32;
-static NSUInteger const kAutoGroupRuleMaxTotalNodes = 256;
+static NSUInteger const kAutoGroupRuleMaxTotalNodes = 2000;
+//a rule stored in the schema format that can't be rebuilt (e.g. it exceeds a limit) is kept here as plain property-list data
+//and written back unchanged on save, so it is never lost; it is not evaluated
+static NSString* const kRetainedAutoGroupRulesSchemaKey = @"RetainedAutoGroupRulesSchema";
 
 static NSSet<NSString*>* allowedAutoGroupRuleKeyPaths(void)
 {
@@ -83,7 +86,7 @@ static NSDictionary* safeSchemaFromAutoGroupPredicate(NSPredicate* predicate, NS
     if ([predicate isKindOfClass:NSCompoundPredicate.class])
     {
         NSCompoundPredicate* compound = (NSCompoundPredicate*)predicate;
-        if (!autoGroupRuleCompoundTypeIsAllowed(compound.compoundPredicateType) || compound.subpredicates.count > kAutoGroupRuleMaxChildren)
+        if (!autoGroupRuleCompoundTypeIsAllowed(compound.compoundPredicateType))
         {
             return nil;
         }
@@ -159,7 +162,7 @@ static NSPredicate* autoGroupPredicateFromSafeSchema(NSDictionary* schema, NSUIn
     {
         NSNumber* compoundTypeNumber = schema[@"Compound"];
         NSArray* subSchemas = schema[@"Subpredicates"];
-        if (![compoundTypeNumber isKindOfClass:NSNumber.class] || ![subSchemas isKindOfClass:NSArray.class] || subSchemas.count > kAutoGroupRuleMaxChildren)
+        if (![compoundTypeNumber isKindOfClass:NSNumber.class] || ![subSchemas isKindOfClass:NSArray.class])
         {
             return nil;
         }
@@ -442,11 +445,13 @@ GroupsController* fGroupsInstance = nil;
             predicate);
 
         dict[@"AutoGroupRules"] = predicate;
+        [dict removeObjectForKey:kRetainedAutoGroupRulesSchemaKey];
         [GroupsController.groups saveGroups];
     }
     else
     {
         [dict removeObjectForKey:@"AutoGroupRules"];
+        [dict removeObjectForKey:kRetainedAutoGroupRulesSchemaKey];
         [self setUsesAutoAssignRules:NO forIndex:index];
     }
 }
@@ -594,6 +599,7 @@ GroupsController* fGroupsInstance = nil;
         NSDictionary* schema = group[@"AutoGroupRulesSchema"];
         id legacyPredicate = group[@"AutoGroupRules"];
         [group removeObjectForKey:@"AutoGroupRulesSchema"];
+        [group removeObjectForKey:kRetainedAutoGroupRulesSchemaKey];
 
         NSPredicate* rebuilt = nil;
         if ([schema isKindOfClass:NSDictionary.class])
@@ -621,7 +627,13 @@ GroupsController* fGroupsInstance = nil;
                 //unrecognized shape - drop the rule rather than risk evaluating it
                 [group removeObjectForKey:@"AutoGroupRules"];
                 group[@"UsesAutoGroupRules"] = @NO;
-                NSLog(@"Transmission: discarded an auto-assign rule with an unsupported predicate structure");
+                //keep an unconvertible schema-format rule as inert plist data (never a live predicate) instead of losing it
+                if ([schema isKindOfClass:NSDictionary.class] &&
+                    [NSPropertyListSerialization propertyList:schema isValidForFormat:NSPropertyListBinaryFormat_v1_0])
+                {
+                    group[kRetainedAutoGroupRulesSchemaKey] = schema;
+                }
+                NSLog(@"Transmission: could not load an auto-assign rule with an unsupported or too large predicate structure");
             }
         }
         else if (legacyPredicate != nil)
@@ -654,8 +666,17 @@ GroupsController* fGroupsInstance = nil;
             {
                 tempDict[@"AutoGroupRulesSchema"] = schema;
             }
+            else
+            {
+                NSLog(@"Transmission: could not save the auto-assign rule for group %@ (too large or unsupported)", tempDict[@"Name"]);
+            }
             [tempDict removeObjectForKey:@"AutoGroupRules"];
         }
+        else if (NSDictionary* retained = tempDict[kRetainedAutoGroupRulesSchemaKey])
+        {
+            tempDict[@"AutoGroupRulesSchema"] = retained;
+        }
+        [tempDict removeObjectForKey:kRetainedAutoGroupRulesSchemaKey];
 
         [groups addObject:tempDict];
     }
