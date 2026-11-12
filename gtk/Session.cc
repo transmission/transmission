@@ -722,6 +722,18 @@ void Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
         return;
     }
 
+    /* "save to the .torrent file's folder": when enabled, a torrent that was
+     * added from a local .torrent file keeps its download directory set to
+     * the folder that file lives in. Magnet links and URLs have no such file,
+     * so they fall back to the global download-dir preference. */
+    if (gtr_pref_flag_get(TR_KEY_download_dir_same_as_torrent))
+    {
+        if (auto const source = tr_ctorGetSourceFile(ctor); source.has_value() && !source->empty())
+        {
+            tr_ctorSetDownloadDir(ctor, TR_FORCE, Glib::path_get_dirname(*source));
+        }
+    }
+
     if (tr_torrentFindFromMetainfo(get_session(), metainfo) != nullptr)
     {
         /* don't complain about torrent files in the watch directory
