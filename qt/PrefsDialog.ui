@@ -866,6 +866,13 @@ To add a new primary URL, add it after a blank line.</string>
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="inhibitHibernationCheck">
+            <property name="text">
+             <string>&amp;Inhibit hibernation when torrents are active</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

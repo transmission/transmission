@@ -299,6 +299,7 @@ void PrefsDialog::initDesktopTab()
 {
     initWidget(ui_.showTrayIconCheck, TR_KEY_show_notification_area_icon);
     initWidget(ui_.startMinimizedCheck, TR_KEY_start_minimized);
+    initWidget(ui_.inhibitHibernationCheck, TR_KEY_inhibit_desktop_hibernation);
     initWidget(ui_.notifyOnTorrentAddedCheck, TR_KEY_torrent_added_notification_enabled);
     initWidget(ui_.notifyOnTorrentCompletedCheck, TR_KEY_torrent_complete_notification_enabled);
     initWidget(ui_.playSoundOnTorrentCompletedCheck, TR_KEY_torrent_complete_sound_enabled);
