@@ -71,6 +71,11 @@
                 <lookup name="item">GtkListItem</lookup>
               </lookup>
             </binding>
+            <binding name="text">
+              <lookup name="percent-done-text" type="gtkmm__CustomObject_7Torrent">
+                <lookup name="item">GtkListItem</lookup>
+              </lookup>
+            </binding>
           </object>
         </child>
       </object>
