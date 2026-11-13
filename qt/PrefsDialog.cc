@@ -533,6 +533,7 @@ void PrefsDialog::initDownloadingTab()
     initWidget(ui_.downloadDirFreeSpaceLabel, TR_KEY_download_dir);
     initWidget(ui_.downloadQueueSizeSpin, TR_KEY_download_queue_size);
     initWidget(ui_.queueStalledMinutesSpin, TR_KEY_queue_stalled_minutes);
+    initWidget(ui_.wrapSingleFileTorrentsCheck, TR_KEY_wrap_single_file_torrents);
     initWidget(ui_.renamePartialFilesCheck, TR_KEY_rename_partial_files);
     initWidget(ui_.incompleteDirCheck, TR_KEY_incomplete_dir_enabled);
     initWidget(ui_.incompleteDirButton, TR_KEY_incomplete_dir);

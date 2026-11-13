@@ -252,6 +252,7 @@ private:
     bool uspeed_enabled_ = false;
     int uspeed_ = 0;
     int upload_slots_per_torrent_ = 0;
+    bool wrap_single_file_torrents_ = false;
 
 public:
     static constexpr auto Fields = std::make_tuple(
@@ -348,7 +349,8 @@ public:
         Field<&Prefs::rpc_whitelist_>{ TR_KEY_rpc_whitelist },
         Field<&Prefs::uspeed_enabled_>{ TR_KEY_speed_limit_up_enabled },
         Field<&Prefs::uspeed_>{ TR_KEY_speed_limit_up },
-        Field<&Prefs::upload_slots_per_torrent_>{ TR_KEY_upload_slots_per_torrent });
+        Field<&Prefs::upload_slots_per_torrent_>{ TR_KEY_upload_slots_per_torrent },
+        Field<&Prefs::wrap_single_file_torrents_>{ TR_KEY_wrap_single_file_torrents });
 
 private:
     struct PrefItem
@@ -357,7 +359,7 @@ private:
         int type;
     };
 
-    static auto constexpr Items = std::array<PrefItem, 94>{ {
+    static auto constexpr Items = std::array<PrefItem, 95>{ {
         { .key = TR_KEY_show_options_window, .type = QMetaType::Bool },
         { .key = TR_KEY_open_dialog_dir, .type = QMetaType::QString },
         { .key = TR_KEY_inhibit_desktop_hibernation, .type = QMetaType::Bool },
@@ -452,6 +454,7 @@ private:
         { .key = TR_KEY_speed_limit_up_enabled, .type = QMetaType::Bool },
         { .key = TR_KEY_speed_limit_up, .type = QMetaType::Int },
         { .key = TR_KEY_upload_slots_per_torrent, .type = QMetaType::Int },
+        { .key = TR_KEY_wrap_single_file_torrents, .type = QMetaType::Bool },
     } };
 
     [[nodiscard]] static PrefItem const& item(tr_quark key);
