@@ -29,6 +29,7 @@
 #include <QStringList>
 #include <QString>
 #include <QStyle>
+#include <QShortcut>
 #include <QTreeWidgetItem>
 
 #include <libtransmission/transmission.h>
@@ -38,6 +39,7 @@
 #include "BaseDialog.h"
 #include "ColumnResizer.h"
 #include "DetailsDialog.h"
+#include "FileTreeModel.h"
 #include "Formatter.h"
 #include "IconCache.h"
 #include "NativeIcon.h"
@@ -310,6 +312,9 @@ void DetailsDialog::setIds(torrent_ids_t const& ids)
     {
         setEnabled(false);
         ui_.filesView->clear();
+
+        file_search_matches_.clear();
+        file_search_match_ = -1;
 
         ids_ = ids;
         session_.refreshDetailInfo(ids_);
@@ -1307,6 +1312,8 @@ void DetailsDialog::refreshUI()
     }
 
     setEnabled(true);
+    ui_.fileSearchWidget->setEnabled(single);
+    searchFiles(false);
 }
 
 void DetailsDialog::setEnabled(bool enabled)
@@ -1626,12 +1633,107 @@ void DetailsDialog::initPeersTab()
 
 // ---
 
-void DetailsDialog::initFilesTab() const
+void DetailsDialog::initFilesTab()
 {
     connect(ui_.filesView, &FileTreeView::openRequested, this, &DetailsDialog::onOpenRequested);
     connect(ui_.filesView, &FileTreeView::pathEdited, this, &DetailsDialog::onPathEdited);
     connect(ui_.filesView, &FileTreeView::priorityChanged, this, &DetailsDialog::onFilePriorityChanged);
     connect(ui_.filesView, &FileTreeView::wantedChanged, this, &DetailsDialog::onFileWantedChanged);
+    connect(ui_.fileSearchEdit, &QLineEdit::textChanged, this, [this]() { searchFiles(); });
+    connect(ui_.previousMatchButton, &QToolButton::clicked, this, [this]() { showSearchMatch(-1); });
+    connect(ui_.nextMatchButton, &QToolButton::clicked, this, [this]() { showSearchMatch(1); });
+    auto* find_shortcut = new QShortcut{ QKeySequence::Find, this };
+    connect(find_shortcut, &QShortcut::activated, this, [this]()
+    {
+        ui_.tabs->setCurrentWidget(ui_.filesTab);
+        ui_.fileSearchEdit->setFocus();
+        ui_.fileSearchEdit->selectAll();
+    });
+    for (auto const key : { Qt::Key_Return, Qt::Key_Enter })
+    {
+        auto* shortcut = new QShortcut{ QKeySequence{ key }, ui_.fileSearchEdit };
+        shortcut->setContext(Qt::WidgetShortcut);
+        connect(shortcut, &QShortcut::activated, this, [this]() { showSearchMatch(1); });
+    }
+    searchFiles(false);
+}
+
+void DetailsDialog::searchFiles(bool navigate)
+{
+    auto const previous = file_search_match_ >= 0 && file_search_match_ < file_search_matches_.size() ?
+        file_search_matches_[file_search_match_] : QPersistentModelIndex{};
+    file_search_matches_.clear();
+    file_search_match_ = -1;
+    auto const query = ui_.fileSearchEdit->text();
+    auto const* model = ui_.filesView->model();
+    auto pending = QModelIndexList{};
+    if (!query.isEmpty())
+    {
+        for (int row = model->rowCount() - 1; row >= 0; --row)
+        {
+            pending.push_back(model->index(row, FileTreeModel::COL_NAME));
+        }
+    }
+    while (!pending.isEmpty())
+    {
+        auto const index = pending.takeLast();
+        for (int row = model->rowCount(index) - 1; row >= 0; --row)
+        {
+            pending.push_back(model->index(row, FileTreeModel::COL_NAME, index));
+        }
+        if (index.data(FileTreeModel::FileIndexRole).toInt() >= 0 &&
+            index.data().toString().contains(query, Qt::CaseInsensitive))
+        {
+            file_search_matches_.push_back(index);
+        }
+    }
+    auto const have_matches = !file_search_matches_.isEmpty();
+    ui_.previousMatchButton->setEnabled(have_matches);
+    ui_.nextMatchButton->setEnabled(have_matches);
+    if (!have_matches)
+    {
+        ui_.fileSearchStatus->setText(query.isEmpty() ? QString{} : tr("No matches"));
+        if (navigate)
+        {
+            ui_.filesView->clearSelection();
+        }
+        return;
+    }
+    file_search_match_ = static_cast<int>(file_search_matches_.indexOf(previous));
+    if (navigate || file_search_match_ < 0)
+    {
+        file_search_match_ = -1;
+        showSearchMatch(1);
+    }
+    else
+    {
+        // Periodic progress updates must not move the user's selection or scroll position.
+        ui_.fileSearchStatus->setText(tr("%1 of %2").arg(file_search_match_ + 1).arg(file_search_matches_.size()));
+    }
+}
+
+void DetailsDialog::showSearchMatch(int offset)
+{
+    if (file_search_matches_.isEmpty())
+    {
+        return;
+    }
+    auto const count = static_cast<int>(file_search_matches_.size());
+    file_search_match_ = (file_search_match_ + offset + count) % count;
+    QModelIndex const index = file_search_matches_[file_search_match_];
+    if (!index.isValid())
+    {
+        searchFiles();
+        return;
+    }
+    for (auto parent = index.parent(); parent.isValid(); parent = parent.parent())
+    {
+        ui_.filesView->expand(parent);
+    }
+    ui_.filesView->selectionModel()->setCurrentIndex(
+        index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    ui_.filesView->scrollTo(index, QAbstractItemView::PositionAtCenter);
+    ui_.fileSearchStatus->setText(tr("%1 of %2").arg(file_search_match_ + 1).arg(count));
 }
 
 void DetailsDialog::onFilePriorityChanged(file_indices_t const& indices, int priority)
