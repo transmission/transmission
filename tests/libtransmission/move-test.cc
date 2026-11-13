@@ -4,10 +4,12 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <atomic>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -64,7 +66,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Partial);
     auto path = tr_pathbuf{};
 
-    path.assign(incomplete_dir, '/', tr_torrentFile(tor, 0).name, tr_torrent_files::PartialFileSuffix);
+    path.assign(incomplete_dir, '/', tr_torrentFile(tor, 0).name, session_->partial_file_suffix());
     EXPECT_EQ(path, tr_torrentFindFile(tor, 0));
     path.assign(incomplete_dir, '/', tr_torrentFile(tor, 1).name);
     EXPECT_EQ(path, tr_torrentFindFile(tor, 1));
@@ -191,6 +193,63 @@ TEST_F(MoveTest, setLocation)
         auto const expected = tr_pathbuf{ target_dir, '/', tr_torrentFile(tor, i).name };
         EXPECT_EQ(expected, tr_torrentFindFile(tor, i));
     }
+
+    // cleanup
+    tr_torrentRemove(tor, true);
+}
+
+class PartialFileSuffixTest : public SessionTest
+{
+protected:
+    static constexpr auto PartialSuffix = ".partial"sv;
+
+    void SetUp() override
+    {
+        if (auto* map = settings()->get_if<tr_variant::Map>(); map != nullptr)
+        {
+            map->insert_or_assign(TR_KEY_partial_file_suffix, PartialSuffix);
+        }
+
+        SessionTest::SetUp();
+    }
+};
+
+TEST_F(PartialFileSuffixTest, newPartialFilesGetTheSuffix)
+{
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    ASSERT_NE(nullptr, tor);
+    EXPECT_EQ(""sv, tr_torrentFindFile(tor, 0));
+
+    // writing the first block creates the first file
+    auto done = std::atomic<bool>{ false };
+    session_->run_in_session_thread(
+        [tor, &done]()
+        {
+            auto const buf = std::vector<uint8_t>(tr_block_info::BlockSize);
+            EXPECT_EQ(0, tr_ioWrite(*tor, tor->session->openFiles(), tor->block_loc(0), buf));
+            done = true;
+        });
+    EXPECT_TRUE(waitFor([&done]() { return done.load(); }, MaxWaitMsec));
+
+    auto const expected = tr_pathbuf{ tor->current_dir(), '/', tr_torrentFile(tor, 0).name, PartialSuffix };
+    EXPECT_EQ(expected, tr_torrentFindFile(tor, 0));
+
+    // cleanup
+    tr_torrentRemove(tor, true);
+}
+
+TEST_F(PartialFileSuffixTest, legacyPartialFilesAreFoundAndRenamed)
+{
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::Partial, tr_torrent_files::LegacyPartialFileSuffix);
+    ASSERT_NE(nullptr, tor);
+
+    // the legacy partial file was found: only the missing piece is left
+    EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor).left_until_done);
+
+    // and verifying it gave it the configured suffix
+    auto const filename = tr_pathbuf{ tor->current_dir(), '/', tr_torrentFile(tor, 0).name };
+    EXPECT_EQ((tr_pathbuf{ filename, PartialSuffix }), tr_torrentFindFile(tor, 0));
+    EXPECT_FALSE(tr_sys_path_exists(tr_pathbuf{ filename, tr_torrent_files::LegacyPartialFileSuffix }));
 
     // cleanup
     tr_torrentRemove(tor, true);

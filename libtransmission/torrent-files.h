@@ -111,11 +111,13 @@ public:
     bool move(
         std::string_view old_parent_in,
         std::string_view parent_in,
+        std::string_view partial_suffix,
         std::string_view parent_name = "",
         tr_error* error = nullptr) const;
 
     void remove(
         std::string_view parent_in,
+        std::string_view partial_suffix,
         std::string_view tmpdir_prefix,
         tr_torrent_remove_func const& func,
         tr_error* error = nullptr) const;
@@ -153,8 +155,14 @@ public:
         size_t base_len_;
     };
 
-    [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t file, std::string_view const* paths, size_t n_paths) const;
-    [[nodiscard]] bool has_any_local_data(std::string_view const* paths, size_t n_paths) const;
+    // Tries each of `paths` in turn, looking for the complete file, then for a partial
+    // file with `partial_suffix`, then for a partial file with `LegacyPartialFileSuffix`.
+    [[nodiscard]] std::optional<FoundFile> find(
+        tr_file_index_t file,
+        std::string_view const* paths,
+        size_t n_paths,
+        std::string_view partial_suffix) const;
+    [[nodiscard]] bool has_any_local_data(std::string_view const* paths, size_t n_paths, std::string_view partial_suffix) const;
     [[nodiscard]] std::string_view primary_mime_type() const;
 
     static void sanitize_subpath(std::string_view path, tr_pathbuf& append_me, bool os_specific = true);
@@ -171,7 +179,8 @@ public:
         return sanitize_subpath(path, os_specific) == path;
     }
 
-    static constexpr std::string_view PartialFileSuffix = ".part";
+    // Partial files created before the suffix was configurable have this suffix.
+    static constexpr std::string_view LegacyPartialFileSuffix = ".part";
 
 private:
     struct file_t

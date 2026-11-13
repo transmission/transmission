@@ -357,6 +357,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "open_dialog_dir"sv, // gtk app, qt app
     "p"sv, // BEP0010; BT protocol
     "params"sv, // json-rpc
+    "partial_file_suffix"sv, // tr_session::Settings
     "path"sv, // .torrent, rpc
     "paused"sv, // .resume, rpc
     "pausedTorrentCount"sv, // rpc
