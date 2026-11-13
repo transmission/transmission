@@ -66,9 +66,39 @@
     </widget>
    </item>
    <item row="3" column="0" colspan="2">
+    <widget class="QWidget" name="fileSearchWidget">
+     <layout class="QHBoxLayout" name="fileSearchLayout">
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
+      <item>
+       <widget class="QLineEdit" name="fileSearchEdit">
+        <property name="placeholderText"><string>Search torrent files...</string></property>
+        <property name="accessibleName"><string>Search torrent files</string></property>
+        <property name="clearButtonEnabled"><bool>true</bool></property>
+       </widget>
+      </item>
+      <item><widget class="QLabel" name="fileSearchStatus"/></item>
+      <item>
+       <widget class="QToolButton" name="previousMatchButton">
+        <property name="text"><string>Previous</string></property>
+        <property name="toolTip"><string>Previous matching file</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="nextMatchButton">
+        <property name="text"><string>Next</string></property>
+        <property name="toolTip"><string>Next matching file</string></property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
     <widget class="FileTreeView" name="filesView"/>
    </item>
-   <item row="4" column="0">
+   <item row="5" column="0">
     <widget class="QLabel" name="priorityLabel">
      <property name="text">
       <string>&amp;Priority:</string>
@@ -78,24 +108,24 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="5" column="1">
     <widget class="QComboBox" name="priorityCombo"/>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="6" column="0" colspan="2">
     <widget class="QCheckBox" name="startCheck">
      <property name="text">
       <string>S&amp;tart when added</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
+   <item row="7" column="0" colspan="2">
     <widget class="QCheckBox" name="trashCheck">
      <property name="text">
       <string>Mo&amp;ve .torrent file to the trash</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="0" colspan="2">
+   <item row="8" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="dialogButtons">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

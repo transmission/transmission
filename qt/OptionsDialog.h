@@ -10,6 +10,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QPersistentModelIndex>
 #include <QString>
 #include <QTimer>
 
@@ -57,6 +58,11 @@ private:
     void reload();
     void updateWidgetsLocality();
     void clearInfo();
+    void searchFiles();
+    void showSearchMatch(int offset);
+
+    QList<QPersistentModelIndex> search_matches_;
+    int search_match_ = -1;
 
     AddData add_;
     FileList files_;
