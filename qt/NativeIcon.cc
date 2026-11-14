@@ -294,7 +294,7 @@ struct Info
     case Type::Settings:
         sf_symbol_name = "gearshape";
         segoe_codepoint = 0xE713U; // Settings
-        xdg_icon_name = "preferences-system";
+        xdg_icon_name = "configure";
         ok_in_gnome_menus = true;
         break;
 
