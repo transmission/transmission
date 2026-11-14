@@ -56,6 +56,7 @@
 #import "FileRenameSheetController.h"
 #import "BonjourController.h"
 #import "Badger.h"
+#import "MenuBarItem.h"
 #import "DragOverlayWindow.h"
 #import "NSImageAdditions.h"
 #import "NSMutableArrayAdditions.h"
@@ -428,6 +429,8 @@ static void removeKeRangerRansomware()
 
 @property(nonatomic) Badger* fBadger;
 
+@property(nonatomic) MenuBarItem* fMenuBarItem;
+
 @property(nonatomic) NSMutableArray<NSString*>* fAutoImportedNames;
 @property(nonatomic) NSTimer* fAutoImportTimer;
 
@@ -775,6 +778,8 @@ static void removeKeRangerRansomware()
     }
 
     self.fBadger = [[Badger alloc] init];
+
+    [self updateMenuBarItem];
 
     //observe notifications
     NSNotificationCenter* nc = NSNotificationCenter.defaultCenter;
@@ -2492,6 +2497,9 @@ static void removeKeRangerRansomware()
 
     //badge dock
     [self.fBadger updateBadgeWithDownload:dlRate upload:ulRate];
+
+    //menu bar item
+    [self.fMenuBarItem updateWithDownload:dlRate upload:ulRate];
 }
 
 #warning can this be removed or refined?
@@ -4136,6 +4144,28 @@ static void removeKeRangerRansomware()
     [self updateMainWindow];
 }
 
+- (void)toggleMenuBarItem:(id)sender
+{
+    [self.fDefaults setBool:![self.fDefaults boolForKey:@"MenuBar"] forKey:@"MenuBar"];
+    [self updateMenuBarItem];
+}
+
+- (void)updateMenuBarItem
+{
+    if ([self.fDefaults boolForKey:@"MenuBar"])
+    {
+        if (!self.fMenuBarItem)
+        {
+            self.fMenuBarItem = [[MenuBarItem alloc] init];
+        }
+        [self.fMenuBarItem showWithController:self];
+    }
+    else
+    {
+        [self.fMenuBarItem hide];
+    }
+}
+
 - (void)toggleFilterBar:(id)sender
 {
     BOOL const show = self.fFilterBar == nil || self.fFilterBar.isHidden;
@@ -4801,6 +4831,17 @@ static void removeKeRangerRansomware()
         menuItem.title = title;
 
         return self.fWindow.visible;
+    }
+
+    //enable toggle menu bar icon
+    if (action == @selector(toggleMenuBarItem:))
+    {
+        BOOL const menuBarItemVisible = self.fMenuBarItem.isVisible;
+        NSString* title = !menuBarItemVisible ? NSLocalizedString(@"Show Menu Bar Icon", "View menu -> Menu Bar Icon") :
+                                                NSLocalizedString(@"Hide Menu Bar Icon", "View menu -> Menu Bar Icon");
+        menuItem.title = title;
+
+        return YES;
     }
 
     //enable toggle filter bar

@@ -94,6 +94,8 @@
 	<true/>
 	<key>MessageLevel</key>
 	<integer>1</integer>
+	<key>MenuBar</key>
+	<false/>
 	<key>MoveChoice</key>
 	<string>Constant</string>
 	<key>NatTraversal</key>
