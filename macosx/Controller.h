@@ -153,6 +153,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (IBAction)toggleAvailabilityBar:(id)sender;
 
 - (IBAction)toggleStatusBar:(id)sender;
+- (IBAction)toggleMenuBarItem:(id)sender;
 - (IBAction)toggleFilterBar:(id)sender;
 - (IBAction)toggleToolbarShown:(id)sender;
 - (void)focusFilterField;
