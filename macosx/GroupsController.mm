@@ -20,8 +20,8 @@ static CGFloat const kIconWidthSmall = 12.0;
 // of keyword criteria in a single OR group, so the budget is generous.
 static NSUInteger const kAutoGroupRuleMaxDepth = 8;
 static NSUInteger const kAutoGroupRuleMaxTotalNodes = 2000;
-//a rule stored in the schema format that can't be rebuilt (e.g. it exceeds a limit) is kept here as plain property-list data
-//and written back unchanged on save, so it is never lost; it is not evaluated
+//a rule whose schema can't be rebuilt (e.g. it exceeds a limit) is kept here as plain property-list data
+//and written back unchanged on save until the user saves a replacement rule; it is not evaluated
 static NSString* const kRetainedAutoGroupRulesSchemaKey = @"RetainedAutoGroupRulesSchema";
 
 static NSSet<NSString*>* allowedAutoGroupRuleKeyPaths(void)
@@ -627,11 +627,15 @@ GroupsController* fGroupsInstance = nil;
                 //unrecognized shape - drop the rule rather than risk evaluating it
                 [group removeObjectForKey:@"AutoGroupRules"];
                 group[@"UsesAutoGroupRules"] = @NO;
-                //keep an unconvertible schema-format rule as inert plist data (never a live predicate) instead of losing it
-                if ([schema isKindOfClass:NSDictionary.class] &&
-                    [NSPropertyListSerialization propertyList:schema isValidForFormat:NSPropertyListBinaryFormat_v1_0])
+                //keep an unconvertible rule as inert plist data (never a live predicate) instead of losing it;
+                //a legacy rule that only exceeds the node budget still converts with the budget lifted
+                NSUInteger retainNodeBudget = NSUIntegerMax;
+                NSDictionary* retained = [schema isKindOfClass:NSDictionary.class] ?
+                    schema :
+                    safeSchemaFromAutoGroupPredicate(legacyPredicate, 0, &retainNodeBudget);
+                if (retained && [NSPropertyListSerialization propertyList:retained isValidForFormat:NSPropertyListBinaryFormat_v1_0])
                 {
-                    group[kRetainedAutoGroupRulesSchemaKey] = schema;
+                    group[kRetainedAutoGroupRulesSchemaKey] = retained;
                 }
                 NSLog(@"Transmission: could not load an auto-assign rule with an unsupported or too large predicate structure");
             }
