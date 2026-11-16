@@ -155,8 +155,9 @@ export function createDialogContainer(id) {
   confirm.textContent = 'OK';
   buttons.append(confirm);
 
-  win.addEventListener('keyup', ({ key }) => {
-    if (key === 'Enter') {
+  win.addEventListener('keyup', ({ key, shiftKey, target }) => {
+    // Shift+Enter adds a new line in a multi-line field instead of confirming.
+    if (key === 'Enter' && !(shiftKey && target.tagName === 'TEXTAREA')) {
       confirm.click();
     }
   });

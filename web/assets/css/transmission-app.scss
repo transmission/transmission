@@ -1696,6 +1696,13 @@ dialog {
     }
   }
 
+  textarea {
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    resize: vertical;
+    width: 100%;
+  }
+
   #auto-start-label {
     margin-left: 5px;
   }

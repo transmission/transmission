@@ -53,6 +53,21 @@ export class OpenDialog extends EventTarget {
     this.close();
   }
 
+  // Splits the URL field into one URL per line. Several magnet links pasted
+  // on the same line are split too, as in the macOS client. A bare info hash
+  // becomes a magnet link.
+  static _parseUrls(text) {
+    return text
+      .split(/\s+|(?=magnet:\?)/)
+      .filter((url) => url.length > 0)
+      .map((url) => {
+        if (/^[\da-f]{40}$/i.test(url)) {
+          return `magnet:?xt=urn:btih:${url}`;
+        }
+        return url;
+      });
+  }
+
   _updateFreeSpaceInAddDialog() {
     const path = this.elements.folder_input.value;
     this.remote.getFreeSpace(path, (dir, bytes) => {
@@ -104,11 +119,7 @@ export class OpenDialog extends EventTarget {
       reader.readAsDataURL(file);
     }
 
-    let url = url_input.value.trim();
-    if (url.length > 0) {
-      if (/^[\da-f]{40}$/i.test(url)) {
-        url = `magnet:?xt=urn:btih:${url}`;
-      }
+    for (const url of OpenDialog._parseUrls(url_input.value)) {
       const o = {
         id: 'webui',
         jsonrpc: RPC._JsonRpcVersion,
@@ -163,15 +174,17 @@ export class OpenDialog extends EventTarget {
     input_id = makeUUID();
     label = document.createElement('label');
     label.setAttribute('for', input_id);
-    label.textContent = 'Or enter a URL:';
+    label.textContent = 'Or enter URLs, one per line:';
     workarea.append(label);
 
-    input = document.createElement('input');
-    input.type = 'url';
-    input.id = input_id;
-    input.value = url;
-    workarea.append(input);
-    elements.url_input = input;
+    const textarea = document.createElement('textarea');
+    textarea.id = input_id;
+    textarea.rows = 3;
+    textarea.spellcheck = false;
+    textarea.wrap = 'off';
+    textarea.value = url;
+    workarea.append(textarea);
+    elements.url_input = textarea;
 
     input_id = makeUUID();
     label = document.createElement('label');
