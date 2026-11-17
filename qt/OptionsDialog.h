@@ -52,9 +52,10 @@ private slots:
     void onDestinationChanged();
 
     void onSessionUpdated();
+    void onSearchedStringChanged(const QString &newText);
 
 private:
-    void reload();
+    void reload(const QString& searched_string = QString(), bool reload_only_to_search = false);
     void updateWidgetsLocality();
     void clearInfo();
 
