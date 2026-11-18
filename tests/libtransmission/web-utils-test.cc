@@ -306,3 +306,25 @@ TEST_F(WebUtilsTest, urlPercentEncode)
         EXPECT_EQ(encoded, buf);
     }
 }
+
+TEST_F(WebUtilsTest, urlPercentEncodePath)
+{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 8U>{ {
+        { "file.txt"sv, "file.txt"sv },
+        { "dir/sub dir/file.txt"sv, "dir/sub%20dir/file.txt"sv },
+        { "Kick#Snare 1.wav"sv, "Kick%23Snare%201.wav"sv },
+        { "what?.txt"sv, "what%3F.txt"sv },
+        { "100%.txt"sv, "100%25.txt"sv },
+        { "a+b (1) [x].txt"sv, "a%2Bb%20%281%29%20%5Bx%5D.txt"sv },
+        { "Letöltések/你好.txt"sv, "Let%C3%B6lt%C3%A9sek/%E4%BD%A0%E5%A5%BD.txt"sv },
+        { "~user/a-b_c.d"sv, "~user/a-b_c.d"sv },
+    } };
+
+    for (auto const& [decoded, encoded] : Tests)
+    {
+        auto buf = tr_urlbuf{};
+        tr_urlPercentEncodePath(std::back_inserter(buf), decoded);
+        EXPECT_EQ(encoded, buf);
+        EXPECT_EQ(decoded, tr_urlPercentDecode(buf.sv()));
+    }
+}

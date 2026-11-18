@@ -476,7 +476,7 @@ void makeUrl(tr_webseed_impl const* const webseed, std::string_view name, Output
 
     if (tr_strv_ends_with(url, "/"sv) && !std::empty(name))
     {
-        tr_urlPercentEncode(out, name, false);
+        tr_urlPercentEncodePath(out, name);
     }
 }
 
