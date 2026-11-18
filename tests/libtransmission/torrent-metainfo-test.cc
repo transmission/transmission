@@ -8,6 +8,7 @@
 #include <cstddef> // size_t
 #include <string_view>
 #include <vector>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -293,4 +294,25 @@ TEST_F(TorrentMetainfoTest, preservesInfoDictOrder)
     }
 }
 
+TEST_F(TorrentMetainfoTest, duplicatePaddingPaths)
+{
+    auto parses_files = [](std::string_view first, std::string_view second)
+    {
+        auto benc = std::string{ "d4:infod5:filesl" };
+        benc += first;
+        benc += second;
+        benc += "e4:name1:x12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaaee";
+
+        auto metainfo = tr_torrent_metainfo{};
+        return metainfo.parse_benc(benc);
+    };
+
+    auto constexpr PaddingFile = "d4:attr1:p6:lengthi1e4:pathl4:.pad1:1ee"sv;
+    auto constexpr OrdinaryFile = "d6:lengthi1e4:pathl4:.pad1:1ee"sv;
+
+    EXPECT_TRUE(parses_files(PaddingFile, PaddingFile));
+    EXPECT_FALSE(parses_files(OrdinaryFile, OrdinaryFile));
+    EXPECT_FALSE(parses_files(PaddingFile, OrdinaryFile));
+    EXPECT_FALSE(parses_files(OrdinaryFile, PaddingFile));
+}
 } // namespace tr::test
