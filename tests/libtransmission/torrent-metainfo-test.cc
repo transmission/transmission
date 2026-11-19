@@ -253,6 +253,76 @@ TEST_F(TorrentMetainfoTest, pathKeyTest)
     }
 }
 
+TEST_F(TorrentMetainfoTest, paddingFilesGetUniquePaths)
+{
+    // BEP 47 recommends the path [".pad", "<length>"] for padding files,
+    // so padding files of the same length have the same path
+    static auto constexpr Benc =
+        "d4:infod5:filesl"
+        "d6:lengthi2e4:pathl5:a.txtee"
+        "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+        "d6:lengthi2e4:pathl5:b.txtee"
+        "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+        "d6:lengthi2e4:pathl5:c.txtee"
+        "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+        "e4:name4:test12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaaee"sv;
+
+    auto tm = tr_torrent_metainfo{};
+    auto error = tr_error{};
+    EXPECT_TRUE(tm.parse_benc(Benc, &error)) << error.message();
+    ASSERT_EQ(6U, tm.file_count());
+    EXPECT_EQ("test/a.txt"sv, tm.file_subpath(0));
+    EXPECT_EQ("test/.pad/30"sv, tm.file_subpath(1));
+    EXPECT_EQ("test/b.txt"sv, tm.file_subpath(2));
+    EXPECT_EQ("test/.pad/30-2"sv, tm.file_subpath(3));
+    EXPECT_EQ("test/c.txt"sv, tm.file_subpath(4));
+    EXPECT_EQ("test/.pad/30-3"sv, tm.file_subpath(5));
+
+    // the new paths are local: the info hash is still the one of the info dict as received
+    static auto constexpr InfoDictBegin = "d4:info"sv.size();
+    auto const info_dict = Benc.substr(InfoDictBegin, std::size(Benc) - InfoDictBegin - 1U);
+    EXPECT_EQ(tr_sha1_to_string(tr_sha1::digest(info_dict)), tm.info_hash_string());
+}
+
+TEST_F(TorrentMetainfoTest, paddingFilesYieldToRegularFiles)
+{
+    // a regular file keeps its path, and a padding file never takes a path that is in use
+    static auto constexpr Benc =
+        "d4:infod5:filesl"
+        "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+        "d6:lengthi2e4:pathl4:.pad2:30ee"
+        "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+        "d6:lengthi2e4:pathl4:.pad4:30-2ee"
+        "e4:name4:test12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaaee"sv;
+
+    auto tm = tr_torrent_metainfo{};
+    auto error = tr_error{};
+    EXPECT_TRUE(tm.parse_benc(Benc, &error)) << error.message();
+    ASSERT_EQ(4U, tm.file_count());
+    EXPECT_EQ("test/.pad/30-3"sv, tm.file_subpath(0));
+    EXPECT_EQ("test/.pad/30"sv, tm.file_subpath(1));
+    EXPECT_EQ("test/.pad/30-4"sv, tm.file_subpath(2));
+    EXPECT_EQ("test/.pad/30-2"sv, tm.file_subpath(3));
+}
+
+TEST_F(TorrentMetainfoTest, paddingFilesDoNotHideDuplicatePaths)
+{
+    // two regular files with the same path are still an error
+    static auto constexpr Benc =
+        "d4:infod5:filesl"
+        "d6:lengthi2e4:pathl5:a.txtee"
+        "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+        "d6:lengthi2e4:pathl5:a.txtee"
+        "d4:attr1:p6:lengthi30e4:pathl4:.pad2:30ee"
+        "e4:name4:test12:piece lengthi32768e6:pieces20:aaaaaaaaaaaaaaaaaaaaee"sv;
+
+    auto tm = tr_torrent_metainfo{};
+    auto error = tr_error{};
+    EXPECT_FALSE(tm.parse_benc(Benc, &error));
+    EXPECT_EQ(EINVAL, error.code());
+    EXPECT_EQ("duplicate path [a.txt]"sv, error.message());
+}
+
 TEST_F(TorrentMetainfoTest, utf8Test)
 {
 // MacOS implementation uses non-deterministic conversion for illegal UTF-8
