@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include <fmt/format.h>
@@ -69,6 +70,8 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     tr_tracker_tier_t tier_ = 0;
     tr_pathbuf file_subpath_;
     int64_t file_length_ = 0;
+    bool file_is_padding_ = false;
+    std::vector<tr_file_index_t> padding_files_; // in ascending order
 
     enum class State : uint8_t
     {
@@ -170,6 +173,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             state_ = std::empty(tm_.files_) ? State::Files : State::FilesIgnored;
             file_subpath_.clear();
             file_length_ = 0;
+            file_is_padding_ = false;
         }
         else if (pathStartsWith(InfoKey, FilesKey, ArrayKey, PathUtf8Key))
         {
@@ -311,8 +315,9 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             }
             else if (current_key == AttrKey)
             {
-                // currently unused. TODO support for BEP0047
+                // BEP 47: only padding files are recognized so far.
                 // TODO https://github.com/transmission/transmission/issues/3387
+                file_is_padding_ = tr_strv_contains(value, 'p');
             }
             else if (
                 pathIs(InfoKey, FilesKey, ArrayKey, Crc32Key) || //
@@ -467,13 +472,70 @@ private:
         }
         else
         {
-            tm_.files_.add(file_subpath_, file_length_);
+            auto const file_index = tm_.files_.add(file_subpath_, file_length_);
+            if (file_is_padding_)
+            {
+                padding_files_.push_back(file_index);
+            }
         }
 
         file_length_ = 0;
+        file_is_padding_ = false;
         // NB: let caller decide how to clear file_tree_.
         // if we're in "files" mode we clear it; if in "file tree" we pop it
         return ok;
+    }
+
+    // BEP 47 recommends naming a padding file [".pad", "<length>"], so
+    // padding files of the same length are given the same path. Their
+    // names carry no meaning, so give each of them a path of its own
+    // rather than have several files of a torrent share one.
+    // The info hash is unaffected: it is computed from the raw info dict.
+    void uniquifyPaddingPaths()
+    {
+        if (std::empty(padding_files_))
+        {
+            return;
+        }
+
+        // maps a path that is in use to the next suffix to try
+        // for a padding file that wants the same path
+        auto in_use = std::unordered_map<std::string, size_t>{};
+        auto const n_files = tm_.files_.file_count();
+        in_use.reserve(n_files);
+
+        // regular files keep their paths, so they claim them first
+        auto next_padding = std::begin(padding_files_);
+        for (tr_file_index_t i = 0; i < n_files; ++i)
+        {
+            if (next_padding != std::end(padding_files_) && *next_padding == i)
+            {
+                ++next_padding;
+            }
+            else
+            {
+                in_use.try_emplace(tm_.files_.path(i), 2U);
+            }
+        }
+
+        for (auto const file_index : padding_files_)
+        {
+            auto const& path = tm_.files_.path(file_index);
+            auto const [iter, is_unique] = in_use.try_emplace(path, 2U);
+            if (is_unique)
+            {
+                continue;
+            }
+
+            auto& suffix = iter->second;
+            auto unique_path = std::string{};
+            do
+            {
+                unique_path = fmt::format("{:s}-{:d}", path, suffix++);
+            } while (!in_use.try_emplace(unique_path, 2U).second);
+
+            tm_.files_.set_path(file_index, unique_path);
+        }
     }
 
     bool finishInfoDict(Context const& context)
@@ -489,6 +551,8 @@ private:
             context.error.set(EINVAL, "missing v1 metadata");
             return false;
         }
+
+        uniquifyPaddingPaths();
 
         // FIXME: update for hybrid torrents with duplicate info between "file tree" and "files"
         // when "file tree" (bittorrent v2) supported
