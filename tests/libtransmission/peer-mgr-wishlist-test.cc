@@ -633,6 +633,45 @@ TEST_F(PeerMgrWishlistTest, peerDisconnectDecrementsReplication)
     }
 }
 
+TEST_F(PeerMgrWishlistTest, gotBadPieceAddsPieceThatWasComplete)
+{
+    auto mediator = MockMediator{};
+
+    // setup: three pieces, and we have all of them
+    mediator.block_span_[0] = { .begin = 0, .end = 100 };
+    mediator.block_span_[1] = { .begin = 100, .end = 200 };
+    mediator.block_span_[2] = { .begin = 200, .end = 300 };
+    for (tr_piece_index_t i = 0; i < mediator.piece_count(); ++i)
+    {
+        mediator.client_wants_piece_.insert(i);
+        mediator.client_has_piece_.insert(i);
+        mediator.piece_replication_[i] = 1;
+    }
+    for (tr_block_index_t block = 0; block < 300; ++block)
+    {
+        mediator.client_has_block_.insert(block);
+    }
+
+    // allow the wishlist to build its cache
+    auto wishlist = Wishlist{ mediator };
+
+    // there is nothing to download
+    EXPECT_TRUE(std::empty(wishlist.next(1000, PeerHasAllPieces)));
+
+    // piece 1 turned out to be corrupt on disk, so it needs to be downloaded again
+    mediator.client_has_piece_.erase(1);
+    for (auto [block, end] = mediator.block_span_[1]; block < end; ++block)
+    {
+        mediator.client_has_block_.erase(block);
+    }
+    wishlist.on_got_bad_piece(1);
+
+    auto const spans = wishlist.next(1000, PeerHasAllPieces);
+    ASSERT_EQ(1U, std::size(spans));
+    EXPECT_EQ(100U, spans[0].begin);
+    EXPECT_EQ(200U, spans[0].end);
+}
+
 TEST_F(PeerMgrWishlistTest, gotBadPieceResetsPiece)
 {
     auto const get_spans = [](size_t n_wanted)
