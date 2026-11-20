@@ -15,7 +15,10 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/block-info.h>
+#include <libtransmission/cache.h>
 #include <libtransmission/error.h>
+#include <libtransmission/session.h>
 #include <libtransmission/torrent.h>
 #include <libtransmission/utils.h>
 
@@ -208,4 +211,39 @@ TEST_F(TorrentTest, setAnnounceListReportsSaveFailure)
     EXPECT_FALSE(tor->set_announce_list("https://a.example.com/announce"));
     EXPECT_EQ(TR_STAT_LOCAL_ERROR, tor->error().error_type());
     EXPECT_NE(std::string::npos, tor->error().errmsg().find("missing 'info' dict"));
+}
+
+TEST_F(TorrentTest, resumeFileIsSavedAfterItsBlocksAreOnDisk)
+{
+    static auto constexpr Block = tr_block_index_t{ 0U };
+
+    // the first piece is missing: on disk its bytes are '\1' instead of '\0'
+    auto* const tor = zeroTorrentInit(ZeroTorrentState::Partial);
+    ASSERT_NE(nullptr, tor);
+    ASSERT_FALSE(tor->has_block(Block));
+
+    auto saved = std::promise<void>{};
+    session_->run_in_session_thread(
+        [this, tor, &saved]()
+        {
+            // a block of that piece arrives and goes to the write cache
+            auto buf = std::make_unique<Cache::BlockData>(tr_block_info::BlockSize);
+            std::fill_n(std::data(*buf), tr_block_info::BlockSize, '\0');
+            session_->cache->write_block(tor->id(), Block, std::move(buf));
+            tor->on_block_received(Block);
+
+            // the resume file now says that we have the block
+            tor->save_resume_file();
+            saved.set_value();
+        });
+    ASSERT_EQ(std::future_status::ready, saved.get_future().wait_for(5s));
+    EXPECT_TRUE(tor->has_block(Block));
+
+    // so the block has to be in the file: if the session ended
+    // abnormally here, the cache would be gone and the claim would stay
+    auto contents = std::vector<char>{};
+    ASSERT_TRUE(tr_file_read(tr_torrentFindFile(tor, 0U), contents));
+    ASSERT_LE(tr_block_info::BlockSize, std::size(contents));
+    EXPECT_TRUE(
+        std::all_of(std::begin(contents), std::begin(contents) + tr_block_info::BlockSize, [](char ch) { return ch == '\0'; }));
 }

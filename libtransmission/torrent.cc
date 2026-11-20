@@ -1761,6 +1761,15 @@ void tr_torrent::save_resume_file()
         return;
     }
 
+    // A block counts as ours as soon as it is received, even while it is
+    // still in the write cache. Write this torrent's cached blocks to disk
+    // first, so that the resume file never lists a block that would be lost
+    // if the session ended abnormally. The cache belongs to the session thread.
+    if (session->am_in_session_thread())
+    {
+        session->flush_torrent_files(id());
+    }
+
     set_dirty(false);
     auto helper = ResumeHelper{ *this };
     tr_resume::save(this, helper);
