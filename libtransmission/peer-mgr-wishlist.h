@@ -122,6 +122,8 @@ public:
 
     void on_got_bad_piece(tr_piece_index_t piece);
 
+    void on_lost_piece(tr_piece_index_t piece);
+
     constexpr void on_got_bitfield(tr_bitfield const& bitfield)
     {
         inc_replication_bitfield(bitfield);

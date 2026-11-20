@@ -153,6 +153,18 @@ void Wishlist::on_got_bad_piece(tr_piece_index_t const piece)
     std::ranges::sort(candidates_);
 }
 
+void Wishlist::on_lost_piece(tr_piece_index_t const piece)
+{
+    on_got_bad_piece(piece);
+
+    // Peers were told that we have this piece, so get it back before starting on new ones.
+    if (auto const iter = find_by_piece(piece); iter != std::end(candidates_))
+    {
+        iter->priority = TR_PRI_HIGH;
+        resort_piece(iter);
+    }
+}
+
 tr_piece_index_t Wishlist::get_salt(tr_piece_index_t const piece)
 {
     auto const is_sequential = mediator_.is_sequential_download();

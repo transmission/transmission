@@ -388,6 +388,14 @@ public:
                       { wishlist_.on_peer_disconnect(have, requests); }),
                   tor_.got_bad_piece_.connect_scoped([this](tr_torrent*, tr_piece_index_t piece)
                                                      { wishlist_.on_got_bad_piece(piece); }),
+                  tor_.lost_piece_.connect_scoped(
+                      [this](tr_torrent*, tr_piece_index_t piece)
+                      {
+                          if (client_wants_piece(piece))
+                          {
+                              wishlist_.on_lost_piece(piece);
+                          }
+                      }),
                   swarm_.got_bitfield.connect_scoped([this](tr_torrent*, tr_bitfield const& bitfield)
                                                      { wishlist_.on_got_bitfield(bitfield); }),
                   swarm_.got_block.connect_scoped([this](tr_torrent*, tr_block_index_t block)
@@ -474,7 +482,7 @@ public:
         tr_torrent& tor_;
         tr_swarm& swarm_;
         Wishlist wishlist_;
-        std::array<sigslot::scoped_connection, 15U> signal_tags_; // depends-on: wishlist_
+        std::array<sigslot::scoped_connection, 16U> signal_tags_; // depends-on: wishlist_
     };
 
     [[nodiscard]] auto unique_lock() const
