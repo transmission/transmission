@@ -393,7 +393,7 @@ public:
                       {
                           if (client_wants_piece(piece))
                           {
-                              wishlist_.on_got_bad_piece(piece);
+                              wishlist_.on_lost_piece(piece);
                           }
                       }),
                   swarm_.got_bitfield.connect_scoped([this](tr_torrent*, tr_bitfield const& bitfield)
