@@ -2186,7 +2186,10 @@ void tr_peerMsgsImpl::check_request_timeout(time_t const now)
     {
         ok = tor_.ensure_piece_is_checked(req.index);
 
-        if (!ok)
+        // A piece that failed its checksum test is no longer claimed and gets
+        // downloaded again, so there is nothing for the user to do. A piece
+        // that is still claimed could not be read.
+        if (!ok && tor_.has_piece(req.index))
         {
             tor_.error().set_local_error(fmt::format("Please Verify Local Data! Piece #{:d} is corrupt.", req.index));
         }
