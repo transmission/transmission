@@ -479,6 +479,7 @@
 		F63480631E1D7274005B9E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
 		FA7E00000000000000000023 /* announcer-ws-protocol.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000003 /* announcer-ws-protocol.cc */; };
 		FA7E00000000000000000025 /* websocket-client.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000005 /* websocket-client.cc */; };
+		FA7E00000000000000000027 /* rtc-signaling.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000007 /* rtc-signaling.cc */; };
 		FA7E0000000000000000002A /* peer-socket-rtc.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA7E0000000000000000000A /* peer-socket-rtc.cc */; };
 		FA7E000000000000000000A7 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000041 /* libcurl.a */; };
 		ED5E0EA02CD3147B0071433B /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
@@ -1666,6 +1667,8 @@
 		FA7E00000000000000000004 /* announcer-ws-protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "announcer-ws-protocol.h"; sourceTree = "<group>"; };
 		FA7E00000000000000000005 /* websocket-client.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "websocket-client.cc"; sourceTree = "<group>"; };
 		FA7E00000000000000000006 /* websocket-client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "websocket-client.h"; sourceTree = "<group>"; };
+		FA7E00000000000000000007 /* rtc-signaling.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "rtc-signaling.cc"; sourceTree = "<group>"; };
+		FA7E00000000000000000008 /* rtc-signaling.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "rtc-signaling.h"; sourceTree = "<group>"; };
 		FA7E00000000000000000009 /* rtc-endpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "rtc-endpoint.h"; sourceTree = "<group>"; };
 		FA7E0000000000000000000A /* peer-socket-rtc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-socket-rtc.cc"; sourceTree = "<group>"; };
 		FA7E0000000000000000000B /* peer-socket-rtc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "peer-socket-rtc.h"; sourceTree = "<group>"; };
@@ -2458,6 +2461,8 @@
 				FA7E00000000000000000004 /* announcer-ws-protocol.h */,
 				FA7E00000000000000000005 /* websocket-client.cc */,
 				FA7E00000000000000000006 /* websocket-client.h */,
+				FA7E00000000000000000007 /* rtc-signaling.cc */,
+				FA7E00000000000000000008 /* rtc-signaling.h */,
 				FA7E00000000000000000009 /* rtc-endpoint.h */,
 				FA7E0000000000000000000A /* peer-socket-rtc.cc */,
 				FA7E0000000000000000000B /* peer-socket-rtc.h */,
@@ -3958,6 +3963,7 @@
 				FA5D8AC27CF4B02A0011A102 /* curl-tls.cc in Sources */,
 				FA7E00000000000000000023 /* announcer-ws-protocol.cc in Sources */,
 				FA7E00000000000000000025 /* websocket-client.cc in Sources */,
+				FA7E00000000000000000027 /* rtc-signaling.cc in Sources */,
 				FA7E0000000000000000002A /* peer-socket-rtc.cc in Sources */,
 				A292A6E80DFB45FC004B9C0A /* webseed.cc in Sources */,
 				A25E03E30E4015380086C225 /* tr-getopt.cc in Sources */,

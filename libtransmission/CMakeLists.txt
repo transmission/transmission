@@ -113,6 +113,8 @@ target_sources(${TR_NAME}
         $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-protocol.h>
         $<$<BOOL:${ENABLE_WEBTORRENT}>:websocket-client.cc>
         $<$<BOOL:${ENABLE_WEBTORRENT}>:websocket-client.h>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:rtc-signaling.cc>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:rtc-signaling.h>
         $<$<BOOL:${ENABLE_WEBTORRENT}>:peer-socket-rtc.cc>
         $<$<BOOL:${ENABLE_WEBTORRENT}>:peer-socket-rtc.h>
         platform.cc
