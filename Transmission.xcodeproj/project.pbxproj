@@ -1666,6 +1666,7 @@
 		FA7E00000000000000000004 /* announcer-ws-protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "announcer-ws-protocol.h"; sourceTree = "<group>"; };
 		FA7E00000000000000000005 /* websocket-client.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "websocket-client.cc"; sourceTree = "<group>"; };
 		FA7E00000000000000000006 /* websocket-client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "websocket-client.h"; sourceTree = "<group>"; };
+		FA7E00000000000000000009 /* rtc-endpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "rtc-endpoint.h"; sourceTree = "<group>"; };
 		FA7E0000000000000000000A /* peer-socket-rtc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-socket-rtc.cc"; sourceTree = "<group>"; };
 		FA7E0000000000000000000B /* peer-socket-rtc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "peer-socket-rtc.h"; sourceTree = "<group>"; };
 		FA7E00000000000000000041 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "$(BUILD_DIR)/webtorrent-network/lib/libcurl.a"; sourceTree = "<absolute>"; };
@@ -2457,6 +2458,7 @@
 				FA7E00000000000000000004 /* announcer-ws-protocol.h */,
 				FA7E00000000000000000005 /* websocket-client.cc */,
 				FA7E00000000000000000006 /* websocket-client.h */,
+				FA7E00000000000000000009 /* rtc-endpoint.h */,
 				FA7E0000000000000000000A /* peer-socket-rtc.cc */,
 				FA7E0000000000000000000B /* peer-socket-rtc.h */,
 				A292A6E50DFB45EC004B9C0A /* webseed.cc */,
