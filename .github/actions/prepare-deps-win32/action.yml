@@ -6,6 +6,10 @@ inputs:
   type:
     description: Type (CoreDeps, Deps)
     required: true
+  cache-suffix:
+    description: Optional cache namespace suffix for a different toolchain
+    required: false
+    default: ''
 runs:
   using: composite
   steps:
@@ -40,7 +44,7 @@ runs:
       id: restore-cache
       with:
         path: ${{ env.DEPS_PREFIX }}
-        key: ${{ github.job }}-${{ inputs.arch }}-${{ steps.cache-key.outputs.hash }}
+        key: ${{ github.job }}-${{ inputs.arch }}-${{ steps.cache-key.outputs.hash }}${{ inputs.cache-suffix }}
     - name: Build Dependencies
       if: steps.restore-cache.outputs.cache-hit != 'true'
       shell: pwsh
@@ -58,4 +62,4 @@ runs:
       id: cache
       with:
         path: ${{ env.DEPS_PREFIX }}
-        key: ${{ github.job }}-${{ inputs.arch }}-${{ steps.cache-key.outputs.hash }}
+        key: ${{ github.job }}-${{ inputs.arch }}-${{ steps.cache-key.outputs.hash }}${{ inputs.cache-suffix }}
