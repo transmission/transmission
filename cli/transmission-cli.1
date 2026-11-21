@@ -36,6 +36,8 @@
 .Op Fl u Ar number | Fl U
 .Op Fl v
 .Op Fl w Ar directory
+.Op Fl -webtorrent | -no-webtorrent
+.Op Fl -webtorrent-ice-servers Ar urls
 .Ar torrent-file
 .Ek
 .Sh DESCRIPTION
@@ -118,6 +120,14 @@ Don't limit the upload speed
 Verify the torrent's downloaded data.
 .It Fl w Fl -download-dir Ar directory
 Where to save downloaded data.
+.It Fl -webtorrent
+Enable WS/WSS trackers and WebRTC peers when WebTorrent support is compiled in.
+.It Fl -no-webtorrent
+Disable WebTorrent for this session.
+.It Fl -webtorrent-ice-servers Ar urls
+Set a comma-separated list of STUN/TURN server URLs for WebRTC ICE.
+An empty value clears the list.
+These options override settings.json values.
 .El
 .Sh SIGNALS
 In addition to these options, sending
