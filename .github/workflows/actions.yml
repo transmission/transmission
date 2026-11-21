@@ -1692,6 +1692,7 @@ jobs:
             export LANG=en_US.UTF-8 # Qt requires UTF-8 locales
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
             patch -d src/third-party/libdatachannel/deps/libjuice -p1 < src/cmake/patches/libjuice-bsd-dual-stack.patch
+            # Temporary: usrsctp expects _ALIGN on DragonFlyBSD; use socket alignment until fixed upstream.
             cmake \
               -S src \
               -B obj \
@@ -1699,6 +1700,7 @@ jobs:
               -DCMAKE_BUILD_TYPE=RelWithDebInfo \
               -DCMAKE_CXX_COMPILER='/usr/local/bin/g++14' \
               -DCMAKE_C_COMPILER='/usr/local/bin/gcc14' \
+              -DCMAKE_C_FLAGS='-D"_ALIGN(n)=_CMSG_ALIGN(n)"' \
               -DCMAKE_BUILD_RPATH='/usr/local/lib/gcc14' \
               -DCMAKE_INSTALL_PREFIX=pfx \
               -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
