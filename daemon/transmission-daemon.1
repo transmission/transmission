@@ -26,6 +26,8 @@
 .Op Fl L Ar limit
 .Op Fl er | ep | et
 .Op Fl utp | no-utp
+.Op Fl -webtorrent | -no-webtorrent
+.Op Fl -webtorrent-ice-servers Ar urls
 .Op Fl V
 .Op Fl w Ar download-dir
 .Op Fl e Ar logfile
@@ -123,6 +125,14 @@ Show version number and exit
 Enable uTP for peer connections.
 .It Fl -no-utp
 Disable uTP for peer connections.
+.It Fl -webtorrent
+Enable WS/WSS trackers and WebRTC peers when WebTorrent support is compiled in.
+.It Fl -no-webtorrent
+Disable WebTorrent for this session.
+.It Fl -webtorrent-ice-servers Ar urls
+Set a comma-separated list of STUN/TURN server URLs for WebRTC ICE.
+An empty value clears the list.
+The command-line options override settings.json values for this daemon invocation.
 .It Fl w Fl -download-dir
 Where to store downloaded data.
 .It Fl e Fl -logfile

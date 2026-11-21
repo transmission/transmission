@@ -43,6 +43,7 @@
 #include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
+#include <libtransmission/webtorrent-ice-servers.h>
 
 using namespace std::literals;
 
@@ -218,7 +219,7 @@ enum
 
 using Arg = tr_option::Arg;
 static_assert(TrDefaultPeerPort == 51413, "update 'port' desc");
-auto constexpr Options = std::array<tr_option, 106>{ {
+auto constexpr Options = std::array<tr_option, 109>{ {
     { 'a', "add", "Add torrent files by filename or URL", "a", Arg::None, nullptr },
     { 970, "alt-speed", "Use the alternate Limits", "as", Arg::None, nullptr },
     { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", Arg::None, nullptr },
@@ -371,6 +372,9 @@ auto constexpr Options = std::array<tr_option, 106>{ {
       "<protocol(s)>" },
     { 831, "utp", "*DEPRECATED* Enable µTP for peer connections", nullptr, Arg::None, nullptr },
     { 832, "no-utp", "*DEPRECATED* Disable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 833, "webtorrent", "Enable WS/WSS trackers and WebRTC peers", nullptr, Arg::None, nullptr },
+    { 834, "no-webtorrent", "Disable WS/WSS trackers and WebRTC peers", nullptr, Arg::None, nullptr },
+    { 835, "webtorrent-ice-servers", "Comma-separated STUN/TURN server URLs for WebRTC", nullptr, Arg::Required, "<urls>" },
     { 'v', "verify", "Verify the current torrent(s)", "v", Arg::None, nullptr },
     { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
     { 'w',
@@ -462,6 +466,9 @@ enum
     case 830: /* preferred-transports */
     case 831: /* utp */
     case 832: /* no-utp */
+    case 833: /* webtorrent */
+    case 834: /* no-webtorrent */
+    case 835: /* webtorrent-ice-servers */
     case 970: /* alt-speed */
     case 971: /* no-alt-speed */
     case 972: /* alt-speed-downlimit */
@@ -1426,7 +1433,15 @@ void print_file_list(tr_variant::Map const& result)
 
 void print_peers_impl(tr_variant::Vector const& peers)
 {
-    fmt::print("{:<40s}  {:<12s}  {:<5s} {:>8s}  {:>8s}  {:s}\n", "Address", "Flags", "Done", "Down", "Up", "Client");
+    fmt::print(
+        "{:<40s}  {:<12s}  {:<7s}  {:<5s} {:>8s}  {:>8s}  {:s}\n",
+        "Address",
+        "Flags",
+        "Transport",
+        "Done",
+        "Down",
+        "Up",
+        "Client");
 
     for (auto const& peer_var : peers)
     {
@@ -1439,6 +1454,9 @@ void print_peers_impl(tr_variant::Vector const& peers)
         auto const address = peer->value_if<std::string_view>(TR_KEY_address);
         auto const client = peer->value_if<std::string_view>(TR_KEY_client_name);
         auto const flagstr = peer->value_if<std::string_view>(TR_KEY_flag_str);
+        auto const is_webrtc = peer->value_if<bool>(TR_KEY_is_webrtc).value_or(false);
+        auto const is_utp = peer->value_if<bool>(TR_KEY_is_utp).value_or(false);
+        auto const transport = is_webrtc ? "WebRTC"sv : is_utp ? "uTP"sv : "TCP"sv;
         auto const progress = peer->value_if<double>(TR_KEY_progress);
         auto const rate_to_client = peer->value_if<int64_t>(TR_KEY_rate_to_client);
         auto const rate_to_peer = peer->value_if<int64_t>(TR_KEY_rate_to_peer);
@@ -1446,9 +1464,10 @@ void print_peers_impl(tr_variant::Vector const& peers)
         if (address && client && progress && flagstr && rate_to_client && rate_to_peer)
         {
             fmt::print(
-                "{:<40s}  {:<12s}  {:<5s} {:8.1f}  {:8.1f}  {:s}\n",
+                "{:<40s}  {:<12s}  {:<7s}  {:<5s} {:8.1f}  {:8.1f}  {:s}\n",
                 *address,
                 *flagstr,
+                transport,
                 strlpercent(*progress * 100.0),
                 Speed{ *rate_to_client, Speed::Units::Byps }.count(Speed::Units::KByps),
                 Speed{ *rate_to_peer, Speed::Units::Byps }.count(Speed::Units::KByps),
@@ -1861,6 +1880,16 @@ void print_session(tr_variant::Map const& result)
     {
         auto const view = std::views::transform(*l, [](tr_variant const& var) { return *var.value_if<std::string_view>(); });
         fmt::print("  Transport protocol preference: {}\n", fmt::join(view, ", "));
+    }
+
+    if (auto b = result.value_if<bool>(TR_KEY_webtorrent_enabled))
+    {
+        fmt::print("  WebTorrent enabled: {:s}\n", *b ? "Yes" : "No");
+    }
+
+    if (auto const* servers = result.find_if<tr_variant::Vector>(TR_KEY_webtorrent_ice_servers))
+    {
+        fmt::print("  WebTorrent ICE servers configured: {:d}\n", std::size(*servers));
     }
 
     if (auto b = result.value_if<bool>(TR_KEY_dht_enabled))
@@ -2936,6 +2965,18 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 832:
                 args.insert_or_assign(TR_KEY_utp_enabled, false);
+                break;
+
+            case 833:
+                args.insert_or_assign(TR_KEY_webtorrent_enabled, true);
+                break;
+
+            case 834:
+                args.insert_or_assign(TR_KEY_webtorrent_enabled, false);
+                break;
+
+            case 835:
+                args.insert_or_assign(TR_KEY_webtorrent_ice_servers, tr_webtorrent_ice_servers::parse(optarg_sv));
                 break;
 
             case 'p':

@@ -6,6 +6,17 @@
 	objectVersion = 54;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		FAAF00000000000000001300 /* WebTorrent network dependencies */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = FAAF00000000000000001302 /* Build configuration list for PBXAggregateTarget "WebTorrent network dependencies" */;
+			buildPhases = (FAAF00000000000000001301 /* Build WebSocket and TLS libraries */,);
+			dependencies = ();
+			name = "WebTorrent network dependencies";
+			productName = WebTorrentNetwork;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		0A6169A70FE5C9A200C66CE6 /* bitfield.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A6169A50FE5C9A200C66CE6 /* bitfield.cc */; };
 		0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6169A60FE5C9A200C66CE6 /* bitfield.h */; };
@@ -65,11 +76,6 @@
 		4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCCA0981D9BE00BE280E /* Defaults.plist */; };
 		4DF0C5AB0899190500DD8943 /* Controller.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C5A90899190500DD8943 /* Controller.mm */; };
 		4DFBC2DF09C0970D00D5C571 /* Torrent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBC2DE09C0970D00D5C571 /* Torrent.mm */; };
-		55869926257074EC00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
-		55869932257074FE00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
-		558699542570759E00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
-		558699602570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
-		5586996C2570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		62F644738FE3D8788EBF73A9 /* block-info.cc in Sources */ = {isa = PBXBuildFile; fileRef = A54D44C6A7AAF131D9AE29F5 /* block-info.cc */; };
 		66F977825E65AD498C028BB0 /* announce-list.cc in Sources */ = {isa = PBXBuildFile; fileRef = 66F977825E65AD498C028BB1 /* announce-list.cc */; };
 		66F977825E65AD498C028BB2 /* announce-list.h in Headers */ = {isa = PBXBuildFile; fileRef = 66F977825E65AD498C028BB3 /* announce-list.h */; };
@@ -208,6 +214,7 @@
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.mm */; };
 		A2A4E9210DE0F7E9000CE197 /* web.h in Headers */ = {isa = PBXBuildFile; fileRef = A29EBE530DC01FC9006CEE80 /* web.h */; };
 		A2A4E9220DE0F7EB000CE197 /* web.cc in Sources */ = {isa = PBXBuildFile; fileRef = A29EBE520DC01FC9006CEE80 /* web.cc */; };
+		FA5D8AC27CF4B02A0011A102 /* curl-tls.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA5D8AC27CF4B02A0011A100 /* curl-tls.cc */; };
 		A2A6321B0CD9751700E3DA60 /* BadgeView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.mm */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.mm */; };
 		A2AA9BE1132CAC8E00FA131E /* announcer-udp.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE0132CAC8D00FA131E /* announcer-udp.cc */; };
@@ -409,17 +416,14 @@
 		C88771B62803EEB5005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
 		C8B27B7628153F2B00A22B5D /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		C8B27B7728153F2B00A22B5D /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
-		C8B27B7828153F2B00A22B5D /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		C8B27B7928153F2B00A22B5D /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771AB2803EE53005C7523 /* libiconv.tbd */; };
 		C8B27B7A28153F2B00A22B5D /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		C8B27B8728153F3100A22B5D /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		C8B27B8828153F3100A22B5D /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
-		C8B27B8928153F3100A22B5D /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		C8B27B8A28153F3100A22B5D /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771AB2803EE53005C7523 /* libiconv.tbd */; };
 		C8B27B8B28153F3100A22B5D /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		C8B27B9828153F3400A22B5D /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		C8B27B9928153F3400A22B5D /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
-		C8B27B9A28153F3400A22B5D /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		C8B27B9B28153F3400A22B5D /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771AB2803EE53005C7523 /* libiconv.tbd */; };
 		C8B27B9C28153F3400A22B5D /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		C8B27BA328153F6300A22B5D /* create.cc in Sources */ = {isa = PBXBuildFile; fileRef = C887BEC02807FCE900867D3C /* create.cc */; };
@@ -443,7 +447,6 @@
 		ED5E0E8D2CD30B180071433B /* QuickLookExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = ED5E0E7C2CD30B180071433B /* QuickLookExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		ED5E0E9C2CD30E8F0071433B /* PreviewProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED5E0E962CD30E8F0071433B /* PreviewProvider.mm */; };
 		ED5E0E9D2CD3134B0071433B /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		ED5E0EA02CD3147B0071433B /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		ED5E0EA22CD314FE0071433B /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = ED5E0EA12CD314FE0071433B /* style.css */; };
 		ED5E0EFA2CD315720071433B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = ED5E0EF72CD315720071433B /* Localizable.strings */; };
 		ED5E0F0F2CD31BC20071433B /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
@@ -474,6 +477,196 @@
 		EDD735D62D83087400852628 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDD735D52D83087400852628 /* UniformTypeIdentifiers.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		F11545ACA7C4D7A464F703AB /* block-info.h in Headers */ = {isa = PBXBuildFile; fileRef = 6A044CBD8C049AFCBD4DB411 /* block-info.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		F63480631E1D7274005B9E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
+		FA7E00000000000000000021 /* announcer-ws.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000001 /* announcer-ws.cc */; };
+		FA7E00000000000000000023 /* announcer-ws-protocol.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000003 /* announcer-ws-protocol.cc */; };
+		FA7E00000000000000000025 /* websocket-client.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000005 /* websocket-client.cc */; };
+		FA7E00000000000000000027 /* rtc-signaling.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000007 /* rtc-signaling.cc */; };
+		FA7E0000000000000000002A /* peer-socket-rtc.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA7E0000000000000000000A /* peer-socket-rtc.cc */; };
+		FA7E000000000000000000A7 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000041 /* libcurl.a */; };
+		ED5E0EA02CD3147B0071433B /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		FAAF00000000000000001410 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001400 /* libssl.a */; };
+		FAAF00000000000000001411 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001401 /* libcrypto.a */; };
+		FA7E000000000000000000A6 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000041 /* libcurl.a */; };
+		C8B27B9A28153F3400A22B5D /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		FAAF0000000000000000140E /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001400 /* libssl.a */; };
+		FAAF0000000000000000140F /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001401 /* libcrypto.a */; };
+		FA7E000000000000000000A5 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000041 /* libcurl.a */; };
+		C8B27B8928153F3100A22B5D /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		FAAF0000000000000000140C /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001400 /* libssl.a */; };
+		FAAF0000000000000000140D /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001401 /* libcrypto.a */; };
+		FA7E000000000000000000A4 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000041 /* libcurl.a */; };
+		C8B27B7828153F2B00A22B5D /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		FAAF0000000000000000140A /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001400 /* libssl.a */; };
+		FAAF0000000000000000140B /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001401 /* libcrypto.a */; };
+		FA7E000000000000000000A3 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000041 /* libcurl.a */; };
+		5586996C2570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		FAAF00000000000000001408 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001400 /* libssl.a */; };
+		FAAF00000000000000001409 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001401 /* libcrypto.a */; };
+		FA7E000000000000000000A2 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000041 /* libcurl.a */; };
+		558699602570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		FAAF00000000000000001406 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001400 /* libssl.a */; };
+		FAAF00000000000000001407 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001401 /* libcrypto.a */; };
+		FA7E000000000000000000A1 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000041 /* libcurl.a */; };
+		55869926257074EC00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		FAAF00000000000000001404 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001400 /* libssl.a */; };
+		FAAF00000000000000001405 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001401 /* libcrypto.a */; };
+		FA7E000000000000000000A0 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000041 /* libcurl.a */; };
+		558699542570759E00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		FAAF00000000000000001402 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001400 /* libssl.a */; };
+		FAAF00000000000000001403 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001401 /* libcrypto.a */; };
+		FA7E00000000000000000050 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000043 /* SystemConfiguration.framework */; };
+		FA7E00000000000000000060 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
+		FA7E00000000000000000051 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000043 /* SystemConfiguration.framework */; };
+		FA7E00000000000000000052 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000043 /* SystemConfiguration.framework */; };
+		FA7E00000000000000000062 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
+		FA7E00000000000000000053 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000043 /* SystemConfiguration.framework */; };
+		FA7E00000000000000000063 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
+		FA7E00000000000000000054 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000043 /* SystemConfiguration.framework */; };
+		FA7E00000000000000000064 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
+		FA7E00000000000000000055 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000043 /* SystemConfiguration.framework */; };
+		FA7E00000000000000000065 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
+		FA7E00000000000000000056 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000043 /* SystemConfiguration.framework */; };
+		FA7E00000000000000000066 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
+		FA7E00000000000000000057 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000043 /* SystemConfiguration.framework */; };
+		FA7E00000000000000000067 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
+		FA7E00000000000000000070 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
+		FAAF00000000000000001009 /* sctp_asconf.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001008 /* sctp_asconf.c */; };
+		FAAF0000000000000000100B /* sctp_auth.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000100A /* sctp_auth.c */; };
+		FAAF0000000000000000100D /* sctp_bsd_addr.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000100C /* sctp_bsd_addr.c */; };
+		FAAF0000000000000000100F /* sctp_callout.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000100E /* sctp_callout.c */; };
+		FAAF00000000000000001011 /* sctp_cc_functions.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001010 /* sctp_cc_functions.c */; };
+		FAAF00000000000000001013 /* sctp_crc32.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001012 /* sctp_crc32.c */; };
+		FAAF00000000000000001015 /* sctp_indata.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001014 /* sctp_indata.c */; };
+		FAAF00000000000000001017 /* sctp_input.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001016 /* sctp_input.c */; };
+		FAAF00000000000000001019 /* sctp_output.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001018 /* sctp_output.c */; };
+		FAAF0000000000000000101B /* sctp_pcb.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000101A /* sctp_pcb.c */; };
+		FAAF0000000000000000101D /* sctp_peeloff.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000101C /* sctp_peeloff.c */; };
+		FAAF0000000000000000101F /* sctp_sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000101E /* sctp_sha1.c */; };
+		FAAF00000000000000001021 /* sctp_ss_functions.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001020 /* sctp_ss_functions.c */; };
+		FAAF00000000000000001023 /* sctp_sysctl.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001022 /* sctp_sysctl.c */; };
+		FAAF00000000000000001025 /* sctp_timer.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001024 /* sctp_timer.c */; };
+		FAAF00000000000000001027 /* sctp_userspace.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001026 /* sctp_userspace.c */; };
+		FAAF00000000000000001029 /* sctp_usrreq.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001028 /* sctp_usrreq.c */; };
+		FAAF0000000000000000102B /* sctputil.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000102A /* sctputil.c */; };
+		FAAF0000000000000000102D /* sctp6_usrreq.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000102C /* sctp6_usrreq.c */; };
+		FAAF0000000000000000102F /* user_environment.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000102E /* user_environment.c */; };
+		FAAF00000000000000001031 /* user_mbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001030 /* user_mbuf.c */; };
+		FAAF00000000000000001033 /* user_recv_thread.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001032 /* user_recv_thread.c */; };
+		FAAF00000000000000001035 /* user_socket.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001034 /* user_socket.c */; };
+		FAAF0000000000000000103F /* addr.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000103E /* addr.c */; };
+		FAAF00000000000000001041 /* agent.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001040 /* agent.c */; };
+		FAAF00000000000000001043 /* crc32.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001042 /* crc32.c */; };
+		FAAF00000000000000001045 /* const_time.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001044 /* const_time.c */; };
+		FAAF00000000000000001047 /* conn.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001046 /* conn.c */; };
+		FAAF00000000000000001049 /* conn_poll.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001048 /* conn_poll.c */; };
+		FAAF0000000000000000104B /* conn_thread.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000104A /* conn_thread.c */; };
+		FAAF0000000000000000104D /* conn_mux.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000104C /* conn_mux.c */; };
+		FAAF0000000000000000104F /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000104E /* base64.c */; };
+		FAAF00000000000000001051 /* hash.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001050 /* hash.c */; };
+		FAAF00000000000000001053 /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001052 /* hmac.c */; };
+		FAAF00000000000000001055 /* ice.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001054 /* ice.c */; };
+		FAAF00000000000000001057 /* juice.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001056 /* juice.c */; };
+		FAAF00000000000000001059 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001058 /* log.c */; };
+		FAAF0000000000000000105B /* random.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000105A /* random.c */; };
+		FAAF0000000000000000105D /* server.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000105C /* server.c */; };
+		FAAF0000000000000000105F /* stun.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000105E /* stun.c */; };
+		FAAF00000000000000001061 /* timestamp.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001060 /* timestamp.c */; };
+		FAAF00000000000000001063 /* tcp.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001062 /* tcp.c */; };
+		FAAF00000000000000001065 /* turn.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001064 /* turn.c */; };
+		FAAF00000000000000001067 /* udp.c in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001066 /* udp.c */; };
+		FAAF00000000000000001071 /* candidate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001070 /* candidate.cpp */; };
+		FAAF00000000000000001073 /* channel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001072 /* channel.cpp */; };
+		FAAF00000000000000001075 /* configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001074 /* configuration.cpp */; };
+		FAAF00000000000000001077 /* datachannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001076 /* datachannel.cpp */; };
+		FAAF00000000000000001079 /* dependencydescriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001078 /* dependencydescriptor.cpp */; };
+		FAAF0000000000000000107B /* description.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000107A /* description.cpp */; };
+		FAAF0000000000000000107D /* iceudpmuxlistener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000107C /* iceudpmuxlistener.cpp */; };
+		FAAF0000000000000000107F /* mediahandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000107E /* mediahandler.cpp */; };
+		FAAF00000000000000001081 /* global.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001080 /* global.cpp */; };
+		FAAF00000000000000001083 /* message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001082 /* message.cpp */; };
+		FAAF00000000000000001085 /* peerconnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001084 /* peerconnection.cpp */; };
+		FAAF00000000000000001087 /* rtcpreceivingsession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001086 /* rtcpreceivingsession.cpp */; };
+		FAAF00000000000000001089 /* track.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001088 /* track.cpp */; };
+		FAAF0000000000000000108B /* websocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000108A /* websocket.cpp */; };
+		FAAF0000000000000000108D /* websocketserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000108C /* websocketserver.cpp */; };
+		FAAF0000000000000000108F /* rtppacketizationconfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000108E /* rtppacketizationconfig.cpp */; };
+		FAAF00000000000000001091 /* video_layers_allocation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001090 /* video_layers_allocation.cpp */; };
+		FAAF00000000000000001093 /* rtcpsrreporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001092 /* rtcpsrreporter.cpp */; };
+		FAAF00000000000000001095 /* rtppacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001094 /* rtppacketizer.cpp */; };
+		FAAF00000000000000001097 /* rtpdepacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001096 /* rtpdepacketizer.cpp */; };
+		FAAF00000000000000001099 /* h264rtppacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001098 /* h264rtppacketizer.cpp */; };
+		FAAF0000000000000000109B /* h264rtpdepacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000109A /* h264rtpdepacketizer.cpp */; };
+		FAAF0000000000000000109D /* nalunit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000109C /* nalunit.cpp */; };
+		FAAF0000000000000000109F /* h265rtppacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000109E /* h265rtppacketizer.cpp */; };
+		FAAF000000000000000010A1 /* h265rtpdepacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010A0 /* h265rtpdepacketizer.cpp */; };
+		FAAF000000000000000010A3 /* h265nalunit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010A2 /* h265nalunit.cpp */; };
+		FAAF000000000000000010A5 /* av1rtppacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010A4 /* av1rtppacketizer.cpp */; };
+		FAAF000000000000000010A7 /* av1rtpdepacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010A6 /* av1rtpdepacketizer.cpp */; };
+		FAAF000000000000000010A9 /* vp8rtppacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010A8 /* vp8rtppacketizer.cpp */; };
+		FAAF000000000000000010AB /* vp8rtpdepacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010AA /* vp8rtpdepacketizer.cpp */; };
+		FAAF000000000000000010AD /* vp9rtppacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010AC /* vp9rtppacketizer.cpp */; };
+		FAAF000000000000000010AF /* vp9rtpdepacketizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010AE /* vp9rtpdepacketizer.cpp */; };
+		FAAF000000000000000010B1 /* rtcpnackresponder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010B0 /* rtcpnackresponder.cpp */; };
+		FAAF000000000000000010B3 /* rtp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010B2 /* rtp.cpp */; };
+		FAAF000000000000000010B5 /* capi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010B4 /* capi.cpp */; };
+		FAAF000000000000000010B7 /* plihandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010B6 /* plihandler.cpp */; };
+		FAAF000000000000000010B9 /* pacinghandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010B8 /* pacinghandler.cpp */; };
+		FAAF000000000000000010BB /* rembhandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010BA /* rembhandler.cpp */; };
+		FAAF000000000000000010BD /* rtcpapphandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010BC /* rtcpapphandler.cpp */; };
+		FAAF000000000000000010BF /* certificate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010BE /* certificate.cpp */; };
+		FAAF000000000000000010C1 /* channel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010C0 /* channel.cpp */; };
+		FAAF000000000000000010C3 /* datachannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010C2 /* datachannel.cpp */; };
+		FAAF000000000000000010C5 /* dtlssrtptransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010C4 /* dtlssrtptransport.cpp */; };
+		FAAF000000000000000010C7 /* dtlstransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010C6 /* dtlstransport.cpp */; };
+		FAAF000000000000000010C9 /* icetransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010C8 /* icetransport.cpp */; };
+		FAAF000000000000000010CB /* iceudpmuxlistener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010CA /* iceudpmuxlistener.cpp */; };
+		FAAF000000000000000010CD /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010CC /* init.cpp */; };
+		FAAF000000000000000010CF /* peerconnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010CE /* peerconnection.cpp */; };
+		FAAF000000000000000010D1 /* logcounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010D0 /* logcounter.cpp */; };
+		FAAF000000000000000010D3 /* sctptransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010D2 /* sctptransport.cpp */; };
+		FAAF000000000000000010D5 /* threadpool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010D4 /* threadpool.cpp */; };
+		FAAF000000000000000010D7 /* tls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010D6 /* tls.cpp */; };
+		FAAF000000000000000010D9 /* track.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010D8 /* track.cpp */; };
+		FAAF000000000000000010DB /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010DA /* utils.cpp */; };
+		FAAF000000000000000010DD /* processor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010DC /* processor.cpp */; };
+		FAAF000000000000000010DF /* sha.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010DE /* sha.cpp */; };
+		FAAF000000000000000010E1 /* pollinterrupter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010E0 /* pollinterrupter.cpp */; };
+		FAAF000000000000000010E3 /* pollservice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010E2 /* pollservice.cpp */; };
+		FAAF000000000000000010E5 /* http.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010E4 /* http.cpp */; };
+		FAAF000000000000000010E7 /* httpproxytransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010E6 /* httpproxytransport.cpp */; };
+		FAAF000000000000000010E9 /* tcpserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010E8 /* tcpserver.cpp */; };
+		FAAF000000000000000010EB /* tcptransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010EA /* tcptransport.cpp */; };
+		FAAF000000000000000010ED /* tlstransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010EC /* tlstransport.cpp */; };
+		FAAF000000000000000010EF /* transport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010EE /* transport.cpp */; };
+		FAAF000000000000000010F1 /* verifiedtlstransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010F0 /* verifiedtlstransport.cpp */; };
+		FAAF000000000000000010F3 /* websocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010F2 /* websocket.cpp */; };
+		FAAF000000000000000010F5 /* websocketserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010F4 /* websocketserver.cpp */; };
+		FAAF000000000000000010F7 /* wstransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010F6 /* wstransport.cpp */; };
+		FAAF000000000000000010F9 /* wshandshake.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAAF000000000000000010F8 /* wshandshake.cpp */; };
+		FAAF00000000000000001310 /* libwebtorrent-datachannel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000106B /* libwebtorrent-datachannel.a */; };
+		FAAF00000000000000001311 /* libwebtorrent-juice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001039 /* libwebtorrent-juice.a */; };
+		FAAF00000000000000001312 /* libwebtorrent-usrsctp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */; };
+		FAAF00000000000000001313 /* libwebtorrent-datachannel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000106B /* libwebtorrent-datachannel.a */; };
+		FAAF00000000000000001314 /* libwebtorrent-juice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001039 /* libwebtorrent-juice.a */; };
+		FAAF00000000000000001315 /* libwebtorrent-usrsctp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */; };
+		FAAF00000000000000001316 /* libwebtorrent-datachannel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000106B /* libwebtorrent-datachannel.a */; };
+		FAAF00000000000000001317 /* libwebtorrent-juice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001039 /* libwebtorrent-juice.a */; };
+		FAAF00000000000000001318 /* libwebtorrent-usrsctp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */; };
+		FAAF00000000000000001319 /* libwebtorrent-datachannel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000106B /* libwebtorrent-datachannel.a */; };
+		FAAF0000000000000000131A /* libwebtorrent-juice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001039 /* libwebtorrent-juice.a */; };
+		FAAF0000000000000000131B /* libwebtorrent-usrsctp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */; };
+		FAAF0000000000000000131C /* libwebtorrent-datachannel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000106B /* libwebtorrent-datachannel.a */; };
+		FAAF0000000000000000131D /* libwebtorrent-juice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001039 /* libwebtorrent-juice.a */; };
+		FAAF0000000000000000131E /* libwebtorrent-usrsctp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */; };
+		FAAF0000000000000000131F /* libwebtorrent-datachannel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000106B /* libwebtorrent-datachannel.a */; };
+		FAAF00000000000000001320 /* libwebtorrent-juice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001039 /* libwebtorrent-juice.a */; };
+		FAAF00000000000000001321 /* libwebtorrent-usrsctp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */; };
+		FAAF00000000000000001322 /* libwebtorrent-datachannel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000106B /* libwebtorrent-datachannel.a */; };
+		FAAF00000000000000001323 /* libwebtorrent-juice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001039 /* libwebtorrent-juice.a */; };
+		FAAF00000000000000001324 /* libwebtorrent-usrsctp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */; };
+		FAAF00000000000000001325 /* libwebtorrent-datachannel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF0000000000000000106B /* libwebtorrent-datachannel.a */; };
+		FAAF00000000000000001326 /* libwebtorrent-juice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001039 /* libwebtorrent-juice.a */; };
+		FAAF00000000000000001327 /* libwebtorrent-usrsctp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -609,6 +802,41 @@
 			proxyType = 1;
 			remoteGlobalIDString = ED91F00B2CBDA5D3008388AA;
 			remoteInfo = "madler-crcany";
+		};
+		FAAF00000000000000001306 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FAAF00000000000000001000;
+			remoteInfo = "webtorrent-usrsctp";
+		};
+		FAAF00000000000000001308 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FAAF00000000000000001036;
+			remoteInfo = "webtorrent-juice";
+		};
+		FAAF0000000000000000130A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FAAF00000000000000001300;
+			remoteInfo = "WebTorrent network dependencies";
+		};
+		FAAF0000000000000000130C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FAAF00000000000000001068;
+			remoteInfo = "webtorrent-datachannel";
+		};
+		FAAF0000000000000000130E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FAAF00000000000000001300;
+			remoteInfo = "WebTorrent network dependencies";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -809,7 +1037,6 @@
 		4DF0C5AA0899190500DD8943 /* Controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Torrent.mm; sourceTree = "<group>"; };
-		55869925257074EC00F77A43 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 		66F977825E65AD498C028BB1 /* announce-list.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "announce-list.cc"; sourceTree = "<group>"; };
 		66F977825E65AD498C028BB3 /* announce-list.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "announce-list.h"; sourceTree = "<group>"; };
 		6A044CBD8C049AFCBD4DB411 /* block-info.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "block-info.h"; sourceTree = "<group>"; };
@@ -993,6 +1220,8 @@
 		A29E653513F1603100048D71 /* evutil_rand.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = evutil_rand.c; sourceTree = "<group>"; };
 		A29EBE520DC01FC9006CEE80 /* web.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = web.cc; sourceTree = "<group>"; };
 		A29EBE530DC01FC9006CEE80 /* web.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = web.h; sourceTree = "<group>"; };
+		FA5D8AC27CF4B02A0011A100 /* curl-tls.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "curl-tls.cc"; sourceTree = "<group>"; };
+		FA5D8AC27CF4B02A0011A101 /* curl-tls.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "curl-tls.h"; sourceTree = "<group>"; };
 		A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PeerProgressIndicatorCell.h; sourceTree = "<group>"; };
 		A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PeerProgressIndicatorCell.mm; sourceTree = "<group>"; };
 		A2A632190CD9751700E3DA60 /* BadgeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BadgeView.h; sourceTree = "<group>"; };
@@ -1435,6 +1664,138 @@
 		EDC749F82D98AE2900A12D0F /* PowerManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PowerManager.mm; sourceTree = "<group>"; };
 		EDD735D52D83087400852628 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 		F63480621E1D7274005B9E09 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Images/Images.xcassets; sourceTree = "<group>"; };
+		FA7E00000000000000000001 /* announcer-ws.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "announcer-ws.cc"; sourceTree = "<group>"; };
+		FA7E00000000000000000002 /* announcer-ws.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "announcer-ws.h"; sourceTree = "<group>"; };
+		FA7E00000000000000000003 /* announcer-ws-protocol.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "announcer-ws-protocol.cc"; sourceTree = "<group>"; };
+		FA7E00000000000000000004 /* announcer-ws-protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "announcer-ws-protocol.h"; sourceTree = "<group>"; };
+		FA7E00000000000000000005 /* websocket-client.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "websocket-client.cc"; sourceTree = "<group>"; };
+		FA7E00000000000000000006 /* websocket-client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "websocket-client.h"; sourceTree = "<group>"; };
+		FA7E00000000000000000007 /* rtc-signaling.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "rtc-signaling.cc"; sourceTree = "<group>"; };
+		FA7E00000000000000000008 /* rtc-signaling.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "rtc-signaling.h"; sourceTree = "<group>"; };
+		FA7E00000000000000000009 /* rtc-endpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "rtc-endpoint.h"; sourceTree = "<group>"; };
+		FA7E0000000000000000000A /* peer-socket-rtc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-socket-rtc.cc"; sourceTree = "<group>"; };
+		FA7E0000000000000000000B /* peer-socket-rtc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "peer-socket-rtc.h"; sourceTree = "<group>"; };
+		FA7E00000000000000000041 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "$(BUILD_DIR)/webtorrent-network/lib/libcurl.a"; sourceTree = "<absolute>"; };
+		55869925257074EC00F77A43 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
+		FAAF00000000000000001400 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "$(BUILD_DIR)/webtorrent-network/lib/libssl.a"; sourceTree = "<absolute>"; };
+		FAAF00000000000000001401 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "$(BUILD_DIR)/webtorrent-network/lib/libcrypto.a"; sourceTree = "<absolute>"; };
+		FA7E00000000000000000043 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		FAAF00000000000000001008 /* sctp_asconf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_asconf.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_asconf.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000100A /* sctp_auth.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_auth.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_auth.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000100C /* sctp_bsd_addr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_bsd_addr.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_bsd_addr.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000100E /* sctp_callout.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_callout.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_callout.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001010 /* sctp_cc_functions.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_cc_functions.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_cc_functions.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001012 /* sctp_crc32.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_crc32.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_crc32.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001014 /* sctp_indata.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_indata.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_indata.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001016 /* sctp_input.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_input.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_input.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001018 /* sctp_output.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_output.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_output.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000101A /* sctp_pcb.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_pcb.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_pcb.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000101C /* sctp_peeloff.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_peeloff.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_peeloff.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000101E /* sctp_sha1.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_sha1.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_sha1.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001020 /* sctp_ss_functions.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_ss_functions.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_ss_functions.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001022 /* sctp_sysctl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_sysctl.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_sysctl.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001024 /* sctp_timer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_timer.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_timer.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001026 /* sctp_userspace.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_userspace.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_userspace.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001028 /* sctp_usrreq.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp_usrreq.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_usrreq.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000102A /* sctputil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctputil.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctputil.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000102C /* sctp6_usrreq.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "sctp6_usrreq.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/netinet6/sctp6_usrreq.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000102E /* user_environment.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "user_environment.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/user_environment.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001030 /* user_mbuf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "user_mbuf.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/user_mbuf.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001032 /* user_recv_thread.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "user_recv_thread.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/user_recv_thread.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001034 /* user_socket.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "user_socket.c"; path = "third-party/libdatachannel/deps/usrsctp/usrsctplib/user_socket.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libwebtorrent-usrsctp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FAAF0000000000000000103E /* addr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "addr.c"; path = "third-party/libdatachannel/deps/libjuice/src/addr.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001040 /* agent.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "agent.c"; path = "third-party/libdatachannel/deps/libjuice/src/agent.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001042 /* crc32.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "crc32.c"; path = "third-party/libdatachannel/deps/libjuice/src/crc32.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001044 /* const_time.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "const_time.c"; path = "third-party/libdatachannel/deps/libjuice/src/const_time.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001046 /* conn.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "conn.c"; path = "third-party/libdatachannel/deps/libjuice/src/conn.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001048 /* conn_poll.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "conn_poll.c"; path = "third-party/libdatachannel/deps/libjuice/src/conn_poll.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000104A /* conn_thread.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "conn_thread.c"; path = "third-party/libdatachannel/deps/libjuice/src/conn_thread.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000104C /* conn_mux.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "conn_mux.c"; path = "third-party/libdatachannel/deps/libjuice/src/conn_mux.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000104E /* base64.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "base64.c"; path = "third-party/libdatachannel/deps/libjuice/src/base64.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001050 /* hash.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "hash.c"; path = "third-party/libdatachannel/deps/libjuice/src/hash.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001052 /* hmac.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "hmac.c"; path = "third-party/libdatachannel/deps/libjuice/src/hmac.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001054 /* ice.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "ice.c"; path = "third-party/libdatachannel/deps/libjuice/src/ice.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001056 /* juice.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "juice.c"; path = "third-party/libdatachannel/deps/libjuice/src/juice.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001058 /* log.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "log.c"; path = "third-party/libdatachannel/deps/libjuice/src/log.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000105A /* random.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "random.c"; path = "third-party/libdatachannel/deps/libjuice/src/random.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000105C /* server.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "server.c"; path = "third-party/libdatachannel/deps/libjuice/src/server.c"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000105E /* stun.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "stun.c"; path = "third-party/libdatachannel/deps/libjuice/src/stun.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001060 /* timestamp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "timestamp.c"; path = "third-party/libdatachannel/deps/libjuice/src/timestamp.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001062 /* tcp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "tcp.c"; path = "third-party/libdatachannel/deps/libjuice/src/tcp.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001064 /* turn.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "turn.c"; path = "third-party/libdatachannel/deps/libjuice/src/turn.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001066 /* udp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "udp.c"; path = "third-party/libdatachannel/deps/libjuice/src/udp.c"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001039 /* libwebtorrent-juice.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libwebtorrent-juice.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FAAF00000000000000001070 /* candidate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "candidate.cpp"; path = "third-party/libdatachannel/src/candidate.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001072 /* channel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "channel.cpp"; path = "third-party/libdatachannel/src/channel.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001074 /* configuration.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "configuration.cpp"; path = "third-party/libdatachannel/src/configuration.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001076 /* datachannel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "datachannel.cpp"; path = "third-party/libdatachannel/src/datachannel.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001078 /* dependencydescriptor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "dependencydescriptor.cpp"; path = "third-party/libdatachannel/src/dependencydescriptor.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000107A /* description.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "description.cpp"; path = "third-party/libdatachannel/src/description.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000107C /* iceudpmuxlistener.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "iceudpmuxlistener.cpp"; path = "third-party/libdatachannel/src/iceudpmuxlistener.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000107E /* mediahandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "mediahandler.cpp"; path = "third-party/libdatachannel/src/mediahandler.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001080 /* global.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "global.cpp"; path = "third-party/libdatachannel/src/global.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001082 /* message.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "message.cpp"; path = "third-party/libdatachannel/src/message.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001084 /* peerconnection.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "peerconnection.cpp"; path = "third-party/libdatachannel/src/peerconnection.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001086 /* rtcpreceivingsession.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "rtcpreceivingsession.cpp"; path = "third-party/libdatachannel/src/rtcpreceivingsession.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001088 /* track.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "track.cpp"; path = "third-party/libdatachannel/src/track.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000108A /* websocket.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "websocket.cpp"; path = "third-party/libdatachannel/src/websocket.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000108C /* websocketserver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "websocketserver.cpp"; path = "third-party/libdatachannel/src/websocketserver.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000108E /* rtppacketizationconfig.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "rtppacketizationconfig.cpp"; path = "third-party/libdatachannel/src/rtppacketizationconfig.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001090 /* video_layers_allocation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "video_layers_allocation.cpp"; path = "third-party/libdatachannel/src/video_layers_allocation.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001092 /* rtcpsrreporter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "rtcpsrreporter.cpp"; path = "third-party/libdatachannel/src/rtcpsrreporter.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001094 /* rtppacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "rtppacketizer.cpp"; path = "third-party/libdatachannel/src/rtppacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001096 /* rtpdepacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "rtpdepacketizer.cpp"; path = "third-party/libdatachannel/src/rtpdepacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF00000000000000001098 /* h264rtppacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "h264rtppacketizer.cpp"; path = "third-party/libdatachannel/src/h264rtppacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000109A /* h264rtpdepacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "h264rtpdepacketizer.cpp"; path = "third-party/libdatachannel/src/h264rtpdepacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000109C /* nalunit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "nalunit.cpp"; path = "third-party/libdatachannel/src/nalunit.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000109E /* h265rtppacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "h265rtppacketizer.cpp"; path = "third-party/libdatachannel/src/h265rtppacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010A0 /* h265rtpdepacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "h265rtpdepacketizer.cpp"; path = "third-party/libdatachannel/src/h265rtpdepacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010A2 /* h265nalunit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "h265nalunit.cpp"; path = "third-party/libdatachannel/src/h265nalunit.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010A4 /* av1rtppacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "av1rtppacketizer.cpp"; path = "third-party/libdatachannel/src/av1rtppacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010A6 /* av1rtpdepacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "av1rtpdepacketizer.cpp"; path = "third-party/libdatachannel/src/av1rtpdepacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010A8 /* vp8rtppacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "vp8rtppacketizer.cpp"; path = "third-party/libdatachannel/src/vp8rtppacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010AA /* vp8rtpdepacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "vp8rtpdepacketizer.cpp"; path = "third-party/libdatachannel/src/vp8rtpdepacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010AC /* vp9rtppacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "vp9rtppacketizer.cpp"; path = "third-party/libdatachannel/src/vp9rtppacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010AE /* vp9rtpdepacketizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "vp9rtpdepacketizer.cpp"; path = "third-party/libdatachannel/src/vp9rtpdepacketizer.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010B0 /* rtcpnackresponder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "rtcpnackresponder.cpp"; path = "third-party/libdatachannel/src/rtcpnackresponder.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010B2 /* rtp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "rtp.cpp"; path = "third-party/libdatachannel/src/rtp.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010B4 /* capi.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "capi.cpp"; path = "third-party/libdatachannel/src/capi.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010B6 /* plihandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "plihandler.cpp"; path = "third-party/libdatachannel/src/plihandler.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010B8 /* pacinghandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "pacinghandler.cpp"; path = "third-party/libdatachannel/src/pacinghandler.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010BA /* rembhandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "rembhandler.cpp"; path = "third-party/libdatachannel/src/rembhandler.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010BC /* rtcpapphandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "rtcpapphandler.cpp"; path = "third-party/libdatachannel/src/rtcpapphandler.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010BE /* certificate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "certificate.cpp"; path = "third-party/libdatachannel/src/impl/certificate.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010C0 /* channel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "channel.cpp"; path = "third-party/libdatachannel/src/impl/channel.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010C2 /* datachannel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "datachannel.cpp"; path = "third-party/libdatachannel/src/impl/datachannel.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010C4 /* dtlssrtptransport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "dtlssrtptransport.cpp"; path = "third-party/libdatachannel/src/impl/dtlssrtptransport.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010C6 /* dtlstransport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "dtlstransport.cpp"; path = "third-party/libdatachannel/src/impl/dtlstransport.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010C8 /* icetransport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "icetransport.cpp"; path = "third-party/libdatachannel/src/impl/icetransport.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010CA /* iceudpmuxlistener.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "iceudpmuxlistener.cpp"; path = "third-party/libdatachannel/src/impl/iceudpmuxlistener.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010CC /* init.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "init.cpp"; path = "third-party/libdatachannel/src/impl/init.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010CE /* peerconnection.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "peerconnection.cpp"; path = "third-party/libdatachannel/src/impl/peerconnection.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010D0 /* logcounter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "logcounter.cpp"; path = "third-party/libdatachannel/src/impl/logcounter.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010D2 /* sctptransport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "sctptransport.cpp"; path = "third-party/libdatachannel/src/impl/sctptransport.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010D4 /* threadpool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "threadpool.cpp"; path = "third-party/libdatachannel/src/impl/threadpool.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010D6 /* tls.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "tls.cpp"; path = "third-party/libdatachannel/src/impl/tls.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010D8 /* track.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "track.cpp"; path = "third-party/libdatachannel/src/impl/track.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010DA /* utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "utils.cpp"; path = "third-party/libdatachannel/src/impl/utils.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010DC /* processor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "processor.cpp"; path = "third-party/libdatachannel/src/impl/processor.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010DE /* sha.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "sha.cpp"; path = "third-party/libdatachannel/src/impl/sha.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010E0 /* pollinterrupter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "pollinterrupter.cpp"; path = "third-party/libdatachannel/src/impl/pollinterrupter.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010E2 /* pollservice.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "pollservice.cpp"; path = "third-party/libdatachannel/src/impl/pollservice.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010E4 /* http.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "http.cpp"; path = "third-party/libdatachannel/src/impl/http.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010E6 /* httpproxytransport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "httpproxytransport.cpp"; path = "third-party/libdatachannel/src/impl/httpproxytransport.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010E8 /* tcpserver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "tcpserver.cpp"; path = "third-party/libdatachannel/src/impl/tcpserver.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010EA /* tcptransport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "tcptransport.cpp"; path = "third-party/libdatachannel/src/impl/tcptransport.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010EC /* tlstransport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "tlstransport.cpp"; path = "third-party/libdatachannel/src/impl/tlstransport.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010EE /* transport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "transport.cpp"; path = "third-party/libdatachannel/src/impl/transport.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010F0 /* verifiedtlstransport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "verifiedtlstransport.cpp"; path = "third-party/libdatachannel/src/impl/verifiedtlstransport.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010F2 /* websocket.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "websocket.cpp"; path = "third-party/libdatachannel/src/impl/websocket.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010F4 /* websocketserver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "websocketserver.cpp"; path = "third-party/libdatachannel/src/impl/websocketserver.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010F6 /* wstransport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wstransport.cpp"; path = "third-party/libdatachannel/src/impl/wstransport.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF000000000000000010F8 /* wshandshake.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "wshandshake.cpp"; path = "third-party/libdatachannel/src/impl/wshandshake.cpp"; sourceTree = SOURCE_ROOT; };
+		FAAF0000000000000000106B /* libwebtorrent-datachannel.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libwebtorrent-datachannel.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1450,8 +1811,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */,
-				C88771AE2803EE7C005C7523 /* libz.tbd in Frameworks */,
+				FAAF00000000000000001310 /* libwebtorrent-datachannel.a in Frameworks */,
+				FAAF00000000000000001311 /* libwebtorrent-juice.a in Frameworks */,
+				FAAF00000000000000001312 /* libwebtorrent-usrsctp.a in Frameworks */,
+				FA7E000000000000000000A0 /* libcurl.a in Frameworks */,
 				558699542570759E00F77A43 /* libcurl.tbd in Frameworks */,
+				FAAF00000000000000001402 /* libssl.a in Frameworks */,
+				FAAF00000000000000001403 /* libcrypto.a in Frameworks */,
+				C88771AE2803EE7C005C7523 /* libz.tbd in Frameworks */,
+				FA7E00000000000000000050 /* SystemConfiguration.framework in Frameworks */,
+				FA7E00000000000000000060 /* Security.framework in Frameworks */,
 				C88771B22803EE87005C7523 /* libiconv.tbd in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1465,9 +1834,16 @@
 				C87369652809984200573C90 /* UserNotifications.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */,
+				FAAF00000000000000001313 /* libwebtorrent-datachannel.a in Frameworks */,
+				FAAF00000000000000001314 /* libwebtorrent-juice.a in Frameworks */,
+				FAAF00000000000000001315 /* libwebtorrent-usrsctp.a in Frameworks */,
+				FA7E000000000000000000A1 /* libcurl.a in Frameworks */,
+				55869926257074EC00F77A43 /* libcurl.tbd in Frameworks */,
+				FAAF00000000000000001404 /* libssl.a in Frameworks */,
+				FAAF00000000000000001405 /* libcrypto.a in Frameworks */,
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				C88771B52803EEB1005C7523 /* libiconv.tbd in Frameworks */,
-				55869926257074EC00F77A43 /* libcurl.tbd in Frameworks */,
+				FA7E00000000000000000051 /* SystemConfiguration.framework in Frameworks */,
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
 				A221DCC8104B3660008A642D /* Quartz.framework in Frameworks */,
@@ -1525,8 +1901,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
-				C88771AF2803EE7D005C7523 /* libz.tbd in Frameworks */,
+				FAAF00000000000000001316 /* libwebtorrent-datachannel.a in Frameworks */,
+				FAAF00000000000000001317 /* libwebtorrent-juice.a in Frameworks */,
+				FAAF00000000000000001318 /* libwebtorrent-usrsctp.a in Frameworks */,
+				FA7E000000000000000000A2 /* libcurl.a in Frameworks */,
 				558699602570759F00F77A43 /* libcurl.tbd in Frameworks */,
+				FAAF00000000000000001406 /* libssl.a in Frameworks */,
+				FAAF00000000000000001407 /* libcrypto.a in Frameworks */,
+				C88771AF2803EE7D005C7523 /* libz.tbd in Frameworks */,
+				FA7E00000000000000000052 /* SystemConfiguration.framework in Frameworks */,
+				FA7E00000000000000000062 /* Security.framework in Frameworks */,
 				C88771B32803EE88005C7523 /* libiconv.tbd in Frameworks */,
 				A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1537,8 +1921,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
-				C88771B02803EE7D005C7523 /* libz.tbd in Frameworks */,
+				FAAF00000000000000001319 /* libwebtorrent-datachannel.a in Frameworks */,
+				FAAF0000000000000000131A /* libwebtorrent-juice.a in Frameworks */,
+				FAAF0000000000000000131B /* libwebtorrent-usrsctp.a in Frameworks */,
+				FA7E000000000000000000A3 /* libcurl.a in Frameworks */,
 				5586996C2570759F00F77A43 /* libcurl.tbd in Frameworks */,
+				FAAF00000000000000001408 /* libssl.a in Frameworks */,
+				FAAF00000000000000001409 /* libcrypto.a in Frameworks */,
+				C88771B02803EE7D005C7523 /* libz.tbd in Frameworks */,
+				FA7E00000000000000000053 /* SystemConfiguration.framework in Frameworks */,
+				FA7E00000000000000000063 /* Security.framework in Frameworks */,
 				C88771B42803EE88005C7523 /* libiconv.tbd in Frameworks */,
 				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
 			);
@@ -1577,8 +1969,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8B27B7628153F2B00A22B5D /* libtransmission.a in Frameworks */,
-				C8B27B7728153F2B00A22B5D /* libz.tbd in Frameworks */,
+				FAAF0000000000000000131C /* libwebtorrent-datachannel.a in Frameworks */,
+				FAAF0000000000000000131D /* libwebtorrent-juice.a in Frameworks */,
+				FAAF0000000000000000131E /* libwebtorrent-usrsctp.a in Frameworks */,
+				FA7E000000000000000000A4 /* libcurl.a in Frameworks */,
 				C8B27B7828153F2B00A22B5D /* libcurl.tbd in Frameworks */,
+				FAAF0000000000000000140A /* libssl.a in Frameworks */,
+				FAAF0000000000000000140B /* libcrypto.a in Frameworks */,
+				C8B27B7728153F2B00A22B5D /* libz.tbd in Frameworks */,
+				FA7E00000000000000000054 /* SystemConfiguration.framework in Frameworks */,
+				FA7E00000000000000000064 /* Security.framework in Frameworks */,
 				C8B27B7928153F2B00A22B5D /* libiconv.tbd in Frameworks */,
 				C8B27B7A28153F2B00A22B5D /* Cocoa.framework in Frameworks */,
 			);
@@ -1589,8 +1989,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8B27B8728153F3100A22B5D /* libtransmission.a in Frameworks */,
-				C8B27B8828153F3100A22B5D /* libz.tbd in Frameworks */,
+				FAAF0000000000000000131F /* libwebtorrent-datachannel.a in Frameworks */,
+				FAAF00000000000000001320 /* libwebtorrent-juice.a in Frameworks */,
+				FAAF00000000000000001321 /* libwebtorrent-usrsctp.a in Frameworks */,
+				FA7E000000000000000000A5 /* libcurl.a in Frameworks */,
 				C8B27B8928153F3100A22B5D /* libcurl.tbd in Frameworks */,
+				FAAF0000000000000000140C /* libssl.a in Frameworks */,
+				FAAF0000000000000000140D /* libcrypto.a in Frameworks */,
+				C8B27B8828153F3100A22B5D /* libz.tbd in Frameworks */,
+				FA7E00000000000000000055 /* SystemConfiguration.framework in Frameworks */,
+				FA7E00000000000000000065 /* Security.framework in Frameworks */,
 				C8B27B8A28153F3100A22B5D /* libiconv.tbd in Frameworks */,
 				C8B27B8B28153F3100A22B5D /* Cocoa.framework in Frameworks */,
 			);
@@ -1601,8 +2009,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8B27B9828153F3400A22B5D /* libtransmission.a in Frameworks */,
-				C8B27B9928153F3400A22B5D /* libz.tbd in Frameworks */,
+				FAAF00000000000000001322 /* libwebtorrent-datachannel.a in Frameworks */,
+				FAAF00000000000000001323 /* libwebtorrent-juice.a in Frameworks */,
+				FAAF00000000000000001324 /* libwebtorrent-usrsctp.a in Frameworks */,
+				FA7E000000000000000000A6 /* libcurl.a in Frameworks */,
 				C8B27B9A28153F3400A22B5D /* libcurl.tbd in Frameworks */,
+				FAAF0000000000000000140E /* libssl.a in Frameworks */,
+				FAAF0000000000000000140F /* libcrypto.a in Frameworks */,
+				C8B27B9928153F3400A22B5D /* libz.tbd in Frameworks */,
+				FA7E00000000000000000056 /* SystemConfiguration.framework in Frameworks */,
+				FA7E00000000000000000066 /* Security.framework in Frameworks */,
 				C8B27B9B28153F3400A22B5D /* libiconv.tbd in Frameworks */,
 				C8B27B9C28153F3400A22B5D /* Cocoa.framework in Frameworks */,
 			);
@@ -1614,7 +2030,16 @@
 			files = (
 				ED5E0E7E2CD30B180071433B /* Quartz.framework in Frameworks */,
 				ED5E0E9D2CD3134B0071433B /* libtransmission.a in Frameworks */,
+				FAAF00000000000000001325 /* libwebtorrent-datachannel.a in Frameworks */,
+				FAAF00000000000000001326 /* libwebtorrent-juice.a in Frameworks */,
+				FAAF00000000000000001327 /* libwebtorrent-usrsctp.a in Frameworks */,
+				FA7E000000000000000000A7 /* libcurl.a in Frameworks */,
 				ED5E0EA02CD3147B0071433B /* libcurl.tbd in Frameworks */,
+				FAAF00000000000000001410 /* libssl.a in Frameworks */,
+				FAAF00000000000000001411 /* libcrypto.a in Frameworks */,
+				FA7E00000000000000000057 /* SystemConfiguration.framework in Frameworks */,
+				FA7E00000000000000000067 /* Security.framework in Frameworks */,
+				FA7E00000000000000000070 /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1741,6 +2166,9 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				FAAF0000000000000000106B /* libwebtorrent-datachannel.a */,
+				FAAF00000000000000001039 /* libwebtorrent-juice.a */,
+				FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */,
 				8D1107320486CEB800E47090 /* Transmission.app */,
 				4DDBB71909E16BAE00284745 /* transmissioncli */,
 				4D18389709DEC0030047D688 /* libtransmission.a */,
@@ -1767,6 +2195,9 @@
 		29B97314FDCFA39411CA2CEA /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
+				FAAF00000000000000001069 /* webtorrent-datachannel */,
+				FAAF00000000000000001037 /* webtorrent-juice */,
+				FAAF00000000000000001001 /* webtorrent-usrsctp */,
 				A22CEF9E21CDC44400C5C1BA /* Transmission.entitlements */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				ED5E0E992CD30E8F0071433B /* QuickLookExtension */,
@@ -2027,6 +2458,19 @@
 				C17740D4273A002C00E455D2 /* web-utils.h */,
 				A29EBE520DC01FC9006CEE80 /* web.cc */,
 				A29EBE530DC01FC9006CEE80 /* web.h */,
+				FA5D8AC27CF4B02A0011A100 /* curl-tls.cc */,
+				FA5D8AC27CF4B02A0011A101 /* curl-tls.h */,
+				FA7E00000000000000000001 /* announcer-ws.cc */,
+				FA7E00000000000000000002 /* announcer-ws.h */,
+				FA7E00000000000000000003 /* announcer-ws-protocol.cc */,
+				FA7E00000000000000000004 /* announcer-ws-protocol.h */,
+				FA7E00000000000000000005 /* websocket-client.cc */,
+				FA7E00000000000000000006 /* websocket-client.h */,
+				FA7E00000000000000000007 /* rtc-signaling.cc */,
+				FA7E00000000000000000008 /* rtc-signaling.h */,
+				FA7E00000000000000000009 /* rtc-endpoint.h */,
+				FA7E0000000000000000000A /* peer-socket-rtc.cc */,
+				FA7E0000000000000000000B /* peer-socket-rtc.h */,
 				A292A6E50DFB45EC004B9C0A /* webseed.cc */,
 				A292A6E60DFB45EC004B9C0A /* webseed.h */,
 			);
@@ -2140,7 +2584,11 @@
 			children = (
 				EDD735D52D83087400852628 /* UniformTypeIdentifiers.framework */,
 				C87369642809984200573C90 /* UserNotifications.framework */,
+				FA7E00000000000000000041 /* libcurl.a */,
 				55869925257074EC00F77A43 /* libcurl.tbd */,
+				FAAF00000000000000001400 /* libssl.a */,
+				FAAF00000000000000001401 /* libcrypto.a */,
+				FA7E00000000000000000043 /* SystemConfiguration.framework */,
 				C88771AB2803EE53005C7523 /* libiconv.tbd */,
 				C88771A92803EE42005C7523 /* libz.tbd */,
 				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
@@ -2444,6 +2892,140 @@
 			path = "third-party/madler-crcany";
 			sourceTree = "<group>";
 		};
+		FAAF00000000000000001001 /* webtorrent-usrsctp */ = {
+			isa = PBXGroup;
+			children = (
+				FAAF00000000000000001008 /* sctp_asconf.c */,
+				FAAF0000000000000000100A /* sctp_auth.c */,
+				FAAF0000000000000000100C /* sctp_bsd_addr.c */,
+				FAAF0000000000000000100E /* sctp_callout.c */,
+				FAAF00000000000000001010 /* sctp_cc_functions.c */,
+				FAAF00000000000000001012 /* sctp_crc32.c */,
+				FAAF00000000000000001014 /* sctp_indata.c */,
+				FAAF00000000000000001016 /* sctp_input.c */,
+				FAAF00000000000000001018 /* sctp_output.c */,
+				FAAF0000000000000000101A /* sctp_pcb.c */,
+				FAAF0000000000000000101C /* sctp_peeloff.c */,
+				FAAF0000000000000000101E /* sctp_sha1.c */,
+				FAAF00000000000000001020 /* sctp_ss_functions.c */,
+				FAAF00000000000000001022 /* sctp_sysctl.c */,
+				FAAF00000000000000001024 /* sctp_timer.c */,
+				FAAF00000000000000001026 /* sctp_userspace.c */,
+				FAAF00000000000000001028 /* sctp_usrreq.c */,
+				FAAF0000000000000000102A /* sctputil.c */,
+				FAAF0000000000000000102C /* sctp6_usrreq.c */,
+				FAAF0000000000000000102E /* user_environment.c */,
+				FAAF00000000000000001030 /* user_mbuf.c */,
+				FAAF00000000000000001032 /* user_recv_thread.c */,
+				FAAF00000000000000001034 /* user_socket.c */,
+			);
+			name = "webtorrent-usrsctp";
+			sourceTree = "<group>";
+		};
+		FAAF00000000000000001037 /* webtorrent-juice */ = {
+			isa = PBXGroup;
+			children = (
+				FAAF0000000000000000103E /* addr.c */,
+				FAAF00000000000000001040 /* agent.c */,
+				FAAF00000000000000001042 /* crc32.c */,
+				FAAF00000000000000001044 /* const_time.c */,
+				FAAF00000000000000001046 /* conn.c */,
+				FAAF00000000000000001048 /* conn_poll.c */,
+				FAAF0000000000000000104A /* conn_thread.c */,
+				FAAF0000000000000000104C /* conn_mux.c */,
+				FAAF0000000000000000104E /* base64.c */,
+				FAAF00000000000000001050 /* hash.c */,
+				FAAF00000000000000001052 /* hmac.c */,
+				FAAF00000000000000001054 /* ice.c */,
+				FAAF00000000000000001056 /* juice.c */,
+				FAAF00000000000000001058 /* log.c */,
+				FAAF0000000000000000105A /* random.c */,
+				FAAF0000000000000000105C /* server.c */,
+				FAAF0000000000000000105E /* stun.c */,
+				FAAF00000000000000001060 /* timestamp.c */,
+				FAAF00000000000000001062 /* tcp.c */,
+				FAAF00000000000000001064 /* turn.c */,
+				FAAF00000000000000001066 /* udp.c */,
+			);
+			name = "webtorrent-juice";
+			sourceTree = "<group>";
+		};
+		FAAF00000000000000001069 /* webtorrent-datachannel */ = {
+			isa = PBXGroup;
+			children = (
+				FAAF00000000000000001070 /* candidate.cpp */,
+				FAAF00000000000000001072 /* channel.cpp */,
+				FAAF00000000000000001074 /* configuration.cpp */,
+				FAAF00000000000000001076 /* datachannel.cpp */,
+				FAAF00000000000000001078 /* dependencydescriptor.cpp */,
+				FAAF0000000000000000107A /* description.cpp */,
+				FAAF0000000000000000107C /* iceudpmuxlistener.cpp */,
+				FAAF0000000000000000107E /* mediahandler.cpp */,
+				FAAF00000000000000001080 /* global.cpp */,
+				FAAF00000000000000001082 /* message.cpp */,
+				FAAF00000000000000001084 /* peerconnection.cpp */,
+				FAAF00000000000000001086 /* rtcpreceivingsession.cpp */,
+				FAAF00000000000000001088 /* track.cpp */,
+				FAAF0000000000000000108A /* websocket.cpp */,
+				FAAF0000000000000000108C /* websocketserver.cpp */,
+				FAAF0000000000000000108E /* rtppacketizationconfig.cpp */,
+				FAAF00000000000000001090 /* video_layers_allocation.cpp */,
+				FAAF00000000000000001092 /* rtcpsrreporter.cpp */,
+				FAAF00000000000000001094 /* rtppacketizer.cpp */,
+				FAAF00000000000000001096 /* rtpdepacketizer.cpp */,
+				FAAF00000000000000001098 /* h264rtppacketizer.cpp */,
+				FAAF0000000000000000109A /* h264rtpdepacketizer.cpp */,
+				FAAF0000000000000000109C /* nalunit.cpp */,
+				FAAF0000000000000000109E /* h265rtppacketizer.cpp */,
+				FAAF000000000000000010A0 /* h265rtpdepacketizer.cpp */,
+				FAAF000000000000000010A2 /* h265nalunit.cpp */,
+				FAAF000000000000000010A4 /* av1rtppacketizer.cpp */,
+				FAAF000000000000000010A6 /* av1rtpdepacketizer.cpp */,
+				FAAF000000000000000010A8 /* vp8rtppacketizer.cpp */,
+				FAAF000000000000000010AA /* vp8rtpdepacketizer.cpp */,
+				FAAF000000000000000010AC /* vp9rtppacketizer.cpp */,
+				FAAF000000000000000010AE /* vp9rtpdepacketizer.cpp */,
+				FAAF000000000000000010B0 /* rtcpnackresponder.cpp */,
+				FAAF000000000000000010B2 /* rtp.cpp */,
+				FAAF000000000000000010B4 /* capi.cpp */,
+				FAAF000000000000000010B6 /* plihandler.cpp */,
+				FAAF000000000000000010B8 /* pacinghandler.cpp */,
+				FAAF000000000000000010BA /* rembhandler.cpp */,
+				FAAF000000000000000010BC /* rtcpapphandler.cpp */,
+				FAAF000000000000000010BE /* certificate.cpp */,
+				FAAF000000000000000010C0 /* channel.cpp */,
+				FAAF000000000000000010C2 /* datachannel.cpp */,
+				FAAF000000000000000010C4 /* dtlssrtptransport.cpp */,
+				FAAF000000000000000010C6 /* dtlstransport.cpp */,
+				FAAF000000000000000010C8 /* icetransport.cpp */,
+				FAAF000000000000000010CA /* iceudpmuxlistener.cpp */,
+				FAAF000000000000000010CC /* init.cpp */,
+				FAAF000000000000000010CE /* peerconnection.cpp */,
+				FAAF000000000000000010D0 /* logcounter.cpp */,
+				FAAF000000000000000010D2 /* sctptransport.cpp */,
+				FAAF000000000000000010D4 /* threadpool.cpp */,
+				FAAF000000000000000010D6 /* tls.cpp */,
+				FAAF000000000000000010D8 /* track.cpp */,
+				FAAF000000000000000010DA /* utils.cpp */,
+				FAAF000000000000000010DC /* processor.cpp */,
+				FAAF000000000000000010DE /* sha.cpp */,
+				FAAF000000000000000010E0 /* pollinterrupter.cpp */,
+				FAAF000000000000000010E2 /* pollservice.cpp */,
+				FAAF000000000000000010E4 /* http.cpp */,
+				FAAF000000000000000010E6 /* httpproxytransport.cpp */,
+				FAAF000000000000000010E8 /* tcpserver.cpp */,
+				FAAF000000000000000010EA /* tcptransport.cpp */,
+				FAAF000000000000000010EC /* tlstransport.cpp */,
+				FAAF000000000000000010EE /* transport.cpp */,
+				FAAF000000000000000010F0 /* verifiedtlstransport.cpp */,
+				FAAF000000000000000010F2 /* websocket.cpp */,
+				FAAF000000000000000010F4 /* websocketserver.cpp */,
+				FAAF000000000000000010F6 /* wstransport.cpp */,
+				FAAF000000000000000010F8 /* wshandshake.cpp */,
+			);
+			name = "webtorrent-datachannel";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -2698,6 +3280,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				FAAF0000000000000000130F /* PBXTargetDependency */,
+				FAAF0000000000000000130D /* PBXTargetDependency */,
 				ED91F3952CBDA9BD008388AA /* PBXTargetDependency */,
 				C1846BA7294F7B1400A98F30 /* PBXTargetDependency */,
 				C33E46A22794B3CC0090F2AA /* PBXTargetDependency */,
@@ -3016,6 +3600,45 @@
 			productReference = ED91F00C2CBDA5D3008388AA /* libmadler-crcany.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		FAAF00000000000000001000 /* webtorrent-usrsctp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FAAF00000000000000001004 /* Build configuration list for PBXNativeTarget "webtorrent-usrsctp" */;
+			buildPhases = (FAAF00000000000000001002 /* Sources */,);
+			buildRules = ();
+			dependencies = (
+			);
+			name = "webtorrent-usrsctp";
+			productName = "webtorrent-usrsctp";
+			productReference = FAAF00000000000000001003 /* libwebtorrent-usrsctp.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		FAAF00000000000000001036 /* webtorrent-juice */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FAAF0000000000000000103A /* Build configuration list for PBXNativeTarget "webtorrent-juice" */;
+			buildPhases = (FAAF00000000000000001038 /* Sources */,);
+			buildRules = ();
+			dependencies = (
+			);
+			name = "webtorrent-juice";
+			productName = "webtorrent-juice";
+			productReference = FAAF00000000000000001039 /* libwebtorrent-juice.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		FAAF00000000000000001068 /* webtorrent-datachannel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FAAF0000000000000000106C /* Build configuration list for PBXNativeTarget "webtorrent-datachannel" */;
+			buildPhases = (FAAF0000000000000000106A /* Sources */,);
+			buildRules = ();
+			dependencies = (
+				FAAF0000000000000000130B /* PBXTargetDependency */,
+				FAAF00000000000000001309 /* PBXTargetDependency */,
+				FAAF00000000000000001307 /* PBXTargetDependency */,
+			);
+			name = "webtorrent-datachannel";
+			productName = "webtorrent-datachannel";
+			productReference = FAAF0000000000000000106B /* libwebtorrent-datachannel.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -3078,6 +3701,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				FAAF00000000000000001300 /* WebTorrent network dependencies */,
+				FAAF00000000000000001068 /* webtorrent-datachannel */,
+				FAAF00000000000000001036 /* webtorrent-juice */,
+				FAAF00000000000000001000 /* webtorrent-usrsctp */,
 				8D1107260486CEB800E47090 /* Transmission */,
 				ED5E0E7B2CD30B180071433B /* QuickLookExtension */,
 				4D18389609DEC0030047D688 /* libtransmission */,
@@ -3259,6 +3886,20 @@
 			shellPath = /bin/sh;
 			shellScript = "sed 's|@LIBPSL_[A-Z_]*@|0|' < third-party/libpsl/include/libpsl.h.in > third-party/libpsl/include/libpsl.h\n\n# Generate files to be included\nPYTHON=$( command -v python3 ) || PYTHON=$( command -v python3.7 ) || PYTHON=$( command -v python2 )\n\"${PYTHON}\" \"third-party/libpsl/src/psl-make-dafsa\" --output-format=cxx+ \"third-party/libpsl/list/public_suffix_list.dat\" \"third-party/suffixes_dafsa.h\"\n";
 		};
+		FAAF00000000000000001301 /* Build WebSocket and TLS libraries */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = ("$(SRCROOT)/release/macos/webtorrent-network/CMakeLists.txt",);
+			outputPaths = (
+				"$(BUILD_DIR)/webtorrent-network/lib/libcurl.a",
+				"$(BUILD_DIR)/webtorrent-network/lib/libssl.a",
+				"$(BUILD_DIR)/webtorrent-network/lib/libcrypto.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nexport PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\"\ncmake -S \"$SRCROOT/release/macos/webtorrent-network\" -B \"$BUILD_DIR/webtorrent-network\" -G Ninja\ncmake --build \"$BUILD_DIR/webtorrent-network\" --parallel \"$(sysctl -n hw.logicalcpu)\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -3324,6 +3965,12 @@
 				4D4ADFC70DA1631500A68297 /* blocklist.cc in Sources */,
 				A29DF8B90DB2544C00D04E5A /* resume.cc in Sources */,
 				A2A4E9220DE0F7EB000CE197 /* web.cc in Sources */,
+				FA5D8AC27CF4B02A0011A102 /* curl-tls.cc in Sources */,
+				FA7E00000000000000000021 /* announcer-ws.cc in Sources */,
+				FA7E00000000000000000023 /* announcer-ws-protocol.cc in Sources */,
+				FA7E00000000000000000025 /* websocket-client.cc in Sources */,
+				FA7E00000000000000000027 /* rtc-signaling.cc in Sources */,
+				FA7E0000000000000000002A /* peer-socket-rtc.cc in Sources */,
 				A292A6E80DFB45FC004B9C0A /* webseed.cc in Sources */,
 				A25E03E30E4015380086C225 /* tr-getopt.cc in Sources */,
 				C1305EBE186A13B100F03351 /* file.cc in Sources */,
@@ -3626,6 +4273,140 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FAAF00000000000000001002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FAAF00000000000000001009 /* sctp_asconf.c in Sources */,
+				FAAF0000000000000000100B /* sctp_auth.c in Sources */,
+				FAAF0000000000000000100D /* sctp_bsd_addr.c in Sources */,
+				FAAF0000000000000000100F /* sctp_callout.c in Sources */,
+				FAAF00000000000000001011 /* sctp_cc_functions.c in Sources */,
+				FAAF00000000000000001013 /* sctp_crc32.c in Sources */,
+				FAAF00000000000000001015 /* sctp_indata.c in Sources */,
+				FAAF00000000000000001017 /* sctp_input.c in Sources */,
+				FAAF00000000000000001019 /* sctp_output.c in Sources */,
+				FAAF0000000000000000101B /* sctp_pcb.c in Sources */,
+				FAAF0000000000000000101D /* sctp_peeloff.c in Sources */,
+				FAAF0000000000000000101F /* sctp_sha1.c in Sources */,
+				FAAF00000000000000001021 /* sctp_ss_functions.c in Sources */,
+				FAAF00000000000000001023 /* sctp_sysctl.c in Sources */,
+				FAAF00000000000000001025 /* sctp_timer.c in Sources */,
+				FAAF00000000000000001027 /* sctp_userspace.c in Sources */,
+				FAAF00000000000000001029 /* sctp_usrreq.c in Sources */,
+				FAAF0000000000000000102B /* sctputil.c in Sources */,
+				FAAF0000000000000000102D /* sctp6_usrreq.c in Sources */,
+				FAAF0000000000000000102F /* user_environment.c in Sources */,
+				FAAF00000000000000001031 /* user_mbuf.c in Sources */,
+				FAAF00000000000000001033 /* user_recv_thread.c in Sources */,
+				FAAF00000000000000001035 /* user_socket.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FAAF00000000000000001038 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FAAF0000000000000000103F /* addr.c in Sources */,
+				FAAF00000000000000001041 /* agent.c in Sources */,
+				FAAF00000000000000001043 /* crc32.c in Sources */,
+				FAAF00000000000000001045 /* const_time.c in Sources */,
+				FAAF00000000000000001047 /* conn.c in Sources */,
+				FAAF00000000000000001049 /* conn_poll.c in Sources */,
+				FAAF0000000000000000104B /* conn_thread.c in Sources */,
+				FAAF0000000000000000104D /* conn_mux.c in Sources */,
+				FAAF0000000000000000104F /* base64.c in Sources */,
+				FAAF00000000000000001051 /* hash.c in Sources */,
+				FAAF00000000000000001053 /* hmac.c in Sources */,
+				FAAF00000000000000001055 /* ice.c in Sources */,
+				FAAF00000000000000001057 /* juice.c in Sources */,
+				FAAF00000000000000001059 /* log.c in Sources */,
+				FAAF0000000000000000105B /* random.c in Sources */,
+				FAAF0000000000000000105D /* server.c in Sources */,
+				FAAF0000000000000000105F /* stun.c in Sources */,
+				FAAF00000000000000001061 /* timestamp.c in Sources */,
+				FAAF00000000000000001063 /* tcp.c in Sources */,
+				FAAF00000000000000001065 /* turn.c in Sources */,
+				FAAF00000000000000001067 /* udp.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FAAF0000000000000000106A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FAAF00000000000000001071 /* candidate.cpp in Sources */,
+				FAAF00000000000000001073 /* channel.cpp in Sources */,
+				FAAF00000000000000001075 /* configuration.cpp in Sources */,
+				FAAF00000000000000001077 /* datachannel.cpp in Sources */,
+				FAAF00000000000000001079 /* dependencydescriptor.cpp in Sources */,
+				FAAF0000000000000000107B /* description.cpp in Sources */,
+				FAAF0000000000000000107D /* iceudpmuxlistener.cpp in Sources */,
+				FAAF0000000000000000107F /* mediahandler.cpp in Sources */,
+				FAAF00000000000000001081 /* global.cpp in Sources */,
+				FAAF00000000000000001083 /* message.cpp in Sources */,
+				FAAF00000000000000001085 /* peerconnection.cpp in Sources */,
+				FAAF00000000000000001087 /* rtcpreceivingsession.cpp in Sources */,
+				FAAF00000000000000001089 /* track.cpp in Sources */,
+				FAAF0000000000000000108B /* websocket.cpp in Sources */,
+				FAAF0000000000000000108D /* websocketserver.cpp in Sources */,
+				FAAF0000000000000000108F /* rtppacketizationconfig.cpp in Sources */,
+				FAAF00000000000000001091 /* video_layers_allocation.cpp in Sources */,
+				FAAF00000000000000001093 /* rtcpsrreporter.cpp in Sources */,
+				FAAF00000000000000001095 /* rtppacketizer.cpp in Sources */,
+				FAAF00000000000000001097 /* rtpdepacketizer.cpp in Sources */,
+				FAAF00000000000000001099 /* h264rtppacketizer.cpp in Sources */,
+				FAAF0000000000000000109B /* h264rtpdepacketizer.cpp in Sources */,
+				FAAF0000000000000000109D /* nalunit.cpp in Sources */,
+				FAAF0000000000000000109F /* h265rtppacketizer.cpp in Sources */,
+				FAAF000000000000000010A1 /* h265rtpdepacketizer.cpp in Sources */,
+				FAAF000000000000000010A3 /* h265nalunit.cpp in Sources */,
+				FAAF000000000000000010A5 /* av1rtppacketizer.cpp in Sources */,
+				FAAF000000000000000010A7 /* av1rtpdepacketizer.cpp in Sources */,
+				FAAF000000000000000010A9 /* vp8rtppacketizer.cpp in Sources */,
+				FAAF000000000000000010AB /* vp8rtpdepacketizer.cpp in Sources */,
+				FAAF000000000000000010AD /* vp9rtppacketizer.cpp in Sources */,
+				FAAF000000000000000010AF /* vp9rtpdepacketizer.cpp in Sources */,
+				FAAF000000000000000010B1 /* rtcpnackresponder.cpp in Sources */,
+				FAAF000000000000000010B3 /* rtp.cpp in Sources */,
+				FAAF000000000000000010B5 /* capi.cpp in Sources */,
+				FAAF000000000000000010B7 /* plihandler.cpp in Sources */,
+				FAAF000000000000000010B9 /* pacinghandler.cpp in Sources */,
+				FAAF000000000000000010BB /* rembhandler.cpp in Sources */,
+				FAAF000000000000000010BD /* rtcpapphandler.cpp in Sources */,
+				FAAF000000000000000010BF /* certificate.cpp in Sources */,
+				FAAF000000000000000010C1 /* channel.cpp in Sources */,
+				FAAF000000000000000010C3 /* datachannel.cpp in Sources */,
+				FAAF000000000000000010C5 /* dtlssrtptransport.cpp in Sources */,
+				FAAF000000000000000010C7 /* dtlstransport.cpp in Sources */,
+				FAAF000000000000000010C9 /* icetransport.cpp in Sources */,
+				FAAF000000000000000010CB /* iceudpmuxlistener.cpp in Sources */,
+				FAAF000000000000000010CD /* init.cpp in Sources */,
+				FAAF000000000000000010CF /* peerconnection.cpp in Sources */,
+				FAAF000000000000000010D1 /* logcounter.cpp in Sources */,
+				FAAF000000000000000010D3 /* sctptransport.cpp in Sources */,
+				FAAF000000000000000010D5 /* threadpool.cpp in Sources */,
+				FAAF000000000000000010D7 /* tls.cpp in Sources */,
+				FAAF000000000000000010D9 /* track.cpp in Sources */,
+				FAAF000000000000000010DB /* utils.cpp in Sources */,
+				FAAF000000000000000010DD /* processor.cpp in Sources */,
+				FAAF000000000000000010DF /* sha.cpp in Sources */,
+				FAAF000000000000000010E1 /* pollinterrupter.cpp in Sources */,
+				FAAF000000000000000010E3 /* pollservice.cpp in Sources */,
+				FAAF000000000000000010E5 /* http.cpp in Sources */,
+				FAAF000000000000000010E7 /* httpproxytransport.cpp in Sources */,
+				FAAF000000000000000010E9 /* tcpserver.cpp in Sources */,
+				FAAF000000000000000010EB /* tcptransport.cpp in Sources */,
+				FAAF000000000000000010ED /* tlstransport.cpp in Sources */,
+				FAAF000000000000000010EF /* transport.cpp in Sources */,
+				FAAF000000000000000010F1 /* verifiedtlstransport.cpp in Sources */,
+				FAAF000000000000000010F3 /* websocket.cpp in Sources */,
+				FAAF000000000000000010F5 /* websocketserver.cpp in Sources */,
+				FAAF000000000000000010F7 /* wstransport.cpp in Sources */,
+				FAAF000000000000000010F9 /* wshandshake.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -3723,6 +4504,31 @@
 			isa = PBXTargetDependency;
 			target = ED91F00B2CBDA5D3008388AA /* madler-crcany */;
 			targetProxy = ED91F3942CBDA9BD008388AA /* PBXContainerItemProxy */;
+		};
+		FAAF00000000000000001307 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FAAF00000000000000001000 /* webtorrent-usrsctp */;
+			targetProxy = FAAF00000000000000001306 /* PBXContainerItemProxy */;
+		};
+		FAAF00000000000000001309 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FAAF00000000000000001036 /* webtorrent-juice */;
+			targetProxy = FAAF00000000000000001308 /* PBXContainerItemProxy */;
+		};
+		FAAF0000000000000000130B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FAAF00000000000000001300 /* WebTorrent network dependencies */;
+			targetProxy = FAAF0000000000000000130A /* PBXContainerItemProxy */;
+		};
+		FAAF0000000000000000130D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FAAF00000000000000001068 /* webtorrent-datachannel */;
+			targetProxy = FAAF0000000000000000130C /* PBXContainerItemProxy */;
+		};
+		FAAF0000000000000000130F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FAAF00000000000000001300 /* WebTorrent network dependencies */;
+			targetProxy = FAAF0000000000000000130E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -4102,6 +4908,8 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(BUILD_DIR)/webtorrent-network/include",
+					"$(SRCROOT)/third-party/libdatachannel/include",
 					"third-party/dht",
 					"third-party/fast_float/include",
 					"third-party/wide-integer",
@@ -4116,6 +4924,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
+					"$(WEBTORRENT_CFLAGS_$(ENABLE_WEBTORRENT))",
 					"-D__TRANSMISSION__",
 					"-DWIDE_INTEGER_DISABLE_FLOAT_INTEROP",
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
@@ -4287,6 +5096,15 @@
 					BUILD_MAC_CLIENT,
 					XCODE_BUILD,
 				);
+				ENABLE_WEBTORRENT = YES;
+				EXCLUDED_EXPLICIT_TARGET_DEPENDENCIES = "$(WEBTORRENT_EXCLUDED_TARGETS_$(ENABLE_WEBTORRENT))";
+				EXCLUDED_SOURCE_FILE_NAMES = "$(WEBTORRENT_EXCLUDED_FILES_$(ENABLE_WEBTORRENT))";
+				WEBTORRENT_CFLAGS_YES = "-DWITH_WEBTORRENT=1 -DRTC_STATIC -DRTC_ENABLE_MEDIA=0 -DRTC_ENABLE_WEBSOCKET=0";
+				WEBTORRENT_CFLAGS_NO = "";
+				WEBTORRENT_EXCLUDED_TARGETS_YES = "";
+				WEBTORRENT_EXCLUDED_TARGETS_NO = "webtorrent-* WebTorrent*";
+				WEBTORRENT_EXCLUDED_FILES_YES = "libcurl.tbd";
+				WEBTORRENT_EXCLUDED_FILES_NO = "announcer-ws.cc announcer-ws-protocol.cc websocket-client.cc rtc-signaling.cc peer-socket-rtc.cc libwebtorrent-*.a libcurl.a libssl.a libcrypto.a";
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -4303,6 +5121,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
+				LIBRARY_SEARCH_PATHS = ("$(inherited)", "$(BUILD_DIR)/webtorrent-network/lib");
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
@@ -4354,6 +5173,8 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(BUILD_DIR)/webtorrent-network/include",
+					"$(SRCROOT)/third-party/libdatachannel/include",
 					"third-party/dht",
 					"third-party/fast_float/include",
 					"third-party/wide-integer",
@@ -4368,6 +5189,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
+					"$(WEBTORRENT_CFLAGS_$(ENABLE_WEBTORRENT))",
 					"-D__TRANSMISSION__",
 					"-DWIDE_INTEGER_DISABLE_FLOAT_INTEROP",
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
@@ -4496,6 +5318,15 @@
 					BUILD_MAC_CLIENT,
 					XCODE_BUILD,
 				);
+				ENABLE_WEBTORRENT = YES;
+				EXCLUDED_EXPLICIT_TARGET_DEPENDENCIES = "$(WEBTORRENT_EXCLUDED_TARGETS_$(ENABLE_WEBTORRENT))";
+				EXCLUDED_SOURCE_FILE_NAMES = "$(WEBTORRENT_EXCLUDED_FILES_$(ENABLE_WEBTORRENT))";
+				WEBTORRENT_CFLAGS_YES = "-DWITH_WEBTORRENT=1 -DRTC_STATIC -DRTC_ENABLE_MEDIA=0 -DRTC_ENABLE_WEBSOCKET=0";
+				WEBTORRENT_CFLAGS_NO = "";
+				WEBTORRENT_EXCLUDED_TARGETS_YES = "";
+				WEBTORRENT_EXCLUDED_TARGETS_NO = "webtorrent-* WebTorrent*";
+				WEBTORRENT_EXCLUDED_FILES_YES = "libcurl.tbd";
+				WEBTORRENT_EXCLUDED_FILES_NO = "announcer-ws.cc announcer-ws-protocol.cc websocket-client.cc rtc-signaling.cc peer-socket-rtc.cc libwebtorrent-*.a libcurl.a libssl.a libcrypto.a";
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -4512,6 +5343,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
+				LIBRARY_SEARCH_PATHS = ("$(inherited)", "$(BUILD_DIR)/webtorrent-network/lib");
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -4600,6 +5432,15 @@
 					BUILD_MAC_CLIENT,
 					XCODE_BUILD,
 				);
+				ENABLE_WEBTORRENT = YES;
+				EXCLUDED_EXPLICIT_TARGET_DEPENDENCIES = "$(WEBTORRENT_EXCLUDED_TARGETS_$(ENABLE_WEBTORRENT))";
+				EXCLUDED_SOURCE_FILE_NAMES = "$(WEBTORRENT_EXCLUDED_FILES_$(ENABLE_WEBTORRENT))";
+				WEBTORRENT_CFLAGS_YES = "-DWITH_WEBTORRENT=1 -DRTC_STATIC -DRTC_ENABLE_MEDIA=0 -DRTC_ENABLE_WEBSOCKET=0";
+				WEBTORRENT_CFLAGS_NO = "";
+				WEBTORRENT_EXCLUDED_TARGETS_YES = "";
+				WEBTORRENT_EXCLUDED_TARGETS_NO = "webtorrent-* WebTorrent*";
+				WEBTORRENT_EXCLUDED_FILES_YES = "libcurl.tbd";
+				WEBTORRENT_EXCLUDED_FILES_NO = "announcer-ws.cc announcer-ws-protocol.cc websocket-client.cc rtc-signaling.cc peer-socket-rtc.cc libwebtorrent-*.a libcurl.a libssl.a libcrypto.a";
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -4616,6 +5457,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
+				LIBRARY_SEARCH_PATHS = ("$(inherited)", "$(BUILD_DIR)/webtorrent-network/lib");
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
@@ -4686,6 +5528,8 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(BUILD_DIR)/webtorrent-network/include",
+					"$(SRCROOT)/third-party/libdatachannel/include",
 					"third-party/dht",
 					"third-party/fast_float/include",
 					"third-party/wide-integer",
@@ -4700,6 +5544,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
+					"$(WEBTORRENT_CFLAGS_$(ENABLE_WEBTORRENT))",
 					"-D__TRANSMISSION__",
 					"-DWIDE_INTEGER_DISABLE_FLOAT_INTEROP",
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
@@ -5331,6 +6176,294 @@
 			};
 			name = Release;
 		};
+		FAAF00000000000000001005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+				PRODUCT_NAME = "webtorrent-usrsctp";
+				SKIP_INSTALL = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/third-party/libdatachannel/deps/usrsctp/usrsctplib",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-D__Userspace__",
+					"-DSCTP_SIMPLE_ALLOCATOR",
+					"-DSCTP_PROCESS_LEVEL_LOCKS",
+					"-D__APPLE_USE_RFC_2292",
+					"-DHAVE_SYS_QUEUE_H",
+					"-DHAVE_STDATOMIC_H",
+					"-DHAVE_SA_LEN",
+					"-DHAVE_SIN_LEN",
+					"-DHAVE_SIN6_LEN",
+					"-DHAVE_SCONN_LEN",
+					"-DHAVE_NET_ROUTE_H",
+					"-DHAVE_NETINET_IP_ICMP_H",
+				);
+			};
+			name = Debug;
+		};
+		FAAF00000000000000001006 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+				PRODUCT_NAME = "webtorrent-usrsctp";
+				SKIP_INSTALL = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/third-party/libdatachannel/deps/usrsctp/usrsctplib",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-D__Userspace__",
+					"-DSCTP_SIMPLE_ALLOCATOR",
+					"-DSCTP_PROCESS_LEVEL_LOCKS",
+					"-D__APPLE_USE_RFC_2292",
+					"-DHAVE_SYS_QUEUE_H",
+					"-DHAVE_STDATOMIC_H",
+					"-DHAVE_SA_LEN",
+					"-DHAVE_SIN_LEN",
+					"-DHAVE_SIN6_LEN",
+					"-DHAVE_SCONN_LEN",
+					"-DHAVE_NET_ROUTE_H",
+					"-DHAVE_NETINET_IP_ICMP_H",
+				);
+			};
+			name = "Release - Debug";
+		};
+		FAAF00000000000000001007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+				PRODUCT_NAME = "webtorrent-usrsctp";
+				SKIP_INSTALL = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/third-party/libdatachannel/deps/usrsctp/usrsctplib",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-D__Userspace__",
+					"-DSCTP_SIMPLE_ALLOCATOR",
+					"-DSCTP_PROCESS_LEVEL_LOCKS",
+					"-D__APPLE_USE_RFC_2292",
+					"-DHAVE_SYS_QUEUE_H",
+					"-DHAVE_STDATOMIC_H",
+					"-DHAVE_SA_LEN",
+					"-DHAVE_SIN_LEN",
+					"-DHAVE_SIN6_LEN",
+					"-DHAVE_SCONN_LEN",
+					"-DHAVE_NET_ROUTE_H",
+					"-DHAVE_NETINET_IP_ICMP_H",
+				);
+			};
+			name = Release;
+		};
+		FAAF0000000000000000103B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+				PRODUCT_NAME = "webtorrent-juice";
+				SKIP_INSTALL = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/include",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/include/juice",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/src",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DJUICE_EXPORTS",
+					"-DJUICE_STATIC",
+					"-DUSE_NETTLE=0",
+				);
+			};
+			name = Debug;
+		};
+		FAAF0000000000000000103C /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+				PRODUCT_NAME = "webtorrent-juice";
+				SKIP_INSTALL = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/include",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/include/juice",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/src",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DJUICE_EXPORTS",
+					"-DJUICE_STATIC",
+					"-DUSE_NETTLE=0",
+				);
+			};
+			name = "Release - Debug";
+		};
+		FAAF0000000000000000103D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+				PRODUCT_NAME = "webtorrent-juice";
+				SKIP_INSTALL = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/include",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/include/juice",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/src",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DJUICE_EXPORTS",
+					"-DJUICE_STATIC",
+					"-DUSE_NETTLE=0",
+				);
+			};
+			name = Release;
+		};
+		FAAF0000000000000000106D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+				PRODUCT_NAME = "webtorrent-datachannel";
+				SKIP_INSTALL = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/third-party/libdatachannel/include",
+					"$(SRCROOT)/third-party/libdatachannel/include/rtc",
+					"$(SRCROOT)/third-party/libdatachannel/src",
+					"$(SRCROOT)/third-party/libdatachannel/deps/plog/include",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/include",
+					"$(SRCROOT)/third-party/libdatachannel/deps/usrsctp/usrsctplib",
+					"$(BUILD_DIR)/webtorrent-network/include",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DRTC_EXPORTS",
+					"-DRTC_STATIC",
+					"-DRTC_ENABLE_MEDIA=0",
+					"-DRTC_ENABLE_WEBSOCKET=0",
+					"-DUSE_GNUTLS=0",
+					"-DUSE_NICE=0",
+					"-DRTC_SYSTEM_JUICE=0",
+				);
+			};
+			name = Debug;
+		};
+		FAAF0000000000000000106E /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+				PRODUCT_NAME = "webtorrent-datachannel";
+				SKIP_INSTALL = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/third-party/libdatachannel/include",
+					"$(SRCROOT)/third-party/libdatachannel/include/rtc",
+					"$(SRCROOT)/third-party/libdatachannel/src",
+					"$(SRCROOT)/third-party/libdatachannel/deps/plog/include",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/include",
+					"$(SRCROOT)/third-party/libdatachannel/deps/usrsctp/usrsctplib",
+					"$(BUILD_DIR)/webtorrent-network/include",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DRTC_EXPORTS",
+					"-DRTC_STATIC",
+					"-DRTC_ENABLE_MEDIA=0",
+					"-DRTC_ENABLE_WEBSOCKET=0",
+					"-DUSE_GNUTLS=0",
+					"-DUSE_NICE=0",
+					"-DRTC_SYSTEM_JUICE=0",
+				);
+			};
+			name = "Release - Debug";
+		};
+		FAAF0000000000000000106F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+				PRODUCT_NAME = "webtorrent-datachannel";
+				SKIP_INSTALL = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/third-party/libdatachannel/include",
+					"$(SRCROOT)/third-party/libdatachannel/include/rtc",
+					"$(SRCROOT)/third-party/libdatachannel/src",
+					"$(SRCROOT)/third-party/libdatachannel/deps/plog/include",
+					"$(SRCROOT)/third-party/libdatachannel/deps/libjuice/include",
+					"$(SRCROOT)/third-party/libdatachannel/deps/usrsctp/usrsctplib",
+					"$(BUILD_DIR)/webtorrent-network/include",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DRTC_EXPORTS",
+					"-DRTC_STATIC",
+					"-DRTC_ENABLE_MEDIA=0",
+					"-DRTC_ENABLE_WEBSOCKET=0",
+					"-DUSE_GNUTLS=0",
+					"-DUSE_NICE=0",
+					"-DRTC_SYSTEM_JUICE=0",
+				);
+			};
+			name = Release;
+		};
+		FAAF00000000000000001303 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		FAAF00000000000000001304 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+			};
+			name = "Release - Debug";
+		};
+		FAAF00000000000000001305 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -5530,6 +6663,46 @@
 				ED91F0142CBDA5D3008388AA /* Debug */,
 				ED91F0152CBDA5D3008388AA /* Release - Debug */,
 				ED91F0162CBDA5D3008388AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FAAF00000000000000001004 /* Build configuration list for PBXNativeTarget "webtorrent-usrsctp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FAAF00000000000000001005 /* Debug */,
+				FAAF00000000000000001006 /* Release - Debug */,
+				FAAF00000000000000001007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FAAF0000000000000000103A /* Build configuration list for PBXNativeTarget "webtorrent-juice" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FAAF0000000000000000103B /* Debug */,
+				FAAF0000000000000000103C /* Release - Debug */,
+				FAAF0000000000000000103D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FAAF0000000000000000106C /* Build configuration list for PBXNativeTarget "webtorrent-datachannel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FAAF0000000000000000106D /* Debug */,
+				FAAF0000000000000000106E /* Release - Debug */,
+				FAAF0000000000000000106F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FAAF00000000000000001302 /* Build configuration list for PBXAggregateTarget "WebTorrent network dependencies" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FAAF00000000000000001303 /* Debug */,
+				FAAF00000000000000001304 /* Release - Debug */,
+				FAAF00000000000000001305 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

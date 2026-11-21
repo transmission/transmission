@@ -882,6 +882,16 @@ public:
 
     [[nodiscard]] bool allowsUTP() const noexcept;
 
+    void set_webtorrent_enabled(bool enabled) noexcept
+    {
+        settings_.webtorrent_enabled = enabled;
+    }
+
+    void set_webtorrent_ice_servers(std::vector<std::string> servers)
+    {
+        settings_.webtorrent_ice_servers = std::move(servers);
+    }
+
     [[nodiscard]] constexpr auto const& preferred_transports() const noexcept
     {
         return settings().preferred_transports;

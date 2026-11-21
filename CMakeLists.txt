@@ -49,6 +49,7 @@ set(EVENT2_MINIMUM 2.1.0)
 # The version range currently distributed varies greatly (e.g. Debian Trixie -> 8.0.0, Ubuntu 24.04 -> 3.9.0)
 # set(FAST_FLOAT_MINIMUM 3...8)
 set(FMT_MINIMUM 8.0.1)
+set(LIBDATACHANNEL_MINIMUM 0.24.6)
 set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
 set(GTKMM3_MINIMUM 3.24.0)
@@ -75,6 +76,10 @@ option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
 option(ENABLE_UTP "Build µTP support" ON)
+option(ENABLE_WEBTORRENT "Enable WebSocket trackers and WebRTC peer support" ON)
+if(ENABLE_WEBTORRENT)
+    set(CURL_MINIMUM 7.86.0)
+endif()
 option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
@@ -86,6 +91,7 @@ tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" ${USE_SYSTEM_DEFA
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_FAST_FLOAT "Use system fast_float library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_FMT "Use system fmt library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_LIBDATACHANNEL "Use system libdatachannel library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_SIGSLOT "Use system sigslot library" ${USE_SYSTEM_DEFAULT})
@@ -582,6 +588,29 @@ if(ENABLE_UTP)
             -DLIBUTP_SHARED:BOOL=OFF)
 endif()
 
+if(ENABLE_WEBTORRENT)
+    tr_add_external_auto_library(LIBDATACHANNEL LibDataChannel
+        SUBPROJECT
+        SOURCE_DIR libdatachannel
+        CMAKE_ARGS
+            -DNO_MEDIA=ON
+            -DNO_WEBSOCKET=ON
+            -DNO_EXAMPLES=ON
+            -DNO_TESTS=ON)
+
+    # Prefer static linkage to avoid shipping an additional WebRTC shared library.
+    # System packages providing only the shared target remain supported off Windows.
+    if(TARGET LibDataChannel::LibDataChannelStatic)
+        set(TR_WEBRTC_DATACHANNEL_TARGET LibDataChannel::LibDataChannelStatic)
+    elseif(WIN32)
+        message(FATAL_ERROR "WebRTC on Windows requires LibDataChannel::LibDataChannelStatic")
+    elseif(TARGET LibDataChannel::LibDataChannel)
+        set(TR_WEBRTC_DATACHANNEL_TARGET LibDataChannel::LibDataChannel)
+    else()
+        message(FATAL_ERROR "WebRTC requires libdatachannel >= 0.24.6")
+    endif()
+endif()
+
 tr_add_external_auto_library(B64 libb64
     SUBPROJECT
     CMAKE_ARGS
@@ -887,15 +916,16 @@ if(RUN_CLANG_TIDY)
     tr_get_required_flag(RUN_CLANG_TIDY CLANG_TIDY_IS_REQUIRED)
 
     message(STATUS "Looking for clang-tidy")
-    find_program(CLANG_TIDY NAMES clang-tidy-20 clang-tidy)
-    if(CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
+    # libjuice uses CLANG_TIDY as a Boolean option, not an executable path.
+    find_program(TR_CLANG_TIDY NAMES clang-tidy-20 clang-tidy)
+    if(TR_CLANG_TIDY STREQUAL "TR_CLANG_TIDY-NOTFOUND")
         message(STATUS "Looking for clang-tidy - not found")
         if(CLANG_TIDY_IS_REQUIRED)
             message(FATAL_ERROR "clang-tidy is required but wasn't found")
         endif()
     else()
-        message(STATUS "Looking for clang-tidy - found: ${CLANG_TIDY}")
-        set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}" --allow-no-checks)
+        message(STATUS "Looking for clang-tidy - found: ${TR_CLANG_TIDY}")
+        set(CMAKE_CXX_CLANG_TIDY "${TR_CLANG_TIDY}" --allow-no-checks)
     endif()
 endif()
 

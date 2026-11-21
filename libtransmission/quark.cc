@@ -278,6 +278,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "is_stalled"sv, // rpc
     "is_uploading_to"sv, // rpc
     "is_utp"sv, // rpc
+    "is_webrtc"sv, // rpc
     "jsonrpc"sv, // json-rpc
     "labels"sv, // .resume, rpc
     "lastAnnouncePeerCount"sv, // rpc
@@ -740,6 +741,8 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "webseedsSendingToUs"sv, // rpc
     "webseeds_ex"sv, // rpc
     "webseeds_sending_to_us"sv, // rpc
+    "webtorrent_enabled"sv, // session and rpc
+    "webtorrent_ice_servers"sv, // session and rpc
     "yourip"sv, // BEP0010; BT protocol
 };
 

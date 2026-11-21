@@ -929,6 +929,10 @@ TEST_F(AnnouncerUdpTest, canAnnounceDualStack)
     auto* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
     auto fromlen = socklen_t{};
 
+    // Collect both connection requests before replying to either.
+    ASSERT_TRUE(
+        tr::test::waitFor(mediator.eventBase(), [&mediator]() { return std::size(mediator.sent_) >= NUM_TR_AF_INET_TYPES; }));
+
     auto connection_ids = std::array<tau_connection_t, NUM_TR_AF_INET_TYPES>{};
     for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
     {
@@ -1033,6 +1037,10 @@ TEST_F(AnnouncerUdpTest, announceDualStackOnlyIPv4Successful)
     auto from = sockaddr_storage{};
     auto* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
     auto fromlen = socklen_t{};
+
+    // Collect both connection requests before replying to either.
+    ASSERT_TRUE(
+        tr::test::waitFor(mediator.eventBase(), [&mediator]() { return std::size(mediator.sent_) >= NUM_TR_AF_INET_TYPES; }));
 
     auto connection_ids = std::array<tau_connection_t, NUM_TR_AF_INET_TYPES>{};
     for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
@@ -1140,6 +1148,10 @@ TEST_F(AnnouncerUdpTest, announceDualStackOnlyIPv6Successful)
     auto* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
     auto fromlen = socklen_t{};
 
+    // Collect both connection requests before replying to either.
+    ASSERT_TRUE(
+        tr::test::waitFor(mediator.eventBase(), [&mediator]() { return std::size(mediator.sent_) >= NUM_TR_AF_INET_TYPES; }));
+
     auto connection_ids = std::array<tau_connection_t, NUM_TR_AF_INET_TYPES>{};
     for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
     {
@@ -1236,6 +1248,10 @@ TEST_F(AnnouncerUdpTest, announceDualStackNoneSuccessful)
     auto from = sockaddr_storage{};
     auto* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
     auto fromlen = socklen_t{};
+
+    // Collect both connection requests before replying to either.
+    ASSERT_TRUE(
+        tr::test::waitFor(mediator.eventBase(), [&mediator]() { return std::size(mediator.sent_) >= NUM_TR_AF_INET_TYPES; }));
 
     auto connection_ids = std::array<tau_connection_t, NUM_TR_AF_INET_TYPES>{};
     for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)

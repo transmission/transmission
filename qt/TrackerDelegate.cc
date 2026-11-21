@@ -3,6 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <cstdint>
+#include <limits>
+
 #include <QAbstractTextDocumentLayout>
 #include <QApplication>
 #include <QPainter>
@@ -199,6 +203,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
     // hostname
     str += inf.st.is_backup ? QStringLiteral("<i>") : QStringLiteral("<b>");
     auto const announce_url = inf.st.announce.toStdString();
+    auto const is_ws_tracker = announce_url.starts_with("ws://") || announce_url.starts_with("wss://");
     if (auto const parsed = tr_urlParse(announce_url); parsed)
     {
         str += QStringLiteral("%1:%2")
@@ -218,8 +223,15 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
 
             if (inf.st.last_announce_succeeded)
             {
+                auto peer_count = inf.st.last_announce_peer_count;
+                // WebSocket trackers report swarm population, not a list of IP:port peers.
+                if (is_ws_tracker && inf.st.seeder_count >= 0 && inf.st.leecher_count >= 0)
+                {
+                    auto const swarm_count = int64_t{ inf.st.seeder_count } + inf.st.leecher_count;
+                    peer_count = static_cast<int>(std::min(swarm_count, int64_t{ std::numeric_limits<int>::max() }));
+                }
                 //: %1 and %2 are replaced with HTML markup, %3 is duration
-                str += tr("Got a list of%1 %Ln peer(s)%2 %3 ago", nullptr, inf.st.last_announce_peer_count)
+                str += tr("Got a list of%1 %Ln peer(s)%2 %3 ago", nullptr, peer_count)
                            .arg(success_markup_begin)
                            .arg(success_markup_end)
                            .arg(tstr);
