@@ -28,6 +28,9 @@
 
 #include "libtransmission/announce-list.h"
 #include "libtransmission/announcer-common.h"
+#ifdef WITH_WEBTORRENT
+#include "libtransmission/announcer-ws.h"
+#endif
 #include "libtransmission/announcer.h"
 #include "libtransmission/crypto-utils.h" /* tr_rand_int() */
 #include "libtransmission/interned-string.h" // tr_interned_string
@@ -123,6 +126,9 @@ public:
     explicit tr_announcer_impl(tr_session* session_in, tr_announcer_udp& announcer_udp)
         : session{ session_in }
         , announcer_udp_{ announcer_udp }
+#ifdef WITH_WEBTORRENT
+        , announcer_ws_{ std::make_unique<tr_announcer_ws>(session_in) }
+#endif
         , upkeep_timer_{ session_in->timerMaker().create() }
     {
         upkeep_timer_->set_callback([this]() { this->upkeep(); });
@@ -203,6 +209,12 @@ public:
         {
             announcer_udp_.announce(request, std::move(on_response));
         }
+#ifdef WITH_WEBTORRENT
+        else if (tr_strv_starts_with(announce_sv, "ws://"sv) || tr_strv_starts_with(announce_sv, "wss://"sv))
+        {
+            announcer_ws_->announce(request, std::move(on_response));
+        }
+#endif
         else
         {
             tr_logAddWarn(fmt::format(fmt::runtime(_("Unsupported URL: '{url}'")), fmt::arg("url", announce_sv)));
@@ -225,6 +237,9 @@ private:
     static auto constexpr UpkeepInterval = 500ms;
 
     tr_announcer_udp& announcer_udp_;
+#ifdef WITH_WEBTORRENT
+    std::unique_ptr<tr_announcer_ws> announcer_ws_;
+#endif
 
     std::map<tr_interned_string, tr_scrape_info> scrape_info_;
 
@@ -1620,6 +1635,9 @@ void tr_announcer_impl::upkeep()
     }
 
     announcer_udp_.upkeep();
+#ifdef WITH_WEBTORRENT
+    announcer_ws_->upkeep();
+#endif
 }
 
 // ---
