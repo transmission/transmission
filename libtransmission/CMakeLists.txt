@@ -111,6 +111,8 @@ target_sources(${TR_NAME}
         peer-socket.h
         $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-protocol.cc>
         $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-protocol.h>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:websocket-client.cc>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:websocket-client.h>
         platform.cc
         platform.h
         port-forwarding-natpmp.cc
