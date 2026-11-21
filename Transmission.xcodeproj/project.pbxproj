@@ -477,6 +477,7 @@
 		EDD735D62D83087400852628 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDD735D52D83087400852628 /* UniformTypeIdentifiers.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		F11545ACA7C4D7A464F703AB /* block-info.h in Headers */ = {isa = PBXBuildFile; fileRef = 6A044CBD8C049AFCBD4DB411 /* block-info.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		F63480631E1D7274005B9E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
+		FA7E00000000000000000023 /* announcer-ws-protocol.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000003 /* announcer-ws-protocol.cc */; };
 		FA7E000000000000000000A7 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7E00000000000000000041 /* libcurl.a */; };
 		ED5E0EA02CD3147B0071433B /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		FAAF00000000000000001410 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAF00000000000000001400 /* libssl.a */; };
@@ -1659,6 +1660,8 @@
 		EDC749F82D98AE2900A12D0F /* PowerManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PowerManager.mm; sourceTree = "<group>"; };
 		EDD735D52D83087400852628 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 		F63480621E1D7274005B9E09 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Images/Images.xcassets; sourceTree = "<group>"; };
+		FA7E00000000000000000003 /* announcer-ws-protocol.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "announcer-ws-protocol.cc"; sourceTree = "<group>"; };
+		FA7E00000000000000000004 /* announcer-ws-protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "announcer-ws-protocol.h"; sourceTree = "<group>"; };
 		FA7E00000000000000000041 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "$(BUILD_DIR)/webtorrent-network/lib/libcurl.a"; sourceTree = "<absolute>"; };
 		55869925257074EC00F77A43 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 		FAAF00000000000000001400 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "$(BUILD_DIR)/webtorrent-network/lib/libssl.a"; sourceTree = "<absolute>"; };
@@ -2444,6 +2447,8 @@
 				A29EBE530DC01FC9006CEE80 /* web.h */,
 				FA5D8AC27CF4B02A0011A100 /* curl-tls.cc */,
 				FA5D8AC27CF4B02A0011A101 /* curl-tls.h */,
+				FA7E00000000000000000003 /* announcer-ws-protocol.cc */,
+				FA7E00000000000000000004 /* announcer-ws-protocol.h */,
 				A292A6E50DFB45EC004B9C0A /* webseed.cc */,
 				A292A6E60DFB45EC004B9C0A /* webseed.h */,
 			);
@@ -3939,6 +3944,7 @@
 				A29DF8B90DB2544C00D04E5A /* resume.cc in Sources */,
 				A2A4E9220DE0F7EB000CE197 /* web.cc in Sources */,
 				FA5D8AC27CF4B02A0011A102 /* curl-tls.cc in Sources */,
+				FA7E00000000000000000023 /* announcer-ws-protocol.cc in Sources */,
 				A292A6E80DFB45FC004B9C0A /* webseed.cc in Sources */,
 				A25E03E30E4015380086C225 /* tr-getopt.cc in Sources */,
 				C1305EBE186A13B100F03351 /* file.cc in Sources */,
