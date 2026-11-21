@@ -214,6 +214,7 @@
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.mm */; };
 		A2A4E9210DE0F7E9000CE197 /* web.h in Headers */ = {isa = PBXBuildFile; fileRef = A29EBE530DC01FC9006CEE80 /* web.h */; };
 		A2A4E9220DE0F7EB000CE197 /* web.cc in Sources */ = {isa = PBXBuildFile; fileRef = A29EBE520DC01FC9006CEE80 /* web.cc */; };
+		FA5D8AC27CF4B02A0011A102 /* curl-tls.cc in Sources */ = {isa = PBXBuildFile; fileRef = FA5D8AC27CF4B02A0011A100 /* curl-tls.cc */; };
 		A2A6321B0CD9751700E3DA60 /* BadgeView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.mm */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.mm */; };
 		A2AA9BE1132CAC8E00FA131E /* announcer-udp.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE0132CAC8D00FA131E /* announcer-udp.cc */; };
@@ -1214,6 +1215,8 @@
 		A29E653513F1603100048D71 /* evutil_rand.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = evutil_rand.c; sourceTree = "<group>"; };
 		A29EBE520DC01FC9006CEE80 /* web.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = web.cc; sourceTree = "<group>"; };
 		A29EBE530DC01FC9006CEE80 /* web.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = web.h; sourceTree = "<group>"; };
+		FA5D8AC27CF4B02A0011A100 /* curl-tls.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "curl-tls.cc"; sourceTree = "<group>"; };
+		FA5D8AC27CF4B02A0011A101 /* curl-tls.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "curl-tls.h"; sourceTree = "<group>"; };
 		A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PeerProgressIndicatorCell.h; sourceTree = "<group>"; };
 		A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PeerProgressIndicatorCell.mm; sourceTree = "<group>"; };
 		A2A632190CD9751700E3DA60 /* BadgeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BadgeView.h; sourceTree = "<group>"; };
@@ -2439,6 +2442,8 @@
 				C17740D4273A002C00E455D2 /* web-utils.h */,
 				A29EBE520DC01FC9006CEE80 /* web.cc */,
 				A29EBE530DC01FC9006CEE80 /* web.h */,
+				FA5D8AC27CF4B02A0011A100 /* curl-tls.cc */,
+				FA5D8AC27CF4B02A0011A101 /* curl-tls.h */,
 				A292A6E50DFB45EC004B9C0A /* webseed.cc */,
 				A292A6E60DFB45EC004B9C0A /* webseed.h */,
 			);
@@ -3933,6 +3938,7 @@
 				4D4ADFC70DA1631500A68297 /* blocklist.cc in Sources */,
 				A29DF8B90DB2544C00D04E5A /* resume.cc in Sources */,
 				A2A4E9220DE0F7EB000CE197 /* web.cc in Sources */,
+				FA5D8AC27CF4B02A0011A102 /* curl-tls.cc in Sources */,
 				A292A6E80DFB45FC004B9C0A /* webseed.cc in Sources */,
 				A25E03E30E4015380086C225 /* tr-getopt.cc in Sources */,
 				C1305EBE186A13B100F03351 /* file.cc in Sources */,
