@@ -1574,7 +1574,12 @@ jobs:
             set -ex
             uname -a
             export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
-            export PKG_PATH="https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/`uname -p`/`uname -r`/All"
+            # NetBSD 11.1 is newer than the available pkgsrc binary package set.
+            pkg_release="$(uname -r)"
+            if [ "$pkg_release" = "11.1" ]; then
+              pkg_release="11.0_2026Q3"
+            fi
+            export PKG_PATH="https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/$(uname -p)/$pkg_release/All"
             # cairo, dbus, gtkmm4 and qt6-qtbase check for X11 shared libraries
             # as they install, so the sets have to go in before pkg_add adds
             # those packages.
