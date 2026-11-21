@@ -455,6 +455,7 @@ struct tr_peer_stat
     bool is_seed = {};
     bool is_uploading_to = {};
     bool is_utp = {};
+    bool is_webrtc = {};
     bool peer_is_choked = {};
     bool peer_is_interested = {};
     bool supports_holepunch = {};
