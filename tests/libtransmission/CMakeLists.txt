@@ -74,6 +74,7 @@ target_sources(libtransmission-test
         $<$<BOOL:${ENABLE_WEBTORRENT}>:rtc-endpoint-test.cc>
         $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-protocol-test.cc>
         $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-test.cc>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-proxy-test.cc>
 )
 
 if(APPLE)
