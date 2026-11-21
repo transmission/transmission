@@ -289,6 +289,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_is_stalled,
     TR_KEY_is_uploading_to,
     TR_KEY_is_utp,
+    TR_KEY_is_webrtc,
     TR_KEY_jsonrpc,
     TR_KEY_labels,
     TR_KEY_last_announce_peer_count_camel_APICOMPAT,
@@ -751,6 +752,8 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_webseeds_sending_to_us_camel_APICOMPAT,
     TR_KEY_webseeds_ex,
     TR_KEY_webseeds_sending_to_us,
+    TR_KEY_webtorrent_enabled,
+    TR_KEY_webtorrent_ice_servers,
     TR_KEY_yourip,
     TR_N_KEYS
 };
