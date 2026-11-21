@@ -652,6 +652,7 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_is_encrypted, peer.is_encrypted);
         peer_map.try_emplace(TR_KEY_is_incoming, peer.is_incoming);
         peer_map.try_emplace(TR_KEY_is_utp, peer.is_utp);
+        peer_map.try_emplace(TR_KEY_is_webrtc, peer.is_webrtc);
         peer_map.try_emplace(TR_KEY_is_uploading_to, peer.is_uploading_to);
         peer_map.try_emplace(TR_KEY_supports_holepunch, peer.supports_holepunch);
         peer_map.try_emplace(TR_KEY_peer_is_choked, peer.peer_is_choked);
@@ -2644,6 +2645,36 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
         TR_KEY_version,
         [](tr_session const& /*src*/) -> tr_variant { return tr_variant::unmanaged_string(LONG_VERSION_STRING); },
         nullptr);
+
+    map.try_emplace(
+        TR_KEY_webtorrent_enabled,
+        [](tr_session const& src) -> tr_variant { return src.settings().webtorrent_enabled; },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& err)
+        {
+            if (auto const val = src.value_if<bool>())
+            {
+                tgt.set_webtorrent_enabled(*val);
+            }
+            else
+            {
+                err = { JsonRpc::Error::INVALID_PARAMS, "webtorrent_enabled must be a boolean" };
+            }
+        });
+
+    map.try_emplace(
+        TR_KEY_webtorrent_ice_servers,
+        [](tr_session const& src) -> tr_variant { return tr::serializer::to_variant(src.settings().webtorrent_ice_servers); },
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& err)
+        {
+            if (auto val = tr::serializer::to_value<std::vector<std::string>>(src))
+            {
+                tgt.set_webtorrent_ice_servers(std::move(*val));
+            }
+            else
+            {
+                err = { JsonRpc::Error::INVALID_PARAMS, "webtorrent_ice_servers must be an array of strings" };
+            }
+        });
 
     // `row` could have been replaced by structured bindings,
     // but it's not available until clang 16
