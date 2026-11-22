@@ -41,6 +41,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
+#include "libtransmission/socks5-udp.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/tr-strbuf.h"
@@ -393,7 +394,21 @@ struct tau_tracker
         }
 
         auto const& [ss, sslen] = *addr;
-        mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
+        auto const* sa = reinterpret_cast<sockaddr const*>(&ss);
+
+        // If a SOCKS5 proxy is configured, all UDP tracker traffic must go
+        // through the relay. Sending directly would leak the user's real IP.
+        if (auto* socks = mediator_.socks5_udp(); socks != nullptr)
+        {
+            if (socks->is_ready())
+            {
+                socks->sendto(buf, buflen, sa, sslen);
+            }
+
+            return;
+        }
+
+        mediator_.sendto(buf, buflen, sa, sslen);
     }
 
     void on_connection_response(tr_address_type ip_protocol, tau_action_t action, InBuf& buf)
