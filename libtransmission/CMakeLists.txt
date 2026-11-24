@@ -46,6 +46,8 @@ target_sources(${TR_NAME}
         blocklist.h
         clients.cc
         clients.h
+        curl-tls.cc
+        curl-tls.h
         completion.cc
         completion.h
         config-dir-lock.cc
@@ -238,6 +240,7 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${WITH_INOTIFY}>:WITH_INOTIFY>
         $<$<BOOL:${WITH_KQUEUE}>:WITH_KQUEUE>
         $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:WITH_WEBTORRENT=1>
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
@@ -283,6 +286,7 @@ target_link_libraries(${TR_NAME}
         miniupnpc::miniupnpc
         dht::dht
         $<$<BOOL:${ENABLE_UTP}>:libutp::libutp>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:${TR_WEBRTC_DATACHANNEL_TARGET}>
         libb64::libb64
         ${Intl_LIBRARIES}
         ${LIBM_LIBRARY}
