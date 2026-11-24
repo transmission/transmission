@@ -1,0 +1,53 @@
+diff --git a/src/udp.c b/src/udp.c
+--- a/src/udp.c
++++ b/src/udp.c
+@@ -55,8 +55,9 @@ static socket_t create_socket_for_addrinfo(const udp_socket_config_t *config,
+ 
+ 	// Listen on both IPv6 and IPv4
+ 	const sockopt_t disabled = 0;
+-	if (ai->ai_family == AF_INET6)
+-		setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, (const char *)&disabled, sizeof(disabled));
++	if (ai->ai_family == AF_INET6 &&
++	    setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, (const char *)&disabled, sizeof(disabled)) < 0)
++		JLOG_DEBUG("Unable to enable dual-stack UDP, errno=%d", sockerrno);
+ 
+ 		// Set DF flag
+ #ifndef NO_PMTUDISC
+@@ -158,6 +159,7 @@ socket_t udp_create_socket(const udp_socket_config_t *config) {
+ 
+ 	const int families[2] = {AF_INET6, AF_INET}; // Prefer IPv6
+ 	const char *names[2] = {"IPv6", "IPv4"};
++	socket_t ipv6_fallback = INVALID_SOCKET;
+ 	for (int i = 0; i < 2; ++i) {
+ 		const struct addrinfo *ai = find_family(ai_list, families[i]);
+ 		if (!ai)
+@@ -166,13 +168,28 @@ socket_t udp_create_socket(const udp_socket_config_t *config) {
+ 		JLOG_DEBUG("Opening UDP socket for %s family", names[i]);
+ 		socket_t sock = create_socket_for_addrinfo(config, ai);
+ 		if (sock != INVALID_SOCKET) {
++			if (ai->ai_family == AF_INET6 && !config->bind_address) {
++				sockopt_t v6only = 1;
++				socklen_t len = sizeof(v6only);
++				if (getsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&v6only, &len) != 0 ||
++				    v6only != 0) {
++					JLOG_INFO("Dual-stack UDP is unavailable, trying IPv4");
++					ipv6_fallback = sock;
++					continue;
++				}
++			}
++			if (ipv6_fallback != INVALID_SOCKET)
++				closesocket(ipv6_fallback);
+ 			freeaddrinfo(ai_list);
+ 			return sock;
+ 		}
+ 	}
+ 
+-	JLOG_ERROR("UDP socket opening failed");
+ 	freeaddrinfo(ai_list);
++	if (ipv6_fallback != INVALID_SOCKET)
++		return ipv6_fallback;
++
++	JLOG_ERROR("UDP socket opening failed");
+ 	return INVALID_SOCKET;
+ }
+ 
