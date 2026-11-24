@@ -1411,6 +1411,36 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
     return &tor->stats_;
 }
 
+void tr_torrentStatAsync(tr_session* const session, tr_torrent_stats_func callback)
+{
+    tr_return_if_fail(session != nullptr);
+    tr_return_if_fail(callback != nullptr);
+
+    session->queue_session_thread(
+        [session, callback = std::move(callback)]()
+        {
+            auto snapshots = std::vector<tr_stat_snapshot>{};
+
+            {
+                auto const lock = session->unique_lock();
+                auto const torrents = session->torrents().get_all();
+
+                snapshots.reserve(std::size(torrents));
+                for (auto const* const tor : torrents)
+                {
+                    auto& snapshot = snapshots.emplace_back();
+                    snapshot.stat = tor->stats();
+
+                    // errorString points into the torrent, which can change it once the lock is released
+                    snapshot.error_string = snapshot.stat.errorString;
+                    snapshot.stat.errorString = nullptr;
+                }
+            }
+
+            callback(std::move(snapshots));
+        });
+}
+
 // ---
 
 tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)

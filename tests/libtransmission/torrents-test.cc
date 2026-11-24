@@ -100,6 +100,9 @@ TEST_F(TorrentsTest, invalidArgsAreLogged)
     EXPECT_EQ(nullptr, tr_torrentStat(nullptr));
     ++expected_log_size;
 
+    tr_torrentStatAsync(nullptr, [](std::vector<tr_stat_snapshot> const& /*snapshots*/) {});
+    ++expected_log_size;
+
     tr_torrentFile(nullptr, 0);
     ++expected_log_size;
 
