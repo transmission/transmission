@@ -1,0 +1,7 @@
+# Temporary: libjuice picohash callbacks have function-type mismatches; remove after the upstream fix.
+[function]
+fun:picohash_update
+fun:picohash_final
+fun:picohash_reset
+fun:_picohash_hmac_final
+fun:_picohash_hmac_reset
