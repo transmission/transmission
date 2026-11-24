@@ -663,6 +663,8 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_units,
         TR_KEY_utp_enabled,
         TR_KEY_version,
+        TR_KEY_webtorrent_enabled,
+        TR_KEY_webtorrent_ice_servers,
     };
 
     auto const expected_keys = std::set<tr_quark>{ std::begin(ExpectedKeysUnsorted), std::end(ExpectedKeysUnsorted) };
@@ -684,6 +686,34 @@ TEST_F(RpcTest, sessionGet)
 
     // cleanup
     tr_torrentRemove(tor, false);
+}
+
+TEST_F(RpcTest, webtorrentSettings)
+{
+    auto const set_request =
+        R"({"jsonrpc":"2.0","id":1,"method":"session_set","params":{"webtorrent_enabled":true,"webtorrent_ice_servers":["stun:127.0.0.1:3478"]}})";
+    auto const get_request =
+        R"({"jsonrpc":"2.0","id":2,"method":"session_get","params":{"fields":["webtorrent_enabled","webtorrent_ice_servers"]}})";
+
+    auto const set_response = makeRequest(session_, set_request);
+    auto const response = makeRequest(session_, get_request);
+    auto serde = tr_variant_serde::json();
+    auto const set_result = serde.parse(set_response);
+    ASSERT_TRUE(set_result);
+    auto const* const set_map = set_result->get_if<tr_variant::Map>();
+    ASSERT_NE(set_map, nullptr);
+    EXPECT_EQ(set_map->find(TR_KEY_error), std::end(*set_map));
+    auto const result = serde.parse(response);
+    ASSERT_TRUE(result);
+    auto const* const result_map = result->get_if<tr_variant::Map>();
+    ASSERT_NE(result_map, nullptr);
+    auto const* const args = result_map->find_if<tr_variant::Map>(TR_KEY_result);
+    ASSERT_NE(args, nullptr);
+    EXPECT_EQ(args->value_if<bool>(TR_KEY_webtorrent_enabled), true);
+    auto const* const servers = args->find_if<tr_variant::Vector>(TR_KEY_webtorrent_ice_servers);
+    ASSERT_NE(servers, nullptr);
+    ASSERT_EQ(std::size(*servers), 1U);
+    EXPECT_EQ(servers->front().value_if<std::string_view>(), "stun:127.0.0.1:3478"sv);
 }
 
 TEST_F(RpcTest, torrentGet)
