@@ -11,6 +11,7 @@
 
 #include <atomic>
 #include <cstddef> // size_t
+#include <cstdint>
 #include <functional>
 #include <string>
 #include <utility> // for std::make_pair()
@@ -93,13 +94,25 @@ public:
         return type() == Type::TCP;
     }
 
+    [[nodiscard]] constexpr auto is_rtc() const noexcept
+    {
+        return type() == Type::RTC;
+    }
+
+    // RTC transport closure is reported once through its registered error callback.
+    [[nodiscard]] virtual bool is_closed() const noexcept
+    {
+        return false;
+    }
+
     [[nodiscard]] static bool limit_reached(tr_session const* session) noexcept;
 
 protected:
     enum class Type : uint8_t
     {
         UTP,
-        TCP
+        TCP,
+        RTC
     };
 
     explicit tr_peer_socket(tr_socket_address const& socket_address);
