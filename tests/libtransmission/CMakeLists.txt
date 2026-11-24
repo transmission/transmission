@@ -75,7 +75,7 @@ target_sources(libtransmission-test
         $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-protocol-test.cc>
         $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-test.cc>
         $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-proxy-test.cc>
-)
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:webtorrent-e2e-test.cc>)
 
 if(APPLE)
     target_sources(libtransmission-test
@@ -104,7 +104,7 @@ target_link_libraries(libtransmission-test
         libevent::core
         WideInteger::WideInteger
         $<$<BOOL:${ENABLE_WEBTORRENT}>:${TR_WEBRTC_DATACHANNEL_TARGET}>
-)
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:RapidJSON>)
 
 tr_setup_gtest_target(libtransmission-test "LT.")
 
