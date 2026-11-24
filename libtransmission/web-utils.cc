@@ -305,14 +305,21 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     auto parsed = tr_url_parsed_t{};
     parsed.full = url;
 
-    // So many magnet links are malformed, e.g. not escaping text
-    // in the display name, that we're better off handling magnets
-    // as a special case before even scanning for invalid chars.
-    if (auto constexpr MagnetStart = "magnet:?"sv; tr_strv_starts_with(url, MagnetStart))
+    // So many magnet links are malformed, e.g. not escaping text in the display
+    // name, that we're better off handling magnets as a special case before even
+    // scanning for invalid chars. Any run of slashes between the scheme and the
+    // query is skipped in the same spirit: a magnet link has no authority, but a
+    // URI library that insists on one spells it empty, so GLib hands over
+    // "magnet:///?xt=..." for what was written "magnet:?xt=...".
+    if (auto constexpr Scheme = "magnet:"sv; tr_strv_starts_with(url, Scheme))
     {
-        parsed.scheme = "magnet"sv;
-        parsed.query = url.substr(std::size(MagnetStart));
-        return parsed;
+        auto const rest = url.substr(std::size(Scheme));
+        if (auto const pos = rest.find_first_not_of('/'); pos != std::string_view::npos && rest[pos] == '?')
+        {
+            parsed.scheme = "magnet"sv;
+            parsed.query = rest.substr(pos + 1U);
+            return parsed;
+        }
     }
 
     if (!urlCharsAreValid(url))
