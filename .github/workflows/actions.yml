@@ -404,7 +404,7 @@ jobs:
           if grep 'warning:' makelog; then exit 1; fi
 
   clang-tidy-libtransmission-win32:
-    runs-on: windows-2025
+    runs-on: windows-2022
     needs: what-to-make
     if: |
       needs.what-to-make.outputs.make-core == 'true' ||
@@ -424,6 +424,7 @@ jobs:
         with:
           arch: x64
           type: CoreDeps
+          cache-suffix: -vs2022
       - name: Setup Visual Studio Environment
         uses: ./src/.github/actions/setup-vs-env-win32
         with:
