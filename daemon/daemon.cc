@@ -44,6 +44,7 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
+#include <libtransmission/webtorrent-ice-servers.h>
 
 #include "daemon.h"
 
@@ -87,7 +88,7 @@ static_assert(TrDefaultPeerPort == 51413, "update 'peerport' desc");
 static_assert(TrDefaultPeerLimitTorrent == 50, "update 'peerlimit-torrent' desc");
 static_assert(TrDefaultPeerLimitGlobal == 200, "update 'peerlimit-global' desc");
 static_assert(TrDefaultRpcPort == 9091 && R"(update "port" desc)");
-auto constexpr Options = std::array<tr_option, 48>{ {
+auto constexpr Options = std::array<tr_option, 51>{ {
     { 'a', "allowed", "Allowed IP addresses. (Default: '127.0.0.1,::1')", "a", Arg::Required, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
@@ -129,6 +130,9 @@ auto constexpr Options = std::array<tr_option, 48>{ {
       "<protocol(s)>" },
     { 831, "utp", "*DEPRECATED* Enable µTP for peer connections", nullptr, Arg::None, nullptr },
     { 832, "no-utp", "*DEPRECATED* Disable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 833, "webtorrent", "Enable WS/WSS trackers and WebRTC peers", nullptr, Arg::None, nullptr },
+    { 834, "no-webtorrent", "Disable WS/WSS trackers and WebRTC peers", nullptr, Arg::None, nullptr },
+    { 835, "webtorrent-ice-servers", "Comma-separated STUN/TURN server URLs for WebRTC", nullptr, Arg::Required, "<urls>" },
     { 'P', "peerport", "Port for incoming peers (Default: 51413)", "P", Arg::Required, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
     { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
@@ -751,6 +755,18 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
 
         case 832:
             utp_arg_helpers::no_utp(*map);
+            break;
+
+        case 833:
+            map->insert_or_assign(TR_KEY_webtorrent_enabled, true);
+            break;
+
+        case 834:
+            map->insert_or_assign(TR_KEY_webtorrent_enabled, false);
+            break;
+
+        case 835:
+            map->insert_or_assign(TR_KEY_webtorrent_ice_servers, tr_webtorrent_ice_servers::parse(optstr));
             break;
 
         case TR_OPT_UNK:
