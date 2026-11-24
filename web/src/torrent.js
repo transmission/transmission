@@ -296,7 +296,7 @@ export class Torrent extends EventTarget {
   getStateString() {
     switch (this.getStatus()) {
       case Torrent._StatusStopped:
-        return this.isFinished() ? 'Seeding complete' : 'Paused';
+        return this.isDone() ? 'Finished' : 'Paused';
       case Torrent._StatusCheckWait:
         return 'Queued for verification';
       case Torrent._StatusCheck:
