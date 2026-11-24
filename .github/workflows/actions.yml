@@ -1091,6 +1091,7 @@ jobs:
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_FMT=OFF \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
@@ -1445,6 +1446,7 @@ jobs:
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_FMT=OFF \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
