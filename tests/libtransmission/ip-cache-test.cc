@@ -12,6 +12,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <libtransmission/ip-cache.h>
 #include <libtransmission/net.h>
@@ -208,6 +209,39 @@ TEST_F(IPCacheTest, globalSourceIPv6)
                      << "3. You don't have an IPv6 address to your interface";
     }
     EXPECT_TRUE(addr->is_ipv6());
+}
+
+TEST_F(IPCacheTest, notifiesOnlyWhenSourceAddrChanges)
+{
+    struct LocalMockMediator final : public MockMediator
+    {
+        [[nodiscard]] std::string_view settings_bind_addr(tr_address_type /* type */) override
+        {
+            return "::"sv;
+        }
+
+        void on_source_addr_changed(tr_address const& addr) override
+        {
+            changes.push_back(addr);
+        }
+
+        std::vector<tr_address> changes;
+    };
+    auto mediator = LocalMockMediator{};
+    ip_cache_ = tr_ip_cache::create(mediator);
+
+    ip_cache_->update_source_addr(TR_AF_INET6);
+    auto const addr = ip_cache_->source_addr(TR_AF_INET6);
+    if (!addr)
+    {
+        GTEST_SKIP() << "No global IPv6 source address on this machine";
+    }
+    ASSERT_EQ(1U, std::size(mediator.changes));
+    EXPECT_EQ(*addr, mediator.changes.front());
+
+    // same address again: no notification
+    ip_cache_->update_source_addr(TR_AF_INET6);
+    EXPECT_EQ(1U, std::size(mediator.changes));
 }
 
 TEST_F(IPCacheTest, onResponseIPQuery)
