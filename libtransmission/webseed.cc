@@ -390,8 +390,12 @@ void tr_webseed_task::use_fetched_blocks()
                     if (auto const* const torrent = tr_torrentFindFromId(session, tor_id); torrent != nullptr)
                     {
                         webseed->active_requests.unset(block);
-                        session->cache->write_block(tor_id, block, std::move(data));
-                        webseed->publish(tr_peer_event::GotBlock(torrent->block_info(), block));
+                        if (session->cache->write_block(tor_id, block, std::move(data)) == 0)
+                        {
+                            // only publish if the write didn't fail,
+                            // so the block isn't marked as complete
+                            webseed->publish(tr_peer_event::GotBlock(torrent->block_info(), block));
+                        }
                     }
                 });
         }

@@ -89,7 +89,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
     auto const test_incomplete_dir_threadfunc = [](TestIncompleteDirData* data) noexcept
     {
-        data->session->cache->write_block(data->tor->id(), data->block, std::move(data->buf));
+        EXPECT_EQ(0, data->session->cache->write_block(data->tor->id(), data->block, std::move(data->buf)));
         data->tor->on_block_received(data->block);
         data->done = true;
     };
