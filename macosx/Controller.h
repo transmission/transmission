@@ -99,6 +99,8 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (void)resetInfo;
 - (IBAction)setInfoTab:(id)sender;
 
+- (IBAction)toggleSequentialDownloadForSelectedTorrents:(id)sender;
+
 @property(nonatomic, readonly) MessageWindowController* messageWindowController;
 - (IBAction)showMessageWindow:(id)sender;
 - (IBAction)showStatsWindow:(id)sender;

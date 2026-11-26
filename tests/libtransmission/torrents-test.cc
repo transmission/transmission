@@ -51,6 +51,12 @@ TEST_F(TorrentsTest, invalidArgsAreLogged)
     EXPECT_FALSE(tr_torrentUsesSessionLimits(nullptr));
     ++expected_log_size;
 
+    tr_torrentUseSequentialDownload(nullptr, false);
+    ++expected_log_size;
+
+    EXPECT_FALSE(tr_torrentUsesSequentialDownload(nullptr));
+    ++expected_log_size;
+
     tr_torrentSetRatioMode(nullptr, TR_RATIOLIMIT_UNLIMITED);
     ++expected_log_size;
 
