@@ -817,6 +817,11 @@
                                     <action selector="toggleFilterBar:" target="206" id="1621"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Show Menu Bar Icon" id="MBI0001">
+                                <connections>
+                                    <action selector="toggleMenuBarItem:" target="206" id="MBI0002"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="1293">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>

@@ -62,6 +62,7 @@
 		4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		4DE5CC9D0980656F00BE280E /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
 		4DE5CCA70980735700BE280E /* Badger.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CCA60980735700BE280E /* Badger.mm */; };
+		4DE5CCB00980735700BE280E /* MenuBarItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CCAF0980735700BE280E /* MenuBarItem.mm */; };
 		4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCCA0981D9BE00BE280E /* Defaults.plist */; };
 		4DF0C5AB0899190500DD8943 /* Controller.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C5A90899190500DD8943 /* Controller.mm */; };
 		4DFBC2DF09C0970D00D5C571 /* Torrent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBC2DE09C0970D00D5C571 /* Torrent.mm */; };
@@ -804,6 +805,8 @@
 		4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSStringAdditions.mm; sourceTree = "<group>"; };
 		4DE5CCA50980735700BE280E /* Badger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Badger.h; sourceTree = "<group>"; };
 		4DE5CCA60980735700BE280E /* Badger.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Badger.mm; sourceTree = "<group>"; };
+		4DE5CCAE0980735700BE280E /* MenuBarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MenuBarItem.h; sourceTree = "<group>"; };
+		4DE5CCAF0980735700BE280E /* MenuBarItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MenuBarItem.mm; sourceTree = "<group>"; };
 		4DE5CCCA0981D9BE00BE280E /* Defaults.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Defaults.plist; sourceTree = "<group>"; };
 		4DF0C5A90899190500DD8943 /* Controller.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Controller.mm; sourceTree = "<group>"; };
 		4DF0C5AA0899190500DD8943 /* Controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
@@ -1671,6 +1674,8 @@
 				A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.mm */,
 				4DE5CCA50980735700BE280E /* Badger.h */,
 				4DE5CCA60980735700BE280E /* Badger.mm */,
+				4DE5CCAE0980735700BE280E /* MenuBarItem.h */,
+				4DE5CCAF0980735700BE280E /* MenuBarItem.mm */,
 				A2A632190CD9751700E3DA60 /* BadgeView.h */,
 				A2A6321A0CD9751700E3DA60 /* BadgeView.mm */,
 				A256588A0A9A695400E8A03B /* MessageWindowController.h */,
@@ -3384,6 +3389,7 @@
 				4D364DA0091FBB2C00377D12 /* TorrentTableView.mm in Sources */,
 				4DE5CC9D0980656F00BE280E /* NSStringAdditions.mm in Sources */,
 				4DE5CCA70980735700BE280E /* Badger.mm in Sources */,
+				4DE5CCB00980735700BE280E /* MenuBarItem.mm in Sources */,
 				4DFBC2DF09C0970D00D5C571 /* Torrent.mm in Sources */,
 				A200B9200A22798F007BBB1E /* InfoWindowController.mm in Sources */,
 				A2AF1C390A3D0F6200F1575D /* FileOutlineView.mm in Sources */,

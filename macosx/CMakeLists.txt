@@ -122,6 +122,8 @@ target_sources(${TR_NAME}-mac
         InfoWindowController.h
         InfoWindowController.mm
         main.mm
+        MenuBarItem.h
+        MenuBarItem.mm
         MessageWindowController.h
         MessageWindowController.mm
         NSApplicationAdditions.h
