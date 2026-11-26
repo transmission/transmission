@@ -84,6 +84,25 @@ constexpr void tr_urlPercentEncode(BackInsertIter out, std::string_view input, b
     }
 }
 
+// Percent-encode a relative path, e.g. a torrent file's subpath appended to a webseed URL.
+// '/' separators are kept; every other byte that isn't unreserved is encoded, including
+// reserved characters such as '#', '?' and '%' that would otherwise change the URL's meaning.
+template<typename BackInsertIter>
+constexpr void tr_urlPercentEncodePath(BackInsertIter out, std::string_view path)
+{
+    for (auto const ch : path)
+    {
+        if (ch == '/')
+        {
+            out = ch;
+        }
+        else
+        {
+            tr_urlPercentEncode(out, std::string_view{ &ch, 1U });
+        }
+    }
+}
+
 template<typename BackInsertIter>
 constexpr void tr_urlPercentEncode(BackInsertIter out, tr_sha1_digest_t const& digest)
 {
