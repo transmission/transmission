@@ -39,8 +39,6 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
 {
     ui_.setupUi(this);
 
-    setWindowTitle(add_.type == AddData::FILENAME ? tr("Open Torrent from File") : tr("Open Torrent from URL or Magnet Link"));
-
     edit_timer_.setInterval(2000);
     edit_timer_.setSingleShot(true);
     connect(&edit_timer_, &QTimer::timeout, this, &OptionsDialog::onDestinationChanged);
@@ -158,6 +156,13 @@ void OptionsDialog::reload()
     {
         metainfo_ = metainfo;
     }
+
+    auto title = add_.type == AddData::FILENAME ? tr("Open Torrent from File") : tr("Open Torrent from URL or Magnet Link");
+    if (metainfo_ && !std::empty(metainfo_->name()))
+    {
+        title = tr("%1 - %2").arg(QString::fromStdString(metainfo_->name()), title);
+    }
+    setWindowTitle(title);
 
     bool const have_files_to_show = metainfo_ && !std::empty(*metainfo_);
 

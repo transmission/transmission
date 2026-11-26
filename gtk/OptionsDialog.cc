@@ -23,6 +23,8 @@
 #include <gtkmm/combobox.h>
 #include <gtkmm/filefilter.h>
 
+#include <fmt/format.h>
+
 #include <memory>
 #include <utility>
 
@@ -132,11 +134,14 @@ void OptionsDialog::Impl::updateTorrent()
 
     if (tor_ == nullptr)
     {
+        dialog_.set_title(_("Torrent Options"));
         file_list_->clear();
         file_list_->set_sensitive(false);
     }
     else
     {
+        dialog_.set_title(
+            fmt::format(fmt::runtime(_("{torrent_name} - Torrent Options")), fmt::arg("torrent_name", tr_torrentName(tor_))));
         tr_torrentSetDownloadDir(tor_, downloadDir_);
         file_list_->set_sensitive(tr_torrentHasMetadata(tor_));
         file_list_->set_torrent(tr_torrentId(tor_));
