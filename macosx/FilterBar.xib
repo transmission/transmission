@@ -63,7 +63,7 @@
                     <subviews>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="FilterButton">
                             <rect key="frame" x="0.0" y="0.0" width="31" height="16"/>
-                            <buttonCell key="cell" type="recessed" title="All" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="12">
+                            <buttonCell key="cell" type="recessed" title="All" bezelStyle="recessed" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="12">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
                             </buttonCell>
@@ -73,7 +73,7 @@
                         </button>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3" customClass="FilterButton">
                             <rect key="frame" x="32" y="0.0" width="52" height="16"/>
-                            <buttonCell key="cell" type="recessed" title="Active" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="21">
+                            <buttonCell key="cell" type="recessed" title="Active" bezelStyle="recessed" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="21">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
                             </buttonCell>
@@ -83,7 +83,7 @@
                         </button>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="8" customClass="FilterButton">
                             <rect key="frame" x="85" y="0.0" width="89" height="16"/>
-                            <buttonCell key="cell" type="recessed" title="Downloading" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="13">
+                            <buttonCell key="cell" type="recessed" title="Downloading" bezelStyle="recessed" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="13">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
                             </buttonCell>
@@ -93,7 +93,7 @@
                         </button>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="7" customClass="FilterButton">
                             <rect key="frame" x="175" y="0.0" width="62" height="16"/>
-                            <buttonCell key="cell" type="recessed" title="Seeding" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="14">
+                            <buttonCell key="cell" type="recessed" title="Seeding" bezelStyle="recessed" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="14">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
                             </buttonCell>
@@ -103,7 +103,7 @@
                         </button>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="6" customClass="FilterButton">
                             <rect key="frame" x="238" y="0.0" width="57" height="16"/>
-                            <buttonCell key="cell" type="recessed" title="Paused" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="15">
+                            <buttonCell key="cell" type="recessed" title="Paused" bezelStyle="recessed" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="15">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
                             </buttonCell>
@@ -113,7 +113,7 @@
                         </button>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="nvH-xy-86S" customClass="FilterButton">
                             <rect key="frame" x="296" y="0.0" width="45" height="16"/>
-                            <buttonCell key="cell" type="recessed" title="Error" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="AtX-O4-Mqp">
+                            <buttonCell key="cell" type="recessed" title="Error" bezelStyle="recessed" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="AtX-O4-Mqp">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
                             </buttonCell>
