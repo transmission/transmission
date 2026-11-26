@@ -8,6 +8,7 @@
 
 #include <QFileInfo>
 #include <QPushButton>
+#include <QShortcut>
 
 #include <libtransmission/transmission.h>
 
@@ -88,6 +89,22 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     connect(ui_.destinationEdit, &QLineEdit::editingFinished, this, &OptionsDialog::onDestinationChanged);
 
     ui_.filesView->setEditable(false);
+    connect(ui_.fileSearchEdit, &QLineEdit::textChanged, this, &OptionsDialog::searchFiles);
+    connect(ui_.previousMatchButton, &QToolButton::clicked, this, [this]() { showSearchMatch(-1); });
+    connect(ui_.nextMatchButton, &QToolButton::clicked, this, [this]() { showSearchMatch(1); });
+    auto* find_shortcut = new QShortcut{ QKeySequence::Find, this };
+    connect(find_shortcut, &QShortcut::activated, this, [this]()
+    {
+        ui_.fileSearchEdit->setFocus();
+        ui_.fileSearchEdit->selectAll();
+    });
+    // Consume Enter in the search field so it cannot activate the dialog's Open button.
+    for (auto const key : { Qt::Key_Return, Qt::Key_Enter })
+    {
+        auto* shortcut = new QShortcut{ QKeySequence{ key }, ui_.fileSearchEdit };
+        shortcut->setContext(Qt::WidgetShortcut);
+        connect(shortcut, &QShortcut::activated, this, [this]() { showSearchMatch(1); });
+    }
     ui_.priorityCombo->addItem(tr("High"), TR_PRI_HIGH);
     ui_.priorityCombo->addItem(tr("Normal"), TR_PRI_NORMAL);
     ui_.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
@@ -149,6 +166,8 @@ void OptionsDialog::reload()
     }
 
     metainfo_.reset();
+    search_matches_.clear();
+    search_match_ = -1;
     ui_.filesView->clear();
     files_.clear();
     priorities_.clear();
@@ -162,6 +181,7 @@ void OptionsDialog::reload()
     bool const have_files_to_show = metainfo_ && !std::empty(*metainfo_);
 
     ui_.filesView->setVisible(have_files_to_show);
+    ui_.fileSearchWidget->setVisible(have_files_to_show);
     layout()->setSizeConstraint(have_files_to_show ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
 
     if (metainfo_)
@@ -185,6 +205,69 @@ void OptionsDialog::reload()
 
     ui_.filesView->update(files_);
     ui_.filesView->hideColumn(FileTreeModel::COL_PROGRESS);
+    searchFiles();
+}
+
+void OptionsDialog::searchFiles()
+{
+    search_matches_.clear();
+    search_match_ = -1;
+    auto const query = ui_.fileSearchEdit->text();
+    auto const* model = ui_.filesView->model();
+    // Walk the view's sorted model, including collapsed folders, without filtering it.
+    auto pending = QModelIndexList{};
+    if (!query.isEmpty())
+    {
+        for (int row = model->rowCount() - 1; row >= 0; --row)
+        {
+            pending.push_back(model->index(row, FileTreeModel::COL_NAME));
+        }
+    }
+    while (!pending.isEmpty())
+    {
+        auto const index = pending.takeLast();
+        for (int row = model->rowCount(index) - 1; row >= 0; --row)
+        {
+            pending.push_back(model->index(row, FileTreeModel::COL_NAME, index));
+        }
+        auto const file_index = index.data(FileTreeModel::FileIndexRole).toInt();
+        if (file_index >= 0 && file_index < static_cast<int>(files_.size()) &&
+            files_[file_index].filename.contains(query, Qt::CaseInsensitive))
+        {
+            search_matches_.push_back(index);
+        }
+    }
+    auto const have_matches = !search_matches_.isEmpty();
+    ui_.previousMatchButton->setEnabled(have_matches);
+    ui_.nextMatchButton->setEnabled(have_matches);
+    ui_.fileSearchStatus->setText(query.isEmpty() ? QString{} : tr("No matches"));
+    if (have_matches)
+    {
+        showSearchMatch(1);
+    }
+    else
+    {
+        ui_.filesView->clearSelection();
+    }
+}
+
+void OptionsDialog::showSearchMatch(int offset)
+{
+    if (search_matches_.isEmpty())
+    {
+        return;
+    }
+    auto const count = static_cast<int>(search_matches_.size());
+    search_match_ = (search_match_ + offset + count) % count;
+    QModelIndex const index = search_matches_[search_match_];
+    for (auto parent = index.parent(); parent.isValid(); parent = parent.parent())
+    {
+        ui_.filesView->expand(parent);
+    }
+    ui_.filesView->selectionModel()->setCurrentIndex(
+        index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    ui_.filesView->scrollTo(index, QAbstractItemView::PositionAtCenter);
+    ui_.fileSearchStatus->setText(tr("%1 of %2").arg(search_match_ + 1).arg(count));
 }
 
 void OptionsDialog::updateWidgetsLocality()

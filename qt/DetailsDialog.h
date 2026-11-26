@@ -10,6 +10,7 @@
 #include <unordered_set>
 
 #include <QString>
+#include <QPersistentModelIndex>
 #include <QTimer>
 
 #include "BaseDialog.h"
@@ -53,7 +54,11 @@ private:
     void initPeersTab();
     void initTrackerTab();
     void initInfoTab();
-    void initFilesTab() const;
+    void initFilesTab();
+    void searchFiles(bool navigate = true);
+    void showSearchMatch(int offset);
+    QList<QPersistentModelIndex> file_search_matches_;
+    int file_search_match_ = -1;
     void initOptionsTab();
 
     void setEnabled(bool enabled);
