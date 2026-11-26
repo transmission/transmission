@@ -386,7 +386,7 @@ tr_variant from_preferred_transport(small::max_size_vector<tr_preferred_transpor
 {
     static auto constexpr SaveSingle = [](tr_preferred_transport const ele) -> tr_variant
     {
-        return static_cast<int64_t>(ele);
+        return from_enum_or_integral_with_lookup(PreferredTransportKeys, ele);
     };
 
     auto ret = tr_variant::Vector{};
