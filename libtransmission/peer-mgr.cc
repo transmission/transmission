@@ -415,9 +415,12 @@ public:
         {
         }
 
-        [[nodiscard]] auto next(size_t const n_wanted_blocks, std::function<bool(tr_piece_index_t)> const& peer_has_piece)
+        [[nodiscard]] auto next(
+            size_t const n_wanted_blocks,
+            std::function<bool(tr_piece_index_t)> const& peer_has_piece,
+            std::function<bool(tr_block_index_t)> const& peer_has_active_request)
         {
-            return wishlist_.next(n_wanted_blocks, peer_has_piece);
+            return wishlist_.next(n_wanted_blocks, peer_has_piece, peer_has_active_request);
         }
 
         [[nodiscard]] bool client_has_block(tr_block_index_t const block) const override
@@ -433,6 +436,46 @@ public:
         [[nodiscard]] bool client_wants_piece(tr_piece_index_t const piece) const override
         {
             return tor_.piece_is_wanted(piece);
+        }
+
+        [[nodiscard]] bool is_endgame() const override
+        {
+            auto const count_active_requests = [](uint64_t const count, auto const& peer)
+            {
+                return count + peer->active_req_count(tr_direction::ClientToPeer);
+            };
+
+            auto const n_active = std::accumulate(
+                                      std::begin(swarm_.peers),
+                                      std::end(swarm_.peers),
+                                      uint64_t{},
+                                      count_active_requests) +
+                std::accumulate(std::begin(swarm_.webseeds), std::end(swarm_.webseeds), uint64_t{}, count_active_requests);
+
+            return n_active * tr_block_info::BlockSize >= tor_.left_until_done();
+        }
+
+        [[nodiscard]] uint8_t count_active_requests(tr_block_index_t const block) const override
+        {
+            auto n_requesters = uint8_t{};
+            for (auto const& peer : swarm_.peers)
+            {
+                if (peer->active_requests.test(block) && ++n_requesters >= 2U)
+                {
+                    return 2U;
+                }
+            }
+
+            return n_requesters;
+        }
+
+        [[nodiscard]] bool is_requested_by_webseed(tr_block_index_t const block) const override
+        {
+            // HTTP webseeds cannot receive BitTorrent CANCEL messages, so a block
+            // a webseed is already requesting is never a candidate for anyone else.
+            return std::ranges::any_of(
+                swarm_.webseeds,
+                [block](auto const& webseed) { return webseed->active_requests.test(block); });
         }
 
         [[nodiscard]] bool is_sequential_download() const override
@@ -1237,7 +1280,10 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
     if (auto& controller = torrent->swarm->wishlist_controller)
     {
-        return controller->next(numwant, [peer](tr_piece_index_t p) { return peer->has_piece(p); });
+        return controller->next(
+            numwant,
+            [peer](tr_piece_index_t p) { return peer->has_piece(p); },
+            [peer](tr_block_index_t b) { return peer->active_requests.test(b) || peer->is_refill_excluded(b); });
     }
 
     return {};
