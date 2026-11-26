@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <map>
 
 #include <fmt/format.h>
 
@@ -69,6 +70,8 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
     tr_tracker_tier_t tier_ = 0;
     tr_pathbuf file_subpath_;
     int64_t file_length_ = 0;
+    bool file_is_padding_ = false;
+    std::map<std::string, bool> file_path_is_padding_;
 
     enum class State : uint8_t
     {
@@ -117,6 +120,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             state_ = State::FileTree;
             file_subpath_.clear();
             file_length_ = 0;
+            file_is_padding_ = false;
         }
         else if (pathIs(PieceLayersKey))
         {
@@ -152,8 +156,8 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             {
                 return false;
             }
-
             file_subpath_.clear();
+            file_is_padding_ = false;
         }
         else if (state_ == State::PieceLayers)
         {
@@ -170,6 +174,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             state_ = std::empty(tm_.files_) ? State::Files : State::FilesIgnored;
             file_subpath_.clear();
             file_length_ = 0;
+            file_is_padding_ = false;
         }
         else if (pathStartsWith(InfoKey, FilesKey, ArrayKey, PathUtf8Key))
         {
@@ -311,8 +316,7 @@ struct MetainfoHandler final : public tr::benc::BasicHandler<MaxBencDepth>
             }
             else if (current_key == AttrKey)
             {
-                // currently unused. TODO support for BEP0047
-                // TODO https://github.com/transmission/transmission/issues/3387
+                file_is_padding_ = value.find('p') != std::string_view::npos;
             }
             else if (
                 pathIs(InfoKey, FilesKey, ArrayKey, Crc32Key) || //
@@ -467,7 +471,17 @@ private:
         }
         else
         {
-            tm_.files_.add(file_subpath_, file_length_);
+            auto const path = fmt::format("{:s}", file_subpath_);
+            auto const [it, inserted] = file_path_is_padding_.try_emplace(path, file_is_padding_);
+            if (!inserted && (!file_is_padding_ || !it->second))
+            {
+                context.error.set(EINVAL, fmt::format("duplicate path [{:s}]", file_subpath_));
+                ok = false;
+            }
+            else
+            {
+                tm_.files_.add(file_subpath_, file_length_);
+            }
         }
 
         file_length_ = 0;
@@ -492,15 +506,6 @@ private:
 
         // FIXME: update for hybrid torrents with duplicate info between "file tree" and "files"
         // when "file tree" (bittorrent v2) supported
-        auto sorted_paths = tm_.files_.sorted_by_path();
-        if (auto dupe = std::ranges::adjacent_find(
-                sorted_paths,
-                [](auto const& p1, auto const& p2) { return p1.first == p2.first; });
-            dupe != sorted_paths.end())
-        {
-            context.error.set(EINVAL, fmt::format("duplicate path [{:s}]", dupe->first));
-            return false;
-        }
 
         auto root = tr_pathbuf{};
         tr_torrent_files::sanitize_subpath(tm_.name_, root);
