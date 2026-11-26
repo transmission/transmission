@@ -5,6 +5,7 @@ add_executable(libtransmission-app-test)
 target_sources(libtransmission-app-test
 	PRIVATE
 		converter-tests.cc
+		favicon-cache-test.cc
 		session-settings-include-test.cc
 		test-fixtures.h)
 

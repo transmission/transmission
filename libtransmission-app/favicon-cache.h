@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cstddef> // size_t
 #include <fstream>
@@ -16,6 +17,8 @@
 #include <mutex>
 #include <string>
 #include <string_view>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -41,27 +44,49 @@ public:
     {
     }
 
+    FaviconCache(FaviconCache const&) = delete;
+    FaviconCache(FaviconCache&&) = delete;
+    FaviconCache& operator=(FaviconCache const&) = delete;
+    FaviconCache& operator=(FaviconCache&&) = delete;
+
+    ~FaviconCache()
+    {
+        alive_->store(false);
+        web_.reset();
+        for (auto const& in_flight : in_flight_)
+        {
+            in_flight->clear_callback();
+        }
+        in_flight_.clear();
+    }
+
     [[nodiscard]] Icon const* find(std::string_view sitename) const noexcept
     {
         auto const iter = icons_.find(sitename);
         return iter != std::end(icons_) ? &iter->second : nullptr;
     }
 
-    void load(std::string_view url_in, IconFunc callback = [](Icon const&) { /*default callback is a no-op */ })
+    void load(std::string_view url_in, IconFunc callback = [](Icon const*) { /*default callback is a no-op */ })
     {
         std::call_once(scan_once_flag_, &FaviconCache::scan_file_cache, this);
 
         auto const url = tr_urlParse(url_in);
         if (!url) // invalid url?
         {
-            callback({});
+            if (callback)
+            {
+                callback({});
+            }
             return;
         }
 
         // If we already have it, use it.
         if (auto const* const icon = find(url->sitename); icon != nullptr)
         {
-            callback(icon);
+            if (callback)
+            {
+                callback(icon);
+            }
             return;
         }
 
@@ -79,22 +104,47 @@ public:
             ports[n_ports++] = url->port;
         }
 
-        auto in_flight = std::make_shared<InFlightData>(callback, url->sitename);
+        static constexpr auto Schemes = std::array{ "http", "https" };
+        static constexpr auto Suffixes = std::array{ "ico", "png", "gif", "jpg" };
+        auto const n_requests = static_cast<size_t>(n_ports) * std::size(Schemes) * std::size(Suffixes);
+
+        if (!web_)
+        {
+            web_ = tr_web::create(mediator_);
+        }
+
+        auto const in_flight = std::make_shared<InFlightData>(std::move(callback), url->sitename, n_requests);
+        in_flight_.emplace(in_flight);
+
         for (auto i = 0; i < n_ports; ++i)
         {
-            for (auto const scheme : { "http", "https" })
+            for (auto const* const scheme : Schemes)
             {
-                for (auto const suffix : { "ico", "png", "gif", "jpg" })
+                for (auto const* const suffix : Suffixes)
                 {
-                    auto on_fetch_response = [this, in_flight](auto const& response)
+                    auto on_fetch_response = [this, alive = alive_, in_flight](auto const& response)
                     {
+                        if (!alive->load())
+                        {
+                            return;
+                        }
+
                         in_flight->add_response(response.body, response.status);
-                        add_to_ui_thread([this, in_flight]() { check_responses(in_flight); });
+                        add_to_ui_thread(
+                            [this, alive, in_flight]()
+                            {
+                                if (!alive->load())
+                                {
+                                    return;
+                                }
+
+                                check_responses(in_flight);
+                            });
                     };
 
                     static constexpr auto TimeoutSecs = std::chrono::seconds{ 15 };
                     auto const favicon_url = fmt::format("{:s}://{:s}:{:d}/favicon.{:s}", scheme, url->host, ports[i], suffix);
-                    in_flight->web().fetch({ favicon_url, std::move(on_fetch_response), nullptr, TimeoutSecs });
+                    web_->fetch({ favicon_url, std::move(on_fetch_response), nullptr, TimeoutSecs });
                 }
             }
         }
@@ -107,32 +157,48 @@ private:
     class InFlightData
     {
     public:
-        InFlightData(IconFunc callback, std::string_view sitename)
+        InFlightData(IconFunc callback, std::string_view sitename, size_t n_pending)
             : callback_{ std::move(callback) }
             , sitename_{ sitename }
+            , n_pending_{ n_pending }
         {
         }
 
         InFlightData(InFlightData const&) = delete;
+        InFlightData(InFlightData&&) = delete;
         InFlightData& operator=(InFlightData const&) = delete;
+        InFlightData& operator=(InFlightData&&) = delete;
+        ~InFlightData() = default;
 
         [[nodiscard]] constexpr auto const& sitename() const noexcept
         {
             return sitename_;
         }
 
-        ~InFlightData()
+        [[nodiscard]] constexpr bool is_done() const noexcept
         {
-            invoke_callback(nullptr); // ensure it's called once, even if no icon
+            return done_;
+        }
+
+        void clear_callback()
+        {
+            callback_ = nullptr;
+            done_ = true;
         }
 
         void invoke_callback(Icon const* icon)
         {
-            if (callback_)
+            done_ = true;
+            if (auto const callback = std::exchange(callback_, {}); callback)
             {
-                callback_(icon);
-                callback_ = {};
+                callback(icon);
             }
+        }
+
+        [[nodiscard]] size_t consume_pending(size_t n_responses) noexcept
+        {
+            n_pending_ = n_responses < n_pending_ ? n_pending_ - n_responses : 0U;
+            return n_pending_;
         }
 
         [[nodiscard]] auto get_responses()
@@ -151,20 +217,14 @@ private:
             responses_.emplace_back(std::move(contents), code);
         }
 
-        [[nodiscard]] auto& web()
-        {
-            return *web_;
-        }
-
     private:
         IconFunc callback_;
         std::string const sitename_;
+        size_t n_pending_ = 0;
+        bool done_ = false;
 
         std::mutex responses_mutex_;
         std::vector<std::pair<std::string, long>> responses_;
-
-        tr_web::Mediator mediator_;
-        std::unique_ptr<tr_web> web_ = tr_web::create(mediator_);
     };
 
     [[nodiscard]] Icon create_from_file(std::string_view filename) const;
@@ -213,16 +273,22 @@ private:
         }
     }
 
-    void check_responses(std::shared_ptr<FaviconCache::InFlightData> in_flight)
+    void check_responses(std::shared_ptr<InFlightData> const& in_flight)
     {
-        for (auto const& [contents, code] : in_flight->get_responses())
+        auto const responses = in_flight->get_responses();
+        if (in_flight->is_done())
+        {
+            return;
+        }
+
+        for (auto const& [contents, code] : responses)
         {
             if (std::empty(contents) || code < 200 || code >= 300)
             {
                 continue;
             }
 
-            auto const icon = create_from_data(std::data(contents), std::size(contents));
+            auto icon = create_from_data(std::data(contents), std::size(contents));
             if (!icon)
             {
                 continue;
@@ -236,8 +302,15 @@ private:
             tr_file_save(fmt::format("{:s}/{:s}", icons_dir_, in_flight->sitename()), contents);
 
             // notify the user that we got it
+            in_flight_.erase(in_flight);
             in_flight->invoke_callback(&perm);
             return;
+        }
+
+        if (in_flight->consume_pending(std::size(responses)) == 0U)
+        {
+            in_flight_.erase(in_flight);
+            in_flight->invoke_callback(nullptr);
         }
     }
 
@@ -247,6 +320,11 @@ private:
     std::string const scraped_sitenames_filename_;
 
     std::map<std::string /*sitename*/, Icon, std::less<>> icons_;
+    std::unordered_set<std::shared_ptr<InFlightData>> in_flight_;
+
+    std::shared_ptr<std::atomic<bool>> alive_ = std::make_shared<std::atomic<bool>>(true);
+    tr_web::Mediator mediator_;
+    std::unique_ptr<tr_web> web_;
 };
 
 } // namespace tr::app
