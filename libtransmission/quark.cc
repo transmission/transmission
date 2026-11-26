@@ -215,6 +215,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "from_incoming"sv, // rpc
     "from_lpd"sv, // rpc
     "from_ltep"sv, // rpc
+    "from_magnet"sv, // rpc
     "from_pex"sv, // rpc
     "from_tracker"sv, // rpc
     "group"sv, // .resume, rpc
