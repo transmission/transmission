@@ -175,7 +175,7 @@ public:
 
     void exec(tr_quark method, tr_variant&& params);
 
-    void open_folder(tr_torrent_id_t torrent_id) const;
+    void open_file_or_folder(tr_torrent_id_t torrent_id) const;
 
     sigc::signal<void(ErrorCode, Glib::ustring const&)>& signal_add_error();
     sigc::signal<void(tr_ctor*)>& signal_add_prompt();
