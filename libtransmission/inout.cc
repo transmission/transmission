@@ -92,33 +92,48 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t cons
                                                                        tr_open_files::Preallocation::None;
     if (auto const found = tor.find_file(file_index); found)
     {
-        return open_files.get(tor_id, file_index, writable, found->filename(), prealloc, file_size);
-    }
+        if (auto const fd = open_files.get(tor_id, file_index, writable, found->filename(), prealloc, file_size, error); fd)
+        {
+            return fd;
+        }
 
+        // The file exists but can't be opened, e.g. no file descriptors
+        // are left or its permissions changed. `error` is set so that
+        // the caller doesn't mistake this for success and discard the
+        // data it wanted to write.
+    }
     // do we want to create it?
-    auto err = ENOENT;
-    if (writable)
+    else if (writable)
     {
         auto const base = tor.current_dir();
         auto const suffix = session.isIncompleteFileNamingEnabled() ? tr_torrent_files::PartialFileSuffix : ""sv;
         auto const filename = tr_pathbuf{ base, '/', tor.file_subpath(file_index), suffix };
-        if (auto const fd = open_files.get(tor_id, file_index, writable, filename, prealloc, file_size); fd)
+        if (auto const fd = open_files.get(tor_id, file_index, writable, filename, prealloc, file_size, error); fd)
         {
             // make a note that we just created a file
             session.add_file_created();
             return fd;
         }
-
-        err = errno;
     }
 
-    error.set(
-        err,
-        fmt::format(
-            fmt::runtime(_("Couldn't get '{path}': {error} ({error_code})")),
-            fmt::arg("path", tor.file_subpath(file_index)),
-            fmt::arg("error", tr_strerror(err)),
-            fmt::arg("error_code", err)));
+    if (error)
+    {
+        // open_files.get() reports why but not which file; the message
+        // reaches the user via the torrent's local error, so put the
+        // filename back in
+        error.prefix_message(
+            fmt::format(fmt::runtime(_("Couldn't get '{path}': ")), fmt::arg("path", tor.file_subpath(file_index))));
+    }
+    else // the file doesn't exist, and we can't create it
+    {
+        error.set(
+            ENOENT,
+            fmt::format(
+                fmt::runtime(_("Couldn't get '{path}': {error} ({error_code})")),
+                fmt::arg("path", tor.file_subpath(file_index)),
+                fmt::arg("error", tr_strerror(ENOENT)),
+                fmt::arg("error_code", ENOENT)));
+    }
     return {};
 }
 
@@ -145,6 +160,9 @@ void read_or_write_bytes(
     auto const fd = get_fd(session, open_files, tor, writable, file_index, error);
     if (!fd || error)
     {
+        // no logging needed here: open_files.get() has already logged
+        // the failure, and the write path also surfaces `error` via the
+        // torrent's local error
         return;
     }
 
