@@ -9,3 +9,17 @@
 @property(nonatomic) BOOL seed;
 
 @end
+
+@interface PeerProgressIndicatorCellView : NSTableCellView
+
+- (void)updateProgress:(float)progressValue isSeed:(BOOL)isSeed;
+
+@end
+
+@interface PeerTextCellView : NSTableCellView
+- (void)updateText:(nullable NSString*)text;
+@end
+
+@interface EncryptionImageCellView : NSTableCellView
+- (void)updateEncrypted:(BOOL)encrypted;
+@end

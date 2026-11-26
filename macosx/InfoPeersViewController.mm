@@ -14,7 +14,7 @@
 static NSString* const kAnimationIdKey = @"animationId";
 static NSString* const kWebSeedAnimationId = @"webSeed";
 
-@interface InfoPeersViewController ()<CAAnimationDelegate>
+@interface InfoPeersViewController ()<CAAnimationDelegate, NSTableViewDelegate, NSTableViewDataSource>
 
 @property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
@@ -330,68 +330,127 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
     }
 }
 
-- (id)tableView:(NSTableView*)tableView objectValueForTableColumn:(NSTableColumn*)column row:(NSInteger)row
+- (NSView*)tableView:(NSTableView*)tableView viewForTableColumn:(NSTableColumn*)tableColumn row:(NSInteger)row
 {
     if (tableView == self.fWebSeedTable)
     {
-        NSString* ident = column.identifier;
+        NSString* columnIdentifier = tableColumn.identifier;
         NSDictionary* webSeed = self.fWebSeeds[row];
 
-        if ([ident isEqualToString:@"DL From"])
+        if ([columnIdentifier isEqualToString:@"DL From"])
         {
-            NSNumber* rate;
-            return (rate = webSeed[@"DL From Rate"]) ? [NSString stringForSpeedAbbrev:rate.doubleValue] : @"";
+            __auto_type cell = (PeerTextCellView*)[tableView makeViewWithIdentifier:@"ClientCell" owner:self];
+            if (cell == nil)
+            {
+                cell = [[PeerTextCellView alloc] init];
+                cell.identifier = @"ClientCell";
+            }
+
+            NSNumber* rate = webSeed[@"DL From Rate"];
+            NSString* data = rate ? [NSString stringForSpeedAbbrev:rate.doubleValue] : @"";
+            [cell updateText:data];
+            return cell;
         }
-        else
+
+        if ([columnIdentifier isEqualToString:@"Address"])
         {
-            return webSeed[@"Address"];
+            __auto_type cell = (PeerTextCellView*)[tableView makeViewWithIdentifier:@"AddressCell" owner:self];
+            if (cell == nil)
+            {
+                cell = [[PeerTextCellView alloc] init];
+                cell.identifier = @"AddressCell";
+            }
+            [cell updateText:webSeed[@"Address"]];
+
+            return cell;
         }
+
+        return nil;
     }
     else
     {
-        NSString* ident = column.identifier;
+        NSString* columnIdentifier = tableColumn.identifier;
         NSDictionary* peer = self.fPeers[row];
 
-        if ([ident isEqualToString:@"Encryption"])
+        if ([columnIdentifier isEqualToString:@"Progress"])
         {
-            return [peer[@"Encryption"] boolValue] ? [NSImage imageWithSystemSymbolName:@"lock.fill" accessibilityDescription:nil] : nil;
+            __auto_type cell = (PeerProgressIndicatorCellView*)[tableView makeViewWithIdentifier:@"ProgressCell" owner:self];
+            if (cell == nil)
+            {
+                cell = [[PeerProgressIndicatorCellView alloc] init];
+                cell.identifier = @"ProgressCell";
+            }
+            __auto_type progress = [peer[@"Progress"] floatValue];
+            __auto_type isSeed = [peer[@"Seed"] boolValue];
+            [cell updateProgress:progress isSeed:isSeed];
+            return cell;
         }
-        else if ([ident isEqualToString:@"Client"])
-        {
-            return peer[@"Client"];
-        }
-        else if ([ident isEqualToString:@"Progress"])
-        {
-            return peer[@"Progress"];
-        }
-        else if ([ident isEqualToString:@"UL To"])
-        {
-            NSNumber* rate;
-            return (rate = peer[@"UL To Rate"]) ? [NSString stringForSpeedAbbrev:rate.doubleValue] : @"";
-        }
-        else if ([ident isEqualToString:@"DL From"])
-        {
-            NSNumber* rate;
-            return (rate = peer[@"DL From Rate"]) ? [NSString stringForSpeedAbbrev:rate.doubleValue] : @"";
-        }
-        else
-        {
-            return peer[@"IP"];
-        }
-    }
-}
 
-- (void)tableView:(NSTableView*)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn*)tableColumn row:(NSInteger)row
-{
-    if (tableView == self.fPeerTable)
-    {
-        NSString* ident = tableColumn.identifier;
-
-        if ([ident isEqualToString:@"Progress"])
+        if ([columnIdentifier isEqualToString:@"Encryption"])
         {
-            NSDictionary* peer = self.fPeers[row];
-            ((PeerProgressIndicatorCell*)cell).seed = [peer[@"Seed"] boolValue];
+            __auto_type cell = (EncryptionImageCellView*)[tableView makeViewWithIdentifier:@"EncryptionCell" owner:self];
+            if (cell == nil)
+            {
+                cell = [[EncryptionImageCellView alloc] init];
+                cell.identifier = @"EncryptionCell";
+            }
+            [cell updateEncrypted:[peer[@"Encryption"] boolValue]];
+            return cell;
         }
+
+        if ([columnIdentifier isEqualToString:@"Client"])
+        {
+            __auto_type cell = (PeerTextCellView*)[tableView makeViewWithIdentifier:@"ClientCell" owner:self];
+            if (cell == nil)
+            {
+                cell = [[PeerTextCellView alloc] init];
+                cell.identifier = @"ClientCell";
+            }
+            [cell updateText:peer[@"Client"]];
+            return cell;
+        }
+
+        if ([columnIdentifier isEqualToString:@"UL To"])
+        {
+            __auto_type cell = (PeerTextCellView*)[tableView makeViewWithIdentifier:@"ULToCell" owner:self];
+            if (cell == nil)
+            {
+                cell = [[PeerTextCellView alloc] init];
+                cell.identifier = @"ULToCell";
+            }
+            NSNumber* rate = peer[@"UL To Rate"];
+            NSString* data = rate ? [NSString stringForSpeedAbbrev:rate.doubleValue] : @"";
+            [cell updateText:data];
+            return cell;
+        }
+
+        if ([columnIdentifier isEqualToString:@"DL From"])
+        {
+            __auto_type cell = (PeerTextCellView*)[tableView makeViewWithIdentifier:@"DLFromCell" owner:self];
+            if (cell == nil)
+            {
+                cell = [[PeerTextCellView alloc] init];
+                cell.identifier = @"DLFromCell";
+            }
+            NSNumber* rate = peer[@"DL From Rate"];
+            NSString* data = rate ? [NSString stringForSpeedAbbrev:rate.doubleValue] : @"";
+            [cell updateText:data];
+            return cell;
+        }
+
+        if ([columnIdentifier isEqualToString:@"IP"])
+        {
+            __auto_type cell = (PeerTextCellView*)[tableView makeViewWithIdentifier:@"IPCell" owner:self];
+            if (cell == nil)
+            {
+                cell = [[PeerTextCellView alloc] init];
+                cell.identifier = @"IPCell";
+            }
+            [cell updateText:peer[@"IP"]];
+            return cell;
+        }
+
+        return nil;
     }
 }
 
