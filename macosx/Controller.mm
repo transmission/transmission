@@ -3063,7 +3063,15 @@ static void removeKeRangerRansomware()
     NSIndexSet* indexesOfNonFilteredTorrents = [self.fTorrents
         indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(Torrent* torrent, NSUInteger /*torrentIdx*/, BOOL* /*stopTorrentsEnumeration*/) {
             //check status
-            if (torrent.active && !torrent.checkingWaiting)
+            if (torrent.error)
+            {
+                std::atomic_fetch_add_explicit(errorRef, 1, std::memory_order_relaxed);
+                if (filterStatus && !filterError)
+                {
+                    return NO;
+                }
+            }
+            else if (torrent.active && !torrent.checkingWaiting)
             {
                 BOOL const isActive = torrent.transmitting;
                 if (isActive)
@@ -3086,14 +3094,6 @@ static void removeKeRangerRansomware()
                     {
                         return NO;
                     }
-                }
-            }
-            else if (torrent.error)
-            {
-                std::atomic_fetch_add_explicit(errorRef, 1, std::memory_order_relaxed);
-                if (filterStatus && !filterError)
-                {
-                    return NO;
                 }
             }
             else
