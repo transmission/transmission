@@ -17,6 +17,10 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QProxyStyle>
+#ifdef ENABLE_DBUS_INTEROP
+#include <QDBusConnection>
+#include <QDBusMessage>
+#endif
 #include <QtGui>
 
 #include <libtransmission/transmission.h>
@@ -565,7 +569,27 @@ void openSelect(QString const& path)
 #else
 void openSelect(QString const& path)
 {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+#ifdef ENABLE_DBUS_INTEROP
+    // Ask the file manager to open the parent folder with the item selected.
+    // Not every file manager implements this, so fall back to opening the folder itself.
+    if (auto bus = QDBusConnection::sessionBus(); bus.isConnected())
+    {
+        auto m = QDBusMessage::createMethodCall(
+            QStringLiteral("org.freedesktop.FileManager1"),
+            QStringLiteral("/org/freedesktop/FileManager1"),
+            QStringLiteral("org.freedesktop.FileManager1"),
+            QStringLiteral("ShowItems"));
+        m.setArguments({ QStringList{ QUrl::fromLocalFile(path).toString() }, QString{} });
+
+        if (bus.call(m).type() != QDBusMessage::ErrorMessage)
+        {
+            return;
+        }
+    }
+#endif
+
+    auto const info = QFileInfo{ path };
+    QDesktopServices::openUrl(QUrl::fromLocalFile(info.isDir() ? path : info.absolutePath()));
 }
 #endif
 
@@ -639,8 +663,16 @@ void MainWindow::openFolder()
     }
 
     auto const parent = QDir{ tor->getPath() };
-    auto const child = getTopFolder(parent, tor);
-    openSelect(parent.filePath(child));
+
+    if (auto const child = getTopFolder(parent, tor); !child.isEmpty())
+    {
+        openSelect(parent.filePath(child));
+        return;
+    }
+
+    // no top folder: select the file itself, if there's only one
+    auto const& files = tor->files();
+    openSelect(std::size(files) == 1U ? parent.filePath(files.at(0).filename) : parent.path());
 }
 
 void MainWindow::copyMagnetLinkToClipboard()
