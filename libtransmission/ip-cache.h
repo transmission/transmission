@@ -62,6 +62,12 @@ public:
         }
 
         [[nodiscard]] virtual tr::TimerMaker& timer_maker() = 0;
+
+        // Called after the cached source address changes to a different address.
+        // Called without holding any ip-cache lock.
+        virtual void on_source_addr_changed(tr_address const& /* addr */)
+        {
+        }
     };
 
     static std::shared_ptr<tr_ip_cache> create(Mediator& mediator);

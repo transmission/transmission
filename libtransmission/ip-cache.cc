@@ -379,12 +379,18 @@ void tr_ip_cache::unset_global_addr(tr_address_type type) noexcept
 
 void tr_ip_cache::set_source_addr(tr_address const& addr_new) noexcept
 {
-    auto const lock = std::scoped_lock{ source_addr_mutex_[addr_new.type] };
-    if (auto& addr = source_addr_[addr_new.type]; addr != addr_new)
     {
+        auto const lock = std::scoped_lock{ source_addr_mutex_[addr_new.type] };
+        auto& addr = source_addr_[addr_new.type];
+        if (addr == addr_new)
+        {
+            return;
+        }
         addr = addr_new;
-        tr_logAddInfo(fmt::format("Cached {} source address {}", tr_ip_protocol_to_sv(addr->type), addr->display_name()));
     }
+
+    tr_logAddInfo(fmt::format("Cached {} source address {}", tr_ip_protocol_to_sv(addr_new.type), addr_new.display_name()));
+    mediator_.on_source_addr_changed(addr_new);
 }
 
 void tr_ip_cache::unset_addr(tr_address_type type) noexcept

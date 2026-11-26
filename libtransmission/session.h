@@ -339,6 +339,8 @@ private:
             }
         }
 
+        void on_source_addr_changed(tr_address const& addr) override;
+
         [[nodiscard]] std::span<std::string const> settings_ip_endpoint(tr_address_type type) override
         {
             switch (type)
@@ -1098,6 +1100,8 @@ private:
     void initImpl(init_data& data);
     void setSettings(tr_variant const& settings_map, bool force);
     void setSettings(Settings&& settings, bool force);
+    void rebind_ipv6_if_changed();
+    void recreate_udp_core();
 
     void closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
     void closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
@@ -1278,6 +1282,9 @@ private:
 
     // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_, global_ip_cache (via tr_session::bind_address())
     std::optional<BoundSocket> bound_ipv6_;
+
+    // The IPv6 address that bound_ipv6_ and udp_core_ were last bound to.
+    tr_address ipv6_bind_addr_ = tr_address::any(TR_AF_INET6);
 
 public:
     // depends-on: settings_, announcer_udp_, global_ip_cache_

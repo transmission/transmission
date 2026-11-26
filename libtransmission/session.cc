@@ -467,6 +467,61 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
     return {};
 }
 
+void tr_session::IPCacheMediator::on_source_addr_changed(tr_address const& addr)
+{
+    if (addr.is_ipv6())
+    {
+        // Queues the rebind operation to the session thread to allow for the
+        // address change to settle.
+        session_.queue_session_thread([this]() { session_.rebind_ipv6_if_changed(); });
+    }
+}
+
+// Rebuild everything bound to a specific IPv6 address when that address changes.
+// A socket bound to an address stays open after the address is gone, so without
+// this the IPv6 listener, uTP, UDP trackers and DHT silently stop working.
+void tr_session::rebind_ipv6_if_changed()
+{
+    TR_ASSERT(am_in_session_thread());
+
+    auto const addr = bind_address(TR_AF_INET6);
+    if (isClosing() || !udp_core_ || addr == ipv6_bind_addr_)
+    {
+        return;
+    }
+
+    tr_logAddInfo(
+        fmt::format(
+            fmt::runtime(_("IPv6 address changed from {old_address} to {new_address}; rebinding")),
+            fmt::arg("old_address", ipv6_bind_addr_.display_name()),
+            fmt::arg("new_address", addr.display_name())));
+
+    if (settings_.tcp_enabled)
+    {
+        bound_ipv6_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+    }
+
+    // tr_dht uses udp_core_'s sockets, so it must go before them
+    dht_.reset();
+
+    ipv6_bind_addr_ = addr;
+    recreate_udp_core();
+
+    if (settings_.dht_enabled)
+    {
+        dht_ = tr_dht::create(dht_mediator_, advertisedPeerPort(), udp_core_->socket4(), udp_core_->socket6());
+    }
+}
+
+void tr_session::recreate_udp_core()
+{
+    // FreeBSD refuses to bind a second UDP socket to a port that is still
+    // held, even with SO_REUSEADDR. So we need to destroy the old UDP core
+    // before creating a new one.
+    udp_core_.reset();
+    udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
+}
+
 // ---
 
 tr_variant tr_sessionGetDefaultSettings()
@@ -872,7 +927,8 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 
     if (!udp_core_ || force || addr_changed || port_changed || utp_changed)
     {
-        udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
+        ipv6_bind_addr_ = bind_address(TR_AF_INET6);
+        recreate_udp_core();
     }
 
     // Sends out announce messages with advertisedPeerPort(), so this
