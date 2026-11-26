@@ -27,13 +27,15 @@ add_trqt_test(filterbar-test.cc)
 add_trqt_test(prefs-test.cc)
 add_trqt_test(rpcclient-test.cc)
 add_trqt_test(session-test.cc)
+add_trqt_test(sleepinhibitor-test.cc)
 
 add_custom_target(qt-tests
     DEPENDS
         qt-test-filterbar
         qt-test-prefs
         qt-test-rpcclient
-        qt-test-session)
+        qt-test-session
+        qt-test-sleepinhibitor)
 
 set_property(
     TARGET qt-tests

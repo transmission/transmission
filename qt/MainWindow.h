@@ -19,6 +19,7 @@
 
 #include "Filters.h"
 #include "Prefs.h"
+#include "SleepInhibitor.h"
 #include "Speed.h"
 #include "TorrentFilter.h"
 #include "Typedefs.h"
@@ -178,6 +179,7 @@ private:
     QString error_message_;
     bool auto_add_clipboard_links_ = {};
     QStringList clipboard_processed_keys_;
+    SleepInhibitor sleep_inhibitor_;
 
     QString const show_options_checkbox_name_ = QStringLiteral("show-options-checkbox");
 
@@ -196,11 +198,13 @@ private:
     static constexpr auto RefreshTorrentViewHeader = 1 << 3;
     static constexpr auto RefreshActionSensitivity = 1 << 4;
     static constexpr auto RefreshIcon = 1 << 5;
+    static constexpr auto RefreshSleepInhibitor = 1 << 6;
     int refresh_fields_ = {};
     QTimer refresh_timer_;
 
     void refreshActionSensitivity();
     void refreshIcons();
+    void refreshSleepInhibitor();
     void refreshStatusBar(TransferStats const& stats);
     void refreshTitle();
     void refreshTorrentViewHeader();

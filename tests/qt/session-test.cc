@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <ranges>
 
 #include <QApplication>
 #include <QDir>
@@ -106,6 +107,52 @@ private slots:
                 return payload_re.match(str).hasMatch();
             });
         QVERIFY(has_session_set);
+    }
+
+    static void main_window_torrent_refreshes_request_is_stalled_data()
+    {
+        QTest::addColumn<Style>("initial_style");
+        QTest::addColumn<QString>("method");
+        QTest::addColumn<QString>("field");
+        QTest::newRow("Tr4") << Style::Tr4 << QStringLiteral(R"("method":"torrent-get")") << QStringLiteral(R"("isStalled")");
+        QTest::newRow("Tr5") << Style::Tr5 << QStringLiteral(R"("method":"torrent_get")") << QStringLiteral(R"("is_stalled")");
+    }
+    void main_window_torrent_refreshes_request_is_stalled()
+    {
+        // setup: set api_compat style
+        QFETCH(Style const, initial_style);
+        QFETCH(QString const, method);
+        QFETCH(QString const, field);
+        api_compat::set_default_style(initial_style);
+
+        // setup: make a Session that points to a remote session
+        auto const sandbox_dir = sandboxDir();
+        auto prefs = Prefs{};
+        prefs.set(TR_KEY_remote_session_enabled, true);
+        prefs.set(TR_KEY_remote_session_host, QStringLiteral("example.invalid"));
+        prefs.set(TR_KEY_remote_session_port, TrDefaultRpcPort);
+        auto nam = FakeNetworkAccessManager{};
+        auto rpc = RpcClient{ nam };
+        auto session = Session{ sandbox_dir, prefs, rpc };
+        session.restart();
+
+        // action: do the main window's initial and periodic torrent refreshes
+        auto const before = nam.request_bodies.size();
+        session.initTorrents();
+        session.refreshAllTorrents();
+
+        // verify that both torrent_get requests asked for is_stalled
+        auto const bodies = nam.request_bodies.mid(before);
+        auto const is_torrent_get = [&method](QByteArray const& body)
+        {
+            return QString::fromUtf8(body).contains(method);
+        };
+        auto const requests_field = [&field](QByteArray const& body)
+        {
+            return QString::fromUtf8(body).contains(field);
+        };
+        QCOMPARE(std::ranges::count_if(bodies, is_torrent_get), 2);
+        QVERIFY(std::ranges::all_of(bodies | std::views::filter(is_torrent_get), requests_field));
     }
 };
 

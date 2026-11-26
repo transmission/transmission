@@ -740,6 +740,11 @@ void MainWindow::onRefreshTimer()
     {
         refreshActionSensitivity();
     }
+
+    if (fields & RefreshSleepInhibitor)
+    {
+        refreshSleepInhibitor();
+    }
 }
 
 void MainWindow::refreshTitle()
@@ -797,6 +802,21 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
                 .arg(Formatter::storage_to_string(st.downloadedBytes))
                 .arg(Formatter::storage_to_string(st.uploadedBytes)) :
             tr("Ratio: %1").arg(Formatter::ratio_to_string(st.ratio)));
+}
+
+void MainWindow::refreshSleepInhibitor()
+{
+    // A torrent that loses its peers stays active until it stalls, so a
+    // brief gap in transfers doesn't let the computer sleep.
+    auto const is_active = [](auto const* tor)
+    {
+        return !tor->isPaused() && !tor->isQueued() && !tor->isStalled() && !tor->hasError();
+    };
+
+    // A remote session keeps transferring whether or not this computer sleeps.
+    auto const inhibit = std::ranges::any_of(model_.torrents(), is_active) && session_.isLocal() &&
+        prefs_.get<bool>(TR_KEY_inhibit_desktop_hibernation);
+    sleep_inhibitor_.setInhibited(inhibit);
 }
 
 void MainWindow::refreshTorrentViewHeader()
@@ -1208,6 +1228,10 @@ void MainWindow::refreshPref(tr_quark const key)
         tray_icon_.setVisible(b);
         QApplication::setQuitOnLastWindowClosed(!b);
         refreshSoon(RefreshTrayIcon);
+        break;
+
+    case TR_KEY_inhibit_desktop_hibernation:
+        refreshSoon(RefreshSleepInhibitor);
         break;
 
     case TR_KEY_compact_view:

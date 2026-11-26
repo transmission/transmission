@@ -81,6 +81,9 @@ target_sources(${TR_NAME}-qt-lib
         Session.h
         SessionDialog.cc
         SessionDialog.h
+        SleepInhibitor.cc
+        $<$<BOOL:${APPLE}>:SleepInhibitorMac.mm>
+        SleepInhibitor.h
         Speed.h
         SqueezeLabel.cc
         SqueezeLabel.h
