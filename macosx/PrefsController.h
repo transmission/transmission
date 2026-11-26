@@ -17,5 +17,6 @@
 - (instancetype)initWithHandle:(tr_session*)handle;
 
 - (void)rpcUpdatePrefs;
+- (void)stopUpdating;
 
 @end

@@ -33,6 +33,7 @@ static dispatch_queue_t timeMachineExcludeQueue;
 @interface Torrent ()
 
 @property(nonatomic, readonly) tr_torrent* fHandle;
+@property(nonatomic, readonly) tr_session* fLib;
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
@@ -51,6 +52,14 @@ static dispatch_queue_t timeMachineExcludeQueue;
 
 @property(nonatomic) BOOL fResumeOnWake;
 @property(nonatomic, copy, readwrite) NSString* hashString;
+
+// Backing state for knownDataLocation. Main-thread only.
+@property(nonatomic, copy) NSString* fKnownDataLocation;
+@property(nonatomic) BOOL fKnownDataLocationProbed;
+@property(nonatomic) BOOL fKnownDataLocationProbeInFlight;
+// The peer list returned by the last successful tr_torrentTryPeers(); shown
+// again when the session lock is busy so the inspector never waits for it.
+@property(nonatomic, copy) NSArray<NSDictionary*>* fLastPeers;
 
 - (BOOL)canChangeDownloadChecks;
 
@@ -537,14 +546,31 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         return;
     }
 
-    int volatile status;
-    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, &status);
+    // The move runs on the session thread; across volumes it is a full copy
+    // that can take minutes. The session thread reports progress through the
+    // int it is given, so poll that from a timer and let the main thread keep
+    // running events in the meantime. The int is heap-allocated because the
+    // session thread writes to it after this method has returned.
+    auto* const status = new int volatile { TR_LOC_MOVING };
+    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, status);
 
-    while (status == TR_LOC_MOVING) //block while moving (for now)
-    {
-        [NSThread sleepForTimeInterval:0.05];
-    }
+    __weak __auto_type weakSelf = self;
+    NSTimer* timer = [NSTimer timerWithTimeInterval:0.2 repeats:YES block:^(NSTimer* t) {
+        if (*status == TR_LOC_MOVING)
+        {
+            return;
+        }
 
+        [t invalidate];
+        int const result = *status;
+        delete status;
+        [weakSelf finishMoveWithStatus:result];
+    }];
+    [NSRunLoop.mainRunLoop addTimer:timer forMode:NSRunLoopCommonModes];
+}
+
+- (void)finishMoveWithStatus:(int)status
+{
     if (status == TR_LOC_DONE)
     {
         [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateStats" object:nil];
@@ -797,6 +823,87 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
     }
 }
 
+- (NSString*)knownDataLocation
+{
+    if (self.magnet)
+    {
+        return nil;
+    }
+
+    [self probeDataLocationIfNeeded];
+    return self.fKnownDataLocation;
+}
+
+// Mirrors dataLocation's search: the torrent folder for multi-file torrents,
+// otherwise the places tr_torrentFindFile() looks for a single file. Built on
+// the calling thread from torrent state so that the background probe handles
+// only path strings and never the tr_torrent, which closeRemoveTorrent: frees.
+- (NSArray<NSString*>*)dataLocationCandidates
+{
+    if (self.folder)
+    {
+        return @[ [self.currentDirectory stringByAppendingPathComponent:self.name] ];
+    }
+
+    NSString* fileName = @(tr_torrentFile(self.fHandle, 0).name);
+
+    NSMutableArray<NSString*>* directories = [NSMutableArray
+        arrayWithObject:tr_strv_to_utf8_nsstring(tr_torrentGetDownloadDir(self.fHandle))];
+    if (tr_sessionIsIncompleteDirEnabled(self.fLib))
+    {
+        [directories addObject:tr_strv_to_utf8_nsstring(tr_sessionGetIncompleteDir(self.fLib))];
+    }
+
+    NSMutableArray<NSString*>* candidates = [NSMutableArray arrayWithCapacity:directories.count * 2];
+    for (NSString* directory in directories)
+    {
+        NSString* path = [directory stringByAppendingPathComponent:fileName];
+        [candidates addObject:path];
+        [candidates addObject:[path stringByAppendingPathExtension:@"part"]];
+    }
+    return candidates;
+}
+
+- (void)probeDataLocationIfNeeded
+{
+    if (self.fKnownDataLocationProbeInFlight)
+    {
+        return;
+    }
+    self.fKnownDataLocationProbeInFlight = YES;
+
+    NSArray<NSString*>* candidates = self.dataLocationCandidates;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        NSString* found = nil;
+        for (NSString* path in candidates)
+        {
+            if ([NSFileManager.defaultManager fileExistsAtPath:path])
+            {
+                found = path;
+                break;
+            }
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.fKnownDataLocationProbeInFlight = NO;
+
+            // Before the first probe the UI shows nil, so only a non-nil
+            // first result is news. After that any difference is.
+            BOOL const changed = self.fKnownDataLocationProbed ?
+                (found != self.fKnownDataLocation && ![found isEqualToString:self.fKnownDataLocation]) :
+                (found != nil);
+            self.fKnownDataLocationProbed = YES;
+            self.fKnownDataLocation = found;
+
+            if (changed)
+            {
+                [NSNotificationCenter.defaultCenter postNotificationName:@"ResetInspector" object:self
+                                                                userInfo:@{ @"Torrent" : self }];
+            }
+        });
+    });
+}
+
 - (NSString*)lastKnownDataLocation
 {
     if (self.magnet)
@@ -1002,7 +1109,11 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
 - (NSArray<NSDictionary*>*)peers
 {
-    auto const peers = tr_torrentPeers(self.fHandle);
+    auto peers = std::vector<tr_peer_stat>{};
+    if (!tr_torrentTryPeers(self.fLib, self.id, &peers))
+    {
+        return self.fLastPeers ?: @[];
+    }
     size_t const totalPeers = peers.size();
 
     NSMutableArray* peerDicts = [NSMutableArray arrayWithCapacity:totalPeers];
@@ -1034,6 +1145,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
         [peerDicts addObject:dict];
     }
 
+    self.fLastPeers = peerDicts;
     return peerDicts;
 }
 
@@ -1829,6 +1941,7 @@ static tr_torrent_rename_done_func makeRenameDoneCallback(NSDictionary* contextI
 
     _fDefaults = NSUserDefaults.standardUserDefaults;
     _fStat = tr_stat{};
+    _fLib = lib;
 
     if (torrentStruct)
     {

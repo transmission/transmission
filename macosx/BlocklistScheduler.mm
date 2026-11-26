@@ -4,6 +4,7 @@
 
 #import "BlocklistScheduler.h"
 #import "BlocklistDownloader.h"
+#import "Controller.h"
 
 //thirty second delay before running after option is changed
 static NSTimeInterval const kSmallDelay = 30;
@@ -35,6 +36,11 @@ static NSTimeInterval const kFullWait = 60 * 60 * 24 * 7;
         return;
 
     [self cancelSchedule];
+
+    if (((Controller*)NSApp.delegate).quitting)
+    {
+        return;
+    }
 
     NSString* blocklistURL;
     if (![NSUserDefaults.standardUserDefaults boolForKey:@"BlocklistNew"] ||

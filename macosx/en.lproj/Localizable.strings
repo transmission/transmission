@@ -274,6 +274,9 @@
 /* View menu -> Quick Look */
 "Close Quick Look" = "Close Quick Look";
 
+/* Quit progress window -> message */
+"Closing connections" = "Closing connections";
+
 /* Blocklist -> message */
 "Connecting to site" = "Connecting to site";
 
@@ -760,6 +763,9 @@
 /* Confirm Quit panel -> button
    Legal alert -> button */
 "Quit" = "Quit";
+
+/* Quit progress window -> title */
+"Quitting Transmission" = "Quitting Transmission";
 
 /* Stats window -> label
    status bar -> status label

@@ -227,7 +227,11 @@ bool tr_sys_path_copy(std::string_view const src_path, std::string_view const ds
 #if defined(USE_COPYFILE)
     auto const sz_src_path = tr_pathbuf{ src_path };
     auto const sz_dst_path = tr_pathbuf{ dst_path };
-    if (copyfile(sz_src_path.c_str(), sz_dst_path.c_str(), nullptr, COPYFILE_CLONE | COPYFILE_ALL) < 0)
+    // COPYFILE_CLONE implies COPYFILE_EXCL, so a destination left behind by an
+    // interrupted earlier copy would fail with EEXIST. COPYFILE_UNLINK removes
+    // it first, so the copy overwrites as the read/write branch below does.
+    auto const flags = COPYFILE_CLONE | COPYFILE_ALL | COPYFILE_UNLINK;
+    if (copyfile(sz_src_path.c_str(), sz_dst_path.c_str(), nullptr, flags) < 0)
     {
         error->set_from_errno(errno);
         return false;

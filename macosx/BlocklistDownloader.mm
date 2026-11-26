@@ -74,6 +74,11 @@ static BlocklistDownloader* fBLDownloader = nil;
     totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (((Controller*)NSApp.delegate).quitting)
+        {
+            return;
+        }
+
         self.fState = BlocklistDownloadStateDownloading;
 
         self.fCurrentSize = totalBytesWritten;
@@ -86,6 +91,11 @@ static BlocklistDownloader* fBLDownloader = nil;
 - (void)URLSession:(NSURLSession*)session task:(NSURLSessionTask*)task didCompleteWithError:(NSError*)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (((Controller*)NSApp.delegate).quitting)
+        {
+            return;
+        }
+
         if (error)
         {
             [self.viewController setFailed:error.localizedDescription];
@@ -106,6 +116,11 @@ static BlocklistDownloader* fBLDownloader = nil;
     self.fState = BlocklistDownloadStateProcessing;
 
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (((Controller*)NSApp.delegate).quitting)
+        {
+            return;
+        }
+
         [self.viewController setStatusProcessing];
     });
 
@@ -131,6 +146,13 @@ static BlocklistDownloader* fBLDownloader = nil;
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (((Controller*)NSApp.delegate).quitting)
+        {
+            [NSFileManager.defaultManager removeItemAtPath:blocklistFile error:nil];
+            [self.fSession invalidateAndCancel];
+            return;
+        }
+
         auto const count = tr_blocklistSetContent(((Controller*)NSApp.delegate).sessionHandle, blocklistFile.UTF8String);
 
         //delete downloaded file

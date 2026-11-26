@@ -9,8 +9,10 @@
 #include <ctime>
 #include <initializer_list>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <gtest/gtest.h>
 
@@ -355,6 +357,65 @@ TEST_F(SessionTest, loadTorrentsThenMagnets)
     ASSERT_NE(tor, nullptr);
 
     EXPECT_TRUE(tor->has_metainfo());
+}
+
+namespace
+{
+struct LoadProgress
+{
+    tr_session* session = nullptr;
+    size_t n_loaded = 0U;
+    bool was_loading_torrents = true;
+    std::optional<size_t> n_loaded_when_queued_work_ran;
+};
+
+void onTorrentLoaded(tr_torrent* /*tor*/, void* vprogress)
+{
+    auto* const progress = static_cast<LoadProgress*>(vprogress);
+    ++progress->n_loaded;
+    progress->was_loading_torrents = progress->was_loading_torrents && progress->session->isLoadingTorrents();
+
+    if (progress->n_loaded == 1U)
+    {
+        progress->session->queue_session_thread([progress]() { progress->n_loaded_when_queued_work_ran = progress->n_loaded; });
+    }
+}
+} // namespace
+
+// Work queued on the session thread during a load, e.g. a stat request from
+// a client's UI, must not wait for the last torrent.
+TEST_F(SessionTest, loadTorrentsLetsQueuedWorkRunBetweenFiles)
+{
+    static auto constexpr Torrents = std::array{
+        std::pair{ "archlinux-2025.05.01-x86_64.iso.torrent"sv, "a.torrent"sv },
+        std::pair{ "ubuntu-18.04.6-desktop-amd64.iso.torrent"sv, "b.torrent"sv },
+        std::pair{ "ubuntu-20.04.4-desktop-amd64.iso.torrent"sv, "c.torrent"sv },
+    };
+
+    for (auto const& [asset, name] : Torrents)
+    {
+        if (auto error = tr_error{};
+            !tr_sys_path_copy(
+                tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', asset },
+                tr_pathbuf{ session_->torrentDir(), '/', name },
+                &error))
+        {
+            GTEST_SKIP() << fmt::format("Failed to setup torrents dir: {} ({})", error.message(), error.code());
+        }
+    }
+
+    auto progress = LoadProgress{ .session = session_ };
+    auto* const ctor = tr_ctorNew(session_);
+    ctor->set_paused(TR_FORCE, false);
+    EXPECT_EQ(tr_sessionLoadTorrents(session_, ctor, onTorrentLoaded, &progress), std::size(Torrents));
+    tr_ctorFree(ctor);
+
+    EXPECT_EQ(progress.n_loaded, std::size(Torrents));
+    EXPECT_EQ(progress.n_loaded_when_queued_work_ran, 1U);
+
+    // the partly populated torrent queue must not be saved mid-load
+    EXPECT_TRUE(progress.was_loading_torrents);
+    EXPECT_FALSE(session_->isLoadingTorrents());
 }
 
 namespace

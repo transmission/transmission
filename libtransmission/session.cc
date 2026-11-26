@@ -741,7 +741,11 @@ void tr_session::on_save_timer()
     }
 
     stats().save_if_dirty();
-    torrent_queue().to_file();
+
+    if (!isLoadingTorrents())
+    {
+        torrent_queue().to_file();
+    }
 }
 
 void tr_session::initImpl(init_data& data)
@@ -1417,7 +1421,10 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     bound_ipv6_.reset();
     bound_ipv4_.reset();
 
-    torrent_queue().to_file();
+    if (!isLoadingTorrents())
+    {
+        torrent_queue().to_file();
+    }
 
     // Close the torrents in order of most active to least active
     // so that the most important announce=stopped events are
@@ -1526,65 +1533,157 @@ auto get_remaining_files(std::string_view folder, std::vector<std::string>& queu
     return ret;
 }
 
-void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
+// Loads one file per session-thread work item instead of all of them in one.
+// Work queued meanwhile, e.g. tr_torrentStatAsync(), runs between files
+// rather than after the last one.
+struct LoadState
 {
-    auto n_torrents = size_t{};
-    auto const& folder = session->torrentDir();
+    tr_session* session = nullptr;
+    tr_ctor* ctor = nullptr;
+    tr_torrent_loaded_func loaded = nullptr;
+    void* user_data = nullptr;
+    std::promise<size_t>* loaded_promise = nullptr;
 
-    auto load_func = [&folder, &n_torrents, ctor, buf = std::vector<char>{}](std::string_view name) mutable
+    std::string folder;
+    std::vector<std::string> filenames;
+    size_t next = 0U;
+    size_t n_torrents = 0U;
+    std::vector<char> buf;
+};
+
+void load_next_file(LoadState& state)
+{
+    auto const& name = state.filenames[state.next++];
+    auto* tor = static_cast<tr_torrent*>(nullptr);
+
+    if (tr_strv_ends_with(name, ".torrent"sv))
     {
-        if (tr_strv_ends_with(name, ".torrent"sv))
+        auto const path = tr_pathbuf{ state.folder, '/', name };
+        if (state.ctor->set_metainfo_from_file(path.sv()))
         {
-            auto const path = tr_pathbuf{ folder, '/', name };
-            if (ctor->set_metainfo_from_file(path.sv()) && tr_torrentNew(ctor, nullptr) != nullptr)
-            {
-                ++n_torrents;
-            }
+            tor = tr_torrentNew(state.ctor, nullptr);
         }
-        else if (tr_strv_ends_with(name, ".magnet"sv))
+    }
+    else if (tr_strv_ends_with(name, ".magnet"sv))
+    {
+        auto const path = tr_pathbuf{ state.folder, '/', name };
+        if (tr_file_read(path, state.buf) &&
+            state.ctor->set_metainfo_from_magnet_link(std::string_view{ std::data(state.buf), std::size(state.buf) }, nullptr))
         {
-            auto const path = tr_pathbuf{ folder, '/', name };
-            if (tr_file_read(path, buf) &&
-                ctor->set_metainfo_from_magnet_link(std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
-                tr_torrentNew(ctor, nullptr) != nullptr)
-            {
-                ++n_torrents;
-            }
+            tor = tr_torrentNew(state.ctor, nullptr);
         }
-    };
-
-    auto queue_order = session->torrent_queue().from_file();
-    for (auto const& filename : queue_order)
-    {
-        load_func(filename);
-    }
-    for (auto const& filename : get_remaining_files(folder, queue_order))
-    {
-        load_func(filename);
     }
 
-    if (n_torrents != 0U)
+    if (tor != nullptr)
+    {
+        ++state.n_torrents;
+        if (state.loaded != nullptr)
+        {
+            state.loaded(tor, state.user_data);
+        }
+    }
+}
+
+void finish_load(LoadState& state)
+{
+    if (state.n_torrents != 0U)
     {
         tr_logAddInfo(
             fmt::format(
-                fmt::runtime(tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents)),
-                fmt::arg("count", n_torrents)));
+                fmt::runtime(tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", state.n_torrents)),
+                fmt::arg("count", state.n_torrents)));
     }
 
-    session->setTorrentsLoadedTime();
-    loaded_promise->set_value(n_torrents);
+    state.session->setLoadingTorrents(false);
+    state.session->setTorrentsLoadedTime();
+    state.loaded_promise->set_value(state.n_torrents);
+}
+
+// The session can start closing between files, which frees the torrents
+// loaded so far; stop adding more to it.
+[[nodiscard]] bool has_more_files(LoadState const& state)
+{
+    return state.next < std::size(state.filenames) && !state.session->isClosing();
+}
+
+void load_next_file_then_continue(std::shared_ptr<LoadState> const& state)
+{
+    // checked before loading too, in case the session started closing since
+    // this work item was queued
+    if (has_more_files(*state))
+    {
+        load_next_file(*state);
+    }
+
+    if (has_more_files(*state))
+    {
+        state->session->queue_session_thread([state]() { load_next_file_then_continue(state); });
+    }
+    else
+    {
+        finish_load(*state);
+    }
+}
+
+void session_load_torrents(
+    tr_session* session,
+    tr_ctor* ctor,
+    tr_torrent_loaded_func loaded,
+    void* user_data,
+    std::promise<size_t>* loaded_promise,
+    bool const run_to_completion)
+{
+    auto state = std::make_shared<LoadState>();
+    state->session = session;
+    state->ctor = ctor;
+    state->loaded = loaded;
+    state->user_data = user_data;
+    state->loaded_promise = loaded_promise;
+    state->folder = session->torrentDir();
+
+    // get_remaining_files() sorts its argument, so keep a copy in queue order
+    auto queue_order = session->torrent_queue().from_file();
+    state->filenames = queue_order;
+    for (auto& filename : get_remaining_files(state->folder, queue_order))
+    {
+        state->filenames.emplace_back(std::move(filename));
+    }
+
+    session->setLoadingTorrents(true);
+
+    if (run_to_completion)
+    {
+        while (has_more_files(*state))
+        {
+            load_next_file(*state);
+        }
+        finish_load(*state);
+    }
+    else
+    {
+        load_next_file_then_continue(state);
+    }
 }
 } // namespace load_torrents_helpers
 } // namespace
 
-size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
+size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor, tr_torrent_loaded_func loaded, void* user_data)
 {
     using namespace load_torrents_helpers;
 
     auto loaded_promise = std::promise<size_t>{};
     auto loaded_future = loaded_promise.get_future();
 
-    session->run_in_session_thread(session_load_torrents, session, ctor, &loaded_promise);
+    // From the session thread, waiting on work queued behind the caller would
+    // never return, so there the whole load runs before this function does.
+    session->run_in_session_thread(
+        session_load_torrents,
+        session,
+        ctor,
+        loaded,
+        user_data,
+        &loaded_promise,
+        session->am_in_session_thread());
     loaded_future.wait();
     auto const n_torrents = loaded_future.get();
     return n_torrents;
