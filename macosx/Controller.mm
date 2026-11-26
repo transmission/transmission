@@ -98,6 +98,7 @@ static SortType const SortTypeOrder = @"Order";
 static SortType const SortTypeActivity = @"Activity";
 static SortType const SortTypeSize = @"Size";
 static SortType const SortTypeETA = @"ETA";
+static SortType const SortTypeUploaded = @"Uploaded";
 
 typedef NS_ENUM(NSUInteger, SortTag) {
     SortTagOrder = 0,
@@ -108,7 +109,8 @@ typedef NS_ENUM(NSUInteger, SortTag) {
     SortTagTracker = 5,
     SortTagActivity = 6,
     SortTagSize = 7,
-    SortTagETA = 8
+    SortTagETA = 8,
+    SortTagUploaded = 9
 };
 
 typedef NS_ENUM(NSUInteger, SortOrderTag) { //
@@ -2830,6 +2832,9 @@ static void removeKeRangerRansomware()
     case SortTagETA:
         sortType = SortTypeETA;
         break;
+    case SortTagUploaded:
+        sortType = SortTypeUploaded;
+        break;
     default:
         NSAssert1(NO, @"Unknown sort tag received: %ld", senderMenuItem.tag);
         return;
@@ -2925,6 +2930,12 @@ static void removeKeRangerRansomware()
         NSSortDescriptor* sizeDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"totalSizeSelected" ascending:asc];
 
         descriptors = @[ sizeDescriptor, nameDescriptor ];
+    }
+    else if ([sortType isEqualToString:SortTypeUploaded])
+    {
+        NSSortDescriptor* uploadDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"uploadedTotal" ascending:!asc];
+
+        descriptors = @[ uploadDescriptor, nameDescriptor ];
     }
     else if ([sortType isEqualToString:SortTypeName])
     {
@@ -4730,6 +4741,9 @@ static void removeKeRangerRansomware()
             break;
         case SortTagETA:
             sortType = SortTypeETA;
+            break;
+        case SortTagUploaded:
+            sortType = SortTypeUploaded;
             break;
         default:
             NSAssert1(NO, @"Unknown sort tag received: %ld", [menuItem tag]);

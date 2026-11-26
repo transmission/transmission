@@ -818,6 +818,11 @@ Storage Torrent::get_total_size() const
     return impl_->get_cache().total_size;
 }
 
+Storage Torrent::get_uploaded_ever() const
+{
+    return impl_->get_cache().uploaded_ever;
+}
+
 float Torrent::get_ratio() const
 {
     return impl_->get_cache().ratio;

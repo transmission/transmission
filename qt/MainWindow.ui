@@ -260,6 +260,7 @@
     <addaction name="action_SortByRatio"/>
     <addaction name="action_SortBySize"/>
     <addaction name="action_SortByState"/>
+    <addaction name="action_SortByUploaded"/>
     <addaction name="action_SortByETA"/>
     <addaction name="separator"/>
     <addaction name="action_ReverseSortOrder"/>
@@ -583,6 +584,14 @@
    </property>
    <property name="text">
     <string>Sort by Stat&amp;e</string>
+   </property>
+  </action>
+  <action name="action_SortByUploaded">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sort by Upl&amp;oaded</string>
    </property>
   </action>
   <action name="action_SortByTracker">
