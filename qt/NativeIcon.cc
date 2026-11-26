@@ -254,6 +254,12 @@ struct Info
         fallback = QStyle::SP_TrashIcon;
         break;
 
+    case Type::RenameTorrent:
+        sf_symbol_name = "pencil";
+        segoe_codepoint = 0xE70FU; // Edit
+        xdg_icon_name = "document-edit";
+        break;
+
     case Type::SetTorrentLocation:
         sf_symbol_name = "arrow.up.and.down.and.arrow.left.and.right";
         segoe_codepoint = 0xE7C2U; // Move

@@ -213,6 +213,7 @@
     <addaction name="action_Announce"/>
     <addaction name="action_Pause"/>
     <addaction name="separator"/>
+    <addaction name="action_Rename"/>
     <addaction name="action_SetLocation"/>
     <addaction name="action_Verify"/>
     <addaction name="action_CopyMagnetToClipboard"/>
@@ -782,6 +783,14 @@
    </property>
    <property name="text">
     <string>Sort by &amp;Queue</string>
+   </property>
+  </action>
+  <action name="action_Rename">
+   <property name="text">
+    <string>Rename</string>
+   </property>
+   <property name="toolTip">
+    <string>Rename Torrent</string>
    </property>
   </action>
  </widget>

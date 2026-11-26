@@ -29,6 +29,7 @@ enum class Type : uint8_t
     PauseTorrent,
     RemoveTorrent,
     RemoveTorrentAndDeleteData,
+    RenameTorrent,
     SetTorrentLocation,
     CopyMagnetLinkToClipboard,
     VerifyTorrent,
