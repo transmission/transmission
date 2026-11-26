@@ -159,6 +159,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_download_count,
     TR_KEY_download_dir,
     TR_KEY_download_dir_free_space,
+    TR_KEY_download_dir_same_as_torrent,
     TR_KEY_download_limit,
     TR_KEY_download_limited,
     TR_KEY_download_queue_enabled,

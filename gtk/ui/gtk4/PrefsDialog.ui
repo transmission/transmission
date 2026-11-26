@@ -378,6 +378,19 @@
                                 </layout>
                               </object>
                             </child>
+                            <child>
+                              <object class="GtkCheckButton" id="download_dir_same_as_torrent_check">
+                                <property name="label" translatable="yes">Download to the same folder as the .torrent _file</property>
+                                <property name="focusable">1</property>
+                                <property name="valign">center</property>
+                                <property name="use-underline">1</property>
+                                <layout>
+                                  <property name="column">0</property>
+                                  <property name="row">6</property>
+                                  <property name="column-span">2</property>
+                                </layout>
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>

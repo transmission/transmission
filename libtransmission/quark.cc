@@ -148,6 +148,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "download_count"sv, // rpc
     "download_dir"sv, // daemon, gtk app, rpc, tr_session::Settings
     "download_dir_free_space"sv, // rpc
+    "download_dir_same_as_torrent"sv, // gtk app
     "download_limit"sv, // rpc
     "download_limited"sv, // rpc
     "download_queue_enabled"sv, // rpc, tr_session::Settings
