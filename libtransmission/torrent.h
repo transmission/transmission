@@ -60,6 +60,7 @@ namespace tr::test
 
 class RenameTest_multifileTorrent_Test;
 class RenameTest_singleFilenameTorrent_Test;
+class TorrentTest_pieceThatFailsItsLazyCheckIsWantedAgain_Test;
 
 } // namespace tr::test
 
@@ -94,6 +95,7 @@ struct tr_torrent
     private:
         friend class tr::test::RenameTest_multifileTorrent_Test;
         friend class tr::test::RenameTest_singleFilenameTorrent_Test;
+        friend class tr::test::TorrentTest_pieceThatFailsItsLazyCheckIsWantedAgain_Test;
         friend struct tr_torrent;
 
         explicit ResumeHelper(tr_torrent& tor)
@@ -1020,6 +1022,7 @@ struct tr_torrent
 
     sigslot::signal<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
     sigslot::signal<tr_torrent*, tr_piece_index_t> got_bad_piece_;
+    sigslot::signal<tr_torrent*, tr_piece_index_t> lost_piece_;
     sigslot::signal<tr_torrent*, tr_piece_index_t> piece_completed_;
     sigslot::signal<tr_torrent*> doomed_;
     sigslot::signal<tr_torrent*> got_metainfo_;

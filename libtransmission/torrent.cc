@@ -2583,11 +2583,26 @@ void tr_torrent::mark_changed()
         return true;
     }
 
-    bool const checked = check_piece(piece);
+    auto const hash = tr_ioHashPiece(*this, piece);
+    bool const checked = hash && *hash == piece_hash(piece);
+    tr_logAddTraceTor(this, fmt::format("[LAZY] tr_torrent.ensure_piece_is_checked tested piece {}, pass=={}", piece, checked));
     mark_changed();
     set_dirty();
 
     checked_pieces_.set(piece, checked);
+
+    // If the piece was read and does not match its checksum, the local data
+    // is not what we thought it was. Stop claiming the piece so that it gets
+    // downloaded again. A piece that could not be read is left alone, since
+    // it may be readable again later, e.g. when its drive is reconnected.
+    if (hash && !checked && has_piece(piece))
+    {
+        tr_logAddDebugTor(this, fmt::format("Piece {}, which we thought we had, failed its checksum test", piece));
+        set_has_piece(piece, false);
+        set_needs_completeness_check();
+        lost_piece_(this, piece);
+    }
+
     return checked;
 }
 

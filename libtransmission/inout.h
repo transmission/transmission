@@ -10,6 +10,7 @@
 #endif
 
 #include <cstdint> // uint8_t
+#include <optional>
 #include <span>
 
 #include "libtransmission/error-types.h"
@@ -38,6 +39,12 @@ struct tr_torrent;
     tr_open_files& open_files,
     tr_block_info::Location const& loc,
     std::span<uint8_t const> writeme);
+
+/**
+ * @brief Calculate the SHA1 checksum of the piece's local data.
+ * @return the checksum, or an empty optional if the piece could not be read.
+ */
+[[nodiscard]] std::optional<tr_sha1_digest_t> tr_ioHashPiece(tr_torrent const& tor, tr_piece_index_t piece);
 
 /**
  * @brief Test to see if the piece matches its metainfo's SHA1 checksum.
