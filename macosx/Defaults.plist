@@ -146,6 +146,8 @@
 	<false/>
 	<key>SeedingSound</key>
 	<string>Submarine</string>
+	<key>SequentialDownload</key>
+	<false/>
 	<key>ShowInspector</key>
 	<false/>
 	<key>SleepPrevent</key>
