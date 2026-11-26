@@ -40,18 +40,6 @@ struct sockaddr;
 
 namespace
 {
-// Helps us to ignore errors that say "try again later"
-// since that's what peer-io does by default anyway.
-[[nodiscard]] constexpr auto can_retry_from_error(tr_error_code_t error_code) noexcept
-{
-#ifdef _WIN32
-    return error_code == 0 || error_code == WSAEWOULDBLOCK || error_code == WSAEINTR || error_code == WSAEINPROGRESS;
-#else
-    return error_code == 0 || error_code == EAGAIN || error_code == EWOULDBLOCK || error_code == EINTR ||
-        error_code == EINPROGRESS;
-#endif
-}
-
 size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
 {
     // this is all kind of arbitrary, but what seems to work well is
@@ -351,16 +339,20 @@ size_t tr_peerIo::try_write(size_t max)
     auto error = tr_error{};
     auto const n_written = socket_->try_write(buf, max, &error);
     // enable further writes if there's more data to write
-    set_enabled(Dir, !std::empty(buf) && (!error || can_retry_from_error(error.code())));
+    set_enabled(Dir, !std::empty(buf) && (!error || tr::detail::peer_io_error_is_retryable(error.code())));
 
     if (error)
     {
-        if (!can_retry_from_error(error.code()))
+        if (!tr::detail::peer_io_error_is_retryable(error.code()))
         {
             tr_logAddTraceIo(
                 this,
                 fmt::format("try_write err: wrote:{}, errno:{} ({})", n_written, error.code(), error.message()));
-            call_error_callback(error);
+            // The RTC socket already delivered its terminal error callback on closure.
+            if (!socket_->is_rtc() || !socket_->is_closed())
+            {
+                call_error_callback(error);
+            }
         }
     }
     else if (n_written > 0U)
@@ -459,14 +451,17 @@ size_t tr_peerIo::try_read(size_t max)
     auto& buf = inbuf_;
     auto error = tr_error{};
     auto const n_read = socket_->try_read(buf, max, &error);
-    set_enabled(Dir, !error || can_retry_from_error(error.code()));
+    set_enabled(Dir, !error || tr::detail::peer_io_error_is_retryable(error.code()));
 
     if (error)
     {
-        if (!can_retry_from_error(error.code()))
+        if (!tr::detail::peer_io_error_is_retryable(error.code()))
         {
             tr_logAddTraceIo(this, fmt::format("try_read err: n_read:{} errno:{} ({})", n_read, error.code(), error.message()));
-            call_error_callback(error);
+            if (!socket_->is_rtc() || !socket_->is_closed())
+            {
+                call_error_callback(error);
+            }
         }
     }
     else if (!std::empty(buf))

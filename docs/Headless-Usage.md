@@ -75,6 +75,29 @@ Once the daemon is configured to your liking, start it back up.
 ```
 Headless Transmission is now configured.
 
+## WebTorrent command-line configuration
+
+WebTorrent requires a build with `ENABLE_WEBTORRENT=ON` and is disabled by default at runtime. The daemon can be started with WebTorrent enabled and a comma-separated ICE server list:
+
+```sh
+transmission-daemon --webtorrent --webtorrent-ice-servers "stun:stun.l.google.com:19302,turn:relay.example.test:3478"
+```
+
+The same settings can be changed on a running daemon with `transmission-remote`:
+
+```sh
+transmission-remote --webtorrent --webtorrent-ice-servers "stun:stun.l.google.com:19302"
+transmission-remote --session-info
+transmission-remote --torrent 1 --peer-info
+transmission-remote --no-webtorrent
+```
+
+The `--session-info` output reports whether WebTorrent is enabled and the number of configured ICE servers. The peer-information output distinguishes WebRTC from TCP and uTP connections. For standalone use, `transmission-cli` supports the same three options.
+
+The `--webtorrent-ice-servers` option replaces the current list; an empty string clears it. The daemon and standalone CLI load other settings from their configuration directories as usual. `webtorrent_enabled` and `webtorrent_ice_servers` are also available in `settings.json` and via the `session_get`/`session_set` RPC methods.
+
+WS/WSS tracker signaling can use Transmission's HTTP/SOCKS proxy, but WebRTC ICE and peer traffic do not automatically use that proxy. ICE candidates may disclose network addresses. Credentials in command-line arguments may be visible to other local users; avoid placing sensitive TURN credentials directly on the command line.
+
 ## Usage
 To add a torrent:
 ```

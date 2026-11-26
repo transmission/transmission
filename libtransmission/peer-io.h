@@ -10,6 +10,7 @@
 #endif
 
 #include <algorithm>
+#include <cerrno>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <deque>
@@ -22,6 +23,7 @@
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/peer-socket.h"
+#include "libtransmission/error-types.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/types.h"
 
@@ -39,6 +41,20 @@ namespace test
 class HandshakeTest;
 }
 } // namespace tr
+
+namespace tr::detail
+{
+[[nodiscard]] constexpr bool peer_io_error_is_retryable(tr_error_code_t error_code) noexcept
+{
+#ifdef _WIN32
+    return error_code == 0 || error_code == EAGAIN || error_code == WSAEWOULDBLOCK || error_code == WSAEINTR ||
+        error_code == WSAEINPROGRESS;
+#else
+    return error_code == 0 || error_code == EAGAIN || error_code == EWOULDBLOCK || error_code == EINTR ||
+        error_code == EINPROGRESS;
+#endif
+}
+} // namespace tr::detail
 
 enum class ReadState : uint8_t
 {
@@ -102,6 +118,11 @@ public:
     [[nodiscard]] auto is_utp() const noexcept
     {
         return socket_ ? socket_->is_utp() : false;
+    }
+
+    [[nodiscard]] auto is_rtc() const noexcept
+    {
+        return socket_ ? socket_->is_rtc() : false;
     }
 
     void clear();

@@ -41,7 +41,8 @@ public:
         tr_peer_id_t peer_id,
         bool connection_is_encrypted,
         bool connection_is_incoming,
-        bool connection_is_utp);
+        bool connection_is_utp,
+        bool connection_is_rtc);
 
     ~tr_peerMsgs() override;
 
@@ -88,6 +89,11 @@ public:
     [[nodiscard]] constexpr auto is_utp_connection() const noexcept
     {
         return connection_is_utp_;
+    }
+
+    [[nodiscard]] constexpr auto is_rtc_connection() const noexcept
+    {
+        return connection_is_rtc_;
     }
 
     [[nodiscard]] constexpr auto const& user_agent() const noexcept
@@ -191,6 +197,7 @@ private:
     bool const connection_is_encrypted_;
     bool const connection_is_incoming_;
     bool const connection_is_utp_;
+    bool const connection_is_rtc_;
 
     std::array<bool, 2> is_active_ = {};
 

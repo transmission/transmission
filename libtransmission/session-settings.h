@@ -106,6 +106,7 @@ public:
     bool tcp_enabled = true;
     bool torrent_complete_verify_enabled = false;
     bool utp_enabled = true;
+    bool webtorrent_enabled = false;
     double ratio_limit = 2.0;
     size_t unused_cache_size_mbytes = 4U; // TODO(TR5): remove
     size_t download_queue_size = 5U;
@@ -123,6 +124,7 @@ public:
     };
     std::vector<std::string> ip_endpoint_ipv4 = { "https://ip4.transmissionbt.com/" };
     std::vector<std::string> ip_endpoint_ipv6 = { "https://ip6.transmissionbt.com/" };
+    std::vector<std::string> webtorrent_ice_servers = { "stun:stun.l.google.com:19302" };
     std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
     std::optional<std::string> proxy_url;
     std::string announce_ip;
@@ -217,7 +219,9 @@ public:
         Field<&SessionSettings::should_delete_source_torrents>{ TR_KEY_trash_original_torrent_files },
         Field<&SessionSettings::umask>{ TR_KEY_umask },
         Field<&SessionSettings::upload_slots_per_torrent>{ TR_KEY_upload_slots_per_torrent },
-        Field<&SessionSettings::utp_enabled>{ TR_KEY_utp_enabled });
+        Field<&SessionSettings::utp_enabled>{ TR_KEY_utp_enabled },
+        Field<&SessionSettings::webtorrent_enabled>{ TR_KEY_webtorrent_enabled },
+        Field<&SessionSettings::webtorrent_ice_servers>{ TR_KEY_webtorrent_ice_servers });
 };
 
 struct SessionAltSpeedSettings final

@@ -15,6 +15,7 @@
 #include <memory>
 #include <optional>
 #include <ranges>
+#include <string_view>
 #include <tuple> // std::tie
 #include <unordered_map>
 #include <utility>
@@ -1495,6 +1496,20 @@ void create_bit_torrent_peer(
     auto const& socket_address = result.io->socket_address();
     auto* const swarm = manager->get_existing_swarm(result.io->torrent_hash());
     auto info = swarm != nullptr ? swarm->get_existing_peer_info(socket_address) : std::shared_ptr<tr_peer_info>{};
+    auto const log_rtc_handshake = [&](std::string_view outcome)
+    {
+        if (result.io->is_rtc())
+        {
+            tr_logAddDebug(
+                fmt::format(
+                    "WebRTC handshake endpoint={} direction={} result={} received={}",
+                    socket_address.display_name(),
+                    result.io->is_incoming() ? "incoming" : "outgoing",
+                    outcome,
+                    result.read_anything_from_peer),
+                "WebRTC");
+        }
+    };
 
     if (result.io->is_incoming())
     {
@@ -1507,6 +1522,7 @@ void create_bit_torrent_peer(
 
     if (swarm == nullptr || !swarm->is_running)
     {
+        log_rtc_handshake("torrent-unavailable");
         return false;
     }
 
@@ -1586,6 +1602,7 @@ void create_bit_torrent_peer(
             }
         }
 
+        log_rtc_handshake("failed");
         return false;
     }
 
@@ -1600,6 +1617,7 @@ void create_bit_torrent_peer(
 
     if (!info)
     {
+        log_rtc_handshake("unknown-peer");
         return false;
     }
 
@@ -1624,19 +1642,23 @@ void create_bit_torrent_peer(
     if (info->is_banned())
     {
         tr_logAddTraceSwarm(swarm, fmt::format("banned peer {} tried to reconnect", info->display_name()));
+        log_rtc_handshake("banned");
         return false;
     }
 
     if (swarm->peerCount() >= swarm->tor->peer_limit()) // too many peers already
     {
+        log_rtc_handshake("peer-limit");
         return false;
     }
 
     if (info->is_connected()) // we're already connected to this peer; do nothing
     {
+        log_rtc_handshake("duplicate");
         return false;
     }
 
+    log_rtc_handshake("accepted");
     result.io->set_bandwidth(&swarm->tor->bandwidth());
     create_bit_torrent_peer(*swarm->tor, result.io, std::move(info), result.peer_id.value_or(tr_peer_id_t{}));
 
@@ -1658,12 +1680,14 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, std::shared_ptr<tr_peer_socket> 
     else if (!manager->incoming_handshakes.contains(socket->socket_address())) // we don't have a connection to them yet...
     {
         auto const& socket_address = socket->socket_address();
+        auto const is_rtc = socket->is_rtc();
         auto* const session = manager->session;
         manager->incoming_handshakes.try_emplace(
             socket_address,
             &manager->handshake_mediator_,
             tr_peerIo::new_incoming(session, &session->top_bandwidth_, std::move(socket)),
-            session->encryptionMode(),
+            // The BitTorrent handshake runs directly over the RTC DataChannel.
+            is_rtc ? TR_CLEAR_PREFERRED : session->encryptionMode(),
             [manager](tr_handshake::Result const& result) { return on_handshake_done(manager, result); });
     }
 }
@@ -1794,7 +1818,8 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
         infos.reserve(std::size(peers));
         for (auto const& peer : peers)
         {
-            if (peer->socket_address().address().type == address_type)
+            // Compact PEX requires TCP/µTP-dialable endpoints.
+            if (!peer->is_rtc_connection() && peer->socket_address().address().type == address_type)
             {
                 infos.emplace_back(peer->peer_info.get());
             }
@@ -1984,7 +2009,8 @@ namespace peer_stat_helpers
     stats.from = peer->peer_info->from_first();
     stats.progress = peer->percent_done();
     stats.is_utp = peer->is_utp_connection();
-    stats.is_encrypted = peer->is_encrypted();
+    stats.is_webrtc = peer->is_rtc_connection();
+    stats.is_encrypted = peer->is_encrypted() || stats.is_webrtc;
     stats.rate_to_peer = peer->get_piece_speed(now_msec, tr_direction::ClientToPeer);
     stats.rate_to_client = peer->get_piece_speed(now_msec, tr_direction::PeerToClient);
     stats.peer_is_choked = peer->peer_is_choked();

@@ -155,9 +155,9 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_CXX_COMPILER='clang++' \
-            -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_CXX_FLAGS="-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined -fsanitize-ignorelist=$PWD/.github/ubsan-ignorelist.txt" \
             -DCMAKE_C_COMPILER='clang' \
-            -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_C_FLAGS="-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined -fsanitize-ignorelist=$PWD/.github/ubsan-ignorelist.txt" \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=OFF \
             -DENABLE_DAEMON=OFF \
@@ -165,6 +165,7 @@ jobs:
             -DENABLE_MAC=OFF \
             -DENABLE_QT=OFF \
             -DENABLE_TESTS=ON \
+            -DENABLE_WEBTORRENT=ON \
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
@@ -182,6 +183,36 @@ jobs:
           build-dir: obj
           build-config: Debug
           enable-sanitizers: true
+
+  webtorrent-disabled:
+    runs-on: ubuntu-24.04
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-core == 'true' || needs.what-to-make.outputs.make-tests == 'true' }}
+    steps:
+      - name: Get Source
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Get Dependencies
+        uses: ./.github/actions/install-deps
+        with:
+          compiler: clang
+          use-sudo: true
+      - name: Configure without WebTorrent
+        run: |
+          cmake -S . -B obj -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+            -DENABLE_WEBTORRENT=OFF -DENABLE_TESTS=OFF \
+            -DENABLE_CLI=OFF -DENABLE_DAEMON=OFF \
+            -DENABLE_GTK=OFF -DENABLE_QT=OFF -DENABLE_MAC=OFF \
+            -DREBUILD_WEB=OFF -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_DHT=OFF -DUSE_SYSTEM_SIGSLOT=OFF \
+            -DUSE_SYSTEM_SMALL=OFF -DUSE_SYSTEM_UTP=OFF \
+            -DUSE_SYSTEM_WIDE_INTEGER=OFF
+      - name: Build without WebTorrent
+        run: cmake --build obj --config Debug
 
   sanitizer-tests-macos:
     runs-on: macos-26
@@ -217,6 +248,7 @@ jobs:
             -DENABLE_MAC=OFF \
             -DENABLE_QT=OFF \
             -DENABLE_TESTS=ON \
+            -DENABLE_WEBTORRENT=ON \
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
@@ -276,6 +308,7 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_WEBTORRENT=ON \
             -DRUN_CLANG_TIDY=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
@@ -389,6 +422,7 @@ jobs:
             -DENABLE_GTK=${{ matrix.enable-gtk && 'ON' || 'OFF' }} \
             -DENABLE_QT=${{ matrix.enable-qt && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ matrix.enable-tests && 'ON' || 'OFF' }} \
+            -DENABLE_WEBTORRENT=ON \
             -DRUN_CLANG_TIDY=ON \
             -DUSE_SYSTEM_DEFAULT=ON \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
@@ -404,7 +438,7 @@ jobs:
           if grep 'warning:' makelog; then exit 1; fi
 
   clang-tidy-libtransmission-win32:
-    runs-on: windows-2025
+    runs-on: windows-2022
     needs: what-to-make
     if: |
       needs.what-to-make.outputs.make-core == 'true' ||
@@ -424,6 +458,7 @@ jobs:
         with:
           arch: x64
           type: CoreDeps
+          cache-suffix: -vs2022
       - name: Setup Visual Studio Environment
         uses: ./src/.github/actions/setup-vs-env-win32
         with:
@@ -437,6 +472,7 @@ jobs:
             '-DCMAKE_BUILD_TYPE=Debug'
             "-DCMAKE_PREFIX_PATH=`"$Env:DEPS_PREFIX`""
             "-DENABLE_TESTS=${{ needs.what-to-make.outputs.make-tests == 'true' && 'ON' || 'OFF' }}"
+            '-DENABLE_WEBTORRENT=ON'
             '-DRUN_CLANG_TIDY=ON'
             '-DUSE_SYSTEM_DEFAULT=OFF'
           )
@@ -469,14 +505,32 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae xcbeautify
+        run: brew install --formulae xcbeautify cmake ninja
       - name: Get Source
         uses: actions/checkout@v6
         with:
           path: src
           submodules: recursive
       - name: Build
-        run: set -o pipefail && xcodebuild -project src/Transmission.xcodeproj -scheme Transmission -configuration 'Release - Debug' -derivedDataPath pfx ONLY_ACTIVE_ARCH=NO build | xcbeautify --renderer github-actions
+        run: |
+          set -o pipefail
+          xcodebuild -project src/Transmission.xcodeproj -scheme Transmission -configuration 'Release - Debug' -derivedDataPath pfx ONLY_ACTIVE_ARCH=NO build 2>&1 | tee xcodebuild.log | xcbeautify --renderer github-actions
+      - name: Upload Xcode build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: xcodebuild-native-log
+          path: xcodebuild.log
+      - name: Verify native WebTorrent linkage
+        run: |
+          set -euo pipefail
+          app="$(find pfx/Build/Products -path '*/Transmission.app/Contents/MacOS/Transmission' -print -quit)"
+          xcrun lipo "$app" -verify_arch arm64 x86_64
+          for arch in arm64 x86_64; do
+            xcrun nm -arch "$arch" "$app" > native-symbols.txt
+            grep -q '_curl_ws_recv' native-symbols.txt
+            grep -q '_curl_ws_send' native-symbols.txt
+          done
       - uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ github.job }}
@@ -539,6 +593,7 @@ jobs:
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEBTORRENT=ON \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
@@ -705,6 +760,7 @@ jobs:
             '-DENABLE_MAC=OFF'
             "-DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }}"
             "-DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }}"
+            '-DENABLE_WEBTORRENT=ON'
             '-DENABLE_UTILS=ON'
             "-DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }}"
             '-DENABLE_WERROR=ON'
@@ -738,7 +794,7 @@ jobs:
           path: obj/dist/msi/*.msi
 
   make-source-tarball:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-source-tarball == 'true' }}
     steps:
@@ -767,7 +823,8 @@ jobs:
           cmake \
             -S src \
             -B obj \
-            -G Ninja
+            -G Ninja \
+            -DENABLE_WEBTORRENT=ON
       - name: Create source tarball
         run: cmake --build obj --target package_source
       - uses: actions/upload-artifact@v6
@@ -842,6 +899,7 @@ jobs:
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEBTORRENT=ON \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=OFF
@@ -1090,6 +1148,7 @@ jobs:
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_FMT=OFF \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
@@ -1444,6 +1503,7 @@ jobs:
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFAULT=ON \
+            -DUSE_SYSTEM_FMT=OFF \
             -DUSE_SYSTEM_DHT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in Ubuntu` \
             -DUSE_SYSTEM_SMALL=OFF `# Not packaged in Ubuntu` \
@@ -1512,6 +1572,7 @@ jobs:
           run: |
             set -ex
             mkdir src && gtar xf transmission*.tar.* -C src --strip-components 1
+            patch -d src/third-party/libdatachannel/deps/libjuice -p1 < src/cmake/patches/libjuice-bsd-dual-stack.patch
             cmake \
               -S src \
               -B obj \
@@ -1572,7 +1633,12 @@ jobs:
             set -ex
             uname -a
             export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
-            export PKG_PATH="https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/`uname -p`/`uname -r`/All"
+            # NetBSD 11.1 is newer than the available pkgsrc binary package set.
+            pkg_release="$(uname -r)"
+            if [ "$pkg_release" = "11.1" ]; then
+              pkg_release="11.0_2026Q3"
+            fi
+            export PKG_PATH="https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/$(uname -p)/$pkg_release/All"
             # cairo, dbus, gtkmm4 and qt6-qtbase check for X11 shared libraries
             # as they install, so the sets have to go in before pkg_add adds
             # those packages.
@@ -1690,6 +1756,7 @@ jobs:
             set -ex
             export LANG=en_US.UTF-8 # Qt requires UTF-8 locales
             mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+            patch -d src/third-party/libdatachannel/deps/libjuice -p1 < src/cmake/patches/libjuice-bsd-dual-stack.patch
             cmake \
               -S src \
               -B obj \
@@ -1706,6 +1773,7 @@ jobs:
               -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
               -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
               -DREBUILD_WEB=OFF `# Installing esbuild via npm is not supported on DragonFlyBSD, the full list of supported platforms can be found at https://esbuild.github.io/getting-started/#download-a-build` \
+              -DENABLE_WEBTORRENT=ON \
               -DENABLE_WERROR=ON \
               -DRUN_CLANG_TIDY=OFF \
               -DUSE_SYSTEM_DEFAULT=ON \

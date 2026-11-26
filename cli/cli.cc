@@ -24,6 +24,7 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
+#include <libtransmission/webtorrent-ice-servers.h>
 #include <libtransmission/web.h> // tr_sessionFetch()
 
 using namespace std::literals;
@@ -52,7 +53,7 @@ char const* torrentPath = nullptr;
 using Arg = tr_option::Arg;
 static_assert(TrDefaultPeerPort == 51413, "update 'port' desc");
 static_assert(TrDefaultPeerSocketTos == "le", "update 'tos' desc");
-auto constexpr Options = std::array<tr_option, 20>{ {
+auto constexpr Options = std::array<tr_option, 23>{ {
     { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
     { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", Arg::Required, "<speed>" },
@@ -77,6 +78,9 @@ auto constexpr Options = std::array<tr_option, 20>{ {
     { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
     { 'w', "download-dir", "Where to save downloaded data", "w", Arg::Required, "<path>" },
     { 500, "sequential-download", "Download pieces sequentially", "seq", Arg::None, nullptr },
+    { 833, "webtorrent", "Enable WS/WSS trackers and WebRTC peers", nullptr, Arg::None, nullptr },
+    { 834, "no-webtorrent", "Disable WS/WSS trackers and WebRTC peers", nullptr, Arg::None, nullptr },
+    { 835, "webtorrent-ice-servers", "Comma-separated STUN/TURN server URLs for WebRTC", nullptr, Arg::Required, "<urls>" },
 
     { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
@@ -269,6 +273,18 @@ int parseCommandLine(tr_variant::Map& map, int argc, char const** argv)
 
         case 500:
             map[TR_KEY_sequential_download] = true;
+            break;
+
+        case 833:
+            map[TR_KEY_webtorrent_enabled] = true;
+            break;
+
+        case 834:
+            map[TR_KEY_webtorrent_enabled] = false;
+            break;
+
+        case 835:
+            map[TR_KEY_webtorrent_ice_servers] = tr_webtorrent_ice_servers::parse(my_optarg);
             break;
 
         case TR_OPT_UNK:

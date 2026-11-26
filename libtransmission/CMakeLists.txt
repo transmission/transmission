@@ -46,6 +46,8 @@ target_sources(${TR_NAME}
         blocklist.h
         clients.cc
         clients.h
+        curl-tls.cc
+        curl-tls.h
         completion.cc
         completion.h
         config-dir-lock.cc
@@ -107,6 +109,16 @@ target_sources(${TR_NAME}
         peer-socket-utp.h
         peer-socket.cc
         peer-socket.h
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws.cc>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws.h>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-protocol.cc>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:announcer-ws-protocol.h>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:websocket-client.cc>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:websocket-client.h>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:rtc-signaling.cc>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:rtc-signaling.h>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:peer-socket-rtc.cc>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:peer-socket-rtc.h>
         platform.cc
         platform.h
         port-forwarding-natpmp.cc
@@ -238,6 +250,7 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${WITH_INOTIFY}>:WITH_INOTIFY>
         $<$<BOOL:${WITH_KQUEUE}>:WITH_KQUEUE>
         $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:WITH_WEBTORRENT=1>
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
@@ -283,6 +296,7 @@ target_link_libraries(${TR_NAME}
         miniupnpc::miniupnpc
         dht::dht
         $<$<BOOL:${ENABLE_UTP}>:libutp::libutp>
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:${TR_WEBRTC_DATACHANNEL_TARGET}>
         libb64::libb64
         ${Intl_LIBRARIES}
         ${LIBM_LIBRARY}

@@ -31,3 +31,11 @@ sudo rm -rf /Library/Apple/usr/share/rosetta
 9. In Terminal, reinstall Rosetta with: `softwareupdate --install-rosetta`
 
 And finally the CI builds of Transmission.app will be openable.
+
+## WebTorrent validation
+
+When built with `ENABLE_WEBTORRENT=ON`, use `cmake --build build` followed by `ctest --test-dir build --output-on-failure` for the normal unit-test suite, including WebTorrent tracker and RTC endpoint tests.
+
+Sanity also verifies an `ENABLE_WEBTORRENT=OFF` build without feature-specific dependencies.
+
+Successfully exchanging WS/WSS tracker messages alone does not demonstrate successful ICE connectivity or BitTorrent payload transfer.

@@ -11,6 +11,7 @@
 
 #include <libtransmission/crypto-utils.h> // tr_rand_int()
 #include <libtransmission/string-utils.h>
+#include <libtransmission/webtorrent-ice-servers.h>
 
 #include "test-fixtures.h"
 
@@ -206,4 +207,16 @@ TEST_F(UtilsTest, trStrlower)
     EXPECT_EQ("apple"sv, tr_strlower("applE"sv));
     EXPECT_EQ("hello"sv, tr_strlower("HELLO"sv));
     EXPECT_EQ("hello"sv, tr_strlower("hello"sv));
+}
+
+TEST_F(UtilsTest, webtorrentIceServersCsv)
+{
+    auto servers = tr_webtorrent_ice_servers::parse(
+        "stun:stun.example.test:3478, turn:relay.example.test:3478, ,turns:relay.example.test:5349");
+    ASSERT_EQ(servers.size(), 3U);
+    EXPECT_EQ(servers[0].value_if<std::string_view>().value_or(""sv), "stun:stun.example.test:3478"sv);
+    EXPECT_EQ(servers[1].value_if<std::string_view>().value_or(""sv), "turn:relay.example.test:3478"sv);
+    EXPECT_EQ(servers[2].value_if<std::string_view>().value_or(""sv), "turns:relay.example.test:5349"sv);
+    EXPECT_TRUE(tr_webtorrent_ice_servers::parse("").empty());
+    EXPECT_TRUE(tr_webtorrent_ice_servers::parse(" , ").empty());
 }
