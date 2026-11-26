@@ -203,7 +203,10 @@ void MainWindow::Impl::on_popup_menu([[maybe_unused]] double event_x, [[maybe_un
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     popup_menu_->set_pointing_to({ static_cast<int>(event_x), static_cast<int>(event_y), 1, 1 });
-    popup_menu_->popup();
+    // GTK synchronizes menu section separators in a high-priority idle callback.
+    // Wait for that pass before measuring the popup, otherwise its first opening
+    // can be too short and hide the removal actions at the bottom.
+    Glib::signal_idle().connect_once(sigc::mem_fun(*popup_menu_, &Gtk::PopoverMenu::popup));
 #else
     popup_menu_->popup_at_pointer(nullptr);
 #endif
