@@ -511,7 +511,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
     auto const icon_state = is_paused ? QIcon::Off : QIcon::On;
     auto const color_group = is_item_active ? QPalette::Normal : QPalette::Inactive;
-    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
+    auto const color_role = is_item_selected && is_item_active ? QPalette::HighlightedText : QPalette::Text;
 
     auto text_color = (tor.hasError() && !is_item_selected) ? QColor{ Qt::GlobalColor::red } :
                                                               option.palette.color(color_group, color_role);
