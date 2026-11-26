@@ -1101,6 +1101,7 @@ private:
     void setSettings(tr_variant const& settings_map, bool force);
     void setSettings(Settings&& settings, bool force);
     void rebind_ipv6_if_changed();
+    void recreate_udp_core();
 
     void closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
     void closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);

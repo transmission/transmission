@@ -505,12 +505,21 @@ void tr_session::rebind_ipv6_if_changed()
     dht_.reset();
 
     ipv6_bind_addr_ = addr;
-    udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
+    recreate_udp_core();
 
     if (settings_.dht_enabled)
     {
         dht_ = tr_dht::create(dht_mediator_, advertisedPeerPort(), udp_core_->socket4(), udp_core_->socket6());
     }
+}
+
+void tr_session::recreate_udp_core()
+{
+    // FreeBSD refuses to bind a second UDP socket to a port that is still
+    // held, even with SO_REUSEADDR. So we need to destroy the old UDP core
+    // before creating a new one.
+    udp_core_.reset();
+    udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
 }
 
 // ---
@@ -919,7 +928,7 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
     if (!udp_core_ || force || addr_changed || port_changed || utp_changed)
     {
         ipv6_bind_addr_ = bind_address(TR_AF_INET6);
-        udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
+        recreate_udp_core();
     }
 
     // Sends out announce messages with advertisedPeerPort(), so this
