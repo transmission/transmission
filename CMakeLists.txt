@@ -75,6 +75,7 @@ option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
 option(ENABLE_UTP "Build µTP support" ON)
+option(ENABLE_PSL "Build Public Suffix List support" ON)
 option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
@@ -571,9 +572,11 @@ tr_add_external_auto_library(DHT dht
     LIBNAME dht
     TARGET dht::dht)
 
-tr_add_external_auto_library(PSL libpsl
-    LIBNAME psl
-    TARGET psl::psl)
+if(ENABLE_PSL)
+    tr_add_external_auto_library(PSL libpsl
+        LIBNAME psl
+        TARGET psl::psl)
+endif()
 
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp
