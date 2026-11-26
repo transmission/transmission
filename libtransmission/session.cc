@@ -872,6 +872,9 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 
     if (!udp_core_ || force || addr_changed || port_changed || utp_changed)
     {
+        // tr_dht sends on udp_core_'s sockets and the DHT library allows only
+        // one instance, so the old tr_dht must go first. It is recreated below.
+        dht_.reset();
         udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
     }
 
