@@ -69,7 +69,8 @@ target_sources(libtransmission-test
         variant-test.cc
         watchdir-test.cc
         web-test.cc
-        web-utils-test.cc)
+        web-utils-test.cc
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:peer-socket-rtc-test.cc>)
 
 if(APPLE)
     target_sources(libtransmission-test
@@ -96,7 +97,8 @@ target_link_libraries(libtransmission-test
         dht::dht
         transmission::fmt-header-only
         libevent::core
-        WideInteger::WideInteger)
+        WideInteger::WideInteger
+        $<$<BOOL:${ENABLE_WEBTORRENT}>:LibDataChannel::LibDataChannel>)
 
 tr_setup_gtest_target(libtransmission-test "LT.")
 
