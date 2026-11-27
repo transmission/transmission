@@ -103,9 +103,15 @@ int compare_by_ratio(Torrent const& lhs, Torrent const& rhs)
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+int compare_only_by_state(Torrent const& lhs, Torrent const& rhs)
+{
+    return -tr_compare_3way(lhs.get_activity(), rhs.get_activity());
+}
+
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_state(Torrent const& lhs, Torrent const& rhs)
 {
-    if (auto val = -tr_compare_3way(lhs.get_activity(), rhs.get_activity()); val != 0)
+    if (auto val = compare_only_by_state(lhs, rhs); val != 0)
     {
         return val;
     }
@@ -133,7 +139,7 @@ int compare_by_activity(Torrent const& lhs, Torrent const& rhs)
         return val;
     }
 
-    if (auto val = compare_by_state(lhs, rhs); val != 0)
+    if (auto val = compare_only_by_state(lhs, rhs); val != 0)
     {
         return val;
     }

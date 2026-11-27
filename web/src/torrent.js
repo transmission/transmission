@@ -443,11 +443,11 @@ export class Torrent extends EventTarget {
 
     return b - a || Torrent.compareByQueue(ta, tb);
   }
-  static compareByState(ta, tb) {
+  static compareByState(ta, tb, thenByQueue = true) {
     const a = ta.getStatus();
     const b = tb.getStatus();
 
-    return b - a || Torrent.compareByQueue(ta, tb);
+    return b - a || thenByQueue ? Torrent.compareByQueue(ta, tb) : 0;
   }
   static compareByActivity(ta, tb) {
     const a = ta.getActivity();
@@ -455,7 +455,7 @@ export class Torrent extends EventTarget {
     const date_a = ta.getLastActivityOrDateAdded();
     const date_b = tb.getLastActivityOrDateAdded();
 
-    return b - a || Torrent.compareByState(ta, tb) || date_b - date_a;
+    return b - a || Torrent.compareByState(ta, tb, false) || date_b - date_a;
   }
   static compareByRatio(ta, tb) {
     const a = ta.getUploadRatio();

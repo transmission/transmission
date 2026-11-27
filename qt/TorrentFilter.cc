@@ -142,7 +142,8 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
             val = a->getActivity() <=> b->getActivity();
         }
 
-        if (val == 0)
+        // Skip queue sort if we're planning to sort by activity date, this would ruin that
+        if (val == 0 && sortModePref != SortMode::SortByActivity)
         {
             val = b->queuePosition() <=> a->queuePosition();
         }
