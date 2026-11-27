@@ -14,7 +14,7 @@ public:
     }
 
     explicit Percents(float value) noexcept
-        : raw_value_(static_cast<int>(std::round(value * 10000)))
+        : raw_value_(static_cast<int>(std::floor(value * 10000)))
     {
     }
 
