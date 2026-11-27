@@ -174,6 +174,9 @@ export class Torrent extends EventTarget {
   getLastActivity() {
     return this.fields.activity_date;
   }
+  getLastActivityOrDateAdded() {
+    return this.getLastActivity() || this.getDateAdded();
+  }
   getLeftUntilDone() {
     return this.fields.left_until_done;
   }
@@ -440,17 +443,19 @@ export class Torrent extends EventTarget {
 
     return b - a || Torrent.compareByQueue(ta, tb);
   }
-  static compareByState(ta, tb) {
+  static compareByState(ta, tb, thenByQueue = true) {
     const a = ta.getStatus();
     const b = tb.getStatus();
 
-    return b - a || Torrent.compareByQueue(ta, tb);
+    return b - a || thenByQueue ? Torrent.compareByQueue(ta, tb) : 0;
   }
   static compareByActivity(ta, tb) {
     const a = ta.getActivity();
     const b = tb.getActivity();
+    const date_a = ta.getLastActivityOrDateAdded();
+    const date_b = tb.getLastActivityOrDateAdded();
 
-    return b - a || Torrent.compareByState(ta, tb);
+    return b - a || Torrent.compareByState(ta, tb, false) || date_b - date_a;
   }
   static compareByRatio(ta, tb) {
     const a = ta.getUploadRatio();
@@ -605,6 +610,7 @@ Torrent.Fields.Metadata = [
 
 // commonly used fields which need to be periodically refreshed
 Torrent.Fields.Stats = [
+  'activity_date',
   'error',
   'error_string',
   'eta',
