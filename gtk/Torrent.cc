@@ -152,6 +152,7 @@ public:
 
         size_t queue_position = {};
 
+        time_t activity_date = {};
         time_t added_date = {};
         time_t eta = {};
 
@@ -288,6 +289,7 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
     update_cache_value(cache_.stalled, stats.is_stalled, result, ChangeFlag::STALLED);
     update_cache_value(cache_.ratio, stats.upload_ratio, 0.01F, result, ChangeFlag::RATIO);
 
+    update_cache_value(cache_.activity_date, stats.activity_date, result, ChangeFlag::ACTIVITY_DATE);
     update_cache_value(cache_.added_date, stats.added_date, result, ChangeFlag::ADDED_DATE);
     update_cache_value(cache_.eta, stats.eta, result, ChangeFlag::ETA);
     update_cache_value(cache_.percent_complete, Percents(stats.percent_complete), result, ChangeFlag::PERCENT_COMPLETE);
@@ -826,6 +828,11 @@ float Torrent::get_ratio() const
 time_t Torrent::get_eta() const
 {
     return impl_->get_cache().eta;
+}
+
+time_t Torrent::get_activity_date() const
+{
+    return impl_->get_cache().activity_date;
 }
 
 time_t Torrent::get_added_date() const

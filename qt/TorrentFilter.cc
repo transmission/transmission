@@ -82,7 +82,8 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     auto const* a = sourceModel()->data(left, TorrentModel::TorrentRole).value<Torrent const*>();
     auto const* b = sourceModel()->data(right, TorrentModel::TorrentRole).value<Torrent const*>();
 
-    switch (prefs_.get<SortMode>(TR_KEY_sort_mode))
+    SortMode sortModePref = prefs_.get<SortMode>(TR_KEY_sort_mode);
+    switch (sortModePref)
     {
     case SortMode::SortByQueue:
         if (val == 0)
@@ -149,6 +150,14 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
         if (val == 0)
         {
             val = static_cast<int>(a->hasError()) <=> static_cast<int>(b->hasError());
+        }
+
+        // Checking if we fell through to SortByState from a failure to SortByActivity.
+        // We can also sort by last activity date, but we want to prioritize sort by
+        // state before that. It does end up looking kind of awkward to check this again.
+        if (val == 0 && sortModePref == SortMode::SortByActivity)
+        {
+            val = a->lastActivityOrDateAdded() <=> b->lastActivityOrDateAdded();
         }
 
         [[fallthrough]];

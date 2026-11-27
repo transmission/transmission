@@ -46,6 +46,7 @@ public:
         ACTIVE_PEERS_UP,
         ACTIVE,
         ACTIVITY,
+        ACTIVITY_DATE,
         ADDED_DATE,
         ERROR_CODE,
         ERROR_MESSAGE,
@@ -82,6 +83,7 @@ public:
     int get_active_peers_up() const;
     bool get_active() const;
     tr_torrent_activity get_activity() const;
+    time_t get_activity_date() const;
     time_t get_added_date() const;
     tr_stat::Error get_error_code() const;
     Glib::ustring const& get_error_message() const;

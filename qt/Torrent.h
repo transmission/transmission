@@ -323,6 +323,11 @@ public:
         return activity_date_;
     }
 
+    [[nodiscard]] constexpr auto lastActivityOrDateAdded() const noexcept
+    {
+        return activity_date_ != 0 ? activity_date_ : added_date_;
+    }
+
     [[nodiscard]] constexpr auto lastStarted() const noexcept
     {
         return start_date_;

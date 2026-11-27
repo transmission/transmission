@@ -544,6 +544,7 @@ using TorrentProperties = Session::TorrentProperties;
         // union of MainInfoKeys + MainStatKeys
         case TorrentProperties::MainAll:
             return {
+                TR_KEY_activity_date,
                 TR_KEY_added_date,
                 TR_KEY_download_dir,
                 TR_KEY_downloaded_ever,
@@ -601,6 +602,7 @@ using TorrentProperties = Session::TorrentProperties;
         // changing fields needed by the main window
         case TorrentProperties::MainStats:
             return {
+                TR_KEY_activity_date,
                 TR_KEY_downloaded_ever,
                 TR_KEY_edit_date,
                 TR_KEY_error,

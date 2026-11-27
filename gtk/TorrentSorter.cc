@@ -103,6 +103,23 @@ int compare_by_ratio(Torrent const& lhs, Torrent const& rhs)
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+int compare_by_state(Torrent const& lhs, Torrent const& rhs)
+{
+    if (auto val = -tr_compare_3way(lhs.get_activity(), rhs.get_activity()); val != 0)
+    {
+        return val;
+    }
+
+    return compare_by_queue(lhs, rhs);
+}
+
+time_t get_activity_date_or_added(Torrent const& torrent)
+{
+    auto const activity_date = torrent.get_activity_date();
+    return activity_date != 0 ? activity_date : torrent.get_added_date();
+}
+
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_activity(Torrent const& lhs, Torrent const& rhs)
 {
     if (auto val = -tr_compare_3way(lhs.get_speed_up() + lhs.get_speed_down(), rhs.get_speed_up() + rhs.get_speed_down());
@@ -116,7 +133,12 @@ int compare_by_activity(Torrent const& lhs, Torrent const& rhs)
         return val;
     }
 
-    return compare_by_queue(lhs, rhs);
+    if (auto val = compare_by_state(lhs, rhs); val != 0)
+    {
+        return val;
+    }
+
+    return -tr_compare_3way(get_activity_date_or_added(lhs), get_activity_date_or_added(rhs));
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
@@ -173,17 +195,6 @@ int compare_by_eta(Torrent const& lhs, Torrent const& rhs)
 
     return compare_by_name(lhs, rhs);
 }
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_by_state(Torrent const& lhs, Torrent const& rhs)
-{
-    if (auto val = -tr_compare_3way(lhs.get_activity(), rhs.get_activity()); val != 0)
-    {
-        return val;
-    }
-
-    return compare_by_queue(lhs, rhs);
-}
 } // namespace
 
 TorrentSorter::TorrentSorter()
@@ -238,7 +249,9 @@ void TorrentSorter::update(Torrent::ChangeFlags changes)
 {
     using Flag = Torrent::ChangeFlag;
     static auto TR_CONSTEXPR23 CompareFlags = std::array<std::pair<CompareFunc, Torrent::ChangeFlags>, 9U>{ {
-        { &compare_by_activity, Flag::ACTIVE_PEER_COUNT | Flag::QUEUE_POSITION | Flag::SPEED_DOWN | Flag::SPEED_UP },
+        { &compare_by_activity,
+          Flag::ACTIVE_PEER_COUNT | Flag::ACTIVITY | Flag::ACTIVITY_DATE | Flag::ADDED_DATE | Flag::QUEUE_POSITION |
+              Flag::SPEED_DOWN | Flag::SPEED_UP },
         { &compare_by_age, Flag::ADDED_DATE | Flag::NAME },
         { &compare_by_eta, Flag::ETA | Flag::NAME },
         { &compare_by_name, Flag::NAME },
