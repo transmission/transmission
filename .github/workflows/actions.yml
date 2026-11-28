@@ -287,7 +287,9 @@ jobs:
           if grep 'warning:' makelog; then exit 1; fi
 
   clang-tidy-libtransmission-win32:
-    runs-on: windows-2025
+    # windows-2025's MSVC STL rejects Clang older than 22 (error STL1000),
+    # and this project's clang-tidy is 20
+    runs-on: windows-2022
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-core == 'true' || needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
